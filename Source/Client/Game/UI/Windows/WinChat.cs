@@ -126,16 +126,15 @@ public static class WinChat
         {
             return;
         }
-        
-        var windowIndex = Gui.GetWindowIndex("winChat");
-        var controlIndex = Gui.GetControlIndex("winChat", "txtChat");
 
-        Gui.ShowWindow("winChat", resetPosition: false);
+        Gui.ShowWindow(winChat, resetPosition: false);
+        Gui.MoveToFront(winChat);
+
         Gui.HideWindow("winChatSmall");
 
-        Gui.ActiveWindow = winChat;
-        Gui.SetActiveControl(windowIndex, controlIndex);
-        Gui.Windows[windowIndex].Controls[controlIndex].Visible = true;
+        winChat.GetChild("txtChat").Visible = true;
+
+        Gui.SetActiveControl(winChat, "txtChat");
 
         GameState.InSmallChat = false;
         GameState.ChatScroll = 0;
@@ -148,16 +147,17 @@ public static class WinChat
         {
             return;
         }
-        
-        var windowIndex = Gui.GetWindowIndex("winChat");
-        var controlIndex = Gui.GetControlIndex("winChat", "txtChat");
 
-        Gui.ShowWindow("winChatSmall", resetPosition: false);
-        Gui.HideWindow("winChat");
+        var winChatSmall = Gui.GetWindowByName("winChatSmall");
+        if (winChatSmall is null)
+        {
+            return;
+        }
 
-        Gui.ActiveWindow = winChat;
-        Gui.SetActiveControl(windowIndex, controlIndex);
-        Gui.Windows[windowIndex].Controls[controlIndex].Visible = false;
+        Gui.ShowWindow(winChatSmall, resetPosition: false);
+        Gui.HideWindow(winChat);
+
+        winChat.GetChild("txtChat").Visible = false;
 
         GameState.InSmallChat = true;
         GameState.ChatScroll = 0;

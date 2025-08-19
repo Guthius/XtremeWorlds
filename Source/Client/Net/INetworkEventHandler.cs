@@ -2,5 +2,6 @@
 
 public interface INetworkEventHandler
 {
-    Task OnBytesReceivedAsync(ReadOnlyMemory<byte> bytes, CancellationToken cancellationToken);
+    ValueTask OnBytesReceivedAsync(ReadOnlyMemory<byte> bytes, CancellationToken cancellationToken);
+    ValueTask OnConnectionLostAsync(CancellationToken cancellationToken);
 }

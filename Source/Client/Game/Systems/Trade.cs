@@ -7,13 +7,13 @@ using Core.Net;
 
 namespace Client
 {
-
     public class Trade
     {
         public static void CloseTrade()
         {
             InTrade = -1;
-            Gui.HideWindow(Gui.GetWindowIndex("winTrade"));
+            
+            Gui.HideWindow("winTrade");
         }
 
         #region Globals & Type

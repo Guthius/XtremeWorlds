@@ -71,8 +71,8 @@ public static class WindowRenderer
                 RenderWindowParty(window);
                 break;
         }
-
-        window.OnDraw?.Invoke();
+        
+        window.Render();
     }
 
     private static void RenderWindowBlack(Window window)

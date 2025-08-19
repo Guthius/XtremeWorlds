@@ -5,6 +5,8 @@ namespace Client.Game.UI.Controls;
 
 public sealed class Label : Control
 {
+    public Alignment Align { get; set; } = Alignment.Left;
+    
     public override void Render(int x, int y)
     {
         if (string.IsNullOrEmpty(Text) || Font == Font.None)
@@ -27,6 +29,8 @@ public sealed class Label : Control
                 RenderCenterAligned(x, y);
                 break;
         }
+        
+        OnDraw();
     }
 
     private void RenderLeftAligned(int x, int y)

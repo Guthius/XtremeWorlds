@@ -4,6 +4,9 @@ using Client.Net;
 using Core.Globals;
 using Eto.Forms;
 using Eto.Drawing;
+using Serilog;
+using Serilog.Core;
+using Serilog.Sinks.SystemConsole.Themes;
 
 namespace Client;
 
@@ -16,15 +19,20 @@ public static class Program
     [STAThread]
     public static void Main()
     {
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .WriteTo.Console(theme: AnsiConsoleTheme.Literate)
+            .CreateLogger();
+
         // Start game loop on background thread so Eto UI thread stays responsive
-    var gameThread = new System.Threading.Thread(RunGame) { IsBackground = false };
+        var gameThread = new Thread(RunGame) {IsBackground = false};
         gameThread.Start();
 
         // Start Eto application & periodic UI updater
         // Explicitly specify Eto platform for Linux (Gtk) to avoid auto-detect failure
         // NOTE: Ensure package Eto.Platform.Gtk is referenced in the project (added centrally in Directory.Packages.props)
-    var app = new Application(Eto.Platform.Detect);
-        _uiTimer = new UITimer { Interval = 0.05 }; // 50ms (~20fps) for editor UI refresh logic
+        var app = new Application(Eto.Platform.Detect);
+        _uiTimer = new UITimer {Interval = 0.05}; // 50ms (~20fps) for editor UI refresh logic
         _uiTimer.Elapsed += UiTimerOnElapsed;
         _uiTimer.Start();
 
@@ -35,7 +43,7 @@ public static class Program
             ShowInTaskbar = false,
             ClientSize = new Size(1, 1),
         };
-    _rootForm.Shown += (s, e) => ((Form)s!).Visible = false;
+        _rootForm.Shown += (s, e) => ((Form) s!).Visible = false;
 
         app.Run(_rootForm);
     }
@@ -47,7 +55,7 @@ public static class Program
 
     private static void UiTimerOnElapsed(object? sender, EventArgs e)
     {
-        SafeUpdateEditors();
+       // SafeUpdateEditors();
     }
 
     private static void SafeUpdateEditors()
@@ -56,12 +64,22 @@ public static class Program
         {
             UpdateEditors();
         }
-        catch (ObjectDisposedException) { }
-        catch (InvalidOperationException) { }
+        catch (ObjectDisposedException)
+        {
+        }
+        catch (InvalidOperationException)
+        {
+        }
         catch (Exception ex)
         {
             // Prevent UI timer from dying due to unexpected exceptions
-            try { System.Console.WriteLine($"[UiTimer] Exception: {ex}"); } catch { }
+            try
+            {
+                System.Console.WriteLine($"[UiTimer] Exception: {ex}");
+            }
+            catch
+            {
+            }
         }
     }
 
@@ -87,9 +105,9 @@ public static class Program
             for (int i = 1, loopTo = GameState.MapNames.Length; i < loopTo; i++)
             {
                 var admin = Admin.Instance;
-                admin.lstMaps.Items.Add(new ListItem { Text = $"{i}: {GameState.MapNames[i]}" });
+                admin.lstMaps.Items.Add(new ListItem {Text = $"{i}: {GameState.MapNames[i]}"});
             }
-                
+
             GameState.InitMapReport = false;
         }
 
@@ -193,7 +211,11 @@ public static class Program
                 Editor_Animation.Instance?.picSprite1?.Invalidate();
             }
         }
-        catch { /* some editors may not be instantiated yet */ }
+        catch
+        {
+            /* some editors may not be instantiated yet */
+        }
+
         if (!GameState.InGame)
         {
             // Reset disposal flag when (re)entering non-game state
@@ -202,18 +224,102 @@ public static class Program
         else if (!_editorsDisposed)
         {
             // Dispose editors once when entering game state
-            try { Editor_Item.Instance?.Dispose(); } catch { }
-            try { Editor_Job.Instance?.Dispose(); } catch { }
-            try { Editor_Map.Instance?.Dispose(); } catch { }
-            try { Editor_Event.Instance?.Dispose(); } catch { }
-            try { Editor_Npc.Instance?.Dispose(); } catch { }
-            try { Editor_Projectile.Instance?.Dispose(); } catch { }
-            try { Editor_Resource.Instance?.Dispose(); } catch { }
-            try { Editor_Shop.Instance?.Dispose(); } catch { }
-            try { Editor_Skill.Instance?.Dispose(); } catch { }
-            try { Editor_Animation.Instance?.Dispose(); } catch { }
-            try { Editor_Moral.Instance?.Dispose(); } catch { }
-            try { Editor_Script.Instance?.Dispose(); } catch { }
+            try
+            {
+                Editor_Item.Instance?.Dispose();
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                Editor_Job.Instance?.Dispose();
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                Editor_Map.Instance?.Dispose();
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                Editor_Event.Instance?.Dispose();
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                Editor_Npc.Instance?.Dispose();
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                Editor_Projectile.Instance?.Dispose();
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                Editor_Resource.Instance?.Dispose();
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                Editor_Shop.Instance?.Dispose();
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                Editor_Skill.Instance?.Dispose();
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                Editor_Animation.Instance?.Dispose();
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                Editor_Moral.Instance?.Dispose();
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                Editor_Script.Instance?.Dispose();
+            }
+            catch
+            {
+            }
+
             // TODO: track Admin form instance and close if open
             _editorsDisposed = true;
         }
@@ -227,6 +333,8 @@ public static class Program
             // Close the hidden root form, which ends Application.Run
             Application.Instance?.AsyncInvoke(() => _rootForm?.Close());
         }
-        catch { }
+        catch
+        {
+        }
     }
 }

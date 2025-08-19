@@ -1,5 +1,6 @@
 ﻿using System.IO.Compression;
 using System.Runtime.InteropServices;
+using Serilog;
 
 namespace Client.Net;
 
@@ -58,11 +59,16 @@ public abstract class PacketParser<TPacketId> where TPacketId : Enum
         {
             packetId = (int) (packetId & ~CompressionFlag);
         }
-        
+
         if (!Enum.IsDefined(typeof(TPacketId), packetId))
         {
+            Log.Warning("Received unsupported packet (ID={PacketId}) from server, packet will be ignored", packetId);
+
             return;
         }
+
+        Log.Debug("Received {PacketId} packet (Size={PacketSize}, Compression={CompressionType}) from server",
+            (TPacketId) (object) packetId, packetData.Length, compressed ? "GZip" : "None");
 
         if (!_handlers.TryGetValue(packetId, out var handler))
         {

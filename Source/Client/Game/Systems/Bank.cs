@@ -22,7 +22,7 @@ namespace Client
 
             for (x = 0; x < Constant.MaxPlayers; x++)
             {
-                Data.Bank[x].Item = new Type.PlayerInv[(Constant.MaxBank + 1)];
+                Data.Bank[x].Item = new Type.PlayerInv[Constant.MaxBank + 1];
 
                 for (i = 0; i < Constant.MaxBank; i++)
                 {
@@ -49,7 +49,7 @@ namespace Client
 
             GameState.InBank = true;
 
-            if (!(Gui.Windows[Gui.GetWindowIndex("winBank")].Visible == true))
+            if (!Gui.Windows[Gui.GetWindowIndex("winBank")].Visible)
             {
                 Gui.ShowWindow(Gui.GetWindowIndex("winBank"), resetPosition: false);
             }
@@ -94,10 +94,10 @@ namespace Client
 
         public static void CloseBank()
         {
-            if (Gui.Windows[Gui.GetWindowIndex("winBank")].Visible == true)
+            if (Gui.Windows[Gui.GetWindowIndex("winBank")].Visible)
             {
-                Gui.HideWindow(Gui.GetWindowIndex("winBank"));
-                Gui.HideWindow(Gui.GetWindowIndex("winDescription"));
+                Gui.HideWindow("winBank");
+                Gui.HideWindow("winDescription");
             }
 
             var packetWriter = new PacketWriter(4);

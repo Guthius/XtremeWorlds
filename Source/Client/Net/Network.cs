@@ -1,5 +1,6 @@
-﻿using Core;
+﻿using Client.Game.UI;
 using Core.Configurations;
+using Core.Globals;
 using Core.Net;
 
 namespace Client.Net;
@@ -13,7 +14,7 @@ public static class Network
         private readonly byte[] _buffer = new byte[BufferSize];
         private int _bufferOffset;
         
-        public Task OnBytesReceivedAsync(ReadOnlyMemory<byte> bytes, CancellationToken cancellationToken)
+        public ValueTask OnBytesReceivedAsync(ReadOnlyMemory<byte> bytes, CancellationToken cancellationToken)
         {
             var space = BufferSize - _bufferOffset;
             if (bytes.Length > space)
@@ -26,13 +27,13 @@ public static class Network
             _bufferOffset += bytes.Length;
             if (_bufferOffset == 0)
             {
-                return Task.CompletedTask;
+                return ValueTask.CompletedTask;
             }
 
             var count = _parser.Parse(_buffer.AsMemory(0, _bufferOffset));
             if (count == 0)
             {
-                return Task.CompletedTask;
+                return ValueTask.CompletedTask;
             }
 
             var bytesLeft = _bufferOffset - count;
@@ -43,7 +44,19 @@ public static class Network
 
             _bufferOffset = bytesLeft;
             
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
+        }
+
+        public ValueTask OnConnectionLostAsync(CancellationToken cancellationToken)
+        {
+            _bufferOffset = 0;
+            
+            Gui.HideWindows();
+            Gui.ShowWindow("winLogin");
+            
+            GameLogic.DialogueAlert(SystemMessage.Connection);
+
+            return ValueTask.CompletedTask;
         }
     }
 

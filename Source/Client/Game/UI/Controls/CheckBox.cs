@@ -14,7 +14,8 @@ public sealed class CheckBox : Control
     private const int SpriteSellingUnchecked = 59;
 
     public int Group { get; set; }
-    
+    public Alignment Align { get; set; } = Alignment.Left;
+
     public override void Render(int x, int y)
     {
         switch (Design)
@@ -36,12 +37,14 @@ public sealed class CheckBox : Control
                 RenderSelling(x, y);
                 break;
         }
+        
+        OnDraw();
     }
 
     private void RenderNormal(int x, int y)
     {
         var sprite = Value == 0 ? SpriteUnchecked : SpriteChecked;
-        var path = Path.Combine(Texture[0], sprite.ToString());
+        var path = Path.Combine(DataPath.Gui, sprite.ToString());
 
         GameClient.RenderTexture(ref path, X + x, Y + y, 0, 0, 16, 16, 16, 16);
 
@@ -71,16 +74,16 @@ public sealed class CheckBox : Control
 
     private void RenderBuying(int x, int y)
     {
-        var sprite = Value == 0L ? SpriteBuyingUnchecked : SpriteBuyingChecked;
-        var path = Path.Combine(Texture[0], sprite.ToString());
+        var sprite = Value == 0 ? SpriteBuyingUnchecked : SpriteBuyingChecked;
+        var path = Path.Combine(DataPath.Gui, sprite.ToString());
 
         GameClient.RenderTexture(ref path, X + x, Y + y, 0, 0, 49, 20, 49, 20);
     }
 
     private void RenderSelling(int x, int y)
     {
-        var sprite = Value == 0L ? SpriteSellingUnchecked : SpriteSellingChecked;
-        var path = Path.Combine(Texture[0], sprite.ToString());
+        var sprite = Value == 0 ? SpriteSellingUnchecked : SpriteSellingChecked;
+        var path = Path.Combine(DataPath.Gui, sprite.ToString());
 
         GameClient.RenderTexture(ref path, X + x, Y + y, 0, 0, 49, 20, 49, 20);
     }

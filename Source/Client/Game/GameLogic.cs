@@ -901,7 +901,7 @@ namespace Client
             }
         }
 
-        public static void DialogueAlert(byte index)
+        public static void DialogueAlert(SystemMessage index)
         {
             var header = default(string);
             var body = default(string);
@@ -910,7 +910,7 @@ namespace Client
             // find the body/header
             switch (index)
             {
-                case (byte)SystemMessage.Connection:
+                case SystemMessage.Connection:
                     {
                         header = "Invalid Connection";
                         body = "You lost connection to the game server.";
@@ -919,7 +919,7 @@ namespace Client
                         break;
                     }
 
-                case (byte)SystemMessage.Banned:
+                case SystemMessage.Banned:
                     {
                         header = "Banned";
                         body = "You have been banned, have a nice day!";
@@ -928,7 +928,7 @@ namespace Client
                         break;
                     }
 
-                case (byte)SystemMessage.Kicked:
+                case SystemMessage.Kicked:
                     {
                         header = "Kicked";
                         body = "You have been kicked.";
@@ -937,7 +937,7 @@ namespace Client
                         break;
                     }
 
-                case (byte)SystemMessage.ClientOutdated:
+                case SystemMessage.ClientOutdated:
                     {
                         header = "Wrong Version";
                         body = "Your game client is the wrong version.";
@@ -945,7 +945,7 @@ namespace Client
                         break;
                     }
 
-                case (byte)SystemMessage.ServerMaintenance:
+                case SystemMessage.ServerMaintenance:
                     {
                         header = "Connection Refused";
                         body = "The server is currently going under maintenance.";
@@ -953,7 +953,7 @@ namespace Client
                         break;
                     }
 
-                case (byte)SystemMessage.NameTaken:
+                case SystemMessage.NameTaken:
                     {
                         header = "Invalid Name";
                         body = "This name is already in use.";
@@ -961,7 +961,7 @@ namespace Client
                         break;
                     }
 
-                case (byte)SystemMessage.NameLengthInvalid:
+                case SystemMessage.NameLengthInvalid:
                     {
                         header = "Invalid Name";
                         body = "This name is too short or too long.";
@@ -969,7 +969,7 @@ namespace Client
                         break;
                     }
 
-                case (byte)SystemMessage.NameContainsIllegalChars:
+                case SystemMessage.NameContainsIllegalChars:
                     {
                         header = "Invalid Name";
                         body = "This name contains illegal characters.";
@@ -977,7 +977,7 @@ namespace Client
                         break;
                     }
 
-                case (byte)SystemMessage.DatabaseError:
+                case SystemMessage.DatabaseError:
                     {
                         header = "Invalid Connection";
                         body = "Cannot connect to database.";
@@ -985,7 +985,7 @@ namespace Client
                         break;
                     }
 
-                case (byte)SystemMessage.WrongPassword:
+                case SystemMessage.WrongPassword:
                     {
                         header = "Invalid Login";
                         body = "Invalid username or password.";
@@ -994,7 +994,7 @@ namespace Client
                         break;
                     }
 
-                case (byte)SystemMessage.AccountActivationRequired:
+                case SystemMessage.AccountActivationRequired:
                     {
                         header = "Inactive Account";
                         body = "Your account is not activated.";
@@ -1002,7 +1002,7 @@ namespace Client
                         break;
                     }
 
-                case (byte)SystemMessage.MaxCharactersReached:
+                case SystemMessage.MaxCharactersReached:
                     {
                         header = "Cannot Merge";
                         body = "You cannot merge a full account.";
@@ -1010,7 +1010,7 @@ namespace Client
                         break;
                     }
 
-                case (byte)SystemMessage.ConfirmCharacterDeletion:
+                case SystemMessage.ConfirmCharacterDeletion:
                     {
                         header = "Deleted Character";
                         body = "Your character was successfully deleted.";
@@ -1018,7 +1018,7 @@ namespace Client
                         break;
                     }
 
-                case (byte)SystemMessage.CreateAccount:
+                case SystemMessage.CreateAccount:
                     {
                         header = "Account Created";
                         body = "Your account was successfully created.";
@@ -1026,7 +1026,7 @@ namespace Client
                         break;
                     }
 
-                case (byte)SystemMessage.MultipleAccountsNotAllowed:
+                case SystemMessage.MultipleAccountsNotAllowed:
                     {
                         header = "Multiple Accounts";
                         body = "Multiple accounts are not authorized.";
@@ -1034,7 +1034,7 @@ namespace Client
                         break;
                     }
 
-                case (byte)SystemMessage.Login:
+                case SystemMessage.Login:
                     {
                         header = "Cannot Login";
                         body = "This account does not exist.";
@@ -1042,7 +1042,7 @@ namespace Client
                         break;
                     }
 
-                case (byte)SystemMessage.Crashed:
+                case SystemMessage.Crashed:
                     {
                         header = "Error";
                         body = "There was a network error.";
@@ -1060,12 +1060,12 @@ namespace Client
 
         public static void CloseDialogue()
         {
-            Gui.HideWindow(Gui.GetWindowIndex("winDialogue"));
+            Gui.HideWindow("winDialogue");
         }
 
         public static void Dialogue(string header, string body, string body2, DialogueType index, DialogueStyle style = 0, long data1 = 0L, long data2 = 0L, long data3 = 0L, long data4 = 0L, long data5 = 0L)
         {
-            if (Gui.Windows[Gui.GetWindowIndex("winDialogue")].Visible == true)
+            if (Gui.Windows[Gui.GetWindowIndex("winDialogue")].Visible)
                 return;
 
             // set buttons
@@ -2172,13 +2172,18 @@ namespace Client
                     amount = GetPlayerInvValue(GameState.MyIndex, (int)i);
                 }
             }
-            Gui.Windows[Gui.GetWindowIndex("winShop")].Controls[Gui.GetControlIndex("winShop", "lblGold")].Text = Strings.Format(amount, "#,###,###,###") + "g";
-            Gui.Windows[Gui.GetWindowIndex("winInventory")].Controls[Gui.GetControlIndex("winInventory", "lblGold")].Text = Strings.Format(amount, "#,###,###,###") + "g";
-        }
 
-        public static int Clamp(int value, int min, int max)
-        {
-            return value < min ? min : value > max ? max : value;
+            // var winShop = Gui.GetWindowByName("winShop");
+            // if (winShop is not null)
+            // {
+            //     winShop.GetChild("lblGold").Text = Strings.Format(amount, "#,###,###,###") + "g";
+            // }
+
+            // var winInventory = Gui.GetWindowByName("winInventory");
+            // if (winInventory is not null)
+            // {
+            //     winInventory.GetChild("lblGold").Text = Strings.Format(amount, "#,###,###,###") + "g";
+            // }
         }
 
         public static int ConvertMapX(int x)

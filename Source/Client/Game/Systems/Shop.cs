@@ -14,8 +14,10 @@ namespace Client
         public static void CloseShop()
         {
             Sender.SendCloseShop();
-            Gui.HideWindow(Gui.GetWindowIndex("winShop"));
-            Gui.HideWindow(Gui.GetWindowIndex("winDescription"));
+            
+            Gui.HideWindow("winShop");
+            Gui.HideWindow("winDescription");
+            
             GameState.ShopSelectedSlot = 0;
             GameState.ShopSelectedItem = 0;
             GameState.ShopIsSelling = false;

@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Window Name="winEscMenu"
+        Size="210, 156"
+        Design="WindowNormal"
+        StartPosition="CenterScreen"
+        Visible="False" CanDrag="False">
+
+    <PictureBox Position="6, 26" Size="198, 144" Design="Parchment"/>
+
+    <Button Name="btnReturn" Text="Return to Game"
+            Position="16, 16" Size="178, 28"
+            Design="Green"
+            DesignHover="GreenHover"
+            DesignMouseDown="GreenClick"/>
+
+    <Button Name="btnOptions" Text="Options"
+            Position="16, 48" Size="178, 28"
+            Design="Orange"
+            DesignHover="OrangeHover"
+            DesignMouseDown="OrangeClick"/>
+
+    <Button Name="btnMainMenu" Text="Back to Main Menu"
+            Position="16, 80" Size="178, 28"
+            Design="Blue"
+            DesignHover="BlueHover"
+            DesignMouseDown="BlueClick"/>
+
+    <Button Name="btnExit" Text="Exit the Game"
+            Position="16, 112" Size="178, 28"
+            Design="Red"
+            DesignHover="RedHover"
+            DesignMouseDown="RedClick"/>
+
+</Window>

@@ -377,11 +377,12 @@ namespace Client
             scrlResource.MinValue = 0; scrlResource.MaxValue = Constant.MaxResources - 1; scrlResource.ValueChanged += ScrlResource_ValueChanged;
             btnResourceOk.Click += BtnResourceOk_Click;
 
-            lstNpc.SelectedIndex = 0;
+            //lstNpc.SelectedIndex = 0;
             scrlNpcDir.MinValue = 0; scrlNpcDir.MaxValue = 3; scrlNpcDir.ValueChanged += ScrlNpcDir_Scroll;
             btnNpcSpawn.Click += BtnNpcSpawn_Click;
 
-            cmbShop.SelectedIndex = 0; btnShop.Click += BtnShop_Click;
+            //cmbShop.SelectedIndex = 0; 
+            btnShop.Click += BtnShop_Click;
 
             cmbHeal.Items.Clear();
             cmbHeal.Items.Add("Hp");
@@ -391,7 +392,8 @@ namespace Client
 
             scrlTrap.MinValue = 1; scrlTrap.MaxValue = 255; scrlTrap.ValueChanged += ScrlTrap_ValueChanged; btnTrap.Click += BtnTrap_Click;
 
-            cmbAnimation.SelectedIndex = 0; brnAnimation.Click += brnAnimation_Click;
+            //cmbAnimation.SelectedIndex = 0; 
+            brnAnimation.Click += brnAnimation_Click;
 
             btnFillAttributes.Click += btnFillAttributes_Click;
 
@@ -578,7 +580,7 @@ namespace Client
             // Slot 0 is reserved as "None" and not assignable
             if (slot == 0)
             {
-                cmbNpcList.SelectedIndex = 0;
+                //cmbNpcList.SelectedIndex = 0;
                 return;
             }
 
@@ -2184,9 +2186,9 @@ namespace Client
             Sender.SendCloseEditor();
 
             // show gui
-            Gui.ShowWindow(Gui.GetWindowIndex("winHotbar"), resetPosition: false);
-            Gui.ShowWindow(Gui.GetWindowIndex("winMenu"), resetPosition: false);
-            Gui.ShowWindow(Gui.GetWindowIndex("winBars"), resetPosition: false);
+            Gui.ShowWindow("winHotbar", resetPosition: false);
+            Gui.ShowWindow("winMenu", resetPosition: false);
+            Gui.ShowWindow("winBars", resetPosition: false);
             WinChat.Hide();
 
             Editor_Event.CloseIfOpen();
@@ -2203,9 +2205,9 @@ namespace Client
             Sender.SendCloseEditor();
 
             // show gui
-            Gui.ShowWindow(Gui.GetWindowIndex("winHotbar"), resetPosition: false);
-            Gui.ShowWindow(Gui.GetWindowIndex("winMenu"), resetPosition: false);
-            Gui.ShowWindow(Gui.GetWindowIndex("winBars"), resetPosition: false);
+            Gui.ShowWindow("winHotbar", resetPosition: false);
+            Gui.ShowWindow("winMenu", resetPosition: false);
+            Gui.ShowWindow("winBars", resetPosition: false);
             WinChat.Hide();
 
             Editor_Event.CloseIfOpen();

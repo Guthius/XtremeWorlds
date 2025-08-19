@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Core.Globals;
+using Microsoft.Xna.Framework;
 
 namespace Client.Game.UI.Controls;
 
@@ -23,10 +24,12 @@ public sealed class ComboBox : Control
                     }
                 }
 
-                var path = Path.Combine(Texture[0], ArrowSprite.ToString());
+                var path = Path.Combine(DataPath.Gui, ArrowSprite.ToString());
 
                 GameClient.RenderTexture(ref path, X + x + Width, Y + y, 0, 0, 5, 4, 5, 4);
                 break;
         }
+        
+        OnDraw();
     }
 }

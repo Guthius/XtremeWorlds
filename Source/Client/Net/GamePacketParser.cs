@@ -151,36 +151,36 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             switch ((Menu) menuReset)
             {
                 case Menu.Login:
-                    Gui.ShowWindow(Gui.GetWindowIndex("winLogin"));
+                    Gui.ShowWindow("winLogin");
                     break;
 
                 case Menu.CharacterSelect:
-                    Gui.ShowWindow(Gui.GetWindowIndex("winChars"));
+                    Gui.ShowWindow("winChars");
                     break;
 
                 case Menu.JobSelection:
-                    Gui.ShowWindow(Gui.GetWindowIndex("winJobs"));
+                    Gui.ShowWindow("winJobs");
                     break;
 
                 case Menu.NewCharacter:
-                    Gui.ShowWindow(Gui.GetWindowIndex("winNewChar"));
+                    Gui.ShowWindow("winNewChar");
                     break;
 
                 case Menu.MainMenu:
-                    Gui.ShowWindow(Gui.GetWindowIndex("winLogin"));
+                    Gui.ShowWindow("winLogin");
                     break;
 
                 case Menu.Register:
-                    Gui.ShowWindow(Gui.GetWindowIndex("winRegister"));
+                    Gui.ShowWindow("winRegister");
                     break;
             }
         }
         else if (kick > 0 || GameState.InGame)
         {
-            Gui.ShowWindow(Gui.GetWindowIndex("winLogin"));
+            Gui.ShowWindow("winLogin");
         }
 
-        GameLogic.DialogueAlert(dialogueIndex);
+        GameLogic.DialogueAlert((SystemMessage)dialogueIndex);
     }
 
     private static void Packet_LoginOk(ReadOnlyMemory<byte> data)
@@ -217,17 +217,17 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Gui.HideWindows();
         Gui.ShowWindow(Gui.GetWindowIndex("winChars"));
 
-        long winNum = Gui.GetWindowIndex("winChars");
-        for (var i = 0L; i < Constant.MaxChars; i++)
+        var winNum = Gui.GetWindowIndex("winChars");
+        for (var i = 0; i < Constant.MaxChars; i++)
         {
             long conNum = Gui.GetControlIndex("winChars", "lblCharName_" + (i + 1));
             {
                 var control = Gui.Windows[winNum].Controls[(int) conNum];
 
-                control.Text = !isSlotEmpty[(int) i] ? GameState.CharName[(int) i] : "Blank Slot";
+                control.Text = !isSlotEmpty[i] ? GameState.CharName[i] : "Blank Slot";
             }
 
-            if (isSlotEmpty[(int) i])
+            if (isSlotEmpty[i])
             {
                 // create button
                 conNum = Gui.GetControlIndex("winChars", "btnCreateChar_" + (i + 1));
@@ -331,9 +331,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         GameState.SkillBuffer = -1;
         GameState.InShop = -1;
 
-        Gui.ShowWindow(Gui.GetWindowIndex("winHotbar"), resetPosition: false);
-        Gui.ShowWindow(Gui.GetWindowIndex("winMenu"), resetPosition: false);
-        Gui.ShowWindow(Gui.GetWindowIndex("winBars"), resetPosition: false);
+        Gui.ShowWindow("winHotbar", resetPosition: false);
+        Gui.ShowWindow("winMenu", resetPosition: false);
+        Gui.ShowWindow("winBars", resetPosition: false);
         WinChat.Hide();
 
         General.GameInit();

@@ -5,18 +5,27 @@ namespace Client.Game.UI.Controls;
 
 public sealed class Button : Control
 {
+    private bool _isMouseOver;
+    private bool _isMousePressed;
+
+    public int Icon { get; set; }
+    public Design? DesignHover { get; set; }
+    public Design? DesignMouseDown { get; set; }
+    public int? ImageHover { get; set; }
+    public int? ImageMouseDown { get; set; }
+
     public override void Render(int x, int y)
     {
-        var design = GetActiveDesign();
+        var design = GetDesign();
         if (design != Design.None)
         {
             DesignRenderer.Render(design, X + x, Y + y, Width, Height);
         }
 
-        var image = GetActiveImage();
+        var image = GetImage();
         if (image is not null)
         {
-            var path = Path.Combine(Texture[(int) State], image.Value.ToString());
+            var path = Path.Combine(DataPath.Gui, image.Value.ToString());
 
             GameClient.RenderTexture(ref path,
                 X + x,
@@ -53,5 +62,76 @@ public sealed class Button : Control
             (int) Math.Round(textY),
             Color, Color.Black,
             Font);
+
+        OnDraw();
+    }
+
+    private Design GetDesign()
+    {
+        Design? design = null;
+
+        if (_isMousePressed)
+        {
+            design = DesignMouseDown;
+        }
+        else if (_isMouseOver)
+        {
+            design = DesignHover;
+        }
+
+        return design ?? Design;
+    }
+
+    private int? GetImage()
+    {
+        int? image = null;
+
+        if (_isMousePressed)
+        {
+            image = ImageMouseDown;
+        }
+        else if (_isMouseOver)
+        {
+            image = ImageHover;
+        }
+
+        return image ?? Image;
+    }
+
+    protected override void OnMouseEnter()
+    {
+        _isMouseOver = true;
+
+        base.OnMouseEnter();
+    }
+
+    protected override void OnMouseLeave()
+    {
+        _isMouseOver = false;
+
+        base.OnMouseLeave();
+    }
+
+    protected override void OnMousePressed(int x, int y)
+    {
+        Gui.CaptureMouse(this);
+
+        _isMousePressed = true;
+
+        base.OnMousePressed(x, y);
+    }
+
+    protected override void OnMouseReleased(int x, int y)
+    {
+        Gui.ReleaseMouse();
+
+        _isMousePressed = false;
+
+        if (Contains(x, y))
+        {
+            OnClick();
+        }
+
+        base.OnMouseReleased(x, y);
     }
 }

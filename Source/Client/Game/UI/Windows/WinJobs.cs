@@ -5,6 +5,10 @@ namespace Client.Game.UI.Windows;
 
 public static class WinJobs
 {
+    private const int JobWarrior = 0;
+    private const int JobWizard = 1;
+    private const int JobWhisperer = 2;
+    
     public static void OnDrawSprite()
     {
         var winJobs = Gui.GetWindowByName("winJobs");
@@ -19,9 +23,9 @@ public static class WinJobs
         {
             spriteIndex = GameState.NewCharJob switch
             {
-                0 => 1, // Warrior
-                1 => 2, // Wizard
-                2 => 3, // Whisperer
+                JobWarrior => 1,
+                JobWizard => 2,
+                JobWhisperer => 3,
                 _ => 0
             };
         }
@@ -58,44 +62,35 @@ public static class WinJobs
         {
             return;
         }
-
-        var lines = default(string[]);
+        
         var text = "";
-
-        // Get job description or use default
         if (Data.Job[GameState.NewCharJob].Desc == "")
         {
-            switch (GameState.NewCharJob)
+            text = GameState.NewCharJob switch
             {
-                case 0: // Warrior
-                    {
-                        text = "The way of a warrior has never been an easy one. ...";
-                        break;
-                    }
-                case 1: // Wizard
-                    {
-                        text = "Wizards are often mistrusted characters who ... enjoy setting things on fire.";
-                        break;
-                    }
-                case 2: // Whisperer
-                    {
-                        text = "The art of healing comes with pressure and guilt, ...";
-                        break;
-                    }
-            }
+                JobWarrior => "The way of a warrior has never been an easy one. ...",
+                JobWizard => "Wizards are often mistrusted characters who ... enjoy setting things on fire.",
+                JobWhisperer => "The art of healing comes with pressure and guilt, ...",
+                _ => text
+            };
         }
         else
         {
             text = Data.Job[GameState.NewCharJob].Desc;
         }
-
+        
+        var lines = Array.Empty<string>();
+        
         TextRenderer.WordWrap(text, winJobs.Font, 330, ref lines);
 
         var y = winJobs.Y + 60;
 
         foreach (var line in lines)
         {
-            if (line == "") continue;
+            if (string.IsNullOrEmpty(line))
+            {
+                continue;
+            }
             
             var x = winJobs.X + 118 + 200 / 2 - TextRenderer.GetTextWidth(line, winJobs.Font) / 2;
 

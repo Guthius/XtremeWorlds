@@ -16,27 +16,27 @@ internal sealed class NetworkServiceHost<TSession>(
     : BackgroundService
     where TSession : IDisposable
 {
-    private sealed class NetworkChannelProxy(ILogger logger, INetworkService<TSession> serviceHost, TSession user) : INetworkChannelProxy
+    private sealed class NetworkChannelProxy(ILogger logger, INetworkService<TSession> serviceHost, TSession session) : INetworkChannelProxy
     {
         public Task OnConnectedAsync(INetworkChannel channel, CancellationToken cancellationToken)
         {
             logger.LogInformation("Client from {IpAddress} has connected", channel.IpAddress);
 
-            return serviceHost.OnConnectedAsync(user, cancellationToken);
+            return serviceHost.OnConnectedAsync(session, cancellationToken);
         }
 
         public Task OnDisconnectedAsync(INetworkChannel channel, CancellationToken cancellationToken)
         {
             logger.LogInformation("Client from {IpAddress} has disconnected", channel.IpAddress);
 
-            return serviceHost.OnDisconnectedAsync(user, cancellationToken);
+            return serviceHost.OnDisconnectedAsync(session, cancellationToken);
         }
 
         public Task OnBytesReceivedAsync(INetworkChannel channel, ReadOnlySpan<byte> bytes, CancellationToken cancellationToken)
         {
             logger.LogTrace("Received {NumberOfBytes} from {IpAddress}", bytes.Length, channel.IpAddress);
 
-            return serviceHost.OnBytesReceivedAsync(user, bytes, cancellationToken);
+            return serviceHost.OnBytesReceivedAsync(session, bytes, cancellationToken);
         }
     }
 
@@ -75,7 +75,7 @@ internal sealed class NetworkServiceHost<TSession>(
         var connectionLogger = serviceProvider.GetRequiredService<ILogger<NetworkChannel<TSession>>>();
         var connection = new NetworkChannel<TSession>(connectionLogger, tcpClient);
 
-        if (!sessionManager.TryCreate(connection, out TSession? user) || user is null)
+        if (!sessionManager.TryCreate(connection, out var session))
         {
             logger.LogInformation("Client from {IpAddress} has been rejected - server full", connection.IpAddress);
 
@@ -83,8 +83,8 @@ internal sealed class NetworkServiceHost<TSession>(
             return;
         }
 
-        var proxy = new NetworkChannelProxy(connectionLogger, service, user);
+        var proxy = new NetworkChannelProxy(connectionLogger, service, session);
 
-        _ = connection.StartAsync(proxy, user, cancellationToken);
+        _ = connection.StartAsync(proxy, session, cancellationToken);
     }
 }

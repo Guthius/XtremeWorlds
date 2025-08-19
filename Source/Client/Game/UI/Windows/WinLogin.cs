@@ -6,13 +6,19 @@ namespace Client.Game.UI.Windows;
 
 public static class WinLogin
 {
-    public static void OnExit()
+    public static void OnClose()
     {
-    // Request the game to exit; Exiting handler will call DestroyGame and end Eto
-    try { General.Client.Exit(); } catch { General.DestroyGame(); }
+        try
+        {
+            General.Client.Exit();
+        }
+        catch
+        {
+            General.DestroyGame();
+        }
     }
-    
-    public static void OnLogin()
+
+    public static void OnAccept()
     {
         var window = Gui.GetWindowByName("winLogin");
         if (window is null)
@@ -30,6 +36,18 @@ public static class WinLogin
         else
         {
             GameLogic.Dialogue("Invalid Connection", "Cannot connect to game server.", "Please try again.", DialogueType.Alert);
+        }
+    }
+    
+    public static void OnExit()
+    {
+        try
+        {
+            General.Client.Exit();
+        }
+        catch
+        {
+            General.DestroyGame();
         }
     }
 
@@ -60,7 +78,7 @@ public static class WinLogin
         {
             return;
         }
-        
+
         var checkBoxSaveUsername = winLogin.GetChild("chkSaveUsername");
         if (checkBoxSaveUsername.Value == 0)
         {

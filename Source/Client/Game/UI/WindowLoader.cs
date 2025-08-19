@@ -59,12 +59,14 @@ public static class WindowLoader
         var designMousedown = GetDesignByName(designMousedownName, design);
         var startPosition = xmlReader.GetAttribute("StartPosition");
         var visible = GetBoolean(xmlReader.GetAttribute("Visible"), true);
+        var canDrag = GetBoolean(xmlReader.GetAttribute("CanDrag"), true);
+        var canFocus = GetBoolean(xmlReader.GetAttribute("CanFocus"), true);
+        var clickthrough = GetBoolean(xmlReader.GetAttribute("ClickThrough"));
 
         var windowIndex = Gui.CreateWindow(
             name: name ?? string.Empty,
             caption: caption ?? string.Empty,
             font: font,
-            zOrder: Gui.ZOrderWin,
             left: positionVec.X,
             top: positionVec.Y,
             width: sizeVec.X,
@@ -75,18 +77,19 @@ public static class WindowLoader
             yOffset: iconOffsetVec.Y,
             designNorm: design,
             designHover: designHover,
-            designMousedown: designMousedown);
+            designMousedown: designMousedown,
+            canDrag: canDrag,
+            canFocus: canFocus,
+            clickthrough: clickthrough);
 
         if (!string.IsNullOrEmpty(startPosition))
         {
             if (startPosition.Equals("Center", StringComparison.OrdinalIgnoreCase) ||
                 startPosition.Equals("CenterScreen", StringComparison.OrdinalIgnoreCase))
             {
-                Gui.CentralizeWindow(windowIndex);
+                Gui.MoveToCenterScreen(windowIndex);
             }
         }
-
-        Gui.ZOrderCon = 0;
 
         while (xmlReader.Read())
         {
@@ -146,17 +149,19 @@ public static class WindowLoader
         var font = GetFontByName(fontName, DefaultControlFont);
         var alignmentName = xmlReader.GetAttribute("Align");
         var alignment = GetAlignmentByName(alignmentName, Alignment.Left);
+        var visible = GetBoolean(xmlReader.GetAttribute("Visible"), true);
 
         Gui.CreateLabel(
             windowIndex: windowIndex,
             name: name ?? string.Empty,
             text: text ?? string.Empty,
-            left: positionVec.X,
-            top: positionVec.Y,
+            x: positionVec.X,
+            y: positionVec.Y,
             width: sizeVec.X,
             height: sizeVec.Y,
             font: font,
-            align: alignment);
+            align: alignment,
+            visible: visible);
     }
 
     private static void ReadPictureBox(XmlReader xmlReader, int windowIndex)
@@ -175,6 +180,7 @@ public static class WindowLoader
         var designHover = GetDesignByName(designHoverName, design);
         var designMousedownName = xmlReader.GetAttribute("DesignMouseDown");
         var designMousedown = GetDesignByName(designMousedownName, design);
+        var visible = GetBoolean(xmlReader.GetAttribute("Visible"), true);
 
         Gui.CreatePictureBox(
             windowIndex,
@@ -183,12 +189,13 @@ public static class WindowLoader
             positionVec.Y,
             sizeVec.X,
             sizeVec.Y,
-            imageNorm: image,
+            image: image,
             imageHover: imageHover,
             imageMousedown: imageMousedown,
-            designNorm: design,
+            design: design,
             designHover: designHover,
-            designMousedown: designMousedown);
+            designMousedown: designMousedown,
+            visible: visible);
     }
 
     private static void ReadButton(XmlReader xmlReader, int windowIndex)
@@ -210,6 +217,7 @@ public static class WindowLoader
         var designHover = GetDesignByName(designHoverName, design);
         var designMousedownName = xmlReader.GetAttribute("DesignMouseDown");
         var designMousedown = GetDesignByName(designMousedownName, design);
+        var visible = GetBoolean(xmlReader.GetAttribute("Visible"), true);
 
         var x = positionVec.X;
         if (x < 0)
@@ -227,16 +235,17 @@ public static class WindowLoader
             windowIndex: windowIndex,
             name: name ?? string.Empty,
             text: text ?? string.Empty,
-            left: x, top: y,
+            x: x, y: y,
             width: sizeVec.X,
             height: sizeVec.Y,
             font: font,
-            imageNorm: image,
+            image: image,
             imageHover: imageHover,
-            imageMousedown: imageMousedown,
-            designNorm: design,
+            imageMouseDown: imageMousedown,
+            design: design,
             designHover: designHover,
-            designMousedown: designMousedown);
+            designMouseDown: designMousedown,
+            visible: visible);
     }
 
     private static void ReadTextBox(XmlReader xmlReader, int windowIndex)
@@ -256,21 +265,24 @@ public static class WindowLoader
         var designMousedownName = xmlReader.GetAttribute("DesignMouseDown");
         var designMousedown = GetDesignByName(designMousedownName, design);
         var censor = GetBoolean(xmlReader.GetAttribute("Censor"));
+        var visible = GetBoolean(xmlReader.GetAttribute("Visible"), true);
 
         Gui.CreateTextbox(
             windowIndex: windowIndex,
             name: name ?? string.Empty,
-            left: positionVec.X,
-            top: positionVec.Y,
+            x: positionVec.X,
+            y: positionVec.Y,
             width: sizeVec.X,
             height: sizeVec.Y,
             text: text ?? string.Empty,
             font: font,
             xOffset: 5,
             yOffset: 3,
-            designNorm: design,
+            design: design,
             designHover: designHover,
-            designMousedown: designMousedown, censor: censor);
+            designMousedown: designMousedown,
+            censor: censor,
+            visible: visible);
     }
 
     private static void ReadCheckBox(XmlReader xmlReader, int windowIndex)
@@ -285,16 +297,18 @@ public static class WindowLoader
         var font = GetFontByName(fontName, DefaultControlFont);
         var designName = xmlReader.GetAttribute("Design");
         var design = GetDesignByName(designName, Design.None);
+        var visible = GetBoolean(xmlReader.GetAttribute("Visible"), true);
 
         Gui.CreateCheckBox(
             windowIndex: windowIndex,
             name: name ?? string.Empty,
             text: text ?? string.Empty,
-            left: positionVec.X,
-            top: positionVec.Y,
+            x: positionVec.X,
+            y: positionVec.Y,
             width: sizeVec.X,
             font: font,
-            theDesign: design);
+            design: design,
+            visible: visible);
     }
 
     private static Font GetFontByName(string? fontName, Font defaultValue)

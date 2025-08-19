@@ -1,4 +1,5 @@
-﻿using Core.Globals;
+﻿using Client.Game.UI.Controls;
+using Core.Globals;
 using static Core.Globals.Command;
 
 namespace Client.Game.UI.Windows;
@@ -253,7 +254,7 @@ public static class WinShop
         var labelName = winShop.GetChild("lblName");
         var labelCost = winShop.GetChild("lblCost");
 
-        var picItem = winShop.GetChild("picItem");
+        var picItem = winShop.GetChild<PictureBox>("picItem");
 
         if (!GameState.ShopIsSelling)
         {
@@ -274,24 +275,16 @@ public static class WinShop
                     labelCost.Text = Data.Shop[GameState.InShop].TradeItem[GameState.ShopSelectedSlot].CostValue + " " + Data.Item[Data.Shop[GameState.InShop].TradeItem[GameState.ShopSelectedSlot].CostItem].Name;
                 }
 
+                picItem.ImagePath = DataPath.Items;
                 picItem.Image = Data.Item[GameState.ShopSelectedItem].Icon;
-
-                for (var i = 0; i < 5; i++)
-                {
-                    picItem.Texture[i] = DataPath.Items;
-                }
             }
             else
             {
                 labelName.Text = "Empty Slot";
                 labelCost.Text = "";
 
+                picItem.ImagePath = null;
                 picItem.Image = null;
-
-                for (var i = 0; i < 5; i++)
-                {
-                    picItem.Texture[i] = string.Empty;
-                }
             }
         }
         else
@@ -305,22 +298,16 @@ public static class WinShop
                 labelName.Text = Data.Item[GameState.ShopSelectedItem].Name;
                 labelCost.Text = cost + "g";
 
+                picItem.ImagePath = DataPath.Items;
                 picItem.Image = Data.Item[GameState.ShopSelectedItem].Icon;
-                for (var i = 0; i < 5; i++)
-                {
-                    picItem.Texture[i] = DataPath.Items;
-                }
             }
             else
             {
                 labelName.Text = "Empty Slot";
                 labelCost.Text = "";
 
+                picItem.ImagePath = null;
                 picItem.Image = null;
-                for (var i = 0; i < 5; i++)
-                {
-                    picItem.Texture[i] = string.Empty;
-                }
             }
         }
     }

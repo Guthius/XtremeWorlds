@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using Client.Game.UI;
@@ -169,6 +169,8 @@ namespace Client
                 throw;
             }
 
+            Components.Add(new UIComponent(this));
+
             base.Initialize();
         }
 
@@ -184,7 +186,7 @@ namespace Client
         {
             // Get all defined font enum values except None (assumed to be 0)
             var fontValues = Enum.GetValues(typeof(Font));
-            for (int i = 1; i < fontValues.Length; i++)
+            for (var i = 1; i < fontValues.Length; i++)
                 TextRenderer.Fonts[(Font) fontValues.GetValue(i)] = LoadFont(DataPath.Fonts, (Font) fontValues.GetValue(i));
         }
 
@@ -235,7 +237,7 @@ namespace Client
 
         public static Rectangle GetAspectRatio(int x, int y, int screenWidth, int screenHeight, int texWidth, int texHeight, float targetAspect)
         {
-            float newAspect = (float) screenWidth / screenHeight;
+            var newAspect = (float) screenWidth / screenHeight;
 
             int width, height;
 
@@ -254,8 +256,8 @@ namespace Client
             }
 
             // Calculate scaling factors
-            float scaleX = (float) width / texWidth;
-            float scaleY = (float) height / texHeight;
+            var scaleX = (float) width / texWidth;
+            var scaleY = (float) height / texHeight;
 
             // Adjust dimensions to fit within screen boundaries
             if (width > screenWidth)
@@ -274,8 +276,8 @@ namespace Client
                 scaleY = (float) height / texHeight;
             }
 
-            int destX = 0;
-            int destY = 0;
+            var destX = 0;
+            var destY = 0;
 
             if (newAspect != targetAspect)
             {
@@ -385,7 +387,7 @@ namespace Client
                 return;
             }
 
-            if (GameState.InGame == true)
+            if (GameState.InGame)
             {
                 Render_Game();
             }
@@ -494,7 +496,7 @@ namespace Client
 
         public static bool IsKeyStateActive(Keys key)
         {
-            if (CanProcessKey(key) == true)
+            if (CanProcessKey(key))
             {
                 // Check if the key is down in the current keyboard state
                 return CurrentKeyboardState.IsKeyDown(key);
@@ -561,8 +563,8 @@ namespace Client
         {
             // Get the mouse position from the cache
             var mousePos = GetMousePosition();
-            int mouseX = mousePos.Item1;
-            int mouseY = mousePos.Item2;
+            var mouseX = mousePos.Item1;
+            var mouseY = mousePos.Item2;
 
             // Convert adjusted coordinates to game world coordinates
             GameState.CurX = (int) Math.Round(GameState.TileView.Left +
@@ -606,70 +608,70 @@ namespace Client
             // Handle Escape key to toggle menus
             if (IsKeyStateActive(Keys.Escape))
             {
-                if (GameState.InMenu == true)
+                if (GameState.InMenu)
                     return;
 
                 // Hide options screen
-                if (Gui.Windows[Gui.GetWindowIndex("winOptions")].Visible == true)
+                if (Gui.Windows[Gui.GetWindowIndex("winOptions")].Visible)
                 {
-                    Gui.HideWindow(Gui.GetWindowIndex("winOptions"));
+                    Gui.HideWindow("winOptions");
                     WinComboMenu.Close();
                     return;
                 }
 
                 // hide/show chat window
-                if (Gui.Windows[Gui.GetWindowIndex("winChat")].Visible == true)
+                if (Gui.Windows[Gui.GetWindowIndex("winChat")].Visible)
                 {
-                    Gui.Windows[Gui.GetWindowIndex("winChat")].Controls[(int) Gui.GetControlIndex("winChat", "txtChat")]
+                    Gui.Windows[Gui.GetWindowIndex("winChat")].Controls[Gui.GetControlIndex("winChat", "txtChat")]
                         .Text = "";
                     WinChat.Hide();
                     return;
                 }
 
-                if (Gui.Windows[Gui.GetWindowIndex("winEscMenu")].Visible == true)
+                if (Gui.Windows[Gui.GetWindowIndex("winEscMenu")].Visible)
                 {
-                    Gui.HideWindow(Gui.GetWindowIndex("winEscMenu"));
+                    Gui.HideWindow("winEscMenu");
                     return;
                 }
 
-                if (Gui.Windows[Gui.GetWindowIndex("winShop")].Visible == true)
+                if (Gui.Windows[Gui.GetWindowIndex("winShop")].Visible)
                 {
                     Shop.CloseShop();
                     return;
                 }
 
-                if (Gui.Windows[Gui.GetWindowIndex("winBank")].Visible == true)
+                if (Gui.Windows[Gui.GetWindowIndex("winBank")].Visible)
                 {
                     Bank.CloseBank();
                     return;
                 }
 
-                if (Gui.Windows[Gui.GetWindowIndex("winTrade")].Visible == true)
+                if (Gui.Windows[Gui.GetWindowIndex("winTrade")].Visible)
                 {
                     Trade.SendDeclineTrade();
                     return;
                 }
 
-                if (Gui.Windows[Gui.GetWindowIndex("winInventory")].Visible == true)
+                if (Gui.Windows[Gui.GetWindowIndex("winInventory")].Visible)
                 {
                     Gui.HideWindow(Gui.GetWindowIndex("winInventory"));
                     return;
                 }
 
-                if (Gui.Windows[Gui.GetWindowIndex("winCharacter")].Visible == true)
+                if (Gui.Windows[Gui.GetWindowIndex("winCharacter")].Visible)
                 {
                     Gui.HideWindow(Gui.GetWindowIndex("winCharacter"));
                     return;
                 }
 
-                if (Gui.Windows[Gui.GetWindowIndex("winSkills")].Visible == true)
+                if (Gui.Windows[Gui.GetWindowIndex("winSkills")].Visible)
                 {
                     Gui.HideWindow(Gui.GetWindowIndex("winSkills"));
                     return;
                 }
 
                 // show them
-                if (Gui.Windows[Gui.GetWindowIndex("winChat")].Visible == false)
+                if (!Gui.Windows[Gui.GetWindowIndex("winChat")].Visible)
                 {
                     Gui.ShowWindow(Gui.GetWindowIndex("winEscMenu"), true);
                     return;
@@ -783,10 +785,7 @@ namespace Client
                     if (IsKeyStateActive(Keys.Enter))
                     {
                         // Handle Enter: Call the control's callback or activate a new control.
-                        if (activeControl.CallBack[(int) ControlState.FocusEnter] is not null)
-                        {
-                            activeControl.CallBack[(int) ControlState.FocusEnter].Invoke();
-                        }
+                        //activeControl.OnEnter?.Invoke();
                     }
 
                     // Check if the Tab key is active and can be processed
@@ -804,7 +803,7 @@ namespace Client
             if (GameState.InSmallChat)
             {
                 // Iterate through hotbar slots and check for corresponding keys
-                for (int i = 0; i < Constant.MaxHotbar; i++)
+                for (var i = 0; i < Constant.MaxHotbar; i++)
                 {
                     // Check if the corresponding hotbar key is pressed
                     if (CurrentKeyboardState.IsKeyDown((Keys) ((int) Keys.D0 + i)))
@@ -819,7 +818,7 @@ namespace Client
         private static void HandleTextInput()
         {
             // Iterate over all pressed keys  
-            foreach (Keys key in CurrentKeyboardState.GetPressedKeys())
+            foreach (var key in CurrentKeyboardState.GetPressedKeys())
             {
                 // Check for special keys and skip processing
                 if (key == Keys.Tab || key == Keys.LeftShift || key == Keys.RightShift || key == Keys.LeftControl ||
@@ -833,7 +832,7 @@ namespace Client
                     // Handle Backspace key separately  
                     if (key == Keys.Back)
                     {
-                        var activeControl = Gui.GetActiveControl();
+                        var activeControl = Gui.ActiveControl;
 
                         if (activeControl is not null && activeControl.Visible && activeControl.Text.Length > 0)
                         {
@@ -851,11 +850,11 @@ namespace Client
                     // If the character is valid, update the active control's text  
                     if (character.HasValue)
                     {
-                        var activeControl = Gui.GetActiveControl();
+                        var activeControl = Gui.ActiveControl;
 
                         if (activeControl is not null && activeControl.Visible && activeControl.Enabled)
                         {
-                            string text = activeControl.Text + Conversions.ToString(character.Value);
+                            var text = activeControl.Text + Conversions.ToString(character.Value);
                             if (TextRenderer.GetTextWidth(text) < activeControl.Width)
                             {
                                 // Append character to the control's text  
@@ -903,14 +902,14 @@ namespace Client
             // Handle alphabetic keys
             if (key >= Keys.A && key <= Keys.Z)
             {
-                char baseChar = Strings.ChrW(Strings.AscW('A') + ((int) key - (int) Keys.A));
+                var baseChar = Strings.ChrW(Strings.AscW('A') + ((int) key - (int) Keys.A));
                 return shiftPressed ? baseChar : char.ToLower(baseChar);
             }
 
             // Handle numeric keys (0-9)
             if (key >= Keys.D0 && key <= Keys.D9)
             {
-                char digit = Strings.ChrW(Strings.AscW('0') + ((int) key - (int) Keys.D0));
+                var digit = Strings.ChrW(Strings.AscW('0') + ((int) key - (int) Keys.D0));
                 return shiftPressed ? General.GetShiftedDigit(digit) : digit;
             }
 
@@ -937,7 +936,7 @@ namespace Client
         private static void HandleScrollWheel()
         {
             // Handle scroll wheel (assuming delta calculation happens elsewhere)
-            int scrollValue = GetMouseScrollDelta();
+            var scrollValue = GetMouseScrollDelta();
             if (scrollValue > 0)
             {
                 GameLogic.ScrollChatBox(0); // Scroll up
@@ -986,20 +985,15 @@ namespace Client
 
         private static void HandleMouseClick()
         {
-            int currentTime = Environment.TickCount;
-
-            // Handle MouseMove event when the mouse moves
-            if (CurrentMouseState.X != PreviousMouseState.X || CurrentMouseState.Y != PreviousMouseState.Y)
-            {
-                Gui.HandleInterfaceEvents(ControlState.MouseMove);
-            }
-
+            var currentTime = Environment.TickCount;
+            
             // Check for MouseDown event (button pressed)
             if (IsMouseButtonDown(MouseButton.Left))
             {
                 if ((DateTime.Now - _lastMouseClickTime).TotalMilliseconds >= MouseClickCooldown)
                 {
                     Gui.HandleInterfaceEvents(ControlState.MouseDown);
+                    
                     _lastMouseClickTime = DateTime.Now; // Update last mouse click time
                     GameState.LastLeftClickTime = currentTime; // Track time for double-click detection
                     GameState.ClickCount++;
@@ -1018,35 +1012,8 @@ namespace Client
                 GameState.Info = false;
             }
 
-            // Check for MouseUp event (button released)
-            if (IsMouseButtonUp(MouseButton.Left))
-            {
-                Gui.HandleInterfaceEvents(ControlState.MouseUp);
-            }
-
-            for (int i = 1; i < Gui.Windows.Count; i++)
-            {
-                // Check if active control is hovered
-                if (Gui.Windows[i].Controls != null)
-                {
-                    for (int j = 0; j < Gui.Windows[i].Controls.Count; j++)
-                    {
-                        if (GameState.CurMouseX >= Gui.Windows[i].X &&
-                            GameState.CurMouseX <= Gui.Windows[i].Width + Gui.Windows[i].X &&
-                            GameState.CurMouseY >= Gui.Windows[i].Y &&
-                            GameState.CurMouseY <= Gui.Windows[i].Height + Gui.Windows[i].Y)
-                        {
-                            if (Gui.Windows[i].Controls[j].State != ControlState.Normal)
-                            {
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
-
             // In-game interactions for left click
-            if (GameState.InGame == true)
+            if (GameState.InGame)
             {
                 if (GameState.MyEditorType == EditorType.Map)
                 {
@@ -1066,7 +1033,8 @@ namespace Client
                 // Right-click interactions
                 if (IsMouseButtonDown(MouseButton.Right))
                 {
-                    int slotNum = (int) GameLogic.IsHotbar(Gui.Windows[Gui.GetWindowIndex("winHotbar")].X,
+                    var slotNum = GameLogic.IsHotbar(
+                        Gui.Windows[Gui.GetWindowIndex("winHotbar")].X,
                         Gui.Windows[Gui.GetWindowIndex("winHotbar")].Y);
 
                     if (slotNum >= 0L)
@@ -1074,7 +1042,7 @@ namespace Client
                         Sender.SendDeleteHotbar(slotNum);
                     }
 
-                    if (GameState.VbKeyShift == true)
+                    if (GameState.VbKeyShift)
                     {
                         // Admin warp if Shift is held and the player has moderator access
                         if (GetPlayerAccess(GameState.MyIndex) >= (int) AccessLevel.Moderator)
@@ -1094,7 +1062,7 @@ namespace Client
         private static void HandleRightClickMenu()
         {
             // Loop through all players and display the right-click menu for the matching one
-            for (int i = 0; i < Constant.MaxPlayers; i++)
+            for (var i = 0; i < Constant.MaxPlayers; i++)
             {
                 if (IsPlaying(i) && GetPlayerMap(i) == GetPlayerMap(GameState.MyIndex))
                 {
@@ -1109,8 +1077,7 @@ namespace Client
             // Perform player search at the current cursor position
             Sender.PlayerSearch(GameState.CurX, GameState.CurY, 1);
         }
-
-
+        
         public static void TakeScreenshot()
         {
             // Set the render target to our RenderTarget2D
@@ -1126,7 +1093,7 @@ namespace Client
             Graphics.GraphicsDevice.SetRenderTarget(null);
 
             // Save the contents of the RenderTarget2D to a PNG file
-            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             using (var stream = new FileStream($"screenshot_{timestamp}.png", FileMode.Create))
             {
                 RenderTarget.SaveAsPng(stream, RenderTarget.Width, RenderTarget.Height);
@@ -1297,7 +1264,7 @@ namespace Client
             x = GameLogic.ConvertMapX(x2);
             y = GameLogic.ConvertMapY(y2) - (GameState.SizeY + 16);
 
-            string argpath = Path.Combine(DataPath.Emotes, sprite.ToString());
+            var argpath = Path.Combine(DataPath.Emotes, sprite.ToString());
             RenderTexture(ref argpath, x, y, rec.X, rec.Y, rec.Width, rec.Height);
         }
 
@@ -1312,7 +1279,7 @@ namespace Client
             rec.Width = 32;
             rec.Height = 32;
 
-            string argpath = Path.Combine(DataPath.Misc, "Direction");
+            var argpath = Path.Combine(DataPath.Misc, "Direction");
             RenderTexture(ref argpath, GameLogic.ConvertMapX(x * GameState.SizeX),
                 GameLogic.ConvertMapY(y * GameState.SizeY),
                 rec.X, rec.Y, rec.Width, rec.Height, rec.Width, rec.Height);
@@ -1326,7 +1293,7 @@ namespace Client
                 // find out whether render blocked or not
                 bool LocalIsDirBlocked()
                 {
-                    byte argdir = (byte) i;
+                    var argdir = (byte) i;
                     var n = GameLogic.IsDirBlocked(ref Data.MyMap.Tile[x, y].DirBlock, ref argdir);
                     return n;
                 }
@@ -1342,7 +1309,7 @@ namespace Client
 
                 rec.Height = 8;
 
-                string argpath1 = Path.Combine(DataPath.Misc, "Direction");
+                var argpath1 = Path.Combine(DataPath.Misc, "Direction");
                 RenderTexture(ref argpath1, GameLogic.ConvertMapX(x * GameState.SizeX) + GameState.DirArrowX[i],
                     GameLogic.ConvertMapY(y * GameState.SizeY) + GameState.DirArrowY[i], rec.X, rec.Y, rec.Width,
                     rec.Height,
@@ -1377,7 +1344,7 @@ namespace Client
             width = rec.Right - rec.Left;
             height = rec.Bottom - rec.Top;
 
-            string argpath = Path.Combine(DataPath.Paperdolls, sprite.ToString());
+            var argpath = Path.Combine(DataPath.Paperdolls, sprite.ToString());
             RenderTexture(ref argpath, x, y, rec.X, rec.Y, rec.Width, rec.Height);
         }
 
@@ -1389,7 +1356,7 @@ namespace Client
             int sprite;
             var spriteLeft = default(int);
             Rectangle rect;
-            int attackSpeed = 1000;
+            var attackSpeed = 1000;
 
             // Check if Npc exists
             if (Data.MyMapNpc[(int) mapNpcNum].Num < 0 ||
@@ -1537,7 +1504,7 @@ namespace Client
             x = GameLogic.ConvertMapX(Data.MyMapItem[itemNum].X * GameState.SizeX);
             y = GameLogic.ConvertMapY(Data.MyMapItem[itemNum].Y * GameState.SizeY);
 
-            string argpath = Path.Combine(DataPath.Items, picNum.ToString());
+            var argpath = Path.Combine(DataPath.Items, picNum.ToString());
             RenderTexture(ref argpath, x, y, srcrec.X, srcrec.Y, srcrec.Width, srcrec.Height, srcrec.Width,
                 srcrec.Height);
         }
@@ -1553,7 +1520,7 @@ namespace Client
             x = GameLogic.ConvertMapX(x2);
             y = GameLogic.ConvertMapY(y2);
 
-            string argpath = Path.Combine(DataPath.Characters, sprite.ToString());
+            var argpath = Path.Combine(DataPath.Characters, sprite.ToString());
             RenderTexture(ref argpath, x, y, sRect.X, sRect.Y, sRect.Width, sRect.Height, sRect.Width, sRect.Height);
         }
 
@@ -1582,7 +1549,7 @@ namespace Client
                 destrec = new Rectangle(GameLogic.ConvertMapX(withBlock.X),
                     GameLogic.ConvertMapY(withBlock.Y), GameState.SizeX, GameState.SizeY);
 
-                string argpath = Path.Combine(DataPath.Misc, "Blood");
+                var argpath = Path.Combine(DataPath.Misc, "Blood");
                 RenderTexture(ref argpath, x, y, srcrec.X, srcrec.Y, srcrec.Width, srcrec.Height);
             }
         }
@@ -1627,14 +1594,14 @@ namespace Client
                         // draw bar background
                         top = height * 3L; // HP bar background
                         left = 0L;
-                        string argpath = Path.Combine(DataPath.Misc, "Bars");
+                        var argpath = Path.Combine(DataPath.Misc, "Bars");
                         RenderTexture(ref argpath, GameLogic.ConvertMapX((int) tmpX), GameLogic.ConvertMapY((int) tmpY),
                             (int) left, (int) top, (int) width, (int) height, (int) width, (int) height);
 
                         // draw the bar proper
                         top = 0L; // HP bar
                         left = 0L;
-                        string argpath1 = Path.Combine(DataPath.Misc, "Bars");
+                        var argpath1 = Path.Combine(DataPath.Misc, "Bars");
                         RenderTexture(ref argpath1, GameLogic.ConvertMapX((int) tmpX), GameLogic.ConvertMapY((int) tmpY),
                             (int) left, (int) top, (int) GameState.BarWidthNpcHp[(int) i], (int) height,
                             (int) GameState.BarWidthNpcHp[(int) i], (int) height);
@@ -1663,14 +1630,14 @@ namespace Client
                         // draw bar background
                         top = height * 3L; // HP bar background
                         left = 0L;
-                        string argpath2 = Path.Combine(DataPath.Misc, "Bars");
+                        var argpath2 = Path.Combine(DataPath.Misc, "Bars");
                         RenderTexture(ref argpath2, GameLogic.ConvertMapX((int) tmpX), GameLogic.ConvertMapY((int) tmpY),
                             (int) left, (int) top, (int) width, (int) height, (int) width, (int) height);
 
                         // draw the bar proper
                         top = 0L; // HP bar
                         left = 0L;
-                        string argpath3 = Path.Combine(DataPath.Misc, "Bars");
+                        var argpath3 = Path.Combine(DataPath.Misc, "Bars");
                         RenderTexture(ref argpath3, GameLogic.ConvertMapX((int) tmpX), GameLogic.ConvertMapY((int) tmpY),
                             (int) left, (int) top, (int) GameState.BarWidthPlayerHp[(int) i], (int) height,
                             (int) GameState.BarWidthPlayerHp[(int) i], (int) height);
@@ -1693,14 +1660,14 @@ namespace Client
                         // draw bar background
                         top = height * 3L; // SP bar background
                         left = 0L;
-                        string argpath4 = Path.Combine(DataPath.Misc, "Bars");
+                        var argpath4 = Path.Combine(DataPath.Misc, "Bars");
                         RenderTexture(ref argpath4, GameLogic.ConvertMapX((int) tmpX), GameLogic.ConvertMapY((int) tmpY),
                             (int) left, (int) top, (int) width, (int) height, (int) width, (int) height);
 
                         // draw the bar proper
                         top = height * 0L; // SP bar
                         left = 0L;
-                        string argpath5 = Path.Combine(DataPath.Misc, "Bars");
+                        var argpath5 = Path.Combine(DataPath.Misc, "Bars");
                         RenderTexture(ref argpath5, GameLogic.ConvertMapX((int) tmpX), GameLogic.ConvertMapY((int) tmpY),
                             (int) left, (int) top, (int) GameState.BarWidthPlayerSp[(int) i], (int) height,
                             (int) GameState.BarWidthPlayerSp[(int) i], (int) height);
@@ -1729,7 +1696,7 @@ namespace Client
                                 // draw bar background
                                 top = height * 3L; // cooldown bar background
                                 left = 0L;
-                                string argpath6 = Path.Combine(DataPath.Misc, "Bars");
+                                var argpath6 = Path.Combine(DataPath.Misc, "Bars");
                                 RenderTexture(ref argpath6, GameLogic.ConvertMapX((int) tmpX),
                                     GameLogic.ConvertMapY((int) tmpY), (int) left, (int) top, (int) width, (int) height,
                                     (int) width, (int) height);
@@ -1737,7 +1704,7 @@ namespace Client
                                 // draw the bar proper
                                 top = height * 2L; // cooldown bar
                                 left = 0L;
-                                string argpath7 = Path.Combine(DataPath.Misc, "Bars");
+                                var argpath7 = Path.Combine(DataPath.Misc, "Bars");
                                 RenderTexture(ref argpath7, GameLogic.ConvertMapX((int) tmpX),
                                     GameLogic.ConvertMapY((int) tmpY), (int) left, (int) top, (int) barWidth, (int) height,
                                     (int) barWidth, (int) height);
@@ -1757,7 +1724,7 @@ namespace Client
             var size = new Vector2(GameState.SizeX, GameState.SizeX);
             var fillColor = Color.Transparent; // No fill
             var outlineColor = Color.Cyan; // Cyan outline
-            int outlineThickness = 1; // Thickness of outline
+            var outlineThickness = 1; // Thickness of outline
 
             // Draw the rectangle with an outline.
             DrawRectangle(position, size, fillColor, outlineColor, outlineThickness);
@@ -1777,10 +1744,10 @@ namespace Client
                     if (GameLogic.IsValidMapPoint((int) Math.Round(x), (int) Math.Round(y)))
                     {
                         // Calculate the tile position and size
-                        int posX = GameLogic.ConvertMapX((int) Math.Round((x - 1d)));
-                        int posY = GameLogic.ConvertMapY((int) Math.Round((y - 1d) * GameState.SizeY));
-                        int rectWidth = GameState.SizeX;
-                        int rectHeight = GameState.SizeY;
+                        var posX = GameLogic.ConvertMapX((int) Math.Round(x - 1d));
+                        var posY = GameLogic.ConvertMapY((int) Math.Round((y - 1d) * GameState.SizeY));
+                        var rectWidth = GameState.SizeX;
+                        var rectHeight = GameState.SizeY;
 
                         // Draw the transparent rectangle as the tile background
                         SpriteBatch.Draw(TransparentTexture, new Rectangle(posX, posY, rectWidth, rectHeight),
@@ -1788,7 +1755,7 @@ namespace Client
 
                         // Define the outline color and thickness
                         var outlineColor = Color.White;
-                        int thickness = 1;
+                        var thickness = 1;
 
                         // Draw the tile outline (top, bottom, left, right)
                         SpriteBatch.Draw(TransparentTexture, new Rectangle(posX, posY, rectWidth, thickness),
@@ -1825,7 +1792,7 @@ namespace Client
             width = rec.Right - rec.Left;
             height = rec.Bottom - rec.Top;
 
-            string argpath = Path.Combine(DataPath.Misc, "Target");
+            var argpath = Path.Combine(DataPath.Misc, "Target");
             RenderTexture(ref argpath, x, y, rec.X, rec.Y, rec.Width, rec.Height, rec.Width, rec.Height);
         }
 
@@ -1853,7 +1820,7 @@ namespace Client
             width = rec.Right - rec.Left;
             height = rec.Bottom - rec.Top;
 
-            string argpath = Path.Combine(DataPath.Misc, "Target");
+            var argpath = Path.Combine(DataPath.Misc, "Target");
             RenderTexture(ref argpath, x, y, rec.X, rec.Y, rec.Width, rec.Height, rec.Width, rec.Height);
         }
 
@@ -1934,52 +1901,52 @@ namespace Client
                 y2 = y - (Information.UBound(theArray) + 1) * 12;
 
                 // render bubble - top left
-                string argpath = Path.Combine(DataPath.Gui, 33.ToString());
+                var argpath = Path.Combine(DataPath.Gui, 33.ToString());
                 RenderTexture(ref argpath, (int) (x2 - 9L), (int) (y2 - 5L), 0, 0, 9, 5, 9, 5);
 
                 // top right
-                string argpath1 = Path.Combine(DataPath.Gui, 33.ToString());
+                var argpath1 = Path.Combine(DataPath.Gui, 33.ToString());
                 RenderTexture(ref argpath1, (int) (x2 + maxWidth), (int) (y2 - 5L), 119, 0, 9, 5, 9, 5);
 
                 // top
-                string argpath2 = Path.Combine(DataPath.Gui, 33.ToString());
+                var argpath2 = Path.Combine(DataPath.Gui, 33.ToString());
                 RenderTexture(ref argpath2, (int) x2, (int) (y2 - 5L), 9, 0, (int) maxWidth, 5, 5, 5);
 
                 // bottom left
-                string argpath3 = Path.Combine(DataPath.Gui, 33.ToString());
+                var argpath3 = Path.Combine(DataPath.Gui, 33.ToString());
                 RenderTexture(ref argpath3, (int) (x2 - 9L), (int) y, 0, 19, 9, 6, 9, 6);
 
                 // bottom right
-                string argpath4 = Path.Combine(DataPath.Gui, 33.ToString());
+                var argpath4 = Path.Combine(DataPath.Gui, 33.ToString());
                 RenderTexture(ref argpath4, (int) (x2 + maxWidth), (int) y, 119, 19, 9, 6, 9, 6);
 
                 // bottom - left half
-                string argpath5 = Path.Combine(DataPath.Gui, 33.ToString());
+                var argpath5 = Path.Combine(DataPath.Gui, 33.ToString());
                 RenderTexture(ref argpath5, (int) x2, (int) y, 9, 19, (int) (maxWidth / 2L - 5L), 6, 6, 6);
 
                 // bottom - right half
-                string argpath6 = Path.Combine(DataPath.Gui, 33.ToString());
+                var argpath6 = Path.Combine(DataPath.Gui, 33.ToString());
                 RenderTexture(ref argpath6, (int) (x2 + maxWidth / 2L + 6L), (int) y, 9, 19, (int) (maxWidth / 2L - 5L), 6,
                     9,
                     6);
 
                 // left
-                string argpath7 = Path.Combine(DataPath.Gui, 33.ToString());
+                var argpath7 = Path.Combine(DataPath.Gui, 33.ToString());
                 RenderTexture(ref argpath7, (int) (x2 - 9L), (int) y2, 0, 6, 9, (Information.UBound(theArray) + 1) * 12, 9, 6);
 
                 // right
-                string argpath8 = Path.Combine(DataPath.Gui, 33.ToString());
+                var argpath8 = Path.Combine(DataPath.Gui, 33.ToString());
                 RenderTexture(ref argpath8, (int) (x2 + maxWidth), (int) y2, 119, 6, 9, (Information.UBound(theArray) + 1) * 12,
                     9,
                     6);
 
                 // center
-                string argpath9 = Path.Combine(DataPath.Gui, 33.ToString());
+                var argpath9 = Path.Combine(DataPath.Gui, 33.ToString());
                 RenderTexture(ref argpath9, (int) x2, (int) y2, 9, 5, (int) maxWidth, (Information.UBound(theArray) + 1) * 12, 9,
                     5);
 
                 // little pointy bit
-                string argpath10 = Path.Combine(DataPath.Gui, 33.ToString());
+                var argpath10 = Path.Combine(DataPath.Gui, 33.ToString());
                 RenderTexture(ref argpath10, (int) (x - 5L), (int) y, 58, 19, 11, 11, 11, 11);
 
                 // render each line centralized
@@ -1993,11 +1960,11 @@ namespace Client
 
                     // Measure button text size and apply padding
                     var textSize = TextRenderer.Fonts[Font.Georgia].MeasureString(theArray[(int) i]);
-                    float actualWidth = textSize.X;
-                    float actualHeight = textSize.Y;
+                    var actualWidth = textSize.X;
+                    var actualHeight = textSize.Y;
 
                     // Calculate horizontal and vertical centers with padding
-                    double padding = (double) actualWidth / 6.0d;
+                    var padding = (double) actualWidth / 6.0d;
 
                     TextRenderer.RenderText(theArray[(int) i],
                         (int) Math.Round(x - theArray[(int) i].Length / 2d - TextRenderer.GetTextWidth(theArray[(int) i]) / 2d +
@@ -2124,7 +2091,7 @@ namespace Client
             x = (int) Math.Round(Data.Player[index].X - (gfxInfo.Width / 4d - 32d) / 2d);
 
             // Is the player's height more than 32..?
-            if ((gfxInfo.Height / 4) > 32)
+            if (gfxInfo.Height / 4 > 32)
             {
                 // Create a 32 pixel offset for larger sprites
                 y = (int) Math.Round(GetPlayerRawY(index) - (gfxInfo.Height / 4d - 32d));
@@ -2146,11 +2113,11 @@ namespace Client
             // check for paperdolling with directional draw order rules
             // Rule: draw weapon first when facing up (behind), draw weapon last when facing down (in front)
             var dirVal = (Direction) GetPlayerDir(index);
-            Equipment[] eqOrder = new[] { Equipment.Weapon, Equipment.Armor, Equipment.Helmet, Equipment.Shield };
+            var eqOrder = new[] { Equipment.Weapon, Equipment.Armor, Equipment.Helmet, Equipment.Shield };
 
             // Treat diagonals as their vertical tendency
-            bool isUp = dirVal == Direction.Up || dirVal == Direction.UpLeft || dirVal == Direction.UpRight;
-            bool isDown = dirVal == Direction.Down || dirVal == Direction.DownLeft || dirVal == Direction.DownRight;
+            var isUp = dirVal == Direction.Up || dirVal == Direction.UpLeft || dirVal == Direction.UpRight;
+            var isDown = dirVal == Direction.Down || dirVal == Direction.DownLeft || dirVal == Direction.DownRight;
 
             if (isDown)
             {
@@ -2200,8 +2167,8 @@ namespace Client
 
             for (int i = 0, loopTo = Information.UBound(Data.MyMap.Event); i < loopTo; i++)
             {
-                int x = GameLogic.ConvertMapX(Data.MyMap.Event[i].X);
-                int y = GameLogic.ConvertMapY(Data.MyMap.Event[i].Y);
+                var x = GameLogic.ConvertMapX(Data.MyMap.Event[i].X);
+                var y = GameLogic.ConvertMapY(Data.MyMap.Event[i].Y);
 
                 // Skip event if there are no pages
                 if (Data.MyMap.Event[i].PageCount <= 0)
@@ -2215,8 +2182,8 @@ namespace Client
                 {
                     case 0: // Text Event
                     {
-                        int tX = x * GameState.SizeX;
-                        int tY = y * GameState.SizeY;
+                        var tX = x * GameState.SizeX;
+                        var tY = y * GameState.SizeY;
                         TextRenderer.RenderText("E", tX, tY, Color.Green, Color.Black);
                         break;
                     }
@@ -2246,15 +2213,15 @@ namespace Client
         public static void RenderCharacterGraphic(Type.Event eventData, int x, int y)
         {
             // Get the graphic index from the event's first page
-            int gfxIndex = eventData.Pages[0].Graphic;
+            var gfxIndex = eventData.Pages[0].Graphic;
 
             // Validate the graphic index to ensure it�s within range
             if (gfxIndex <= 0 || gfxIndex > GameState.NumCharacters)
                 return;
 
             // Get animation details (frame index and columns) from the event
-            int frameIndex = eventData.Pages[0].GraphicX; // Example frame index
-            int columns = 4;
+            var frameIndex = eventData.Pages[0].GraphicX; // Example frame index
+            var columns = 4;
             var gfxInfo = GetGfxInfo(Path.Combine(DataPath.Characters, gfxIndex.ToString()));
             if (gfxInfo == null)
             {
@@ -2263,18 +2230,18 @@ namespace Client
             }
 
             // Calculate the frame size (assuming square frames for simplicity)
-            int frameWidth = gfxInfo.Width / columns;
-            int frameHeight = frameWidth; // Adjust if non-square frames
+            var frameWidth = gfxInfo.Width / columns;
+            var frameHeight = frameWidth; // Adjust if non-square frames
 
             // Calculate the source rectangle for the current frame
-            int column = frameIndex % columns;
-            int row = frameIndex / columns;
+            var column = frameIndex % columns;
+            var row = frameIndex / columns;
             var sourceRect = new Rectangle(column * frameWidth, row * frameHeight, frameWidth, frameHeight);
 
             // Define the position on the map where the graphic will be drawn
             var position = new Vector2(x, y);
 
-            string argpath = Path.Combine(DataPath.Characters, gfxIndex.ToString());
+            var argpath = Path.Combine(DataPath.Characters, gfxIndex.ToString());
             RenderTexture(ref argpath, (int) Math.Round(position.X), (int) Math.Round(position.Y), sourceRect.X,
                 sourceRect.Y,
                 frameWidth, frameHeight, sourceRect.Width, sourceRect.Height);
@@ -2282,7 +2249,7 @@ namespace Client
 
         private static void RenderTilesetGraphic(Type.Event eventData, int x, int y)
         {
-            int gfxIndex = eventData.Pages[0].Graphic;
+            var gfxIndex = eventData.Pages[0].Graphic;
 
             if (gfxIndex > 0 && gfxIndex <= GameState.NumTileSets)
             {
@@ -2297,7 +2264,7 @@ namespace Client
                 // Define destination rectangle
                 var destRect = new Rectangle(x, y, srcRect.Width, srcRect.Height);
 
-                string argpath = Path.Combine(DataPath.Tilesets, gfxIndex.ToString());
+                var argpath = Path.Combine(DataPath.Tilesets, gfxIndex.ToString());
                 RenderTexture(ref argpath, destRect.X, destRect.Y, srcRect.X, srcRect.Y, destRect.Width,
                     destRect.Height,
                     srcRect.Width, srcRect.Height);
@@ -2321,7 +2288,7 @@ namespace Client
 
             try
             {
-                if (Data.MapEvents[id].Visible == false)
+                if (!Data.MapEvents[id].Visible)
                 {
                     return;
                 }
@@ -2384,7 +2351,7 @@ namespace Client
                                              (width - 32d) / 2d);
 
                         // Is the player's height more than 32..?
-                        if ((gfxInfo.Height / 4) > 32)
+                        if (gfxInfo.Height / 4 > 32)
                         {
                             // Create a 32 pixel offset for larger sprites
                             y = (int) Math.Round(Data.MapEvents[id].Y - (height - 32d));
@@ -2427,7 +2394,7 @@ namespace Client
 
                         if (Data.MapEvents[id].GraphicY2 > 1)
                         {
-                            string argpath = Path.Combine(DataPath.Tilesets,
+                            var argpath = Path.Combine(DataPath.Tilesets,
                                 Data.MapEvents[id].Graphic.ToString());
                             RenderTexture(ref argpath,
                                 GameLogic.ConvertMapX(Data.MapEvents[id].X),
@@ -2436,7 +2403,7 @@ namespace Client
                         }
                         else
                         {
-                            string argpath1 = Path.Combine(DataPath.Tilesets,
+                            var argpath1 = Path.Combine(DataPath.Tilesets,
                                 Data.MapEvents[id].Graphic.ToString());
                             RenderTexture(ref argpath1,
                                 GameLogic.ConvertMapX(Data.MapEvents[id].X),
@@ -2732,7 +2699,7 @@ namespace Client
                     var loopTo9 = GameState.CurrentEvents;
                     for (i = 0; i < loopTo9; i++)
                     {
-                        if (Data.MapEvents[i].Visible == true)
+                        if (Data.MapEvents[i].Visible)
                         {
                             if (Data.MapEvents[i].ShowName == 1)
                             {
@@ -2770,7 +2737,7 @@ namespace Client
 
             if (GameState.Bfps)
             {
-                string fps = "FPS: " + GetFps();
+                var fps = "FPS: " + GetFps();
                 TextRenderer.RenderText(fps, (int) Math.Round(GameState.Camera.Left - 24d),
                     (int) Math.Round(GameState.Camera.Top + 60d), Color.Yellow, Color.Black);
             }
@@ -2778,9 +2745,9 @@ namespace Client
             // draw cursor, player X and Y locations
             if (GameState.BLoc)
             {
-                string cur = "Cur X: " + GameState.CurX + " Y: " + GameState.CurY;
-                string loc = "loc X: " + GetPlayerX(GameState.MyIndex) + " Y: " + GetPlayerY(GameState.MyIndex);
-                string map = " (Map #" + GetPlayerMap(GameState.MyIndex) + ")";
+                var cur = "Cur X: " + GameState.CurX + " Y: " + GameState.CurY;
+                var loc = "loc X: " + GetPlayerX(GameState.MyIndex) + " Y: " + GetPlayerY(GameState.MyIndex);
+                var map = " (Map #" + GetPlayerMap(GameState.MyIndex) + ")";
 
                 TextRenderer.RenderText(cur, (int) Math.Round(GameState.DrawLocX), (int) Math.Round(GameState.DrawLocY + 105f),
                     Color.Yellow, Color.Black);
@@ -2803,7 +2770,7 @@ namespace Client
             DrawBars();
             Map.DrawMapFade();
             Gui.Render();
-            string argpath = Path.Combine(DataPath.Misc, "Cursor");
+            var argpath = Path.Combine(DataPath.Misc, "Cursor");
             RenderTexture(ref argpath, GameState.CurMouseX, GameState.CurMouseY, 0, 0, 16, 16, 32, 32);
         }
 

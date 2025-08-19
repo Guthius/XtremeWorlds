@@ -1,41 +1,46 @@
 ﻿using System.Buffers;
 using System.Net.Sockets;
 using System.Threading.Channels;
+using Serilog;
 
 namespace Client.Net;
 
 public sealed class NetworkClient
 {
+    private static readonly TimeSpan ReconnectDelay = TimeSpan.FromMilliseconds(500);
+    private static readonly TimeSpan RetryDelay = TimeSpan.FromSeconds(1);
+
     private Channel<byte[]>? _sendChannel;
-    private volatile bool _isConnected; // true only when TCP is connected
-    private int _started; // 0/1 guard to avoid starting twice
+    private volatile bool _isConnected;
+    private bool _started;
 
     public bool Connected => _isConnected;
 
     public async Task StartAsync(string hostname, int port, INetworkEventHandler eventHandler, CancellationToken cancellationToken)
     {
         // Ensure only a single runner loop
-        if (Interlocked.Exchange(ref _started, 1) == 1)
+        if (Interlocked.Exchange(ref _started, true))
         {
             return;
         }
-
-        _sendChannel = Channel.CreateUnbounded<byte[]>(new UnboundedChannelOptions
+        
+        try
         {
-            SingleReader = true,
-            SingleWriter = false
-        });
+            Log.Information("Connecting to server {HostName} on port {Port}...", hostname, port);
 
-    try
-        {
-            Console.WriteLine("Connecting to server...");
-            
             while (!cancellationToken.IsCancellationRequested)
             {
-        _isConnected = false; // assume disconnected until we actually connect
-        TcpClient tcpClient = null;
+                _isConnected = false;
+
+                TcpClient tcpClient = null;
                 try
                 {
+                    _sendChannel = Channel.CreateUnbounded<byte[]>(new UnboundedChannelOptions
+                    {
+                        SingleReader = true,
+                        SingleWriter = false
+                    });
+                    
                     tcpClient = new TcpClient();
 
                     var connect = tcpClient.ConnectAsync(hostname, port, cancellationToken).AsTask();
@@ -46,38 +51,34 @@ public sealed class NetworkClient
 
                     if (!tcpClient.Connected)
                     {
-                        // Avoid tight loop when server is down
-                        await Task.Delay(TimeSpan.FromMilliseconds(500), cancellationToken);
+                        Log.Warning("Failed to connect to server");
+                        
+                        await Task.Delay(ReconnectDelay, cancellationToken);
+
                         continue;
                     }
 
-                    Console.WriteLine("Connected to server successfully");
+                    Log.Information("Connected to server successfully");
+
                     _isConnected = true;
-
+                    
                     await RunAsync(tcpClient, _sendChannel, eventHandler, cancellationToken);
-
-                    Console.WriteLine("Reconnecting...");
                 }
-                catch (SocketException ex)
+                catch (Exception ex) when (ex is not ObjectDisposedException and not OperationCanceledException)
                 {
-                    Console.WriteLine($"Socket error while connecting: {ex.Message}");
-                    // Backoff a bit before retry
-                    await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
-                }
-                catch (ObjectDisposedException)
-                {
-                    // Disposed due to shutdown; exit loop
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Network connect loop error: {ex.Message}");
-                    await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+                    await eventHandler.OnConnectionLostAsync(cancellationToken);
+                    
+                    Log.Error(ex, "Unexpected exception in network loop");
                 }
                 finally
                 {
-            try { tcpClient?.Close(); } catch { }
-            _isConnected = false; // mark disconnected on any exit
+                    tcpClient?.Close();
+                    
+                    _isConnected = false;
+                    
+                    await Task.Delay(RetryDelay, cancellationToken);
+                    
+                    Log.Information("Reconnecting...");
                 }
             }
         }
@@ -86,18 +87,32 @@ public sealed class NetworkClient
         }
         finally
         {
-        _isConnected = false;
-        Interlocked.Exchange(ref _started, 0);
+            _isConnected = false;
+
+            Interlocked.Exchange(ref _started, false);
         }
     }
 
     private static async Task RunAsync(TcpClient tcpClient, Channel<byte[]> sendChannel, INetworkEventHandler eventHandler, CancellationToken cancellationToken)
     {
-        await Task.WhenAll(
-            RunReceive(tcpClient, eventHandler,
-                cancellationToken),
-            RunSend(tcpClient, sendChannel,
-                cancellationToken));
+        var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
+        try
+        {
+            var completedTask = await Task.WhenAny(
+                RunReceive(tcpClient, eventHandler,
+                    linkedTokenSource.Token),
+                RunSend(tcpClient, sendChannel,
+                    linkedTokenSource.Token));
+
+            await completedTask;
+        }
+        catch
+        {
+            await linkedTokenSource.CancelAsync();
+
+            throw;
+        }
     }
 
     private static async Task RunReceive(TcpClient tcpClient, INetworkEventHandler eventHandler, CancellationToken cancellationToken)
@@ -108,12 +123,12 @@ public sealed class NetworkClient
         {
             var networkStream = tcpClient.GetStream();
 
-            while (true)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 var bytesReceived = await networkStream.ReadAsync(buffer, cancellationToken);
                 if (bytesReceived == 0)
                 {
-                    Console.WriteLine("Connection with the server has been lost");
+                    Log.Warning("Connection with the server has been lost");
                     break;
                 }
 
@@ -144,7 +159,7 @@ public sealed class NetworkClient
         }
         catch (SocketException ex)
         {
-            Console.WriteLine($"Socket error while sending: {ex.Message}");
+            Log.Error(ex, "Error sending data to server");
         }
         finally
         {

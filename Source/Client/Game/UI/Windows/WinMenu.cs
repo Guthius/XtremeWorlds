@@ -2,46 +2,37 @@
 
 public static class WinMenu
 {
-    public static void OnCharacterClick()
+    private static void ToggleWindow(string windowName)
     {
-        var windowIndex = Gui.GetWindowIndex("winCharacter");
-
-        if (Gui.Windows[windowIndex].Visible)
+        var window = Gui.GetWindowByName(windowName);
+        if (window is null)
         {
-            Gui.HideWindow(windowIndex);
+            return;
+        }
+
+        if (window.Visible)
+        {
+            Gui.HideWindow(windowName);
         }
         else
         {
-            Gui.ShowWindow(windowIndex, resetPosition: false);
+            Gui.ShowWindow(windowName, resetPosition: false);
         }
+    }
+
+    public static void OnCharacterClick()
+    {
+        ToggleWindow("winCharacter");
     }
 
     public static void OnInventoryClick()
     {
-        var windowIndex = Gui.GetWindowIndex("winInventory");
-
-        if (Gui.Windows[windowIndex].Visible)
-        {
-            Gui.HideWindow(windowIndex);
-        }
-        else
-        {
-            Gui.ShowWindow(windowIndex, resetPosition: false);
-        }
+        ToggleWindow("winInventory");
     }
 
     public static void OnSkillsClick()
     {
-        var windowIndex = Gui.GetWindowIndex("winSkills");
-
-        if (Gui.Windows[windowIndex].Visible)
-        {
-            Gui.HideWindow(windowIndex);
-        }
-        else
-        {
-            Gui.ShowWindow(windowIndex, resetPosition: false);
-        }
+        ToggleWindow("winSkills");
     }
 
     public static void OnMapClick()

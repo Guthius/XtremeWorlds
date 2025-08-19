@@ -1,4 +1,5 @@
-﻿using Core.Globals;
+﻿using Client.Game.UI.Controls;
+using Core.Globals;
 using static Core.Globals.Command;
 
 namespace Client.Game.UI.Windows;
@@ -47,18 +48,16 @@ public static class WinParty
                 continue;
             }
 
+            var pictureBox = winParty.GetChild<PictureBox>("picChar" + frame);
+
+            pictureBox.Visible = true;
+            pictureBox.Value = playerIndex;
+            pictureBox.ImagePath = DataPath.Characters;
+            pictureBox.Image = GetPlayerSprite(playerIndex);
+
             winParty.GetChild("lblName" + frame).Visible = true;
             winParty.GetChild("lblName" + frame).Text = GetPlayerName(playerIndex);
             winParty.GetChild("picShadow" + frame).Visible = true;
-            winParty.GetChild("picChar" + frame).Visible = true;
-            winParty.GetChild("picChar" + frame).Value = playerIndex;
-            winParty.GetChild("picChar" + frame).Image = GetPlayerSprite(playerIndex);
-            
-            for (var x = 0; x <= 4; x++)
-            {
-                winParty.GetChild("picChar" + frame).Texture[x] = DataPath.Characters;
-            }
-
             winParty.GetChild("picEmptyBar_HP" + frame).Visible = true;
             winParty.GetChild("picEmptyBar_SP" + frame).Visible = true;
             winParty.GetChild("picBar_HP" + frame).Visible = true;

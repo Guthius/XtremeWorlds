@@ -67,7 +67,7 @@ public static class WinDragBox
             return;
         }
 
-        foreach (var window in Gui.Windows.Values)
+        foreach (var window in Gui.Windows)
         {
             if (!window.Visible || window.Name == "winDragBox")
             {
@@ -83,11 +83,6 @@ public static class WinDragBox
             }
 
             targetWindow ??= window;
-
-            if (window.ZOrder > targetWindow.ZOrder)
-            {
-                targetWindow = window;
-            }
         }
 
         if (targetWindow is not null)

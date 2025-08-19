@@ -6,17 +6,17 @@ public static class WinDialogue
 {
     public static void OnOkay()
     {
-        GameLogic.DialogueHandler(1L);
+        GameLogic.DialogueHandler(1);
     }
 
     public static void OnYes()
     {
-        GameLogic.DialogueHandler(2L);
+        GameLogic.DialogueHandler(2);
     }
 
     public static void OnNo()
     {
-        GameLogic.DialogueHandler(3L);
+        GameLogic.DialogueHandler(3);
     }
 
     public static void OnClose()
@@ -24,11 +24,11 @@ public static class WinDialogue
         switch (GameState.DiaStyle)
         {
             case DialogueStyle.Okay:
-                GameLogic.DialogueHandler(1L);
+                GameLogic.DialogueHandler(1);
                 break;
 
             case DialogueStyle.YesNo:
-                GameLogic.DialogueHandler(3L);
+                GameLogic.DialogueHandler(3);
                 break;
         }
     }
