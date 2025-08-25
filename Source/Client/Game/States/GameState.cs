@@ -436,7 +436,7 @@ namespace Client
         public static bool InitAdminForm;
         public static bool InitMapReport;
         public static bool InitEventEditor;
-        public static int InEvent;
+        public static bool InEvent;
         public static int EventNum;
         public static bool InitScriptEditor;
 
