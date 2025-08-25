@@ -183,11 +183,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
         else if (kick > 0 || GameState.InGame)
         {
-            // Ensure we return to login with proper state
-            GameState.InGame = false;
-            GameState.InMenu = true;
-            Gui.HideWindows();
-            Gui.ShowWindow("winLogin");
+            GameLogic.LogoutGame();
         }
         GameLogic.DialogueAlert(dialogueIndex);
     }
