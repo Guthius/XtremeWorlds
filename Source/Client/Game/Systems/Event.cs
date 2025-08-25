@@ -178,7 +178,6 @@ namespace Client
         public static void AddEvent(int X, int Y, bool cancelLoad = false)
         {
             int count;
-            int pageCount;
             int i;
 
             if (Event.InEvent)
@@ -223,10 +222,8 @@ namespace Client
             // set the new event
             Data.MyMap.Event[count - 1].X = X;
             Data.MyMap.Event[count - 1].Y = Y;
-            // give it a new page
-            pageCount = Data.MyMap.Event[count - 1].PageCount + 1;
-            Data.MyMap.Event[count - 1].PageCount = pageCount;
-            Array.Resize(ref Data.MyMap.Event[count - 1].Pages, pageCount);
+            // ClearEvent already initialized a single page (PageCount=1),
+            // so do NOT add another page here. New events should start with exactly 1 page.
             // load the editor
             if (!cancelLoad)
             {
@@ -275,6 +272,10 @@ namespace Client
                 return;
             }
 
+            // Guard UI updates to avoid firing change handlers
+            Editor_Event.Instance.BeginPageSync();
+            try
+            {
             ref var withBlock = ref TmpEvent.Pages[pageNum];
             GraphicSelX = withBlock.GraphicX;
             GraphicSelY = withBlock.GraphicY;
@@ -312,6 +313,8 @@ namespace Client
             Editor_Event.Instance.chkShowName.Checked = Conversions.ToBoolean(withBlock.ShowName);
             Editor_Event.Instance.nudPlayerVariable.Value = withBlock.VariableCondition;
             Editor_Event.Instance.nudGraphic.Value = withBlock.Graphic;
+            // Event-level fields
+            Editor_Event.Instance.txtName.Text = TmpEvent.Name ?? string.Empty;
 
             if (withBlock.ChkSelfSwitch == 0)
             {
@@ -366,6 +369,11 @@ namespace Client
             catch
             {
                 EventListCommands();
+            }
+            }
+            finally
+            {
+                Editor_Event.Instance.EndPageSync();
             }
         }
 
