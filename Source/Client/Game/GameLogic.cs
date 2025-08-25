@@ -5,6 +5,8 @@ using System;
 using System.Data.Common;
 using Client.Game.UI;
 using Client.Game.UI.Windows;
+using System.Linq;
+using Eto.Forms;
 using Client.Net;
 using Core.Configurations;
 using Core.Globals;
@@ -2007,6 +2009,32 @@ namespace Client
             GameState.InMenu = true;
             GameState.GettingMap = false;
             GameState.InGame = false;
+            // Close all open Eto.Forms windows (editors, admin, etc.) on the UI thread
+            try
+            {
+                Application.Instance?.AsyncInvoke(() =>
+                {
+                    try
+                    {
+                        // Only close visible windows to avoid closing the hidden root form
+                        foreach (var win in Application.Instance.Windows.ToList())
+                        {
+                            try
+                            {
+                                if (win != null && win.Visible)
+                                {
+                                    // Prefer Close (triggers Closing handlers), then Dispose as a fallback
+                                    try { win.Close(); } catch { }
+                                    try { win.Dispose(); } catch { }
+                                }
+                            }
+                            catch { }
+                        }
+                    }
+                    catch { }
+                });
+            }
+            catch { }
             Gui.HideWindows();
             Gui.ShowWindow("winLogin");
             General.ClearGameData();
