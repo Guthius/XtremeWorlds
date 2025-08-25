@@ -2699,11 +2699,11 @@ namespace Server
                         switch (page.VariableCompare)
                         {
                             case 0: variableConditionMet = playerVar == page.VariableCondition; break;
-                            case 1: variableConditionMet = playerVar >= page.VariableCondition; break;
-                            case 2: variableConditionMet = playerVar <= page.VariableCondition; break;
-                            case 3: variableConditionMet = playerVar > page.VariableCondition; break;
-                            case 4: variableConditionMet = playerVar < page.VariableCondition; break;
-                            case 5: variableConditionMet = playerVar != page.VariableCondition; break;
+                            case 1: variableConditionMet = playerVar > page.VariableCondition; break;
+                            case 2: variableConditionMet = playerVar < page.VariableCondition; break;
+                            case 3: variableConditionMet = playerVar != page.VariableCondition; break;
+                            case 4: variableConditionMet = playerVar >= page.VariableCondition; break;
+                            case 5: variableConditionMet = playerVar <= page.VariableCondition; break;
                         }
 
                         if (!variableConditionMet)
