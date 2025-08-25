@@ -2958,7 +2958,7 @@ namespace Client
             {
                 for (i = 0; i < byte.MaxValue; i++)
                 {
-                    if (Animation.AnimInstance[i].Used[0])
+                    if (Animation.AnimInstance?[i].Used[0] == true)
                     {
                         Animation.Draw(i, 0);
                     }                
