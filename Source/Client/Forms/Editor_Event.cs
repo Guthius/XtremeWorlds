@@ -17,8 +17,8 @@ namespace Client
         public static Editor_Event Instance => _instance ??= new Editor_Event();
         private int tmpGraphicIndex;
         private byte tmpGraphicType;
-    // Guard to avoid feedback loops when syncing Graphic/Index controls
-    private bool _syncingGraphic;
+        // Guard to avoid feedback loops when syncing Graphic/Index controls
+        private bool _syncingGraphic;
 
         public ComboBox cmbSwitch = new ComboBox();
         public ComboBox cmbVariable = new ComboBox();
