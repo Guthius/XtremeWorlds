@@ -2613,6 +2613,7 @@ namespace Client
 
         public static void DrawEvents()
         {
+            return;
             if (Data.MyMap.Event == null)
                 return;
 

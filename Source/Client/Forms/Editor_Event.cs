@@ -15,7 +15,6 @@ namespace Client
         // Singleton access for legacy usage
         private static Editor_Event? _instance;
         public static Editor_Event Instance => _instance ??= new Editor_Event();
-        private static volatile bool _isVisible;
         private int tmpGraphicIndex;
         private byte tmpGraphicType;
     // Guard to avoid feedback loops when syncing Graphic/Index controls
@@ -133,7 +132,6 @@ namespace Client
         public Panel fraGraphic = new Panel();
         public ComboBox cmbGraphic = new ComboBox();
         public NumericStepper nudGraphic = new NumericStepper();
-    // Removed: Set Graphic button is no longer used; selection occurs directly
         // Host panel for the full editor content inside the selected tab
         private Panel editorHost = new Panel();
         // Keep a reference to the main splitter so we can enforce sizes and adjust position
@@ -257,9 +255,6 @@ namespace Client
             _instance = this;
             Title = "Event Editor";
             ClientSize = new Size(1400, 750);
-            // Keep cached visibility updated when toggled on UI thread
-            Shown += (s, e) => _isVisible = true;
-            Closed += (s, e) => _isVisible = false;
             InitializeComponent();
         }
 
