@@ -2699,10 +2699,13 @@ namespace Client
             int row = Math.Max(0, Math.Min(3, eventData.Pages[0].GraphicY));
             var sourceRect = new Rectangle(column * frameWidth, row * frameHeight, frameWidth, frameHeight);
 
+            // Draw directly at the provided screen-space coordinates.
+            // Note: x,y here are already converted to screen space by DrawEvents.
             string argPath = Path.Combine(DataPath.Characters, gfxIndex.ToString());
-            RenderTexture(ref argPath, x, y, sourceRect.X,
-                sourceRect.Y,
-                frameWidth, frameHeight, sourceRect.Width, sourceRect.Height);
+            RenderTexture(ref argPath, x, y,
+                sourceRect.X, sourceRect.Y,
+                sourceRect.Width, sourceRect.Height,
+                sourceRect.Width, sourceRect.Height);
         }
 
         private static void RenderTilesetGraphic(Type.Event eventData, int x, int y)
