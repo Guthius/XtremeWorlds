@@ -925,6 +925,9 @@ namespace Client
 
         private void TsbSave_Click(object sender, EventArgs e)
         {
+            if (Event.InEvent)
+                Editor_Event.Instance.Dispose();
+
             UpdateMap();
             Dispose();
         }
@@ -1069,6 +1072,9 @@ namespace Client
 
         private void TsbDiscard_Click(object sender, EventArgs e)
         {
+            if (Event.InEvent)
+                Editor_Event.Instance.Dispose();
+
             MapEditorCancel();
             Dispose();
         }
