@@ -2123,20 +2123,19 @@ namespace Client
                 }
                 else if (GameState.MapEditorTab == (int)MapEditorTab.Events)
                 {
-                    // Use tile indices under the mouse (CurXGame/CurYGame), not raw mouse pixels
+                    // Use editor tile indices (CurX/CurY) for event placement
                     if (Event.EventCopy)
                     {
-                        Event.CopyEvent_Map(GameState.CurXGame, GameState.CurYGame);
+                        Event.CopyEvent_Map(GameState.CurX, GameState.CurY);
                     }
                     else if (Event.EventPaste)
                     {
-                        Event.PasteEvent_Map(GameState.CurXGame, GameState.CurYGame);
+                        Event.PasteEvent_Map(GameState.CurX, GameState.CurY);
                     }
                     else
                     {
-                        Event.AddEvent(GameState.CurXGame, GameState.CurYGame);
+                        Event.AddEvent(GameState.CurX, GameState.CurY);
                     }
-                
                 }
             }
 

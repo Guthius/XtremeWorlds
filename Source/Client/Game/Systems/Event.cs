@@ -96,7 +96,7 @@ namespace Client
         {
             int count;
             int i;
-            var EventNum = default(int);
+            int EventNum = -1;
 
             count = Data.MyMap.EventCount;
 
@@ -113,10 +113,11 @@ namespace Client
             }
 
             // couldn't find one - create one
-            if (EventNum == 0)
+            if (EventNum == -1)
             {
                 AddEvent(x, y, true);
-                EventNum = count;
+                // Index of the newly added event is the last valid slot (0-based)
+                EventNum = Data.MyMap.EventCount - 1;
             }
 
             // copy it
@@ -180,6 +181,9 @@ namespace Client
             int pageCount;
             int i;
 
+            if (Event.InEvent)
+                return;
+
             count = Data.MyMap.EventCount;
 
             // make sure there's not already an event
@@ -214,7 +218,8 @@ namespace Client
             Data.MyMap.EventCount = count;
             Array.Resize(ref Data.MyMap.Event, count + 1);
             Array.Resize(ref Data.MapEvents, count + 1);
-            ClearEvent(count);
+            // Initialize the newly added event slot (0-based index is count - 1)
+            ClearEvent(count - 1);
             // set the new event
             Data.MyMap.Event[count - 1].X = X;
             Data.MyMap.Event[count - 1].Y = Y;
@@ -368,6 +373,8 @@ namespace Client
             // copy the event data from the temp event
             Data.MyMap.Event[EditorEvent] = TmpEvent;
             TmpEvent = default;
+
+            Event.InEvent = false;
 
             // unload the form
             Editor_Event.Instance.Dispose();

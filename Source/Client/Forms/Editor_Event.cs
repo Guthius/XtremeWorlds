@@ -1195,6 +1195,8 @@ namespace Client
                 fraGraphic.Visible = false;
                 DrawGraphic();
             }
+
+            Event.InEvent = false;
         }
 
         private void TvCommands_AfterSelect(object? sender, EventArgs e)

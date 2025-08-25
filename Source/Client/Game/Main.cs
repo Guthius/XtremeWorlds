@@ -105,6 +105,7 @@ public static class Program
         if (GameState.InitEventEditor)
         {
             new Editor_Event().Show();
+            Event.InEvent = true;
             GameState.InitEventEditor = false;
         }
 

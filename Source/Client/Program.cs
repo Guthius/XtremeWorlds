@@ -2311,9 +2311,9 @@ namespace Client
                     }
                     case (byte) TargetType.Event:
                     {
-                        // Event X/Y are stored in map pixel coordinates
-                        x = GameLogic.ConvertMapX(Data.MyMap.Event[withBlock.Target].X) + 16;
-                        y = GameLogic.ConvertMapY(Data.MyMap.Event[withBlock.Target].Y) - 16;
+                        // Event X/Y are stored as tile coordinates
+                        x = GameLogic.ConvertMapX(Data.MyMap.Event[withBlock.Target].X * GameState.SizeX) + 16;
+                        y = GameLogic.ConvertMapY(Data.MyMap.Event[withBlock.Target].Y * GameState.SizeY) - 16;
                         break;
                     }
 
@@ -2613,49 +2613,55 @@ namespace Client
 
         public static void DrawEvents()
         {
-            return;
             if (Data.MyMap.Event == null)
                 return;
 
-            // Iterate all events (inclusive upper bound)
-            for (int i = 0, loopTo = Information.UBound(Data.MyMap.Event); i <= loopTo; i++)
+            // Iterate only actual events to avoid drawing the trailing empty slot
+            int count = Math.Max(0, Data.MyMap.EventCount);
+            for (int i = 0; i < count; i++)
             {
-                // Treat MyMap.Event.X/Y as pixel coordinates; convert to screen-space
-                int x = GameLogic.ConvertMapX(Data.MyMap.Event[i].X);
-                int y = GameLogic.ConvertMapY(Data.MyMap.Event[i].Y);
+                if (i >= Data.MyMap.Event.Length)
+                    break;
+                // Treat MyMap.Event.X/Y as tile coordinates; compute world pixel coordinates
+                int worldX = Data.MyMap.Event[i].X * GameState.SizeX;
+                int worldY = Data.MyMap.Event[i].Y * GameState.SizeY;
 
                 // Skip event if there are no pages
                 if (Data.MyMap.Event[i].PageCount <= 0)
                 {
-                    DrawOutlineRectangle(x, y, GameState.SizeX, GameState.SizeY, Color.Blue, 0.6f);
+                    DrawOutlineRectangle(GameLogic.ConvertMapX(worldX), GameLogic.ConvertMapY(worldY), GameState.SizeX, GameState.SizeY, Color.Blue, 0.6f);
                     continue;
                 }
+
+                // Precompute screen coordinates once
+                int screenX = GameLogic.ConvertMapX(worldX);
+                int screenY = GameLogic.ConvertMapY(worldY);
 
                 // Render event based on its graphic type
                 switch (Data.MyMap.Event[i].Pages[0].GraphicType)
                 {
-                    case 0: // Text Event (draw an E centered on the tile)
+                    case 0: // Text Event (draw simple 'E' at the tile origin like other 32x32 textures)
                     {
-                        TextRenderer.RenderText("E", x + GameState.SizeX / 4, y + GameState.SizeY / 4, Color.Green, Color.Black);
+                        TextRenderer.RenderText("E", screenX, screenY, Color.Green, Color.Black);
                         break;
                     }
 
                     case 1: // Character Graphic
                     {
-                        RenderCharacterGraphic(Data.MyMap.Event[i], x, y);
+                        RenderCharacterGraphic(Data.MyMap.Event[i], screenX, screenY);
                         break;
                     }
 
                     case 2: // Tileset Graphic
                     {
-                        RenderTilesetGraphic(Data.MyMap.Event[i], x, y);
+                        RenderTilesetGraphic(Data.MyMap.Event[i], screenX, screenY);
                         break;
                     }
 
                     default:
                     {
                         // Draw fallback outline rectangle if graphic type is unknown
-                        DrawOutlineRectangle(x, y, GameState.SizeX, GameState.SizeY, Color.Blue, 0.6f);
+                        DrawOutlineRectangle(GameLogic.ConvertMapX(worldX), GameLogic.ConvertMapY(worldY), GameState.SizeX, GameState.SizeY, Color.Blue, 0.6f);
                         break;
                     }
                 }
@@ -2671,8 +2677,7 @@ namespace Client
             if (gfxIndex <= 0 || gfxIndex > GameState.NumCharacters)
                 return;
 
-            // Get animation details (frame index and columns) from the event
-            int frameIndex = eventData.Pages[0].GraphicX; // Example frame index
+            // Character sheets are 4x4 (columns x rows). Use GraphicX as column and GraphicY as row.
             int columns = 4;
             var gfxInfo = GetGfxInfo(Path.Combine(DataPath.Characters, gfxIndex.ToString()));
             if (gfxInfo == null)
@@ -2681,18 +2686,18 @@ namespace Client
                 return;
             }
 
-            // Calculate the frame size (assuming square frames for simplicity)
-            int frameWidth = gfxInfo.Width / columns;
-            int frameHeight = frameWidth; // Adjust if non-square frames
+            // Calculate the frame size based on actual sheet dimensions
+            int frameWidth = Math.Max(1, gfxInfo.Width / columns);
+            int frameHeight = Math.Max(1, gfxInfo.Height / columns);
 
-            // Calculate the source rectangle for the current frame
-            int column = frameIndex % columns;
-            int row = frameIndex / columns;
+            // Clamp and build the source rectangle for the selected frame
+            int column = Math.Max(0, Math.Min(3, eventData.Pages[0].GraphicX));
+            int row = Math.Max(0, Math.Min(3, eventData.Pages[0].GraphicY));
             var sourceRect = new Rectangle(column * frameWidth, row * frameHeight, frameWidth, frameHeight);
 
-            // Anchor bottom-center of the sprite to the tile origin (x,y)
-            int destX = x - (frameWidth - GameState.SizeX) / 2;
-            int destY = y - Math.Max(0, frameHeight - GameState.SizeY);
+            // Draw at the tile's top-left in screen space for editor consistency (matches the 'E' marker)
+            int destX = x;
+            int destY = y;
 
             string argPath = Path.Combine(DataPath.Characters, gfxIndex.ToString());
             RenderTexture(ref argPath, destX, destY, sourceRect.X,
@@ -2707,19 +2712,17 @@ namespace Client
             if (gfxIndex > 0 && gfxIndex <= GameState.NumTileSets)
             {
                 // Define source rectangle from tileset graphics
-                var srcRect = new Rectangle(eventData.Pages[0].GraphicX * 32, eventData.Pages[0].GraphicY * 32,
-                    eventData.Pages[0].GraphicX2 * 32, eventData.Pages[0].GraphicY2 * 32);
+                int width = Math.Max(1, eventData.Pages[0].GraphicX2) * GameState.SizeX;
+                int height = Math.Max(1, eventData.Pages[0].GraphicY2) * GameState.SizeY;
+                var srcRect = new Rectangle(eventData.Pages[0].GraphicX * GameState.SizeX,
+                    eventData.Pages[0].GraphicY * GameState.SizeY, width, height);
 
-                // Anchor bottom-left of the tileset region to the tile origin
-                if (srcRect.Height > GameState.SizeY)
-                    y -= (srcRect.Height - GameState.SizeY);
-
-                // Define destination rectangle
-                var destRect = new Rectangle(x, y, srcRect.Width, srcRect.Height);
+                // Draw at the tile's top-left in screen space for editor consistency
+                int destX = x;
+                int destY = y;
 
                 string argPath = Path.Combine(DataPath.Tilesets, gfxIndex.ToString());
-                RenderTexture(ref argPath, destRect.X, destRect.Y, srcRect.X, srcRect.Y, destRect.Width,
-                    destRect.Height,
+                RenderTexture(ref argPath, destX, destY, srcRect.X, srcRect.Y, srcRect.Width, srcRect.Height,
                     srcRect.Width, srcRect.Height);
             }
             else
@@ -3066,15 +3069,14 @@ namespace Client
                         if (GameState.ResourceIndex > 0)
                         {
                             var loopTo5 = GameState.ResourceIndex;
-                            for (i = 0; i < loopTo5; i++)
-                            {
+                            for (i = 0; i < loopTo5; i++)                               
                                 if (Data.MyMapResource[i].Y == y)
                                 {
                                     MapResource.DrawMapResource(i);
                                 }
                             }
                         }
-                    }
+                                   
                 }
             }
 
@@ -3083,7 +3085,7 @@ namespace Client
             {
                 for (i = 0; i < byte.MaxValue; i++)
                 {
-                    if (Animation.AnimInstance[i].Used[1])
+                    if (Animation.AnimInstance?[i].Used[1] == true)
                         {
                             Animation.Draw(i, 1);
                         }
@@ -3224,7 +3226,7 @@ namespace Client
             Map.DrawMapFade();
         }
 
-    // Cancels the current target if the distance between PLAYER and TARGET exceeds the visible camera view.
+        // Cancels the current target if the distance between PLAYER and TARGET exceeds the visible camera view.
         private static void CancelTargetIfOffCamera()
         {
             // Only handle Player and NPC targets
