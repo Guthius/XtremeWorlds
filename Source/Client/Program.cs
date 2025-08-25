@@ -2311,6 +2311,7 @@ namespace Client
                     }
                     case (byte) TargetType.Event:
                     {
+                        // Event X/Y are stored in map pixel coordinates
                         x = GameLogic.ConvertMapX(Data.MyMap.Event[withBlock.Target].X) + 16;
                         y = GameLogic.ConvertMapY(Data.MyMap.Event[withBlock.Target].Y) - 16;
                         break;
@@ -2615,8 +2616,10 @@ namespace Client
             if (Data.MyMap.Event == null)
                 return;
 
-            for (int i = 0, loopTo = Information.UBound(Data.MyMap.Event); i < loopTo; i++)
+            // Iterate all events (inclusive upper bound)
+            for (int i = 0, loopTo = Information.UBound(Data.MyMap.Event); i <= loopTo; i++)
             {
+                // Treat MyMap.Event.X/Y as pixel coordinates; convert to screen-space
                 int x = GameLogic.ConvertMapX(Data.MyMap.Event[i].X);
                 int y = GameLogic.ConvertMapY(Data.MyMap.Event[i].Y);
 
@@ -2630,17 +2633,15 @@ namespace Client
                 // Render event based on its graphic type
                 switch (Data.MyMap.Event[i].Pages[0].GraphicType)
                 {
-                    case 0: // Text Event
+                    case 0: // Text Event (draw an E centered on the tile)
                     {
-                        int tX = x * GameState.SizeX;
-                        int tY = y * GameState.SizeY;
-                        TextRenderer.RenderText("E", tX, tY, Color.Green, Color.Black);
+                        TextRenderer.RenderText("E", x + GameState.SizeX / 4, y + GameState.SizeY / 4, Color.Green, Color.Black);
                         break;
                     }
 
                     case 1: // Character Graphic
                     {
-                        RenderCharacterGraphic(Data.MyMap.Event[i], x * GameState.SizeX, y * GameState.SizeY);
+                        RenderCharacterGraphic(Data.MyMap.Event[i], x, y);
                         break;
                     }
 
@@ -2688,11 +2689,12 @@ namespace Client
             int row = frameIndex / columns;
             var sourceRect = new Rectangle(column * frameWidth, row * frameHeight, frameWidth, frameHeight);
 
-            // Define the position on the map where the graphic will be drawn
-            var position = new Vector2(x, y);
+            // Anchor bottom-center of the sprite to the tile origin (x,y)
+            int destX = x - (frameWidth - GameState.SizeX) / 2;
+            int destY = y - Math.Max(0, frameHeight - GameState.SizeY);
 
             string argPath = Path.Combine(DataPath.Characters, gfxIndex.ToString());
-            RenderTexture(ref argPath, (int) Math.Round(position.X), (int) Math.Round(position.Y), sourceRect.X,
+            RenderTexture(ref argPath, destX, destY, sourceRect.X,
                 sourceRect.Y,
                 frameWidth, frameHeight, sourceRect.Width, sourceRect.Height);
         }
@@ -2707,9 +2709,9 @@ namespace Client
                 var srcRect = new Rectangle(eventData.Pages[0].GraphicX * 32, eventData.Pages[0].GraphicY * 32,
                     eventData.Pages[0].GraphicX2 * 32, eventData.Pages[0].GraphicY2 * 32);
 
-                // Adjust position if the tile is larger than 32x32
-                if (srcRect.Height > 32)
-                    y -= GameState.SizeY;
+                // Anchor bottom-left of the tileset region to the tile origin
+                if (srcRect.Height > GameState.SizeY)
+                    y -= (srcRect.Height - GameState.SizeY);
 
                 // Define destination rectangle
                 var destRect = new Rectangle(x, y, srcRect.Width, srcRect.Height);
@@ -2738,12 +2740,12 @@ namespace Client
 
             try
             {
-                if (Data.MapEvents[id].Visible == false)
+                if (Data.MapEvents?[id].Visible == false)
                 {
                     return;
                 }
 
-                switch (Data.MapEvents[id].GraphicType)
+                switch (Data.MapEvents?[id].GraphicType)
                 {
                     case 0:
                     {

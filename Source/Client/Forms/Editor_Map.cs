@@ -2123,22 +2123,20 @@ namespace Client
                 }
                 else if (GameState.MapEditorTab == (int)MapEditorTab.Events)
                 {
-                    // Avoid cross-thread UI access: rely on cached visibility flag updated on UI thread
-                    if (!Editor_Event.IsVisibleCached)
+                    // Use tile indices under the mouse (CurXGame/CurYGame), not raw mouse pixels
+                    if (Event.EventCopy)
                     {
-                        if (Event.EventCopy)
-                        {
-                            Event.CopyEvent_Map(GameState.CurX, GameState.CurY);
-                        }
-                        else if (Event.EventPaste)
-                        {
-                            Event.PasteEvent_Map(GameState.CurX, GameState.CurY);
-                        }
-                        else
-                        {
-                            Event.AddEvent(GameState.CurX, GameState.CurY);
-                        }
+                        Event.CopyEvent_Map(GameState.CurXGame, GameState.CurYGame);
                     }
+                    else if (Event.EventPaste)
+                    {
+                        Event.PasteEvent_Map(GameState.CurXGame, GameState.CurYGame);
+                    }
+                    else
+                    {
+                        Event.AddEvent(GameState.CurXGame, GameState.CurYGame);
+                    }
+                
                 }
             }
 

@@ -10,15 +10,12 @@ using Type = Core.Globals.Type;
 
 namespace Client
 {
-
     public partial class Editor_Event : Form
     {
         // Singleton access for legacy usage
         private static Editor_Event? _instance;
         public static Editor_Event Instance => _instance ??= new Editor_Event();
-        // Safe state mirror for game thread checks
         private static volatile bool _isVisible;
-        public static bool IsVisibleCached => _isVisible;
         private int tmpGraphicIndex;
         private byte tmpGraphicType;
     // Guard to avoid feedback loops when syncing Graphic/Index controls
