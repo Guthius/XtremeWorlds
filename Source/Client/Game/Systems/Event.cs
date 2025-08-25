@@ -252,6 +252,7 @@ namespace Client
         public static void EventEditorInit()
         {
             int EventNum = GameState.EventNum;
+            GameState.InEvent = true;
             EditorEvent = EventNum;
             TmpEvent = Data.MyMap.Event[EventNum];
             if (TmpEvent.Pages[0].CommandListCount == 0)

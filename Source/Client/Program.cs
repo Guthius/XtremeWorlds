@@ -69,10 +69,10 @@ namespace Client
         public static RenderTarget2D? RenderTarget;
         public static Texture2D? TransparentTexture;
         public static Texture2D? PixelTexture;
-    private static RenderTarget2D? _guiRenderTarget; // GUI layer RT (never zoomed)
-    // Smoothed camera pivot (native coords) used for composition-time zoom
-    private static Vector2 _zoomPivotSmoothed = Vector2.Zero;
-    private static bool _zoomPivotInitialized = false;
+        private static RenderTarget2D? _guiRenderTarget; // GUI layer RT (never zoomed)
+        // Smoothed camera pivot (native coords) used for composition-time zoom
+        private static Vector2 _zoomPivotSmoothed = Vector2.Zero;
+        private static bool _zoomPivotInitialized = false;
 
         // Add a timer to prevent spam
         private static DateTime _lastInputTime = DateTime.MinValue;
@@ -1813,6 +1813,9 @@ namespace Client
                 Data.MyMapNpc[(int) mapNpcNum].Num > Constant.MaxNpcs)
                 return;
 
+            if (EditorType.Map == GameState.MyEditorType)
+                return;
+
             x = (int) Math.Floor((double) Data.MyMapNpc[(int) mapNpcNum].X / 32);
             y = (int) Math.Floor((double) Data.MyMapNpc[(int) mapNpcNum].Y / 32);
 
@@ -2622,6 +2625,7 @@ namespace Client
             {
                 if (i >= Data.MyMap.Event.Length)
                     break;
+                    
                 // Treat MyMap.Event.X/Y as tile coordinates; compute world pixel coordinates
                 int worldX = Data.MyMap.Event[i].X * GameState.SizeX;
                 int worldY = Data.MyMap.Event[i].Y * GameState.SizeY;
@@ -2695,12 +2699,8 @@ namespace Client
             int row = Math.Max(0, Math.Min(3, eventData.Pages[0].GraphicY));
             var sourceRect = new Rectangle(column * frameWidth, row * frameHeight, frameWidth, frameHeight);
 
-            // Draw at the tile's top-left in screen space for editor consistency (matches the 'E' marker)
-            int destX = x;
-            int destY = y;
-
             string argPath = Path.Combine(DataPath.Characters, gfxIndex.ToString());
-            RenderTexture(ref argPath, destX, destY, sourceRect.X,
+            RenderTexture(ref argPath, x, y, sourceRect.X,
                 sourceRect.Y,
                 frameWidth, frameHeight, sourceRect.Width, sourceRect.Height);
         }
@@ -2748,128 +2748,131 @@ namespace Client
                 {
                     return;
                 }
+                
+                if (EditorType.Map == GameState.MyEditorType)
+                    return;
 
                 switch (Data.MapEvents?[id].GraphicType)
                 {
                     case 0:
-                    {
-                        return;
-                    }
+                        {
+                            return;
+                        }
                     case 1:
-                    {
-                        if (Data.MapEvents[id].Graphic <= 0 |
-                            Data.MapEvents[id].Graphic > GameState.NumCharacters)
-                            return;
-
-                        anim = Data.MapEvents[id].Steps;
-
-                        // Set the left
-                        switch (Data.MapEvents[id].ShowDir)
                         {
-                            case (int) Direction.Up:
+                            if (Data.MapEvents[id].Graphic <= 0 |
+                                Data.MapEvents[id].Graphic > GameState.NumCharacters)
+                                return;
+
+                            anim = Data.MapEvents[id].Steps;
+
+                            // Set the left
+                            switch (Data.MapEvents[id].ShowDir)
                             {
-                                spritetop = 3;
-                                break;
+                                case (int)Direction.Up:
+                                    {
+                                        spritetop = 3;
+                                        break;
+                                    }
+                                case (int)Direction.Right:
+                                    {
+                                        spritetop = 2;
+                                        break;
+                                    }
+                                case (int)Direction.Down:
+                                    {
+                                        spritetop = 0;
+                                        break;
+                                    }
+                                case (int)Direction.Left:
+                                    {
+                                        spritetop = 1;
+                                        break;
+                                    }
                             }
-                            case (int) Direction.Right:
+
+                            var gfxInfo = GetGfxInfo(Path.Combine(DataPath.Characters,
+                                Data.MapEvents[id].Graphic.ToString()));
+
+                            if (gfxInfo == null)
                             {
-                                spritetop = 2;
-                                break;
+                                // Handle the case where gfxInfo is null
+                                return;
                             }
-                            case (int) Direction.Down:
+
+                            height = (int)Math.Round((double)gfxInfo.Height / 4d);
+                            width = (int)Math.Round((double)gfxInfo.Width / 4d);
+                            sRect = new Rectangle((int)Math.Round((double)anim * width),
+                                (int)Math.Round((double)spritetop * height), width, height);
+
+                            // Calculate the X
+                            x = (int)Math.Round(Data.MapEvents[id].X -
+                                                 (width - 32d) / 2d);
+
+                            // Is the player's height more than 32..?
+                            if ((gfxInfo.Height / 4) > 32)
                             {
-                                spritetop = 0;
-                                break;
+                                // Create a 32 pixel offset for larger sprites
+                                y = (int)Math.Round(Data.MapEvents[id].Y - (height - 32d));
                             }
-                            case (int) Direction.Left:
+                            else
                             {
-                                spritetop = 1;
-                                break;
+                                // Proceed as normal
+                                y = Data.MapEvents[id].Y;
                             }
+
+                            // render the actual sprite
+                            DrawCharacterSprite(Data.MapEvents[id].Graphic, x, y, sRect);
+                            break;
                         }
-
-                        var gfxInfo = GetGfxInfo(Path.Combine(DataPath.Characters,
-                            Data.MapEvents[id].Graphic.ToString()));
-
-                        if (gfxInfo == null)
-                        {
-                            // Handle the case where gfxInfo is null
-                            return;
-                        }
-
-                        height = (int) Math.Round((double) gfxInfo.Height / 4d);
-                        width = (int) Math.Round((double) gfxInfo.Width / 4d);
-                        sRect = new Rectangle((int) Math.Round((double) anim * width),
-                            (int) Math.Round((double) spritetop * height), width, height);
-
-                        // Calculate the X
-                        x = (int) Math.Round(Data.MapEvents[id].X -
-                                             (width - 32d) / 2d);
-
-                        // Is the player's height more than 32..?
-                        if ((gfxInfo.Height / 4) > 32)
-                        {
-                            // Create a 32 pixel offset for larger sprites
-                            y = (int) Math.Round(Data.MapEvents[id].Y - (height - 32d));
-                        }
-                        else
-                        {
-                            // Proceed as normal
-                            y = Data.MapEvents[id].Y;
-                        }
-
-                        // render the actual sprite
-                        DrawCharacterSprite(Data.MapEvents[id].Graphic, x, y, sRect);
-                        break;
-                    }
                     case 2:
-                    {
-                        if (Data.MapEvents[id].Graphic < 1 |
-                            Data.MapEvents[id].Graphic > GameState.NumTileSets)
-                            return;
-
-                        if (Data.MapEvents[id].GraphicY2 > 0 | Data.MapEvents[id].GraphicX2 > 0)
                         {
-                            sRect.X = Data.MapEvents[id].GraphicX * 32;
-                            sRect.Y = Data.MapEvents[id].GraphicY * 32;
-                            sRect.Width = Data.MapEvents[id].GraphicX2 * 32;
-                            sRect.Height = Data.MapEvents[id].GraphicY2 * 32;
-                        }
-                        else
-                        {
-                            sRect.X = Data.MapEvents[id].GraphicY * 32;
-                            sRect.Height = sRect.Top + 32;
-                            sRect.Y = Data.MapEvents[id].GraphicX * 32;
-                            sRect.Width = sRect.Left + 32;
-                        }
+                            if (Data.MapEvents[id].Graphic < 1 |
+                                Data.MapEvents[id].Graphic > GameState.NumTileSets)
+                                return;
 
-                        x = Data.MapEvents[id].X * 32;
-                        y = Data.MapEvents[id].Y * 32;
-                        x = (int) Math.Round(x - (sRect.Right - sRect.Left) / 2d);
-                        y = y - (sRect.Bottom - sRect.Top) + 32;
+                            if (Data.MapEvents[id].GraphicY2 > 0 | Data.MapEvents[id].GraphicX2 > 0)
+                            {
+                                sRect.X = Data.MapEvents[id].GraphicX * 32;
+                                sRect.Y = Data.MapEvents[id].GraphicY * 32;
+                                sRect.Width = Data.MapEvents[id].GraphicX2 * 32;
+                                sRect.Height = Data.MapEvents[id].GraphicY2 * 32;
+                            }
+                            else
+                            {
+                                sRect.X = Data.MapEvents[id].GraphicY * 32;
+                                sRect.Height = sRect.Top + 32;
+                                sRect.Y = Data.MapEvents[id].GraphicX * 32;
+                                sRect.Width = sRect.Left + 32;
+                            }
 
-                        if (Data.MapEvents[id].GraphicY2 > 1)
-                        {
-                            string argPath = Path.Combine(DataPath.Tilesets,
-                                Data.MapEvents[id].Graphic.ToString());
-                            RenderTexture(ref argPath,
-                                GameLogic.ConvertMapX(Data.MapEvents[id].X),
-                                GameLogic.ConvertMapY(Data.MapEvents[id].Y) - GameState.SizeY,
-                                sRect.Left, sRect.Top, sRect.Width, sRect.Height);
-                        }
-                        else
-                        {
-                            string argPath1 = Path.Combine(DataPath.Tilesets,
-                                Data.MapEvents[id].Graphic.ToString());
-                            RenderTexture(ref argPath1,
-                                GameLogic.ConvertMapX(Data.MapEvents[id].X),
-                                GameLogic.ConvertMapY(Data.MapEvents[id].Y), sRect.Left,
-                                sRect.Top,
-                                sRect.Width, sRect.Height);
-                        }
+                            x = Data.MapEvents[id].X * 32;
+                            y = Data.MapEvents[id].Y * 32;
+                            x = (int)Math.Round(x - (sRect.Right - sRect.Left) / 2d);
+                            y = y - (sRect.Bottom - sRect.Top) + 32;
 
-                        break;
-                    }
+                            if (Data.MapEvents[id].GraphicY2 > 1)
+                            {
+                                string argPath = Path.Combine(DataPath.Tilesets,
+                                    Data.MapEvents[id].Graphic.ToString());
+                                RenderTexture(ref argPath,
+                                    GameLogic.ConvertMapX(Data.MapEvents[id].X),
+                                    GameLogic.ConvertMapY(Data.MapEvents[id].Y) - GameState.SizeY,
+                                    sRect.Left, sRect.Top, sRect.Width, sRect.Height);
+                            }
+                            else
+                            {
+                                string argPath1 = Path.Combine(DataPath.Tilesets,
+                                    Data.MapEvents[id].Graphic.ToString());
+                                RenderTexture(ref argPath1,
+                                    GameLogic.ConvertMapX(Data.MapEvents[id].X),
+                                    GameLogic.ConvertMapY(Data.MapEvents[id].Y), sRect.Left,
+                                    sRect.Top,
+                                    sRect.Width, sRect.Height);
+                            }
+
+                            break;
+                        }
                 }
             }
             catch (Exception ex)
@@ -2926,7 +2929,7 @@ namespace Client
                     var loopTo2 = Information.UBound(Data.MapEvents);
                     for (i = 0; i <= loopTo2; i++)
                     {
-                        if (Data.MapEvents[i].Position == 0)
+                        if (Data.MapEvents?[i].Position == 0)
                         {
                             DrawEvent(i);
                         }

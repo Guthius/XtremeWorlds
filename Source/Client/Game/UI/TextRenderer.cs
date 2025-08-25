@@ -318,30 +318,34 @@ public static class TextRenderer
 
         if (npcNum < 0 | npcNum > Constant.MaxNpcs)
             return;
+            
 
-        switch (Data.Npc[(int) npcNum].Behaviour)
+        if (EditorType.Map == GameState.MyEditorType)
+            return;
+
+        switch (Data.Npc[(int)npcNum].Behaviour)
         {
             case 0: // attack on sight
-            {
-                color = Color.Red;
-                backColor = Color.Black;
-                break;
-            }
+                {
+                    color = Color.Red;
+                    backColor = Color.Black;
+                    break;
+                }
             case 1:
             case 4: // attack when attacked + guard
-            {
-                color = Color.Green;
-                backColor = Color.Black;
-                break;
-            }
+                {
+                    color = Color.Green;
+                    backColor = Color.Black;
+                    break;
+                }
             case 2:
             case 3:
             case 5: // friendly + shopkeeper + quest
-            {
-                color = Color.Yellow;
-                backColor = Color.Black;
-                break;
-            }
+                {
+                    color = Color.Yellow;
+                    backColor = Color.Black;
+                    break;
+                }
         }
 
         var textX = GameLogic.ConvertMapX(Data.MyMapNpc[mapNpcNum].X) + GameState.SizeX / 2 - 6;
