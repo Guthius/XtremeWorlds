@@ -1442,13 +1442,15 @@ namespace Client
             int p;
             Type.CommandList oldCommandList;
 
-            if (Editor_Event.Instance.lstCommands.SelectedIndex == -1 || EventList == null)
+            // Determine the current list index safely
+            var selIndex = Editor_Event.Instance.lstCommands.SelectedIndex;
+            if (selIndex == -1 || EventList == null || selIndex < 0 || selIndex >= EventList.Length)
             {
                 curlist = 0;
             }
             else
             {
-                curlist = EventList[Editor_Event.Instance.lstCommands.SelectedIndex].CommandList;
+                curlist = EventList[selIndex].CommandList;
             }
 
             TmpEvent.Pages[CurPageNum].CommandListCount += 1;
@@ -1470,14 +1472,21 @@ namespace Client
                 for (i = 0; i < loopTo; i++)
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[i] = oldCommandList.Commands[i];
 
-                i = EventList[Editor_Event.Instance.lstCommands.SelectedIndex].CommandNum;
+                // Safely resolve the selected command number; default to appending at end
+                var sel = Editor_Event.Instance.lstCommands.SelectedIndex;
+                var selectedCommandNum = p; // default insertion at end if selection is invalid
+                if (EventList != null && sel >= 0 && sel < EventList.Length)
+                {
+                    selectedCommandNum = EventList[sel].CommandNum;
+                }
+                i = selectedCommandNum;
                 if (i <= TmpEvent.Pages[CurPageNum].CommandList[curlist].CommandCount)
                 {
                     var loopTo1 = i;
                     for (X = TmpEvent.Pages[CurPageNum].CommandList[curlist].CommandCount; X < loopTo1; X++)
                         TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[X + 1] = TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[X];
 
-                    curslot = EventList[Editor_Event.Instance.lstCommands.SelectedIndex].CommandNum;
+                    curslot = selectedCommandNum;
                 }
                 else
                 {
@@ -1489,7 +1498,7 @@ namespace Client
             {
                 case (int) EventCommand.AddText:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Text1 = Editor_Event.Instance.txtAddText_Text.Text;
                     if (Editor_Event.Instance.optAddText_Player.Checked == true)
                     {
@@ -1508,7 +1517,7 @@ namespace Client
                 }
                 case (int) EventCommand.ConditionalBranch:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     TmpEvent.Pages[CurPageNum].CommandListCount += 1;
                     Array.Resize(ref TmpEvent.Pages[CurPageNum].CommandList, TmpEvent.Pages[CurPageNum].CommandListCount);
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].ConditionalBranch.CommandList = TmpEvent.Pages[CurPageNum].CommandListCount;
@@ -1609,7 +1618,7 @@ namespace Client
 
                 case (int) EventCommand.ShowText:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     string tmptxt = "";
                     // TextArea has no Lines property; split Text manually to mimic previous behavior
                     var rawText = Editor_Event.Instance.txtShowText.Text ?? string.Empty;
@@ -1624,7 +1633,7 @@ namespace Client
 
                 case (int) EventCommand.ShowChoices:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Text1 = Editor_Event.Instance.txtChoicePrompt.Text;
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Text2 = Editor_Event.Instance.txtChoices1.Text;
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Text3 = Editor_Event.Instance.txtChoices2.Text;
@@ -1645,7 +1654,7 @@ namespace Client
 
                 case (int) EventCommand.ModifyVariable:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1 = Editor_Event.Instance.cmbVariable.SelectedIndex;
 
                     if (Editor_Event.Instance.optVariableAction0.Checked == true)
@@ -1681,7 +1690,7 @@ namespace Client
 
                 case (int) EventCommand.ModifySwitch:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1 = Editor_Event.Instance.cmbSwitch.SelectedIndex;
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data2 = Editor_Event.Instance.cmbPlayerSwitchSet.SelectedIndex;
                     break;
@@ -1689,7 +1698,7 @@ namespace Client
 
                 case (int) EventCommand.ModifySelfSwitch:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1 = Editor_Event.Instance.cmbSetSelfSwitch.SelectedIndex;
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data2 = Editor_Event.Instance.cmbSetSelfSwitchTo.SelectedIndex;
                     break;
@@ -1697,13 +1706,13 @@ namespace Client
 
                 case (int) EventCommand.ExitEventProcess:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     break;
                 }
 
                 case (int) EventCommand.ChangeItems:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1 = Editor_Event.Instance.cmbChangeItemIndex.SelectedIndex;
                     if (Editor_Event.Instance.optChangeItemSet.Checked == true)
                     {
@@ -1724,38 +1733,38 @@ namespace Client
 
                 case (int) EventCommand.RestoreHealth:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     break;
                 }
 
                 case (int) EventCommand.RestoreMana:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     break;
                 }
 
                 case (int) EventCommand.RestoreStamina:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     break;
                 }
 
                 case (int) EventCommand.LevelUp:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     break;
                 }
 
                 case (int) EventCommand.ChangeLevel:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1 = (int) Math.Round(Editor_Event.Instance.nudChangeLevel.Value);
                     break;
                 }
 
                 case (int) EventCommand.ChangeSkills:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1 = Editor_Event.Instance.cmbChangeSkills.SelectedIndex;
                     if (Editor_Event.Instance.optChangeSkillsAdd.Checked == true)
                     {
@@ -1771,21 +1780,21 @@ namespace Client
 
                 case (int) EventCommand.ChangeJob:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1 = Editor_Event.Instance.cmbChangeJob.SelectedIndex;
                     break;
                 }
 
                 case (int) EventCommand.ChangeSprite:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1 = (int) Math.Round(Editor_Event.Instance.nudChangeSprite.Value);
                     break;
                 }
 
                 case (int) EventCommand.ChangeSex:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     if (Editor_Event.Instance.optChangeSexMale.Checked == true)
                     {
                         TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1 = (int) Sex.Male;
@@ -1800,14 +1809,14 @@ namespace Client
 
                 case (int) EventCommand.SetPlayerKillable:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1 = Editor_Event.Instance.cmbSetPK.SelectedIndex;
                     break;
                 }
 
                 case (int) EventCommand.WarpPlayer:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1 = (int) Math.Round(Editor_Event.Instance.nudWPMap.Value);
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data2 = (int) Math.Round(Editor_Event.Instance.nudWPX.Value);
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data3 = (int) Math.Round(Editor_Event.Instance.nudWPY.Value);
@@ -1817,7 +1826,7 @@ namespace Client
 
                 case (int) EventCommand.SetMoveRoute:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1 = ListOfEvents[Editor_Event.Instance.cmbEvent.SelectedIndex];
                     if (Editor_Event.Instance.chkIgnoreMove.Checked == true)
                     {
@@ -1844,7 +1853,7 @@ namespace Client
 
                 case (int) EventCommand.PlayAnimation:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1 = Editor_Event.Instance.cmbPlayAnim.SelectedIndex;
                     if (Editor_Event.Instance.cmbAnimTargetType.SelectedIndex == 0)
                     {
@@ -1867,60 +1876,60 @@ namespace Client
 
                 case (int) EventCommand.PlayBgm:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Text1 = Sound.MusicCache[Editor_Event.Instance.cmbPlayBGM.SelectedIndex];
                     break;
                 }
 
                 case (int) EventCommand.FadeOutBgm:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     break;
                 }
 
                 case (int) EventCommand.PlaySound:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Text1 = Sound.SoundCache[Editor_Event.Instance.cmbPlaySound.SelectedIndex];
                     break;
                 }
 
                 case (int) EventCommand.StopSound:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     break;
                 }
 
                 case (int) EventCommand.OpenBank:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     break;
                 }
 
                 case (int) EventCommand.OpenShop:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1 = Editor_Event.Instance.cmbOpenShop.SelectedIndex;
                     break;
                 }
 
                 case (int) EventCommand.SetAccessLevel:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1 = Editor_Event.Instance.cmbSetAccess.SelectedIndex + 1;
                     break;
                 }
 
                 case (int) EventCommand.GiveExperience:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1 = (int) Math.Round(Editor_Event.Instance.nudGiveExp.Value);
                     break;
                 }
 
                 case (int) EventCommand.ShowChatBubble:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Text1 = Editor_Event.Instance.txtChatbubbleText.Text;
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1 = Editor_Event.Instance.cmbChatBubbleTargetType.SelectedIndex + 1;
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data2 = Editor_Event.Instance.cmbChatBubbleTarget.SelectedIndex;
@@ -1929,7 +1938,7 @@ namespace Client
 
                 case (int) EventCommand.Label:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Text1 = Editor_Event.Instance.txtLabelName.Text;
                     break;
                 }
