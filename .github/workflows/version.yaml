@@ -24,14 +24,18 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
-      - name: Build
-        run: dotnet build --configuration Release --no-restore
+      - name: Build Client
+        run: dotnet build Source/Client/Client.csproj --configuration Release --no-restore
+      - name: Build Server
+        run: dotnet build Source/Server/Server.csproj --configuration Release --no-restore
 
       - name: Test
         run: dotnet test --no-build --verbosity normal
 
-      - name: Publish build output
-        run: dotnet publish -c Release -o ./publish
+      - name: Publish Client
+        run: dotnet publish Source/Client/Client.csproj -c Release -o ./publish/Client --self-contained true
+      - name: Publish Server
+        run: dotnet publish Source/Server/Server.csproj -c Release -o ./publish/Server --self-contained true
 
       # Linux ZIP
       - name: Create ZIP on Linux
