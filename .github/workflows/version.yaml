@@ -87,5 +87,5 @@ jobs:
       - name: Upload ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: xtremeworlds-${{ toLower(runner.os) }}-${GITHUB_REF_NAME}
-          path: xtremeworlds-${{ toLower(runner.os) }}-${GITHUB_REF_NAME}.zip
+          name: xtremeworlds-${{ runner.os }}-${GITHUB_REF_NAME}
+          path: xtremeworlds-${{ runner.os }}-${GITHUB_REF_NAME}.zip
