@@ -19,6 +19,11 @@ namespace Client
         private byte tmpGraphicType;
         // Guard to avoid feedback loops when syncing Graphic/Index controls
         private bool _syncingGraphic;
+        // Guard to avoid firing change handlers during page UI programmatic updates
+        private bool _syncingPageUI;
+        public bool IsSyncingPageUI => _syncingPageUI;
+        public void BeginPageSync() { _syncingPageUI = true; }
+        public void EndPageSync() { _syncingPageUI = false; }
 
         public ComboBox cmbSwitch = new ComboBox();
         public ComboBox cmbVariable = new ComboBox();
@@ -53,6 +58,29 @@ namespace Client
         // Add Text scope options
         public RadioButton optAddText_Map = new RadioButton { Text = "Map" };
         public RadioButton optAddText_Global = new RadioButton { Text = "Global" };
+
+        // Keep a handle to the right-side scroll view so we can bring frames into view
+        private Scrollable? _rightScroll;
+
+        private void ScrollRightPaneTop()
+        {
+            try
+            {
+                if (_rightScroll != null)
+                {
+                    // Reset scroll to top-left; use Eto.Drawing namespace explicitly to avoid ambiguity
+                    _rightScroll.ScrollPosition = new Eto.Drawing.Point(0, 0);
+                }
+            }
+            catch { }
+        }
+
+        // Legacy sizing hook retained for compatibility with existing calls
+        private void SyncOverlayChildSizes()
+        {
+            try { }
+            catch { }
+        }
         // Animation play / targeting controls
         public ComboBox cmbPlayAnimEvent = new ComboBox();
         public ComboBox cmbAnimTargetType = new ComboBox();
@@ -135,8 +163,8 @@ namespace Client
         // Host panel for the full editor content inside the selected tab
         private Panel editorHost = new Panel();
         // Keep a reference to the main splitter so we can enforce sizes and adjust position
-        private Splitter? mainSplit;
-        // Host for active command frames, shown above the command list
+            private Splitter? mainSplit;
+        // Host for active command frames
         private Panel frameHost = new Panel();
         private StackLayout frameDeck = new StackLayout { Orientation = Orientation.Vertical, Spacing = 6 };
         // Pages toolbar (New/Copy/Paste/Delete) lives inside the active tab so the tab fills the entire editor
@@ -144,6 +172,9 @@ namespace Client
         // Single container that wraps pagesBar + editorHost and is moved between selected tabs
         private Panel tabContentHost = new Panel();
         private TabPage? hostedTab;
+        // Keep a handle to the right-side container for invalidation
+        private StackLayout? _rightStack;
+        // Right side uses a simple vertical stack: frameHost (top) and fraCommands (bottom)
 
         // Additional controls referenced in logic (declare as needed)
         public ListBox lstCommands = new ListBox();
@@ -158,7 +189,18 @@ namespace Client
         public Panel fraShowChoices = new Panel();
         public Panel fraAddText = new Panel();
         public Panel fraShowChatBubble = new Panel();
-        public Panel fraCommands = new Panel();
+        // Command list/palette container – stays visible under frames
+        // Command area; override Visible to prevent hiding
+        public sealed class NonHideablePanel : Panel
+        {
+            // Allow true/false so we can hide the palette when a frame is active
+            public new bool Visible
+            {
+                get => base.Visible;
+                set { base.Visible = value; }
+            }
+        }
+        public NonHideablePanel fraCommands = new NonHideablePanel();
         public Panel fraPlayerVariable = new Panel();
         public Panel fraPlayerSwitch = new Panel();
         public Panel fraSetSelfSwitch = new Panel();
@@ -212,6 +254,7 @@ namespace Client
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
+            Event.InEvent = false;
             if (ReferenceEquals(_instance, this)) _instance = null;
         }
 
@@ -254,7 +297,8 @@ namespace Client
         {
             _instance = this;
             Title = "Event Editor";
-            ClientSize = new Size(1400, 750);
+        // Make the editor more compact by default
+        ClientSize = new Size(1200, 680);
             InitializeComponent();
         }
 
@@ -333,8 +377,8 @@ namespace Client
                 }
             };
 
-            // enlarge preview to increase overall group height
-            picGraphic.Size = new Size(96, 96);
+            // Smaller preview to keep the UI compact
+            picGraphic.Size = new Size(64, 64);
 
             var pageSettingsLeft = new TableLayout
             {
@@ -470,16 +514,21 @@ namespace Client
             chkWalkThrough.CheckedChanged += ChkWalkThrough_CheckedChanged;
             chkDirFix.CheckedChanged += ChkDirFix_CheckedChanged;
             chkShowName.CheckedChanged += ChkShowName_CheckedChanged;
+            // Event-level fields
+            txtName.TextChanged += TxtName_TextChanged;
+            chkGlobal.CheckedChanged += ChkGlobal_CheckedChanged;
             btnMoveRoute.Click += BtnMoveRoute_Click;
-            // removed Set Graphic button hookup
+            // Make the graphic preview open the Set Graphic selector when clicked
+            picGraphic.Cursor = Cursors.Pointer;
+            picGraphic.MouseDown += PicGraphic_Click;
             picGraphicSel.MouseDown += PicGraphicSel_MouseDown;
             // Ensure the tab control has some vertical space via layout (StackLayoutItem true above)
             var leftPadded = new Panel { Padding = new Eto.Drawing.Padding(12,8,8,8), Content = leftPane };
 
             // RIGHT: command palette and command list + editors
             // Build the Variable/Switch management panel UI
-            // Hide variables/switches panel until opened via the button
-            pnlVariableSwitches.Visible = false;
+            // Show variables/switches panel by default; command frames will appear here when selected
+            pnlVariableSwitches.Visible = true;
             fraLabeling.Visible = true;
             FraRenaming.Visible = false;
 
@@ -517,7 +566,7 @@ namespace Client
             var btnLabelCancel = new Button { Text = "Cancel" };
             btnLabelCancel.Click += BtnLabel_Cancel_Click;
 
-            fraLabeling.Content = new TableLayout
+        fraLabeling.Content = new TableLayout
             {
                 Spacing = new Size(8,6),
                 Rows =
@@ -543,6 +592,7 @@ namespace Client
             try { tvCommands.Width = -1; lstCommands.Width = -1; } catch { }
 
             // Bottom OK/Cancel bar (aligned right)
+            // Bottom OK/Cancel bar (aligned right) – moved outside panels
             var spacer = new Panel();
             var bottomButtons = new TableLayout
             {
@@ -556,7 +606,7 @@ namespace Client
             btnOK.Click += BtnOK_Click;
             btnCancel.Click += BtnCancel_Click;
 
-            // Build command area (palette + list) and host beside the variables/switches panel
+            // Build command area (palette + list) and host below the variables/switches panel
             var commandButtons = new StackLayout
             {
                 Orientation = Orientation.Horizontal,
@@ -580,52 +630,56 @@ namespace Client
             fraCommands.Content = commandArea;
             fraCommands.Visible = true;
 
-        var rightPane = new StackLayout
+            // Host where we will display active frames (including Variables/Switches) over the command palette
+            if (frameHost == null) frameHost = new Panel();
+            frameHost.Visible = false;
+
+            // Set consistent width for frame text fields
+            try
+            {
+                const int frameTextWidth = 300;
+                // TextAreas: set width while preserving a sensible height
+                if (txtShowText != null)
+                {
+                    var h = txtShowText.Size.Height > 0 ? txtShowText.Size.Height : 160;
+                    txtShowText.Size = new Size(frameTextWidth, h);
+                }
+                if (txtAddText_Text != null)
+                {
+                    var h2 = txtAddText_Text.Size.Height > 0 ? txtAddText_Text.Size.Height : 120;
+                    txtAddText_Text.Size = new Size(frameTextWidth, h2);
+                }
+                // TextBoxes
+                txtChoicePrompt.Width = frameTextWidth;
+                txtChoices1.Width = frameTextWidth;
+                txtChoices2.Width = frameTextWidth;
+                txtChoices3.Width = frameTextWidth;
+                txtChoices4.Width = frameTextWidth;
+                txtChatbubbleText.Width = frameTextWidth;
+                txtGoToLabel.Width = frameTextWidth;
+                txtRename.Width = frameTextWidth;
+            }
+            catch { }
+
+            // Build frame UIs so panels have visible content when shown
+            BuildFrameUIs();
+
+            // Build a simple vertical stack with frameHost (top) and command palette (bottom)
+            frameHost.Visible = false; // start with palette visible
+            fraCommands.Visible = true;
+            var rightStack = new StackLayout
             {
                 Orientation = Orientation.Vertical,
                 Spacing = 6,
-                Items =
-                {
-            // Frames show on top; commands hide via fraCommands.Visible toggles in existing logic
-                    fraDialogue,
-                    fraGraphic,
-                    fraMoveRoute,
-                    fraShowText,
-                    fraShowChoices,
-                    fraAddText,
-                    fraShowChatBubble,
-            fraPlayerVariable,
-            fraPlayerSwitch,
-            fraSetSelfSwitch,
-            fraConditionalBranch,
-            fraCreateLabel,
-            fraGoToLabel,
-            fraChangeItems,
-            fraChangeLevel,
-            fraChangeSkills,
-            fraChangeJob,
-            fraChangeSprite,
-            fraChangeGender,
-            fraChangePK,
-            fraGiveExp,
-            fraPlayerWarp,
-            fraMoveRouteWait,
-            fraSpawnNpc,
-            fraPlayAnimation,
-            fraSetFog,
-            fraSetWeather,
-            fraMapTint,
-            fraPlayBGM,
-            fraPlaySound,
-            fraSetWait,
-            fraSetAccess,
-            fraShowPic,
-            fraOpenShop,
-            // Switches/Variables manager lives on the right
-            pnlVariableSwitches,
-                    fraCommands, // command area appears when no frame is active
-                    bottomButtons
-                }
+                Items = { new StackLayoutItem(frameHost, true), fraCommands }
+            };
+            _rightStack = rightStack;
+
+            // Use a table so the overlay fills remaining space
+            var rightPane = new TableLayout
+            {
+                Spacing = new Size(6,6),
+                Rows = { new TableRow(new TableCell(rightStack, true)) }
             };
             // Wire up command list and buttons
             lstCommands.SelectedIndexChanged += LstCommands_SelectedIndexChanged;
@@ -633,9 +687,10 @@ namespace Client
             btnEditCommand.Click += BtnEditCommand_Click;
             btnDeleteComand.Click += BtnDeleteComand_Click;
             btnClearCommand.Click += BtnClearCommand_Click;
-            // Optional: respond to palette selection if needed
+            // Respond to selection change and double-click activation
             tvCommands.SelectionChanged += TvCommands_AfterSelect;
-            var right = new Scrollable { Content = rightPane, ExpandContentWidth = true, ExpandContentHeight = true, Padding = new Eto.Drawing.Padding(12,8,8,8) };
+            tvCommands.MouseDoubleClick += (s, e) => TvCommands_AfterSelect(s, EventArgs.Empty);
+            _rightScroll = new Scrollable { Content = rightPane, ExpandContentWidth = true, ExpandContentHeight = true, Padding = new Eto.Drawing.Padding(8,6,6,6) };
             HideAllFrames();
 
             // Build the full editor content into editorHost, which will be placed inside the selected tab
@@ -643,16 +698,18 @@ namespace Client
             {
                 Orientation = Orientation.Horizontal,
                 Panel1 = new Scrollable { Content = leftPadded, ExpandContentWidth = true },
-                Panel2 = right,
+                Panel2 = _rightScroll,
                 // Make the left pane wider by default (min 800px, ~45% of window)
-                Position = Math.Max(800, (int)(ClientSize.Width * 0.45))
+                // Make the left pane reasonably wide by default (min 640px)
+                Position = Math.Max(640, (int)(ClientSize.Width * 0.42))
             };
                 // Prevent either pane from collapsing to 0 so left page details are always visible
             try
             {
                     // Keep a generous minimum so controls don't clip
-                    mainSplit.Panel1MinimumSize = 800;
-                mainSplit.Panel2MinimumSize = 420;
+                    // Keep minimums smaller for a compact layout
+                    mainSplit.Panel1MinimumSize = 640;
+                    mainSplit.Panel2MinimumSize = 380;
                     // Prefer keeping left width fixed while resizing
                     try { mainSplit.FixedPanel = Eto.Forms.SplitterFixedPanel.Panel1; } catch { }
             }
@@ -673,7 +730,17 @@ namespace Client
             };
 
             // Top-level: only the TabControl so the tab page fills the entire editor
-            Content = tabPages;
+            // Top-level: TabControl plus a fixed footer with OK/Cancel
+            Content = new TableLayout
+            {
+                Spacing = new Size(0,0),
+                Padding = new Eto.Drawing.Padding(6),
+                Rows =
+                {
+                    new TableRow(new TableCell(tabPages, true)),
+                    new TableRow(bottomButtons)
+                }
+            };
             // Ensure there's at least one visible page before Load runs, so the form isn't blank
             if (tabPages.Pages.Count == 0)
             {
@@ -684,14 +751,14 @@ namespace Client
             AttachEditorHostToSelectedTab();
 
             // Re-balance the splitter when the window shows/resizes to keep the left pane visible
-        Shown += (s, e) =>
+            Shown += (s, e) =>
             {
                 try
                 {
                     if (mainSplit != null)
-                        mainSplit.Position = Math.Max(800, (int)(ClientSize.Width * 0.45));
-            // Sync initial Move Route button state
-            SyncMoveRouteButton();
+                        mainSplit.Position = Math.Max(640, (int)(ClientSize.Width * 0.42));
+                    // Sync initial Move Route button state
+                    SyncMoveRouteButton();
                 }
                 catch { }
             };
@@ -700,15 +767,525 @@ namespace Client
                 try
                 {
                     if (mainSplit != null)
-                        mainSplit.Position = Math.Max(800, Math.Min(ClientSize.Width - 420, mainSplit.Position));
+                        mainSplit.Position = Math.Max(640, Math.Min(ClientSize.Width - 380, mainSplit.Position));
                 }
                 catch { }
             };
 
         }
 
-    // No extra helpers needed; visibility is controlled by existing code paths that toggle
-    // specific frame panels and fraCommands. Frames are placed before fraCommands to appear on top.
+        // No extra helpers needed; visibility is controlled by existing code paths that toggle
+        // specific frame panels and fraCommands. Frames are placed before fraCommands to appear on top.
+
+        // Build all command frame UIs (headers, inputs, OK/Cancel)
+        private void BuildFrameUIs()
+        {
+            // Show Text
+            if (fraShowText.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnShowTextOk_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnShowTextCancel_Click;
+                // Ensure the text area has a sensible default size for visibility
+                if (txtShowText.Size.Width <= 0 || txtShowText.Size.Height <= 0)
+                    txtShowText.Size = new Size(520, 160);
+                fraShowText.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items =
+                    {
+                        new Label{ Text = "Show Text", Font = SystemFonts.Bold(12) },
+                        txtShowText,
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } }
+                    }
+                };
+            }
+
+            // Show Choices
+            if (fraShowChoices.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnShowChoicesOk_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnShowChoicesCancel_Click;
+                fraShowChoices.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items =
+                    {
+                        new Label{ Text = "Show Choices", Font = SystemFonts.Bold(12) },
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Prompt" }, txtChoicePrompt }},
+                        new Label{ Text = "Choices" },
+                        txtChoices1, txtChoices2, txtChoices3, txtChoices4,
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } }
+                    }
+                };
+            }
+
+            // Add Chatbox Text
+            if (fraAddText.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnAddTextOk_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnAddTextCancel_Click;
+                fraAddText.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items =
+                    {
+                        new Label{ Text = "Add Chatbox Text", Font = SystemFonts.Bold(12) },
+                        txtAddText_Text,
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 8, Items = { optAddText_Map, optAddText_Global, optAddText_Player }},
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } }
+                    }
+                };
+            }
+
+            // Show ChatBubble
+            if (fraShowChatBubble.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnShowChatBubbleOK_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnShowChatBubbleCancel_Click;
+                cmbChatBubbleTargetType.SelectedIndexChanged += CmbChatBubbleTargetType_SelectedIndexChanged;
+                fraShowChatBubble.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items =
+                    {
+                        new Label{ Text = "Show ChatBubble", Font = SystemFonts.Bold(12) },
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Text" }, txtChatbubbleText }},
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Target" }, cmbChatBubbleTargetType, cmbChatBubbleTarget }},
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } }
+                    }
+                };
+            }
+
+            // Player Variable
+            if (fraPlayerVariable.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnPlayerVarOk_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnPlayerVarCancel_Click;
+                optVariableAction0.CheckedChanged += OptVariableAction0_CheckedChanged;
+                optVariableAction1.CheckedChanged += OptVariableAction1_CheckedChanged;
+                optVariableAction2.CheckedChanged += OptVariableAction2_CheckedChanged;
+                optVariableAction3.CheckedChanged += OptVariableAction3_CheckedChanged;
+                fraPlayerVariable.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items =
+                    {
+                        new Label{ Text = "Set Player Variable", Font = SystemFonts.Bold(12) },
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Variable" }, cmbVariable }},
+                        new Label{ Text = "Action" },
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 8, Items = { optVariableAction0, optVariableAction1, optVariableAction2, optVariableAction3 }},
+                        new Label{ Text = "Data" },
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { nudVariableData0, nudVariableData1, nudVariableData2, nudVariableData3, nudVariableData4 }},
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } }
+                    }
+                };
+            }
+
+            // Player Switch
+            if (fraPlayerSwitch.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnSetPlayerSwitchOk_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnSetPlayerSwitchCancel_Click;
+                fraPlayerSwitch.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items =
+                    {
+                        new Label{ Text = "Set Player Switch", Font = SystemFonts.Bold(12) },
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Switch" }, cmbSwitch, new Label{ Text = "Set" }, cmbPlayerSwitchSet }},
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } }
+                    }
+                };
+            }
+
+            // Self Switch
+            if (fraSetSelfSwitch.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnSelfswitchOk_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnSelfswitchCancel_Click;
+                fraSetSelfSwitch.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items =
+                    {
+                        new Label{ Text = "Set Self Switch", Font = SystemFonts.Bold(12) },
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Switch" }, cmbSetSelfSwitch, new Label{ Text = "To" }, cmbSetSelfSwitchTo }},
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } }
+                    }
+                };
+            }
+
+            // Conditional Branch
+            if (fraConditionalBranch.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnConditionalBranchOk_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnConditionalBranchCancel_Click;
+                // condition toggles already wired in InitializeComponent
+                fraConditionalBranch.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items =
+                    {
+                        new Label{ Text = "Conditional Branch", Font = SystemFonts.Bold(12) },
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 10, Items = { optCondition0, optCondition1, optCondition2, optCondition3, optCondition4, optCondition5, optCondition6, optCondition8, optCondition9 }},
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } }
+                    }
+                };
+            }
+
+            // Label
+            if (fraCreateLabel.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnCreatelabelOk_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnCreateLabelCancel_Click;
+                fraCreateLabel.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items = { new Label{ Text = "Label", Font = SystemFonts.Bold(12) }, txtLabelName, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } } }
+                };
+            }
+
+            // Go To Label
+            if (fraGoToLabel.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnGoToLabelOk_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnGoToLabelCancel_Click;
+                fraGoToLabel.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items = { new Label{ Text = "Go To Label", Font = SystemFonts.Bold(12) }, txtGoToLabel, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } } }
+                };
+            }
+
+            // Change Items
+            if (fraChangeItems.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnChangeItemsOk_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnChangeItemsCancel_Click;
+                fraChangeItems.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items =
+                    {
+                        new Label{ Text = "Change Items", Font = SystemFonts.Bold(12) },
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { cmbChangeItemIndex, new Label{ Text = "Amount" }, nudChangeItemsAmount } },
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 8, Items = { optChangeItemSet, optChangeItemAdd, optChangeItemRemove } },
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } }
+                    }
+                };
+            }
+
+            // Change Level
+            if (fraChangeLevel.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnChangeLevelOK_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnChangeLevelCancel_Click;
+                fraChangeLevel.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items = { new Label{ Text = "Change Level", Font = SystemFonts.Bold(12) }, nudChangeLevel, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } } }
+                };
+            }
+
+            // Change Skills
+            if (fraChangeSkills.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnChangeSkillsOK_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnChangeSkillsCancel_Click;
+                fraChangeSkills.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items = { new Label{ Text = "Change Skills", Font = SystemFonts.Bold(12) }, cmbChangeSkills, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { optChangeSkillsAdd, optChangeSkillsRemove } }, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } } }
+                };
+            }
+
+            // Change Job
+            if (fraChangeJob.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnChangeJobOK_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnChangeJobCancel_Click;
+                fraChangeJob.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items = { new Label{ Text = "Change Job", Font = SystemFonts.Bold(12) }, cmbChangeJob, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } } }
+                };
+            }
+
+            // Change Sprite
+            if (fraChangeSprite.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnChangeSpriteOK_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnChangeSpriteCancel_Click;
+                fraChangeSprite.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items = { new Label{ Text = "Change Sprite", Font = SystemFonts.Bold(12) }, nudChangeSprite, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } } }
+                };
+            }
+
+            // Change Gender
+            if (fraChangeGender.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnChangeGenderOK_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnChangeGenderCancel_Click;
+                fraChangeGender.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items = { new Label{ Text = "Change Gender", Font = SystemFonts.Bold(12) }, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 8, Items = { optChangeSexMale, optChangeSexFemale } }, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } } }
+                };
+            }
+
+            // Change PK
+            if (fraChangePK.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnChangePkOK_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnChangePkCancel_Click;
+                fraChangePK.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items = { new Label{ Text = "Change PK", Font = SystemFonts.Bold(12) }, cmbSetPK, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } } }
+                };
+            }
+
+            // Give Experience
+            if (fraGiveExp.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnGiveExpOK_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnGiveExpCancel_Click;
+                fraGiveExp.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items = { new Label{ Text = "Give Experience", Font = SystemFonts.Bold(12) }, nudGiveExp, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } } }
+                };
+            }
+
+            // Warp Player
+            if (fraPlayerWarp.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnPlayerWarpOK_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnPlayerWarpCancel_Click;
+                fraPlayerWarp.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items =
+                    {
+                        new Label{ Text = "Warp Player", Font = SystemFonts.Bold(12) },
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Map" }, nudWPMap, new Label{ Text = "X" }, nudWPX, new Label{ Text = "Y" }, nudWPY, new Label{ Text = "Dir" }, cmbWarpPlayerDir }},
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } }
+                    }
+                };
+            }
+
+            // Move Route
+            if (fraMoveRoute.Content == null)
+            {
+                // Buttons already exist as fields
+                btnMoveRouteOk.Click += BtnMoveRouteOk_Click;
+                btnMoveRouteCancel.Click += BtnMoveRouteCancel_Click;
+                fraMoveRoute.Content = new TableLayout
+                {
+                    Spacing = new Size(6,6),
+                    Rows =
+                    {
+                        new TableRow(new Label{ Text = "Move Route", Font = SystemFonts.Bold(12) }),
+                        new TableRow(new TableCell(lstvwMoveRoute, true)),
+                        new TableRow(new TableCell(lstMoveRoute, true)),
+                        new TableRow(new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 10, Items = { chkIgnoreMove, chkRepeatRoute } }),
+                        new TableRow(new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnMoveRouteOk, btnMoveRouteCancel } })
+                    }
+                };
+            }
+
+            // Move Route Wait
+            if (fraMoveRouteWait.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnMoveWaitOK_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnMoveWaitCancel_Click;
+                fraMoveRouteWait.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items = { new Label{ Text = "Wait for Route Completion", Font = SystemFonts.Bold(12) }, cmbMoveWait, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } } }
+                };
+            }
+
+            // Spawn NPC
+            if (fraSpawnNpc.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnSpawnNpcOK_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnSpawnNpcancel_Click;
+                fraSpawnNpc.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items = { new Label{ Text = "Force Spawn NPC", Font = SystemFonts.Bold(12) }, cmbSpawnNpc, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } } }
+                };
+            }
+
+            // Play Animation
+            if (fraPlayAnimation.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnPlayAnimationOK_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnPlayAnimationCancel_Click;
+                fraPlayAnimation.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items =
+                    {
+                        new Label{ Text = "Play Animation", Font = SystemFonts.Bold(12) },
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Target" }, cmbAnimTargetType, cmbPlayAnimEvent } },
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Animation" }, cmbPlayAnim } },
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { lblPlayAnimX, nudPlayAnimTileX, lblPlayAnimY, nudPlayAnimTileY } },
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } }
+                    }
+                };
+            }
+
+            // Set Fog
+            if (fraSetFog.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnSetFogOK_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnSetFogCancel_Click;
+                fraSetFog.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items = { new Label{ Text = "Set Fog", Font = SystemFonts.Bold(12) }, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Fog" }, nudFogData0, new Label{ Text = "X Offset" }, nudFogData1, new Label{ Text = "Y Offset" }, nudFogData2 } }, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } } }
+                };
+            }
+
+            // Set Weather
+            if (fraSetWeather.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnSetWeatherOK_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnSetWeatherCancel_Click;
+                fraSetWeather.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items = { new Label{ Text = "Set Weather", Font = SystemFonts.Bold(12) }, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { CmbWeather, new Label{ Text = "Intensity" }, nudWeatherIntensity } }, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } } }
+                };
+            }
+
+            // Map Tint
+            if (fraMapTint.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnMapTintOK_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnMapTintCancel_Click;
+                fraMapTint.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items = { new Label{ Text = "Set Map Tint", Font = SystemFonts.Bold(12) }, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "R" }, nudMapTintData0, new Label{ Text = "G" }, nudMapTintData1, new Label{ Text = "B" }, nudMapTintData2, new Label{ Text = "A" }, nudMapTintData3 } }, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } } }
+                };
+            }
+
+            // Play BGM
+            if (fraPlayBGM.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnPlayBgmOK_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnPlayBgmCancel_Click;
+                fraPlayBGM.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items = { new Label{ Text = "Play BGM", Font = SystemFonts.Bold(12) }, cmbPlayBGM, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } } }
+                };
+            }
+
+            // Play Sound
+            if (fraPlaySound.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnPlaySoundOK_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnPlaySoundCancel_Click;
+                fraPlaySound.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items = { new Label{ Text = "Play Sound", Font = SystemFonts.Bold(12) }, cmbPlaySound, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } } }
+                };
+            }
+
+            // Wait
+            if (fraSetWait.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnSetWaitOK_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnSetWaitCancel_Click;
+                fraSetWait.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items = { new Label{ Text = "Wait", Font = SystemFonts.Bold(12) }, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Seconds" }, nudWaitAmount } }, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } } }
+                };
+            }
+
+            // Set Access
+            if (fraSetAccess.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnSetAccessOK_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnSetAccessCancel_Click;
+                fraSetAccess.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items = { new Label{ Text = "Set Access", Font = SystemFonts.Bold(12) }, cmbSetAccess, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } } }
+                };
+            }
+
+            // Open Shop
+            if (fraOpenShop.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnOpenShopOK_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnOpenShopCancel_Click;
+                fraOpenShop.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items = { new Label{ Text = "Open Shop", Font = SystemFonts.Bold(12) }, cmbOpenShop, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } } }
+                };
+            }
+
+            // Show Picture
+            if (fraShowPic.Content == null)
+            {
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnShowPicOK_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnShowPicCancel_Click;
+                fraShowPic.Content = new StackLayout
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 6,
+                    Items =
+                    {
+                        new Label{ Text = "Show Picture", Font = SystemFonts.Bold(12) },
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Picture" }, nudShowPicture } },
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Location" }, cmbPicLoc } },
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Offset X" }, nudPicOffsetX, new Label{ Text = "Offset Y" }, nudPicOffsetY } },
+                        picShowPic,
+                        new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnOk, btnCancel } }
+                    }
+                };
+            }
+        }
 
         // Build command palette with categories and leaves
         private void BuildCommandPalette()
@@ -1159,7 +1736,7 @@ namespace Client
             {
                 Event.EventEditorOK();
                 Event.TmpEvent = default;
-                try { Close(); } catch { Dispose(); }
+                Close();
             }
             else
             {
@@ -1186,7 +1763,7 @@ namespace Client
             if (fraGraphic.Visible == false)
             {
                 Event.TmpEvent = default;
-                Dispose();
+                Close();
             }
             else
             {
@@ -1194,29 +1771,25 @@ namespace Client
                 Event.TmpEvent.Pages[Event.CurPageNum].Graphic = tmpGraphicIndex;
                 fraGraphic.Visible = false;
                 DrawGraphic();
-            }
-
-            Event.InEvent = false;
+            }            
         }
 
         private void TvCommands_AfterSelect(object? sender, EventArgs e)
         {
-            // Map selected command text from the palette and open the right editor frame or add direct commands
+            // Use selectedText directly to show the appropriate frame; ignore categories
             var x = 0;
             string selectedText = string.Empty;
-            try
-            {
-                var item = tvCommands.SelectedItem as TreeGridItem;
-                if (item == null) return;
-                // Ignore category nodes (have children); only respond to leaf items
-                // Treat items with any children as categories; leaves are executable
-                if (item.Children != null && item.Children.Count > 0) return;
-                // Use Values array to get first column text
-                var vals = item.Values;
-                if (vals != null && vals.Length > 0)
-                    selectedText = vals[0]?.ToString() ?? string.Empty;
-            }
-            catch { selectedText = string.Empty; }
+            var item = tvCommands.SelectedItem as TreeGridItem;
+            if (item == null) return;
+            if (item.Children != null && item.Children.Count > 0) return; // category, do nothing
+            var vals = item.Values;
+            if (vals != null && vals.Length > 0) selectedText = vals[0]?.ToString() ?? string.Empty;
+            // Always start from a clean state so only the target frame is visible
+            HideAllFrames();
+            // Keep command palette visible; show frames above via layout ordering
+            // Scroll to top so the frame header is in view
+            ScrollRightPaneTop();
+
             switch (selectedText)
             {
                 // Messages
@@ -1225,9 +1798,8 @@ namespace Client
                 case "Show Text":
                     {
                         txtShowText.Text = "";
-                        fraDialogue.Visible = true;
-                        fraShowText.Visible = true;
-                        fraCommands.Visible = false;
+                        // host inside dialogue wrapper
+                        ShowFrame(fraShowText, true);
                         break;
                     }
                 // show choices
@@ -1239,9 +1811,7 @@ namespace Client
                         txtChoices3.Text = "";
                         txtChoices4.Text = "";
 
-                        fraDialogue.Visible = true;
-                        fraShowChoices.Visible = true;
-                        fraCommands.Visible = false;
+                        ShowFrame(fraShowChoices, true);
                         break;
                     }
                 // chatbox text
@@ -1249,9 +1819,7 @@ namespace Client
                     {
                         txtAddText_Text.Text = "";
                         optAddText_Player.Checked = true;
-                        fraDialogue.Visible = true;
-                        fraAddText.Visible = true;
-                        fraCommands.Visible = false;
+                        ShowFrame(fraAddText, true);
                         break;
                     }
                 // chat bubble
@@ -1260,9 +1828,7 @@ namespace Client
                         txtChatbubbleText.Text = "";
                         cmbChatBubbleTargetType.SelectedIndex = 0;
                         cmbChatBubbleTarget.Visible = false;
-                        fraDialogue.Visible = true;
-                        fraShowChatBubble.Visible = true;
-                        fraCommands.Visible = false;
+                        ShowFrame(fraShowChatBubble, true);
                         break;
                     }
                 // event progression
@@ -1277,9 +1843,7 @@ namespace Client
 
                         cmbVariable.SelectedIndex = 0;
                         optVariableAction0.Checked = true;
-                        fraDialogue.Visible = true;
-                        fraPlayerVariable.Visible = true;
-                        fraCommands.Visible = false;
+                        ShowFrame(fraPlayerVariable, true);
                         break;
                     }
                 // player switch
@@ -1287,18 +1851,14 @@ namespace Client
                     {
                         cmbPlayerSwitchSet.SelectedIndex = 0;
                         cmbSwitch.SelectedIndex = 0;
-                        fraDialogue.Visible = true;
-                        fraPlayerSwitch.Visible = true;
-                        fraCommands.Visible = false;
+                        ShowFrame(fraPlayerSwitch, true);
                         break;
                     }
                 // self switch
                 case "Set Self Switch":
                     {
                         cmbSetSelfSwitchTo.SelectedIndex = 0;
-                        fraDialogue.Visible = true;
-                        fraSetSelfSwitch.Visible = true;
-                        fraCommands.Visible = false;
+                        ShowFrame(fraSetSelfSwitch, true);
                         break;
                     }
                 // flow control
@@ -1306,40 +1866,32 @@ namespace Client
                 // conditional branch
                 case "Conditional Branch":
                     {
-                        fraDialogue.Visible = true;
-                        fraConditionalBranch.Visible = true;
+                        ShowFrame(fraConditionalBranch, true);
                         optCondition0.Checked = true;
                         ClearConditionFrame();
                         cmbCondition_PlayerVarIndex.Enabled = true;
                         cmbCondition_PlayerVarCompare.Enabled = true;
                         nudCondition_PlayerVarCondition.Enabled = true;
-                        fraCommands.Visible = false;
                         break;
                     }
                 // Exit Event Process
                 case "Stop Event Processing":
                     {
                         Event.AddCommand((int)EventCommand.ExitEventProcess);
-                        fraCommands.Visible = false;
-                        fraDialogue.Visible = false;
                         break;
                     }
                 // Label
                 case "Label":
                     {
                         txtLabelName.Text = "";
-                        fraCreateLabel.Visible = true;
-                        fraCommands.Visible = false;
-                        fraDialogue.Visible = true;
+                        ShowFrame(fraCreateLabel, true);
                         break;
                     }
                 // GoTo Label
                 case "GoTo Label":
                     {
                         txtGoToLabel.Text = "";
-                        fraGoToLabel.Visible = true;
-                        fraCommands.Visible = false;
-                        fraDialogue.Visible = true;
+                        ShowFrame(fraGoToLabel, true);
                         break;
                     }
                 // Player Control
@@ -1350,59 +1902,45 @@ namespace Client
                         cmbChangeItemIndex.SelectedIndex = 0;
                         optChangeItemSet.Checked = true;
                         nudChangeItemsAmount.Value = 0;
-                        fraDialogue.Visible = true;
-                        fraChangeItems.Visible = true;
-                        fraCommands.Visible = false;
+                        ShowFrame(fraChangeItems, true);
                         break;
                     }
                 // Restore HP
                 case "Restore HP":
                     {
                         Event.AddCommand((int)EventCommand.RestoreHealth);
-                        fraCommands.Visible = false;
-                        fraDialogue.Visible = false;
                         break;
                     }
                 // Restore MP
                 case "Restore MP":
                     {
                         Event.AddCommand((int)EventCommand.RestoreMana);
-                        fraCommands.Visible = false;
-                        fraDialogue.Visible = false;
                         break;
                     }
                 // Restore SP
                 case "Restore SP":
                     {
                         Event.AddCommand((int)EventCommand.RestoreStamina);
-                        fraCommands.Visible = false;
-                        fraDialogue.Visible = false;
                         break;
                     }
                 // Level Up
                 case "Level Up":
                     {
                         Event.AddCommand((int)EventCommand.ChangeLevel);
-                        fraCommands.Visible = false;
-                        fraDialogue.Visible = false;
                         break;
                     }
                 // Change Level
                 case "Change Level":
                     {
                         nudChangeLevel.Value = 1;
-                        fraDialogue.Visible = true;
-                        fraChangeLevel.Visible = true;
-                        fraCommands.Visible = false;
+                        ShowFrame(fraChangeLevel, true);
                         break;
                     }
                 // Change Skills
                 case "Change Skills":
                     {
                         cmbChangeSkills.SelectedIndex = 0;
-                        fraDialogue.Visible = true;
-                        fraChangeSkills.Visible = true;
-                        fraCommands.Visible = false;
+                        ShowFrame(fraChangeSkills, true);
                         break;
                     }
                 // Change Job
@@ -1419,45 +1957,35 @@ namespace Client
                                 cmbChangeJob.SelectedIndex = 0;
                             }
                         }
-                        fraDialogue.Visible = true;
-                        fraChangeJob.Visible = true;
-                        fraCommands.Visible = false;
+                        ShowFrame(fraChangeJob, true);
                         break;
                     }
                 // Change Sprite
                 case "Change Sprite":
                     {
                         nudChangeSprite.Value = 1;
-                        fraDialogue.Visible = true;
-                        fraChangeSprite.Visible = true;
-                        fraCommands.Visible = false;
+                        ShowFrame(fraChangeSprite, true);
                         break;
                     }
                 // Change Gender
                 case "Change Gender":
                     {
                         optChangeSexMale.Checked = true;
-                        fraDialogue.Visible = true;
-                        fraChangeGender.Visible = true;
-                        fraCommands.Visible = false;
+                        ShowFrame(fraChangeGender, true);
                         break;
                     }
                 // Change PK
                 case "Change PK":
                     {
                         cmbSetPK.SelectedIndex = 0;
-                        fraDialogue.Visible = true;
-                        fraChangePK.Visible = true;
-                        fraCommands.Visible = false;
+                        ShowFrame(fraChangePK, true);
                         break;
                     }
                 // Give Exp
                 case "Give Experience":
                     {
                         nudGiveExp.Value = 0;
-                        fraDialogue.Visible = true;
-                        fraGiveExp.Visible = true;
-                        fraCommands.Visible = false;
+                        ShowFrame(fraGiveExp, true);
                         break;
                     }
                 // Movement
@@ -1469,9 +1997,7 @@ namespace Client
                         nudWPX.Value = 0;
                         nudWPY.Value = 0;
                         cmbWarpPlayerDir.SelectedIndex = 0;
-                        fraDialogue.Visible = true;
-                        fraPlayerWarp.Visible = true;
-                        fraCommands.Visible = false;
+                        ShowFrame(fraPlayerWarp, true);
                         break;
                     }
                 // Set Move Route
@@ -1495,10 +2021,7 @@ namespace Client
                         chkRepeatRoute.Checked = false;
                         Event.TempMoveRouteCount = 0;
                         Event.TempMoveRoute = new Type.MoveRoute[1];
-                        fraMoveRoute.Visible = true;
-                        // fraMoveRoute.BringToFront(); // not available in Eto - rely on container layout & visibility
-                        fraMoveRoute.Visible = true;
-                        fraCommands.Visible = false;
+                        ShowFrame(fraMoveRoute, false);
                         break;
                     }
                 // Wait for Route Completion
@@ -1519,9 +2042,7 @@ namespace Client
                                 Event.ListOfEvents[x] = i;
                             }
                         }
-                        fraDialogue.Visible = true;
-                        fraMoveRouteWait.Visible = true;
-                        fraCommands.Visible = false;
+                        ShowFrame(fraMoveRouteWait, true);
                         break;
                     }
                 // Force Spawn Npc
@@ -1532,25 +2053,19 @@ namespace Client
                         for (int i = 0; i < Constant.MaxVariables; i++)
                             cmbSpawnNpc.Items.Add(Strings.Trim(Data.Npc[i].Name));
                         cmbSpawnNpc.SelectedIndex = 0;
-                        fraDialogue.Visible = true;
-                        fraSpawnNpc.Visible = true;
-                        fraCommands.Visible = false;
+                        ShowFrame(fraSpawnNpc, true);
                         break;
                     }
                 // Hold Player
                 case "Hold Player":
                     {
                         Event.AddCommand((int)EventCommand.HoldPlayer);
-                        fraCommands.Visible = false;
-                        fraDialogue.Visible = false;
                         break;
                     }
                 // Release Player
                 case "Release Player":
                     {
                         Event.AddCommand((int)EventCommand.ReleasePlayer);
-                        fraCommands.Visible = false;
-                        fraDialogue.Visible = false;
                         break;
                     }
                 // Animation
@@ -1569,9 +2084,7 @@ namespace Client
                         nudPlayAnimTileY.Value = 0;
                         nudPlayAnimTileX.MaxValue = Data.MyMap.MaxX;
                         nudPlayAnimTileY.MaxValue = Data.MyMap.MaxY;
-                        fraDialogue.Visible = true;
-                        fraPlayAnimation.Visible = true;
-                        fraCommands.Visible = false;
+                        ShowFrame(fraPlayAnimation, true);
                         lblPlayAnimX.Visible = false;
                         lblPlayAnimY.Visible = false;
                         nudPlayAnimTileX.Visible = false;
@@ -1587,9 +2100,7 @@ namespace Client
                         nudFogData0.Value = 0;
                         nudFogData1.Value = 0;
                         nudFogData2.Value = 0;
-                        fraDialogue.Visible = true;
-                        fraSetFog.Visible = true;
-                        fraCommands.Visible = false;
+                        ShowFrame(fraSetFog, true);
                         break;
                     }
                 // Set Weather
@@ -1597,9 +2108,7 @@ namespace Client
                     {
                         CmbWeather.SelectedIndex = 0;
                         nudWeatherIntensity.Value = 0;
-                        fraDialogue.Visible = true;
-                        fraSetWeather.Visible = true;
-                        fraCommands.Visible = false;
+                        ShowFrame(fraSetWeather, true);
                         break;
                     }
                 // Set Map Tinting
@@ -1609,9 +2118,7 @@ namespace Client
                         nudMapTintData1.Value = 0;
                         nudMapTintData2.Value = 0;
                         nudMapTintData3.Value = 0;
-                        fraDialogue.Visible = true;
-                        fraMapTint.Visible = true;
-                        fraCommands.Visible = false;
+                        ShowFrame(fraMapTint, true);
                         break;
                     }
                 // Music and Sound
@@ -1620,34 +2127,26 @@ namespace Client
                 case "Play BGM":
                     {
                         cmbPlayBGM.SelectedIndex = 0;
-                        fraDialogue.Visible = true;
-                        fraPlayBGM.Visible = true;
-                        fraCommands.Visible = false;
+                        ShowFrame(fraPlayBGM, true);
                         break;
                     }
                 // Stop BGM
                 case "Stop BGM":
                     {
                         Event.AddCommand((int)EventCommand.FadeOutBgm);
-                        fraCommands.Visible = false;
-                        fraDialogue.Visible = false;
                         break;
                     }
                 // Play Sound
                 case "Play Sound":
                     {
                         cmbPlaySound.SelectedIndex = 0;
-                        fraDialogue.Visible = true;
-                        fraPlaySound.Visible = true;
-                        fraCommands.Visible = false;
+                        ShowFrame(fraPlaySound, true);
                         break;
                     }
                 // Stop Sounds
                 case "Stop Sounds":
                     {
                         Event.AddCommand((int)EventCommand.StopSound);
-                        fraCommands.Visible = false;
-                        fraDialogue.Visible = false;
                         break;
                     }
                 // Etc...
@@ -1656,18 +2155,14 @@ namespace Client
                 case "Wait...":
                     {
                         nudWaitAmount.Value = 1;
-                        fraDialogue.Visible = true;
-                        fraSetWait.Visible = true;
-                        fraCommands.Visible = false;
+                        ShowFrame(fraSetWait, true);
                         break;
                     }
                 // Set Access
                 case "Set Access":
                     {
                         cmbSetAccess.SelectedIndex = 0;
-                        fraDialogue.Visible = true;
-                        fraSetAccess.Visible = true;
-                        fraCommands.Visible = false;
+                        ShowFrame(fraSetAccess, true);
                         break;
                     }
                 // Shop, bank etc
@@ -1676,17 +2171,13 @@ namespace Client
                 case "Open Bank":
                     {
                         Event.AddCommand((int)EventCommand.OpenBank);
-                        fraCommands.Visible = false;
-                        fraDialogue.Visible = false;
                         break;
                     }
                 // Open shop
                 case "Open Shop":
                     {
-                        fraDialogue.Visible = true;
-                        fraOpenShop.Visible = true;
+                        ShowFrame(fraOpenShop, true);
                         cmbOpenShop.SelectedIndex = 0;
-                        fraCommands.Visible = false;
                         break;
                     }
                 // cutscene options
@@ -1695,24 +2186,18 @@ namespace Client
                 case "Fade In":
                     {
                         Event.AddCommand((int)EventCommand.FadeIn);
-                        fraCommands.Visible = false;
-                        fraDialogue.Visible = false;
                         break;
                     }
                 // Fade out
                 case "Fade Out":
                     {
                         Event.AddCommand((int)EventCommand.FadeOut);
-                        fraCommands.Visible = false;
-                        fraDialogue.Visible = false;
                         break;
                     }
                 // Flash white
                 case "Flash White":
                     {
                         Event.AddCommand((int)EventCommand.FlashScreen);
-                        fraCommands.Visible = false;
-                        fraDialogue.Visible = false;
                         break;
                     }
                 // Show pic
@@ -1722,25 +2207,22 @@ namespace Client
                         cmbPicLoc.SelectedIndex = 0;
                         nudPicOffsetX.Value = 0;
                         nudPicOffsetY.Value = 0;
-                        fraDialogue.Visible = true;
-                        fraShowPic.Visible = true;
-                        fraCommands.Visible = false;
+                        ShowFrame(fraShowPic, true);
                         break;
                     }
                 // Hide pic
                 case "Hide Picture":
                     {
                         Event.AddCommand((int)EventCommand.HidePicture);
-                        fraCommands.Visible = false;
-                        fraDialogue.Visible = false;
                         break;
                     }
             }
         }
 
-        private void BtnCancelCommand_Click(object sender, EventArgs e)
+        private void BtnCancelCommand_Click(object? sender, EventArgs e)
         {
-            fraCommands.Visible = false;
+            // Close any open command frame overlay and keep the palette visible
+            HideAllFrames();
         }
 
         #endregion
@@ -1974,7 +2456,7 @@ namespace Client
             Event.TmpEvent.Pages[Event.CurPageNum].SelfSwitchIndex = cmbSelfSwitch.SelectedIndex;
         }
 
-    private void CmbSelfSwitchCompare_SelectedIndexChanged(object? sender, EventArgs e)
+        private void CmbSelfSwitchCompare_SelectedIndexChanged(object? sender, EventArgs e)
         {
             if (cmbSelfSwitchCompare.SelectedIndex == -1)
                 return;
@@ -1985,21 +2467,23 @@ namespace Client
 
         #region Graphic
 
-    private void PicGraphic_Click(object? sender, EventArgs e)
+    private void PicGraphic_Click(object? sender, MouseEventArgs e)
         {
-            // BringToFront removed for Eto; ensure visible
             tmpGraphicIndex = Event.TmpEvent.Pages[Event.CurPageNum].Graphic;
             tmpGraphicType = Event.TmpEvent.Pages[Event.CurPageNum].GraphicType;
-            fraGraphic.Visible = true;
+            // Show the Set Graphic frame via the overlay host
+            HideAllFrames();
+            ShowFrame(fraGraphic, false);
             Event.GraphicSelType = 0;
             // Render selection sheet so user can click a frame
             DrawGraphicSelectionPreview();
         }
 
-    private void CmbGraphic_SelectedIndexChanged(object? sender, EventArgs e)
+        private void CmbGraphic_SelectedIndexChanged(object? sender, EventArgs e)
         {
             if (cmbGraphic.SelectedIndex == -1)
                 return;
+                
             if (_syncingGraphic) return;
 
             Event.TmpEvent.Pages[Event.CurPageNum].GraphicType = (byte)cmbGraphic.SelectedIndex;
@@ -2040,7 +2524,7 @@ namespace Client
             DrawGraphic();
         }
 
-    private void PicGraphicSel_MouseDown(object? sender, MouseEventArgs e)
+        private void PicGraphicSel_MouseDown(object? sender, MouseEventArgs e)
         {
             int X;
             int Y;
@@ -2092,13 +2576,13 @@ namespace Client
 
         private void nudGraphic_ValueChanged(object? sender, EventArgs e)
         {
-                if (!_syncingGraphic)
-                {
-                    // Persist to page only when this is a user-driven change
-                    Event.TmpEvent.Pages[Event.CurPageNum].Graphic = (int)Math.Round(nudGraphic.Value);
-                }
-                DrawGraphic();
-                DrawGraphicSelectionPreview();
+            if (!_syncingGraphic)
+            {
+                // Persist to page only when this is a user-driven change
+                Event.TmpEvent.Pages[Event.CurPageNum].Graphic = (int)Math.Round(nudGraphic.Value);
+            }
+            DrawGraphic();
+            DrawGraphicSelectionPreview();
         }
 
         #endregion
@@ -2116,7 +2600,20 @@ namespace Client
         // Helper: keep Move Route button in sync with current Move Type
         private void SyncMoveRouteButton()
         {
-            try { btnMoveRoute.Enabled = (cmbMoveType.SelectedIndex == 2); } catch { }
+            try
+            {
+                // Always allow opening the Move Route editor; if not in Route mode,
+                // we'll switch the page to Route when the user clicks the button.
+                btnMoveRoute.Enabled = true;
+                try
+                {
+                    btnMoveRoute.ToolTip = (cmbMoveType.SelectedIndex == 2)
+                        ? "Edit this page's move route."
+                        : "Click to switch Move Type to 'Route' and edit the move route.";
+                }
+                catch { }
+            }
+            catch { }
         }
 
         // Ensure cmbGraphic/nudGraphic reflect the current page and preview is updated
@@ -2167,6 +2664,16 @@ namespace Client
 
         private void BtnMoveRoute_Click(object? sender, EventArgs e)
         {
+            // Ensure the page is in Route mode so the route is actually used
+            try
+            {
+                if (cmbMoveType.SelectedIndex != 2)
+                {
+                    cmbMoveType.SelectedIndex = 2;
+                    try { Event.TmpEvent.Pages[Event.CurPageNum].MoveType = (byte)2; } catch { }
+                }
+            }
+            catch { }
             // BringToFront removed for Eto
             lstMoveRoute.Items.Clear();
             Event.IsMoveRouteCommand = false;
@@ -2445,8 +2952,9 @@ namespace Client
             Event.TmpEvent.Pages[Event.CurPageNum].Trigger = (byte)cmbTrigger.SelectedIndex;
         }
 
-        private void ChkGlobal_CheckedChanged(object sender, EventArgs e)
+        private void ChkGlobal_CheckedChanged(object? sender, EventArgs e)
         {
+            if (IsSyncingPageUI) return; // ignore programmatic updates
             if (Event.TmpEvent.PageCount > 0)
             {
                 if (MessageBox.Show("If you set the event to global you will lose all pages except for your first one. Do you want to continue?", "Confirmation", MessageBoxButtons.YesNo) == DialogResult.No)
@@ -2630,17 +3138,18 @@ namespace Client
         // 'Renaming Variables/Switches
         private void BtnLabeling_Click(object? sender, EventArgs e)
         {
-            // Show variable/switch management panel (Eto: rely on layout, no BringToFront/absolute positioning)
-            pnlVariableSwitches.Visible = true;
+            // Populate lists fresh
             lstSwitches.Items.Clear();
-
             for (int i = 0; i < Constant.MaxSwitches; i++)
-                lstSwitches.Items.Add((i + 1).ToString()  + ". " + Event.Switches[i]);
+                lstSwitches.Items.Add((i + 1) + ". " + Event.Switches[i]);
             lstVariables.Items.Clear();
-
             for (int i = 0; i < Constant.MaxVariables; i++)
-                lstVariables.Items.Add((i + 1).ToString() + ". " + Event.Variables[i]);
+                lstVariables.Items.Add((i + 1) + ". " + Event.Variables[i]);
 
+            // Reset substate and show via unified overlay flow
+            FraRenaming.Visible = false;
+            fraLabeling.Visible = true;
+            ShowFrame(pnlVariableSwitches, false);
         }
 
         private void BtnRename_Ok_Click(object? sender, EventArgs e)
@@ -2681,6 +3190,8 @@ namespace Client
             }
             // Refresh all places where switch/variable names appear
             RefreshSwitchAndVariableUI();
+            // Restore command palette after rename
+            try { HideAllFrames(); } catch { }
         }
 
         private void BtnRename_Cancel_Click(object? sender, EventArgs e)
@@ -2700,6 +3211,8 @@ namespace Client
             for (int i = 0; i < Constant.MaxVariables; i++)
                 lstVariables.Items.Add((i + 1).ToString() + ". " + Event.Variables[i]);
             lstVariables.SelectedIndex = 0;
+            // Restore command palette on cancel
+            try { HideAllFrames(); } catch { }
         }
 
         private void TxtRename_TextChanged(object? sender, EventArgs e)
@@ -2768,11 +3281,30 @@ namespace Client
             Event.SendSwitchesAndVariables();
             // Ensure UI reflects latest names after save
             RefreshSwitchAndVariableUI();
+            // Close the Switches/Variables panel after saving
+            try
+            {
+                FraRenaming.Visible = false;
+                fraLabeling.Visible = true;
+                HideAllFrames();
+            }
+            catch { }
         }
 
     private void BtnLabel_Cancel_Click(object? sender, EventArgs e)
         {
             Event.RequestSwitchesAndVariables();
+            // Revert UI to a clean state and close the panel
+            try
+            {
+                FraRenaming.Visible = false;
+                fraLabeling.Visible = true;
+                HideAllFrames();
+                // Reset any rename context
+                Event.RenameType = 0;
+                Event.RenameIndex = 0;
+            }
+            catch { }
         }
 
         // Refresh UI elements that display switch/variable names
@@ -2819,7 +3351,7 @@ namespace Client
         }
 
         // MoveRoute Commands
-        private void LstvwMoveRoute_SelectedIndexChanged(object sender, EventArgs e)
+    private void LstvwMoveRoute_SelectedIndexChanged(object? sender, EventArgs e)
         {
             // Eto ListBox: single SelectedIndex
             if (lstvwMoveRoute.SelectedIndex < 0)
@@ -2833,7 +3365,8 @@ namespace Client
                     {
                         // Show the Set Graphic frame and mark that selection applies to a route command
                         Event.GraphicSelType = 1;
-                        fraGraphic.Visible = true;
+                        HideAllFrames();
+                        ShowFrame(fraGraphic, false);
                         DrawGraphicSelectionPreview();
                         break;
                     }
@@ -2846,7 +3379,7 @@ namespace Client
             }
         }
 
-        private void LstMoveRoute_KeyDown(object sender, KeyEventArgs e)
+    private void LstMoveRoute_KeyDown(object? sender, KeyEventArgs e)
         {
             if (e.Key == Keys.Delete)
             {
@@ -3166,7 +3699,7 @@ namespace Client
 
         }
 
-        private void ChkIgnoreMove_CheckedChanged(object sender, EventArgs e)
+    private void ChkIgnoreMove_CheckedChanged(object? sender, EventArgs e)
         {
             if (chkIgnoreMove.Checked == true)
             {
@@ -3178,7 +3711,7 @@ namespace Client
             }
         }
 
-        private void ChkRepeatRoute_CheckedChanged(object sender, EventArgs e)
+    private void ChkRepeatRoute_CheckedChanged(object? sender, EventArgs e)
         {
             if (chkRepeatRoute.Checked == true)
             {
@@ -3190,7 +3723,7 @@ namespace Client
             }
         }
 
-        private void BtnMoveRouteOk_Click(object sender, EventArgs e)
+    private void BtnMoveRouteOk_Click(object? sender, EventArgs e)
         {
             if (Event.IsMoveRouteCommand == true)
             {
@@ -3204,7 +3737,7 @@ namespace Client
                 }
                 Event.TempMoveRouteCount = 0;
                 Event.TempMoveRoute = new Type.MoveRoute[1];
-                fraMoveRoute.Visible = false;
+                HideAllFrames();
             }
             else
             {
@@ -3212,15 +3745,15 @@ namespace Client
                 Event.TmpEvent.Pages[Event.CurPageNum].MoveRoute = Event.TempMoveRoute!;
                 Event.TempMoveRouteCount = 0;
                 Event.TempMoveRoute = new Type.MoveRoute[1];
-                fraMoveRoute.Visible = false;
+                HideAllFrames();
             }
         }
 
-        private void BtnMoveRouteCancel_Click(object sender, EventArgs e)
+    private void BtnMoveRouteCancel_Click(object? sender, EventArgs e)
         {
             Event.TempMoveRouteCount = 0;
             Event.TempMoveRoute = new Type.MoveRoute[1];
-            fraMoveRoute.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
@@ -3229,7 +3762,7 @@ namespace Client
 
         #region Show Text
 
-        private void BtnShowTextOk_Click(object sender, EventArgs e)
+    private void BtnShowTextOk_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -3239,28 +3772,19 @@ namespace Client
             {
                 Event.EditCommand();
             }
-
-            // hide
-            fraDialogue.Visible = false;
-            fraShowText.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnShowTextCancel_Click(object sender, EventArgs e)
+    private void BtnShowTextCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraShowText.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Add Text
 
-        private void BtnAddTextOk_Click(object sender, EventArgs e)
+    private void BtnAddTextOk_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -3270,26 +3794,18 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraAddText.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnAddTextCancel_Click(object sender, EventArgs e)
+    private void BtnAddTextCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraAddText.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Show Choices
-        private void BtnShowChoicesOk_Click(object sender, EventArgs e)
+    private void BtnShowChoicesOk_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -3299,27 +3815,19 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraShowChoices.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnShowChoicesCancel_Click(object sender, EventArgs e)
+    private void BtnShowChoicesCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraShowChoices.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Show Chatbubble
 
-        private void CmbChatBubbleTargetType_SelectedIndexChanged(object sender, EventArgs e)
+    private void CmbChatBubbleTargetType_SelectedIndexChanged(object? sender, EventArgs e)
         {
             if (cmbChatBubbleTargetType.SelectedIndex == (int)TargetType.None)
             {
@@ -3355,7 +3863,7 @@ namespace Client
 
         }
 
-        private void BtnShowChatBubbleOK_Click(object sender, EventArgs e)
+    private void BtnShowChatBubbleOK_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -3365,27 +3873,19 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraShowChatBubble.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnShowChatBubbleCancel_Click(object sender, EventArgs e)
+    private void BtnShowChatBubbleCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraShowChatBubble.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Set Player Variable
 
-        private void OptVariableAction0_CheckedChanged(object sender, EventArgs e)
+    private void OptVariableAction0_CheckedChanged(object? sender, EventArgs e)
         {
             if (optVariableAction0.Checked == true)
             {
@@ -3401,7 +3901,7 @@ namespace Client
             }
         }
 
-        private void OptVariableAction1_CheckedChanged(object sender, EventArgs e)
+    private void OptVariableAction1_CheckedChanged(object? sender, EventArgs e)
         {
             if (optVariableAction1.Checked == true)
             {
@@ -3418,7 +3918,7 @@ namespace Client
             }
         }
 
-        private void OptVariableAction2_CheckedChanged(object sender, EventArgs e)
+    private void OptVariableAction2_CheckedChanged(object? sender, EventArgs e)
         {
             if (optVariableAction2.Checked == true)
             {
@@ -3435,7 +3935,7 @@ namespace Client
             }
         }
 
-        private void OptVariableAction3_CheckedChanged(object sender, EventArgs e)
+    private void OptVariableAction3_CheckedChanged(object? sender, EventArgs e)
         {
             if (optVariableAction2.Checked == true)
             {
@@ -3452,7 +3952,7 @@ namespace Client
             }
         }
 
-        private void BtnPlayerVarOk_Click(object sender, EventArgs e)
+    private void BtnPlayerVarOk_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -3462,27 +3962,19 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraPlayerVariable.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnPlayerVarCancel_Click(object sender, EventArgs e)
+    private void BtnPlayerVarCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraPlayerVariable.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Set Player Switch
 
-        private void BtnSetPlayerSwitchOk_Click(object sender, EventArgs e)
+    private void BtnSetPlayerSwitchOk_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -3492,27 +3984,19 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraPlayerSwitch.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnSetPlayerSwitchCancel_Click(object sender, EventArgs e)
+    private void BtnSetPlayerSwitchCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraPlayerSwitch.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Set Self Switch
 
-        private void BtnSelfswitchOk_Click(object sender, EventArgs e)
+    private void BtnSelfswitchOk_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -3522,27 +4006,19 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraSetSelfSwitch.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnSelfswitchCancel_Click(object sender, EventArgs e)
+    private void BtnSelfswitchCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraSetSelfSwitch.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Conditional Branch
 
-        private void OptCondition_Index0_CheckedChanged(object sender, EventArgs e)
+    private void OptCondition_Index0_CheckedChanged(object? sender, EventArgs e)
         {
             if (!optCondition0.Checked)
                 return;
@@ -3554,7 +4030,7 @@ namespace Client
             nudCondition_PlayerVarCondition.Enabled = true;
         }
 
-        private void OptCondition1_CheckedChanged(object sender, EventArgs e)
+        private void OptCondition1_CheckedChanged(object? sender, EventArgs e)
         {
             if (!optCondition1.Checked)
                 return;
@@ -3565,7 +4041,7 @@ namespace Client
             cmbCondtion_PlayerSwitchCondition.Enabled = true;
         }
 
-        private void OptCondition2_CheckedChanged(object sender, EventArgs e)
+    private void OptCondition2_CheckedChanged(object? sender, EventArgs e)
         {
             if (!optCondition2.Checked)
                 return;
@@ -3576,7 +4052,7 @@ namespace Client
             nudCondition_HasItem.Enabled = true;
         }
 
-        private void OptCondition3_CheckedChanged(object sender, EventArgs e)
+        private void OptCondition3_CheckedChanged(object? sender, EventArgs e)
         {
             if (!optCondition3.Checked)
                 return;
@@ -3586,7 +4062,7 @@ namespace Client
             cmbCondition_JobIs.Enabled = true;
         }
 
-        private void OptCondition4_CheckedChanged(object sender, EventArgs e)
+    private void OptCondition4_CheckedChanged(object? sender, EventArgs e)
         {
             if (!optCondition4.Checked)
                 return;
@@ -3596,7 +4072,7 @@ namespace Client
         }
 
 
-        private void OptCondition5_CheckedChanged(object sender, EventArgs e)
+    private void OptCondition5_CheckedChanged(object? sender, EventArgs e)
         {
             if (!optCondition5.Checked)
                 return;
@@ -3607,7 +4083,7 @@ namespace Client
             nudCondition_LevelAmount.Enabled = true;
         }
 
-        private void OptCondition6_CheckedChanged(object sender, EventArgs e)
+    private void OptCondition6_CheckedChanged(object? sender, EventArgs e)
         {
             if (!optCondition6.Checked)
                 return;
@@ -3618,7 +4094,7 @@ namespace Client
             cmbCondition_SelfSwitchCondition.Enabled = true;
         }
 
-        private void OptCondition8_CheckedChanged(object sender, EventArgs e)
+    private void OptCondition8_CheckedChanged(object? sender, EventArgs e)
         {
             if (!optCondition8.Checked)
                 return;
@@ -3628,7 +4104,7 @@ namespace Client
             cmbCondition_Gender.Enabled = true;
         }
 
-        private void OptCondition9_CheckedChanged(object sender, EventArgs e)
+    private void OptCondition9_CheckedChanged(object? sender, EventArgs e)
         {
             if (!optCondition9.Checked)
                 return;
@@ -3638,7 +4114,7 @@ namespace Client
             cmbCondition_Time.Enabled = true;
         }
 
-        private void BtnConditionalBranchOk_Click(object sender, EventArgs e)
+    private void BtnConditionalBranchOk_Click(object? sender, EventArgs e)
         {
             if (Event.IsEdit == false)
             {
@@ -3648,27 +4124,19 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraCommands.Visible = false;
-            fraConditionalBranch.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnConditionalBranchCancel_Click(object sender, EventArgs e)
+    private void BtnConditionalBranchCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraConditionalBranch.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Create Label
 
-        private void BtnCreatelabelOk_Click(object sender, EventArgs e)
+    private void BtnCreatelabelOk_Click(object? sender, EventArgs e)
         {
             if (Event.IsEdit == false)
             {
@@ -3678,27 +4146,18 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraCreateLabel.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
-
-        private void BtnCreateLabelCancel_Click(object sender, EventArgs e)
+    private void BtnCreateLabelCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraCreateLabel.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region GoTo Label
 
-        private void BtnGoToLabelOk_Click(object sender, EventArgs e)
+    private void BtnGoToLabelOk_Click(object? sender, EventArgs e)
         {
             if (Event.IsEdit == false)
             {
@@ -3708,27 +4167,19 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraGoToLabel.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnGoToLabelCancel_Click(object sender, EventArgs e)
+    private void BtnGoToLabelCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraGoToLabel.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Change Items
 
-        private void BtnChangeItemsOk_Click(object sender, EventArgs e)
+    private void BtnChangeItemsOk_Click(object? sender, EventArgs e)
         {
             if (Event.IsEdit == false)
             {
@@ -3738,27 +4189,19 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraCommands.Visible = false;
-            fraChangeItems.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnChangeItemsCancel_Click(object sender, EventArgs e)
+    private void BtnChangeItemsCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraChangeItems.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Change Level
 
-        private void BtnChangeLevelOK_Click(object sender, EventArgs e)
+    private void BtnChangeLevelOK_Click(object? sender, EventArgs e)
         {
             if (Event.IsEdit == false)
             {
@@ -3768,27 +4211,19 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraChangeLevel.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnChangeLevelCancel_Click(object sender, EventArgs e)
+    private void BtnChangeLevelCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraChangeLevel.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Change Skills
 
-        private void BtnChangeSkillsOK_Click(object sender, EventArgs e)
+    private void BtnChangeSkillsOK_Click(object? sender, EventArgs e)
         {
             if (Event.IsEdit == false)
             {
@@ -3798,27 +4233,19 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraChangeSkills.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnChangeSkillsCancel_Click(object sender, EventArgs e)
+    private void BtnChangeSkillsCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraChangeSkills.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Change Job
 
-        private void BtnChangeJobOK_Click(object sender, EventArgs e)
+    private void BtnChangeJobOK_Click(object? sender, EventArgs e)
         {
             if (Event.IsEdit == false)
             {
@@ -3828,27 +4255,19 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraChangeJob.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnChangeJobCancel_Click(object sender, EventArgs e)
+    private void BtnChangeJobCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraChangeJob.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Change Sprite
 
-        private void BtnChangeSpriteOK_Click(object sender, EventArgs e)
+    private void BtnChangeSpriteOK_Click(object? sender, EventArgs e)
         {
             if (Event.IsEdit == false)
             {
@@ -3858,27 +4277,19 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraChangeSprite.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnChangeSpriteCancel_Click(object sender, EventArgs e)
+    private void BtnChangeSpriteCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraChangeSprite.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Change Gender
 
-        private void BtnChangeGenderOK_Click(object sender, EventArgs e)
+    private void BtnChangeGenderOK_Click(object? sender, EventArgs e)
         {
             if (Event.IsEdit == false)
             {
@@ -3888,27 +4299,19 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraChangeGender.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnChangeGenderCancel_Click(object sender, EventArgs e)
+    private void BtnChangeGenderCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraChangeGender.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Change PK
 
-        private void BtnChangePkOK_Click(object sender, EventArgs e)
+    private void BtnChangePkOK_Click(object? sender, EventArgs e)
         {
             if (Event.IsEdit == false)
             {
@@ -3918,27 +4321,19 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraChangePK.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnChangePkCancel_Click(object sender, EventArgs e)
+    private void BtnChangePkCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraChangePK.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Give Exp
 
-        private void BtnGiveExpOK_Click(object sender, EventArgs e)
+    private void BtnGiveExpOK_Click(object? sender, EventArgs e)
         {
             if (Event.IsEdit == false)
             {
@@ -3948,27 +4343,19 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraGiveExp.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnGiveExpCancel_Click(object sender, EventArgs e)
+    private void BtnGiveExpCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraGiveExp.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Player Warp
 
-        private void BtnPlayerWarpOK_Click(object sender, EventArgs e)
+    private void BtnPlayerWarpOK_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -3978,27 +4365,19 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraPlayerWarp.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnPlayerWarpCancel_Click(object sender, EventArgs e)
+    private void BtnPlayerWarpCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraPlayerWarp.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Route Completion
 
-        private void BtnMoveWaitOK_Click(object sender, EventArgs e)
+    private void BtnMoveWaitOK_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -4008,27 +4387,19 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraMoveRouteWait.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnMoveWaitCancel_Click(object sender, EventArgs e)
+    private void BtnMoveWaitCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraMoveRouteWait.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Spawn Npc
 
-        private void BtnSpawnNpcOK_Click(object sender, EventArgs e)
+    private void BtnSpawnNpcOK_Click(object? sender, EventArgs e)
         {
             if (Event.IsEdit == false)
             {
@@ -4038,27 +4409,19 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraSpawnNpc.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnSpawnNpcancel_Click(object sender, EventArgs e)
+    private void BtnSpawnNpcancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraSpawnNpc.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Play Animation
 
-        private void OptPlayAnimPlayer_CheckedChanged(object sender, EventArgs e)
+    private void OptPlayAnimPlayer_CheckedChanged(object? sender, EventArgs e)
         {
             lblPlayAnimX.Visible = false;
             lblPlayAnimY.Visible = false;
@@ -4067,7 +4430,7 @@ namespace Client
             cmbPlayAnimEvent.Visible = false;
         }
 
-        private void OptPlayAnimEvent_CheckedChanged(object sender, EventArgs e)
+    private void OptPlayAnimEvent_CheckedChanged(object? sender, EventArgs e)
         {
             lblPlayAnimX.Visible = false;
             lblPlayAnimY.Visible = false;
@@ -4076,7 +4439,7 @@ namespace Client
             cmbPlayAnimEvent.Visible = true;
         }
 
-        private void OptPlayAnimTile_CheckedChanged(object sender, EventArgs e)
+    private void OptPlayAnimTile_CheckedChanged(object? sender, EventArgs e)
         {
             lblPlayAnimX.Visible = true;
             lblPlayAnimY.Visible = true;
@@ -4085,7 +4448,7 @@ namespace Client
             cmbPlayAnimEvent.Visible = false;
         }
 
-        private void BtnPlayAnimationOK_Click(object sender, EventArgs e)
+    private void BtnPlayAnimationOK_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -4095,27 +4458,19 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraPlayAnimation.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnPlayAnimationCancel_Click(object sender, EventArgs e)
+    private void BtnPlayAnimationCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraPlayAnimation.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Set Fog
 
-        private void BtnSetFogOK_Click(object sender, EventArgs e)
+    private void BtnSetFogOK_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -4125,27 +4480,19 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraSetFog.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnSetFogCancel_Click(object sender, EventArgs e)
+    private void BtnSetFogCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraSetFog.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Set Weather
 
-        private void BtnSetWeatherOK_Click(object sender, EventArgs e)
+    private void BtnSetWeatherOK_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -4155,27 +4502,19 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraSetWeather.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnSetWeatherCancel_Click(object sender, EventArgs e)
+    private void BtnSetWeatherCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraSetWeather.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Set Map Tint
 
-        private void BtnMapTintOK_Click(object sender, EventArgs e)
+    private void BtnMapTintOK_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -4185,27 +4524,19 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraMapTint.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnMapTintCancel_Click(object sender, EventArgs e)
+    private void BtnMapTintCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraMapTint.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Play BGM
 
-        private void BtnPlayBgmOK_Click(object sender, EventArgs e)
+    private void BtnPlayBgmOK_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -4215,27 +4546,19 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraPlayBGM.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnPlayBgmCancel_Click(object sender, EventArgs e)
+    private void BtnPlayBgmCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraPlayBGM.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Play Sound
 
-        private void BtnPlaySoundOK_Click(object sender, EventArgs e)
+    private void BtnPlaySoundOK_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -4245,27 +4568,19 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraPlaySound.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnPlaySoundCancel_Click(object sender, EventArgs e)
+    private void BtnPlaySoundCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraPlaySound.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Wait
 
-        private void BtnSetWaitOK_Click(object sender, EventArgs e)
+    private void BtnSetWaitOK_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -4275,27 +4590,19 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraSetWait.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnSetWaitCancel_Click(object sender, EventArgs e)
+    private void BtnSetWaitCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraSetWait.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Set Access
 
-        private void BtnSetAccessOK_Click(object sender, EventArgs e)
+    private void BtnSetAccessOK_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -4305,27 +4612,19 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraSetAccess.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnSetAccessCancel_Click(object sender, EventArgs e)
+    private void BtnSetAccessCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraSetAccess.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
 
         #region Show Pic
 
-        private void BtnShowPicOK_Click(object sender, EventArgs e)
+    private void BtnShowPicOK_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -4335,23 +4634,15 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraShowPic.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnShowPicCancel_Click(object sender, EventArgs e)
+        private void BtnShowPicCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraShowPic.Visible = false;
+            HideAllFrames();
         }
 
-        private void nudShowPicture_Click(object sender, EventArgs e)
+        private void nudShowPicture_Click(object? sender, EventArgs e)
         {
             DrawPicture();
         }
@@ -4387,7 +4678,7 @@ namespace Client
 
         #region Open Shop
 
-        private void BtnOpenShopOK_Click(object sender, EventArgs e)
+        private void BtnOpenShopOK_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -4397,20 +4688,12 @@ namespace Client
             {
                 Event.EditCommand();
             }
-            // hide
-            fraDialogue.Visible = false;
-            fraOpenShop.Visible = false;
-            fraCommands.Visible = false;
+            HideAllFrames();
         }
 
-        private void BtnOpenShopCancel_Click(object sender, EventArgs e)
+    private void BtnOpenShopCancel_Click(object? sender, EventArgs e)
         {
-            if (!Event.IsEdit)
-                fraCommands.Visible = true;
-            else
-                fraCommands.Visible = false;
-            fraDialogue.Visible = false;
-            fraOpenShop.Visible = false;
+            HideAllFrames();
         }
 
         #endregion
@@ -4439,7 +4722,45 @@ namespace Client
             catch { }
         }
 
-        // Hide all frames and show the commands area
+        // Place a frame panel into the TOP host area (where Variables/Switches live).
+        // If useDialogueWrapper is true, embed the content inside fraDialogue, otherwise show directly.
+        private void ShowFrame(Panel content, bool useDialogueWrapper)
+        {
+            try
+            {
+                if (useDialogueWrapper)
+                {
+                    // Ensure wrapper hosts the content
+                    fraDialogue.Content = content;
+                    fraDialogue.Visible = true;
+                    content.Visible = true;
+                    frameHost.Content = fraDialogue;
+                }
+                else
+                {
+                    content.Visible = true;
+                    frameHost.Content = content;
+                }
+                // Ensure sizing before showing
+                SyncOverlayChildSizes();
+                frameHost.Visible = true;
+                // Swap palette out and show the active frame
+                fraCommands.Visible = false;
+                frameHost.Visible = true;
+                // Nudge layout
+                try { _rightStack?.Invalidate(true); } catch { }
+                try { _rightScroll?.Invalidate(true); } catch { }
+                try { editorHost?.Invalidate(true); } catch { }
+                // Defer one more size sync after layout on UI thread
+                try { Application.Instance?.Invoke(() => SyncOverlayChildSizes()); } catch { }
+                // Force layout refresh
+                frameHost.Invalidate(true);
+                ScrollRightPaneTop();
+            }
+            catch { }
+        }
+
+        // Hide all frames and show the variables/switches area at the top, keep commands at the bottom
         private void HideAllFrames()
         {
             // Set visibility off for all known frames so the command area is shown
@@ -4477,8 +4798,16 @@ namespace Client
             fraSetAccess.Visible = false;
             fraShowPic.Visible = false;
             fraOpenShop.Visible = false;
-            // Show commands
+            // Clear the frame host so nothing is overlayed in the top area
+            try { frameHost.Content = null; } catch { }
+            frameHost.Visible = false;
+            // Show command palette again
             fraCommands.Visible = true;
+            frameHost.Visible = false;
+            SyncOverlayChildSizes();
+            try { _rightStack?.Invalidate(true); } catch { }
+            try { _rightScroll?.Invalidate(true); } catch { }
+            try { editorHost?.Invalidate(true); } catch { }
         }
     }
 }
