@@ -43,7 +43,7 @@ namespace Client
         public Panel pnlAttributes = new Panel();
         public GroupBox fraAnimation = new GroupBox{ Text = "Animation" };
         public ComboBox cmbAnimation = new ComboBox();
-        public Button brnAnimation = new Button{ Text = "OK" };
+        public Button btnAnimation = new Button{ Text = "OK" };
         public GroupBox fraMapWarp = new GroupBox{ Text = "Map Warp" };
         public Button btnMapWarp = new Button{ Text = "OK" };
         public Slider scrlMapWarpY = new Slider();
@@ -59,27 +59,24 @@ namespace Client
         public Label lblNpcDir = new Label();
         public GroupBox fraHeal = new GroupBox{ Text = "Heal" };
         public Slider scrlHeal = new Slider();
-        public Label lblHeal = new Label();
         public ComboBox cmbHeal = new ComboBox();
         public Button btnHeal = new Button{ Text = "OK" };
         public GroupBox fraShop = new GroupBox{ Text = "Shop" };
         public ComboBox cmbShop = new ComboBox();
         public Button btnShop = new Button{ Text = "OK" };
         public GroupBox fraResource = new GroupBox{ Text = "Resource" };
+
+        public ComboBox cmbResource = new ComboBox();
         public Button btnResourceOk = new Button{ Text = "OK" };
-        public Slider scrlResource = new Slider();
-        public Label lblResource = new Label();
         public GroupBox fraMapItem = new GroupBox{ Text = "Map Item" };
         public ImageView picMapItem = new ImageView();
         public Button btnMapItem = new Button{ Text = "OK" };
+        public ComboBox cmbMapItem = new ComboBox();
         public Slider scrlMapItemValue = new Slider();
-        public Slider scrlMapItem = new Slider();
-        public Label lblMapItem = new Label();
         public GroupBox fraTrap = new GroupBox{ Text = "Trap" };
         public ComboBox cmbTrapVital = new ComboBox();
         public Button btnTrap = new Button{ Text = "OK" };
         public Slider scrlTrap = new   Slider();
-        public Label lblTrap = new Label();
         public ToolBar? toolbar;
         public TabControl tabPages = new TabControl();
         public TabPage tpTiles = new TabPage{ Text = "Tiles" };
@@ -89,7 +86,6 @@ namespace Client
         public ComboBox cmbLayers = new ComboBox();
         public Label Label9 = new Label{ Text = "Tileset" };
         public Slider sldTileSet = new Slider();
-        // Use the Scrollable's native vertical scrollbar beside the tiles
         private Scrollable tilesetScrollArea = new Scrollable();
         public TabPage tpAttributes = new TabPage{ Text = "Attributes" };
         public RadioButton optNoCrossing;
@@ -381,11 +377,20 @@ namespace Client
             scrlMapWarpY.MinValue = 0; scrlMapWarpY.MaxValue = byte.MaxValue; scrlMapWarpY.ValueChanged += ScrlMapWarpY_Scroll;
             btnMapWarp.Click += BtnMapWarp_Click;
 
-            scrlMapItem.MinValue = 0; scrlMapItem.MaxValue = Constant.MaxItems - 1; scrlMapItem.ValueChanged += ScrlMapItem_ValueChanged;
-            scrlMapItemValue.MinValue = 1; scrlMapItemValue.MaxValue = 255; scrlMapItemValue.ValueChanged += ScrlMapItemValue_ValueChanged;
-            btnMapItem.Click += BtnMapItem_Click;
+            // Populate item combo with names
+            cmbMapItem.Items.Clear();
+            for (int i = 0; i < Constant.MaxItems; i++)
+                cmbMapItem.Items.Add((i + 1) + ": " + Data.Item[i].Name);
 
-            scrlResource.MinValue = 0; scrlResource.MaxValue = Constant.MaxResources - 1; scrlResource.ValueChanged += ScrlResource_ValueChanged;
+            btnMapItem.Click += BtnMapItem_Click;
+            // Item combos sizing
+            cmbMapItem.Width = 400;
+            
+            // Populate resource list for attribute selection
+            cmbResource.Items.Clear();
+            for (int i = 0; i < Constant.MaxResources; i++)
+                cmbResource.Items.Add((i + 1) + ": " + Data.Resource[i].Name);
+            cmbResource.SelectedIndexChanged += CmbResource_SelectedIndexChanged;
             btnResourceOk.Click += BtnResourceOk_Click;
 
             lstNpc.SelectedIndex = 0;
@@ -399,11 +404,10 @@ namespace Client
             cmbHeal.Items.Add("Mp");
             cmbHeal.Items.Add("Sp");
             cmbHeal.SelectedIndex = 0;
-            scrlHeal.MinValue = 1; scrlHeal.MaxValue = 255; scrlHeal.ValueChanged += ScrlHeal_Scroll; btnHeal.Click += BtnHeal_Click;
+            scrlHeal.MinValue = 1; scrlHeal.MaxValue = 1024; btnHeal.Click += BtnHeal_Click;
+            scrlTrap.MinValue = 1; scrlTrap.MaxValue = 1024; btnTrap.Click += BtnTrap_Click;
 
-            scrlTrap.MinValue = 1; scrlTrap.MaxValue = 255; scrlTrap.ValueChanged += ScrlTrap_ValueChanged; btnTrap.Click += BtnTrap_Click;
-
-            cmbAnimation.SelectedIndex = 0; brnAnimation.Click += brnAnimation_Click;
+            cmbAnimation.SelectedIndex = 0; btnAnimation.Click += btnAnimation_Click;
 
             btnFillAttributes.Click += btnFillAttributes_Click;
 
@@ -415,15 +419,11 @@ namespace Client
             scrlMapWarpY.Width = 400;
             scrlMapWarpY.Height = 30;
 
-            // Item
-            scrlMapItem.Width = 400;
-            scrlMapItem.Height = 30;
+            // Item combos sizing
+            cmbMapItem.Width = 400;
+            scrlMapItemValue.MaxValue = 1024;
             scrlMapItemValue.Width = 400;
-            scrlMapItemValue.Height = 30;
-
-            // Resource
-            scrlResource.Width = 400;
-            scrlResource.Height = 30;
+            scrlMapItemValue.MinValue = 1;
 
             // NPC spawn direction
             scrlNpcDir.Width = 400;
@@ -436,6 +436,7 @@ namespace Client
             // Trap amount
             scrlTrap.Width = 400;
             scrlTrap.Height = 30;
+            
             // Trap vital (Hp/Mp/Sp)
             cmbTrapVital.Items.Clear();
             cmbTrapVital.Items.Add("Hp");
@@ -461,8 +462,8 @@ namespace Client
                 Padding = 6, Spacing = 6,
                 Items =
                 {
-                    new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Item" }, scrlMapItem, lblMapItem } },
-                    new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Value" }, scrlMapItemValue } },
+                    new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Item" }, cmbMapItem } },
+                    new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Amount" }, scrlMapItemValue } },
                     picMapItem,
                     btnMapItem
                 }
@@ -471,7 +472,7 @@ namespace Client
             fraResource.Content = new StackLayout
             {
                 Padding = 6, Spacing = 6,
-                Items = { new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Resource" }, scrlResource, lblResource } }, btnResourceOk }
+                Items = { new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Resource" }, cmbResource } }, btnResourceOk }
             };
 
             fraNpcSpawn.Content = new StackLayout
@@ -481,7 +482,7 @@ namespace Client
             };
 
             fraShop.Content = new StackLayout{ Padding = 6, Spacing = 6, Items = { cmbShop, btnShop } };
-            fraHeal.Content = new StackLayout{ Padding = 6, Spacing = 6, Items = { cmbHeal, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Amount" }, scrlHeal, lblHeal } }, btnHeal } };
+            fraHeal.Content = new StackLayout{ Padding = 6, Spacing = 6, Items = { cmbHeal, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Amount" }, scrlHeal } }, btnHeal } };
             fraTrap.Content = new StackLayout
             {
                 Padding = 6,
@@ -489,11 +490,11 @@ namespace Client
                 Items =
                 {
                     new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Vital" }, cmbTrapVital } },
-                    new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Amount" }, scrlTrap, lblTrap } },
+                    new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Amount" }, scrlTrap } },
                     btnTrap
                 }
             };
-            fraAnimation.Content = new StackLayout{ Padding = 6, Spacing = 6, Items = { cmbAnimation, brnAnimation } };
+            fraAnimation.Content = new StackLayout{ Padding = 6, Spacing = 6, Items = { cmbAnimation, btnAnimation } };
 
             // Place all attribute group boxes into a stack; only one visible at a time
             pnlAttributes.Content = new StackLayout
@@ -1198,30 +1199,9 @@ namespace Client
             scrlMapWarpY.Value = 0;
         }
 
-        private void ScrlMapItem_ValueChanged(object? sender, EventArgs e)
-        {
-            if (Data.Item[scrlMapItem.Value].Type == (byte)ItemCategory.Currency | Data.Item[scrlMapItem.Value].Stackable == 1)
-            {
-                scrlMapItemValue.Enabled = true;
-            }
-            else
-            {
-                scrlMapItemValue.Value = 1;
-                scrlMapItemValue.Enabled = false;
-            }
-
-            // DrawItem removed in refactor (image updated elsewhere)
-            lblMapItem.Text = (scrlMapItem.Value + 1) + ". " + Data.Item[scrlMapItem.Value].Name + " x" + scrlMapItemValue.Value;
-        }
-
-        private void ScrlMapItemValue_ValueChanged(object? sender, EventArgs e)
-        {
-            lblMapItem.Text = (scrlMapItem.Value + 1) + ". " + Data.Item[scrlMapItem.Value].Name + " x" + scrlMapItemValue.Value;
-        }
-
         private void BtnMapItem_Click(object? sender, EventArgs e)
         {
-            GameState.ItemEditorNum = scrlMapItem.Value;
+            GameState.ItemEditorNum = cmbMapItem.SelectedIndex;
             GameState.ItemEditorValue = scrlMapItemValue.Value;
             pnlAttributes.Visible = false;
             fraMapItem.Visible = false;
@@ -1235,22 +1215,21 @@ namespace Client
             ClearAttributeDialogue();
             pnlAttributes.Visible = true;
             fraMapItem.Visible = true;
-
-            lblMapItem.Text = Data.Item[scrlMapItem.Value].Name + " x" + scrlMapItemValue.Value;
-            ScrlMapItem_ValueChanged(sender, e);
-            // DrawItem removed in refactor (image updated elsewhere)
     }
 
         private void BtnResourceOk_Click(object? sender, EventArgs e)
         {
-            GameState.ResourceEditorNum = scrlResource.Value;
+            GameState.ResourceEditorNum = cmbResource.SelectedIndex;
             pnlAttributes.Visible = false;
             fraResource.Visible = false;
         }
 
-        private void ScrlResource_ValueChanged(object? sender, EventArgs e)
+        private void CmbResource_SelectedIndexChanged(object? sender, EventArgs e)
         {
-            lblResource.Text = "Resource: " + Data.Resource[scrlResource.Value].Name;
+            // Keep the selected resource index in GameState for immediate placement
+            if (cmbResource.SelectedIndex < 0 || cmbResource.SelectedIndex >= Constant.MaxResources)
+                return;
+            GameState.ResourceEditorNum = cmbResource.SelectedIndex;
         }
 
         private void OptResource_CheckedChanged(object? sender, EventArgs e)
@@ -1261,7 +1240,6 @@ namespace Client
             ClearAttributeDialogue();
             pnlAttributes.Visible = true;
             fraResource.Visible = true;
-            ScrlResource_ValueChanged(sender, e);
         }
 
         private void BtnNpcSpawn_Click(object? sender, EventArgs e)
@@ -1334,11 +1312,6 @@ namespace Client
             fraHeal.Visible = false;
         }
 
-        private void ScrlHeal_Scroll(object? sender, EventArgs e)
-        {
-            lblHeal.Text = "Amount: " + scrlHeal.Value;
-        }
-
         private void OptHeal_CheckedChanged(object? sender, EventArgs e)
         {
             if (optHeal.Checked == false)
@@ -1348,12 +1321,6 @@ namespace Client
             pnlAttributes.Visible = true;
             fraHeal.Visible = true;
             cmbHeal.SelectedIndex = 0;
-        }
-
-        private void ScrlTrap_ValueChanged(object? sender, EventArgs e)
-        {
-            var vitalName = cmbTrapVital.SelectedIndex switch { 0 => "HP", 1 => "MP", _ => "SP" };
-            lblTrap.Text = $"{vitalName}: {scrlTrap.Value}";
         }
 
         private void BtnTrap_Click(object? sender, EventArgs e)
@@ -2797,7 +2764,7 @@ namespace Client
             fraAnimation.Visible = true;
         }
 
-        private void brnAnimation_Click(object? sender, EventArgs e)
+        private void btnAnimation_Click(object? sender, EventArgs e)
         {
             GameState.EditorAnimation = cmbAnimation.SelectedIndex;
             pnlAttributes.Visible = false;
