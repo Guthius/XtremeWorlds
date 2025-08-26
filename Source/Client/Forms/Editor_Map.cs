@@ -695,7 +695,7 @@ namespace Client
         {
             Label15.Text = "Copy Mode:";
             Label16.Text = "Paste Mode:";
-            lblCopyMode.Text = "CopyMode Off";
+            lblCopyMode.Text = "Copy Mode Off";
             lblPasteMode.Text = "PasteMode Off";
             btnCopyEvent.Click += BtnCopyEvent_Click;
             btnPasteEvent.Click += BtnPasteEvent_Click;
@@ -1435,14 +1435,14 @@ namespace Client
             if (Event.EventCopy == false)
             {
                 Event.EventCopy = true;
-                lblCopyMode.Text = "CopyMode On";
+                lblCopyMode.Text = "Copy Mode On";
                 Event.EventPaste = false;
-                lblPasteMode.Text = "PasteMode Off";
+                lblPasteMode.Text = "Paste Mode Off";
             }
             else
             {
                 Event.EventCopy = false;
-                lblCopyMode.Text = "CopyMode Off";
+                lblCopyMode.Text = "Copy Mode Off";
             }
         }
 
@@ -1451,14 +1451,14 @@ namespace Client
             if (Event.EventPaste == false)
             {
                 Event.EventPaste = true;
-                lblPasteMode.Text = "PasteMode On";
+                lblPasteMode.Text = "Paste Mode On";
                 Event.EventCopy = false;
-                lblCopyMode.Text = "CopyMode Off";
+                lblCopyMode.Text = "Copy Mode Off";
             }
             else
             {
                 Event.EventPaste = false;
-                lblPasteMode.Text = "PasteMode Off";
+                lblPasteMode.Text = "Paste Mode Off";
             }
         }
 
@@ -2706,32 +2706,32 @@ namespace Client
             }
         }
 
-    private void tsbCopyMap_Click(object? sender, EventArgs e)
+        private void tsbCopyMap_Click(object? sender, EventArgs e)
         {
             MapEditorCopyMap();
         }
 
-    private void tsbUndo_Click(object? sender, EventArgs e)
+        private void tsbUndo_Click(object? sender, EventArgs e)
         {
             MapEditorUndo();
         }
 
-    private void tsbRedo_Click(object? sender, EventArgs e)
+        private void tsbRedo_Click(object? sender, EventArgs e)
         {
             MapEditorRedo();
         }
 
-    private void tsbOpacity_Click(object? sender, EventArgs e)
+        private void tsbOpacity_Click(object? sender, EventArgs e)
         {
             GameState.HideLayers = !GameState.HideLayers;
         }
 
-    private void tsbScreenshot_Click(object? sender, EventArgs e)
+        private void tsbScreenshot_Click(object? sender, EventArgs e)
         {
             GameClient.TakeScreenshot();
         }
 
-    private void tsbTileset_Click(object? sender, EventArgs e)
+        private void tsbTileset_Click(object? sender, EventArgs e)
         {
             for (int y = 0; y < Data.MyMap.MaxY; y++)
             {
@@ -2762,7 +2762,7 @@ namespace Client
             fraAnimation.Visible = true;
         }
 
-    private void brnAnimation_Click(object? sender, EventArgs e)
+        private void brnAnimation_Click(object? sender, EventArgs e)
         {
             GameState.EditorAnimation = cmbAnimation.SelectedIndex;
             pnlAttributes.Visible = false;
