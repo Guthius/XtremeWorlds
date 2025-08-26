@@ -49,10 +49,13 @@ jobs:
       if: runner.os == 'macOS'
       run: |
         brew install zip || true
+        # Portable lowercase conversion
         OS=$(echo "$RUNNER_OS" | tr '[:upper:]' '[:lower:]')
+        ZIP_FILE="../xtremeworlds-${OS}-${GITHUB_REF_NAME}.zip"
         cd publish
-        zip -r "../xtremeworlds-${OS}-${GITHUB_REF_NAME}.zip" *
+        zip -r "$ZIP_FILE" *
         cd ..
+
 
       # Windows ZIP
       - name: Create ZIP on Windows
