@@ -22,7 +22,7 @@ jobs:
           dotnet-version: 9.0.x
 
       - name: Restore dependencies (Linux/macOS)
-        if: runner.os != 'Windows'
+        if: ${{ runner.os != 'Windows' }}
         shell: bash
         run: |
           if [[ "$RUNNER_OS" == "Linux" ]]; then
@@ -32,11 +32,11 @@ jobs:
             dotnet restore --runtime osx-arm64
           fi
       - name: Restore dependencies (Windows)
-        if: runner.os == 'Windows'
+        if: ${{ runner.os == 'Windows' }}
         run: dotnet restore --runtime win-x64
 
       - name: Build (Linux/macOS)
-        if: runner.os != 'Windows'
+        if: ${{ runner.os != 'Windows' }}
         shell: bash
         run: |
           if [[ "$RUNNER_OS" == "Linux" ]]; then
@@ -46,11 +46,11 @@ jobs:
             dotnet build --configuration Release --no-restore --runtime osx-arm64
           fi
       - name: Build (Windows)
-        if: runner.os == 'Windows'
+        if: ${{ runner.os == 'Windows' }}
         run: dotnet build --configuration Release --no-restore --runtime win-x64
 
       - name: Test (Linux/macOS)
-        if: runner.os != 'Windows'
+        if: ${{ runner.os != 'Windows' }}
         shell: bash
         run: |
           if [[ "$RUNNER_OS" == "Linux" ]]; then
@@ -60,7 +60,7 @@ jobs:
             dotnet test --no-build --verbosity normal --runtime osx-arm64
           fi
       - name: Test (Windows)
-        if: runner.os == 'Windows'
+        if: ${{ runner.os == 'Windows' }}
         run: dotnet test --no-build --verbosity normal --runtime win-x64
 
       # ===== macOS universal build =====
