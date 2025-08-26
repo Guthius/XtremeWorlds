@@ -21,95 +21,61 @@ jobs:
         with:
           dotnet-version: 9.0.x
 
-      - name: Restore dependencies (Linux/macOS)
-        if: ${{ runner.os != 'Windows' }}
-        shell: bash
-        run: |
-          if [[ "$RUNNER_OS" == "Linux" ]]; then
-            dotnet restore --runtime linux-x64
-          elif [[ "$RUNNER_OS" == "macOS" ]]; then
-            dotnet restore --runtime osx-x64
-            dotnet restore --runtime osx-arm64
-          fi
-      - name: Restore dependencies (Windows)
-        if: ${{ runner.os == 'Windows' }}
-        run: dotnet restore --runtime win-x64
+      - name: Restore dependencies
+        run: dotnet restore
 
-      - name: Build (Linux/macOS)
-        if: ${{ runner.os != 'Windows' }}
-        shell: bash
-        run: |
-          if [[ "$RUNNER_OS" == "Linux" ]]; then
-            dotnet build Source/Client/Client.csproj --configuration Release --no-restore
-            dotnet build Source/Server/Server.csproj --configuration Release --no-restore
-          elif [[ "$RUNNER_OS" == "macOS" ]]; then
-            dotnet build Source/Client/Client.csproj --configuration Release --no-restore
-            dotnet build Source/Client/Client.csproj --configuration Release --no-restore
-            dotnet build Source/Server/Server.csproj --configuration Release --no-restore
-            dotnet build Source/Server/Server.csproj --configuration Release --no-restore
-          fi
-      - name: Build (Windows)
-        if: ${{ runner.os == 'Windows' }}
-        run: |
-          dotnet build Source/Client/Client.csproj --configuration Release --no-restore
-          dotnet build Source/Server/Server.csproj --configuration Release --no-restore
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
 
+      - name: Test
+        run: dotnet test --no-build --verbosity normal
 
-      # ===== macOS universal build =====
-      - name: Publish macOS Client and Server (x64/arm64)
-        if: ${{ runner.os == 'macOS' }}
-        run: |
-          set -e
-          CLIENT_PROJ="./Source/Client/Client.csproj"
-          SERVER_PROJ="./Source/Server/Server.csproj"
+      - name: Publish build output
+        run: dotnet publish -c Release -o ./publish
 
-          rm -rf ./tmp-client-x64 ./tmp-client-arm64 ./tmp-server-x64 ./tmp-server-arm64 ./publish
-
-          # Publish Client
-          dotnet publish "$CLIENT_PROJ" -c Release -o ./tmp-client-x64   --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true
-          dotnet publish "$CLIENT_PROJ" -c Release -o ./tmp-client-arm64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true
-
-          # Publish Server
-          dotnet publish "$SERVER_PROJ" -c Release -o ./tmp-server-x64   --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true
-          dotnet publish "$SERVER_PROJ" -c Release -o ./tmp-server-arm64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true
-
-          # Merge into universal binaries
-          mkdir -p ./publish/Client
-          cp -R ./tmp-client-arm64/* ./publish/Client/
-          lipo -create ./tmp-client-x64/Client ./tmp-client-arm64/Client -output ./publish/Client/Client
-
-          mkdir -p ./publish/Server
-          cp -R ./tmp-server-arm64/* ./publish/Server/
-          lipo -create ./tmp-server-x64/Server ./tmp-server-arm64/Server -output ./publish/Server/Server
-
-      # ===== Generic publish for Linux/Windows =====
-      - name: Publish build output (Linux)
+      # Linux ZIP
+      - name: Create ZIP on Linux
         if: ${{ runner.os == 'Linux' }}
-        shell: bash
         run: |
-          mkdir -p publish/Client
-          mkdir -p publish/Server
-          dotnet publish Source/Client/Client.csproj -c Release -o ./publish/Client --self-contained true
-          dotnet publish Source/Server/Server.csproj -c Release -o ./publish/Server --self-contained true
-      - name: Publish build output (Windows)
-        if: ${{ runner.os == 'Windows' }}
-        run: |
-          mkdir publish\Client
-          mkdir publish\Server
-          dotnet publish Source/Client/Client.csproj -c Release -o .\publish\Client --self-contained true
-          dotnet publish Source/Server/Server.csproj -c Release -o .\publish\Server --self-contained true
-
-      # ===== ZIP packaging =====
-      - name: Create ZIP package
-        run: |
-          ZIP_FILE="engine-${RUNNER_OS}.zip"
+          sudo apt-get update
+          sudo apt-get install -y zip
+          OS=$(echo "$RUNNER_OS" | tr '[:upper:]' '[:lower:]')
           cd publish
-          zip -r "../$ZIP_FILE" *
+          zip -r "../xtremeworlds-${OS}-${GITHUB_REF_NAME}.zip" *
           cd ..
-
-      # ===== Upload artifact =====
-      - name: Upload ZIP
+      - name: Upload ZIP on Linux
+        if: ${{ runner.os == 'Linux' }}
         uses: actions/upload-artifact@v4
         with:
-          name: xtremeworlds-${{ runner.os }}
-          path: xtremeworlds-${{ runner.os }}.zip
+          name: xtremeworlds-linux-${{ github.ref_name }}
+          path: xtremeworlds-linux-${{ github.ref_name }}.zip
+      # macOS ZIP
+      - name: Create ZIP on macOS
+        if: ${{ runner.os == 'macOS' }}
+        run: |
+          which zip || brew install zip
+          OS=$(echo "$RUNNER_OS" | tr '[:upper:]' '[:lower:]')
+          ZIP_FILE="../xtremeworlds-${OS}-${GITHUB_REF_NAME}.zip"
+          cd publish
+          zip -r "$ZIP_FILE" *
+          cd ..
+      - name: Upload ZIP on macOS
+        if: ${{ runner.os == 'macOS' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: xtremeworlds-macos-${{ github.ref_name }}
+          path: xtremeworlds-macos-${{ github.ref_name }}.zip
+      # Windows ZIP
+      - name: Create ZIP on Windows
+        if: ${{ runner.os == 'Windows' }}
+        shell: powershell
+        run: |
+          $OS = $env:RUNNER_OS.ToLower()
+          $ZIP = "..\xtremeworlds-$OS-$env:GITHUB_REF_NAME.zip"
+          Compress-Archive -Path publish\* -DestinationPath $ZIP
+      - name: Upload ZIP on Windows
+        if: ${{ runner.os == 'Windows' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: xtremeworlds-windows-${{ github.ref_name }}
+          path: xtremeworlds-windows-${{ github.ref_name }}.zip
