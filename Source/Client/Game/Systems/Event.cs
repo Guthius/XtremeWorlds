@@ -198,6 +198,7 @@ namespace Client
                         {
                             GameState.InitEventEditor = true;
                             GameState.EventNum = i;
+                            InEvent = true;
                         }
                         return;
                     }
@@ -229,6 +230,7 @@ namespace Client
             {
                 GameState.InitEventEditor = true;
                 GameState.EventNum = count - 1;
+                InEvent = true;
             }
         }
 
@@ -249,7 +251,6 @@ namespace Client
         public static void EventEditorInit()
         {
             int EventNum = GameState.EventNum;
-            GameState.InEvent = true;
             EditorEvent = EventNum;
             TmpEvent = Data.MyMap.Event[EventNum];
             if (TmpEvent.Pages[0].CommandListCount == 0)
@@ -382,8 +383,6 @@ namespace Client
             // copy the event data from the temp event
             Data.MyMap.Event[EditorEvent] = TmpEvent;
             TmpEvent = default;
-
-            Event.InEvent = false;
 
             // unload the form
             Editor_Event.Instance.Dispose();
@@ -3608,7 +3607,7 @@ namespace Client
             EventChat = true;
             ShowEventLbl = true;
             choices = buffer.ReadInt32();
-            InEvent = true;
+            
             for (i = 0; i < Constant.MaxEventChoices; i++)
             {
                 EventChoices[i] = "";
