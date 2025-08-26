@@ -878,17 +878,17 @@ namespace Client
                     new ButtonToolItem{ Text = "Discard", Command = new Command((_,__) => TsbDiscard_Click(this, EventArgs.Empty))},
                     new SeparatorToolItem(),
                     new ButtonToolItem{ Text = "Grid", Command = new Command((_,__) => TsbMapGrid_Click(this, EventArgs.Empty))},
-                    new ButtonToolItem{ Text = "Opacity"},
+                    new ButtonToolItem{ Text = "Opacity", Command = new Command((_,__) => tsbOpacity_Click(this, EventArgs.Empty))},
                     new SeparatorToolItem(),
                     new ButtonToolItem{ Text = "Fill", Command = new Command((_,__) => TsbFill_Click(this, EventArgs.Empty))},
                     new ButtonToolItem{ Text = "Clear", Command = new Command((_,__) => TsbClear_Click(this, EventArgs.Empty))},
                     new ButtonToolItem{ Text = "Eye Dropper", Command = new Command((_,__) => TsbEyeDropper_Click(this, EventArgs.Empty))},
                     new ButtonToolItem{ Text = "Copy", Command = new Command((_,__) => tsbCopyMap_Click(this, EventArgs.Empty))},
-                    new ButtonToolItem{ Text = "Delete"},
-                    new ButtonToolItem{ Text = "Undo"},
-                    new ButtonToolItem{ Text = "Redo"},
-                    new ButtonToolItem{ Text = "Screenshot"},
-                    new ButtonToolItem{ Text = "Tileset"}
+                    new ButtonToolItem{ Text = "Delete", Command = new Command((_,__) => tsbDeleteMap_Click(this, EventArgs.Empty))},
+                    new ButtonToolItem{ Text = "Undo", Command = new Command((_,__) => tsbUndo_Click(this, EventArgs.Empty))},
+                    new ButtonToolItem{ Text = "Redo", Command = new Command((_,__) => tsbRedo_Click(this, EventArgs.Empty))},
+                    new ButtonToolItem{ Text = "Screenshot", Command = new Command((_,__) => tsbScreenshot_Click(this, EventArgs.Empty))},
+                    new ButtonToolItem{ Text = "Tileset", Command = new Command((_,__) => tsbTileset_Click(this, EventArgs.Empty))}
                 }
             };
             ToolBar = toolbar;
