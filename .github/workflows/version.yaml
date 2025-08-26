@@ -33,39 +33,35 @@ jobs:
       - name: Publish build output
         run: dotnet publish -c Release -o ./publish
 
-      # Linux ZIP
-      - name: Create ZIP on Linux
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y zip
-          OS=$(echo "$RUNNER_OS" | tr '[:upper:]' '[:lower:]')
-          cd publish
-          zip -r "../xtremeworlds-${OS}-${GITHUB_REF_NAME}.zip" *
-          cd ..
+     # Linux ZIP
+- name: Create ZIP on Linux
+  if: runner.os == 'Linux'
+  run: |
+    sudo apt-get update
+    sudo apt-get install -y zip
+    OS=$(echo "$RUNNER_OS" | tr '[:upper:]' '[:lower:]')
+    cd publish
+    zip -r "../xtremeworlds-${OS}-${GITHUB_REF_NAME}.zip" *
+    cd ..
 
-      # macOS ZIP
-      - name: Create ZIP on macOS
-        if: runner.os == 'macOS'
-        run: |
-          brew install zip || true
-          OS=$(echo "$RUNNER_OS" | tr '[:upper:]' '[:lower:]')
-          ZIP_FILE="../xtremeworlds-${OS}-${GITHUB_REF_NAME}.zip"
-          cd publish
-          zip -r "$ZIP_FILE" *
-          cd ..
+# macOS ZIP
+- name: Create ZIP on macOS
+  if: runner.os == 'macOS'
+  run: |
+    # macOS usually has zip installed, but install via brew if missing
+    which zip || brew install zip
+    OS=$(echo "$RUNNER_OS" | tr '[:upper:]' '[:lower:]')
+    ZIP_FILE="../xtremeworlds-${OS}-${GITHUB_REF_NAME}.zip"
+    cd publish
+    zip -r "$ZIP_FILE" *
+    cd ..
 
-      # Windows ZIP
-      - name: Create ZIP on Windows
-        if: runner.os == 'Windows'
-        shell: powershell
-        run: |
-          $OS = $env:RUNNER_OS.ToLower()
-          $ZIP = "..\xtremeworlds-$OS-$env:GITHUB_REF_NAME.zip"
-          Compress-Archive -Path publish\* -DestinationPath $ZIP
+# Windows ZIP
+- name: Create ZIP on Windows
+  if: runner.os == 'Windows'
+  shell: powershell
+  run: |
+    $OS = $env:RUNNER_OS.ToLower()
+    $ZIP = "..\xtremeworlds-$OS-$env:GITHUB_REF_NAME.zip"
+    Compress-Archive -Path publish\* -DestinationPath $ZIP
 
-      - name: Upload ZIP artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: xtremeworlds-${{ toLower(matrix.os) }}
-          path: xtremeworlds-${{ toLower(matrix.os) }}-${{ github.ref_name }}.zip
