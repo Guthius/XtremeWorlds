@@ -1703,7 +1703,7 @@ namespace Client
                                       2d));
             rec.Width = (int) Math.Round(GetGfxInfo(Path.Combine(DataPath.Emotes, sprite.ToString())).Width /
                                          2d);
-
+                                         
             x = GameLogic.ConvertMapX(x2);
             y = GameLogic.ConvertMapY(y2) - (GameState.SizeY + 16);
 
@@ -1771,16 +1771,17 @@ namespace Client
             if (sprite < 1 | sprite > GameState.NumPaperdolls)
                 return;
 
-            rec.Y = (int) Math.Round(spritetop *
-                GetGfxInfo(Path.Combine(DataPath.Paperdolls, sprite.ToString())).Height / 4d);
+            int columns = Math.Max(1, SettingsManager.Instance.SpriteColumns);
+            rec.Y = (int)Math.Round(spritetop *
+                GetGfxInfo(Path.Combine(DataPath.Paperdolls, sprite.ToString())).Height / (double)columns);
             rec.Height =
-                (int) Math.Round(GetGfxInfo(Path.Combine(DataPath.Paperdolls, sprite.ToString())).Height /
-                                 4d);
-            rec.X = (int) Math.Round(anim *
-                GetGfxInfo(Path.Combine(DataPath.Paperdolls, sprite.ToString())).Width / 4d);
-            rec.Width = (int) Math.Round(
+                (int)Math.Round(GetGfxInfo(Path.Combine(DataPath.Paperdolls, sprite.ToString())).Height /
+                                 (double)columns);
+            rec.X = (int)Math.Round(anim *
+                GetGfxInfo(Path.Combine(DataPath.Paperdolls, sprite.ToString())).Width / (double)columns);
+            rec.Width = (int)Math.Round(
                 GetGfxInfo(Path.Combine(DataPath.Paperdolls, sprite.ToString())).Width /
-                4d);
+                (double)columns);
 
             x = GameLogic.ConvertMapX(x2);
             y = GameLogic.ConvertMapY(y2);
@@ -1880,31 +1881,32 @@ namespace Client
                 }
             }
 
+            int columns = Math.Max(1, SettingsManager.Instance.SpriteColumns);
             // Create the rectangle for rendering the sprite
             rect = new Rectangle(
-                (int) Math.Round(anim *
+                (int)Math.Round(anim *
                                  (GetGfxInfo(Path.Combine(DataPath.Characters, sprite.ToString())).Width /
-                                  4d)),
-                (int) Math.Round(spriteLeft *
+                                  (double)columns)),
+                (int)Math.Round(spriteLeft *
                                  (GetGfxInfo(Path.Combine(DataPath.Characters, sprite.ToString())).Height /
-                                  4d)),
-                (int) Math.Round(GetGfxInfo(Path.Combine(DataPath.Characters, sprite.ToString())).Width / 4d),
-                (int) Math.Round(GetGfxInfo(Path.Combine(DataPath.Characters, sprite.ToString())).Height /
-                                 4d));
+                                  (double)columns)),
+                (int)Math.Round(GetGfxInfo(Path.Combine(DataPath.Characters, sprite.ToString())).Width / (double)columns),
+                (int)Math.Round(GetGfxInfo(Path.Combine(DataPath.Characters, sprite.ToString())).Height /
+                                 (double)columns));
 
             // Calculate X and Y coordinates for rendering
-            x = (int) Math.Round(Data.MyMapNpc[(int) mapNpcNum].X -
+            x = (int)Math.Round(Data.MyMapNpc[(int)mapNpcNum].X -
                                  (GetGfxInfo(Path.Combine(DataPath.Characters, sprite.ToString())).Width /
-                                  4d -
+                                  (double)columns -
                                   32d) / 2d);
 
-            if (GetGfxInfo(Path.Combine(DataPath.Characters, sprite.ToString())).Height / 4d > 32d)
+            if (GetGfxInfo(Path.Combine(DataPath.Characters, sprite.ToString())).Height / (double)columns > 32d)
             {
                 // Larger sprites need an offset for height adjustment
-                y = (int) Math.Round(Data.MyMapNpc[(int) mapNpcNum].Y -
+                y = (int)Math.Round(Data.MyMapNpc[(int)mapNpcNum].Y -
                                      (GetGfxInfo(Path.Combine(DataPath.Characters, sprite.ToString()))
                                              .Height /
-                                         4d - 32d));
+                                         (double)columns - 32d));
             }
             else
             {
@@ -2534,14 +2536,15 @@ namespace Client
                 return;
             }
 
+            int columns = Math.Max(1, SettingsManager.Instance.SpriteColumns);
             // Calculate the X
-            x = (int) Math.Round(Data.Player[index].X - (gfxInfo.Width / 4d - 32d) / 2d);
+            x = (int) Math.Round(Data.Player[index].X - (gfxInfo.Width / (double)columns - 32d) / 2d);
 
             // Is the player's height more than 32..?
-            if ((gfxInfo.Height / 4) > 32)
+            if ((gfxInfo.Height / columns) > 32)
             {
                 // Create a 32 pixel offset for larger sprites
-                y = (int) Math.Round(GetPlayerRawY(index) - (gfxInfo.Height / 4d - 32d));
+                y = (int) Math.Round(GetPlayerRawY(index) - (gfxInfo.Height / (double)columns - 32d));
             }
             else
             {
@@ -2549,9 +2552,9 @@ namespace Client
                 y = GetPlayerRawY(index);
             }
 
-            rect = new Rectangle((int) Math.Round(anim * (gfxInfo.Width / 4d)),
-                (int) Math.Round(spriteleft * (gfxInfo.Height / 4d)), (int) Math.Round(gfxInfo.Width / 4d),
-                (int) Math.Round(gfxInfo.Height / 4d));
+            rect = new Rectangle((int) Math.Round(anim * (gfxInfo.Width / (double)columns)),
+                (int) Math.Round(spriteleft * (gfxInfo.Height / (double)columns)), (int) Math.Round(gfxInfo.Width / (double)columns),
+                (int) Math.Round(gfxInfo.Height / (double)columns));
 
             // render the actual sprite
             // DrawShadow(x, y + 16)
@@ -2674,8 +2677,8 @@ namespace Client
             if (gfxIndex <= 0 || gfxIndex > GameState.NumCharacters)
                 return;
 
-            // Character sheets are 4x4 (columns x rows). Use GraphicX as column and GraphicY as row.
-            int columns = 4;
+            // Character sheets use configurable columns; rows equal columns.
+            int columns = Math.Max(1, SettingsManager.Instance.SpriteColumns);
             var gfxInfo = GetGfxInfo(Path.Combine(DataPath.Characters, gfxIndex.ToString()));
             if (gfxInfo == null)
             {
@@ -2688,8 +2691,8 @@ namespace Client
             int frameHeight = Math.Max(1, gfxInfo.Height / columns);
 
             // Clamp and build the source rectangle for the selected frame
-            int column = Math.Max(0, Math.Min(3, eventData.Pages[0].GraphicX));
-            int row = Math.Max(0, Math.Min(3, eventData.Pages[0].GraphicY));
+            int column = Math.Max(0, Math.Min(columns - 1, eventData.Pages[0].GraphicX));
+            int row = Math.Max(0, Math.Min(columns - 1, eventData.Pages[0].GraphicY));
             var sourceRect = new Rectangle(column * frameWidth, row * frameHeight, frameWidth, frameHeight);
 
             // Draw directly at the provided screen-space coordinates.
@@ -2796,17 +2799,18 @@ namespace Client
                                 return;
                             }
 
-                            height = (int)Math.Round((double)gfxInfo.Height / 4d);
-                            width = (int)Math.Round((double)gfxInfo.Width / 4d);
-                            sRect = new Rectangle((int)Math.Round((double)anim * width),
-                                (int)Math.Round((double)spritetop * height), width, height);
+                            int columns = Math.Max(1, SettingsManager.Instance.SpriteColumns);
+                            height = (int)Math.Round(gfxInfo.Height / (double)columns);
+                            width = (int)Math.Round(gfxInfo.Width / (double)columns);
+                            sRect = new Rectangle(anim * width,
+                                spritetop * height, width, height);
 
                             // Calculate the X
                             x = (int)Math.Round(Data.MapEvents[id].X -
                                                  (width - 32d) / 2d);
 
                             // Is the player's height more than 32..?
-                            if ((gfxInfo.Height / 4) > 32)
+                            if ((gfxInfo.Height / columns) > 32)
                             {
                                 // Create a 32 pixel offset for larger sprites
                                 y = (int)Math.Round(Data.MapEvents[id].Y - (height - 32d));

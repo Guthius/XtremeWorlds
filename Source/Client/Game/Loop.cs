@@ -322,15 +322,13 @@ namespace Client
                         {
                             if (GetPlayerMap(i) == GetPlayerMap(GameState.MyIndex))
                             {
-                                // Check if completed walking over to the next tile
-                                if (Data.Player[i].Steps == 3)
-                                {
+                                // Advance animation step using dynamic sprite columns
+                                int cols = Math.Max(1, SettingsManager.Instance.SpriteColumns);
+                                int maxFrame = Math.Max(0, cols - 1);
+                                if (Data.Player[i].Steps >= maxFrame)
                                     Data.Player[i].Steps = 0;
-                                }
                                 else
-                                {
                                     Data.Player[i].Steps++;
-                                }                              
                             }
                         }
                     }
@@ -339,15 +337,12 @@ namespace Client
                     {
                         if (Data.MyMapNpc[i].Num >= 0)
                         {
-                            // Check if completed walking over to the next tile
-                            if (Data.MyMapNpc[i].Steps == 3)
-                            {
+                            int cols = Math.Max(1, SettingsManager.Instance.SpriteColumns);
+                            int maxFrame = Math.Max(0, cols - 1);
+                            if (Data.MyMapNpc[i].Steps >= maxFrame)
                                 Data.MyMapNpc[i].Steps = 0;
-                            }
                             else
-                            {
                                 Data.MyMapNpc[i].Steps++;
-                            }
                         }
                     }
 
@@ -356,15 +351,12 @@ namespace Client
                     {
                         if (Data.MapEvents[_i].WalkAnim == 1)
                         {
-                            // Check if completed walking over to the next tile
-                            if (Data.MyMapNpc[_i].Steps == 3)
-                            {
+                            int cols = Math.Max(1, SettingsManager.Instance.SpriteColumns);
+                            int maxFrame = Math.Max(0, cols - 1);
+                            if (Data.MyMapNpc[_i].Steps >= maxFrame)
                                 Data.MyMapNpc[_i].Steps = 0;
-                            }
                             else
-                            {
                                 Data.MyMapNpc[_i].Steps++;
-                            }
                         }
                     }
 
