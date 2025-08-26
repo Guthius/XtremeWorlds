@@ -40,31 +40,30 @@ jobs:
         shell: bash
         run: |
           if [[ "$RUNNER_OS" == "Linux" ]]; then
-            dotnet build --configuration Release --no-restore Source/Client/Client.csproj --runtime linux-x64
-            dotnet build --configuration Release --no-restore Source/Server/Server.csproj --runtime linux-x64
+            dotnet build XtremeWorlds.sln --configuration Release --no-restore --runtime linux-x64
           elif [[ "$RUNNER_OS" == "macOS" ]]; then
-            dotnet build --configuration Release --no-restore Source/Client/Client.csproj --runtime osx-x64
-            dotnet build --configuration Release --no-restore Source/Client/Client.csproj --runtime osx-arm64
-            dotnet build --configuration Release --no-restore Source/Server/Server.csproj --runtime osx-x64
-            dotnet build --configuration Release --no-restore Source/Server/Server.csproj --runtime osx-arm64
+            dotnet build XtremeWorlds.sln --configuration Release --no-restore --runtime osx-x64
+            dotnet build XtremeWorlds.sln --configuration Release --no-restore --runtime osx-arm64
           fi
       - name: Build (Windows)
         if: ${{ runner.os == 'Windows' }}
-        run: dotnet build --configuration Release --no-restore --runtime win-x64
+        run: |
+          dotnet build XtremeWorlds.sln --configuration Release --no-restore --runtime win-x64
 
       - name: Test (Linux/macOS)
         if: ${{ runner.os != 'Windows' }}
         shell: bash
         run: |
           if [[ "$RUNNER_OS" == "Linux" ]]; then
-            dotnet test --no-build --verbosity normal --runtime linux-x64
+            dotnet test XtremeWorlds.sln --no-build --verbosity normal --runtime linux-x64
           elif [[ "$RUNNER_OS" == "macOS" ]]; then
-            dotnet test --no-build --verbosity normal --runtime osx-x64
-            dotnet test --no-build --verbosity normal --runtime osx-arm64
+            dotnet test XtremeWorlds.sln --no-build --verbosity normal --runtime osx-x64
+            dotnet test XtremeWorlds.sln --no-build --verbosity normal --runtime osx-arm64
           fi
       - name: Test (Windows)
         if: ${{ runner.os == 'Windows' }}
-        run: dotnet test --no-build --verbosity normal --runtime win-x64
+        run: |
+          dotnet test XtremeWorlds.sln --no-build --verbosity normal --runtime win-x64
 
       # ===== macOS universal build =====
       - name: Publish macOS Client and Server (x64/arm64)
