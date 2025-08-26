@@ -91,40 +91,33 @@ jobs:
           lipo -create ./tmp-server-x64/Server ./tmp-server-arm64/Server -output ./publish/Server/Server
 
       # ===== Generic publish for Linux/Windows =====
-      - name: Publish build output (Linux/macOS)
-        if: ${{ runner.os != 'Windows' && runner.os != 'macOS' }}
-        shell: bash
+      - name: Publish build output (non-macOS)
+        if: ${{ runner.os != 'macOS' }}
         run: |
           mkdir -p publish/Client
           mkdir -p publish/Server
-          dotnet publish Source/Client/Client.csproj -c Release -r linux-x64 -o ./publish/Client --self-contained false
-          dotnet publish Source/Server/Server.csproj -c Release -r linux-x64 -o ./publish/Server --self-contained false
-      - name: Publish build output (Windows)
-        if: ${{ runner.os == 'Windows' }}
-        run: |
-          mkdir publish\Client
-          mkdir publish\Server
-          dotnet publish Source/Client/Client.csproj -c Release -r win-x64 -o .\publish\Client --self-contained false
-          dotnet publish Source/Server/Server.csproj -c Release -r win-x64 -o .\publish\Server --self-contained false
+
+          RID=""
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            RID=linux-x64
+          elif [[ "$RUNNER_OS" == "Windows" ]]; then
+            RID=win-x64
+          fi
+
+          dotnet publish Source/Client/Client.csproj -c Release -r $RID -o ./publish/Client --self-contained false
+          dotnet publish Source/Server/Server.csproj -c Release -r $RID -o ./publish/Server --self-contained false
 
       # ===== ZIP packaging =====
-      - name: Create ZIP package (Linux/macOS)
-        if: ${{ runner.os != 'Windows' }}
-        shell: bash
+      - name: Create ZIP package
         run: |
           ZIP_FILE="engine-${RUNNER_OS}.zip"
           cd publish
           zip -r "../$ZIP_FILE" *
           cd ..
-      - name: Create ZIP package (Windows)
-        if: ${{ runner.os == 'Windows' }}
-        run: |
-          $ZIP_FILE = "engine-$env:RUNNER_OS.zip"
-          Compress-Archive -Path publish\* -DestinationPath $ZIP_FILE
 
       # ===== Upload artifact =====
       - name: Upload ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: engine-${{ runner.os }}
-          path: engine-${{ runner.os }}.zip
+          name: xtremeworlds-${{ runner.os }}
+          path: xtremeworlds-${{ runner.os }}.zip
