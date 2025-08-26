@@ -3,7 +3,7 @@ name: Cross-Platform Release
 on:
   push:
     tags:
-      - "v*"   # runs when you push a tag like v1.0.0
+      - "v*"   # triggers on tags like v1.0.0
 
 jobs:
   build:
@@ -36,8 +36,13 @@ jobs:
 
       - name: Package Build
         run: |
-          cd out
-          zip -r ../xtremeworlds-${{ matrix.os }}-${{ github.ref_name }}.zip *
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            pwsh -Command "Compress-Archive -Path out\* -DestinationPath xtremeworlds-windows-${GITHUB_REF_NAME}.zip"
+          else
+            sudo apt-get update && sudo apt-get install -y zip || true
+            cd out
+            zip -r ../xtremeworlds-${RUNNER_OS,,}-${GITHUB_REF_NAME}.zip *
+          fi
         shell: bash
 
       - name: Upload Artifact
