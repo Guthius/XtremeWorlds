@@ -22,13 +22,37 @@ jobs:
           dotnet-version: 9.0.x
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: |
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            dotnet restore --runtime linux-x64
+          elif [[ "$RUNNER_OS" == "Windows" ]]; then
+            dotnet restore --runtime win-x64
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            dotnet restore --runtime osx-x64
+            dotnet restore --runtime osx-arm64
+          fi
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        run: |
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            dotnet build --configuration Release --no-restore --runtime linux-x64
+          elif [[ "$RUNNER_OS" == "Windows" ]]; then
+            dotnet build --configuration Release --no-restore --runtime win-x64
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            dotnet build --configuration Release --no-restore --runtime osx-x64
+            dotnet build --configuration Release --no-restore --runtime osx-arm64
+          fi
 
       - name: Test
-        run: dotnet test --no-build --verbosity normal
+        run: |
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            dotnet test --no-build --verbosity normal --runtime linux-x64
+          elif [[ "$RUNNER_OS" == "Windows" ]]; then
+            dotnet test --no-build --verbosity normal --runtime win-x64
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            dotnet test --no-build --verbosity normal --runtime osx-x64
+            dotnet test --no-build --verbosity normal --runtime osx-arm64
+          fi
 
       # ===== macOS universal build =====
       - name: Publish macOS Client and Server (x64/arm64)
