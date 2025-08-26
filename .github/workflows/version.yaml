@@ -40,10 +40,13 @@ jobs:
         shell: bash
         run: |
           if [[ "$RUNNER_OS" == "Linux" ]]; then
-            dotnet build --configuration Release --no-restore --runtime linux-x64
+            dotnet build --configuration Release --no-restore Source/Client/Client.csproj --runtime linux-x64
+            dotnet build --configuration Release --no-restore Source/Server/Server.csproj --runtime linux-x64
           elif [[ "$RUNNER_OS" == "macOS" ]]; then
-            dotnet build --configuration Release --no-restore --runtime osx-x64
-            dotnet build --configuration Release --no-restore --runtime osx-arm64
+            dotnet build --configuration Release --no-restore Source/Client/Client.csproj --runtime osx-x64
+            dotnet build --configuration Release --no-restore Source/Client/Client.csproj --runtime osx-arm64
+            dotnet build --configuration Release --no-restore Source/Server/Server.csproj --runtime osx-x64
+            dotnet build --configuration Release --no-restore Source/Server/Server.csproj --runtime osx-arm64
           fi
       - name: Build (Windows)
         if: ${{ runner.os == 'Windows' }}
