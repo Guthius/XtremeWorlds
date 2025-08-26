@@ -2497,12 +2497,14 @@ namespace Client
                     }
                 case 1: // character
                     {
+                        nudGraphic.MinValue = 0;
                         nudGraphic.MaxValue = GameState.NumCharacters;
                         nudGraphic.Enabled = true;
                         break;
                     }
                 case 2: // Tileset
                     {
+                        nudGraphic.MinValue = 0;
                         nudGraphic.MaxValue = GameState.NumTileSets;
                         nudGraphic.Enabled = true;
                         break;
@@ -2531,6 +2533,9 @@ namespace Client
 
             X = (int)e.Location.X;
             Y = (int)e.Location.Y;
+            // Enforce minimum index 0 on raw selection
+            if (X < 0) X = 0;
+            if (Y < 0) Y = 0;
 
             int selW = (int)Math.Round(Math.Ceiling((decimal)(X)) - Event.GraphicSelX);
             int selH = (int)Math.Round(Math.Ceiling((decimal)(Y)) - Event.GraphicSelY);
@@ -2538,15 +2543,15 @@ namespace Client
             if (cmbGraphic.SelectedIndex == 2)
             {
                 // Multi-tile (shift-mod) selection not yet implemented in Eto. Single-tile select:
-                Event.GraphicSelX = (int)Math.Round(Math.Ceiling((decimal)(X)));
-                Event.GraphicSelY = (int)Math.Round(Math.Ceiling((decimal)(Y)));
+                Event.GraphicSelX = System.Math.Max(0, (int)System.Math.Round(System.Math.Ceiling((decimal)(X))));
+                Event.GraphicSelY = System.Math.Max(0, (int)System.Math.Round(System.Math.Ceiling((decimal)(Y))));
                 Event.GraphicSelX2 = 1;
                 Event.GraphicSelY2 = 1;
             }
             else if (cmbGraphic.SelectedIndex == 1)
             {
-                Event.GraphicSelX = X;
-                Event.GraphicSelY = Y;
+                Event.GraphicSelX = System.Math.Max(0, X);
+                Event.GraphicSelY = System.Math.Max(0, Y);
                 Event.GraphicSelX2 = 0;
                 Event.GraphicSelY2 = 0;
 
