@@ -1,59 +1,57 @@
-name: Release Builds (Client & Server)
+name: Cross-Platform Release
 
 on:
   push:
     tags:
-      - "v*"   # triggers when you push a new tag like v1.0.0
+      - "v*"   # runs when you push a tag like v1.0.0
 
 jobs:
   build:
+    name: Build ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup .NET SDK
+      - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 9.0.x
 
-      - name: Restore dependencies
+      - name: Restore
         run: dotnet restore XtremeWorlds.sln
 
-      - name: Build solution
-        run: dotnet build XtremeWorlds.sln --configuration Release --no-restore
+      - name: Build
+        run: dotnet build XtremeWorlds.sln -c Release --no-restore
 
-      - name: Publish client
-        run: |
-          dotnet publish Source/Client/Client.csproj \
-            -c Release -o published/client
+      - name: Publish Client
+        run: dotnet publish Source/Client/Client.csproj -c Release -o out/client
 
-      - name: Publish server
-        run: |
-          dotnet publish Source/Server/Server.csproj \
-            -c Release -o published/server
+      - name: Publish Server
+        run: dotnet publish Source/Server/Server.csproj -c Release -o out/server
 
-      - name: Archive build
+      - name: Package Build
         run: |
-          cd published
-          zip -r ../xtremeworlds-${{ matrix.os }}.zip .
+          cd out
+          zip -r ../xtremeworlds-${{ matrix.os }}-${{ github.ref_name }}.zip *
         shell: bash
 
-      - name: Upload artifact
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: xtremeworlds-${{ matrix.os }}
-          path: xtremeworlds-${{ matrix.os }}.zip
+          name: xtremeworlds-${{ matrix.os }}-${{ github.ref_name }}
+          path: xtremeworlds-${{ matrix.os }}-${{ github.ref_name }}.zip
 
   release:
-    needs: build
+    name: Publish Release
     runs-on: ubuntu-latest
+    needs: build
     steps:
-      - name: Download all artifacts
+      - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
           path: dist
@@ -61,6 +59,6 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/**/*
+          files: dist/**/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
