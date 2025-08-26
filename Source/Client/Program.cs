@@ -447,29 +447,22 @@ namespace Client
             if (GameState.IsLoading || GameState.GettingMap)
             {
                 // Draw loading screen onto the RenderTarget
-                SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
-                var loadingText = "Loading...";
-                if (TextRenderer.Fonts.TryGetValue(Font.Georgia, out var font))
-                {
-                    var size = font.MeasureString(loadingText);
-                    var x = (nativeWidth - size.X) / 2f;
-                    var y = (nativeHeight - size.Y) / 2f;
-                    SpriteBatch.DrawString(font, loadingText, new Vector2(x, y), Color.White);
-                }
-                SpriteBatch.End();
+                SpriteBatch?.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
+
+                SpriteBatch?.End();
             }
             else if (GameState.InGame == true)
             {
                 // Draw the actual game onto the RenderTarget
-                SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
+                SpriteBatch?.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
                 Render_Game();
-                SpriteBatch.End();
+                SpriteBatch?.End();
             }
 
             // After drawing to RenderTarget, reset to back buffer for composition
             GraphicsDevice.SetRenderTarget(null);
 
-            if (!GameState.GettingMap)
+            if (!GameState.GettingMap && !GameState.IsLoading)
             {
                 // --- Render GUI to guiRenderTarget (not zoomed) ---
                 if (_guiRenderTarget == null || _guiRenderTarget.Width != nativeWidth || _guiRenderTarget.Height != nativeHeight)
