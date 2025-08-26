@@ -43,7 +43,6 @@ public class SettingsManager
     public int SaveInterval { get; set; } = 5;
     public int MaxSqlClients { get; set; } = 10;
     public string Skin { get; set; } = "Crystalshire";
-    // Number of animation frames per row (columns) for character/paperdoll sprites
     public int SpriteColumns { get; set; } = 4;
     
     private static SettingsManager Load()

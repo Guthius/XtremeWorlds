@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <Version>2.3.0</Version>
         <OutputType>Exe</OutputType>
         <RootNamespace>Server</RootNamespace>
         <ApplicationIcon>Resources\Icon.ico</ApplicationIcon>
