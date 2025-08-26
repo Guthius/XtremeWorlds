@@ -311,7 +311,14 @@ namespace Client
             BuildEffectsTab();
 
             tpTiles.Content = tilesTabContent;
-
+            GameState.MapEditorTab = (int)MapEditorTab.Tiles;
+            
+            // Set a 32x32 choose tile selection
+            GameState.EditorTileWidth = 1;
+            GameState.EditorTileHeight = 1;
+            GameState.EditorTileSelStart = new Point(0, 0);
+            GameState.EditorTileSelEnd = new Point(1, 1);
+            
             // Ensure all known tabs exist
             tabPages.Pages.Clear();
             tabPages.Pages.Add(tpTiles);
@@ -362,7 +369,6 @@ namespace Client
             optTrap.CheckedChanged += OptTrap_CheckedChanged;
             optAnimation.CheckedChanged += optAnimation_CheckedChanged;
             optBlocked.CheckedChanged += OptBlocked_CheckedChanged;
-            // Ensure radios with no extra settings clear any open panels when selected
             optBank.CheckedChanged += OptBank_CheckedChanged;
             optNpcAvoid.CheckedChanged += OptNpcAvoid_CheckedChanged;
             optNoCrossing.CheckedChanged += OptNoCrossing_CheckedChanged;
@@ -1850,21 +1856,7 @@ namespace Client
 
             if (GameClient.IsMouseButtonDown(MouseButton.Left))
             {
-                if (GameState.OptInfo)
-                {
-                    if (GameState.Info == false)
-                    {
-                        if (GameState.EditorAttribute == 1)
-                        {
-                            GameLogic.Dialogue("Map Editor", "Info: " + System.Enum.GetName(Data.MyMap.Tile[GameState.CurX, GameState.CurY].Type), " Data 1: " + Data.MyMap.Tile[GameState.CurX, GameState.CurY].Data1 + " Data 2: " + Data.MyMap.Tile[GameState.CurX, GameState.CurY].Data2 + " Data 3: " + Data.MyMap.Tile[GameState.CurX, GameState.CurY].Data3, DialogueType.Information, (byte)DialogueStyle.Okay);
-                        }
-                        else
-                        {
-                            GameLogic.Dialogue("Map Editor", "Info: " + System.Enum.GetName(Data.MyMap.Tile[GameState.CurX, GameState.CurY].Type2), " Data 1: " + Data.MyMap.Tile[GameState.CurX, GameState.CurY].Data1_2 + " Data 2: " + Data.MyMap.Tile[GameState.CurX, GameState.CurY].Data2_2 + " Data 3: " + Data.MyMap.Tile[GameState.CurX, GameState.CurY].Data3_2, DialogueType.Information, (byte)DialogueStyle.Okay);
-                        }
-                    }
-                }
-
+                // Only allow Set Tile on Tiles tab
                 if (GameState.MapEditorTab == (int)MapEditorTab.Tiles)
                 {
                     if (GameState.EditorTileWidth == 1 & GameState.EditorTileHeight == 1) // single tile
@@ -1880,22 +1872,39 @@ namespace Client
                         MapEditorSetTile(GameState.CurX, GameState.CurY, GameState.CurLayer, true, (byte)GameState.CurAutotileType);
                     }
                 }
+                // Only allow attribute placement on Attributes tab
                 else if (GameState.MapEditorTab == (int)MapEditorTab.Attributes)
                 {
                     ref var withBlock1 = ref Data.MyMap.Tile[GameState.CurX, GameState.CurY];
-                    // blocked tile
-                    if (GameState.OptBlocked)
+
+                    if (GameState.OptInfo)
                     {
-                        if (GameState.EditorAttribute == 1)
+                        if (GameState.Info == false)
                         {
-                            withBlock1.Type = TileType.Blocked;
-                        }
-                        else
-                        {
-                            withBlock1.Type2 = TileType.Blocked;
+                            if (GameState.EditorAttribute == 1)
+                            {
+                                GameLogic.Dialogue("Map Editor", "Info: " + System.Enum.GetName(Data.MyMap.Tile[GameState.CurX, GameState.CurY].Type), " Data 1: " + Data.MyMap.Tile[GameState.CurX, GameState.CurY].Data1 + " Data 2: " + Data.MyMap.Tile[GameState.CurX, GameState.CurY].Data2 + " Data 3: " + Data.MyMap.Tile[GameState.CurX, GameState.CurY].Data3, DialogueType.Information, (byte)DialogueStyle.Okay);
+                            }
+                            else
+                            {
+                                GameLogic.Dialogue("Map Editor", "Info: " + System.Enum.GetName(Data.MyMap.Tile[GameState.CurX, GameState.CurY].Type2), " Data 1: " + Data.MyMap.Tile[GameState.CurX, GameState.CurY].Data1_2 + " Data 2: " + Data.MyMap.Tile[GameState.CurX, GameState.CurY].Data2_2 + " Data 3: " + Data.MyMap.Tile[GameState.CurX, GameState.CurY].Data3_2, DialogueType.Information, (byte)DialogueStyle.Okay);
+                            }
                         }
                     }
-
+                    
+                    // blocked tile
+                        if (GameState.OptBlocked)
+                        {
+                            if (GameState.EditorAttribute == 1)
+                            {
+                                withBlock1.Type = TileType.Blocked;
+                            }
+                            else
+                            {
+                                withBlock1.Type2 = TileType.Blocked;
+                            }
+                        }
+                    // ...rest of attribute placement logic unchanged...
                     // warp tile
                     if (GameState.OptWarp)
                     {
@@ -1914,7 +1923,7 @@ namespace Client
                             withBlock1.Data3_2 = GameState.EditorWarpY;
                         }
                     }
-
+                    // ...rest of attribute placement logic unchanged...
                     // item spawn
                     if (GameState.OptItem)
                     {
@@ -1933,7 +1942,7 @@ namespace Client
                             withBlock1.Data3_2 = 0;
                         }
                     }
-
+                    // ...rest of attribute placement logic unchanged...
                     // Npc avoid
                     if (GameState.OptNpcAvoid)
                     {
@@ -1952,7 +1961,7 @@ namespace Client
                             withBlock1.Data3_2 = 0;
                         }
                     }
-
+                    // ...rest of attribute placement logic unchanged...
                     // resource
                     if (GameState.OptResource)
                     {
@@ -1971,7 +1980,7 @@ namespace Client
                             withBlock1.Data3_2 = 0;
                         }
                     }
-
+                    // ...rest of attribute placement logic unchanged...
                     // Npc spawn
                     if (GameState.OptNpcSpawn)
                     {
@@ -1990,7 +1999,7 @@ namespace Client
                             withBlock1.Data3_2 = 0;
                         }
                     }
-
+                    // ...rest of attribute placement logic unchanged...
                     // shop
                     if (GameState.OptShop)
                     {
@@ -2009,7 +2018,7 @@ namespace Client
                             withBlock1.Data3_2 = 0;
                         }
                     }
-
+                    // ...rest of attribute placement logic unchanged...
                     // bank
                     if (GameState.OptBank)
                     {
@@ -2028,7 +2037,7 @@ namespace Client
                             withBlock1.Data3_2 = 0;
                         }
                     }
-
+                    // ...rest of attribute placement logic unchanged...
                     // heal
                     if (GameState.OptHeal)
                     {
@@ -2047,7 +2056,7 @@ namespace Client
                             withBlock1.Data3_2 = 0;
                         }
                     }
-
+                    // ...rest of attribute placement logic unchanged...
                     // trap
                     if (GameState.OptTrap)
                     {
@@ -2066,7 +2075,7 @@ namespace Client
                             withBlock1.Data3_2 = 0;
                         }
                     }
-
+                    // ...rest of attribute placement logic unchanged...
                     // Animation
                     if (GameState.OptAnimation)
                     {
@@ -2085,7 +2094,7 @@ namespace Client
                             withBlock1.Data3_2 = 0;
                         }
                     }
-
+                    // ...rest of attribute placement logic unchanged...
                     // No Xing
                     if (GameState.OptNoCrossing)
                     {
