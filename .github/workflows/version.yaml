@@ -36,16 +36,29 @@ jobs:
       - name: Create ZIP of build
         shell: bash
         run: |
-          # Convert RUNNER_OS to lowercase for consistent naming
+          # Convert OS name to lowercase safely
           OS=$(echo "$RUNNER_OS" | tr '[:upper:]' '[:lower:]')
-          ZIP_FILE="xtremeworlds-${OS}-${GITHUB_REF_NAME}.zip"
+          ZIP_FILE="../xtremeworlds-${OS}-${GITHUB_REF_NAME}.zip"
+
+          # Install zip if needed (Linux/macOS only)
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            sudo apt-get update
+            sudo apt-get install -y zip
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            brew install zip || true
+          fi
+
           cd publish
-          zip -r "../$ZIP_FILE" *
+          # On Windows, use PowerShell Compress-Archive
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            powershell Compress-Archive -Path * -DestinationPath $ZIP_FILE
+          else
+            zip -r "$ZIP_FILE" *
+          fi
           cd ..
 
       - name: Upload ZIP artifact
         uses: actions/upload-artifact@v3
         with:
-          # Use toLower() instead of unsupported pipe syntax
           name: xtremeworlds-${{ toLower(matrix.os) }}
           path: xtremeworlds-${{ toLower(matrix.os) }}-${{ github.ref_name }}.zip
