@@ -1,6 +1,5 @@
 name: Cross-Platform Release
 
-
 on:
   push:
     tags:
@@ -47,5 +46,6 @@ jobs:
       - name: Upload ZIP artifact
         uses: actions/upload-artifact@v3
         with:
-          name: xtremeworlds-${{ matrix.os }}
-          path: xtremeworlds-${{ matrix.os | lower }}-${{ github.ref_name }}.zip
+          # Use toLower() instead of unsupported pipe syntax
+          name: xtremeworlds-${{ toLower(matrix.os) }}
+          path: xtremeworlds-${{ toLower(matrix.os) }}-${{ github.ref_name }}.zip
