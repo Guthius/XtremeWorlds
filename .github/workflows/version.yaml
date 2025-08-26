@@ -77,7 +77,8 @@ jobs:
       # ===== ZIP packaging =====
       - name: Create ZIP package
         run: |
-          ZIP_FILE="xtremeworlds-${{ toLower(runner.os) }}-${GITHUB_REF_NAME}.zip"
+          OS=$(echo "$RUNNER_OS" | tr '[:upper:]' '[:lower:]')
+          ZIP_FILE="xtremeworlds-${OS}-${GITHUB_REF_NAME}.zip"
           cd publish
           zip -r "../$ZIP_FILE" *
           cd ..
@@ -86,5 +87,5 @@ jobs:
       - name: Upload ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: xtremeworlds-${{ toLower(runner.os) }}-${GITHUB_REF_NAME}
-          path: xtremeworlds-${{ toLower(runner.os) }}-${GITHUB_REF_NAME}.zip
+          name: xtremeworlds-${{ runner.os }}-${GITHUB_REF_NAME}
+          path: xtremeworlds-${{ runner.os }}-${GITHUB_REF_NAME}.zip
