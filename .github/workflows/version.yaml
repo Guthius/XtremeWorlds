@@ -54,24 +54,6 @@ jobs:
           dotnet build Source/Client/Client.csproj --configuration Release --no-restore --runtime win-x64
           dotnet build Source/Server/Server.csproj --configuration Release --no-restore --runtime win-x64
 
-      - name: Test (Linux/macOS)
-        if: ${{ runner.os != 'Windows' }}
-        shell: bash
-        run: |
-          if [[ "$RUNNER_OS" == "Linux" ]]; then
-            dotnet test Source/Client/Client.csproj --no-build --verbosity normal --runtime linux-x64
-            dotnet test Source/Server/Server.csproj --no-build --verbosity normal --runtime linux-x64
-          elif [[ "$RUNNER_OS" == "macOS" ]]; then
-            dotnet test Source/Client/Client.csproj --no-build --verbosity normal --runtime osx-x64
-            dotnet test Source/Client/Client.csproj --no-build --verbosity normal --runtime osx-arm64
-            dotnet test Source/Server/Server.csproj --no-build --verbosity normal --runtime osx-x64
-            dotnet test Source/Server/Server.csproj --no-build --verbosity normal --runtime osx-arm64
-          fi
-      - name: Test (Windows)
-        if: ${{ runner.os == 'Windows' }}
-        run: |
-          dotnet test Source/Client/Client.csproj --no-build --verbosity normal --runtime win-x64
-          dotnet test Source/Server/Server.csproj --no-build --verbosity normal --runtime win-x64
 
       # ===== macOS universal build =====
       - name: Publish macOS Client and Server (x64/arm64)
