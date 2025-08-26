@@ -68,7 +68,7 @@ namespace Client
 
         public ComboBox cmbResource = new ComboBox();
         public Button btnResourceOk = new Button{ Text = "OK" };
-        public GroupBox fraMapItem = new GroupBox{ Text = "Map Item" };
+        public GroupBox fraMapItem = new GroupBox{ Text = "Item" };
         public ImageView picMapItem = new ImageView();
         public Button btnMapItem = new Button{ Text = "OK" };
         public ComboBox cmbMapItem = new ComboBox();
@@ -462,8 +462,8 @@ namespace Client
                 Padding = 6, Spacing = 6,
                 Items =
                 {
-                    new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Item" }, cmbMapItem } },
-                    new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Amount" }, scrlMapItemValue } },
+                    cmbMapItem,
+                    scrlMapItemValue,
                     picMapItem,
                     btnMapItem
                 }
@@ -472,7 +472,7 @@ namespace Client
             fraResource.Content = new StackLayout
             {
                 Padding = 6, Spacing = 6,
-                Items = { new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Resource" }, cmbResource } }, btnResourceOk }
+                Items = { cmbResource, btnResourceOk }
             };
 
             fraNpcSpawn.Content = new StackLayout
