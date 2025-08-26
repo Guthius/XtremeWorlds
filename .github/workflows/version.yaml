@@ -30,10 +30,40 @@ jobs:
       - name: Test
         run: dotnet test --no-build --verbosity normal
 
-      - name: Publish build output
+      # ===== macOS universal build =====
+      - name: Publish macOS Client and Server (x64/arm64)
+        if: ${{ runner.os == 'macOS' }}
+        run: |
+          set -e
+          CLIENT_PROJ="./Source/Client/Client.csproj"
+          SERVER_PROJ="./Source/Server/Server.csproj"
+
+          # Clean old folders
+          rm -rf ./tmp-client-x64 ./tmp-client-arm64 ./tmp-server-x64 ./tmp-server-arm64 ./publish-client ./publish-server
+
+          # Publish Client
+          dotnet publish "$CLIENT_PROJ" -r osx-x64   -c Release -o ./tmp-client-x64   --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true
+          dotnet publish "$CLIENT_PROJ" -r osx-arm64 -c Release -o ./tmp-client-arm64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true
+
+          # Publish Server
+          dotnet publish "$SERVER_PROJ" -r osx-x64   -c Release -o ./tmp-server-x64   --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true
+          dotnet publish "$SERVER_PROJ" -r osx-arm64 -c Release -o ./tmp-server-arm64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true
+
+          # Merge into universal binaries
+          mkdir -p ./publish-client
+          cp -R ./tmp-client-arm64/* ./publish-client/
+          lipo -create ./tmp-client-x64/Client ./tmp-client-arm64/Client -output ./publish-client/Client
+
+          mkdir -p ./publish-server
+          cp -R ./tmp-server-arm64/* ./publish-server/
+          lipo -create ./tmp-server-x64/Server ./tmp-server-arm64/Server -output ./publish-server/Server
+
+      # ===== Generic publish for Linux/Windows =====
+      - name: Publish build output (non-macOS)
+        if: ${{ runner.os != 'macOS' }}
         run: dotnet publish -c Release -o ./publish
 
-      # Linux ZIP
+      # ===== ZIP packaging =====
       - name: Create ZIP on Linux
         if: ${{ runner.os == 'Linux' }}
         run: |
@@ -44,18 +74,19 @@ jobs:
           zip -r "../xtremeworlds-${OS}-${GITHUB_REF_NAME}.zip" *
           cd ..
 
-      # macOS ZIP
       - name: Create ZIP on macOS
         if: ${{ runner.os == 'macOS' }}
         run: |
           which zip || brew install zip
-          OS=$(echo "$RUNNER_OS" | tr '[:upper:]' '[:lower:]')
-          ZIP_FILE="../xtremeworlds-${OS}-${GITHUB_REF_NAME}.zip"
-          cd publish
-          zip -r "$ZIP_FILE" *
+          # Client
+          cd publish-client
+          zip -r ../xtremeworlds-client-macos-universal-${GITHUB_REF_NAME}.zip *
+          cd ..
+          # Server
+          cd publish-server
+          zip -r ../xtremeworlds-server-macos-universal-${GITHUB_REF_NAME}.zip *
           cd ..
 
-      # Windows ZIP
       - name: Create ZIP on Windows
         if: ${{ runner.os == 'Windows' }}
         shell: powershell
@@ -63,3 +94,32 @@ jobs:
           $OS = $env:RUNNER_OS.ToLower()
           $ZIP = "..\xtremeworlds-$OS-$env:GITHUB_REF_NAME.zip"
           Compress-Archive -Path publish\* -DestinationPath $ZIP
+
+      # ===== Upload artifacts =====
+      - name: Upload Linux ZIP
+        if: ${{ runner.os == 'Linux' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: xtremeworlds-linux-${GITHUB_REF_NAME}
+          path: xtremeworlds-linux-${GITHUB_REF_NAME}.zip
+
+      - name: Upload macOS Client ZIP
+        if: ${{ runner.os == 'macOS' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: xtremeworlds-client-macos-universal-${GITHUB_REF_NAME}
+          path: xtremeworlds-client-macos-universal-${GITHUB_REF_NAME}.zip
+
+      - name: Upload macOS Server ZIP
+        if: ${{ runner.os == 'macOS' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: xtremeworlds-server-macos-universal-${GITHUB_REF_NAME}
+          path: xtremeworlds-server-macos-universal-${GITHUB_REF_NAME}.zip
+
+      - name: Upload Windows ZIP
+        if: ${{ runner.os == 'Windows' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: xtremeworlds-windows-${GITHUB_REF_NAME}
+          path: xtremeworlds-windows-${GITHUB_REF_NAME}.zip
