@@ -418,7 +418,7 @@ public static class Player
                 moved = true;
             }
 
-            // Check if it's a heal tile
+            // Check if it's a heal tile (Data1=vital: 0=HP,1=MP,2=SP; Data2=amount)
             if (tile.Type == TileType.Heal)
             {
                 vital = tile.Data1;
@@ -427,6 +427,7 @@ public static class Player
 
             if (tile.Type2 == TileType.Heal)
             {
+                // If second layer heal exists, pick its vital and add its amount
                 vital = tile.Data1_2;
                 amount += tile.Data2_2;
             }
@@ -440,9 +441,13 @@ public static class Player
                     {
                         color = (int) ColorName.BrightGreen;
                     }
-                    else
+                    else if (vital == (byte) Vital.Mana)
                     {
                         color = (int) ColorName.BrightBlue;
+                    }
+                    else
+                    {
+                        color = (int) ColorName.Yellow;
                     }
 
                     NetworkSend.SendActionMsg(GetPlayerMap(playerId), "+" + amount, color, (byte) ActionMessageType.Scroll, GetPlayerX(playerId) * 32, GetPlayerY(playerId) * 32, 1);
@@ -456,30 +461,34 @@ public static class Player
                 moved = true;
             }
 
-            // Check if it's a trap tile
+            // Check if it's a trap tile (damage vital). Default to HP if no vital is set.
+            byte trapVital = (byte) Vital.Health;
             if (tile.Type == TileType.Trap)
             {
                 amount = tile.Data1;
+                if (tile.Data2 > 0) trapVital = (byte) tile.Data2;
             }
 
             if (tile.Type2 == TileType.Trap)
             {
                 amount += tile.Data1_2;
+                if (tile.Data2_2 > 0) trapVital = (byte) tile.Data2_2;
             }
 
             if (amount > 0)
             {
                 NetworkSend.SendActionMsg(GetPlayerMap(playerId), "-" + amount, (int) ColorName.BrightRed, (byte) ActionMessageType.Scroll, GetPlayerX(playerId) * 32, GetPlayerY(playerId) * 32, 1);
-                if (GetPlayerVital(playerId, Vital.Health) - amount < 0)
+                if (trapVital == (byte) Vital.Health && GetPlayerVital(playerId, Vital.Health) - amount < 0)
                 {
                     KillPlayer(playerId);
                     NetworkSend.PlayerMsg(playerId, "You've been killed by a trap.", (int) ColorName.BrightRed);
                 }
                 else
                 {
-                    SetPlayerVital(playerId, Vital.Health, GetPlayerVital(playerId, Vital.Health) - amount);
+                    var v = (Vital) trapVital;
+                    SetPlayerVital(playerId, v, GetPlayerVital(playerId, v) - amount);
                     NetworkSend.PlayerMsg(playerId, "You've been injured by a trap.", (int) ColorName.BrightRed);
-                    NetworkSend.SendVital(playerId, Vital.Health);
+                    NetworkSend.SendVital(playerId, v);
                 }
 
                 moved = true;

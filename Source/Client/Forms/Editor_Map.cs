@@ -16,7 +16,6 @@ using Command = Eto.Forms.Command;
 using Point = Microsoft.Xna.Framework.Point;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using Type = Core.Globals.Type;
-
 namespace Client
 {
 
@@ -77,6 +76,7 @@ namespace Client
         public Slider scrlMapItem = new Slider();
         public Label lblMapItem = new Label();
         public GroupBox fraTrap = new GroupBox{ Text = "Trap" };
+        public ComboBox cmbTrapVital = new ComboBox();
         public Button btnTrap = new Button{ Text = "OK" };
         public Slider scrlTrap = new   Slider();
         public Label lblTrap = new Label();
@@ -347,8 +347,11 @@ namespace Client
             {
                 cmbAttribute.Items.Add("1");
                 cmbAttribute.Items.Add("2");
-                cmbAttribute.SelectedIndex = 1; // default to layer 1
+                // Default to primary attribute layer (1). Our engine expects EditorAttribute = 1 for primary, 2 for secondary.
+                cmbAttribute.SelectedIndex = 0; // show "1" by default
                 cmbAttribute.SelectedIndexChanged += cmbAttribute_SelectedIndexChanged;
+                // Initialize mapping the first time
+                GameState.EditorAttribute = (byte)(cmbAttribute.SelectedIndex + 1);
             }
             // Ensure the combo doesn't force an oversized width within the narrow left column
             cmbAttribute.Width = 160;
@@ -363,6 +366,11 @@ namespace Client
             optTrap.CheckedChanged += OptTrap_CheckedChanged;
             optAnimation.CheckedChanged += optAnimation_CheckedChanged;
             optBlocked.CheckedChanged += OptBlocked_CheckedChanged;
+            // Ensure radios with no extra settings clear any open panels when selected
+            optBank.CheckedChanged += OptBank_CheckedChanged;
+            optNpcAvoid.CheckedChanged += OptNpcAvoid_CheckedChanged;
+            optNoCrossing.CheckedChanged += OptNoCrossing_CheckedChanged;
+            optInfo.CheckedChanged += OptInfo_CheckedChanged;
 
             // Right side content: stacked panels; visibility controlled by radio selection
             // Configure default ranges/text
@@ -389,6 +397,7 @@ namespace Client
             cmbHeal.Items.Clear();
             cmbHeal.Items.Add("Hp");
             cmbHeal.Items.Add("Mp");
+            cmbHeal.Items.Add("Sp");
             cmbHeal.SelectedIndex = 0;
             scrlHeal.MinValue = 1; scrlHeal.MaxValue = 255; scrlHeal.ValueChanged += ScrlHeal_Scroll; btnHeal.Click += BtnHeal_Click;
 
@@ -427,6 +436,12 @@ namespace Client
             // Trap amount
             scrlTrap.Width = 400;
             scrlTrap.Height = 30;
+            // Trap vital (Hp/Mp/Sp)
+            cmbTrapVital.Items.Clear();
+            cmbTrapVital.Items.Add("Hp");
+            cmbTrapVital.Items.Add("Mp");
+            cmbTrapVital.Items.Add("Sp");
+            cmbTrapVital.SelectedIndex = 0;
 
             // Compose group boxes content minimally with labels + sliders/combos
             fraMapWarp.Content = new StackLayout
@@ -467,7 +482,17 @@ namespace Client
 
             fraShop.Content = new StackLayout{ Padding = 6, Spacing = 6, Items = { cmbShop, btnShop } };
             fraHeal.Content = new StackLayout{ Padding = 6, Spacing = 6, Items = { cmbHeal, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Amount" }, scrlHeal, lblHeal } }, btnHeal } };
-            fraTrap.Content = new StackLayout{ Padding = 6, Spacing = 6, Items = { new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Amount" }, scrlTrap, lblTrap } }, btnTrap } };
+            fraTrap.Content = new StackLayout
+            {
+                Padding = 6,
+                Spacing = 6,
+                Items =
+                {
+                    new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Vital" }, cmbTrapVital } },
+                    new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Amount" }, scrlTrap, lblTrap } },
+                    btnTrap
+                }
+            };
             fraAnimation.Content = new StackLayout{ Padding = 6, Spacing = 6, Items = { cmbAnimation, brnAnimation } };
 
             // Place all attribute group boxes into a stack; only one visible at a time
@@ -1258,13 +1283,14 @@ namespace Client
 
             for (n = 0; n < Constant.MaxMapNpcs; n++)
             {
-                if (Data.MyMap.Npc[n] > 0)
+                var idx = (n < Data.MyMap.Npc.Length) ? Data.MyMap.Npc[n] : -1;
+                if (idx >= 0 && idx < Constant.MaxNpcs)
                 {
-                    lstNpc.Items.Add(n + ": " + Data.Npc[Data.MyMap.Npc[n]].Name);
+                    lstNpc.Items.Add(n + ": " + Strings.Trim(Data.Npc[idx].Name));
                 }
                 else
                 {
-                    lstNpc.Items.Add(n.ToString());
+                    lstNpc.Items.Add(n + ": None");
                 }
             }
 
@@ -1291,6 +1317,13 @@ namespace Client
             ClearAttributeDialogue();
             pnlAttributes.Visible = true;
             fraShop.Visible = true;
+
+            // Ensure shop list is populated when opening the attribute panel
+            cmbShop.Items.Clear();
+            for (int i = 0; i < Constant.MaxShops; i++)
+                cmbShop.Items.Add((i + 1) + ": " + Data.Shop[i].Name);
+            if (cmbShop.Items.Count > 0)
+                cmbShop.SelectedIndex = 0;
         }
 
         private void BtnHeal_Click(object? sender, EventArgs e)
@@ -1319,12 +1352,14 @@ namespace Client
 
         private void ScrlTrap_ValueChanged(object? sender, EventArgs e)
         {
-            lblTrap.Text = "Amount: " + scrlTrap.Value;
+            var vitalName = cmbTrapVital.SelectedIndex switch { 0 => "HP", 1 => "MP", _ => "SP" };
+            lblTrap.Text = $"{vitalName}: {scrlTrap.Value}";
         }
 
         private void BtnTrap_Click(object? sender, EventArgs e)
         {
             GameState.MapEditorHealAmount = scrlTrap.Value;
+            GameState.MapEditorTrapVital = cmbTrapVital.SelectedIndex;
             pnlAttributes.Visible = false;
             fraTrap.Visible = false;
         }
@@ -1337,6 +1372,7 @@ namespace Client
             ClearAttributeDialogue();
             pnlAttributes.Visible = true;
             fraTrap.Visible = true;
+            cmbTrapVital.SelectedIndex = 0;
         }
 
         private void BtnClearAttribute_Click(object sender, EventArgs e)
@@ -1631,9 +1667,8 @@ namespace Client
                 var npcIndex = (x < Data.MyMap.Npc.Length) ? Data.MyMap.Npc[x] : -1;
                 if (npcIndex >= 0 && npcIndex < Constant.MaxNpcs)
                 {
-                    var displayId = npcIndex + 1; // show 1-based ID to user
                     var name = Strings.Trim(Data.Npc[npcIndex].Name);
-                    Instance.lstMapNpc.Items.Add($"{x}: {displayId}. {name}");
+                    Instance.lstMapNpc.Items.Add($"{x}: {name}");
                 }
                 else
                 {
@@ -1644,7 +1679,7 @@ namespace Client
             Instance.lstMapNpc.SelectedIndex = 0;
 
             for (y = 0; y < Constant.MaxNpcs; y++)
-                Instance.cmbNpcList.Items.Add((y + 1) + ": " + Strings.Trim(Data.Npc[y].Name));
+                Instance.cmbNpcList.Items.Add(Strings.Trim(Data.Npc[y].Name));
 
             Instance.cmbNpcList.SelectedIndex = 0;
 
@@ -1798,7 +1833,7 @@ namespace Client
 
                 if ((double)X > (Instance.picBackSelect.Width + tilesetOffsetX) / (double)GameState.SizeX)
                     X = (float)((Instance.picBackSelect.Width + tilesetOffsetX) / (double)GameState.SizeX);
-                
+
                 if (Y < 0f)
                     Y = 0f;
 
@@ -2053,14 +2088,14 @@ namespace Client
                         {
                             withBlock1.Type = TileType.Trap;
                             withBlock1.Data1 = GameState.MapEditorHealAmount;
-                            withBlock1.Data2 = 0;
+                            withBlock1.Data2 = GameState.MapEditorTrapVital;
                             withBlock1.Data3 = 0;
                         }
                         else
                         {
                             withBlock1.Type2 = TileType.Trap;
                             withBlock1.Data1_2 = GameState.MapEditorHealAmount;
-                            withBlock1.Data2_2 = 0;
+                            withBlock1.Data2_2 = GameState.MapEditorTrapVital;
                             withBlock1.Data3_2 = 0;
                         }
                     }
@@ -2795,7 +2830,37 @@ namespace Client
 
         private void cmbAttribute_SelectedIndexChanged(object? sender, EventArgs e)
         {
-            GameState.EditorAttribute = (byte)(cmbAttribute.SelectedIndex);
+            // Map combo selection (0=>"1", 1=>"2") to engine's 1-based EditorAttribute values (1 or 2).
+            GameState.EditorAttribute = (byte)(cmbAttribute.SelectedIndex + 1);
+        }
+
+        // Radios without extra configuration: hide any open attribute panels when selected
+        private void OptBank_CheckedChanged(object? sender, EventArgs e)
+        {
+            if (optBank.Checked == false) return;
+            ClearAttributeDialogue();
+            pnlAttributes.Visible = false;
+        }
+
+        private void OptNpcAvoid_CheckedChanged(object? sender, EventArgs e)
+        {
+            if (optNpcAvoid.Checked == false) return;
+            ClearAttributeDialogue();
+            pnlAttributes.Visible = false;
+        }
+
+        private void OptNoCrossing_CheckedChanged(object? sender, EventArgs e)
+        {
+            if (optNoCrossing.Checked == false) return;
+            ClearAttributeDialogue();
+            pnlAttributes.Visible = false;
+        }
+
+        private void OptInfo_CheckedChanged(object? sender, EventArgs e)
+        {
+            if (optInfo.Checked == false) return;
+            ClearAttributeDialogue();
+            pnlAttributes.Visible = false;
         }
 
         private void tsbDeleteMap_Click(object? sender, EventArgs e)
@@ -2818,6 +2883,7 @@ namespace Client
 
             if (GameState.MapEditorTab == (int)MapEditorTab.Attributes)
             {
+                // Default to primary attribute layer when opening the Attributes tab
                 cmbAttribute.SelectedIndex = 1;
             }
         }

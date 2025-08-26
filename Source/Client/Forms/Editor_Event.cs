@@ -177,12 +177,12 @@ namespace Client
         // Right side uses a simple vertical stack: frameHost (top) and fraCommands (bottom)
 
         // Additional controls referenced in logic (declare as needed)
-        public ListBox lstCommands = new ListBox();
+        public ListBox lstCommands = new ListBox { Height = 200 };
         public Button btnAddCommand = new Button { Text = "Add" };
         public Button btnEditCommand = new Button { Text = "Edit" };
         public Button btnDeleteComand = new Button { Text = "Delete" };
         public Button btnClearCommand = new Button { Text = "Clear" };
-        public TreeGridView tvCommands = new TreeGridView();
+        public TreeGridView tvCommands = new TreeGridView { Height = 300 };
 
         // Numerous frame panels placeholders (keep as Panel)
         public Panel fraShowText = new Panel();
@@ -615,13 +615,13 @@ namespace Client
             };
 
             // Use a TableLayout so the grids expand horizontally and vertically
-            var commandArea = new TableLayout
+        var commandArea = new TableLayout
             {
                 Spacing = new Size(6,6),
                 Rows =
                 {
                     new TableRow(new Label{ Text = "Command Palette" }),
-                    new TableRow(new TableCell(tvCommands, true)),
+                    new TableRow(new TableCell(new Panel { Content = tvCommands, Size = new Size(-1, 300) }, true)),
                     new TableRow(new Label{ Text = "Event Commands" }),
                     new TableRow(new TableCell(lstCommands, true)),
                     new TableRow(commandButtons)
@@ -3120,7 +3120,50 @@ namespace Client
 
         private void BtnEditCommand_Click(object? sender, EventArgs e)
         {
+            // Invoke legacy edit logic to populate fields
             Event.EditEventCommand();
+            // Bridge legacy visibility flags to the new frameHost flow
+            try
+            {
+                // If any known frame panel is visible from legacy code, re-show through ShowFrame
+                Panel? visible = null;
+                if (fraShowText.Visible) visible = fraShowText;
+                else if (fraShowChoices.Visible) visible = fraShowChoices;
+                else if (fraAddText.Visible) visible = fraAddText;
+                else if (fraShowChatBubble.Visible) visible = fraShowChatBubble;
+                else if (fraPlayerVariable.Visible) visible = fraPlayerVariable;
+                else if (fraPlayerSwitch.Visible) visible = fraPlayerSwitch;
+                else if (fraSetSelfSwitch.Visible) visible = fraSetSelfSwitch;
+                else if (fraConditionalBranch.Visible) visible = fraConditionalBranch;
+                else if (fraCreateLabel.Visible) visible = fraCreateLabel;
+                else if (fraGoToLabel.Visible) visible = fraGoToLabel;
+                else if (fraChangeItems.Visible) visible = fraChangeItems;
+                else if (fraChangeLevel.Visible) visible = fraChangeLevel;
+                else if (fraChangeSkills.Visible) visible = fraChangeSkills;
+                else if (fraChangeJob.Visible) visible = fraChangeJob;
+                else if (fraChangeSprite.Visible) visible = fraChangeSprite;
+                else if (fraChangeGender.Visible) visible = fraChangeGender;
+                else if (fraChangePK.Visible) visible = fraChangePK;
+                else if (fraPlayerWarp.Visible) visible = fraPlayerWarp;
+                else if (fraMoveRoute.Visible) visible = fraMoveRoute;
+                else if (fraMoveRouteWait.Visible) visible = fraMoveRouteWait;
+                else if (fraSpawnNpc.Visible) visible = fraSpawnNpc;
+                else if (fraPlayAnimation.Visible) visible = fraPlayAnimation;
+                else if (fraSetFog.Visible) visible = fraSetFog;
+                else if (fraSetWeather.Visible) visible = fraSetWeather;
+                else if (fraMapTint.Visible) visible = fraMapTint;
+                else if (fraPlayBGM.Visible) visible = fraPlayBGM;
+                else if (fraPlaySound.Visible) visible = fraPlaySound;
+                else if (fraShowPic.Visible) visible = fraShowPic;
+
+                if (visible != null)
+                {
+                    // Hide legacy flags to avoid duplicate visibility and show via new host
+                    HideAllFrames();
+                    ShowFrame(visible, useDialogueWrapper: true);
+                }
+            }
+            catch { }
         }
 
         private void BtnDeleteComand_Click(object? sender, EventArgs e)

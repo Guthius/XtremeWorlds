@@ -327,7 +327,9 @@ namespace Client
                     cmbSubType.Enabled = true;
                     break;
                 case ItemCategory.Consumable:
+                    // Order must match ConsumableEffect enum: 0=HP, 1=MP, 2=SP, 3=Exp
                     cmbSubType.Items.Add("HP");
+                    cmbSubType.Items.Add("MP");
                     cmbSubType.Items.Add("SP");
                     cmbSubType.Items.Add("Exp");
                     cmbSubType.Enabled = true;

@@ -201,9 +201,10 @@ namespace Client
         // Resources
         public static int ResourceEditorNum;
 
-        // Used for map editor heal & trap & slide tiles
+         // Used for map editor heal & trap & slide tiles
         public static int MapEditorHealType;
         public static int MapEditorHealAmount;
+        public static int MapEditorTrapVital;
         public static int MapEditorSlideDir;
 
         public static Type.Rect Camera;
