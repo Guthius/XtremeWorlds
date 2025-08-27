@@ -31,7 +31,7 @@ The client has editors for the world (maps), items, spells, animations, NPCs, an
 
 ### How do I access the editors?
 
-Log in to the game with the client. On the server, type the command /access name 5 to promote yourself to owner. Now, go back to the client and tap Insert for each of the editor options.
+Log in to the game with the client. On the server, type the command /access name 5 to promote yourself to owner. Now, go back to the client and tap Insert for each of the editor options. By default, the first character created is set to owner.
 
 ## Quick Start
 
