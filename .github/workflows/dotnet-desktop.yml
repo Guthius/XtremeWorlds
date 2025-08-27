@@ -66,4 +66,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: xtremeworlds-windows-${{ github.ref_name }}
-          path: xtremeworlds-windows-${{ github.ref_name }}.zip
+          path: ../xtremeworlds-windows-${{ github.ref_name }}.zip
