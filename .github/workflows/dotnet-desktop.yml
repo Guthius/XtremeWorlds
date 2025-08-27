@@ -59,11 +59,11 @@ jobs:
         shell: powershell
         run: |
           $OS = $env:RUNNER_OS.ToLower()
-          $ZIP = "..\xtremeworlds-$OS-$env:GITHUB_REF_NAME.zip"
+          $ZIP = "xtremeworlds-windows-$env:GITHUB_REF_NAME.zip"
           Compress-Archive -Path publish\* -DestinationPath $ZIP
       - name: Upload ZIP on Windows
         if: ${{ runner.os == 'Windows' }}
         uses: actions/upload-artifact@v4
         with:
           name: xtremeworlds-windows-${{ github.ref_name }}
-          path: ../xtremeworlds-windows-${{ github.ref_name }}.zip
+          path: xtremeworlds-windows-${{ github.ref_name }}.zip
