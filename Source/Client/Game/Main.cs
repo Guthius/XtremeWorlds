@@ -18,7 +18,7 @@ public static class Program
     public static void Main()
     {
         // Start game loop on background thread so Eto UI thread stays responsive
-    var gameThread = new System.Threading.Thread(RunGame) { IsBackground = false };
+        var gameThread = new System.Threading.Thread(RunGame) { IsBackground = false };
         gameThread.Start();
 
         // Start Eto application & periodic UI updater
@@ -37,13 +37,6 @@ public static class Program
             ClientSize = new Size(1, 1),
         };
         _rootForm.Shown += (s, e) => ((Form)s!).Visible = false;
-
-        // Pre-warm editor windows on the UI thread so they can be shown instantly
-        app.AsyncInvoke(() =>
-        {
-            try { var _ = Editor_Event.Instance; } catch { }
-        });
-
         app.Run(_rootForm);
     }
 
