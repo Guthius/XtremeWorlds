@@ -59,14 +59,15 @@
     <!-- Always include Eto.Forms, but only include Gtk on Linux -->
     <ItemGroup>
         <PackageReference Include="Eto.Forms"/>
-        
-                <ItemGroup Condition="'$(TargetFramework)'=='net9.0-windows'">
-            <PackageReference Include="Eto.Platform.Windows"/>
-        </ItemGroup>
+    </ItemGroup>
 
-        <ItemGroup Condition="'$(TargetFramework)'=='net9.0'">
-            <PackageReference Include="Eto.Platform.Gtk"/>
-        </ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)'=='net9.0-windows'">
+        <PackageReference Include="Eto.Platform.Windows"/>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)'=='net9.0'">
+        <PackageReference Include="Eto.Platform.Gtk"/>
+    </ItemGroup>
 
     <!-- Other platform-agnostic and always-needed packages -->
     <ItemGroup>
