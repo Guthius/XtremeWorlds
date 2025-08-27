@@ -20,12 +20,12 @@
       "name": "C# Client",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "build",
-      "program": "${workspaceFolder}/Build/Client/Client",
+      "preLaunchTask": "build Client",
+      "program": "${workspaceFolder}/Build/Client/Client.dll",
       "args": [],
       "cwd": "${workspaceFolder}/Build/Client",
       "stopAtEntry": false,
       "console": "integratedTerminal"
-    },
+    }
   ]
 }
