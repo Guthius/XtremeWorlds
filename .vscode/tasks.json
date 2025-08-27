@@ -6,30 +6,16 @@
 			"type": "shell",
 			"command": "dotnet build ${workspaceFolder}/Source/Server/Server.csproj -c Debug --nologo",
 			"group": "build",
-			"problemMatcher": [
-				"$msCompile"
-			],
-			"presentation": {
-				"reveal": "always"
-			}
-		},
-	up": "build"
-		},
-		{
-			"label": "build Server",
-			"type": "shell",
-			"command": "dotnet build ${workspaceFolder}/Source/Server/Server.csproj -c Debug --nologo",
-			"group": "build"
+			"problemMatcher": ["$msCompile"],
+			"presentation": { "reveal": "always" }
 		},
 		{
 			"label": "build Client",
 			"type": "shell",
 			"command": "dotnet build ${workspaceFolder}/Source/Client/Client.csproj -c Debug --nologo",
-			"isBackground": false,
-			"problemMatcher": [
-				"$msCompile"
-			],
-			"group": "build"
+			"group": "build",
+			"problemMatcher": ["$msCompile"],
+			"presentation": { "reveal": "always" }
 		}
 	]
 }
