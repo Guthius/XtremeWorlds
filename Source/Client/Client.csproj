@@ -59,6 +59,7 @@
     <ItemGroup>
         <PackageReference Include="Eto.Forms"/>
         <PackageReference Include="Eto.Platform.Gtk"/>
+        <PackageReference Include="Eto.Platform.Mac64"/>
         <PackageReference Include="ManagedBass"/>
         <PackageReference Include="ManagedBass.Midi"/>
         <PackageReference Include="MonoGame.Content.Builder.Task"/>
