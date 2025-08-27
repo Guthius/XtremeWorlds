@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Version>2.3.0</Version>
-        <TargetFrameworks>net9.0</TargetFrameworks>
+        <TargetFrameworks>net9.0;net9.0-windows</TargetFrameworks>
         <OutputType>Exe</OutputType>
         <RootNamespace>Client</RootNamespace>
         <ApplicationIcon>Icon.ico</ApplicationIcon>
