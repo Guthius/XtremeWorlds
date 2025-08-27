@@ -13,11 +13,7 @@
 				"reveal": "always"
 			}
 		},
-		{
-			"label": "build Server",
-			"type": "shell",
-			"command": "dotnet build ${workspaceFolder}/Source/Server/Server.csproj -c Debug --nologo",
-			"group": "build"
+	up": "build"
 		},
 		{
 			"label": "build Server",
@@ -26,15 +22,13 @@
 			"group": "build"
 		},
 		{
-			"label": "build Server",
+			"label": "build Client",
 			"type": "shell",
-			"command": "dotnet build ${workspaceFolder}/Source/Server/Server.csproj -c Debug --nologo",
-			"group": "build"
-		},
-		{
-			"label": "build Server",
-			"type": "shell",
-			"command": "dotnet build ${workspaceFolder}/Source/Server/Server.csproj -c Debug --nologo",
+			"command": "dotnet build ${workspaceFolder}/Source/Client/Client.csproj -c Debug --nologo",
+			"isBackground": false,
+			"problemMatcher": [
+				"$msCompile"
+			],
 			"group": "build"
 		}
 	]
