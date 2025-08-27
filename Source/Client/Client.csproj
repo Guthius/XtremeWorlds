@@ -12,6 +12,11 @@
         <MonoGamePlatform>OpenGL</MonoGamePlatform>
     </PropertyGroup>
 
+    <!-- Only set RuntimeIdentifiers for macOS builds -->
+    <PropertyGroup Condition=" '$(OS)' == 'OSX' Or '$(RuntimeIdentifier)' == 'osx-x64' Or '$(RuntimeIdentifier)' == 'osx-arm64' ">
+        <RuntimeIdentifiers>osx-x64;osx-arm64</RuntimeIdentifiers>
+    </PropertyGroup>
+
     <PropertyGroup>
         <Title>XtremeWorlds Client</Title>
         <Product>Game Client</Product>
@@ -56,9 +61,24 @@
         <ProjectReference Include="..\Core\Core.csproj"/>
     </ItemGroup>
 
+
+    <!-- Always include Eto.Forms, but only include Gtk on Linux -->
     <ItemGroup>
         <PackageReference Include="Eto.Forms"/>
+    </ItemGroup>
+
+    <ItemGroup Condition=" '$(TargetFramework)' == 'net9.0' and ( '$(OS)' == 'Linux' or '$(RuntimeIdentifier)' == 'linux-x64' or '$(RuntimeIdentifier)' == 'linux-arm64' ) ">
         <PackageReference Include="Eto.Platform.Gtk"/>
+    </ItemGroup>
+
+
+    <!-- Only include Eto.Platform.Mac64 on macOS builds -->
+    <ItemGroup Condition=" '$(TargetFramework)' == 'net9.0' and ( '$(OS)' == 'OSX' or '$(RuntimeIdentifier)' == 'osx-x64' or '$(RuntimeIdentifier)' == 'osx-arm64' ) ">
+        <PackageReference Include="Eto.Platform.Mac64"/>
+    </ItemGroup>
+
+    <!-- Other platform-agnostic and always-needed packages -->
+    <ItemGroup>
         <PackageReference Include="ManagedBass"/>
         <PackageReference Include="ManagedBass.Midi"/>
         <PackageReference Include="MonoGame.Content.Builder.Task"/>
