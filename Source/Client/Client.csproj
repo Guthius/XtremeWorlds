@@ -1,9 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
         <Version>2.3.0</Version>
         <TargetFrameworks>net9.0-windows;net9.0</TargetFrameworks>
-        <OutputType>Exe</OutputType>
         <RootNamespace>Client</RootNamespace>
         <ApplicationIcon>Icon.ico</ApplicationIcon>
         <OutputPath>..\..\Build\Client\</OutputPath>
@@ -12,6 +10,14 @@
         <MonoGamePlatform>OpenGL</MonoGamePlatform>
 		<RuntimeIdentifiers>win-x64;linux-x64;osx-x64;osx-arm64</RuntimeIdentifiers>
     </PropertyGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' == 'net9.0-windows'">
+		<OutputType>WinExe</OutputType>
+	</ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+        <OutputType>Exe</OutputType>
+    </ItemGroup>
 
     <PropertyGroup>
         <Title>XtremeWorlds Client</Title>
