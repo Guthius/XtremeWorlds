@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Version>2.3.0</Version>
-        <TargetFrameworks>net9.0;net9.0-windows</TargetFrameworks>
+        <TargetFrameworks>net9.0-windows;net9.0</TargetFrameworks>
         <OutputType>Exe</OutputType>
         <RootNamespace>Client</RootNamespace>
         <ApplicationIcon>Icon.ico</ApplicationIcon>
@@ -10,6 +10,7 @@
         <DefineConstants>CLIENT</DefineConstants>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <MonoGamePlatform>OpenGL</MonoGamePlatform>
+		<RuntimeIdentifiers>win-x64;linux-x64;osx-x64;osx-arm64</RuntimeIdentifiers>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -53,41 +54,41 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Core\Core.csproj"/>
+        <ProjectReference Include="..\Core\Core.csproj" />
     </ItemGroup>
 
     <!-- Always include Eto.Forms, but only include Gtk on Linux -->
     <ItemGroup>
-        <PackageReference Include="Eto.Forms"/>
+        <PackageReference Include="Eto.Forms" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)'=='net9.0-windows'">
-        <PackageReference Include="Eto.Platform.Windows"/>
-    </ItemGroup>
+	<!-- Windows-only backends (require -windows TFM) -->
+	<ItemGroup Condition="'$(TargetFramework)' == 'net9.0-windows'">
+		<PackageReference Include="Eto.Platform.Wpf" />
+		<PackageReference Include="Eto.Platform.Windows" />
+	</ItemGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)'=='net9.0'">
-        <PackageReference Include="Eto.Platform.Gtk"/>
-    </ItemGroup>
+	<!-- Non-Windows backends -->
+	<ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+		<PackageReference Include="Eto.Platform.Gtk" />
+		<PackageReference Include="Eto.Platform.Mac64" />
+	</ItemGroup>
 
     <!-- Other platform-agnostic and always-needed packages -->
     <ItemGroup>
-        <PackageReference Include="ManagedBass"/>
-        <PackageReference Include="ManagedBass.Midi"/>
-        <PackageReference Include="MonoGame.Content.Builder.Task"/>
-        <PackageReference Include="MonoGame.Framework.Content.Pipeline"/>
-        <PackageReference Include="MonoGame.Framework.DesktopGL"/>
-        <PackageReference Include="MonoGame.Library.SDL"/>
-        <PackageReference Include="Ryujinx.SDL2-CS"/>
-        <PackageReference Include="SDL2-CS"/>
-        <PackageReference Include="CS-Script"/>
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(TargetFramework)'=='net9.0-windows'">
-        <PackageReference Include="Eto.Platform.Windows"/>
+        <PackageReference Include="ManagedBass" />
+        <PackageReference Include="ManagedBass.Midi" />
+        <PackageReference Include="MonoGame.Content.Builder.Task" />
+        <PackageReference Include="MonoGame.Framework.Content.Pipeline" />
+        <PackageReference Include="MonoGame.Framework.DesktopGL" />
+        <PackageReference Include="MonoGame.Library.SDL" />
+        <PackageReference Include="Ryujinx.SDL2-CS" />
+        <PackageReference Include="SDL2-CS" />
+        <PackageReference Include="CS-Script" />
     </ItemGroup>
 
     <Target Name="EnsureContentFolderExists" BeforeTargets="Build">
-        <MakeDir Directories="$(OutputPath)Content"/>
+        <MakeDir Directories="$(OutputPath)Content" />
     </Target>
 
 </Project>

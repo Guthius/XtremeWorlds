@@ -21,10 +21,16 @@ public static class Program
         var gameThread = new System.Threading.Thread(RunGame) { IsBackground = false };
         gameThread.Start();
 
-        // Start Eto application & periodic UI updater
-        // Explicitly specify Eto platform for Linux (Gtk) to avoid auto-detect failure
-        // NOTE: Ensure package Eto.Platform.Gtk is referenced in the project (added centrally in Directory.Packages.props)
-        var app = new Application(Eto.Platform.Detect);
+#if WINDOWS
+        var app = new Application(Eto.Platforms.Wpf);
+#elif LINUX
+        var app = new Application(Eto.Platforms.Gtk);
+#elif MAC
+        var app = new Application(Eto.Platforms.macOS);
+#else
+        var app = new Application(Eto.Platform.Detect);    
+#endif
+        // Set up a timer to periodically update editor UIs
         _uiTimer = new UITimer { Interval = 0.05 }; // 50ms (~20fps) for editor UI refresh logic
         _uiTimer.Elapsed += UiTimerOnElapsed;
         _uiTimer.Start();

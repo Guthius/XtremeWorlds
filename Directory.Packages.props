@@ -5,15 +5,15 @@
     <NoWarn>$(NoWarn);NU1507</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="CS-Script" Version="4.10.1" />
+    <PackageVersion Include="CS-Script" Version="4.11.0" />
     <PackageVersion Include="CS-Script.Core" Version="2.0.0" />
     <PackageVersion Include="Eto.Forms" Version="2.9.0" />
     <PackageVersion Include="Eto.Platform.Gtk" Version="2.9.0" />
     <PackageVersion Include="Eto.Platform.Windows" Version="2.9.0" />
     <PackageVersion Include="Eto.Platform.Mac64" Version="2.9.0" />
     <PackageVersion Include="Eto.Platform.Wpf" Version="2.9.0" />
-    <PackageVersion Include="ManagedBass" Version="3.1.1" />
-    <PackageVersion Include="ManagedBass.Midi" Version="3.1.1" />
+    <PackageVersion Include="ManagedBass" Version="3.1.4" />
+    <PackageVersion Include="ManagedBass.Midi" Version="3.1.4" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.8" />
     <PackageVersion Include="MonoGame.Content.Builder.Task" Version="3.8.4" />
     <PackageVersion Include="MonoGame.Extended" Version="4.1.0" />
