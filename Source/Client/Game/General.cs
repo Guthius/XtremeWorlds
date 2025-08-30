@@ -7,6 +7,7 @@ using Core.Configurations;
 using Core.Globals;
 using static Core.Globals.Command;
 using Type = Core.Globals.Type;
+using System.IO;
 
 namespace Client
 {

@@ -11,9 +11,14 @@
 		<RuntimeIdentifiers>win-x64;linux-x64;osx-x64;osx-arm64</RuntimeIdentifiers>
     </PropertyGroup>
 
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-windows'">
+        <DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
+    </PropertyGroup>
+
     <!-- OutputType must be in PropertyGroup, not ItemGroup -->
     <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-windows'">
         <OutputType>WinExe</OutputType>
+        <UseWPF>true</UseWPF>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0'">
