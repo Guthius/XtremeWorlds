@@ -11,13 +11,14 @@
 		<RuntimeIdentifiers>win-x64;linux-x64;osx-x64;osx-arm64</RuntimeIdentifiers>
     </PropertyGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'net9.0-windows'">
-		<OutputType>WinExe</OutputType>
-	</ItemGroup>
+    <!-- OutputType must be in PropertyGroup, not ItemGroup -->
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-windows'">
+        <OutputType>WinExe</OutputType>
+    </PropertyGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0'">
         <OutputType>Exe</OutputType>
-    </ItemGroup>
+    </PropertyGroup>
 
     <PropertyGroup>
         <Title>XtremeWorlds Client</Title>
@@ -68,17 +69,17 @@
         <PackageReference Include="Eto.Forms" />
     </ItemGroup>
 
-	<!-- Windows-only backends (require -windows TFM) -->
-	<ItemGroup Condition="'$(TargetFramework)' == 'net9.0-windows'">
-		<PackageReference Include="Eto.Platform.Wpf" />
-		<PackageReference Include="Eto.Platform.Windows" />
-	</ItemGroup>
+    <!-- Windows-only backends (require -windows TFM) -->
+    <ItemGroup Condition="'$(TargetFramework)' == 'net9.0-windows'">
+        <PackageReference Include="Eto.Platform.Wpf" />
+        <PackageReference Include="Eto.Platform.Windows" />
+    </ItemGroup>
 
-	<!-- Non-Windows backends -->
-	<ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
-		<PackageReference Include="Eto.Platform.Gtk" />
-		<PackageReference Include="Eto.Platform.Mac64" />
-	</ItemGroup>
+    <!-- Non-Windows backends -->
+    <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+        <PackageReference Include="Eto.Platform.Gtk" />
+        <PackageReference Include="Eto.Platform.Mac64" />
+    </ItemGroup>
 
     <!-- Other platform-agnostic and always-needed packages -->
     <ItemGroup>
