@@ -42,9 +42,8 @@ public static class Program
         _uiTimer = new UITimer { Interval = 0.05 }; // 50ms (~20fps) for editor UI refresh logic
         _uiTimer.Elapsed += UiTimerOnElapsed;
         _uiTimer.Start();
-        var admin = new Admin();
-        admin.Visible = false;
-        app.Run(new Admin());
+
+        app.Run();
     }
 
     private static void RunGame()
@@ -76,7 +75,7 @@ public static class Program
     {
         if (GameState.InitAdminForm)
         {
-            Admin.Instance.Show();
+            new Admin().Show();
             Sender.SendRequestMapReport();
             GameState.AdminPanel = true;
             GameState.InitAdminForm = false;
@@ -188,43 +187,6 @@ public static class Program
             GameState.EditorIndex = 0;
             new Editor_Script().Show();
             GameState.InitScriptEditor = false;
-        }
-
-        // Invalidate redraw surfaces where needed (guard against null/partial migration)
-        try
-        {
-            if (GameState.MyEditorType == EditorType.Map)
-                Editor_Map.Instance?.picBackSelect.Invalidate();
-
-            if (GameState.MyEditorType == EditorType.Animation)
-            {
-                Editor_Animation.Instance?.picSprite0?.Invalidate();
-                Editor_Animation.Instance?.picSprite1?.Invalidate();
-            }
-        }
-        catch { /* some editors may not be instantiated yet */ }
-        if (!GameState.InGame)
-        {
-            // Reset disposal flag when (re)entering non-game state
-            _editorsDisposed = false;
-        }
-        else if (!_editorsDisposed)
-        {
-            // Dispose editors once when entering game state
-            try { Editor_Item.Instance?.Dispose(); } catch { }
-            try { Editor_Job.Instance?.Dispose(); } catch { }
-            try { Editor_Map.Instance?.Dispose(); } catch { }
-            try { Editor_Event.Instance?.Dispose(); } catch { }
-            try { Editor_Npc.Instance?.Dispose(); } catch { }
-            try { Editor_Projectile.Instance?.Dispose(); } catch { }
-            try { Editor_Resource.Instance?.Dispose(); } catch { }
-            try { Editor_Shop.Instance?.Dispose(); } catch { }
-            try { Editor_Skill.Instance?.Dispose(); } catch { }
-            try { Editor_Animation.Instance?.Dispose(); } catch { }
-            try { Editor_Moral.Instance?.Dispose(); } catch { }
-            try { Editor_Script.Instance?.Dispose(); } catch { }
-            // TODO: track Admin form instance and close if open
-            _editorsDisposed = true;
         }
     }
 
