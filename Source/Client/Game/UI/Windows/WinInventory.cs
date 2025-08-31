@@ -75,6 +75,11 @@ public static class WinInventory
 
             var itemIcon = Data.Item[itemNum].Icon;
 
+            if (itemIcon <= 0 || itemIcon > GameState.NumItems)
+            {
+                return;
+            }
+
             // exit out if we're offering item in a trade.
             var amountModifier = 0;
             if (Trade.InTrade >= 0)
