@@ -21,14 +21,23 @@ public static class Program
         var gameThread = new System.Threading.Thread(RunGame) { IsBackground = false };
         gameThread.Start();
 
+        Application app;
+
 #if WINDOWS
-        var app = new Application(Eto.Platforms.Wpf);
+        app = new Application(Eto.Platforms.Wpf);
 #elif LINUX
-        var app = new Application(Eto.Platforms.Gtk);
-#elif MAC
-        var app = new Application(Eto.Platforms.macOS);
+        app = new Application(Eto.Platforms.Gtk);
+#elif MACOS
+        app = new Application(Eto.Platforms.Mac64);
 #else
-        var app = new Application(Eto.Platform.Detect);    
+        try
+        {
+            app = new Application(Eto.Platform.Detect);    
+        }
+        catch (Exception ex)
+        {
+            app = new Application(Eto.Platforms.Wpf);
+        }
 #endif
         // Set up a timer to periodically update editor UIs
         _uiTimer = new UITimer { Interval = 0.05 }; // 50ms (~20fps) for editor UI refresh logic

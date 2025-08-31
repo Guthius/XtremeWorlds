@@ -8,14 +8,19 @@
         <DefineConstants>CLIENT</DefineConstants>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <MonoGamePlatform>OpenGL</MonoGamePlatform>
-		<RuntimeIdentifiers>win-x64;linux-x64;osx-x64;osx-arm64</RuntimeIdentifiers>
     </PropertyGroup>
+
+	<!-- Cross-platform TFM: non-Windows RIDs -->
+	<PropertyGroup Condition="'$(TargetFramework)'=='net9.0'">
+		<RuntimeIdentifiers>linux-x64;osx-x64;osx-arm64</RuntimeIdentifiers>
+	</PropertyGroup>
 
     <!-- OutputType must be in PropertyGroup, not ItemGroup -->
     <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-windows'">
         <OutputType>WinExe</OutputType>
         <UseWPF>true</UseWPF>
 		<EnableWindowsTargeting>true</EnableWindowsTargeting>
+		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
 		<DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
     </PropertyGroup>
 
