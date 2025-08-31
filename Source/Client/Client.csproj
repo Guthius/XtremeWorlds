@@ -63,6 +63,16 @@
     </ItemGroup>
 
     <ItemGroup>
+      <None Remove="Icon.bmp" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="Icon.bmp">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
         <Compile Update="Content\Skins\Crystashire.cs">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Compile>
