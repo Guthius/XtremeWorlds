@@ -1,12 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>2.3.0</Version>
-        <OutputType>Exe</OutputType>
+        <Version>2.3.1</Version>
+        <TargetFrameworks>net9.0-windows;net9.0</TargetFrameworks>
         <RootNamespace>Server</RootNamespace>
         <ApplicationIcon>Resources\Icon.ico</ApplicationIcon>
         <OutputPath>..\..\Build\Server\</OutputPath>
         <DefineConstants>SERVER</DefineConstants>
+    </PropertyGroup>
+
+    <!-- Cross-platform TFM: non-Windows RIDs -->
+	<PropertyGroup Condition="'$(TargetFramework)'=='net9.0'">
+        <OutputType>Exe</OutputType>
+		<RuntimeIdentifiers>linux-x64;osx-x64;osx-arm64</RuntimeIdentifiers>
+	</PropertyGroup>
+
+    <!-- OutputType must be in PropertyGroup, not ItemGroup -->
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-windows'">
+        <OutputType>WinExe</OutputType>
+		<EnableWindowsTargeting>true</EnableWindowsTargeting>
+		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+		<DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup>

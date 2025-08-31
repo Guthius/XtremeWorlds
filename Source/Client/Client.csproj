@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <Version>2.3.0</Version>
+        <Version>2.3.1</Version>
         <TargetFrameworks>net9.0-windows;net9.0</TargetFrameworks>
         <RootNamespace>Client</RootNamespace>
         <ApplicationIcon>Icon.ico</ApplicationIcon>
@@ -12,6 +12,7 @@
 
 	<!-- Cross-platform TFM: non-Windows RIDs -->
 	<PropertyGroup Condition="'$(TargetFramework)'=='net9.0'">
+        <OutputType>Exe</OutputType>
 		<RuntimeIdentifiers>linux-x64;osx-x64;osx-arm64</RuntimeIdentifiers>
 	</PropertyGroup>
 
