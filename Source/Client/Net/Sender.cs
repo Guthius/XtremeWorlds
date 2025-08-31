@@ -5,6 +5,7 @@ using Client.Game.UI;
 using Core;
 using Core.Globals;
 using Core.Net;
+using System.IO;
 using static Core.Globals.Command;
 
 namespace Client.Net;

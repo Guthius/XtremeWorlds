@@ -1,5 +1,6 @@
 ﻿using Core.Globals;
 using static Core.Globals.Command;
+using System.IO;
 
 namespace Client.Game.UI.Windows;
 
@@ -20,17 +21,17 @@ public static class WinSkills
 
         // render green
         var greenPath = Path.Combine(DataPath.Gui, "34");
-        
-        GameClient.RenderTexture(ref greenPath, 
-            winSkills.X + 4, 
-            winSkills.Y + 23, 
+
+        GameClient.RenderTexture(ref greenPath,
+            winSkills.X + 4,
+            winSkills.Y + 23,
             0, 0,
-            winSkills.Width - 8, 
-            winSkills.Height - 27, 
+            winSkills.Width - 8,
+            winSkills.Height - 27,
             4, 4);
-        
+
         var height = 76;
-        
+
         var x = winSkills.X;
         var y = winSkills.Y + 23;
 
@@ -40,16 +41,16 @@ public static class WinSkills
             {
                 height = 42;
             }
-            
+
             var path = Path.Combine(DataPath.Gui, "35");
-            
+
             GameClient.RenderTexture(ref path, x + 4, y, 0, 0, 76, height, 76, height);
             GameClient.RenderTexture(ref path, x + 80, y, 0, 0, 76, height, 76, height);
             GameClient.RenderTexture(ref path, x + 156, y, 0, 0, 42, height, 42, height);
-            
+
             y += 76;
         }
-        
+
         for (var slot = 0; slot < Constant.MaxPlayerSkills; slot++)
         {
             var skillNum = Data.Player[GameState.MyIndex].Skill[slot].Num;
@@ -57,7 +58,7 @@ public static class WinSkills
             {
                 continue;
             }
-            
+
             Database.StreamSkill(skillNum);
 
             if (Gui.DragBox.Origin == PartOrigin.SkillTree &&
@@ -65,18 +66,18 @@ public static class WinSkills
             {
                 continue;
             }
-            
+
             var icon = Data.Skill[skillNum].Icon;
             if (icon < 0 || icon >= GameState.NumSkills)
             {
                 continue;
             }
-                    
+
             var top = winSkills.Y + GameState.SkillTop + (GameState.SkillOffsetY + 32) * (slot / GameState.SkillColumns);
             var left = winSkills.X + GameState.SkillLeft + (GameState.SkillOffsetX + 32) * (slot % GameState.SkillColumns);
 
             var iconPath = Path.Combine(DataPath.Skills, icon.ToString());
-                        
+
             GameClient.RenderTexture(ref iconPath, left, top, 0, 0, 32, 32, 32, 32);
         }
     }
