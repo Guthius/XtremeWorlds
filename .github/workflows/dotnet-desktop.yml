@@ -115,9 +115,12 @@ jobs:
             "$SERVER_X64_APP/Contents/MacOS/Server" \
             "$SERVER_ARM_APP/Contents/MacOS/Server" \
             -output "$SERVER_UNIVERSAL_APP/Contents/MacOS/Server"
-          # Zip the universal .app bundles
+          # Zip the universal .app bundles into a single folder
           cd publish/macos-universal
-          zip -r ../../xtremeworlds-macos-${GITHUB_REF_NAME}.zip Client Server
+          mkdir XtremeWorlds-macOS
+          mv Client/Client.app XtremeWorlds-macOS/
+          mv Server/Server.app XtremeWorlds-macOS/
+          zip -r ../../xtremeworlds-macos-${GITHUB_REF_NAME}.zip XtremeWorlds-macOS
           cd ../..
 
 
