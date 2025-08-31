@@ -8,7 +8,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using static Core.Globals.Command;
 using Type = Core.Globals.Type;
-using System.IO;
 
 namespace Client.Game.UI;
 
