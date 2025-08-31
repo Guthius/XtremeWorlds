@@ -1,6 +1,7 @@
 ﻿using Client.Net;
 using Core.Globals;
 using Microsoft.Xna.Framework;
+using System.IO;
 using static Core.Globals.Command;
 
 namespace Client.Game.UI.Windows;

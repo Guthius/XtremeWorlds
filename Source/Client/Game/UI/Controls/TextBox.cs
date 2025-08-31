@@ -1,4 +1,6 @@
-﻿namespace Client.Game.UI.Controls;
+﻿using System.IO;
+
+namespace Client.Game.UI.Controls;
 
 public sealed class TextBox : Control
 {
