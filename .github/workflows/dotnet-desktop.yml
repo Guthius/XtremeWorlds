@@ -86,9 +86,25 @@ jobs:
         if: ${{ runner.os == 'macOS' }}
         run: dotnet publish Source/Server/Server.csproj -c Release -r osx-x64 -o ./publish/osx-x64/Server --self-contained true /p:PackageFormat=app
 
+      - name: Debug List Server x64 Output
+        if: ${{ runner.os == 'macOS' }}
+        run: |
+          echo "Listing ./publish/osx-x64/Server after publish:"
+          ls -l ./publish/osx-x64/Server || true
+          echo "Listing ./publish/osx-x64/Server/Server.app/Contents/MacOS if exists:"
+          ls -l ./publish/osx-x64/Server/Server.app/Contents/MacOS || true
+
       - name: Publish Server (macOS arm64, .app)
         if: ${{ runner.os == 'macOS' }}
         run: dotnet publish Source/Server/Server.csproj -c Release -r osx-arm64 -o ./publish/osx-arm64/Server --self-contained true /p:PackageFormat=app
+
+      - name: Debug List Server arm64 Output
+        if: ${{ runner.os == 'macOS' }}
+        run: |
+          echo "Listing ./publish/osx-arm64/Server after publish:"
+          ls -l ./publish/osx-arm64/Server || true
+          echo "Listing ./publish/osx-arm64/Server/Server.app/Contents/MacOS if exists:"
+          ls -l ./publish/osx-arm64/Server/Server.app/Contents/MacOS || true
 
       - name: Create universal .app bundles and ZIP (macOS)
         if: ${{ runner.os == 'macOS' }}
@@ -100,21 +116,31 @@ jobs:
           CLIENT_ARM_APP="publish/osx-arm64/Client/Client.app"
           CLIENT_UNIVERSAL_APP="publish/macos-universal/Client/Client.app"
           mkdir -p publish/macos-universal/Client
-          cp -R "$CLIENT_X64_APP" "$CLIENT_UNIVERSAL_APP"
-          lipo -create \
-            "$CLIENT_X64_APP/Contents/MacOS/Client" \
-            "$CLIENT_ARM_APP/Contents/MacOS/Client" \
-            -output "$CLIENT_UNIVERSAL_APP/Contents/MacOS/Client"
+          if [ -d "$CLIENT_X64_APP" ] && [ -d "$CLIENT_ARM_APP" ]; then
+            cp -R "$CLIENT_X64_APP" "$CLIENT_UNIVERSAL_APP"
+            lipo -create \
+              "$CLIENT_X64_APP/Contents/MacOS/Client" \
+              "$CLIENT_ARM_APP/Contents/MacOS/Client" \
+              -output "$CLIENT_UNIVERSAL_APP/Contents/MacOS/Client"
+          else
+            echo "Client .app not found for one or both architectures!"
+            exit 1
+          fi
           # Universal Server.app
           SERVER_X64_APP="publish/osx-x64/Server/Server.app"
           SERVER_ARM_APP="publish/osx-arm64/Server/Server.app"
           SERVER_UNIVERSAL_APP="publish/macos-universal/Server/Server.app"
           mkdir -p publish/macos-universal/Server
-          cp -R "$SERVER_X64_APP" "$SERVER_UNIVERSAL_APP"
-          lipo -create \
-            "$SERVER_X64_APP/Contents/MacOS/Server" \
-            "$SERVER_ARM_APP/Contents/MacOS/Server" \
-            -output "$SERVER_UNIVERSAL_APP/Contents/MacOS/Server"
+          if [ -d "$SERVER_X64_APP" ] && [ -d "$SERVER_ARM_APP" ]; then
+            cp -R "$SERVER_X64_APP" "$SERVER_UNIVERSAL_APP"
+            lipo -create \
+              "$SERVER_X64_APP/Contents/MacOS/Server" \
+              "$SERVER_ARM_APP/Contents/MacOS/Server" \
+              -output "$SERVER_UNIVERSAL_APP/Contents/MacOS/Server"
+          else
+            echo "Server .app not found for one or both architectures!"
+            exit 1
+          fi
           # Zip the universal .app bundles
           cd publish/macos-universal
           zip -r ../../xtremeworlds-macos-${GITHUB_REF_NAME}.zip Client Server
