@@ -118,6 +118,34 @@ jobs:
           zip -r ../../xtremeworlds-macos-${GITHUB_REF_NAME}.zip Client Server
           cd ../..
 
+
+      # Zip and upload Linux build
+      - name: Zip Linux build
+        if: ${{ runner.os == 'Linux' }}
+        run: |
+          zip -r xtremeworlds-linux-${GITHUB_REF_NAME}.zip publish/linux-x64
+
+      - name: Upload ZIP on Linux
+        if: ${{ runner.os == 'Linux' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: xtremeworlds-linux-${{ github.ref_name }}
+          path: xtremeworlds-linux-${{ github.ref_name }}.zip
+
+      # Zip and upload Windows build
+      - name: Zip Windows build
+        if: ${{ runner.os == 'Windows' }}
+        shell: powershell
+        run: |
+          Compress-Archive -Path publish/win-x64/* -DestinationPath xtremeworlds-windows-${env:GITHUB_REF_NAME}.zip
+
+      - name: Upload ZIP on Windows
+        if: ${{ runner.os == 'Windows' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: xtremeworlds-windows-${{ github.ref_name }}
+          path: xtremeworlds-windows-${{ github.ref_name }}.zip
+      
       - name: Upload ZIP on macOS
         if: ${{ runner.os == 'macOS' }}
         uses: actions/upload-artifact@v4
