@@ -74,8 +74,8 @@ jobs:
         if: ${{ runner.os == 'Linux' }}
         uses: actions/upload-artifact@v4
         with:
-          name: xtremeworlds-linux-${{ github.ref_name }}
-          path: xtremeworlds-linux-${{ github.ref_name }}.zip
+          name: xtremeworlds-${{ toLower(env.RUNNER_OS) }}-${{ github.ref_name }}
+          path: xtremeworlds-${{ toLower(env.RUNNER_OS) }}-${{ github.ref_name }}.zip
 
       # Windows cleanup and ZIP
       - name: Cleanup old zip files (Windows)
@@ -95,5 +95,5 @@ jobs:
         if: ${{ runner.os == 'Windows' }}
         uses: actions/upload-artifact@v4
         with:
-          name: xtremeworlds-${{ env.RUNNER_OS | toLower }}-${{ github.ref_name }}
-          path: xtremeworlds-${{ env.RUNNER_OS | toLower }}-${{ github.ref_name }}.zip
+          name: xtremeworlds-${{ toLower(env.RUNNER_OS) }}-${{ github.ref_name }}
+          path: xtremeworlds-${{ toLower(env.RUNNER_OS) }}-${{ github.ref_name }}.zip
