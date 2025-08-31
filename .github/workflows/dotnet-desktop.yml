@@ -10,7 +10,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            osName: linux
+          - os: windows-latest
+            osName: windows
 
     steps:
       - name: Checkout repository
@@ -57,10 +61,10 @@ jobs:
         shell: powershell
         run: dotnet publish Source/Server/Server.csproj -c Release -r win-x64 -o ./publish/win-x64/Server --self-contained true
 
-            # Linux cleanup and ZIP
+      # Linux cleanup and ZIP
       - name: Cleanup old zip files (Linux)
         if: ${{ runner.os == 'Linux' }}
-        run: rm -f xtremeworlds-linux-*.zip
+        run: rm -f xtremeworlds-${{ matrix.osName }}-*.zip
 
       - name: Create ZIP on Linux
         if: ${{ runner.os == 'Linux' }}
@@ -74,14 +78,14 @@ jobs:
         if: ${{ runner.os == 'Linux' }}
         uses: actions/upload-artifact@v4
         with:
-          name: xtremeworlds-${{ toLower(env.RUNNER_OS) }}-${{ github.ref_name }}
-          path: xtremeworlds-${{ toLower(env.RUNNER_OS) }}-${{ github.ref_name }}.zip
+          name: xtremeworlds-${{ matrix.osName }}-${{ github.ref_name }}
+          path: xtremeworlds-${{ matrix.osName }}-${{ github.ref_name }}.zip
 
       # Windows cleanup and ZIP
       - name: Cleanup old zip files (Windows)
         if: ${{ runner.os == 'Windows' }}
         shell: powershell
-        run: Remove-Item -Force xtremeworlds-windows-*.zip
+        run: Remove-Item -Force xtremeworlds-${{ matrix.osName }}-*.zip
 
       - name: Create ZIP on Windows
         if: ${{ runner.os == 'Windows' }}
@@ -95,5 +99,5 @@ jobs:
         if: ${{ runner.os == 'Windows' }}
         uses: actions/upload-artifact@v4
         with:
-          name: xtremeworlds-${{ toLower(env.RUNNER_OS) }}-${{ github.ref_name }}
-          path: xtremeworlds-${{ toLower(env.RUNNER_OS) }}-${{ github.ref_name }}.zip
+          name: xtremeworlds-${{ matrix.osName }}-${{ github.ref_name }}
+          path: xtremeworlds-${{ matrix.osName }}-${{ github.ref_name }}.zip
