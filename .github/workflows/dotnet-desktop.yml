@@ -10,8 +10,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
-
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -57,46 +56,72 @@ jobs:
         shell: powershell
         run: dotnet publish Source/Server/Server.csproj -c Release -r win-x64 -o ./publish/win-x64/Server --self-contained true
 
-      # Linux cleanup and ZIP
-      - name: Cleanup old zip files (Linux)
-        if: ${{ runner.os == 'Linux' }}
-        run: rm -f publish/linux-x64/*.zip
+      # macOS: Build, publish, lipo universal, zip, and upload
+      - name: Build Client (macOS x64)
+        if: ${{ runner.os == 'macOS' }}
+        run: dotnet build Source/Client/Client.csproj -c Release -f net9.0 -r osx-x64 --no-restore
 
-      - name: Create ZIP on Linux
-        if: ${{ runner.os == 'Linux' }}
+      - name: Build Client (macOS arm64)
+        if: ${{ runner.os == 'macOS' }}
+        run: dotnet build Source/Client/Client.csproj -c Release -f net9.0 -r osx-arm64 --no-restore
+
+      - name: Build Server (macOS x64)
+        if: ${{ runner.os == 'macOS' }}
+        run: dotnet build Source/Server/Server.csproj --configuration Release -r osx-x64 --no-restore
+
+      - name: Build Server (macOS arm64)
+        if: ${{ runner.os == 'macOS' }}
+        run: dotnet build Source/Server/Server.csproj --configuration Release -r osx-arm64 --no-restore
+
+      - name: Publish Client (macOS x64)
+        if: ${{ runner.os == 'macOS' }}
+        run: dotnet publish Source/Client/Client.csproj -c Release -f net9.0 -r osx-x64 -o ./publish/osx-x64/Client --self-contained true
+
+      - name: Publish Client (macOS arm64)
+        if: ${{ runner.os == 'macOS' }}
+        run: dotnet publish Source/Client/Client.csproj -c Release -f net9.0 -r osx-arm64 -o ./publish/osx-arm64/Client --self-contained true
+
+      - name: Publish Server (macOS x64)
+        if: ${{ runner.os == 'macOS' }}
+        run: dotnet publish Source/Server/Server.csproj -c Release -r osx-x64 -o ./publish/osx-x64/Server --self-contained true
+
+      - name: Publish Server (macOS arm64)
+        if: ${{ runner.os == 'macOS' }}
+        run: dotnet publish Source/Server/Server.csproj -c Release -r osx-arm64 -o ./publish/osx-arm64/Server --self-contained true
+
+      - name: Create universal binaries and ZIP (macOS)
+        if: ${{ runner.os == 'macOS' }}
+        shell: bash
         run: |
-          sudo apt-get update
-          sudo apt-get install -y zip
-          OS=$(echo "$RUNNER_OS" | tr '[:upper:]' '[:lower:]')
-          cd publish/linux-x64
-          zip -r "../../xtremeworlds-${OS}-${GITHUB_REF_NAME}.zip" Client Server
+          brew install zip || true
+          mkdir -p publish/macos-universal/Client
+          mkdir -p publish/macos-universal/Server
+          # Universal Client
+          lipo -create \
+            publish/osx-x64/Client/Client \
+            publish/osx-arm64/Client/Client \
+            -output publish/macos-universal/Client/Client
+          cp -R publish/osx-x64/Client/* publish/macos-universal/Client/
+          cp -R publish/osx-arm64/Client/* publish/macos-universal/Client/
+          mv publish/macos-universal/Client/Client publish/macos-universal/Client/Client_universal
+          mv publish/macos-universal/Client/Client_universal publish/macos-universal/Client/Client
+          # Universal Server
+          lipo -create \
+            publish/osx-x64/Server/Server \
+            publish/osx-arm64/Server/Server \
+            -output publish/macos-universal/Server/Server
+          cp -R publish/osx-x64/Server/* publish/macos-universal/Server/
+          cp -R publish/osx-arm64/Server/* publish/macos-universal/Server/
+          mv publish/macos-universal/Server/Server publish/macos-universal/Server/Server_universal
+          mv publish/macos-universal/Server/Server_universal publish/macos-universal/Server/Server
+          cd publish/macos-universal
+          zip -r ../../xtremeworlds-macos-${GITHUB_REF_NAME}.zip Client Server
           cd ../..
 
-      - name: Upload ZIP on Linux
-        if: ${{ runner.os == 'Linux' }}
+      - name: Upload ZIP on macOS
+        if: ${{ runner.os == 'macOS' }}
         uses: actions/upload-artifact@v4
         with:
-          name: xtremeworlds-linux-${{ github.ref_name }}
-          path: xtremeworlds-linux-${{ github.ref_name }}.zip
+          name: xtremeworlds-macos-${{ github.ref_name }}
+          path: xtremeworlds-macos-${{ github.ref_name }}.zip
 
-      # Windows cleanup and ZIP
-      - name: Cleanup old zip files (Windows)
-        if: ${{ runner.os == 'Windows' }}
-        shell: powershell
-        run: Remove-Item -Force publish\win-x64\*.zip
-
-      - name: Create ZIP on Windows
-        if: ${{ runner.os == 'Windows' }}
-        shell: powershell
-        run: |
-          $OS = $env:RUNNER_OS.ToLower()
-          $ZIP = "xtremeworlds-windows-$env:GITHUB_REF_NAME.zip"
-          cd publish\win-x64
-          Compress-Archive -Path Client,Server -DestinationPath "..\..\$ZIP"
-
-      - name: Upload ZIP on Windows
-        if: ${{ runner.os == 'Windows' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: xtremeworlds-windows-${{ github.ref_name }}
-          path: xtremeworlds-windows-${{ github.ref_name }}.zip
