@@ -50,16 +50,16 @@ public sealed class GameSession(int id, INetworkChannel channel, GameSessionMana
             return;
         }
 
-        var count = _parser.Parse(this, _buffer.AsMemory(0, _bufferOffset));
-        if (count == 0)
+        var consumed = _parser.Parse(this, _buffer.AsMemory(0, _bufferOffset));
+        if (consumed == 0)
         {
             return;
         }
 
-        var bytesLeft = _bufferOffset - count;
+        var bytesLeft = _bufferOffset - consumed;
         if (bytesLeft > 0)
         {
-            _buffer.AsSpan(_bufferOffset, bytesLeft).CopyTo(_buffer.AsSpan(0));
+            _buffer.AsSpan(consumed, bytesLeft).CopyTo(_buffer.AsSpan(0));
         }
 
         _bufferOffset = bytesLeft;
