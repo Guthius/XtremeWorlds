@@ -140,9 +140,9 @@ namespace Client
                 args.GraphicsDeviceInformation.PresentationParameters.MultiSampleCount = 8;
             };
 
-#if DEBUG
-            IsMouseVisible = true;
-#endif
+            // Hide OS cursor; we'll render our own
+            IsMouseVisible = false;
+
             Content.RootDirectory = "Content";
 
             // Handle Exiting without forcing a hard shutdown
@@ -282,32 +282,13 @@ namespace Client
                 }
             });
 
+            // Preload cursor texture into cache (drawn each frame in GUI layer)
             try
             {
-                var cursorPath = Path.Combine(DataPath.Misc, "Cursor.png");
-                if (!File.Exists(cursorPath))
-                {
-                    // Fallback to Content relative path if the asset base is different
-                    var fallback = Path.Combine(Content.RootDirectory, "Graphics", "Misc", "Cursor.png");
-                    cursorPath = File.Exists(fallback) ? fallback : cursorPath;
-                }
-
-                if (File.Exists(cursorPath))
-                {
-                    using var fs = new FileStream(cursorPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                    using var tempTex = Texture2D.FromStream(Graphics?.GraphicsDevice, fs);
-                    Mouse.SetCursor(MouseCursor.FromTexture2D(tempTex, 0, 0));
-                }
-                else
-                {
-                    Mouse.SetCursor(MouseCursor.Arrow);
-                }
+                var preload = Path.Combine(DataPath.Misc, "Cursor");
+                _ = GetTexture(preload);
             }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Cursor load failed: {ex.Message}");
-                Mouse.SetCursor(MouseCursor.Arrow);
-            }
+            catch { }
         }
 
         public static SpriteFont LoadFont(string path, Font font)
@@ -485,6 +466,21 @@ namespace Client
                     WindowManager.DrawMenuBackground();
                 WindowManager.Render();
                 TextRenderer.DrawMapName();
+
+                // Draw custom cursor on the GUI layer at GUI mouse coords
+                if (GameState.CurMouseXGui >= 0 && GameState.CurMouseYGui >= 0)
+                {
+                    string cursorTex = Path.Combine(DataPath.Misc, "Cursor");
+                    var info = GetGfxInfo(cursorTex);
+                    int cw = Math.Max(1, info.Width);
+                    int ch = Math.Max(1, info.Height);
+                    int hotspotX = 0; // adjust if your cursor hotspot is not top-left
+                    int hotspotY = 0;
+                    int cx = GameState.CurMouseXGui - hotspotX;
+                    int cy = GameState.CurMouseYGui - hotspotY;
+                    RenderTexture(ref cursorTex, cx, cy, 0, 0, cw, ch, cw, ch);
+                }
+
                 SpriteBatch.End();
 
                 // After drawing to _guiRenderTarget, reset to back buffer
@@ -2701,7 +2697,6 @@ namespace Client
             string argPath = Path.Combine(DataPath.Characters, gfxIndex.ToString());
             RenderTexture(ref argPath, x, y,
                 sourceRect.X, sourceRect.Y,
-                sourceRect.Width, sourceRect.Height,
                 sourceRect.Width, sourceRect.Height);
         }
 
@@ -2814,7 +2809,7 @@ namespace Client
                             if ((gfxInfo.Height / columns) > 32)
                             {
                                 // Create a 32 pixel offset for larger sprites
-                                y = (int)Math.Round(Data.MapEvents[id].Y - (height - 32d));
+                                y = (int) Math.Round(Data.MapEvents[id].Y - (height - 32d));
                             }
                             else
                             {
