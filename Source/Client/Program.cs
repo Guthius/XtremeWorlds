@@ -137,7 +137,6 @@ namespace Client
             Graphics.PreparingDeviceSettings += (sender, args) =>
             {
                 args.GraphicsDeviceInformation.PresentationParameters.RenderTargetUsage = RenderTargetUsage.PreserveContents;
-                args.GraphicsDeviceInformation.PresentationParameters.MultiSampleCount = 8;
             };
 
             // Hide OS cursor; we'll render our own
@@ -1524,7 +1523,7 @@ namespace Client
             Graphics.GraphicsDevice.SetRenderTarget(RenderTarget);
 
             // Clear the render target with a transparent background
-            Graphics.GraphicsDevice.Clear(Color.Transparent);
+            Graphics.GraphicsDevice.Clear(Color.Black);
 
             // Draw everything to the render target
             General.Client.Draw(new GameTime()); // Assuming Draw handles your game rendering
