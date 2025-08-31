@@ -60,7 +60,9 @@ jobs:
       - name: Zip Linux build
         if: ${{ runner.os == 'Linux' }}
         run: |
-          zip -r xtremeworlds-linux-${GITHUB_REF_NAME}.zip publish/linux-x64
+          cd publish
+          zip -r ../xtremeworlds-linux-${GITHUB_REF_NAME}.zip linux-x64
+          cd ..
 
       - name: Upload ZIP on Linux
         if: ${{ runner.os == 'Linux' }}
