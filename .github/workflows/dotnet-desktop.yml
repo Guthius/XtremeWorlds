@@ -73,47 +73,49 @@ jobs:
         if: ${{ runner.os == 'macOS' }}
         run: dotnet build Source/Server/Server.csproj --configuration Release -r osx-arm64 --no-restore
 
-      - name: Publish Client (macOS x64)
-        if: ${{ runner.os == 'macOS' }}
-        run: dotnet publish Source/Client/Client.csproj -c Release -f net9.0 -r osx-x64 -o ./publish/osx-x64/Client --self-contained true
 
-      - name: Publish Client (macOS arm64)
+      - name: Publish Client (macOS x64, .app)
         if: ${{ runner.os == 'macOS' }}
-        run: dotnet publish Source/Client/Client.csproj -c Release -f net9.0 -r osx-arm64 -o ./publish/osx-arm64/Client --self-contained true
+        run: dotnet publish Source/Client/Client.csproj -c Release -f net9.0 -r osx-x64 -o ./publish/osx-x64/Client --self-contained true /p:PackageFormat=app
 
-      - name: Publish Server (macOS x64)
+      - name: Publish Client (macOS arm64, .app)
         if: ${{ runner.os == 'macOS' }}
-        run: dotnet publish Source/Server/Server.csproj -c Release -r osx-x64 -o ./publish/osx-x64/Server --self-contained true
+        run: dotnet publish Source/Client/Client.csproj -c Release -f net9.0 -r osx-arm64 -o ./publish/osx-arm64/Client --self-contained true /p:PackageFormat=app
 
-      - name: Publish Server (macOS arm64)
+      - name: Publish Server (macOS x64, .app)
         if: ${{ runner.os == 'macOS' }}
-        run: dotnet publish Source/Server/Server.csproj -c Release -r osx-arm64 -o ./publish/osx-arm64/Server --self-contained true
+        run: dotnet publish Source/Server/Server.csproj -c Release -r osx-x64 -o ./publish/osx-x64/Server --self-contained true /p:PackageFormat=app
 
-      - name: Create universal binaries and ZIP (macOS)
+      - name: Publish Server (macOS arm64, .app)
+        if: ${{ runner.os == 'macOS' }}
+        run: dotnet publish Source/Server/Server.csproj -c Release -r osx-arm64 -o ./publish/osx-arm64/Server --self-contained true /p:PackageFormat=app
+
+      - name: Create universal .app bundles and ZIP (macOS)
         if: ${{ runner.os == 'macOS' }}
         shell: bash
         run: |
           brew install zip || true
+          # Universal Client.app
+          CLIENT_X64_APP="publish/osx-x64/Client/Client.app"
+          CLIENT_ARM_APP="publish/osx-arm64/Client/Client.app"
+          CLIENT_UNIVERSAL_APP="publish/macos-universal/Client/Client.app"
           mkdir -p publish/macos-universal/Client
+          cp -R "$CLIENT_X64_APP" "$CLIENT_UNIVERSAL_APP"
+          lipo -create \
+            "$CLIENT_X64_APP/Contents/MacOS/Client" \
+            "$CLIENT_ARM_APP/Contents/MacOS/Client" \
+            -output "$CLIENT_UNIVERSAL_APP/Contents/MacOS/Client"
+          # Universal Server.app
+          SERVER_X64_APP="publish/osx-x64/Server/Server.app"
+          SERVER_ARM_APP="publish/osx-arm64/Server/Server.app"
+          SERVER_UNIVERSAL_APP="publish/macos-universal/Server/Server.app"
           mkdir -p publish/macos-universal/Server
-          # Universal Client
+          cp -R "$SERVER_X64_APP" "$SERVER_UNIVERSAL_APP"
           lipo -create \
-            publish/osx-x64/Client/Client \
-            publish/osx-arm64/Client/Client \
-            -output publish/macos-universal/Client/Client
-          cp -R publish/osx-x64/Client/* publish/macos-universal/Client/
-          cp -R publish/osx-arm64/Client/* publish/macos-universal/Client/
-          mv publish/macos-universal/Client/Client publish/macos-universal/Client/Client_universal
-          mv publish/macos-universal/Client/Client_universal publish/macos-universal/Client/Client
-          # Universal Server
-          lipo -create \
-            publish/osx-x64/Server/Server \
-            publish/osx-arm64/Server/Server \
-            -output publish/macos-universal/Server/Server
-          cp -R publish/osx-x64/Server/* publish/macos-universal/Server/
-          cp -R publish/osx-arm64/Server/* publish/macos-universal/Server/
-          mv publish/macos-universal/Server/Server publish/macos-universal/Server/Server_universal
-          mv publish/macos-universal/Server/Server_universal publish/macos-universal/Server/Server
+            "$SERVER_X64_APP/Contents/MacOS/Server" \
+            "$SERVER_ARM_APP/Contents/MacOS/Server" \
+            -output "$SERVER_UNIVERSAL_APP/Contents/MacOS/Server"
+          # Zip the universal .app bundles
           cd publish/macos-universal
           zip -r ../../xtremeworlds-macos-${GITHUB_REF_NAME}.zip Client Server
           cd ../..
@@ -135,7 +137,7 @@ jobs:
       # Zip and upload Windows build
       - name: Zip Windows build
         if: ${{ runner.os == 'Windows' }}
-        shell: powershell
+        shell: powershells      
         run: |
           Compress-Archive -Path publish/win-x64/* -DestinationPath xtremeworlds-windows-${env:GITHUB_REF_NAME}.zip
 
