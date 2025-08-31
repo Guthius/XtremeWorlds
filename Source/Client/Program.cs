@@ -25,6 +25,8 @@ namespace Client
         public static readonly ConcurrentDictionary<string, Texture2D> TextureCache = new();
         public static readonly ConcurrentDictionary<string, GfxInfo> GfxInfoCache = new();
 
+        private static string? _pendingScreenshotPath;
+
         private static int _gameFps;
         private static readonly object FpsLock = new();
 
@@ -647,6 +649,11 @@ namespace Client
             if (IsKeyStateActive(Keys.F12))
             {
                 TakeScreenshot();
+            }
+
+            if (_pendingScreenshotPath != "")
+            {
+                TrySaveBackbufferScreenshot(_pendingScreenshotPath);
             }
 
             SetFps(_gameFps + 1);
@@ -1519,23 +1526,43 @@ namespace Client
 
         public static void TakeScreenshot()
         {
-            // Set the render target to our RenderTarget2D
-            Graphics.GraphicsDevice.SetRenderTarget(RenderTarget);
-
-            // Clear the render target with a transparent background
-            Graphics.GraphicsDevice.Clear(Color.Black);
-
-            // Draw everything to the render target
-            General.Client.Draw(new GameTime()); // Assuming Draw handles your game rendering
-
-            // Reset the render target to the back buffer (main display)
-            Graphics.GraphicsDevice.SetRenderTarget(null);
-
-            // Save the contents of the RenderTarget2D to a PNG file
-            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-            using (var stream = new FileStream($"screenshot_{timestamp}.png", FileMode.Create))
+            try
             {
-                RenderTarget.SaveAsPng(stream, RenderTarget.Width, RenderTarget.Height);
+                var dir = Path.Combine(AppContext.BaseDirectory, "Screenshots");
+                if (!Path.Exists(dir))
+                    Directory.CreateDirectory(dir);
+                var ts = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                _pendingScreenshotPath = Path.Combine(dir, $"screenshot_{ts}.png");
+            }
+            catch
+            {
+                _pendingScreenshotPath = null;
+            }
+        }
+
+        private void TrySaveBackbufferScreenshot(string path)
+        {
+            try
+            {
+                var gd = GraphicsDevice;
+                var pp = gd.PresentationParameters;
+                int w = pp.BackBufferWidth;
+                int h = pp.BackBufferHeight;
+
+                var data = new Color[w * h];
+                gd.GetBackBufferData(data); // works with MSAA off
+
+                using var tex = new Texture2D(gd, w, h, false, SurfaceFormat.Color);
+                tex.SetData(data);
+
+                using var fs = File.Create(path);
+                tex.SaveAsPng(fs, w, h);
+
+                _pendingScreenshotPath = "";
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Screenshot failed: {ex}");
             }
         }
 
@@ -1555,19 +1582,19 @@ namespace Client
             {
                 // Create the four sides of the outline
                 var left = new Rectangle(position.ToPoint(),
-                    new Point((int) Math.Round(outlineThickness), (int) Math.Round(size.Y)));
+                    new Point((int)Math.Round(outlineThickness), (int)Math.Round(size.Y)));
 
                 var top = new Rectangle(position.ToPoint(),
-                    new Point((int) Math.Round(size.X), (int) Math.Round(outlineThickness)));
+                    new Point((int)Math.Round(size.X), (int)Math.Round(outlineThickness)));
 
                 var right = new Rectangle(
-                    new Point((int) Math.Round(position.X + size.X - outlineThickness), (int) Math.Round(position.Y)),
-                    new Point((int) Math.Round(outlineThickness), (int) Math.Round(size.Y)));
+                    new Point((int)Math.Round(position.X + size.X - outlineThickness), (int)Math.Round(position.Y)),
+                    new Point((int)Math.Round(outlineThickness), (int)Math.Round(size.Y)));
 
                 var bottom =
                     new Rectangle(
-                        new Point((int) Math.Round(position.X), (int) Math.Round(position.Y + size.Y - outlineThickness)),
-                        new Point((int) Math.Round(size.X), (int) Math.Round(outlineThickness)));
+                        new Point((int)Math.Round(position.X), (int)Math.Round(position.Y + size.Y - outlineThickness)),
+                        new Point((int)Math.Round(size.X), (int)Math.Round(outlineThickness)));
 
                 // Draw the outline rectangles
                 SpriteBatch.Draw(whiteTexture, left, outlineColor);
