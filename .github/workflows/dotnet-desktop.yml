@@ -163,7 +163,7 @@ jobs:
       # Zip and upload Windows build
       - name: Zip Windows build
         if: ${{ runner.os == 'Windows' }}
-        shell: powershells      
+        shell: powershell
         run: |
           Compress-Archive -Path publish/win-x64/* -DestinationPath xtremeworlds-windows-${env:GITHUB_REF_NAME}.zip
 
