@@ -24,8 +24,14 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
-      - name: Build Client
-        run: dotnet build Source/Client/Client.csproj --configuration Release --no-restore
+      # Build Client with OS-appropriate TFM (WPF on Windows)
+      - name: Build Client (Linux)
+        if: ${{ runner.os == 'Linux' }}
+        run: dotnet build Source/Client/Client.csproj -c Release -f net9.0 --no-restore
+      - name: Build Client (Windows)
+        if: ${{ runner.os == 'Windows' }}
+        run: dotnet build Source/Client/Client.csproj -c Release -f net9.0-windows --no-restore
+
       - name: Build Server
         run: dotnet build Source/Server/Server.csproj --configuration Release --no-restore
 
@@ -36,11 +42,12 @@ jobs:
       - name: Publish Client (Linux)
         if: ${{ runner.os == 'Linux' }}
         shell: bash
-        run: dotnet publish Source/Client/Client.csproj -c Release -r linux-x64 -o ./publish/linux-x64/Client --self-contained true
+        run: dotnet publish Source/Client/Client.csproj -c Release -f net9.0 -r linux-x64 -o ./publish/linux-x64/Client --self-contained true
       - name: Publish Client (Windows)
         if: ${{ runner.os == 'Windows' }}
         shell: powershell
-        run: dotnet publish Source/Client/Client.csproj -c Release -r win-x64 -o ./publish/win-x64/Client --self-contained true
+        run: dotnet publish Source/Client/Client.csproj -c Release -f net9.0-windows -r win-x64 -o ./publish/win-x64/Client --self-contained true
+
       - name: Publish Server (Linux)
         if: ${{ runner.os == 'Linux' }}
         shell: bash
