@@ -586,13 +586,52 @@ namespace Client
                 Items = { fraLabeling, FraRenaming }
             };
 
+
             // Build the command palette tree (categories + leaf commands)
             BuildCommandPalette();
-            // Remove fixed widths to allow full horizontal expansion
-            try { tvCommands.Width = -1; lstCommands.Width = -1; } catch { }
+
+
+            // Auto-size command palette width to fit widest text
+            try
+            {
+                int minWidth = 220; // fallback minimum
+                int maxWidth = minWidth;
+                var font = SystemFonts.Default();
+                using (var bmp = new Bitmap(new Size(1, 1), PixelFormat.Format32bppRgba))
+                using (var g = new Graphics(bmp))
+                {
+                    void MeasureNode(TreeGridItem node)
+                    {
+                        if (node != null && node.Values != null && node.Values.Count() > 0)
+                        {
+                            var val = node.Values.ElementAtOrDefault(0);
+                            var text = val != null ? val.ToString() : string.Empty;
+                            var size = g.MeasureString(font, text);
+                            if (size.Width > maxWidth)
+                                maxWidth = (int)size.Width + 48; // add padding for icon/expand
+                        }
+                        if (node != null && node.Children != null)
+                        {
+                            foreach (var child in node.Children)
+                                if (child is TreeGridItem tgiChild)
+                                    MeasureNode(tgiChild);
+                        }
+                    }
+                    if (tvCommands.DataStore is TreeGridItemCollection roots)
+                    {
+                        foreach (var root in roots)
+                            if (root is TreeGridItem tgiRoot)
+                                MeasureNode(tgiRoot);
+                    }
+                }
+                tvCommands.Width = maxWidth;
+            }
+            catch { tvCommands.Width = 220; }
+
+            // Remove fixed widths from list so it expands
+            try { lstCommands.Width = -1; } catch { }
 
             // Bottom OK/Cancel bar (aligned right)
-            // Bottom OK/Cancel bar (aligned right) – moved outside panels
             var spacer = new Panel();
             var bottomButtons = new TableLayout
             {
@@ -675,11 +714,16 @@ namespace Client
             };
             _rightStack = rightStack;
 
-            // Use a table so the overlay fills remaining space
+
+            // Use a table so the overlay fills remaining space, and include OK/Cancel in the scrollable area
             var rightPane = new TableLayout
             {
                 Spacing = new Size(6,6),
-                Rows = { new TableRow(new TableCell(rightStack, true)) }
+                Rows =
+                {
+                    new TableRow(new TableCell(rightStack, true)),
+                    new TableRow(bottomButtons)
+                }
             };
             // Wire up command list and buttons
             lstCommands.SelectedIndexChanged += LstCommands_SelectedIndexChanged;
@@ -730,15 +774,13 @@ namespace Client
             };
 
             // Top-level: only the TabControl so the tab page fills the entire editor
-            // Top-level: TabControl plus a fixed footer with OK/Cancel
             Content = new TableLayout
             {
                 Spacing = new Size(0,0),
                 Padding = new Eto.Drawing.Padding(6),
                 Rows =
                 {
-                    new TableRow(new TableCell(tabPages, true)),
-                    new TableRow(bottomButtons)
+                    new TableRow(new TableCell(tabPages, true))
                 }
             };
             // Ensure there's at least one visible page before Load runs, so the form isn't blank
