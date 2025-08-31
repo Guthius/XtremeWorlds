@@ -1142,34 +1142,34 @@ namespace Client
 
                 // set form
                 {
-                    var withBlock = Gui.Windows[Gui.GetWindowIndex("winCharacter")];
-                    withBlock.Controls[Gui.GetControlIndex("winCharacter", "lblName")].Text = "Name";
-                    withBlock.Controls[Gui.GetControlIndex("winCharacter", "lblJob")].Text = "Job";
-                    withBlock.Controls[Gui.GetControlIndex("winCharacter", "lblLevel")].Text = "Level";
-                    withBlock.Controls[Gui.GetControlIndex("winCharacter", "lblGuild")].Text = "Guild";
-                    withBlock.Controls[Gui.GetControlIndex("winCharacter", "lblName2")].Text = GetPlayerName(GameState.MyIndex);
-                    withBlock.Controls[Gui.GetControlIndex("winCharacter", "lblJob2")].Text = Data.Job[GetPlayerJob(GameState.MyIndex)].Name;
-                    withBlock.Controls[Gui.GetControlIndex("winCharacter", "lblLevel2")].Text = GetPlayerLevel(GameState.MyIndex).ToString();
-                    withBlock.Controls[Gui.GetControlIndex("winCharacter", "lblGuild2")].Text = "None";
+                    var withBlock = WindowManager.Windows[WindowManager.GetWindowIndex("winCharacter")];
+                    withBlock.Controls[WindowManager.GetControlIndex("winCharacter", "lblName")].Text = "Name";
+                    withBlock.Controls[WindowManager.GetControlIndex("winCharacter", "lblJob")].Text = "Job";
+                    withBlock.Controls[WindowManager.GetControlIndex("winCharacter", "lblLevel")].Text = "Level";
+                    withBlock.Controls[WindowManager.GetControlIndex("winCharacter", "lblGuild")].Text = "Guild";
+                    withBlock.Controls[WindowManager.GetControlIndex("winCharacter", "lblName2")].Text = GetPlayerName(GameState.MyIndex);
+                    withBlock.Controls[WindowManager.GetControlIndex("winCharacter", "lblJob2")].Text = Data.Job[GetPlayerJob(GameState.MyIndex)].Name;
+                    withBlock.Controls[WindowManager.GetControlIndex("winCharacter", "lblLevel2")].Text = GetPlayerLevel(GameState.MyIndex).ToString();
+                    withBlock.Controls[WindowManager.GetControlIndex("winCharacter", "lblGuild2")].Text = "None";
                     WinCharacter.Update();
 
                     // stats
                     for (x = 0; x < statCount; x++)
-                        withBlock.Controls[Gui.GetControlIndex("winCharacter", "lblStat_" + (x + 1))].Text = GetPlayerStat(GameState.MyIndex, (Stat) x).ToString();
+                        withBlock.Controls[WindowManager.GetControlIndex("winCharacter", "lblStat_" + (x + 1))].Text = GetPlayerStat(GameState.MyIndex, (Stat) x).ToString();
 
                     // points
-                    withBlock.Controls[Gui.GetControlIndex("winCharacter", "lblPoints")].Text = GetPlayerPoints(GameState.MyIndex).ToString();
+                    withBlock.Controls[WindowManager.GetControlIndex("winCharacter", "lblPoints")].Text = GetPlayerPoints(GameState.MyIndex).ToString();
 
                     // grey out buttons
                     if (GetPlayerPoints(GameState.MyIndex) == 0)
                     {
                         for (x = 0; x < statCount; x++)
-                            withBlock.Controls[Gui.GetControlIndex("winCharacter", "btnGreyStat_" + (x + 1))].Visible = true;
+                            withBlock.Controls[WindowManager.GetControlIndex("winCharacter", "btnGreyStat_" + (x + 1))].Visible = true;
                     }
                     else
                     {
                         for (x = 0; x < statCount; x++)
-                            withBlock.Controls[Gui.GetControlIndex("winCharacter", "btnGreyStat_" + (x + 1))].Visible = false;
+                            withBlock.Controls[WindowManager.GetControlIndex("winCharacter", "btnGreyStat_" + (x + 1))].Visible = false;
                     }
                 }
                 GameState.PlayerData = true;

@@ -48,9 +48,9 @@ namespace Client
 
             GameState.InBank = true;
 
-            if (!(Gui.Windows[Gui.GetWindowIndex("winBank")].Visible == true))
+            if (!(WindowManager.Windows[WindowManager.GetWindowIndex("winBank")].Visible == true))
             {
-                Gui.ShowWindow("winBank", resetPosition: false);
+                WindowManager.ShowWindow("winBank", resetPosition: false);
             }
         }
 
@@ -93,10 +93,10 @@ namespace Client
 
         public static void CloseBank()
         {
-            if (Gui.Windows[Gui.GetWindowIndex("winBank")].Visible == true)
+            if (WindowManager.Windows[WindowManager.GetWindowIndex("winBank")].Visible == true)
             {
-                Gui.HideWindow(Gui.GetWindowIndex("winBank"));
-                Gui.HideWindow(Gui.GetWindowIndex("winDescription"));
+                WindowManager.HideWindow(WindowManager.GetWindowIndex("winBank"));
+                WindowManager.HideWindow(WindowManager.GetWindowIndex("winDescription"));
             }
 
             var packetWriter = new PacketWriter(4);

@@ -7,7 +7,7 @@ public static class WinRegister
 {
     public static void OnRegister()
     {
-        var winRegister = Gui.GetWindowByName("winRegister");
+        var winRegister = WindowManager.GetWindowByName("winRegister");
         if (winRegister is null)
         {
             return;
@@ -46,20 +46,20 @@ public static class WinRegister
 
     public static void OnClose()
     {
-        Gui.HideWindows();
+        WindowManager.HideWindows();
 
-        Gui.ShowWindow("winLogin");
+        WindowManager.ShowWindow("winLogin");
     }
 
     public static void ClearPasswords()
     {
-        var winRegister = Gui.GetWindowByName("winRegister");
+        var winRegister = WindowManager.GetWindowByName("winRegister");
 
         winRegister.GetChild("txtPassword").Text = "";
         winRegister.GetChild("txtRetypePassword").Text = "";
     
 
-        var winLogin = Gui.GetWindowByName("winLogin");
+        var winLogin = WindowManager.GetWindowByName("winLogin");
 
         winLogin.GetChild("txtPassword").Text = "";
         

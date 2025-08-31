@@ -36,7 +36,7 @@ public static class WindowLoader
 
         var windowIndex = ReadWindow(xmlReader);
 
-        return Gui.Windows[windowIndex];
+        return WindowManager.Windows[windowIndex];
     }
 
     private static int ReadWindow(XmlReader xmlReader)
@@ -60,11 +60,11 @@ public static class WindowLoader
         var designMousedown = GetDesignByName(designMousedownName, design);
         var startPosition = xmlReader.GetAttribute("StartPosition");
         var visible = GetBoolean(xmlReader.GetAttribute("Visible"), false);
-        var windowIndex = Gui.CreateWindow(
+        var windowIndex = WindowManager.CreateWindow(
             name: name ?? string.Empty,
             caption: caption ?? string.Empty,
             font: font,
-            zOrder: Gui.ZOrderWin,
+            zOrder: WindowManager.ZOrderWin,
             left: positionVec.X,
             top: positionVec.Y,
             width: sizeVec.X,
@@ -82,11 +82,11 @@ public static class WindowLoader
             if (startPosition.Equals("Center", StringComparison.OrdinalIgnoreCase) ||
                 startPosition.Equals("CenterScreen", StringComparison.OrdinalIgnoreCase))
             {
-                Gui.CentralizeWindow(windowIndex);
+                WindowManager.CentralizeWindow(windowIndex);
             }
         }
 
-        Gui.ZOrderCon = 0;
+        WindowManager.ZOrderCon = 0;
 
         while (xmlReader.Read())
         {
@@ -149,7 +149,7 @@ public static class WindowLoader
         var designName = xmlReader.GetAttribute("Design");
         var design = GetDesignByName(designName, Design.ComboBoxNormal);
 
-        Gui.CreateComboBox(
+        WindowManager.CreateComboBox(
             windowIndex: windowIndex,
             name: name ?? string.Empty,
             left: positionVec.X,
@@ -172,7 +172,7 @@ public static class WindowLoader
         var alignmentName = xmlReader.GetAttribute("Align");
         var alignment = GetAlignmentByName(alignmentName, Alignment.Left);
 
-        Gui.CreateLabel(
+        WindowManager.CreateLabel(
             windowIndex: windowIndex,
             name: name ?? string.Empty,
             text: text ?? string.Empty,
@@ -201,7 +201,7 @@ public static class WindowLoader
         var designMousedownName = xmlReader.GetAttribute("DesignMouseDown");
         var designMousedown = GetDesignByName(designMousedownName, design);
 
-        Gui.CreatePictureBox(
+        WindowManager.CreatePictureBox(
             windowIndex,
             name ?? string.Empty,
             positionVec.X,
@@ -240,16 +240,16 @@ public static class WindowLoader
         var x = positionVec.X;
         if (x < 0)
         {
-            x = Gui.Windows[windowIndex].Width + x;
+            x = WindowManager.Windows[windowIndex].Width + x;
         }
 
         var y = positionVec.Y;
         if (y < 0)
         {
-            y = Gui.Windows[windowIndex].Height + y;
+            y = WindowManager.Windows[windowIndex].Height + y;
         }
 
-        Gui.CreateButton(
+        WindowManager.CreateButton(
             windowIndex: windowIndex,
             name: name ?? string.Empty,
             text: text ?? string.Empty,
@@ -285,7 +285,7 @@ public static class WindowLoader
         var designMousedown = GetDesignByName(designMousedownName, design);
         var censor = GetBoolean(xmlReader.GetAttribute("Censor"));
 
-        Gui.CreateTextbox(
+        WindowManager.CreateTextbox(
             windowIndex: windowIndex,
             name: name ?? string.Empty,
             left: positionVec.X,
@@ -314,7 +314,7 @@ public static class WindowLoader
         var designName = xmlReader.GetAttribute("Design");
         var design = GetDesignByName(designName, Design.None);
 
-        Gui.CreateCheckBox(
+        WindowManager.CreateCheckBox(
             windowIndex: windowIndex,
             name: name ?? string.Empty,
             text: text ?? string.Empty,

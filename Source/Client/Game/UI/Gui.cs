@@ -12,7 +12,7 @@ using System.IO;
 
 namespace Client.Game.UI;
 
-public class Gui
+public class WindowManager
 {
     // GUI
     public static ConcurrentDictionary<long, Window> Windows { get; private set; } = new();

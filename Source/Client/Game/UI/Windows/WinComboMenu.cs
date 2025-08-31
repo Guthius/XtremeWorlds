@@ -9,7 +9,7 @@ public static class WinComboMenu
     /// </summary>
     public static bool IsOpen(Window window, int controlIndex)
     {
-        var winComboMenu = Gui.GetWindowByName("winComboMenu");
+        var winComboMenu = WindowManager.GetWindowByName("winComboMenu");
         if (winComboMenu is null || !winComboMenu.Visible)
             return false;
         // Check if the menu is for the current ComboBox
@@ -20,8 +20,8 @@ public static class WinComboMenu
     
     public static void Close()
     {
-        Gui.HideWindow("winComboMenuBG");
-        Gui.HideWindow("winComboMenu");
+        WindowManager.HideWindow("winComboMenuBG");
+        WindowManager.HideWindow("winComboMenu");
     }
 
     public static void Show(Window window, int controlIndex)
@@ -31,7 +31,7 @@ public static class WinComboMenu
             return;
         }
 
-        var winComboMenu = Gui.GetWindowByName("winComboMenu");
+        var winComboMenu = WindowManager.GetWindowByName("winComboMenu");
         if (winComboMenu is null)
         {
             return;
@@ -54,7 +54,7 @@ public static class WinComboMenu
         winComboMenu.Group = 0;
         winComboMenu.Visible = true;
 
-        Gui.ShowWindow("winComboMenuBG", true, false);
-        Gui.ShowWindow("winComboMenu", true, false);
+        WindowManager.ShowWindow("winComboMenuBG", true, false);
+        WindowManager.ShowWindow("winComboMenu", true, false);
     }
 }

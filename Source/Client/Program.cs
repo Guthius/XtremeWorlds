@@ -482,8 +482,8 @@ namespace Client
                 GraphicsDevice.Clear(Color.Transparent);
                 SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
                 if (GameState.InMenu)
-                    Gui.DrawMenuBackground();
-                Gui.Render();
+                    WindowManager.DrawMenuBackground();
+                WindowManager.Render();
                 TextRenderer.DrawMapName();
                 SpriteBatch.End();
 
@@ -926,7 +926,7 @@ namespace Client
             if (IsKeyStateActive(Keys.F5))
             {
                 UIScript.Load();
-                Gui.Init();
+                WindowManager.Init();
             }
 
             // Handle Escape key to toggle menus
@@ -976,7 +976,7 @@ namespace Client
                 // Hide options screen
                 if (IsWindowVisible("winOptions"))
                 {
-                    Gui.HideWindow("winOptions");
+                    WindowManager.HideWindow("winOptions");
                     WinComboMenu.Close();
                     return;
                 }
@@ -984,7 +984,7 @@ namespace Client
                 // hide/show chat window
                 if (IsWindowVisible("winChat"))
                 {
-                    if (Gui.TryGetControl("winChat", "txtChat", out var chatCtrl))
+                    if (WindowManager.TryGetControl("winChat", "txtChat", out var chatCtrl))
                     {
                         chatCtrl!.Text = "";
                     }
@@ -994,7 +994,7 @@ namespace Client
 
                 if (IsWindowVisible("winEscMenu"))
                 {
-                    Gui.HideWindow("winEscMenu");
+                    WindowManager.HideWindow("winEscMenu");
                     return;
                 }
 
@@ -1018,26 +1018,26 @@ namespace Client
 
                 if (IsWindowVisible("winInventory"))
                 {
-                    Gui.HideWindow("winInventory");
+                    WindowManager.HideWindow("winInventory");
                     return;
                 }
 
                 if (IsWindowVisible("winCharacter"))
                 {
-                    Gui.HideWindow("winCharacter");
+                    WindowManager.HideWindow("winCharacter");
                     return;
                 }
 
                 if (IsWindowVisible("winSkills"))
                 {
-                    Gui.HideWindow("winSkills");
+                    WindowManager.HideWindow("winSkills");
                     return;
                 }
 
                 // show them
                 if (!IsWindowVisible("winChat"))
                 {
-                    Gui.ShowWindow("winEscMenu", true);
+                    WindowManager.ShowWindow("winEscMenu", true);
                     return;
                 }
             }
@@ -1105,7 +1105,7 @@ namespace Client
 
         private static bool IsWindowVisible(string windowName)
         {
-            return Gui.TryGetWindow(windowName, out var window) && window!.Visible;
+            return WindowManager.TryGetWindow(windowName, out var window) && window!.Visible;
         }
 
         private static bool IsInputCooldownElapsed()
@@ -1135,13 +1135,13 @@ namespace Client
         private static void HandleActiveWindowInput()
         {
             // Check if there is an active window and that it is visible.
-            if (Gui.ActiveWindow is not null && Gui.ActiveWindow.Visible)
+            if (WindowManager.ActiveWindow is not null && WindowManager.ActiveWindow.Visible)
             {
                 // Check if an active control exists.
-                if (Gui.ActiveWindow.ActiveControl is not null)
+                if (WindowManager.ActiveWindow.ActiveControl is not null)
                 {
                     // Get the active control.
-                    var activeControl = Gui.ActiveWindow.ActiveControl;
+                    var activeControl = WindowManager.ActiveWindow.ActiveControl;
 
                     // Check if the Enter key is active and can be processed.
                     if (IsKeyStateActive(Keys.Enter))
@@ -1153,7 +1153,7 @@ namespace Client
                     // Check if the Tab key is active and can be processed
                     if (IsKeyStateActive(Keys.Tab))
                     {
-                        Gui.FocusNextControl();
+                        WindowManager.FocusNextControl();
                     }
                 }
             }
@@ -1194,13 +1194,13 @@ namespace Client
                     // Handle Backspace key separately  
                     if (key == Keys.Back)
                     {
-                        var activeControl = Gui.GetActiveControl();
+                        var activeControl = WindowManager.GetActiveControl();
 
                         if (activeControl is not null && activeControl.Visible && activeControl.Text.Length > 0)
                         {
                             // Modify the text and update it back in the window  
                             activeControl.Text = activeControl.Text.Substring(0, activeControl.Text.Length - 1);
-                            Gui.UpdateActiveControl(activeControl);
+                            WindowManager.UpdateActiveControl(activeControl);
                         }
 
                         continue; // Move to the next key  
@@ -1212,7 +1212,7 @@ namespace Client
                     // If the character is valid, update the active control's text  
                     if (character.HasValue)
                     {
-                        var activeControl = Gui.GetActiveControl();
+                        var activeControl = WindowManager.GetActiveControl();
 
                         if (activeControl is not null && activeControl.Visible && activeControl.Enabled)
                         {
@@ -1221,7 +1221,7 @@ namespace Client
                             {
                                 // Append character to the control's text  
                                 activeControl.Text += character.Value;
-                                Gui.UpdateActiveControl(activeControl);
+                                WindowManager.UpdateActiveControl(activeControl);
                                 continue; // Move to the next key  
                             }
                         }
@@ -1311,7 +1311,7 @@ namespace Client
             GameState.CurY = GameState.CurYGui;
 
             // Dispatch the GUI event
-            Gui.HandleInterfaceEvents(state);
+            WindowManager.HandleInterfaceEvents(state);
 
             // Restore game legacy values
             GameState.CurMouseX = prevMouseX;
@@ -1423,19 +1423,19 @@ namespace Client
                 HandleGuiEvent(ControlState.MouseUp);
             }
 
-            for (int i = 1; i < Gui.Windows.Count; i++)
+            for (int i = 1; i < WindowManager.Windows.Count; i++)
             {
                 // Check if active control is hovered (GUI context)
-                if (Gui.Windows[i].Controls != null)
+                if (WindowManager.Windows[i].Controls != null)
                 {
-                    for (int j = 0; j < Gui.Windows[i].Controls.Count; j++)
+                    for (int j = 0; j < WindowManager.Windows[i].Controls.Count; j++)
                     {
-                        if (GameState.CurMouseXGui >= Gui.Windows[i].X &&
-                            GameState.CurMouseXGui <= Gui.Windows[i].Width + Gui.Windows[i].X &&
-                            GameState.CurMouseYGui >= Gui.Windows[i].Y &&
-                            GameState.CurMouseYGui <= Gui.Windows[i].Height + Gui.Windows[i].Y)
+                        if (GameState.CurMouseXGui >= WindowManager.Windows[i].X &&
+                            GameState.CurMouseXGui <= WindowManager.Windows[i].Width + WindowManager.Windows[i].X &&
+                            GameState.CurMouseYGui >= WindowManager.Windows[i].Y &&
+                            GameState.CurMouseYGui <= WindowManager.Windows[i].Height + WindowManager.Windows[i].Y)
                         {
-                            if (Gui.Windows[i].Controls[j].State != ControlState.Normal)
+                            if (WindowManager.Windows[i].Controls[j].State != ControlState.Normal)
                             {
                                 return;
                             }
@@ -1466,7 +1466,7 @@ namespace Client
                 if (IsMouseButtonDown(MouseButton.Right))
                 {
                     int slotNum = -1;
-                    if (Gui.TryGetWindow("winHotbar", out var winHotbar))
+                    if (WindowManager.TryGetWindow("winHotbar", out var winHotbar))
                     {
                         slotNum = (int) GameLogic.IsHotbar(winHotbar!.X, winHotbar!.Y);
                     }

@@ -7,8 +7,8 @@ public static class WinPlayerMenu
 {
     public static void OnClose()
     {
-        Gui.HideWindow("winRightClickBG");
-        Gui.HideWindow("winPlayerMenu");
+        WindowManager.HideWindow("winRightClickBG");
+        WindowManager.HideWindow("winPlayerMenu");
     }
     
     public static void OnPartyInvite()

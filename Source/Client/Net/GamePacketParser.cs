@@ -152,32 +152,32 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             // We're going back to a menu screen; ensure flags are consistent
             GameState.InGame = false;
             GameState.InMenu = true;
-            Gui.HideWindows();
+            WindowManager.HideWindows();
 
             switch ((Menu) menuReset)
             {
                 case Menu.Login:
-                    Gui.ShowWindow("winLogin");
+                    WindowManager.ShowWindow("winLogin");
                     break;
 
                 case Menu.CharacterSelect:
-                    Gui.ShowWindow("winChars");
+                    WindowManager.ShowWindow("winChars");
                     break;
 
                 case Menu.JobSelection:
-                    Gui.ShowWindow("winJobs");
+                    WindowManager.ShowWindow("winJobs");
                     break;
 
                 case Menu.NewCharacter:
-                    Gui.ShowWindow("winNewChar");
+                    WindowManager.ShowWindow("winNewChar");
                     break;
 
                 case Menu.MainMenu:
-                    Gui.ShowWindow("winLogin");
+                    WindowManager.ShowWindow("winLogin");
                     break;
 
                 case Menu.Register:
-                    Gui.ShowWindow("winRegister");
+                    WindowManager.ShowWindow("winRegister");
                     break;
             }
         }
@@ -201,7 +201,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         var isSlotEmpty = new bool[Constant.MaxChars];
 
-        if (Gui.TryGetControl("winLogin", "txtUsername", out var usernameCtrl))
+        if (WindowManager.TryGetControl("winLogin", "txtUsername", out var usernameCtrl))
         {
             SettingsManager.Instance.Username = usernameCtrl!.Text;
         }
@@ -222,15 +222,15 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
 
 
-        Gui.HideWindows();
-        Gui.ShowWindow("winChars");
+        WindowManager.HideWindows();
+        WindowManager.ShowWindow("winChars");
 
-        long winNum = Gui.GetWindowIndex("winChars");
+        long winNum = WindowManager.GetWindowIndex("winChars");
         for (var i = 0L; i < Constant.MaxChars; i++)
         {
-            long conNum = Gui.GetControlIndex("winChars", "lblCharName_" + (i + 1));
+            long conNum = WindowManager.GetControlIndex("winChars", "lblCharName_" + (i + 1));
             {
-                var control = Gui.Windows[winNum].Controls[(int) conNum];
+                var control = WindowManager.Windows[winNum].Controls[(int) conNum];
 
                 control.Text = !isSlotEmpty[(int) i] ? GameState.CharName[(int) i] : "Blank Slot";
             }
@@ -238,30 +238,30 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             if (isSlotEmpty[(int) i])
             {
                 // create button
-                conNum = Gui.GetControlIndex("winChars", "btnCreateChar_" + (i + 1));
-                Gui.Windows[winNum].Controls[(int) conNum].Visible = true;
+                conNum = WindowManager.GetControlIndex("winChars", "btnCreateChar_" + (i + 1));
+                WindowManager.Windows[winNum].Controls[(int) conNum].Visible = true;
 
                 // select button
-                conNum = Gui.GetControlIndex("winChars", "btnSelectChar_" + (i + 1));
-                Gui.Windows[winNum].Controls[(int) conNum].Visible = false;
+                conNum = WindowManager.GetControlIndex("winChars", "btnSelectChar_" + (i + 1));
+                WindowManager.Windows[winNum].Controls[(int) conNum].Visible = false;
 
                 // delete button
-                conNum = Gui.GetControlIndex("winChars", "btnDelChar_" + (i + 1));
-                Gui.Windows[winNum].Controls[(int) conNum].Visible = false;
+                conNum = WindowManager.GetControlIndex("winChars", "btnDelChar_" + (i + 1));
+                WindowManager.Windows[winNum].Controls[(int) conNum].Visible = false;
             }
             else
             {
                 // create button
-                conNum = Gui.GetControlIndex("winChars", "btnCreateChar_" + (i + 1));
-                Gui.Windows[winNum].Controls[(int) conNum].Visible = false;
+                conNum = WindowManager.GetControlIndex("winChars", "btnCreateChar_" + (i + 1));
+                WindowManager.Windows[winNum].Controls[(int) conNum].Visible = false;
 
                 // select button
-                conNum = Gui.GetControlIndex("winChars", "btnSelectChar_" + (i + 1));
-                Gui.Windows[winNum].Controls[(int) conNum].Visible = true;
+                conNum = WindowManager.GetControlIndex("winChars", "btnSelectChar_" + (i + 1));
+                WindowManager.Windows[winNum].Controls[(int) conNum].Visible = true;
 
                 // delete button
-                conNum = Gui.GetControlIndex("winChars", "btnDelChar_" + (i + 1));
-                Gui.Windows[winNum].Controls[(int) conNum].Visible = true;
+                conNum = WindowManager.GetControlIndex("winChars", "btnDelChar_" + (i + 1));
+                WindowManager.Windows[winNum].Controls[(int) conNum].Visible = true;
             }
         }
     }
@@ -332,16 +332,16 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         GameState.InMenu = false;
         GameState.InGame = true;
 
-        Gui.HideWindows();
+        WindowManager.HideWindows();
 
         GameState.CanMoveNow = true;
         GameState.MyEditorType = EditorType.None;
         GameState.SkillBuffer = -1;
         GameState.InShop = -1;
 
-        Gui.ShowWindow("winHotbar", resetPosition: false);
-        Gui.ShowWindow("winMenu", resetPosition: false);
-        Gui.ShowWindow("winBars", resetPosition: false);
+        WindowManager.ShowWindow("winHotbar", resetPosition: false);
+        WindowManager.ShowWindow("winMenu", resetPosition: false);
+        WindowManager.ShowWindow("winBars", resetPosition: false);
 
         try { WinChat.Hide(); } catch (Exception ex) { Console.WriteLine($"WinChat.Hide error: {ex.Message}"); }
 

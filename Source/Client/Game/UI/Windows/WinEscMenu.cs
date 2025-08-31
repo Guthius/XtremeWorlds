@@ -6,13 +6,13 @@ public static class WinEscMenu
 {
     public static void OnClose()
     {
-        Gui.HideWindow("winEscMenu");
+        WindowManager.HideWindow("winEscMenu");
     }
 
     public static void OnOptionsClick()
     {
-        Gui.HideWindow("winEscMenu");
-        Gui.ShowWindow("winOptions", true);
+        WindowManager.HideWindow("winEscMenu");
+        WindowManager.ShowWindow("winOptions", true);
         GameLogic.SetOptionsScreen();
     }
 
@@ -21,15 +21,15 @@ public static class WinEscMenu
         // We're going back to a menu screen; ensure flags are consistent
         GameState.InGame = false;
         GameState.InMenu = true;
-        Gui.HideWindows();
+        WindowManager.HideWindows();
 
-        Gui.ShowWindow("winLogin");
+        WindowManager.ShowWindow("winLogin");
         Sender.SendLogout();
     }
 
     public static void OnExitClick()
     {
-        Gui.HideWindow("winEscMenu");
+        WindowManager.HideWindow("winEscMenu");
 
         General.DestroyGame();
     }

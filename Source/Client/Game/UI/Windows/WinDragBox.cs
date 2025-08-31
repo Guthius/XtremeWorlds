@@ -12,7 +12,7 @@ public static class WinDragBox
 {
     public static void OnDraw()
     {
-        var winDragBox = Gui.GetWindowByName("winDragBox");
+        var winDragBox = WindowManager.GetWindowByName("winDragBox");
         if (winDragBox is null)
         {
             return;
@@ -21,12 +21,12 @@ public static class WinDragBox
         var x = winDragBox.X;
         var y = winDragBox.Y;
 
-        if (Gui.DragBox.Type == DraggablePartType.None)
+        if (WindowManager.DragBox.Type == DraggablePartType.None)
         {
             return;
         }
 
-        ref var dragBox = ref Gui.DragBox;
+        ref var dragBox = ref WindowManager.DragBox;
         switch (dragBox.Type)
         {
             case DraggablePartType.Item:
@@ -57,18 +57,18 @@ public static class WinDragBox
     {
         Window? targetWindow = null;
 
-        var winDragBox = Gui.GetWindowByName("winDragBox");
+        var winDragBox = WindowManager.GetWindowByName("winDragBox");
         if (winDragBox is null)
         {
             return;
         }
 
-        if (Gui.DragBox.Type == DraggablePartType.None)
+        if (WindowManager.DragBox.Type == DraggablePartType.None)
         {
             return;
         }
 
-        foreach (var window in Gui.Windows.Values)
+        foreach (var window in WindowManager.Windows.Values)
         {
             if (!window.Visible || window.Name == "winDragBox")
             {
@@ -117,9 +117,9 @@ public static class WinDragBox
             DropWithoutTarget();
         }
 
-        Gui.HideWindow("winDragBox");
+        WindowManager.HideWindow("winDragBox");
 
-        ref var dragBox = ref Gui.DragBox;
+        ref var dragBox = ref WindowManager.DragBox;
 
         dragBox.Type = DraggablePartType.None;
         dragBox.Slot = 0;
@@ -129,10 +129,10 @@ public static class WinDragBox
 
     private static void DropOnBank(Window window)
     {
-        switch (Gui.DragBox.Origin)
+        switch (WindowManager.DragBox.Origin)
         {
             case PartOrigin.Bank:
-                if (Gui.DragBox.Type == DraggablePartType.Item)
+                if (WindowManager.DragBox.Type == DraggablePartType.Item)
                 {
                     for (var slot = 0; slot <= Constant.MaxBank; slot++)
                     {
@@ -151,12 +151,12 @@ public static class WinDragBox
                             continue;
                         }
 
-                        if (Gui.DragBox.Slot == slot)
+                        if (WindowManager.DragBox.Slot == slot)
                         {
                             continue;
                         }
 
-                        Bank.ChangeBankSlots(Gui.DragBox.Slot, slot);
+                        Bank.ChangeBankSlots(WindowManager.DragBox.Slot, slot);
                         break;
                     }
                 }
@@ -164,15 +164,15 @@ public static class WinDragBox
                 break;
 
             case PartOrigin.Inventory:
-                if (Gui.DragBox.Type == DraggablePartType.Item)
+                if (WindowManager.DragBox.Type == DraggablePartType.Item)
                 {
-                    if (Data.Item[GetPlayerInv(GameState.MyIndex, Gui.DragBox.Slot)].Type != (byte) ItemCategory.Currency)
+                    if (Data.Item[GetPlayerInv(GameState.MyIndex, WindowManager.DragBox.Slot)].Type != (byte) ItemCategory.Currency)
                     {
-                        Bank.DepositItem(Gui.DragBox.Slot, 1);
+                        Bank.DepositItem(WindowManager.DragBox.Slot, 1);
                     }
                     else
                     {
-                        GameLogic.Dialogue("Deposit Item", "Enter the deposit quantity.", "", DialogueType.DepositItem, DialogueStyle.Input, Gui.DragBox.Slot);
+                        GameLogic.Dialogue("Deposit Item", "Enter the deposit quantity.", "", DialogueType.DepositItem, DialogueStyle.Input, WindowManager.DragBox.Slot);
                     }
                 }
 
@@ -182,10 +182,10 @@ public static class WinDragBox
 
     private static void DropOnInventory(Window window)
     {
-        switch (Gui.DragBox.Origin)
+        switch (WindowManager.DragBox.Origin)
         {
             case PartOrigin.Inventory:
-                if (Gui.DragBox.Type == DraggablePartType.Item)
+                if (WindowManager.DragBox.Type == DraggablePartType.Item)
                 {
                     for (var slot = 0; slot < Constant.MaxInv; slot++)
                     {
@@ -204,9 +204,9 @@ public static class WinDragBox
                             continue;
                         }
 
-                        if (Gui.DragBox.Slot != slot)
+                        if (WindowManager.DragBox.Slot != slot)
                         {
-                            Sender.SendChangeInvSlots(Gui.DragBox.Slot, slot);
+                            Sender.SendChangeInvSlots(WindowManager.DragBox.Slot, slot);
                         }
 
                         break;
@@ -216,15 +216,15 @@ public static class WinDragBox
                 break;
 
             case PartOrigin.Bank:
-                if (Gui.DragBox.Type == DraggablePartType.Item)
+                if (WindowManager.DragBox.Type == DraggablePartType.Item)
                 {
-                    if (Data.Item[GetBank(GameState.MyIndex, (byte) Gui.DragBox.Slot)].Type != (byte) ItemCategory.Currency)
+                    if (Data.Item[GetBank(GameState.MyIndex, (byte) WindowManager.DragBox.Slot)].Type != (byte) ItemCategory.Currency)
                     {
-                        Bank.WithdrawItem((byte) Gui.DragBox.Slot, 0);
+                        Bank.WithdrawItem((byte) WindowManager.DragBox.Slot, 0);
                     }
                     else
                     {
-                        GameLogic.Dialogue("Withdraw Item", "Enter the amount you wish to withdraw.", "", DialogueType.WithdrawItem, DialogueStyle.Input, Gui.DragBox.Slot);
+                        GameLogic.Dialogue("Withdraw Item", "Enter the amount you wish to withdraw.", "", DialogueType.WithdrawItem, DialogueStyle.Input, WindowManager.DragBox.Slot);
                     }
                 }
 
@@ -234,8 +234,8 @@ public static class WinDragBox
 
     private static void DropOnSkills(Window window)
     {
-        if (Gui.DragBox.Origin != PartOrigin.SkillTree ||
-            Gui.DragBox.Type != DraggablePartType.Skill)
+        if (WindowManager.DragBox.Origin != PartOrigin.SkillTree ||
+            WindowManager.DragBox.Type != DraggablePartType.Skill)
         {
             return;
         }
@@ -257,9 +257,9 @@ public static class WinDragBox
                 continue;
             }
 
-            if (Gui.DragBox.Slot != slot)
+            if (WindowManager.DragBox.Slot != slot)
             {
-                Sender.SendChangeSkillSlots(Gui.DragBox.Slot, slot);
+                Sender.SendChangeSkillSlots(WindowManager.DragBox.Slot, slot);
             }
 
             break;
@@ -268,8 +268,8 @@ public static class WinDragBox
 
     private static void DropOnHotBar(Window window)
     {
-        if (Gui.DragBox.Origin == PartOrigin.None ||
-            Gui.DragBox.Type == DraggablePartType.None)
+        if (WindowManager.DragBox.Origin == PartOrigin.None ||
+            WindowManager.DragBox.Type == DraggablePartType.None)
         {
             return;
         }
@@ -291,22 +291,22 @@ public static class WinDragBox
                 continue;
             }
 
-            if (Gui.DragBox.Origin != PartOrigin.Hotbar)
+            if (WindowManager.DragBox.Origin != PartOrigin.Hotbar)
             {
-                switch (Gui.DragBox.Type)
+                switch (WindowManager.DragBox.Type)
                 {
                     case DraggablePartType.Item:
-                        Sender.SendSetHotbarSlot((int) PartOrigin.Inventory, slot, Gui.DragBox.Slot, Gui.DragBox.Value);
+                        Sender.SendSetHotbarSlot((int) PartOrigin.Inventory, slot, WindowManager.DragBox.Slot, WindowManager.DragBox.Value);
                         break;
 
                     case DraggablePartType.Skill:
-                        Sender.SendSetHotbarSlot((int) PartOrigin.SkillTree, slot, Gui.DragBox.Slot, Gui.DragBox.Value);
+                        Sender.SendSetHotbarSlot((int) PartOrigin.SkillTree, slot, WindowManager.DragBox.Slot, WindowManager.DragBox.Value);
                         break;
                 }
             }
-            else if (Gui.DragBox.Slot != slot)
+            else if (WindowManager.DragBox.Slot != slot)
             {
-                Sender.SendSetHotbarSlot((int) PartOrigin.Hotbar, slot, Gui.DragBox.Slot, Gui.DragBox.Value);
+                Sender.SendSetHotbarSlot((int) PartOrigin.Hotbar, slot, WindowManager.DragBox.Slot, WindowManager.DragBox.Value);
             }
 
             break;
@@ -315,26 +315,26 @@ public static class WinDragBox
 
     private static void DropWithoutTarget()
     {
-        switch (Gui.DragBox.Origin)
+        switch (WindowManager.DragBox.Origin)
         {
             case PartOrigin.Inventory:
-                if (Data.Item[GetPlayerInv(GameState.MyIndex, Gui.DragBox.Slot)].Type != (byte) ItemCategory.Currency)
+                if (Data.Item[GetPlayerInv(GameState.MyIndex, WindowManager.DragBox.Slot)].Type != (byte) ItemCategory.Currency)
                 {
-                    Sender.SendDropItem(Gui.DragBox.Slot, GetPlayerInv(GameState.MyIndex, Gui.DragBox.Slot));
+                    Sender.SendDropItem(WindowManager.DragBox.Slot, GetPlayerInv(GameState.MyIndex, WindowManager.DragBox.Slot));
                 }
                 else
                 {
-                    GameLogic.Dialogue("Drop Item", "Please choose how many to drop.", "", DialogueType.DropItem, DialogueStyle.Input, Gui.DragBox.Slot);
+                    GameLogic.Dialogue("Drop Item", "Please choose how many to drop.", "", DialogueType.DropItem, DialogueStyle.Input, WindowManager.DragBox.Slot);
                 }
 
                 break;
 
             case PartOrigin.SkillTree:
-                Sender.ForgetSkill(Gui.DragBox.Slot);
+                Sender.ForgetSkill(WindowManager.DragBox.Slot);
                 break;
 
             case PartOrigin.Hotbar:
-                Sender.SendSetHotbarSlot((int) Gui.DragBox.Origin, Gui.DragBox.Slot, Gui.DragBox.Slot, 0);
+                Sender.SendSetHotbarSlot((int) WindowManager.DragBox.Origin, WindowManager.DragBox.Slot, WindowManager.DragBox.Slot, 0);
                 break;
         }
     }

@@ -13,7 +13,7 @@ public static class WinDescription
             return;
         }
 
-        var winDescription = Gui.GetWindowByName("winDescription");
+        var winDescription = WindowManager.GetWindowByName("winDescription");
         if (winDescription is null)
         {
             return;

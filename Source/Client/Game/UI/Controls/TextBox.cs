@@ -28,7 +28,7 @@ public sealed class TextBox : Control
 
         string input = null;
 
-        if (Gui.ActiveWindow?.ActiveControl == this)
+        if (WindowManager.ActiveWindow?.ActiveControl == this)
         {
             input = GameState.ChatShowLine;
         }

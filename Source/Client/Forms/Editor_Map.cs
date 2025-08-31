@@ -2284,9 +2284,9 @@ namespace Client
             Sender.SendCloseEditor();
 
             // show gui
-            Gui.ShowWindow("winHotbar", resetPosition: false);
-            Gui.ShowWindow("winMenu", resetPosition: false);
-            Gui.ShowWindow("winBars", resetPosition: false);
+            WindowManager.ShowWindow("winHotbar", resetPosition: false);
+            WindowManager.ShowWindow("winMenu", resetPosition: false);
+            WindowManager.ShowWindow("winBars", resetPosition: false);
             WinChat.Hide();
 
             GameState.TileHistoryHighIndex = 0;
@@ -2301,9 +2301,9 @@ namespace Client
             Sender.SendCloseEditor();
 
             // show gui
-            Gui.ShowWindow("winHotbar", resetPosition: false);
-            Gui.ShowWindow("winMenu", resetPosition: false);
-            Gui.ShowWindow("winBars", resetPosition: false);
+            WindowManager.ShowWindow("winHotbar", resetPosition: false);
+            WindowManager.ShowWindow("winMenu", resetPosition: false);
+            WindowManager.ShowWindow("winBars", resetPosition: false);
             WinChat.Hide();
             
             GameState.TileHistoryHighIndex = 0;

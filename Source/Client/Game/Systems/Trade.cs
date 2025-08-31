@@ -13,7 +13,7 @@ namespace Client
         public static void CloseTrade()
         {
             InTrade = -1;
-            Gui.HideWindow(Gui.GetWindowIndex("winTrade"));
+            WindowManager.HideWindow(WindowManager.GetWindowIndex("winTrade"));
         }
 
         #region Globals & Type
@@ -65,7 +65,7 @@ namespace Client
                     Data.TradeYourOffer[i].Value = buffer.ReadInt32();
                 }
                 YourWorth = buffer.ReadInt32().ToString();
-                if (Gui.TryGetControl("winTrade", "lblYourValue", out var lblYourValue))
+                if (WindowManager.TryGetControl("winTrade", "lblYourValue", out var lblYourValue))
                 {
                     lblYourValue!.Text = YourWorth + "g";
                 }
@@ -78,7 +78,7 @@ namespace Client
                     Data.TradeTheirOffer[i].Value = buffer.ReadInt32();
                 }
                 TheirWorth = buffer.ReadInt32().ToString();
-                if (Gui.TryGetControl("winTrade", "lblTheirValue", out var lblTheirValue))
+                if (WindowManager.TryGetControl("winTrade", "lblTheirValue", out var lblTheirValue))
                 {
                     lblTheirValue!.Text = TheirWorth + "g";
                 }
@@ -96,22 +96,22 @@ namespace Client
             {
                 case 0: // clear
                     {
-                        if (Gui.TryGetControl("winTrade", "lblStatus", out var lblStatus)) lblStatus!.Text = "Choose items to offer.";
+                        if (WindowManager.TryGetControl("winTrade", "lblStatus", out var lblStatus)) lblStatus!.Text = "Choose items to offer.";
                         break;
                     }
                 case 1: // they've accepted
                     {
-                        if (Gui.TryGetControl("winTrade", "lblStatus", out var lblStatus)) lblStatus!.Text = "Other player has accepted.";
+                        if (WindowManager.TryGetControl("winTrade", "lblStatus", out var lblStatus)) lblStatus!.Text = "Other player has accepted.";
                         break;
                     }
                 case 2: // you've accepted
                     {
-                        if (Gui.TryGetControl("winTrade", "lblStatus", out var lblStatus)) lblStatus!.Text = "Waiting for other player to accept.";
+                        if (WindowManager.TryGetControl("winTrade", "lblStatus", out var lblStatus)) lblStatus!.Text = "Waiting for other player to accept.";
                         break;
                     }
                 case 3: // no room
                     {
-                        if (Gui.TryGetControl("winTrade", "lblStatus", out var lblStatus)) lblStatus!.Text = "Not enough inventory space.";
+                        if (WindowManager.TryGetControl("winTrade", "lblStatus", out var lblStatus)) lblStatus!.Text = "Not enough inventory space.";
                         break;
                     }
             }
