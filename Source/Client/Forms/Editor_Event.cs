@@ -594,7 +594,7 @@ namespace Client
             // Auto-size command palette width to fit widest text
             try
             {
-                int minWidth = 220; // fallback minimum
+                int minWidth = 200; // fallback minimum
                 int maxWidth = minWidth;
                 var font = SystemFonts.Default();
                 using (var bmp = new Bitmap(new Size(1, 1), PixelFormat.Format32bppRgba))
@@ -626,7 +626,7 @@ namespace Client
                 }
                 tvCommands.Width = maxWidth;
             }
-            catch { tvCommands.Width = 220; }
+            catch { tvCommands.Width = 200; }
 
             // Remove fixed widths from list so it expands
             try { lstCommands.Width = -1; } catch { }
