@@ -89,10 +89,8 @@ jobs:
       - name: Debug List Server x64 Output
         if: ${{ runner.os == 'macOS' }}
         run: |
-          echo "Listing ./publish/osx-x64/Server after publish:"
-          ls -l ./publish/osx-x64/Server || true
-          echo "Listing ./publish/osx-x64/Server/Server.app/Contents/MacOS if exists:"
-          ls -l ./publish/osx-x64/Server/Server.app/Contents/MacOS || true
+          echo "Recursive listing of ./publish/osx-x64/Server after publish:"
+          find ./publish/osx-x64/Server || true
 
       - name: Publish Server (macOS arm64, .app)
         if: ${{ runner.os == 'macOS' }}
@@ -101,10 +99,8 @@ jobs:
       - name: Debug List Server arm64 Output
         if: ${{ runner.os == 'macOS' }}
         run: |
-          echo "Listing ./publish/osx-arm64/Server after publish:"
-          ls -l ./publish/osx-arm64/Server || true
-          echo "Listing ./publish/osx-arm64/Server/Server.app/Contents/MacOS if exists:"
-          ls -l ./publish/osx-arm64/Server/Server.app/Contents/MacOS || true
+          echo "Recursive listing of ./publish/osx-arm64/Server after publish:"
+          find ./publish/osx-arm64/Server || true
 
       - name: Create universal .app bundles and ZIP (macOS)
         if: ${{ runner.os == 'macOS' }}
