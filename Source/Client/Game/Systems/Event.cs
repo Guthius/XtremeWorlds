@@ -1468,30 +1468,23 @@ namespace Client
                 oldCommandList = TmpEvent.Pages[CurPageNum].CommandList[curlist];
                 TmpEvent.Pages[CurPageNum].CommandList[curlist].ParentList = oldCommandList.ParentList;
 
-                var loopTo = p;
-                for (i = 0; i < loopTo; i++)
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[i] = oldCommandList.Commands[i];
+                // copy old commands into resized array
+                for (int j = 0; j < oldCommandList.CommandCount; j++)
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[j] = oldCommandList.Commands[j];
 
-                // Safely resolve the selected command number; default to appending at end
+                // Determine insert index; clamp to [0, p - 1]
                 var sel = Editor_Event.Instance.lstCommands.SelectedIndex;
-                var selectedCommandNum = p; // default insertion at end if selection is invalid
-                if (EventList != null && sel >= 0 && sel < EventList.Length)
-                {
-                    selectedCommandNum = EventList[sel].CommandNum;
-                }
-                i = selectedCommandNum;
-                if (i <= TmpEvent.Pages[CurPageNum].CommandList[curlist].CommandCount)
-                {
-                    var loopTo1 = i;
-                    for (X = TmpEvent.Pages[CurPageNum].CommandList[curlist].CommandCount; X < loopTo1; X++)
-                        TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[X + 1] = TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[X];
+                int selectedCommandNum = (EventList != null && sel >= 0 && sel < EventList.Length)
+                    ? EventList[sel].CommandNum
+                    : p - 1;
+                int insertIndex = Math.Clamp(selectedCommandNum, 0, p - 1);
 
-                    curslot = selectedCommandNum;
-                }
-                else
-                {
-                    curslot = TmpEvent.Pages[CurPageNum].CommandList[curlist].CommandCount;
-                }
+                // Shift right to make room
+                for (int j = p - 1; j > insertIndex; j--)
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[j] =
+                        TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[j - 1];
+
+                curslot = insertIndex;
             }
 
             switch (Index)
