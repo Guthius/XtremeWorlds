@@ -57,7 +57,11 @@ jobs:
         shell: powershell
         run: dotnet publish Source/Server/Server.csproj -c Release -r win-x64 -o ./publish/win-x64/Server --self-contained true
 
-      # Linux ZIP
+      # Linux cleanup and ZIP
+      - name: Cleanup old zip files (Linux)
+        if: ${{ runner.os == 'Linux' }}
+        run: rm -f publish/linux-x64/*.zip
+
       - name: Create ZIP on Linux
         if: ${{ runner.os == 'Linux' }}
         run: |
@@ -75,7 +79,12 @@ jobs:
           name: xtremeworlds-linux-${{ github.ref_name }}
           path: xtremeworlds-linux-${{ github.ref_name }}.zip
 
-      # Windows ZIP
+      # Windows cleanup and ZIP
+      - name: Cleanup old zip files (Windows)
+        if: ${{ runner.os == 'Windows' }}
+        shell: powershell
+        run: Remove-Item -Force publish\win-x64\*.zip
+
       - name: Create ZIP on Windows
         if: ${{ runner.os == 'Windows' }}
         shell: powershell
