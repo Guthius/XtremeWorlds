@@ -23,10 +23,12 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
-      # Build Client with OS-appropriate TFM (WPF on Windows)
+      # Build Client (Linux)
       - name: Build Client (Linux)
         if: ${{ runner.os == 'Linux' }}
         run: dotnet build Source/Client/Client.csproj -c Release -f net9.0 --no-restore
+
+      # Build Client (Windows)
       - name: Build Client (Windows)
         if: ${{ runner.os == 'Windows' }}
         run: dotnet build Source/Client/Client.csproj -c Release -f net9.0-windows --no-restore
@@ -41,7 +43,7 @@ jobs:
       - name: Publish Client (Linux)
         if: ${{ runner.os == 'Linux' }}
         shell: bash
-        run: dotnet publish Source/Client/Client.csproj -c Release -f net9.0 -r linux-x64 -o ./publish/linux-x64/Client --self-contained true
+        run: dotnet publish Source/Client/Client.csproj -c Release -f net9.0 -r linux-x64 -o ./publish/Client --self-contained true
       - name: Publish Client (Windows)
         if: ${{ runner.os == 'Windows' }}
         shell: powershell
@@ -50,7 +52,7 @@ jobs:
       - name: Publish Server (Linux)
         if: ${{ runner.os == 'Linux' }}
         shell: bash
-        run: dotnet publish Source/Server/Server.csproj -c Release -r linux-x64 -o ./publish/linux-x64/Server --self-contained true
+        run: dotnet publish Source/Server/Server.csproj -c Release -r linux-x64 -o ./publish/Server --self-contained true
       - name: Publish Server (Windows)
         if: ${{ runner.os == 'Windows' }}
         shell: powershell
@@ -61,10 +63,10 @@ jobs:
         if: ${{ runner.os == 'Linux' }}
         run: |
           cd publish
-          zip -r ../xtremeworlds-linux-${GITHUB_REF_NAME}.zip linux-x64
+          zip -r ../xtremeworlds-linux-${GITHUB_REF_NAME}.zip Client Server
           cd ..
 
-      - name: Upload ZIP on Linux
+      - name: Upload Zip on Linux
         if: ${{ runner.os == 'Linux' }}
         uses: actions/upload-artifact@v4
         with:
@@ -78,17 +80,11 @@ jobs:
         run: |
           Compress-Archive -Path publish/win-x64/* -DestinationPath xtremeworlds-windows-${env:GITHUB_REF_NAME}.zip
 
-      - name: Upload ZIP on Windows
+      - name: Upload Zip on Windows
         if: ${{ runner.os == 'Windows' }}
         uses: actions/upload-artifact@v4
         with:
           name: xtremeworlds-windows-${{ github.ref_name }}
           path: xtremeworlds-windows-${{ github.ref_name }}.zip
-      
-      - name: Upload ZIP on macOS
-        if: ${{ runner.os == 'macOS' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: xtremeworlds-macos-${{ github.ref_name }}
-          path: xtremeworlds-macos-${{ github.ref_name }}.zip
+    
 
