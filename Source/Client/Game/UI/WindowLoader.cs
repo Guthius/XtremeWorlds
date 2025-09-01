@@ -11,7 +11,8 @@ public static class WindowLoader
 
     public static Window FromLayout(string layoutName)
     {
-        var path = Path.Combine("Content", "Skins", "Layouts", layoutName + ".xml");
+        // Resolve layout path relative to the packaged Content root
+        var path = Path.Combine(DataPath.Skins, "Layouts", layoutName + ".xml");
         if (!File.Exists(path))
         {
             throw new UIException(
