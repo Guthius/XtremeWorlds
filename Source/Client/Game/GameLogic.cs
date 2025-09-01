@@ -2009,30 +2009,33 @@ namespace Client
             GameState.InMenu = true;
             GameState.GettingMap = false;
             GameState.InGame = false;
-            // Close all open Eto.Forms windows (editors, admin, etc.) on the UI thread
+            // Close all open Eto.Forms windows (editors, admin, etc.) when Eto is active
             try
             {
-                Application.Instance?.AsyncInvoke(() =>
+                if (Client.Program.IsEtoAvailable)
                 {
-                    try
+                    Application.Instance?.AsyncInvoke(() =>
                     {
-                        // Only close visible windows to avoid closing the hidden root form
-                        foreach (var win in Application.Instance.Windows.ToList())
+                        try
                         {
-                            try
+                            // Only close visible windows to avoid closing the hidden root form
+                            foreach (var win in Application.Instance.Windows.ToList())
                             {
-                                if (win != null && win.Visible)
+                                try
                                 {
-                                    // Prefer Close (triggers Closing handlers), then Dispose as a fallback
-                                    try { win.Close(); } catch { }
-                                    try { win.Dispose(); } catch { }
+                                    if (win != null && win.Visible)
+                                    {
+                                        // Prefer Close (triggers Closing handlers), then Dispose as a fallback
+                                        try { win.Close(); } catch { }
+                                        try { win.Dispose(); } catch { }
+                                    }
                                 }
+                                catch { }
                             }
-                            catch { }
                         }
-                    }
-                    catch { }
-                });
+                        catch { }
+                    });
+                }
             }
             catch { }
             WindowManager.HideWindows();

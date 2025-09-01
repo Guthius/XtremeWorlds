@@ -5,6 +5,7 @@ using Eto.Forms;
 using System;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Runtime.InteropServices;
 
 namespace Client;
 
@@ -12,11 +13,19 @@ public static class Program
 {
     private static UITimer? _uiTimer;
     private static bool _editorsDisposed;
+    public static bool IsEtoAvailable => !RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && Application.Instance != null;
 
     [STAThread]
     public static void Main()
     {
-        // Start game loop on background thread so Eto UI thread stays responsive
+        // On macOS, don't use Eto.Forms at all; run the game on the main thread
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            RunGame();
+            return;
+        }
+
+        // Other platforms: start game loop on background thread so Eto UI thread stays responsive
         var gameThread = new System.Threading.Thread(RunGame) { IsBackground = false };
         gameThread.Start();
 
@@ -26,8 +35,6 @@ public static class Program
         app = new Application(Eto.Platforms.Wpf);
 #elif LINUX
         app = new Application(Eto.Platforms.Gtk);
-#elif MACOS
-        app = new Application(Eto.Platforms.Mac64);
 #else
         try
         {
@@ -53,7 +60,8 @@ public static class Program
 
     private static void UiTimerOnElapsed(object? sender, EventArgs e)
     {
-        SafeUpdateEditors();
+        if (IsEtoAvailable)
+            SafeUpdateEditors();
     }
 
     private static void SafeUpdateEditors()
@@ -73,6 +81,7 @@ public static class Program
 
     private static void UpdateEditors()
     {
+    if (!IsEtoAvailable) return;
         if (GameState.InitAdminForm)
         {
             new Admin().Show();
@@ -199,7 +208,8 @@ public static class Program
             try { _uiTimer?.Stop(); } catch { }
 
             // Close all open Eto windows on the UI thread, then close the hidden root form
-            Application.Instance?.AsyncInvoke(() =>
+        if (IsEtoAvailable)
+        Application.Instance?.AsyncInvoke(() =>
             {
                 try
                 {
@@ -217,7 +227,7 @@ public static class Program
                 catch
                 {
                     // As a fallback, request application quit
-                    try { Application.Instance.Quit(); } catch { }
+            try { Application.Instance?.Quit(); } catch { }
                 }
             });
         }
