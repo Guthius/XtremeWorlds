@@ -2,6 +2,8 @@
 using Core.Globals;
 using Eto.Drawing;
 using Eto.Forms;
+using MonoMac.AppKit;
+using MonoMac.ObjCRuntime;
 using System;
 using System.Linq;
 using System.Net.Http.Headers;
@@ -13,15 +15,54 @@ public static class Program
 {
     private static UITimer? _uiTimer;
     private static bool _editorsDisposed;
-    public static bool IsEtoAvailable => !RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && Application.Instance != null;
+    public static bool IsEtoAvailable => Application.Instance != null;
 
     [STAThread]
-    public static void Main()
+    public static void Main(string[] args)
     {
-        // On macOS, don't use Eto.Forms at all; run the game on the main thread
+        // macOS: always use Eto host window
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            RunGame();
+            try
+            {
+                NSApplication.Init();
+
+                // initialize eto forms after native app is initialized
+
+                var etoApp = new Eto.Forms.Application(new Eto.Mac.Platform());
+                etoApp.Attach();
+
+                var client = General.Client; // reuse global client
+                var host = new Client.Game.UI.SkiaHostWindow();
+
+                // Enable host mode in the client
+                client.AttachEtoHost();
+
+                // Drive MonoGame timing using HostTick and paint the latest frame
+                host.UpdateFrame += dt =>
+                {
+                    var sz = host.ClientSize;
+                    client.HostResize(sz.Width, sz.Height);
+                    client.HostTick();
+                };
+                host.PaintSurface += g =>
+                {
+                    var sz = host.ClientSize;
+                    client.DrawHostInto(g, sz.Width, sz.Height);
+                };
+
+                // Set up a timer to periodically update editor UIs (same behavior as other platforms)
+                _uiTimer = new UITimer { Interval = 0.05 }; // 50ms (~20fps)
+                _uiTimer.Elapsed += UiTimerOnElapsed;
+                _uiTimer.Start();
+
+                host.Show();
+                NSApplication.Main(args);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
             return;
         }
 
@@ -42,7 +83,7 @@ public static class Program
         }
         catch (Exception ex)
         {
-            app = new Application(Eto.Platforms.Wpf);
+            throw ex;
         }
 #endif
         // Set up a timer to periodically update editor UIs
@@ -208,8 +249,8 @@ public static class Program
             try { _uiTimer?.Stop(); } catch { }
 
             // Close all open Eto windows on the UI thread, then close the hidden root form
-        if (IsEtoAvailable)
-        Application.Instance?.AsyncInvoke(() =>
+            if (IsEtoAvailable)
+            Application.Instance?.AsyncInvoke(() =>
             {
                 try
                 {
@@ -224,13 +265,13 @@ public static class Program
                         catch { }
                     };
                 }
-                catch
-                {
-                    // As a fallback, request application quit
-            try { Application.Instance?.Quit(); } catch { }
-                }
-            });
-        }
+            catch
+            {
+                // As a fallback, request application quit
+                try { Application.Instance?.Quit(); } catch { }
+                    }
+                });
+            }
         catch { }
     }
 }

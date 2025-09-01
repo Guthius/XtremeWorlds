@@ -11,6 +11,7 @@
     <PackageVersion Include="Eto.Platform.Gtk" Version="2.9.0" />
     <PackageVersion Include="Eto.Platform.Windows" Version="2.9.0" />
     <PackageVersion Include="Eto.Platform.Mac64" Version="2.9.0" />
+    <PackageVersion Include="Eto.Platform.macOS" Version="2.9.0" />
     <PackageVersion Include="Eto.Platform.Wpf" Version="2.9.0" />
     <PackageVersion Include="ManagedBass" Version="4.0.0" />
     <PackageVersion Include="ManagedBass.Midi" Version="4.0.0" />
