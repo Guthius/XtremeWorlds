@@ -1,19 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <Version>2.3.1</Version>
-        <TargetFrameworks>net9.0-windows;net9.0-macos;net9.0</TargetFrameworks>
+        <TargetFrameworks>net9.0-windows;net9.0</TargetFrameworks>
         <RootNamespace>Client</RootNamespace>
         <ApplicationIcon>Icon.ico</ApplicationIcon>
         <OutputPath>..\..\Build\Client\</OutputPath>
         <DefineConstants>CLIENT</DefineConstants>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <MonoGamePlatform>OpenGL</MonoGamePlatform>
-        <RuntimeIdentifiers>win-x64;linux-x64;osx-x64;osx-arm64</RuntimeIdentifiers>
     </PropertyGroup>
 
 	<!-- Cross-platform TFM: non-Windows RIDs -->
 	<PropertyGroup Condition="'$(TargetFramework)'=='net9.0'">
         <OutputType>Exe</OutputType>
+		<RuntimeIdentifiers>linux-x64;osx-x64;osx-arm64</RuntimeIdentifiers>
 	</PropertyGroup>
 
     <!-- OutputType must be in PropertyGroup, not ItemGroup -->
@@ -25,15 +25,8 @@
 		<DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-macos'">
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0'">
         <OutputType>Exe</OutputType>
-        <SupportedOSPlatformVersion>10.15</SupportedOSPlatformVersion>
-        <EnableDefaultImageAssets>False</EnableDefaultImageAssets>
-        <TrimMode>partial</TrimMode>
-        <RuntimeIdentifiers>osx-x64;osx-arm64</RuntimeIdentifiers>
-        <!-- Add code signing keys if you use them -->
-        <!-- <CodeSigningKey>Mac Developer</CodeSigningKey> -->
-        <!-- <PackageSigningKey>3rd Party Mac Developer Installer</PackageSigningKey> -->
     </PropertyGroup>
 
     <PropertyGroup>
@@ -104,11 +97,6 @@
     <!-- Non-Windows backends -->
     <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
         <PackageReference Include="Eto.Platform.Gtk" />
-        <PackageReference Include="Eto.Platform.Mac64" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(TargetFramework)' == 'net9.0-macos'">
-        <PackageReference Include="Eto.Platform.macOS" />
         <PackageReference Include="Eto.Platform.Mac64" />
     </ItemGroup>
 

@@ -76,9 +76,6 @@ namespace Client
         // Smoothed camera pivot (native coords) used for composition-time zoom
         private static Vector2 _zoomPivotSmoothed = Vector2.Zero;
         private static bool _zoomPivotInitialized = false;
-        // Host (Eto) manual-loop state
-        private bool _hostInitialized = false;
-        private TimeSpan _hostTotalTime = TimeSpan.Zero;
 
         // Add a timer to prevent spam
         private static DateTime _lastInputTime = DateTime.MinValue;
@@ -207,154 +204,6 @@ namespace Client
             // Start TCP client after the window has loaded
             try { _ = Network.Start(); }
             catch (Exception ex) { Debug.WriteLine($"Network start error: {ex.Message}"); }
-        }
-
-        // --- Host (Eto) integration state ---
-        // When true, Draw will publish frames to an Eto bitmap for the host to display.
-        private bool _hostMode;
-        private Eto.Drawing.Bitmap? _hostLatestBitmap;
-        private readonly object _hostFrameLock = new();
-
-        // Public entry to enable host mode from the macOS bootstrap
-        public void AttachEtoHost()
-        {
-            _hostMode = true;
-        }
-
-        // Update backbuffer size to match host control
-        public void HostResize(int targetWidth, int targetHeight)
-        {
-            try
-            {
-                if (Graphics != null)
-                {
-                    if (Graphics.PreferredBackBufferWidth != targetWidth || Graphics.PreferredBackBufferHeight != targetHeight)
-                    {
-                        Graphics.PreferredBackBufferWidth = Math.Max(1, targetWidth);
-                        Graphics.PreferredBackBufferHeight = Math.Max(1, targetHeight);
-                        try { Graphics.ApplyChanges(); } catch { }
-                    }
-                }
-            }
-            catch { }
-        }
-
-        // Ensure Game.Initialize/LoadContent/BeginRun are invoked when running under a host without Game.Run()
-        public void EnsureHostInitialized()
-        {
-            if (_hostInitialized)
-                return;
-
-            try
-            {
-                Initialize();
-                LoadContent();
-                BeginRun();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Host init failed: {ex}");
-            }
-            _hostInitialized = true;
-        }
-
-        // Preferred host entry: advance MonoGame using its internal loop via Tick if accessible,
-        // otherwise fall back to manual Update/Draw using a fixed timestep.
-        public void HostTick()
-        {
-            EnsureHostInitialized();
-
-            // Try to use the base Game loop tick to keep internal timing coherent.
-            try
-            {
-                // base.Tick() is protected in some MonoGame versions; we can call it from here.
-                // If the API shape differs and throws, we fall back below.
-                base.Tick();
-                return;
-            }
-            catch
-            {
-                // Fallback: fixed 60 FPS tick
-                var elapsed = TimeSpan.FromSeconds(1.0 / 60.0);
-                _hostTotalTime += elapsed;
-                var gt = new GameTime(_hostTotalTime, elapsed);
-                try { Update(gt); } catch (Exception ex) { Debug.WriteLine($"Host Update error: {ex}"); }
-                try { Draw(gt); } catch (Exception ex) { Debug.WriteLine($"Host Draw error: {ex}"); }
-            }
-        }
-
-        // Draw latest published frame into the Eto surface (called by Skia host Paint)
-        public void DrawHostInto(Eto.Drawing.Graphics g, int targetWidth, int targetHeight)
-        {
-            try
-            {
-                lock (_hostFrameLock)
-                {
-                    if (_hostLatestBitmap != null)
-                    {
-                        g.DrawImage(_hostLatestBitmap, new Eto.Drawing.RectangleF(0, 0, targetWidth, targetHeight));
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Host blit error: {ex}");
-            }
-        }
-
-        // Legacy helper: still available, but HostTick + DrawHostInto is the preferred path now.
-        // Render a full frame into an Eto Drawable host: performs Update + Draw and blits the backbuffer
-        public void RenderIntoHost(Eto.Drawing.Graphics g, int targetWidth, int targetHeight, float dtSeconds)
-        {
-            EnsureHostInitialized();
-
-            // Keep MonoGame backbuffer in sync with host control size
-            try
-            {
-                if (Graphics != null)
-                {
-                    if (Graphics.PreferredBackBufferWidth != targetWidth || Graphics.PreferredBackBufferHeight != targetHeight)
-                    {
-                        Graphics.PreferredBackBufferWidth = Math.Max(1, targetWidth);
-                        Graphics.PreferredBackBufferHeight = Math.Max(1, targetHeight);
-                        try { Graphics.ApplyChanges(); } catch { }
-                    }
-                }
-            }
-            catch { }
-
-            // Advance time and execute our normal Update/Draw overrides
-            var elapsed = TimeSpan.FromSeconds(Math.Max(0.0f, dtSeconds));
-            _hostTotalTime += elapsed;
-            var gt = new GameTime(_hostTotalTime, elapsed);
-
-            try { Update(gt); } catch (Exception ex) { Debug.WriteLine($"Host Update error: {ex}"); }
-            try { Draw(gt); } catch (Exception ex) { Debug.WriteLine($"Host Draw error: {ex}"); }
-
-            // Read back backbuffer and draw it into the Eto surface via an in-memory PNG
-            try
-            {
-                var gd = GraphicsDevice;
-                var pp = gd.PresentationParameters;
-                int w = Math.Max(1, pp.BackBufferWidth);
-                int h = Math.Max(1, pp.BackBufferHeight);
-
-                // Fetch pixels, write to a temporary texture and encode as PNG
-                var colorData = new Microsoft.Xna.Framework.Color[w * h];
-                gd.GetBackBufferData(colorData);
-                using var tex = new Texture2D(gd, w, h, false, SurfaceFormat.Color);
-                tex.SetData(colorData);
-                using var ms = new MemoryStream();
-                tex.SaveAsPng(ms, w, h);
-                ms.Position = 0;
-                using var bmp = new Eto.Drawing.Bitmap(ms);
-                // Fit to host control size
-                g.DrawImage(bmp, new Eto.Drawing.RectangleF(0, 0, targetWidth, targetHeight));
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Host blit error: {ex}");
-            }
         }
 
         static void LoadFonts()
@@ -491,8 +340,6 @@ namespace Client
 
             return TextureCache[path];
         }
-
-        
 
         public static Texture2D LoadTexture(string path)
         {
@@ -665,38 +512,6 @@ namespace Client
             }
 
             base.Draw(gameTime);
-
-            // If running under Eto host, publish the backbuffer into an Eto bitmap for the host to paint.
-            if (_hostMode)
-            {
-                try
-                {
-                    var gd = GraphicsDevice;
-                    var pp = gd.PresentationParameters;
-                    int w = Math.Max(1, pp.BackBufferWidth);
-                    int h = Math.Max(1, pp.BackBufferHeight);
-
-                    var colorData = new Microsoft.Xna.Framework.Color[w * h];
-                    gd.GetBackBufferData(colorData);
-                    using var tex = new Texture2D(gd, w, h, false, SurfaceFormat.Color);
-                    tex.SetData(colorData);
-                    using var ms = new MemoryStream();
-                    tex.SaveAsPng(ms, w, h);
-                    ms.Position = 0;
-                    var newBmp = new Eto.Drawing.Bitmap(ms);
-
-                    lock (_hostFrameLock)
-                    {
-                        var old = _hostLatestBitmap;
-                        _hostLatestBitmap = newBmp;
-                        try { old?.Dispose(); } catch { }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"Host publish frame error: {ex}");
-                }
-            }
         }
 
         // Compute the base destination rectangle that preserves aspect ratio (pillarbox/letterbox)
