@@ -2455,7 +2455,9 @@ namespace Client
 
         public static void DrawPlayer(int index)
         {
-            byte anim;
+            // Expect sprite sheet columns grouped evenly into 3 segments: Idle, Run, Attack.
+            // If columns not divisible by 3, we fallback to original linear usage.
+            byte anim; // frame index within chosen segment
             int x;
             int y;
             int spriteNum;
@@ -2481,20 +2483,37 @@ namespace Client
                 attackSpeed = 1000;
             }
 
-            // Reset frame
-            anim = 0;
-
-            // Check for attacking animation
-            if (Data.Player[index].AttackTimer + attackSpeed / 2d > General.GetTickCount())
+            long tick = General.GetTickCount();
+            bool isAttackingWindow = Data.Player[index].Attacking == 1 && Data.Player[index].AttackTimer + attackSpeed / 2d > tick;
+            bool isMoving = Data.Player[index].Moving != 0;
+            int totalColumns = Math.Max(1, SettingsManager.Instance.SpriteColumns);
+            int segmentSize = totalColumns / 3; // 0 if <3 total
+            bool segmented = segmentSize > 0 && segmentSize * 3 == totalColumns;
+            if (!segmented)
             {
-                if (Data.Player[index].Attacking == 1)
-                {
-                    anim = 3;
-                }
+                // fallback: original behaviour using Steps directly (no segments) and simple attack overlay frame
+                if (isAttackingWindow)
+                    anim = (byte)Math.Min(totalColumns - 1, totalColumns - 1); // use last frame as attack
+                else
+                    anim = (byte)(Data.Player[index].Steps % totalColumns);
             }
             else
             {
-                anim = Data.Player[index].Steps;
+                if (isAttackingWindow)
+                {
+                    double attackDuration = attackSpeed / 2.0;
+                    double elapsed = Math.Max(0, tick - Data.Player[index].AttackTimer);
+                    double pct = attackDuration > 0 ? Math.Min(1.0, elapsed / attackDuration) : 1.0;
+                    anim = (byte)Math.Min(segmentSize - 1, (int)(pct * segmentSize));
+                }
+                else if (isMoving)
+                {
+                    anim = (byte)(Data.Player[index].Steps % segmentSize);
+                }
+                else
+                {
+                    anim = (byte)(Data.Player[index].Steps % segmentSize);
+                }
             }
 
             // Check to see if we want to stop making him attack
@@ -2575,9 +2594,22 @@ namespace Client
                 y = GetPlayerRawY(index);
             }
 
-            rect = new Rectangle((int) Math.Round(anim * (gfxInfo.Width / (double)columns)),
-                (int) Math.Round(spriteleft * (gfxInfo.Height / (double)columns)), (int) Math.Round(gfxInfo.Width / (double)columns),
-                (int) Math.Round(gfxInfo.Height / (double)columns));
+            int frameColumn;
+            if (segmentSize > 0 && segmentSize * 3 == columns)
+            {
+                int segmentOffset = 0;
+                if (isAttackingWindow) segmentOffset = segmentSize * 2; else if (isMoving) segmentOffset = segmentSize;
+                frameColumn = Math.Min(columns - 1, segmentOffset + anim);
+            }
+            else
+            {
+                frameColumn = anim;
+            }
+            double frameWidth = gfxInfo.Width / (double)columns;
+            double frameHeight = gfxInfo.Height / (double)columns; // rows == columns (original assumption)
+            rect = new Rectangle((int)Math.Round(frameColumn * frameWidth),
+                (int)Math.Round(spriteleft * frameHeight), (int)Math.Round(frameWidth),
+                (int)Math.Round(frameHeight));
 
             // render the actual sprite
             // DrawShadow(x, y + 16)
@@ -3128,12 +3160,12 @@ namespace Client
                 }
             }
 
-            if (GameState.CurrentEvents > 0 & GameState.CurrentEvents <= Data.MyMap.EventCount)
+            if (Data.MapEvents != null && GameState.CurrentEvents > 0 & GameState.CurrentEvents <= Data.MyMap.EventCount)
             {
                 var loopTo6 = GameState.CurrentEvents;
                 for (i = 0; i < loopTo6; i++)
                 {
-                    if (Data.MapEvents[i].Position == 2)
+                    if (i < Data.MapEvents.Length && Data.MapEvents[i].Position == 2)
                     {
                         DrawEvent(i);
                     }
