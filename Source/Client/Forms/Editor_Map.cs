@@ -957,9 +957,6 @@ namespace Client
 
         private void TsbSave_Click(object sender, EventArgs e)
         {
-            if (Event.InEvent)
-                Editor_Event.Instance.Dispose();
-
             UpdateMap();
             Dispose();
         }
