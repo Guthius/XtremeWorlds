@@ -559,6 +559,7 @@ public class Script
         {
             var entity = entities[x];
             if (entity == null) continue;
+            var vitals = entity.Vital; // capture early
             var mapNum = entity.Map;
 
             // Only process entities that are Npcs
@@ -688,20 +689,24 @@ public class Script
                 }
 
                 // Simplified death/spawn handling (entity is non-null here)
-                if (entity.Vital[(byte)Vital.Health] < 0 && entity.SpawnWait > 0)
+                    #pragma warning disable CS8602
+                    if (vitals != null && vitals[(byte)Vital.Health] < 0 && entity.SpawnWait > 0)
                 {
-                    entity.Num = 0;
-                    entity.SpawnWait = General.GetTimeMs();
-                    entity.Vital[(byte)Vital.Health] = 0;
+                        entity.Num = 0;
+                        entity.SpawnWait = General.GetTimeMs();
+                        vitals[(byte)Vital.Health] = 0;
                 }
+                    #pragma warning restore CS8602
 
-                if (entity.Type == Core.Globals.Entity.EntityType.Npc && entity.Num == -1 && entity.SpawnSecs > 0)
+                    #pragma warning disable CS8602
+                    if (entity.Type == Core.Globals.Entity.EntityType.Npc && entity.Num == -1 && entity.SpawnSecs > 0)
                 {
                     if (tickCount > entity.SpawnWait + entity.SpawnSecs * 1000)
                     {
                         Server.Npc.SpawnNpc(x, mapNum);
                     }
                 }
+                    #pragma warning restore CS8602
             }
         }
 
@@ -883,9 +888,25 @@ public class Script
     {
         if (target.Type == Entity.EntityType.Player)
         {
-            // Use Script pipeline for experience/penalties
-            Server.Script.Instance?.KillPlayer(target.Id);
+            // Apply death penalty & get exp lost
+            int lost = Server.Player.KillPlayer(target.Id);
+
+            // Basic attacker reward (if attacker is player)
+            if (attacker.Type == Entity.EntityType.Player && attacker.Id != target.Id)
+            {
+                // Simple PK reward: gain fraction of lost exp
+                if (lost > 0)
+                {
+                    int gain = Math.Max(1, lost / 2);
+                    SetPlayerExp(attacker.Id, GetPlayerExp(attacker.Id) + gain);
+                    NetworkSend.PlayerMsg(attacker.Id, $"You gained {gain} experience for defeating {GetPlayerName(target.Id)}.", (int)ColorName.BrightGreen);
+                    NetworkSend.SendExp(attacker.Id);
+                }
+            }
+
             NetworkSend.GlobalMsg(GetPlayerName(target.Id) + " was slain by " + GetEntityDisplayName(attacker) + ".");
+            OnDeath(target.Id);
+
         }
         else if (target.Type == Entity.EntityType.Npc)
         {
@@ -893,7 +914,32 @@ public class Script
             var mapNpcNum = target.Id;
             if (map >= 0 && map < Data.MapNpc.Length && mapNpcNum >= 0 && mapNpcNum < Core.Globals.Constant.MaxMapNpcs)
             {
+                // Loot
                 DropNpcLoot(map, mapNpcNum);
+
+                // Mark dead & schedule respawn
+                ref var mapNpc = ref Data.MapNpc[map].Npc[mapNpcNum];
+                mapNpc.Num = -1; // dead state
+                mapNpc.SpawnWait = (int)General.GetTimeMs();
+                mapNpc.Vital[(int)Vital.Health] = 0;
+                // Broadcast vitals zero + maybe a death animation hook here future
+                Server.Npc.SendMapNpcVitals(map, (byte)mapNpcNum);
+
+                // Grant exp to attacker if player
+                if (attacker.Type == Entity.EntityType.Player && mapNpc.Num == -1)
+                {
+                    int baseExp = 0;
+                    if (target.Num >= 0 && target.Num < Data.Npc.Length)
+                    {
+                        baseExp = Data.Npc[target.Num].Exp; // assuming Exp field exists
+                    }
+                    if (baseExp > 0)
+                    {
+                        SetPlayerExp(attacker.Id, GetPlayerExp(attacker.Id) + baseExp);
+                        NetworkSend.PlayerMsg(attacker.Id, $"You gained {baseExp} experience.", (int)ColorName.BrightGreen);
+                        NetworkSend.SendExp(attacker.Id);
+                    }
+                }
             }
         }
     }
@@ -942,6 +988,8 @@ public class Script
         {
             HandleDeath(attacker, target);
         }
+
+        // Death is handled inside ApplyDamage now; killed flag returned for external hooks.
         return true;
     }
 
@@ -1147,11 +1195,6 @@ public class Script
             SetPlayerVital(target.Id, Vital.Health, newHp);
             NetworkSend.SendVital(target.Id, Vital.Health);
             NetworkSend.SendActionMsg(map, "-" + final, (int)ColorName.BrightRed, 1, tx, ty);
-            // Death check
-            if (newHp <= 0)
-            {
-                // TODO: integrate OnDeath pipeline via existing Script / Player methods
-            }
         }
         else if (target.Type == Entity.EntityType.Npc)
         {
@@ -1163,16 +1206,9 @@ public class Script
                 var newHp = Math.Max(0, current - final);
                 Data.MapNpc[map].Npc[mapNpcNum].Vital[hpIndex] = newHp;
                 NetworkSend.SendActionMsg(map, "-" + final, (int)ColorName.BrightRed, 1, tx, ty);
-                // Death
-                if (newHp <= 0)
+                if (newHp > 0)
                 {
-                    Data.MapNpc[map].Npc[mapNpcNum].Num = -1;
-                    Data.MapNpc[map].Npc[mapNpcNum].SpawnWait = (int)General.GetTimeMs();
-                    Data.MapNpc[map].Npc[mapNpcNum].Vital[hpIndex] = 0;
-                    Server.Npc.SendMapNpcVitals(map, (byte)mapNpcNum); // may need access adjustment
-                }
-                else
-                {
+                    // still alive
                     Server.Npc.SendMapNpcVitals(map, (byte)mapNpcNum);
                 }
             }
@@ -1212,17 +1248,11 @@ public class Script
         var before = target.Vital != null ? target.Vital[(int)Vital.Health] : 0;
         ApplyDamage(attacker, target, dmg, skillId);
         var after = target.Type == Entity.EntityType.Player ? GetPlayerVital(target.Id, Vital.Health) : (target.Vital != null ? target.Vital[(int)Vital.Health] : 0);
-        // For npc we will read from Data.MapNpc after ApplyDamage mutated underlying
         if (target.Type == Entity.EntityType.Npc && target.Map >= 0 && target.Map < Data.MapNpc.Length && target.Id >= 0 && target.Id < Core.Globals.Constant.MaxMapNpcs)
         {
             after = Data.MapNpc[target.Map].Npc[target.Id].Vital[(int)Vital.Health];
-            if (after <= 0)
-            {
-                // ensure Num marked dead
-                Data.MapNpc[target.Map].Npc[target.Id].Num = -1;
-            }
         }
-        return before > 0 && after <= 0;
+        return before > 0 && after <= 0; // HandleDeath already executed if true
     }
 
     private void DropNpcLoot(int mapNum, int mapNpcNum)
