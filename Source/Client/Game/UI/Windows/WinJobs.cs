@@ -1,5 +1,6 @@
 ﻿using Core.Globals;
 using Microsoft.Xna.Framework;
+using System.IO;
 
 namespace Client.Game.UI.Windows;
 
@@ -7,7 +8,7 @@ public static class WinJobs
 {
     public static void OnDrawSprite()
     {
-        var winJobs = Gui.GetWindowByName("winJobs");
+        var winJobs = WindowManager.GetWindowByName("winJobs");
         if (winJobs is null)
         {
             return;
@@ -53,7 +54,7 @@ public static class WinJobs
     {
         const int lineHeight = 14;
 
-        var winJobs = Gui.GetWindowByName("winJobs");
+        var winJobs = WindowManager.GetWindowByName("winJobs");
         if (winJobs is null)
         {
             return;
@@ -112,7 +113,7 @@ public static class WinJobs
 
     public static void OnLeftClick()
     {
-        var winJobs = Gui.GetWindowByName("winJobs");
+        var winJobs = WindowManager.GetWindowByName("winJobs");
         if (winJobs is null)
         {
             return;
@@ -129,7 +130,7 @@ public static class WinJobs
 
     public static void OnRightClick()
     {
-        var winJobs = Gui.GetWindowByName("winJobs");
+        var winJobs = WindowManager.GetWindowByName("winJobs");
         if (winJobs is null)
         {
             return;
@@ -147,10 +148,10 @@ public static class WinJobs
 
     public static void OnAccept()
     {
-        Gui.HideWindow("winJobs");
-        Gui.ShowWindow("winNewChar");
+        WindowManager.HideWindow("winJobs");
+        WindowManager.ShowWindow("winNewChar");
 
-        var winNewChar = Gui.GetWindowByName("winNewChar");
+        var winNewChar = WindowManager.GetWindowByName("winNewChar");
         if (winNewChar is null)
         {
             return;
@@ -163,8 +164,8 @@ public static class WinJobs
 
     public static void OnClose()
     {
-        Gui.HideWindows();
+        WindowManager.HideWindows();
 
-        Gui.ShowWindow("winChars");
+        WindowManager.ShowWindow("winChars");
     }
 }

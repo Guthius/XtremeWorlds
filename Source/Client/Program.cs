@@ -13,6 +13,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using static Core.Globals.Command;
 using Type = Core.Globals.Type;
+using System.IO;
 
 namespace Client
 {
@@ -23,6 +24,8 @@ namespace Client
 
         public static readonly ConcurrentDictionary<string, Texture2D> TextureCache = new();
         public static readonly ConcurrentDictionary<string, GfxInfo> GfxInfoCache = new();
+
+        private static string? _pendingScreenshotPath;
 
         private static int _gameFps;
         private static readonly object FpsLock = new();
@@ -136,12 +139,11 @@ namespace Client
             Graphics.PreparingDeviceSettings += (sender, args) =>
             {
                 args.GraphicsDeviceInformation.PresentationParameters.RenderTargetUsage = RenderTargetUsage.PreserveContents;
-                args.GraphicsDeviceInformation.PresentationParameters.MultiSampleCount = 8;
             };
 
-#if DEBUG
-            IsMouseVisible = true;
-#endif
+            // Hide OS cursor; we'll render our own
+            IsMouseVisible = false;
+
             Content.RootDirectory = "Content";
 
             // Handle Exiting without forcing a hard shutdown
@@ -281,32 +283,13 @@ namespace Client
                 }
             });
 
+            // Preload cursor texture into cache (drawn each frame in GUI layer)
             try
             {
-                var cursorPath = Path.Combine(DataPath.Misc, "Cursor.png");
-                if (!File.Exists(cursorPath))
-                {
-                    // Fallback to Content relative path if the asset base is different
-                    var fallback = Path.Combine(Content.RootDirectory, "Graphics", "Misc", "Cursor.png");
-                    cursorPath = File.Exists(fallback) ? fallback : cursorPath;
-                }
-
-                if (File.Exists(cursorPath))
-                {
-                    using var fs = new FileStream(cursorPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                    using var tempTex = Texture2D.FromStream(Graphics?.GraphicsDevice, fs);
-                    Mouse.SetCursor(MouseCursor.FromTexture2D(tempTex, 0, 0));
-                }
-                else
-                {
-                    Mouse.SetCursor(MouseCursor.Arrow);
-                }
+                var preload = Path.Combine(DataPath.Misc, "Cursor");
+                _ = GetTexture(preload);
             }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Cursor load failed: {ex.Message}");
-                Mouse.SetCursor(MouseCursor.Arrow);
-            }
+            catch { }
         }
 
         public static SpriteFont LoadFont(string path, Font font)
@@ -481,9 +464,24 @@ namespace Client
                 GraphicsDevice.Clear(Color.Transparent);
                 SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
                 if (GameState.InMenu)
-                    Gui.DrawMenuBackground();
-                Gui.Render();
+                    WindowManager.DrawMenuBackground();
+                WindowManager.Render();
                 TextRenderer.DrawMapName();
+
+                // Draw custom cursor on the GUI layer at GUI mouse coords
+                if (GameState.CurMouseXGui >= 0 && GameState.CurMouseYGui >= 0)
+                {
+                    string cursorTex = Path.Combine(DataPath.Misc, "Cursor");
+                    var info = GetGfxInfo(cursorTex);
+                    int cw = Math.Max(1, info.Width);
+                    int ch = Math.Max(1, info.Height);
+                    int hotspotX = 0; // adjust if your cursor hotspot is not top-left
+                    int hotspotY = 0;
+                    int cx = GameState.CurMouseXGui - hotspotX;
+                    int cy = GameState.CurMouseYGui - hotspotY;
+                    RenderTexture(ref cursorTex, cx, cy, 0, 0, cw, ch, cw, ch);
+                }
+
                 SpriteBatch.End();
 
                 // After drawing to _guiRenderTarget, reset to back buffer
@@ -651,6 +649,11 @@ namespace Client
             if (IsKeyStateActive(Keys.F12))
             {
                 TakeScreenshot();
+            }
+
+            if (_pendingScreenshotPath != "")
+            {
+                TrySaveBackbufferScreenshot(_pendingScreenshotPath);
             }
 
             SetFps(_gameFps + 1);
@@ -925,7 +928,7 @@ namespace Client
             if (IsKeyStateActive(Keys.F5))
             {
                 UIScript.Load();
-                Gui.Init();
+                WindowManager.Init();
             }
 
             // Handle Escape key to toggle menus
@@ -975,7 +978,7 @@ namespace Client
                 // Hide options screen
                 if (IsWindowVisible("winOptions"))
                 {
-                    Gui.HideWindow("winOptions");
+                    WindowManager.HideWindow("winOptions");
                     WinComboMenu.Close();
                     return;
                 }
@@ -983,7 +986,7 @@ namespace Client
                 // hide/show chat window
                 if (IsWindowVisible("winChat"))
                 {
-                    if (Gui.TryGetControl("winChat", "txtChat", out var chatCtrl))
+                    if (WindowManager.TryGetControl("winChat", "txtChat", out var chatCtrl))
                     {
                         chatCtrl!.Text = "";
                     }
@@ -993,7 +996,7 @@ namespace Client
 
                 if (IsWindowVisible("winEscMenu"))
                 {
-                    Gui.HideWindow("winEscMenu");
+                    WindowManager.HideWindow("winEscMenu");
                     return;
                 }
 
@@ -1017,26 +1020,26 @@ namespace Client
 
                 if (IsWindowVisible("winInventory"))
                 {
-                    Gui.HideWindow("winInventory");
+                    WindowManager.HideWindow("winInventory");
                     return;
                 }
 
                 if (IsWindowVisible("winCharacter"))
                 {
-                    Gui.HideWindow("winCharacter");
+                    WindowManager.HideWindow("winCharacter");
                     return;
                 }
 
                 if (IsWindowVisible("winSkills"))
                 {
-                    Gui.HideWindow("winSkills");
+                    WindowManager.HideWindow("winSkills");
                     return;
                 }
 
                 // show them
                 if (!IsWindowVisible("winChat"))
                 {
-                    Gui.ShowWindow("winEscMenu", true);
+                    WindowManager.ShowWindow("winEscMenu", true);
                     return;
                 }
             }
@@ -1104,7 +1107,7 @@ namespace Client
 
         private static bool IsWindowVisible(string windowName)
         {
-            return Gui.TryGetWindow(windowName, out var window) && window!.Visible;
+            return WindowManager.TryGetWindow(windowName, out var window) && window!.Visible;
         }
 
         private static bool IsInputCooldownElapsed()
@@ -1134,13 +1137,13 @@ namespace Client
         private static void HandleActiveWindowInput()
         {
             // Check if there is an active window and that it is visible.
-            if (Gui.ActiveWindow is not null && Gui.ActiveWindow.Visible)
+            if (WindowManager.ActiveWindow is not null && WindowManager.ActiveWindow.Visible)
             {
                 // Check if an active control exists.
-                if (Gui.ActiveWindow.ActiveControl is not null)
+                if (WindowManager.ActiveWindow.ActiveControl is not null)
                 {
                     // Get the active control.
-                    var activeControl = Gui.ActiveWindow.ActiveControl;
+                    var activeControl = WindowManager.ActiveWindow.ActiveControl;
 
                     // Check if the Enter key is active and can be processed.
                     if (IsKeyStateActive(Keys.Enter))
@@ -1152,7 +1155,7 @@ namespace Client
                     // Check if the Tab key is active and can be processed
                     if (IsKeyStateActive(Keys.Tab))
                     {
-                        Gui.FocusNextControl();
+                        WindowManager.FocusNextControl();
                     }
                 }
             }
@@ -1193,13 +1196,13 @@ namespace Client
                     // Handle Backspace key separately  
                     if (key == Keys.Back)
                     {
-                        var activeControl = Gui.GetActiveControl();
+                        var activeControl = WindowManager.GetActiveControl();
 
                         if (activeControl is not null && activeControl.Visible && activeControl.Text.Length > 0)
                         {
                             // Modify the text and update it back in the window  
                             activeControl.Text = activeControl.Text.Substring(0, activeControl.Text.Length - 1);
-                            Gui.UpdateActiveControl(activeControl);
+                            WindowManager.UpdateActiveControl(activeControl);
                         }
 
                         continue; // Move to the next key  
@@ -1211,7 +1214,7 @@ namespace Client
                     // If the character is valid, update the active control's text  
                     if (character.HasValue)
                     {
-                        var activeControl = Gui.GetActiveControl();
+                        var activeControl = WindowManager.GetActiveControl();
 
                         if (activeControl is not null && activeControl.Visible && activeControl.Enabled)
                         {
@@ -1220,7 +1223,7 @@ namespace Client
                             {
                                 // Append character to the control's text  
                                 activeControl.Text += character.Value;
-                                Gui.UpdateActiveControl(activeControl);
+                                WindowManager.UpdateActiveControl(activeControl);
                                 continue; // Move to the next key  
                             }
                         }
@@ -1310,7 +1313,7 @@ namespace Client
             GameState.CurY = GameState.CurYGui;
 
             // Dispatch the GUI event
-            Gui.HandleInterfaceEvents(state);
+            WindowManager.HandleInterfaceEvents(state);
 
             // Restore game legacy values
             GameState.CurMouseX = prevMouseX;
@@ -1422,19 +1425,19 @@ namespace Client
                 HandleGuiEvent(ControlState.MouseUp);
             }
 
-            for (int i = 1; i < Gui.Windows.Count; i++)
+            for (int i = 1; i < WindowManager.Windows.Count; i++)
             {
                 // Check if active control is hovered (GUI context)
-                if (Gui.Windows[i].Controls != null)
+                if (WindowManager.Windows[i].Controls != null)
                 {
-                    for (int j = 0; j < Gui.Windows[i].Controls.Count; j++)
+                    for (int j = 0; j < WindowManager.Windows[i].Controls.Count; j++)
                     {
-                        if (GameState.CurMouseXGui >= Gui.Windows[i].X &&
-                            GameState.CurMouseXGui <= Gui.Windows[i].Width + Gui.Windows[i].X &&
-                            GameState.CurMouseYGui >= Gui.Windows[i].Y &&
-                            GameState.CurMouseYGui <= Gui.Windows[i].Height + Gui.Windows[i].Y)
+                        if (GameState.CurMouseXGui >= WindowManager.Windows[i].X &&
+                            GameState.CurMouseXGui <= WindowManager.Windows[i].Width + WindowManager.Windows[i].X &&
+                            GameState.CurMouseYGui >= WindowManager.Windows[i].Y &&
+                            GameState.CurMouseYGui <= WindowManager.Windows[i].Height + WindowManager.Windows[i].Y)
                         {
-                            if (Gui.Windows[i].Controls[j].State != ControlState.Normal)
+                            if (WindowManager.Windows[i].Controls[j].State != ControlState.Normal)
                             {
                                 return;
                             }
@@ -1465,7 +1468,7 @@ namespace Client
                 if (IsMouseButtonDown(MouseButton.Right))
                 {
                     int slotNum = -1;
-                    if (Gui.TryGetWindow("winHotbar", out var winHotbar))
+                    if (WindowManager.TryGetWindow("winHotbar", out var winHotbar))
                     {
                         slotNum = (int) GameLogic.IsHotbar(winHotbar!.X, winHotbar!.Y);
                     }
@@ -1523,23 +1526,43 @@ namespace Client
 
         public static void TakeScreenshot()
         {
-            // Set the render target to our RenderTarget2D
-            Graphics.GraphicsDevice.SetRenderTarget(RenderTarget);
-
-            // Clear the render target with a transparent background
-            Graphics.GraphicsDevice.Clear(Color.Transparent);
-
-            // Draw everything to the render target
-            General.Client.Draw(new GameTime()); // Assuming Draw handles your game rendering
-
-            // Reset the render target to the back buffer (main display)
-            Graphics.GraphicsDevice.SetRenderTarget(null);
-
-            // Save the contents of the RenderTarget2D to a PNG file
-            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-            using (var stream = new FileStream($"screenshot_{timestamp}.png", FileMode.Create))
+            try
             {
-                RenderTarget.SaveAsPng(stream, RenderTarget.Width, RenderTarget.Height);
+                var dir = Path.Combine(AppContext.BaseDirectory, "Screenshots");
+                if (!Path.Exists(dir))
+                    Directory.CreateDirectory(dir);
+                var ts = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                _pendingScreenshotPath = Path.Combine(dir, $"screenshot_{ts}.png");
+            }
+            catch
+            {
+                _pendingScreenshotPath = null;
+            }
+        }
+
+        private void TrySaveBackbufferScreenshot(string path)
+        {
+            try
+            {
+                var gd = GraphicsDevice;
+                var pp = gd.PresentationParameters;
+                int w = pp.BackBufferWidth;
+                int h = pp.BackBufferHeight;
+
+                var data = new Color[w * h];
+                gd.GetBackBufferData(data); // works with MSAA off
+
+                using var tex = new Texture2D(gd, w, h, false, SurfaceFormat.Color);
+                tex.SetData(data);
+
+                using var fs = File.Create(path);
+                tex.SaveAsPng(fs, w, h);
+
+                _pendingScreenshotPath = "";
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Screenshot failed: {ex}");
             }
         }
 
@@ -1559,19 +1582,19 @@ namespace Client
             {
                 // Create the four sides of the outline
                 var left = new Rectangle(position.ToPoint(),
-                    new Point((int) Math.Round(outlineThickness), (int) Math.Round(size.Y)));
+                    new Point((int)Math.Round(outlineThickness), (int)Math.Round(size.Y)));
 
                 var top = new Rectangle(position.ToPoint(),
-                    new Point((int) Math.Round(size.X), (int) Math.Round(outlineThickness)));
+                    new Point((int)Math.Round(size.X), (int)Math.Round(outlineThickness)));
 
                 var right = new Rectangle(
-                    new Point((int) Math.Round(position.X + size.X - outlineThickness), (int) Math.Round(position.Y)),
-                    new Point((int) Math.Round(outlineThickness), (int) Math.Round(size.Y)));
+                    new Point((int)Math.Round(position.X + size.X - outlineThickness), (int)Math.Round(position.Y)),
+                    new Point((int)Math.Round(outlineThickness), (int)Math.Round(size.Y)));
 
                 var bottom =
                     new Rectangle(
-                        new Point((int) Math.Round(position.X), (int) Math.Round(position.Y + size.Y - outlineThickness)),
-                        new Point((int) Math.Round(size.X), (int) Math.Round(outlineThickness)));
+                        new Point((int)Math.Round(position.X), (int)Math.Round(position.Y + size.Y - outlineThickness)),
+                        new Point((int)Math.Round(size.X), (int)Math.Round(outlineThickness)));
 
                 // Draw the outline rectangles
                 SpriteBatch.Draw(whiteTexture, left, outlineColor);
@@ -2700,7 +2723,6 @@ namespace Client
             string argPath = Path.Combine(DataPath.Characters, gfxIndex.ToString());
             RenderTexture(ref argPath, x, y,
                 sourceRect.X, sourceRect.Y,
-                sourceRect.Width, sourceRect.Height,
                 sourceRect.Width, sourceRect.Height);
         }
 
@@ -2813,7 +2835,7 @@ namespace Client
                             if ((gfxInfo.Height / columns) > 32)
                             {
                                 // Create a 32 pixel offset for larger sprites
-                                y = (int)Math.Round(Data.MapEvents[id].Y - (height - 32d));
+                                y = (int) Math.Round(Data.MapEvents[id].Y - (height - 32d));
                             }
                             else
                             {

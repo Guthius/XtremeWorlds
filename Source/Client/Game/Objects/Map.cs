@@ -671,7 +671,7 @@ namespace Client
             var buffer = new PacketReader(data);
 
             GameState.InitMapEditor = true;
-            Gui.HideWindows();
+            WindowManager.HideWindows();
         }
 
         public static void Packet_CheckMap(ReadOnlyMemory<byte> data)

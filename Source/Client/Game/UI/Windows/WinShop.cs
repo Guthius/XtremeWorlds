@@ -1,5 +1,6 @@
 ﻿using Core.Globals;
 using static Core.Globals.Command;
+using System.IO;
 
 namespace Client.Game.UI.Windows;
 
@@ -7,7 +8,7 @@ public static class WinShop
 {
     public static void OnDraw()
     {
-        var winShop = Gui.GetWindowByName("winShop");
+        var winShop = WindowManager.GetWindowByName("winShop");
         if (winShop is null)
         {
             return;
@@ -32,7 +33,7 @@ public static class WinShop
 
     public static void OnDrawBackground()
     {
-        var winShop = Gui.GetWindowByName("winShop");
+        var winShop = WindowManager.GetWindowByName("winShop");
         if (winShop is null)
         {
             return;
@@ -81,7 +82,7 @@ public static class WinShop
 
     public static void OnBuyingChecked()
     {
-        var winShop = Gui.GetWindowByName("winShop");
+        var winShop = WindowManager.GetWindowByName("winShop");
         if (winShop is null)
         {
             return;
@@ -115,7 +116,7 @@ public static class WinShop
 
     public static void OnSellingChecked()
     {
-        var winShop = Gui.GetWindowByName("winShop");
+        var winShop = WindowManager.GetWindowByName("winShop");
         if (winShop is null)
         {
             return;
@@ -159,7 +160,7 @@ public static class WinShop
 
     public static void OnMouseDown()
     {
-        var winShop = Gui.GetWindowByName("winShop");
+        var winShop = WindowManager.GetWindowByName("winShop");
         if (winShop is null)
         {
             return;
@@ -193,13 +194,13 @@ public static class WinShop
 
     public static void OnMouseMove()
     {
-        var winShop = Gui.GetWindowByName("winShop");
+        var winShop = WindowManager.GetWindowByName("winShop");
         if (winShop is null)
         {
             return;
         }
 
-        var winDescription = Gui.GetWindowByName("winDescription");
+        var winDescription = WindowManager.GetWindowByName("winDescription");
         if (winDescription is null)
         {
             return;
@@ -239,7 +240,7 @@ public static class WinShop
 
     public static void UpdateShop()
     {
-        var winShop = Gui.GetWindowByName("winShop");
+        var winShop = WindowManager.GetWindowByName("winShop");
         if (winShop is null)
         {
             return;

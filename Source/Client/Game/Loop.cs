@@ -434,7 +434,7 @@ namespace Client
                 _fadeTmr = _tick + 30;
             }
 
-            Gui.ResizeGui();
+            WindowManager.ResizeGui();
         }
     }
 }

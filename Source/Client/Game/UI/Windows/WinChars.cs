@@ -1,5 +1,6 @@
 ﻿using Client.Net;
 using Core.Globals;
+using System.IO;
 
 namespace Client.Game.UI.Windows;
 
@@ -69,13 +70,13 @@ public static class WinChars
 
     public static void OnClose()
     {
-        Gui.HideWindows();
-        Gui.ShowWindow("winLogin");
+        WindowManager.HideWindows();
+        WindowManager.ShowWindow("winLogin");
     }
     
     public static void OnDraw()
     {
-        var winChars = Gui.GetWindowByName("winChars");
+        var winChars = WindowManager.GetWindowByName("winChars");
         if (winChars is null)
         {
             return;

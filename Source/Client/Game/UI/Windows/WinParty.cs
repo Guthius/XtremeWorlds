@@ -7,7 +7,7 @@ public static class WinParty
 {
     public static void Update()
     {
-        var winParty = Gui.GetWindowByName("winParty");
+        var winParty = WindowManager.GetWindowByName("winParty");
         if (winParty is null)
         {
             return;
@@ -15,11 +15,11 @@ public static class WinParty
 
         if (Data.MyParty.Leader == 0)
         {
-            Gui.HideWindow("winParty");
+            WindowManager.HideWindow("winParty");
             return;
         }
 
-        Gui.ShowWindow("winParty");
+        WindowManager.ShowWindow("winParty");
 
         for (var i = 0; i < 4; i++)
         {

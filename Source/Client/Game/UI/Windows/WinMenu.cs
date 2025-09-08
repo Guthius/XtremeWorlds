@@ -4,43 +4,43 @@ public static class WinMenu
 {
     public static void OnCharacterClick()
     {
-        var windowIndex = Gui.GetWindowIndex("winCharacter");
+        var windowIndex = WindowManager.GetWindowIndex("winCharacter");
 
-        if (Gui.Windows[windowIndex].Visible)
+        if (WindowManager.Windows[windowIndex].Visible)
         {
-            Gui.HideWindow(windowIndex);
+            WindowManager.HideWindow(windowIndex);
         }
         else
         {
-            Gui.ShowWindow(windowIndex, resetPosition: false);
+            WindowManager.ShowWindow(windowIndex, resetPosition: false);
         }
     }
 
     public static void OnInventoryClick()
     {
-        var windowIndex = Gui.GetWindowIndex("winInventory");
+        var windowIndex = WindowManager.GetWindowIndex("winInventory");
 
-        if (Gui.Windows[windowIndex].Visible)
+        if (WindowManager.Windows[windowIndex].Visible)
         {
-            Gui.HideWindow(windowIndex);
+            WindowManager.HideWindow(windowIndex);
         }
         else
         {
-            Gui.ShowWindow(windowIndex, resetPosition: false);
+            WindowManager.ShowWindow(windowIndex, resetPosition: false);
         }
     }
 
     public static void OnSkillsClick()
     {
-        var windowIndex = Gui.GetWindowIndex("winSkills");
+        var windowIndex = WindowManager.GetWindowIndex("winSkills");
 
-        if (Gui.Windows[windowIndex].Visible)
+        if (WindowManager.Windows[windowIndex].Visible)
         {
-            Gui.HideWindow(windowIndex);
+            WindowManager.HideWindow(windowIndex);
         }
         else
         {
-            Gui.ShowWindow(windowIndex, resetPosition: false);
+            WindowManager.ShowWindow(windowIndex, resetPosition: false);
         }
     }
 

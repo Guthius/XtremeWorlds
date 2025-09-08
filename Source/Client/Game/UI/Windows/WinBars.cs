@@ -1,4 +1,5 @@
 ﻿using Core.Globals;
+using System.IO;
 
 namespace Client.Game.UI.Windows;
 
@@ -6,7 +7,7 @@ public static class WinBars
 {
     public static void OnDraw()
     {
-        var winBars = Gui.GetWindowByName("winBars");
+        var winBars = WindowManager.GetWindowByName("winBars");
         if (winBars is null)
         {
             return;

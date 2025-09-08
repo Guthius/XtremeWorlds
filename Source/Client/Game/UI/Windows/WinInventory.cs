@@ -1,5 +1,6 @@
 ﻿using Client.Net;
 using Core.Globals;
+using System.IO;
 using static Core.Globals.Command;
 
 namespace Client.Game.UI.Windows;
@@ -13,7 +14,7 @@ public static class WinInventory
             return;
         }
 
-        var winInventory = Gui.GetWindowByName("winInventory");
+        var winInventory = WindowManager.GetWindowByName("winInventory");
         if (winInventory is null)
         {
             return;
@@ -66,13 +67,18 @@ public static class WinInventory
 
             Item.StreamItem(itemNum);
 
-            if (Gui.DragBox.Origin == PartOrigin.Inventory &&
-                Gui.DragBox.Slot == slot)
+            if (WindowManager.DragBox.Origin == PartOrigin.Inventory &&
+                WindowManager.DragBox.Slot == slot)
             {
                 continue;
             }
 
             var itemIcon = Data.Item[itemNum].Icon;
+
+            if (itemIcon <= 0 || itemIcon > GameState.NumItems)
+            {
+                return;
+            }
 
             // exit out if we're offering item in a trade.
             var amountModifier = 0;
@@ -139,26 +145,26 @@ public static class WinInventory
             return;
         }
 
-        var winInventory = Gui.GetWindowByName("winInventory");
+        var winInventory = WindowManager.GetWindowByName("winInventory");
         var slot = General.IsInv(winInventory.X, winInventory.Y);
         if (slot >= 0)
         {
-            ref var dragBox = ref Gui.DragBox;
+            ref var dragBox = ref WindowManager.DragBox;
 
             dragBox.Type = DraggablePartType.Item;
             dragBox.Value = GetPlayerInv(GameState.MyIndex, slot);
             dragBox.Origin = PartOrigin.Inventory;
             dragBox.Slot = slot;
 
-            var windowIndex = Gui.GetWindowIndex("winDragBox");
-            var window = Gui.Windows[windowIndex];
+            var windowIndex = WindowManager.GetWindowIndex("winDragBox");
+            var window = WindowManager.Windows[windowIndex];
 
             window.X = GameState.CurMouseX;
             window.Y = GameState.CurMouseY;
             window.MovedX = GameState.CurMouseX - window.X;
             window.MovedY = GameState.CurMouseY - window.Y;
 
-            Gui.ShowWindow(windowIndex, resetPosition: false);
+            WindowManager.ShowWindow(windowIndex, resetPosition: false);
 
             winInventory.State = ControlState.Normal;
         }
@@ -168,7 +174,7 @@ public static class WinInventory
 
     public static void OnDoubleClick()
     {
-        var winInventory = Gui.GetWindowByName("winInventory");
+        var winInventory = WindowManager.GetWindowByName("winInventory");
         if (winInventory is null)
         {
             return;
@@ -234,18 +240,18 @@ public static class WinInventory
 
     public static void OnMouseMove()
     {
-        if (Gui.DragBox.Type != DraggablePartType.None)
+        if (WindowManager.DragBox.Type != DraggablePartType.None)
         {
             return;
         }
 
-        var winInventory = Gui.GetWindowByName("winInventory");
+        var winInventory = WindowManager.GetWindowByName("winInventory");
         if (winInventory is null)
         {
             return;
         }
 
-        var winDescription = Gui.GetWindowByName("winDescription");
+        var winDescription = WindowManager.GetWindowByName("winDescription");
         if (winDescription is null)
         {
             return;
@@ -279,8 +285,8 @@ public static class WinInventory
             }
         }
 
-        if (Gui.DragBox.Type == DraggablePartType.Item &&
-            Gui.DragBox.Value == slot)
+        if (WindowManager.DragBox.Type == DraggablePartType.Item &&
+            WindowManager.DragBox.Value == slot)
         {
             return;
         }

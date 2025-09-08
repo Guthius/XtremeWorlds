@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Client.Net;
+using Core.Globals;
+using Eto.Drawing;
+using Eto.Forms;
+using System;
 using System.Linq;
 using System.Net.Http.Headers;
-using Client.Net;
-using Core.Globals;
-using Eto.Forms;
-using Eto.Drawing;
+using System.Runtime.InteropServices;
 
 namespace Client;
 
@@ -12,32 +13,44 @@ public static class Program
 {
     private static UITimer? _uiTimer;
     private static bool _editorsDisposed;
-    private static Form? _rootForm; // hidden form to keep Eto alive
+    public static bool IsEtoAvailable => !RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && Application.Instance != null;
 
     [STAThread]
     public static void Main()
     {
-        // Start game loop on background thread so Eto UI thread stays responsive
+        // On macOS, don't use Eto.Forms at all; run the game on the main thread
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            RunGame();
+            return;
+        }
+
+        // Other platforms: start game loop on background thread so Eto UI thread stays responsive
         var gameThread = new System.Threading.Thread(RunGame) { IsBackground = false };
         gameThread.Start();
 
-        // Start Eto application & periodic UI updater
-        // Explicitly specify Eto platform for Linux (Gtk) to avoid auto-detect failure
-        // NOTE: Ensure package Eto.Platform.Gtk is referenced in the project (added centrally in Directory.Packages.props)
-        var app = new Application(Eto.Platform.Detect);
+        Application app;
+
+#if WINDOWS
+        app = new Application(Eto.Platforms.Wpf);
+#elif LINUX
+        app = new Application(Eto.Platforms.Gtk);
+#else
+        try
+        {
+            app = new Application(Eto.Platform.Detect);    
+        }
+        catch (Exception ex)
+        {
+            app = new Application(Eto.Platforms.Wpf);
+        }
+#endif
+        // Set up a timer to periodically update editor UIs
         _uiTimer = new UITimer { Interval = 0.05 }; // 50ms (~20fps) for editor UI refresh logic
         _uiTimer.Elapsed += UiTimerOnElapsed;
         _uiTimer.Start();
 
-        // Keep Eto running even if all editor windows are closed by using a hidden root form
-        _rootForm = new Form
-        {
-            Title = string.Empty,
-            ShowInTaskbar = false,
-            ClientSize = new Size(1, 1),
-        };
-        _rootForm.Shown += (s, e) => ((Form)s!).Visible = false;
-        app.Run(_rootForm);
+        app.Run();
     }
 
     private static void RunGame()
@@ -47,7 +60,8 @@ public static class Program
 
     private static void UiTimerOnElapsed(object? sender, EventArgs e)
     {
-        SafeUpdateEditors();
+        if (IsEtoAvailable)
+            SafeUpdateEditors();
     }
 
     private static void SafeUpdateEditors()
@@ -67,6 +81,7 @@ public static class Program
 
     private static void UpdateEditors()
     {
+    if (!IsEtoAvailable) return;
         if (GameState.InitAdminForm)
         {
             new Admin().Show();
@@ -182,43 +197,6 @@ public static class Program
             new Editor_Script().Show();
             GameState.InitScriptEditor = false;
         }
-
-        // Invalidate redraw surfaces where needed (guard against null/partial migration)
-        try
-        {
-            if (GameState.MyEditorType == EditorType.Map)
-                Editor_Map.Instance?.picBackSelect.Invalidate();
-
-            if (GameState.MyEditorType == EditorType.Animation)
-            {
-                Editor_Animation.Instance?.picSprite0?.Invalidate();
-                Editor_Animation.Instance?.picSprite1?.Invalidate();
-            }
-        }
-        catch { /* some editors may not be instantiated yet */ }
-        if (!GameState.InGame)
-        {
-            // Reset disposal flag when (re)entering non-game state
-            _editorsDisposed = false;
-        }
-        else if (!_editorsDisposed)
-        {
-            // Dispose editors once when entering game state
-            try { Editor_Item.Instance?.Dispose(); } catch { }
-            try { Editor_Job.Instance?.Dispose(); } catch { }
-            try { Editor_Map.Instance?.Dispose(); } catch { }
-            try { Editor_Event.Instance?.Dispose(); } catch { }
-            try { Editor_Npc.Instance?.Dispose(); } catch { }
-            try { Editor_Projectile.Instance?.Dispose(); } catch { }
-            try { Editor_Resource.Instance?.Dispose(); } catch { }
-            try { Editor_Shop.Instance?.Dispose(); } catch { }
-            try { Editor_Skill.Instance?.Dispose(); } catch { }
-            try { Editor_Animation.Instance?.Dispose(); } catch { }
-            try { Editor_Moral.Instance?.Dispose(); } catch { }
-            try { Editor_Script.Instance?.Dispose(); } catch { }
-            // TODO: track Admin form instance and close if open
-            _editorsDisposed = true;
-        }
     }
 
     // Called when the game is exiting to stop the Eto loop cleanly
@@ -230,7 +208,8 @@ public static class Program
             try { _uiTimer?.Stop(); } catch { }
 
             // Close all open Eto windows on the UI thread, then close the hidden root form
-            Application.Instance?.AsyncInvoke(() =>
+        if (IsEtoAvailable)
+        Application.Instance?.AsyncInvoke(() =>
             {
                 try
                 {
@@ -239,19 +218,16 @@ public static class Program
                     {
                         try
                         {
-                            if (!ReferenceEquals(win, _rootForm) && win.Visible)
+                            if (win.Visible)
                                 win.Close();
                         }
                         catch { }
-                    }
-
-                    // Finally close the root form to end Application.Run
-                    _rootForm?.Close();
+                    };
                 }
                 catch
                 {
                     // As a fallback, request application quit
-                    try { Application.Instance.Quit(); } catch { }
+            try { Application.Instance?.Quit(); } catch { }
                 }
             });
         }

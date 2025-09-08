@@ -1,5 +1,6 @@
 ﻿using Client.Net;
 using Core.Globals;
+using System.IO;
 using static Core.Globals.Command;
 
 namespace Client.Game.UI.Windows;
@@ -12,7 +13,7 @@ public static class WinCharacter
     {
         UpdateBars();
 
-        var winCharacter = Gui.GetWindowByName("winCharacter");
+        var winCharacter = WindowManager.GetWindowByName("winCharacter");
         if (winCharacter is null)
         {
             return;
@@ -28,7 +29,7 @@ public static class WinCharacter
 
     private static void UpdateBars()
     {
-        var winBars = Gui.GetWindowByName("winBars");
+        var winBars = WindowManager.GetWindowByName("winBars");
         if (winBars is null)
         {
             return;
@@ -46,7 +47,7 @@ public static class WinCharacter
             return;
         }
 
-        var winCharacter = Gui.GetWindowByName("winCharacter");
+        var winCharacter = WindowManager.GetWindowByName("winCharacter");
         if (winCharacter is null)
         {
             return;
@@ -91,7 +92,7 @@ public static class WinCharacter
 
     public static void OnDoubleClick()
     {
-        var winCharacter = Gui.GetWindowByName("winCharacter");
+        var winCharacter = WindowManager.GetWindowByName("winCharacter");
         if (winCharacter is null)
         {
             return;
@@ -108,18 +109,18 @@ public static class WinCharacter
 
     public static void OnMouseMove()
     {
-        if (Gui.DragBox.Type != DraggablePartType.None)
+        if (WindowManager.DragBox.Type != DraggablePartType.None)
         {
             return;
         }
 
-        var winCharacter = Gui.GetWindowByName("winCharacter");
+        var winCharacter = WindowManager.GetWindowByName("winCharacter");
         if (winCharacter is null)
         {
             return;
         }
 
-        var winDescription = Gui.GetWindowByName("winDescription");
+        var winDescription = WindowManager.GetWindowByName("winDescription");
         if (winDescription is null)
         {
             return;

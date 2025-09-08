@@ -919,7 +919,6 @@ namespace Client
                     new ButtonToolItem{ Text = "Delete", Command = new Command((_,__) => tsbDeleteMap_Click(this, EventArgs.Empty))},
                     new ButtonToolItem{ Text = "Undo", Command = new Command((_,__) => tsbUndo_Click(this, EventArgs.Empty))},
                     new ButtonToolItem{ Text = "Redo", Command = new Command((_,__) => tsbRedo_Click(this, EventArgs.Empty))},
-                    new ButtonToolItem{ Text = "Screenshot", Command = new Command((_,__) => tsbScreenshot_Click(this, EventArgs.Empty))},
                     new ButtonToolItem{ Text = "Tileset", Command = new Command((_,__) => tsbTileset_Click(this, EventArgs.Empty))}
                 }
             };
@@ -2281,9 +2280,9 @@ namespace Client
             Sender.SendCloseEditor();
 
             // show gui
-            Gui.ShowWindow("winHotbar", resetPosition: false);
-            Gui.ShowWindow("winMenu", resetPosition: false);
-            Gui.ShowWindow("winBars", resetPosition: false);
+            WindowManager.ShowWindow("winHotbar", resetPosition: false);
+            WindowManager.ShowWindow("winMenu", resetPosition: false);
+            WindowManager.ShowWindow("winBars", resetPosition: false);
             WinChat.Hide();
 
             GameState.TileHistoryHighIndex = 0;
@@ -2298,9 +2297,9 @@ namespace Client
             Sender.SendCloseEditor();
 
             // show gui
-            Gui.ShowWindow("winHotbar", resetPosition: false);
-            Gui.ShowWindow("winMenu", resetPosition: false);
-            Gui.ShowWindow("winBars", resetPosition: false);
+            WindowManager.ShowWindow("winHotbar", resetPosition: false);
+            WindowManager.ShowWindow("winMenu", resetPosition: false);
+            WindowManager.ShowWindow("winBars", resetPosition: false);
             WinChat.Hide();
             
             GameState.TileHistoryHighIndex = 0;
@@ -2732,11 +2731,6 @@ namespace Client
         private void tsbOpacity_Click(object? sender, EventArgs e)
         {
             GameState.HideLayers = !GameState.HideLayers;
-        }
-
-        private void tsbScreenshot_Click(object? sender, EventArgs e)
-        {
-            GameClient.TakeScreenshot();
         }
 
         private void tsbTileset_Click(object? sender, EventArgs e)

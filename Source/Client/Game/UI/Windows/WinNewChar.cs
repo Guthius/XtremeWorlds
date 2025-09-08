@@ -1,4 +1,5 @@
 ﻿using Core.Globals;
+using System.IO;
 
 namespace Client.Game.UI.Windows;
 
@@ -6,7 +7,7 @@ public static class WinNewChar
 {
     public static void OnDrawSprite()
     {
-        var winNewChar = Gui.GetWindowByName("winNewChar");
+        var winNewChar = WindowManager.GetWindowByName("winNewChar");
         if (winNewChar is null)
         {
             return;
@@ -68,7 +69,7 @@ public static class WinNewChar
         GameState.NewCharSprite = 1;
         GameState.NewCnarGender = Sex.Male;
 
-        var winNewChar = Gui.GetWindowByName("winNewChar");
+        var winNewChar = WindowManager.GetWindowByName("winNewChar");
         if (winNewChar is null)
         {
             return;
@@ -88,7 +89,7 @@ public static class WinNewChar
         GameState.NewCharSprite = 1;
         GameState.NewCnarGender = Sex.Female;
 
-        var winNewChar = Gui.GetWindowByName("winNewChar");
+        var winNewChar = WindowManager.GetWindowByName("winNewChar");
         if (winNewChar is null)
         {
             return;
@@ -105,7 +106,7 @@ public static class WinNewChar
 
     public static void OnCancel()
     {
-        var winNewChar = Gui.GetWindowByName("winNewChar");
+        var winNewChar = WindowManager.GetWindowByName("winNewChar");
         if (winNewChar is null)
         {
             return;
@@ -118,13 +119,13 @@ public static class WinNewChar
         GameState.NewCharSprite = 1;
         GameState.NewCnarGender = Sex.Male;
 
-            Gui.HideWindows();
-            Gui.ShowWindow("winJobs");
+            WindowManager.HideWindows();
+            WindowManager.ShowWindow("winJobs");
     }
 
     public static void OnAccept()
     {
-        var winNewChar = Gui.GetWindowByName("winNewChar");
+        var winNewChar = WindowManager.GetWindowByName("winNewChar");
         if (winNewChar is null)
         {
             return;
@@ -132,7 +133,7 @@ public static class WinNewChar
 
         var name = winNewChar.GetChild("txtName").Text;
 
-        Gui.HideWindows();
+        WindowManager.HideWindows();
 
         GameLogic.AddChar(name, (int) GameState.NewCnarGender, GameState.NewCharJob, GameState.NewCharSprite);
     }

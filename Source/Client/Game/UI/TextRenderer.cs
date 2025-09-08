@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.IO;
+using System.Text;
 using Core.Configurations;
 using Core.Globals;
 using Microsoft.Xna.Framework;
@@ -77,7 +78,7 @@ public static class TextRenderer
     {
         // wordwrap
         string[] wrappedLines = null;
-        WordWrap(text, Font.Georgia, Gui.Windows[Gui.GetWindowIndex("winChat")].Width, ref wrappedLines);
+        WordWrap(text, Font.Georgia, WindowManager.Windows[WindowManager.GetWindowIndex("winChat")].Width, ref wrappedLines);
 
         GameState.ChatHighIndex += wrappedLines.Length;
 
@@ -502,9 +503,9 @@ public static class TextRenderer
 
         // set the position
         var xO = 19L;
-        xO += Gui.Windows[Gui.GetWindowIndex("winChat")].X;
+        xO += WindowManager.Windows[WindowManager.GetWindowIndex("winChat")].X;
         long yO = GameState.ResolutionHeight - 45;
-        var width = (int) Gui.Windows[Gui.GetWindowIndex("winChat")].Width;
+        var width = (int) WindowManager.Windows[WindowManager.GetWindowIndex("winChat")].Width;
 
         // loop through chat
         var rLines = 1;

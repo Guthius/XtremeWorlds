@@ -85,11 +85,28 @@ namespace Client
                 return;
             }
 
-            // Load the SoundFont (.sf2) for MIDi playback
-            string soundFontPath = "GeneralUser.sf2";
-            if (!File.Exists(soundFontPath))
+            // Load the SoundFont (.sf2) for MIDI playback
+            // Probe common locations so running from different working directories still works
+            string[] sf2Candidates = new[]
             {
-                Console.WriteLine($"SoundFont not found: {soundFontPath}");
+                Path.Combine(Environment.CurrentDirectory, "GeneralUser.sf2"),
+                Path.Combine(AppContext.BaseDirectory ?? Environment.CurrentDirectory, "GeneralUser.sf2"),
+                Path.Combine(DataPath.Asset, "GeneralUser.sf2")
+            };
+
+            string? soundFontPath = null;
+            foreach (var cand in sf2Candidates)
+            {
+                if (File.Exists(cand))
+                {
+                    soundFontPath = cand;
+                    break;
+                }
+            }
+
+            if (string.IsNullOrEmpty(soundFontPath))
+            {
+                Console.WriteLine("SoundFont not found in expected locations (GeneralUser.sf2). MIDI playback will be unavailable.");
                 return;
             }
 
@@ -167,14 +184,15 @@ namespace Client
 
         public static void PlaySound(string fileName, int x, int y, bool looped = false)
         {
-            if (!SettingsManager.Instance.Sound || !File.Exists(DataPath.Sounds + fileName))
+            var soundPath = Path.Combine(DataPath.Sounds, fileName);
+            if (!SettingsManager.Instance.Sound || !File.Exists(soundPath))
                 return;
 
             try
             {
                 StopSound(); // Stop previous sound if any
 
-                SoundStream = Bass.CreateStream(DataPath.Sounds + fileName, 0L, 0L, looped ? BassFlags.Loop : BassFlags.Default);
+                SoundStream = Bass.CreateStream(soundPath, 0L, 0L, looped ? BassFlags.Loop : BassFlags.Default);
                 if (SoundStream != 0)
                 {
                     double calculatedVolume = CalculateSoundVolume(ref x, ref y);
@@ -200,14 +218,15 @@ namespace Client
 
         public static void PlayExtraSound(string fileName, bool looped = false)
         {
-            if (!SettingsManager.Instance.Sound || !File.Exists(DataPath.Sounds + fileName))
+            var soundPath = Path.Combine(DataPath.Sounds, fileName);
+            if (!SettingsManager.Instance.Sound || !File.Exists(soundPath))
                 return;
 
             try
             {
                 StopExtraSound();
 
-                ExtraSoundStream = Bass.CreateStream(DataPath.Sounds + fileName, 0L, 0L, looped ? BassFlags.Loop : BassFlags.Default);
+                ExtraSoundStream = Bass.CreateStream(soundPath, 0L, 0L, looped ? BassFlags.Loop : BassFlags.Default);
                 if (ExtraSoundStream != 0)
                 {
                     Bass.ChannelSetAttribute(ExtraSoundStream, ChannelAttribute.Volume, SettingsManager.Instance.SoundVolume / 100.0f);
@@ -346,7 +365,8 @@ namespace Client
         public static void PlayWeatherSound(string fileName, bool looped = false)
         {
             // Check if sound is enabled and the file exists
-            if (!SettingsManager.Instance.Sound || !File.Exists(DataPath.Sounds + fileName))
+            var soundPath = Path.Combine(DataPath.Sounds, fileName);
+            if (!SettingsManager.Instance.Sound || !File.Exists(soundPath))
                 return;
 
             // Avoid reloading the same sound if it's already playing
@@ -357,7 +377,6 @@ namespace Client
             StopWeatherSound();
 
             // Load the new sound file
-            string soundPath = DataPath.Sounds + fileName;
             WeatherStream = Bass.CreateStream(soundPath, 0L, 0L, looped ? BassFlags.Loop : BassFlags.Default);
 
             // Check if the stream was created successfully

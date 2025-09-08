@@ -8,10 +8,11 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using static Core.Globals.Command;
 using Type = Core.Globals.Type;
+using System.IO;
 
 namespace Client.Game.UI;
 
-public class Gui
+public class WindowManager
 {
     // GUI
     public static ConcurrentDictionary<long, Window> Windows { get; private set; } = new();

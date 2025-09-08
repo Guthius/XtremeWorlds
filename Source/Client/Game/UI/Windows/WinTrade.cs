@@ -1,5 +1,6 @@
 ﻿using Core.Globals;
 using static Core.Globals.Command;
+using System.IO;
 
 namespace Client.Game.UI.Windows;
 
@@ -7,7 +8,7 @@ public static class WinTrade
 {
     public static void OnDraw()
     {
-        var winTrade = Gui.GetWindowByName("winTrade");
+        var winTrade = WindowManager.GetWindowByName("winTrade");
         if (winTrade is null)
         {
             return;
@@ -65,7 +66,7 @@ public static class WinTrade
     
     public static void OnClose()
     {
-        Gui.HideWindow("winTrade");
+        WindowManager.HideWindow("winTrade");
 
         Trade.SendDeclineTrade();
     }
@@ -77,7 +78,7 @@ public static class WinTrade
 
     public static void OnYourTradeClick()
     {
-        var winTrade = Gui.GetWindowByName("winTrade");
+        var winTrade = WindowManager.GetWindowByName("winTrade");
         if (winTrade is null)
         {
             return;
@@ -108,13 +109,13 @@ public static class WinTrade
 
     public static void OnYourTradeMouseMove()
     {
-        var winTrade = Gui.GetWindowByName("winTrade");
+        var winTrade = WindowManager.GetWindowByName("winTrade");
         if (winTrade is null)
         {
             return;
         }
 
-        var winDescription = Gui.GetWindowByName("winDescription");
+        var winDescription = WindowManager.GetWindowByName("winDescription");
         if (winDescription is null)
         {
             return;
@@ -144,13 +145,13 @@ public static class WinTrade
 
     public static void OnTheirTradeMouseMove()
     {
-        var winTrade = Gui.GetWindowByName("winTrade");
+        var winTrade = WindowManager.GetWindowByName("winTrade");
         if (winTrade is null)
         {
             return;
         }
 
-        var winDescription = Gui.GetWindowByName("winDescription");
+        var winDescription = WindowManager.GetWindowByName("winDescription");
         if (winDescription is null)
         {
             return;

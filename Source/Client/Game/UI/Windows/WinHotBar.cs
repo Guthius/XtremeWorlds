@@ -1,6 +1,7 @@
 ﻿using Client.Net;
 using Core.Globals;
 using Microsoft.Xna.Framework;
+using System.IO;
 using static Core.Globals.Command;
 
 namespace Client.Game.UI.Windows;
@@ -14,7 +15,7 @@ public static class WinHotBar
             return;
         }
 
-        var winHotbar = Gui.GetWindowByName("winHotbar");
+        var winHotbar = WindowManager.GetWindowByName("winHotbar");
         if (winHotbar is null)
         {
             return;
@@ -41,7 +42,7 @@ public static class WinHotBar
 
             GameClient.RenderTexture(ref argPath3, x - 2, y - 2, 0, 0, 36, 36, 36, 36);
 
-            if (Gui.DragBox.Origin != PartOrigin.Hotbar || Gui.DragBox.Slot != slot)
+            if (WindowManager.DragBox.Origin != PartOrigin.Hotbar || WindowManager.DragBox.Slot != slot)
             {
                 switch (Data.Player[GameState.MyIndex].Hotbar[slot].SlotType)
                 {
@@ -69,7 +70,7 @@ public static class WinHotBar
 
     public static void OnMouseDown()
     {
-        var winHotbar = Gui.GetWindowByName("winHotbar");
+        var winHotbar = WindowManager.GetWindowByName("winHotbar");
         if (winHotbar is null)
         {
             return;
@@ -78,7 +79,7 @@ public static class WinHotBar
         var slot = GameLogic.IsHotbar(winHotbar.X, winHotbar.Y);
         if (slot >= 0)
         {
-            ref var dragBox = ref Gui.DragBox;
+            ref var dragBox = ref WindowManager.DragBox;
 
             dragBox.Type = Data.Player[GameState.MyIndex].Hotbar[slot].SlotType switch
             {
@@ -91,15 +92,15 @@ public static class WinHotBar
             dragBox.Origin = PartOrigin.Hotbar;
             dragBox.Slot = slot;
 
-            var windowIndex = Gui.GetWindowIndex("winDragBox");
-            var winDragBox = Gui.Windows[windowIndex];
+            var windowIndex = WindowManager.GetWindowIndex("winDragBox");
+            var winDragBox = WindowManager.Windows[windowIndex];
 
             winDragBox.X = GameState.CurMouseX;
             winDragBox.Y = GameState.CurMouseY;
             winDragBox.MovedX = GameState.CurMouseX - winDragBox.X;
             winDragBox.MovedY = GameState.CurMouseY - winDragBox.Y;
 
-            Gui.ShowWindow(windowIndex, resetPosition: false);
+            WindowManager.ShowWindow(windowIndex, resetPosition: false);
 
             winHotbar.State = ControlState.Normal;
         }
@@ -109,7 +110,7 @@ public static class WinHotBar
 
     public static void OnDoubleClick()
     {
-        var winHotbar = Gui.GetWindowByName("winHotbar");
+        var winHotbar = WindowManager.GetWindowByName("winHotbar");
         if (winHotbar is null)
         {
             return;
@@ -126,18 +127,18 @@ public static class WinHotBar
 
     public static void OnMouseMove()
     {
-        if (Gui.DragBox.Type != (int) PartOrigin.None)
+        if (WindowManager.DragBox.Type != (int) PartOrigin.None)
         {
             return;
         }
 
-        var winHotbar = Gui.GetWindowByName("winHotbar");
+        var winHotbar = WindowManager.GetWindowByName("winHotbar");
         if (winHotbar is null)
         {
             return;
         }
 
-        var winDescription = Gui.GetWindowByName("winDescription");
+        var winDescription = WindowManager.GetWindowByName("winDescription");
         if (winDescription is null)
         {
             return;
@@ -150,8 +151,8 @@ public static class WinHotBar
             return;
         }
 
-        if (Gui.DragBox.Origin == PartOrigin.Hotbar &&
-            Gui.DragBox.Slot == slot)
+        if (WindowManager.DragBox.Origin == PartOrigin.Hotbar &&
+            WindowManager.DragBox.Slot == slot)
         {
             return;
         }

@@ -21,7 +21,7 @@ public class Crystalshire
         window.GetChild("btnExit").CallBack[(int) ControlState.MouseDown] = WinLogin.OnExit;
         window.GetChild("btnRegister").CallBack[(int) ControlState.MouseDown] = WinLogin.OnRegister;
 
-        Gui.SetActiveControl(window, userName.Length == 0 ? "txtUsername" : "txtPassword");
+        WindowManager.SetActiveControl(window, userName.Length == 0 ? "txtUsername" : "txtPassword");
     }
 
     public void UpdateWindow_Register()
@@ -32,7 +32,7 @@ public class Crystalshire
         window.GetChild("btnAccept").CallBack[(int) ControlState.MouseDown] = WinRegister.OnRegister;
         window.GetChild("btnExit").CallBack[(int) ControlState.MouseDown] = WinRegister.OnClose;
 
-        Gui.SetActiveControl(window, "txtUsername");
+        WindowManager.SetActiveControl(window, "txtUsername");
     }
 
     public void UpdateWindow_NewChar()
@@ -46,7 +46,7 @@ public class Crystalshire
         window.GetChild("btnLeft").CallBack[(int) ControlState.MouseDown] = WinNewChar.OnLeftClick;
         window.GetChild("btnRight").CallBack[(int) ControlState.MouseDown] = WinNewChar.OnRightClick;
 
-        Gui.SetActiveControl(window, "txtName");
+        WindowManager.SetActiveControl(window, "txtName");
     }
 
     public void UpdateWindow_Chars()
@@ -87,7 +87,7 @@ public class Crystalshire
         window.GetChild("btnYes").CallBack[(int) ControlState.MouseDown] = WinDialogue.OnYes;
         window.GetChild("btnNo").CallBack[(int) ControlState.MouseDown] = WinDialogue.OnNo;
         window.GetChild("btnOkay").CallBack[(int) ControlState.MouseDown] = WinDialogue.OnOkay;
-        Gui.SetActiveControl(window, "txtInput");
+        WindowManager.SetActiveControl(window, "txtInput");
     }
 
     public void UpdateWindow_Party()
@@ -147,7 +147,7 @@ public class Crystalshire
         window.GetChild("chkGuild").CallBack[(int)ControlState.MouseDown] = WinChat.OnGuildChannelClicked;
         window.GetChild("chkPlayer").CallBack[(int)ControlState.MouseDown] = WinChat.OnPrivateChannelClicked;
 
-        Gui.SetActiveControl(window, "txtChat");
+        WindowManager.SetActiveControl(window, "txtChat");
 
         // Initialize checkbox states
         window.GetChild("chkGame").Value = SettingsManager.Instance.ChannelState[(int)ChatChannel.Game];

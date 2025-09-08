@@ -9,7 +9,7 @@ public static class WinOptions
     {
         var restartRequired = false;
 
-        var winOptions = Gui.GetWindowByName("winOptions");
+        var winOptions = WindowManager.GetWindowByName("winOptions");
         if (winOptions is null)
         {
             return;
@@ -118,7 +118,7 @@ public static class WinOptions
 
     public static void OnClose()
     {
-        Gui.HideWindow("winOptions");
-        Gui.ShowWindow("winEscMenu");
+        WindowManager.HideWindow("winOptions");
+        WindowManager.ShowWindow("winEscMenu");
     }
 }

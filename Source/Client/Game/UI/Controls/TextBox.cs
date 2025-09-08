@@ -1,4 +1,6 @@
-﻿namespace Client.Game.UI.Controls;
+﻿using System.IO;
+
+namespace Client.Game.UI.Controls;
 
 public sealed class TextBox : Control
 {
@@ -26,7 +28,7 @@ public sealed class TextBox : Control
 
         string input = null;
 
-        if (Gui.ActiveWindow?.ActiveControl == this)
+        if (WindowManager.ActiveWindow?.ActiveControl == this)
         {
             input = GameState.ChatShowLine;
         }

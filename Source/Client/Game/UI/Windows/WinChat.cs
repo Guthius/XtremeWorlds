@@ -1,5 +1,6 @@
 ﻿using Core.Configurations;
 using Core.Globals;
+using System.IO;
 
 namespace Client.Game.UI.Windows;
 
@@ -12,7 +13,7 @@ public static class WinChat
 
     public static void OnDraw()
     {
-        var winIndex = Gui.GetWindowByName("winChat");
+        var winIndex = WindowManager.GetWindowByName("winChat");
         if (winIndex is null)
         {
             return;
@@ -33,7 +34,7 @@ public static class WinChat
 
     public static void OnDrawSmall()
     {
-        var winChatSmall = Gui.GetWindowByName("winChatSmall");
+        var winChatSmall = WindowManager.GetWindowByName("winChatSmall");
         if (winChatSmall is null)
         {
             return;
@@ -57,7 +58,7 @@ public static class WinChat
 
     private static void UpdateChatChannel(string checkBoxName, ChatChannel channel)
     {
-        var winChat = Gui.GetWindowByName("winChat");
+        var winChat = WindowManager.GetWindowByName("winChat");
 
         var checkBox = winChat?.GetChild(checkBoxName);
         if (checkBox is null)
@@ -121,21 +122,21 @@ public static class WinChat
 
     public static void Show()
     {
-        var winChat = Gui.GetWindowByName("winChat");
+        var winChat = WindowManager.GetWindowByName("winChat");
         if (winChat is null)
         {
             return;
         }
         
-        var windowIndex = Gui.GetWindowIndex("winChat");
-        var controlIndex = Gui.GetControlIndex("winChat", "txtChat");
+        var windowIndex = WindowManager.GetWindowIndex("winChat");
+        var controlIndex = WindowManager.GetControlIndex("winChat", "txtChat");
 
-        Gui.ShowWindow("winChat", resetPosition: false);
-        Gui.HideWindow("winChatSmall");
+        WindowManager.ShowWindow("winChat", resetPosition: false);
+        WindowManager.HideWindow("winChatSmall");
 
-        Gui.ActiveWindow = winChat;
-        Gui.SetActiveControl(windowIndex, controlIndex);
-        Gui.Windows[windowIndex].Controls[controlIndex].Visible = true;
+        WindowManager.ActiveWindow = winChat;
+        WindowManager.SetActiveControl(windowIndex, controlIndex);
+        WindowManager.Windows[windowIndex].Controls[controlIndex].Visible = true;
 
         GameState.InSmallChat = false;
         GameState.ChatScroll = 0;
@@ -143,21 +144,21 @@ public static class WinChat
 
     public static void Hide()
     {
-        var winChat = Gui.GetWindowByName("winChat");
+        var winChat = WindowManager.GetWindowByName("winChat");
         if (winChat is null)
         {
             return;
         }
         
-        var windowIndex = Gui.GetWindowIndex("winChat");
-        var controlIndex = Gui.GetControlIndex("winChat", "txtChat");
+        var windowIndex = WindowManager.GetWindowIndex("winChat");
+        var controlIndex = WindowManager.GetControlIndex("winChat", "txtChat");
 
-        Gui.ShowWindow("winChatSmall", resetPosition: false);
-        Gui.HideWindow("winChat");
+        WindowManager.ShowWindow("winChatSmall", resetPosition: false);
+        WindowManager.HideWindow("winChat");
 
-        Gui.ActiveWindow = winChat;
-        Gui.SetActiveControl(windowIndex, controlIndex);
-        Gui.Windows[windowIndex].Controls[controlIndex].Visible = false;
+        WindowManager.ActiveWindow = winChat;
+        WindowManager.SetActiveControl(windowIndex, controlIndex);
+        WindowManager.Windows[windowIndex].Controls[controlIndex].Visible = false;
 
         GameState.InSmallChat = true;
         GameState.ChatScroll = 0;

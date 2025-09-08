@@ -1,5 +1,6 @@
 ﻿using Core.Globals;
 using Microsoft.Xna.Framework;
+using System.IO;
 
 namespace Client.Game.UI.Windows;
 
@@ -12,7 +13,7 @@ public static class WinDescription
             return;
         }
 
-        var winDescription = Gui.GetWindowByName("winDescription");
+        var winDescription = WindowManager.GetWindowByName("winDescription");
         if (winDescription is null)
         {
             return;

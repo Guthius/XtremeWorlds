@@ -14,7 +14,7 @@ public static class WinLogin
     
     public static void OnLogin()
     {
-        var window = Gui.GetWindowByName("winLogin");
+        var window = WindowManager.GetWindowByName("winLogin");
         if (window is null)
         {
             return;
@@ -46,16 +46,16 @@ public static class WinLogin
             return;
         }
 
-        Gui.HideWindows();
+        WindowManager.HideWindows();
 
         WinRegister.ClearPasswords();
 
-        Gui.ShowWindow("winRegister");
+        WindowManager.ShowWindow("winRegister");
     }
 
     public static void OnSaveUserClicked()
     {
-        var winLogin = Gui.GetWindowByName("winLogin");
+        var winLogin = WindowManager.GetWindowByName("winLogin");
         
         var checkBoxSaveUsername = winLogin.GetChild("chkSaveUsername");
         if (checkBoxSaveUsername.Value == 0)
