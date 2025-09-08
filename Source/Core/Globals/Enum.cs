@@ -122,13 +122,13 @@ public enum Equipment : byte
 /// </summary>
 public enum Direction : byte
 {
-    Up,
-    Right,
     Down,
+    Right,
     Left,
-    UpRight,
+    Up,
     DownRight,
     DownLeft,
+    UpRight,
     UpLeft
 }
 
