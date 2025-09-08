@@ -692,9 +692,9 @@ public class Script
                 #pragma warning disable CS8602
                 if (vitals != null && vitals[(byte)Vital.Health] < 0 && entity.SpawnWait > 0)
                 {
-                        entity.Num = 0;
-                        entity.SpawnWait = General.GetTimeMs();
-                        vitals[(byte)Vital.Health] = 0;
+                    entity.Num = 0;
+                    entity.SpawnWait = General.GetTimeMs();
+                    vitals[(byte)Vital.Health] = 0;
                 }
                 #pragma warning restore CS8602
 
@@ -706,7 +706,7 @@ public class Script
                         Server.Npc.SpawnNpc(x, mapNum);
                     }
                 }
-                    #pragma warning restore CS8602
+                #pragma warning restore CS8602
             }
         }
 
