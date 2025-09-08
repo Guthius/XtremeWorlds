@@ -689,17 +689,17 @@ public class Script
                 }
 
                 // Simplified death/spawn handling (entity is non-null here)
-                    #pragma warning disable CS8602
-                    if (vitals != null && vitals[(byte)Vital.Health] < 0 && entity.SpawnWait > 0)
+                #pragma warning disable CS8602
+                if (vitals != null && vitals[(byte)Vital.Health] < 0 && entity.SpawnWait > 0)
                 {
                         entity.Num = 0;
                         entity.SpawnWait = General.GetTimeMs();
                         vitals[(byte)Vital.Health] = 0;
                 }
-                    #pragma warning restore CS8602
+                #pragma warning restore CS8602
 
-                    #pragma warning disable CS8602
-                    if (entity.Type == Core.Globals.Entity.EntityType.Npc && entity.Num == -1 && entity.SpawnSecs > 0)
+                #pragma warning disable CS8602
+                if (entity.Type == Core.Globals.Entity.EntityType.Npc && entity.Num == -1 && entity.SpawnSecs > 0)
                 {
                     if (tickCount > entity.SpawnWait + entity.SpawnSecs * 1000)
                     {
