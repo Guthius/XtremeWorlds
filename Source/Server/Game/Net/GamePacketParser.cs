@@ -1176,6 +1176,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             }
         }
 
+        NetworkSend.SendJoinMap(session.Id);
+
         Data.TempPlayer[session.Id].GettingMap = false;
     }
 

@@ -66,7 +66,6 @@ public class Script
         NetworkSend.SendHotbar(index);
         NetworkSend.SendPlayerSkills(index);
         NetworkSend.SendStats(index);
-        NetworkSend.SendJoinMap(index);
 
         // Send the flag so they know they can start doing stuff
         NetworkSend.SendInGame(index);
@@ -425,7 +424,6 @@ public class Script
     public void JoinMap(int index)
     {
         byte[] data;
-        int dataSize;
         int mapNum = GetPlayerMap(index);
 
         // Send all players on current map to index
