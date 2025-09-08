@@ -495,7 +495,7 @@ public static class Npc
         PlayerService.Instance.SendDataTo(playerId, buffer.GetBytes());
     }
 
-    private static void SendUpdateNpcToAll(int npcNum)
+    public static void SendUpdateNpcToAll(int npcNum)
     {
         var packet = new PacketWriter();
 
@@ -538,11 +538,12 @@ public static class Npc
         PlayerService.Instance.SendDataToAll(packet.GetBytes());
     }
 
-    private static void SendMapNpcVitals(int mapNum, byte mapNpcNum)
+    
+    public static void SendMapNpcVitals(int mapNum, byte mapNpcNum)
     {
         var packet = new PacketWriter(4);
 
-        packet.WriteInt32((int) ServerPackets.SMapNpcVitals);
+        packet.WriteInt32((int)ServerPackets.SMapNpcVitals);
         packet.WriteInt32(mapNpcNum);
 
         var vitalCount = Enum.GetValues<Vital>().Length;
