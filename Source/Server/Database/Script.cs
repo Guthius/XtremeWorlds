@@ -40,6 +40,7 @@ public class Script
     private static long _lastPlayerRegen;
     private const int NpcRegenIntervalMs = 10000; // 10 seconds like legacy
     private const int PlayerRegenIntervalMs = 5000; // 5 seconds (adjust as desired)
+    private const int BaseAttackSpeedMs = 1000; // fallback when no weapon speed
 
     public void Loop()
     {
@@ -363,7 +364,7 @@ public class Script
         }
     }
 
-    public static void PlayerLearnSkill(int index, int itemNum, int skillNum = -1)
+    public void PlayerLearnSkill(int index, int itemNum, int skillNum = -1)
     {
         int n;
         int i;
@@ -687,14 +688,12 @@ public class Script
                 }
 
                 // Simplified death/spawn handling (entity is non-null here)
-#pragma warning disable CS8602
                 if (entity.Vital[(byte)Vital.Health] < 0 && entity.SpawnWait > 0)
                 {
                     entity.Num = 0;
                     entity.SpawnWait = General.GetTimeMs();
                     entity.Vital[(byte)Vital.Health] = 0;
                 }
-#pragma warning restore CS8602
 
                 if (entity.Type == Core.Globals.Entity.EntityType.Npc && entity.Num == -1 && entity.SpawnSecs > 0)
                 {
@@ -868,8 +867,6 @@ public class Script
             }
         }
     }
-    
-      private const int BaseAttackSpeedMs = 1000; // fallback when no weapon speed
 
     public struct DamageResult
     {
@@ -882,7 +879,7 @@ public class Script
         public int Final => (Dodge || Parry) ? 0 : Mitigated;
     }
 
-    private static void HandleDeath(Entity attacker, Entity target)
+    private void HandleDeath(Entity attacker, Entity target)
     {
         if (target.Type == Entity.EntityType.Player)
         {
@@ -901,7 +898,7 @@ public class Script
         }
     }
 
-    private static string GetEntityDisplayName(Entity e)
+    private string GetEntityDisplayName(Entity e)
     {
         if (e.Type == Entity.EntityType.Player)
         {
@@ -914,7 +911,7 @@ public class Script
         return "Entity";
     }
 
-    private static bool IsSkillRanged(int? skillId)
+    private bool IsSkillRanged(int? skillId)
     {
         if (!skillId.HasValue) return false;
         var id = skillId.Value;
@@ -922,7 +919,7 @@ public class Script
         return Data.Skill[id].Range > 1; // simple heuristic
     }
 
-    public static bool AttemptAttack(Entity attacker, Entity target, int? skillId = null)
+    public bool AttemptAttack(Entity attacker, Entity target, int? skillId = null)
     {
         if (attacker == null || target == null) return false;
         if (attacker.Map != target.Map) return false;
@@ -948,13 +945,13 @@ public class Script
         return true;
     }
 
-    private static bool IsAlive(Entity e)
+    private bool IsAlive(Entity e)
     {
         if (e.Vital == null) return false;
         return e.Vital[(int)Vital.Health] > 0;
     }
 
-    private static bool IsInMeleeRange(Entity a, Entity b)
+    private bool IsInMeleeRange(Entity a, Entity b)
     {
         // Tile-based adjacency (4-direction)
         var ax = a.X / 32; var ay = a.Y / 32;
@@ -964,7 +961,7 @@ public class Script
         return (dx + dy) == 1; // orthogonal neighbor
     }
 
-    private static int GetAttackSpeed(Entity attacker, int? skillId)
+    private int GetAttackSpeed(Entity attacker, int? skillId)
     {
         // Skill cast time gating handled elsewhere; for now consider weapon speed for players
         if (attacker.Type == Entity.EntityType.Player)
@@ -978,7 +975,7 @@ public class Script
         return BaseAttackSpeedMs;
     }
 
-    private static int GetEquippedItemId(Entity player, Equipment eq)
+    private int GetEquippedItemId(Entity player, Equipment eq)
     {
         if (player.Equipment == null) return -1;
         var slot = (int)eq;
@@ -986,7 +983,7 @@ public class Script
         return player.Equipment[slot].Num;
     }
 
-    private static DamageResult CalculateDamage(Entity attacker, Entity target, int? skillId)
+    private DamageResult CalculateDamage(Entity attacker, Entity target, int? skillId)
     {
         var result = new DamageResult();
 
@@ -1070,7 +1067,7 @@ public class Script
         return result;
     }
 
-    private static int SafeStat(Entity e, Stat stat)
+    private int SafeStat(Entity e, Stat stat)
     {
         if (e.Stat == null) return 0;
         var idx = (int)stat;
@@ -1078,7 +1075,7 @@ public class Script
         return e.Stat[idx];
     }
 
-    private static int SumArmor(Entity player)
+    private int SumArmor(Entity player)
     {
         if (player.Type != Entity.EntityType.Player || player.Equipment == null) return 0;
         int total = 0;
@@ -1093,21 +1090,21 @@ public class Script
         return total / 6; // legacy divide
     }
 
-    private static bool HasShield(Entity e)
+    private bool HasShield(Entity e)
     {
         if (e.Type != Entity.EntityType.Player || e.Equipment == null) return false;
         var shieldId = GetEquippedItemId(e, Equipment.Shield);
         return shieldId >= 0;
     }
 
-    private static bool Roll(int threshold)
+    private bool Roll(int threshold)
     {
         if (threshold <= 0) return false;
         var roll = (int)Math.Round(General.GetRandom.NextDouble(1d, 100d));
         return roll <= threshold;
     }
 
-    private static void ApplyDamage(Entity attacker, Entity target, DamageResult dmg, int? skillId)
+    private void ApplyDamage(Entity attacker, Entity target, DamageResult dmg, int? skillId)
     {
         // Feedback messages
         var map = attacker.Map;
@@ -1182,7 +1179,7 @@ public class Script
         }
     }
 
-    private static void UpdateUnderlyingAttackTimer(Entity entity, int newTime)
+    private void UpdateUnderlyingAttackTimer(Entity entity, int newTime)
     {
         if (entity.Type == Entity.EntityType.Player)
         {
@@ -1197,7 +1194,7 @@ public class Script
         }
     }
 
-    private static void BroadcastAttack(Entity attacker)
+    private void BroadcastAttack(Entity attacker)
     {
         if (attacker.Type == Entity.EntityType.Player)
         {
@@ -1209,7 +1206,7 @@ public class Script
         }
     }
 
-    private static bool ApplyDamageExtended(Entity attacker, Entity target, DamageResult dmg, int? skillId)
+    private bool ApplyDamageExtended(Entity attacker, Entity target, DamageResult dmg, int? skillId)
     {
         // reuse existing ApplyDamage but capture death result
         var before = target.Vital != null ? target.Vital[(int)Vital.Health] : 0;
@@ -1228,7 +1225,7 @@ public class Script
         return before > 0 && after <= 0;
     }
 
-    private static void DropNpcLoot(int mapNum, int mapNpcNum)
+    private void DropNpcLoot(int mapNum, int mapNpcNum)
     {
         if (mapNum < 0 || mapNum >= Data.MapNpc.Length) return;
         ref var mapNpc = ref Data.MapNpc[mapNum].Npc[mapNpcNum];
