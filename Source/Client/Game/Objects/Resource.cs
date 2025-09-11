@@ -108,7 +108,7 @@ namespace Client
 
         #region Drawing
 
-        public static void DrawResource(int resource, int dx, int dy, Rectangle rec)
+        public static void DrawResource(int resource, int dx, int dy, System.Drawing.Rectangle rec)
         {
             int x;
             int y;
@@ -135,7 +135,7 @@ namespace Client
             int mapResourceNum;
             int resourceState;
             var resourceSprite = default(int);
-            var rec = default(Rectangle);
+            var rec = default(System.Drawing.Rectangle);
             int x;
             int y;
 
