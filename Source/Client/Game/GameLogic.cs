@@ -2258,11 +2258,17 @@ namespace Client
         {
             if (x < 0)
                 return default;
+                
             if (y < 0)
                 return default;
-            if (x > Data.Map[GetPlayerMap(GameState.MyIndex)].MaxX - 1)
+
+            int maxMapX = Data.MyMap.MaxX;
+            int maxMapY = Data.MyMap.MaxY;
+
+            if (x > maxMapX - 1)
                 return default;
-            if (y > Data.Map[GetPlayerMap(GameState.MyIndex)].MaxY - 1)
+
+            if (y > maxMapY - 1)
                 return default;
 
             return true;
