@@ -10,6 +10,8 @@ A simple 2D MMORPG game engine written in C# (.NET 9.0).
 
 Based on the Orion+ conversion and MirageBasic frameworks.
 
+Game assets such as character base are only permitted to use in XtremeWOrlds Worlds.
+
 ## Overview
 
 XtremeWorlds is a tile-based 2D MMORPG game engine designed for ease of use and
