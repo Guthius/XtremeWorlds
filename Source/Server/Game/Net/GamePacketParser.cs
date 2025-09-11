@@ -1156,7 +1156,6 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         // Get yes/no value
         var s = buffer.ReadInt32();
 
-
         // Check if data is needed to be sent
         if (s == 1)
         {
