@@ -5,6 +5,7 @@ using Core;
 using Core.Globals;
 using Core.Net;
 using Microsoft.VisualBasic.CompilerServices;
+using Pango;
 
 namespace Client
 {
@@ -141,7 +142,7 @@ namespace Client
             if (GameState.GettingMap)
                 return;
 
-            if (GameState.MyEditorType == EditorType.Map)
+            if (GameState.MapEditorTab != (byte)MapEditorTab.Tiles && GameState.MyEditorType == EditorType.Map)
                 return;
 
             if (!GameState.MapData)
