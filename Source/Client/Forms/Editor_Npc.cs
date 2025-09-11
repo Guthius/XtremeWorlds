@@ -171,13 +171,34 @@ namespace Client
             picSprite = new Drawable { Size = new Size(96, 96), BackgroundColor = Colors.Transparent };
             picSprite.Paint += (s, e) =>
             {
-                if (_spriteBitmap != null)
+                if (_spriteBitmap == null) return;
+
+                // Determine if sheet is segmented (Idle/Run/Attack) like in-world rendering.
+                int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
+                int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
+                int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
+                int totalPerRow = idleFrames + runFrames + attackFrames;
+
+                // Each direction row stacked vertically (4 directions typical). Width contains horizontal frames.
+                int rows = 4; // assume standard 4-direction sheet
+                int frameHeight = _spriteBitmap.Height / rows;
+                int frameWidth;
+                bool segmented = (_spriteBitmap.Width % totalPerRow) == 0;
+                if (segmented)
                 {
-                    // Show only the first frame at native size (4x4 spritesheet)
-                    int frameW = _spriteBitmap.Width / SettingsManager.Instance.IdleFrames;
-                    int frameH = _spriteBitmap.Height / SettingsManager.Instance.IdleFrames;
-                    picSprite.Size = new Size(frameW, frameH);
-                    e.Graphics.DrawImage(_spriteBitmap, new Rectangle(0,0, frameW, frameH), new Rectangle(0,0, frameW, frameH));
+                    // First segment = Idle; we want its first frame only (column 0 of idle segment)
+                    frameWidth = _spriteBitmap.Width / totalPerRow; // width of a single frame
+                    var src = new Rectangle(0, 0, frameWidth, frameHeight); // top row, first idle frame
+                    picSprite.Size = new Size(frameWidth, frameHeight);
+                    e.Graphics.DrawImage(_spriteBitmap, new Rectangle(0, 0, frameWidth, frameHeight), src);
+                }
+                else
+                {
+                    // Fallback: treat sheet as uniform columns of idleFrames (legacy). Show first frame.
+                    frameWidth = _spriteBitmap.Width / idleFrames;
+                    var src = new Rectangle(0, 0, frameWidth, frameHeight);
+                    picSprite.Size = new Size(frameWidth, frameHeight);
+                    e.Graphics.DrawImage(_spriteBitmap, new Rectangle(0, 0, frameWidth, frameHeight), src);
                 }
             };
 
