@@ -43,7 +43,10 @@ public class SettingsManager
     public int SaveInterval { get; set; } = 5;
     public int MaxSqlClients { get; set; } = 10;
     public string Skin { get; set; } = "Crystalshire";
-    public int SpriteColumns { get; set; } = 4;
+    public string SpriteSegmentOrder { get; set; } = "idle,run,attack";
+    public int IdleFrames { get; set; } = 3;
+    public int RunFrames { get; set; } = 4;
+    public int AttackFrames { get; set; } = 5;
     
     private static SettingsManager Load()
     {

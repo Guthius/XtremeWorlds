@@ -174,8 +174,8 @@ namespace Client
                 if (_spriteBitmap != null)
                 {
                     // Show only the first frame at native size (4x4 spritesheet)
-                    int frameW = _spriteBitmap.Width / SettingsManager.Instance.SpriteColumns;
-                    int frameH = _spriteBitmap.Height / SettingsManager.Instance.SpriteColumns;
+                    int frameW = _spriteBitmap.Width / SettingsManager.Instance.IdleFrames;
+                    int frameH = _spriteBitmap.Height / SettingsManager.Instance.IdleFrames;
                     picSprite.Size = new Size(frameW, frameH);
                     e.Graphics.DrawImage(_spriteBitmap, new Rectangle(0,0, frameW, frameH), new Rectangle(0,0, frameW, frameH));
                 }

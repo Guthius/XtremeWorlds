@@ -64,9 +64,11 @@ namespace Client
                 {
                     if (_animationTmr[layer] < _tick)
                     {
-                        for (byte x = 0, loopTo = Data.MyMap.MaxX; x < loopTo; x++)
+                        byte mapMaxX = Data.MyMap.MaxX;
+                        for (byte x = 0; x < mapMaxX; x++)
                         {
-                            for (byte y = 0, loopTo1 = Data.MyMap.MaxY; y < loopTo1; y++)
+                            byte mapMaxY = Data.MyMap.MaxY;
+                            for (byte y = 0; y < mapMaxY; y++)
                             {
                                 if (GameLogic.IsValidMapPoint(x, y))
                                 {
@@ -83,8 +85,6 @@ namespace Client
                             }
                         }
                         ;
-
-
                     }
                 }
 
@@ -318,31 +318,17 @@ namespace Client
                 {
                     for (int i = 0; i < Constant.MaxPlayers; i++)
                     {
-                        if (IsPlaying(i))
-                        {
-                            if (GetPlayerMap(i) == GetPlayerMap(GameState.MyIndex))
-                            {
-                                // Advance animation step using dynamic sprite columns
-                                int cols = Math.Max(1, SettingsManager.Instance.SpriteColumns);
-                                int maxFrame = Math.Max(0, cols - 1);
-                                if (Data.Player[i].Steps >= maxFrame)
-                                    Data.Player[i].Steps = 0;
-                                else
-                                    Data.Player[i].Steps++;
-                            }
-                        }
+                        if (!IsPlaying(i)) continue;
+                        if (GetPlayerMap(i) != GetPlayerMap(GameState.MyIndex)) continue;
+                        // Always advance Steps (used modulo by idle/run frame counts in draw)
+                        unchecked { Data.Player[i].Steps++; } // byte wraps automatically
                     }
 
                     for (int i = 0; i < Constant.MaxMapNpcs; i++)
                     {
                         if (Data.MyMapNpc[i].Num >= 0)
                         {
-                            int cols = Math.Max(1, SettingsManager.Instance.SpriteColumns);
-                            int maxFrame = Math.Max(0, cols - 1);
-                            if (Data.MyMapNpc[i].Steps >= maxFrame)
-                                Data.MyMapNpc[i].Steps = 0;
-                            else
-                                Data.MyMapNpc[i].Steps++;
+                            unchecked { Data.MyMapNpc[i].Steps++; }
                         }
                     }
 
@@ -351,12 +337,20 @@ namespace Client
                     {
                         if (Data.MapEvents[_i].WalkAnim == 1)
                         {
-                            int cols = Math.Max(1, SettingsManager.Instance.SpriteColumns);
-                            int maxFrame = Math.Max(0, cols - 1);
-                            if (Data.MyMapNpc[_i].Steps >= maxFrame)
-                                Data.MyMapNpc[_i].Steps = 0;
+                            int cols;
+                            if (Data.MapEvents[_i].Moving != 0)
+                            {
+                                cols = Math.Max(1, SettingsManager.Instance.RunFrames);
+                            }
                             else
-                                Data.MyMapNpc[_i].Steps++;
+                            {
+                                cols = Math.Max(1, SettingsManager.Instance.IdleFrames);
+                            }
+                            int maxFrame = Math.Max(0, cols - 1);
+                            if (Data.MapEvents[_i].Steps >= maxFrame)
+                                Data.MapEvents[_i].Steps = 0;
+                            else
+                                Data.MapEvents[_i].Steps++;
                         }
                     }
 

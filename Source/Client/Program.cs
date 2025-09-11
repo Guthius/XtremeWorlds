@@ -1794,7 +1794,7 @@ namespace Client
             if (sprite < 1 | sprite > GameState.NumPaperdolls)
                 return;
 
-            int columns = Math.Max(1, SettingsManager.Instance.SpriteColumns);
+            int columns = Math.Max(1, SettingsManager.Instance.IdleFrames);
             rec.Y = (int)Math.Round(spritetop *
                 GetGfxInfo(Path.Combine(DataPath.Paperdolls, sprite.ToString())).Height / (double)columns);
             rec.Height =
@@ -1817,13 +1817,14 @@ namespace Client
 
         public static void DrawNpc(int mapNpcNum)
         {
-            byte anim;
+            // Segmented NPC draw mirroring player logic (Idle/Run/Attack) with fallback.
+            byte anim = 0; // frame within chosen segment
             int x;
             int y;
             int sprite;
-            var spriteLeft = default(int);
+            int spriteLeft = 0; // direction row
             Rectangle rect;
-            int attackSpeed = 1000;
+            int attackSpeed = 1000; // could be extended per-NPC later
 
             // Check if Npc exists
             if (Data.MyMapNpc[(int) mapNpcNum].Num < 0 ||
@@ -1855,19 +1856,10 @@ namespace Client
             if (sprite < 1 | sprite > GameState.NumCharacters)
                 return;
 
-            // Reset animation frame
-            anim = 0;
-
-            // Check for attacking animation
-            if (Data.MyMapNpc[(int) mapNpcNum].AttackTimer + attackSpeed / 2d > General.GetTickCount() &&
-                Data.MyMapNpc[(int) mapNpcNum].Attacking == 1)
-            {
-                anim = 3;
-            }
-            else
-            {
-                anim = (byte) Data.MyMapNpc[(int) mapNpcNum].Steps;
-            }
+            // Timing flags
+            long tick = General.GetTickCount();
+            bool isAttacking = Data.MyMapNpc[mapNpcNum].Attacking == 1; // treat full attack duration as attack
+            bool provisionalMoving = Data.MyMapNpc[mapNpcNum].Moving != 0;
 
             // Reset attacking state if attack timer has passed
             {
@@ -1904,41 +1896,93 @@ namespace Client
                 }
             }
 
-            int columns = Math.Max(1, SettingsManager.Instance.SpriteColumns);
-            // Create the rectangle for rendering the sprite
-            rect = new Rectangle(
-                (int)Math.Round(anim *
-                                 (GetGfxInfo(Path.Combine(DataPath.Characters, sprite.ToString())).Width /
-                                  (double)columns)),
-                (int)Math.Round(spriteLeft *
-                                 (GetGfxInfo(Path.Combine(DataPath.Characters, sprite.ToString())).Height /
-                                  (double)columns)),
-                (int)Math.Round(GetGfxInfo(Path.Combine(DataPath.Characters, sprite.ToString())).Width / (double)columns),
-                (int)Math.Round(GetGfxInfo(Path.Combine(DataPath.Characters, sprite.ToString())).Height /
-                                 (double)columns));
+            // Segmentation logic
+            var gfxInfo = GetGfxInfo(Path.Combine(DataPath.Characters, sprite.ToString()));
+            if (gfxInfo == null) return;
+            int directionRows = 4;
+            int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
+            int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
+            int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
+            int[] segmentLengths = { idleFrames, runFrames, attackFrames };
+            int expectedTotalColumns = idleFrames + runFrames + attackFrames;
 
-            // Calculate X and Y coordinates for rendering
-            x = (int)Math.Round(Data.MyMapNpc[(int)mapNpcNum].X -
-                                 (GetGfxInfo(Path.Combine(DataPath.Characters, sprite.ToString())).Width /
-                                  (double)columns -
-                                  32d) / 2d);
+            int frameHeight = gfxInfo.Height / directionRows;
+            if (frameHeight <= 0) return;
+            int autoColsBySquare = frameHeight > 0 ? gfxInfo.Width / frameHeight : 0;
+            if (autoColsBySquare <= 0) autoColsBySquare = 1;
+            bool widthDivisible = expectedTotalColumns > 0 && gfxInfo.Width % expectedTotalColumns == 0;
+            int candidateFrameWidth = widthDivisible ? gfxInfo.Width / expectedTotalColumns : 0;
+            // Relaxed segmentation: if width is divisible by expected columns we segment, even if not perfectly square.
+            bool canSegment = widthDivisible; // old heuristic removed to prevent cycling through all segments linearly
+            int frameColumnsForWidth = canSegment ? expectedTotalColumns : autoColsBySquare; // legacy fallback
 
-            if (GetGfxInfo(Path.Combine(DataPath.Characters, sprite.ToString())).Height / (double)columns > 32d)
+            // Dynamic segment ordering via settings
+            string orderCsv = SettingsManager.Instance.SpriteSegmentOrder ?? "idle,run,attack";
+            var tokens = orderCsv.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            if (tokens.Length != 3)
+                tokens = new[] { "idle", "run", "attack" };
+            for (int i = 0; i < tokens.Length; i++) tokens[i] = tokens[i].Trim().ToLowerInvariant();
+            if (!(tokens.Contains("idle") && tokens.Contains("run") && tokens.Contains("attack")))
+                tokens = new[] { "idle", "run", "attack" };
+            int runningOffset = 0;
+            int idleOffset = 0, runOffset = 0, attackOffset = 0;
+            for (int i = 0; i < tokens.Length; i++)
             {
-                // Larger sprites need an offset for height adjustment
-                y = (int)Math.Round(Data.MyMapNpc[(int)mapNpcNum].Y -
-                                     (GetGfxInfo(Path.Combine(DataPath.Characters, sprite.ToString()))
-                                             .Height /
-                                         (double)columns - 32d));
+                string t = tokens[i];
+                if (t == "idle") idleOffset = runningOffset;
+                else if (t == "run") runOffset = runningOffset;
+                else if (t == "attack") attackOffset = runningOffset;
+                if (t == "idle") runningOffset += idleFrames;
+                else if (t == "run") runningOffset += runFrames;
+                else if (t == "attack") runningOffset += attackFrames;
+            }
+            bool isMoving = provisionalMoving && !isAttacking && canSegment;
+
+            if (canSegment)
+            {
+                if (isAttacking)
+                {
+                    // Attack frames advance using the shared Steps counter just like idle/run
+                    anim = (byte)(Data.MyMapNpc[mapNpcNum].Steps % attackFrames);
+                }
+                else if (isMoving)
+                {
+                    anim = (byte)(Data.MyMapNpc[mapNpcNum].Steps % runFrames);
+                }
+                else
+                {
+                    anim = (byte)(Data.MyMapNpc[mapNpcNum].Steps % idleFrames); // idle animated
+                }
             }
             else
             {
-                // Normal sprite height
-                y = Data.MyMapNpc[(int) mapNpcNum].Y;
+                anim = (byte)(Data.MyMapNpc[mapNpcNum].Steps % frameColumnsForWidth);
             }
 
-            // Draw shadow and Npc sprite
-            // DrawShadow(x, y + 16)
+            // Frame placement
+            int segmentOffset = 0;
+            if (canSegment)
+            {
+                if (isAttacking) segmentOffset = attackOffset;
+                else if (isMoving) segmentOffset = runOffset;
+                else segmentOffset = idleOffset;
+            }
+            int frameColumn = Math.Min(frameColumnsForWidth - 1, segmentOffset + anim);
+            double frameWidth = gfxInfo.Width / (double)frameColumnsForWidth;
+            double frameHeightD = frameHeight;
+            rect = new Rectangle(
+                (int)Math.Round(frameColumn * frameWidth),
+                (int)Math.Round(spriteLeft * frameHeightD),
+                (int)Math.Round(frameWidth),
+                (int)Math.Round(frameHeightD));
+
+            // X/Y positioning
+            x = (int)Math.Round(Data.MyMapNpc[mapNpcNum].X - (gfxInfo.Width / (double)frameColumnsForWidth - 32d) / 2d);
+            if ((gfxInfo.Height / directionRows) > 32)
+                y = (int)Math.Round(Data.MyMapNpc[mapNpcNum].Y - (gfxInfo.Height / (double)directionRows - 32d));
+            else
+                y = Data.MyMapNpc[mapNpcNum].Y;
+
             DrawCharacterSprite(sprite, x, y, rect);
         }
 
@@ -2484,37 +2528,9 @@ namespace Client
             }
 
             long tick = General.GetTickCount();
-            bool isAttackingWindow = Data.Player[index].Attacking == 1 && Data.Player[index].AttackTimer + attackSpeed / 2d > tick;
-            bool isMoving = Data.Player[index].Moving != 0;
-            int totalColumns = Math.Max(1, SettingsManager.Instance.SpriteColumns);
-            int segmentSize = totalColumns / 3; // 0 if <3 total
-            bool segmented = segmentSize > 0 && segmentSize * 3 == totalColumns;
-            if (!segmented)
-            {
-                // fallback: original behaviour using Steps directly (no segments) and simple attack overlay frame
-                if (isAttackingWindow)
-                    anim = (byte)Math.Min(totalColumns - 1, totalColumns - 1); // use last frame as attack
-                else
-                    anim = (byte)(Data.Player[index].Steps % totalColumns);
-            }
-            else
-            {
-                if (isAttackingWindow)
-                {
-                    double attackDuration = attackSpeed / 2.0;
-                    double elapsed = Math.Max(0, tick - Data.Player[index].AttackTimer);
-                    double pct = attackDuration > 0 ? Math.Min(1.0, elapsed / attackDuration) : 1.0;
-                    anim = (byte)Math.Min(segmentSize - 1, (int)(pct * segmentSize));
-                }
-                else if (isMoving)
-                {
-                    anim = (byte)(Data.Player[index].Steps % segmentSize);
-                }
-                else
-                {
-                    anim = (byte)(Data.Player[index].Steps % segmentSize);
-                }
-            }
+            bool isAttacking = Data.Player[index].Attacking == 1; // full attack state
+            bool provisionalMoving = Data.Player[index].Moving != 0; // raw flag from network
+            anim = 0; // will be set after texture info (need framesPerSegment)
 
             // Check to see if we want to stop making him attack
             {
@@ -2536,7 +2552,7 @@ namespace Client
                 }
                 case (int) Direction.Right:
                 {
-                    spriteleft = 2;
+                    spriteleft = 1; // corrected: right-facing row
                     break;
                 }
                 case (int) Direction.Down:
@@ -2546,27 +2562,27 @@ namespace Client
                 }
                 case (int) Direction.Left:
                 {
-                    spriteleft = 1;
+                    spriteleft = 2; // corrected: left-facing row
                     break;
                 }
                 case (int) Direction.UpRight:
                 {
-                    spriteleft = 2;
+                    spriteleft = 1; // follow right-facing row
                     break;
                 }
                 case (int) Direction.UpLeft:
                 {
-                    spriteleft = 1;
+                    spriteleft = 2; // follow left-facing row
                     break;
                 }
                 case (int) Direction.DownLeft:
                 {
-                    spriteleft = 1;
+                    spriteleft = 2; // follow left-facing row
                     break;
                 }
                 case (int) Direction.DownRight:
                 {
-                    spriteleft = 2;
+                    spriteleft = 1; // follow right-facing row
                     break;
                 }
             }
@@ -2578,15 +2594,96 @@ namespace Client
                 return;
             }
 
-            int columns = Math.Max(1, SettingsManager.Instance.SpriteColumns);
+            int directionRows = 4; // Down, Right, Left, Up (rows)
+
+            // Determine segment frame counts (allow variable counts)
+            int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
+            int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
+            int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
+            int[] segmentLengths = { idleFrames, runFrames, attackFrames };
+            int expectedTotalColumns = idleFrames + runFrames + attackFrames;
+
+            // Derive frameHeight from vertical directional stacking
+            int frameHeight = gfxInfo.Height / directionRows;
+            if (frameHeight <= 0) return; // safety
+
+            // Heuristic for legacy sheets: sprites are usually square per frame
+            int autoColsBySquare = frameHeight > 0 ? gfxInfo.Width / frameHeight : 0;
+            if (autoColsBySquare <= 0) autoColsBySquare = 1;
+
+            // Candidate segmented frame width if we attempted 3 segments
+            bool widthDivisible = expectedTotalColumns > 0 && gfxInfo.Width % expectedTotalColumns == 0;
+            int candidateFrameWidth = widthDivisible ? gfxInfo.Width / expectedTotalColumns : 0;
+
+            // Relax segmentation: any width-divisible sheet is treated as segmented.
+            bool canSegment = widthDivisible;
+            bool hasThreeSegments = canSegment;
+
+            int frameColumnsForWidth = canSegment ? expectedTotalColumns : autoColsBySquare;
+
+            // Dynamic segment ordering via settings (e.g. "idle,run,attack" or "attack,idle,run")
+            string orderCsv = SettingsManager.Instance.SpriteSegmentOrder ?? "idle,run,attack";
+            var tokens = orderCsv.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            if (tokens.Length != 3)
+                tokens = new[] { "idle", "run", "attack" };
+            // Normalize & validate
+            for (int i = 0; i < tokens.Length; i++) tokens[i] = tokens[i].Trim().ToLowerInvariant();
+            // Ensure all three unique expected names present; else fallback default
+            if (!(tokens.Contains("idle") && tokens.Contains("run") && tokens.Contains("attack")))
+                tokens = new[] { "idle", "run", "attack" };
+
+            // Build offsets based on order sequence
+            int runningOffset = 0;
+            int idleOffset = 0, runOffset = 0, attackOffset = 0;
+            for (int i = 0; i < tokens.Length; i++)
+            {
+                string t = tokens[i];
+                if (t == "idle") idleOffset = runningOffset;
+                else if (t == "run") runOffset = runningOffset;
+                else if (t == "attack") attackOffset = runningOffset;
+                // advance by that segment's length
+                if (t == "idle") runningOffset += idleFrames;
+                else if (t == "run") runningOffset += runFrames;
+                else if (t == "attack") runningOffset += attackFrames;
+            }
+
+            // Moving only meaningful if segmented sheet
+            bool isMoving = provisionalMoving && !isAttacking && hasThreeSegments;
+
+            // Determine frame inside its segment (Steps driven for run; idle frame stays 0)
+            if (hasThreeSegments)
+            {
+                if (isAttacking)
+                {
+                    // Use Steps-based cycling for attack segment
+                    anim = (byte)(Data.Player[index].Steps % attackFrames);
+                }
+                else if (isMoving)
+                {
+                    // Run anim: tied to movement steps only
+                    int len = segmentLengths[1];
+                    anim = (byte)(Data.Player[index].Steps % len);
+                }
+                else
+                {
+                    // Idle: animate through idle frames using Steps
+                    int len = segmentLengths[0];
+                    anim = (byte)(Data.Player[index].Steps % len);
+                }
+            }
+            else
+            {
+                // Legacy: single segment; Steps only advance while moving so idle shows frame 0
+                anim = (byte)(Data.Player[index].Steps % frameColumnsForWidth); // legacy: cycles while idle too
+            }
             // Calculate the X
-            x = (int) Math.Round(Data.Player[index].X - (gfxInfo.Width / (double)columns - 32d) / 2d);
+            x = (int) Math.Round(Data.Player[index].X - (gfxInfo.Width / (double)frameColumnsForWidth - 32d) / 2d);
 
             // Is the player's height more than 32..?
-            if ((gfxInfo.Height / columns) > 32)
+            if ((gfxInfo.Height / directionRows) > 32)
             {
                 // Create a 32 pixel offset for larger sprites
-                y = (int) Math.Round(GetPlayerRawY(index) - (gfxInfo.Height / (double)columns - 32d));
+                y = (int)Math.Round(GetPlayerRawY(index) - (gfxInfo.Height / (double)directionRows - 32d));
             }
             else
             {
@@ -2595,25 +2692,35 @@ namespace Client
             }
 
             int frameColumn;
-            if (segmentSize > 0 && segmentSize * 3 == columns)
+            int segmentOffset = 0;
+            if (hasThreeSegments)
             {
-                int segmentOffset = 0;
-                if (isAttackingWindow) segmentOffset = segmentSize * 2; else if (isMoving) segmentOffset = segmentSize;
-                frameColumn = Math.Min(columns - 1, segmentOffset + anim);
+                if (isAttacking) segmentOffset = attackOffset;
+                else if (isMoving) segmentOffset = runOffset;
+                else segmentOffset = idleOffset;
             }
-            else
-            {
-                frameColumn = anim;
-            }
-            double frameWidth = gfxInfo.Width / (double)columns;
-            double frameHeight = gfxInfo.Height / (double)columns; // rows == columns (original assumption)
+            frameColumn = Math.Min(frameColumnsForWidth - 1, segmentOffset + anim);
+            double frameWidth = gfxInfo.Width / (double)frameColumnsForWidth;
+            double frameHeightD = frameHeight; // already computed above
             rect = new Rectangle((int)Math.Round(frameColumn * frameWidth),
-                (int)Math.Round(spriteleft * frameHeight), (int)Math.Round(frameWidth),
-                (int)Math.Round(frameHeight));
+                (int)Math.Round(spriteleft * frameHeightD), (int)Math.Round(frameWidth),
+                (int)Math.Round(frameHeightD));
 
             // render the actual sprite
             // DrawShadow(x, y + 16)
             DrawCharacterSprite(spriteNum, x, y, rect);
+
+            // DEBUG: show segment info above player 0 for animation troubleshooting
+        if (index == GameState.MyIndex && GameState.Bfps) // piggyback on FPS debug toggle
+            {
+                try
+                {
+                    string segName = isAttacking ? "attack" : (isMoving ? "run" : "idle");
+                    string dbg = $"seg={segName} anim={anim} idleOff={idleOffset} runOff={runOffset} atkOff={attackOffset} col={frameColumn}";
+            TextRenderer.RenderText(dbg, x, y - 12, Color.Yellow, Color.Black);
+                }
+                catch { }
+            }
 
             // check for paperdolling with directional draw order rules
             // Rule: draw weapon first when facing up (behind), draw weapon last when facing down (in front)
@@ -2643,7 +2750,9 @@ namespace Client
                     var paperId = Data.Item[itemIndex].Paperdoll;
                     if (paperId > 0)
                     {
-                        DrawPaperdoll(x, y, paperId, anim, spriteleft);
+                        int pdCols = Math.Max(1, SettingsManager.Instance.IdleFrames);
+                        int safeAnim = anim % pdCols; // prevent out-of-range for paperdolls
+                        DrawPaperdoll(x, y, paperId, safeAnim, spriteleft);
                     }
                 }
             }
@@ -2733,7 +2842,7 @@ namespace Client
                 return;
 
             // Character sheets use configurable columns; rows equal columns.
-            int columns = Math.Max(1, SettingsManager.Instance.SpriteColumns);
+            int columns = Math.Max(1, SettingsManager.Instance.IdleFrames);
             var gfxInfo = GetGfxInfo(Path.Combine(DataPath.Characters, gfxIndex.ToString()));
             if (gfxInfo == null)
             {
@@ -2792,7 +2901,6 @@ namespace Client
             int width;
             int height;
             var sRect = default(Rectangle);
-            var anim = default(int);
             var spritetop = default(int);
 
             try
@@ -2813,69 +2921,88 @@ namespace Client
                         }
                     case 1:
                         {
-                            if (Data.MapEvents[id].Graphic <= 0 |
-                                Data.MapEvents[id].Graphic > GameState.NumCharacters)
+                            // Character event using same segmentation logic as NPC, but only idle segment animates.
+                            if (Data.MapEvents[id].Graphic <= 0 || Data.MapEvents[id].Graphic > GameState.NumCharacters)
                                 return;
 
-                            anim = Data.MapEvents[id].Steps;
-
-                            // Set the left
+                            // Direction row (same ordering as players/NPCs)
                             switch (Data.MapEvents[id].ShowDir)
                             {
-                                case (int)Direction.Up:
-                                    {
-                                        spritetop = 3;
-                                        break;
-                                    }
-                                case (int)Direction.Right:
-                                    {
-                                        spritetop = 2;
-                                        break;
-                                    }
-                                case (int)Direction.Down:
-                                    {
-                                        spritetop = 0;
-                                        break;
-                                    }
-                                case (int)Direction.Left:
-                                    {
-                                        spritetop = 1;
-                                        break;
-                                    }
+                                case (int)Direction.Up:    spritetop = 3; break;
+                                case (int)Direction.Right: spritetop = 2; break;
+                                case (int)Direction.Down:  spritetop = 0; break;
+                                case (int)Direction.Left:  spritetop = 1; break;
                             }
 
-                            var gfxInfo = GetGfxInfo(Path.Combine(DataPath.Characters,
-                                Data.MapEvents[id].Graphic.ToString()));
+                            var gfxInfo = GetGfxInfo(Path.Combine(DataPath.Characters, Data.MapEvents[id].Graphic.ToString()));
+                            if (gfxInfo == null) return;
 
-                            if (gfxInfo == null)
+                            const int directionRows = 4;
+                            int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
+                            int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
+                            int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
+                            int expectedTotalColumns = idleFrames + runFrames + attackFrames;
+                            int frameRowHeight = gfxInfo.Height / directionRows;
+                            if (frameRowHeight <= 0) frameRowHeight = gfxInfo.Height; // safety
+                            int autoColsBySquare = frameRowHeight > 0 ? gfxInfo.Width / frameRowHeight : 0;
+                            if (autoColsBySquare <= 0) autoColsBySquare = 1;
+                            bool widthDivisible = expectedTotalColumns > 0 && gfxInfo.Width % expectedTotalColumns == 0;
+                            int candidateFrameWidth = widthDivisible ? gfxInfo.Width / expectedTotalColumns : 0;
+                            // Relaxed: treat any sheet whose width is divisible by expectedTotalColumns as segmented (match player/NPC logic)
+                            bool canSegment = widthDivisible;
+                            int frameColumnsForWidth = canSegment ? expectedTotalColumns : autoColsBySquare;
+
+                            // Dynamic ordering (same parsing as NPC)
+                            string orderCsv = SettingsManager.Instance.SpriteSegmentOrder ?? "idle,run,attack";
+                            var tokens = orderCsv.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                            if (tokens.Length != 3) tokens = new[] { "idle", "run", "attack" };
+                            for (int i = 0; i < tokens.Length; i++) tokens[i] = tokens[i].Trim().ToLowerInvariant();
+                            if (!(tokens.Contains("idle") && tokens.Contains("run") && tokens.Contains("attack")))
+                                tokens = new[] { "idle", "run", "attack" };
+                            int runningOffset = 0;
+                            int idleOffset = 0, runOffset = 0, attackOffset = 0; // (run/attack unused but kept for symmetry)
+                            for (int i = 0; i < tokens.Length; i++)
                             {
-                                // Handle the case where gfxInfo is null
-                                return;
+                                string t = tokens[i];
+                                if (t == "idle") idleOffset = runningOffset;
+                                else if (t == "run") runOffset = runningOffset;
+                                else if (t == "attack") attackOffset = runningOffset;
+                                if (t == "idle") runningOffset += idleFrames;
+                                else if (t == "run") runningOffset += runFrames;
+                                else if (t == "attack") runningOffset += attackFrames;
                             }
 
-                            int columns = Math.Max(1, SettingsManager.Instance.SpriteColumns);
-                            height = (int)Math.Round(gfxInfo.Height / (double)columns);
-                            width = (int)Math.Round(gfxInfo.Width / (double)columns);
-                            sRect = new Rectangle(anim * width,
-                                spritetop * height, width, height);
-
-                            // Calculate the X
-                            x = (int)Math.Round(Data.MapEvents[id].X -
-                                                 (width - 32d) / 2d);
-
-                            // Is the player's height more than 32..?
-                            if ((gfxInfo.Height / columns) > 32)
-                            {
-                                // Create a 32 pixel offset for larger sprites
-                                y = (int) Math.Round(Data.MapEvents[id].Y - (height - 32d));
-                            }
+                            // Idle animation loop only
+                            byte idleAnim;
+                            if (canSegment)
+                                idleAnim = (byte)(Data.MapEvents[id].Steps % idleFrames);
                             else
-                            {
-                                // Proceed as normal
-                                y = Data.MapEvents[id].Y;
-                            }
+                                idleAnim = (byte)(Data.MapEvents[id].Steps % frameColumnsForWidth);
 
-                            // render the actual sprite
+                            int frameColumn;
+                            if (canSegment)
+                                frameColumn = Math.Min(frameColumnsForWidth - 1, idleOffset + idleAnim);
+                            else
+                                frameColumn = idleAnim; // legacy continuous sheet
+
+                            double frameWidthD = gfxInfo.Width / (double)frameColumnsForWidth;
+                            double frameHeightD = frameRowHeight;
+                            sRect = new Rectangle(
+                                (int)Math.Round(frameColumn * frameWidthD),
+                                (int)Math.Round(spritetop * frameHeightD),
+                                (int)Math.Round(frameWidthD),
+                                (int)Math.Round(frameHeightD));
+
+                            width = sRect.Width;
+                            height = sRect.Height;
+
+                            // Positioning replicating player/NPC centering
+                            x = (int)Math.Round(Data.MapEvents[id].X - (frameWidthD - 32d) / 2d);
+                            if (frameRowHeight > 32)
+                                y = (int)Math.Round(Data.MapEvents[id].Y - (frameHeightD - 32d));
+                            else
+                                y = Data.MapEvents[id].Y;
+
                             DrawCharacterSprite(Data.MapEvents[id].Graphic, x, y, sRect);
                             break;
                         }

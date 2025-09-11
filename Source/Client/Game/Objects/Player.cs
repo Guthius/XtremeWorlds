@@ -213,6 +213,8 @@ namespace Client
                     Sender.SendStopPlayerMove();
                     Data.Player[GameState.MyIndex].IsMoving = false;
                 }
+                // Always ensure numeric Moving flag (animation driver) is cleared whenever no movement keys are down
+                Data.Player[GameState.MyIndex].Moving = 0; // 0 = idle
             }
 
             return isTryingToMove;
@@ -460,8 +462,6 @@ namespace Client
                         {
                             Sender.SendPlayerDir();
                         }
-
-                        return canMove;
                     }
                 }
                 else if (Data.MyMap.Up > 0)
@@ -482,8 +482,6 @@ namespace Client
                         {
                             Sender.SendPlayerDir();
                         }
-
-                        return canMove;
                     }
                 }
                 else if (Data.MyMap.Down > 0)
@@ -504,8 +502,6 @@ namespace Client
                         {
                             Sender.SendPlayerDir();
                         }
-
-                        return canMove;
                     }
                 }
                 else if (Data.MyMap.Left > 0)
@@ -526,8 +522,6 @@ namespace Client
                         {
                             Sender.SendPlayerDir();
                         }
-
-                        return canMove;
                     }
                 }
                 else if (Data.MyMap.Right > 0)
@@ -549,8 +543,6 @@ namespace Client
                         {
                             Sender.SendPlayerDir();
                         }
-
-                        return canMove;
                     }
                 }
                 else if (Data.MyMap.Up > 0 & Data.MyMap.Right > 0)
@@ -570,8 +562,6 @@ namespace Client
                         {
                             Sender.SendPlayerDir();
                         }
-
-                        return canMove;
                     }
                 }
                 else if (Data.MyMap.Up > 0 & Data.MyMap.Left > 0)
@@ -591,8 +581,6 @@ namespace Client
                         {
                             Sender.SendPlayerDir();
                         }
-
-                        return canMove;
                     }
                 }
                 else if (Data.MyMap.Down > 0 & Data.MyMap.Right > 0)
@@ -612,8 +600,6 @@ namespace Client
                         {
                             Sender.SendPlayerDir();
                         }
-
-                        return canMove;
                     }
                 }
                 else if (Data.MyMap.Down > 0 & Data.MyMap.Left > 0)
