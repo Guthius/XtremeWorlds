@@ -141,6 +141,9 @@ namespace Client
             if (GameState.GettingMap)
                 return;
 
+            if (GameState.MyEditorType == EditorType.Map)
+                return;
+
             if (!GameState.MapData)
                 return;
 
