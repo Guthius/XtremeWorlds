@@ -145,8 +145,6 @@ namespace Client
         public static bool PlayerData;
 
         // Draw map name location
-        public static float DrawLocX = 10f;
-        public static float DrawLocY = 0f;
         public static Color DrawMapNameColor;
 
         // Game direction vars

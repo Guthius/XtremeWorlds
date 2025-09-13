@@ -660,7 +660,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                 break;
             }
 
-            case var case4 when case4 == (byte) Direction.UpRight:
+            case (byte) Direction.UpRight:
             {
                 if (GetPlayerX(session.Id) == Data.Map[GetPlayerMap(session.Id)].MaxX)
                     return;
@@ -671,7 +671,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                 break;
             }
 
-            case var case5 when case5 == (byte) Direction.UpLeft:
+            case (byte) Direction.UpLeft:
             {
                 if (GetPlayerX(session.Id) == Data.Map[GetPlayerMap(session.Id)].MaxX)
                     return;
@@ -682,7 +682,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                 break;
             }
 
-            case var case6 when case6 == (byte) Direction.DownRight:
+            case (byte) Direction.DownRight:
             {
                 if (GetPlayerX(session.Id) == Data.Map[GetPlayerMap(session.Id)].MaxX)
                     return;
@@ -693,7 +693,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                 break;
             }
 
-            case var case7 when case7 == (byte) Direction.DownLeft:
+            case (byte) Direction.DownLeft:
             {
                 if (GetPlayerX(session.Id) == Data.Map[GetPlayerMap(session.Id)].MaxX)
                     return;
@@ -731,6 +731,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
                 if (n > 100)
                     n = 100;
+                    
                 if (i > 100)
                     i = 100;
                 NetworkSend.PlayerMsg(session.Id, "Critical Hit Chance: " + n + "%, Block Chance: " + i + "%", (int) ColorName.Yellow);

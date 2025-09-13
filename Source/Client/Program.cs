@@ -1564,19 +1564,27 @@ namespace Client
 
         private static void DrawOutlineRectangle(int x, int y, int width, int height, Color color, float thickness)
         {
+            if (SpriteBatch == null) return; // safety
+            if (width <= 0 || height <= 0) return;
+
             var whiteTexture = new Texture2D(SpriteBatch.GraphicsDevice, 1, 1);
+            whiteTexture.SetData([Color.White]); // ensure texture has visible pixel
+
+            int t = (int)Math.Max(1, Math.Round(thickness));
 
             // Define four rectangles for the outline
-            var left = new Rectangle(x, y, (int) Math.Round(thickness), height);
-            var top = new Rectangle(x, y, width, (int) Math.Round(thickness));
-            var right = new Rectangle((int) Math.Round(x + width - thickness), y, (int) Math.Round(thickness), height);
-            var bottom = new Rectangle(x, (int) Math.Round(y + height - thickness), width, (int) Math.Round(thickness));
+            var left = new Rectangle(x, y, t, height);
+            var top = new Rectangle(x, y, width, t);
+            var right = new Rectangle(x + width - t, y, t, height);
+            var bottom = new Rectangle(x, y + height - t, width, t);
 
             // Draw the outline
             SpriteBatch.Draw(whiteTexture, left, color);
             SpriteBatch.Draw(whiteTexture, top, color);
             SpriteBatch.Draw(whiteTexture, right, color);
             SpriteBatch.Draw(whiteTexture, bottom, color);
+
+            whiteTexture.Dispose();
         }
 
         public static Color QbColorToXnaColor(int qbColor)
@@ -1738,7 +1746,7 @@ namespace Client
             }
         }
 
-        public static void DrawPaperdoll(int x2, int y2, int sprite, int anim, int spritetop, bool isMoving = false, bool isAttacking = false)
+        public static void DrawPaperdoll(int x, int y, int sprite, int anim, int spritetop, bool isMoving = false, bool isAttacking = false)
         {
             // Paperdoll rendering now mirrors DrawPlayer segmented logic (Idle|Run|Attack) so equipment layers
             // stay frame-synchronized with the base character during run/attack animations.
@@ -1747,29 +1755,35 @@ namespace Client
             string gfxPath = Path.Combine(DataPath.Paperdolls, sprite.ToString());
             var info = GetGfxInfo(gfxPath);
             if (info == null || info.Width <= 0 || info.Height <= 0) return;
+            // Determine if this paperdoll has directional rows or is a single strip.
+            // Heuristic: if height divides evenly by 4 and each row height >= 16, assume 4 directional rows.
+            bool looksDirectional = (info.Height % 4 == 0) && (info.Height / 4 >= 16);
+            int directionRows = looksDirectional ? 4 : 1;
 
-            const int directionRows = 4; // Down, Right, Left, Up ordering like base sprites (mapped via spritetop)
+            int frameHeight = info.Height / directionRows;
+            if (frameHeight <= 0) frameHeight = info.Height; // safety
+
+            // Segment frame counts (match player logic) but only meaningful if segmented sheet.
             int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
             int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
             int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
             int expectedTotalColumns = idleFrames + runFrames + attackFrames;
 
-            int frameHeight = info.Height / directionRows;
-            if (frameHeight <= 0) return;
+            // Legacy: derive columns by square-ish assumption
+            int autoColsBySquare = frameHeight > 0 ? info.Width / frameHeight : 1;
+            if (autoColsBySquare <= 0) autoColsBySquare = 1;
+            // Can we treat as segmented? Require width divisibility AND at least expectedTotalColumns frames by square heuristic.
+            bool canSegment = expectedTotalColumns > 0 && info.Width % expectedTotalColumns == 0 && autoColsBySquare >= expectedTotalColumns;
+            // Force non-segment if sheet effectively only has 1 column (common for static paperdolls)
+            if (autoColsBySquare <= 1) canSegment = false;
+            int frameColumnsForWidth = canSegment ? expectedTotalColumns : autoColsBySquare;
+            if (frameColumnsForWidth <= 0) frameColumnsForWidth = 1;
+            int frameWidth = Math.Max(1, info.Width / frameColumnsForWidth);
 
-            bool widthDivisible = expectedTotalColumns > 0 && info.Width % expectedTotalColumns == 0;
-            bool canSegment = widthDivisible; // relaxed heuristic identical to player logic
-
-            // Fallback for legacy (non-segmented) sheets: treat horizontal frames as a single sequence (idle only)
-            int frameColumnsForWidth = canSegment ? expectedTotalColumns : (frameHeight > 0 ? Math.Max(1, info.Width / frameHeight) : idleFrames);
-            if (frameColumnsForWidth <= 0) frameColumnsForWidth = idleFrames;
-
-            int frameWidth = info.Width / frameColumnsForWidth;
-
+            // Offsets for segments
             int idleOffset = 0, runOffset = 0, attackOffset = 0;
             if (canSegment)
             {
-                // Honor dynamic ordering (idle,run,attack permutations)
                 string orderCsv = SettingsManager.Instance.SpriteSegmentOrder ?? "idle,run,attack";
                 var tokens = orderCsv.Split(',', StringSplitOptions.RemoveEmptyEntries);
                 if (tokens.Length != 3) tokens = new[] { "idle", "run", "attack" };
@@ -1789,33 +1803,41 @@ namespace Client
                 }
             }
 
+            // Choose segment (paperdolls track with base character state via isMoving/isAttacking flags)
             int segmentOffset = idleOffset;
             int segmentFrames = idleFrames;
             if (canSegment)
             {
-                if (isAttacking)
-                {
-                    segmentOffset = attackOffset;
-                    segmentFrames = attackFrames;
-                }
-                else if (isMoving)
-                {
-                    segmentOffset = runOffset;
-                    segmentFrames = runFrames;
-                }
+                if (isAttacking) { segmentOffset = attackOffset; segmentFrames = attackFrames; }
+                else if (isMoving) { segmentOffset = runOffset; segmentFrames = runFrames; }
             }
 
             int frameInSegment = anim % Math.Max(1, segmentFrames);
             int frameColumn = Math.Min(frameColumnsForWidth - 1, segmentOffset + frameInSegment);
 
+            // Row: if no directional rows, clamp to 0 ignoring spritetop
+            if (!looksDirectional) spritetop = 0;
             if (spritetop < 0 || spritetop >= directionRows) spritetop = 0;
-            int srcX = frameColumn * frameWidth;
-            int srcY = spritetop * frameHeight;
-            var rec = new Rectangle(srcX, srcY, frameWidth, frameHeight);
 
-            int x = GameLogic.ConvertMapX(x2);
-            int y = GameLogic.ConvertMapY(y2);
-            RenderTexture(ref gfxPath, x, y, rec.X, rec.Y, rec.Width, rec.Height);
+            // Match player rectangle math exactly (double precision + Math.Round)
+            double frameWidthD = info.Width / (double)frameColumnsForWidth;
+            double frameHeightD2 = frameHeight; // already derived
+            var rec = new Rectangle(
+                (int)Math.Round(frameColumn * frameWidthD),
+                (int)Math.Round(spritetop * frameHeightD2),
+                (int)Math.Round(frameWidthD),
+                (int)Math.Round(frameHeightD2));
+
+            // IMPORTANT: x,y passed in are already world (raw) coordinates chosen to match the base player sprite
+            // AFTER that function later converts them in DrawCharacterSprite. We should *not* reconvert here.
+            // Likewise, vertical tall-sprite adjustment has already been applied to the base player's Y before
+            // calling DrawPaperdoll. Applying it again here caused the paperdoll to render too high. So we leave
+            // x,y exactly as provided (no ConvertMapX/Y, no tall adjustment) for perfect overlap.
+
+            // Convert to screen coordinates exactly once here for the equipment layer.
+            int sx = GameLogic.ConvertMapX(x);
+            int sy = GameLogic.ConvertMapY(y);
+            RenderTexture(ref gfxPath, sx, sy, rec.X, rec.Y, rec.Width, rec.Height, rec.Width, rec.Height);
         }
 
         public static void DrawNpc(int mapNpcNum)
@@ -1830,15 +1852,15 @@ namespace Client
             int attackSpeed = 1000; // could be extended per-NPC later
 
             // Check if Npc exists
-            if (Data.MyMapNpc[(int) mapNpcNum].Num < 0 ||
-                Data.MyMapNpc[(int) mapNpcNum].Num > Constant.MaxNpcs)
+            if (Data.MyMapNpc[(int)mapNpcNum].Num < 0 ||
+                Data.MyMapNpc[(int)mapNpcNum].Num > Constant.MaxNpcs)
                 return;
 
             if (EditorType.Map == GameState.MyEditorType)
                 return;
 
-            x = (int) Math.Floor((double) Data.MyMapNpc[(int) mapNpcNum].X / 32);
-            y = (int) Math.Floor((double) Data.MyMapNpc[(int) mapNpcNum].Y / 32);
+            x = (int)Math.Floor((double)Data.MyMapNpc[(int)mapNpcNum].X / 32);
+            y = (int)Math.Floor((double)Data.MyMapNpc[(int)mapNpcNum].Y / 32);
 
             // Ensure Npc is within the tile view range
             if (x < GameState.TileView.Left |
@@ -1850,10 +1872,10 @@ namespace Client
                 return;
 
             // Stream Npc if not yet loaded
-            Database.StreamNpc((int) Data.MyMapNpc[(int) mapNpcNum].Num);
+            Database.StreamNpc((int)Data.MyMapNpc[(int)mapNpcNum].Num);
 
             // Get the sprite of the Npc
-            sprite = Data.Npc[(int) Data.MyMapNpc[(int) mapNpcNum].Num].Sprite;
+            sprite = Data.Npc[(int)Data.MyMapNpc[(int)mapNpcNum].Num].Sprite;
 
             // Validate sprite
             if (sprite < 1 | sprite > GameState.NumCharacters)
@@ -1866,7 +1888,7 @@ namespace Client
 
             // Reset attacking state if attack timer has passed
             {
-                ref var withBlock = ref Data.MyMapNpc[(int) mapNpcNum];
+                ref var withBlock = ref Data.MyMapNpc[(int)mapNpcNum];
                 if (withBlock.AttackTimer + attackSpeed < General.GetTickCount())
                 {
                     withBlock.Attacking = 0;
@@ -1875,28 +1897,28 @@ namespace Client
             }
 
             // Set sprite sheet position based on direction
-            switch (Data.MyMapNpc[(int) mapNpcNum].Dir)
+            switch (Data.MyMapNpc[(int)mapNpcNum].Dir)
             {
-                case (int) Direction.Up:
-                {
-                    spriteLeft = 3;
-                    break;
-                }
-                case (int) Direction.Right:
-                {
-                    spriteLeft = 2;
-                    break;
-                }
-                case (int) Direction.Down:
-                {
-                    spriteLeft = 0;
-                    break;
-                }
-                case (int) Direction.Left:
-                {
-                    spriteLeft = 1;
-                    break;
-                }
+                case (int)Direction.Up:
+                    {
+                        spriteLeft = 3;
+                        break;
+                    }
+                case (int)Direction.Right:
+                    {
+                        spriteLeft = 2;
+                        break;
+                    }
+                case (int)Direction.Down:
+                    {
+                        spriteLeft = 0;
+                        break;
+                    }
+                case (int)Direction.Left:
+                    {
+                        spriteLeft = 1;
+                        break;
+                    }
             }
 
             // Segmentation logic
@@ -2711,18 +2733,9 @@ namespace Client
 
             // render the actual sprite
             // DrawShadow(x, y + 16)
-            DrawCharacterSprite(spriteNum, x, y, rect);
-
-            // DEBUG: show segment info above player 0 for animation troubleshooting
-            if (index == GameState.MyIndex && GameState.Bfps) // piggyback on FPS debug toggle
+            if (GetPlayerDir(index) == (byte)Direction.Up)
             {
-                try
-                {
-                    string segName = isAttacking ? "attack" : (isMoving ? "run" : "idle");
-                    string dbg = $"seg={segName} anim={anim} idleOff={idleOffset} runOff={runOffset} atkOff={attackOffset} col={frameColumn}";
-                    TextRenderer.RenderText(dbg, x, y - 12, Color.Yellow, Color.Black);
-                }
-                catch { }
+                DrawCharacterSprite(spriteNum, x, y, rect);
             }
 
             // check for paperdolling with directional draw order rules
@@ -2757,6 +2770,11 @@ namespace Client
                         DrawPaperdoll(x, y, paperId, anim, spriteleft, isMoving, isAttacking);
                     }
                 }
+            }
+
+            if (GetPlayerDir(index) != (byte)Direction.Up)
+            {
+                DrawCharacterSprite(spriteNum, x, y, rect);
             }
 
             // Check to see if we want to stop showing emote
@@ -3450,14 +3468,20 @@ namespace Client
             if (GameState.BLoc)
             {
                 string cur = "Cur X: " + GameState.CurXGame + " Y: " + GameState.CurYGame;
-                string loc = "loc X: " + GetPlayerX(GameState.MyIndex) + " Y: " + GetPlayerY(GameState.MyIndex);
+                string loc = "Loc X: " + GetPlayerX(GameState.MyIndex) + " Y: " + GetPlayerY(GameState.MyIndex);
                 string map = " (Map #" + GetPlayerMap(GameState.MyIndex) + ")";
+                string curMouse = "Mouse X: " + (int)GameState.CurMouseXGame + " Y: " + (int)GameState.CurMouseYGame;
 
-                TextRenderer.RenderText(cur, (int) Math.Round(GameState.DrawLocX), (int) Math.Round(GameState.DrawLocY + 105f),
+                TextRenderer.RenderText(cur, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 15f),
                     Color.Yellow, Color.Black);
-                TextRenderer.RenderText(loc, (int) Math.Round(GameState.DrawLocX), (int) Math.Round(GameState.DrawLocY + 120f),
+
+                TextRenderer.RenderText(curMouse, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 30f),
                     Color.Yellow, Color.Black);
-                TextRenderer.RenderText(map, (int) Math.Round(GameState.DrawLocX), (int) Math.Round(GameState.DrawLocY + 135f),
+
+                TextRenderer.RenderText(loc, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 45f),
+                    Color.Yellow, Color.Black);
+
+                TextRenderer.RenderText(map, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 60f),
                     Color.Yellow, Color.Black);
             }
             
