@@ -1,4 +1,5 @@
-﻿using Core.Globals;
+﻿using Core.Configurations;
+using Core.Globals;
 using System.IO;
 
 namespace Client.Game.UI.Windows;
@@ -26,12 +27,13 @@ public static class WinNewChar
             return;
         }
 
-        var w = sprite.Width / 4;
+        var frameCount = SettingsManager.Instance.RunFrames + SettingsManager.Instance.IdleFrames + SettingsManager.Instance.AttackFrames;
+        var w = sprite.Width / frameCount;
         var h = sprite.Height / 4;
 
         GameClient.RenderTexture(ref spritePath,
-            winNewChar.X + 190,
-            winNewChar.Y + 100, 0, 0,
+            winNewChar.X + (w / 2) + 134,
+            winNewChar.Y + 90, 0, 0,
             w, h, w, h);
     }
 

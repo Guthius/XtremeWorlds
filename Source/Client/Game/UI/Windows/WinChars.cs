@@ -1,4 +1,5 @@
 ﻿using Client.Net;
+using Core.Configurations;
 using Core.Globals;
 using System.IO;
 
@@ -82,9 +83,6 @@ public static class WinChars
             return;
         }
         
-        var x = winChars.X + 24;
-        var y = winChars.Y;
-        
         for (var i = 0; i <= Constant.MaxChars - 1; i++)
         {
             if (!string.IsNullOrEmpty(GameState.CharName[i]))
@@ -98,18 +96,19 @@ public static class WinChars
                         continue;
                     }
 
-                    var w = sprite.Width / 4;
+                    var x = winChars.X + 24 + (i * 110);
+                    var y = winChars.Y + 90;
+
+                    var frameCount = SettingsManager.Instance.RunFrames + SettingsManager.Instance.IdleFrames + SettingsManager.Instance.AttackFrames;
+                    var w = sprite.Width / frameCount;
                     var h = sprite.Height / 4;
                     
                     if (GameState.CharSprite[i] <= GameState.NumCharacters)
                     {
-                        GameClient.RenderTexture(ref spritePath, x + 30, y + 100, 0, 0, w, h, w, h);
+                        GameClient.RenderTexture(ref spritePath, x, y, 0, 0, w, h, w, h);
                     }
                 }
             }
-
-            // Move to the next position for the next character
-            x += 110;
         }
     }
 }

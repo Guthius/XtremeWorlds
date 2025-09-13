@@ -5,6 +5,7 @@ using Eto.Forms;
 using Core;
 using Core.Globals;
 using Eto.Drawing;
+using Core.Configurations;
 
 namespace Client
 {
@@ -112,11 +113,28 @@ namespace Client
             };
             paperdollPreview = new Drawable { Size = new Size(64,64), BackgroundColor = Colors.Transparent };
             paperdollPreview.Paint += (s,e)=> {
-                if(paperdollBmp!=null) {
-                    int fw = paperdollBmp.Width / 4;
-                    int fh = paperdollBmp.Height / 4;
-                    paperdollPreview.Size = new Size(fw, fh);
-                    e.Graphics.DrawImage(paperdollBmp, new Rectangle(0,0,fw,fh), new Rectangle(0,0,fw,fh));
+                if (paperdollBmp != null)
+                {
+                    int directionRows = 4;
+                    int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
+                    int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
+                    int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
+                    int expectedCols = idleFrames + runFrames + attackFrames;
+                    int frameHeight = paperdollBmp.Height / directionRows;
+                    if (frameHeight <= 0) return;
+                    bool widthDivisible = expectedCols > 0 && paperdollBmp.Width % expectedCols == 0;
+                    bool canSegment = widthDivisible;
+                    int frameColumnsForWidth = canSegment ? expectedCols : idleFrames;
+                    if (!canSegment && paperdollBmp.Width % idleFrames != 0)
+                    {
+                        int approx = frameHeight > 0 ? paperdollBmp.Width / frameHeight : idleFrames;
+                        if (approx > 0) frameColumnsForWidth = approx;
+                    }
+                    int frameWidth = paperdollBmp.Width / Math.Max(1, frameColumnsForWidth);
+                    if (frameWidth <= 0) return;
+                    var src = new Rectangle(0, 0, frameWidth, frameHeight); // first idle frame, top direction row
+                    paperdollPreview.Size = new Size(frameWidth, frameHeight);
+                    e.Graphics.DrawImage(paperdollBmp, new Rectangle(0,0,frameWidth,frameHeight), src);
                 }
             };
 

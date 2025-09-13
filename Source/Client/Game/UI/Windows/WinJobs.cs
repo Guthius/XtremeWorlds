@@ -1,4 +1,5 @@
-﻿using Core.Globals;
+﻿using Core.Configurations;
+using Core.Globals;
 using Microsoft.Xna.Framework;
 using System.IO;
 
@@ -41,18 +42,19 @@ public static class WinJobs
             return;
         }
 
-        var w = spriteTexture.Width / 4;
+        var frameCount = SettingsManager.Instance.RunFrames + SettingsManager.Instance.IdleFrames + SettingsManager.Instance.AttackFrames;
+        var w = spriteTexture.Width / frameCount;
         var h = spriteTexture.Height / 4;
 
         GameClient.RenderTexture(ref spritePath,
-            winJobs.X + 50,
+            winJobs.X + w / 2 - 12,
             winJobs.Y + 90,
             0, 0, w, h, w, h);
     }
 
     public static void OnDrawDescription()
     {
-        const int lineHeight = 14;
+        const int lineHeight = 12;
 
         var winJobs = WindowManager.GetWindowByName("winJobs");
         if (winJobs is null)

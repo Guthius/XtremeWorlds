@@ -5,6 +5,7 @@ using Eto.Forms;
 using Eto.Drawing;
 using Core;
 using Core.Globals;
+using Core.Configurations;
 
 namespace Client
 {
@@ -289,29 +290,60 @@ namespace Client
             string femalePath = System.IO.Path.Combine(DataPath.Characters, Data.Job[GameState.EditorIndex].FemaleSprite + GameState.GfxExt);
             maleBmp = File.Exists(malePath) ? new Bitmap(malePath) : null;
             femaleBmp = File.Exists(femalePath) ? new Bitmap(femalePath) : null;
-            if (maleBmp != null)
+
+            void ApplySize(Bitmap? bmp, Drawable? target)
             {
-                int fw = maleBmp.Width / 4;
-                int fh = maleBmp.Height / 4;
-                malePreview!.Size = new Size(fw, fh);
+                if (bmp == null || target == null) return;
+                int directionRows = 4;
+                int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
+                int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
+                int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
+                int expectedCols = idleFrames + runFrames + attackFrames;
+                int frameHeight = bmp.Height / directionRows;
+                if (frameHeight <= 0) return;
+                bool widthDivisible = expectedCols > 0 && bmp.Width % expectedCols == 0;
+                bool canSegment = widthDivisible;
+                int frameColumnsForWidth = canSegment ? expectedCols : idleFrames;
+                if (!canSegment && bmp.Width % idleFrames != 0)
+                {
+                    int approx = frameHeight > 0 ? bmp.Width / frameHeight : idleFrames;
+                    if (approx > 0) frameColumnsForWidth = approx;
+                }
+                int frameWidth = bmp.Width / Math.Max(1, frameColumnsForWidth);
+                if (frameWidth <= 0) return;
+                target.Size = new Size(frameWidth, frameHeight);
             }
-            if (femaleBmp != null)
-            {
-                int fw = femaleBmp.Width / 4;
-                int fh = femaleBmp.Height / 4;
-                femalePreview!.Size = new Size(fw, fh);
-            }
-            malePreview!.Invalidate(); femalePreview!.Invalidate();
+
+            ApplySize(maleBmp, malePreview);
+            ApplySize(femaleBmp, femalePreview);
+            malePreview?.Invalidate();
+            femalePreview?.Invalidate();
         }
 
         public void DrawPreview(Graphics g, Bitmap? bmp, Size size)
         {
             g.Clear(Colors.Transparent);
             if (bmp == null) return;
-            int fw = bmp.Width / 4;
-            int fh = bmp.Height / 4;
-            // Draw only the first frame at 0,0, at its native size
-            g.DrawImage(bmp, new RectangleF(0, 0, fw, fh), new Rectangle(0, 0, fw, fh));
+            int directionRows = 4;
+            int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
+            int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
+            int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
+            int expectedCols = idleFrames + runFrames + attackFrames;
+            int frameHeight = bmp.Height / directionRows;
+            if (frameHeight <= 0) return;
+            bool widthDivisible = expectedCols > 0 && bmp.Width % expectedCols == 0;
+            bool canSegment = widthDivisible;
+            int frameColumnsForWidth = canSegment ? expectedCols : idleFrames;
+            if (!canSegment && bmp.Width % idleFrames != 0)
+            {
+                int approx = frameHeight > 0 ? bmp.Width / frameHeight : idleFrames;
+                if (approx > 0) frameColumnsForWidth = approx;
+            }
+            int frameWidth = bmp.Width / Math.Max(1, frameColumnsForWidth);
+            if (frameWidth <= 0) return;
+            // First idle frame: column 0, direction row 0 (down-facing)
+            var src = new Rectangle(0, 0, frameWidth, frameHeight);
+            g.DrawImage(bmp, new RectangleF(0, 0, frameWidth, frameHeight), src);
         }
 
         // Parameterless wrapper used by Editors.cs legacy call pattern
