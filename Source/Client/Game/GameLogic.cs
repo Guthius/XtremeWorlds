@@ -1969,8 +1969,8 @@ namespace Client
             ShowItemDesc(x, y, itemNum);
         }
 
-    public static void ShowEqDesc(int x, int y, long eqNum)
-    {
+        public static void ShowEqDesc(int x, int y, long eqNum)
+        {
 
             var equipmentCount = System.Enum.GetValues(typeof(Equipment)).Length;
 
@@ -1981,10 +1981,8 @@ namespace Client
                 return;
 
             // show
-            if (Data.Player[GameState.MyIndex].Equipment[(int)eqNum].Num != 0)
-            {
-                ShowItemDesc(x, y, Data.Player[GameState.MyIndex].Equipment[(int)eqNum].Num, -1, (byte)eqNum);
-            }
+            ShowItemDesc(x, y, Data.Player[GameState.MyIndex].Equipment[(int)eqNum].Num, -1, (byte)eqNum);
+            
         }
 
         public static void AddDescInfo(string text, Microsoft.Xna.Framework.Color color)
