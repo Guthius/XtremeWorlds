@@ -51,7 +51,6 @@ namespace Client
         private Button btnCopy = null!;
         private Core.Globals.Type.Npc _clipboardNpc;
         private bool _hasClipboardNpc;
-
         private Bitmap? _spriteBitmap;
         private bool _initializing;
 
@@ -72,9 +71,9 @@ namespace Client
             lstIndex.SelectedIndexChanged += (s, e) =>
             {
                 if (_initializing) return;
-                if (lstIndex.SelectedIndex < 0) return;
-                GameState.EditorIndex = lstIndex.SelectedIndex;
-                Editors.NpcEditorInit();
+                if (lstIndex.SelectedIndex >= 0)
+                    GameState.EditorIndex = lstIndex.SelectedIndex;
+                LstIndex_Click();
             };
 
             txtName = new TextBox { Width = 200 };
@@ -362,6 +361,8 @@ namespace Client
             };
         }
 
+        private void LstIndex_Click() => Editors.NpcEditorInit();
+
         private void CopyOrPasteNpc()
         {
             int src = GameState.EditorIndex;
@@ -469,7 +470,15 @@ namespace Client
 
             if (lstIndex.Items.Count > 0) lstIndex.SelectedIndex = 0;
             cmbDropSlot.SelectedIndex = 0;
+            // End of bulk population: allow events again
             _initializing = false;
+
+            // Explicitly set editor index and invoke init routine (SelectedIndexChanged suppressed during _initializing)
+            if (lstIndex.SelectedIndex >= 0)
+            {
+                GameState.EditorIndex = lstIndex.SelectedIndex;
+                Editors.NpcEditorInit();
+            }
         }
 
         private void SyncDropFields()

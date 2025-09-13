@@ -15,10 +15,8 @@ namespace Client
     private static Editor_Job? _instance;
     public static Editor_Job Instance => _instance ??= new Editor_Job();
     private bool _suppressIndexChanged;
-    // Copy/Paste clipboard for jobs
     private Core.Globals.Type.Job _clipboardJob;
     private bool _hasClipboardJob;
-
     public ListBox? lstIndex = new ListBox { Width = 200 };
     public ListBox? lstStartItems;
     public TextBox? txtName;
