@@ -33,6 +33,11 @@ public static class WinDragBox
                 if (dragBox.Value >= 0)
                 {
                     var icon = Data.Item[dragBox.Value].Icon;
+                    if (icon <= 0 || icon > GameState.NumItems)
+                    {
+                        return;
+                    }
+
                     var iconPath = Path.Combine(DataPath.Items, icon.ToString());
 
                     GameClient.RenderTexture(ref iconPath, x, y, 0, 0, 32, 32, 32, 32);
@@ -44,6 +49,10 @@ public static class WinDragBox
                 if (dragBox.Value >= 0)
                 {
                     var icon = Data.Skill[dragBox.Value].Icon;
+                    if (icon <= 0 || icon > GameState.NumSkills)
+                    {
+                        return;
+                    }
                     var iconPath = Path.Combine(DataPath.Skills, icon.ToString());
 
                     GameClient.RenderTexture(ref iconPath, x, y, 0, 0, 32, 32, 32, 32);

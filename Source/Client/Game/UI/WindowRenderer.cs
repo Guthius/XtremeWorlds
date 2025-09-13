@@ -108,6 +108,11 @@ public static class WindowRenderer
     {
         var path = Path.Combine(DataPath.Items, window.Icon.ToString());
 
+        if (window.Icon <= 0 || window.Icon > GameState.NumItems)
+        {
+            return;
+        }
+        
         DesignRenderer.Render(Design.WoodEmpty, window.X, window.Y, window.Width, window.Height);
         DesignRenderer.Render(Design.Green, window.X, window.Y, window.Width, 23);
 
