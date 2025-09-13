@@ -49,7 +49,7 @@ public static class Sender
 
     public static void SendLogout()
     {
-        var packetWriter = new PacketWriter(4);
+        var packetWriter = new PacketWriter(5);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CLogout);
 

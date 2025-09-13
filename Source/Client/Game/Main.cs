@@ -208,8 +208,8 @@ public static class Program
             try { _uiTimer?.Stop(); } catch { }
 
             // Close all open Eto windows on the UI thread, then close the hidden root form
-        if (IsEtoAvailable)
-        Application.Instance?.AsyncInvoke(() =>
+            if (IsEtoAvailable)
+            Application.Instance?.AsyncInvoke(() =>
             {
                 try
                 {
