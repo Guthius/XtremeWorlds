@@ -801,7 +801,7 @@ namespace Client
             var x = default(int);
             var y = default(int);
 
-            if (GameState.VbKeyControl | mouse)
+            if (GameState.VbKeyControl)
             {
                 if (GameState.MyIndex < 0 | GameState.MyIndex > Constant.MaxPlayers)
                     return;

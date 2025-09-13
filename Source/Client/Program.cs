@@ -1458,7 +1458,6 @@ namespace Client
                 {
                     if (IsMouseButtonDown(MouseButton.Left))
                     {
-                        Player.CheckAttack(true);
                         Sender.PlayerSearch(GameState.CurXGame, GameState.CurYGame, 0);
                         _lastSearchTime = DateTime.Now;
                     }
@@ -1783,36 +1782,84 @@ namespace Client
             }
         }
 
-        public static void DrawPaperdoll(int x2, int y2, int sprite, int anim, int spritetop)
+        public static void DrawPaperdoll(int x2, int y2, int sprite, int anim, int spritetop, bool isMoving = false, bool isAttacking = false)
         {
-            Rectangle rec;
-            int x;
-            int y;
-            int width;
-            int height;
+            // Paperdoll rendering now mirrors DrawPlayer segmented logic (Idle|Run|Attack) so equipment layers
+            // stay frame-synchronized with the base character during run/attack animations.
+            if (sprite < 1 || sprite > GameState.NumPaperdolls) return;
 
-            if (sprite < 1 | sprite > GameState.NumPaperdolls)
-                return;
+            string gfxPath = Path.Combine(DataPath.Paperdolls, sprite.ToString());
+            var info = GetGfxInfo(gfxPath);
+            if (info == null || info.Width <= 0 || info.Height <= 0) return;
 
-            int columns = Math.Max(1, SettingsManager.Instance.IdleFrames);
-            rec.Y = (int)Math.Round(spritetop *
-                GetGfxInfo(Path.Combine(DataPath.Paperdolls, sprite.ToString())).Height / (double)columns);
-            rec.Height =
-                (int)Math.Round(GetGfxInfo(Path.Combine(DataPath.Paperdolls, sprite.ToString())).Height /
-                                 (double)columns);
-            rec.X = (int)Math.Round(anim *
-                GetGfxInfo(Path.Combine(DataPath.Paperdolls, sprite.ToString())).Width / (double)columns);
-            rec.Width = (int)Math.Round(
-                GetGfxInfo(Path.Combine(DataPath.Paperdolls, sprite.ToString())).Width /
-                (double)columns);
+            const int directionRows = 4; // Down, Right, Left, Up ordering like base sprites (mapped via spritetop)
+            int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
+            int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
+            int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
+            int expectedTotalColumns = idleFrames + runFrames + attackFrames;
 
-            x = GameLogic.ConvertMapX(x2);
-            y = GameLogic.ConvertMapY(y2);
-            width = rec.Right - rec.Left;
-            height = rec.Bottom - rec.Top;
+            int frameHeight = info.Height / directionRows;
+            if (frameHeight <= 0) return;
 
-            string argPath = Path.Combine(DataPath.Paperdolls, sprite.ToString());
-            RenderTexture(ref argPath, x, y, rec.X, rec.Y, rec.Width, rec.Height);
+            bool widthDivisible = expectedTotalColumns > 0 && info.Width % expectedTotalColumns == 0;
+            bool canSegment = widthDivisible; // relaxed heuristic identical to player logic
+
+            // Fallback for legacy (non-segmented) sheets: treat horizontal frames as a single sequence (idle only)
+            int frameColumnsForWidth = canSegment ? expectedTotalColumns : (frameHeight > 0 ? Math.Max(1, info.Width / frameHeight) : idleFrames);
+            if (frameColumnsForWidth <= 0) frameColumnsForWidth = idleFrames;
+
+            int frameWidth = info.Width / frameColumnsForWidth;
+
+            int idleOffset = 0, runOffset = 0, attackOffset = 0;
+            if (canSegment)
+            {
+                // Honor dynamic ordering (idle,run,attack permutations)
+                string orderCsv = SettingsManager.Instance.SpriteSegmentOrder ?? "idle,run,attack";
+                var tokens = orderCsv.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                if (tokens.Length != 3) tokens = new[] { "idle", "run", "attack" };
+                for (int i = 0; i < tokens.Length; i++) tokens[i] = tokens[i].Trim().ToLowerInvariant();
+                if (!(tokens.Contains("idle") && tokens.Contains("run") && tokens.Contains("attack")))
+                    tokens = new[] { "idle", "run", "attack" };
+                int runningOffset = 0;
+                for (int i = 0; i < tokens.Length; i++)
+                {
+                    string t = tokens[i];
+                    if (t == "idle") idleOffset = runningOffset;
+                    else if (t == "run") runOffset = runningOffset;
+                    else if (t == "attack") attackOffset = runningOffset;
+                    if (t == "idle") runningOffset += idleFrames;
+                    else if (t == "run") runningOffset += runFrames;
+                    else if (t == "attack") runningOffset += attackFrames;
+                }
+            }
+
+            int segmentOffset = idleOffset;
+            int segmentFrames = idleFrames;
+            if (canSegment)
+            {
+                if (isAttacking)
+                {
+                    segmentOffset = attackOffset;
+                    segmentFrames = attackFrames;
+                }
+                else if (isMoving)
+                {
+                    segmentOffset = runOffset;
+                    segmentFrames = runFrames;
+                }
+            }
+
+            int frameInSegment = anim % Math.Max(1, segmentFrames);
+            int frameColumn = Math.Min(frameColumnsForWidth - 1, segmentOffset + frameInSegment);
+
+            if (spritetop < 0 || spritetop >= directionRows) spritetop = 0;
+            int srcX = frameColumn * frameWidth;
+            int srcY = spritetop * frameHeight;
+            var rec = new Rectangle(srcX, srcY, frameWidth, frameHeight);
+
+            int x = GameLogic.ConvertMapX(x2);
+            int y = GameLogic.ConvertMapY(y2);
+            RenderTexture(ref gfxPath, x, y, rec.X, rec.Y, rec.Width, rec.Height);
         }
 
         public static void DrawNpc(int mapNpcNum)
@@ -2711,13 +2758,13 @@ namespace Client
             DrawCharacterSprite(spriteNum, x, y, rect);
 
             // DEBUG: show segment info above player 0 for animation troubleshooting
-        if (index == GameState.MyIndex && GameState.Bfps) // piggyback on FPS debug toggle
+            if (index == GameState.MyIndex && GameState.Bfps) // piggyback on FPS debug toggle
             {
                 try
                 {
                     string segName = isAttacking ? "attack" : (isMoving ? "run" : "idle");
                     string dbg = $"seg={segName} anim={anim} idleOff={idleOffset} runOff={runOffset} atkOff={attackOffset} col={frameColumn}";
-            TextRenderer.RenderText(dbg, x, y - 12, Color.Yellow, Color.Black);
+                    TextRenderer.RenderText(dbg, x, y - 12, Color.Yellow, Color.Black);
                 }
                 catch { }
             }
@@ -2750,9 +2797,8 @@ namespace Client
                     var paperId = Data.Item[itemIndex].Paperdoll;
                     if (paperId > 0)
                     {
-                        int pdCols = Math.Max(1, SettingsManager.Instance.IdleFrames);
-                        int safeAnim = anim % pdCols; // prevent out-of-range for paperdolls
-                        DrawPaperdoll(x, y, paperId, safeAnim, spriteleft);
+                        // Pass segment context so equipment animates consistently with base sprite.
+                        DrawPaperdoll(x, y, paperId, anim, spriteleft, isMoving, isAttacking);
                     }
                 }
             }
