@@ -72,6 +72,11 @@ namespace Client
             Data.Job[index].StartValue = new int[Constant.MaxStartItems];
             Data.Job[index].MaleSprite = 1;
             Data.Job[index].FemaleSprite = 1;
+            for (int i = 0; i < Constant.MaxStartItems; i++)
+            {
+                Data.Job[index].StartItem[i] = -1;
+                Data.Job[index].StartValue[i] = 0;
+            }
         }
         #endregion
 

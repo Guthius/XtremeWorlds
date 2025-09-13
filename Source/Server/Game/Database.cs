@@ -29,6 +29,7 @@ using File=System.IO.File;
 using Path = System.IO.Path;
 using SdMapLayer = Core.Globals.SdMapLayer;
 using Type = Core.Globals.Type;
+using System.Reflection.Metadata;
 
 namespace Server
 {
@@ -772,6 +773,12 @@ namespace Server
             Data.Job[jobNum].StartMap = 1;
             Data.Job[jobNum].MaleSprite = 0;
             Data.Job[jobNum].FemaleSprite = 0;
+
+            for (int i = 0; i < Core.Globals.Constant.MaxStartItems; i++)
+            {
+                Data.Job[jobNum].StartItem[i] = -1;
+                Data.Job[jobNum].StartValue[i] = 0;
+            }
         }
 
         public static async System.Threading.Tasks.Task LoadJobAsync(int jobNum)
@@ -1879,8 +1886,11 @@ namespace Server
 
             Data.Player[index].Equipment = new PlayerEq[Enum.GetValues(typeof(Equipment)).Length];
             for (int i = 0, loopTo = Enum.GetValues(typeof(Equipment)).Length; i < loopTo; i++)
+            {
                 Data.Player[index].Equipment[i] = new PlayerEq();
-
+                Data.Player[index].Equipment[i].Num = -1;
+            }
+            
             Data.Player[index].Inv = new PlayerInv[Core.Globals.Constant.MaxInv];
             for (int i = 0, loopTo1 = Core.Globals.Constant.MaxInv; i < loopTo1; i++)
             {
@@ -2016,16 +2026,22 @@ namespace Server
                 for (i = 0; i < vitalCount; i++)
                     SetPlayerVital(index, (Vital)i, GetPlayerMaxVital(index, (Vital)i));
 
-                // set starter equipment
+                // set starter items
                 for (n = 0; n < Core.Globals.Constant.MaxStartItems; n++)
                 {
-                    if (Data.Job[jobNum].StartItem[n] > 0)
+                    if (Data.Job[jobNum].StartItem[n] >= 0)
                     {
                         Data.Player[index].Inv[n].Num = Data.Job[jobNum].StartItem[n];
                         Data.Player[index].Inv[n].Value = Data.Job[jobNum].StartValue[n];
                     }
                 }
 
+                for (n = 0; n < Enum.GetValues(typeof(Equipment)).Length; n++)
+                {
+                    Data.Player[index].Equipment[n] = new PlayerEq();
+                    Data.Player[index].Equipment[n].Num = -1;
+                }
+                
                 // set skills
                 var resourceCount = Enum.GetValues(typeof(ResourceSkill)).Length;
                 for (i = 0; i < resourceCount; i++)

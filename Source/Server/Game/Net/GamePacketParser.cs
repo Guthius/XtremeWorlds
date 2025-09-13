@@ -382,10 +382,10 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             }
 
             // Everything went ok, add the character
-            Data.Char.Add(name);
+            Data.Char?.Add(name);
             Database.AddChar(session.Id, slot, name, (byte) sexNum, (byte) jobNum, sprite);
 
-            if (Data.Char.Count == 1)
+            if (Data.Char?.Count == 1)
                 SetPlayerAccess(session.Id, (int) AccessLevel.Owner);
 
             Log.Add("Character " + name + " added to " + GetAccountLogin(session.Id) + "'s account.", Constant.PlayerLog);
