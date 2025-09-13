@@ -3,6 +3,8 @@ using Eto.Drawing;
 using Core;
 using System;
 using Core.Globals;
+// Ensure helper is visible
+// (EditorLayoutHelper resides in namespace Client as per its definition)
 
 namespace Client
 {
@@ -21,6 +23,9 @@ namespace Client
         public ComboBox cmbItemCurrency = new ComboBox();
         public NumericStepper nudItemValue = new NumericStepper { MinValue = 0, MaxValue = 1000000 };
         public NumericStepper nudCostValue = new NumericStepper { MinValue = 0, MaxValue = 1000000 };
+        // Width control & scrolling support (implemented locally for this editor)
+        private NumericStepper? _nudWidth;
+        private Splitter? _mainSplitter; // still referenced for inner layout
         private Button btnUpdate = new Button { Text = "Update Trade" };
         private Button btnDeleteTrade = new Button { Text = "Delete Trade" };
         private Button btnSave = new Button { Text = "Save" };
@@ -34,7 +39,7 @@ namespace Client
         {
             _instance = this;
             Title = "Shop Editor";
-            ClientSize = new Size(900, 600);
+            ClientSize = new Size(980, 520); // reduced height to better fit typical screens
             Padding = 10;
             InitializeComponent();
             Editors.AutoSizeWindow(this, 720, 480);
@@ -117,7 +122,7 @@ namespace Client
                 Panel2MinimumSize = 180
             };
 
-            var rightPanel = new StackLayout
+            var rightInner = new StackLayout
             {
                 Padding = 4,
                 Spacing = 8,
@@ -129,17 +134,47 @@ namespace Client
                             Rows = { new TableRow(new Label{Text="Name:"}, txtName, new Label{Text="Buy Rate:"}, nudBuy) }
                         }
                     },
-                    // Make trades area expand to fill remaining space
                     new StackLayoutItem(new GroupBox { Text = "Trade", Content = tradeArea }, expand: true),
                     new StackLayout { Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnSave, btnDelete, btnCopy, btnCancel } }
                 }
             };
+            var rightPanel = new Scrollable { Content = rightInner, ExpandContentWidth = true, ExpandContentHeight = false };
 
-            Content = new Splitter
+            _mainSplitter = new Splitter
             {
                 Position = 240,
                 Panel1 = leftPanel,
                 Panel2 = rightPanel
+            };
+            // Inline width control (no external helper to avoid dependency issues)
+            _nudWidth = new NumericStepper
+            {
+                MinValue = 900,
+                MaxValue = 2600,
+                Increment = 20,
+                Value = ClientSize.Width
+            };
+            _nudWidth.ValueChanged += (s, e) =>
+            {
+                int w = (int)Math.Round(_nudWidth.Value);
+                // adjust splitter/container width hint
+                try { _mainSplitter.Width = w; } catch { }
+            };
+
+            var outerScroll = new Scrollable
+            {
+                Content = _mainSplitter,
+                ExpandContentWidth = true,
+                ExpandContentHeight = false // enable vertical scrollbar when height exceeds window
+            };
+
+            Content = new StackLayout
+            {
+                Spacing = 4,
+                Items =
+                {
+                    new StackLayoutItem(outerScroll, expand: true)
+                }
             };
         }
 
