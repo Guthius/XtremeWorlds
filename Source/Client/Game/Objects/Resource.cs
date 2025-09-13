@@ -4,8 +4,6 @@ using Client.Net;
 using Core;
 using Core.Globals;
 using Core.Net;
-using Microsoft.VisualBasic.CompilerServices;
-using Pango;
 
 namespace Client
 {
