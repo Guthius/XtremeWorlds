@@ -1136,7 +1136,7 @@ public static class Player
         }
     }
 
-    public static void UnequipItem(int playerId, int eqSlot)
+    public static void UnEquipItem(int playerId, int eqSlot, int invSlot)
     {
         var eqCount = Enum.GetNames<Equipment>().Length;
         if (eqSlot < 0 || eqSlot > eqCount)
@@ -1150,20 +1150,23 @@ public static class Player
             return;
         }
 
+        if (GetPlayerEquipment(playerId, (Equipment)eqSlot) < 0 || GetPlayerEquipment(playerId, (Equipment)eqSlot) > Core.Globals.Constant.MaxItems)
+            return;
+
         if (FindOpenInvSlot(playerId, itemNum) >= 0)
         {
             try
             {
-                Script.Instance?.UnequipItem(playerId);
+                Script.Instance?.UnEquipItem(playerId, itemNum, eqSlot, invSlot);
             }
             catch (Exception ex)
             {
-                General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(UnequipItem));
+                General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(UnEquipItem));
             }
         }
         else
         {
-            NetworkSend.PlayerMsg(playerId, "Your inventory is full.", (int) ColorName.BrightRed);
+            NetworkSend.PlayerMsg(playerId, "Your inventory is full.", (int)ColorName.BrightRed);
         }
     }
 

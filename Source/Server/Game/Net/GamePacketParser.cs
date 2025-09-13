@@ -63,7 +63,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Bind(GamePacketId.FromClient.CSwapSkillSlots, Packet_SwapSkillSlots);
 
         Bind(GamePacketId.FromClient.CCheckPing, Packet_CheckPing);
-        Bind(GamePacketId.FromClient.CUnequip, Packet_Unequip);
+        Bind(GamePacketId.FromClient.CUnequip, Packet_UnEquip);
         Bind(GamePacketId.FromClient.CRequestPlayerData, Packet_RequestPlayerData);
         Bind(GamePacketId.FromClient.CRequestItem, Item.HandleRequestItem);
         Bind(GamePacketId.FromClient.CRequestNpc, Packet_RequestNpc);
@@ -1752,11 +1752,12 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         PlayerService.Instance.SendDataTo(session.Id, packetWriter.GetBytes());
     }
 
-    public static void Packet_Unequip(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static void Packet_UnEquip(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
-
-        Server.Player.UnequipItem(session.Id, buffer.ReadInt32());
+        int eqSlot = buffer.ReadInt32();
+        int m = Server.Player.FindOpenInvSlot(session.Id, (int)Data.Player[session.Id].Equipment[eqSlot].Num);
+        Server.Player.UnEquipItem(session.Id, eqSlot, m);
     }
 
     public static void Packet_RequestPlayerData(GameSession session, ReadOnlyMemory<byte> bytes)
