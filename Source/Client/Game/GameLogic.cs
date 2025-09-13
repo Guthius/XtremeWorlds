@@ -10,6 +10,7 @@ using Eto.Forms;
 using Client.Net;
 using Core.Configurations;
 using Core.Globals;
+using System.Threading;
 using Core.Net;
 using static Core.Globals.Command;
 using static Core.Globals.Type;
@@ -1291,94 +1292,77 @@ namespace Client
 
                     case DialogueType.FillAttributes:
                         {
-                            TileType type = TileType.None;
-                            var loopTo6 = (int)Data.MyMap.MaxX;
-                            for (x = 0; x < loopTo6; x++)
+                            // Capture UI control state safely on the UI thread to avoid UIThreadAccessException.
+                            TileType resolvedType = TileType.None;
+                            int attrIndexCached = 0;
+
+                            void Capture()
                             {
-                                var loopTo7 = (int)Data.MyMap.MaxY;
-                                for (y = 0; y < loopTo7; y++)
+                                var editor = Editor_Map.Instance;
+                                if (editor == null) return;
+
+                                // Sequential overwrite precedence (last true wins) preserved.
+                                if (editor.optBlocked.Checked == true) resolvedType = TileType.Blocked;
+                                if (editor.optWarp.Checked == true) resolvedType = TileType.Warp;
+                                if (editor.optItem.Checked == true) resolvedType = TileType.Item;
+                                if (editor.optNpcAvoid.Checked == true) resolvedType = TileType.NpcAvoid;
+                                if (editor.optResource.Checked == true) resolvedType = TileType.Resource;
+                                if (editor.optNpcSpawn.Checked == true) resolvedType = TileType.NpcSpawn;
+                                if (editor.optShop.Checked == true) resolvedType = TileType.Shop;
+                                if (editor.optBank.Checked == true) resolvedType = TileType.Bank;
+                                if (editor.optHeal.Checked == true) resolvedType = TileType.Heal;
+                                if (editor.optTrap.Checked == true) resolvedType = TileType.Trap;
+                                if (editor.optAnimation.Checked == true) resolvedType = TileType.Animation;
+                                if (editor.optNoCrossing.Checked == true) resolvedType = TileType.NoCrossing;
+                                attrIndexCached = editor.cmbAttribute.SelectedIndex;
+                            }
+
+                            var app = Eto.Forms.Application.Instance;
+                            if (app != null)
+                            {
+                                bool captured = false;
+                                try
                                 {
-                                    // blocked tile
-                                    if (Editor_Map.Instance.optBlocked.Checked == true)
+                                    // Try synchronous invoke first (fast if already on UI thread, marshals otherwise)
+                                    app.Invoke(() => { Capture(); captured = true; });
+                                }
+                                catch
+                                {
+                                    // Fallback: AsyncInvoke then wait (avoid leaving capture incomplete)
+                                    var mre = new ManualResetEventSlim(false);
+                                    try
                                     {
-                                        type = TileType.Blocked;
+                                        app.AsyncInvoke(() => { Capture(); captured = true; mre.Set(); });
+                                        // Wait with timeout to avoid infinite stall during shutdown
+                                        mre.Wait(200);
                                     }
+                                    catch { /* swallow */ }
+                                }
+                                if (!captured)
+                                {
+                                    // Last resort direct call (may still throw but prevents silent no-op)
+                                    try { Capture(); } catch { /* ignore */ }
+                                }
+                            }
+                            else
+                            {
+                                // No application instance; proceed best-effort
+                                try { Capture(); } catch { /* ignore */ }
+                            }
 
-                                    // warp tile
-                                    if (Editor_Map.Instance.optWarp.Checked == true)
+                            var maxX = (int)Data.MyMap.MaxX;
+                            var maxY = (int)Data.MyMap.MaxY;
+                            for (x = 0; x < maxX; x++)
+                            {
+                                for (y = 0; y < maxY; y++)
+                                {
+                                    if (attrIndexCached == 0)
                                     {
-                                        type = TileType.Warp;
-                                    }
-
-                                    // item spawn
-                                    if (Editor_Map.Instance.optItem.Checked == true)
-                                    {
-                                        type = TileType.Item;
-                                    }
-
-                                    // Npc avoid
-                                    if (Editor_Map.Instance.optNpcAvoid.Checked == true)
-                                    {
-                                        type = TileType.NpcAvoid;
-                                    }
-
-                                    // resource
-                                    if (Editor_Map.Instance.optResource.Checked == true)
-                                    {
-                                        type = TileType.Resource;
-                                    }
-
-                                    // Npc spawn
-                                    if (Editor_Map.Instance.optNpcSpawn.Checked == true)
-                                    {
-                                        type = TileType.NpcSpawn;
-                                    }
-
-                                    // shop
-                                    if (Editor_Map.Instance.optShop.Checked == true)
-                                    {
-                                        type = TileType.Shop;
-                                    }
-
-                                    // bank
-                                    if (Editor_Map.Instance.optBank.Checked == true)
-                                    {
-                                        type = TileType.Bank;
-                                    }
-
-                                    // heal
-                                    if (Editor_Map.Instance.optHeal.Checked == true)
-                                    {
-                                        type = TileType.Heal;
-                                    }
-
-                                    // trap
-                                    if (Editor_Map.Instance.optTrap.Checked == true)
-                                    {
-                                        type = TileType.Trap;
-                                    }
-
-                                    // Animation
-                                    if (Editor_Map.Instance.optAnimation.Checked == true)
-                                    {
-                                        type = TileType.Animation;
-                                    }
-
-                                    // No Xing
-                                    if (Editor_Map.Instance.optNoCrossing.Checked == true)
-                                    {
-                                        type = TileType.NoCrossing;
-                                    }
-                                    // Determine which attribute set (primary/secondary) to apply based on current selection
-                                    // Assuming cmbAttribute index 0 => primary (EditorAttribute 1), 1 => secondary (EditorAttribute 2) adjust if different.
-                                    var attrIndex = Editor_Map.Instance.cmbAttribute.SelectedIndex;
-                                    if (attrIndex == 0)
-                                    {
-                                        Data.MyMap.Tile[x, y].Type = type;
+                                        Data.MyMap.Tile[x, y].Type = resolvedType;
                                     }
                                     else
                                     {
-                                        Data.MyMap.Tile[x, y].Type2 = type;
+                                        Data.MyMap.Tile[x, y].Type2 = resolvedType;
                                     }
                                 }
                             }
