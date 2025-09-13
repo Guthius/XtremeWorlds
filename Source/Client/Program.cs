@@ -1329,55 +1329,11 @@ namespace Client
             if (scrollValue > 0)
             {
                 GameLogic.ScrollChatBox(0); // Scroll up
-
-                if (GameState.MyEditorType == EditorType.Map)
-                {
-                    if (CurrentKeyboardState.IsKeyDown(Keys.LeftShift))
-                    {
-                        if (GameState.CurLayer > 0)
-                        {
-                            GameState.CurLayer -= 1;
-                        }
-                    }
-                    else if (GameState.CurTileset > 1)
-                    {
-                        GameState.CurTileset -= 1;
-                        // Sync the slider if the editor is open
-                        if (Editor_Map.Instance != null)
-                        {
-                            Eto.Forms.Application.Instance.AsyncInvoke(() =>
-                                Editor_Map.Instance.sldTileSet.Value = GameState.CurTileset
-                            );
-                        }
-                    }
-                }
             }
             else if (scrollValue < 0)
             {
                 GameLogic.ScrollChatBox(1); // Scroll down
-
-                if (GameState.MyEditorType == EditorType.Map)
-                {
-                    if (CurrentKeyboardState.IsKeyDown(Keys.LeftShift))
-                    {
-                        if (GameState.CurLayer < Enum.GetValues(typeof(MapLayer)).Length - 1)
-                        {
-                            GameState.CurLayer += 1;
-                        }
-                    }
-                    else if (GameState.CurTileset < GameState.NumTileSets)
-                    {
-                        GameState.CurTileset += 1;
-                        // Sync the slider if the editor is open
-                        if (Editor_Map.Instance != null)
-                        {
-                            Eto.Forms.Application.Instance.AsyncInvoke(() =>
-                                Editor_Map.Instance.sldTileSet.Value = GameState.CurTileset
-                            );
-                        }
-                    }
-                }
-
+                
                 if (scrollValue != 0)
                 {
                     HandleGuiEvent(ControlState.MouseScroll);
