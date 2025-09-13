@@ -1208,6 +1208,7 @@ namespace Client
 
             // Stop the player from moving
             Data.Player[i].Moving = 0;
+            Data.Player[i].IsMoving = false; // ensure per-pixel movement halts client-side
         }
 
         public static void Packet_PlayerDir(ReadOnlyMemory<byte> data)
@@ -1278,6 +1279,31 @@ namespace Client
             SetPlayerDir(index, dir);
             Data.Player[index].Moving = moving;
             Data.Player[index].IsMoving = buffer.ReadBoolean();
+
+            // If server indicates not moving (Moving == 0) OR our pixel position aligns exactly to tile grid, ensure IsMoving false.
+            // This prevents residual per-pixel drift after movement stops.
+            if (Data.Player[index].Moving == 0)
+            {
+                Data.Player[index].IsMoving = false;
+                // SNAP: ensure raw X/Y are aligned exactly to tile grid (multiple of tile size) to avoid drift accumulation.
+                int tileSizeX = GameState.SizeX;
+                int tileSizeY = GameState.SizeY;
+                // Only snap if we're within 1 pixel of alignment to avoid large corrections mid-move.
+                int modX = Data.Player[index].X % tileSizeX;
+                int modY = Data.Player[index].Y % tileSizeY;
+                if (modX != 0 && (modX == tileSizeX - 1)) Data.Player[index].X += 1; // near upper edge
+                else if (modX != 0 && modX <= 1) Data.Player[index].X -= modX; // near zero
+                if (modY != 0 && (modY == tileSizeY - 1)) Data.Player[index].Y += 1;
+                else if (modY != 0 && modY <= 1) Data.Player[index].Y -= modY;
+            }
+            else
+            {
+                // Safety: if movement flag says moving but we're already perfectly aligned and IsMoving came false, start movement.
+                if (Data.Player[index].IsMoving == false)
+                {
+                    // Optionally re-enable IsMoving if partial movement is expected; left disabled to avoid phantom motion.
+                }
+            }
         }
 
         #endregion

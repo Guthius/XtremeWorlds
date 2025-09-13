@@ -738,8 +738,10 @@ public static class NetworkSend
         packetWriter.WriteInt32(GetPlayerRawX(positionPlayerId));
         packetWriter.WriteInt32(GetPlayerRawY(positionPlayerId));
         packetWriter.WriteByte(GetPlayerDir(positionPlayerId));
-        packetWriter.WriteByte(Data.Player[sendToPlayerId].Moving);
-        packetWriter.WriteBoolean(Data.Player[sendToPlayerId].IsMoving);
+        // BUGFIX: previously used the RECIPIENT player's Moving/IsMoving flags, causing desync view of other players.
+        // Now use the subject (positionPlayerId) player movement flags.
+        packetWriter.WriteByte(Data.Player[positionPlayerId].Moving);
+        packetWriter.WriteBoolean(Data.Player[positionPlayerId].IsMoving);
 
         PlayerService.Instance.SendDataTo(sendToPlayerId, packetWriter.GetBytes());
     }

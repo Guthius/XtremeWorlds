@@ -536,6 +536,13 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         SetPlayerDir(session.Id, dir);
         Data.Player[session.Id].Moving = movement;
+        // Mark pixel movement active if movement > 0
+        if (movement > 0)
+        {
+            Data.Player[session.Id].IsMoving = true;
+            // Immediate broadcast so others start interpolation promptly
+            NetworkSend.SendPlayerXyToMap(session.Id);
+        }
     }
 
     public static void Packet_StopPlayerMove(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -547,6 +554,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         Data.Player[session.Id].IsMoving = false;
         Data.Player[session.Id].Moving = 0;
+        // Broadcast final resting position & flags immediately
+        NetworkSend.SendPlayerXyToMap(session.Id);
     }
 
     public static void Packet_PlayerDirection(GameSession session, ReadOnlyMemory<byte> bytes)
