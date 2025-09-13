@@ -19,6 +19,9 @@ namespace Client
             if (AnimInstance == null || index < 0 || index >= AnimInstance.Length)
                 return;
 
+            if (GameState.MyEditorType == EditorType.Map && GameState.MapEditorTab != (byte)MapEditorTab.Tiles)
+                return;
+
             ref var inst = ref AnimInstance[index];
             int animIdx = inst.Animation;
             if (animIdx < 0 || animIdx >= Data.Animation.Length)
@@ -31,6 +34,7 @@ namespace Client
             var anim = Data.Animation[animIdx];
             if (anim.Sprite == null || anim.Frames == null || inst.Used == null || inst.FrameIndex == null)
                 return;
+
             if (anim.Sprite.Length <= layer || anim.Frames.Length <= layer || inst.Used.Length <= layer || inst.FrameIndex.Length <= layer)
                 return;
 

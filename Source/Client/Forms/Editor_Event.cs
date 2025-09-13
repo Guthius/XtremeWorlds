@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using Core.Globals;
+using Core.Configurations; // for SettingsManager.Instance
 using Eto.Forms;
 using Eto.Drawing;
 using static Core.Globals.Type;
@@ -1717,26 +1718,52 @@ namespace Client
 
                 var src = new Eto.Drawing.Bitmap(path);
 
-                // For character sheets, show the selected 1/4 x 1/4 frame; otherwise show the full image
+                // Character sheet preview: dynamically compute first idle frame or selected frame using segmentation logic
                 if (gfxType == 1 && src.Width > 0 && src.Height > 0)
                 {
-                    int frameW = System.Math.Max(1, src.Width / 4);
-                    int frameH = System.Math.Max(1, src.Height / 4);
-                    int fx = Event.GraphicSelX; if (fx < 0) fx = 0; else if (fx > 3) fx = 3;
-                    int fy = Event.GraphicSelY; if (fy < 0) fy = 0; else if (fy > 3) fy = 3;
-
-                    var cropped = new Eto.Drawing.Bitmap(frameW, frameH, Eto.Drawing.PixelFormat.Format32bppRgba);
-                    using (var g = new Eto.Drawing.Graphics(cropped))
+                    try
                     {
-                        var srcRect = new Eto.Drawing.Rectangle(fx * frameW, fy * frameH, frameW, frameH);
-                        g.DrawImage(src, new Eto.Drawing.Rectangle(0, 0, frameW, frameH), srcRect);
+                        int directionRows = 4; // Up, Left, Right, Down ordering may vary; we just want consistent row height
+                        int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
+                        int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
+                        int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
+                        int expectedCols = idleFrames + runFrames + attackFrames;
+                        int frameHeight = src.Height / directionRows;
+                        if (frameHeight <= 0) frameHeight = src.Height; // safety fallback
+
+                        bool widthDivisible = expectedCols > 0 && src.Width % expectedCols == 0;
+                        bool canSegment = widthDivisible; // treat divisible width as segmented sheet
+                        int frameColumnsForWidth = canSegment ? expectedCols : idleFrames;
+                        if (!canSegment && src.Width % idleFrames != 0)
+                        {
+                            // Fallback: attempt square-ish frames based on row height
+                            int approx = frameHeight > 0 ? src.Width / frameHeight : idleFrames;
+                            if (approx > 0) frameColumnsForWidth = approx;
+                        }
+                        int frameWidth = src.Width / Math.Max(1, frameColumnsForWidth);
+                        if (frameWidth <= 0) frameWidth = src.Width; // final fallback
+
+                        // Use selected sub-frame if user clicked in selection (Event.GraphicSelX/Y). Clamp inside first direction row (down-facing assumed row 0)
+                        int fx = Event.GraphicSelX; if (fx < 0) fx = 0; else if (fx >= frameColumnsForWidth) fx = frameColumnsForWidth - 1;
+                        int fy = Event.GraphicSelY; if (fy < 0) fy = 0; else if (fy >= directionRows) fy = 0; // restrict to row 0 for preview simplicity
+
+                        var cropped = new Bitmap(frameWidth, frameHeight, PixelFormat.Format32bppRgba);
+                        using (var g = new Graphics(cropped))
+                        {
+                            var srcRect = new Eto.Drawing.Rectangle(fx * frameWidth, fy * frameHeight, frameWidth, frameHeight);
+                            g.DrawImage(src, new Eto.Drawing.Rectangle(0, 0, frameWidth, frameHeight), srcRect);
+                        }
+                        picGraphic.Image = cropped;
                     }
-                    picGraphic.Image = cropped;
+                    catch
+                    {
+                        // Fallback to full image if segmentation fails
+                        picGraphic.Image = src;
+                    }
                 }
                 else
                 {
-                    // Tileset or unsupported type: show full image
-                    picGraphic.Image = src;
+                    picGraphic.Image = src; // Tileset or unsupported graphic type
                 }
             }
             catch

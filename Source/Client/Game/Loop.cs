@@ -334,24 +334,21 @@ namespace Client
 
                     var loopTo = GameState.CurrentEvents;
                     for (_i = 0; _i < loopTo; _i++)
-                    {
-                        if (Data.MapEvents[_i].WalkAnim == 1)
+                    {         
+                        int cols;
+                        if (Data.MapEvents[_i].Moving != 0 || Data.MapEvents[_i].WalkAnim == 1)
                         {
-                            int cols;
-                            if (Data.MapEvents[_i].Moving != 0)
-                            {
-                                cols = Math.Max(1, SettingsManager.Instance.RunFrames);
-                            }
-                            else
-                            {
-                                cols = Math.Max(1, SettingsManager.Instance.IdleFrames);
-                            }
-                            int maxFrame = Math.Max(0, cols - 1);
-                            if (Data.MapEvents[_i].Steps >= maxFrame)
-                                Data.MapEvents[_i].Steps = 0;
-                            else
-                                Data.MapEvents[_i].Steps++;
+                            cols = Math.Max(1, SettingsManager.Instance.RunFrames);
                         }
+                        else
+                        {
+                            cols = Math.Max(1, SettingsManager.Instance.IdleFrames);
+                        }
+                        int maxFrame = Math.Max(0, cols - 1);
+                        if (Data.MapEvents[_i].Steps >= maxFrame)
+                            Data.MapEvents[_i].Steps = 0;
+                        else
+                            Data.MapEvents[_i].Steps++;
                     }
 
                     GameState.MapAnim = !GameState.MapAnim;

@@ -2838,35 +2838,96 @@ namespace Client
         {
             // Get the graphic index from the event's first page
             int gfxIndex = eventData.Pages[0].Graphic;
-
-            // Validate the graphic index to ensure it�s within range
             if (gfxIndex <= 0 || gfxIndex > GameState.NumCharacters)
                 return;
 
-            // Character sheets use configurable columns; rows equal columns.
-            int columns = Math.Max(1, SettingsManager.Instance.IdleFrames);
             var gfxInfo = GetGfxInfo(Path.Combine(DataPath.Characters, gfxIndex.ToString()));
             if (gfxInfo == null)
-            {
-                // Handle the case where the graphic information is not found
                 return;
+
+            // Direction rows follow Player/NPC ordering: Down(0), Right(1), Left(2), Up(3)
+            const int directionRows = 4;
+
+            // Frame counts from settings (segment lengths)
+            int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
+            int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
+            int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
+            int expectedTotalColumns = idleFrames + runFrames + attackFrames;
+
+            // Height of one directional row
+            int frameRowHeight = gfxInfo.Height / directionRows;
+            if (frameRowHeight <= 0)
+                frameRowHeight = gfxInfo.Height; // safety fallback
+
+            // Legacy heuristic: square frames => columns inferred by height
+            int autoColsBySquare = frameRowHeight > 0 ? gfxInfo.Width / frameRowHeight : 0;
+            if (autoColsBySquare <= 0)
+                autoColsBySquare = 1;
+
+            bool widthDivisible = expectedTotalColumns > 0 && gfxInfo.Width % expectedTotalColumns == 0;
+            bool canSegment = widthDivisible; // relaxed rule (match Player/NPC logic)
+            int frameColumnsForWidth = canSegment ? expectedTotalColumns : autoColsBySquare;
+            double frameWidthD = gfxInfo.Width / (double)frameColumnsForWidth;
+            double frameHeightD = frameRowHeight;
+
+            // Parse ordering (e.g. "idle,run,attack")
+            string orderCsv = SettingsManager.Instance.SpriteSegmentOrder ?? "idle,run,attack";
+            var tokens = orderCsv.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            if (tokens.Length != 3)
+                tokens = new[] { "idle", "run", "attack" };
+            for (int i = 0; i < tokens.Length; i++)
+                tokens[i] = tokens[i].Trim().ToLowerInvariant();
+            if (!(tokens.Contains("idle") && tokens.Contains("run") && tokens.Contains("attack")))
+                tokens = new[] { "idle", "run", "attack" };
+
+            int runningOffset = 0;
+            int idleOffset = 0, runOffset = 0, attackOffset = 0; // run/attack retained for symmetry/debug
+            for (int i = 0; i < tokens.Length; i++)
+            {
+                string t = tokens[i];
+                if (t == "idle") idleOffset = runningOffset;
+                else if (t == "run") runOffset = runningOffset;
+                else if (t == "attack") attackOffset = runningOffset;
+
+                if (t == "idle") runningOffset += idleFrames;
+                else if (t == "run") runningOffset += runFrames;
+                else if (t == "attack") runningOffset += attackFrames;
             }
 
-            // Calculate the frame size based on actual sheet dimensions
-            int frameWidth = Math.Max(1, gfxInfo.Width / columns);
-            int frameHeight = Math.Max(1, gfxInfo.Height / columns);
+            // Determine animation frame (idle-only animation for events)
+            int animFrame;
+            // Derive a pseudo steps counter from global tick (150ms per frame)
+            const int IdleFrameDurationMs = 150;
+            long tick = General.GetTickCount();
+            int pseudoSteps = (int)(tick / IdleFrameDurationMs);
+            if (canSegment)
+            {
+                animFrame = idleOffset + (pseudoSteps % idleFrames);
+            }
+            else
+            {
+                // Legacy: animate across all columns. If user explicitly set GraphicX>0, honor it as a base offset.
+                int baseCol = Math.Max(0, Math.Min(frameColumnsForWidth - 1, eventData.Pages[0].GraphicX));
+                animFrame = (baseCol + pseudoSteps) % frameColumnsForWidth;
+            }
 
-            // Clamp and build the source rectangle for the selected frame
-            int column = Math.Max(0, Math.Min(columns - 1, eventData.Pages[0].GraphicX));
-            int row = Math.Max(0, Math.Min(columns - 1, eventData.Pages[0].GraphicY));
-            var sourceRect = new Rectangle(column * frameWidth, row * frameHeight, frameWidth, frameHeight);
+            // Row selection: event editor stores desired facing row in GraphicY.
+            int row = Math.Max(0, Math.Min(directionRows - 1, eventData.Pages[0].GraphicY));
 
-            // Draw directly at the provided screen-space coordinates.
-            // Note: x,y here are already converted to screen space by DrawEvents.
+            // Build rectangle
+            var sourceRect = new Rectangle(
+                (int)Math.Round(animFrame * frameWidthD),
+                (int)Math.Round(row * frameHeightD),
+                (int)Math.Round(frameWidthD),
+                (int)Math.Round(frameHeightD));
+
+            // Anchor adjustment for tall sprites (>32px)
+            int drawY = y;
+            if (frameRowHeight > 32)
+                drawY = y - (frameRowHeight - 32); // lift so feet align to tile
+
             string argPath = Path.Combine(DataPath.Characters, gfxIndex.ToString());
-            RenderTexture(ref argPath, x, y,
-                sourceRect.X, sourceRect.Y,
-                sourceRect.Width, sourceRect.Height);
+            RenderTexture(ref argPath, x, drawY, sourceRect.X, sourceRect.Y, sourceRect.Width, sourceRect.Height);
         }
 
         private static void RenderTilesetGraphic(Type.Event eventData, int x, int y)
