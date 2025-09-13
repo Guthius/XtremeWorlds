@@ -384,7 +384,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         {
             var itemNum = packetReader.ReadInt32();
 
-            SetPlayerEquipment(GameState.MyIndex, itemNum, (Equipment) i);
+            SetPlayerEquipment(GameState.MyIndex, itemNum, (Equipment)i);
+            Item.StreamItem(itemNum);
         }
     }
 
