@@ -1902,7 +1902,7 @@ namespace Client
             int sprite;
             int spriteLeft = 0; // direction row
             Rectangle rect;
-            int attackSpeed = 1000; // could be extended per-NPC later
+            int attackSpeed = 1000; // attack duration (ms) for one full NPC attack animation cycle
 
             // Check if Npc exists
             if (Data.MyMapNpc[(int)mapNpcNum].Num < 0 ||
@@ -1997,8 +1997,15 @@ namespace Client
             {
                 if (isAttacking)
                 {
-                    // Attack frames advance using the shared Steps counter just like idle/run
-                    anim = (byte)(Data.MyMapNpc[mapNpcNum].Steps % attackFrames);
+                    long elapsed = tick - Data.MyMapNpc[mapNpcNum].AttackTimer;
+                    if (elapsed < 0) elapsed = 0;
+                    long duration = attackSpeed;
+                    if (duration <= 0) duration = 1;
+                    if (elapsed >= duration) elapsed = duration - 1;
+                    double ratio = elapsed / (double)duration;
+                    int frame = (int)(ratio * attackFrames);
+                    if (frame >= attackFrames) frame = attackFrames - 1;
+                    anim = (byte)frame;
                 }
                 else if (isMoving)
                 {
@@ -2593,7 +2600,7 @@ namespace Client
             int y;
             int spriteNum;
             var spriteleft = default(int);
-            int attackSpeed;
+            int attackSpeed; // attack speed duration (ms) controlling full attack cycle length
             Rectangle rect;
 
             spriteNum = GetPlayerSprite(index);
@@ -2604,10 +2611,11 @@ namespace Client
             if (spriteNum <= 0 | spriteNum > GameState.NumCharacters)
                 return;
 
-            // speed from weapon
+            // Derive attack speed duration (ms). If stored as seconds, multiply here; if already ms, keep as-is.
             if (GetPlayerEquipment(index, Equipment.Weapon) >= 0)
             {
                 attackSpeed = Data.Item[GetPlayerEquipment(index, Equipment.Weapon)].Speed;
+                if (attackSpeed < 50) attackSpeed *= 1000; // heuristic: treat tiny values as seconds, convert to ms
             }
             else
             {
@@ -2701,8 +2709,16 @@ namespace Client
             {
                 if (isAttacking)
                 {
-                    // Use Steps-based cycling for attack segment
-                    anim = (byte)(Data.Player[index].Steps % attackFrames);
+                    // Time-based mapping: elapsed over attackSpeed spans exactly one full attack frame cycle
+                    long elapsed = tick - Data.Player[index].AttackTimer;
+                    if (elapsed < 0) elapsed = 0;
+                    long duration = attackSpeed;
+                    if (duration <= 0) duration = 1;
+                    if (elapsed >= duration) elapsed = duration - 1; // clamp
+                    double ratio = elapsed / (double)duration; // 0.. <1
+                    int frame = (int)(ratio * attackFrames);
+                    if (frame >= attackFrames) frame = attackFrames - 1;
+                    anim = (byte)frame;
                 }
                 else if (isMoving)
                 {
