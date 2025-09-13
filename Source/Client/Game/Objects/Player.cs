@@ -756,6 +756,35 @@ namespace Client
             return checkPlayerDir;
         }
 
+        /// <summary>
+        /// Update player facing based on mouse cursor screen position. Converts current player world position
+        /// to screen center and sets an 8-direction facing, then sends direction packet.
+        /// </summary>
+        public static void UpdateFacingFromMouse(int mouseScreenX, int mouseScreenY)
+        {
+            if (GameState.MyIndex < 0 | GameState.MyIndex > Constant.MaxPlayers) return;
+            int playerScreenX = GameLogic.ConvertMapX(GetPlayerRawX(GameState.MyIndex)) + GameState.SizeX / 2;
+            int playerScreenY = GameLogic.ConvertMapY(GetPlayerRawY(GameState.MyIndex)) + GameState.SizeY / 2;
+            int dx = mouseScreenX - playerScreenX;
+            int dy = mouseScreenY - playerScreenY; // positive downwards
+            if (dx == 0 && dy == 0) return;
+            double angle = Math.Atan2(dy, dx) * 180.0 / Math.PI; // degrees
+            Direction dir;
+            if (angle > -22.5 && angle <= 22.5) dir = Direction.Right;
+            else if (angle > 22.5 && angle <= 67.5) dir = Direction.DownRight;
+            else if (angle > 67.5 && angle <= 112.5) dir = Direction.Down;
+            else if (angle > 112.5 && angle <= 157.5) dir = Direction.DownLeft;
+            else if (angle > 157.5 || angle <= -157.5) dir = Direction.Left;
+            else if (angle > -157.5 && angle <= -112.5) dir = Direction.UpLeft;
+            else if (angle > -112.5 && angle <= -67.5) dir = Direction.Up;
+            else dir = Direction.UpRight;
+            if (Data.Player[GameState.MyIndex].Dir != (byte)dir)
+            {
+                Data.Player[GameState.MyIndex].Dir = (byte)dir;
+                Sender.SendPlayerDir();
+            }
+        }
+
         public static void ProcessMovement(int index)
         {
             if (Data.Player[GameState.MyIndex].IsMoving)
@@ -801,7 +830,7 @@ namespace Client
             var x = default(int);
             var y = default(int);
 
-            if (GameState.VbKeyControl)
+            if (GameState.VbKeyControl || mouse)
             {
                 if (GameState.MyIndex < 0 | GameState.MyIndex > Constant.MaxPlayers)
                     return;

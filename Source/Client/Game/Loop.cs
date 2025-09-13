@@ -32,6 +32,8 @@ namespace Client
         private static int _fadeTmr;
         private static int _renderTmr;
         private static int[] _animationTmr = new int[2];
+    private static int _lastMouseAttackX = int.MinValue; // cache last facing update
+    private static int _lastMouseAttackY = int.MinValue;
 
         public static void Game()
         {
@@ -166,9 +168,36 @@ namespace Client
                     if (GameState.CanMoveNow)
                     {
                         Player.CheckMovement(); // Check if player is trying to move
-                        Player.CheckAttack();   // Check to see if player is trying to attack
+                        Player.CheckAttack();   // Keyboard attack
+                        // Mouse attack support:
+                        // 1. On fresh press, face cursor & attempt attack.
+                        // 2. While held, keep facing cursor and attempt attack when cooldown ready.
+                        var leftPressedNow = GameClient.CurrentMouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed;
+                        var leftPressedPrev = GameClient.PreviousMouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed;
+                        if (leftPressedNow && !leftPressedPrev)
+                        {
+                            Player.UpdateFacingFromMouse(GameClient.CurrentMouseState.X, GameClient.CurrentMouseState.Y);
+                            Player.CheckAttack(mouse: true);
+                        }
+                        else if (leftPressedNow)
+                        {
+                            // While holding: only update facing if cursor moved at least 2px to reduce network spam
+                            // (Simple heuristic: compare to last stored facing update position.)
+                            // We'll store last position in GameState (add if not present) or use static fields in Loop.
+                            // For minimal intrusion, static private cached fields:
+                            if (_lastMouseAttackX != GameClient.CurrentMouseState.X || _lastMouseAttackY != GameClient.CurrentMouseState.Y)
+                            {
+                                if (Math.Abs(_lastMouseAttackX - GameClient.CurrentMouseState.X) + Math.Abs(_lastMouseAttackY - GameClient.CurrentMouseState.Y) >= 2)
+                                {
+                                    Player.UpdateFacingFromMouse(GameClient.CurrentMouseState.X, GameClient.CurrentMouseState.Y);
+                                    _lastMouseAttackX = GameClient.CurrentMouseState.X;
+                                    _lastMouseAttackY = GameClient.CurrentMouseState.Y;
+                                }
+                            }
+                            // Attempt attack each tick; internal cooldown logic in CheckAttack prevents spam.
+                            Player.CheckAttack(mouse: true);
+                        }
                     }
-                    
                     // Process player movements
                     for (_i = 0; _i < Constant.MaxPlayers; _i++)
                     {
