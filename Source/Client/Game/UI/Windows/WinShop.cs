@@ -328,16 +328,18 @@ public static class WinShop
 
     private static void DrawBuying(Window winShop)
     {
+        // NOTE: Buying grid previously had X/Y swapped (using winShop.Y for X and winShop.X for Y) which caused
+        // the selection highlight and icons to render in incorrect positions after toggling buying mode.
+        // Align with DrawSelling logic: left uses window X, top uses window Y.
         for (var i = 0; i < Constant.MaxTrades; i++)
         {
-            var x = winShop.Y + GameState.ShopLeft + (GameState.ShopOffsetX + 32) * (i % GameState.ShopColumns);
-            var y = winShop.X + GameState.ShopTop + (GameState.ShopOffsetY + 32) * (i / GameState.ShopColumns);
+            var top = winShop.Y + GameState.ShopTop + (GameState.ShopOffsetY + 32) * (i / GameState.ShopColumns);
+            var left = winShop.X + GameState.ShopLeft + (GameState.ShopOffsetX + 32) * (i % GameState.ShopColumns);
 
             if (GameState.ShopSelectedSlot == i)
             {
                 var selectedSlotTexturePath = Path.Combine(DataPath.Gui, "61");
-
-                GameClient.RenderTexture(ref selectedSlotTexturePath, x, y, 0, 0, 32, 32, 32, 32);
+                GameClient.RenderTexture(ref selectedSlotTexturePath, left, top, 0, 0, 32, 32, 32, 32);
             }
 
             var itemNum = Data.Shop[GameState.InShop].TradeItem[i].Item;
@@ -355,8 +357,7 @@ public static class WinShop
             }
 
             var path = Path.Combine(DataPath.Items, itemIcon.ToString());
-
-            GameClient.RenderTexture(ref path, x, y, 0, 0, 32, 32, 32, 32);
+            GameClient.RenderTexture(ref path, left, top, 0, 0, 32, 32, 32, 32);
         }
     }
 
