@@ -787,40 +787,44 @@ namespace Client
 
         public static void ProcessMovement(int index)
         {
-            if (Data.Player[GameState.MyIndex].IsMoving)
+            // BUGFIX: Previously gated all players' pixel movement on the LOCAL player's IsMoving flag,
+            // causing remote players to slide only while you moved (and freeze otherwise), producing
+            // desynced positions and camera jitter when targeting them. Now use each player's own flag.
+            if (!IsPlaying(index)) return;
+            if (!Data.Player[index].IsMoving) return;
+
+            // Update per‑pixel offsets based on direction.
+            // NOTE: This assumes 1px per tick step. If variable speed is desired later, introduce a per-player speed.
+            switch (GetPlayerDir(index))
             {
-                // Update player offsets based on direction
-                switch (GetPlayerDir(index))
-                {
-                    case (int)Direction.Up:
-                        Data.Player[index].Y -= 1;
-                        break;
-                    case (int)Direction.Down:
-                        Data.Player[index].Y += 1;
-                        break;
-                    case (int)Direction.Left:
-                        Data.Player[index].X -= 1;
-                        break;
-                    case (int)Direction.Right:
-                        Data.Player[index].X += 1;
-                        break;
-                    case (int)Direction.UpRight:
-                        Data.Player[index].X += 1;
-                        Data.Player[index].Y -= 1;
-                        break;
-                    case (int)Direction.UpLeft:
-                        Data.Player[index].X -= 1;
-                        Data.Player[index].Y -= 1;
-                        break;
-                    case (int)Direction.DownRight:
-                        Data.Player[index].X += 1;
-                        Data.Player[index].Y += 1;
-                        break;
-                    case (int)Direction.DownLeft:
-                        Data.Player[index].X -= 1;
-                        Data.Player[index].Y += 1;
-                        break;
-                }
+                case (int)Direction.Up:
+                    Data.Player[index].Y -= 1;
+                    break;
+                case (int)Direction.Down:
+                    Data.Player[index].Y += 1;
+                    break;
+                case (int)Direction.Left:
+                    Data.Player[index].X -= 1;
+                    break;
+                case (int)Direction.Right:
+                    Data.Player[index].X += 1;
+                    break;
+                case (int)Direction.UpRight:
+                    Data.Player[index].X += 1;
+                    Data.Player[index].Y -= 1;
+                    break;
+                case (int)Direction.UpLeft:
+                    Data.Player[index].X -= 1;
+                    Data.Player[index].Y -= 1;
+                    break;
+                case (int)Direction.DownRight:
+                    Data.Player[index].X += 1;
+                    Data.Player[index].Y += 1;
+                    break;
+                case (int)Direction.DownLeft:
+                    Data.Player[index].X -= 1;
+                    Data.Player[index].Y += 1;
+                    break;
             }
         }
 
