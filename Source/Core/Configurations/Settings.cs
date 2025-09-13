@@ -47,6 +47,7 @@ public class SettingsManager
     public int IdleFrames { get; set; } = 3;
     public int RunFrames { get; set; } = 4;
     public int AttackFrames { get; set; } = 5;
+    public int SpriteDirections { get; set; } = 4;
     
     private static SettingsManager Load()
     {

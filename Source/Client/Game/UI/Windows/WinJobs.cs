@@ -42,14 +42,56 @@ public static class WinJobs
             return;
         }
 
-        var frameCount = SettingsManager.Instance.RunFrames + SettingsManager.Instance.IdleFrames + SettingsManager.Instance.AttackFrames;
-        var w = spriteTexture.Width / frameCount;
-        var h = spriteTexture.Height / 4;
+        // Determine dynamic direction rows (supports configured -> 8 -> 4 -> 1 fallback)
+        int configuredDirs = SettingsManager.Instance.SpriteDirections <= 0 ? 4 : SettingsManager.Instance.SpriteDirections;
+        configuredDirs = Math.Max(1, configuredDirs);
+        int directionRows;
+        if (spriteTexture.Height % configuredDirs == 0) directionRows = configuredDirs;
+        else if (configuredDirs != 8 && spriteTexture.Height % 8 == 0) directionRows = 8;
+        else if (configuredDirs != 4 && spriteTexture.Height % 4 == 0) directionRows = 4;
+        else directionRows = 1;
 
-        GameClient.RenderTexture(ref spritePath,
-            winJobs.X + w / 2 - 12,
-            winJobs.Y + 90,
-            0, 0, w, h, w, h);
+        int frameHeight = Math.Max(1, spriteTexture.Height / directionRows);
+
+        // Segment logic: treat width as Idle+Run+Attack segments if divisible by the sum of frames.
+        int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
+        int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
+        int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
+        int expectedCols = idleFrames + runFrames + attackFrames;
+        bool segmented = expectedCols > 0 && spriteTexture.Width % expectedCols == 0;
+        int frameWidth;
+        if (segmented)
+        {
+            frameWidth = spriteTexture.Width / expectedCols; // show first idle frame (col 0)
+        }
+        else
+        {
+            // Legacy heuristic: assume square frames using frameHeight if that divides evenly
+            if (frameHeight > 0 && spriteTexture.Width % frameHeight == 0)
+            {
+                int approxCols = spriteTexture.Width / frameHeight;
+                if (approxCols > 0) frameWidth = spriteTexture.Width / approxCols; else frameWidth = spriteTexture.Width;
+            }
+            else
+            {
+                // Fallback: single frame across whole width
+                frameWidth = spriteTexture.Width;
+            }
+        }
+
+    // Center sprite in gap between window left and description background (picBackground at 127,55 size 210x124)
+    int windowLeft = winJobs.X; // window origin
+    int gapLeft = windowLeft + 6; // parchment left
+    int gapRight = winJobs.X + 127; // start of description background
+    int gapWidth = gapRight - gapLeft; // width of free area
+    int parchmentTop = winJobs.Y + 26;
+    int parchmentBottom = parchmentTop + 197; // parchment height
+    // Horizontal center within gap
+    int destX = gapLeft + (gapWidth - frameWidth) / 2;
+    // Vertical placement: raise sprite by using a smaller baseline padding
+    int baselineY = parchmentBottom - 50; // baseline 50px above bottom of parchment
+    int destY = baselineY - frameHeight;
+    GameClient.RenderTexture(ref spritePath, destX, destY, 0, 0, frameWidth, frameHeight, frameWidth, frameHeight);
     }
 
     public static void OnDrawDescription()

@@ -294,22 +294,44 @@ namespace Client
             void ApplySize(Bitmap? bmp, Drawable? target)
             {
                 if (bmp == null || target == null) return;
-                int directionRows = 4;
+
+                // Determine direction rows dynamically (configured -> 8 -> 4 -> 1)
+                int configured = SettingsManager.Instance.SpriteDirections <= 0 ? 4 : SettingsManager.Instance.SpriteDirections;
+                configured = Math.Max(1, configured);
+                int directionRows;
+                if (bmp.Height % configured == 0) directionRows = configured;
+                else if (configured != 8 && bmp.Height % 8 == 0) directionRows = 8;
+                else if (configured != 4 && bmp.Height % 4 == 0) directionRows = 4;
+                else directionRows = 1;
+
                 int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
                 int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
                 int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
                 int expectedCols = idleFrames + runFrames + attackFrames;
                 int frameHeight = bmp.Height / directionRows;
                 if (frameHeight <= 0) return;
-                bool widthDivisible = expectedCols > 0 && bmp.Width % expectedCols == 0;
-                bool canSegment = widthDivisible;
-                int frameColumnsForWidth = canSegment ? expectedCols : idleFrames;
-                if (!canSegment && bmp.Width % idleFrames != 0)
+
+                // Determine frame width using segmentation heuristic
+                bool segmented = expectedCols > 0 && bmp.Width % expectedCols == 0;
+                int frameWidth;
+                if (segmented)
                 {
-                    int approx = frameHeight > 0 ? bmp.Width / frameHeight : idleFrames;
-                    if (approx > 0) frameColumnsForWidth = approx;
+                    frameWidth = bmp.Width / expectedCols;
                 }
-                int frameWidth = bmp.Width / Math.Max(1, frameColumnsForWidth);
+                else
+                {
+                    // Square-ish frames fallback using frameHeight; else single frame
+                    if (frameHeight > 0)
+                    {
+                        int approxCols = bmp.Width / frameHeight;
+                        if (approxCols > 0 && bmp.Width % approxCols == 0)
+                            frameWidth = bmp.Width / approxCols;
+                        else
+                            frameWidth = bmp.Width; // single frame sheet
+                    }
+                    else frameWidth = bmp.Width;
+                }
+
                 if (frameWidth <= 0) return;
                 target.Size = new Size(frameWidth, frameHeight);
             }
@@ -324,24 +346,43 @@ namespace Client
         {
             g.Clear(Colors.Transparent);
             if (bmp == null) return;
-            int directionRows = 4;
+
+            // Dynamic direction rows
+            int configured = SettingsManager.Instance.SpriteDirections <= 0 ? 4 : SettingsManager.Instance.SpriteDirections;
+            configured = Math.Max(1, configured);
+            int directionRows;
+            if (bmp.Height % configured == 0) directionRows = configured;
+            else if (configured != 8 && bmp.Height % 8 == 0) directionRows = 8;
+            else if (configured != 4 && bmp.Height % 4 == 0) directionRows = 4;
+            else directionRows = 1;
+
             int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
             int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
             int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
             int expectedCols = idleFrames + runFrames + attackFrames;
             int frameHeight = bmp.Height / directionRows;
             if (frameHeight <= 0) return;
-            bool widthDivisible = expectedCols > 0 && bmp.Width % expectedCols == 0;
-            bool canSegment = widthDivisible;
-            int frameColumnsForWidth = canSegment ? expectedCols : idleFrames;
-            if (!canSegment && bmp.Width % idleFrames != 0)
+
+            bool segmented = expectedCols > 0 && bmp.Width % expectedCols == 0;
+            int frameWidth;
+            if (segmented)
             {
-                int approx = frameHeight > 0 ? bmp.Width / frameHeight : idleFrames;
-                if (approx > 0) frameColumnsForWidth = approx;
+                frameWidth = bmp.Width / expectedCols;
             }
-            int frameWidth = bmp.Width / Math.Max(1, frameColumnsForWidth);
+            else
+            {
+                if (frameHeight > 0)
+                {
+                    int approxCols = bmp.Width / frameHeight;
+                    if (approxCols > 0 && bmp.Width % approxCols == 0)
+                        frameWidth = bmp.Width / approxCols;
+                    else
+                        frameWidth = bmp.Width;
+                }
+                else frameWidth = bmp.Width;
+            }
+
             if (frameWidth <= 0) return;
-            // First idle frame: column 0, direction row 0 (down-facing)
             var src = new Rectangle(0, 0, frameWidth, frameHeight);
             g.DrawImage(bmp, new RectangleF(0, 0, frameWidth, frameHeight), src);
         }

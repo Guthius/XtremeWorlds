@@ -639,17 +639,57 @@ public static class TextRenderer
         var textX = GameLogic.ConvertMapX(GetPlayerRawX(index)) + 8;
         textX = (int) Math.Round(textX - GetTextWidth(name) / 6d);
 
-        if (GetPlayerSprite(index) <= 0 | GetPlayerSprite(index) > GameState.NumCharacters)
+        int spriteNum = GetPlayerSprite(index);
+        if (spriteNum <= 0 || spriteNum > GameState.NumCharacters)
         {
+            // Fallback legacy behavior if sprite invalid
             textY = GameLogic.ConvertMapY(GetPlayerRawY(index)) - 16;
-        }
-        else
-        {
-            // Determine location for text
-            textY = (int) Math.Round((decimal) GameLogic.ConvertMapY((int) (GetPlayerRawY(index) - GameClient.GetGfxInfo(Path.Combine(DataPath.Characters, GetPlayerSprite(index).ToString())).Height / 4d + 16d)));
+            RenderText(name, textX, textY, color, backColor);
+            return;
         }
 
-        // Draw name
+        // Acquire gfx info and dynamically determine direction rows + frame height
+        var gfxInfo = GameClient.GetGfxInfo(Path.Combine(DataPath.Characters, spriteNum.ToString()));
+        if (gfxInfo == null || gfxInfo.Height <= 0)
+        {
+            textY = GameLogic.ConvertMapY(GetPlayerRawY(index)) - 16;
+            RenderText(name, textX, textY, color, backColor);
+            return;
+        }
+
+        // Use the shared helper from Program (static) via full qualification to avoid duplicate logic if namespace differs
+    // Compute direction rows (mirror logic from GameClient.ComputeDirectionRows)
+    int configuredDirs = SettingsManager.Instance.SpriteDirections;
+    if (configuredDirs <= 0) configuredDirs = 4;
+    configuredDirs = Math.Max(1, configuredDirs);
+    int directionRows = 1;
+    if (gfxInfo.Height % configuredDirs == 0) directionRows = configuredDirs;
+    else if (configuredDirs != 8 && gfxInfo.Height % 8 == 0) directionRows = 8;
+    else if (configuredDirs != 4 && gfxInfo.Height % 4 == 0) directionRows = 4;
+    // else remain 1
+
+    int frameHeight = gfxInfo.Height / directionRows;
+        if (frameHeight <= 0) frameHeight = 32; // safety fallback
+
+        // Determine the world Y where sprite base (feet) is drawn accounting for tall sprite upward shift in DrawPlayer
+        int worldBaseY = GetPlayerRawY(index);
+        int spriteTopWorldY = worldBaseY; // will subtract any tall-sprite offset below
+        if (frameHeight > 32)
+        {
+            // In DrawPlayer tall sprites shift drawing upward by (frameHeight - 32)
+            spriteTopWorldY = worldBaseY - (frameHeight - 32);
+        }
+
+        // Convert top of sprite to screen coordinates
+        int spriteTopScreenY = GameLogic.ConvertMapY(spriteTopWorldY);
+
+        // Fixed gap logic (restored): 4px margin above sprite top, using scaled text height
+        int textPixelHeight = (int)Math.Ceiling(Fonts[Font.Georgia].LineSpacing * 12f / 16f);
+        int margin = 4;
+        textY = spriteTopScreenY - margin - textPixelHeight;
+        if (textY > spriteTopScreenY - 2)
+            textY = spriteTopScreenY - 2; // keep just above sprite
+
         RenderText(name, textX, textY, color, backColor);
     }
 }

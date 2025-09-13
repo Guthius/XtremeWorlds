@@ -107,7 +107,9 @@ public static class WinChars
 
             var frameCount = SettingsManager.Instance.RunFrames + SettingsManager.Instance.IdleFrames + SettingsManager.Instance.AttackFrames;
             var w = sprite.Width / frameCount;
-            var h = sprite.Height / 4;
+            var dirs = Math.Max(1, SettingsManager.Instance.SpriteDirections);
+            if (sprite.Height % dirs != 0) dirs = 4; // fallback legacy
+            var h = sprite.Height / (dirs == 0 ? 1 : dirs);
 
             if (GameState.CharSprite[i] <= GameState.NumCharacters)
             {
@@ -132,7 +134,9 @@ public static class WinChars
                 }
                 
                 var sourceW = doll.Width / frameCount;
-                var sourceH = doll.Height / 4;
+                var dirs2 = Math.Max(1, SettingsManager.Instance.SpriteDirections);
+                if (doll.Height % dirs2 != 0) dirs2 = 4;
+                var sourceH = doll.Height / (dirs2 == 0 ? 1 : dirs2);
 
                 GameClient.RenderTexture(ref dollPath, x, y, 0, 0, w, h, sourceW, sourceH);
             }

@@ -173,33 +173,52 @@ namespace Client
             {
                 if (_spriteBitmap == null) return;
 
-                // Determine if sheet is segmented (Idle/Run/Attack) like in-world rendering.
+                // Read settings (ensure at least 1 frame per segment)
                 int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
                 int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
                 int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
-                int totalPerRow = idleFrames + runFrames + attackFrames;
+                int expectedCols = idleFrames + runFrames + attackFrames;
 
-                // Each direction row stacked vertically (4 directions typical). Width contains horizontal frames.
-                int rows = 4; // assume standard 4-direction sheet
-                int frameHeight = _spriteBitmap.Height / rows;
+                // Dynamic direction rows (supports 8/4/1)
+                int configured = SettingsManager.Instance.SpriteDirections <= 0 ? 4 : SettingsManager.Instance.SpriteDirections;
+                configured = Math.Max(1, configured);
+                int directionRows;
+                if (_spriteBitmap.Height % configured == 0) directionRows = configured;
+                else if (configured != 8 && _spriteBitmap.Height % 8 == 0) directionRows = 8;
+                else if (configured != 4 && _spriteBitmap.Height % 4 == 0) directionRows = 4;
+                else directionRows = 1;
+
+                int frameHeight = Math.Max(1, _spriteBitmap.Height / directionRows);
+
+                // Determine if the sheet is segmented into idle/run/attack columns
+                bool segmented = expectedCols > 0 && _spriteBitmap.Width % expectedCols == 0;
                 int frameWidth;
-                bool segmented = (_spriteBitmap.Width % totalPerRow) == 0;
                 if (segmented)
                 {
-                    // First segment = Idle; we want its first frame only (column 0 of idle segment)
-                    frameWidth = _spriteBitmap.Width / totalPerRow; // width of a single frame
-                    var src = new Rectangle(0, 0, frameWidth, frameHeight); // top row, first idle frame
-                    picSprite.Size = new Size(frameWidth, frameHeight);
-                    e.Graphics.DrawImage(_spriteBitmap, new Rectangle(0, 0, frameWidth, frameHeight), src);
+                    frameWidth = _spriteBitmap.Width / expectedCols;
                 }
                 else
                 {
-                    // Fallback: treat sheet as uniform columns of idleFrames (legacy). Show first frame.
-                    frameWidth = _spriteBitmap.Width / idleFrames;
-                    var src = new Rectangle(0, 0, frameWidth, frameHeight);
-                    picSprite.Size = new Size(frameWidth, frameHeight);
-                    e.Graphics.DrawImage(_spriteBitmap, new Rectangle(0, 0, frameWidth, frameHeight), src);
+                    // Legacy heuristic: square frames (using frameHeight) else fallback to single full width
+                    if (frameHeight > 0)
+                    {
+                        int approxCols = _spriteBitmap.Width / frameHeight;
+                        if (approxCols > 0 && _spriteBitmap.Width % approxCols == 0)
+                            frameWidth = _spriteBitmap.Width / approxCols;
+                        else
+                            frameWidth = _spriteBitmap.Width; // single frame
+                    }
+                    else
+                    {
+                        frameWidth = _spriteBitmap.Width;
+                    }
                 }
+
+                // Always show the first idle frame (column = idle segment start)
+                int idleOffset = 0; // by definition order idle,run,attack for preview
+                var src = new Rectangle(idleOffset * frameWidth, 0, frameWidth, frameHeight);
+                picSprite.Size = new Size(frameWidth, frameHeight);
+                e.Graphics.DrawImage(_spriteBitmap, new Rectangle(0, 0, frameWidth, frameHeight), src);
             };
 
             btnSave = new Button { Text = "Save" };

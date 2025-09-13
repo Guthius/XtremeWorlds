@@ -1723,7 +1723,14 @@ namespace Client
                 {
                     try
                     {
-                        int directionRows = 4; // Up, Left, Right, Down ordering may vary; we just want consistent row height
+                        // Dynamic direction rows (supports configured -> 8 -> 4 -> 1 fallback)
+                        int configuredDirs = SettingsManager.Instance.SpriteDirections <= 0 ? 4 : SettingsManager.Instance.SpriteDirections;
+                        configuredDirs = Math.Max(1, configuredDirs);
+                        int directionRows;
+                        if (src.Height % configuredDirs == 0) directionRows = configuredDirs;
+                        else if (configuredDirs != 8 && src.Height % 8 == 0) directionRows = 8;
+                        else if (configuredDirs != 4 && src.Height % 4 == 0) directionRows = 4;
+                        else directionRows = 1;
                         int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
                         int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
                         int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
@@ -2627,20 +2634,41 @@ namespace Client
                 if (nudGraphic.Value <= 0 | nudGraphic.Value > GameState.NumCharacters)
                     return;
 
-                for (int i = 0; i <= 3; i++)
+                var gfxInfo = GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Characters, nudGraphic.Value.ToString()));
+                int dirs = ComputeDirectionRows(gfxInfo.Height);
+                // Compute frame dimensions heuristically using animation settings
+                int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
+                int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
+                int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
+                int expectedCols = idleFrames + runFrames + attackFrames;
+                int frameWidth;
+                if (expectedCols > 0 && gfxInfo.Width % expectedCols == 0)
+                    frameWidth = gfxInfo.Width / expectedCols;
+                else if (gfxInfo.Width % idleFrames == 0)
+                    frameWidth = gfxInfo.Width / idleFrames;
+                else
                 {
-                    if (Event.GraphicSelX >= GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Characters, nudGraphic.Value.ToString())).Width / 4d * i & Event.GraphicSelX < GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Characters, nudGraphic.Value.ToString())).Width / 4d * (i + 1))
-                    {
-                        Event.GraphicSelX = i;
-                    }
+                    // fallback approximate square frames
+                    int approx = (gfxInfo.Height / dirs) > 0 ? gfxInfo.Width / (gfxInfo.Height / dirs) : gfxInfo.Width;
+                    if (approx <= 0) approx = 1;
+                    frameWidth = gfxInfo.Width / approx;
                 }
-                for (int i = 0; i <= 3; i++)
-                {
-                    if (Event.GraphicSelY >= GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Characters, nudGraphic.Value.ToString())).Height / 4d * i & Event.GraphicSelY < GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Characters, nudGraphic.Value.ToString())).Height / 4d * (i + 1))
-                    {
-                        Event.GraphicSelY = i;
-                    }
-                }
+                int frameHeight = gfxInfo.Height / dirs;
+                if (frameWidth <= 0) frameWidth = gfxInfo.Width;
+                if (frameHeight <= 0) frameHeight = gfxInfo.Height;
+
+                // Determine column index
+                int col = Event.GraphicSelX / Math.Max(1, frameWidth);
+                if (col < 0) col = 0;
+                int maxCols = Math.Max(1, gfxInfo.Width / Math.Max(1, frameWidth));
+                if (col >= maxCols) col = maxCols - 1;
+                Event.GraphicSelX = col;
+
+                // Determine row (direction) index
+                int row = Event.GraphicSelY / Math.Max(1, frameHeight);
+                if (row < 0) row = 0;
+                if (row >= dirs) row = dirs - 1;
+                Event.GraphicSelY = row;
             }
             DrawGraphic();
             // Also refresh the full-sheet display (not strictly needed for single-frame highlighting)
@@ -2660,6 +2688,18 @@ namespace Client
         }
 
         #endregion
+
+        // Helper to compute direction row count with fallback heuristics
+        private static int ComputeDirectionRows(int bmpHeight)
+        {
+            int configured = SettingsManager.Instance.SpriteDirections <= 0 ? 4 : SettingsManager.Instance.SpriteDirections;
+            configured = Math.Max(1, configured);
+            if (bmpHeight <= 0) return 1;
+            if (bmpHeight % configured == 0) return configured;
+            if (configured != 8 && bmpHeight % 8 == 0) return 8;
+            if (configured != 4 && bmpHeight % 4 == 0) return 4;
+            return 1;
+        }
 
         #region Movement
 

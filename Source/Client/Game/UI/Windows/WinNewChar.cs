@@ -29,7 +29,9 @@ public static class WinNewChar
 
         var frameCount = SettingsManager.Instance.RunFrames + SettingsManager.Instance.IdleFrames + SettingsManager.Instance.AttackFrames;
         var w = sprite.Width / frameCount;
-        var h = sprite.Height / 4;
+        var dirs = Math.Max(1, SettingsManager.Instance.SpriteDirections);
+        if (sprite.Height % dirs != 0) dirs = 4; // fallback
+        var h = sprite.Height / (dirs == 0 ? 1 : dirs);
 
         GameClient.RenderTexture(ref spritePath,
             winNewChar.X + (w / 2) + 134,

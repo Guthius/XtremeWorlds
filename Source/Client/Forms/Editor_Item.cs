@@ -49,6 +49,18 @@ namespace Client
             Editors.AutoSizeWindow(this, 1000, 720);
         }
 
+        // Helper to compute direction rows from a bitmap height with configured setting
+        private static int ComputeDirectionRows(int bmpHeight)
+        {
+            int configured = SettingsManager.Instance.SpriteDirections <= 0 ? 4 : SettingsManager.Instance.SpriteDirections;
+            configured = Math.Max(1, configured);
+            if (bmpHeight <= 0) return 1;
+            if (bmpHeight % configured == 0) return configured;
+            if (configured != 8 && bmpHeight % 8 == 0) return 8;
+            if (configured != 4 && bmpHeight % 4 == 0) return 4;
+            return 1;
+        }
+
         Eto.Forms.Control BuildUi()
         {
             lstIndex = new ListBox { Width = 200 };
@@ -102,40 +114,45 @@ namespace Client
             numIntAdd = StatAdd(Stat.Intelligence);
             numSprAdd = StatAdd(Stat.Spirit);
 
-            iconPreview = new Drawable { Size = new Size(32,32), BackgroundColor = Colors.Transparent }; iconPreview.Paint += (s,e)=> { if(itemBmp!=null) e.Graphics.DrawImage(itemBmp,0,0); };
+            iconPreview = new Drawable { Size = new Size(32,32), BackgroundColor = Colors.Transparent };
             iconPreview.Paint += (s,e)=> {
-                if(itemBmp!=null) {
-                    int fw = itemBmp.Width / 4;
-                    int fh = itemBmp.Height / 4;
-                    iconPreview.Size = new Size(fw, fh);
-                    e.Graphics.DrawImage(itemBmp, new Rectangle(0,0,fw,fh), new Rectangle(0,0,fw,fh));
-                }
+                if(itemBmp==null) return;
+                // Icons are single-frame images; draw at natural size.
+                iconPreview.Size = new Size(itemBmp.Width, itemBmp.Height);
+                e.Graphics.DrawImage(itemBmp, 0, 0);
             };
             paperdollPreview = new Drawable { Size = new Size(64,64), BackgroundColor = Colors.Transparent };
             paperdollPreview.Paint += (s,e)=> {
-                if (paperdollBmp != null)
+                if (paperdollBmp == null) return;
+                int dirs = ComputeDirectionRows(paperdollBmp.Height);
+                int frameHeight = paperdollBmp.Height / Math.Max(1, dirs);
+                if (frameHeight <= 0) return;
+
+                int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
+                int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
+                int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
+                int expectedCols = idleFrames + runFrames + attackFrames;
+                int frameWidth;
+                if (expectedCols > 0 && paperdollBmp.Width % expectedCols == 0)
                 {
-                    int directionRows = 4;
-                    int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
-                    int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
-                    int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
-                    int expectedCols = idleFrames + runFrames + attackFrames;
-                    int frameHeight = paperdollBmp.Height / directionRows;
-                    if (frameHeight <= 0) return;
-                    bool widthDivisible = expectedCols > 0 && paperdollBmp.Width % expectedCols == 0;
-                    bool canSegment = widthDivisible;
-                    int frameColumnsForWidth = canSegment ? expectedCols : idleFrames;
-                    if (!canSegment && paperdollBmp.Width % idleFrames != 0)
-                    {
-                        int approx = frameHeight > 0 ? paperdollBmp.Width / frameHeight : idleFrames;
-                        if (approx > 0) frameColumnsForWidth = approx;
-                    }
-                    int frameWidth = paperdollBmp.Width / Math.Max(1, frameColumnsForWidth);
-                    if (frameWidth <= 0) return;
-                    var src = new Rectangle(0, 0, frameWidth, frameHeight); // first idle frame, top direction row
-                    paperdollPreview.Size = new Size(frameWidth, frameHeight);
-                    e.Graphics.DrawImage(paperdollBmp, new Rectangle(0,0,frameWidth,frameHeight), src);
+                    frameWidth = paperdollBmp.Width / expectedCols;
                 }
+                else if (paperdollBmp.Width % idleFrames == 0)
+                {
+                    frameWidth = paperdollBmp.Width / idleFrames;
+                }
+                else
+                {
+                    // heuristic: use square-ish frames if possible
+                    int approx = frameHeight > 0 ? paperdollBmp.Width / frameHeight : paperdollBmp.Width;
+                    if (approx <= 0) approx = 1;
+                    frameWidth = paperdollBmp.Width / approx;
+                }
+                if (frameWidth <= 0) frameWidth = paperdollBmp.Width;
+
+                var src = new Rectangle(0,0,frameWidth,frameHeight); // first frame, top direction row
+                paperdollPreview.Size = new Size(frameWidth, frameHeight);
+                e.Graphics.DrawImage(paperdollBmp, new Rectangle(0,0,frameWidth,frameHeight), src);
             };
 
             btnSave = new Button { Text = "Save" }; btnSave.Click += (s,e)=> { Editors.ItemEditorOK(); Close(); };

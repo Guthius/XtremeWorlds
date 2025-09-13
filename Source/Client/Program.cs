@@ -19,6 +19,49 @@ namespace Client
 {
     public class GameClient : Microsoft.Xna.Framework.Game
     {
+        // Helper: compute direction rows from texture height and configured setting with fallbacks (8->4->1)
+        private static int ComputeDirectionRows(int textureHeight)
+        {
+            int configured = SettingsManager.Instance.SpriteDirections;
+            if (configured <= 0) configured = 4;
+            configured = Math.Max(1, configured);
+            if (textureHeight <= 0) return 1;
+            if (textureHeight % configured == 0) return configured;
+            if (configured != 8 && textureHeight % 8 == 0) return 8;
+            if (configured != 4 && textureHeight % 4 == 0) return 4;
+            return 1;
+        }
+
+        // Helper: map logical Direction enum to row index based on supported row count.
+        // New ordering requirement (top-left, top-right, down-left, down-right) interpreted for diagonals when 8 directions present.
+        // For 4-row sheets we retain legacy Down(0), Right(1), Left(2), Up(3) unless expanded sheet present.
+        private static int MapDirectionToRow(Direction dir, int rows)
+        {
+            if (rows <= 1) return 0;
+            // If 8-direction sheet, assume ordering rows 0..7 in enum numeric order.
+            if (rows >= 8)
+            {
+                return (int)dir % rows; // enum expected to align with ordering
+            }
+            // 4-direction fallback mapping: Down, Right, Left, Up
+            switch (dir)
+            {
+                case Direction.Down:
+                case Direction.DownLeft:
+                case Direction.DownRight:
+                    return 0;
+                case Direction.Right:
+                case Direction.UpRight:
+                    return 1;
+                case Direction.Left:
+                case Direction.UpLeft:
+                    return 2;
+                case Direction.Up:
+                    return 3;
+                default:
+                    return 0;
+            }
+        }
         public static GraphicsDeviceManager? Graphics;
         public static SpriteBatch? SpriteBatch;
 
@@ -1755,10 +1798,26 @@ namespace Client
             string gfxPath = Path.Combine(DataPath.Paperdolls, sprite.ToString());
             var info = GetGfxInfo(gfxPath);
             if (info == null || info.Width <= 0 || info.Height <= 0) return;
-            // Determine if this paperdoll has directional rows or is a single strip.
-            // Heuristic: if height divides evenly by 4 and each row height >= 16, assume 4 directional rows.
-            bool looksDirectional = (info.Height % 4 == 0) && (info.Height / 4 >= 16);
-            int directionRows = looksDirectional ? 4 : 1;
+            // Determine directional rows using configurable SpriteDirections with heuristic fallback.
+            int configuredDirs = Math.Max(1, SettingsManager.Instance.SpriteDirections);
+            int directionRows;
+            if (configuredDirs > 1 && info.Height % configuredDirs == 0)
+            {
+                directionRows = configuredDirs;
+            }
+            else if (info.Height % 8 == 0 && (info.Height / 8) >= 16)
+            {
+                directionRows = 8; // auto-detect 8-direction sheet
+            }
+            else if (info.Height % 4 == 0 && (info.Height / 4) >= 16)
+            {
+                directionRows = 4; // legacy 4-direction sheet
+            }
+            else
+            {
+                directionRows = 1; // single strip
+            }
+            bool looksDirectional = directionRows > 1;
 
             int frameHeight = info.Height / directionRows;
             if (frameHeight <= 0) frameHeight = info.Height; // safety
@@ -1890,35 +1949,12 @@ namespace Client
                 }
             }
 
-            // Set sprite sheet position based on direction
-            switch (Data.MyMapNpc[(int)mapNpcNum].Dir)
-            {
-                case (int)Direction.Up:
-                    {
-                        spriteLeft = 3;
-                        break;
-                    }
-                case (int)Direction.Right:
-                    {
-                        spriteLeft = 2;
-                        break;
-                    }
-                case (int)Direction.Down:
-                    {
-                        spriteLeft = 0;
-                        break;
-                    }
-                case (int)Direction.Left:
-                    {
-                        spriteLeft = 1;
-                        break;
-                    }
-            }
-
             // Segmentation logic
             var gfxInfo = GetGfxInfo(Path.Combine(DataPath.Characters, sprite.ToString()));
             if (gfxInfo == null) return;
-            int directionRows = 4;
+            int directionRows = ComputeDirectionRows(gfxInfo.Height);
+            // Map direction to row after computing available rows
+            spriteLeft = MapDirectionToRow((Direction)Data.MyMapNpc[(int)mapNpcNum].Dir, directionRows);
             int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
             int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
             int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
@@ -2385,12 +2421,44 @@ namespace Client
                     case (byte) TargetType.Player:
                     {
                         // it's a player
-                        if (!(GetPlayerMap(withBlock.Target) == GetPlayerMap(GameState.MyIndex)))
+                        if (GetPlayerMap(withBlock.Target) != GetPlayerMap(GameState.MyIndex))
                             return;
 
-                        // it's on our map - get co-ords
+                        // Base anchor previously used for bubble (top of classic 32px frame)
                         x = GameLogic.ConvertMapX(Data.Player[withBlock.Target].X) + 16;
                         y = GameLogic.ConvertMapY(Data.Player[withBlock.Target].Y) - 32;
+
+                        // Adjust upward so bubble sits above nameplate.
+                        // Recreate nameplate top Y (TextRenderer logic simplified):
+                        int spriteNumLocal = GetPlayerSprite((int)withBlock.Target);
+                        if (spriteNumLocal > 0 && spriteNumLocal <= GameState.NumCharacters)
+                        {
+                            var gi = GetGfxInfo(Path.Combine(DataPath.Characters, spriteNumLocal.ToString()));
+                            if (gi != null && gi.Height > 0)
+                            {
+                                int configuredDirs = SettingsManager.Instance.SpriteDirections <= 0 ? 4 : SettingsManager.Instance.SpriteDirections;
+                                configuredDirs = Math.Max(1, configuredDirs);
+                                int dirs;
+                                if (gi.Height % configuredDirs == 0) dirs = configuredDirs;
+                                else if (configuredDirs != 8 && gi.Height % 8 == 0) dirs = 8;
+                                else if (configuredDirs != 4 && gi.Height % 4 == 0) dirs = 4;
+                                else dirs = 1;
+                                int frameHeight = gi.Height / dirs;
+                                if (frameHeight <= 0) frameHeight = 32;
+                                int worldBaseY = Data.Player[withBlock.Target].Y;
+                                if (frameHeight > 32)
+                                {
+                                    // replicate upward shift used when drawing tall sprites
+                                    int shift = frameHeight - 32;
+                                    y -= shift; // move anchor up to sprite top
+                                }
+                                // Nameplate sits (margin + textHeight) above spriteTop. We'll raise bubble further: name height ~=  (LineSpacing*12/16)
+                                int textHeight = (int)Math.Ceiling(TextRenderer.Fonts[Font.Georgia].LineSpacing * 12f / 16f);
+                                int nameGap = 4; // from TextRenderer
+                                int bubbleExtra = 4; // extra visual gap above name
+                                y -= (textHeight + nameGap + bubbleExtra);
+                            }
+                        }
                         break;
                     }
                     case (byte) TargetType.Event:
@@ -2561,50 +2629,8 @@ namespace Client
                 }
             }
 
-            // Set the left
-            switch (GetPlayerDir(index))
-            {
-                case (int) Direction.Up:
-                {
-                    spriteleft = 3;
-                    break;
-                }
-                case (int) Direction.Right:
-                {
-                    spriteleft = 1; // corrected: right-facing row
-                    break;
-                }
-                case (int) Direction.Down:
-                {
-                    spriteleft = 0;
-                    break;
-                }
-                case (int) Direction.Left:
-                {
-                    spriteleft = 2; // corrected: left-facing row
-                    break;
-                }
-                case (int) Direction.UpRight:
-                {
-                    spriteleft = 1; // follow right-facing row
-                    break;
-                }
-                case (int) Direction.UpLeft:
-                {
-                    spriteleft = 2; // follow left-facing row
-                    break;
-                }
-                case (int) Direction.DownLeft:
-                {
-                    spriteleft = 2; // follow left-facing row
-                    break;
-                }
-                case (int) Direction.DownRight:
-                {
-                    spriteleft = 1; // follow right-facing row
-                    break;
-                }
-            }
+            // Dynamic row index from direction
+            // We'll compute directionRows below once gfxInfo known; use placeholder for now
 
             var gfxInfo = GetGfxInfo(Path.Combine(DataPath.Characters, spriteNum.ToString()));
             if (gfxInfo == null)
@@ -2613,7 +2639,8 @@ namespace Client
                 return;
             }
 
-            int directionRows = 4; // Down, Right, Left, Up (rows)
+            int directionRows = ComputeDirectionRows(gfxInfo.Height); // dynamic rows (supports 4/8/1)
+            spriteleft = MapDirectionToRow((Direction)GetPlayerDir(index), directionRows);
 
             // Determine segment frame counts (allow variable counts)
             int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
@@ -2857,8 +2884,8 @@ namespace Client
             if (gfxInfo == null)
                 return;
 
-            // Direction rows follow Player/NPC ordering: Down(0), Right(1), Left(2), Up(3)
-            const int directionRows = 4;
+            // Direction rows dynamic (configured sprite directions with fallback heuristics)
+            int directionRows = ComputeDirectionRows(gfxInfo.Height);
 
             // Frame counts from settings (segment lengths)
             int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
@@ -3000,19 +3027,14 @@ namespace Client
                             if (Data.MapEvents[id].Graphic <= 0 || Data.MapEvents[id].Graphic > GameState.NumCharacters)
                                 return;
 
-                            // Direction row (same ordering as players/NPCs)
-                            switch (Data.MapEvents[id].ShowDir)
-                            {
-                                case (int)Direction.Up:    spritetop = 3; break;
-                                case (int)Direction.Right: spritetop = 2; break;
-                                case (int)Direction.Down:  spritetop = 0; break;
-                                case (int)Direction.Left:  spritetop = 1; break;
-                            }
+                            // Direction row dynamic mapping
+                            // We'll compute rows after loading gfxInfo
 
                             var gfxInfo = GetGfxInfo(Path.Combine(DataPath.Characters, Data.MapEvents[id].Graphic.ToString()));
                             if (gfxInfo == null) return;
 
-                            const int directionRows = 4;
+                            int directionRows = ComputeDirectionRows(gfxInfo.Height);
+                            spritetop = MapDirectionToRow((Direction)Data.MapEvents[id].ShowDir, directionRows);
                             int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
                             int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
                             int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
