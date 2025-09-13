@@ -154,6 +154,23 @@ namespace Client
             int i;
             int sprite;
 
+            // Defensive: ensure projectile index within bounds
+            if (projectileNum < 0 || projectileNum >= Constant.MaxProjectiles)
+            {
+                return;
+            }
+
+            // Defensive: ensure player index and map index are valid before indexing map projectile array
+            if (GameState.MyIndex < 0 || GameState.MyIndex > Constant.MaxPlayers)
+            {
+                return;
+            }
+            int mapId = Data.Player[GameState.MyIndex].Map;
+            if (mapId < 0 || mapId >= Data.MapProjectile.GetLength(0))
+            {
+                return;
+            }
+
             StreamProjectile(projectileNum);
 
             // check to see if it's time to move the Projectile
@@ -261,9 +278,22 @@ namespace Client
                 return;
             }
 
-            sprite = Data.Projectile[Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].ProjectileNum].Sprite;
-            if (sprite < 1 | sprite > GameState.NumProjectiles)
+            int projectileDataIndex = Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].ProjectileNum;
+            // Validate projectile data index (treat <=0 as empty slot) to avoid IndexOutOfRange
+            if (projectileDataIndex <= 0 || projectileDataIndex >= Data.Projectile.Length)
+            {
+                // Clear invalid slot to avoid repeated exceptions
+                ClearMapProjectile(projectileNum);
                 return;
+            }
+
+            sprite = Data.Projectile[projectileDataIndex].Sprite;
+            if (sprite < 1 || sprite > GameState.NumProjectiles)
+            {
+                // Invalid sprite reference; clear and exit
+                ClearMapProjectile(projectileNum);
+                return;
+            }
 
             // src rect
             rec.Top = 0d;
@@ -282,22 +312,30 @@ namespace Client
             {
                 case (byte) Direction.Up:
                 {
-                    yOffset = (int) Math.Round((Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].TravelTime - General.GetTickCount()) / (double) Data.Projectile[Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].ProjectileNum].Speed * GameState.SizeY);
+                    int speedYUp = Data.Projectile[projectileDataIndex].Speed;
+                    if (speedYUp <= 0) speedYUp = 1;
+                    yOffset = (int) Math.Round((Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].TravelTime - General.GetTickCount()) / (double) speedYUp * GameState.SizeY);
                     break;
                 }
                 case (byte) Direction.Down:
                 {
-                    yOffset = (int) Math.Round(-((Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].TravelTime - General.GetTickCount()) / (double) Data.Projectile[Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].ProjectileNum].Speed) * GameState.SizeY);
+                    int speedYDown = Data.Projectile[projectileDataIndex].Speed;
+                    if (speedYDown <= 0) speedYDown = 1;
+                    yOffset = (int) Math.Round(-((Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].TravelTime - General.GetTickCount()) / (double) speedYDown) * GameState.SizeY);
                     break;
                 }
                 case (byte) Direction.Left:
                 {
-                    xOffset = (int) Math.Round((Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].TravelTime - General.GetTickCount()) / (double) Data.Projectile[Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].ProjectileNum].Speed);
+                    int speedXLeft = Data.Projectile[projectileDataIndex].Speed;
+                    if (speedXLeft <= 0) speedXLeft = 1;
+                    xOffset = (int) Math.Round((Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].TravelTime - General.GetTickCount()) / (double) speedXLeft);
                     break;
                 }
                 case (byte) Direction.Right:
                 {
-                    xOffset = (int) Math.Round(-((Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].TravelTime - General.GetTickCount()) / (double) Data.Projectile[Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].ProjectileNum].Speed));
+                    int speedXRight = Data.Projectile[projectileDataIndex].Speed;
+                    if (speedXRight <= 0) speedXRight = 1;
+                    xOffset = (int) Math.Round(-((Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].TravelTime - General.GetTickCount()) / (double) speedXRight));
                     break;
                 }
             }
