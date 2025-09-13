@@ -66,6 +66,14 @@ public static class NetworkSend
             packetWriter.WriteInt32(Data.Player[session.Id].Sprite);
             packetWriter.WriteInt32(Data.Player[session.Id].Access);
             packetWriter.WriteInt32(Data.Player[session.Id].Job);
+            for (var j = 0; j < EquipmentCount; j++)
+            {
+                if (Data.Player[session.Id].Equipment[j].Num >= 0)
+                    packetWriter.WriteInt32(Data.Item[Data.Player[session.Id].Equipment[j].Num].Paperdoll);
+                else
+                    packetWriter.WriteInt32(-1);
+            }
+            
 
             Database.ClearCharacter(session.Id);
         }

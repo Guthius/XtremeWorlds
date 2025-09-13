@@ -1828,12 +1828,6 @@ namespace Client
                 (int)Math.Round(frameWidthD),
                 (int)Math.Round(frameHeightD2));
 
-            // IMPORTANT: x,y passed in are already world (raw) coordinates chosen to match the base player sprite
-            // AFTER that function later converts them in DrawCharacterSprite. We should *not* reconvert here.
-            // Likewise, vertical tall-sprite adjustment has already been applied to the base player's Y before
-            // calling DrawPaperdoll. Applying it again here caused the paperdoll to render too high. So we leave
-            // x,y exactly as provided (no ConvertMapX/Y, no tall adjustment) for perfect overlap.
-
             // Convert to screen coordinates exactly once here for the equipment layer.
             int sx = GameLogic.ConvertMapX(x);
             int sy = GameLogic.ConvertMapY(y);

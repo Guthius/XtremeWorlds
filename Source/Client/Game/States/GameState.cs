@@ -5,6 +5,7 @@ using Color = Microsoft.Xna.Framework.Color;
 using Constant = Core.Globals.Constant;
 using Point = Microsoft.Xna.Framework.Point;
 using Type = Core.Globals.Type;
+using Equipment = Core.Globals.Equipment;
 
 namespace Client
 {
@@ -59,6 +60,7 @@ namespace Client
         public static long[] CharSprite = new long[(Constant.MaxChars)];
         public static long[] CharAccess = new long[(Constant.MaxChars)];
         public static long[] CharJob = new long[(Constant.MaxChars)];
+        public static long[,] CharEq = new long[Constant.MaxChars, Enum.GetValues<Equipment>().Length];
         public static byte CharNum;
 
         // elastic bars

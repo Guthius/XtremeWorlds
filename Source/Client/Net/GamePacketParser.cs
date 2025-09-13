@@ -213,9 +213,11 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             GameState.CharSprite[i] = packetReader.ReadInt32();
             GameState.CharAccess[i] = packetReader.ReadInt32();
             GameState.CharJob[i] = packetReader.ReadInt32();
-
-            // set as empty or not
-            if (GameState.CharName[i].Length == 0)
+            for (var j = 0; j < EquipmentCount; j++)
+            {
+                GameState.CharEq[i, j] = packetReader.ReadInt32();
+            }
+            if (string.IsNullOrEmpty(GameState.CharName[i]))
             {
                 isSlotEmpty[i] = true;
             }
@@ -232,7 +234,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             {
                 var control = WindowManager.Windows[winNum].Controls[(int) conNum];
 
-                control.Text = !isSlotEmpty[(int) i] ? GameState.CharName[(int) i] : "Blank Slot";
+                control.Text = !isSlotEmpty[(int) i] ? (GameState.CharName[(int) i] ?? string.Empty) : "Blank Slot";
             }
 
             if (isSlotEmpty[(int) i])
