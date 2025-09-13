@@ -222,7 +222,14 @@ namespace Client
             }
             if (lstIndex.Items.Count > 0) lstIndex.SelectedIndex = 0;
             nudPic.MaxValue = GameState.NumProjectiles;
+            // End bulk population, re-enable events
             _initializing = false;
+            // Ensure editor index and initialize detail panel (SelectedIndexChanged suppressed during _initializing)
+            if (lstIndex.SelectedIndex >= 0)
+            {
+                GameState.EditorIndex = lstIndex.SelectedIndex;
+                Editors.ProjectileEditorInit();
+            }
         }
 
         private void RefreshListEntry(int index)
