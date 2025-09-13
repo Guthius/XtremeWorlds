@@ -526,11 +526,6 @@ public static class Sender
 
     public static void SendRequestAdmin()
     {
-        if (GetPlayerAccess(GameState.MyIndex) < (int) AccessLevel.Moderator)
-        {
-            return;
-        }
-
         var packetWriter = new PacketWriter(4);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CAdmin);
