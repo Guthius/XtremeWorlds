@@ -79,19 +79,19 @@ public static class WinJobs
             }
         }
 
-    // Center sprite in gap between window left and description background (picBackground at 127,55 size 210x124)
-    int windowLeft = winJobs.X; // window origin
-    int gapLeft = windowLeft + 6; // parchment left
-    int gapRight = winJobs.X + 127; // start of description background
-    int gapWidth = gapRight - gapLeft; // width of free area
-    int parchmentTop = winJobs.Y + 26;
-    int parchmentBottom = parchmentTop + 197; // parchment height
-    // Horizontal center within gap
-    int destX = gapLeft + (gapWidth - frameWidth) / 2;
-    // Vertical placement: raise sprite by using a smaller baseline padding
-    int baselineY = parchmentBottom - 50; // baseline 50px above bottom of parchment
-    int destY = baselineY - frameHeight;
-    GameClient.RenderTexture(ref spritePath, destX, destY, 0, 0, frameWidth, frameHeight, frameWidth, frameHeight);
+        // Center sprite in gap between window left and description background (picBackground at 127,55 size 210x124)
+        int windowLeft = winJobs.X; // window origin
+        int gapLeft = windowLeft + 6; // parchment left
+        int gapRight = winJobs.X + 127; // start of description background
+        int gapWidth = gapRight - gapLeft; // width of free area
+        int parchmentTop = winJobs.Y + 26;
+        int parchmentBottom = parchmentTop + 197; // parchment height
+        // Horizontal center within gap
+        int destX = gapLeft + (gapWidth - frameWidth) / 2;
+        // Vertical placement: raise sprite by using a smaller baseline padding
+        int baselineY = parchmentBottom - 50; // baseline 50px above bottom of parchment
+        int destY = baselineY - frameHeight;
+        GameClient.RenderTexture(ref spritePath, destX, destY, 0, 0, frameWidth, frameHeight, frameWidth, frameHeight);
     }
 
     public static void OnDrawDescription()
