@@ -332,16 +332,13 @@ public static class TextRenderer
                     backColor = Color.Black;
                     break;
                 }
-            case 1:
-            case 4: // attack when attacked + guard
+            case 1: // attack when attacked + guard
                 {
                     color = Color.Green;
                     backColor = Color.Black;
                     break;
                 }
-            case 2:
-            case 3:
-            case 5: // friendly + shopkeeper + quest
+            case 2: // friendly + shopkeeper + quest
                 {
                     color = Color.Yellow;
                     backColor = Color.Black;
