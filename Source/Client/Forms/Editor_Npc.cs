@@ -454,9 +454,9 @@ namespace Client
                 cmbItem.Items.Add((i + 1) + ": " + Data.Item[i].Name);
 
             cmbBehaviour.Items.Clear();
-            cmbBehaviour.Items.Add("Stationary");
-            cmbBehaviour.Items.Add("Roam");
             cmbBehaviour.Items.Add("Aggressive");
+            cmbBehaviour.Items.Add("Roam");
+            cmbBehaviour.Items.Add("Stationary");
 
             cmbFaction.Items.Clear();
             cmbFaction.Items.Add("Neutral");
