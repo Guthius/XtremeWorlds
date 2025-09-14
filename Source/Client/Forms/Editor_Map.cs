@@ -59,6 +59,7 @@ namespace Client
         public Label lblNpcDir = new Label();
         public GroupBox fraHeal = new GroupBox{ Text = "Heal" };
         public Slider scrlHeal = new Slider();
+        private readonly Label lblHealAmountValue = new Label();
         public ComboBox cmbHeal = new ComboBox();
         public Button btnHeal = new Button{ Text = "OK" };
         public GroupBox fraShop = new GroupBox{ Text = "Shop" };
@@ -77,6 +78,7 @@ namespace Client
         public ComboBox cmbTrapVital = new ComboBox();
         public Button btnTrap = new Button{ Text = "OK" };
         public Slider scrlTrap = new   Slider();
+        private readonly Label lblTrapAmountValue = new Label();
         public ToolBar? toolbar;
         public TabControl tabPages = new TabControl();
         public TabPage tpTiles = new TabPage{ Text = "Tiles" };
@@ -90,6 +92,7 @@ namespace Client
         public TabPage tpAttributes = new TabPage{ Text = "Attributes" };
         public RadioButton optNoCrossing;
         public Button btnFillAttributes = new Button{ Text = "Fill" };
+        public Button btnClearAttributes = new Button{ Text = "Clear" };
         public RadioButton optInfo;
         public Label Label23 = new Label();
         public ComboBox cmbAttribute = new ComboBox();
@@ -410,12 +413,13 @@ namespace Client
             cmbHeal.Items.Add("Mp");
             cmbHeal.Items.Add("Sp");
             cmbHeal.SelectedIndex = 0;
-            scrlHeal.MinValue = 1; scrlHeal.MaxValue = 1024; btnHeal.Click += BtnHeal_Click;
-            scrlTrap.MinValue = 1; scrlTrap.MaxValue = 1024; btnTrap.Click += BtnTrap_Click;
+            scrlHeal.MinValue = 1; scrlHeal.MaxValue = 1024; btnHeal.Click += BtnHeal_Click; scrlHeal.ValueChanged += (_, __) => UpdateHealAmountLabel();
+            scrlTrap.MinValue = 1; scrlTrap.MaxValue = 1024; btnTrap.Click += BtnTrap_Click; scrlTrap.ValueChanged += (_, __) => UpdateTrapAmountLabel();
 
             cmbAnimation.SelectedIndex = 0; btnAnimation.Click += btnAnimation_Click;
 
             btnFillAttributes.Click += btnFillAttributes_Click;
+            btnClearAttributes.Click += btnClearAttributes_Click;
 
             // Warp
             scrlMapWarpMap.Width = 400;
@@ -488,7 +492,13 @@ namespace Client
             };
 
             fraShop.Content = new StackLayout{ Padding = 6, Spacing = 6, Items = { cmbShop, btnShop } };
-            fraHeal.Content = new StackLayout{ Padding = 6, Spacing = 6, Items = { cmbHeal, new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Amount" }, scrlHeal } }, btnHeal } };
+            // Heal group includes dynamic amount value label
+            lblHealAmountValue.Text = "0";
+            fraHeal.Content = new StackLayout{ Padding = 6, Spacing = 6, Items = { cmbHeal,
+                new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Amount" }, scrlHeal, lblHealAmountValue } },
+                btnHeal } };
+            // Trap group includes dynamic amount value label
+            lblTrapAmountValue.Text = "0";
             fraTrap.Content = new StackLayout
             {
                 Padding = 6,
@@ -496,7 +506,7 @@ namespace Client
                 Items =
                 {
                     new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Vital" }, cmbTrapVital } },
-                    new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Amount" }, scrlTrap } },
+                    new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Amount" }, scrlTrap, lblTrapAmountValue } },
                     btnTrap
                 }
             };
@@ -534,7 +544,7 @@ namespace Client
                     optNoCrossing,
                     optInfo,
                     new StackLayout{ Spacing = 2, Items = { Label23, cmbAttribute } },
-                    btnFillAttributes
+                    new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 4, Items = { btnFillAttributes, btnClearAttributes } }
                 }
             };
 
@@ -1695,6 +1705,21 @@ namespace Client
             Instance.Visible = true;
         }
 
+        // --- Dynamic amount label helpers ---
+        private void UpdateHealAmountLabel()
+        {
+            lblHealAmountValue.Text = scrlHeal.Value.ToString();
+            GameState.MapEditorHealAmount = scrlHeal.Value; // keep live value in sync (user still must click OK to apply to tile)
+        }
+
+        private void UpdateTrapAmountLabel()
+        {
+            lblTrapAmountValue.Text = scrlTrap.Value.ToString();
+            // Trap uses the same numeric store as heal amount (MapEditorHealAmount) when applied
+            // We do not overwrite MapEditorHealAmount here to avoid surprising the user if they are editing heal separately.
+            // Instead only update on OK click (BtnTrap_Click already assigns MapEditorHealAmount = scrlTrap.Value)
+        }
+
         public static void MapEditorInit()
         {
             // set the scrolly bars
@@ -2834,6 +2859,11 @@ namespace Client
         private void btnFillAttributes_Click(object? sender, EventArgs e)
         {
             GameLogic.Dialogue("Map Editor", "Fill Attributes: ", "Are you sure you wish to fill attributes?", DialogueType.FillAttributes, DialogueStyle.YesNo);
+        }
+
+        private void btnClearAttributes_Click(object? sender, EventArgs e)
+        {
+            GameLogic.Dialogue("Map Editor", "Clear Attributes: ", "Are you sure you wish to clear attributes?", DialogueType.ClearAttributes, DialogueStyle.YesNo);
         }
 
         private void ToolStrip_MouseHover(object? sender, EventArgs e)
