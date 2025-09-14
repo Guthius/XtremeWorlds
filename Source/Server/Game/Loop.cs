@@ -11,6 +11,7 @@ using System.Threading;
 using Server.Game;
 using static Core.Globals.Command;
 using static Core.Globals.Type;
+using Microsoft.Extensions.Logging;
 
 namespace Server
 {
@@ -78,7 +79,7 @@ namespace Server
                     }
                     catch(Exception ex)
                     {
-                        Console.WriteLine(ex.Message);
+                        General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(ServerAsync));
                     }
 
                     tmr60000 = General.GetTimeMs() + 60000;
@@ -92,7 +93,7 @@ namespace Server
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex.Message);
+                        General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(Loop));
                     }
 
                     Clock.Instance.Tick();
@@ -129,7 +130,7 @@ namespace Server
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(Loop));
                 }
 
                 await System.Threading.Tasks.Task.Delay(1);
@@ -239,7 +240,7 @@ namespace Server
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(CastSkill));
             }
         }
     }

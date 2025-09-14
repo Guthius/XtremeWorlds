@@ -717,59 +717,55 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Resource.CheckResource(session.Id, x, y);
 
         // New combat system integration: attempt a melee attack on the entity (player or npc)
-        // occupying the targeted tile (x,y). Legacy code only triggered animation + resource checks.
-        try
+        // occupying the targeted tile (x,y). Legacy code only triggered animation + resource checks.                                  
+        var mapNum = GetPlayerMap(session.Id);
+
+        // Build attacker entity snapshot
+        var attackerEntity = Core.Globals.Entity.FromPlayer(session.Id, Data.Player[session.Id]);
+        attackerEntity.Map = mapNum;
+
+        Core.Globals.Entity? targetEntity = null;
+
+        // 1. Prefer NPC target at tile (x,y)
+        for (int i = 0; i < Core.Globals.Constant.MaxMapNpcs; i++)
         {
-            var mapNum = GetPlayerMap(session.Id);
-
-            // Build attacker entity snapshot
-            var attackerEntity = Core.Globals.Entity.FromPlayer(session.Id, Data.Player[session.Id]);
-            attackerEntity.Map = mapNum;
-
-            Core.Globals.Entity? targetEntity = null;
-
-            // 1. Prefer NPC target at tile (x,y)
-            for (int i = 0; i < Core.Globals.Constant.MaxMapNpcs; i++)
+            var npc = Data.MapNpc[mapNum].Npc[i];
+            if (npc.Num < 0) continue;
+            int npcTileX = npc.X / 32;
+            int npcTileY = npc.Y / 32;
+            if (npcTileX == x && npcTileY == y)
             {
-                var npc = Data.MapNpc[mapNum].Npc[i];
-                if (npc.Num < 0) continue;
-                int npcTileX = npc.X / 32;
-                int npcTileY = npc.Y / 32;
-                if (npcTileX == x && npcTileY == y)
+                targetEntity = Core.Globals.Entity.FromNpc(i, npc);
+                targetEntity.Map = mapNum;
+                break;
+            }
+        }
+
+        // 2. If no NPC, look for player (PvP) on that tile (excluding self)
+        if (targetEntity == null)
+        {
+            foreach (var p in PlayerService.Instance.Players)
+            {
+                if (p.Id == session.Id) continue;
+                if (!NetworkConfig.IsPlaying(p.Id)) continue;
+                if (GetPlayerMap(p.Id) != mapNum) continue;
+                if (GetPlayerX(p.Id) == x && GetPlayerY(p.Id) == y)
                 {
-                    targetEntity = Core.Globals.Entity.FromNpc(i, npc);
+                    targetEntity = Core.Globals.Entity.FromPlayer(p.Id, Data.Player[p.Id]);
                     targetEntity.Map = mapNum;
                     break;
                 }
             }
+        }
 
-            // 2. If no NPC, look for player (PvP) on that tile (excluding self)
-            if (targetEntity == null)
-            {
-                foreach (var p in PlayerService.Instance.Players)
-                {
-                    if (p.Id == session.Id) continue;
-                    if (!NetworkConfig.IsPlaying(p.Id)) continue;
-                    if (GetPlayerMap(p.Id) != mapNum) continue;
-                    if (GetPlayerX(p.Id) == x && GetPlayerY(p.Id) == y)
-                    {
-                        targetEntity = Core.Globals.Entity.FromPlayer(p.Id, Data.Player[p.Id]);
-                        targetEntity.Map = mapNum;
-                        break;
-                    }
-                }
-            }
-
-            // 3. Execute combat attempt if a valid target was found.
-            var script = Script.Instance;
-            if (targetEntity != null && script != null)
-            {
-                script!.AttemptAttack(attackerEntity, targetEntity);
-            }
+        // 3. Execute combat attempt if a valid target was found.
+        try
+        {
+            Script.Instance?.AttemptAttack(attackerEntity, targetEntity);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[Packet_Attack] combat attempt error: {ex.Message}");
+            Console.WriteLine(ex.Message);
         }
     }
 
@@ -1773,7 +1769,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(Packet_Cast));
                 }
             }
         }
@@ -1874,7 +1870,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(Packet_TrainStat));
         }
     }
 
