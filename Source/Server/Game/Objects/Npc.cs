@@ -12,6 +12,8 @@ namespace Server;
 
 public static class Npc
 {
+    // Tracks remaining pixels to finish the current tile step for each NPC on each map.
+    private static readonly int[,] _stepRemaining = new int[Core.Globals.Constant.MaxMaps, Core.Globals.Constant.MaxMapNpcs];
     public static async Task SpawnAllMapNpcs()
     {
         await Task.WhenAll(Enumerable
@@ -194,28 +196,21 @@ public static class Npc
 
         var x = Data.MapNpc[mapNum].Npc[mapNpcNum].X;
         var y = Data.MapNpc[mapNum].Npc[mapNpcNum].Y;
+        // If already in mid-move, don't allow a new tile move.
+        if (Data.MapNpc[mapNum].Npc[mapNpcNum].Moving == (byte)MovementState.Walking && _stepRemaining[mapNum, mapNpcNum] > 0)
+            return false;
 
-        // Calculate the next pixel position
-        int nextX = x, nextY = y;
+        int tileX = x / 32;
+        int tileY = y / 32;
+        int nextTileX = tileX;
+        int nextTileY = tileY;
         switch (dir)
         {
-            case (byte)Direction.Up:
-                nextY -= 1;
-                break;
-            case (byte)Direction.Down:
-                nextY += 1;
-                break;
-            case (byte)Direction.Left:
-                nextX -= 1;
-                break;
-            case (byte)Direction.Right:
-                nextX += 1;
-                break;
+            case (byte)Direction.Up: nextTileY -= 1; break;
+            case (byte)Direction.Down: nextTileY += 1; break;
+            case (byte)Direction.Left: nextTileX -= 1; break;
+            case (byte)Direction.Right: nextTileX += 1; break;
         }
-
-        // Calculate the tile the NPC would occupy after moving
-        int nextTileX = (int)Math.Floor((double)nextX / 32);
-        int nextTileY = (int)Math.Floor((double)nextY / 32);
 
         // Check map bounds
         if (nextTileX < 0 || nextTileY < 0 || nextTileX >= Data.Map[mapNum].MaxX || nextTileY >= Data.Map[mapNum].MaxY)
@@ -275,48 +270,69 @@ public static class Npc
         {
             return;
         }
-
-        int nextX = Data.MapNpc[mapNum].Npc[mapNpcNum].X;
-        int nextY = Data.MapNpc[mapNum].Npc[mapNpcNum].Y;
-
-        switch (dir)
-        {
-            case (byte)Direction.Up:
-                nextY -= 32;
-                break;
-            case (byte)Direction.Down:
-                nextY += 32;
-                break;
-            case (byte)Direction.Left:
-                nextX -= 32;
-                break;
-            case (byte)Direction.Right:
-                nextX += 32;
-                break;
-        }
-
-        // Calculate the tile the NPC would occupy after moving
-        int nextTileX = (int)Math.Floor((double)nextX / 32);
-        int nextTileY = (int)Math.Floor((double)nextY / 32);
-
-        // Check map bounds
-        if (nextTileX < 0 || nextTileY < 0 || nextTileX >= Data.Map[mapNum].MaxX || nextTileY >= Data.Map[mapNum].MaxY)
+        // If already walking mid-step, ignore duplicate start.
+        if (Data.MapNpc[mapNum].Npc[mapNpcNum].Moving == (byte)MovementState.Walking && _stepRemaining[mapNum, mapNpcNum] > 0)
             return;
 
+        // Begin a new tile movement: set dir, movement state, step counter (32px)
         Data.MapNpc[mapNum].Npc[mapNpcNum].Dir = dir;
-        Data.MapNpc[mapNum].Npc[mapNpcNum].X = nextX;
-        Data.MapNpc[mapNum].Npc[mapNpcNum].Y = nextY;
+        Data.MapNpc[mapNum].Npc[mapNpcNum].Moving = (byte)MovementState.Walking;
+        _stepRemaining[mapNum, mapNpcNum] = 32; // pixels to travel
 
+        // Send start-of-move packet (position unchanged); client will animate pixel stepping locally.
         var buffer = new PacketWriter(4);
-
         buffer.WriteEnum(ServerPackets.SNpcMove);
         buffer.WriteInt32(mapNpcNum);
         buffer.WriteInt32(Data.MapNpc[mapNum].Npc[mapNpcNum].X);
         buffer.WriteInt32(Data.MapNpc[mapNum].Npc[mapNpcNum].Y);
         buffer.WriteByte(Data.MapNpc[mapNum].Npc[mapNpcNum].Dir);
-        buffer.WriteInt32(movement);
-
+        buffer.WriteInt32((int)MovementState.Walking);
         NetworkConfig.SendDataToMap(mapNum, buffer.GetBytes());
+    }
+
+    /// <summary>
+    /// Advances active NPC pixel movement. Called frequently (e.g., every walk tick) from the main loop.
+    /// Sends an SNpcDir packet when a tile step is completed to stop client movement exactly on tile.
+    /// </summary>
+    public static void ProcessActiveNpcMovement()
+    {
+        const int TileSize = 32;
+        for (int map = 0; map < Core.Globals.Constant.MaxMaps; map++)
+        {
+            for (int i = 0; i < Core.Globals.Constant.MaxMapNpcs; i++)
+            {
+                ref var npc = ref Data.MapNpc[map].Npc[i];
+                if (npc.Num < 0) continue;
+                if (npc.Moving != (byte)MovementState.Walking) continue;
+                if (_stepRemaining[map, i] <= 0) continue;
+
+                // Move one pixel
+                switch ((Direction)npc.Dir)
+                {
+                    case Direction.Up: npc.Y -= 1; break;
+                    case Direction.Down: npc.Y += 1; break;
+                    case Direction.Left: npc.X -= 1; break;
+                    case Direction.Right: npc.X += 1; break;
+                }
+                _stepRemaining[map, i]--;
+
+                if (_stepRemaining[map, i] <= 0)
+                {
+                    // Clamp to tile grid alignment just in case
+                    npc.X = Math.Max(0, Math.Min(npc.X, (Data.Map[map].MaxX - 1) * TileSize));
+                    npc.Y = Math.Max(0, Math.Min(npc.Y, (Data.Map[map].MaxY - 1) * TileSize));
+                    npc.Moving = 0;
+                    _stepRemaining[map, i] = 0;
+
+                    // Send stop (direction) packet so clients stop animating exactly on tile
+                    var stopPacket = new PacketWriter(9);
+                    stopPacket.WriteEnum(ServerPackets.SNpcDir);
+                    stopPacket.WriteInt32(i);
+                    stopPacket.WriteByte(npc.Dir);
+                    NetworkConfig.SendDataToMap(map, stopPacket.GetBytes());
+                }
+            }
+        }
     }
 
     public static void NpcDir(int mapNum, int mapNpcNum, byte dir)

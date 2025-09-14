@@ -22,6 +22,7 @@ namespace Server
             var tmr25 = default(int);
             var tmr500 = default(int);
             var tmrWalk = default(int);
+            var tmrNpcWalk = default(int); // separate NPC pixel movement timer (same cadence as player walk)
             var tmr1000 = default(int);
             var tmr60000 = default(int);
             var lastUpdateSavePlayers = default(int);
@@ -58,9 +59,15 @@ namespace Server
                             Player.PlayerMove(player.Id, Data.Player[player.Id].Dir, Data.Player[player.Id].Moving, false);
                         }
                     }
-
-                    // Move the timer up 250ms.
+                    // Player walk tick interval
                     tmrWalk = General.GetTimeMs() + 5;
+                }
+
+                if (tick > tmrNpcWalk)
+                {
+                    // NPC pixel step progression (1px per tick) independent of player loop
+                    Npc.ProcessActiveNpcMovement();
+                    tmrNpcWalk = General.GetTimeMs() + 5;
                 }
 
                 if (tick > tmr60000)

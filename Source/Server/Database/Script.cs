@@ -747,6 +747,84 @@ public class Script
             }
         }
 
+        // ----- NPC Movement (Chase + Wander) -----
+        // Basic tick-based movement: if an NPC has a target and is not adjacent, step toward the target tile.
+        // Otherwise perform occasional wandering (random step) if Behaviour allows (AttackOnSight / Guard idle roam kept minimal).
+        try
+        {
+            var nowMove = General.GetTimeMs();
+            foreach (var e in entities)
+            {
+                if (e == null) continue;
+                if (e.Type != Core.Globals.Entity.EntityType.Npc) continue;
+                if (e.Num < 0) continue;
+                var npcIndex = e.Id; // Index into Data.MapNpc[map].Npc
+                var map = e.Map;
+                if (map < 0 || map >= Constant.MaxMaps) continue;
+                if (npcIndex < 0 || npcIndex >= Constant.MaxMapNpcs) continue;
+
+                ref var baseNpc = ref Data.MapNpc[map].Npc[npcIndex];
+
+                // Skip if stunned
+                if (baseNpc.StunDuration > 0) continue;
+
+                // Sync any target assigned on snapshot back to base data if base has none.
+                if (baseNpc.TargetType == 0 && e.TargetType != 0)
+                {
+                    baseNpc.TargetType = e.TargetType;
+                    baseNpc.Target = e.Target;
+                }
+
+                bool moved = false;
+
+                // Read target info from persistent npc record
+                if (baseNpc.TargetType == (byte)TargetType.Player && baseNpc.Target > 0 && NetworkConfig.IsPlaying(baseNpc.Target) && GetPlayerMap(baseNpc.Target) == map)
+                {
+                    int sx = baseNpc.X / 32;
+                    int sy = baseNpc.Y / 32;
+                    int tx = GetPlayerX(baseNpc.Target);
+                    int ty = GetPlayerY(baseNpc.Target);
+                    moved = TryChase(map, npcIndex, sx, sy, tx, ty);
+                }
+                else if (baseNpc.TargetType == (byte)TargetType.Npc && baseNpc.Target >= 0 && baseNpc.Target < Constant.MaxMapNpcs)
+                {
+                    // We only have snapshot entities list with indexes unrelated to mapNpc slot ordering for other NPCs; perform tile search.
+                    int targetSlot = baseNpc.Target;
+                    // Validate the target exists on map
+                    if (Data.MapNpc[map].Npc[targetSlot].Num >= 0)
+                    {
+                        int sx = baseNpc.X / 32;
+                        int sy = baseNpc.Y / 32;
+                        int tx = Data.MapNpc[map].Npc[targetSlot].X / 32;
+                        int ty = Data.MapNpc[map].Npc[targetSlot].Y / 32;
+                        moved = TryChase(map, npcIndex, sx, sy, tx, ty);
+                    }
+                    else
+                    {
+                        baseNpc.TargetType = 0;
+                        baseNpc.Target = -1;
+                    }
+                }
+
+                // Wander if not moved and no target
+                if (!moved && baseNpc.TargetType == 0)
+                {
+                    if (Random.Shared.NextDouble() < 0.05) // 5% per tick wander chance
+                    {
+                        byte dir = (byte)(Random.Shared.Next(0,4));
+                        if (Server.Npc.CanNpcMove(map, npcIndex, dir))
+                        {
+                            Server.Npc.NpcMove(map, npcIndex, dir, (int)MovementState.Walking);
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[AI Movement] Error: {ex.Message}");
+        }
+
         var now = General.GetTimeMs();
         var itemCount = Constant.MaxMapItems;
         var mapCount = Constant.MaxMaps;
@@ -1038,12 +1116,36 @@ public class Script
 
     private bool IsInMeleeRange(Entity a, Entity b)
     {
-        // Tile-based adjacency (4-direction)
+        // Tile-based adjacency including diagonals (8-direction) so diagonal melee hits connect.
         var ax = a.X / 32; var ay = a.Y / 32;
         var bx = b.X / 32; var by = b.Y / 32;
         var dx = Math.Abs(ax - bx);
         var dy = Math.Abs(ay - by);
-        return (dx + dy) == 1; // orthogonal neighbor
+        if (dx == 0 && dy == 0) return false; // same tile not considered melee
+        return dx <= 1 && dy <= 1; // any adjacent (including diagonals)
+    }
+
+    private bool TryChase(int mapNum, int npcIndex, int sx, int sy, int tx, int ty)
+    {
+        int dx = tx - sx;
+        int dy = ty - sy;
+        if (dx == 0 && dy == 0) return false; // already on target tile
+
+        // Normalize to primary axis preference (allow simple 4-dir chase)
+        byte dir;
+        if (Math.Abs(dx) > Math.Abs(dy))
+            dir = (byte)(dx > 0 ? Direction.Right : Direction.Left);
+        else if (Math.Abs(dy) > 0)
+            dir = (byte)(dy > 0 ? Direction.Down : Direction.Up);
+        else
+            return false;
+
+        if (Server.Npc.CanNpcMove(mapNum, npcIndex, dir))
+        {
+            Server.Npc.NpcMove(mapNum, npcIndex, dir, (int)MovementState.Walking);
+            return true;
+        }
+        return false;
     }
 
     private int GetAttackSpeed(Entity attacker, int? skillId)

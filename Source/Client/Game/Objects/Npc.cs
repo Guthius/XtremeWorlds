@@ -17,11 +17,16 @@ namespace Client
     {
         private const int TileSize = 32;
 
+        // Client-side prediction helpers: track remaining pixels and destination for current tile step.
+        private static readonly int[] RemainingPixels = new int[Constant.MaxMapNpcs];
+        private static readonly int[] DestX = new int[Constant.MaxMapNpcs];
+        private static readonly int[] DestY = new int[Constant.MaxMapNpcs];
+
         /// <summary>
         /// Raised when an NPC lands exactly on a tile boundary (x % 32 == 0 && y % 32 == 0).
         /// Args: (npcIndex, tileX, tileY)
         /// </summary>
-        public static event Action<int, int, int> OnTileAligned;
+        public static event Action<int, int, int>? OnTileAligned;
 
         /// <summary>
         /// Processes one NPC by index (from a legacy double), moving by 1 pixel per tick.
@@ -38,17 +43,30 @@ namespace Client
             if (index < 0 || index >= Constant.MaxMapNpcs) return;
             if (Data.MyMapNpc == null) return;
 
-            var npc = Data.MyMapNpc[index];
+            ref var npc = ref Data.MyMapNpc[index];
 
             // Only process active walking state
-            if (npc.Moving != (byte)MovementState.Walking) return;
+            if (npc.Moving != (byte)MovementState.Walking)
+            {
+                RemainingPixels[index] = 0;
+                return;
+            }
 
             // Current pixel position
             int x = npc.X;
             int y = npc.Y;
 
-            // Determine intended delta
-            (int dx, int dy) = GetDirectionDelta(npc.Dir, Math.Max(1, pixelsPerTick));
+            // Initialize a new tile step if just started (RemainingPixels == 0)
+            if (RemainingPixels[index] <= 0)
+            {
+                RemainingPixels[index] = TileSize;
+                var (fullDx, fullDy) = GetDirectionDelta(npc.Dir, TileSize);
+                DestX[index] = npc.X + fullDx;
+                DestY[index] = npc.Y + fullDy;
+            }
+
+            var step = Math.Max(1, pixelsPerTick);
+            var (dx, dy) = GetDirectionDelta(npc.Dir, step);
 
             // Apply delta
             int newX = x + dx;
@@ -64,12 +82,17 @@ namespace Client
             // Commit the move (IMPORTANT: commit BEFORE the "aligned" check so we don't get stuck at 31px!)
             npc.X = newX;
             npc.Y = newY;
+            RemainingPixels[index] -= step;
 
             // If we've landed exactly on a tile boundary, notify listeners (e.g., to advance path, stop walking, etc.)
-            if ((newX % TileSize == 0) && (newY % TileSize == 0))
+            if (RemainingPixels[index] <= 0 || ((newX % TileSize == 0) && (newY % TileSize == 0)))
             {
-                var tileX = newX / TileSize;
-                var tileY = newY / TileSize;
+                // Snap to destination to ensure perfect alignment (server authoritative end already snapped)
+                npc.X = DestX[index];
+                npc.Y = DestY[index];
+                RemainingPixels[index] = 0;
+                var tileX = npc.X / TileSize;
+                var tileY = npc.Y / TileSize;
                 OnTileAligned?.Invoke(index, tileX, tileY);
 
                 // If your project requires stopping at tile boundaries, do it here:
