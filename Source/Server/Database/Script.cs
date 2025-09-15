@@ -1441,6 +1441,19 @@ public class Script
         return total / 6;
     }
 
+    public int GetPlayerNextLevel(int index)
+    {
+        int level = GetPlayerLevel(index);
+        int str = GetPlayerStat(index, Stat.Strength);
+        int vit = GetPlayerStat(index, Stat.Vitality);
+        int intellect = GetPlayerStat(index, Stat.Intelligence);
+        int luck = GetPlayerStat(index, Stat.Luck);
+        int points = GetPlayerPoints(index);
+
+        long next = (long)(level + 1) * (str + vit + intellect + luck + points) * 25L;
+        return next > int.MaxValue ? int.MaxValue : (int)Math.Max(0, next);
+    }
+
     private int SafeStat(Entity e, Stat stat)
     {
         if (e.Stat == null) return 0;

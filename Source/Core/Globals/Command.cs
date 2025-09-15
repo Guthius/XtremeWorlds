@@ -189,12 +189,6 @@ public static class Command
         };
     }
 
-
-    public static int GetPlayerNextLevel(int index)
-    {
-        return (int)Math.Round(50d / 3d * (Math.Pow(GetPlayerLevel(index) + 1, 3d) - 6d * Math.Pow(GetPlayerLevel(index) + 1, 2d) + 17 * (GetPlayerLevel(index) + 1) - 12d));
-    }
-
     public static void SetPlayerGatherSkillLvl(int index, int skillSlot, int lvl)
     {
         Data.Player[index].GatherSkills[skillSlot].SkillLevel = lvl;
