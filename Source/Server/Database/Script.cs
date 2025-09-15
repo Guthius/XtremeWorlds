@@ -1033,10 +1033,10 @@ public class Script
                 int maxStam = GameLogic.GetNpcMaxVital(e.Num, Vital.Stamina);
                 if (maxStam > 0)
                 {
-                    uint curStam = (uint)e.Vital[(byte)Vital.Stamina];
+                    int curStam = e.Vital[(byte)Vital.Stamina];
                     if (curStam < maxStam)
                     {
-                        uint amount = Math.Max(1, (uint)Data.Npc[e.Num].Stat[(byte)Stat.Spirit] / 2);
+                        int amount = Math.Max(1, Data.Npc[e.Num].Stat[(byte)Stat.Spirit] / 2);
                         e.Vital[(byte)Vital.Stamina] = (int)Math.Min(maxStam, curStam + amount);
                         Server.Npc.SendMapNpcVitals(e.Map, (byte)Core.Globals.Entity.Index(e));
                     }
@@ -1069,7 +1069,7 @@ public class Script
                 int stamCur = GetPlayerVital(id, Vital.Stamina);
                 if (stamCur < stamMax)
                 {
-                    int amount = Math.Max(1, GetPlayerStat(id, Stat.Intelligence) / 5);
+                    int amount = Math.Max(1, GetPlayerStat(id, Stat.Spirit) / 2);
                     SetPlayerVital(id, Vital.Stamina, Math.Min(stamMax, stamCur + amount));
                     NetworkSend.SendVital(id, Vital.Stamina);
                 }
