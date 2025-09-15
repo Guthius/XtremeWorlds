@@ -569,7 +569,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var dir = buffer.ReadInt32();
 
         // Prevent hacking
-        if (dir < (byte) Direction.Up | dir > (byte) Direction.DownRight)
+        if (dir < 0 | dir > (byte) Direction.DownRight)
             return;
 
         SetPlayerDir(session.Id, dir);
