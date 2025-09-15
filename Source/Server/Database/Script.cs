@@ -676,7 +676,7 @@ public class Script
             }
             else
             {
-                // ATTACKING ON SIGHT
+                // ATTACKING ON SIGHT (use tile-based distance; ensure property name consistency)
                 if (entity.Behavior == (byte)NpcBehavior.AttackOnSight || entity.Behavior == (byte)NpcBehavior.Guard)
                 {
                     // make sure it's not stunned
@@ -688,12 +688,13 @@ public class Script
                             {
                                 if (GetPlayerMap(player.Id) == mapNum && entity.TargetType == 0 && GetPlayerAccess(player.Id) <= (byte)AccessLevel.Moderator)
                                 {
-                                    int n = entity.Range;
-                                    int distanceX = entity.X - GetPlayerX(player.Id);
-                                    int distanceY = entity.Y - GetPlayerY(player.Id);
-
-                                    if (distanceX < 0) distanceX *= -1;
-                                    if (distanceY < 0) distanceY *= -1;
+                                    int n = entity.Range; // range already in tiles
+                                    int ex = entity.X / 32;
+                                    int ey = entity.Y / 32;
+                                    int px = GetPlayerX(player.Id);
+                                    int py = GetPlayerY(player.Id);
+                                    int distanceX = Math.Abs(ex - px);
+                                    int distanceY = Math.Abs(ey - py);
 
                                     if (distanceX <= n && distanceY <= n)
                                     {
@@ -705,6 +706,13 @@ public class Script
                                             }
                                             entity.TargetType = (byte)TargetType.Player;
                                             entity.Target = player.Id;
+                                            // Persist target into base map data for movement logic
+                                            if (entity.Id >= 0 && entity.Id < Constant.MaxMapNpcs && mapNum >= 0 && mapNum < Data.MapNpc.Length)
+                                            {
+                                                ref var mapNpc = ref Data.MapNpc[mapNum].Npc[entity.Id];
+                                                mapNpc.TargetType = entity.TargetType;
+                                                mapNpc.Target = entity.Target;
+                                            }
                                         }
                                     }
                                 }
@@ -724,16 +732,23 @@ public class Script
                                     if ((int)otherEntity.Faction > 0 && otherEntity.Faction != entity.Faction)
                                     {
                                         int n = entity.Range;
-                                        int distanceX = entity.X - otherEntity.X;
-                                        int distanceY = entity.Y - otherEntity.Y;
-
-                                        if (distanceX < 0) distanceX *= -1;
-                                        if (distanceY < 0) distanceY *= -1;
+                                        int ex = entity.X / 32;
+                                        int ey = entity.Y / 32;
+                                        int ox = otherEntity.X / 32;
+                                        int oy = otherEntity.Y / 32;
+                                        int distanceX = Math.Abs(ex - ox);
+                                        int distanceY = Math.Abs(ey - oy);
 
                                         if (distanceX <= n && distanceY <= n && entity.Behavior == (byte)NpcBehavior.AttackOnSight)
                                         {
                                             entity.TargetType = (byte)TargetType.Npc;
                                             entity.Target = i;
+                                            if (entity.Id >= 0 && entity.Id < Constant.MaxMapNpcs && mapNum >= 0 && mapNum < Data.MapNpc.Length)
+                                            {
+                                                ref var mapNpc = ref Data.MapNpc[mapNum].Npc[entity.Id];
+                                                mapNpc.TargetType = entity.TargetType;
+                                                mapNpc.Target = entity.Target;
+                                            }
                                         }
                                     }
                                 }
@@ -743,7 +758,6 @@ public class Script
                 }
 
                 // Attempt attack using new combat system when target acquired
-                // Allow player index 0; so use >= 0
                 if (entity != null && entity.Target >= 0)
                 {
                     if (entity.TargetType == (byte)TargetType.Player)
@@ -838,7 +852,8 @@ public class Script
                 bool moved = false;
 
                 // Read target info from persistent npc record
-                if (baseNpc.TargetType == (byte)TargetType.Player && baseNpc.Target > 0 && NetworkConfig.IsPlaying(baseNpc.Target) && GetPlayerMap(baseNpc.Target) == map)
+                // Allow player index 0 as a valid target (some arrays are 1-based but be permissive)
+                if (baseNpc.TargetType == (byte)TargetType.Player && baseNpc.Target >= 0 && NetworkConfig.IsPlaying(baseNpc.Target) && GetPlayerMap(baseNpc.Target) == map)
                 {
                     int sx = baseNpc.X / 32;
                     int sy = baseNpc.Y / 32;
@@ -869,7 +884,8 @@ public class Script
                 // Wander if not moved and no target. AttackOnSight/Guard now also wander albeit less frequently.
                 if (!moved && baseNpc.TargetType == 0)
                 {
-                    bool aggressive = baseNpc.Behavior == (byte)NpcBehavior.AttackOnSight || baseNpc.Behavior == (byte)NpcBehavior.Guard;
+                    // MapNpc struct does not store Behavior; use snapshot entity's Behavior field.
+                    bool aggressive = e.Behavior == (byte)NpcBehavior.AttackOnSight || e.Behavior == (byte)NpcBehavior.Guard;
                     double chance = aggressive ? 0.02 : 0.05; // aggressive wander less
                     if (Random.Shared.NextDouble() < chance)
                     {
@@ -1183,11 +1199,16 @@ public class Script
                     {
                         baseNpc.TargetType = (byte)TargetType.Player;
                         baseNpc.Target = attacker.Id;
+                        // Also reflect on snapshot target entity so current tick logic can act without waiting for rebuild.
+                        target.TargetType = (byte)TargetType.Player; // retaliation engages immediately
+                        target.Target = attacker.Id;
                     }
                     else if (attacker.Type == Entity.EntityType.Npc)
                     {
                         baseNpc.TargetType = (byte)TargetType.Npc;
                         baseNpc.Target = attacker.Id; // attacker.Id is map npc slot
+                        target.TargetType = (byte)TargetType.Npc;
+                        target.Target = attacker.Id;
                     }
                 }
             }
@@ -1249,19 +1270,36 @@ public class Script
         int dy = ty - sy;
         if (dx == 0 && dy == 0) return false; // already on target tile
 
-        // Normalize to primary axis preference (allow simple 4-dir chase)
-        byte dir;
+        // Primary direction preference
+        Span<byte> dirs = stackalloc byte[4];
+        int count = 0;
         if (Math.Abs(dx) > Math.Abs(dy))
-            dir = (byte)(dx > 0 ? Direction.Right : Direction.Left);
-        else if (Math.Abs(dy) > 0)
-            dir = (byte)(dy > 0 ? Direction.Down : Direction.Up);
-        else
-            return false;
-
-        if (Server.Npc.CanNpcMove(mapNum, npcIndex, dir))
         {
-            Server.Npc.NpcMove(mapNum, npcIndex, dir, (int)MovementState.Walking);
-            return true;
+            dirs[count++] = (byte)(dx > 0 ? Direction.Right : Direction.Left);
+            if (dy != 0) dirs[count++] = (byte)(dy > 0 ? Direction.Down : Direction.Up);
+        }
+        else
+        {
+            dirs[count++] = (byte)(dy > 0 ? Direction.Down : Direction.Up);
+            if (dx != 0) dirs[count++] = (byte)(dx > 0 ? Direction.Right : Direction.Left);
+        }
+
+        // Add perpendicular wiggle options to try to slide around obstacles
+        if (count == 2)
+        {
+            // Add perpendiculars
+            dirs[count++] = (byte)Direction.Left;
+            dirs[count++] = (byte)Direction.Right;
+        }
+
+        for (int i = 0; i < count; i++)
+        {
+            var d = dirs[i];
+            if (Server.Npc.CanNpcMove(mapNum, npcIndex, d))
+            {
+                Server.Npc.NpcMove(mapNum, npcIndex, d, (int)MovementState.Walking);
+                return true;
+            }
         }
         return false;
     }
