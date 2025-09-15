@@ -1370,7 +1370,7 @@ public class Script
         if (target.Type == Entity.EntityType.Player)
         {
             // Use helper to compute player's total protection
-            mitigation += GetPlayerProtection(target.Id);
+            mitigation += GetPlayerProtection(target);
         }
         else if (target.Type == Entity.EntityType.Npc)
         {
@@ -1424,16 +1424,6 @@ public class Script
         // Keep formula aligned with prior CalculateDamage logic (without RNG)
         int baseDamage = str * 2 + weaponPower * 2 + lvl * 3;
         return Math.Max(0, baseDamage);
-    }
-
-    private int GetPlayerProtection(int playerId)
-    {
-        if (playerId < 0 || playerId >= Data.Player.Length) return 0;
-        int spirit = GetPlayerStat(playerId, Stat.Spirit);
-        int lvl = GetPlayerLevel(playerId);
-        int armor = GetPlayerDefense(playerId);
-        int prot = spirit * 2 + lvl * 3 + armor;
-        return Math.Max(0, prot);
     }
 
     private int GetPlayerDefense(int playerId)
@@ -1793,13 +1783,15 @@ public class Script
         }
     }
 
-    private int SumArmor(Entity player)
+    private int GetPlayerProtection(Entity entity)
     {
-        if (player.Type != Entity.EntityType.Player || player.Equipment == null) return 0;
+        if (entity.Type != Entity.EntityType.Player || entity.Equipment == null) return 0;
+
         int total = 0;
-        for (int i = 0; i < player.Equipment.Length; i++)
+
+        for (int i = 0; i < entity.Equipment.Length; i++)
         {
-            var itemNum = player.Equipment[i].Num;
+            var itemNum = entity.Equipment[i].Num;
             if (itemNum >= 0 && itemNum < Data.Item.Length)
             {
                 total += Data.Item[itemNum].Data2;
@@ -1945,6 +1937,72 @@ public class Script
             {
                 Server.Item.SpawnItem(itemId, itemVal, mapNum, mapNpc.X / 32, mapNpc.Y / 32);
             }
+        }
+    }
+
+    public int GetPlayerMaxHP(int index)
+    {
+        if (index < 0 || index >= Data.Player.Length) return 1;
+
+        int level = GetPlayerLevel(index);
+        int str = GetPlayerStat(index, Stat.Strength);
+        int job = GetPlayerJob(index); // falls back to Data.Player[index].Job if this helper doesn’t exist
+
+        int baseJobStr = 0;
+        if (job >= 0 && job < Data.Job.Length)
+            baseJobStr = Data.Job[job].Stat[(int)Stat.Strength];
+
+        // (Level + Int(STR/2) + Class.STR) * 2
+        long val = (long)(level + (str / 2) + baseJobStr) * 2L;
+        return (int)Math.Max(1, Math.Min(int.MaxValue, val));
+    }
+
+    public int GetPlayerMaxMP(int index)
+    {
+        if (index < 0 || index >= Data.Player.Length) return 1;
+
+        int level = GetPlayerLevel(index);
+        int magi = GetPlayerStat(index, Stat.Intelligence);
+        int job = GetPlayerJob(index);
+
+        int baseJobMagi = 0;
+        if (job >= 0 && job < Data.Job.Length)
+            baseJobMagi = Data.Job[job].Stat[(int)Stat.Intelligence];
+
+        // (Level + Int(MAGI/2) + Class.MAGI) * 2
+        long val = (long)(level + (magi / 2) + baseJobMagi) * 2L;
+        return (int)Math.Max(1, Math.Min(int.MaxValue, val));
+    }
+
+    public int GetPlayerMaxSP(int index)
+    {
+        if (index < 0 || index >= Data.Player.Length) return 1;
+
+        int level = GetPlayerLevel(index);
+        int speed = GetPlayerStat(index, Stat.Spirit); // current codebase maps “Speed” to Stat.Spirit
+        int job = GetPlayerJob(index);
+
+        int baseJobSpeed = 0;
+        if (job >= 0 && job < Data.Job.Length)
+            baseJobSpeed = Data.Job[job].Stat[(int)Stat.Spirit]; // base “Speed” on Stat.Spirit
+
+        // (Level + Int(SPEED/2) + Class.SPEED) * 2
+        long val = (long)(level + (speed / 2) + baseJobSpeed) * 2L;
+        return (int)Math.Max(1, Math.Min(int.MaxValue, val));
+    }
+
+    public int GetPlayerMaxVital(int index, Vital vital)
+    {
+        switch (vital)
+        {
+            case Vital.Health:
+                return GetPlayerMaxHP(index);
+            case Vital.Mana:
+                return GetPlayerMaxMP(index);
+            case Vital.Stamina:
+                return GetPlayerMaxSP(index);
+            default:
+                return 1;
         }
     }
 }

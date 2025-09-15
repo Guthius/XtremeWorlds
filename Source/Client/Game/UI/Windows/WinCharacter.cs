@@ -36,7 +36,7 @@ public static class WinCharacter
         }
 
         winBars.GetChild("lblHP").Text = GetPlayerVital(GameState.MyIndex, Vital.Health) + "/" + GetPlayerMaxVital(GameState.MyIndex, Vital.Health);
-        winBars.GetChild("lblMP").Text = GetPlayerVital(GameState.MyIndex, Vital.Stamina) + "/" + GetPlayerMaxVital(GameState.MyIndex, Vital.Stamina);
+        winBars.GetChild("lblMP").Text = GetPlayerVital(GameState.MyIndex, Vital.Mana) + "/" + GetPlayerMaxVital(GameState.MyIndex, Vital.Mana);
         winBars.GetChild("lblEXP").Text = GetPlayerExp(GameState.MyIndex) + "/" + GameState.NextlevelExp;
     }
 

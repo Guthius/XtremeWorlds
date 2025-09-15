@@ -28,9 +28,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Bind(Packets.ServerPackets.SPlayerInv, Packet_PlayerInv);
         Bind(Packets.ServerPackets.SPlayerInvUpdate, Packet_PlayerInvUpdate);
         Bind(Packets.ServerPackets.SPlayerWornEq, Packet_PlayerWornEquipment);
-        Bind(Packets.ServerPackets.SPlayerHp, Player.Packet_PlayerHP);
-        Bind(Packets.ServerPackets.SPlayerMp, Player.Packet_PlayerMP);
-        Bind(Packets.ServerPackets.SPlayerSp, Player.Packet_PlayerSP);
+        Bind(Packets.ServerPackets.SPlayerHP, Player.Packet_PlayerHP);
+        Bind(Packets.ServerPackets.SPlayerMP, Player.Packet_PlayerMP);
+        Bind(Packets.ServerPackets.SPlayerSP, Player.Packet_PlayerSP);
         Bind(Packets.ServerPackets.SPlayerStats, Player.Packet_PlayerStats);
         Bind(Packets.ServerPackets.SPlayerData, Player.Packet_PlayerData);
         Bind(Packets.ServerPackets.SNpcMove, Packet_NpcMove);

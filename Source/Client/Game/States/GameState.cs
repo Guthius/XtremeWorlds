@@ -70,11 +70,13 @@ namespace Client
         public static int[] BarWidthNpcHpMax = new int[Constant.MaxMapNpcs];
         public static int[] BarWidthPlayerHpMax = new int[Constant.MaxPlayers];
         public static int[] BarWidthPlayerSpMax = new int[Constant.MaxPlayers];
-        public static int BarWidthGuiHp;
-        public static int BarWidthGuiSp;
+        public static int BarWidthGuiHP;
+        public static int BarWidthGuiMP;
+        public static int BarWidthGuiSP;
         public static int BarWidthGuiExp;
-        public static int BarWidthGuiHpMax;
-        public static int BarWidthGuiSpMax;
+        public static int BarWidthGuiHPMax;
+        public static int BarWidthGuiMPMax;
+        public static int BarWidthGuiSPMax;
         public static int BarWidthGuiExpMax;
 
         public static int CurrentEvents;

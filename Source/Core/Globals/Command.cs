@@ -89,17 +89,6 @@ public static class Command
         Data.Account[index].Password = password;
     }
 
-    public static int GetPlayerMaxVital(int index, Vital vital)
-    {
-        return vital switch
-        {
-            Vital.Health => (int)Math.Round(100d + (Data.Player[index].Level + GetPlayerStat(index, Stat.Vitality) / 2d) * 2d),
-            Vital.Mana => (int)Math.Round(50d + (Data.Player[index].Level + GetPlayerStat(index, Stat.Intelligence) / 2d) * 2d),
-            Vital.Stamina => (int)Math.Round(50d + (Data.Player[index].Level + GetPlayerStat(index, Stat.Spirit) / 2d) * 2d),
-            _ => 0
-        };
-    }
-
     public static int GetPlayerStat(int index, Stat stat)
     {
         int statValue = Data.Player[index].Stat[(int)stat];
@@ -163,6 +152,17 @@ public static class Command
         {
             Data.Player[index].Vital[(int)vital] = 0;
         }
+    }
+
+    public static int GetPlayerMaxVital(int index, Vital vital)
+    {
+        return Data.Player[index].MaxVital[(int)vital];
+    }
+
+    public static int SetPlayerMaxVital(int index, Vital vital, int value)
+    {
+        Data.Player[index].MaxVital[(int)vital] = value;
+        return Data.Player[index].MaxVital[(int)vital];
     }
 
     public static bool IsDirBlocked(byte blockvar, Direction dir)

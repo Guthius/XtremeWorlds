@@ -1056,15 +1056,16 @@ namespace Client
             var buffer = new PacketReader(data);
 
             SetPlayerVital(GameState.MyIndex, Vital.Health, buffer.ReadInt32());
+            SetPlayerMaxVital(GameState.MyIndex, Vital.Health, buffer.ReadInt32());
 
             // set max width
             if (GetPlayerVital(GameState.MyIndex, Vital.Health) > 0)
             {
-                GameState.BarWidthGuiHpMax = (int) Math.Round(GetPlayerVital(GameState.MyIndex, Vital.Health) / 209d / (GetPlayerMaxVital(GameState.MyIndex, Vital.Health) / 209d) * 209d);
+                GameState.BarWidthGuiHPMax = (int) Math.Round(GetPlayerVital(GameState.MyIndex, Vital.Health) / 209d / (GetPlayerMaxVital(GameState.MyIndex, Vital.Health) / 209d) * 209d);
             }
             else
             {
-                GameState.BarWidthGuiHpMax = 0;
+                GameState.BarWidthGuiHPMax = 0;
             }
 
             WinCharacter.Update();
@@ -1075,15 +1076,16 @@ namespace Client
             var buffer = new PacketReader(data);
 
             SetPlayerVital(GameState.MyIndex, Vital.Mana, buffer.ReadInt32());
+            SetPlayerMaxVital(GameState.MyIndex, Vital.Mana, buffer.ReadInt32());
 
             // set max width
-            if (GetPlayerVital(GameState.MyIndex, Vital.Health) > 0)
+            if (GetPlayerVital(GameState.MyIndex, Vital.Mana) > 0)
             {
-                //GameState.BarWidth_GuiHP_Max = (long)Math.Round(GetPlayerVital(GameState.MyIndex, Core.Vital.Health) / 209d / (GetPlayerMaxVital(GameState.MyIndex, Core.Vital.Health) / 209d) * 209d);
+                GameState.BarWidthGuiMPMax = (int) Math.Round(GetPlayerVital(GameState.MyIndex, Vital.Mana) / 209d / (GetPlayerMaxVital(GameState.MyIndex, Vital.Mana) / 209d) * 209d);
             }
             else
             {
-                //GameState.BarWidth_GuiHP_Max = 0L;
+                GameState.BarWidthGuiMPMax = 0;
             }
 
             WinCharacter.Update();
@@ -1094,15 +1096,16 @@ namespace Client
             var buffer = new PacketReader(data);
 
             SetPlayerVital(GameState.MyIndex, Vital.Stamina, buffer.ReadInt32());
+            SetPlayerMaxVital(GameState.MyIndex, Vital.Stamina, buffer.ReadInt32());
 
             // set max width
             if (GetPlayerVital(GameState.MyIndex, Vital.Stamina) > 0)
             {
-                GameState.BarWidthGuiSpMax = (int) Math.Round(GetPlayerVital(GameState.MyIndex, Vital.Stamina) / 209d / (GetPlayerMaxVital(GameState.MyIndex, Vital.Stamina) / 209d) * 209d);
+                GameState.BarWidthGuiSPMax = (int) Math.Round(GetPlayerVital(GameState.MyIndex, Vital.Stamina) / 209d / (GetPlayerMaxVital(GameState.MyIndex, Vital.Stamina) / 209d) * 209d);
             }
             else
             {
-                GameState.BarWidthGuiSpMax = 0;
+                GameState.BarWidthGuiSPMax = 0;
             }
 
             WinCharacter.Update();

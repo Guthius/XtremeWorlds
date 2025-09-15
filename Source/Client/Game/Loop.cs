@@ -318,8 +318,8 @@ namespace Client
                 // elastic bars
                 if (_barTmr < _tick)
                 {
-                    GameLogic.SetBarWidth(ref GameState.BarWidthGuiHpMax, ref GameState.BarWidthGuiHp);
-                    GameLogic.SetBarWidth(ref GameState.BarWidthGuiSpMax, ref GameState.BarWidthGuiSp);
+                    GameLogic.SetBarWidth(ref GameState.BarWidthGuiHPMax, ref GameState.BarWidthGuiHP);
+                    GameLogic.SetBarWidth(ref GameState.BarWidthGuiMPMax, ref GameState.BarWidthGuiMP);
                     GameLogic.SetBarWidth(ref GameState.BarWidthGuiExpMax, ref GameState.BarWidthGuiExp);
                     for (_i = 0; _i < Constant.MaxMapNpcs; _i++)
                     {

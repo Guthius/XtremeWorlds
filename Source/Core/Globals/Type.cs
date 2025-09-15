@@ -239,6 +239,7 @@ public static class Type
         public byte Access;
         public bool Pk;
         public int[] Vital;
+        public int[] MaxVital;
         public byte[] Stat;
         public byte Points;
         public PlayerEq[] Equipment;

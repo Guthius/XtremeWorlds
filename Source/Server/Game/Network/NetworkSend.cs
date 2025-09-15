@@ -386,19 +386,20 @@ public static class NetworkSend
         switch (vital)
         {
             case Vital.Health:
-                packetWriter.WriteEnum(ServerPackets.SPlayerHp);
+                packetWriter.WriteEnum(ServerPackets.SPlayerHP);
                 break;
 
             case Vital.Mana:
-                packetWriter.WriteEnum(ServerPackets.SPlayerMp);
+                packetWriter.WriteEnum(ServerPackets.SPlayerMP);
                 break;
 
             case Vital.Stamina:
-                packetWriter.WriteEnum(ServerPackets.SPlayerSp);
+                packetWriter.WriteEnum(ServerPackets.SPlayerSP);
                 break;
         }
 
         packetWriter.WriteInt32(GetPlayerVital(playerId, vital));
+        packetWriter.WriteInt32(Script.Instance?.GetPlayerMaxVital(playerId, vital));
 
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
 
