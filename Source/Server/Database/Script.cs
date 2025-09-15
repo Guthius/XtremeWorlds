@@ -42,7 +42,7 @@ public class Script
     private static long _lastNpcRegen;
     private static long _lastPlayerRegen;
     private const int NpcRegenIntervalMs = 10000; // 10 seconds like legacy
-    private const int PlayerRegenIntervalMs = 5000; // 5 seconds (adjust as desired)
+    private const int PlayerRegenIntervalMs = 10000; // 10 seconds like legacy
     private const int BaseAttackSpeedMs = 1000; // fallback when no weapon speed
 
     public void Loop()
