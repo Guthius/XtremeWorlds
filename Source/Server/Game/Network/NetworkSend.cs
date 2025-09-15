@@ -120,7 +120,7 @@ public static class NetworkSend
         packetWriter.WriteEnum(ServerPackets.SPlayerExp);
         packetWriter.WriteInt32(playerId);
         packetWriter.WriteInt32(GetPlayerExp(playerId));
-        packetWriter.WriteInt32(GetPlayerNextLevel(playerId));
+        packetWriter.WriteInt32(Script.Instance?.GetPlayerNextLevel(playerId));
 
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
     }
