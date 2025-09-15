@@ -43,12 +43,12 @@ namespace Server
                 await General.CheckShutDownCountDownAsync();
 
                 if (tick > tmr25)
-                {                
+                {
                     // Update all our available events.
                     EventLogic.UpdateEventLogic();
 
-                    // Move the timer up 25ms.
                     tmr25 = General.GetTimeMs() + 25;
+
                 }
                 
                 if (tick > tmrWalk)
@@ -68,6 +68,7 @@ namespace Server
                 {
                     // NPC pixel step progression (1px per tick) independent of player loop
                     Npc.ProcessActiveNpcMovement();
+                    
                     tmrNpcWalk = General.GetTimeMs() + 5;
                 }
 

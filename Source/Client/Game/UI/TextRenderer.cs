@@ -324,7 +324,7 @@ public static class TextRenderer
         if (EditorType.Map == GameState.MyEditorType)
             return;
 
-        switch (Data.Npc[(int)npcNum].Behaviour)
+        switch (Data.Npc[(int)npcNum].Behavior)
         {
             case 0: // attack on sight
                 {
@@ -540,7 +540,7 @@ public static class TextRenderer
                 if (GetTextWidth(Data.Chat[i].Text) > width)
                 {
                     // word wrap
-                    string[] wrappedLines = null;
+                    string[] wrappedLines = new string[0];
                     WordWrap(Data.Chat[(int) i].Text, Font.Georgia, width, ref wrappedLines);
 
                     // continue on

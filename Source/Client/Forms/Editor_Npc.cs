@@ -19,7 +19,7 @@ namespace Client
         public TextBox txtAttackSay = null!;
         public NumericStepper nudSprite = null!;
         public NumericStepper nudSpawnSecs = null!;
-        public ComboBox cmbBehaviour = null!;
+        public ComboBox cmbBehavior = null!;
         public ComboBox cmbFaction = null!;
         public NumericStepper nudRange = null!;
         public NumericStepper nudChance = null!;
@@ -107,8 +107,8 @@ namespace Client
             nudSpawnSecs = new NumericStepper { MinValue = 0, MaxValue = 3600, DecimalPlaces = 0, Width = 80 };
             nudSpawnSecs.ValueChanged += (s, e) => { if (!_initializing) { Data.Npc[GameState.EditorIndex].SpawnSecs = (int)nudSpawnSecs.Value; GameState.NpcChanged[GameState.EditorIndex] = true; } };
 
-            cmbBehaviour = new ComboBox();
-            cmbBehaviour.SelectedIndexChanged += (s, e) => { if (!_initializing) { Data.Npc[GameState.EditorIndex].Behaviour = (byte)cmbBehaviour.SelectedIndex; GameState.NpcChanged[GameState.EditorIndex] = true; } };
+            cmbBehavior = new ComboBox();
+            cmbBehavior.SelectedIndexChanged += (s, e) => { if (!_initializing) { Data.Npc[GameState.EditorIndex].Behavior = (byte)cmbBehavior.SelectedIndex; GameState.NpcChanged[GameState.EditorIndex] = true; } };
 
             cmbFaction = new ComboBox();
             cmbFaction.SelectedIndexChanged += (s, e) => { if (!_initializing) { Data.Npc[GameState.EditorIndex].Faction = (byte)cmbFaction.SelectedIndex; GameState.NpcChanged[GameState.EditorIndex] = true; } };
@@ -250,7 +250,7 @@ namespace Client
                     new TableRow(new Label{Text="Animation:"}, cmbAnimation),
                     new TableRow(new Label{Text="Spawn Secs:"}, nudSpawnSecs),
                     new TableRow(new Label{Text="Spawn Period:"}, cmbSpawnPeriod),
-                    new TableRow(new Label{Text="Behaviour:"}, cmbBehaviour),
+                    new TableRow(new Label{Text="Behavior:"}, cmbBehavior),
                     new TableRow(new Label{Text="Faction:"}, cmbFaction),
                     new TableRow(new Label{Text="Range:"}, nudRange),
                     new TableRow(new Label{Text="Damage:"}, nudDamage)
@@ -453,10 +453,10 @@ namespace Client
             for (int i = 0; i < Constant.MaxItems; i++)
                 cmbItem.Items.Add((i + 1) + ": " + Data.Item[i].Name);
 
-            cmbBehaviour.Items.Clear();
-            cmbBehaviour.Items.Add("Aggressive");
-            cmbBehaviour.Items.Add("Roam");
-            cmbBehaviour.Items.Add("Stationary");
+            cmbBehavior.Items.Clear();
+            cmbBehavior.Items.Add("Aggressive");
+            cmbBehavior.Items.Add("Roam");
+            cmbBehavior.Items.Add("Stationary");
 
             cmbFaction.Items.Clear();
             cmbFaction.Items.Add("Neutral");

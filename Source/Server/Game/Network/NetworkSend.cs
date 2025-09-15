@@ -52,6 +52,29 @@ public static class NetworkSend
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
     }
 
+    public static void SendStartSkillBuffer(int playerId, int skillSlot, int castTimeSeconds)
+    {
+        var packetWriter = new PacketWriter(20);
+        packetWriter.WriteEnum(ServerPackets.SStartSkillBuffer);
+        packetWriter.WriteInt32(skillSlot);
+        PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
+    }
+
+    public static void SendClearSkillBuffer(int playerId)
+    {
+        var packetWriter = new PacketWriter(4);
+        packetWriter.WriteEnum(ServerPackets.SClearSkillBuffer);
+        PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
+    }
+
+    public static void SendSkillCooldown(int playerId, int skillSlot)
+    {
+        var packetWriter = new PacketWriter(8);
+        packetWriter.WriteEnum(ServerPackets.SCooldown);
+        packetWriter.WriteInt32(skillSlot);
+        PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
+    }
+
     public static void SendPlayerChars(GameSession session)
     {
         var packetWriter = new PacketWriter();

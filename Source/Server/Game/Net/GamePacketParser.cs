@@ -1758,21 +1758,14 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         // Skill slot
         var n = buffer.ReadInt32();
 
-
-        if ((int) Data.Map[GetPlayerMap(session.Id)].Moral >= 0)
+        try
         {
-            if (Data.Moral[Data.Map[GetPlayerMap(session.Id)].Moral].CanCast)
-            {
-                try
-                {
-                    Script.Instance?.BufferSkill(session.Id, n);
-                }
-                catch (Exception ex)
-                {
-                    General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(Packet_Cast));
-                }
-            }
+            Script.Instance?.BufferSkill(session.Id, n);
         }
+        catch (Exception ex)
+        {
+            General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(Packet_Cast));
+        }  
     }
 
     public static void Packet_SwapInvSlots(GameSession session, ReadOnlyMemory<byte> bytes)

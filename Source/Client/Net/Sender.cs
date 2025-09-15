@@ -593,7 +593,7 @@ public static class Sender
         packetWriter.WriteInt32(npcNum);
         packetWriter.WriteInt32(Data.Npc[npcNum].Animation);
         packetWriter.WriteString(Data.Npc[npcNum].AttackSay);
-        packetWriter.WriteByte(Data.Npc[npcNum].Behaviour);
+        packetWriter.WriteByte(Data.Npc[npcNum].Behavior);
 
         for (var i = 0; i < Constant.MaxDropItems; i++)
         {
@@ -882,7 +882,7 @@ public static class Sender
         {
             case (byte) DraggablePartType.Skill:
             {
-                Player.PlayerCastSkill(Player.FindSkill(Data.Player[GameState.MyIndex].Hotbar[slot].Slot));
+                Player.CastSkill(Player.FindSkill(Data.Player[GameState.MyIndex].Hotbar[slot].Slot));
                 return;
             }
         }
@@ -913,9 +913,6 @@ public static class Sender
         packetWriter.WriteInt32(skillSlot);
 
         Network.Send(packetWriter);
-
-        GameState.SkillBuffer = skillSlot;
-        GameState.SkillBufferTimer = General.GetTickCount();
     }
 
     public static void SendRequestMoral(int moralNum)

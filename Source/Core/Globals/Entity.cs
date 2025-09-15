@@ -80,7 +80,7 @@ public class Entity
     public string AttackSay { get; set; }
     public byte SpawnTime { get; set; }
     public int SpawnSecs { get; set; }
-    public byte Behaviour { get; set; }
+    public byte Behavior { get; set; }
     public byte Range { get; set; }
     public int Animation { get; set; }
     public int Hp { get; set; }

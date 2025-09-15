@@ -163,7 +163,7 @@ namespace Client
             withBlock.txtAttackSay.Text = Data.Npc[GameState.EditorIndex].AttackSay;
             withBlock.nudSprite.Value = Data.Npc[GameState.EditorIndex].Sprite;
             withBlock.nudSpawnSecs.Value = Data.Npc[GameState.EditorIndex].SpawnSecs;
-            withBlock.cmbBehaviour.SelectedIndex = Data.Npc[GameState.EditorIndex].Behaviour;
+            withBlock.cmbBehavior.SelectedIndex = Data.Npc[GameState.EditorIndex].Behavior;
             withBlock.cmbFaction.SelectedIndex = Data.Npc[GameState.EditorIndex].Faction;
             withBlock.nudRange.Value = Data.Npc[GameState.EditorIndex].Range;
             withBlock.nudChance.Value = Data.Npc[GameState.EditorIndex].DropChance[Editor_Npc.Instance!.cmbDropSlot.SelectedIndex];

@@ -183,7 +183,7 @@ public static class Type
         public int Sprite;
         public byte SpawnTime;
         public int SpawnSecs;
-        public byte Behaviour;
+        public byte Behavior;
         public byte Range;
         public int[] DropChance;
         public int[] DropItem;

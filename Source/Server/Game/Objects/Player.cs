@@ -430,7 +430,7 @@ public static class Player
             }
             if (tile.Type2 == TileType.Heal)
             {
-                // If a second-layer heal exists, we override vital with layer2's vital to match editor behaviour and add amounts
+                // If a second-layer heal exists, we override vital with layer2's vital to match editor Behavior and add amounts
                 if (healVital < 0) healVital = tile.Data1_2; else healVital = tile.Data1_2; // explicit override
                 healAmount += tile.Data2_2;
             }

@@ -541,9 +541,64 @@ public class Script
         }
     }
 
-    public void BufferSkill(int mapNum, int index, int skillNum)
+    // Initiate a player skill cast (buffer or instant). Called from Packet_Cast with (playerIndex, skillSlot)
+    public void BufferSkill(int playerIndex, int skillSlot)
     {
+        // Basic validations
+        if (playerIndex < 0 || playerIndex >= Data.Player.Length) return;
+        if (!IsPlaying(playerIndex)) return;
+        if (skillSlot < 0 || skillSlot >= Data.Player[playerIndex].Skill.Length) return;
 
+        // Already casting something
+        if (Data.TempPlayer[playerIndex].SkillBuffer >= 0) return;
+
+        // Stunned
+        if (Data.TempPlayer[playerIndex].StunDuration > 0) return;
+
+        int skillId = Data.Player[playerIndex].Skill[skillSlot].Num;
+        if (skillId < 0 || skillId >= Data.Skill.Length) return;
+
+        ref var skill = ref Data.Skill[skillId];
+
+        // Cooldown check
+        long now = General.GetTimeMs();
+        if (Data.TempPlayer[playerIndex].SkillCd != null && skillSlot < Data.TempPlayer[playerIndex].SkillCd.Length)
+        {
+            var cdExpiry = Data.TempPlayer[playerIndex].SkillCd[skillSlot];
+            if (cdExpiry > now)
+            {
+                NetworkSend.PlayerMsg(playerIndex, "That skill is still cooling down.", (int)ColorName.BrightRed);
+                return;
+            }
+        }
+
+        // Mana check (only deduct on finalize) - ensure sufficient now
+        if (GetPlayerVital(playerIndex, Vital.Mana) < skill.MpCost)
+        {
+            NetworkSend.PlayerMsg(playerIndex, "Not enough mana.", (int)ColorName.BrightRed);
+            return;
+        }
+
+        // Moral / map rule check
+        var mapNum = GetPlayerMap(playerIndex);
+        if (mapNum < 0 || mapNum >= Data.Map.Length) return;
+
+        var moralId = Data.Map[mapNum].Moral;
+        if (moralId >= 0 && !Data.Moral[moralId].CanCast)
+        {
+            NetworkSend.PlayerMsg(playerIndex, "You cannot cast here.", (int)ColorName.BrightRed);
+            return;
+        }
+
+        // Always buffer, even for instant-cast skills. If castTime == 0 we treat it as 1 tick latency (next 25ms cycle) for consistency.
+        int effectiveCastTime = skill.CastTime;
+        if (effectiveCastTime < 0) effectiveCastTime = 0;
+
+        // Buffer the skill for later completion by server loop
+        Data.TempPlayer[playerIndex].SkillBuffer = skillSlot;
+        Data.TempPlayer[playerIndex].SkillBufferTimer = (int)now;
+        NetworkSend.SendStartSkillBuffer(playerIndex, skillSlot, effectiveCastTime);
+        // Client now begins cast bar on authoritative server ack; SClearSkillBuffer still clears when finalized
     }
 
     public int KillPlayer(int index)
@@ -607,18 +662,22 @@ public class Script
             {
                 if (General.GetTimeMs() > entity.SkillBufferTimer + Data.Skill[entity.SkillBuffer].CastTime * 1000)
                 {
-                    if (Data.Moral[Data.Map[mapNum].Moral].CanCast)
-                    {
-                        //BufferSkill(mapNum, [Core.Globals.Entity.Index(entity), entity.SkillBuffer);
-                        entity.SkillBuffer = -1;
-                        entity.SkillBufferTimer = 0;
-                    }
+                    var casterIndex = Core.Globals.Entity.Index(entity);
+
+                    // Execute the buffered skill now  that cast time elapsed
+                    CastSkill(mapNum, casterIndex, entity.SkillBuffer);    
+
+                    entity.SkillBuffer = -1;
+                    entity.SkillBufferTimer = 0;
+
+                    if (entity.Type == Core.Globals.Entity.EntityType.Player)
+                        SendClearSkillBuffer(entity.Id);
                 }
             }
             else
             {
                 // ATTACKING ON SIGHT
-                if (entity.Behaviour == (byte)NpcBehavior.AttackOnSight || entity.Behaviour == (byte)NpcBehavior.Guard)
+                if (entity.Behavior == (byte)NpcBehavior.AttackOnSight || entity.Behavior == (byte)NpcBehavior.Guard)
                 {
                     // make sure it's not stunned
                     if (!(entity.StunDuration > 0))
@@ -638,7 +697,7 @@ public class Script
 
                                     if (distanceX <= n && distanceY <= n)
                                     {
-                                        if (entity.Behaviour == (byte)NpcBehavior.AttackOnSight || GetPlayerPk(player.Id))
+                                        if (entity.Behavior == (byte)NpcBehavior.AttackOnSight || GetPlayerPk(player.Id))
                                         {
                                             if (!string.IsNullOrEmpty(entity.AttackSay))
                                             {
@@ -671,7 +730,7 @@ public class Script
                                         if (distanceX < 0) distanceX *= -1;
                                         if (distanceY < 0) distanceY *= -1;
 
-                                        if (distanceX <= n && distanceY <= n && entity.Behaviour == (byte)NpcBehavior.AttackOnSight)
+                                        if (distanceX <= n && distanceY <= n && entity.Behavior == (byte)NpcBehavior.AttackOnSight)
                                         {
                                             entity.TargetType = (byte)TargetType.Npc;
                                             entity.Target = i;
@@ -684,7 +743,8 @@ public class Script
                 }
 
                 // Attempt attack using new combat system when target acquired
-                if (entity != null && entity.Target > 0)
+                // Allow player index 0; so use >= 0
+                if (entity != null && entity.Target >= 0)
                 {
                     if (entity.TargetType == (byte)TargetType.Player)
                     {
@@ -749,7 +809,7 @@ public class Script
 
         // ----- NPC Movement (Chase + Wander) -----
         // Basic tick-based movement: if an NPC has a target and is not adjacent, step toward the target tile.
-        // Otherwise perform occasional wandering (random step) if Behaviour allows (AttackOnSight / Guard idle roam kept minimal).
+        // Otherwise perform occasional wandering (random step) if Behavior allows (AttackOnSight / Guard idle roam kept minimal).
         try
         {
             var nowMove = General.GetTimeMs();
@@ -806,10 +866,12 @@ public class Script
                     }
                 }
 
-                // Wander if not moved and no target
+                // Wander if not moved and no target. AttackOnSight/Guard now also wander albeit less frequently.
                 if (!moved && baseNpc.TargetType == 0)
                 {
-                    if (Random.Shared.NextDouble() < 0.05) // 5% per tick wander chance
+                    bool aggressive = baseNpc.Behavior == (byte)NpcBehavior.AttackOnSight || baseNpc.Behavior == (byte)NpcBehavior.Guard;
+                    double chance = aggressive ? 0.02 : 0.05; // aggressive wander less
+                    if (Random.Shared.NextDouble() < chance)
                     {
                         byte dir = (byte)(Random.Shared.Next(0,4));
                         if (Server.Npc.CanNpcMove(map, npcIndex, dir))
@@ -1099,6 +1161,62 @@ public class Script
         UpdateUnderlyingAttackTimer(attacker, (int) now);
         BroadcastAttack(attacker);
 
+        // If target is an NPC and was attacked by player/NPC, make it retaliate (set chase target)
+        if (target.Type == Entity.EntityType.Npc && target.Num >= 0)
+        {
+            // Acquire underlying map npc to set target persistent
+            var map = target.Map;
+            var mapNpcIndex = target.Id;
+            if (map >= 0 && map < Data.MapNpc.Length && mapNpcIndex >= 0 && mapNpcIndex < Core.Globals.Constant.MaxMapNpcs)
+            {
+                ref var baseNpc = ref Data.MapNpc[map].Npc[mapNpcIndex];
+                // Only set if no existing target or current target not alive
+                bool needTarget = baseNpc.TargetType == 0;
+                if (!needTarget)
+                {
+                    if (baseNpc.TargetType == (byte)TargetType.Player && (!NetworkConfig.IsPlaying(baseNpc.Target) || GetPlayerMap(baseNpc.Target) != map)) needTarget = true;
+                    else if (baseNpc.TargetType == (byte)TargetType.Npc && (baseNpc.Target < 0 || baseNpc.Target >= Core.Globals.Constant.MaxMapNpcs || Data.MapNpc[map].Npc[baseNpc.Target].Num < 0)) needTarget = true;
+                }
+                if (needTarget)
+                {
+                    if (attacker.Type == Entity.EntityType.Player)
+                    {
+                        baseNpc.TargetType = (byte)TargetType.Player;
+                        baseNpc.Target = attacker.Id;
+                    }
+                    else if (attacker.Type == Entity.EntityType.Npc)
+                    {
+                        baseNpc.TargetType = (byte)TargetType.Npc;
+                        baseNpc.Target = attacker.Id; // attacker.Id is map npc slot
+                    }
+                }
+            }
+        }
+
+        // If attacker is an NPC with no target set (e.g., guard retaliating) ensure its target is the victim
+        if (attacker.Type == Entity.EntityType.Npc && attacker.Num >= 0)
+        {
+            var map = attacker.Map;
+            var mapNpcIndex = attacker.Id;
+            if (map >= 0 && map < Data.MapNpc.Length && mapNpcIndex >= 0 && mapNpcIndex < Core.Globals.Constant.MaxMapNpcs)
+            {
+                ref var baseNpc = ref Data.MapNpc[map].Npc[mapNpcIndex];
+                if (baseNpc.TargetType == 0)
+                {
+                    if (target.Type == Entity.EntityType.Player)
+                    {
+                        baseNpc.TargetType = (byte)TargetType.Player;
+                        baseNpc.Target = target.Id;
+                    }
+                    else if (target.Type == Entity.EntityType.Npc)
+                    {
+                        baseNpc.TargetType = (byte)TargetType.Npc;
+                        baseNpc.Target = target.Id;
+                    }
+                }
+            }
+        }
+
         if (killed)
         {
             HandleDeath(attacker, target);
@@ -1262,6 +1380,325 @@ public class Script
         return e.Stat[idx];
     }
 
+    // Adjust vital on an entity (player or npc). If isHeal=false we subtract (damage). If true we add (heal).
+    // amountParam is base amount from skill; for now no scaling besides simple clamp.
+    // caster may be used later for threat/aggro or scaling.
+    private void AdjustVital(Entity target, Vital vital, int amountParam, bool isHeal, int skillId, int mapNum, Entity caster)
+    {
+        if (target == null) return;
+        if (vital != Vital.Health && vital != Vital.Mana && vital != Vital.Stamina) return; // only support these
+
+        int amount = Math.Max(0, amountParam);
+        if (amount == 0) return;
+
+        if (target.Type == Core.Globals.Entity.EntityType.Player)
+        {
+            int pid = target.Id;
+            if (!NetworkConfig.IsPlaying(pid)) return;
+            int cur = GetPlayerVital(pid, vital);
+            int max = GetPlayerMaxVital(pid, vital);
+            int newVal;
+            if (isHeal)
+            {
+                if (cur >= max) return; // nothing to do
+                newVal = Math.Min(max, cur + amount);
+            }
+            else
+            {
+                if (cur <= 0) return; // already dead/empty
+                newVal = Math.Max(0, cur - amount);
+            }
+            SetPlayerVital(pid, vital, newVal);
+            NetworkSend.SendVital(pid, vital);
+            if (!isHeal && newVal <= 0 && vital == Vital.Health)
+            {
+                // Player death routine (reuse existing logic if available)
+                if (caster != null && caster.Type == Core.Globals.Entity.EntityType.Player)
+                {
+                    // Award exp or handle PvP consequences if needed later.
+                }
+            }
+        }
+        else if (target.Type == Core.Globals.Entity.EntityType.Npc)
+        {
+            if (target.Map < 0 || target.Map >= Data.MapNpc.Length) return;
+            if (target.Id < 0 || target.Id >= Constant.MaxMapNpcs) return;
+            ref var mapNpc = ref Data.MapNpc[target.Map].Npc[target.Id];
+            if (mapNpc.Num < 0) return;
+            int idx = (int)vital;
+            if (mapNpc.Vital == null || idx < 0 || idx >= mapNpc.Vital.Length) return;
+            int cur = mapNpc.Vital[idx];
+            int max = GameLogic.GetNpcMaxVital(mapNpc.Num, vital);
+            int newVal;
+            if (isHeal)
+            {
+                if (cur >= max) return;
+                newVal = Math.Min(max, cur + amount);
+            }
+            else
+            {
+                if (cur <= 0) return;
+                newVal = Math.Max(0, cur - amount);
+            }
+            mapNpc.Vital[idx] = newVal;
+            if (vital == Vital.Health && !isHeal)
+            {
+                // show damage amount like existing ApplyDamage does (keep consistent color if possible)
+                NetworkSend.SendActionMsg(target.Map, (isHeal ? "+" : "-") + amount, (int)(isHeal ? ColorName.BrightGreen : ColorName.BrightRed), 1, target.X, target.Y);
+            }
+            Server.Npc.SendMapNpcVitals(target.Map, (byte)target.Id);
+            if (!isHeal && vital == Vital.Health && newVal <= 0)
+            {
+                // handle npc death (reuse existing logic if there is a method; for now rely on other damage pipeline)
+            }
+        }
+    }
+
+    private void CastSkill(int mapNum, int casterEntityIndex, int bufferedValue)
+    {
+        if (casterEntityIndex < 0 || casterEntityIndex >= Core.Globals.Entity.Instances.Count) return;
+        var caster = Core.Globals.Entity.Instances[casterEntityIndex];
+        if (caster == null) return;
+        if (caster.Map != mapNum) return;
+
+        int skillId;
+        int playerSkillSlot = -1;
+        if (caster.Type == Core.Globals.Entity.EntityType.Player)
+        {
+            playerSkillSlot = bufferedValue;
+            if (playerSkillSlot < 0 || playerSkillSlot >= Data.Player[caster.Id].Skill.Length) return;
+            skillId = Data.Player[caster.Id].Skill[playerSkillSlot].Num;
+        }
+        else
+        {
+            // For NPCs treat buffered value as a direct skillId (future: NPC skill slots)
+            skillId = bufferedValue;
+        }
+        if (skillId < 0 || skillId >= Data.Skill.Length) return;
+        ref var skill = ref Data.Skill[skillId];
+
+        // Re-check mana just before execution (player or npc could have spent mana meanwhile)
+        if (skill.MpCost > 0)
+        {
+            if (caster.Type == Core.Globals.Entity.EntityType.Player)
+            {
+                if (GetPlayerVital(caster.Id, Vital.Mana) < skill.MpCost) return;
+            }
+            else if (caster.Type == Core.Globals.Entity.EntityType.Npc)
+            {
+                if (caster.Vital == null || caster.Vital.Length <= (int)Vital.Mana || caster.Vital[(int)Vital.Mana] < skill.MpCost) return;
+            }
+        }
+
+        Entity resolvedTarget = null;
+        if (skill.Range > 0)
+        {
+            resolvedTarget = ResolveTargetEntity(mapNum, caster);
+        }
+
+        // Optional cast (wind-up) animation already played when buffering; only play execution anim here.
+        bool isProjectile = skill.IsProjectile == 1;
+        bool isAoE = skill.IsAoE;
+        int range = skill.Range;
+
+        if (isProjectile)
+        {
+            HandleProjectileSkill(mapNum, caster, skillId, resolvedTarget);
+        }
+        else if (range == 0 && !isAoE)
+        {
+            HandleSelfCastSkill(mapNum, caster, skillId);
+        }
+        else if (range == 0 && isAoE)
+        {
+            HandleSelfCastAoESkill(mapNum, caster, skillId);
+        }
+        else if (range > 0 && isAoE)
+        {
+            HandleTargetedAoESkill(mapNum, caster, skillId, resolvedTarget);
+        }
+        else if (range > 0)
+        {
+            HandleTargetedSkill(mapNum, caster, skillId, resolvedTarget);
+        }
+
+        FinalizeCast(mapNum, caster, skillId, playerSkillSlot);
+    }
+
+    private Entity ResolveTargetEntity(int mapNum, Entity caster)
+    {
+        if (caster.TargetType == (byte)TargetType.Player)
+        {
+            var pid = caster.Target;
+            if (NetworkConfig.IsPlaying(pid) && GetPlayerMap(pid) == mapNum)
+            {
+                var e = Core.Globals.Entity.FromPlayer(pid, Data.Player[pid]);
+                e.Map = mapNum;
+                return e;
+            }
+        }
+        else if (caster.TargetType == (byte)TargetType.Npc)
+        {
+            var tid = caster.Target;
+            if (tid >= 0 && tid < Core.Globals.Entity.Instances.Count)
+            {
+                var tEnt = Core.Globals.Entity.Instances[tid];
+                if (tEnt != null && tEnt.Type == Core.Globals.Entity.EntityType.Npc && tEnt.Map == mapNum && tEnt.Num >= 0)
+                    return tEnt;
+            }
+        }
+        return null;
+    }
+
+    private void HandleProjectileSkill(int mapNum, Entity caster, int skillId, Entity target)
+    {
+        if (target != null) AttemptAttack(caster, target, skillId);
+    }
+
+    private void HandleSelfCastSkill(int mapNum, Entity caster, int skillId)
+    {
+        ref var skill = ref Data.Skill[skillId];
+        switch (skill.Type)
+        {
+            case 0: // Damage HP self
+                AdjustVital(caster, Vital.Health, skill.Vital, false, skillId, mapNum, caster);
+                break;
+            case 1: // Damage MP self
+                AdjustVital(caster, Vital.Mana, skill.Vital, false, skillId, mapNum, caster);
+                break;
+            case 2: // Heal HP self
+                AdjustVital(caster, Vital.Health, skill.Vital, true, skillId, mapNum, caster);
+                break;
+            case 3: // Heal MP self
+                AdjustVital(caster, Vital.Mana, skill.Vital, true, skillId, mapNum, caster);
+                break;
+            case 4: // Warp
+                if (skill.Map >= 0 && skill.Map < Data.Map.Length)
+                {
+                    int destMap = skill.Map;
+                    int destX = skill.X;
+                    int destY = skill.Y;
+                    if (destMap >= 0 && destMap < Data.Map.Length && destX >= 0 && destX < Constant.MaxMapx && destY >= 0 && destY < Constant.MaxMapy)
+                    {
+                        if (caster.Type == Core.Globals.Entity.EntityType.Player)
+                        {
+                            byte dir = skill.Dir > 0 ? skill.Dir : (byte)Direction.Down;
+                            PlayerWarp(caster.Id, destMap, destX, destY, dir);
+                            NetworkSend.PlayerMsg(caster.Id, "You feel space bend around you...", (int)ColorName.Cyan);
+                        }
+                    }
+                }
+                break;
+        }
+        PlaySkillAnimation(mapNum, caster, skillId, caster);
+    }
+
+    private void HandleSelfCastAoESkill(int mapNum, Entity caster, int skillId)
+    {
+        ApplyAoE(mapNum, caster, skillId, caster.X / 32, caster.Y / 32);
+    }
+
+    private void HandleTargetedSkill(int mapNum, Entity caster, int skillId, Entity target)
+    {
+        if (target == null) return;
+        AttemptAttack(caster, target, skillId);
+        ref var skill = ref Data.Skill[skillId];
+        if (skill.Type == 2 || skill.Type == 3)
+        {
+            var vital = skill.Type == 2 ? Vital.Health : Vital.Mana;
+            AdjustVital(target, vital, skill.Vital, true, skillId, mapNum, caster);
+        }
+        PlaySkillAnimation(mapNum, caster, skillId, target);
+    }
+
+    private void HandleTargetedAoESkill(int mapNum, Entity caster, int skillId, Entity target)
+    {
+        int centerX = (target != null ? target.X : caster.X) / 32;
+        int centerY = (target != null ? target.Y : caster.Y) / 32;
+        ApplyAoE(mapNum, caster, skillId, centerX, centerY);
+    }
+
+    private void ApplyAoE(int mapNum, Entity caster, int skillId, int centerX, int centerY)
+    {
+        ref var skill = ref Data.Skill[skillId];
+        int radius = skill.AoE;
+        bool isDamage = skill.Type == 0 || skill.Type == 1;
+        bool isHeal = skill.Type == 2 || skill.Type == 3;
+        var vital = (skill.Type == 1 || skill.Type == 3) ? Vital.Mana : Vital.Health;
+
+        // Players
+        foreach (var player in PlayerService.Instance.Players)
+        {
+            if (!NetworkConfig.IsPlaying(player.Id)) continue;
+            if (GetPlayerMap(player.Id) != mapNum) continue;
+            int px = GetPlayerX(player.Id);
+            int py = GetPlayerY(player.Id);
+            if (Math.Abs(px - centerX) <= radius && Math.Abs(py - centerY) <= radius)
+            {
+                var targetEntity = Core.Globals.Entity.FromPlayer(player.Id, Data.Player[player.Id]);
+                targetEntity.Map = mapNum;
+                if (isDamage) AttemptAttack(caster, targetEntity, skillId);
+                if (isHeal) AdjustVital(targetEntity, vital, skill.Vital, true, skillId, mapNum, caster);
+                PlaySkillAnimation(mapNum, caster, skillId, targetEntity);
+            }
+        }
+
+        // NPCs via map data (avoid LINQ)
+        if (mapNum >= 0 && mapNum < Data.MapNpc.Length)
+        {
+            for (int i = 0; i < Constant.MaxMapNpcs; i++)
+            {
+                if (Data.MapNpc[mapNum].Npc[i].Num < 0) continue;
+                int nx = Data.MapNpc[mapNum].Npc[i].X / 32;
+                int ny = Data.MapNpc[mapNum].Npc[i].Y / 32;
+                if (Math.Abs(nx - centerX) <= radius && Math.Abs(ny - centerY) <= radius)
+                {
+                    var npcEntity = Core.Globals.Entity.FromNpc(i, Data.MapNpc[mapNum].Npc[i]);
+                    npcEntity.Map = mapNum;
+                    if (isDamage) AttemptAttack(caster, npcEntity, skillId);
+                    if (isHeal) AdjustVital(npcEntity, vital, skill.Vital, true, skillId, mapNum, caster);
+                    PlaySkillAnimation(mapNum, caster, skillId, npcEntity);
+                }
+            }
+        }
+    }
+
+    private void PlaySkillAnimation(int mapNum, Entity caster, int skillId, Entity target)
+    {
+        int anim = Data.Skill[skillId].SkillAnim;
+        if (anim <= 0) return;
+        byte tType = (byte)(target.Type == Core.Globals.Entity.EntityType.Player ? TargetType.Player : TargetType.Npc);
+        Server.Animation.SendAnimation(mapNum, anim, 0, 0, tType, target.Id);
+    }
+
+    private void FinalizeCast(int mapNum, Entity caster, int skillId, int playerSkillSlot)
+    {
+        ref var skill = ref Data.Skill[skillId];
+        if (skill.MpCost > 0)
+        {
+            if (caster.Type == Core.Globals.Entity.EntityType.Player)
+            {
+                int pid = caster.Id;
+                int cur = GetPlayerVital(pid, Vital.Mana);
+                SetPlayerVital(pid, Vital.Mana, Math.Max(0, cur - skill.MpCost));
+                NetworkSend.SendVital(pid, Vital.Mana);
+            }
+            else if (caster.Type == Core.Globals.Entity.EntityType.Npc && caster.Vital != null && caster.Vital.Length > (int)Vital.Mana)
+            {
+                caster.Vital[(int)Vital.Mana] = Math.Max(0, caster.Vital[(int)Vital.Mana] - skill.MpCost);
+            }
+        }
+        if (caster.Type == Core.Globals.Entity.EntityType.Player && playerSkillSlot >= 0)
+        {
+            int pid = caster.Id;
+            if (Data.TempPlayer[pid].SkillCd != null && playerSkillSlot < Data.TempPlayer[pid].SkillCd.Length)
+            {
+                Data.TempPlayer[pid].SkillCd[playerSkillSlot] = General.GetTimeMs() + skill.CdTime * 1000;
+                NetworkSend.SendSkillCooldown(pid, playerSkillSlot);
+            }
+        }
+    }
+
     private int SumArmor(Entity player)
     {
         if (player.Type != Entity.EntityType.Player || player.Equipment == null) return 0;
@@ -1383,7 +1820,7 @@ public class Script
 
     private bool ApplyDamageExtended(Entity attacker, Entity target, DamageResult dmg, int? skillId)
     {
-        // reuse existing ApplyDamage but capture death result
+        // Reuse existing ApplyDamage but capture death result
         var before = target.Vital != null ? target.Vital[(int)Vital.Health] : 0;
         ApplyDamage(attacker, target, dmg, skillId);
         var after = target.Type == Entity.EntityType.Player ? GetPlayerVital(target.Id, Vital.Health) : (target.Vital != null ? target.Vital[(int)Vital.Health] : 0);

@@ -965,7 +965,7 @@ namespace Client
             }
         }
 
-        public static void PlayerCastSkill(int skillSlot)
+        public static void CastSkill(int skillSlot)
         {
             // Check for subscript out of range
             if (skillSlot < 0 | skillSlot > Constant.MaxPlayerSkills)
@@ -981,9 +981,9 @@ namespace Client
                 return;
 
             // Check if player has enough MP
-            if (GetPlayerVital(GameState.MyIndex, Vital.Stamina) < Data.Skill[Data.Player[GameState.MyIndex].Skill[skillSlot].Num].MpCost)
+            if (GetPlayerVital(GameState.MyIndex, Vital.Mana) < Data.Skill[Data.Player[GameState.MyIndex].Skill[skillSlot].Num].MpCost)
             {
-                TextRenderer.AddText("Not enough MP to cast " + Data.Skill[Data.Player[GameState.MyIndex].Skill[skillSlot].Num].Name + ".", (int) ColorName.BrightRed);
+                TextRenderer.AddText("Not enough mana to cast " + Data.Skill[Data.Player[GameState.MyIndex].Skill[skillSlot].Num].Name + ".", (int) ColorName.BrightRed);
                 return;
             }
 

@@ -70,6 +70,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Bind(Packets.ServerPackets.SMapNpcVitals, Packet_NpcVitals);
         Bind(Packets.ServerPackets.SCooldown, Packet_Cooldown);
         Bind(Packets.ServerPackets.SClearSkillBuffer, Packet_ClearSkillBuffer);
+        Bind(Packets.ServerPackets.SStartSkillBuffer, Packet_StartSkillBuffer);
         Bind(Packets.ServerPackets.SSayMsg, Packet_SayMessage);
         Bind(Packets.ServerPackets.SOpenShop, Shop.Packet_OpenShop);
         Bind(Packets.ServerPackets.SResetShopAction, Shop.Packet_ResetShopAction);
@@ -531,7 +532,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         Data.Npc[npcNum].Animation = packetReader.ReadInt32();
         Data.Npc[npcNum].AttackSay = packetReader.ReadString();
-        Data.Npc[npcNum].Behaviour = packetReader.ReadByte();
+        Data.Npc[npcNum].Behavior = packetReader.ReadByte();
 
         for (var i = 0; i < Constant.MaxDropItems; i++)
         {
@@ -681,6 +682,15 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     {
         GameState.SkillBuffer = -1;
         GameState.SkillBufferTimer = 0;
+    }
+
+    private static void Packet_StartSkillBuffer(ReadOnlyMemory<byte> data)
+    {
+        var reader = new PacketReader(data);
+        // Packet id already consumed by dispatcher
+        int slot = reader.ReadInt32();
+        GameState.SkillBuffer = slot;
+        GameState.SkillBufferTimer = General.GetTickCount(); // could offset with serverStart if clock sync later
     }
 
     private static void Packet_SayMessage(ReadOnlyMemory<byte> data)

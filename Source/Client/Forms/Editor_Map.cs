@@ -1409,11 +1409,12 @@ namespace Client
 
             if (slot == 0) return; // slot 0 is None
             if (slot >= Data.MyMap.Npc.Length) return;
+            if (cmbNpcList.SelectedIndex == 0) return;
 
             // Update map data and refresh the item's display text
-            var npcIndex = cmbNpcList.SelectedIndex;        // 0-based internal id
+            var npcIndex = cmbNpcList.SelectedIndex - 1;
             Data.MyMap.Npc[slot] = npcIndex;
-            var displayId = npcIndex + 1;                   // 1-based display id
+            var displayId = npcIndex + 1;
             var newName = Strings.Trim(Data.Npc[npcIndex].Name);
             lstMapNpc.Items[idx] = new ListItem { Text = $"{slot}: {displayId}. {newName}" };
         }
@@ -1636,7 +1637,8 @@ namespace Client
             {
                 if (x == 0)
                 {
-                    Instance.lstMapNpc.Items.Add("None");
+                    // Show explicit slot number for consistency with other entries
+                    Instance.lstMapNpc.Items.Add("0: None");
                     continue;
                 }
 
@@ -1654,6 +1656,9 @@ namespace Client
 
             Instance.lstMapNpc.SelectedIndex = 0;
 
+            // Populate NPC combo with a leading 'None' so designers can clear a slot explicitly.
+            Instance.cmbNpcList.Items.Clear();
+            Instance.cmbNpcList.Items.Add("None"); // index 0 -> no NPC
             for (y = 0; y < Constant.MaxNpcs; y++)
                 Instance.cmbNpcList.Items.Add(Strings.Trim(Data.Npc[y].Name));
 

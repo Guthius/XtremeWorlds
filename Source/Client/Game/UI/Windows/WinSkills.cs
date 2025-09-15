@@ -170,7 +170,7 @@ public static class WinSkills
         var slot = General.IsSkill(winSkills.X, winSkills.Y);
         if (slot >= 0)
         {
-            Player.PlayerCastSkill(slot);
+            Player.CastSkill(slot);
         }
 
         OnMouseMove();

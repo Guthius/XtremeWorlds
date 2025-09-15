@@ -417,7 +417,7 @@ public static class Npc
 
         Data.Npc[npcNum].Animation = packetReader.ReadInt32();
         Data.Npc[npcNum].AttackSay = packetReader.ReadString();
-        Data.Npc[npcNum].Behaviour = packetReader.ReadByte();
+        Data.Npc[npcNum].Behavior = packetReader.ReadByte();
 
         for (var i = 0; i < Core.Globals.Constant.MaxDropItems; i++)
         {
@@ -476,7 +476,7 @@ public static class Npc
         buffer.WriteInt32(npcNum);
         buffer.WriteInt32(Data.Npc[npcNum].Animation);
         buffer.WriteString(Data.Npc[npcNum].AttackSay);
-        buffer.WriteByte(Data.Npc[npcNum].Behaviour);
+        buffer.WriteByte(Data.Npc[npcNum].Behavior);
 
         for (var i = 0; i < Core.Globals.Constant.MaxDropItems; i++)
         {
@@ -519,7 +519,7 @@ public static class Npc
         packet.WriteInt32(npcNum);
         packet.WriteInt32(Data.Npc[npcNum].Animation);
         packet.WriteString(Data.Npc[npcNum].AttackSay);
-        packet.WriteByte(Data.Npc[npcNum].Behaviour);
+        packet.WriteByte(Data.Npc[npcNum].Behavior);
 
         for (var i = 0; i < Core.Globals.Constant.MaxDropItems; i++)
         {

@@ -1847,7 +1847,7 @@ namespace Client
                 Event.TmpEvent.Pages[Event.CurPageNum].Graphic = tmpGraphicIndex;
                 fraGraphic.Visible = false;
                 DrawGraphic();
-            }            
+            }          
         }
 
         private void TvCommands_AfterSelect(object? sender, EventArgs e)
@@ -3224,8 +3224,8 @@ namespace Client
             {
                 // If we didn't change selection (already a leaf), execute now
                 TvCommands_AfterSelect(tvCommands, EventArgs.Empty);
-            }                        
-        }                                                               
+            }                      
+        }                                                             
 
         private void BtnEditCommand_Click(object? sender, EventArgs e)
         {
