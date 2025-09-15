@@ -1848,17 +1848,17 @@ namespace Server
                                         }
 
                                         case (byte) EventCommand.RestoreHealth:
-                                            SetPlayerVital(i, Vital.Health, GetPlayerMaxVital(i, Vital.Health));
+                                            SetPlayerVital(i, Vital.Health, Script.Instance?.GetPlayerMaxVital(i, Vital.Health));
                                             NetworkSend.SendVital(i, Vital.Health);
                                             break;
 
                                         case (byte) EventCommand.RestoreMana:
-                                            SetPlayerVital(i, Vital.Mana, GetPlayerMaxVital(i, Vital.Mana));
+                                            SetPlayerVital(i, Vital.Mana, Script.Instance?.GetPlayerMaxVital(i, Vital.Mana));
                                             NetworkSend.SendVital(i, Vital.Mana);
                                             break;
 
                                         case (byte) EventCommand.RestoreStamina:
-                                            SetPlayerVital(i, Vital.Stamina, GetPlayerMaxVital(i, Vital.Stamina));
+                                            SetPlayerVital(i, Vital.Stamina, Script.Instance?.GetPlayerMaxVital(i, Vital.Stamina));
                                             NetworkSend.SendVital(i, Vital.Stamina);
                                             break;
 

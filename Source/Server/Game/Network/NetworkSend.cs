@@ -381,7 +381,7 @@ public static class NetworkSend
 
     public static void SendVital(int playerId, Vital vital)
     {
-        var packetWriter = new PacketWriter(8);
+        var packetWriter = new PacketWriter(12);
 
         switch (vital)
         {

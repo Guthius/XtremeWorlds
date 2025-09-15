@@ -1921,9 +1921,12 @@ namespace Server
 
             var count = Enum.GetValues(typeof(Vital)).Length;
             Data.Player[index].Vital = new int[count];
+            Data.Player[index].MaxVital = new int[count];
             for (int i = 0, loopTo4 = count; i < loopTo4; i++)
+            {
                 Data.Player[index].Vital[i] = 0;
-
+                Data.Player[index].MaxVital[i] = 0;
+            }
             Data.Player[index].X = 0;
             Data.Player[index].Y = 0;
 
@@ -2024,7 +2027,9 @@ namespace Server
 
                 var vitalCount = Enum.GetValues(typeof(Vital)).Length;
                 for (i = 0; i < vitalCount; i++)
-                    SetPlayerVital(index, (Vital)i, GetPlayerMaxVital(index, (Vital)i));
+                {
+                    SetPlayerVital(index, (Vital)i, Script.Instance?.GetPlayerMaxVital(index, (Vital)i));
+                }
 
                 // set starter items
                 for (n = 0; n < Core.Globals.Constant.MaxStartItems; n++)

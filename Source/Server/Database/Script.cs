@@ -1937,16 +1937,14 @@ public class Script
     {
         if (index < 0 || index >= Data.Player.Length) return 1;
 
-        int level = GetPlayerLevel(index);
         int str = GetPlayerStat(index, Stat.Strength);
-        int job = GetPlayerJob(index); // falls back to Data.Player[index].Job if this helper doesn’t exist
+        int job = GetPlayerJob(index);
 
         int baseJobStr = 0;
         if (job >= 0 && job < Data.Job.Length)
             baseJobStr = Data.Job[job].Stat[(int)Stat.Strength];
 
-        // (Level + Int(STR/2) + Class.STR) * 2
-        long val = (long)(level + (str / 2) + baseJobStr) * 2L;
+        long val = (long)(1 + (str / 2) + baseJobStr) * 2L;
         return (int)Math.Max(1, Math.Min(int.MaxValue, val));
     }
 
@@ -1954,16 +1952,14 @@ public class Script
     {
         if (index < 0 || index >= Data.Player.Length) return 1;
 
-        int level = GetPlayerLevel(index);
         int magi = GetPlayerStat(index, Stat.Intelligence);
         int job = GetPlayerJob(index);
 
-        int baseJobMagi = 0;
+        int basejobInt = 0;
         if (job >= 0 && job < Data.Job.Length)
-            baseJobMagi = Data.Job[job].Stat[(int)Stat.Intelligence];
+            basejobInt = Data.Job[job].Stat[(int)Stat.Intelligence];
 
-        // (Level + Int(MAGI/2) + Class.MAGI) * 2
-        long val = (long)(level + (magi / 2) + baseJobMagi) * 2L;
+        long val = (long)(1 + (magi / 2) + basejobInt) * 2L;
         return (int)Math.Max(1, Math.Min(int.MaxValue, val));
     }
 
@@ -1971,16 +1967,14 @@ public class Script
     {
         if (index < 0 || index >= Data.Player.Length) return 1;
 
-        int level = GetPlayerLevel(index);
         int speed = GetPlayerStat(index, Stat.Spirit); // current codebase maps “Speed” to Stat.Spirit
         int job = GetPlayerJob(index);
 
-        int baseJobSpeed = 0;
+        int baseJobSpirit = 0;
         if (job >= 0 && job < Data.Job.Length)
-            baseJobSpeed = Data.Job[job].Stat[(int)Stat.Spirit]; // base “Speed” on Stat.Spirit
+            baseJobSpirit = Data.Job[job].Stat[(int)Stat.Spirit]; // base “Speed” on Stat.Spirit
 
-        // (Level + Int(SPEED/2) + Class.SPEED) * 2
-        long val = (long)(level + (speed / 2) + baseJobSpeed) * 2L;
+        long val = (long)(1 + (speed / 2) + baseJobSpirit) * 2L;
         return (int)Math.Max(1, Math.Min(int.MaxValue, val));
     }
 
@@ -1990,10 +1984,13 @@ public class Script
         {
             case Vital.Health:
                 return GetPlayerMaxHP(index);
+
             case Vital.Mana:
                 return GetPlayerMaxMP(index);
+
             case Vital.Stamina:
                 return GetPlayerMaxSP(index);
+                
             default:
                 return 1;
         }

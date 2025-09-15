@@ -80,9 +80,12 @@ namespace Client
 
             int vitalCount = Enum.GetValues(typeof(Vital)).Length;
             Data.Player[index].Vital = new int[vitalCount];
+            Data.Player[index].MaxVital = new int[vitalCount];
             foreach (Vital vital in Enum.GetValues(typeof(Vital)))
-                Data.Player[index].Vital[(int) vital] = 0;
-
+            {
+                Data.Player[index].Vital[(int)vital] = 0;
+                Data.Player[index].MaxVital[(int)vital] = 0;
+            }
             Data.Player[index].X = 0;
             Data.Player[index].Y = 0;
 

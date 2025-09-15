@@ -142,16 +142,6 @@ public static class Command
     public static void SetPlayerVital(int index, Vital vital, int value)
     {
         Data.Player[index].Vital[(int)vital] = value;
-
-        if (GetPlayerVital(index, vital) > GetPlayerMaxVital(index, vital))
-        {
-            Data.Player[index].Vital[(int)vital] = GetPlayerMaxVital(index, vital);
-        }
-
-        if (GetPlayerVital(index, vital) < 0)
-        {
-            Data.Player[index].Vital[(int)vital] = 0;
-        }
     }
 
     public static int GetPlayerMaxVital(int index, Vital vital)
