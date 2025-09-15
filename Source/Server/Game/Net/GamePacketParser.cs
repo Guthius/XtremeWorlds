@@ -785,7 +785,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             if (GetPlayerAccess(session.Id) > (byte) AccessLevel.Moderator)
             {
                 NetworkSend.PlayerMsg(session.Id, " Stats for " + GetPlayerName(i) + " ", (int) ColorName.Yellow);
-                NetworkSend.PlayerMsg(session.Id, "Level: " + GetPlayerLevel(i) + "  Exp: " + GetPlayerExp(i) + "/" + GetPlayerNextLevel(i), (int) ColorName.Yellow);
+                NetworkSend.PlayerMsg(session.Id, "Level: " + GetPlayerLevel(i) + "  Exp: " + GetPlayerExp(i) + "/" + Script.Instance?.GetPlayerNextLevel(i), (int) ColorName.Yellow);
                 NetworkSend.PlayerMsg(session.Id, "HP: " + GetPlayerVital(i, Vital.Health) + "/" + GetPlayerMaxVital(i, Vital.Health) + "  MP: " + GetPlayerVital(i, Vital.Stamina) + "/" + GetPlayerMaxVital(i, Vital.Stamina) + "  SP: " + GetPlayerVital(i, Vital.Stamina) + "/" + GetPlayerMaxVital(i, Vital.Stamina), (int) ColorName.Yellow);
                 NetworkSend.PlayerMsg(session.Id, "Strength: " + GetPlayerStat(i, Stat.Strength) + "  Defense: " + GetPlayerStat(i, Stat.Luck) + "  Magic: " + GetPlayerStat(i, Stat.Intelligence) + "  Speed: " + GetPlayerStat(i, Stat.Spirit), (int) ColorName.Yellow);
                 n = GetPlayerStat(i, Stat.Strength) / 2 + GetPlayerLevel(i) / 2;
@@ -909,7 +909,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
     public static void Packet_GetStats(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         NetworkSend.PlayerMsg(session.Id, "Stats: " + GetPlayerName(session.Id), (int) ColorName.Yellow);
-        NetworkSend.PlayerMsg(session.Id, "Level: " + GetPlayerLevel(session.Id) + "  Exp: " + GetPlayerExp(session.Id) + "/" + GetPlayerNextLevel(session.Id), (int) ColorName.Yellow);
+        NetworkSend.PlayerMsg(session.Id, "Level: " + GetPlayerLevel(session.Id) + "  Exp: " + GetPlayerExp(session.Id) + "/" + Script.Instance?.GetPlayerNextLevel(session.Id), (int) ColorName.Yellow);
         NetworkSend.PlayerMsg(session.Id, "HP: " + GetPlayerVital(session.Id, Vital.Health) + "/" + GetPlayerMaxVital(session.Id, Vital.Health) + "  MP: " + GetPlayerVital(session.Id, Vital.Stamina) + "/" + GetPlayerMaxVital(session.Id, Vital.Stamina) + "  SP: " + GetPlayerVital(session.Id, Vital.Stamina) + "/" + GetPlayerMaxVital(session.Id, Vital.Stamina), (int) ColorName.Yellow);
         NetworkSend.PlayerMsg(session.Id, "STR: " + GetPlayerStat(session.Id, Stat.Strength) + "  DEF: " + GetPlayerStat(session.Id, Stat.Luck) + "  MAGI: " + GetPlayerStat(session.Id, Stat.Intelligence) + "  Speed: " + GetPlayerStat(session.Id, Stat.Spirit), (int) ColorName.Yellow);
         var n = GetPlayerStat(session.Id, Stat.Strength) / 2 + GetPlayerLevel(session.Id) / 2;
@@ -1898,7 +1898,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         if (GetPlayerAccess(session.Id) < (byte) AccessLevel.Developer)
             return;
 
-        SetPlayerExp(session.Id, GetPlayerNextLevel(session.Id));
+        SetPlayerExp(session.Id, Script.Instance?.GetPlayerNextLevel(session.Id));
         Server.Player.CheckPlayerLevelUp(session.Id);
     }
 
