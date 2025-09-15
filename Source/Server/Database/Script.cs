@@ -45,6 +45,11 @@ public class Script
     private const int PlayerRegenIntervalMs = 10000; // 10 seconds like legacy
     private const int BaseAttackSpeedMs = 1000; // fallback when no weapon speed
 
+    private const long ItemSpawnTime = 30000L; // 30 seconds
+    private const long ItemDespawnTime = 90000L; // 1:30 seconds
+
+    private const byte StatPerLevel = 5;
+
     public void Loop()
     {
 
@@ -969,7 +974,7 @@ public class Script
         {
             var expRollover = GetPlayerExp(index) - GetPlayerNextLevel(index);
             SetPlayerLevel(index, GetPlayerLevel(index) + 1);
-            int points = Server.Constant.StatPerLevel;
+            int points = StatPerLevel;
             points += ((int)Math.Floor((decimal)GetPlayerStat(index, Stat.Luck) / 10));
             SetPlayerPoints(index, GetPlayerPoints(index) + points);
             SetPlayerExp(index, expRollover);
