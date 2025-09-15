@@ -912,14 +912,19 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         NetworkSend.PlayerMsg(session.Id, "Level: " + GetPlayerLevel(session.Id) + "  Exp: " + GetPlayerExp(session.Id) + "/" + Script.Instance?.GetPlayerNextLevel(session.Id), (int) ColorName.Yellow);
         NetworkSend.PlayerMsg(session.Id, "HP: " + GetPlayerVital(session.Id, Vital.Health) + "/" + Script.Instance?.GetPlayerMaxVital(session.Id, Vital.Health) + "  MP: " + GetPlayerVital(session.Id, Vital.Stamina) + "/" + Script.Instance?.GetPlayerMaxVital(session.Id, Vital.Stamina) + "  SP: " + GetPlayerVital(session.Id, Vital.Stamina) + "/" + Script.Instance?.GetPlayerMaxVital(session.Id, Vital.Stamina), (int) ColorName.Yellow);
         NetworkSend.PlayerMsg(session.Id, "STR: " + GetPlayerStat(session.Id, Stat.Strength) + "  DEF: " + GetPlayerStat(session.Id, Stat.Luck) + "  MAGI: " + GetPlayerStat(session.Id, Stat.Intelligence) + "  Speed: " + GetPlayerStat(session.Id, Stat.Spirit), (int) ColorName.Yellow);
-        var n = GetPlayerStat(session.Id, Stat.Strength) / 2 + GetPlayerLevel(session.Id) / 2;
-        var i = GetPlayerStat(session.Id, Stat.Luck) / 2 + GetPlayerLevel(session.Id) / 2;
+        var n = GetPlayerStat(session.Id, Stat.Strength) / 2;
+        var n2 = GetPlayerStat(session.Id, Stat.Intelligence) / 2;
+        var i = GetPlayerStat(session.Id, Stat.Vitality) / 5;
 
         if (n > 100)
             n = 100;
+
+        if (n2 > 100)
+            n2 = 100;
+
         if (i > 100)
             i = 100;
-        NetworkSend.PlayerMsg(session.Id, "Critical Hit Chance: " + n + "%, Block Chance: " + i + "%", (int) ColorName.Yellow);
+        NetworkSend.PlayerMsg(session.Id, "Critical Hit Chance: " + n + "% Critical Cast Chance: " + n2 + "%, Block Chance: " + i + "%", (int) ColorName.Yellow);
     }
 
     public static void Packet_RequestNewMap(GameSession session, ReadOnlyMemory<byte> bytes)
