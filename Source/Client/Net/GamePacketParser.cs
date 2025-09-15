@@ -36,7 +36,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Bind(Packets.ServerPackets.SNpcMove, Packet_NpcMove);
         Bind(Packets.ServerPackets.SPlayerDir, Player.Packet_PlayerDir);
         Bind(Packets.ServerPackets.SNpcDir, Packet_NpcDir);
-        Bind(Packets.ServerPackets.SPlayerXy, Player.Packet_PlayerXY);
+        Bind(Packets.ServerPackets.SPlayerXY, Player.Packet_PlayerXY);
         Bind(Packets.ServerPackets.SAttack, Packet_Attack);
         Bind(Packets.ServerPackets.SNpcAttack, Packet_NpcAttack);
         Bind(Packets.ServerPackets.SCheckForMap, Map.Packet_CheckMap);

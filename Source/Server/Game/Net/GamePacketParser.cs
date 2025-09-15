@@ -541,7 +541,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         {
             Data.Player[session.Id].IsMoving = true;
             // Immediate broadcast so others start interpolation promptly
-            NetworkSend.SendPlayerXyToMap(session.Id);
+            NetworkSend.SendPlayerXYToMap(session.Id);
         }
     }
 
@@ -554,8 +554,9 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         Data.Player[session.Id].IsMoving = false;
         Data.Player[session.Id].Moving = 0;
+
         // Broadcast final resting position & flags immediately
-        NetworkSend.SendPlayerXyToMap(session.Id);
+        NetworkSend.SendPlayerXYToMap(session.Id);
     }
 
     public static void Packet_PlayerDirection(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -2071,7 +2072,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             SetPlayerX(session.Id, x);
             SetPlayerY(session.Id, y);
             SetPlayerDir(session.Id, (byte) Direction.Down);
-            NetworkSend.SendPlayerXyToMap(session.Id);
+            NetworkSend.SendPlayerXYToMap(session.Id);
         }
     }
 

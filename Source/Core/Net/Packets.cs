@@ -151,7 +151,7 @@ public static class Packets
         SNpcMove = 15,
         SPlayerDir = 16,
         SNpcDir = 17,
-        SPlayerXy = 18,
+        SPlayerXY = 18,
         SAttack = 19,
         SNpcAttack = 20,
         SCheckForMap = 21,

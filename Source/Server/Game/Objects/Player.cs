@@ -90,7 +90,7 @@ public static class Player
         SetPlayerY(playerId, y);
         SetPlayerDir(playerId, dir);
 
-        NetworkSend.SendPlayerXy(playerId);
+        NetworkSend.SendPlayerXY(playerId);
 
         // Send equipment of all people on new map
         if (GameLogic.GetTotalMapPlayers(mapNum) > 0)
@@ -154,27 +154,27 @@ public static class Player
         // Prevent player from moving if they have casted a skill
         if (Data.TempPlayer[playerId].SkillBuffer >= 0)
         {
-            NetworkSend.SendPlayerXy(playerId);
+            NetworkSend.SendPlayerXY(playerId);
             return;
         }
 
         // Cant move if in the bank
         if (Data.TempPlayer[playerId].InBank)
         {
-            NetworkSend.SendPlayerXy(playerId);
+            NetworkSend.SendPlayerXY(playerId);
             return;
         }
 
         // if stunned, stop them moving
         if (Data.TempPlayer[playerId].StunDuration > 0)
         {
-            NetworkSend.SendPlayerXy(playerId);
+            NetworkSend.SendPlayerXY(playerId);
             return;
         }
 
         if (Data.TempPlayer[playerId].InShop >= 0 || Data.TempPlayer[playerId].InBank)
         {
-            NetworkSend.SendPlayerXy(playerId);
+            NetworkSend.SendPlayerXY(playerId);
             return;
         }
 
@@ -499,7 +499,7 @@ public static class Player
         
         Data.Player[playerId].IsMoving = true;
         
-        NetworkSend.SendPlayerXyToMap(playerId);
+        NetworkSend.SendPlayerXYToMap(playerId);
         try
         {
             Script.Instance?.PlayerMove(playerId);

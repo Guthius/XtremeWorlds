@@ -482,7 +482,7 @@ public class Script
                     {
                         data = GetPlayerDataPacket(player.Id);
                         PlayerService.Instance.SendDataTo(index, data);
-                        SendPlayerXyTo(index, player.Id);
+                        SendPlayerXYTo(index, player.Id);
                         NetworkSend.SendMapEquipmentTo(index, player.Id);
                     }
                 }
@@ -494,7 +494,7 @@ public class Script
         // Send index's player data to everyone on the map including himself
         data = GetPlayerDataPacket(index);
         NetworkConfig.SendDataToMap(mapNum, data);
-        SendPlayerXyToMap(index);
+        SendPlayerXYToMap(index);
         NetworkSend.SendMapEquipment(index);
         NetworkSend.SendVitals(index);
     }

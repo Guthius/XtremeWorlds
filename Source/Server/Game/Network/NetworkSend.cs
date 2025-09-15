@@ -747,33 +747,31 @@ public static class NetworkSend
         return packetWriter.GetBytes();
     }
 
-    public static void SendPlayerXy(int playerId)
+    public static void SendPlayerXY(int playerId)
     {
-        SendPlayerXyTo(playerId, playerId);
+        SendPlayerXYTo(playerId, playerId);
     }
 
-    public static void SendPlayerXyTo(int sendToPlayerId, int positionPlayerId)
+    public static void SendPlayerXYTo(int sendToPlayerId, int positionPlayerId)
     {
         var packetWriter = new PacketWriter();
 
-        packetWriter.WriteEnum(ServerPackets.SPlayerXy);
+        packetWriter.WriteEnum(ServerPackets.SPlayerXY);
         packetWriter.WriteInt32(positionPlayerId);
         packetWriter.WriteInt32(GetPlayerRawX(positionPlayerId));
         packetWriter.WriteInt32(GetPlayerRawY(positionPlayerId));
         packetWriter.WriteByte(GetPlayerDir(positionPlayerId));
-        // BUGFIX: previously used the RECIPIENT player's Moving/IsMoving flags, causing desync view of other players.
-        // Now use the subject (positionPlayerId) player movement flags.
         packetWriter.WriteByte(Data.Player[positionPlayerId].Moving);
         packetWriter.WriteBoolean(Data.Player[positionPlayerId].IsMoving);
 
         PlayerService.Instance.SendDataTo(sendToPlayerId, packetWriter.GetBytes());
     }
 
-    public static void SendPlayerXyToMap(int playerId)
+    public static void SendPlayerXYToMap(int playerId)
     {
         var packetWriter = new PacketWriter(4);
 
-        packetWriter.WriteEnum(ServerPackets.SPlayerXy);
+        packetWriter.WriteEnum(ServerPackets.SPlayerXY);
         packetWriter.WriteInt32(playerId);
         packetWriter.WriteInt32(GetPlayerRawX(playerId));
         packetWriter.WriteInt32(GetPlayerRawY(playerId));

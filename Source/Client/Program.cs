@@ -19,8 +19,9 @@ namespace Client
 {
     public class GameClient : Microsoft.Xna.Framework.Game
     {
-        // Helper: compute direction rows from texture height and configured setting with fallbacks (8->4->1)
-        private static int ComputeDirectionRows(int textureHeight)
+        // Helper: compute direction rows from texture height and configured setting with fallbacks (configured -> 8 -> 4 -> 1)
+        // Mirrors legacy heuristic used in DrawPaperdoll (ensuring per-row frame height >= 16 when auto-detecting 8/4).
+        private static int ComputeDirectionRows(int textureHeight, int configuredDirs)
         {
             int configured = SettingsManager.Instance.SpriteDirections;
             if (configured <= 0) configured = 4;
@@ -29,6 +30,7 @@ namespace Client
             if (textureHeight % configured == 0) return configured;
             if (configured != 8 && textureHeight % 8 == 0) return 8;
             if (configured != 4 && textureHeight % 4 == 0) return 4;
+
             return 1;
         }
 
@@ -1798,25 +1800,9 @@ namespace Client
             string gfxPath = Path.Combine(DataPath.Paperdolls, sprite.ToString());
             var info = GetGfxInfo(gfxPath);
             if (info == null || info.Width <= 0 || info.Height <= 0) return;
-            // Determine directional rows using configurable SpriteDirections with heuristic fallback.
+            // Determine directional rows using helper (configured -> 8 -> 4 -> 1 heuristic)
             int configuredDirs = Math.Max(1, SettingsManager.Instance.SpriteDirections);
-            int directionRows;
-            if (configuredDirs > 1 && info.Height % configuredDirs == 0)
-            {
-                directionRows = configuredDirs;
-            }
-            else if (info.Height % 8 == 0 && (info.Height / 8) >= 16)
-            {
-                directionRows = 8; // auto-detect 8-direction sheet
-            }
-            else if (info.Height % 4 == 0 && (info.Height / 4) >= 16)
-            {
-                directionRows = 4; // legacy 4-direction sheet
-            }
-            else
-            {
-                directionRows = 1; // single strip
-            }
+            int directionRows = ComputeDirectionRows(info.Height, configuredDirs);
             bool looksDirectional = directionRows > 1;
 
             int frameHeight = info.Height / directionRows;
@@ -1952,7 +1938,7 @@ namespace Client
             // Segmentation logic
             var gfxInfo = GetGfxInfo(Path.Combine(DataPath.Characters, sprite.ToString()));
             if (gfxInfo == null) return;
-            int directionRows = ComputeDirectionRows(gfxInfo.Height);
+            int directionRows = ComputeDirectionRows(gfxInfo.Height, Math.Max(1, SettingsManager.Instance.SpriteDirections));
             // Map direction to row after computing available rows
             spriteLeft = MapDirectionToRow((Direction)Data.MyMapNpc[(int)mapNpcNum].Dir, directionRows);
             int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
@@ -2647,7 +2633,7 @@ namespace Client
                 return;
             }
 
-            int directionRows = ComputeDirectionRows(gfxInfo.Height); // dynamic rows (supports 4/8/1)
+            int directionRows = ComputeDirectionRows(gfxInfo.Height, Math.Max(1, SettingsManager.Instance.SpriteDirections)); // dynamic rows (supports 4/8/1)
             spriteleft = MapDirectionToRow((Direction)GetPlayerDir(index), directionRows);
 
             // Determine segment frame counts (allow variable counts)
@@ -2901,7 +2887,7 @@ namespace Client
                 return;
 
             // Direction rows dynamic (configured sprite directions with fallback heuristics)
-            int directionRows = ComputeDirectionRows(gfxInfo.Height);
+            int directionRows = ComputeDirectionRows(gfxInfo.Height, Math.Max(1, SettingsManager.Instance.SpriteDirections));
 
             // Frame counts from settings (segment lengths)
             int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
@@ -3049,7 +3035,7 @@ namespace Client
                             var gfxInfo = GetGfxInfo(Path.Combine(DataPath.Characters, Data.MapEvents[id].Graphic.ToString()));
                             if (gfxInfo == null) return;
 
-                            int directionRows = ComputeDirectionRows(gfxInfo.Height);
+                            int directionRows = ComputeDirectionRows(gfxInfo.Height, Math.Max(1, SettingsManager.Instance.SpriteDirections));
                             spritetop = MapDirectionToRow((Direction)Data.MapEvents[id].ShowDir, directionRows);
                             int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
                             int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);

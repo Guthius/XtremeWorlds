@@ -691,7 +691,7 @@ namespace Server
 
                 player.X = x;
                 player.Y = y;
-                NetworkSend.SendPlayerXyToMap(playerIndex);
+                NetworkSend.SendPlayerXYToMap(playerIndex);
                 Logger.LogInformation($"Player {playerIndex} teleported to ({x}, {y})");
             }
             catch (Exception ex)
