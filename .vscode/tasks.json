@@ -17,17 +17,5 @@
 			"problemMatcher": ["$msCompile"],
 			"presentation": { "reveal": "always" }
 		},
-		{
-			"label": "prep Client (macOS .app)",
-			"type": "shell",
-			"command": "bash",
-			"args": [
-				"-lc",
-				"rm -f \"${workspaceFolder}/Build/Client/Client.app/Contents/MacOS/libhostfxr.dylib\" \"${workspaceFolder}/Build/Client/Client.app/Contents/MacOS/libhostpolicy.dylib\"; true"
-			],
-			"problemMatcher": [],
-			"dependsOn": ["build Client"],
-			"presentation": { "reveal": "always" }
-		}
 	]
 }
