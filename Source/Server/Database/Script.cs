@@ -969,7 +969,12 @@ public class Script
         {
             var expRollover = GetPlayerExp(index) - GetPlayerNextLevel(index);
             SetPlayerLevel(index, GetPlayerLevel(index) + 1);
-            SetPlayerPoints(index, GetPlayerPoints(index) + Server.Constant.StatPerLevel);
+            int points = Server.Constant.StatPerLevel;
+            if (GetPlayerStat(index, Stat.Luck) >= 10)
+            {
+                points += ((int)Math.Floor((decimal)GetPlayerStat(index, Stat.Luck) / 10));
+            }
+            SetPlayerPoints(index, GetPlayerPoints(index) + points);
             SetPlayerExp(index, expRollover);
             level_count += 1;
         }
