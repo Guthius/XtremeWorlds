@@ -1346,8 +1346,7 @@ public class Script
         int raw = 0;
         if (attacker.Type == Entity.EntityType.Player)
         {
-            // Use helper to compute player's base attack power and add a small random roll
-            raw = GetPlayerDamage(attacker.Id) + (int)General.GetRandom.NextDouble(0d, 20d);
+            raw = GetPlayerDamage(attacker.Id);
         }
         else // NPC
         {
@@ -1357,47 +1356,38 @@ public class Script
             }
         }
 
-        // Skill modifier (very naive: + Skill.Level * 2 etc.)
-        if (skillId.HasValue && skillId.Value >= 0 && skillId.Value < Data.Skill.Length)
-        {
-            raw = (int)(raw * 1.1); // placeholder scaling
-        }
-
         result.Raw = raw;
 
         // Defense / mitigation
         int mitigation = 0;
         if (target.Type == Entity.EntityType.Player)
         {
-            // Use helper to compute player's total protection
             mitigation += GetPlayerProtection(target);
         }
         else if (target.Type == Entity.EntityType.Npc)
         {
-            // NPC spirit & level stored in Data.Npc template
             if (target.Num >= 0 && target.Num < Data.Npc.Length)
             {
-                mitigation += (int)Data.Npc[target.Num].Stat[(int)Stat.Spirit] * 2 + Data.Npc[target.Num].Level * 3;
+                mitigation += (int)Data.Npc[target.Num].Stat[(int)Stat.Vitality / 5];
             }
         }
 
         var mitigated = Math.Max(0, raw - mitigation);
 
-        // Defensive rolls only if mitigated > 0
         if (mitigated > 0)
         {
-            result.Dodge = Roll(SafeStat(target, Stat.Luck) / 4);
-            if (!result.Dodge) result.Parry = Roll(SafeStat(target, Stat.Luck) / 6);
+            result.Dodge = Roll(SafeStat(target, Stat.Luck) / 5);
+            if (!result.Dodge) result.Parry = Roll(SafeStat(target, Stat.Strength) / 5);
             if (!result.Dodge && !result.Parry)
             {
-                result.Block = HasShield(target) && Roll((SafeStat(target, Stat.Luck) / 2 + target.Level / 2));
+                result.Block = HasShield(target) && Roll((SafeStat(target, Stat.Vitality) / 5));
             }
         }
 
         // Critical only if attack not fully avoided
         if (!result.Dodge && !result.Parry && !result.Block)
         {
-            result.Crit = Roll(SafeStat(attacker, Stat.Strength) / 2 + attacker.Level / 2);
+            result.Crit = Roll(SafeStat(attacker, Stat.Strength) / 3);
             if (result.Crit)
             {
                 mitigated = (int)Math.Round(mitigated * 1.5);
@@ -1413,34 +1403,22 @@ public class Script
         return result;
     }
 
-    // Classic-style helpers for computing player offensive and defensive power
     private int GetPlayerDamage(int playerId)
     {
         if (playerId < 0 || playerId >= Data.Player.Length) return 0;
-        int str = GetPlayerStat(playerId, Stat.Strength);
+        int str = GetPlayerStat(playerId, Stat.Strength) / 2;
         int lvl = GetPlayerLevel(playerId);
         int weaponId = GetPlayerEquipment(playerId, Equipment.Weapon);
         int weaponPower = (weaponId >= 0 && weaponId < Data.Item.Length) ? Data.Item[weaponId].Data2 : 0;
         // Keep formula aligned with prior CalculateDamage logic (without RNG)
-        int baseDamage = str * 2 + weaponPower * 2 + lvl * 3;
+        int baseDamage = str + weaponPower;
         return Math.Max(0, baseDamage);
     }
 
     private int GetPlayerDefense(int playerId)
     {
-        if (playerId < 0 || playerId >= Data.Player.Length) return 0;
-        int total = 0;
-        var equip = Data.Player[playerId].Equipment;
-        if (equip == null) return 0;
-        for (int i = 0; i < equip.Length; i++)
-        {
-            int itemNum = equip[i].Num;
-            if (itemNum >= 0 && itemNum < Data.Item.Length)
-            {
-                total += Data.Item[itemNum].Data2;
-            }
-        }
-        return total / 6;
+        int def = GetPlayerStat(playerId, Stat.Vitality) / 5;
+        return def;
     }
 
     public int GetPlayerNextLevel(int index)
@@ -1797,7 +1775,7 @@ public class Script
                 total += Data.Item[itemNum].Data2;
             }
         }
-        return total / 6; // legacy divide
+        return total + GetPlayerDefense(entity.Id);
     }
 
     private bool HasShield(Entity e)
