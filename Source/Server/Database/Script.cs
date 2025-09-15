@@ -1389,7 +1389,7 @@ public class Script
         {
             if (skillId >= 0)
             {
-                result.Crit = Roll(SafeStat(attacker, Stat.Intelligence) / 5);
+                result.Crit = Roll(SafeStat(attacker, Stat.Intelligence) / 2);
                 if (result.Crit)
                 {
                     mitigated = (int)Math.Round(mitigated * 1.5);
