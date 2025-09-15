@@ -16,7 +16,7 @@ public static class Command
 
     public static int GetPlayerRawStat(int index, Stat stat)
     {
-        return Data.Player[index].Stat[(int) stat];
+        return Data.Player[index].Stat[(int)stat];
     }
 
     public static string GetPlayerName(int index)
@@ -36,7 +36,7 @@ public static class Command
 
     public static int GetPlayerVital(int index, Vital vital)
     {
-        return Data.Player[index].Vital[(int) vital];
+        return Data.Player[index].Vital[(int)vital];
     }
 
     public static int GetPlayerSprite(int index)
@@ -61,7 +61,7 @@ public static class Command
 
     public static int GetPlayerEquipment(int index, Equipment equipmentSlot)
     {
-        return Data.Player[index].Equipment[(int) equipmentSlot].Num;
+        return Data.Player[index].Equipment[(int)equipmentSlot].Num;
     }
 
     public static int GetPlayerSkill(int index, int skillSlot)
@@ -93,22 +93,22 @@ public static class Command
     {
         return vital switch
         {
-            Vital.Health => (int) Math.Round(100d + (Data.Player[index].Level + GetPlayerStat(index, Stat.Vitality) / 2d) * 2d),
-            Vital.Mana => (int) Math.Round(50d + (Data.Player[index].Level + GetPlayerStat(index, Stat.Intelligence) / 2d) * 2d),
-            Vital.Stamina => (int) Math.Round(50d + (Data.Player[index].Level + GetPlayerStat(index, Stat.Spirit) / 2d) * 2d),
+            Vital.Health => (int)Math.Round(100d + (Data.Player[index].Level + GetPlayerStat(index, Stat.Vitality) / 2d) * 2d),
+            Vital.Mana => (int)Math.Round(50d + (Data.Player[index].Level + GetPlayerStat(index, Stat.Intelligence) / 2d) * 2d),
+            Vital.Stamina => (int)Math.Round(50d + (Data.Player[index].Level + GetPlayerStat(index, Stat.Spirit) / 2d) * 2d),
             _ => 0
         };
     }
 
     public static int GetPlayerStat(int index, Stat stat)
     {
-        int statValue = Data.Player[index].Stat[(int) stat];
+        int statValue = Data.Player[index].Stat[(int)stat];
 
         for (var i = 0; i < EquipmentCount; i++)
         {
-            if (Data.Player[index].Equipment[i].Num >= 0 && Data.Item[Data.Player[index].Equipment[i].Num].AddStat[(int) stat] > 0)
+            if (Data.Player[index].Equipment[i].Num >= 0 && Data.Item[Data.Player[index].Equipment[i].Num].AddStat[(int)stat] > 0)
             {
-                statValue += Data.Item[Data.Player[index].Equipment[i].Num].AddStat[(int) stat];
+                statValue += Data.Item[Data.Player[index].Equipment[i].Num].AddStat[(int)stat];
             }
         }
 
@@ -122,12 +122,12 @@ public static class Command
 
     public static int GetPlayerX(int index)
     {
-        return (int) Math.Floor((double) Data.Player[index].X / 32);
+        return (int)Math.Floor((double)Data.Player[index].X / 32);
     }
 
     public static int GetPlayerY(int index)
     {
-        return (int) Math.Floor((double) Data.Player[index].Y / 32);
+        return (int)Math.Floor((double)Data.Player[index].Y / 32);
     }
 
     public static int GetPlayerRawX(int index)
@@ -152,16 +152,16 @@ public static class Command
 
     public static void SetPlayerVital(int index, Vital vital, int value)
     {
-        Data.Player[index].Vital[(int) vital] = value;
+        Data.Player[index].Vital[(int)vital] = value;
 
         if (GetPlayerVital(index, vital) > GetPlayerMaxVital(index, vital))
         {
-            Data.Player[index].Vital[(int) vital] = GetPlayerMaxVital(index, vital);
+            Data.Player[index].Vital[(int)vital] = GetPlayerMaxVital(index, vital);
         }
 
         if (GetPlayerVital(index, vital) < 0)
         {
-            Data.Player[index].Vital[(int) vital] = 0;
+            Data.Player[index].Vital[(int)vital] = 0;
         }
     }
 
@@ -170,29 +170,29 @@ public static class Command
         return dir switch
         {
             Direction.UpRight =>
-                (blockvar & (long) Math.Round(Math.Pow(2d, (double) Direction.Up))) != 0 ||
-                (blockvar & (long) Math.Round(Math.Pow(2d, (double) Direction.Right))) != 0,
+                (blockvar & (long)Math.Round(Math.Pow(2d, (double)Direction.Up))) != 0 ||
+                (blockvar & (long)Math.Round(Math.Pow(2d, (double)Direction.Right))) != 0,
 
             Direction.UpLeft =>
-                (blockvar & (long) Math.Round(Math.Pow(2d, (double) Direction.Up))) != 0 ||
-                (blockvar & (long) Math.Round(Math.Pow(2d, (double) Direction.Left))) != 0,
+                (blockvar & (long)Math.Round(Math.Pow(2d, (double)Direction.Up))) != 0 ||
+                (blockvar & (long)Math.Round(Math.Pow(2d, (double)Direction.Left))) != 0,
 
             Direction.DownRight =>
-                (blockvar & (long) Math.Round(Math.Pow(2d, (double) Direction.Down))) != 0 ||
-                (blockvar & (long) Math.Round(Math.Pow(2d, (double) Direction.Right))) != 0,
+                (blockvar & (long)Math.Round(Math.Pow(2d, (double)Direction.Down))) != 0 ||
+                (blockvar & (long)Math.Round(Math.Pow(2d, (double)Direction.Right))) != 0,
 
             Direction.DownLeft =>
-                (blockvar & (long) Math.Round(Math.Pow(2d, (double) Direction.Down))) != 0 ||
-                (blockvar & (long) Math.Round(Math.Pow(2d, (double) Direction.Left))) != 0,
+                (blockvar & (long)Math.Round(Math.Pow(2d, (double)Direction.Down))) != 0 ||
+                (blockvar & (long)Math.Round(Math.Pow(2d, (double)Direction.Left))) != 0,
 
-            _ => (blockvar & (long) Math.Round(Math.Pow(2d, (byte) dir))) != 0
+            _ => (blockvar & (long)Math.Round(Math.Pow(2d, (byte)dir))) != 0
         };
     }
 
 
     public static int GetPlayerNextLevel(int index)
     {
-        return (int) Math.Round(50d / 3d * (Math.Pow(GetPlayerLevel(index) + 1, 3d) - 6d * Math.Pow(GetPlayerLevel(index) + 1, 2d) + 17 * (GetPlayerLevel(index) + 1) - 12d));
+        return (int)Math.Round(50d / 3d * (Math.Pow(GetPlayerLevel(index) + 1, 3d) - 6d * Math.Pow(GetPlayerLevel(index) + 1, 2d) + 17 * (GetPlayerLevel(index) + 1) - 12d));
     }
 
     public static void SetPlayerGatherSkillLvl(int index, int skillSlot, int lvl)
@@ -224,7 +224,7 @@ public static class Command
 
     public static int GetSkillNextLevel(int index, int skillSlot)
     {
-        return (int) Math.Round(50d / 3d * (Math.Pow(GetPlayerGatherSkillLvl(index, skillSlot) + 1, 3d) - 6d * Math.Pow(GetPlayerGatherSkillLvl(index, skillSlot) + 1, 2d) + 17 * (GetPlayerGatherSkillLvl(index, skillSlot) + 1) - 12d));
+        return (int)Math.Round(50d / 3d * (Math.Pow(GetPlayerGatherSkillLvl(index, skillSlot) + 1, 3d) - 6d * Math.Pow(GetPlayerGatherSkillLvl(index, skillSlot) + 1, 2d) + 17 * (GetPlayerGatherSkillLvl(index, skillSlot) + 1) - 12d));
     }
 
     public static bool IsPlaying(int index)
@@ -264,17 +264,17 @@ public static class Command
 
     public static void SetPlayerJob(int index, int jobNum)
     {
-        Data.Player[index].Job = (byte) jobNum;
+        Data.Player[index].Job = (byte)jobNum;
     }
 
     public static void SetPlayerPoints(int index, int points)
     {
-        Data.Player[index].Points = (byte) points;
+        Data.Player[index].Points = (byte)points;
     }
 
     public static void SetPlayerStat(int index, Stat stat, int value)
     {
-        Data.Player[index].Stat[(int) stat] = (byte) value;
+        Data.Player[index].Stat[(int)stat] = (byte)value;
     }
 
     public static void SetPlayerInv(int index, int invSlot, int itemNum)
@@ -319,17 +319,17 @@ public static class Command
 
     public static void SetPlayerLevel(int index, int level)
     {
-        Data.Player[index].Level = (byte) level;
+        Data.Player[index].Level = (byte)level;
     }
 
     public static void SetPlayerDir(int index, int dir)
     {
-        Data.Player[index].Dir = (byte) dir;
+        Data.Player[index].Dir = (byte)dir;
     }
 
     public static void SetPlayerEquipment(int index, int itemNum, Equipment equipmentSlot)
     {
-        Data.Player[index].Equipment[(int) equipmentSlot].Num = itemNum;
+        Data.Player[index].Equipment[(int)equipmentSlot].Num = itemNum;
     }
 
     public static string IsEditorLocked(int index, EditorType id)

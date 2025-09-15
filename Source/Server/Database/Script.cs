@@ -364,7 +364,7 @@ public class Script
     {
         if (_isEquippingItem[index])
             return;
-            
+
         _isEquippingItem[index] = true;
         try
         {
@@ -665,7 +665,7 @@ public class Script
                     var casterIndex = Core.Globals.Entity.Index(entity);
 
                     // Execute the buffered skill now  that cast time elapsed
-                    CastSkill(mapNum, casterIndex, entity.SkillBuffer);    
+                    CastSkill(mapNum, casterIndex, entity.SkillBuffer);
 
                     entity.SkillBuffer = -1;
                     entity.SkillBufferTimer = 0;
@@ -800,16 +800,16 @@ public class Script
                 }
 
                 // Simplified death/spawn handling (entity is non-null here)
-                #pragma warning disable CS8602
+#pragma warning disable CS8602
                 if (vitals != null && vitals[(byte)Vital.Health] < 0 && entity.SpawnWait > 0)
                 {
                     entity.Num = 0;
                     entity.SpawnWait = General.GetTimeMs();
                     vitals[(byte)Vital.Health] = 0;
                 }
-                #pragma warning restore CS8602
+#pragma warning restore CS8602
 
-                #pragma warning disable CS8602
+#pragma warning disable CS8602
                 if (entity.Type == Core.Globals.Entity.EntityType.Npc && entity.Num == -1 && entity.SpawnSecs > 0)
                 {
                     if (tickCount > entity.SpawnWait + entity.SpawnSecs * 1000)
@@ -817,7 +817,7 @@ public class Script
                         Server.Npc.SpawnNpc(x, mapNum);
                     }
                 }
-                #pragma warning restore CS8602
+#pragma warning restore CS8602
             }
         }
 
@@ -889,7 +889,7 @@ public class Script
                     double chance = aggressive ? 0.02 : 0.05; // aggressive wander less
                     if (Random.Shared.NextDouble() < chance)
                     {
-                        byte dir = (byte)(Random.Shared.Next(0,4));
+                        byte dir = (byte)(Random.Shared.Next(0, 4));
                         if (Server.Npc.CanNpcMove(map, npcIndex, dir))
                         {
                             Server.Npc.NpcMove(map, npcIndex, dir, (int)MovementState.Walking);
@@ -1173,8 +1173,8 @@ public class Script
         var killed = ApplyDamageExtended(attacker, target, dmg, skillId);
 
         // set cooldown
-        attacker.AttackTimer = (int) now; // attacker is a snapshot; we must also update underlying store
-        UpdateUnderlyingAttackTimer(attacker, (int) now);
+        attacker.AttackTimer = (int)now; // attacker is a snapshot; we must also update underlying store
+        UpdateUnderlyingAttackTimer(attacker, (int)now);
         BroadcastAttack(attacker);
 
         // If target is an NPC and was attacked by player/NPC, make it retaliate (set chase target)
@@ -1334,17 +1334,8 @@ public class Script
         int raw = 0;
         if (attacker.Type == Entity.EntityType.Player)
         {
-            var str = SafeStat(attacker, Stat.Strength);
-            var lvl = attacker.Level;
-            var weaponId = GetEquippedItemId(attacker, Equipment.Weapon);
-            if (weaponId >= 0)
-            {
-                raw = str * 2 + Data.Item[weaponId].Data2 * 2 + lvl * 3 + (int)General.GetRandom.NextDouble(0d, 20d);
-            }
-            else
-            {
-                raw = str * 2 + lvl * 3 + (int)General.GetRandom.NextDouble(0d, 20d);
-            }
+            // Use helper to compute player's base attack power and add a small random roll
+            raw = GetPlayerDamage(attacker.Id) + (int)General.GetRandom.NextDouble(0d, 20d);
         }
         else // NPC
         {
@@ -1366,8 +1357,8 @@ public class Script
         int mitigation = 0;
         if (target.Type == Entity.EntityType.Player)
         {
-            mitigation += SafeStat(target, Stat.Spirit) * 2 + target.Level * 3;
-            mitigation += SumArmor(target);
+            // Use helper to compute player's total protection
+            mitigation += GetPlayerProtection(target.Id);
         }
         else if (target.Type == Entity.EntityType.Npc)
         {
@@ -1408,6 +1399,46 @@ public class Script
 
         result.Mitigated = mitigated;
         return result;
+    }
+
+    // Classic-style helpers for computing player offensive and defensive power
+    private int GetPlayerDamage(int playerId)
+    {
+        if (playerId < 0 || playerId >= Data.Player.Length) return 0;
+        int str = GetPlayerStat(playerId, Stat.Strength);
+        int lvl = GetPlayerLevel(playerId);
+        int weaponId = GetPlayerEquipment(playerId, Equipment.Weapon);
+        int weaponPower = (weaponId >= 0 && weaponId < Data.Item.Length) ? Data.Item[weaponId].Data2 : 0;
+        // Keep formula aligned with prior CalculateDamage logic (without RNG)
+        int baseDamage = str * 2 + weaponPower * 2 + lvl * 3;
+        return Math.Max(0, baseDamage);
+    }
+
+    private int GetPlayerProtection(int playerId)
+    {
+        if (playerId < 0 || playerId >= Data.Player.Length) return 0;
+        int spirit = GetPlayerStat(playerId, Stat.Spirit);
+        int lvl = GetPlayerLevel(playerId);
+        int armor = GetPlayerDefense(playerId);
+        int prot = spirit * 2 + lvl * 3 + armor;
+        return Math.Max(0, prot);
+    }
+
+    private int GetPlayerDefense(int playerId)
+    {
+        if (playerId < 0 || playerId >= Data.Player.Length) return 0;
+        int total = 0;
+        var equip = Data.Player[playerId].Equipment;
+        if (equip == null) return 0;
+        for (int i = 0; i < equip.Length; i++)
+        {
+            int itemNum = equip[i].Num;
+            if (itemNum >= 0 && itemNum < Data.Item.Length)
+            {
+                total += Data.Item[itemNum].Data2;
+            }
+        }
+        return total / 6;
     }
 
     private int SafeStat(Entity e, Stat stat)
@@ -1563,7 +1594,7 @@ public class Script
         FinalizeCast(mapNum, caster, skillId, playerSkillSlot);
     }
 
-    private Entity ResolveTargetEntity(int mapNum, Entity caster)
+    private Entity? ResolveTargetEntity(int mapNum, Entity caster)
     {
         if (caster.TargetType == (byte)TargetType.Player)
         {
@@ -1588,7 +1619,7 @@ public class Script
         return null;
     }
 
-    private void HandleProjectileSkill(int mapNum, Entity caster, int skillId, Entity target)
+    private void HandleProjectileSkill(int mapNum, Entity caster, int skillId, Entity? target)
     {
         if (target != null) AttemptAttack(caster, target, skillId);
     }
@@ -1636,7 +1667,7 @@ public class Script
         ApplyAoE(mapNum, caster, skillId, caster.X / 32, caster.Y / 32);
     }
 
-    private void HandleTargetedSkill(int mapNum, Entity caster, int skillId, Entity target)
+    private void HandleTargetedSkill(int mapNum, Entity caster, int skillId, Entity? target)
     {
         if (target == null) return;
         AttemptAttack(caster, target, skillId);
@@ -1649,7 +1680,7 @@ public class Script
         PlaySkillAnimation(mapNum, caster, skillId, target);
     }
 
-    private void HandleTargetedAoESkill(int mapNum, Entity caster, int skillId, Entity target)
+    private void HandleTargetedAoESkill(int mapNum, Entity caster, int skillId, Entity? target)
     {
         int centerX = (target != null ? target.X : caster.X) / 32;
         int centerY = (target != null ? target.Y : caster.Y) / 32;
