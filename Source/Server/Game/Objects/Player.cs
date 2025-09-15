@@ -146,7 +146,7 @@ public static class Player
         // Check for subscript out of range
         var count = System.Enum.GetValues(typeof(MovementState)).Length;
         var count2 = System.Enum.GetValues(typeof(Direction)).Length;
-		if (dir < (int) Direction.Up || dir > count2 || movement < 0 || movement > count)
+        if (dir < 0 || dir > count2 || movement < 0 || movement > count)
         {
             return;
         }
@@ -498,8 +498,8 @@ public static class Player
         }
         
         Data.Player[playerId].IsMoving = true;
-        
         NetworkSend.SendPlayerXYToMap(playerId);
+
         try
         {
             Script.Instance?.PlayerMove(playerId);

@@ -534,15 +534,15 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var tmpX = buffer.ReadInt32();
         var tmpY = buffer.ReadInt32();
 
+        if (tmpX != GetPlayerRawX(session.Id) || tmpY != GetPlayerRawY(session.Id))
+        {
+            // Desync detected, correct client
+            NetworkSend.SendPlayerXYToMap(session.Id);
+            return;
+        }
+
         SetPlayerDir(session.Id, dir);
         Data.Player[session.Id].Moving = movement;
-        // Mark pixel movement active if movement > 0
-        if (movement > 0)
-        {
-            Data.Player[session.Id].IsMoving = true;
-            // Immediate broadcast so others start interpolation promptly
-            NetworkSend.SendPlayerXYToMap(session.Id);
-        }
     }
 
     public static void Packet_StopPlayerMove(GameSession session, ReadOnlyMemory<byte> bytes)
