@@ -6,10 +6,8 @@ public static class Constant
     public const byte MaxBank = 90;
     public const byte MaxJobs = 3;
     public const byte MaxMorals = 50;
-    public const int MaxCots = 30;
     public const byte MaxInv = 35;
     public const int MaxItems = 500;
-    public const byte MaxLevel = 99;
     public const int MaxMaps = 1000;
     public const byte MaxMapItems = 255;
     public const byte MaxMapNpcs = 30;

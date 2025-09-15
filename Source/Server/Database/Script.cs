@@ -49,6 +49,12 @@ public class Script
     private const long ItemDespawnTime = 90000L; // 1:30 seconds
 
     private const byte StatPerLevel = 5;
+    private const byte MaxLevel = 99;
+
+    public int GetPlayerMaxLevel()
+    {
+        return MaxLevel;
+    }
 
     public void Loop()
     {
@@ -805,7 +811,7 @@ public class Script
                 }
 
                 // Simplified death/spawn handling (entity is non-null here)
-#pragma warning disable CS8602
+                #pragma warning disable CS8602
                 if (vitals != null && vitals[(byte)Vital.Health] < 0 && entity.SpawnWait > 0)
                 {
                     entity.Num = 0;

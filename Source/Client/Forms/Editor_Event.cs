@@ -1512,7 +1512,7 @@ namespace Client
                     cmbChangeItemIndex.Items.Add(Data.Item[i].Name);
                 cmbChangeItemIndex.SelectedIndex = 0;
                 nudChangeLevel.MinValue = 1;
-                nudChangeLevel.MaxValue = Constant.MaxLevel;
+                nudChangeLevel.MaxValue = GameState.MaxLevel;
                 nudChangeLevel.Value = 1;
                 cmbChangeSkills.Items.Clear();
 

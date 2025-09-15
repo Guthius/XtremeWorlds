@@ -119,6 +119,7 @@ public static class NetworkSend
 
         packetWriter.WriteEnum(ServerPackets.SPlayerExp);
         packetWriter.WriteInt32(playerId);
+        packetWriter.WriteInt32(Script.Instance?.GetPlayerMaxLevel());
         packetWriter.WriteInt32(GetPlayerExp(playerId));
         packetWriter.WriteInt32(Script.Instance?.GetPlayerNextLevel(playerId));
 

@@ -135,6 +135,7 @@ namespace Client
         public static int SkillBufferTimer;
         public static int StunDuration;
         public static int NextlevelExp;
+        public static int MaxLevel;
 
         // Stops movement when updating a map
         public static bool CanMoveNow;

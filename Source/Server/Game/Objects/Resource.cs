@@ -86,7 +86,7 @@ public static class Resource
     {
         var levels = 0;
 
-        if (GetPlayerGatherSkillLvl(playerId, skillSlot) == Core.Globals.Constant.MaxLevel)
+        if (GetPlayerGatherSkillLvl(playerId, skillSlot) == Script.Instance?.MaxLevel)
         {
             return;
         }

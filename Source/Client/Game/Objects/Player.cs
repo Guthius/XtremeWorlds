@@ -1237,15 +1237,18 @@ namespace Client
             int index;
             int tnl;
             var buffer = new PacketReader(data);
+            int maxLevel = 0;
 
             index = buffer.ReadInt32();
+            maxLevel = buffer.ReadInt32();
+            GameState.MaxLevel = maxLevel;
             SetPlayerExp(index, buffer.ReadInt32());
 
             tnl = buffer.ReadInt32();
             GameState.NextlevelExp = tnl;
 
             // set max width
-            if (GetPlayerLevel(GameState.MyIndex) < Constant.MaxLevel)
+            if (GetPlayerLevel(GameState.MyIndex) < GameState.MaxLevel)
             {
                 if (GetPlayerExp(GameState.MyIndex) > 0)
                 {
