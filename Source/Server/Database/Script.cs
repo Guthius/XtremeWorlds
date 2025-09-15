@@ -1338,7 +1338,7 @@ public class Script
         return player.Equipment[slot].Num;
     }
 
-    private DamageResult CalculateDamage(Entity attacker, Entity target, int? skillId)
+    private DamageResult CalculateDamage(Entity attacker, Entity target, int? skillId = -1)
     {
         var result = new DamageResult();
 
@@ -1346,7 +1346,7 @@ public class Script
         int raw = 0;
         if (attacker.Type == Entity.EntityType.Player)
         {
-            raw = GetPlayerDamage(attacker.Id);
+            raw = GetPlayerDamage(attacker.Id, skillId);
         }
         else // NPC
         {
@@ -1403,15 +1403,19 @@ public class Script
         return result;
     }
 
-    private int GetPlayerDamage(int playerId)
+    private int GetPlayerDamage(int playerId, int skillId)
     {
         if (playerId < 0 || playerId >= Data.Player.Length) return 0;
-        int str = GetPlayerStat(playerId, Stat.Strength) / 2;
-        int lvl = GetPlayerLevel(playerId);
+        int power = 0;
+        if (skillId >= 0)
+            power = GetPlayerStat(playerId, Stat.Intelligence) / 2;
+        else
+            power = GetPlayerStat(playerId, Stat.Strength) / 2;
+
         int weaponId = GetPlayerEquipment(playerId, Equipment.Weapon);
         int weaponPower = (weaponId >= 0 && weaponId < Data.Item.Length) ? Data.Item[weaponId].Data2 : 0;
         // Keep formula aligned with prior CalculateDamage logic (without RNG)
-        int baseDamage = str + weaponPower;
+        int baseDamage = power + weaponPower;
         return Math.Max(0, baseDamage);
     }
 
