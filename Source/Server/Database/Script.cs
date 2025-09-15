@@ -956,7 +956,7 @@ public class Script
         }
 
         // Group vital regeneration executed after NPC AI loop (wrapped for script safety)
-        RunRegen();
+        RegenVitals();
     }
 
     public void CheckPlayerLevelUp(int index)
@@ -992,7 +992,7 @@ public class Script
         }
     }
 
-    public void RunRegen()
+    public void RegenVitals()
     {
         long now = General.GetTimeMs();
         bool doNpc = now - _lastNpcRegen >= NpcRegenIntervalMs;
@@ -1014,7 +1014,7 @@ public class Script
                 int curHp = e.Vital[(byte)Vital.Health];
                 if (curHp > 0 && curHp < maxHp)
                 {
-                    int amount = Math.Max(1, Data.Npc[e.Num].Stat[(byte)Stat.Vitality] / 3);
+                    int amount = Math.Max(1, Data.Npc[e.Num].Stat[(byte)Stat.Vitality] / 2);
                     e.Vital[(byte)Vital.Health] = Math.Min(maxHp, curHp + amount);
                     Server.Npc.SendMapNpcVitals(e.Map, (byte)Core.Globals.Entity.Index(e));
                 }
@@ -1024,12 +1024,23 @@ public class Script
                     int curMana = e.Vital[(byte)Vital.Mana];
                     if (curMana < maxMana)
                     {
-                        int amount = Math.Max(1, Data.Npc[e.Num].Stat[(byte)Stat.Intelligence] / 3);
+                        int amount = Math.Max(1, Data.Npc[e.Num].Stat[(byte)Stat.Intelligence] / 2);
                         e.Vital[(byte)Vital.Mana] = Math.Min(maxMana, curMana + amount);
                         Server.Npc.SendMapNpcVitals(e.Map, (byte)Core.Globals.Entity.Index(e));
                     }
                 }
-            }
+
+                int maxStam = GameLogic.GetNpcMaxVital(e.Num, Vital.Stamina);
+                if (maxStam > 0)
+                {
+                    uint curStam = (uint)e.Vital[(byte)Vital.Stamina];
+                    if (curStam < maxStam)
+                    {
+                        uint amount = Math.Max(1, (uint)Data.Npc[e.Num].Stat[(byte)Stat.Spirit] / 2);
+                        e.Vital[(byte)Vital.Stamina] = (int)Math.Min(maxStam, curStam + amount);
+                        Server.Npc.SendMapNpcVitals(e.Map, (byte)Core.Globals.Entity.Index(e));
+                    }
+                }
         }
 
         if (doPlayer)
@@ -1042,7 +1053,7 @@ public class Script
                 int hpCur = GetPlayerVital(id, Vital.Health);
                 if (hpCur > 0 && hpCur < hpMax)
                 {
-                    int amount = Math.Max(1, GetPlayerStat(id, Stat.Vitality) / 3);
+                    int amount = Math.Max(1, GetPlayerStat(id, Stat.Vitality) / 2);
                     SetPlayerVital(id, Vital.Health, Math.Min(hpMax, hpCur + amount));
                     NetworkSend.SendVital(id, Vital.Health);
                 }
@@ -1050,7 +1061,7 @@ public class Script
                 int manaCur = GetPlayerVital(id, Vital.Mana);
                 if (manaCur < manaMax)
                 {
-                    int amount = Math.Max(1, GetPlayerStat(id, Stat.Spirit) / 4);
+                    int amount = Math.Max(1, GetPlayerStat(id, Stat.Intelligence) / 2);
                     SetPlayerVital(id, Vital.Mana, Math.Min(manaMax, manaCur + amount));
                     NetworkSend.SendVital(id, Vital.Mana);
                 }
