@@ -1680,7 +1680,7 @@ namespace Client
                     {
                         AddDescInfo("Projectile", Microsoft.Xna.Framework.Color.White);
                         break;
-                    }     
+                    }
             }
 
             // more info

@@ -3238,7 +3238,7 @@ namespace Client
                     if (Animation.AnimInstance?[i].Used[0] == true)
                     {
                         Animation.Draw(i, 0);
-                    }              
+                    }         
                 }
             }
 
@@ -3372,7 +3372,7 @@ namespace Client
                         {
                             Animation.Draw(i, 1);
                         }
-                    }            
+                    }       
             }
 
             if (GameState.NumProjectiles > 0)

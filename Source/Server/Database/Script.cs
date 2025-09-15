@@ -1041,6 +1041,7 @@ public class Script
                         Server.Npc.SendMapNpcVitals(e.Map, (byte)Core.Globals.Entity.Index(e));
                     }
                 }
+            }
         }
 
         if (doPlayer)
