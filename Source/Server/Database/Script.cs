@@ -1387,10 +1387,21 @@ public class Script
         // Critical only if attack not fully avoided
         if (!result.Dodge && !result.Parry && !result.Block)
         {
-            result.Crit = Roll(SafeStat(attacker, Stat.Strength) / 3);
-            if (result.Crit)
+            if (skillId >= 0)
             {
-                mitigated = (int)Math.Round(mitigated * 1.5);
+                result.Crit = Roll(SafeStat(attacker, Stat.Intelligence) / 5);
+                if (result.Crit)
+                {
+                    mitigated = (int)Math.Round(mitigated * 1.5);
+                }
+            }
+            else
+            {
+                result.Crit = Roll(SafeStat(attacker, Stat.Strength) / 2);
+                if (result.Crit)
+                {
+                    mitigated = (int)Math.Round(mitigated * 1.5);
+                }
             }
         }
 
@@ -1403,7 +1414,7 @@ public class Script
         return result;
     }
 
-    private int GetPlayerDamage(int playerId, int skillId)
+    private int GetPlayerDamage(int playerId, int? skillId)
     {
         if (playerId < 0 || playerId >= Data.Player.Length) return 0;
         int power = 0;
