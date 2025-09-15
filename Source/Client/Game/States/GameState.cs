@@ -64,12 +64,12 @@ namespace Client
         public static byte CharNum;
 
         // elastic bars
-        public static int[] BarWidthNpcHp = new int[Constant.MaxMapNpcs];
-        public static int[] BarWidthPlayerHp = new int[Constant.MaxPlayers];
-        public static int[] BarWidthPlayerSp = new int[Constant.MaxPlayers];
-        public static int[] BarWidthNpcHpMax = new int[Constant.MaxMapNpcs];
-        public static int[] BarWidthPlayerHpMax = new int[Constant.MaxPlayers];
-        public static int[] BarWidthPlayerSpMax = new int[Constant.MaxPlayers];
+        public static int[] BarWidthNpcHP = new int[Constant.MaxMapNpcs];
+        public static int[] BarWidthPlayerHP = new int[Constant.MaxPlayers];
+        public static int[] BarWidthPlayerMP = new int[Constant.MaxPlayers];
+        public static int[] BarWidthNpcHPMax = new int[Constant.MaxMapNpcs];
+        public static int[] BarWidthPlayerHPMax = new int[Constant.MaxPlayers];
+        public static int[] BarWidthPlayerMPMax = new int[Constant.MaxPlayers];
         public static int BarWidthGuiHP;
         public static int BarWidthGuiMP;
         public static int BarWidthGuiSP;

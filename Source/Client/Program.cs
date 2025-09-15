@@ -2150,7 +2150,7 @@ namespace Client
 
                         // calculate the width to fill
                         if (width > 0)
-                            GameState.BarWidthNpcHpMax[(int) i] = (int) Math.Round(
+                            GameState.BarWidthNpcHPMax[(int) i] = (int) Math.Round(
                                 Data.MyMapNpc[(int) i].Vital[(int) Vital.Health] / (double) width /
                                 (Data.Npc[(int) npcNum].Hp / (double) width) * width);
 
@@ -2166,8 +2166,8 @@ namespace Client
                         left = 0L;
                         string argPath1 = Path.Combine(DataPath.Misc, "Bars");
                         RenderTexture(ref argPath1, GameLogic.ConvertMapX((int) tmpX), GameLogic.ConvertMapY((int) tmpY),
-                            (int) left, (int) top, (int) GameState.BarWidthNpcHp[(int) i], (int) height,
-                            (int) GameState.BarWidthNpcHp[(int) i], (int) height);
+                            (int) left, (int) top, (int) GameState.BarWidthNpcHP[(int) i], (int) height,
+                            (int) GameState.BarWidthNpcHP[(int) i], (int) height);
                     }
                 }
             }
@@ -2186,7 +2186,7 @@ namespace Client
 
                         // calculate the width to fill
                         if (width > 0)
-                            GameState.BarWidthPlayerHpMax[(int) i] = (int) Math.Round(
+                            GameState.BarWidthPlayerHPMax[(int) i] = (int) Math.Round(
                                 GetPlayerVital((int) i, Vital.Health) / (double) width /
                                 (GetPlayerMaxVital((int) i, Vital.Health) / (double) width) * width);
 
@@ -2202,8 +2202,8 @@ namespace Client
                         left = 0L;
                         string argPath3 = Path.Combine(DataPath.Misc, "Bars");
                         RenderTexture(ref argPath3, GameLogic.ConvertMapX((int) tmpX), GameLogic.ConvertMapY((int) tmpY),
-                            (int) left, (int) top, (int) GameState.BarWidthPlayerHp[(int) i], (int) height,
-                            (int) GameState.BarWidthPlayerHp[(int) i], (int) height);
+                            (int) left, (int) top, (int) GameState.BarWidthPlayerHP[(int) i], (int) height,
+                            (int) GameState.BarWidthPlayerHP[(int) i], (int) height);
                     }
 
                     if (GetPlayerVital((int) i, Vital.Stamina) > 0 &
@@ -2216,9 +2216,9 @@ namespace Client
 
                         // calculate the width to fill
                         if (width > 0)
-                            GameState.BarWidthPlayerSpMax[(int) i] = (int) Math.Round(
-                                GetPlayerVital((int) i, Vital.Stamina) / (double) width /
-                                (GetPlayerMaxVital((int) i, Vital.Stamina) / (double) width) * width);
+                            GameState.BarWidthPlayerMPMax[(int) i] = (int) Math.Round(
+                                GetPlayerVital((int) i, Vital.Mana) / (double) width /
+                                (GetPlayerMaxVital((int) i, Vital.Mana) / (double) width) * width);
 
                         // draw bar background
                         top = height * 3L; // SP bar background
@@ -2228,12 +2228,12 @@ namespace Client
                             (int) left, (int) top, (int) width, (int) height, (int) width, (int) height);
 
                         // draw the bar proper
-                        top = height * 1L; // SP bar
+                        top = height * 1L; // MP bar
                         left = 0L;
                         string argPath5 = Path.Combine(DataPath.Misc, "Bars");
                         RenderTexture(ref argPath5, GameLogic.ConvertMapX((int) tmpX), GameLogic.ConvertMapY((int) tmpY),
-                            (int) left, (int) top, (int) GameState.BarWidthPlayerSp[(int) i], (int) height,
-                            (int) GameState.BarWidthPlayerSp[(int) i], (int) height);
+                            (int) left, (int) top, (int) GameState.BarWidthPlayerMP[(int) i], (int) height,
+                            (int) GameState.BarWidthPlayerMP[(int) i], (int) height);
                     }
 
                     if (GameState.SkillBuffer >= 0)

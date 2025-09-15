@@ -325,7 +325,7 @@ namespace Client
                     {
                         if (Data.MyMapNpc[_i].Num >= 0)
                         {
-                            GameLogic.SetBarWidth(ref GameState.BarWidthNpcHpMax[_i], ref GameState.BarWidthNpcHp[_i]);
+                            GameLogic.SetBarWidth(ref GameState.BarWidthPlayerHPMax[_i], ref GameState.BarWidthPlayerHP[_i]);
                         }
                     }
 
@@ -333,8 +333,8 @@ namespace Client
                     {
                         if (IsPlaying(_i) & GetPlayerMap(_i) == GetPlayerMap(GameState.MyIndex))
                         {
-                            GameLogic.SetBarWidth(ref GameState.BarWidthPlayerHpMax[_i], ref GameState.BarWidthPlayerHp[_i]);
-                            GameLogic.SetBarWidth(ref GameState.BarWidthPlayerSpMax[_i], ref GameState.BarWidthPlayerSp[_i]);
+                            GameLogic.SetBarWidth(ref GameState.BarWidthPlayerHPMax[_i], ref GameState.BarWidthPlayerHP[_i]);
+                            GameLogic.SetBarWidth(ref GameState.BarWidthPlayerMPMax[_i], ref GameState.BarWidthPlayerMP[_i]);
                         }
                     }
 
