@@ -411,6 +411,10 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                 // Ensure account loading completes before proceeding
                 NetworkConfig.LoadAccount(session, Data.Account[session.Id].Login, slot).Wait();
             }
+            else
+            {
+                NetworkSend.AlertMsg(session, SystemMessage.Connection, Menu.Login);
+            }
         }
         else
         {
