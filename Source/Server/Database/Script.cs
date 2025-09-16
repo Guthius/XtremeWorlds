@@ -530,7 +530,7 @@ public class Script
 
     }
 
-    public void OnDeath(int index)
+    public void OnPlayerDeath(int index)
     {
         // Set HP to nothing
         SetPlayerVital(index, Vital.Health, 0);
@@ -1161,7 +1161,7 @@ public class Script
             }
 
             NetworkSend.GlobalMsg(GetPlayerName(target.Id) + " was slain by " + GetEntityDisplayName(attacker) + ".");
-            OnDeath(target.Id);
+            OnPlayerDeath(target.Id);
 
         }
         else if (target.Type == Entity.EntityType.Npc)
@@ -1178,8 +1178,38 @@ public class Script
                 mapNpc.Num = -1; // dead state
                 mapNpc.SpawnWait = (int)General.GetTimeMs();
                 mapNpc.Vital[(int)Vital.Health] = 0;
+
                 // Broadcast vitals zero + maybe a death animation hook here future
                 Server.Npc.SendMapNpcVitals(map, (byte)mapNpcNum);
+
+                // clear targets
+                ref var mapNpcTarget = ref Data.MapNpc[map].Npc[mapNpc.Target];
+                mapNpcTarget.Target = -1;
+                mapNpcTarget.TargetType = 0;
+
+                for (int i = 0; i < Constant.MaxMapNpcs; i++)
+                {
+                    if (Data.MapNpc[map].Npc[i].TargetType == (byte)TargetType.Npc & Data.MapNpc[map].Npc[i].Target == mapNpc.Target)
+                    {
+                        Data.MapNpc[map].Npc[i].TargetType = 0;
+                        Data.MapNpc[map].Npc[i].Target = -1;
+                    }
+                }
+
+                foreach (var player in PlayerService.Instance.Players)
+                {
+                    if (IsPlaying(player.Id))
+                    {
+                        if (GetPlayerMap(player.Id) == map)
+                        {
+                            if (Data.TempPlayer[player.Id].TargetType == (byte)TargetType.Npc & Data.TempPlayer[player.Id].Target == mapNpc.Target)
+                            {
+                                Data.TempPlayer[player.Id].TargetType = 0;
+                                Data.TempPlayer[player.Id].Target = -1;
+                            }
+                        }
+                    }
+                }
 
                 // Grant exp to attacker if player
                 if (attacker.Type == Entity.EntityType.Player && mapNpc.Num == -1)
