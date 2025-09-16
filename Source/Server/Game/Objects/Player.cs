@@ -876,8 +876,8 @@ public static class Player
             mapItem.X = GetPlayerX(playerId);
             mapItem.Y = GetPlayerY(playerId);
             mapItem.PlayerName = GetPlayerName(playerId);
-            mapItem.PlayerTimer = General.GetTimeMs() + Script.Instance?.ItemSpawnTime;
-            mapItem.DespawnTimer = General.GetTimeMs() + Script.Instance?.ItemDespawnTime;
+            mapItem.PlayerTimer = General.GetTimeMs() + Script.Instance?.ItemSpawnTimeMs();
+            mapItem.DespawnTimer = General.GetTimeMs() + Script.Instance?.ItemDespawnTimeMs();
             mapItem.CanDespawn = true;
 
             try

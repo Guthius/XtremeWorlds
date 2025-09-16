@@ -51,6 +51,16 @@ public class Script
     private const byte StatPerLevel = 5;
     private const byte MaxLevel = 99;
 
+    public long ItemDespawnTimeMs()
+    {
+        return ItemDespawnTime;
+    }
+
+    public long ItemSpawnTimeMs()
+    {
+        return ItemSpawnTime;
+    }
+
     public int GetPlayerMaxLevel()
     {
         return MaxLevel;
