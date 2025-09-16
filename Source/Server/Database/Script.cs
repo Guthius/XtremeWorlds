@@ -551,6 +551,19 @@ public class Script
         // Warp player away
         SetPlayerDir(index, (byte)Direction.Down);
 
+        // clear targets
+        Data.TempPlayer[index].Target = -1;
+        Data.TempPlayer[index].TargetType = 0;
+
+        for (int i = 0; i <= Constant.MaxMapNpcs - 1; i++)
+        {
+            if (Data.MapNpc[GetPlayerMap(index)].Npc[i].TargetType == (byte)TargetType.Player & Data.MapNpc[GetPlayerMap(index)].Npc[i].Target == index)
+            {
+                Data.MapNpc[GetPlayerMap(index)].Npc[i].TargetType = 0;
+                Data.MapNpc[GetPlayerMap(index)].Npc[i].Target = -1;
+            }
+        }
+
         // to the bootmap if it is set
         if (withBlock.BootMap > 0)
         {
