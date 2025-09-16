@@ -1014,7 +1014,7 @@ namespace Client
                 }
                 else
                 {
-                    withBlock.Shop = 0;
+                    withBlock.Shop = -1;
                 }
 
                 withBlock.Up = (int)Math.Round(Conversion.Val(Instance.txtUp.Text));
@@ -1583,6 +1583,7 @@ namespace Client
 
             // find the shop we have set
             Instance.lstShop.Items.Clear();
+            Instance.lstShop.Items.Add("None");
 
             for (i = 0; i < Constant.MaxShops; i++)
                 Instance.lstShop.Items.Add(Data.Shop[i].Name);
@@ -1594,7 +1595,7 @@ namespace Client
             {
                 if ((Instance.lstShop.Items[i].ToString() ?? "") == (Data.Shop[Data.MyMap.Shop].Name ?? ""))
                 {
-                    Instance.lstShop.SelectedIndex = i;
+                    Instance.lstShop.SelectedIndex = i - 1;
                     break;
                 }
             }

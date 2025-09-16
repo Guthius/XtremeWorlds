@@ -10,6 +10,7 @@ using Core.Globals;
 using Core.Net;
 using static Core.Globals.Command;
 using Type = Core.Globals.Type;
+using Serilog.Parsing;
 
 namespace Server.Game.Net;
 
@@ -1243,7 +1244,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             if (!string.IsNullOrEmpty(Data.Shop[Data.Map[GetPlayerMap(session.Id)].Shop].Name))
             {
                 Data.TempPlayer[session.Id].InShop = Data.Map[GetPlayerMap(session.Id)].Shop;
-                NetworkSend.SendOpenShop(session.Id, Data.Map[GetPlayerMap(session.Id)].Shop);
+                NetworkSend.SendOpenShop(session.Id, (int)Data.TempPlayer[session.Id].InShop);
             }
         }
 
