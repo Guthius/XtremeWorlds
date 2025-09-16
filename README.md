@@ -10,7 +10,7 @@ A simple 2D MMORPG game engine written in C# (.NET 9.0).
 
 Based on the Orion+ conversion and MirageBasic frameworks.
 
-Game assets such as character base are only permitted to use in XtremeWOrlds Worlds.
+Game assets such as character base are only permitted to use in XtremeWorlds.
 
 ## Overview
 
