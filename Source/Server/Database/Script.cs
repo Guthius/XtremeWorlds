@@ -555,7 +555,22 @@ public class Script
         Data.TempPlayer[index].Target = -1;
         Data.TempPlayer[index].TargetType = 0;
 
-        for (int i = 0; i <= Constant.MaxMapNpcs - 1; i++)
+        foreach (var player in PlayerService.Instance.Players)
+        {
+            if (IsPlaying(player.Id))
+            {
+                if (GetPlayerMap(player.Id) == GetPlayerMap(index))
+                {
+                    if (Data.TempPlayer[player.Id].TargetType == (byte)TargetType.Player & Data.TempPlayer[player.Id].Target == index)
+                    {
+                        Data.TempPlayer[player.Id].TargetType = 0;
+                        Data.TempPlayer[player.Id].Target = -1;
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < Constant.MaxMapNpcs; i++)
         {
             if (Data.MapNpc[GetPlayerMap(index)].Npc[i].TargetType == (byte)TargetType.Player & Data.MapNpc[GetPlayerMap(index)].Npc[i].Target == index)
             {
