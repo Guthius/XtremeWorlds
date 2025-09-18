@@ -3821,46 +3821,41 @@ namespace Client
 
         public static void ProcessEventMovement(int id)
         {
+            // Guard: ensure event system and target index are valid
+            if (id < 0) return;
+
+            if (Data.MapEvents == null) return;
+            if (id >= Data.MyMap.EventCount) return;
+            if (id >= Data.MapEvents.Length) return;
+
+            // Some events may be uninitialized structs (default). We can skip if MovementSpeed == 0 and name null/empty and not moving.
+            if (Data.MapEvents[id].Moving != 1) return;
+
             if (GameState.MyEditorType == EditorType.Map)
                 return;
-
-            if (id >= Data.MyMap.EventCount)
-                return;
-
-            if (id >= Data.MapEvents.Length)
-                return;
-
-            if (Data.MapEvents[id].Moving == 1)
+                
+            // Only process if actually moving toward next tile
+            if (Data.MapEvents[id].Moving > 0)
             {
-                // Check if completed walking over to the next tile
-                if (Data.MapEvents[id].Moving > 0)
+                int dir = Data.MapEvents[id].Dir;
+                // Adjust position when heading Right or Down first (mimicking original intent)
+                if (dir == (int)Direction.Right || dir == (int)Direction.Down ||
+                    dir == (int)Direction.Left || dir == (int)Direction.Up)
                 {
-                    if (Data.MapEvents[id].Dir == (int) Direction.Right | Data.MapEvents[id].Dir == (int) Direction.Down)
+                    switch (dir)
                     {
-                        switch (Data.MapEvents[(int) id].Dir)
-                        {
-                            case (int) Direction.Up:
-                            {
-                                Data.MapEvents[(int) id].Y = (byte) (Data.MapEvents[(int) id].Y - 1);
-
-                                break;
-                            }
-                            case (int) Direction.Down:
-                            {
-                                Data.MapEvents[(int) id].Y = (byte) (Data.MapEvents[(int) id].Y + 1);
-                                break;
-                            }
-                            case (int) Direction.Left:
-                            {
-                                Data.MapEvents[(int) id].X = (byte) (Data.MapEvents[(int) id].X - 1);
-                                break;
-                            }
-                            case (int) Direction.Right:
-                            {
-                                Data.MyMapNpc[(int) id].X = (byte) (Data.MyMapNpc[(int) id].X + 1);
-                                break;
-                            }
-                        }
+                        case (int)Direction.Up:
+                            Data.MapEvents[id].Y = (byte)Math.Max(0, Data.MapEvents[id].Y - 1);
+                            break;
+                        case (int)Direction.Down:
+                            Data.MapEvents[id].Y = (byte)Math.Min(byte.MaxValue, Data.MapEvents[id].Y + 1);
+                            break;
+                        case (int)Direction.Left:
+                            Data.MapEvents[id].X = (byte)Math.Max(0, Data.MapEvents[id].X - 1);
+                            break;
+                        case (int)Direction.Right:
+                            Data.MapEvents[id].X = (byte)Math.Min(byte.MaxValue, Data.MapEvents[id].X + 1);
+                            break;
                     }
                 }
             }
