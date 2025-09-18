@@ -345,7 +345,7 @@ namespace Client
                     Spacing = 4,
                     Items =
                     {
-                        new Label{ Text = "NPCs", Font = SystemFonts.Bold(12)},
+                        new Label{ Text = "Npcs", Font = SystemFonts.Bold(12)},
                         new StackLayoutItem(lstIndex, expand: true)
                     }
                 },
