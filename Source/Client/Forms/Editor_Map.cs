@@ -1008,7 +1008,7 @@ namespace Client
                     withBlock.Music = "";
                 }
 
-                if (Instance.lstShop.SelectedIndex >= 0)
+                if (Instance.lstShop.SelectedIndex > 0)
                 {
                     withBlock.Shop = Instance.lstShop.SelectedIndex;
                 }
