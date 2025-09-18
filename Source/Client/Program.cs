@@ -45,6 +45,7 @@ namespace Client
             {
                 return (int)dir % rows; // enum expected to align with ordering
             }
+            
             // 4-direction fallback mapping: Down, Right, Left, Up
             switch (dir)
             {
@@ -1107,7 +1108,6 @@ namespace Client
             {
                 // Check for movement keys
                 UpdateMovementKeys();
-
                 HandleHotbarInput();
 
                 // Exit if escape menu is open

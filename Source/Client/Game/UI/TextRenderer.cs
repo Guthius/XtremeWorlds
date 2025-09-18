@@ -633,8 +633,8 @@ public static class TextRenderer
         var name = Data.Player[index].Name;
 
         // calc pos
-        var textX = GameLogic.ConvertMapX(GetPlayerRawX(index)) + 8;
-        textX = (int) Math.Round(textX - GetTextWidth(name) / 6d);
+        var textX = GameLogic.ConvertMapX(GetPlayerRawX(index)) + 2;
+        textX = (int) Math.Round(textX + GetTextWidth(name) / 6d);
 
         int spriteNum = GetPlayerSprite(index);
         if (spriteNum <= 0 || spriteNum > GameState.NumCharacters)
