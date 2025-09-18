@@ -1122,50 +1122,57 @@ namespace Client
 
         private static bool CheckTileMatch(int layerNum, int x1, int y1, int x2, int y2)
         {
-            bool checkTileMatch = default;
-            checkTileMatch = true;
-
-            // if it's off the map then set it as autotile and exit out early
-            if (x2 < 0 | x2 > Data.MyMap.MaxX | y2 < 0 | y2 > Data.MyMap.MaxY)
+            try
             {
+                bool checkTileMatch = default;
                 checkTileMatch = true;
-                return checkTileMatch;
-            }
 
-            // fakes ALWAYS return true
-            if (Data.MyMap.Tile[x2, y2].Layer[layerNum].AutoTile == GameState.AutotileFake)
-            {
-                checkTileMatch = true;
-                return checkTileMatch;
-            }
+                // if it's off the map then set it as autotile and exit out early
+                if (x2 < 0 | x2 > Data.MyMap.MaxX | y2 < 0 | y2 > Data.MyMap.MaxY)
+                {
+                    checkTileMatch = true;
+                    return checkTileMatch;
+                }
 
-            // check neighbour is an autotile
-            if (Data.MyMap.Tile[x2, y2].Layer[layerNum].AutoTile == 0)
-            {
-                checkTileMatch = false;
-                return checkTileMatch;
-            }
+                // fakes ALWAYS return true
+                if (Data.MyMap.Tile[x2, y2].Layer[layerNum].AutoTile == GameState.AutotileFake)
+                {
+                    checkTileMatch = true;
+                    return checkTileMatch;
+                }
 
-            // check we're a matching
-            if (Data.MyMap.Tile[x1, y1].Layer[layerNum].Tileset != Data.MyMap.Tile[x2, y2].Layer[layerNum].Tileset)
-            {
-                checkTileMatch = false;
-                return checkTileMatch;
-            }
+                // check neighbour is an autotile
+                if (Data.MyMap.Tile[x2, y2].Layer[layerNum].AutoTile == 0)
+                {
+                    checkTileMatch = false;
+                    return checkTileMatch;
+                }
 
-            // check tiles match
-            if (Data.MyMap.Tile[x1, y1].Layer[layerNum].X != Data.MyMap.Tile[x2, y2].Layer[layerNum].X)
-            {
-                checkTileMatch = false;
-                return checkTileMatch;
-            }
-            else if (Data.MyMap.Tile[x1, y1].Layer[layerNum].Y != Data.MyMap.Tile[x2, y2].Layer[layerNum].Y)
-            {
-                checkTileMatch = false;
-                return checkTileMatch;
-            }
+                // check we're a matching
+                if (Data.MyMap.Tile[x1, y1].Layer[layerNum].Tileset != Data.MyMap.Tile[x2, y2].Layer[layerNum].Tileset)
+                {
+                    checkTileMatch = false;
+                    return checkTileMatch;
+                }
 
-            return checkTileMatch;
+                // check tiles match
+                if (Data.MyMap.Tile[x1, y1].Layer[layerNum].X != Data.MyMap.Tile[x2, y2].Layer[layerNum].X)
+                {
+                    checkTileMatch = false;
+                    return checkTileMatch;
+                }
+                else if (Data.MyMap.Tile[x1, y1].Layer[layerNum].Y != Data.MyMap.Tile[x2, y2].Layer[layerNum].Y)
+                {
+                    checkTileMatch = false;
+                    return checkTileMatch;
+                }
+
+                return checkTileMatch;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
     }
