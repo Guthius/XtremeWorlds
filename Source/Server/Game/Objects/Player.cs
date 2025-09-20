@@ -429,12 +429,14 @@ public static class Player
                 healVital = tile.Data1;
                 healAmount = tile.Data2;
             }
+            
             if (tile.Type2 == TileType.Heal)
             {
                 // If a second-layer heal exists, we override vital with layer2's vital to match editor Behavior and add amounts
                 if (healVital < 0) healVital = tile.Data1_2; else healVital = tile.Data1_2; // explicit override
                 healAmount += tile.Data2_2;
             }
+
             if (healVital >= 0 && healAmount > 0 && healVital < System.Enum.GetValues(typeof(Vital)).Length)
             {
                 var hv = (Vital)healVital;
@@ -489,14 +491,6 @@ public static class Player
         {
             PlayerWarp(playerId, GetPlayerMap(playerId), GetPlayerX(playerId), GetPlayerY(playerId), (byte) Direction.Down);
         }
-
-        x = GetPlayerX(playerId);
-        y = GetPlayerY(playerId);
-
-        if (!moved)
-        {
-            return;
-        }
         
         Data.Player[playerId].IsMoving = true;
         NetworkSend.SendPlayerXYToMap(playerId);
@@ -509,6 +503,9 @@ public static class Player
         {
             General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(PlayerMove));
         }
+
+        x = GetPlayerX(playerId);
+        y = GetPlayerY(playerId);
 
         if (Data.TempPlayer[playerId].EventMap.CurrentEvents <= 0)
         {

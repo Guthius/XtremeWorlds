@@ -821,7 +821,6 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         // The player
         var n = GameLogic.FindPlayer(buffer.ReadString());
 
-
         if (n != session.Id)
         {
             if (n >= 0)
@@ -884,7 +883,6 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         // The map
         var n = buffer.ReadInt32();
-
 
         // Prevent hacking
         if (n < 0 | n > Core.Globals.Constant.MaxMaps)
