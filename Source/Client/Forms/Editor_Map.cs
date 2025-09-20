@@ -1697,7 +1697,6 @@ namespace Client
                 }
             }
 
-            // Populate Moral list (Eto 2.10: prefer setting DataStore in one shot)
             var moralNames = new List<string>(Constant.MaxMorals);
             for (i = 0; i < Constant.MaxMorals; i++)
             {
