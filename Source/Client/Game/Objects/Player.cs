@@ -101,103 +101,62 @@ namespace Client
 
         public static void CheckMovement()
         {
-            if (IsTryingToMove() && CanMove())
+            // Always refresh facing immediately based on current key state (diagonals prioritized)
+            RefreshFacingFromKeys(sendIfChanged: true);
+
+            if (IsTryingToMove())
             {
-                // Check if player has the shift key down for running
-                if (GameState.VbKeyShift)
+                bool started = CanMove();
+                if (started)
                 {
-                    Data.Player[GameState.MyIndex].Moving = (byte) MovementState.Walking;
+                    Data.Player[GameState.MyIndex].Moving = (byte)(GameState.VbKeyShift ? MovementState.Walking : MovementState.Running);
+                    Sender.SendPlayerMove();
                 }
-                else
+                else if (Data.Player[GameState.MyIndex].IsMoving)
                 {
-                    Data.Player[GameState.MyIndex].Moving = (byte) MovementState.Running;
-                }
-
-                switch (Data.Player[GameState.MyIndex].Dir)
-                {
-                    case (byte) Direction.Up:
-                    {
-                        if (GameState.DirUp && Data.Player[GameState.MyIndex].IsMoving)
-                        {
-                            Sender.SendPlayerMove();
-                        }
-
-                        break;
-                    }
-                    case (byte) Direction.Down:
-                    {
-                        if (GameState.DirDown && Data.Player[GameState.MyIndex].IsMoving)
-                        {
-                            Sender.SendPlayerMove();
-                        }
-
-                        break;
-                    }
-                    case (byte) Direction.Left:
-                    {
-                        if (GameState.DirLeft && Data.Player[GameState.MyIndex].IsMoving)
-                        {
-                            Sender.SendPlayerMove();
-                        }
-
-                        break;
-                    }
-                    case (byte) Direction.Right:
-                    {
-                        if (GameState.DirRight && Data.Player[GameState.MyIndex].IsMoving)
-                        {
-                            Sender.SendPlayerMove();
-                        }
-
-                        break;
-                    }
-                    case (byte) Direction.UpRight:
-                    {
-                        if (GameState.DirUp && GameState.DirRight && Data.Player[GameState.MyIndex].IsMoving)
-                        {
-                            Sender.SendPlayerMove();
-                        }
-
-                        break;
-                    }
-                    case (byte) Direction.UpLeft:
-                    {
-                        if (GameState.DirUp && GameState.DirLeft && Data.Player[GameState.MyIndex].IsMoving)
-                        {
-                            Sender.SendPlayerMove();
-                        }
-
-                        break;
-                    }
-                    case (byte) Direction.DownRight:
-                    {
-                        if (GameState.DirDown && GameState.DirRight && Data.Player[GameState.MyIndex].IsMoving)
-                        {
-                            Sender.SendPlayerMove();
-                        }
-
-                        break;
-                    }
-                    case (byte) Direction.DownLeft:
-                    {
-                        if (GameState.DirDown && GameState.DirLeft && Data.Player[GameState.MyIndex].IsMoving)
-                        {
-                            Sender.SendPlayerMove();
-                        }
-
-                        break;
-                    }
-                }
-
-                if (!Data.Player[GameState.MyIndex].IsMoving)
-                {
+                    // Keep sending movement while mid‑tile to keep server in sync (optional; can throttle later)
                     Sender.SendPlayerMove();
                 }
 
-                if (Data.MyMap.Tile[GetPlayerX(GameState.MyIndex), GetPlayerY(GameState.MyIndex)].Type == TileType.Warp | Data.MyMap.Tile[GetPlayerX(GameState.MyIndex), GetPlayerY(GameState.MyIndex)].Type2 == TileType.Warp)
-                {
+                // Warp detection stays here
+                var tile = Data.MyMap.Tile[GetPlayerX(GameState.MyIndex), GetPlayerY(GameState.MyIndex)];
+                if (tile.Type == TileType.Warp || tile.Type2 == TileType.Warp)
                     GameState.GettingMap = true;
-                }
+            }
+        }
+
+        private static void RefreshFacingFromKeys(bool sendIfChanged)
+        {
+            int newDir = -1;
+            bool up = GameState.DirUp;
+            bool down = GameState.DirDown;
+            bool left = GameState.DirLeft;
+            bool right = GameState.DirRight;
+
+            // Diagonals first
+            if (up && right)
+                newDir = (int)Direction.UpRight;
+            else if (up && left)
+                newDir = (int)Direction.UpLeft;
+            else if (down && right)
+                newDir = (int)Direction.DownRight;
+            else if (down && left)
+                newDir = (int)Direction.DownLeft;
+            else if (up)
+                newDir = (int)Direction.Up;
+            else if (down)
+                newDir = (int)Direction.Down;
+            else if (left)
+                newDir = (int)Direction.Left;
+            else if (right)
+                newDir = (int)Direction.Right;
+            else
+                return; // no input
+
+            if (newDir >= 0 && Data.Player[GameState.MyIndex].Dir != newDir)
+            {
+                Data.Player[GameState.MyIndex].Dir = (byte)newDir;
+                if (sendIfChanged) Sender.SendPlayerDir();
             }
         }
 
@@ -453,8 +412,7 @@ namespace Client
                 }
             }
 
-            // Check for cardinal movements if no diagonal movements
-            if (GameState.DirUp)
+            if (GameState.DirUp && !GameState.DirDown && !GameState.DirLeft && !GameState.DirRight)
             {
                 SetPlayerDir(GameState.MyIndex, (int) Direction.Up);
                 if (GetPlayerY(GameState.MyIndex) > 0)
@@ -474,7 +432,7 @@ namespace Client
                 }
             }
 
-            if (GameState.DirDown)
+            if (GameState.DirDown && !GameState.DirUp && !GameState.DirLeft && !GameState.DirRight)
             {
                 SetPlayerDir(GameState.MyIndex, (int) Direction.Down);
                 if (GetPlayerY(GameState.MyIndex) < Data.MyMap.MaxY - 1)
@@ -494,7 +452,7 @@ namespace Client
                 }
             }
 
-            if (GameState.DirLeft)
+            if (GameState.DirLeft && !GameState.DirUp && !GameState.DirDown && !GameState.DirRight)
             {
                 SetPlayerDir(GameState.MyIndex, (int) Direction.Left);
                 if (GetPlayerX(GameState.MyIndex) > 0)
@@ -514,7 +472,7 @@ namespace Client
                 }
             }
 
-            if (GameState.DirRight)
+            if (GameState.DirRight && !GameState.DirUp && !GameState.DirDown && !GameState.DirLeft)
             {
                 SetPlayerDir(GameState.MyIndex, (int) Direction.Right);
                 if (GetPlayerX(GameState.MyIndex) < Data.MyMap.MaxX)
@@ -535,14 +493,14 @@ namespace Client
             }
 
             // Check for diagonal movements first
-            if (GameState.DirUp & GameState.DirRight)
+            if (GameState.DirUp && GameState.DirRight && !GameState.DirLeft && !GameState.DirDown)
             {
-                SetPlayerDir(GameState.MyIndex, (int) Direction.UpRight);
                 if (GetPlayerY(GameState.MyIndex) > 0 & GetPlayerX(GameState.MyIndex) < Data.MyMap.MaxX)
                 {
-                    if (CheckPlayerDir((byte) Direction.UpRight))
+                    SetPlayerDir(GameState.MyIndex, (int) Direction.UpRight);
+                    if (CheckPlayerDir((byte)Direction.UpRight))
                     {
-                        if (d != (int) Direction.UpRight)
+                        if (d != (int)Direction.UpRight)
                         {
                             Sender.SendPlayerDir();
                         }
@@ -554,7 +512,7 @@ namespace Client
                     return canMove;
                 }
             }
-            else if (GameState.DirUp & GameState.DirLeft)
+            else if (GameState.DirUp && GameState.DirLeft && !GameState.DirRight && !GameState.DirDown)
             {
                 SetPlayerDir(GameState.MyIndex, (int) Direction.UpLeft);
                 if (GetPlayerY(GameState.MyIndex) > 0 & GetPlayerX(GameState.MyIndex) > 0)
@@ -573,7 +531,7 @@ namespace Client
                     return canMove;
                 }
             }
-            else if (GameState.DirDown & GameState.DirRight)
+            else if (GameState.DirDown && GameState.DirRight && !GameState.DirLeft && !GameState.DirUp)
             {
                 SetPlayerDir(GameState.MyIndex, (int) Direction.DownRight);
                 if (GetPlayerY(GameState.MyIndex) < Data.MyMap.MaxY & GetPlayerX(GameState.MyIndex) < Data.MyMap.MaxX)
@@ -592,7 +550,7 @@ namespace Client
                     return canMove;
                 }
             }
-            else if (GameState.DirDown & GameState.DirLeft)
+            else if (GameState.DirDown && GameState.DirLeft && !GameState.DirRight && !GameState.DirUp)
             {
                 SetPlayerDir(GameState.MyIndex, (int) Direction.DownLeft);
                 if (GetPlayerY(GameState.MyIndex) < Data.MyMap.MaxY & GetPlayerX(GameState.MyIndex) > 0)

@@ -1,6 +1,8 @@
 using Eto.Forms;
 using Eto.Drawing;
 using Assimp.Configs;
+using System.Linq;
+using System.Collections.Generic;
 using Client.Game.UI;
 using Client.Game.UI.Windows;
 using Client.Net;
@@ -52,9 +54,9 @@ namespace Client
         public Label lblMapWarpY = new Label();
         public Label lblMapWarpX = new Label();
         public Label lblMapWarpMap = new Label();
-        public GroupBox fraNpcSpawn = new GroupBox{ Text = "NPC Spawn" };
-        public ComboBox lstNpc = new ComboBox();
-        public Button btnNpcSpawn = new Button{ Text = "OK" };
+        public GroupBox fraNpcSpawn = new GroupBox{ Text = "Npc Spawn" };
+        public ListBox lstNpc = new() { Width = 200 };
+        public Button btnNpcSpawn = new Button { Text = "OK" };
         public Slider scrlNpcDir = new Slider();
         public Label lblNpcDir = new Label();
         public GroupBox fraHeal = new GroupBox{ Text = "Heal" };
@@ -97,8 +99,8 @@ namespace Client
         public Label Label23 = new Label();
         public ComboBox cmbAttribute = new ComboBox();
         public RadioButton optAnimation;
-        public TabPage tpNpcs = new TabPage{ Text = "NPCs" };
-        public GroupBox fraNpcs = new GroupBox{ Text = "NPCs" };
+        public TabPage tpNpcs = new TabPage{ Text = "Npcs" };
+        public GroupBox fraNpcs = new GroupBox{ Text = "Npcs" };
         public ListBox lstMapNpc = new ListBox();
         public Label Label18 = new Label();
         public Label Label17 = new Label();
@@ -173,6 +175,114 @@ namespace Client
         public Label Label14 = new Label();
         public ComboBox cmbWeather = new ComboBox();
 
+        // --- Deferred combo population (handles race where server data not yet loaded) ---
+        private UITimer? _deferredPopulateTimer;
+        private int _deferredPopulateAttempts;
+        private const int MaxPopulateAttempts = 20; // 20 * 250ms = 5s max
+
+        private void StartDeferredComboPopulate()
+        {
+            if (IsComboDataReady()) return;
+            _deferredPopulateAttempts = 0;
+            _deferredPopulateTimer ??= new UITimer { Interval = 0.25 }; // 250ms cadence
+            _deferredPopulateTimer.Elapsed -= DeferredPopulateTimer_Elapsed; // avoid multi-subscribe
+            _deferredPopulateTimer.Elapsed += DeferredPopulateTimer_Elapsed;
+            _deferredPopulateTimer.Start();
+        }
+
+        private void DeferredPopulateTimer_Elapsed(object? sender, EventArgs e)
+        {
+            _deferredPopulateAttempts++;
+            TryPopulateCombos();
+            if (IsComboDataReady() || _deferredPopulateAttempts >= MaxPopulateAttempts)
+                _deferredPopulateTimer?.Stop();
+        }
+
+        private void TryPopulateCombos()
+        {
+            if (lstMoral.Items.Count == 0 || (Data.Moral.Length > 0 && !string.IsNullOrWhiteSpace(Data.Moral[0].Name)))
+                RefreshMoralCombo();
+
+            if (cmbNpcList.Items.Count == 0 || (Data.Npc.Length > 0 && !string.IsNullOrWhiteSpace(Data.Npc[0].Name)))
+                RefreshNpcCombo();
+
+            RefreshNpcList();
+        }
+
+        private bool IsComboDataReady()
+        {
+            bool moralsReady = lstMoral.Items.Count > 0 && lstMoral.Items.Any(i => !string.IsNullOrWhiteSpace(i?.ToString()));
+            // NPC ready only if there's at least one non-empty NPC name (beyond index 0 placeholder in combo)
+            bool npcReady = false;
+            if (cmbNpcList.Items.Count > 1)
+            {
+                for (int i = 1; i < cmbNpcList.Items.Count; i++)
+                {
+                    var txt = cmbNpcList.Items[i]?.ToString();
+                    if (!string.IsNullOrWhiteSpace(txt)) { npcReady = true; break; }
+                }
+            }
+            return moralsReady && npcReady;
+        }
+
+        private void RefreshMoralCombo()
+        {
+            var selected = Data.MyMap.Moral;
+            lstMoral.Items.Clear();
+            for (int i = 0; i < Constant.MaxMorals && i < Data.Moral.Length; i++)
+                lstMoral.Items.Add(Data.Moral[i].Name ?? "");
+            if (lstMoral.Items.Count == 0)
+            {
+                lstMoral.Items.Add("<no morals>");
+                lstMoral.SelectedIndex = 0;
+                return;
+            }
+            lstMoral.SelectedIndex = (selected >= 0 && selected < lstMoral.Items.Count) ? selected : 0;
+        }
+
+        private void RefreshNpcCombo()
+        {
+            int prev = cmbNpcList.SelectedIndex;
+            cmbNpcList.Items.Clear();
+            cmbNpcList.Items.Add("None");
+            for (int i = 0; i < Constant.MaxNpcs && i < Data.Npc.Length; i++)
+            {
+                var name = Strings.Trim(Data.Npc[i].Name);
+                cmbNpcList.Items.Add(name);
+            }
+            cmbNpcList.SelectedIndex = (prev >= 0 && prev < cmbNpcList.Items.Count) ? prev : 0;
+        }
+
+        private void RefreshNpcList()
+        {
+            int selected = lstMapNpc.SelectedIndex;
+            lstMapNpc.Items.Clear();
+            for (int i = 0; i < Constant.MaxMapNpcs && i < Data.MyMapNpc.Length; i++)
+            {
+                if (i == 0)
+                {
+                    lstMapNpc.Items.Add("None");
+                    continue;
+                }
+
+                var npcIndex = Data.MyMapNpc[i].Num;
+                if (npcIndex < 0 || npcIndex >= Constant.MaxNpcs)
+                    lstMapNpc.Items.Add($"{i}: None");
+                else
+                {
+                    var name = Strings.Trim(Data.Npc[npcIndex].Name);
+                    lstMapNpc.Items.Add($"{i}: {name}");
+                }
+            }
+
+            if (lstMapNpc.Items.Count == 0)
+            {
+                lstMapNpc.SelectedIndex = 0;
+                return;
+            }
+            lstMapNpc.SelectedIndex = (selected >= 0 && selected < lstMapNpc.Items.Count) ? selected : 0;
+        }
+
         public Editor_Map()
         {
             _instance = this;
@@ -197,8 +307,8 @@ namespace Client
             GameState.CurTileset = sldTileSet.Value;
             if (Data.MyMap.Tileset <= 0 || Data.MyMap.Tileset != GameState.CurTileset)
                 Data.MyMap.Tileset = GameState.CurTileset;
-            sldTileSet.Width = 400;   // make the slider wider
-            sldTileSet.Height = 30;   // make the slider taller
+            sldTileSet.Width = 400; // make the slider wider
+            sldTileSet.Height = 30; // make the slider taller
             sldTileSet.ValueChanged += SldTileSet_ValueChanged;
 
             // Configure tileset scroll area: show vertical scrollbar automatically
@@ -209,6 +319,9 @@ namespace Client
                 ExpandContentWidth = true,
                 ExpandContentHeight = false // allow vertical scrollbar when content taller than viewport
             };
+
+            // Ensure moral/npc combos populate even if data not ready exactly at construction
+            Shown += (_, __) => StartDeferredComboPopulate();
 
             // Instantiate attribute radio buttons with a shared controller for mutual exclusivity
             optBlocked = new RadioButton(attrRadioController) { Text = "Blocked" };
@@ -224,6 +337,7 @@ namespace Client
             optAnimation = new RadioButton(attrRadioController) { Text = "Animation" };
             optNoCrossing = new RadioButton(attrRadioController) { Text = "No Crossing" };
             optInfo = new RadioButton(attrRadioController) { Text = "Info" };
+            
             // Mirror radio buttons into GameState to avoid cross-thread UI access
             optInfo.CheckedChanged += (_, __) => GameState.OptInfo = optInfo.Checked;
             optBlocked.CheckedChanged += (_, __) => GameState.OptBlocked = optBlocked.Checked;
@@ -768,7 +882,7 @@ namespace Client
             cmbWeather.Items.Add("Snow");
             cmbWeather.Items.Add("Storm");
             cmbWeather.SelectedIndexChanged += CmbWeather_SelectedIndexChanged;
-
+            cmbWeather.SelectedIndex = (byte)Data.MyMap.Weather;
             scrlIntensity.MinValue = 0; scrlIntensity.MaxValue = 100; scrlIntensity.ValueChanged += ScrlIntensity_Scroll;
             scrlIntensity.Width = 400;
 
@@ -1008,7 +1122,7 @@ namespace Client
                     withBlock.Music = "";
                 }
 
-                if (Instance.lstShop.SelectedIndex >= 0)
+                if (Instance.lstShop.SelectedIndex > 0)
                 {
                     withBlock.Shop = Instance.lstShop.SelectedIndex;
                 }
@@ -1261,28 +1375,11 @@ namespace Client
 
         private void OptNpcSpawn_CheckedChanged(object? sender, EventArgs e)
         {
-            int n;
-
-            if (optNpcSpawn.Checked == false)
+            if (!optNpcSpawn.Checked)
                 return;
 
-            lstNpc.Items.Clear();
 
-            for (n = 0; n < Constant.MaxMapNpcs; n++)
-            {
-                var idx = (n < Data.MyMap.Npc.Length) ? Data.MyMap.Npc[n] : -1;
-                if (idx >= 0 && idx < Constant.MaxNpcs)
-                {
-                    lstNpc.Items.Add(n + ": " + Strings.Trim(Data.Npc[idx].Name));
-                }
-                else
-                {
-                    lstNpc.Items.Add(n + ": None");
-                }
-            }
-
-            scrlNpcDir.Value = 0;
-            lstNpc.SelectedIndex = 0;
+            scrlNpcDir.Value = 0; // default direction Up
 
             ClearAttributeDialogue();
             pnlAttributes.Visible = true;
@@ -1600,23 +1697,15 @@ namespace Client
                 }
             }
 
-            // find the shop we have set
-            Instance.lstMoral.Items.Clear();
-
+            // Populate Moral list (Eto 2.10: prefer setting DataStore in one shot)
+            var moralNames = new List<string>(Constant.MaxMorals);
             for (i = 0; i < Constant.MaxMorals; i++)
-                Instance.lstMoral.Items.Add(Data.Moral[i].Name);
-
-            Instance.lstMoral.SelectedIndex = 0;
-
-            var loopTo3 = Instance.lstMoral.Items.Count;
-            for (i = 0; i < loopTo3; i++)
             {
-                if ((Instance.lstMoral.Items[i].ToString() ?? "") == (Data.Moral[Data.MyMap.Moral].Name ?? ""))
-                {
-                    Instance.lstMoral.SelectedIndex = i;
-                    break;
-                }
+                var moralName = (i < Data.Moral.Length) ? Data.Moral[i].Name : string.Empty;
+                moralNames.Add(moralName ?? string.Empty);
             }
+            Instance.lstMoral.DataStore = moralNames;
+            Instance.lstMoral.SelectedIndex = (Data.MyMap.Moral >= 0 && Data.MyMap.Moral < moralNames.Count) ? Data.MyMap.Moral : 0;
 
             Instance.chkTint.Checked = Data.MyMap.MapTint;
             Instance.chkNoMapRespawn.Checked = Data.MyMap.NoRespawn;
@@ -1657,13 +1746,19 @@ namespace Client
 
             Instance.lstMapNpc.SelectedIndex = 0;
 
-            // Populate NPC combo with a leading 'None' so designers can clear a slot explicitly.
-            Instance.cmbNpcList.Items.Clear();
-            Instance.cmbNpcList.Items.Add("None"); // index 0 -> no NPC
+            // Populate NPC combo (index 0 = None)
+            var npcNames = new List<string>(Constant.MaxNpcs + 1) { "None" };
             for (y = 0; y < Constant.MaxNpcs; y++)
-                Instance.cmbNpcList.Items.Add(Strings.Trim(Data.Npc[y].Name));
+            {
+                var raw = (y < Data.Npc.Length) ? Data.Npc[y].Name : string.Empty;
+                npcNames.Add(Strings.Trim(raw) ?? string.Empty);
+            }
+            Instance.cmbNpcList.DataStore = npcNames;
+            if (Instance.cmbNpcList.SelectedIndex < 0)
+                Instance.cmbNpcList.SelectedIndex = 0;
 
-            Instance.cmbNpcList.SelectedIndex = 0;
+            // Also seed lstNpc (spawn list) now so attribute panel opens instantly populated
+            Instance.RefreshNpcList();
 
             Instance.cmbAnimation.Items.Clear();
 
