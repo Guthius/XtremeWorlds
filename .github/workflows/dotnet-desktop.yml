@@ -26,15 +26,15 @@ jobs:
       # Build Client (Linux)
       - name: Build Client (Linux)
         if: ${{ runner.os == 'Linux' }}
-        run: dotnet build Source/Client/Client.csproj -c Release -f net9.0 --no-restore
+        run: dotnet build src/client/Client.csproj -c Release -f net9.0 --no-restore
 
       # Build Client (Windows)
       - name: Build Client (Windows)
         if: ${{ runner.os == 'Windows' }}
-        run: dotnet build Source/Client/Client.csproj -c Release -f net9.0-windows --no-restore
+        run: dotnet build src/client/Client.csproj -c Release -f net9.0-windows --no-restore
 
       - name: Build Server
-        run: dotnet build Source/Server/Server.csproj --configuration Release --no-restore
+        run: dotnet build src/server/Server.csproj --configuration Release --no-restore
 
       - name: Test
         run: dotnet test --no-build --verbosity normal
@@ -43,20 +43,20 @@ jobs:
       - name: Publish Client (Linux)
         if: ${{ runner.os == 'Linux' }}
         shell: bash
-        run: dotnet publish Source/Client/Client.csproj -c Release -f net9.0 -r linux-x64 -o ./publish/Client --self-contained true
+        run: dotnet publish src/client/Client.csproj -c Release -f net9.0 -r linux-x64 -o ./publish/Client --self-contained true
       - name: Publish Client (Windows)
         if: ${{ runner.os == 'Windows' }}
         shell: powershell
-        run: dotnet publish Source/Client/Client.csproj -c Release -f net9.0-windows -r win-x64 -o ./publish/win-x64/Client --self-contained true
+        run: dotnet publish src/client/Client.csproj -c Release -f net9.0-windows -r win-x64 -o ./publish/win-x64/Client --self-contained true
 
       - name: Publish Server (Linux)
         if: ${{ runner.os == 'Linux' }}
         shell: bash
-        run: dotnet publish Source/Server/Server.csproj -c Release -r linux-x64 -o ./publish/Server --self-contained true
+        run: dotnet publish src/server/Server.csproj -c Release -r linux-x64 -o ./publish/Server --self-contained true
       - name: Publish Server (Windows)
         if: ${{ runner.os == 'Windows' }}
         shell: powershell
-        run: dotnet publish Source/Server/Server.csproj -c Release -r win-x64 -o ./publish/win-x64/Server --self-contained true
+        run: dotnet publish src/server/Server.csproj -c Release -r win-x64 -o ./publish/win-x64/Server --self-contained true
 
       # Zip and upload Linux build
       - name: Zip Linux build
