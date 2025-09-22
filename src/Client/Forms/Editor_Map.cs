@@ -2011,18 +2011,18 @@ namespace Client
                     }
                     
                     // blocked tile
-                        if (GameState.OptBlocked)
+                    if (GameState.OptBlocked)
+                    {
+                        if (GameState.EditorAttribute == 1)
                         {
-                            if (GameState.EditorAttribute == 1)
-                            {
-                                withBlock1.Type = TileType.Blocked;
-                            }
-                            else
-                            {
-                                withBlock1.Type2 = TileType.Blocked;
-                            }
+                            withBlock1.Type = TileType.Blocked;
                         }
-                    // ...rest of attribute placement logic unchanged...
+                        else
+                        {
+                            withBlock1.Type2 = TileType.Blocked;
+                        }
+                    }
+
                     // warp tile
                     if (GameState.OptWarp)
                     {
@@ -2041,7 +2041,7 @@ namespace Client
                             withBlock1.Data3_2 = GameState.EditorWarpY;
                         }
                     }
-                    // ...rest of attribute placement logic unchanged...
+
                     // item spawn
                     if (GameState.OptItem)
                     {
@@ -2060,7 +2060,7 @@ namespace Client
                             withBlock1.Data3_2 = 0;
                         }
                     }
-                    // ...rest of attribute placement logic unchanged...
+
                     // Npc avoid
                     if (GameState.OptNpcAvoid)
                     {
@@ -2079,7 +2079,7 @@ namespace Client
                             withBlock1.Data3_2 = 0;
                         }
                     }
-                    // ...rest of attribute placement logic unchanged...
+
                     // resource
                     if (GameState.OptResource)
                     {
@@ -2098,7 +2098,7 @@ namespace Client
                             withBlock1.Data3_2 = 0;
                         }
                     }
-                    // ...rest of attribute placement logic unchanged...
+
                     // Npc spawn
                     if (GameState.OptNpcSpawn)
                     {
@@ -2117,7 +2117,7 @@ namespace Client
                             withBlock1.Data3_2 = 0;
                         }
                     }
-                    // ...rest of attribute placement logic unchanged...
+
                     // shop
                     if (GameState.OptShop)
                     {
@@ -2136,7 +2136,7 @@ namespace Client
                             withBlock1.Data3_2 = 0;
                         }
                     }
-                    // ...rest of attribute placement logic unchanged...
+
                     // bank
                     if (GameState.OptBank)
                     {
@@ -2155,7 +2155,7 @@ namespace Client
                             withBlock1.Data3_2 = 0;
                         }
                     }
-                    // ...rest of attribute placement logic unchanged...
+
                     // heal
                     if (GameState.OptHeal)
                     {
@@ -2174,7 +2174,7 @@ namespace Client
                             withBlock1.Data3_2 = 0;
                         }
                     }
-                    // ...rest of attribute placement logic unchanged...
+
                     // trap
                     if (GameState.OptTrap)
                     {
@@ -2193,7 +2193,7 @@ namespace Client
                             withBlock1.Data3_2 = 0;
                         }
                     }
-                    // ...rest of attribute placement logic unchanged...
+
                     // Animation
                     if (GameState.OptAnimation)
                     {
@@ -2212,7 +2212,7 @@ namespace Client
                             withBlock1.Data3_2 = 0;
                         }
                     }
-                    // ...rest of attribute placement logic unchanged...
+
                     // No Xing
                     if (GameState.OptNoCrossing)
                     {

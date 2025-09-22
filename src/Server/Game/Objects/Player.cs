@@ -190,7 +190,8 @@ public static class Player
                 {
                     if (IsTileBlocked(mapNum, GetPlayerX(playerId), GetPlayerY(playerId), Direction.Up))
                     {
-                        break;
+                        NetworkSend.SendPlayerXY(playerId);
+                        return;
                     }
 
                     SetPlayerY(playerId, GetPlayerRawY(playerId) - 1);
@@ -216,7 +217,8 @@ public static class Player
                 {
                     if (IsTileBlocked(mapNum, GetPlayerX(playerId), GetPlayerY(playerId), Direction.Down))
                     {
-                        break;
+                        NetworkSend.SendPlayerXY(playerId);
+                        return;
                     }
 
                     SetPlayerY(playerId, GetPlayerRawY(playerId) + 1);
@@ -241,7 +243,8 @@ public static class Player
                 {
                     if (IsTileBlocked(mapNum, GetPlayerX(playerId), GetPlayerY(playerId), Direction.Left))
                     {
-                        break;
+                        NetworkSend.SendPlayerXY(playerId);
+                        return;
                     }
 
                     SetPlayerX(playerId, GetPlayerRawX(playerId) - 1);
@@ -268,7 +271,8 @@ public static class Player
                 {
                     if (IsTileBlocked(mapNum, GetPlayerX(playerId), GetPlayerY(playerId), Direction.Right))
                     {
-                        break;
+                        NetworkSend.SendPlayerXY(playerId);
+                        return;
                     }
 
                     SetPlayerX(playerId, GetPlayerRawX(playerId) + 1);
@@ -293,7 +297,8 @@ public static class Player
                 {
                     if (IsTileBlocked(mapNum, GetPlayerX(playerId), GetPlayerY(playerId), Direction.UpRight))
                     {
-                        break;
+                        NetworkSend.SendPlayerXY(playerId);
+                        return;
                     }
 
                     SetPlayerX(playerId, GetPlayerRawX(playerId) + 1);
@@ -309,7 +314,8 @@ public static class Player
                 {
                     if (IsTileBlocked(mapNum, GetPlayerX(playerId), GetPlayerY(playerId), Direction.UpLeft))
                     {
-                        break;
+                        NetworkSend.SendPlayerXY(playerId);
+                        return;
                     }
 
                     SetPlayerX(playerId, GetPlayerRawX(playerId) - 1);
@@ -325,7 +331,8 @@ public static class Player
                 {
                     if (IsTileBlocked(mapNum, GetPlayerX(playerId), GetPlayerY(playerId), Direction.DownRight))
                     {
-                        break;
+                        NetworkSend.SendPlayerXY(playerId);
+                        return;
                     }
 
                     SetPlayerX(playerId, GetPlayerRawX(playerId) + 1);
@@ -341,7 +348,8 @@ public static class Player
                 {
                     if (IsTileBlocked(mapNum, GetPlayerX(playerId), GetPlayerY(playerId), Direction.DownLeft))
                     {
-                        break;
+                        NetworkSend.SendPlayerXY(playerId);
+                        return;
                     }
 
                     SetPlayerX(playerId, GetPlayerRawX(playerId) - 1);
