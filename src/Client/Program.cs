@@ -668,12 +668,12 @@ namespace Client
             {
                 if (IsKeyStateActive(Keys.Z))
                 {
-                    Editor_Map.MapEditorUndo();
+                    Editor_Map.Undo();
                 }
 
                 if (IsKeyStateActive(Keys.Y))
                 {
-                    Editor_Map.MapEditorRedo();
+                    Editor_Map.Redo();
                 }
             }
 
@@ -1452,7 +1452,7 @@ namespace Client
             {
                 if (GameState.MyEditorType == EditorType.Map)
                 {
-                    Editor_Map.MapEditorMouseDown(GameState.CurXGame, GameState.CurYGame, false);
+                    Editor_Map.MouseDown(GameState.CurXGame, GameState.CurYGame, false);
                 }
 
                 if (IsSearchCooldownElapsed())

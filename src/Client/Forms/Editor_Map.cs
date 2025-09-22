@@ -1948,7 +1948,7 @@ namespace Client
 
         }
 
-        public static void MapEditorMouseDown(int x, int y, bool movedMouse = true)
+        public static void MouseDown(int x, int y, bool movedMouse = true)
         {
 
             int i;
@@ -2567,7 +2567,7 @@ namespace Client
             }
         }
 
-        public static void MapEditorUndo()
+        public static void Undo()
         {
             bool isModified = false;
 
@@ -2638,11 +2638,11 @@ namespace Client
 
             if (!isModified)
             {
-                MapEditorUndo();
+                Undo();
             }
         }
 
-        public static void MapEditorRedo()
+        public static void Redo()
         {
             bool isModified = false;
 
@@ -2714,7 +2714,7 @@ namespace Client
 
             if (!isModified)
             {
-                MapEditorRedo();
+                Redo();
             }
         }
 
@@ -2842,12 +2842,12 @@ namespace Client
 
         private void tsbUndo_Click(object? sender, EventArgs e)
         {
-            MapEditorUndo();
+            Undo();
         }
 
         private void tsbRedo_Click(object? sender, EventArgs e)
         {
-            MapEditorRedo();
+            Redo();
         }
 
         private void tsbOpacity_Click(object? sender, EventArgs e)
