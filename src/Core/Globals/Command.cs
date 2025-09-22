@@ -179,9 +179,9 @@ public static class Command
         };
     }
 
-    public static void SetPlayerGatherSkillLvl(int index, int skillSlot, int lvl)
+    public static void SetPlayerGatherSkillLevel(int index, int skillSlot, int level)
     {
-        Data.Player[index].GatherSkills[skillSlot].SkillLevel = lvl;
+        Data.Player[index].GatherSkills[skillSlot].SkillLevel = level;
     }
 
     public static void SetPlayerGatherSkillExp(int index, int skillSlot, int exp)
@@ -191,7 +191,7 @@ public static class Command
 
     public static void SetPlayerGatherSkillMaxExp(int index, int skillSlot, int maxExp)
     {
-        Data.Player[index].GatherSkills[skillSlot].SkillNextLvlExp = maxExp;
+        Data.Player[index].GatherSkills[skillSlot].SkillNextLevelExp = maxExp;
     }
 
     public static string GetResourceSkillName(ResourceSkill skillNum)
@@ -206,9 +206,17 @@ public static class Command
         };
     }
 
-    public static int GetSkillNextLevel(int index, int skillSlot)
+    public static long GetSkillNextLevel(int index, int skillSlot)
     {
-        return (int)Math.Round(50d / 3d * (Math.Pow(GetPlayerGatherSkillLvl(index, skillSlot) + 1, 3d) - 6d * Math.Pow(GetPlayerGatherSkillLvl(index, skillSlot) + 1, 2d) + 17 * (GetPlayerGatherSkillLvl(index, skillSlot) + 1) - 12d));
+        int level = GetPlayerGatherSkillLevel(index, skillSlot);
+        int str = GetPlayerStat(index, Stat.Strength);
+        int vit = GetPlayerStat(index, Stat.Vitality);
+        int intellect = GetPlayerStat(index, Stat.Intelligence);
+        int luck = GetPlayerStat(index, Stat.Luck);
+        int points = GetPlayerPoints(index);
+
+        long next = (long)(level + 1) * (str + vit + intellect + luck + points) * 25L;
+        return next;
     }
 
     public static bool IsPlaying(int index)
@@ -216,7 +224,7 @@ public static class Command
         return GetPlayerName(index).Length > 0;
     }
 
-    public static int GetPlayerGatherSkillLvl(int index, int skillSlot)
+    public static int GetPlayerGatherSkillLevel(int index, int skillSlot)
     {
         return Data.Player[index].GatherSkills[skillSlot].SkillLevel;
     }
@@ -228,7 +236,7 @@ public static class Command
 
     public static int GetPlayerGatherSkillMaxExp(int index, int skillSlot)
     {
-        return Data.Player[index].GatherSkills[skillSlot].SkillNextLvlExp;
+        return Data.Player[index].GatherSkills[skillSlot].SkillNextLevelExp;
     }
 
     public static void SetPlayerMap(int index, int mapNum)

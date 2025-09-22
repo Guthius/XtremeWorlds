@@ -741,7 +741,7 @@ public static class NetworkSend
 
         for (var i = 0; i < ResourceSkillCount; i++)
         {
-            packetWriter.WriteInt32(GetPlayerGatherSkillLvl(playerId, i));
+            packetWriter.WriteInt32(GetPlayerGatherSkillLevel(playerId, i));
             packetWriter.WriteInt32(GetPlayerGatherSkillExp(playerId, i));
             packetWriter.WriteInt32(GetPlayerGatherSkillMaxExp(playerId, i));
         }

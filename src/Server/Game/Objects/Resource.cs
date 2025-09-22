@@ -86,7 +86,7 @@ public static class Resource
     {
         var levels = 0;
 
-        if (GetPlayerGatherSkillLvl(playerId, skillSlot) == Script.Instance?.MaxLevel)
+        if (GetPlayerGatherSkillLevel(playerId, skillSlot) == Script.Instance?.MaxLevel)
         {
             return;
         }
@@ -95,9 +95,9 @@ public static class Resource
         {
             var expRollover = GetPlayerGatherSkillExp(playerId, skillSlot) - GetPlayerGatherSkillMaxExp(playerId, skillSlot);
 
-            SetPlayerGatherSkillLvl(playerId, skillSlot, GetPlayerGatherSkillLvl(playerId, skillSlot) + 1);
+            SetPlayerGatherSkillLevel(playerId, skillSlot, GetPlayerGatherSkillLevel(playerId, skillSlot) + 1);
             SetPlayerGatherSkillExp(playerId, skillSlot, expRollover);
-            SetPlayerGatherSkillMaxExp(playerId, skillSlot, GetSkillNextLevel(playerId, skillSlot));
+            SetPlayerGatherSkillMaxExp(playerId, skillSlot, (int)GetSkillNextLevel(playerId, skillSlot));
 
             levels++;
         }
@@ -319,7 +319,7 @@ public static class Resource
             }
         }
 
-        if (Data.Resource[resourceIndex].LvlRequired > GetPlayerGatherSkillLvl(playerId, resourceType))
+        if (Data.Resource[resourceIndex].LvlRequired > GetPlayerGatherSkillLevel(playerId, resourceType))
         {
             NetworkSend.PlayerMsg(playerId, "Your level is too low!", (int) ColorName.Yellow);
             return;
@@ -337,7 +337,7 @@ public static class Resource
         int damage;
         if (Data.Resource[resourceIndex].ToolRequired == 0)
         {
-            damage = 1 * GetPlayerGatherSkillLvl(playerId, resourceType);
+            damage = 1 * GetPlayerGatherSkillLevel(playerId, resourceType);
         }
         else
         {

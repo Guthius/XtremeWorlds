@@ -1111,7 +1111,7 @@ namespace Client
             {
                 Data.Player[i].GatherSkills[x].SkillLevel = buffer.ReadInt32();
                 Data.Player[i].GatherSkills[x].SkillCurExp = buffer.ReadInt32();
-                Data.Player[i].GatherSkills[x].SkillNextLvlExp = buffer.ReadInt32();
+                Data.Player[i].GatherSkills[x].SkillNextLevelExp = buffer.ReadInt32();
             }
 
             // Check if the player is the client player

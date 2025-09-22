@@ -6,7 +6,7 @@ public static class Type
     {
         public int SkillLevel;
         public int SkillCurExp;
-        public int SkillNextLvlExp;
+        public int SkillNextLevelExp;
     }
 
     public struct Animation

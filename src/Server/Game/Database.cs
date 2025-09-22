@@ -1949,9 +1949,9 @@ namespace Server
             Data.Player[index].GatherSkills = new Type.ResourceType[resoruceCount];
             for (int i = 0, loopTo8 = resoruceCount; i < loopTo8; i++)
             {
-                Data.Player[index].GatherSkills[i].SkillLevel = 0;
+                Data.Player[index].GatherSkills[i].SkillLevel = 1;
                 Data.Player[index].GatherSkills[i].SkillCurExp = 0;
-                SetPlayerGatherSkillMaxExp(index, i, GetSkillNextLevel(index, i));
+                SetPlayerGatherSkillMaxExp(index, i, (int)GetSkillNextLevel(index, i));
             }
 
             for (int i = 0, loopTo9 = Enum.GetValues(typeof(Equipment)).Length; i < loopTo9; i++)
@@ -2028,7 +2028,8 @@ namespace Server
                 var vitalCount = Enum.GetValues(typeof(Vital)).Length;
                 for (i = 0; i < vitalCount; i++)
                 {
-                    SetPlayerVital(index, (Vital)i, Script.Instance?.GetPlayerMaxVital(index, (Vital)i));
+                    int value = Script.Instance?.GetPlayerMaxVital(index, (Vital)i) ?? 0;
+                    SetPlayerVital(index, (Vital)i, value);
                 }
 
                 // set starter items
@@ -2051,9 +2052,9 @@ namespace Server
                 var resourceCount = Enum.GetValues(typeof(ResourceSkill)).Length;
                 for (i = 0; i < resourceCount; i++)
                 {
-                    Data.Player[index].GatherSkills[i].SkillLevel = 0;
+                    Data.Player[index].GatherSkills[i].SkillLevel = 1;
                     Data.Player[index].GatherSkills[i].SkillCurExp = 0;
-                    SetPlayerGatherSkillMaxExp(index, i, GetSkillNextLevel(index, i));
+                    SetPlayerGatherSkillMaxExp(index, i, (int)GetSkillNextLevel(index, i));
                 }
 
                 SaveCharacter(index, slot);
