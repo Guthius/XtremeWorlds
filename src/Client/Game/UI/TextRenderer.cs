@@ -395,7 +395,7 @@ public static class TextRenderer
         {
             if (Data.MapEvents[index].GraphicY2 > 0)
             {
-                textX = textX + Data.MapEvents[index].GraphicY2 * GameState.SizeY / 2 - 16;
+                textX = textX + Data.MapEvents[index].GraphicY2 * GameState.SizeY / 2 - 6;
                 textY = GameLogic.ConvertMapY(Data.MapEvents[index].Y) - Data.MapEvents[index].GraphicY2 * GameState.SizeY + 16;
             }
             else
@@ -633,7 +633,7 @@ public static class TextRenderer
         var name = Data.Player[index].Name;
 
         // calc pos
-        var textX = GameLogic.ConvertMapX(GetPlayerRawX(index)) + 2;
+        var textX = GameLogic.ConvertMapX(GetPlayerRawX(index)) + GameState.SizeY / 2 - 6;;
         textX = (int) Math.Round(textX - GetTextWidth(name) / 6d);
 
         int spriteNum = GetPlayerSprite(index);
