@@ -58,7 +58,6 @@
         <PackageReference Include="Serilog.Sinks.Console"/>
         <PackageReference Include="Serilog.Sinks.File"/>
         <PackageReference Include="Npgsql"/>
-        <PackageReference Include="CS-Script"/>
         <PackageReference Include="Newtonsoft.Json"/>
     </ItemGroup>
 
