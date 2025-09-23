@@ -26,12 +26,12 @@ jobs:
       # Build Client (Linux)
       - name: Build Client (Linux)
         if: ${{ runner.os == 'Linux' }}
-        run: dotnet build src/Client/Client.csproj -c Release -f net9.0 --no-restore  -p:RuntimeIdentifier=linux-x64
+        run: dotnet build src/Client/Client.csproj -c Release -f net9.0 --no-restore
 
       # Build Client (Windows)
       - name: Build Client (Windows)
         if: ${{ runner.os == 'Windows' }}
-        run: dotnet build src/Client/Client.csproj -c Release -f net9.0-windows --no-restore  -p:RuntimeIdentifier=win-x64
+        run: dotnet build src/Client/Client.csproj -c Release -f net9.0-windows --no-restore
 
       - name: Build Server
         run: dotnet build src/Server/Server.csproj --configuration Release --no-restore
@@ -58,6 +58,21 @@ jobs:
         shell: powershell
         run: dotnet publish src/Server/Server.csproj -c Release -r win-x64 -o ./publish/Server --self-contained true
 
+      # Clean up macOS .app folders that may have been created
+      - name: Remove macOS app folders (Linux)
+        if: ${{ runner.os == 'Linux' }}
+        shell: bash
+        run: |
+          find ./publish -name "*.app" -type d -exec rm -rf {} + 2>/dev/null || true
+          find . -path "*/osx-x64/*" -type d -exec rm -rf {} + 2>/dev/null || true
+          find . -path "*/osx-arm64/*" -type d -exec rm -rf {} + 2>/dev/null || true
+      - name: Remove macOS app folders (Windows)
+        if: ${{ runner.os == 'Windows' }}
+        shell: powershell
+        run: |
+          Get-ChildItem -Path ./publish -Recurse -Directory -Name "*.app" | ForEach-Object { Remove-Item -Path $_ -Recurse -Force -ErrorAction SilentlyContinue }
+          Get-ChildItem -Path . -Recurse -Directory | Where-Object { $_.FullName -like "*osx-x64*" -or $_.FullName -like "*osx-arm64*" } | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+
       # Zip and upload Linux build
       - name: Zip Linux build
         if: ${{ runner.os == 'Linux' }}
@@ -78,7 +93,9 @@ jobs:
         if: ${{ runner.os == 'Windows' }}
         shell: powershell
         run: |
-          Compress-Archive -Path publish/win-x64/* -DestinationPath xtremeworlds-windows-${env:GITHUB_REF_NAME}.zip
+          cd publish
+          Compress-Archive -Path Client,Server -DestinationPath ../xtremeworlds-windows-${env:GITHUB_REF_NAME}.zip
+          cd ..
 
       - name: Upload Zip on Windows
         if: ${{ runner.os == 'Windows' }}
