@@ -187,13 +187,15 @@ namespace Client
                             // For minimal intrusion, static private cached fields:
                             if (_lastMouseAttackX != GameClient.CurrentMouseState.X || _lastMouseAttackY != GameClient.CurrentMouseState.Y)
                             {
-                                if (Math.Abs(_lastMouseAttackX - GameClient.CurrentMouseState.X) + Math.Abs(_lastMouseAttackY - GameClient.CurrentMouseState.Y) >= 2)
+                                // Handle initial case or check distance moved
+                                if (_lastMouseAttackX == int.MinValue || _lastMouseAttackY == int.MinValue ||
+                                    Math.Abs(_lastMouseAttackX - GameClient.CurrentMouseState.X) + Math.Abs(_lastMouseAttackY - GameClient.CurrentMouseState.Y) >= 2)
                                 {
                                     Player.UpdateFacingFromMouse(GameClient.CurrentMouseState.X, GameClient.CurrentMouseState.Y);
                                     _lastMouseAttackX = GameClient.CurrentMouseState.X;
                                     _lastMouseAttackY = GameClient.CurrentMouseState.Y;
                                 }
-                            }
+                            }   
                             // Attempt attack each tick; internal cooldown logic in CheckAttack prevents spam.
                             Player.CheckAttack(mouse: true);
                         }
