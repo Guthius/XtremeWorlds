@@ -194,7 +194,7 @@ public static class Player
             case Direction.Up:
                 if (GetPlayerY(playerId) > 0)
                 {
-                    if (IsTileBlocked(mapNum, GetPlayerX(playerId), GetPlayerY(playerId), Direction.Up))
+                    if (IsTileBlocked(mapNum, GetPlayerX(playerId), GetPlayerY(playerId) - 1, Direction.Up))
                     {
                         NetworkSend.SendPlayerXY(playerId);
                         return;
@@ -221,7 +221,7 @@ public static class Player
             case Direction.Down:
                 if (GetPlayerY(playerId) < Data.Map[mapNum].MaxY - 1)
                 {
-                    if (IsTileBlocked(mapNum, GetPlayerX(playerId), GetPlayerY(playerId), Direction.Down))
+                    if (IsTileBlocked(mapNum, GetPlayerX(playerId), GetPlayerY(playerId) + 1, Direction.Down))
                     {
                         NetworkSend.SendPlayerXY(playerId);
                         return;
@@ -247,7 +247,7 @@ public static class Player
             case Direction.Left:
                 if (GetPlayerX(playerId) > 0)
                 {
-                    if (IsTileBlocked(mapNum, GetPlayerX(playerId), GetPlayerY(playerId), Direction.Left))
+                    if (IsTileBlocked(mapNum, GetPlayerX(playerId) - 1, GetPlayerY(playerId), Direction.Left))
                     {
                         NetworkSend.SendPlayerXY(playerId);
                         return;
@@ -275,7 +275,7 @@ public static class Player
             case Direction.Right:
                 if (GetPlayerX(playerId) < Data.Map[mapNum].MaxX - 1)
                 {
-                    if (IsTileBlocked(mapNum, GetPlayerX(playerId), GetPlayerY(playerId), Direction.Right))
+                    if (IsTileBlocked(mapNum, GetPlayerX(playerId) + 1, GetPlayerY(playerId), Direction.Right))
                     {
                         NetworkSend.SendPlayerXY(playerId);
                         return;
@@ -301,7 +301,7 @@ public static class Player
             case Direction.UpRight:
                 if (GetPlayerY(playerId) > 0 && GetPlayerX(playerId) < Data.Map[mapNum].MaxX - 1)
                 {
-                    if (IsTileBlocked(mapNum, GetPlayerX(playerId), GetPlayerY(playerId), Direction.UpRight))
+                    if (IsTileBlocked(mapNum, GetPlayerX(playerId) - 1, GetPlayerY(playerId), Direction.UpRight))
                     {
                         NetworkSend.SendPlayerXY(playerId);
                         return;
@@ -318,7 +318,7 @@ public static class Player
             case Direction.UpLeft:
                 if (GetPlayerY(playerId) > 0 && GetPlayerX(playerId) > 0)
                 {
-                    if (IsTileBlocked(mapNum, GetPlayerX(playerId), GetPlayerY(playerId), Direction.UpLeft))
+                    if (IsTileBlocked(mapNum, GetPlayerX(playerId) - 1, GetPlayerY(playerId) - 1, Direction.UpLeft))
                     {
                         NetworkSend.SendPlayerXY(playerId);
                         return;
@@ -335,7 +335,7 @@ public static class Player
             case Direction.DownRight:
                 if (GetPlayerY(playerId) < Data.Map[mapNum].MaxY - 1 && GetPlayerX(playerId) < Data.Map[mapNum].MaxX - 1)
                 {
-                    if (IsTileBlocked(mapNum, GetPlayerX(playerId), GetPlayerY(playerId), Direction.DownRight))
+                    if (IsTileBlocked(mapNum, GetPlayerX(playerId) + 1, GetPlayerY(playerId) + 1, Direction.DownRight))
                     {
                         NetworkSend.SendPlayerXY(playerId);
                         return;
@@ -352,7 +352,7 @@ public static class Player
             case Direction.DownLeft:
                 if (GetPlayerY(playerId) < Data.Map[mapNum].MaxY - 1 && GetPlayerX(playerId) > 0)
                 {
-                    if (IsTileBlocked(mapNum, GetPlayerX(playerId), GetPlayerY(playerId), Direction.DownLeft))
+                    if (IsTileBlocked(mapNum, GetPlayerX(playerId) - 1, GetPlayerY(playerId) + 1, Direction.DownLeft))
                     {
                         NetworkSend.SendPlayerXY(playerId);
                         return;
