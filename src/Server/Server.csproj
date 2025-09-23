@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>2.4.1</Version>
+        <Version>2.4.2</Version>
         <TargetFrameworks>net9.0-windows;net9.0</TargetFrameworks>
         <RootNamespace>Server</RootNamespace>
         <ApplicationIcon>Resources\Icon.ico</ApplicationIcon>
