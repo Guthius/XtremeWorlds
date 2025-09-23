@@ -301,7 +301,7 @@ public static class Player
             case Direction.UpRight:
                 if (GetPlayerY(playerId) > 0 && GetPlayerX(playerId) < Data.Map[mapNum].MaxX - 1)
                 {
-                    if (IsTileBlocked(mapNum, GetPlayerX(playerId) - 1, GetPlayerY(playerId), Direction.UpRight))
+                    if (IsTileBlocked(mapNum, GetPlayerX(playerId) + 1, GetPlayerY(playerId) - 1, Direction.UpRight))
                     {
                         NetworkSend.SendPlayerXY(playerId);
                         return;
