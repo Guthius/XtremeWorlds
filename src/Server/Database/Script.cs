@@ -85,7 +85,7 @@ public class Script
     public void JoinGame(int index)
     {
         // Warp the player to his saved location
-        PlayerWarp(index, GetPlayerMap(index), GetPlayerX(index), GetPlayerY(index), (byte)Direction.Down);
+        PlayerWarp(index, GetPlayerMap(index), GetPlayerX(index), GetPlayerY(index), (byte)Direction.Down, true);
 
         // Notify everyone that a player has joined the game.
         NetworkSend.GlobalMsg(string.Format("{0} has joined {1}!", GetPlayerName(index), SettingsManager.Instance.GameName));

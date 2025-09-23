@@ -53,7 +53,7 @@ public static class Player
         NetworkConfig.SendDataToMapBut(playerId, mapNum, packet.GetBytes());
     }
 
-    public static void PlayerWarp(int playerId, int mapNum, int x, int y, int dir)
+    public static void PlayerWarp(int playerId, int mapNum, int x, int y, int dir, bool send = false)
     {
         if (!NetworkConfig.IsPlaying(playerId) || mapNum <= 0 || mapNum >= Core.Globals.Constant.MaxMaps || Data.TempPlayer[playerId].GettingMap == true || mapNum < 0 || mapNum >= Core.Globals.Constant.MaxMaps)
         {
@@ -111,25 +111,31 @@ public static class Player
             // Regenerate all Npcs' health
             for (var mapNpcNum = 0; mapNpcNum < Core.Globals.Constant.MaxMapNpcs; mapNpcNum++)
             {
-                if (Data.MapNpc[oldMapNum].Npc[mapNpcNum].Num >= 0)
+                var vitalCount = (int)System.Enum.GetValues(typeof(Vital)).Length;
+                for (var i = 0; i < vitalCount; i++)
                 {
-                    Data.MapNpc[oldMapNum].Npc[mapNpcNum].Vital[(byte) Vital.Health] = GameLogic.GetNpcMaxVital(Data.MapNpc[oldMapNum].Npc[mapNpcNum].Num, Vital.Health);
+                    if (Data.MapNpc[oldMapNum].Npc[mapNpcNum].Num >= 0)
+                    {
+                        Data.MapNpc[oldMapNum].Npc[mapNpcNum].Vital[i] = GameLogic.GetNpcMaxVital(Data.MapNpc[oldMapNum].Npc[mapNpcNum].Num, (Vital)i);
+                    }
                 }
             }
         }
 
-        // Sets it so we know to process npcs on the map
-        Data.TempPlayer[playerId].GettingMap = true;
+        if (oldMapNum != mapNum || send)
+        {
+            Data.TempPlayer[playerId].GettingMap = true;
 
-        Moral.SendUpdateMoralTo(playerId, Data.Map[mapNum].Moral);
+            Moral.SendUpdateMoralTo(playerId, Data.Map[mapNum].Moral);
 
-        var packet = new PacketWriter(12);
+            var packet = new PacketWriter(12);
 
-        packet.WriteEnum(ServerPackets.SCheckForMap);
-        packet.WriteInt32(mapNum);
-        packet.WriteInt32(Data.Map[mapNum].Revision);
+            packet.WriteEnum(ServerPackets.SCheckForMap);
+            packet.WriteInt32(mapNum);
+            packet.WriteInt32(Data.Map[mapNum].Revision);
 
-        PlayerService.Instance.SendDataTo(playerId, packet.GetBytes());
+            PlayerService.Instance.SendDataTo(playerId, packet.GetBytes());
+        }
     }
 
     public static void PlayerMove(int playerId, int dir, int movement, bool expectingWarp)
