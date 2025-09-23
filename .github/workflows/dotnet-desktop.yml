@@ -26,12 +26,12 @@ jobs:
       # Build Client (Linux)
       - name: Build Client (Linux)
         if: ${{ runner.os == 'Linux' }}
-        run: dotnet build src/Client/Client.csproj -c Release -f net9.0 --no-restore
+        run: dotnet build src/Client/Client.csproj -c Release -f net9.0 --no-restore  -p:RuntimeIdentifier=linux-x64
 
       # Build Client (Windows)
       - name: Build Client (Windows)
         if: ${{ runner.os == 'Windows' }}
-        run: dotnet build src/Client/Client.csproj -c Release -f net9.0-windows --no-restore
+        run: dotnet build src/Client/Client.csproj -c Release -f net9.0-windows --no-restore  -p:RuntimeIdentifier=win-x64
 
       - name: Build Server
         run: dotnet build src/Server/Server.csproj --configuration Release --no-restore
@@ -78,9 +78,7 @@ jobs:
         if: ${{ runner.os == 'Windows' }}
         shell: powershell
         run: |
-          cd publish
-          Compress-Archive -Path Client,Server -DestinationPath ../xtremeworlds-windows-${env:GITHUB_REF_NAME}.zip
-          cd ..
+          Compress-Archive -Path publish/win-x64/* -DestinationPath xtremeworlds-windows-${env:GITHUB_REF_NAME}.zip
 
       - name: Upload Zip on Windows
         if: ${{ runner.os == 'Windows' }}
