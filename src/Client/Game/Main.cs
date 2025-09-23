@@ -61,22 +61,7 @@ public static class Program
     private static void UiTimerOnElapsed(object? sender, EventArgs e)
     {
         if (IsEtoAvailable)
-            SafeUpdateEditors();
-    }
-
-    private static void SafeUpdateEditors()
-    {
-        try
-        {
-            UpdateEditors();
-        }
-        catch (ObjectDisposedException) { }
-        catch (InvalidOperationException) { }
-        catch (Exception ex)
-        {
-            // Prevent UI timer from dying due to unexpected exceptions
-            try { System.Console.WriteLine($"[UiTimer] Exception: {ex}"); } catch { }
-        }
+            UpdateEditors();;
     }
 
     private static void UpdateEditors()

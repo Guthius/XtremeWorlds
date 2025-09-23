@@ -337,7 +337,7 @@ namespace Client
             optAnimation = new RadioButton(attrRadioController) { Text = "Animation" };
             optNoCrossing = new RadioButton(attrRadioController) { Text = "No Crossing" };
             optInfo = new RadioButton(attrRadioController) { Text = "Info" };
-            
+
             // Mirror radio buttons into GameState to avoid cross-thread UI access
             optInfo.CheckedChanged += (_, __) => GameState.OptInfo = optInfo.Checked;
             optBlocked.CheckedChanged += (_, __) => GameState.OptBlocked = optBlocked.Checked;
@@ -367,6 +367,9 @@ namespace Client
             GameState.CurTileset = sldTileSet.Value;
             if (Data.MyMap.Tileset <= 0) Data.MyMap.Tileset = GameState.CurTileset;
             picBackSelect.Invalidate();
+            
+            // Initialize editor state from the selected map id (GameState.MapNum)
+            MapEditorInit();
         }
 
         /// <summary>
@@ -1090,25 +1093,6 @@ namespace Client
             int y2;
             Tile[,] tempArr;
 
-            if (Instance == null) return; // safety
-            if (!Information.IsNumeric(Instance.txtMaxX.Text))
-                Instance.txtMaxX.Text = Data.MyMap.MaxX.ToString();
-
-            if (Conversion.Val(Instance.txtMaxX.Text) < SettingsManager.Instance.CameraWidth)
-                Instance.txtMaxX.Text = SettingsManager.Instance.CameraWidth.ToString();
-
-            if (Conversion.Val(Instance.txtMaxX.Text) > System.Byte.MaxValue)
-                Instance.txtMaxX.Text = System.Byte.MaxValue.ToString();
-
-            if (!Information.IsNumeric(Instance.txtMaxY.Text))
-                Instance.txtMaxY.Text = Data.MyMap.MaxY.ToString();
-
-            if (Conversion.Val(Instance.txtMaxY.Text) < SettingsManager.Instance.CameraHeight)
-                Instance.txtMaxY.Text = SettingsManager.Instance.CameraHeight.ToString();
-
-            if (Conversion.Val(Instance.txtMaxY.Text) > System.Byte.MaxValue)
-                Instance.txtMaxY.Text = System.Byte.MaxValue.ToString();
-
             {
                 ref var withBlock = ref Data.MyMap;
                 withBlock.Name = Instance.txtName.Text;
@@ -1690,7 +1674,9 @@ namespace Client
             var loopTo2 = Instance.lstShop.Items.Count;
             for (i = 0; i < loopTo2; i++)
             {
-                if ((Instance.lstShop.Items[i].ToString() ?? "") == (Data.Shop[Data.MyMap.Shop].Name ?? ""))
+                // Add bounds checking for Data.MyMap.Shop to prevent IndexOutOfRangeException
+                if (Data.MyMap.Shop >= 0 && Data.MyMap.Shop < Constant.MaxShops && 
+                    (Instance.lstShop.Items[i].ToString() ?? "") == (Data.Shop[Data.MyMap.Shop].Name ?? ""))
                 {
                     Instance.lstShop.SelectedIndex = i - 1;
                     break;
@@ -1853,6 +1839,9 @@ namespace Client
             Instance.scrlMapGreen.Value = Data.MyMap.MapTintG;
             Instance.scrlMapBlue.Value = Data.MyMap.MapTintB;
             Instance.scrlMapAlpha.Value = Data.MyMap.MapTintA;
+            Instance.txtMaxX.Text = Data.MyMap.MaxX.ToString();
+            Instance.txtMaxY.Text = Data.MyMap.MaxY.ToString();
+
             Instance.Visible = true;
             MapPropertiesInit();
 
