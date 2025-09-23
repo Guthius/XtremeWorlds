@@ -38,7 +38,7 @@ namespace Client
         public CheckBox optChangeItemRemove = new CheckBox { Text = "Remove" };
         public RadioButton optChangeSkillsAdd = new RadioButton { Text = "Add Skill" };
         public RadioButton optChangeSkillsRemove = new RadioButton { Text = "Remove Skill" };
-        public RadioButton optCondition0 = new RadioButton { Text = "Player Var" };
+        public RadioButton optCondition0 = new RadioButton { Text = "Player Variable" };
         public RadioButton optCondition1 = new RadioButton { Text = "Player Switch" };
         public RadioButton optCondition2 = new RadioButton { Text = "Has Item" };
         public RadioButton optCondition3 = new RadioButton { Text = "Self Switch" };
@@ -268,7 +268,7 @@ namespace Client
         public ComboBox cmbVariableDataType = new ComboBox();
         public ComboBox cmbPlayerVarCompare = new ComboBox();
         public NumericStepper nudPlayerVariable = new NumericStepper();
-        public CheckBox chkPlayerVar = new CheckBox { Text = "Player Var" };
+        public CheckBox chkPlayerVar = new CheckBox { Text = "Player Variable" };
         public CheckBox chkPlayerSwitch = new CheckBox { Text = "Player Switch" };
         public ComboBox cmbPlayerSwitchCompare = new ComboBox();
         public CheckBox chkHasItem = new CheckBox { Text = "Has Item" };
