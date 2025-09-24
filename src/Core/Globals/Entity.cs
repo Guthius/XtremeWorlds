@@ -154,80 +154,25 @@ public class Entity
             Vital = npc.Vital,
             X = npc.X,
             Y = npc.Y,
-            Dir = (byte) npc.Dir,
+            Dir = (byte)npc.Dir,
             AttackTimer = npc.AttackTimer,
             SpawnWait = npc.SpawnWait,
             StunDuration = npc.StunDuration,
             StunTimer = npc.StunTimer,
             SkillBuffer = npc.SkillBuffer,
             SkillBufferTimer = npc.SkillBufferTimer,
-            Skill = npc.SkillCd != null ? (int[]) npc.SkillCd.Clone() : null,
+            Skill = npc.SkillCd != null ? (int[])npc.SkillCd.Clone() : null,
             Attacking = npc.Attacking,
         };
+
+        // Pull behavior-related data from NPC template for AI logic
+        if (npc.Num >= 0 && npc.Num < Data.Npc.Length)
+        {
+            entity.Behavior = Data.Npc[npc.Num].Behavior;
+            entity.Range = Data.Npc[npc.Num].Range;
+            entity.AttackSay = Data.Npc[npc.Num].AttackSay;
+            entity.Name = Data.Npc[npc.Num].Name;
+        }
         return entity;
-    }
-
-    public static MapNpc ToNpc(int id, Entity entity)
-    {
-        return new MapNpc
-        {
-            Num = entity.Num,
-            Target = entity.Target,
-            TargetType = entity.TargetType,
-            Vital = entity.Vital != null ? (int[]) entity.Vital.Clone() : [],
-            X = entity.X,
-            Y = entity.Y,
-            Dir = entity.Dir,
-            AttackTimer = entity.AttackTimer,
-            SpawnWait = entity.SpawnWait,
-            StunDuration = entity.StunDuration,
-            StunTimer = entity.StunTimer,
-            SkillBuffer = entity.SkillBuffer,
-            SkillBufferTimer = entity.SkillBufferTimer,
-            SkillCd = entity.Skill != null ? (int[]) entity.Skill.Clone() : [],
-            StopRegen = entity.StopRegen,
-            StopRegenTimer = 0,
-            Moving = entity.Moving,
-            Attacking = entity.Attacking,
-            Steps = entity.Steps
-        };
-    }
-
-    public static Player ToPlayer(int id, Entity entity)
-    {
-        return new Player
-        {
-            Name = entity.Name ?? string.Empty,
-            Sex = entity.Sex,
-            Job = entity.Job,
-            Sprite = entity.Sprite,
-            Level = entity.Level,
-            Exp = entity.Exp,
-            Access = entity.Access,
-            Pk = entity.Pk,
-            Vital = entity.Vital != null ? (int[]) entity.Vital.Clone() : [],
-            Stat = entity.Stat != null ? (byte[]) entity.Stat.Clone() : [],
-            Points = entity.Points,
-            Equipment = entity.Equipment != null ? (PlayerEq[]) entity.Equipment.Clone() : [],
-            Inv = entity.Inv != null ? entity.Inv.Cast<PlayerInv>().ToArray() : [],
-            Skill = entity.PlayerSkill != null ? entity.PlayerSkill.Cast<PlayerSkill>().ToArray() : [],
-            Map = entity.Map,
-            X = entity.X,
-            Y = entity.Y,
-            Dir = entity.Dir,
-            Hotbar = entity.Hotbar != null ? entity.Hotbar.Cast<Hotbar>().ToArray() : [],
-            Switches = entity.Switches != null ? (byte[]) entity.Switches.Clone() : [],
-            Variables = entity.Variables != null ? (int[]) entity.Variables.Clone() : [],
-            GatherSkills = entity.GatherSkills,
-            Moving = entity.Moving,
-            Attacking = entity.Attacking,
-            AttackTimer = entity.AttackTimer,
-            Steps = entity.Steps,
-            Emote = entity.Emote,
-            EmoteTimer = entity.EmoteTimer,
-            EventTimer = entity.EventTimer,
-            Quests = entity.Quests != null ? entity.Quests.Cast<PlayerQuest>().ToArray() : [],
-            GuildId = entity.GuildId
-        };
     }
 }
