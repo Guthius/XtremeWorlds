@@ -1939,6 +1939,7 @@ namespace Client
             var gfxInfo = GetGfxInfo(Path.Combine(DataPath.Characters, sprite.ToString()));
             if (gfxInfo == null) return;
             int directionRows = ComputeDirectionRows(gfxInfo.Height, Math.Max(1, SettingsManager.Instance.SpriteDirections));
+
             // Map direction to row after computing available rows
             spriteLeft = MapDirectionToRow((Direction)Data.MyMapNpc[(int)mapNpcNum].Dir, directionRows);
             int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
@@ -1953,6 +1954,7 @@ namespace Client
             if (autoColsBySquare <= 0) autoColsBySquare = 1;
             bool widthDivisible = expectedTotalColumns > 0 && gfxInfo.Width % expectedTotalColumns == 0;
             int candidateFrameWidth = widthDivisible ? gfxInfo.Width / expectedTotalColumns : 0;
+            
             // Relaxed segmentation: if width is divisible by expected columns we segment, even if not perfectly square.
             bool canSegment = widthDivisible; // old heuristic removed to prevent cycling through all segments linearly
             int frameColumnsForWidth = canSegment ? expectedTotalColumns : autoColsBySquare; // legacy fallback
@@ -1977,7 +1979,9 @@ namespace Client
                 else if (t == "run") runningOffset += runFrames;
                 else if (t == "attack") runningOffset += attackFrames;
             }
-            bool isMoving = provisionalMoving && !isAttacking && canSegment;
+            // Allow a short post-stop window to finish the running segment frames
+            bool finishingRun = !provisionalMoving && !isAttacking && canSegment && Client.Npc.ShouldRenderRun(mapNpcNum, runFrames, tick, Data.MyMapNpc[mapNpcNum].Steps);
+            bool isMoving = (provisionalMoving || finishingRun) && !isAttacking && canSegment;
 
             if (canSegment)
             {
