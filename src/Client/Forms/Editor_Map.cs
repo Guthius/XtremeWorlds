@@ -55,7 +55,7 @@ namespace Client
         public Label lblMapWarpX = new Label();
         public Label lblMapWarpMap = new Label();
         public GroupBox fraNpcSpawn = new GroupBox{ Text = "Npc Spawn" };
-        public ListBox lstNpc = new() { Width = 200 };
+        public ListBox lstNpc = new() { Width = 500 };;
         public Button btnNpcSpawn = new Button { Text = "OK" };
         public Slider scrlNpcDir = new Slider();
         public Label lblNpcDir = new Label();
@@ -207,6 +207,7 @@ namespace Client
                 RefreshNpcCombo();
 
             RefreshNpcList();
+            RefreshNpcSpawnList();
         }
 
         private bool IsComboDataReady()
@@ -281,6 +282,30 @@ namespace Client
                 return;
             }
             lstMapNpc.SelectedIndex = (selected >= 0 && selected < lstMapNpc.Items.Count) ? selected : 0;
+        }
+
+        // Populate the npc Spawn list (attribute dialog) with Map NPC slots for the current map
+        private void RefreshNpcSpawnList()
+        {
+            int prev = lstNpc.SelectedIndex;
+            lstNpc.Items.Clear();
+            for (int slot = 0; slot < Constant.MaxMapNpcs && slot < Data.MyMap.Npc.Length; slot++)
+            {
+                if (slot == 0)
+                {
+                    lstNpc.Items.Add("0: None");
+                    continue;
+                }
+
+                int npcIndex = Data.MyMap.Npc[slot];
+                string name = (npcIndex >= 0 && npcIndex < Constant.MaxNpcs)
+                    ? Strings.Trim(Data.Npc[npcIndex].Name)
+                    : "None";
+                lstNpc.Items.Add($"{slot}: {name}");
+            }
+
+            // Keep selection if possible; default to slot 0 (None)
+            lstNpc.SelectedIndex = (prev >= 0 && prev < lstNpc.Items.Count) ? prev : 0;
         }
 
         public Editor_Map()
@@ -520,10 +545,13 @@ namespace Client
             btnResourceOk.Click += BtnResourceOk_Click;
 
             lstNpc.SelectedIndex = 0;
+            lblNpcDir.Text = "Direction: Up";
             scrlNpcDir.MinValue = 0; scrlNpcDir.MaxValue = 3; scrlNpcDir.ValueChanged += ScrlNpcDir_Scroll;
             btnNpcSpawn.Click += BtnNpcSpawn_Click;
+            RefreshNpcSpawnList();
 
-            cmbShop.SelectedIndex = 0; btnShop.Click += BtnShop_Click;
+            cmbShop.SelectedIndex = 0;
+            btnShop.Click += BtnShop_Click;
 
             cmbHeal.Items.Clear();
             cmbHeal.Items.Add("Hp");
@@ -533,7 +561,8 @@ namespace Client
             scrlHeal.MinValue = 1; scrlHeal.MaxValue = 1024; btnHeal.Click += BtnHeal_Click; scrlHeal.ValueChanged += (_, __) => UpdateHealAmountLabel();
             scrlTrap.MinValue = 1; scrlTrap.MaxValue = 1024; btnTrap.Click += BtnTrap_Click; scrlTrap.ValueChanged += (_, __) => UpdateTrapAmountLabel();
 
-            cmbAnimation.SelectedIndex = 0; btnAnimation.Click += btnAnimation_Click;
+            cmbAnimation.SelectedIndex = 0;
+            btnAnimation.Click += btnAnimation_Click;
 
             btnFillAttributes.Click += btnFillAttributes_Click;
             btnClearAttributes.Click += btnClearAttributes_Click;
@@ -552,7 +581,7 @@ namespace Client
             scrlMapItemValue.Width = 400;
             scrlMapItemValue.MinValue = 1;
 
-            // NPC spawn direction
+            // Bpc spawn direction
             scrlNpcDir.Width = 400;
             scrlNpcDir.Height = 30;
 
@@ -1351,7 +1380,19 @@ namespace Client
 
         private void BtnNpcSpawn_Click(object? sender, EventArgs e)
         {
-            GameState.SpawnNpcNum = lstNpc.SelectedIndex;
+            // Persist the map NPC slot number in Data1 for TileType.NpcSpawn
+            int slot = 0;
+            try
+            {
+                var text = lstNpc.SelectedIndex >= 0 ? lstNpc.Items[lstNpc.SelectedIndex]?.ToString() : null;
+                if (!string.IsNullOrEmpty(text) && TryParseLeadingNumber(text, out var parsed))
+                    slot = parsed;
+                else
+                    slot = Math.Max(0, lstNpc.SelectedIndex);
+            }
+            catch { slot = Math.Max(0, lstNpc.SelectedIndex); }
+
+            GameState.SpawnNpcNum = slot;
             GameState.SpawnNpcDir = scrlNpcDir.Value;
             pnlAttributes.Visible = false;
             fraNpcSpawn.Visible = false;
@@ -1744,6 +1785,7 @@ namespace Client
 
             // Also seed lstNpc (spawn list) now so attribute panel opens instantly populated
             Instance.RefreshNpcList();
+            Instance.RefreshNpcSpawnList();
 
             Instance.cmbAnimation.Items.Clear();
 

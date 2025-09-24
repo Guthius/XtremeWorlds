@@ -97,8 +97,6 @@ public static class Program
 
         if (GameState.InitEventEditor)
         {
-            // Initialize editor state from the selected event id (GameState.EventNum)
-            Event.EventEditorInit();
             new Editor_Event().Show();
             GameState.InitEventEditor = false;
         }

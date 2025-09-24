@@ -65,15 +65,11 @@ namespace Client
 
         private void ScrollRightPaneTop()
         {
-            try
+            if (_rightScroll != null)
             {
-                if (_rightScroll != null)
-                {
-                    // Reset scroll to top-left; use Eto.Drawing namespace explicitly to avoid ambiguity
-                    _rightScroll.ScrollPosition = new Eto.Drawing.Point(0, 0);
-                }
+                // Reset scroll to top-left; use Eto.Drawing namespace explicitly to avoid ambiguity
+                _rightScroll.ScrollPosition = new Eto.Drawing.Point(0, 0);
             }
-            catch { }
         }
 
         // Legacy sizing hook retained for compatibility with existing calls
@@ -138,7 +134,7 @@ namespace Client
         public ComboBox cmbPlayBGM = new ComboBox();
         public ComboBox cmbPlaySound = new ComboBox();
         public ComboBox cmbOpenShop = new ComboBox();
-        public ComboBox cmbSpawnNpc = new ComboBox();
+        public ListBox cmbSpawnNpc = new ListBox { Width = 200 };
         public NumericStepper nudFogData0 = new NumericStepper();
         public NumericStepper nudWPMap = new NumericStepper();
         public Panel fraDialogue = new Panel();
@@ -298,9 +294,10 @@ namespace Client
         {
             _instance = this;
             Title = "Event Editor";
-        // Make the editor more compact by default
-        ClientSize = new Size(1200, 680);
+            // Make the editor more compact by default
+            ClientSize = new Size(1200, 680);
             InitializeComponent();
+            Event.EventEditorInit();
         }
 
         private void InitializeComponent()
