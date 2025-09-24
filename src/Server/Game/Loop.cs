@@ -186,7 +186,7 @@ namespace Server
             var entities = Core.Globals.Entity.Instances;
             var mapCount = Core.Globals.Constant.MaxMaps;
 
-            // Use entities from Entity class
+            // Use entities from entity class
             for (int mapNum = 0; mapNum < mapCount; mapNum++)
             {
                 // Add Npcs
@@ -216,21 +216,6 @@ namespace Server
             }
 
             Script.Instance?.UpdateMapAi();
-
-            // Use entities from Entity class
-            for (int mapNum = 0; mapNum < mapCount; mapNum++)
-            {
-                // Add Npcs
-                for (int i = 0; i < Core.Globals.Constant.MaxMapNpcs; i++)
-                {
-                    var npc = Core.Globals.Entity.FromNpc(i, Data.MapNpc[mapNum].Npc[i]);
-                    if (npc.Num >= 0)
-                    {
-                        npc.Map = mapNum;
-                        entities.Add(npc);
-                    }
-                }
-            }
         }
 
         public static void CastSkill(int index, int skillSlot)
