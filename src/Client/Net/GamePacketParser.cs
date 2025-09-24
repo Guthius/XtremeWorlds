@@ -53,6 +53,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Bind(Packets.ServerPackets.SUpdateItem, Item.Packet_UpdateItem);
         Bind(Packets.ServerPackets.SSpawnNpc, Packet_SpawnNpc);
         Bind(Packets.ServerPackets.SNpcDead, Packet_NpcDead);
+        Bind(Packets.ServerPackets.SPlayerDead, Packet_PlayerDead);
         Bind(Packets.ServerPackets.SUpdateNpc, Packet_UpdateNpc);
         Bind(Packets.ServerPackets.SEditMap, Map.Packet_EditMap);
         Bind(Packets.ServerPackets.SUpdateShop, Shop.Packet_UpdateShop);
@@ -404,10 +405,13 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         ref var mapNpc = ref Data.MyMapNpc[mapNpcNum];
 
+        // Server signals start of a 1-tile move. Keep the authoritative starting position,
+        // initialize client-side step bookkeeping, and set moving state/dir.
         mapNpc.X = x;
         mapNpc.Y = y;
         mapNpc.Dir = dir;
-        mapNpc.Moving = (byte) movement;
+        mapNpc.Moving = (byte)movement;
+        Client.Npc.StartStep(mapNpcNum, x, y, dir);
     }
 
     private static void Packet_NpcDir(ReadOnlyMemory<byte> data)
@@ -420,7 +424,11 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         ref var mapNpc = ref Data.MyMapNpc[mapNpcNum];
 
         mapNpc.Dir = dir;
+        // Ensure we finish at the exact destination for the last step
+        Client.Npc.SnapToDest(mapNpcNum);
         mapNpc.Moving = 0;
+        // Mark movement stop so renderer may finish the run cycle visually
+        Client.Npc.MarkMoveStop(mapNpcNum);
     }
 
     private static void Packet_Attack(ReadOnlyMemory<byte> data)
@@ -519,9 +527,19 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     {
         var packetReader = new PacketReader(data);
 
+        var timer = packetReader.ReadInt32(); // milliseconds until respawn
         var mapNpcNum = packetReader.ReadInt32();
 
+        Data.MyMapNpc[mapNpcNum].DeathTimer = Client.General.GetTickCount() + timer;
         Map.ClearMapNpc(mapNpcNum);
+    }
+
+    private static void Packet_PlayerDead(ReadOnlyMemory<byte> data)
+    {
+        var packetReader = new PacketReader(data);
+        var timer = packetReader.ReadInt32(); // milliseconds until respawn
+
+        Data.Player[packetReader.ReadInt32()].DeathTimer = Client.General.GetTickCount() + timer;
     }
 
     private static void Packet_UpdateNpc(ReadOnlyMemory<byte> data)

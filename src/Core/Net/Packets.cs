@@ -241,8 +241,10 @@ public static class Packets
         STime = 105,
         SClock = 106,
         SScriptEditor = 107,
+        // Death notifications
+        SPlayerDead = 108,
 
         // Make sure COUNT is below everything else
-        Count = 108
+        Count = 109
     }
 }

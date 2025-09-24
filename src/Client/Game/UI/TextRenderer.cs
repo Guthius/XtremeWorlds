@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using Core.Configurations;
 using Core.Globals;
@@ -346,20 +347,36 @@ public static class TextRenderer
                 }
         }
 
-        var textX = GameLogic.ConvertMapX(Data.MyMapNpc[mapNpcNum].X) + GameState.SizeX / 2 - 6;
-        textX -= (int) (GetTextWidth(Data.Npc[(int) npcNum].Name) / 6d);
+        var remaining = Data.MyMapNpc[mapNpcNum].DeathTimer - General.GetTickCount() / 1000;
+        if (remaining < 0) remaining = 0;
 
-        if (Data.Npc[(int) npcNum].Sprite < 1 | Data.Npc[(int) npcNum].Sprite > GameState.NumCharacters)
+        var name = "";
+
+        if (remaining > 0)
         {
-            textY = GameLogic.ConvertMapY(Data.MyMapNpc[mapNpcNum].Y) - 16;
+            name = $"{remaining}...";
         }
         else
         {
-            textY = GameLogic.ConvertMapY((int) (Data.MyMapNpc[mapNpcNum].Y - GameClient.GetGfxInfo(Path.Combine(DataPath.Characters, Data.Npc[(int) npcNum].Sprite.ToString())).Height / 4d + 16d));
+            name = Data.Npc[(int)npcNum].Name;
+        }
+
+        int baseWorldX = Data.MyMapNpc[mapNpcNum].X;
+        int baseWorldY = Data.MyMapNpc[mapNpcNum].Y;
+        int centerX = GameLogic.ConvertMapX(baseWorldX) + GameState.SizeX / 2 - 6;
+        var textX = centerX - (int)(GetTextWidth(name) / 6d);
+
+        if (Data.Npc[(int) npcNum].Sprite < 1 | Data.Npc[(int) npcNum].Sprite > GameState.NumCharacters)
+        {
+            textY = GameLogic.ConvertMapY(baseWorldY) - 16;
+        }
+        else
+        {
+            textY = GameLogic.ConvertMapY((int) (baseWorldY - GameClient.GetGfxInfo(Path.Combine(DataPath.Characters, Data.Npc[(int) npcNum].Sprite.ToString())).Height / 4d + 16d));
         }
 
         // Draw name
-        RenderText(Data.Npc[(int) npcNum].Name, textX, textY, color, backColor);
+        RenderText(name, textX, textY, color, backColor);
     }
 
     public static void DrawEventName(int index)
@@ -630,17 +647,30 @@ public static class TextRenderer
             color = Color.Red;
         }
 
-        var name = Data.Player[index].Name;
+        var remaining = (Data.Player[index].DeathTimer - General.GetTickCount()) / 1000;
+        if (remaining < 0) remaining = 0;
 
-        // calc pos
-        var textX = GameLogic.ConvertMapX(GetPlayerRawX(index)) + GameState.SizeY / 2 - 6;;
-        textX = (int) Math.Round(textX - GetTextWidth(name) / 6d);
+        var name = "";
+
+        if (remaining > 0)
+        {
+            name = $"{remaining}...";
+        }
+        else
+        {
+            name = Data.Player[index].Name;
+        }
+
+        int baseWorldX = GetPlayerRawX(index);
+        int baseWorldY = GetPlayerRawY(index);
+        int centerX = GameLogic.ConvertMapX(baseWorldX) + GameState.SizeX / 2 - 6;
+        var textX = (int)Math.Round(centerX - GetTextWidth(name) / 6d);
 
         int spriteNum = GetPlayerSprite(index);
         if (spriteNum <= 0 || spriteNum > GameState.NumCharacters)
         {
             // Fallback legacy behavior if sprite invalid
-            textY = GameLogic.ConvertMapY(GetPlayerRawY(index)) - 16;
+            textY = GameLogic.ConvertMapY(baseWorldY) - 16;
             RenderText(name, textX, textY, color, backColor);
             return;
         }
@@ -649,7 +679,7 @@ public static class TextRenderer
         var gfxInfo = GameClient.GetGfxInfo(Path.Combine(DataPath.Characters, spriteNum.ToString()));
         if (gfxInfo == null || gfxInfo.Height <= 0)
         {
-            textY = GameLogic.ConvertMapY(GetPlayerRawY(index)) - 16;
+            textY = GameLogic.ConvertMapY(baseWorldY) - 16;
             RenderText(name, textX, textY, color, backColor);
             return;
         }
@@ -669,7 +699,7 @@ public static class TextRenderer
         if (frameHeight <= 0) frameHeight = 32; // safety fallback
 
         // Determine the world Y where sprite base (feet) is drawn accounting for tall sprite upward shift in DrawPlayer
-        int worldBaseY = GetPlayerRawY(index);
+        int worldBaseY = baseWorldY;
         int spriteTopWorldY = worldBaseY; // will subtract any tall-sprite offset below
         if (frameHeight > 32)
         {

@@ -22,6 +22,108 @@ namespace Client
         private static readonly int[] DestX = new int[Constant.MaxMapNpcs];
         private static readonly int[] DestY = new int[Constant.MaxMapNpcs];
 
+        // Run animation finishing support: after movement stops, keep rendering the run segment
+        // until the current cycle completes (based on Steps and 250ms cadence).
+        private static readonly long[] StopTick = new long[Constant.MaxMapNpcs];
+        private static readonly long[] FinishUntil = new long[Constant.MaxMapNpcs];
+        private const int StepsCadenceMs = 250; // matches Loop.cs _tmr250 cadence
+
+        /// <summary>
+        /// Call when an NPC begins moving (SNpcMove). Clears any pending finish-tail.
+        /// </summary>
+        public static void MarkMoveStart(int index)
+        {
+            if (index < 0 || index >= Constant.MaxMapNpcs) return;
+            StopTick[index] = 0;
+            FinishUntil[index] = 0;
+        }
+
+        /// <summary>
+        /// Initializes a new 1-tile step starting from the given start position and direction.
+        /// Also clears any pending finish-tail.
+        /// </summary>
+        public static void StartStep(int index, int startX, int startY, byte dir)
+        {
+            if (index < 0 || index >= Constant.MaxMapNpcs) return;
+            // Reset finish-tail
+            StopTick[index] = 0;
+            FinishUntil[index] = 0;
+            // Initialize movement bookkeeping
+            RemainingPixels[index] = TileSize;
+            var (fullDx, fullDy) = GetDirectionDelta(dir, TileSize);
+            DestX[index] = startX + fullDx;
+            DestY[index] = startY + fullDy;
+        }
+
+        /// <summary>
+        /// Call when an NPC stops moving (SNpcDir). Records the stop time; actual finish window is computed lazily in Draw.
+        /// </summary>
+        public static void MarkMoveStop(int index)
+        {
+            if (index < 0 || index >= Constant.MaxMapNpcs) return;
+            StopTick[index] = General.GetTickCount();
+            FinishUntil[index] = 0; // will be set on first ShouldRenderRun call
+        }
+
+        /// <summary>
+        /// Snap NPC to its last planned tile destination (used when receiving SNpcDir at tile end).
+        /// </summary>
+        public static void SnapToDest(int index)
+        {
+            if (index < 0 || index >= Constant.MaxMapNpcs) return;
+            if (Data.MyMapNpc == null) return;
+            ref var npc = ref Data.MyMapNpc[index];
+            if (RemainingPixels[index] > 0)
+            {
+                npc.X = DestX[index];
+                npc.Y = DestY[index];
+                RemainingPixels[index] = 0;
+            }
+        }
+
+        /// <summary>
+        /// Determines if we should keep rendering the run segment after movement stopped
+        /// to complete the current run cycle. Uses Steps modulo runFrames to compute remaining frames.
+        /// </summary>
+        /// <param name="index">NPC index</param>
+        /// <param name="runFrames">Number of frames in the run segment (>=1)</param>
+        /// <param name="tick">Current tick count</param>
+        /// <param name="steps">Current Steps counter for this NPC</param>
+        public static bool ShouldRenderRun(int index, int runFrames, long tick, int steps)
+        {
+            if (index < 0 || index >= Constant.MaxMapNpcs) return false;
+            if (runFrames <= 1) return false; // nothing to finish
+            if (Data.MyMapNpc[index].Moving != 0) return false; // currently moving, not finishing
+
+            // If we haven't observed a stop, nothing to finish
+            long stoppedAt = StopTick[index];
+            if (stoppedAt <= 0) return false;
+
+            // Initialize finish window if not yet computed
+            if (FinishUntil[index] <= 0)
+            {
+                int shown = steps % runFrames;
+                int remaining = (runFrames - shown) % runFrames;
+                if (remaining <= 0)
+                {
+                    // No remaining frames; nothing to finish
+                    StopTick[index] = 0;
+                    return false;
+                }
+                FinishUntil[index] = stoppedAt + remaining * StepsCadenceMs;
+            }
+
+            if (tick < FinishUntil[index])
+            {
+                return true;
+            }
+
+            // Finished tail; clear markers
+            StopTick[index] = 0;
+            FinishUntil[index] = 0;
+            return false;
+        }
+
         /// <summary>
         /// Raised when an NPC lands exactly on a tile boundary (x % 32 == 0 && y % 32 == 0).
         /// Args: (npcIndex, tileX, tileY)

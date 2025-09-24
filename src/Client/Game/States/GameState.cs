@@ -453,6 +453,5 @@ namespace Client
         public static bool[] JobChanged = new bool[(Constant.MaxJobs)];
         public static bool[] MoralChanged = new bool[(Constant.MaxMorals)];
         public static bool[] ProjectileChanged = new bool[Constant.MaxProjectiles];
-        public static int DeathTimerExpiryMs;
     }
 }

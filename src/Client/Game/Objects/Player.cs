@@ -196,8 +196,8 @@ namespace Client
             {
                 return canMove;
             }
-            
-            var remaining = (int) ((Client.GameState.DeathTimerExpiryMs + Client.General.GetTickCount()) / 1000);
+
+            var remaining = (int) (Data.Player[GameState.MyIndex].DeathTimer - General.GetTickCount()) / 1000;
             if (remaining < 0) remaining = 0;
 
             if (remaining > 0)
@@ -817,7 +817,7 @@ namespace Client
                     return;
                 }
 
-                var remaining = (int) ((Client.GameState.DeathTimerExpiryMs + Client.General.GetTickCount()) / 1000);
+                var remaining = (int) (Data.Player[GameState.MyIndex].DeathTimer - General.GetTickCount()) / 1000;
                 if (remaining < 0) remaining = 0;
 
                 if (remaining > 0)

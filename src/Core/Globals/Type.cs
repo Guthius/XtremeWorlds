@@ -263,6 +263,8 @@ public static class Type
         public int EventTimer;
         public PlayerQuest[] Quests;
         public int GuildId;
+        public bool Dead;
+        public int DeathTimer;
     }
 
     public struct TempPlayer
@@ -376,6 +378,7 @@ public static class Type
         public byte Moving;
         public byte Attacking;
         public int Steps;
+        public int DeathTimer;
     }
 
     public struct MapData

@@ -14,6 +14,8 @@ public static class Npc
 {
     // Tracks remaining pixels to finish the current tile step for each NPC on each map.
     private static readonly int[,] _stepRemaining = new int[Core.Globals.Constant.MaxMaps, Core.Globals.Constant.MaxMapNpcs];
+    // Planned multi-tile movement route (as directions) per NPC.
+    private static readonly System.Collections.Generic.Queue<byte>?[,] _route = new System.Collections.Generic.Queue<byte>?[Core.Globals.Constant.MaxMaps, Core.Globals.Constant.MaxMapNpcs];
     public static async Task SpawnAllMapNpcs()
     {
         await Task.WhenAll(Enumerable
@@ -33,13 +35,21 @@ public static class Npc
     {
         var spawned = false;
 
+        // Validate map
+        if (mapNum < 0 || mapNum >= Core.Globals.Constant.MaxMaps)
+        {
+            return;
+        }
+
         if (Data.Map[mapNum].NoRespawn)
         {
             return;
         }
 
         var npcNum = Data.Map[mapNum].Npc[mapNpcNum];
-        if (mapNpcNum == 0 || npcNum < 0 || npcNum > Core.Globals.Constant.MaxNpcs)
+        
+        // Validate slot and npc index; allow slot 0
+        if (mapNpcNum < 0 || mapNpcNum >= Core.Globals.Constant.MaxMapNpcs || npcNum < 0 || npcNum >= Core.Globals.Constant.MaxNpcs)
         {
             return;
         }
@@ -69,18 +79,20 @@ public static class Npc
         {
             for (var y = 0; y < Data.Map[mapNum].MaxY; y++)
             {
-                if (Data.Map[mapNum].Tile[x, y].Type != TileType.NpcSpawn ||
-                    Data.Map[mapNum].Tile[x, y].Data1 != mapNpcNum)
-                {
+                var tile = Data.Map[mapNum].Tile[x, y];
+                bool isPrimaryMatch = tile.Type == TileType.NpcSpawn && tile.Data1 == mapNpcNum;
+                bool isSecondaryMatch = tile.Type2 == TileType.NpcSpawn && tile.Data1_2 == mapNpcNum;
+                if (!isPrimaryMatch && !isSecondaryMatch)
                     continue;
-                }
 
                 Data.MapNpc[mapNum].Npc[mapNpcNum].X = x * 32;
-                Data.MapNpc[mapNum].Npc[mapNpcNum].Dir = (byte) Data.Map[mapNum].Tile[x, y].Data2;
+                Data.MapNpc[mapNum].Npc[mapNpcNum].Y = y * 32;
+                Data.MapNpc[mapNum].Npc[mapNpcNum].Dir = (byte)(isPrimaryMatch ? tile.Data2 : tile.Data2_2);
 
                 spawned = true;
                 break;
             }
+            if (spawned) break;
         }
 
         if (!spawned)
@@ -156,8 +168,8 @@ public static class Npc
         foreach (var playerId in PlayerService.Instance.PlayerIds)
         {
             if (GetPlayerMap(playerId) == mapNum &&
-                GetPlayerX(playerId) == x * 32 &&
-                GetPlayerY(playerId) == y * 32)
+                GetPlayerX(playerId) == x &&
+                GetPlayerY(playerId) == y)
             {
                 return false;
             }
@@ -166,8 +178,8 @@ public static class Npc
         for (var mapNpcNum = 0; mapNpcNum < Core.Globals.Constant.MaxMapNpcs; mapNpcNum++)
         {
             if (Data.MapNpc[mapNum].Npc[mapNpcNum].Num >= 0 &&
-                Data.MapNpc[mapNum].Npc[mapNpcNum].X == x * 32 &&
-                Data.MapNpc[mapNum].Npc[mapNpcNum].Y == y  * 32)
+                Data.MapNpc[mapNum].Npc[mapNpcNum].X == x &&
+                Data.MapNpc[mapNum].Npc[mapNpcNum].Y == y)
             {
                 return false;
             }
@@ -324,7 +336,14 @@ public static class Npc
                     npc.Moving = 0;
                     _stepRemaining[map, i] = 0;
 
-                    // Send stop (direction) packet so clients stop animating exactly on tile
+                    // If there is a planned route, immediately continue with the next step.
+                    if (TryDequeueNextStep(map, i))
+                    {
+                        // Movement continued; don't send stop packet.
+                        continue;
+                    }
+
+                    // Route finished; send stop so clients end the walk animation exactly on tile.
                     var stopPacket = new PacketWriter(9);
                     stopPacket.WriteEnum(ServerPackets.SNpcDir);
                     stopPacket.WriteInt32(i);
@@ -352,6 +371,62 @@ public static class Npc
         packet.WriteByte(dir);
 
         NetworkConfig.SendDataToMap(mapNum, packet.GetBytes());
+    }
+
+    /// <summary>
+    /// Replace the NPC's route with the provided sequence of directions.
+    /// </summary>
+    public static void SetRoute(int mapNum, int mapNpcNum, System.Collections.Generic.IEnumerable<byte> directions)
+    {
+        if (mapNum < 0 || mapNum >= Core.Globals.Constant.MaxMaps || mapNpcNum < 0 || mapNpcNum >= Core.Globals.Constant.MaxMapNpcs) return;
+        var q = new System.Collections.Generic.Queue<byte>();
+        foreach (var d in directions) q.Enqueue(d);
+        _route[mapNum, mapNpcNum] = q;
+    }
+
+    /// <summary>
+    /// Clears any planned route for the NPC.
+    /// </summary>
+    public static void ClearRoute(int mapNum, int mapNpcNum)
+    {
+        if (mapNum < 0 || mapNum >= Core.Globals.Constant.MaxMaps || mapNpcNum < 0 || mapNpcNum >= Core.Globals.Constant.MaxMapNpcs) return;
+        _route[mapNum, mapNpcNum] = null;
+    }
+
+    /// <summary>
+    /// If there is a pending route and the NPC is not currently mid-step, dequeue the next step and start moving.
+    /// </summary>
+    public static bool TryStartNextStepNow(int mapNum, int mapNpcNum)
+    {
+        if (mapNum < 0 || mapNum >= Core.Globals.Constant.MaxMaps || mapNpcNum < 0 || mapNpcNum >= Core.Globals.Constant.MaxMapNpcs) return false;
+        ref var npc = ref Data.MapNpc[mapNum].Npc[mapNpcNum];
+        if (npc.Moving == (byte)MovementState.Walking && _stepRemaining[mapNum, mapNpcNum] > 0) return false;
+        return TryDequeueNextStep(mapNum, mapNpcNum);
+    }
+
+    /// <summary>
+    /// Pops the next planned direction and begins a new tile step if possible.
+    /// </summary>
+    private static bool TryDequeueNextStep(int mapNum, int mapNpcNum)
+    {
+        var route = _route[mapNum, mapNpcNum];
+        if (route == null || route.Count == 0) return false;
+        // Validate and attempt the next step
+        var nextDir = route.Peek();
+        if (CanNpcMove(mapNum, mapNpcNum, nextDir))
+        {
+            route.Dequeue();
+            NpcMove(mapNum, mapNpcNum, nextDir, (int)MovementState.Walking);
+            // If route is finished after this step, clear it now; ProcessActiveNpcMovement will send stop when the step ends.
+            if (route.Count == 0)
+            {
+                _route[mapNum, mapNpcNum] = null;
+            }
+            return true;
+        }
+        // Cannot move as planned; drop the route so callers can recompute.
+        _route[mapNum, mapNpcNum] = null;
+        return false;
     }
 
     private static void SendMapNpcsToMap(int mapNum)

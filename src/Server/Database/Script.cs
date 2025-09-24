@@ -44,6 +44,7 @@ public class Script
     private const int NpcRegenIntervalMs = 10000; // 10 seconds like legacy
     private const int PlayerRegenIntervalMs = 10000; // 10 seconds like legacy
     private const int BaseAttackSpeedMs = 1000; // fallback when no weapon speed
+    private const int DeathSpawnTimeMs = 60000; // 1 minute
 
     private const long ItemSpawnTime = 30000L; // 30 seconds
     private const long ItemDespawnTime = 90000L; // 1:30 seconds
@@ -550,6 +551,7 @@ public class Script
 
         // Warp player away
         SetPlayerDir(index, (byte)Direction.Down);
+        Data.Player[index].Dead = false;
 
         // clear targets
         Data.TempPlayer[index].Target = -1;
@@ -737,7 +739,8 @@ public class Script
                             {
                                 if (GetPlayerMap(player.Id) == mapNum && entity.TargetType == 0 && GetPlayerAccess(player.Id) <= (byte)AccessLevel.Moderator)
                                 {
-                                    int n = entity.Range; // range already in tiles
+                                    // Detection range: if NPC template has Range=0, use a sensible default (8 tiles)
+                                    int n = entity.Range;
                                     int ex = entity.X / 32;
                                     int ey = entity.Y / 32;
                                     int px = GetPlayerX(player.Id);
@@ -780,7 +783,8 @@ public class Script
                                     if (ReferenceEquals(otherEntity, entity)) continue;
                                     if ((int)otherEntity.Faction > 0 && otherEntity.Faction != entity.Faction)
                                     {
-                                        int n = entity.Range;
+                                        // Detection range between NPCs (same default behavior)
+                                        int n = otherEntity.Range;
                                         int ex = entity.X / 32;
                                         int ey = entity.Y / 32;
                                         int ox = otherEntity.X / 32;
@@ -814,9 +818,31 @@ public class Script
                         var pid = entity.Target;
                         if (NetworkConfig.IsPlaying(pid) && GetPlayerMap(pid) == mapNum)
                         {
-                            var targetEntity = Core.Globals.Entity.FromPlayer(pid, Data.Player[pid]);
-                            targetEntity.Map = mapNum;
-                            AttemptAttack(entity, targetEntity);
+                            // Clear target if out of chase range
+                            int ex = entity.X / 32;
+                            int ey = entity.Y / 32;
+                            int px = GetPlayerX(pid);
+                            int py = GetPlayerY(pid);
+                            // Clear target only if well beyond detection range (leash) to avoid flicker
+                            int r = entity.Range;
+                            if (Math.Abs(ex - px) > r || Math.Abs(ey - py) > r)
+                            {
+                                entity.Target = -1;
+                                entity.TargetType = 0;
+                                // reflect to base map npc if this is an NPC snapshot
+                                if (entity.Type == Core.Globals.Entity.EntityType.Npc && entity.Id >= 0 && entity.Id < Constant.MaxMapNpcs)
+                                {
+                                    ref var baseNpcClr = ref Data.MapNpc[mapNum].Npc[entity.Id];
+                                    baseNpcClr.TargetType = 0;
+                                    baseNpcClr.Target = -1;
+                                }
+                            }
+                            else
+                            {
+                                var targetEntity = Core.Globals.Entity.FromPlayer(pid, Data.Player[pid]);
+                                targetEntity.Map = mapNum;
+                                AttemptAttack(entity, targetEntity);
+                            }
                         }
                         else
                         {
@@ -832,7 +858,27 @@ public class Script
                             var targetEntity = entities[idx];
                             if (targetEntity != null && targetEntity.Type == Core.Globals.Entity.EntityType.Npc && targetEntity.Map == mapNum && targetEntity.Num >= 0)
                             {
-                                AttemptAttack(entity, targetEntity);
+                                // Clear target if out of chase range
+                                int ex = entity.X / 32;
+                                int ey = entity.Y / 32;
+                                int tx = targetEntity.X / 32;
+                                int ty = targetEntity.Y / 32;
+                                int r = entity.Range;
+                                if (Math.Abs(ex - tx) > r || Math.Abs(ey - ty) > r)
+                                {
+                                    entity.Target = -1;
+                                    entity.TargetType = 0;
+                                    if (entity.Type == Core.Globals.Entity.EntityType.Npc && entity.Id >= 0 && entity.Id < Constant.MaxMapNpcs)
+                                    {
+                                        ref var baseNpc = ref Data.MapNpc[mapNum].Npc[entity.Id];
+                                        baseNpc.TargetType = 0;
+                                        baseNpc.Target = -1;
+                                    }
+                                }
+                                else
+                                {
+                                    AttemptAttack(entity, targetEntity);
+                                }
                             }
                             else
                             {
@@ -859,11 +905,16 @@ public class Script
 #pragma warning restore CS8602
 
 #pragma warning disable CS8602
-                if (entity.Type == Core.Globals.Entity.EntityType.Npc && entity.Num == -1 && entity.SpawnSecs > 0)
+                // Handle npc respawn logic (no special death window state)
+                if (entity.Type == Core.Globals.Entity.EntityType.Npc)
                 {
-                    if (tickCount > entity.SpawnWait + entity.SpawnSecs * 1000)
+                    if (entity.Num == -1 && entity.SpawnSecs > 0)
                     {
-                        Server.Npc.SpawnNpc(x, mapNum);
+                        // Regular respawn logic
+                        if (tickCount > entity.SpawnWait)
+                        {
+                            Server.Npc.SpawnNpc(x, mapNum);
+                        }
                     }
                 }
 #pragma warning restore CS8602
@@ -899,6 +950,42 @@ public class Script
                 }
 
                 bool moved = false;
+
+                // If target exists but is out of range, clear it before deciding movement
+                if (baseNpc.TargetType == (byte)TargetType.Player && baseNpc.Target >= 0 && NetworkConfig.IsPlaying(baseNpc.Target) && GetPlayerMap(baseNpc.Target) == map)
+                {
+                    int sxR = baseNpc.X / 32;
+                    int syR = baseNpc.Y / 32;
+                    int txR = GetPlayerX(baseNpc.Target);
+                    int tyR = GetPlayerY(baseNpc.Target);
+                    int rR = Math.Max(0, (int)Data.Npc[baseNpc.Num].Range);
+                    if (Math.Abs(sxR - txR) > rR || Math.Abs(syR - tyR) > rR)
+                    {
+                        baseNpc.TargetType = 0;
+                        baseNpc.Target = -1;
+                    }
+                }
+                else if (baseNpc.TargetType == (byte)TargetType.Npc && baseNpc.Target >= 0 && baseNpc.Target < Constant.MaxMapNpcs)
+                {
+                    if (Data.MapNpc[map].Npc[baseNpc.Target].Num >= 0)
+                    {
+                        int sxR = baseNpc.X / 32;
+                        int syR = baseNpc.Y / 32;
+                        int txR = Data.MapNpc[map].Npc[baseNpc.Target].X / 32;
+                        int tyR = Data.MapNpc[map].Npc[baseNpc.Target].Y / 32;
+                        int rR = Math.Max(0, (int)Data.Npc[baseNpc.Num].Range);
+                        if (Math.Abs(sxR - txR) > rR || Math.Abs(syR - tyR) > rR)
+                        {
+                            baseNpc.TargetType = 0;
+                            baseNpc.Target = -1;
+                        }
+                    }
+                    else
+                    {
+                        baseNpc.TargetType = 0;
+                        baseNpc.Target = -1;
+                    }
+                }
 
                 // Read target info from persistent npc record
                 // Allow player index 0 as a valid target (some arrays are 1-based but be permissive)
@@ -1160,8 +1247,25 @@ public class Script
                 }
             }
 
-            NetworkSend.GlobalMsg(GetPlayerName(target.Id) + " was slain by " + GetEntityDisplayName(attacker) + ".");
-            OnPlayerDeath(target.Id);
+            NetworkSend.GlobalMsg(GetPlayerName(target.Id) + " was slain by " + GetEntityName(attacker) + ".");
+
+            // Hide the player on their client immediately (do not broadcast to map)
+            var deathPacket = new Core.Net.PacketWriter();
+            var deathTimerMs = DeathSpawnTimeMs;
+            deathPacket.WriteInt32((int)ServerPackets.SPlayerDead);
+            deathPacket.WriteInt32(deathTimerMs);
+            deathPacket.WriteInt32(target.Id);
+            PlayerService.Instance.SendDataTo(target.Id, deathPacket.GetBytes());
+
+            // After timer expires: perform the actual death warp and then release hold
+            System.Threading.Tasks.Task.Run(async () =>
+            {
+                await System.Threading.Tasks.Task.Delay(DeathSpawnTimeMs);
+                if (IsPlaying(target.Id) && Data.Player[target.Id].Dead)
+                {
+                    OnPlayerDeath(target.Id);
+                }
+            });
 
         }
         else if (target.Type == Entity.EntityType.Npc)
@@ -1173,23 +1277,31 @@ public class Script
                 // Loot
                 DropNpcLoot(map, mapNpcNum);
 
-                // Mark dead & schedule respawn
+                // Mark dead & schedule respawn with a 60-second countdown via action messages
                 ref var mapNpc = ref Data.MapNpc[map].Npc[mapNpcNum];
-                mapNpc.Num = -1; // dead state
-                mapNpc.SpawnWait = (int)General.GetTimeMs();
+                var deathTimerMs = DeathSpawnTimeMs;
+                var currentTime = (int)General.GetTimeMs();
+                
+                // Store original NPC number for respawn and set to dead state
+                int originalNpcNum = mapNpc.Num;
+                mapNpc.Num = -1; // regular dead
+                mapNpc.SpawnWait = currentTime + deathTimerMs; // respawn time
                 mapNpc.Vital[(int)Vital.Health] = 0;
 
-                // Broadcast vitals zero + maybe a death animation hook here future
-                Server.Npc.SendMapNpcVitals(map, (byte)mapNpcNum);
+                // Hide this single NPC on clients (send slot index as payload)
+                var deathPacket = new Core.Net.PacketWriter();
+                deathPacket.WriteInt32((int)ServerPackets.SNpcDead);
+                deathPacket.WriteInt32(deathTimerMs);
+                deathPacket.WriteInt32(mapNpcNum);
+                NetworkConfig.SendDataToMap(map, deathPacket.GetBytes());
 
-                // clear targets
-                ref var mapNpcTarget = ref Data.MapNpc[map].Npc[mapNpc.Target];
-                mapNpcTarget.Target = -1;
-                mapNpcTarget.TargetType = 0;
+                // clear this npc's own target
+                mapNpc.Target = -1;
+                mapNpc.TargetType = 0;
 
                 for (int i = 0; i < Constant.MaxMapNpcs; i++)
                 {
-                    if (Data.MapNpc[map].Npc[i].TargetType == (byte)TargetType.Npc & Data.MapNpc[map].Npc[i].Target == mapNpc.Target)
+                    if (Data.MapNpc[map].Npc[i].TargetType == (byte)TargetType.Npc && Data.MapNpc[map].Npc[i].Target == mapNpcNum)
                     {
                         Data.MapNpc[map].Npc[i].TargetType = 0;
                         Data.MapNpc[map].Npc[i].Target = -1;
@@ -1202,7 +1314,7 @@ public class Script
                     {
                         if (GetPlayerMap(player.Id) == map)
                         {
-                            if (Data.TempPlayer[player.Id].TargetType == (byte)TargetType.Npc & Data.TempPlayer[player.Id].Target == mapNpc.Target)
+                            if (Data.TempPlayer[player.Id].TargetType == (byte)TargetType.Npc && Data.TempPlayer[player.Id].Target == mapNpcNum)
                             {
                                 Data.TempPlayer[player.Id].TargetType = 0;
                                 Data.TempPlayer[player.Id].Target = -1;
@@ -1215,9 +1327,9 @@ public class Script
                 if (attacker.Type == Entity.EntityType.Player && mapNpc.Num == -1)
                 {
                     int baseExp = 0;
-                    if (target.Num >= 0 && target.Num < Data.Npc.Length)
+                    if (originalNpcNum >= 0 && originalNpcNum < Data.Npc.Length)
                     {
-                        baseExp = Data.Npc[target.Num].Exp; // assuming Exp field exists
+                        baseExp = Data.Npc[originalNpcNum].Exp; // assuming Exp field exists
                     }
                     if (baseExp > 0)
                     {
@@ -1230,7 +1342,7 @@ public class Script
         }
     }
 
-    private string GetEntityDisplayName(Entity e)
+    private string GetEntityName(Entity e)
     {
         if (e.Type == Entity.EntityType.Player)
         {
@@ -1279,30 +1391,21 @@ public class Script
             if (map >= 0 && map < Data.MapNpc.Length && mapNpcIndex >= 0 && mapNpcIndex < Core.Globals.Constant.MaxMapNpcs)
             {
                 ref var baseNpc = ref Data.MapNpc[map].Npc[mapNpcIndex];
-                // Only set if no existing target or current target not alive
-                bool needTarget = baseNpc.TargetType == 0;
-                if (!needTarget)
+                // Always switch target to the attacker on hit for snappy aggro behavior
+                if (attacker.Type == Entity.EntityType.Player)
                 {
-                    if (baseNpc.TargetType == (byte)TargetType.Player && (!NetworkConfig.IsPlaying(baseNpc.Target) || GetPlayerMap(baseNpc.Target) != map)) needTarget = true;
-                    else if (baseNpc.TargetType == (byte)TargetType.Npc && (baseNpc.Target < 0 || baseNpc.Target >= Core.Globals.Constant.MaxMapNpcs || Data.MapNpc[map].Npc[baseNpc.Target].Num < 0)) needTarget = true;
+                    baseNpc.TargetType = (byte)TargetType.Player;
+                    baseNpc.Target = attacker.Id;
+                    // Also reflect on snapshot target entity so current tick logic can act without waiting for rebuild.
+                    target.TargetType = (byte)TargetType.Player; // retaliation engages immediately
+                    target.Target = attacker.Id;
                 }
-                if (needTarget)
+                else if (attacker.Type == Entity.EntityType.Npc)
                 {
-                    if (attacker.Type == Entity.EntityType.Player)
-                    {
-                        baseNpc.TargetType = (byte)TargetType.Player;
-                        baseNpc.Target = attacker.Id;
-                        // Also reflect on snapshot target entity so current tick logic can act without waiting for rebuild.
-                        target.TargetType = (byte)TargetType.Player; // retaliation engages immediately
-                        target.Target = attacker.Id;
-                    }
-                    else if (attacker.Type == Entity.EntityType.Npc)
-                    {
-                        baseNpc.TargetType = (byte)TargetType.Npc;
-                        baseNpc.Target = attacker.Id; // attacker.Id is map npc slot
-                        target.TargetType = (byte)TargetType.Npc;
-                        target.Target = attacker.Id;
-                    }
+                    baseNpc.TargetType = (byte)TargetType.Npc;
+                    baseNpc.Target = attacker.Id; // attacker.Id is map npc slot
+                    target.TargetType = (byte)TargetType.Npc;
+                    target.Target = attacker.Id;
                 }
             }
         }
@@ -1363,7 +1466,16 @@ public class Script
         int dy = ty - sy;
         if (dx == 0 && dy == 0) return false; // already on target tile
 
-        // Primary direction preference
+        // Try to compute a short path and enqueue it so animation continues between tiles.
+        var route = ComputePathAStar(mapNum, sx, sy, tx, ty, maxSteps: 12);
+        if (route != null && route.Count > 0)
+        {
+            Server.Npc.SetRoute(mapNum, npcIndex, route);
+            Server.Npc.TryStartNextStepNow(mapNum, npcIndex);
+            return true;
+        }
+
+        // Fallback: attempt a single greedy step like before
         Span<byte> dirs = stackalloc byte[4];
         int count = 0;
         if (Math.Abs(dx) > Math.Abs(dy))
@@ -1376,15 +1488,6 @@ public class Script
             dirs[count++] = (byte)(dy > 0 ? Direction.Down : Direction.Up);
             if (dx != 0) dirs[count++] = (byte)(dx > 0 ? Direction.Right : Direction.Left);
         }
-
-        // Add perpendicular wiggle options to try to slide around obstacles
-        if (count == 2)
-        {
-            // Add perpendiculars
-            dirs[count++] = (byte)Direction.Left;
-            dirs[count++] = (byte)Direction.Right;
-        }
-
         for (int i = 0; i < count; i++)
         {
             var d = dirs[i];
@@ -1395,6 +1498,97 @@ public class Script
             }
         }
         return false;
+    }
+
+    private static System.Collections.Generic.List<byte>? ComputePathAStar(int mapNum, int sx, int sy, int tx, int ty, int maxSteps)
+    {
+        int maxX = Data.Map[mapNum].MaxX;
+        int maxY = Data.Map[mapNum].MaxY;
+        if (sx < 0 || sy < 0 || tx < 0 || ty < 0 || sx >= maxX || sy >= maxY || tx >= maxX || ty >= maxY) return null;
+
+        var open = new System.Collections.Generic.SortedSet<(int f,int g,int x,int y)>(System.Collections.Generic.Comparer<(int,int,int,int)>.Create((a,b)=> a.Item1!=b.Item1? a.Item1-b.Item1 : (a.Item2!=b.Item2? a.Item2-b.Item2 : (a.Item3!=b.Item3? a.Item3-b.Item3 : a.Item4-b.Item4))));
+            var cameFrom = new System.Collections.Generic.Dictionary<(int,int),(int,int)>();
+            var gScore = new System.Collections.Generic.Dictionary<(int,int),int>();
+            var start = (sx, sy);
+            var goal = (tx, ty);
+            gScore[start] = 0;
+            open.Add((Heuristic(sx, sy, tx, ty), 0, sx, sy));
+
+        int stepsExplored = 0;
+        while (open.Count > 0 && stepsExplored < 2000)
+        {
+            stepsExplored++;
+            var current = open.Min; open.Remove(current);
+            int cx = current.Item3, cy = current.Item4, cg = current.Item2;
+            if (cx == tx && cy == ty) break;
+
+            foreach (var (nx, ny, dir) in Neighbors(mapNum, cx, cy, maxX, maxY))
+            {
+                int tentative = cg + 1;
+                var key = (nx, ny);
+                if (!gScore.TryGetValue(key, out int old) || tentative < old)
+                {
+                    gScore[key] = tentative;
+                    cameFrom[key] = (cx, cy);
+                    int f = tentative + Heuristic(nx, ny, tx, ty);
+                    open.Add((f, tentative, nx, ny));
+                }
+            }
+        }
+
+        // Reconstruct
+        if (!cameFrom.ContainsKey(goal) && !(sx == tx && sy == ty))
+            return null;
+
+        var pathTiles = new System.Collections.Generic.List<(int x,int y)>();
+        var cur = goal;
+        pathTiles.Add(cur);
+        while (!cur.Equals(start) && cameFrom.TryGetValue(cur, out var prev))
+        {
+            cur = prev;
+            pathTiles.Add(cur);
+            if (pathTiles.Count > 1000) break; // safety
+        }
+        pathTiles.Reverse();
+
+        // Convert consecutive tiles into directions, cap length
+        var dirsOut = new System.Collections.Generic.List<byte>(pathTiles.Count);
+        int limit = System.Math.Min(maxSteps, pathTiles.Count - 1);
+        for (int i = 0; i < limit; i++)
+        {
+            var a = i==0 ? (sx, sy) : pathTiles[i];
+            var b = pathTiles[i+1];
+            int dx2 = b.x - a.Item1;
+            int dy2 = b.y - a.Item2;
+            byte d;
+            if (dx2 == 1) d = (byte)Direction.Right;
+            else if (dx2 == -1) d = (byte)Direction.Left;
+            else if (dy2 == 1) d = (byte)Direction.Down;
+            else d = (byte)Direction.Up;
+            dirsOut.Add(d);
+        }
+        return dirsOut;
+    }
+
+    private static int Heuristic(int x1, int y1, int x2, int y2) => System.Math.Abs(x1 - x2) + System.Math.Abs(y1 - y2);
+
+    private static System.Collections.Generic.IEnumerable<(int x,int y,byte dir)> Neighbors(int mapNum, int x, int y, int maxX, int maxY)
+    {
+        // Cardinal moves
+        if (x+1 < maxX && IsTileWalkable(mapNum, x+1, y)) yield return (x+1, y, (byte)Direction.Right);
+        if (x-1 >= 0  && IsTileWalkable(mapNum, x-1, y)) yield return (x-1, y, (byte)Direction.Left);
+        if (y+1 < maxY && IsTileWalkable(mapNum, x, y+1)) yield return (x, y+1, (byte)Direction.Down);
+        if (y-1 >= 0  && IsTileWalkable(mapNum, x, y-1)) yield return (x, y-1, (byte)Direction.Up);
+    }
+
+    private static bool IsTileWalkable(int mapNum, int x, int y)
+    {
+        // Mirror CanNpcMove constraints loosely using tile types only; dynamic collisions are validated at step time.
+        var t = Data.Map[mapNum].Tile[x, y];
+        int n = (int)t.Type; int n2 = (int)t.Type2;
+        bool ok = (n == (byte)TileType.None || n == (byte)TileType.Item || n == (byte)TileType.NpcSpawn) ||
+                  (n2 == (byte)TileType.None || n2 == (byte)TileType.Item || n2 == (byte)TileType.NpcSpawn);
+        return ok;
     }
 
     private int GetAttackSpeed(Entity attacker, int? skillId)
