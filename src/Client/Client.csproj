@@ -10,11 +10,17 @@
         <MonoGamePlatform>OpenGL</MonoGamePlatform>
     </PropertyGroup>
 
+    <!-- Opt-in flag to include macOS packaging/backends & RIDs when needed -->
+    <PropertyGroup>
+        <BuildMac>false</BuildMac>
+    </PropertyGroup>
+
 	<!-- Cross-platform TFM: non-Windows RIDs -->
-	<PropertyGroup Condition="'$(TargetFramework)'=='net9.0'">
+    <PropertyGroup Condition="'$(TargetFramework)'=='net9.0'">
         <OutputType>Exe</OutputType>
-		<RuntimeIdentifiers>linux-x64;osx-x64;osx-arm64</RuntimeIdentifiers>
-	</PropertyGroup>
+        <!-- Default to Linux only; macOS can be enabled via -p:BuildMac=true if needed -->
+        <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
+    </PropertyGroup>
 
     <!-- OutputType must be in PropertyGroup, not ItemGroup -->
     <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-windows'">
@@ -94,11 +100,19 @@
         <PackageReference Include="Eto.Platform.Windows" />
     </ItemGroup>
 
-    <!-- Non-Windows backends -->
+    <!-- Non-Windows backends: Gtk for Linux always; Mac64 only when explicitly enabled -->
     <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
         <PackageReference Include="Eto.Platform.Gtk" />
+    </ItemGroup>
+
+    <!-- Opt-in macOS backend and add macOS RIDs when BuildMac=true -->
+    <ItemGroup Condition="'$(BuildMac)' == 'true' and '$(TargetFramework)' == 'net9.0'">
         <PackageReference Include="Eto.Platform.Mac64" />
     </ItemGroup>
+
+    <PropertyGroup Condition="'$(BuildMac)' == 'true' and '$(TargetFramework)' == 'net9.0'">
+        <RuntimeIdentifiers>linux-x64;osx-x64;osx-arm64</RuntimeIdentifiers>
+    </PropertyGroup>
 
     <!-- Other platform-agnostic and always-needed packages -->
     <ItemGroup>
