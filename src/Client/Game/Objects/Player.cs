@@ -196,6 +196,14 @@ namespace Client
             {
                 return canMove;
             }
+            
+            var remaining = (int) ((Client.GameState.DeathTimerExpiryMs + Client.General.GetTickCount()) / 1000);
+            if (remaining < 0) remaining = 0;
+
+            if (remaining > 0)
+            {
+                return canMove;
+            }
 
             if (GameState.GettingMap)
             {
@@ -802,6 +810,20 @@ namespace Client
 
                 if (Event.InEvent)
                     return;
+
+                // If server is holding the player (e.g., on death), block attacks and show a quick local message
+                if (Event.HoldPlayer)
+                {
+                    return;
+                }
+
+                var remaining = (int) ((Client.GameState.DeathTimerExpiryMs + Client.General.GetTickCount()) / 1000);
+                if (remaining < 0) remaining = 0;
+
+                if (remaining > 0)
+                {
+                    return;
+                }
 
                 if (GameState.SkillBuffer >= 0)
                     return; // currently casting a skill, can't attack

@@ -418,7 +418,7 @@ namespace Client
         public static bool OptItem;         // Item attribute
         public static bool OptNpcAvoid;     // NPC avoid attribute
         public static bool OptResource;     // Resource attribute
-        public static bool OptNpcSpawn;     // NPC spawn attribute
+        public static bool OptNpcSpawn;     // Npc spawn attribute
         public static bool OptShop;         // Shop attribute
         public static bool OptBank;         // Bank attribute
         public static bool OptHeal;         // Heal attribute
@@ -453,5 +453,6 @@ namespace Client
         public static bool[] JobChanged = new bool[(Constant.MaxJobs)];
         public static bool[] MoralChanged = new bool[(Constant.MaxMorals)];
         public static bool[] ProjectileChanged = new bool[Constant.MaxProjectiles];
+        public static int DeathTimerExpiryMs;
     }
 }

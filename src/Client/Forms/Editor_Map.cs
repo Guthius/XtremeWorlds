@@ -55,7 +55,7 @@ namespace Client
         public Label lblMapWarpX = new Label();
         public Label lblMapWarpMap = new Label();
         public GroupBox fraNpcSpawn = new GroupBox{ Text = "Npc Spawn" };
-        public ListBox lstNpc = new() { Width = 500 };;
+        public ListBox lstNpc = new() { Width = 500 };
         public Button btnNpcSpawn = new Button { Text = "OK" };
         public Slider scrlNpcDir = new Slider();
         public Label lblNpcDir = new Label();
