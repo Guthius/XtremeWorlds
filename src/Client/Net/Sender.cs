@@ -878,15 +878,6 @@ public static class Sender
 
     public static void SendUseHotbarSlot(int slot)
     {
-        switch (Data.Player[GameState.MyIndex].Hotbar[slot].SlotType)
-        {
-            case (byte) DraggablePartType.Skill:
-            {
-                Player.CastSkill(Player.FindSkill(Data.Player[GameState.MyIndex].Hotbar[slot].Slot));
-                return;
-            }
-        }
-
         var packetWriter = new PacketWriter(8);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CUseHotbarSlot);

@@ -2502,15 +2502,25 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         var slot = buffer.ReadInt32();
 
-
         if (slot < 0 | slot > Core.Globals.Constant.MaxHotbar)
             return;
 
         if (Data.Player[session.Id].Hotbar[slot].Slot >= 0)
         {
-            if (Data.Player[session.Id].Hotbar[slot].SlotType == (byte) DraggablePartType.Item)
+            if (Data.Player[session.Id].Hotbar[slot].SlotType == (byte)DraggablePartType.Item)
             {
-                Server.Player.UseItem(session.Id, Server.Player.FindItemSlot(session.Id, (int) Data.Player[session.Id].Hotbar[slot].Slot));
+                Server.Player.UseItem(session.Id, Server.Player.FindItemSlot(session.Id, (int)Data.Player[session.Id].Hotbar[slot].Slot));
+            }
+            else if (Data.Player[session.Id].Hotbar[slot].SlotType == (byte)DraggablePartType.Skill)
+            {
+                try
+                {
+                    Script.Instance?.BufferSkill(session.Id, Data.Player[session.Id].Hotbar[slot].Slot);
+                }
+                catch (Exception ex)
+                {
+                    General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(Packet_UseHotbarSlot));
+                }
             }
         }
 
