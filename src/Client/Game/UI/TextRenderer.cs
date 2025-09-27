@@ -363,7 +363,7 @@ public static class TextRenderer
 
         int baseWorldX = Data.MyMapNpc[mapNpcNum].X;
         int baseWorldY = Data.MyMapNpc[mapNpcNum].Y;
-        int centerX = GameLogic.ConvertMapX(baseWorldX) + GameState.SizeX / 2 - 6;
+        int centerX = GameLogic.ConvertMapX(baseWorldX) + GameState.SizeX / 2 - 4;
         var textX = centerX - (int)(GetTextWidth(name) / 6d);
 
         if (Data.Npc[(int) npcNum].Sprite < 1 | Data.Npc[(int) npcNum].Sprite > GameState.NumCharacters)
