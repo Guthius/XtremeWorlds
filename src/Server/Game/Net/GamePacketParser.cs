@@ -539,6 +539,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var tmpX = buffer.ReadInt32();
         var tmpY = buffer.ReadInt32();
 
+        SetPlayerDir(session.Id, dir);
+
         if (tmpX != GetPlayerRawX(session.Id) || tmpY != GetPlayerRawY(session.Id))
         {
             // Desync detected, correct client
@@ -546,7 +548,6 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             return;
         }
 
-        SetPlayerDir(session.Id, dir);
         Data.Player[session.Id].Moving = movement;
     }
 

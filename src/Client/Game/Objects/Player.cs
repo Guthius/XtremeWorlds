@@ -153,10 +153,15 @@ namespace Client
             else
                 return; // no input
 
-            if (newDir >= 0 && Data.Player[GameState.MyIndex].Dir != newDir)
+            if (newDir >= 0)
             {
-                Data.Player[GameState.MyIndex].Dir = (byte)newDir;
-                if (sendIfChanged) Sender.SendPlayerDir();
+                // Always update local facing immediately
+                if (Data.Player[GameState.MyIndex].Dir != newDir)
+                {
+                    Data.Player[GameState.MyIndex].Dir = (byte)newDir;
+                }
+                // Send dir every frame while keys are held to eliminate visual lag between transitions
+                Sender.SendPlayerDir();
             }
         }
 
@@ -1207,9 +1212,13 @@ namespace Client
             dir = buffer.ReadByte();
 
             SetPlayerDir(i, dir);
-
-            ref var withBlock = ref Data.Player[i];
-            withBlock.Moving = 0;
+            
+            // Do not reset local player's movement state on our own echoed dir packets; this causes micro-stutters
+            if (i != GameState.MyIndex)
+            {
+                ref var withBlock = ref Data.Player[i];
+                withBlock.Moving = 0;
+            }
         }
 
         public static void Packet_PlayerExp(ReadOnlyMemory<byte> data)
