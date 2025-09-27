@@ -30,6 +30,8 @@ public class WindowManager
     private const double DragInterval = 100d; // Set the interval in milliseconds to start dragging
     private static bool _canDrag; // Flag to control when dragging is allowed
     private static bool _isDragging;
+    private static bool _isSelected;
+    public static bool IsWindowActive => _isSelected;
 
     public static void UpdateZOrder(long windowIndex, bool forced = false)
     {
@@ -762,6 +764,8 @@ public class WindowManager
 
             if (curWindow is not null)
             {
+                _isSelected = true;
+                
                 // Handle the active window's callback
                 var callBack = curWindow.CallBack[(int) entState];
 
@@ -775,30 +779,10 @@ public class WindowManager
 
                     if (control is {Enabled: true, Visible: true})
                     {
-                        bool isComboMenuHit = false;
-                        if (control is ComboBox comboBox)
-                        {                          
-                            int itemHeight = 10;
-                            int menuPadding = 5;
-                            int menuX = curWindow.X + comboBox.X - menuPadding;
-                            int menuY = curWindow.Y + comboBox.Y + comboBox.Height;
-                            int menuWidth = comboBox.Width + menuPadding * 2;
-                            int menuHeight = comboBox.Items.Count * itemHeight + menuPadding * 2;
-                            if (GameState.CurMouseX >= menuX &&
-                                GameState.CurMouseX <= menuX + menuWidth &&
-                                GameState.CurMouseY >= menuY &&
-                                GameState.CurMouseY <= menuY + menuHeight)
-                            {
-                                isComboMenuHit = true;
-                            }
-                            // Optionally, you can add a border or background drawing here if you have a custom render method
-                        }
-
                         if ((GameState.CurMouseX >= control.X + curWindow.X &&
                              GameState.CurMouseX <= control.X + control.Width + curWindow.X &&
                              GameState.CurMouseY >= control.Y + curWindow.Y &&
-                             GameState.CurMouseY <= control.Y + control.Height + curWindow.Y)
-                            || isComboMenuHit)
+                             GameState.CurMouseY <= control.Y + control.Height + curWindow.Y))
                         {
                             if (curControl == 0L || control.ZOrder > curWindow.Controls[curControl].ZOrder)
                             {
@@ -901,6 +885,7 @@ public class WindowManager
             if (curWindow is null)
             {
                 ResetInterface();
+                _isSelected = false;
             }
 
             if (entState == ControlState.MouseUp)

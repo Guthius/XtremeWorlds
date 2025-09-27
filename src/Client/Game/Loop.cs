@@ -174,12 +174,12 @@ namespace Client
                         // 2. While held, keep facing cursor and attempt attack when cooldown ready.
                         var leftPressedNow = GameClient.CurrentMouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed;
                         var leftPressedPrev = GameClient.PreviousMouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed;
-                        if (leftPressedNow && !leftPressedPrev)
+                        if (leftPressedNow && !leftPressedPrev && !WindowManager.IsWindowActive)
                         {
                             Player.UpdateFacingFromMouse(GameClient.CurrentMouseState.X, GameClient.CurrentMouseState.Y);
                             Player.CheckAttack(mouse: true);
                         }
-                        else if (leftPressedNow)
+                        else if (leftPressedNow && !WindowManager.IsWindowActive)
                         {
                             // While holding: only update facing if cursor moved at least 2px to reduce network spam
                             // (Simple heuristic: compare to last stored facing update position.)
