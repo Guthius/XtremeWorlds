@@ -1432,12 +1432,12 @@ public class Script
         return Data.Skill[id].Range > 1; // simple heuristic
     }
 
-    public bool AttemptAttack(Entity attacker, Entity target, int? skillId = null)
+    public bool AttemptAttack(Entity attacker, Entity target, int? skillId = null, bool? allowOutOfRange = false)
     {
         if (attacker == null || target == null) return false;
         if (attacker.Map != target.Map) return false;
         if (!IsAlive(attacker) || !IsAlive(target)) return false;
-        if (!IsSkillRanged(skillId) && !IsInMeleeRange(attacker, target)) return false;
+        if (!IsSkillRanged(skillId) && !IsInMeleeRange(attacker, target) && allowOutOfRange == false) return false;
 
         var now = General.GetTimeMs();
         var cd = GetAttackSpeed(attacker, skillId);

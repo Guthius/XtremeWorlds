@@ -407,6 +407,7 @@ public static class Projectile
                             break;
                         }
                     }
+
                     if (hit)
                     {
                         int anim = Data.Projectile[projId].Animation;
@@ -414,10 +415,10 @@ public static class Projectile
                         {
                             Animation.SendAnimation(map, anim, tileX, tileY);
                         }
-                        
+
                         try
                         {
-                            Script.Instance?.AttemptAttack(attackerEntity, targetEntity);
+                            Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, true);
                         }
                         catch (Exception ex)
                         {
@@ -445,6 +446,7 @@ public static class Projectile
                             break;
                         }
                     }
+                    
                     if (hit)
                     {
                         int anim = Data.Projectile[projId].Animation;
@@ -452,10 +454,10 @@ public static class Projectile
                         {
                             Animation.SendAnimation(map, anim, tileX, tileY);
                         }
-                        
+
                         try
                         {
-                            Script.Instance?.AttemptAttack(attackerEntity, targetEntity);
+                            Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, true);
                         }
                         catch (Exception ex)
                         {
