@@ -1300,6 +1300,20 @@ public class Script
     {
         if (target.Type == Entity.EntityType.Player)
         {
+            if (Data.Moral[Data.Map[GetPlayerMap(target.Id)].Moral].DropItems)
+            {
+                // Drop equipment
+                for (int i = 0; i < 4; i++)
+                {
+                    if (GetPlayerEquipment(target.Id, (Equipment)i) >= 0)
+                    {
+                        Server.Item.SpawnItem(GetPlayerEquipment(target.Id, (Equipment)i), 1, GetPlayerMap(target.Id), GetPlayerX(target.Id), GetPlayerY(target.Id));
+                        NetworkSend.PlayerMsg(target.Id, "You have dropped your " + Data.Item[GetPlayerEquipment(target.Id, (Equipment)i)].Name + " upon death.", (int)ColorName.BrightRed);
+                        SetPlayerEquipment(target.Id, -1, (Equipment)i);
+                    }
+                }
+            }
+
             // Apply death penalty & get exp lost
             int lost = Server.Player.KillPlayer(target.Id);
 
@@ -1439,12 +1453,15 @@ public class Script
         if (!IsAlive(attacker) || !IsAlive(target)) return false;
         if (!IsSkillRanged(skillId) && !IsInMeleeRange(attacker, target) && allowOutOfRange == false) return false;
 
+        if (!Data.Moral[Data.Map[GetPlayerMap(attacker.Id)].Moral].CanPk && attacker.Type == Entity.EntityType.Player && target.Type == Entity.EntityType.Player)
+        {
+            return false; // PvP not allowed on this map
+        }
         var now = General.GetTimeMs();
         var cd = GetAttackSpeed(attacker, skillId);
         if (attacker.AttackTimer + cd > now) return false;
 
-        var dmg = CalculateDamage(attacker, target, skillId);
-        dmg.Raw += damage ?? 0; // allow flat damage override
+        var dmg = CalculateDamage(attacker, target, skillId, damage);
         var killed = ApplyDamageExtended(attacker, target, dmg, skillId);
 
         // set cooldown
@@ -1452,7 +1469,26 @@ public class Script
         UpdateUnderlyingAttackTimer(attacker, (int)now);
         BroadcastAttack(attacker);
 
-        // If target is an NPC and was attacked by player/NPC, make it retaliate (set chase target)
+        if (target.Type == Entity.EntityType.Player)
+        {
+            if (attacker.Type == Entity.EntityType.Player)
+            {
+                NetworkSend.PlayerMsg(target.Id, $"You were hit by {GetPlayerName(attacker.Id)} for {dmg.Final} damage.", (int)ColorName.BrightRed);
+            }
+            else if (attacker.Type == Entity.EntityType.Npc)
+            {
+                NetworkSend.PlayerMsg(target.Id, $"You were hit by {GetEntityName(attacker)} for {dmg.Final} damage.", (int)ColorName.BrightRed);
+            }
+        }
+        else if (target.Type == Entity.EntityType.Npc)
+        {
+            if (attacker.Type == Entity.EntityType.Player)
+            {
+                NetworkSend.PlayerMsg(attacker.Id, $"You hit {GetEntityName(target)} for {dmg.Final} damage.", (int)ColorName.BrightGreen);
+            }
+        }
+
+        // If target is an npc and was attacked by player/npc, make it retaliate (set chase target)
         if (target.Type == Entity.EntityType.Npc && target.Num >= 0)
         {
             // Acquire underlying map npc to set target persistent
@@ -1480,7 +1516,7 @@ public class Script
             }
         }
 
-        // If attacker is an NPC with no target set (e.g., guard retaliating) ensure its target is the victim
+        // If attacker is an npc with no target set (e.g., guard retaliating) ensure its target is the victim
         if (attacker.Type == Entity.EntityType.Npc && attacker.Num >= 0)
         {
             var map = attacker.Map;
@@ -1683,7 +1719,7 @@ public class Script
         return player.Equipment[slot].Num;
     }
 
-    private DamageResult CalculateDamage(Entity attacker, Entity target, int? skillId = -1)
+    private DamageResult CalculateDamage(Entity attacker, Entity target, int? skillId = -1, int? damage = null)
     {
         var result = new DamageResult();
 
@@ -1693,7 +1729,7 @@ public class Script
         {
             raw = GetPlayerDamage(attacker.Id, skillId);
         }
-        else // NPC
+        else // npc
         {
             if (attacker.Num >= 0 && attacker.Num < Data.Npc.Length)
             {
@@ -1701,7 +1737,7 @@ public class Script
             }
         }
 
-        result.Raw = raw;
+        result.Raw = raw + (damage ?? 0); 
 
         // Defense / mitigation
         int mitigation = 0;
