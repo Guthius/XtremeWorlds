@@ -51,9 +51,6 @@ namespace Client
         public Slider scrlMapWarpY = new Slider();
         public Slider scrlMapWarpX = new Slider();
         public Slider scrlMapWarpMap = new Slider();
-        public Label lblMapWarpY = new Label();
-        public Label lblMapWarpX = new Label();
-        public Label lblMapWarpMap = new Label();
         public GroupBox fraNpcSpawn = new GroupBox{ Text = "Npc Spawn" };
         public ListBox lstNpc = new() { Width = 500 };
         public Button btnNpcSpawn = new Button { Text = "OK" };
@@ -523,9 +520,6 @@ namespace Client
             // Configure default ranges/text
             scrlMapWarpMap.MinValue = 1;
             scrlMapWarpMap.MaxValue = Constant.MaxMaps;
-            scrlMapWarpMap.ValueChanged += ScrlMapWarpMap_Scroll;
-            scrlMapWarpX.MinValue = 0; scrlMapWarpX.MaxValue = byte.MaxValue; scrlMapWarpX.ValueChanged += ScrlMapWarpX_Scroll;
-            scrlMapWarpY.MinValue = 0; scrlMapWarpY.MaxValue = byte.MaxValue; scrlMapWarpY.ValueChanged += ScrlMapWarpY_Scroll;
             btnMapWarp.Click += BtnMapWarp_Click;
 
             // Populate item combo with names
@@ -606,9 +600,9 @@ namespace Client
                 Padding = 6, Spacing = 6,
                 Items =
                 {
-                    new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Map" }, scrlMapWarpMap, lblMapWarpMap } },
-                    new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "X" }, scrlMapWarpX, lblMapWarpX } },
-                    new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Y" }, scrlMapWarpY, lblMapWarpY } },
+                    new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Map" }, scrlMapWarpMap } },
+                    new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "X" }, scrlMapWarpX } },
+                    new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Y" }, scrlMapWarpY } },
                     new StackLayoutItem(btnMapWarp)
                 }
             };
@@ -1292,21 +1286,6 @@ namespace Client
         #endregion
 
         #region Attributes
-
-        private void ScrlMapWarpMap_Scroll(object? sender, EventArgs e)
-        {
-            lblMapWarpMap.Text = "Map: " + scrlMapWarpMap.Value;
-        }
-
-        private void ScrlMapWarpX_Scroll(object? sender, EventArgs e)
-        {
-            lblMapWarpX.Text = "X: " + scrlMapWarpX.Value;
-        }
-
-        private void ScrlMapWarpY_Scroll(object? sender, EventArgs e)
-        {
-            lblMapWarpY.Text = "Y: " + scrlMapWarpY.Value;
-        }
 
         private void BtnMapWarp_Click(object? sender, EventArgs e)
         {
