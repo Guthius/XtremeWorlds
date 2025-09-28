@@ -937,7 +937,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         moral.Color = packetReader.ReadByte();
         moral.NpcBlock = packetReader.ReadBoolean();
         moral.PlayerBlock = packetReader.ReadBoolean();
-        moral.DropItems = packetReader.ReadBoolean();
         moral.CanCast = packetReader.ReadBoolean();
         moral.CanDropItem = packetReader.ReadBoolean();
         moral.CanPickupItem = packetReader.ReadBoolean();

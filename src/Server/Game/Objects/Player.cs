@@ -857,7 +857,7 @@ public static class Player
             return;
         }
 
-        if (!Data.Moral[GetPlayerMap(playerId)].CanDropItem)
+        if (!Data.Moral[Data.Map[GetPlayerMap(playerId)].Moral].CanDropItem)
         {
             NetworkSend.PlayerMsg(playerId, "You can't drop items here!", (int) ColorName.BrightRed);
             return;

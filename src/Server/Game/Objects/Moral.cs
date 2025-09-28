@@ -103,7 +103,6 @@ public static class Moral
         packet.WriteByte(Data.Moral[moralNum].Color);
         packet.WriteBoolean(Data.Moral[moralNum].NpcBlock);
         packet.WriteBoolean(Data.Moral[moralNum].PlayerBlock);
-        packet.WriteBoolean(Data.Moral[moralNum].DropItems);
         packet.WriteBoolean(Data.Moral[moralNum].CanCast);
         packet.WriteBoolean(Data.Moral[moralNum].CanDropItem);
         packet.WriteBoolean(Data.Moral[moralNum].CanPickupItem);
