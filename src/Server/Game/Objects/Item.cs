@@ -324,7 +324,7 @@ public static class Item
             return;
         }
 
-        if (invNum is < 0 or > Core.Globals.Constant.MaxInv)
+        if (invNum < 0 || invNum > Core.Globals.Constant.MaxInv)
         {
             return;
         }
