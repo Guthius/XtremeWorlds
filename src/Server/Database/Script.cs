@@ -1432,7 +1432,7 @@ public class Script
         return Data.Skill[id].Range > 1; // simple heuristic
     }
 
-    public bool AttemptAttack(Entity attacker, Entity target, int? skillId = null, bool? allowOutOfRange = false)
+    public bool AttemptAttack(Entity attacker, Entity target, int? skillId = null, int? damage = null, bool? allowOutOfRange = false)
     {
         if (attacker == null || target == null) return false;
         if (attacker.Map != target.Map) return false;
@@ -1444,6 +1444,7 @@ public class Script
         if (attacker.AttackTimer + cd > now) return false;
 
         var dmg = CalculateDamage(attacker, target, skillId);
+        dmg.Raw += damage ?? 0; // allow flat damage override
         var killed = ApplyDamageExtended(attacker, target, dmg, skillId);
 
         // set cooldown

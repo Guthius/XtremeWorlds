@@ -418,7 +418,7 @@ public static class Projectile
 
                         try
                         {
-                            Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, true);
+                            Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, Data.Projectile[projId].Damage, true);
                         }
                         catch (Exception ex)
                         {
@@ -457,7 +457,7 @@ public static class Projectile
 
                         try
                         {
-                            Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, true);
+                            Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, Data.Projectile[projId].Damage, true);
                         }
                         catch (Exception ex)
                         {
