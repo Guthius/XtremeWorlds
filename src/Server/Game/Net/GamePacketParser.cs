@@ -733,7 +733,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         Core.Globals.Entity? targetEntity = null;
 
-        // 1. Prefer NPC target at tile (x,y)
+        // 1. Prefer npc target at tile (x,y)
         for (int i = 0; i < Core.Globals.Constant.MaxMapNpcs; i++)
         {
             var npc = Data.MapNpc[mapNum].Npc[i];
@@ -772,7 +772,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            General.Logger.LogError(ex, "[Script] Error in {MethodName}", "AttemptAttack");
         }
     }
 

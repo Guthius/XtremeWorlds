@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using Client.Net;
 using Core;
 using Core.Globals;
@@ -116,12 +117,12 @@ namespace Client
             Data.Projectile[index].Range = 0;
             Data.Projectile[index].Speed = 0;
             Data.Projectile[index].Damage = 0;
-            Data.Projectile[index].Animation = 0;
+            Data.Projectile[index].Animation = -1;
         }
 
         public static void ClearMapProjectile(int projectileNum)
         {
-            Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].ProjectileNum = 0;
+            Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].ProjectileNum = -1;
             Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Owner = 0;
             Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].OwnerType = 0;
             Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].X = 0;
@@ -185,7 +186,7 @@ namespace Client
                 return;
 
             int projectile = Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].ProjectileNum;
-            if (projectile <= 0 || projectile >= Data.Projectile.Length)
+            if (projectile < 0 || projectile >= Data.Projectile.Length)
             {
                 return;
             }
@@ -205,16 +206,36 @@ namespace Client
             }
 
             rec.Bottom = gfxInfo.Height;
-            rec.Left = Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Dir * GameState.SizeX;
+            rec.Left = 0;
+            // 4-direction fallback mapping: Down, Right, Left, Up
+            switch (Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Dir)
+            {
+                case (byte)Direction.Down:
+                case (byte)Direction.DownLeft:
+                case (byte)Direction.DownRight:
+                    rec.Left = GameState.SizeX;
+                    break;
+                case (byte)Direction.Right:
+                    rec.Left = GameState.SizeX * 3;
+                    break;
+                case (byte)Direction.Left:
+                    rec.Left = GameState.SizeX * 2;
+                    break;
+                case (byte)Direction.UpRight:
+                case (byte)Direction.UpLeft:
+                case (byte)Direction.Up:
+                    break;
+            }
+           
             rec.Right = rec.Left + GameState.SizeX;
             
             // Convert coordinates
-            x = GameLogic.ConvertMapX(Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].X * 32);
-            y = GameLogic.ConvertMapY(Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Y * 32);
+            x = GameLogic.ConvertMapX(Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].X);
+            y = GameLogic.ConvertMapY(Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Y);
 
             // Render texture
             string argPath = System.IO.Path.Combine(DataPath.Projectiles, sprite.ToString());
-            GameClient.RenderTexture(ref argPath, x, y, (int) Math.Round(rec.Left), (int) Math.Round(rec.Top), 32, 32);
+            GameClient.RenderTexture(ref argPath, x, y, (int) rec.Left, (int) rec.Top, 32, 32, 32, 32);
         }
 
         #endregion

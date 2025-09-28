@@ -50,7 +50,7 @@ public static class Projectile
     private static void ClearMapProjectile(int mapNum, int mapProjectileNum)
     {
         ref var mp = ref Data.MapProjectile[mapNum, mapProjectileNum];
-        mp.ProjectileNum = 0;
+        mp.ProjectileNum = -1;
         mp.Owner = 0;
         mp.OwnerType = 0;
         mp.X = 0;
@@ -70,7 +70,7 @@ public static class Projectile
         Data.Projectile[projectileNum].Range = 0;
         Data.Projectile[projectileNum].Speed = 0;
         Data.Projectile[projectileNum].Damage = 0;
-        Data.Projectile[projectileNum].Animation = 0;
+        Data.Projectile[projectileNum].Animation = -1;
     }
 
     public static void HandleRequestEditProjectile(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -305,7 +305,7 @@ public static class Projectile
             for (int i = 0; i < Core.Globals.Constant.MaxProjectiles; i++)
             {
                 ref var mp = ref Data.MapProjectile[map, i];
-                if (mp.ProjectileNum <= 0) continue;
+                if (mp.ProjectileNum < 0) continue;
 
                 // Expire long-running projectiles defensively
                 if (mp.Timer > 0 && now > mp.Timer)
@@ -387,6 +387,8 @@ public static class Projectile
 
                     // Entity collisions (simple tile match)
                     bool hit = false;
+                    Entity attackerEntity = null;
+                    Entity targetEntity = null;
 
                     // Players
                     foreach (var p in PlayerService.Instance.Players)
@@ -399,6 +401,8 @@ public static class Projectile
                             if (!(mp.OwnerType == (byte)TargetType.Player && mp.Owner == p.Id))
                             {
                                 hit = true;
+                                attackerEntity = Core.Globals.Entity.FromPlayer(mp.Owner, Data.Player[mp.Owner]);
+                                targetEntity = Core.Globals.Entity.FromPlayer(p.Id, Data.Player[p.Id]);
                             }
                             break;
                         }
@@ -406,16 +410,25 @@ public static class Projectile
                     if (hit)
                     {
                         int anim = Data.Projectile[projId].Animation;
-                        if (anim > 0)
+                        if (anim >= 0)
                         {
                             Animation.SendAnimation(map, anim, tileX, tileY);
+                        }
+                        
+                        try
+                        {
+                            Script.Instance?.AttemptAttack(attackerEntity, targetEntity);
+                        }
+                        catch (Exception ex)
+                        {
+                            General.Logger.LogError(ex, "[Script] Error in {MethodName}", "AttemptAttack");
                         }
                         ClearMapProjectile(map, i);
                         moved = false;
                         break;
                     }
 
-                    // NPCs
+                    // Npcs
                     for (int n = 0; n < Core.Globals.Constant.MaxMapNpcs; n++)
                     {
                         ref var mn = ref Data.MapNpc[map].Npc[n];
@@ -426,6 +439,8 @@ public static class Projectile
                             if (!(mp.OwnerType == (byte)TargetType.Npc && mp.Owner == n))
                             {
                                 hit = true;
+                                attackerEntity = Core.Globals.Entity.FromPlayer(mp.Owner, Data.Player[mp.Owner]);
+                                targetEntity = Core.Globals.Entity.FromNpc(n, mn);
                             }
                             break;
                         }
@@ -433,9 +448,18 @@ public static class Projectile
                     if (hit)
                     {
                         int anim = Data.Projectile[projId].Animation;
-                        if (anim > 0)
+                        if (anim >= 0)
                         {
                             Animation.SendAnimation(map, anim, tileX, tileY);
+                        }
+                        
+                        try
+                        {
+                            Script.Instance?.AttemptAttack(attackerEntity, targetEntity);
+                        }
+                        catch (Exception ex)
+                        {
+                            General.Logger.LogError(ex, "[Script] Error in {MethodName}", "AttemptAttack");
                         }
                         ClearMapProjectile(map, i);
                         moved = false;
