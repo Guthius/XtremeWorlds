@@ -7,7 +7,7 @@
   <ItemGroup>
     <PackageVersion Include="CS-Script" Version="4.11.0" />
     <PackageVersion Include="CS-Script.Core" Version="2.0.0" />
-    <PackageVersion Include="Eto.Forms" Version="2.10.1" />
+    <PackageVersion Include="Eto.Forms" Version="2.10.2" />
     <PackageVersion Include="Eto.Platform.Gtk" Version="2.10.1" />
     <PackageVersion Include="Eto.Platform.Windows" Version="2.10.1" />
     <PackageVersion Include="Eto.Platform.Mac64" Version="2.10.1" />
