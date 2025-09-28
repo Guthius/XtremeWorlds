@@ -1913,6 +1913,10 @@ namespace Client
             // Stream Npc if not yet loaded
             Database.StreamNpc((int)Data.MyMapNpc[(int)mapNpcNum].Num);
 
+            if (Data.MyMapNpc[(int)mapNpcNum].Num < 0 ||
+                Data.MyMapNpc[(int)mapNpcNum].Num > Constant.MaxNpcs)
+                return;
+                
             // Get the sprite of the Npc
             sprite = Data.Npc[(int)Data.MyMapNpc[(int)mapNpcNum].Num].Sprite;
 
