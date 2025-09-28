@@ -77,7 +77,11 @@ namespace Client
 
             cmbType.Items.Clear();
             foreach (var name in Enum.GetNames(typeof(SkillEffect)))
-                cmbType.Items.Add(name);
+            {
+                // Insert spaces before capital letters (except the first letter)
+                string displayName = System.Text.RegularExpressions.Regex.Replace(name, "(?<!^)([A-Z])", " $1");
+                cmbType.Items.Add(displayName);
+            }
 
             foreach (var name in Enum.GetNames(typeof(AccessLevel)))
             {
@@ -142,13 +146,21 @@ namespace Client
             listLayout.Add(lstIndex, yscale: true);
 
             var general = new DynamicLayout { Spacing = new Size(4,4) };
-            general.AddRow("Name:", txtName, "Type:", cmbType, "Access:", cmbAccessReq, "Job:", cmbJob);
-            general.AddRow("MP:", nudMp, "Level:", nudLevel, "Cast:", nudCast, "Cool:", nudCool);
-            general.AddRow("Icon:", nudIcon, picSprite, "Map:", nudMap, "Dir:", cmbDir);
-            general.AddRow("X:", nudX, "Y:", nudY, "Vital:", nudVital, "Dur:", nudDuration);
-            general.AddRow("Interval:", nudInterval, "Range:", nudRange, chkAoE, "AoE Size:", nudAoE);
-            general.AddRow("Cast Anim:", cmbAnimCast, "Skill Anim:", cmbAnim, "Stun:", nudStun);
-            general.AddRow(chkProjectile, "Projectile:", cmbProjectile, chkKnockBack, "KB Tiles:", cmbKnockBackTiles);
+            // Make layout taller (more rows) and less wide by limiting items per row
+            general.AddRow("Name:", txtName, "Type:", cmbType);
+            general.AddRow("Access:", cmbAccessReq, "Job:", cmbJob);
+            general.AddRow("MP:", nudMp, "Level:", nudLevel);
+            general.AddRow("Cast:", nudCast, "Cooldown:", nudCool);
+            general.AddRow("Icon:", nudIcon, picSprite);
+            general.AddRow("Map:", nudMap, "Direction:", cmbDir);
+            general.AddRow("X:", nudX, "Y:", nudY);
+            general.AddRow("Vital:", nudVital, "Duration:", nudDuration);
+            general.AddRow("Interval:", nudInterval, "Range:", nudRange);
+            general.AddRow(chkAoE, "AoE Size:", nudAoE);
+            general.AddRow("Cast Anim:", cmbAnimCast, "Skill Anim:", cmbAnim);
+            general.AddRow("Stun:", nudStun);
+            general.AddRow(chkProjectile, "Projectile:", cmbProjectile);
+            general.AddRow(chkKnockBack, "KB Tiles:", cmbKnockBackTiles);
 
             var buttons = new StackLayout { Orientation = Orientation.Horizontal, Spacing = 5, Items = { btnSave, btnDelete, btnCopy, btnCancel, btnLearn } }; // order enforced
 
