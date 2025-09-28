@@ -870,7 +870,7 @@ public static class Player
         }
 
         var itemNum = GetPlayerInv(playerId, invNum);
-        if (itemNum is < 0 or >= Core.Globals.Constant.MaxItems)
+        if (itemNum < 0 || itemNum >= Core.Globals.Constant.MaxItems)
         {
             return;
         }
@@ -998,7 +998,7 @@ public static class Player
 
     public static void UseItem(int playerId, int invNum)
     {
-        if (invNum is < 0 or > Core.Globals.Constant.MaxInv)
+        if (invNum < 0 || invNum > Core.Globals.Constant.MaxInv)
         {
             return;
         }

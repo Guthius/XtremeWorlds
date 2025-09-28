@@ -916,7 +916,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         for (var i = 0; i < Constant.MaxHotbar; i++)
         {
             Data.Player[GameState.MyIndex].Hotbar[i].Slot = buffer.ReadInt32();
-            Data.Player[GameState.MyIndex].Hotbar[i].SlotType = (byte) buffer.ReadInt32();
+            Data.Player[GameState.MyIndex].Hotbar[i].SlotType = buffer.ReadByte();
         }
     }
 

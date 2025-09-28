@@ -1086,7 +1086,7 @@ public static class NetworkSend
         for (var i = 0; i < Core.Globals.Constant.MaxHotbar; i++)
         {
             packetWriter.WriteInt32(Data.Player[playerId].Hotbar[i].Slot);
-            packetWriter.WriteInt32(Data.Player[playerId].Hotbar[i].SlotType);
+            packetWriter.WriteByte(Data.Player[playerId].Hotbar[i].SlotType);
         }
 
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
