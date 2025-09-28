@@ -101,6 +101,15 @@ namespace Client
 
         public static void CheckMovement()
         {
+            // Guard against invalid player or map state
+            if (GameState.MyIndex < 0 || GameState.MyIndex >= Constant.MaxPlayers)
+                return;
+            int mapIdx = GetPlayerMap(GameState.MyIndex);
+            if (mapIdx < 0 || mapIdx >= Data.Map.Length)
+                return;
+            if (Data.MyMap.MaxX <= 0 || Data.MyMap.MaxY <= 0)
+                return;
+
             // Always refresh facing immediately based on current key state (diagonals prioritized)
             RefreshFacingFromKeys(sendIfChanged: true);
 
@@ -118,10 +127,15 @@ namespace Client
                     Sender.SendPlayerMove();
                 }
 
-                // Warp detection stays here
-                var tile = Data.MyMap.Tile[GetPlayerX(GameState.MyIndex), GetPlayerY(GameState.MyIndex)];
-                if (tile.Type == TileType.Warp || tile.Type2 == TileType.Warp)
-                    GameState.GettingMap = true;
+                // Warp detection with bounds checks to avoid out-of-range
+                int tx = GetPlayerX(GameState.MyIndex);
+                int ty = GetPlayerY(GameState.MyIndex);
+                if (tx >= 0 && ty >= 0 && tx < Data.MyMap.MaxX && ty < Data.MyMap.MaxY)
+                {
+                    var tile = Data.MyMap.Tile[tx, ty];
+                    if (tile.Type == TileType.Warp || tile.Type2 == TileType.Warp)
+                        GameState.GettingMap = true;
+                }
             }
         }
 
