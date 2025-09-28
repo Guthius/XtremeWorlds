@@ -412,7 +412,7 @@ public static class Sender
             return;
         }
 
-        if (invNum is < 0 or > Constant.MaxInv)
+        if (invNum < 0 || invNum > Constant.MaxInv)
         {
             return;
         }

@@ -1004,7 +1004,7 @@ public static class Player
         }
 
         var itemNum = GetPlayerInv(playerId, invNum);
-        if (itemNum is < 0 or > Core.Globals.Constant.MaxItems)
+        if (itemNum < 0 || itemNum > Core.Globals.Constant.MaxItems)
         {
             return;
         }
