@@ -177,8 +177,7 @@ public enum SkillEffect : byte
     DamageMana,
     HealHealth,
     HealMana,
-    Warp,
-    SummonPet
+    Warp
 }
 
 /// <summary>

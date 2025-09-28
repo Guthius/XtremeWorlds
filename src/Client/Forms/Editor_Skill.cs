@@ -44,7 +44,7 @@ namespace Client
         public NumericStepper nudStun = new NumericStepper { MinValue = 0 };
         public CheckBox chkProjectile = new CheckBox { Text = "Projectile" };
         public ComboBox cmbProjectile = new ComboBox();
-        public CheckBox chkKnockBack = new CheckBox { Text = "KnockBack" };
+        public CheckBox chkKnockBack = new CheckBox { Text = "Knockback" };
         public ComboBox cmbKnockBackTiles = new ComboBox();
         public Button btnSave = new Button { Text = "Save" };
         public Button btnDelete = new Button { Text = "Delete" };
