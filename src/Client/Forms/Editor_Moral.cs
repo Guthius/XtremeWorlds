@@ -23,7 +23,7 @@ namespace Client
         public CheckBox chkCanDropItem = new CheckBox { Text = "Can Drop Item" };
         public CheckBox chkCanUseItem = new CheckBox { Text = "Can Use Item" };
         public CheckBox chkDropItems = new CheckBox { Text = "Drop Items" };
-        public CheckBox chkLoseExp = new CheckBox { Text = "Lose Exp" };
+        public CheckBox chkLoseExp = new CheckBox { Text = "Lose Experience" };
         public CheckBox chkPlayerBlock = new CheckBox { Text = "Player Block" };
         public CheckBox chkNpcBlock = new CheckBox { Text = "Npc Block" };
         public Button btnSave = new Button { Text = "Save" };
