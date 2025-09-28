@@ -125,7 +125,7 @@ namespace Client
                 new TableRow(new Label{Text="STR"}, numStr, new Label{Text="LCK"}, numLck),
                 new TableRow(new Label{Text="END"}, numEnd, new Label{Text="INT"}, numInt),
                 new TableRow(new Label{Text="VIT"}, numVit, new Label{Text="SPR"}, numSpr),
-                new TableRow(new Label{Text="BaseExp"}, numBaseExp, null, null)
+                new TableRow(new Label{Text="Base Experience"}, numBaseExp, null, null)
             }
         });
 
