@@ -763,11 +763,12 @@ namespace Client
         public static void ProjectileEditorInit()
         {            
             ref var withBlock = ref Data.Projectile[GameState.EditorIndex];
-            Editor_Projectile.Instance.txtName.Text = Strings.Trim(withBlock.Name);
+            Editor_Projectile.Instance.txtName.Text = withBlock.Name;
             Editor_Projectile.Instance.nudPic.Value = withBlock.Sprite;
             Editor_Projectile.Instance.nudRange.Value = withBlock.Range;
             Editor_Projectile.Instance.nudSpeed.Value = withBlock.Speed;
             Editor_Projectile.Instance.nudDamage.Value = withBlock.Damage;
+            Editor_Projectile.Instance.cmbPlayAnimHit.SelectedIndex = Math.Clamp(withBlock.Animation, 0, Constant.MaxAnimations);
             Editor_Projectile.Instance.Drawicon();
             GameState.ProjectileChanged[GameState.EditorIndex] = true;
         }

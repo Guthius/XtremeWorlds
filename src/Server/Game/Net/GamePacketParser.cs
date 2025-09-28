@@ -623,7 +623,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                     if (Convert.ToBoolean(Server.Player.HasItem(session.Id, Data.Item[GetPlayerEquipment(session.Id, Equipment.Weapon)].Ammo)))
                     {
                         Server.Player.TakeInv(session.Id, Data.Item[GetPlayerEquipment(session.Id, Equipment.Weapon)].Ammo, 1);
-                        Projectile.PlayerFireProjectile(session.Id);
+                        Projectile.PlayerFireProjectile(session.Id, -1, GetPlayerEquipment(session.Id, Equipment.Weapon));
                         return;
                     }
                     else
@@ -634,7 +634,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                 }
                 else
                 {
-                    Projectile.PlayerFireProjectile(session.Id);
+                    Projectile.PlayerFireProjectile(session.Id, -1, GetPlayerEquipment(session.Id, Equipment.Weapon));
                     return;
                 }
             }

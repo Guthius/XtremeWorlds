@@ -644,6 +644,7 @@ public static class Type
         public byte Range;
         public int Speed;
         public int Damage;
+        public int Animation;
     }
 
     public struct MapProjectile

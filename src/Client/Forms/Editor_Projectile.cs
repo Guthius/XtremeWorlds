@@ -19,6 +19,7 @@ namespace Client
         public NumericStepper nudSpeed = null!;
         public NumericStepper nudDamage = null!;
         public Drawable picProjectile = null!;
+        public ComboBox cmbPlayAnimHit = null!;
 
         public Button btnSave = null!;
         public Button btnCancel = null!;
@@ -113,6 +114,16 @@ namespace Client
                 }
             };
 
+            // Play animation on hit combo
+            cmbPlayAnimHit = new ComboBox { Width = 200 };
+            cmbPlayAnimHit.SelectedIndexChanged += (s, e) =>
+            {
+                if (_initializing) return;
+                var val = cmbPlayAnimHit.SelectedIndex;
+                Data.Projectile[GameState.EditorIndex].Animation = val;
+                GameState.ProjectileChanged[GameState.EditorIndex] = true;
+            };
+
             btnSave = new Button { Text = "Save" };
             btnSave.Click += (s, e) =>
             {
@@ -177,6 +188,7 @@ namespace Client
                     new TableRow(new TableCell(new Label{Text="Range:", VerticalAlignment=VerticalAlignment.Center}, false), nudRange),
                     new TableRow(new TableCell(new Label{Text="Speed:", VerticalAlignment=VerticalAlignment.Center}, false), nudSpeed),
                     new TableRow(new TableCell(new Label{Text="Damage:", VerticalAlignment=VerticalAlignment.Center}, false), nudDamage),
+                    new TableRow(new TableCell(new Label{Text="Animation:", VerticalAlignment=VerticalAlignment.Center}, false), cmbPlayAnimHit),
                     new TableRow(new TableCell(new Label{Text="Preview:", VerticalAlignment=VerticalAlignment.Center}, false), picProjectile),
                     new TableRow(new TableCell(null, true), new StackLayout
                     {
@@ -222,6 +234,14 @@ namespace Client
             }
             if (lstIndex.Items.Count > 0) lstIndex.SelectedIndex = 0;
             nudPic.MaxValue = GameState.NumProjectiles;
+            
+            // Populate animations list (0 = None)
+            cmbPlayAnimHit.Items.Clear();
+            cmbPlayAnimHit.Items.Add("0: None");
+            for (int i = 0; i < Constant.MaxAnimations; i++)
+            {
+                cmbPlayAnimHit.Items.Add($"{i + 1}: {Data.Animation[i].Name}");
+            }
             // End bulk population, re-enable events
             _initializing = false;
             // Ensure editor index and initialize detail panel (SelectedIndexChanged suppressed during _initializing)

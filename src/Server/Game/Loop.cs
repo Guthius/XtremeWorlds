@@ -25,6 +25,7 @@ namespace Server
             var tmrWalk = default(int);
             var tmrNpcWalk = default(int); // separate NPC pixel movement timer (same cadence as player walk)
             var tmr1000 = default(int);
+            var tmrProj = default(int);
             var tmr60000 = default(int);
             var lastUpdateSavePlayers = default(int);
             var lastUpdateMapSpawnItems = default(int);
@@ -70,6 +71,13 @@ namespace Server
                     Npc.ProcessActiveNpcMovement();
                     
                     tmrNpcWalk = General.GetTimeMs() + 5;
+                }
+
+                if (tick > tmrProj)
+                {
+                    // Server-side projectile pixel movement and sparse map broadcasts
+                    Projectile.UpdateProjectiles();
+                    tmrProj = General.GetTimeMs() + 5;
                 }
 
                 if (tick > tmr60000)

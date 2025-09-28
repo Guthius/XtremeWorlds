@@ -32,6 +32,7 @@ namespace Client
             packetWriter.WriteInt32(Data.Projectile[projectileNum].Range);
             packetWriter.WriteInt32(Data.Projectile[projectileNum].Speed);
             packetWriter.WriteInt32(Data.Projectile[projectileNum].Damage);
+            packetWriter.WriteInt32(Data.Projectile[projectileNum].Animation);
 
             Network.Send(packetWriter);
         }
@@ -74,6 +75,7 @@ namespace Client
             Data.Projectile[projectileNum].Range = (byte) buffer.ReadInt32();
             Data.Projectile[projectileNum].Speed = buffer.ReadInt32();
             Data.Projectile[projectileNum].Damage = buffer.ReadInt32();
+            Data.Projectile[projectileNum].Animation = buffer.ReadInt32();
         }
 
         public static void HandleMapProjectile(ReadOnlyMemory<byte> data)
@@ -114,6 +116,7 @@ namespace Client
             Data.Projectile[index].Range = 0;
             Data.Projectile[index].Speed = 0;
             Data.Projectile[index].Damage = 0;
+            Data.Projectile[index].Animation = 0;
         }
 
         public static void ClearMapProjectile(int projectileNum)
@@ -143,12 +146,6 @@ namespace Client
         public static void DrawProjectile(int projectileNum)
         {
             Type.Rect rec;
-            var canClearProjectile = default(bool);
-            var collisionindex = default(int);
-            var collisionType = default(byte);
-            var collisionZone = default(int);
-            int xOffset;
-            int yOffset;
             int x;
             int y;
             int i;
@@ -165,6 +162,7 @@ namespace Client
             {
                 return;
             }
+            
             int mapId = Data.Player[GameState.MyIndex].Map;
             if (mapId < 0 || mapId >= Data.MapProjectile.GetLength(0))
             {
@@ -173,125 +171,28 @@ namespace Client
 
             StreamProjectile(projectileNum);
 
-            // check to see if it's time to move the Projectile
-            if (General.GetTickCount() > Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].TravelTime)
-            {
-                switch (Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Dir)
-                {
-                    case (byte) Direction.Up:
-                    {
-                        Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Y -= 1;
-                        break;
-                    }
-                    case (byte) Direction.Down:
-                    {
-                        Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Y += 1;
-                        break;
-                    }
-                    case (byte) Direction.Left:
-                    {
-                        Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].X -= 1;
-                        break;
-                    }
-                    case (byte) Direction.Right:
-                    {
-                        Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].X += 1;
-                        break;
-                    }
-                }
-
-                Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].TravelTime = General.GetTickCount() + Data.Projectile[Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].ProjectileNum].Speed;
-                Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Range = Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Range + 1;
-            }
-
-            x = Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].X;
-            y = Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Y;
+            x = (int)Math.Floor((double)Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].X / 32);
+            y = (int)Math.Floor((double)Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Y / 32);
 
             // Check if its been going for over 1 minute, if so clear.
             if (Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Timer < General.GetTickCount())
-                canClearProjectile = true;
+                return;
 
             if (x > Data.MyMap.MaxX | x < 0)
-                canClearProjectile = true;
+                return;
 
             if (y > Data.MyMap.MaxY | y < 0)
-                canClearProjectile = true;
+                return;
 
-            // Check for blocked wall collision
-            if (canClearProjectile == false) // Add a check to prevent crashing
+            int projectile = Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].ProjectileNum;
+            if (projectile <= 0 || projectile >= Data.Projectile.Length)
             {
-                if (Data.MyMap.Tile[x, y].Type == TileType.Blocked | Data.MyMap.Tile[x, y].Type2 == TileType.Blocked)
-                {
-                    canClearProjectile = true;
-                }
-            }
-
-            // Check for Npc collision
-            for (i = 0; i < Constant.MaxMapNpcs; i++)
-            {
-                if (Data.MyMapNpc[i].X == x & Data.MyMapNpc[i].Y == y)
-                {
-                    canClearProjectile = true;
-                    collisionindex = i;
-                    collisionType = (byte) TargetType.Npc;
-                    collisionZone = -1;
-                    break;
-                }
-            }
-
-            // Check for player collision
-            for (i = 0; i < Constant.MaxPlayers; i++)
-            {
-                if (IsPlaying(i) & GetPlayerMap(i) == GetPlayerMap(GameState.MyIndex))
-                {
-                    if (GetPlayerX(i) == x & GetPlayerY(i) == y)
-                    {
-                        canClearProjectile = true;
-                        collisionindex = i;
-                        collisionType = (byte) TargetType.Player;
-                        collisionZone = -1;
-                        if (Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].OwnerType == (byte) TargetType.Player)
-                        {
-                            if (Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Owner == i)
-                                canClearProjectile = false; // Reset if its the owner of projectile
-                        }
-
-                        break;
-                    }
-                }
-            }
-
-            // Check if it has hit its maximum range
-            if (Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Range >= Data.Projectile[Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].ProjectileNum].Range + 1)
-                canClearProjectile = true;
-
-            // Clear the projectile if possible
-            if (Conversions.ToInteger(canClearProjectile) == 1)
-            {
-                // Only send the clear to the server if you're the projectile caster or the one hit (only if owner is not a player)
-                if (Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].OwnerType == (byte) TargetType.Player & Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Owner == GameState.MyIndex)
-                {
-                    SendClearProjectile(projectileNum, collisionindex, collisionType, collisionZone);
-                }
-
-                ClearMapProjectile(projectileNum);
                 return;
             }
 
-            int projectileDataIndex = Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].ProjectileNum;
-            // Validate projectile data index (treat <=0 as empty slot) to avoid IndexOutOfRange
-            if (projectileDataIndex <= 0 || projectileDataIndex >= Data.Projectile.Length)
-            {
-                // Clear invalid slot to avoid repeated exceptions
-                ClearMapProjectile(projectileNum);
-                return;
-            }
-
-            sprite = Data.Projectile[projectileDataIndex].Sprite;
+            sprite = Data.Projectile[projectile].Sprite;
             if (sprite < 1 || sprite > GameState.NumProjectiles)
             {
-                // Invalid sprite reference; clear and exit
-                ClearMapProjectile(projectileNum);
                 return;
             }
 
@@ -306,43 +207,10 @@ namespace Client
             rec.Bottom = gfxInfo.Height;
             rec.Left = Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Dir * GameState.SizeX;
             rec.Right = rec.Left + GameState.SizeX;
-
-            // Find the offset
-            switch (Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Dir)
-            {
-                case (byte) Direction.Up:
-                {
-                    int speedYUp = Data.Projectile[projectileDataIndex].Speed;
-                    if (speedYUp <= 0) speedYUp = 1;
-                    yOffset = (int) Math.Round((Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].TravelTime - General.GetTickCount()) / (double) speedYUp * GameState.SizeY);
-                    break;
-                }
-                case (byte) Direction.Down:
-                {
-                    int speedYDown = Data.Projectile[projectileDataIndex].Speed;
-                    if (speedYDown <= 0) speedYDown = 1;
-                    yOffset = (int) Math.Round(-((Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].TravelTime - General.GetTickCount()) / (double) speedYDown) * GameState.SizeY);
-                    break;
-                }
-                case (byte) Direction.Left:
-                {
-                    int speedXLeft = Data.Projectile[projectileDataIndex].Speed;
-                    if (speedXLeft <= 0) speedXLeft = 1;
-                    xOffset = (int) Math.Round((Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].TravelTime - General.GetTickCount()) / (double) speedXLeft);
-                    break;
-                }
-                case (byte) Direction.Right:
-                {
-                    int speedXRight = Data.Projectile[projectileDataIndex].Speed;
-                    if (speedXRight <= 0) speedXRight = 1;
-                    xOffset = (int) Math.Round(-((Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].TravelTime - General.GetTickCount()) / (double) speedXRight));
-                    break;
-                }
-            }
-
+            
             // Convert coordinates
-            x = GameLogic.ConvertMapX(x * 32);
-            y = GameLogic.ConvertMapY(y * 32);
+            x = GameLogic.ConvertMapX(Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].X * 32);
+            y = GameLogic.ConvertMapY(Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Y * 32);
 
             // Render texture
             string argPath = System.IO.Path.Combine(DataPath.Projectiles, sprite.ToString());

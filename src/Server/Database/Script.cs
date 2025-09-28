@@ -230,7 +230,6 @@ public class Script
             // removed unused variable 'i'
             int n;
 
-            // (tempItem and m moved into EquipItem helper)
             var tempdata = new int[Enum.GetValues(typeof(Stat)).Length + 4];
             var tempstr = new string[3];
 
@@ -325,17 +324,17 @@ public class Script
                             if (HasItem(index, Data.Item[itemNum].Ammo) > 0)
                             {
                                 TakeInv(index, Data.Item[itemNum].Ammo, 1);
-                                Server.Projectile.PlayerFireProjectile(index);
+                                Server.Projectile.PlayerFireProjectile(index, -1, itemNum);
                             }
                             else
                             {
-                                NetworkSend.PlayerMsg(index, "No More " + Data.Item[Data.Item[GetPlayerEquipment(index, Equipment.Weapon)].Ammo].Name + " !", (int)ColorName.BrightRed);
+                                NetworkSend.PlayerMsg(index, "No more " + Data.Item[Data.Item[GetPlayerEquipment(index, Equipment.Weapon)].Ammo].Name + " !", (int)ColorName.BrightRed);
                                 return;
                             }
                         }
                         else
                         {
-                            Server.Projectile.PlayerFireProjectile(index);
+                            Server.Projectile.PlayerFireProjectile(index, -1, itemNum);
                             return;
                         }
 
@@ -654,6 +653,9 @@ public class Script
 
     public int KillPlayer(int index)
     {
+        if (!Data.Moral[Data.Map[GetPlayerMap(index)].Moral].LoseExp)
+            return 0;
+
         int exp = GetPlayerExp(index) / 3;
 
         if (exp == 0)
@@ -841,7 +843,43 @@ public class Script
                             {
                                 var targetEntity = Core.Globals.Entity.FromPlayer(pid, Data.Player[pid]);
                                 targetEntity.Map = mapNum;
-                                AttemptAttack(entity, targetEntity);
+                                // NPC skills: select a valid skill and cast it directly; otherwise do a basic attack
+                                bool didCast = false;
+                                if (entity.Type == Core.Globals.Entity.EntityType.Npc && entity.Num >= 0 && entity.Num < Data.Npc.Length)
+                                {
+                                    var skills = Data.Npc[entity.Num].Skill;
+                                    if (skills != null)
+                                    {
+                                        long nowMs = General.GetTimeMs();
+                                        // ex, ey, px, py already calculated above in this scope
+                                        int dist = Math.Max(Math.Abs(ex - px), Math.Abs(ey - py));
+                                        for (int slot = 0; slot < Core.Globals.Constant.MaxNpcSkills && slot < skills.Length; slot++)
+                                        {
+                                            int sid = skills[slot];
+                                            if (sid <= 0 || sid >= Data.Skill.Length) continue;
+                                            ref var sk = ref Data.Skill[sid];
+                                            // Range check (0 range means self or adjacent unless AoE)
+                                            bool inRange = sk.Range == 0 ? (sk.IsAoE || dist <= 1) : dist <= sk.Range;
+                                            if (!inRange) continue;
+                                            // Cooldown check
+                                            if (mapNum < 0 || mapNum >= Data.MapNpc.Length || entity.Id < 0 || entity.Id >= Core.Globals.Constant.MaxMapNpcs) break;
+                                            ref var baseNpc = ref Data.MapNpc[mapNum].Npc[entity.Id];
+                                            bool cdReady = baseNpc.SkillCd == null || slot >= baseNpc.SkillCd.Length || baseNpc.SkillCd[slot] <= nowMs;
+                                            if (!cdReady) continue;
+                                            // Mana check
+                                            if (entity.Vital == null || entity.Vital.Length <= (int)Vital.Mana || entity.Vital[(int)Vital.Mana] < sk.MpCost) continue;
+                                            // Cast immediately using entity-centric casting
+                                            CastSkill(mapNum, Core.Globals.Entity.Index(entity), sid);
+                                            didCast = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                
+                                if (!didCast)
+                                {
+                                    AttemptAttack(entity, targetEntity);
+                                }
                             }
                         }
                         else
@@ -877,7 +915,38 @@ public class Script
                                 }
                                 else
                                 {
-                                    AttemptAttack(entity, targetEntity);
+                                    // NPC skills: select a valid skill and cast it directly; otherwise do a basic attack
+                                    bool didCast2 = false;
+                                    if (entity.Type == Core.Globals.Entity.EntityType.Npc && entity.Num >= 0 && entity.Num < Data.Npc.Length)
+                                    {
+                                        var skills2 = Data.Npc[entity.Num].Skill;
+                                        if (skills2 != null)
+                                        {
+                                            long nowMs2 = General.GetTimeMs();
+                                            // ex, ey, tx, ty already calculated above in this scope
+                                            int dist2 = Math.Max(Math.Abs(ex - tx), Math.Abs(ey - ty));
+                                            for (int slot2 = 0; slot2 < Core.Globals.Constant.MaxNpcSkills && slot2 < skills2.Length; slot2++)
+                                            {
+                                                int sid2 = skills2[slot2];
+                                                if (sid2 <= 0 || sid2 >= Data.Skill.Length) continue;
+                                                ref var sk2 = ref Data.Skill[sid2];
+                                                bool inRange2 = sk2.Range == 0 ? (sk2.IsAoE || dist2 <= 1) : dist2 <= sk2.Range;
+                                                if (!inRange2) continue;
+                                                if (mapNum < 0 || mapNum >= Data.MapNpc.Length || entity.Id < 0 || entity.Id >= Core.Globals.Constant.MaxMapNpcs) break;
+                                                ref var baseNpc2 = ref Data.MapNpc[mapNum].Npc[entity.Id];
+                                                bool cdReady2 = baseNpc2.SkillCd == null || slot2 >= baseNpc2.SkillCd.Length || baseNpc2.SkillCd[slot2] <= nowMs2;
+                                                if (!cdReady2) continue;
+                                                if (entity.Vital == null || entity.Vital.Length <= (int)Vital.Mana || entity.Vital[(int)Vital.Mana] < sk2.MpCost) continue;
+                                                CastSkill(mapNum, Core.Globals.Entity.Index(entity), sid2);
+                                                didCast2 = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    if (!didCast2)
+                                    {
+                                        AttemptAttack(entity, targetEntity);
+                                    }
                                 }
                             }
                             else
@@ -1240,7 +1309,7 @@ public class Script
                 // Simple PK reward: gain fraction of lost exp
                 if (lost > 0)
                 {
-                    int gain = Math.Max(1, lost / 2);
+                    int gain = Math.Max(1, lost);
                     SetPlayerExp(attacker.Id, GetPlayerExp(attacker.Id) + gain);
                     NetworkSend.PlayerMsg(attacker.Id, $"You gained {gain} experience for defeating {GetPlayerName(target.Id)}.", (int)ColorName.BrightGreen);
                     NetworkSend.SendExp(attacker.Id);
@@ -1904,7 +1973,15 @@ public class Script
 
     private void HandleProjectileSkill(int mapNum, Entity caster, int skillId, Entity? target)
     {
-        if (target != null) AttemptAttack(caster, target, skillId);
+        // Spawn a visible projectile if this skill defines one
+        if (caster.Type == Core.Globals.Entity.EntityType.Player)
+        {
+            Server.Projectile.PlayerFireProjectile(caster.Id, skillId);
+        }
+        else if (caster.Type == Core.Globals.Entity.EntityType.Npc)
+        {
+            Server.Projectile.NpcFireProjectile(mapNum, caster.Id, skillId);
+        }
     }
 
     private void HandleSelfCastSkill(int mapNum, Entity caster, int skillId)
@@ -2047,6 +2124,26 @@ public class Script
             {
                 Data.TempPlayer[pid].SkillCd[playerSkillSlot] = General.GetTimeMs() + skill.CdTime * 1000;
                 NetworkSend.SendSkillCooldown(pid, playerSkillSlot);
+            }
+        }
+        else if (caster.Type == Core.Globals.Entity.EntityType.Npc)
+        {
+            // Set NPC cooldown on the slot that matches this skillId
+            if (caster.Map >= 0 && caster.Map < Data.MapNpc.Length && caster.Id >= 0 && caster.Id < Core.Globals.Constant.MaxMapNpcs)
+            {
+                ref var baseNpc = ref Data.MapNpc[caster.Map].Npc[caster.Id];
+                var npcTemplate = caster.Num >= 0 && caster.Num < Data.Npc.Length ? Data.Npc[caster.Num] : default;
+                if (npcTemplate.Skill != null && baseNpc.SkillCd != null)
+                {
+                    for (int slot = 0; slot < Core.Globals.Constant.MaxNpcSkills && slot < npcTemplate.Skill.Length && slot < baseNpc.SkillCd.Length; slot++)
+                    {
+                        if (npcTemplate.Skill[slot] == skillId)
+                        {
+                            baseNpc.SkillCd[slot] = General.GetTimeMs() + skill.CdTime * 1000;
+                            break;
+                        }
+                    }
+                }
             }
         }
     }
