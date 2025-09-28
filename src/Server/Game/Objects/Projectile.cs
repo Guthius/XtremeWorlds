@@ -349,11 +349,11 @@ public static class Projectile
                             int tx = Math.Clamp(prevTileX, 0, Data.Map[map].MaxX - 1);
                             int ty = Math.Clamp(prevTileY, 0, Data.Map[map].MaxY - 1);
                             Animation.SendAnimation(map, anim, tx, ty);
+                        }
+                        ClearMapProjectile(map, i);
+                        moved = false;
+                        break;
                     }
-                    ClearMapProjectile(map, i);
-                    moved = false;
-                    break;
-                }
 
                     // Bounds check
                     int tileX = Math.Clamp(mp.X / 32, 0, Core.Globals.Constant.MaxMapx - 1);
