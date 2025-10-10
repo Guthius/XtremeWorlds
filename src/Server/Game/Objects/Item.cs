@@ -52,6 +52,7 @@ public static class Item
     {
         Data.Item[itemNum].Name = "";
         Data.Item[itemNum].Description = "";
+        Data.Item[itemNum].Ammo = -1;
         Data.Item[itemNum].Stackable = 1;
     }
 
@@ -105,7 +106,7 @@ public static class Item
     public static void SpawnItemSlot(int mapItemSlot, int itemNum, int itemVal, int mapNum, int x, int y)
     {
         if (mapItemSlot < 0 || mapItemSlot > Core.Globals.Constant.MaxMapItems || itemNum < 0 || itemNum > Core.Globals.Constant.MaxItems || mapNum < 0 || mapNum >= Core.Globals.Constant.MaxMaps)
-        {          
+        {
             return;
         }
 
@@ -173,7 +174,7 @@ public static class Item
             {
                 if (Data.Map[mapNum].Tile[x, y].Type == TileType.Item)
                 {
-                    if (Data.Item[Data.Map[mapNum].Tile[x, y].Data1].Type == (byte) ItemCategory.Currency ||
+                    if (Data.Item[Data.Map[mapNum].Tile[x, y].Data1].Type == (byte)ItemCategory.Currency ||
                         Data.Item[Data.Map[mapNum].Tile[x, y].Data1].Stackable == 1)
                     {
                         var value = Data.Map[mapNum].Tile[x, y].Data2 < 1 ? 1 : Data.Map[mapNum].Tile[x, y].Data2;
@@ -188,7 +189,7 @@ public static class Item
 
                 if (Data.Map[mapNum].Tile[x, y].Type2 == TileType.Item)
                 {
-                    if (Data.Item[Data.Map[mapNum].Tile[x, y].Data1_2].Type == (byte) ItemCategory.Currency ||
+                    if (Data.Item[Data.Map[mapNum].Tile[x, y].Data1_2].Type == (byte)ItemCategory.Currency ||
                         Data.Item[Data.Map[mapNum].Tile[x, y].Data1_2].Stackable == 1)
                     {
                         var value = Data.Map[mapNum].Tile[x, y].Data2_2 < 1 ? 1 : Data.Map[mapNum].Tile[x, y].Data2_2;
@@ -209,7 +210,7 @@ public static class Item
         var packetReader = new PacketReader(bytes);
 
         var itemNum = packetReader.ReadInt32();
-        if (itemNum is < 0 or > Core.Globals.Constant.MaxItems)
+        if (itemNum < 0 || itemNum > Core.Globals.Constant.MaxItems)
         {
             return;
         }
@@ -256,7 +257,7 @@ public static class Item
         }
 
         var itemNum = packetReader.ReadInt32();
-        if (itemNum is < 0 or > Core.Globals.Constant.MaxItems)
+        if (itemNum < 0 || itemNum > Core.Globals.Constant.MaxItems)
         {
             return;
         }
@@ -266,7 +267,7 @@ public static class Item
         var statCount = Enum.GetNames<Stat>().Length;
         for (var i = 0; i < statCount; i++)
         {
-            Data.Item[itemNum].AddStat[i] = (byte) packetReader.ReadInt32();
+            Data.Item[itemNum].AddStat[i] = (byte)packetReader.ReadInt32();
         }
 
         Data.Item[itemNum].Animation = packetReader.ReadInt32();

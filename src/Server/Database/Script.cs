@@ -319,9 +319,9 @@ public class Script
 
                 case (byte)ItemCategory.Projectile:
                     {
-                        if (Data.Item[itemNum].Ammo > 0)
+                        if (Data.Item[itemNum].Ammo >= 0)
                         {
-                            if (HasItem(index, Data.Item[itemNum].Ammo) > 0)
+                            if (HasItem(index, Data.Item[itemNum].Ammo) >= 0)
                             {
                                 TakeInv(index, Data.Item[itemNum].Ammo, 1);
                                 Server.Projectile.PlayerFireProjectile(index, -1, itemNum);

@@ -297,11 +297,11 @@ namespace Client
                 for (int i = 0; i < Constant.MaxItems; i++) lstIndex.Items.Add((i+1)+": "+Data.Item[i].Name);
                 lstIndex.SelectedIndex = GameState.EditorIndex >= 0 ? GameState.EditorIndex : 0;
 
-                cmbAnimation!.Items.Clear(); for (int i=0;i<Constant.MaxAnimations;i++) cmbAnimation.Items.Add((i+1)+": "+Data.Animation[i].Name);
-                cmbProjectile!.Items.Clear(); for (int i=0;i<Constant.MaxVariables;i++) cmbProjectile.Items.Add((i+1)+": "+Data.Projectile[i].Name);
-                cmbAmmo!.Items.Clear(); for (int i=0;i<Constant.MaxItems;i++) cmbAmmo.Items.Add((i+1)+": "+Data.Item[i].Name);
-                cmbSkills!.Items.Clear(); for (int i=0;i<Constant.MaxSkills;i++) cmbSkills.Items.Add((i+1)+": "+Data.Skill[i].Name);
-                cmbJobReq!.Items.Clear(); for (int i=0;i<Constant.MaxJobs;i++) cmbJobReq.Items.Add(Data.Job[i].Name);
+                cmbAnimation!.Items.Clear(); for (int i = 0; i < Constant.MaxAnimations;i++) cmbAnimation.Items.Add((i+1)+": "+Data.Animation[i].Name);
+                cmbProjectile!.Items.Clear(); for (int i = 0; i < Constant.MaxProjectiles;i++) cmbProjectile.Items.Add($"{i+1}: {Data.Projectile[i].Name}");
+                cmbAmmo!.Items.Clear(); for (int i = 0; i < Constant.MaxItems;i++) cmbAmmo.Items.Add((i+1)+": "+Data.Item[i].Name);
+                cmbSkills!.Items.Clear(); for (int i = 0; i < Constant.MaxSkills;i++) cmbSkills.Items.Add((i+1)+": "+Data.Skill[i].Name);
+                cmbJobReq!.Items.Clear(); for (int i = 0; i < Constant.MaxJobs;i++) cmbJobReq.Items.Add(Data.Job[i].Name);
                 cmbAccessReq!.Items.Clear();
                 foreach (var name in Enum.GetNames(typeof(Core.Globals.AccessLevel)))
                     cmbAccessReq.Items.Add(name);
@@ -309,7 +309,7 @@ namespace Client
                 cmbTool!.Items.Clear();
                 foreach (var name in Enum.GetNames(typeof(ToolType)))
                     cmbTool.Items.Add(name);
-                cmbKnockBackTiles!.Items.Clear(); for(int i=0;i<6;i++) cmbKnockBackTiles.Items.Add(i+" tile");
+                cmbKnockBackTiles!.Items.Clear(); for (int i = 0; i < 6; i++) cmbKnockBackTiles.Items.Add(i+" tile");
 
                 cmbType!.Items.Clear();
                 foreach(var name in Enum.GetNames(typeof(ItemCategory))) cmbType.Items.Add(name);

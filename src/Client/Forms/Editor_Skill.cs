@@ -201,8 +201,10 @@ namespace Client
                 }
 
                 cmbProjectile.Items.Clear();
-                for (int i = 0; i < Constant.MaxAnimations; i++)
-                    cmbProjectile.Items.Add($"{i + 1}: {Data.Projectile[i].Name}");
+                for (int i = 0; i < Constant.MaxProjectiles; i++)
+                {
+                    cmbProjectile.Items.Add($"{i}: {Data.Projectile[i].Name}");
+                }
 
                 cmbJob.Items.Clear();
                 for (int i = 0; i < Constant.MaxJobs; i++)

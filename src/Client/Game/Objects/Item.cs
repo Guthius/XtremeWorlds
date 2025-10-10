@@ -17,10 +17,11 @@ namespace Client
 
             var statCount = Enum.GetNames(typeof(Stat)).Length;
             Data.Item[index].AddStat = new byte[statCount];
-            Data.Item[index].StatReq = new byte[statCount];          
+            Data.Item[index].StatReq = new byte[statCount];
 
             Data.Item[index].Name = "";
             Data.Item[index].Description = "";
+            Data.Item[index].Ammo = -1;
             GameState.ItemLoaded[index] = 0;
         }
 
@@ -91,6 +92,7 @@ namespace Client
 
             Data.Item[n].Type = (byte)buffer.ReadInt32();
             Data.Item[n].SubType = (byte)buffer.ReadInt32();
+            Data.Item[n].ItemLevel = (byte)buffer.ReadInt32();
 
             Data.Item[n].KnockBack = (byte)buffer.ReadInt32();
             Data.Item[n].KnockBackTiles = (byte)buffer.ReadInt32();
