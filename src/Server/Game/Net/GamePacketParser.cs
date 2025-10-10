@@ -616,11 +616,11 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         // Projectile check
         if (GetPlayerEquipment(session.Id, Equipment.Weapon) >= 0)
         {
-            if (Data.Item[GetPlayerEquipment(session.Id, Equipment.Weapon)].Projectile > 0) // Item has a projectile
+            if (Data.Item[GetPlayerEquipment(session.Id, Equipment.Weapon)].Projectile >= 0) // Item has a projectile
             {
-                if (Data.Item[GetPlayerEquipment(session.Id, Equipment.Weapon)].Ammo > 0)
+                if (Data.Item[GetPlayerEquipment(session.Id, Equipment.Weapon)].Ammo >= 0)
                 {
-                    if (Convert.ToBoolean(Server.Player.HasItem(session.Id, Data.Item[GetPlayerEquipment(session.Id, Equipment.Weapon)].Ammo)))
+                    if (Server.Player.HasItem(session.Id, Data.Item[GetPlayerEquipment(session.Id, Equipment.Weapon)].Ammo) > 0)
                     {
                         Server.Player.TakeInv(session.Id, Data.Item[GetPlayerEquipment(session.Id, Equipment.Weapon)].Ammo, 1);
                         Projectile.PlayerFireProjectile(session.Id, -1, GetPlayerEquipment(session.Id, Equipment.Weapon));
@@ -628,7 +628,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                     }
                     else
                     {
-                        NetworkSend.PlayerMsg(session.Id, "No more " + Data.Item[Data.Item[GetPlayerEquipment(session.Id, Equipment.Weapon)].Ammo].Name + " !", (int) ColorName.BrightRed);
+                        NetworkSend.PlayerMsg(session.Id, "Out of " + Data.Item[Data.Item[GetPlayerEquipment(session.Id, Equipment.Weapon)].Ammo].Name + " !", (int) ColorName.BrightRed);
                         return;
                     }
                 }

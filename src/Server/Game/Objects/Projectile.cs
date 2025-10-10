@@ -218,9 +218,10 @@ public static class Projectile
     {
         var mapNum = GetPlayerMap(playerId);
         var mapProjectileNum = -1;
+
         for (var i = 0; i < Core.Globals.Constant.MaxProjectiles; i++)
         {
-            if (Data.MapProjectile[mapNum, i].ProjectileNum <= 0)
+            if (Data.MapProjectile[mapNum, i].ProjectileNum < 0)
             {
                 mapProjectileNum = i;
                 break;
@@ -238,8 +239,14 @@ public static class Projectile
             return;
         }
 
+        if (Data.TempPlayer[playerId].ProjectileTimer > General.GetTimeMs())
+        {
+            return;
+        }
+
         ref var mapProjectile = ref Data.MapProjectile[mapNum, mapProjectileNum];
 
+        Data.TempPlayer[playerId].ProjectileTimer = General.GetTimeMs() + Data.Item[itemNum].Speed;
         mapProjectile.ProjectileNum = projectileNum;
         mapProjectile.Owner = playerId;
         mapProjectile.OwnerType = (byte) TargetType.Player;
@@ -259,7 +266,7 @@ public static class Projectile
         var mapProjectileNum = -1;
         for (var i = 0; i < Core.Globals.Constant.MaxProjectiles; i++)
         {
-            if (Data.MapProjectile[mapNum, i].ProjectileNum <= 0)
+            if (Data.MapProjectile[mapNum, i].ProjectileNum < 0)
             {
                 mapProjectileNum = i;
                 break;

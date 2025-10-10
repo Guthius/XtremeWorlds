@@ -649,7 +649,7 @@ namespace Client
 
             // Projectile
             Editor_Item.Instance!.cmbProjectile!.SelectedIndex = withBlock.Projectile;
-            Editor_Item.Instance!.cmbAmmo!.SelectedIndex = withBlock.Ammo;
+            Editor_Item.Instance!.cmbAmmo!.SelectedIndex = withBlock.Ammo + 1;
 
             // Basic requirements
             Editor_Item.Instance!.cmbAccessReq!.SelectedIndex = withBlock.AccessReq;

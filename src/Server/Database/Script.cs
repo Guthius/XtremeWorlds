@@ -321,16 +321,16 @@ public class Script
                     {
                         if (Data.Item[itemNum].Ammo >= 0)
                         {
-                            if (HasItem(index, Data.Item[itemNum].Ammo) >= 0)
+                            if (HasItem(index, Data.Item[itemNum].Ammo) > 0)
                             {
                                 TakeInv(index, Data.Item[itemNum].Ammo, 1);
                                 Server.Projectile.PlayerFireProjectile(index, -1, itemNum);
                             }
                             else
                             {
-                                NetworkSend.PlayerMsg(index, "No more " + Data.Item[Data.Item[GetPlayerEquipment(index, Equipment.Weapon)].Ammo].Name + " !", (int)ColorName.BrightRed);
+                                NetworkSend.PlayerMsg(index, "Out of " + Data.Item[Data.Item[GetPlayerEquipment(index, Equipment.Weapon)].Ammo].Name + " !", (int)ColorName.BrightRed);
                                 return;
-                            }
+                            }   
                         }
                         else
                         {

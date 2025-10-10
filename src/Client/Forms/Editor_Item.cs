@@ -101,7 +101,16 @@ namespace Client
             cmbAmmo = new ComboBox(); cmbAmmo.SelectedIndexChanged += (s,e)=> {
                 // Index 0 = None => Ammo = -1; otherwise, selected index maps to item index (selected-1)
                 var sel = cmbAmmo.SelectedIndex;
-                Data.Item[GameState.EditorIndex].Ammo = sel <= 0 ? -1 : sel - 1;
+                if (sel == 0) 
+                {
+                    sel = -1;
+                }
+                else
+                {
+                    sel -= 1;
+                 }
+
+                Data.Item[GameState.EditorIndex].Ammo = sel;
                 MarkChanged();
             };
             cmbKnockBackTiles = new ComboBox(); cmbKnockBackTiles.SelectedIndexChanged += (s,e)=> { Data.Item[GameState.EditorIndex].KnockBackTiles = (byte)cmbKnockBackTiles.SelectedIndex; MarkChanged(); };

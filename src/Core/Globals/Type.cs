@@ -303,6 +303,7 @@ public static class Type
         public int GoToY;
         public EditorType Editor;
         public byte Slot;
+        public int ProjectileTimer;
     }
 
     public struct Map

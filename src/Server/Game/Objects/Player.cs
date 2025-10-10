@@ -621,7 +621,7 @@ public static class Player
 
     public static int HasItem(int playerId, int itemNum)
     {
-        if (itemNum is < 0 or > Core.Globals.Constant.MaxItems)
+        if (itemNum < 0 || itemNum > Core.Globals.Constant.MaxItems)
         {
             return 0;
         }

@@ -830,7 +830,7 @@ public static class Sender
         packetWriter.WriteInt32(Data.Item[itemNum].KnockBackTiles);
 
         packetWriter.WriteInt32(Data.Item[itemNum].Projectile);
-        packetWriter.WriteInt32(Data.Item[itemNum].Ammo + 1); // to allow for 0 = none
+        packetWriter.WriteInt32(Data.Item[itemNum].Ammo);
 
         Network.Send(packetWriter);
     }
