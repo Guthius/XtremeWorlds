@@ -6,6 +6,7 @@ using Eto.Drawing;
 using Core;
 using Core.Globals;
 using Core.Configurations;
+using Client.Game.UI.Windows;
 
 namespace Client
 {
@@ -146,30 +147,30 @@ namespace Client
         itemsLayout.AddRow(new Label{Text="Item"}, cmbItems, new Label{Text="Amount"}, numItemAmount, btnSetItem);
         var items = Box("Start Items", itemsLayout);
 
-    // Left side: just the jobs list (scales vertically)
-    var left = new DynamicLayout { Spacing = new Size(4,4) };
-    left.Add(lstIndex, yscale: true);
+        // Left side: just the jobs list (scales vertically)
+        var left = new DynamicLayout { Spacing = new Size(4,4) };
+        left.Add(lstIndex, yscale: true);
 
-    // Right content wrapped in a scrollable to keep window compact
-    var rightContent = new DynamicLayout { Spacing = new Size(6,6) };
-    // Name row at the top (non-scaling textbox like other editors)
-    var nameRow = new TableLayout
-    {
-        Spacing = new Size(4,4),
-        Rows = { new TableRow(new Label{Text="Name:"}, new TableCell(txtName, scaleWidth: false), null, null) }
-    };
-    rightContent.Add(nameRow);
-    rightContent.Add(stats);
-    rightContent.Add(items);
-    rightContent.AddRow(start);
-    rightContent.AddRow(sprites);
-    rightContent.AddRow(new StackLayout { Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnSave, btnDelete, btnCopy, btnCancel } });
-    var right = new Scrollable { Content = rightContent, ExpandContentWidth = true };
+        // Right content wrapped in a scrollable to keep window compact
+        var rightContent = new DynamicLayout { Spacing = new Size(6,6) };
+        // Name row at the top (non-scaling textbox like other editors)
+        var nameRow = new TableLayout
+        {
+            Spacing = new Size(4,4),
+            Rows = { new TableRow(new Label{Text="Name:"}, new TableCell(txtName, scaleWidth: false), null, null) }
+        };
+        rightContent.Add(nameRow);
+        rightContent.Add(stats);
+        rightContent.Add(items);
+        rightContent.AddRow(start);
+        rightContent.AddRow(sprites);
+        rightContent.AddRow(new StackLayout { Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnSave, btnDelete, btnCopy, btnCancel } });
+        var right = new Scrollable { Content = rightContent, ExpandContentWidth = true };
 
         return new TableLayout
         {
             Padding = 4,
-            Spacing = new Size(8,8),
+            Spacing = new Size(8, 8),
             Rows = { new TableRow(left, right) }
         };
     }
@@ -192,6 +193,7 @@ namespace Client
         finally { _suppressIndexChanged = false; }
 
         ReloadPanel();
+        Editors.JobEditorInit();
     }
 
     void ReloadPanel()
