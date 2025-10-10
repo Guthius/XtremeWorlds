@@ -1,4 +1,5 @@
 ﻿using Core;
+using Core.Configurations;
 using Core.Globals;
 using Core.Net;
 using Microsoft.Extensions.Logging;
@@ -305,6 +306,7 @@ public static class Projectile
             for (int i = 0; i < Core.Globals.Constant.MaxProjectiles; i++)
             {
                 ref var mp = ref Data.MapProjectile[map, i];
+                // Skip empty slots
                 if (mp.ProjectileNum < 0) continue;
 
                 // Expire long-running projectiles defensively
@@ -328,12 +330,29 @@ public static class Projectile
                 
                 while (now > mp.TravelTime)
                 {
+                    bool eightDir = SettingsManager.Instance.SpriteDirections >= 8;
                     switch (mp.Dir)
                     {
                         case (byte)Direction.Up: mp.Y -= 1; break;
                         case (byte)Direction.Down: mp.Y += 1; break;
                         case (byte)Direction.Left: mp.X -= 1; break;
                         case (byte)Direction.Right: mp.X += 1; break;
+                        case (byte)Direction.UpRight:
+                            if (eightDir) { mp.Y -= 1; mp.X += 1; }
+                            else { mp.Y -= 1; }
+                            break;
+                        case (byte)Direction.UpLeft:
+                            if (eightDir) { mp.Y -= 1; mp.X -= 1; }
+                            else { mp.Y -= 1; }
+                            break;
+                        case (byte)Direction.DownRight:
+                            if (eightDir) { mp.Y += 1; mp.X += 1; }
+                            else { mp.Y += 1; }
+                            break;
+                        case (byte)Direction.DownLeft:
+                            if (eightDir) { mp.Y += 1; mp.X -= 1; }
+                            else { mp.Y += 1; }
+                            break;
                     }
                     mp.TravelTime += stepMs;
                     mp.Range += 1; // pixels traveled

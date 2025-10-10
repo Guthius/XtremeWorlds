@@ -5,6 +5,7 @@ using Core;
 using Core.Globals;
 using Core.Net;
 using static Core.Globals.Command;
+using Core.Configurations;
 using Type = Core.Globals.Type;
 
 namespace Client
@@ -206,26 +207,49 @@ namespace Client
             }
 
             rec.Bottom = gfxInfo.Height;
-            rec.Left = 0;
-            // 4-direction fallback mapping: Down, Right, Left, Up
-            switch (Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Dir)
+            // 8-direction spritesheet assumed with 8 columns in order:
+            // 0: Up, 1: Down, 2: Left, 3: Right, 4: UpRight, 5: UpLeft, 6: DownRight, 7: DownLeft
+            // If the sheet has fewer than 8 columns, fall back to 4-direction mapping.
+            int col = 0;
+            var dir = Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Dir;
+            int cols = Math.Max(1, gfxInfo.Width / GameState.SizeX);
+            bool eightDirEnabled = SettingsManager.Instance.SpriteDirections >= 8;
+            if (cols >= 8 && eightDirEnabled)
             {
-                case (byte)Direction.Down:
-                case (byte)Direction.DownLeft:
-                case (byte)Direction.DownRight:
-                    rec.Left = GameState.SizeX;
-                    break;
-                case (byte)Direction.Right:
-                    rec.Left = GameState.SizeX * 3;
-                    break;
-                case (byte)Direction.Left:
-                    rec.Left = GameState.SizeX * 2;
-                    break;
-                case (byte)Direction.UpRight:
-                case (byte)Direction.UpLeft:
-                case (byte)Direction.Up:
-                    break;
+                switch (dir)
+                {
+                    case (byte)Direction.Up: col = 0; break;
+                    case (byte)Direction.Down: col = 1; break;
+                    case (byte)Direction.Left: col = 2; break;
+                    case (byte)Direction.Right: col = 3; break;
+                    case (byte)Direction.UpRight: col = 4; break;
+                    case (byte)Direction.UpLeft: col = 5; break;
+                    case (byte)Direction.DownRight: col = 6; break;
+                    case (byte)Direction.DownLeft: col = 7; break;
+                    default: col = 1; break; // default to Down
+                }
             }
+            else
+            {
+                // 4-dir fallback (Up=0, Down=1, Left=2, Right=3) — diagonals map to nearest cardinal
+                switch (dir)
+                {
+                    case (byte)Direction.Down:
+                    case (byte)Direction.DownLeft:
+                    case (byte)Direction.DownRight:
+                        col = 1; break;
+                    case (byte)Direction.Right:
+                        col = 3; break;
+                    case (byte)Direction.Left:
+                        col = 2; break;
+                    case (byte)Direction.UpRight:
+                    case (byte)Direction.UpLeft:
+                    case (byte)Direction.Up:
+                    default:
+                        col = 0; break;
+                }
+            }
+            rec.Left = GameState.SizeX * Math.Clamp(col, 0, cols - 1);
            
             rec.Right = rec.Left + GameState.SizeX;
             
