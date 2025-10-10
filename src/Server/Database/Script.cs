@@ -1302,8 +1302,10 @@ public class Script
         {
             if (Data.Moral[Data.Map[GetPlayerMap(target.Id)].Moral].DropItems)
             {
+                var equipCount = Enum.GetValues(typeof(Equipment)).Length;
+                
                 // Drop equipment
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < equipCount; i++)
                 {
                     if (GetPlayerEquipment(target.Id, (Equipment)i) >= 0)
                     {
