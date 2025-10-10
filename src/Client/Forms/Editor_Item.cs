@@ -98,7 +98,12 @@ namespace Client
             cmbTool = new ComboBox(); cmbTool.SelectedIndexChanged += (s,e)=> { Data.Item[GameState.EditorIndex].Data3 = cmbTool.SelectedIndex; MarkChanged(); };
             cmbSkills = new ComboBox(); cmbSkills.SelectedIndexChanged += (s,e)=> { Data.Item[GameState.EditorIndex].Data1 = cmbSkills.SelectedIndex; MarkChanged(); };
             cmbProjectile = new ComboBox(); cmbProjectile.SelectedIndexChanged += (s,e)=> { Data.Item[GameState.EditorIndex].Projectile = cmbProjectile.SelectedIndex; MarkChanged(); };
-            cmbAmmo = new ComboBox(); cmbAmmo.SelectedIndexChanged += (s,e)=> { Data.Item[GameState.EditorIndex].Ammo = cmbAmmo.SelectedIndex; MarkChanged(); };
+            cmbAmmo = new ComboBox(); cmbAmmo.SelectedIndexChanged += (s,e)=> {
+                // Index 0 = None => Ammo = -1; otherwise, selected index maps to item index (selected-1)
+                var sel = cmbAmmo.SelectedIndex;
+                Data.Item[GameState.EditorIndex].Ammo = sel <= 0 ? -1 : sel - 1;
+                MarkChanged();
+            };
             cmbKnockBackTiles = new ComboBox(); cmbKnockBackTiles.SelectedIndexChanged += (s,e)=> { Data.Item[GameState.EditorIndex].KnockBackTiles = (byte)cmbKnockBackTiles.SelectedIndex; MarkChanged(); };
 
             numLevelReq = Num(0, 500); numLevelReq.ValueChanged += (s,e)=> { Data.Item[GameState.EditorIndex].LevelReq = (int)numLevelReq.Value; MarkChanged(); };
@@ -299,8 +304,10 @@ namespace Client
 
                 cmbAnimation!.Items.Clear(); for (int i = 0; i < Constant.MaxAnimations;i++) cmbAnimation.Items.Add((i+1)+": "+Data.Animation[i].Name);
                 cmbProjectile!.Items.Clear(); for (int i = 0; i < Constant.MaxProjectiles;i++) cmbProjectile.Items.Add($"{i+1}: {Data.Projectile[i].Name}");
-                cmbAmmo!.Items.Clear(); for (int i = 0; i < Constant.MaxItems;i++) cmbAmmo.Items.Add((i+1)+": "+Data.Item[i].Name);
-                cmbSkills!.Items.Clear(); for (int i = 0; i < Constant.MaxSkills;i++) cmbSkills.Items.Add((i+1)+": "+Data.Skill[i].Name);
+                cmbAmmo!.Items.Clear();
+                cmbAmmo.Items.Add("None");
+                for (int i = 0; i < Constant.MaxItems;i++) cmbAmmo.Items.Add(($"{i+1}: " + Data.Item[i].Name));
+                cmbSkills!.Items.Clear(); for (int i = 0; i < Constant.MaxSkills;i++) cmbSkills.Items.Add((i+1)+": "+ Data.Skill[i].Name);
                 cmbJobReq!.Items.Clear(); for (int i = 0; i < Constant.MaxJobs;i++) cmbJobReq.Items.Add(Data.Job[i].Name);
                 cmbAccessReq!.Items.Clear();
                 foreach (var name in Enum.GetNames(typeof(Core.Globals.AccessLevel)))

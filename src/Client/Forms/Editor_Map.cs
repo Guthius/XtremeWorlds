@@ -290,7 +290,7 @@ namespace Client
             {
                 if (slot == 0)
                 {
-                    lstNpc.Items.Add("0: None");
+                    lstNpc.Items.Add("None");
                     continue;
                 }
 
@@ -1733,7 +1733,7 @@ namespace Client
                 if (x == 0)
                 {
                     // Show explicit slot number for consistency with other entries
-                    Instance.lstMapNpc.Items.Add("0: None");
+                    Instance.lstMapNpc.Items.Add("None");
                     continue;
                 }
 

@@ -237,7 +237,7 @@ namespace Client
             
             // Populate animations list (0 = None)
             cmbPlayAnimHit.Items.Clear();
-            cmbPlayAnimHit.Items.Add("0: None");
+            cmbPlayAnimHit.Items.Add("None");
             for (int i = 0; i < Constant.MaxAnimations; i++)
             {
                 cmbPlayAnimHit.Items.Add($"{i + 1}: {Data.Animation[i].Name}");
