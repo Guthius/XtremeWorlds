@@ -369,7 +369,7 @@ public class Script
 
                 case (byte)ItemCategory.Skill:
                     {
-                        PlayerLearnSkill(index, itemNum);
+                        LearnSkill(index, itemNum);
                         break;
                     }
             }
@@ -422,7 +422,7 @@ public class Script
         }
     }
 
-    public void PlayerLearnSkill(int index, int itemNum, int skillNum = -1)
+    public void LearnSkill(int index, int itemNum, int skillNum = -1)
     {
         int n;
         int i;
