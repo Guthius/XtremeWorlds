@@ -125,6 +125,8 @@ public static class GamePacketId
         CSaveScript,
         CRequestEditScript,
 
+        CMouseAttack,
+
         CCloseEditor
     }
 }

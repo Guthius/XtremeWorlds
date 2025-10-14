@@ -82,9 +82,8 @@ namespace Client
 
         public static void HandleMapProjectile(ReadOnlyMemory<byte> data)
         {
-            int i;
             var buffer = new PacketReader(data);
-            i = buffer.ReadInt32();
+            int i = buffer.ReadInt32();
 
             {
                 ref var withBlock = ref Data.MapProjectile[Data.Player[GameState.MyIndex].Map, i];
@@ -94,6 +93,10 @@ namespace Client
                 withBlock.Dir = buffer.ReadByte();
                 withBlock.X = buffer.ReadInt32();
                 withBlock.Y = buffer.ReadInt32();
+                // New free-aim fields
+                withBlock.Vx = buffer.ReadInt16();
+                withBlock.Vy = buffer.ReadInt16();
+                withBlock.FreeAim = buffer.ReadByte();
                 withBlock.Range = 0;
                 withBlock.Timer = General.GetTickCount() + 60000;
             }
@@ -129,6 +132,9 @@ namespace Client
             Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].X = 0;
             Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Y = 0;
             Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Dir = 0;
+            Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Vx = 0;
+            Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Vy = 0;
+            Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].FreeAim = 0;
             Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Timer = 0;
         }
 
@@ -150,7 +156,6 @@ namespace Client
             Type.Rect rec;
             int x;
             int y;
-            int i;
             int sprite;
 
             // Defensive: ensure projectile index within bounds
@@ -211,7 +216,8 @@ namespace Client
             // 0: Up, 1: Down, 2: Left, 3: Right, 4: UpRight, 5: UpLeft, 6: DownRight, 7: DownLeft
             // If the sheet has fewer than 8 columns, fall back to 4-direction mapping.
             int col = 0;
-            var dir = Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Dir;
+            var mp = Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum];
+            var dir = mp.Dir;
             int cols = Math.Max(1, gfxInfo.Width / GameState.SizeX);
             bool eightDirEnabled = SettingsManager.Instance.SpriteDirections >= 8;
             if (cols >= 8 && eightDirEnabled)

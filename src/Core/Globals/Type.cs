@@ -656,6 +656,13 @@ public static class Type
         public int X;
         public int Y;
         public byte Dir;
+        // 360-aim support: normalized velocity components in 1/1000 fixed-point (so 1000 ~ 1.0 px/step)
+        public short Vx;
+        public short Vy;
+        public byte FreeAim; // 1 if using Vx/Vy, 0 if using Dir
+        // Server-side accumulators (fixed point thousandths) for sub-pixel movement
+        public int AccX;
+        public int AccY;
         public int Range;
         public int TravelTime;
         public int Timer;

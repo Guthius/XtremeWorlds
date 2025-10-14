@@ -255,6 +255,15 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
+    public static void SendMouseAttack(int worldPixelX, int worldPixelY)
+    {
+        var packetWriter = new PacketWriter(12);
+        packetWriter.WriteEnum(Packets.ClientPackets.CMouseAttack);
+        packetWriter.WriteInt32(worldPixelX);
+        packetWriter.WriteInt32(worldPixelY);
+        Network.Send(packetWriter);
+    }
+
     public static void SendPlayerDir()
     {
         var packetWriter = new PacketWriter(8);

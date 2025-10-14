@@ -117,7 +117,6 @@ public static class Packets
         CSaveShop = 98,
         CRequestEditSkill = 99,
         CSaveSkill = 100,
-
         CRequestMoral = 101,
         CSaveMoral = 102,
         CRequestEditMoral = 103,
@@ -125,10 +124,12 @@ public static class Packets
         CSaveScript = 104,
         CRequestEditScript = 105,
 
-        CCloseEditor = 106,
+        // Mouse-aimed attack (send world pixel target in map space)
+        CMouseAttack = 106,
+        CCloseEditor = 107,
 
         // Make sure COUNT is below everything else
-        Count = 107
+        Count = 108
     }
 
     public enum ServerPackets

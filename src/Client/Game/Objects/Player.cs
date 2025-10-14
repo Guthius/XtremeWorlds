@@ -870,7 +870,19 @@ namespace Client
                             withBlock.AttackTimer = General.GetTickCount();
                         }
 
-                        Sender.SendAttack();
+                        // If weapon has a projectile, send mouse-aimed attack with world pixel coords
+                        int weapon = GetPlayerEquipment(GameState.MyIndex, Equipment.Weapon);
+                        if (mouse && weapon >= 0 && Data.Item[weapon].Projectile >= 0)
+                        {
+                            // Compute world pixel coordinates of mouse relative to map origin
+                            int worldX = (int)GameState.Camera.Left + GameState.CurMouseXGame;
+                            int worldY = (int)GameState.Camera.Top + GameState.CurMouseYGame;
+                            Sender.SendMouseAttack(worldX, worldY);
+                        }
+                        else
+                        {
+                            Sender.SendAttack();
+                        }
                     }
                 }
 

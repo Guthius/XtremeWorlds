@@ -57,6 +57,11 @@ public static class Projectile
         mp.X = 0;
         mp.Y = 0;
         mp.Dir = 0;
+        mp.Vx = 0;
+        mp.Vy = 0;
+        mp.FreeAim = 0;
+        mp.AccX = 0;
+        mp.AccY = 0;
         mp.Range = 0;
         mp.TravelTime = 0;
         mp.Timer = 0;
@@ -200,16 +205,19 @@ public static class Projectile
     {
         var mapProjectile = Data.MapProjectile[mapNum, projectileNum];
 
-        var packet = new PacketWriter(4);
+    var packet = new PacketWriter(4);
 
         packet.WriteEnum(ServerPackets.SMapProjectile);
         packet.WriteInt32(projectileNum);
-        packet.WriteInt32(mapProjectile.ProjectileNum);
-        packet.WriteInt32(mapProjectile.Owner);
-        packet.WriteByte(mapProjectile.OwnerType);
-        packet.WriteByte(mapProjectile.Dir);
-        packet.WriteInt32(mapProjectile.X);
-        packet.WriteInt32(mapProjectile.Y);
+    packet.WriteInt32(mapProjectile.ProjectileNum);
+    packet.WriteInt32(mapProjectile.Owner);
+    packet.WriteByte(mapProjectile.OwnerType);
+    packet.WriteByte(mapProjectile.Dir);
+    packet.WriteInt32(mapProjectile.X);
+    packet.WriteInt32(mapProjectile.Y);
+    packet.WriteInt16(mapProjectile.Vx);
+    packet.WriteInt16(mapProjectile.Vy);
+    packet.WriteByte(mapProjectile.FreeAim);
 
         NetworkConfig.SendDataToMap(mapNum, packet.GetBytes());
     }
@@ -257,6 +265,46 @@ public static class Projectile
         mapProjectile.TravelTime = General.GetTimeMs() + Math.Max(1, Data.Projectile[projectileNum].Speed);
         mapProjectile.Timer = General.GetTimeMs() + 60000;
 
+        SendProjectileToMap(mapNum, mapProjectileNum);
+    }
+
+    public static void PlayerFireProjectileFreeAim(int playerId, short vx, short vy, int itemNum)
+    {
+        var mapNum = GetPlayerMap(playerId);
+        var mapProjectileNum = -1;
+        for (var i = 0; i < Core.Globals.Constant.MaxProjectiles; i++)
+        {
+            if (Data.MapProjectile[mapNum, i].ProjectileNum < 0)
+            {
+                mapProjectileNum = i; break;
+            }
+        }
+        if (mapProjectileNum == -1) return;
+        int projectileNum = itemNum >= 0 ? Data.Item[itemNum].Projectile : -1;
+        if (projectileNum < 0) return;
+        if (Data.TempPlayer[playerId].ProjectileTimer > General.GetTimeMs()) return;
+
+        ref var mp = ref Data.MapProjectile[mapNum, mapProjectileNum];
+        Data.TempPlayer[playerId].ProjectileTimer = General.GetTimeMs() + Data.Item[itemNum].Speed;
+        mp.ProjectileNum = projectileNum;
+        mp.Owner = playerId;
+        mp.OwnerType = (byte)TargetType.Player;
+        // Derive dir for legacy visuals based on vx,vy in 8 directions
+        double ang = Math.Atan2(vy, vx) * 180.0 / Math.PI;
+        if (ang > -22.5 && ang <= 22.5) mp.Dir = (byte)Direction.Right;
+        else if (ang > 22.5 && ang <= 67.5) mp.Dir = (byte)Direction.DownRight;
+        else if (ang > 67.5 && ang <= 112.5) mp.Dir = (byte)Direction.Down;
+        else if (ang > 112.5 && ang <= 157.5) mp.Dir = (byte)Direction.DownLeft;
+        else if (ang > 157.5 || ang <= -157.5) mp.Dir = (byte)Direction.Left;
+        else if (ang > -157.5 && ang <= -112.5) mp.Dir = (byte)Direction.UpLeft;
+        else if (ang > -112.5 && ang <= -67.5) mp.Dir = (byte)Direction.Up;
+        else mp.Dir = (byte)Direction.UpRight;
+        mp.X = GetPlayerRawX(playerId);
+        mp.Y = GetPlayerRawY(playerId);
+        mp.Vx = vx; mp.Vy = vy; mp.FreeAim = 1;
+    mp.AccX = 0; mp.AccY = 0; mp.Range = 0;
+        mp.TravelTime = General.GetTimeMs() + Math.Max(1, Data.Projectile[projectileNum].Speed);
+        mp.Timer = General.GetTimeMs() + 60000;
         SendProjectileToMap(mapNum, mapProjectileNum);
     }
 
@@ -337,29 +385,42 @@ public static class Projectile
                 
                 while (now > mp.TravelTime)
                 {
-                    bool eightDir = SettingsManager.Instance.SpriteDirections >= 8;
-                    switch (mp.Dir)
+                    if (mp.FreeAim == 1)
                     {
-                        case (byte)Direction.Up: mp.Y -= 1; break;
-                        case (byte)Direction.Down: mp.Y += 1; break;
-                        case (byte)Direction.Left: mp.X -= 1; break;
-                        case (byte)Direction.Right: mp.X += 1; break;
-                        case (byte)Direction.UpRight:
-                            if (eightDir) { mp.Y -= 1; mp.X += 1; }
-                            else { mp.Y -= 1; }
-                            break;
-                        case (byte)Direction.UpLeft:
-                            if (eightDir) { mp.Y -= 1; mp.X -= 1; }
-                            else { mp.Y -= 1; }
-                            break;
-                        case (byte)Direction.DownRight:
-                            if (eightDir) { mp.Y += 1; mp.X += 1; }
-                            else { mp.Y += 1; }
-                            break;
-                        case (byte)Direction.DownLeft:
-                            if (eightDir) { mp.Y += 1; mp.X -= 1; }
-                            else { mp.Y += 1; }
-                            break;
+                        // accumulate thousandths, step whole pixels
+                        mp.AccX += mp.Vx;
+                        mp.AccY += mp.Vy;
+                        while (mp.AccX >= 1000) { mp.X += 1; mp.AccX -= 1000; }
+                        while (mp.AccX <= -1000) { mp.X -= 1; mp.AccX += 1000; }
+                        while (mp.AccY >= 1000) { mp.Y += 1; mp.AccY -= 1000; }
+                        while (mp.AccY <= -1000) { mp.Y -= 1; mp.AccY += 1000; }
+                    }
+                    else
+                    {
+                        bool eightDir = SettingsManager.Instance.SpriteDirections >= 8;
+                        switch (mp.Dir)
+                        {
+                            case (byte)Direction.Up: mp.Y -= 1; break;
+                            case (byte)Direction.Down: mp.Y += 1; break;
+                            case (byte)Direction.Left: mp.X -= 1; break;
+                            case (byte)Direction.Right: mp.X += 1; break;
+                            case (byte)Direction.UpRight:
+                                if (eightDir) { mp.Y -= 1; mp.X += 1; }
+                                else { mp.Y -= 1; }
+                                break;
+                            case (byte)Direction.UpLeft:
+                                if (eightDir) { mp.Y -= 1; mp.X -= 1; }
+                                else { mp.Y -= 1; }
+                                break;
+                            case (byte)Direction.DownRight:
+                                if (eightDir) { mp.Y += 1; mp.X += 1; }
+                                else { mp.Y += 1; }
+                                break;
+                            case (byte)Direction.DownLeft:
+                                if (eightDir) { mp.Y += 1; mp.X -= 1; }
+                                else { mp.Y += 1; }
+                                break;
+                        }
                     }
                     mp.TravelTime += stepMs;
                     mp.Range += 1; // pixels traveled

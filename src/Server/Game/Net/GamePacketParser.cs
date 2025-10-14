@@ -34,6 +34,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Bind(GamePacketId.FromClient.CPlayerDir, Packet_PlayerDirection);
         Bind(GamePacketId.FromClient.CUseItem, Packet_UseItem);
         Bind(GamePacketId.FromClient.CAttack, Packet_Attack);
+        Bind(GamePacketId.FromClient.CMouseAttack, Packet_MouseAttack);
         Bind(GamePacketId.FromClient.CPlayerInfoRequest, Packet_PlayerInfo);
         Bind(GamePacketId.FromClient.CWarpMeTo, Packet_WarpMeTo);
         Bind(GamePacketId.FromClient.CWarpToMe, Packet_WarpToMe);
@@ -774,6 +775,60 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         {
             General.Logger.LogError(ex, "[Script] Error in {MethodName}", "AttemptAttack");
         }
+    }
+
+    public static void Packet_MouseAttack(GameSession session, ReadOnlyMemory<byte> bytes)
+    {
+        var buffer = new PacketReader(bytes);
+        // read target world pixel coordinates relative to map origin
+        int targetX = buffer.ReadInt32();
+        int targetY = buffer.ReadInt32();
+
+        // basic validation
+        if (!NetworkConfig.IsPlaying(session.Id)) return;
+        if (Data.TempPlayer[session.Id].SkillBuffer >= 0) return;
+        if (Data.TempPlayer[session.Id].StunDuration > 0) return;
+
+        // Ensure player holds a weapon with projectile or skill casting projectile
+        int itemNum = GetPlayerEquipment(session.Id, Equipment.Weapon);
+        if (itemNum < 0 || Data.Item[itemNum].Projectile < 0)
+        {
+            // fallback: trigger normal attack if no projectile
+            Packet_Attack(session, ReadOnlyMemory<byte>.Empty);
+            return;
+        }
+
+        // Ammo check if required
+        if (Data.Item[itemNum].Ammo >= 0)
+        {
+            if (Server.Player.HasItem(session.Id, Data.Item[itemNum].Ammo) <= 0)
+            {
+                NetworkSend.PlayerMsg(session.Id, "Out of " + Data.Item[Data.Item[itemNum].Ammo].Name + " !", (int)ColorName.BrightRed);
+                return;
+            }
+            Server.Player.TakeInv(session.Id, Data.Item[itemNum].Ammo, 1);
+        }
+
+        // Compute vector from player center to target in pixels
+        int startX = GetPlayerRawX(session.Id);
+        int startY = GetPlayerRawY(session.Id);
+        int dx = targetX - startX;
+        int dy = targetY - startY;
+        if (dx == 0 && dy == 0)
+        {
+            // if zero vector, default to current facing
+            Projectile.PlayerFireProjectile(session.Id, -1, itemNum);
+            return;
+        }
+
+        // Normalize to fixed-point 1000 scale
+        double length = Math.Sqrt((double)dx * dx + (double)dy * dy);
+        short vx = (short)Math.Clamp((int)Math.Round(dx / length * 1000.0), short.MinValue, short.MaxValue);
+        short vy = (short)Math.Clamp((int)Math.Round(dy / length * 1000.0), short.MinValue, short.MaxValue);
+
+        // Fire with free-aim using helper
+        Server.Projectile.PlayerFireProjectileFreeAim(session.Id, vx, vy, itemNum);
+        NetworkSend.SendPlayerAttack(session.Id);
     }
 
     public static void Packet_PlayerInfo(GameSession session, ReadOnlyMemory<byte> bytes)
