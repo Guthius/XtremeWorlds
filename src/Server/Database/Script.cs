@@ -648,7 +648,6 @@ public class Script
         Data.TempPlayer[playerIndex].SkillBuffer = skillSlot;
         Data.TempPlayer[playerIndex].SkillBufferTimer = (int)now;
         NetworkSend.SendStartSkillBuffer(playerIndex, skillSlot, effectiveCastTime);
-        // Client now begins cast bar on authoritative server ack; SClearSkillBuffer still clears when finalized
     }
 
     public int KillPlayer(int index)
@@ -710,21 +709,48 @@ public class Script
             // Only process entities that are Npcs
             if (entity.Num < 0) continue;
 
-            // check if they've completed casting, and if so set the actual skill going
-            if (entity.SkillBuffer >= 0)
+            // Resolve completed skill buffers for both players and NPCs
+            long nowMsBuff = General.GetTimeMs();
+            if (entity.Type == Core.Globals.Entity.EntityType.Player)
             {
-                if (General.GetTimeMs() > entity.SkillBufferTimer + Data.Skill[entity.SkillBuffer].CastTime * 1000)
+                int slot = (int)Data.TempPlayer[entity.Id].SkillBuffer;
+                if (slot >= 0)
                 {
-                    var casterIndex = Core.Globals.Entity.Index(entity);
-
-                    // Execute the buffered skill now  that cast time elapsed
-                    CastSkill(mapNum, casterIndex, entity.SkillBuffer);
-
-                    entity.SkillBuffer = -1;
-                    entity.SkillBufferTimer = 0;
-
-                    if (entity.Type == Core.Globals.Entity.EntityType.Player)
+                    int skillId = -1;
+                    if (Data.Player[entity.Id].Skill != null && slot < Data.Player[entity.Id].Skill.Length)
+                        skillId = Data.Player[entity.Id].Skill[slot].Num;
+                    int castMs = (skillId >= 0 && skillId < Data.Skill.Length) ? Data.Skill[skillId].CastTime * 1000 : 0;
+                    if (nowMsBuff > Data.TempPlayer[entity.Id].SkillBufferTimer + castMs)
+                    {
+                        var casterIndex = Core.Globals.Entity.Index(entity);
+                        CastSkill(mapNum, casterIndex, slot); // bufferedValue is slot for players
+                        // clear buffer
+                        Data.TempPlayer[entity.Id].SkillBuffer = -1;
+                        Data.TempPlayer[entity.Id].SkillBufferTimer = 0;
                         SendClearSkillBuffer(entity.Id);
+                    }
+                }
+            }
+            else if (entity.Type == Core.Globals.Entity.EntityType.Npc)
+            {
+                int npcSkillId = entity.SkillBuffer; // NPC stores skillId directly
+                if (npcSkillId >= 0)
+                {
+                    int castMs = (npcSkillId < Data.Skill.Length) ? Data.Skill[npcSkillId].CastTime * 1000 : 0;
+                    if (nowMsBuff > entity.SkillBufferTimer + castMs)
+                    {
+                        var casterIndex = Core.Globals.Entity.Index(entity);
+                        CastSkill(mapNum, casterIndex, npcSkillId); // bufferedValue is skillId for NPCs
+                        // clear snapshot & underlying map npc buffer
+                        entity.SkillBuffer = -1;
+                        entity.SkillBufferTimer = 0;
+                        if (entity.Id >= 0 && entity.Id < Constant.MaxMapNpcs && mapNum >= 0 && mapNum < Data.MapNpc.Length)
+                        {
+                            ref var baseNpc = ref Data.MapNpc[mapNum].Npc[entity.Id];
+                            baseNpc.SkillBuffer = -1;
+                            baseNpc.SkillBufferTimer = 0;
+                        }
+                    }
                 }
             }
             else
@@ -1937,7 +1963,7 @@ public class Script
         if (caster == null) return;
         if (caster.Map != mapNum) return;
 
-        int skillId;
+        int skillId = -1;
         int playerSkillSlot = -1;
         if (caster.Type == Core.Globals.Entity.EntityType.Player)
         {
@@ -1947,8 +1973,14 @@ public class Script
         }
         else
         {
-            // For NPCs treat buffered value as a direct skillId (future: NPC skill slots)
-            skillId = bufferedValue;
+            for (int i = 0; i < Constant.MaxNpcSkills; i++)
+            {
+                if (i == bufferedValue)
+                {
+                    skillId = Data.Npc[caster.Num].Skill[i];
+                    break;
+                }
+            }
         }
         if (skillId < 0 || skillId >= Data.Skill.Length) return;
         ref var skill = ref Data.Skill[skillId];

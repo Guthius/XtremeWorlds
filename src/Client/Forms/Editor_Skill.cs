@@ -97,10 +97,11 @@ namespace Client
                 cmbDir.Items.Add(name);
             }
 
-            cmbKnockBackTiles.Items.Add("0");
             cmbKnockBackTiles.Items.Add("1");
             cmbKnockBackTiles.Items.Add("2");
             cmbKnockBackTiles.Items.Add("3");
+            cmbKnockBackTiles.Items.Add("4");
+            cmbKnockBackTiles.Items.Add("5");
 
             // Wiring events
             lstIndex.SelectedIndexChanged += (s, e) =>
@@ -161,7 +162,7 @@ namespace Client
             general.AddRow("Vital:", nudVital, "Duration:", nudDuration);
             general.AddRow("Interval:", nudInterval, "Range:", nudRange);
             general.AddRow(chkAoE, "AoE Size:", nudAoE);
-            general.AddRow("Cast Anim:", cmbAnimCast, "Skill Anim:", cmbAnim);
+            general.AddRow("Cast Animation:", cmbAnimCast, "Skill Anim:", cmbAnim);
             general.AddRow("Stun:", nudStun);
             general.AddRow(chkProjectile, "Projectile:", cmbProjectile);
             // Multi-direction casting: 8 direction checkboxes
