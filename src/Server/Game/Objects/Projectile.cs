@@ -209,15 +209,15 @@ public static class Projectile
 
         packet.WriteEnum(ServerPackets.SMapProjectile);
         packet.WriteInt32(projectileNum);
-    packet.WriteInt32(mapProjectile.ProjectileNum);
-    packet.WriteInt32(mapProjectile.Owner);
-    packet.WriteByte(mapProjectile.OwnerType);
-    packet.WriteByte(mapProjectile.Dir);
-    packet.WriteInt32(mapProjectile.X);
-    packet.WriteInt32(mapProjectile.Y);
-    packet.WriteInt16(mapProjectile.Vx);
-    packet.WriteInt16(mapProjectile.Vy);
-    packet.WriteByte(mapProjectile.FreeAim);
+        packet.WriteInt32(mapProjectile.ProjectileNum);
+        packet.WriteInt32(mapProjectile.Owner);
+        packet.WriteByte(mapProjectile.OwnerType);
+        packet.WriteByte(mapProjectile.Dir);
+        packet.WriteInt32(mapProjectile.X);
+        packet.WriteInt32(mapProjectile.Y);
+        packet.WriteInt16(mapProjectile.Vx);
+        packet.WriteInt16(mapProjectile.Vy);
+        packet.WriteByte(mapProjectile.FreeAim);
 
         NetworkConfig.SendDataToMap(mapNum, packet.GetBytes());
     }
