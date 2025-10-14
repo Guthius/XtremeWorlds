@@ -799,17 +799,34 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             return;
         }
 
-        // Ammo check if required
-        if (Data.Item[itemNum].Ammo >= 0)
+        // Check ammo availability first (do not deduct yet)
+        int ammoId = Data.Item[itemNum].Ammo;
+        if (ammoId >= 0 && Server.Player.HasItem(session.Id, ammoId) <= 0)
         {
-            if (Server.Player.HasItem(session.Id, Data.Item[itemNum].Ammo) <= 0)
-            {
-                NetworkSend.PlayerMsg(session.Id, "Out of " + Data.Item[Data.Item[itemNum].Ammo].Name + " !", (int)ColorName.BrightRed);
-                return;
-            }
-            Server.Player.TakeInv(session.Id, Data.Item[itemNum].Ammo, 1);
+            NetworkSend.PlayerMsg(session.Id, "Out of " + Data.Item[ammoId].Name + " !", (int)ColorName.BrightRed);
+            return;
         }
 
+        // Cooldown gate using weapon attack speed to prevent spamming
+        var attackerEntity = Core.Globals.Entity.FromPlayer(session.Id, Data.Player[session.Id]);
+        attackerEntity.Map = GetPlayerMap(session.Id);
+        try
+        {
+            if (Script.Instance?.TryConsumeAttackCooldown(attackerEntity) != true)
+            {
+                return; // still on cooldown; ignore
+            }
+        }
+        catch (Exception ex)
+        {
+            General.Logger.LogError(ex, "[Script] Error in {MethodName}", "TryConsumeAttackCooldown");
+        }
+
+        // Deduct ammo now that the shot is confirmed
+        if (ammoId >= 0)
+        {
+            Server.Player.TakeInv(session.Id, ammoId, 1);
+        }
         // Compute vector from player center to target in pixels
         int startX = GetPlayerRawX(session.Id);
         int startY = GetPlayerRawY(session.Id);
@@ -1604,6 +1621,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         Data.Skill[skillNum].KnockBack = (byte) buffer.ReadInt32();
         Data.Skill[skillNum].KnockBackTiles = (byte) buffer.ReadInt32();
+        Data.Skill[skillNum].MultiDirMask = buffer.ReadInt32();
 
         // Save it
         NetworkSend.SendUpdateSkillToAll(skillNum);

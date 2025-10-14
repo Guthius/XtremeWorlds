@@ -318,6 +318,7 @@ public static class NetworkSend
         packetWriter.WriteInt32(Data.Skill[skillNum].Projectile);
         packetWriter.WriteInt32(Data.Skill[skillNum].KnockBack);
         packetWriter.WriteInt32(Data.Skill[skillNum].KnockBackTiles);
+        packetWriter.WriteInt32(Data.Skill[skillNum].MultiDirMask);
 
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
     }
@@ -353,6 +354,7 @@ public static class NetworkSend
         packetWriter.WriteInt32(Data.Skill[skillNum].Projectile);
         packetWriter.WriteInt32(Data.Skill[skillNum].KnockBack);
         packetWriter.WriteInt32(Data.Skill[skillNum].KnockBackTiles);
+        packetWriter.WriteInt32(Data.Skill[skillNum].MultiDirMask);
 
         PlayerService.Instance.SendDataToAll(packetWriter.GetBytes());
     }

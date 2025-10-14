@@ -1713,6 +1713,22 @@ public class Script
         return BaseAttackSpeedMs;
     }
 
+    // Public helper to enforce per-attacker cooldown based on attack speed.
+    // Returns true if cooldown was available and is now consumed; false if still on cooldown.
+    public bool TryConsumeAttackCooldown(Entity attacker, int? skillId = null)
+    {
+        if (attacker == null) return false;
+        var now = General.GetTimeMs();
+        var cd = GetAttackSpeed(attacker, skillId);
+        if (attacker.AttackTimer + cd > now)
+        {
+            return false;
+        }
+        attacker.AttackTimer = (int)now;
+        UpdateUnderlyingAttackTimer(attacker, (int)now);
+        return true;
+    }
+
     private int GetEquippedItemId(Entity player, Equipment eq)
     {
         if (player.Equipment == null) return -1;
@@ -1875,7 +1891,7 @@ public class Script
                 // Player death routine (reuse existing logic if available)
                 if (caster != null && caster.Type == Core.Globals.Entity.EntityType.Player)
                 {
-                    // Award exp or handle PvP consequences if needed later.
+                    HandleDeath(caster, target);
                 }
             }
         }
@@ -1909,7 +1925,7 @@ public class Script
             Server.Npc.SendMapNpcVitals(target.Map, (byte)target.Id);
             if (!isHeal && vital == Vital.Health && newVal <= 0)
             {
-                // handle npc death (reuse existing logic if there is a method; for now rely on other damage pipeline)
+                HandleDeath(caster, target);
             }
         }
     }
@@ -2012,15 +2028,31 @@ public class Script
 
     private void HandleProjectileSkill(int mapNum, Entity caster, int skillId, Entity? target)
     {
-        // Spawn a visible projectile if this skill defines one
-        if (caster.Type == Core.Globals.Entity.EntityType.Player)
+        // Spawn one or more projectiles depending on MultiDirMask. If mask==0, fire in caster's facing or skill.Dir
+        ref var skill = ref Data.Skill[skillId];
+        int mask = skill.MultiDirMask;
+        if (mask == 0)
         {
-            Server.Projectile.PlayerFireProjectile(caster.Id, skillId);
+            if (caster.Type == Core.Globals.Entity.EntityType.Player)
+                Server.Projectile.PlayerFireProjectile(caster.Id, skillId);
+            else if (caster.Type == Core.Globals.Entity.EntityType.Npc)
+                Server.Projectile.NpcFireProjectile(mapNum, caster.Id, skillId);
+            return;
         }
-        else if (caster.Type == Core.Globals.Entity.EntityType.Npc)
+
+        // For multi-direction: temporarily adjust caster dir per bit and fire once per enabled direction
+        Span<byte> dirs = stackalloc byte[] { (byte)Direction.Down, (byte)Direction.Right, (byte)Direction.Left, (byte)Direction.Up, (byte)Direction.DownRight, (byte)Direction.DownLeft, (byte)Direction.UpRight, (byte)Direction.UpLeft };
+        byte originalDir = caster.Dir;
+        for (int i = 0; i < 8; i++)
         {
-            Server.Projectile.NpcFireProjectile(mapNum, caster.Id, skillId);
+            if ((mask & (1 << i)) == 0) continue;
+            caster.Dir = dirs[i];
+            if (caster.Type == Core.Globals.Entity.EntityType.Player)
+                Server.Projectile.PlayerFireProjectile(caster.Id, skillId);
+            else if (caster.Type == Core.Globals.Entity.EntityType.Npc)
+                Server.Projectile.NpcFireProjectile(mapNum, caster.Id, skillId);
         }
+        caster.Dir = originalDir;
     }
 
     private void HandleSelfCastSkill(int mapNum, Entity caster, int skillId)
@@ -2070,7 +2102,30 @@ public class Script
     private void HandleTargetedSkill(int mapNum, Entity caster, int skillId, Entity? target)
     {
         if (target == null) return;
-        AttemptAttack(caster, target, skillId);
+        ref var s = ref Data.Skill[skillId];
+        if (s.MultiDirMask == 0)
+        {
+            AttemptAttack(caster, target, skillId);
+        }
+        else
+        {
+            // For multi-direction targeted skills, we resolve separate attacks along up to 8 adjacent directions from caster.
+            // Primary target still gets hit once; additionally, attempt in other adjacent directions.
+            AttemptAttack(caster, target, skillId);
+            Span<(int dx,int dy)> deltas = stackalloc (int,int)[] { (0,1),(1,0),(-1,0),(0,-1),(1,1),(1,-1),(-1,1),(-1,-1) };
+            for (int i = 0; i < 8; i++)
+            {
+                if ((s.MultiDirMask & (1 << i)) == 0) continue;
+                int tx = caster.X/32 + deltas[i].dx;
+                int ty = caster.Y/32 + deltas[i].dy;
+                // Try find another entity on this tile and attack
+                var extraTarget = FindEntityAt(mapNum, tx, ty, preferOpponentsOf: caster);
+                if (extraTarget != null && (extraTarget.Id != target.Id || extraTarget.Type != target.Type))
+                {
+                    AttemptAttack(caster, extraTarget, skillId);
+                }
+            }
+        }
         ref var skill = ref Data.Skill[skillId];
         if (skill.Type == 2 || skill.Type == 3)
         {
@@ -2082,9 +2137,51 @@ public class Script
 
     private void HandleTargetedAoESkill(int mapNum, Entity caster, int skillId, Entity? target)
     {
-        int centerX = (target != null ? target.X : caster.X) / 32;
-        int centerY = (target != null ? target.Y : caster.Y) / 32;
-        ApplyAoE(mapNum, caster, skillId, centerX, centerY);
+        int baseX = (target != null ? target.X : caster.X) / 32;
+        int baseY = (target != null ? target.Y : caster.Y) / 32;
+        ref var s = ref Data.Skill[skillId];
+        if (s.MultiDirMask == 0)
+        {
+            ApplyAoE(mapNum, caster, skillId, baseX, baseY);
+        }
+        else
+        {
+            Span<(int dx,int dy)> deltas = stackalloc (int,int)[] { (0,1),(1,0),(-1,0),(0,-1),(1,1),(1,-1),(-1,1),(-1,-1) };
+            for (int i = 0; i < 8; i++)
+            {
+                if ((s.MultiDirMask & (1 << i)) == 0) continue;
+                ApplyAoE(mapNum, caster, skillId, baseX + deltas[i].dx, baseY + deltas[i].dy);
+            }
+        }
+    }
+
+    private Entity? FindEntityAt(int mapNum, int tx, int ty, Entity preferOpponentsOf)
+    {
+        // Players first
+        foreach (var p in PlayerService.Instance.Players)
+        {
+            if (!NetworkConfig.IsPlaying(p.Id)) continue;
+            if (GetPlayerMap(p.Id) != mapNum) continue;
+            if (GetPlayerX(p.Id) == tx && GetPlayerY(p.Id) == ty)
+            {
+                var e = Core.Globals.Entity.FromPlayer(p.Id, Data.Player[p.Id]); e.Map = mapNum; return e;
+            }
+        }
+        // NPCs
+        if (mapNum >= 0 && mapNum < Data.MapNpc.Length)
+        {
+            for (int i = 0; i < Core.Globals.Constant.MaxMapNpcs; i++)
+            {
+                ref var mn = ref Data.MapNpc[mapNum].Npc[i];
+                if (mn.Num < 0) continue;
+                if (mn.X == tx && mn.Y == ty)
+                {
+                    var e = Core.Globals.Entity.Instances[i];
+                    if (e != null && e.Type == Core.Globals.Entity.EntityType.Npc) return e;
+                }
+            }
+        }
+        return null;
     }
 
     private void ApplyAoE(int mapNum, Entity caster, int skillId, int centerX, int centerY)

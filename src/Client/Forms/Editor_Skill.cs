@@ -46,6 +46,8 @@ namespace Client
         public ComboBox cmbProjectile = new ComboBox();
         public CheckBox chkKnockBack = new CheckBox { Text = "Knockback" };
         public ComboBox cmbKnockBackTiles = new ComboBox();
+        // Multi-direction casting UI
+        public CheckBox[] chkMultiDirs = new CheckBox[8];
         public Button btnSave = new Button { Text = "Save" };
         public Button btnDelete = new Button { Text = "Delete" };
         public Button btnCopy = new Button { Text = "Copy" };
@@ -162,6 +164,26 @@ namespace Client
             general.AddRow("Cast Anim:", cmbAnimCast, "Skill Anim:", cmbAnim);
             general.AddRow("Stun:", nudStun);
             general.AddRow(chkProjectile, "Projectile:", cmbProjectile);
+            // Multi-direction casting: 8 direction checkboxes
+            var dirPanel1 = new StackLayout { Orientation = Orientation.Horizontal, Spacing = 6 };
+            var dirPanel2 = new StackLayout { Orientation = Orientation.Horizontal, Spacing = 6 };
+            var dirNames = Enum.GetNames(typeof(Direction));
+            for (int i = 0; i < 8; i++)
+            {
+                var cb = new CheckBox { Text = dirNames[i] };
+                int bit = i;
+                cb.CheckedChanged += (s,e)=>
+                {
+                    int mask = Data.Skill[GameState.EditorIndex].MultiDirMask;
+                    if (cb.Checked == true) mask |= (1 << bit); else mask &= ~(1 << bit);
+                    Data.Skill[GameState.EditorIndex].MultiDirMask = mask;
+                };
+                chkMultiDirs[i] = cb;
+                (i < 4 ? dirPanel1.Items : dirPanel2.Items).Add(cb);
+            }
+            general.AddRow(new Label { Text = "Multi-cast Directions:" });
+            general.AddRow(dirPanel1);
+            general.AddRow(dirPanel2);
             general.AddRow(chkKnockBack, "KB Tiles:", cmbKnockBackTiles);
 
             var buttons = new StackLayout { Orientation = Orientation.Horizontal, Spacing = 5, Items = { btnSave, btnDelete, btnCopy, btnCancel, btnLearn } }; // order enforced
@@ -275,6 +297,14 @@ namespace Client
         private void CmbProjectile_SelectedIndexChanged() => Data.Skill[GameState.EditorIndex].Projectile = cmbProjectile.SelectedIndex;
         private void ChkKnockBack_CheckedChanged() => Data.Skill[GameState.EditorIndex].KnockBack = (byte)(chkKnockBack.Checked == true ? 1 : 0);
         private void CmbKnockBackTiles_SelectedIndexChanged() => Data.Skill[GameState.EditorIndex].KnockBackTiles = (byte)cmbKnockBackTiles.SelectedIndex;
+        public void SyncMultiDirMask()
+        {
+            int mask = Data.Skill[GameState.EditorIndex].MultiDirMask;
+            for (int i = 0; i < 8; i++)
+            {
+                chkMultiDirs[i].Checked = (mask & (1 << i)) != 0;
+            }
+        }
 
         private void DrawIcon(Graphics g, int iconNum)
         {

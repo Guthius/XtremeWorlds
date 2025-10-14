@@ -680,6 +680,7 @@ public static class Sender
 
         packetWriter.WriteInt32(Data.Skill[skillNum].KnockBack);
         packetWriter.WriteInt32(Data.Skill[skillNum].KnockBackTiles);
+        packetWriter.WriteInt32(Data.Skill[skillNum].MultiDirMask);
 
         Network.Send(packetWriter);
     }

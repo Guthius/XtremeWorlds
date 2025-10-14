@@ -73,6 +73,7 @@ public static class Type
         public int Projectile;
         public byte KnockBack;
         public byte KnockBackTiles;
+        public int MultiDirMask; // bitmask of directions to fire simultaneously (0=off)
     }
 
     public struct Shop

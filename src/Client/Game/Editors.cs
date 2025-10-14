@@ -335,6 +335,7 @@ namespace Client
             withBlock.cmbAnimCast.SelectedIndex = Data.Skill[GameState.EditorIndex].CastAnim;
             withBlock.cmbAnim.SelectedIndex = Data.Skill[GameState.EditorIndex].SkillAnim;
             withBlock.nudStun.Value = Data.Skill[GameState.EditorIndex].StunDuration;
+            withBlock.SyncMultiDirMask();
 
             if (Data.Skill[GameState.EditorIndex].IsProjectile == 1)
             {
@@ -355,6 +356,7 @@ namespace Client
                 withBlock.chkKnockBack.Checked = false;
             }
             withBlock.cmbKnockBackTiles.SelectedIndex = Data.Skill[GameState.EditorIndex].KnockBackTiles;
+            withBlock.SyncMultiDirMask();
 
             Editor_Skill.Instance.DrawIcon();
           
