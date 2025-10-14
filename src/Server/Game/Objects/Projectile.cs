@@ -15,6 +15,83 @@ namespace Server;
 
 public static class Projectile
 {
+    private static void TryAttackAtTile(int map, ref Type.MapProjectile mp, int tileX, int tileY, int projId)
+    {
+        // Build attacker entity snapshot (owner is player for now)
+        Entity attackerEntity = null;
+        if (mp.OwnerType == (byte)TargetType.Player)
+        {
+            attackerEntity = Core.Globals.Entity.FromPlayer(mp.Owner, Data.Player[mp.Owner]);
+            attackerEntity.Map = map;
+        }
+        else if (mp.OwnerType == (byte)TargetType.Npc)
+        {
+            attackerEntity = Core.Globals.Entity.FromNpc(mp.Owner, Data.MapNpc[map].Npc[mp.Owner]);
+            attackerEntity.Map = map;
+        }
+
+        // Prefer player target at tile excluding owner
+        foreach (var p in PlayerService.Instance.Players)
+        {
+            if (!NetworkConfig.IsPlaying(p.Id)) continue;
+            if (GetPlayerMap(p.Id) != map) continue;
+            if (GetPlayerX(p.Id) == tileX && GetPlayerY(p.Id) == tileY)
+            {
+                if (!(mp.OwnerType == (byte)TargetType.Player && mp.Owner == p.Id))
+                {
+                    var targetEntity = Core.Globals.Entity.FromPlayer(p.Id, Data.Player[p.Id]);
+                    targetEntity.Map = map;
+                    try
+                    {
+                        if (mp.SkillId >= 0)
+                        {
+                            Script.Instance?.AttemptAttack(attackerEntity, targetEntity, mp.SkillId);
+                        }
+                        else
+                        {
+                            Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, Data.Projectile[projId].Damage, true);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        General.Logger.LogError(ex, "[Script] Error in {MethodName}", "AttemptAttack");
+                    }
+                }
+                return;
+            }
+        }
+
+        // Then NPC target at tile excluding owner NPC
+        for (int n = 0; n < Core.Globals.Constant.MaxMapNpcs; n++)
+        {
+            ref var mn = ref Data.MapNpc[map].Npc[n];
+            if (mn.Num < 0) continue;
+            if (mn.X == tileX && mn.Y == tileY)
+            {
+                if (!(mp.OwnerType == (byte)TargetType.Npc && mp.Owner == n))
+                {
+                    var targetEntity = Core.Globals.Entity.FromNpc(n, mn);
+                    targetEntity.Map = map;
+                    try
+                    {
+                        if (mp.SkillId >= 0)
+                        {
+                            Script.Instance?.AttemptAttack(attackerEntity, targetEntity, mp.SkillId);
+                        }
+                        else
+                        {
+                            Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, Data.Projectile[projId].Damage, true);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        General.Logger.LogError(ex, "[Script] Error in {MethodName}", "AttemptAttack");
+                    }
+                }
+                return;
+            }
+        }
+    }
     private static void SaveProjectile(int projectileNum)
     {
         var json = JsonConvert.SerializeObject(Data.Projectile[projectileNum]);
@@ -62,6 +139,9 @@ public static class Projectile
         mp.FreeAim = 0;
         mp.AccX = 0;
         mp.AccY = 0;
+        mp.DestX = 0;
+        mp.DestY = 0;
+        mp.SkillId = -1;
         mp.Range = 0;
         mp.TravelTime = 0;
         mp.Timer = 0;
@@ -261,6 +341,7 @@ public static class Projectile
         mapProjectile.Dir = GetPlayerDir(playerId);
         mapProjectile.X = GetPlayerRawX(playerId);
         mapProjectile.Y = GetPlayerRawY(playerId);
+        mapProjectile.SkillId = skillNum;
         mapProjectile.Range = 0;
         mapProjectile.TravelTime = General.GetTimeMs() + Math.Max(1, Data.Projectile[projectileNum].Speed);
         mapProjectile.Timer = General.GetTimeMs() + 60000;
@@ -302,7 +383,45 @@ public static class Projectile
         mp.X = GetPlayerRawX(playerId);
         mp.Y = GetPlayerRawY(playerId);
         mp.Vx = vx; mp.Vy = vy; mp.FreeAim = 1;
-    mp.AccX = 0; mp.AccY = 0; mp.Range = 0;
+        mp.AccX = 0; mp.AccY = 0; mp.Range = 0;
+        mp.TravelTime = General.GetTimeMs() + Math.Max(1, Data.Projectile[projectileNum].Speed);
+        mp.Timer = General.GetTimeMs() + 60000;
+        SendProjectileToMap(mapNum, mapProjectileNum);
+    }
+
+    public static void PlayerFireProjectileFreeAim(int playerId, short vx, short vy, int itemNum, int destX, int destY)
+    {
+        var mapNum = GetPlayerMap(playerId);
+        var mapProjectileNum = -1;
+        for (var i = 0; i < Core.Globals.Constant.MaxProjectiles; i++)
+        {
+            if (Data.MapProjectile[mapNum, i].ProjectileNum < 0)
+            { mapProjectileNum = i; break; }
+        }
+        if (mapProjectileNum == -1) return;
+        int projectileNum = itemNum >= 0 ? Data.Item[itemNum].Projectile : -1;
+        if (projectileNum < 0) return;
+        if (Data.TempPlayer[playerId].ProjectileTimer > General.GetTimeMs()) return;
+
+        ref var mp = ref Data.MapProjectile[mapNum, mapProjectileNum];
+        Data.TempPlayer[playerId].ProjectileTimer = General.GetTimeMs() + Data.Item[itemNum].Speed;
+        mp.ProjectileNum = projectileNum;
+        mp.Owner = playerId;
+        mp.OwnerType = (byte)TargetType.Player;
+        double ang = Math.Atan2(vy, vx) * 180.0 / Math.PI;
+        if (ang > -22.5 && ang <= 22.5) mp.Dir = (byte)Direction.Right;
+        else if (ang > 22.5 && ang <= 67.5) mp.Dir = (byte)Direction.DownRight;
+        else if (ang > 67.5 && ang <= 112.5) mp.Dir = (byte)Direction.Down;
+        else if (ang > 112.5 && ang <= 157.5) mp.Dir = (byte)Direction.DownLeft;
+        else if (ang > 157.5 || ang <= -157.5) mp.Dir = (byte)Direction.Left;
+        else if (ang > -157.5 && ang <= -112.5) mp.Dir = (byte)Direction.UpLeft;
+        else if (ang > -112.5 && ang <= -67.5) mp.Dir = (byte)Direction.Up;
+        else mp.Dir = (byte)Direction.UpRight;
+        mp.X = GetPlayerRawX(playerId);
+        mp.Y = GetPlayerRawY(playerId);
+        mp.Vx = vx; mp.Vy = vy; mp.FreeAim = 1; mp.SkillId = -1;
+        mp.AccX = 0; mp.AccY = 0; mp.Range = 0;
+        mp.DestX = destX; mp.DestY = destY;
         mp.TravelTime = General.GetTimeMs() + Math.Max(1, Data.Projectile[projectileNum].Speed);
         mp.Timer = General.GetTimeMs() + 60000;
         SendProjectileToMap(mapNum, mapProjectileNum);
@@ -346,6 +465,7 @@ public static class Projectile
         mapProjectile.Dir = Data.MapNpc[mapNum].Npc[mapNpcNum].Dir;
         mapProjectile.X = Data.MapNpc[mapNum].Npc[mapNpcNum].X;
         mapProjectile.Y = Data.MapNpc[mapNum].Npc[mapNpcNum].Y;
+        mapProjectile.SkillId = skillNum;
         mapProjectile.Range = 0;
         mapProjectile.TravelTime = General.GetTimeMs() + Math.Max(1, Data.Projectile[projectileNum].Speed);
         mapProjectile.Timer = General.GetTimeMs() + 60000;
@@ -422,20 +542,46 @@ public static class Projectile
                                 break;
                         }
                     }
+
                     mp.TravelTime += stepMs;
                     mp.Range += 1; // pixels traveled
                     moved = true;
+
+                    // If we have a destination (mouse target), stop when reached/passed
+                    if (mp.FreeAim == 1 && (mp.DestX != 0 || mp.DestY != 0))
+                    {
+                        bool stopX = (mp.Vx >= 0 && mp.X >= mp.DestX) || (mp.Vx <= 0 && mp.X <= mp.DestX) || mp.Vx == 0;
+                        bool stopY = (mp.Vy >= 0 && mp.Y >= mp.DestY) || (mp.Vy <= 0 && mp.Y <= mp.DestY) || mp.Vy == 0;
+                        if (stopX && stopY)
+                        {
+                            // Snap to destination tile center rim if desired; for now, snap to Dest
+                            mp.X = mp.DestX; mp.Y = mp.DestY;
+                            int anim = Data.Projectile[projId].Animation;
+                            if (anim >= 0)
+                            {
+                                int tx = Math.Clamp(mp.X / 32, 0, Data.Map[map].MaxX - 1);
+                                int ty = Math.Clamp(mp.Y / 32, 0, Data.Map[map].MaxY - 1);
+                                Animation.SendAnimation(map, anim, tx, ty);
+                                // Try to apply attack on expire at destination
+                                TryAttackAtTile(map, ref mp, tx, ty, projId);
+                            }
+                            ClearMapProjectile(map, i);
+                            moved = false;
+                            break;
+                        }
+                    }
 
                     // Range check (Range in tiles in DB, convert to pixels)
                     if (mp.Range >= (Data.Projectile[projId].Range + 1) * 32)
                     {
                         // Play hit/expire animation at the last tile location if configured
                         int anim = Data.Projectile[projId].Animation;
-                        if (anim > 0)
+                        if (anim >= 0)
                         {
                             int tx = Math.Clamp(prevTileX, 0, Data.Map[map].MaxX - 1);
                             int ty = Math.Clamp(prevTileY, 0, Data.Map[map].MaxY - 1);
                             Animation.SendAnimation(map, anim, tx, ty);
+                            TryAttackAtTile(map, ref mp, tx, ty, projId);
                         }
                         ClearMapProjectile(map, i);
                         moved = false;
@@ -448,11 +594,12 @@ public static class Projectile
                     if (tileX < 0 || tileY < 0 || tileX >= Data.Map[map].MaxX || tileY >= Data.Map[map].MaxY)
                     {
                         int anim = Data.Projectile[projId].Animation;
-                        if (anim > 0)
+                        if (anim >= 0)
                         {
                             int tx = Math.Clamp(prevTileX, 0, Data.Map[map].MaxX - 1);
                             int ty = Math.Clamp(prevTileY, 0, Data.Map[map].MaxY - 1);
                             Animation.SendAnimation(map, anim, tx, ty);
+                            TryAttackAtTile(map, ref mp, tx, ty, projId);
                         }
                         ClearMapProjectile(map, i);
                         moved = false;
@@ -463,10 +610,12 @@ public static class Projectile
                     if (Data.Map[map].Tile[tileX, tileY].Type == TileType.Blocked || Data.Map[map].Tile[tileX, tileY].Type2 == TileType.Blocked)
                     {
                         int anim = Data.Projectile[projId].Animation;
-                        if (anim > 0)
+                        if (anim >= 0)
                         {
                             Animation.SendAnimation(map, anim, tileX, tileY);
+                            TryAttackAtTile(map, ref mp, tileX, tileY, projId);
                         }
+                        
                         ClearMapProjectile(map, i);
                         moved = false;
                         break;
@@ -505,7 +654,16 @@ public static class Projectile
 
                         try
                         {
-                            Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, Data.Projectile[projId].Damage, true);
+                            if (mp.SkillId >= 0)
+                            {
+                                // skill-based projectile: resolve as targeted skill
+                                Script.Instance?.AttemptAttack(attackerEntity, targetEntity, mp.SkillId);
+                            }
+                            else
+                            {
+                                // item/weapon projectile: basic damage
+                                Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, Data.Projectile[projId].Damage, true);
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -544,7 +702,14 @@ public static class Projectile
 
                         try
                         {
-                            Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, Data.Projectile[projId].Damage, true);
+                            if (mp.SkillId >= 0)
+                            {
+                                Script.Instance?.AttemptAttack(attackerEntity, targetEntity, mp.SkillId);
+                            }
+                            else
+                            {
+                                Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, Data.Projectile[projId].Damage, true);
+                            }
                         }
                         catch (Exception ex)
                         {

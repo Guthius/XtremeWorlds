@@ -826,8 +826,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         short vx = (short)Math.Clamp((int)Math.Round(dx / length * 1000.0), short.MinValue, short.MaxValue);
         short vy = (short)Math.Clamp((int)Math.Round(dy / length * 1000.0), short.MinValue, short.MaxValue);
 
-        // Fire with free-aim using helper
-        Server.Projectile.PlayerFireProjectileFreeAim(session.Id, vx, vy, itemNum);
+        // Fire with free-aim using helper and stop at target
+        Server.Projectile.PlayerFireProjectileFreeAim(session.Id, vx, vy, itemNum, targetX, targetY);
         NetworkSend.SendPlayerAttack(session.Id);
     }
 

@@ -663,6 +663,11 @@ public static class Type
         // Server-side accumulators (fixed point thousandths) for sub-pixel movement
         public int AccX;
         public int AccY;
+        // Destination in world pixels (only used server-side to stop at mouse location)
+        public int DestX;
+        public int DestY;
+        // Originating skill id if this projectile came from a skill cast, else -1
+        public int SkillId;
         public int Range;
         public int TravelTime;
         public int Timer;
