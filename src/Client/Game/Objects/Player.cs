@@ -1007,7 +1007,7 @@ namespace Client
                 {
                     if (Data.Player[GameState.MyIndex].Moving == 0)
                     {
-                        if (Data.MyMap.Moral > 0)
+                        if (Data.MyMap.Moral >= 0)
                         {
                             if (Data.Moral[Data.MyMap.Moral].CanCast)
                             {
