@@ -2618,7 +2618,7 @@ namespace Client
 
             long tick = General.GetTickCount();
             bool isAttacking = Data.Player[index].Attacking == 1; // full attack state
-            bool provisionalMoving = Data.Player[index].Moving != 0; // raw flag from network
+            bool provisionalMoving = Data.Player[index].IsMoving; // raw flag from network
             anim = 0; // will be set after texture info (need framesPerSegment)
 
             // Check to see if we want to stop making him attack
