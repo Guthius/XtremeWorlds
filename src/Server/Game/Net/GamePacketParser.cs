@@ -575,8 +575,9 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         var dir = buffer.ReadInt32();
 
-        // Prevent hacking
-        if (dir < 0 | dir > (byte) Direction.DownRight)
+        // Prevent hacking: accept full 8-direction enum range
+        int dirCount = Enum.GetNames(typeof(Direction)).Length;
+        if (dir < 0 | dir > dirCount)
             return;
 
         SetPlayerDir(session.Id, dir);
@@ -681,7 +682,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             {
                 if (GetPlayerX(session.Id) == Data.Map[GetPlayerMap(session.Id)].MaxX)
                     return;
-                if (GetPlayerY(session.Id) == Data.Map[GetPlayerMap(session.Id)].MaxY)
+                if (GetPlayerY(session.Id) == 0)
                     return;
                 x = GetPlayerX(session.Id) + 1;
                 y = GetPlayerY(session.Id) - 1;
@@ -690,9 +691,9 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
             case (byte) Direction.UpLeft:
             {
-                if (GetPlayerX(session.Id) == Data.Map[GetPlayerMap(session.Id)].MaxX)
+                if (GetPlayerX(session.Id) == 0)
                     return;
-                if (GetPlayerY(session.Id) == Data.Map[GetPlayerMap(session.Id)].MaxY)
+                if (GetPlayerY(session.Id) == 0)
                     return;
                 x = GetPlayerX(session.Id) - 1;
                 y = GetPlayerY(session.Id) - 1;
@@ -712,7 +713,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
             case (byte) Direction.DownLeft:
             {
-                if (GetPlayerX(session.Id) == Data.Map[GetPlayerMap(session.Id)].MaxX)
+                if (GetPlayerX(session.Id) == 0)
                     return;
                 if (GetPlayerY(session.Id) == Data.Map[GetPlayerMap(session.Id)].MaxY)
                     return;

@@ -330,7 +330,7 @@ public class Script
                             {
                                 NetworkSend.PlayerMsg(index, "Out of " + Data.Item[Data.Item[GetPlayerEquipment(index, Equipment.Weapon)].Ammo].Name + " !", (int)ColorName.BrightRed);
                                 return;
-                            }   
+                            }
                         }
                         else
                         {
@@ -2050,7 +2050,8 @@ public class Script
                     {
                         if (caster.Type == Core.Globals.Entity.EntityType.Player)
                         {
-                            byte dir = skill.Dir > 0 ? skill.Dir : (byte)Direction.Down;
+                            // Accept any of the 8 directions from the editor; default to Down if out of range
+                            byte dir = (skill.Dir <= (byte)Direction.UpLeft) ? skill.Dir : (byte)Direction.Down;
                             PlayerWarp(caster.Id, destMap, destX, destY, dir);
                             NetworkSend.PlayerMsg(caster.Id, "You feel space bend around you...", (int)ColorName.Cyan);
                         }

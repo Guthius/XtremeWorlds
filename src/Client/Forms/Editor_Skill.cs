@@ -88,10 +88,12 @@ namespace Client
                 cmbAccessReq.Items.Add(name);
             }
 
-            cmbDir.Items.Add("Up");
-            cmbDir.Items.Add("Down");
-            cmbDir.Items.Add("Left");
-            cmbDir.Items.Add("Right");
+            // Populate with all 8 directions in enum declaration order so SelectedIndex maps to Direction value
+            cmbDir.Items.Clear();
+            foreach (var name in Enum.GetNames(typeof(Direction)))
+            {
+                cmbDir.Items.Add(name);
+            }
 
             cmbKnockBackTiles.Items.Add("0");
             cmbKnockBackTiles.Items.Add("1");
