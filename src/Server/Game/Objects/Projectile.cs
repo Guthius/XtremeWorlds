@@ -45,7 +45,7 @@ public static class Projectile
                     {
                         if (mp.SkillId >= 0)
                         {
-                            Script.Instance?.AttemptAttack(attackerEntity, targetEntity, mp.SkillId);
+                            Script.Instance?.CastSkill(map, targetEntity, mp.SkillId);
                         }
                         else
                         {
@@ -76,7 +76,7 @@ public static class Projectile
                     {
                         if (mp.SkillId >= 0)
                         {
-                            Script.Instance?.AttemptAttack(attackerEntity, targetEntity, mp.SkillId);
+                            Script.Instance?.CastSkill(map, targetEntity, mp.SkillId);
                         }
                         else
                         {
@@ -657,7 +657,7 @@ public static class Projectile
                             if (mp.SkillId >= 0)
                             {
                                 // skill-based projectile: resolve as targeted skill
-                                Script.Instance?.AttemptAttack(attackerEntity, targetEntity, mp.SkillId);
+                                Script.Instance?.CastSkill(map, attackerEntity, mp.SkillId);
                             }
                             else
                             {
