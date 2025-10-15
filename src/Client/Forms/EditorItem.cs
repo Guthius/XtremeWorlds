@@ -9,10 +9,10 @@ using Core.Configurations;
 
 namespace Client
 {
-    public class Editor_Item : Form
+    public class EditorItem : Form
     {
-        private static Editor_Item? _instance;
-        public static Editor_Item Instance => _instance ??= new Editor_Item();
+        private static EditorItem? _instance;
+        public static EditorItem Instance => _instance ??= new EditorItem();
         private bool _suppressIndexChanged;
         // Copy/Paste clipboard for items
         private Core.Globals.Type.Item _clipboardItem;
@@ -37,7 +37,7 @@ namespace Client
 
         Bitmap? itemBmp, paperdollBmp;
 
-        public Editor_Item()
+        public EditorItem()
         {
             _instance = this;
             Title = "Item Editor";

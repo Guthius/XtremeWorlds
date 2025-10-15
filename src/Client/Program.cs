@@ -668,12 +668,12 @@ namespace Client
             {
                 if (IsKeyStateActive(Keys.Z))
                 {
-                    Editor_Map.Undo();
+                    EditorMap.Undo();
                 }
 
                 if (IsKeyStateActive(Keys.Y))
                 {
-                    Editor_Map.Redo();
+                    EditorMap.Redo();
                 }
             }
 
@@ -1404,7 +1404,7 @@ namespace Client
             }
 
             // Check for MouseDown event (button pressed)
-        if (IsMouseButtonDown(MouseButton.Left))
+            if (IsMouseButtonDown(MouseButton.Left))
             {
                 if ((DateTime.Now - _lastMouseClickTime).TotalMilliseconds >= MouseClickCooldown)
                 {
@@ -1416,7 +1416,7 @@ namespace Client
 
                 if (GameState.ClickCount >= 2)
                 {
-            HandleGuiEvent(ControlState.DoubleClick);
+                    HandleGuiEvent(ControlState.DoubleClick);
                 }
             }
 
@@ -1459,7 +1459,7 @@ namespace Client
             {
                 if (GameState.MyEditorType == EditorType.Map)
                 {
-                    Editor_Map.MouseDown(GameState.CurXGame, GameState.CurYGame, false);
+                    EditorMap.MouseDown(GameState.CurXGame, GameState.CurYGame, false);
                 }
 
                 if (IsSearchCooldownElapsed())

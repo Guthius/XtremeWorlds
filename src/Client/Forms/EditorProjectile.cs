@@ -7,11 +7,11 @@ using Core.Globals;
 
 namespace Client
 {
-    public sealed class Editor_Projectile : Form
+    public sealed class EditorProjectile : Form
     {
         // Singleton access for legacy usage
-        private static Editor_Projectile? _instance;
-        public static Editor_Projectile Instance => _instance ??= new Editor_Projectile();
+        private static EditorProjectile? _instance;
+        public static EditorProjectile Instance => _instance ??= new EditorProjectile();
         public ListBox lstIndex = null!;
         public TextBox txtName = null!;
         public NumericStepper nudPic = null!;
@@ -30,7 +30,7 @@ namespace Client
 
         private bool _initializing;
 
-        public Editor_Projectile()
+        public EditorProjectile()
         {
             _instance = this;
             Title = "Projectile Editor";

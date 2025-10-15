@@ -6,11 +6,11 @@ using Core.Globals;
 
 namespace Client
 {
-    public class Editor_Moral : Form
+    public class EditorMoral : Form
     {
         // Singleton instance for legacy static access
-        private static Editor_Moral? _instance;
-        public static Editor_Moral Instance => _instance ??= new Editor_Moral();
+        private static EditorMoral? _instance;
+        public static EditorMoral Instance => _instance ??= new EditorMoral();
         private bool _suppressIndexChanged;
         public ListBox lstIndex = new ListBox{ Width = 200 };
         private Core.Globals.Type.Moral _clipboardMoral;
@@ -31,7 +31,7 @@ namespace Client
         public Button btnCopy = new Button { Text = "Copy" };
         public Button btnCancel = new Button { Text = "Cancel" };
 
-        public Editor_Moral()
+        public EditorMoral()
         {
             _instance = this;
             Title = "Moral Editor";

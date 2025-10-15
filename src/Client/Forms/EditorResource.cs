@@ -7,11 +7,11 @@ using Core.Globals;
 
 namespace Client
 {
-    public class Editor_Resource : Form
+    public class EditorResource : Form
     {
         // Singleton access for legacy usage
-        private static Editor_Resource? _instance;
-        public static Editor_Resource Instance => _instance ??= new Editor_Resource();
+        private static EditorResource? _instance;
+        public static EditorResource Instance => _instance ??= new EditorResource();
         private bool _suppressIndexChanged;
         public ListBox lstIndex = new ListBox { Width = 200 };
         public TextBox txtName = new TextBox { Width = 200 };
@@ -36,7 +36,7 @@ namespace Client
         public Drawable picNormalpic = new Drawable { Size = new Size(150, 130), MinimumSize = new Size(150, 130) };
         public Drawable picExhaustedPic = new Drawable { Size = new Size(150, 130), MinimumSize = new Size(150, 130) };
 
-        public Editor_Resource()
+        public EditorResource()
         {
             _instance = this;
             Title = "Resource Editor";

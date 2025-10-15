@@ -5,11 +5,11 @@ using System.IO;
 
 namespace Client
 {
-    public class Editor_Animation : Form
+    public class EditorAnimation : Form
     {
         // Singleton access for legacy usage
-        private static Editor_Animation? _instance;
-        public static Editor_Animation Instance => _instance ??= new Editor_Animation();
+        private static EditorAnimation? _instance;
+        public static EditorAnimation Instance => _instance ??= new EditorAnimation();
         private bool _suppressIndexChanged;
         public NumericStepper nudSprite0 = new();
         public NumericStepper nudSprite1 = new();
@@ -31,7 +31,7 @@ namespace Client
         private Core.Globals.Type.Animation _clipboardAnim;
         private bool _hasClipboardAnim;
 
-        public Editor_Animation()
+        public EditorAnimation()
         {
             _instance = this;
             Title = "Animation Editor";

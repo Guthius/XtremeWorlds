@@ -9,11 +9,11 @@ using Core.Configurations;
 
 namespace Client
 {
-    public sealed class Editor_Npc : Form
+    public sealed class EditorNpc : Form
     {
         // Singleton access for legacy usage
-        private static Editor_Npc? _instance;
-        public static Editor_Npc Instance => _instance ??= new Editor_Npc();
+        private static EditorNpc? _instance;
+        public static EditorNpc Instance => _instance ??= new EditorNpc();
         public ListBox lstIndex = null!;
         public TextBox txtName = null!;
         public TextBox txtAttackSay = null!;
@@ -54,7 +54,7 @@ namespace Client
         private Bitmap? _spriteBitmap;
         private bool _initializing;
 
-        public Editor_Npc()
+        public EditorNpc()
         {
             _instance = this;
             Title = "NPC Editor";

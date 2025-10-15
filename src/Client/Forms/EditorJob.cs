@@ -10,11 +10,11 @@ using Client.Game.UI.Windows;
 
 namespace Client
 {
-    public class Editor_Job : Form
+    public class EditorJob : Form
     {
     // Singleton access to mirror legacy usage pattern in Main.cs
-    private static Editor_Job? _instance;
-    public static Editor_Job Instance => _instance ??= new Editor_Job();
+    private static EditorJob? _instance;
+    public static EditorJob Instance => _instance ??= new EditorJob();
     private bool _suppressIndexChanged;
     private Core.Globals.Type.Job _clipboardJob;
     private bool _hasClipboardJob;
@@ -42,7 +42,7 @@ namespace Client
     public NumericStepper nudMaleSprite => numMaleSprite!;
     public NumericStepper nudFemaleSprite => numFemaleSprite!;
 
-    public Editor_Job()
+    public EditorJob()
     {
         _instance = this;
         Title = "Job Editor";

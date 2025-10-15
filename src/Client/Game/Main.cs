@@ -90,14 +90,14 @@ public static class Program
         {
             GameState.MyEditorType = EditorType.Map;
             GameState.EditorIndex = 0;
-            new Editor_Map().Show();
+            new EditorMap().Show();
             GameState.CameraZoom = 1.0f;
             GameState.InitMapEditor = false;
         }
 
         if (GameState.InitEventEditor)
         {
-            new Editor_Event().Show();
+            new EditorEvent().Show();
             GameState.InitEventEditor = false;
         }
 
@@ -105,7 +105,7 @@ public static class Program
         {
             GameState.MyEditorType = EditorType.Animation;
             GameState.EditorIndex = 0;
-            new Editor_Animation().Show();
+            new EditorAnimation().Show();
             GameState.InitAnimationEditor = false;
         }
 
@@ -113,7 +113,7 @@ public static class Program
         {
             GameState.MyEditorType = EditorType.Item;
             GameState.EditorIndex = 0;
-            new Editor_Item().Show();
+            new EditorItem().Show();
             GameState.InitItemEditor = false;
         }
 
@@ -121,7 +121,7 @@ public static class Program
         {
             GameState.MyEditorType = EditorType.Job;
             GameState.EditorIndex = 0;
-            new Editor_Job().Show();
+            new EditorJob().Show();
             GameState.InitJobEditor = false;
         }
 
@@ -129,7 +129,7 @@ public static class Program
         {
             GameState.MyEditorType = EditorType.Moral;
             GameState.EditorIndex = 0;
-            new Editor_Moral().Show();
+            new EditorMoral().Show();
             GameState.InitMoralEditor = false;
         }
 
@@ -137,7 +137,7 @@ public static class Program
         {
             GameState.MyEditorType = EditorType.Resource;
             GameState.EditorIndex = 0;
-            new Editor_Resource().Show();
+            new EditorResource().Show();
             GameState.InitResourceEditor = false;
         }
 
@@ -145,7 +145,7 @@ public static class Program
         {
             GameState.MyEditorType = EditorType.Npc;
             GameState.EditorIndex = 0;
-            new Editor_Npc().Show();
+            new EditorNpc().Show();
             GameState.InitNpcEditor = false;
         }
 
@@ -153,7 +153,7 @@ public static class Program
         {
             GameState.MyEditorType = EditorType.Skill;
             GameState.EditorIndex = 0;
-            new Editor_Skill().Show();
+            new EditorSkill().Show();
             GameState.InitSkillEditor = false;
         }
 
@@ -161,7 +161,7 @@ public static class Program
         {
             GameState.MyEditorType = EditorType.Shop;
             GameState.EditorIndex = 0;
-            new Editor_Shop().Show();
+            new EditorShop().Show();
             GameState.InitShopEditor = false;
         }
 
@@ -169,7 +169,7 @@ public static class Program
         {
             GameState.MyEditorType = EditorType.Projectile;
             GameState.EditorIndex = 0;
-            new Editor_Projectile().Show();
+            new EditorProjectile().Show();
             GameState.InitProjectileEditor = false;
         }
 
@@ -177,7 +177,7 @@ public static class Program
         {
             GameState.MyEditorType = EditorType.Script;
             GameState.EditorIndex = 0;
-            new Editor_Script().Show();
+            new EditorScript().Show();
             GameState.InitScriptEditor = false;
         }
     }

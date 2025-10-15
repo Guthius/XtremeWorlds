@@ -14,18 +14,18 @@ using Core.Globals;
 
 namespace Client
 {
-    public class Editor_Script : Form
+    public class EditorScript : Form
     {
         // Singleton access for legacy usage
-        private static Editor_Script? _instance;
-        public static Editor_Script Instance => _instance ??= new Editor_Script();
+        private static EditorScript? _instance;
+        public static EditorScript Instance => _instance ??= new EditorScript();
 
         public Button btnOpenScript = new Button { Text = "Open Script" };
         public Button btnSaveScript = new Button { Text = "Save Script" };
         public TextArea txtPreview = new TextArea { ReadOnly = true, Wrap = false, Size = new Size(600,400) };
         public Label lblInfo = new Label { Text = "Open the script in your external editor, then Save to reload and send." };
 
-        public Editor_Script()
+        public EditorScript()
         {
             _instance = this;
             Title = "Script Editor";

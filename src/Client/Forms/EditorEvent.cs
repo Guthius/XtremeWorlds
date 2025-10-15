@@ -11,11 +11,11 @@ using Type = Core.Globals.Type;
 
 namespace Client
 {
-    public partial class Editor_Event : Form
+    public partial class EditorEvent : Form
     {
         // Singleton access for legacy usage
-        private static Editor_Event? _instance;
-        public static Editor_Event Instance => _instance ??= new Editor_Event();
+        private static EditorEvent? _instance;
+        public static EditorEvent Instance => _instance ??= new EditorEvent();
         private int tmpGraphicIndex;
         private byte tmpGraphicType;
         // Guard to avoid feedback loops when syncing Graphic/Index controls
@@ -290,7 +290,7 @@ namespace Client
 
         public CheckBox chkGlobal = new CheckBox { Text = "Global" };
 
-        public Editor_Event()
+        public EditorEvent()
         {
             _instance = this;
             Title = "Event Editor";
@@ -2079,10 +2079,10 @@ namespace Client
                         fraMoveRoute.Visible = true;
                         lstMoveRoute.Items.Clear();
                         Event.ListOfEvents = new int[Data.MyMap.EventCount];
-                        Event.ListOfEvents[0] = Event.EditorEvent;
+                        Event.ListOfEvents[0] = Event.EditorId;
                         for (int i = 0, loopTo = Data.MyMap.EventCount; i < loopTo; i++)
                         {
-                            if (i != Event.EditorEvent)
+                            if (i != Event.EditorId)
                             {
                                 cmbEvent.Items.Add(Data.MyMap.Event[i].Name);
                                 x = x + 1;
@@ -2102,13 +2102,13 @@ namespace Client
                     {
                         cmbMoveWait.Items.Clear();
                         Event.ListOfEvents = new int[Data.MyMap.EventCount];
-                        Event.ListOfEvents[0] = Event.EditorEvent;
+                        Event.ListOfEvents[0] = Event.EditorId;
                         cmbMoveWait.Items.Add("This Event");
                         cmbMoveWait.SelectedIndex = 0;
                         cmbMoveWait.Enabled = true;
                         for (int i = 0, loopTo1 = Data.MyMap.EventCount; i < loopTo1; i++)
                         {
-                            if (i != Event.EditorEvent)
+                            if (i != Event.EditorId)
                             {
                                 cmbMoveWait.Items.Add(Data.MyMap.Event[i].Name);
                                 x = x + 1;

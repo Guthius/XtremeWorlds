@@ -8,11 +8,11 @@ using Core.Globals;
 
 namespace Client
 {
-    public class Editor_Shop : Form
+    public class EditorShop : Form
     {
         // Singleton access for legacy usage
-        private static Editor_Shop? _instance;
-        public static Editor_Shop Instance => _instance ??= new Editor_Shop();
+        private static EditorShop? _instance;
+        public static EditorShop Instance => _instance ??= new EditorShop();
         private bool _suppressIndexChanged;
         public ListBox lstIndex = new ListBox();
         public TextBox txtName = new TextBox { Width = 200 };
@@ -35,7 +35,7 @@ namespace Client
         private Core.Globals.Type.Shop _clipboardShop;
         private bool _hasClipboardShop;
 
-        public Editor_Shop()
+        public EditorShop()
         {
             _instance = this;
             Title = "Shop Editor";

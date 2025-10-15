@@ -21,11 +21,11 @@ using Type = Core.Globals.Type;
 namespace Client
 {
 
-    public partial class Editor_Map : Form
+    public partial class EditorMap : Form
     {
         // Singleton instance for legacy static access
-        private static Editor_Map? _instance;
-        public static Editor_Map Instance => _instance ??= new Editor_Map();
+        private static EditorMap? _instance;
+        public static EditorMap Instance => _instance ??= new EditorMap();
         private static readonly int tilesetOffsetX = 0;
         private static int tilesetOffsetY = 0;
         // Controller for grouping all attribute radio buttons so only one is selectable
@@ -305,7 +305,7 @@ namespace Client
             lstNpc.SelectedIndex = (prev >= 0 && prev < lstNpc.Items.Count) ? prev : 0;
         }
 
-        public Editor_Map()
+        public EditorMap()
         {
             _instance = this;
             Title = "Map Editor";

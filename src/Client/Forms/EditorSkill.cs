@@ -10,11 +10,11 @@ using Eto.Drawing;
 
 namespace Client
 {
-    public class Editor_Skill : Form
+    public class EditorSkill : Form
     {
         // Singleton access for legacy usage
-        private static Editor_Skill? _instance;
-        public static Editor_Skill Instance => _instance ??= new Editor_Skill();
+        private static EditorSkill? _instance;
+        public static EditorSkill Instance => _instance ??= new EditorSkill();
         private bool _suppressIndexChanged;
         // Copy/Paste clipboard
         private Core.Globals.Type.Skill _clipboardSkill;
@@ -59,7 +59,7 @@ namespace Client
         public Button btnLearn = new Button { Text = "Learn" };
         public Drawable picSprite = new Drawable { Size = new Size(64, 64) };
 
-        public Editor_Skill()
+        public EditorSkill()
         {
             _instance = this;
             Title = "Skill Editor";

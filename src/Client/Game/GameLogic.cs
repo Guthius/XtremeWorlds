@@ -1298,7 +1298,7 @@ namespace Client
 
                             void Capture()
                             {
-                                var editor = Editor_Map.Instance;
+                                var editor = EditorMap.Instance;
                                 if (editor == null) return;
 
                                 // Sequential overwrite precedence (last true wins) preserved.
