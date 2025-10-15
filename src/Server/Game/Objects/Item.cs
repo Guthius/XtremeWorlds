@@ -100,7 +100,23 @@ public static class Item
             return;
         }
 
-        SpawnItemSlot(slot, itemNum, itemVal, mapNum, x, y);
+        if (Data.Item[itemNum].Type != (byte)ItemCategory.Currency && Data.Item[itemNum].Stackable != 1)
+        {
+            for (var i = 0; i < itemVal; i++)
+            {
+                slot = FindOpenMapItemSlot(mapNum);
+                if (slot == -1)
+                {
+                    return;
+                }
+
+                SpawnItemSlot(slot, itemNum, 1, mapNum, x, y);
+            }
+        }
+        else
+        {
+            SpawnItemSlot(slot, itemNum, itemVal, mapNum, x, y);
+        }
     }
 
     public static void SpawnItemSlot(int mapItemSlot, int itemNum, int itemVal, int mapNum, int x, int y)
