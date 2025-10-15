@@ -253,7 +253,7 @@ namespace Client
                 for (int i = 0; i < Constant.MaxSkills; i++)
                 {
                     var nm = Strings.Trim(Data.Skill[i].Name);
-                    cmbChainOnHit.Items.Add($"{i}: {nm}");
+                    cmbChainOnHit.Items.Add($"{i + 1}: {nm}");
                 }
 
                 cmbCommonEventType.Items.Clear();
