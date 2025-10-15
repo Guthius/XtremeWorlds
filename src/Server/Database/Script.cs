@@ -105,6 +105,9 @@ public class Script
 
         // Send welcome messages
         NetworkSend.SendWelcome(index);
+    
+        // Use a default bell sound that ships with content; adjust if you prefer another file
+        NetworkSend.SendPlaySound(index, "Bell.ogg", GetPlayerX(index), GetPlayerY(index));
     }
 
     public void MapDropItem(int index, int mapSlot, int invSlot, int amount, int mapNum, Type.Item item, int itemNum)

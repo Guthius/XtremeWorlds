@@ -145,6 +145,16 @@ public static class NetworkSend
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
     }
 
+    public static void SendPlaySound(int playerId, string fileName, int x, int y)
+    {
+        var packetWriter = new PacketWriter();
+        packetWriter.WriteEnum(ServerPackets.SPlaySound);
+        packetWriter.WriteString(fileName);
+        packetWriter.WriteInt32(x);
+        packetWriter.WriteInt32(y);
+        PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
+    }
+
     public static void SendJobs(GameSession session)
     {
         var packetWriter = new PacketWriter();
