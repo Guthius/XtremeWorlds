@@ -756,14 +756,14 @@ public class Script
             }
             else if (entity.Type == Core.Globals.Entity.EntityType.Npc)
             {
-                int npcSkillId = entity.SkillBuffer; // NPC stores skillId directly
-                if (npcSkillId >= 0)
+                int skillId = entity.SkillBuffer; // NPC stores skillId directly
+                if (skillId >= 0)
                 {
-                    int castMs = (npcSkillId < Data.Skill.Length) ? Data.Skill[npcSkillId].CastTime * 1000 : 0;
+                    int castMs = (skillId < Data.Skill.Length) ? Data.Skill[skillId].CastTime * 1000 : 0;
                     if (nowMsBuff > entity.SkillBufferTimer + castMs)
                     {
                         var casterIndex = Core.Globals.Entity.Index(entity);
-                        CastSkill(mapNum, casterIndex, npcSkillId); // bufferedValue is skillId for NPCs
+                        CastSkill(mapNum, casterIndex, skillId); // bufferedValue is skillId for NPCs
                         // clear snapshot & underlying map npc buffer
                         entity.SkillBuffer = -1;
                         entity.SkillBufferTimer = 0;
@@ -2001,7 +2001,7 @@ public class Script
             if (playerSkillSlot < 0 || playerSkillSlot >= Data.Player[caster.Id].Skill.Length) return;
             skillId = Data.Player[caster.Id].Skill[playerSkillSlot].Num;
         }
-        else
+        else if (caster.Type == Core.Globals.Entity.EntityType.Npc)
         {
             for (int i = 0; i < Constant.MaxNpcSkills; i++)
             {
@@ -2012,6 +2012,11 @@ public class Script
                 }
             }
         }
+        else
+        {
+            return; // only players and npcs can cast
+        }
+        
         if (skillId < 0 || skillId >= Data.Skill.Length) return;
         ref var skill = ref Data.Skill[skillId];
 
