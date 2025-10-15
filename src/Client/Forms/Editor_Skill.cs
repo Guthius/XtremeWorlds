@@ -178,7 +178,8 @@ namespace Client
             var dirPanel1 = new StackLayout { Orientation = Orientation.Horizontal, Spacing = 6 };
             var dirPanel2 = new StackLayout { Orientation = Orientation.Horizontal, Spacing = 6 };
             var dirNames = Enum.GetNames(typeof(Direction));
-            for (int i = 0; i < 8; i++)
+            var dirCount = System.Enum.GetValues<Direction>().Length;
+            for (int i = 0; i < dirCount; i++)
             {
                 var cb = new CheckBox { Text = dirNames[i] };
                 int bit = i;
@@ -337,7 +338,8 @@ namespace Client
         public void SyncMultiDirMask()
         {
             int mask = Data.Skill[GameState.EditorIndex].MultiDirMask;
-            for (int i = 0; i < 8; i++)
+            var dirCount = System.Enum.GetValues<Direction>().Length;
+            for (int i = 0; i < dirCount; i++)
             {
                 chkMultiDirs[i].Checked = (mask & (1 << i)) != 0;
             }

@@ -2106,7 +2106,8 @@ public class Script
         // For multi-direction: temporarily adjust caster dir per bit and fire once per enabled direction
         Span<byte> dirs = stackalloc byte[] { (byte)Direction.Down, (byte)Direction.Right, (byte)Direction.Left, (byte)Direction.Up, (byte)Direction.DownRight, (byte)Direction.DownLeft, (byte)Direction.UpRight, (byte)Direction.UpLeft };
         byte originalDir = caster.Dir;
-        for (int i = 0; i < 8; i++)
+        var dirCount = System.Enum.GetValues<Direction>().Length;
+        for (int i = 0; i < dirCount; i++)
         {
             if ((mask & (1 << i)) == 0) continue;
             caster.Dir = dirs[i];
@@ -2175,8 +2176,9 @@ public class Script
             // For multi-direction targeted skills, we resolve separate attacks along up to 8 adjacent directions from caster.
             // Primary target still gets hit once; additionally, attempt in other adjacent directions.
             AttemptAttack(caster, target, skillId);
-            Span<(int dx,int dy)> deltas = stackalloc (int,int)[] { (0,1),(1,0),(-1,0),(0,-1),(1,1),(1,-1),(-1,1),(-1,-1) };
-            for (int i = 0; i < 8; i++)
+            Span<(int dx, int dy)> deltas = stackalloc (int, int)[] { (0, 1), (1, 0), (-1, 0), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1) };
+            var dirCount = System.Enum.GetValues<Direction>().Length;
+            for (int i = 0; i < dirCount; i++)
             {
                 if ((s.MultiDirMask & (1 << i)) == 0) continue;
                 int tx = caster.X/32 + deltas[i].dx;
@@ -2210,7 +2212,8 @@ public class Script
         else
         {
             Span<(int dx,int dy)> deltas = stackalloc (int,int)[] { (0,1),(1,0),(-1,0),(0,-1),(1,1),(1,-1),(-1,1),(-1,-1) };
-            for (int i = 0; i < 8; i++)
+            var dirCount = System.Enum.GetValues<Direction>().Length;
+            for (int i = 0; i < dirCount; i++)
             {
                 if ((s.MultiDirMask & (1 << i)) == 0) continue;
                 ApplyAoE(mapNum, caster, skillId, baseX + deltas[i].dx, baseY + deltas[i].dy);
