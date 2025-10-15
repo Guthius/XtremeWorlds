@@ -392,7 +392,7 @@ public class Script
             case (byte)CommonEventTrigger.Key:
                 EventLogic.TriggerEvent(index, 1, 0, GetPlayerX(index), GetPlayerY(index)); break;
 
-            case (byte)CommonEventTrigger.CustomScript:
+            case (byte)CommonEventTrigger.Script:
                 // Minimal sample custom scripts same as item path
                 if (n == 0)
                     NetworkSend.PlayerMsg(index, "You feel a strange sensation...", (int)ColorName.BrightCyan);

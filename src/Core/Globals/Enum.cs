@@ -425,7 +425,7 @@ public enum CommonEventTrigger
     Switch,
     Variable,
     Key,
-    CustomScript
+    Script
 }
 
 /// <summary>
