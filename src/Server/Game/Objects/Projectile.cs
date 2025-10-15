@@ -284,8 +284,7 @@ public static class Projectile
     private static void SendProjectileToMap(int mapNum, int projectileNum)
     {
         var mapProjectile = Data.MapProjectile[mapNum, projectileNum];
-
-    var packet = new PacketWriter(4);
+        var packet = new PacketWriter(4);
 
         packet.WriteEnum(ServerPackets.SMapProjectile);
         packet.WriteInt32(projectileNum);
