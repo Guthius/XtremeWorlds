@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Core.Globals;
 
 namespace Core.Configurations;
 
@@ -53,13 +54,7 @@ public class SettingsManager
     {
         try
         {
-            var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "XtremeWorlds");
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
-            
-            path = Path.Combine(path, FileName);
+            var path = Path.Combine(DataPath.Config, FileName);
             if (!File.Exists(path))
             {
                 return CreateDefaults();
