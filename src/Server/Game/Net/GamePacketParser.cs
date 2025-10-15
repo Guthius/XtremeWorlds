@@ -142,6 +142,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Bind(GamePacketId.FromClient.CSaveScript, Script.HandleSaveScript);
 
         Bind(GamePacketId.FromClient.CCloseEditor, Packet_CloseEditor);
+        Bind(GamePacketId.FromClient.CCancelCast, Packet_CancelCast);
     }
 
     private static void Packet_Ping(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -550,6 +551,25 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         }
 
         Data.Player[session.Id].Moving = movement;
+
+        // Requirement: moving cancels any buffered cast
+        if (Data.TempPlayer[session.Id].SkillBuffer >= 0)
+        {
+            Data.TempPlayer[session.Id].SkillBuffer = -1;
+            Data.TempPlayer[session.Id].SkillBufferTimer = 0;
+            NetworkSend.SendClearSkillBuffer(session.Id);
+        }
+    }
+
+    private static void Packet_CancelCast(GameSession session, ReadOnlyMemory<byte> bytes)
+    {
+        // Client intends to cancel current cast/buffer (e.g., Escape). Server is authoritative.
+        if (Data.TempPlayer[session.Id].SkillBuffer >= 0)
+        {
+            Data.TempPlayer[session.Id].SkillBuffer = -1;
+            Data.TempPlayer[session.Id].SkillBufferTimer = 0;
+            NetworkSend.SendClearSkillBuffer(session.Id);
+        }
     }
 
     public static void Packet_StopPlayerMove(GameSession session, ReadOnlyMemory<byte> bytes)

@@ -977,9 +977,16 @@ namespace Client
                 WindowManager.Init();
             }
 
-            // Handle Escape key to toggle menus
+            // Handle Escape key to toggle menus or cancel casts
             if (IsKeyStateActive(Keys.Escape))
             {
+                // If we're casting/buffering a skill, cancel it first
+                if (GameState.SkillBuffer >= 0)
+                {
+                    Sender.SendCancelCast();
+                    return; // consume this press
+                }
+
                 // First: clear target with server if one is selected
                 int prevTarget = GameState.MyTarget;
                 int prevTargetType = GameState.MyTargetType;

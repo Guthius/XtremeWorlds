@@ -129,7 +129,10 @@ public static class Packets
         CCloseEditor = 107,
 
         // Make sure COUNT is below everything else
-        Count = 108
+        CCancelCast = 108,
+
+        // Make sure COUNT is below everything else
+        Count = 109
     }
 
     public enum ServerPackets

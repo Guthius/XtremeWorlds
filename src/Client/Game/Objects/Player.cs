@@ -232,7 +232,7 @@ namespace Client
             // Make sure they haven't just casted a skill
             if (GameState.SkillBuffer >= 0)
             {
-                return canMove;
+                Sender.SendCancelCast();
             }
 
             // make sure they're not stunned

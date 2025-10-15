@@ -145,6 +145,13 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
+    public static void SendCancelCast()
+    {
+        var packetWriter = new PacketWriter(4);
+        packetWriter.WriteEnum(Packets.ClientPackets.CCancelCast);
+        Network.Send(packetWriter);
+    }
+
     public static void SayMsg(string text)
     {
         var packetWriter = new PacketWriter();

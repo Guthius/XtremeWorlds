@@ -127,6 +127,9 @@ public static class GamePacketId
 
         CMouseAttack,
 
-        CCloseEditor
+        CCloseEditor,
+
+        // Cancel current cast/buffer
+        CCancelCast
     }
 }
