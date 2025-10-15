@@ -36,7 +36,6 @@ public static class Constant
     public const byte MaxChars = 3;
     public const int ChatLines = 1000;
     public const byte MaxStats = 255;
-    public const byte MaxStatsPerLevel = 5;
     public const byte MaxQuests = 100;
     public const int MaxEvents = 500;
     public const byte MaxGuilds = 100;
