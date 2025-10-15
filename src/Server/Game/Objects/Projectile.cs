@@ -452,7 +452,7 @@ public static class Projectile
             return;
         }
 
-        // Validate NPC is present on map
+        // Validate npc is present on map
         if (mapNum < 0 || mapNum >= Data.MapNpc.Length) return;
         if (mapNpcNum < 0 || mapNpcNum >= Core.Globals.Constant.MaxMapNpcs) return;
         if (Data.MapNpc[mapNum].Npc[mapNpcNum].Num < 0) return;
