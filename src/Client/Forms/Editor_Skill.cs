@@ -101,6 +101,7 @@ namespace Client
                 cmbDir.Items.Add(name);
             }
 
+            cmbKnockBackTiles.Items.Add("0");
             cmbKnockBackTiles.Items.Add("1");
             cmbKnockBackTiles.Items.Add("2");
             cmbKnockBackTiles.Items.Add("3");

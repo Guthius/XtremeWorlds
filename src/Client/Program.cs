@@ -2249,8 +2249,7 @@ namespace Client
                         if ((int) Data.Player[(int) i].Skill[GameState.SkillBuffer].Num >= 0)
                         {
                             if (Data.Skill[(int) Data.Player[(int) i].Skill[GameState.SkillBuffer].Num]
-                                    .CastTime >
-                                0)
+                                    .CastTime > 0)
                             {
                                 // lock to player
                                 tmpX = (long)Math.Round(GetPlayerRawX((int)i) + 16 - width / 2d);
