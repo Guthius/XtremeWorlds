@@ -193,7 +193,7 @@ namespace Client
             general.AddRow(new Label { Text = "Multi-cast Directions:" });
             general.AddRow(dirPanel1);
             general.AddRow(dirPanel2);
-            general.AddRow(chkKnockBack, "KB Tiles:", cmbKnockBackTiles);
+            general.AddRow(chkKnockBack, "Distance:", cmbKnockBackTiles);
             general.AddRow(new Label{ Text = "Chain on Hit:" }, cmbChainOnHit);
             // Common Event (like items)
             var ceRow1 = new DynamicLayout { Spacing = new Size(4,4) };

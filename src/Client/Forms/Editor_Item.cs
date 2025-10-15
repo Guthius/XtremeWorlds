@@ -199,7 +199,7 @@ namespace Client
                 Rows =
                 {
                     new TableRow(new Label{Text="Damage"}, numDamage, new Label{Text="Speed"}, numSpeed),
-                    new TableRow(new Label{Text="Tool"}, cmbTool, chkKnockBack, new Label{Text="KB Tiles"}, cmbKnockBackTiles),
+                    new TableRow(new Label{Text="Tool"}, cmbTool, chkKnockBack, new Label{Text="Distance"}, cmbKnockBackTiles),
                     new TableRow(new Label{Text="Paperdoll"}, numPaperdoll, paperdollPreview, null),
                     new TableRow(new Label{Text="Add STR"}, numStrAdd, new Label{Text="Add VIT"}, numVitAdd),
                     new TableRow(new Label{Text="Add LCK"}, numLuckAdd, new Label{Text="Add INT"}, numIntAdd),
