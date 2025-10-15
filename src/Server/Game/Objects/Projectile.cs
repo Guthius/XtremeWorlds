@@ -300,54 +300,7 @@ public static class Projectile
 
         NetworkConfig.SendDataToMap(mapNum, packet.GetBytes());
     }
-
-    public static void HandleProjectileSkill(int playerId, int skillNum = -1, int itemNum = -1)
-    {
-        var mapNum = GetPlayerMap(playerId);
-        var mapProjectileNum = -1;
-
-        for (var i = 0; i < Core.Globals.Constant.MaxProjectiles; i++)
-        {
-            if (Data.MapProjectile[mapNum, i].ProjectileNum < 0)
-            {
-                mapProjectileNum = i;
-                break;
-            }
-        }
-
-        if (mapProjectileNum == -1)
-        {
-            return;
-        }
-
-        var projectileNum = skillNum >= 0 ? Data.Skill[skillNum].Projectile : itemNum >= 0 ? Data.Item[itemNum].Projectile : -1;
-        if (projectileNum == -1)
-        {
-            return;
-        }
-
-        if (Data.TempPlayer[playerId].ProjectileTimer > General.GetTimeMs())
-        {
-            return;
-        }
-
-        ref var mapProjectile = ref Data.MapProjectile[mapNum, mapProjectileNum];
-
-        Data.TempPlayer[playerId].ProjectileTimer = General.GetTimeMs() + Data.Item[itemNum].Speed;
-        mapProjectile.ProjectileNum = projectileNum;
-        mapProjectile.Owner = playerId;
-        mapProjectile.OwnerType = (byte) TargetType.Player;
-        mapProjectile.Dir = GetPlayerDir(playerId);
-        mapProjectile.X = GetPlayerRawX(playerId);
-        mapProjectile.Y = GetPlayerRawY(playerId);
-        mapProjectile.SkillId = skillNum;
-        mapProjectile.Range = 0;
-        mapProjectile.TravelTime = General.GetTimeMs() + Math.Max(1, Data.Projectile[projectileNum].Speed);
-        mapProjectile.Timer = General.GetTimeMs() + 60000;
-
-        SendProjectileToMap(mapNum, mapProjectileNum);
-    }
-
+    
     public static void PlayerFireProjectileFreeAim(int playerId, short vx, short vy, int itemNum)
     {
         var mapNum = GetPlayerMap(playerId);
@@ -409,6 +362,7 @@ public static class Projectile
         mp.ProjectileNum = projectileNum;
         mp.Owner = playerId;
         mp.OwnerType = (byte)TargetType.Player;
+        // Angle purely for 8-dir visual; movement is driven by vx/vy
         double ang = Math.Atan2(vy, vx) * 180.0 / Math.PI;
         if (ang > -22.5 && ang <= 22.5) mp.Dir = (byte)Direction.Right;
         else if (ang > 22.5 && ang <= 67.5) mp.Dir = (byte)Direction.DownRight;
@@ -428,7 +382,7 @@ public static class Projectile
         SendProjectileToMap(mapNum, mapProjectileNum);
     }
 
-    public static void PlayerFireProjectile(int playerId, int itemNum, int skillNum = -1)
+    public static void PlayerFireProjectile(int playerId, int itemNum, int skillNum = -1, int dir = -1, bool suppressCooldown = false)
     {
         var mapNum = GetPlayerMap(playerId);
         var mapProjectileNum = -1;
@@ -446,24 +400,30 @@ public static class Projectile
             return;
         }
 
-        var projectileNum = itemNum >= 0 ? Data.Item[itemNum].Projectile : skillNum > 0 ? Data.Skill[skillNum].Projectile : -1;
+        var projectileNum = itemNum >= 0 ? Data.Item[itemNum].Projectile : skillNum >= 0 ? Data.Skill[skillNum].Projectile : -1;
         if (projectileNum == -1)
         {
             return;
         }
 
-        if (Data.TempPlayer[playerId].ProjectileTimer > General.GetTimeMs())
+        // Respect cooldown unless explicitly suppressed (multi-direction batch)
+        if (!suppressCooldown && Data.TempPlayer[playerId].ProjectileTimer > General.GetTimeMs())
         {
             return;
         }
 
         ref var mapProjectile = ref Data.MapProjectile[mapNum, mapProjectileNum];
 
-        Data.TempPlayer[playerId].ProjectileTimer = General.GetTimeMs() + Data.Item[itemNum].Speed;
+        // Only set cooldown if not suppressed here; caller may set once per batch
+        if (!suppressCooldown)
+        {
+            int cooldownMs = Data.Projectile[projectileNum].Speed;
+            Data.TempPlayer[playerId].ProjectileTimer = General.GetTimeMs() + cooldownMs;
+        }
         mapProjectile.ProjectileNum = projectileNum;
         mapProjectile.Owner = playerId;
-        mapProjectile.OwnerType = (byte) TargetType.Player;
-        mapProjectile.Dir = GetPlayerDir(playerId);
+        mapProjectile.OwnerType = (byte)TargetType.Player;
+        mapProjectile.Dir = dir >= 0 ? (byte) dir : GetPlayerDir(playerId);
         mapProjectile.X = GetPlayerRawX(playerId);
         mapProjectile.Y = GetPlayerRawY(playerId);
         mapProjectile.SkillId = skillNum;
@@ -474,7 +434,7 @@ public static class Projectile
         SendProjectileToMap(mapNum, mapProjectileNum);
     }
 
-    public static void NpcFireProjectile(int mapNum, int mapNpcNum, int skillNum)
+    public static void NpcFireProjectile(int mapNum, int mapNpcNum, int skillNum, int dir = -1)
     {
         // Find free map projectile slot
         var mapProjectileNum = -1;
@@ -509,7 +469,7 @@ public static class Projectile
         mapProjectile.ProjectileNum = projectileNum;
         mapProjectile.Owner = mapNpcNum;
         mapProjectile.OwnerType = (byte) TargetType.Npc;
-        mapProjectile.Dir = Data.MapNpc[mapNum].Npc[mapNpcNum].Dir;
+        mapProjectile.Dir = dir >= 0 ? (byte) dir : Data.MapNpc[mapNum].Npc[mapNpcNum].Dir;
         mapProjectile.X = Data.MapNpc[mapNum].Npc[mapNpcNum].X;
         mapProjectile.Y = Data.MapNpc[mapNum].Npc[mapNpcNum].Y;
         mapProjectile.SkillId = skillNum;
@@ -564,29 +524,17 @@ public static class Projectile
                     }
                     else
                     {
-                        bool eightDir = SettingsManager.Instance.SpriteDirections >= 8;
+                        // Always move in true 8 directions for projectiles, independent of sprite direction count
                         switch (mp.Dir)
                         {
                             case (byte)Direction.Up: mp.Y -= 1; break;
                             case (byte)Direction.Down: mp.Y += 1; break;
                             case (byte)Direction.Left: mp.X -= 1; break;
                             case (byte)Direction.Right: mp.X += 1; break;
-                            case (byte)Direction.UpRight:
-                                if (eightDir) { mp.Y -= 1; mp.X += 1; }
-                                else { mp.Y -= 1; }
-                                break;
-                            case (byte)Direction.UpLeft:
-                                if (eightDir) { mp.Y -= 1; mp.X -= 1; }
-                                else { mp.Y -= 1; }
-                                break;
-                            case (byte)Direction.DownRight:
-                                if (eightDir) { mp.Y += 1; mp.X += 1; }
-                                else { mp.Y += 1; }
-                                break;
-                            case (byte)Direction.DownLeft:
-                                if (eightDir) { mp.Y += 1; mp.X -= 1; }
-                                else { mp.Y += 1; }
-                                break;
+                            case (byte)Direction.UpRight: mp.Y -= 1; mp.X += 1; break;
+                            case (byte)Direction.UpLeft: mp.Y -= 1; mp.X -= 1; break;
+                            case (byte)Direction.DownRight: mp.Y += 1; mp.X += 1; break;
+                            case (byte)Direction.DownLeft: mp.Y += 1; mp.X -= 1; break;
                         }
                     }
 

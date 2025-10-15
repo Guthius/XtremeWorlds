@@ -748,8 +748,7 @@ public class Script
                     int castMs = (skillId >= 0 && skillId < Data.Skill.Length) ? Data.Skill[skillId].CastTime * 1000 : 0;
                     if (nowMsBuff > Data.TempPlayer[entity.Id].SkillBufferTimer + castMs)
                     {
-                        var casterIndex = Core.Globals.Entity.Index(entity);
-                        CastSkill(mapNum, casterIndex, slot); // bufferedValue is slot for players
+                        CastSkill(mapNum, entity, slot); // bufferedValue is slot for players
                         // clear buffer
                         Data.TempPlayer[entity.Id].SkillBuffer = -1;
                         Data.TempPlayer[entity.Id].SkillBufferTimer = 0;
@@ -765,8 +764,7 @@ public class Script
                     int castMs = (skillId < Data.Skill.Length) ? Data.Skill[skillId].CastTime * 1000 : 0;
                     if (nowMsBuff > entity.SkillBufferTimer + castMs)
                     {
-                        var casterIndex = Core.Globals.Entity.Index(entity);
-                        CastSkill(mapNum, casterIndex, skillId); // bufferedValue is skillId for NPCs
+                        CastSkill(mapNum, entity, skillId); // bufferedValue is skillId for NPCs
                         // clear snapshot & underlying map npc buffer
                         entity.SkillBuffer = -1;
                         entity.SkillBufferTimer = 0;
@@ -921,7 +919,7 @@ public class Script
                                             // Mana check
                                             if (entity.Vital == null || entity.Vital.Length <= (int)Vital.Mana || entity.Vital[(int)Vital.Mana] < sk.MpCost) continue;
                                             // Cast immediately using entity-centric casting
-                                            CastSkill(mapNum, Core.Globals.Entity.Index(entity), sid);
+                                            CastSkill(mapNum, entity, sid);
                                             didCast = true;
                                             break;
                                         }
@@ -989,7 +987,7 @@ public class Script
                                                 bool cdReady2 = baseNpc2.SkillCd == null || slot2 >= baseNpc2.SkillCd.Length || baseNpc2.SkillCd[slot2] <= nowMs2;
                                                 if (!cdReady2) continue;
                                                 if (entity.Vital == null || entity.Vital.Length <= (int)Vital.Mana || entity.Vital[(int)Vital.Mana] < sk2.MpCost) continue;
-                                                CastSkill(mapNum, Core.Globals.Entity.Index(entity), sid2);
+                                                CastSkill(mapNum, entity, sid2);
                                                 didCast2 = true;
                                                 break;
                                             }
@@ -1989,28 +1987,26 @@ public class Script
         }
     }
 
-    private void CastSkill(int mapNum, int casterEntityIndex, int bufferedValue)
+    private void CastSkill(int mapNum, Entity entity, int bufferedValue)
     {
-        if (casterEntityIndex < 0 || casterEntityIndex >= Core.Globals.Entity.Instances.Count) return;
-        var caster = Core.Globals.Entity.Instances[casterEntityIndex];
-        if (caster == null) return;
-        if (caster.Map != mapNum) return;
+        if (entity == null) return;
+        if (entity.Map != mapNum) return;
 
         int skillId = -1;
         int playerSkillSlot = -1;
-        if (caster.Type == Core.Globals.Entity.EntityType.Player)
+        if (entity.Type == Core.Globals.Entity.EntityType.Player)
         {
             playerSkillSlot = bufferedValue;
-            if (playerSkillSlot < 0 || playerSkillSlot >= Data.Player[caster.Id].Skill.Length) return;
-            skillId = Data.Player[caster.Id].Skill[playerSkillSlot].Num;
+            if (playerSkillSlot < 0 || playerSkillSlot >= Data.Player[entity.Id].Skill.Length) return;
+            skillId = Data.Player[entity.Id].Skill[playerSkillSlot].Num;
         }
-        else if (caster.Type == Core.Globals.Entity.EntityType.Npc)
+        else if (entity.Type == Core.Globals.Entity.EntityType.Npc)
         {
             for (int i = 0; i < Constant.MaxNpcSkills; i++)
             {
                 if (i == bufferedValue)
                 {
-                    skillId = Data.Npc[caster.Num].Skill[i];
+                    skillId = Data.Npc[entity.Num].Skill[i];
                     break;
                 }
             }
@@ -2022,20 +2018,20 @@ public class Script
         // Re-check mana just before execution (player or npc could have spent mana meanwhile)
         if (skill.MpCost > 0)
         {
-            if (caster.Type == Core.Globals.Entity.EntityType.Player)
+            if (entity.Type == Core.Globals.Entity.EntityType.Player)
             {
-                if (GetPlayerVital(caster.Id, Vital.Mana) < skill.MpCost) return;
+                if (GetPlayerVital(entity.Id, Vital.Mana) < skill.MpCost) return;
             }
-            else if (caster.Type == Core.Globals.Entity.EntityType.Npc)
+            else if (entity.Type == Core.Globals.Entity.EntityType.Npc)
             {
-                if (caster.Vital == null || caster.Vital.Length <= (int)Vital.Mana || caster.Vital[(int)Vital.Mana] < skill.MpCost) return;
+                if (entity.Vital == null || entity.Vital.Length <= (int)Vital.Mana || entity.Vital[(int)Vital.Mana] < skill.MpCost) return;
             }
         }
 
         Entity resolvedTarget = null;
         if (skill.Range > 0)
         {
-            resolvedTarget = ResolveTargetEntity(mapNum, caster);
+            resolvedTarget = ResolveTargetEntity(mapNum, entity);
         }
 
         // Optional cast (wind-up) animation already played when buffering; only play execution anim here.
@@ -2045,33 +2041,33 @@ public class Script
 
         if (isProjectile)
         {
-            HandleProjectileSkill(mapNum, caster, skillId, resolvedTarget);
+            HandleProjectileSkill(mapNum, entity, skillId, resolvedTarget);
         }
         else if (range == 0 && !isAoE)
         {
-            HandleSelfCastSkill(mapNum, caster, skillId);
+            HandleSelfCastSkill(mapNum, entity, skillId);
         }
         else if (range == 0 && isAoE)
         {
-            HandleSelfCastAoESkill(mapNum, caster, skillId);
+            HandleSelfCastAoESkill(mapNum, entity, skillId);
         }
         else if (range > 0 && isAoE)
         {
-            HandleTargetedAoESkill(mapNum, caster, skillId, resolvedTarget);
+            HandleTargetedAoESkill(mapNum, entity, skillId, resolvedTarget);
         }
         else if (range > 0)
         {
-            HandleTargetedSkill(mapNum, caster, skillId, resolvedTarget);
+            HandleTargetedSkill(mapNum, entity, skillId, resolvedTarget);
         }
 
-        FinalizeCast(mapNum, caster, skillId, playerSkillSlot);
+        FinalizeCast(mapNum, entity, skillId, playerSkillSlot);
     }
 
-    private Entity? ResolveTargetEntity(int mapNum, Entity caster)
+    private Entity? ResolveTargetEntity(int mapNum, Entity entity)
     {
-        if (caster.TargetType == (byte)TargetType.Player)
+        if (entity.TargetType == (byte)TargetType.Player)
         {
-            var pid = caster.Target;
+            var pid = entity.Target;
             if (NetworkConfig.IsPlaying(pid) && GetPlayerMap(pid) == mapNum)
             {
                 var e = Core.Globals.Entity.FromPlayer(pid, Data.Player[pid]);
@@ -2079,9 +2075,9 @@ public class Script
                 return e;
             }
         }
-        else if (caster.TargetType == (byte)TargetType.Npc)
+        else if (entity.TargetType == (byte)TargetType.Npc)
         {
-            var tid = caster.Target;
+            var tid = entity.Target;
             if (tid >= 0 && tid < Core.Globals.Entity.Instances.Count)
             {
                 var tEnt = Core.Globals.Entity.Instances[tid];
@@ -2100,7 +2096,7 @@ public class Script
         if (mask == 0)
         {
             if (caster.Type == Core.Globals.Entity.EntityType.Player)
-                Server.Projectile.PlayerFireProjectile(caster.Id, skillId);
+                Server.Projectile.PlayerFireProjectile(caster.Id, -1, skillId);
             else if (caster.Type == Core.Globals.Entity.EntityType.Npc)
                 Server.Projectile.NpcFireProjectile(mapNum, caster.Id, skillId);
             return;
@@ -2110,16 +2106,27 @@ public class Script
         Span<byte> dirs = stackalloc byte[] { (byte)Direction.Down, (byte)Direction.Right, (byte)Direction.Left, (byte)Direction.Up, (byte)Direction.DownRight, (byte)Direction.DownLeft, (byte)Direction.UpRight, (byte)Direction.UpLeft };
         byte originalDir = caster.Dir;
         var dirCount = System.Enum.GetValues<Direction>().Length;
+        // Multi-direction batch: do not reset cooldown per shot; set once at the end
         for (int i = 0; i < dirCount; i++)
         {
             if ((mask & (1 << i)) == 0) continue;
             caster.Dir = dirs[i];
             if (caster.Type == Core.Globals.Entity.EntityType.Player)
-                Server.Projectile.PlayerFireProjectile(caster.Id, skillId);
+                Server.Projectile.PlayerFireProjectile(caster.Id, -1, skillId, caster.Dir, suppressCooldown: true);
             else if (caster.Type == Core.Globals.Entity.EntityType.Npc)
-                Server.Projectile.NpcFireProjectile(mapNum, caster.Id, skillId);
+                Server.Projectile.NpcFireProjectile(mapNum, caster.Id, skillId, caster.Dir);
         }
         caster.Dir = originalDir;
+
+        // Apply a single cooldown based on this skill's projectile speed
+        if (caster.Type == Core.Globals.Entity.EntityType.Player)
+        {
+            var projNum = Data.Skill[skillId].Projectile;
+            if (projNum >= 0)
+            {
+                Data.TempPlayer[caster.Id].ProjectileTimer = General.GetTimeMs() + Math.Max(0, Data.Projectile[projNum].Speed);
+            }
+        }
     }
 
     private void HandleSelfCastSkill(int mapNum, Entity caster, int skillId)
