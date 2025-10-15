@@ -195,7 +195,7 @@ public static class Projectile
         }
 
         var projectileNum = packetReader.ReadInt32();
-        if (projectileNum is < 0 or > Core.Globals.Constant.MaxProjectiles)
+        if (projectileNum < 0 || projectileNum > Core.Globals.Constant.MaxProjectiles)
         {
             return;
         }
