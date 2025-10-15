@@ -85,7 +85,7 @@ public static class Projectile
                     }
                     catch (Exception ex)
                     {
-                        General.Logger.LogError(ex, "[Script] Error in {MethodName}", "AttemptAttack");
+                        General.Logger.LogError(ex, "[Script] Error in {MethodName}", "ProjectileAttack");
                     }
                 }
                 return;
@@ -667,7 +667,7 @@ public static class Projectile
                         }
                         catch (Exception ex)
                         {
-                            General.Logger.LogError(ex, "[Script] Error in {MethodName}", "AttemptAttack");
+                            General.Logger.LogError(ex, "[Script] Error in {MethodName}", "ProjectileAttack");
                         }
                         ClearMapProjectile(map, i);
                         moved = false;
@@ -713,7 +713,7 @@ public static class Projectile
                         }
                         catch (Exception ex)
                         {
-                            General.Logger.LogError(ex, "[Script] Error in {MethodName}", "AttemptAttack");
+                            General.Logger.LogError(ex, "[Script] Error in {MethodName}", "ProjectileAttack");
                         }
                         ClearMapProjectile(map, i);
                         moved = false;
