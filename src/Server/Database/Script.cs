@@ -2012,10 +2012,6 @@ public class Script
                 }
             }
         }
-        else
-        {
-            return; // only players and npcs can cast
-        }
         
         if (skillId < 0 || skillId >= Data.Skill.Length) return;
         ref var skill = ref Data.Skill[skillId];
