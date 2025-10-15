@@ -46,6 +46,7 @@ namespace Client
         public ComboBox cmbProjectile = new ComboBox();
         public CheckBox chkKnockBack = new CheckBox { Text = "Knockback" };
         public ComboBox cmbKnockBackTiles = new ComboBox();
+        public ComboBox cmbChainOnHit = new ComboBox();
         // Multi-direction casting UI
         public CheckBox[] chkMultiDirs = new CheckBox[8];
         public Button btnSave = new Button { Text = "Save" };
@@ -137,6 +138,7 @@ namespace Client
             cmbProjectile.SelectedIndexChanged += (s, e) => CmbProjectile_SelectedIndexChanged();
             chkKnockBack.CheckedChanged += (s, e) => ChkKnockBack_CheckedChanged();
             cmbKnockBackTiles.SelectedIndexChanged += (s, e) => CmbKnockBackTiles_SelectedIndexChanged();
+            cmbChainOnHit.SelectedIndexChanged += (s, e) => CmbChainOnHit_SelectedIndexChanged();
             btnSave.Click += (s, e) => BtnSave_Click();
             btnDelete.Click += (s, e) => BtnDelete_Click();
             btnCancel.Click += (s, e) => BtnCancel_Click();
@@ -186,6 +188,7 @@ namespace Client
             general.AddRow(dirPanel1);
             general.AddRow(dirPanel2);
             general.AddRow(chkKnockBack, "KB Tiles:", cmbKnockBackTiles);
+            general.AddRow(new Label{ Text = "Chain on Hit:" }, cmbChainOnHit);
 
             var buttons = new StackLayout { Orientation = Orientation.Horizontal, Spacing = 5, Items = { btnSave, btnDelete, btnCopy, btnCancel, btnLearn } }; // order enforced
 
@@ -229,6 +232,14 @@ namespace Client
                 for (int i = 0; i < Constant.MaxProjectiles; i++)
                 {
                     cmbProjectile.Items.Add($"{i}: {Data.Projectile[i].Name}");
+                }
+
+                cmbChainOnHit.Items.Clear();
+                cmbChainOnHit.Items.Add("None");
+                for (int i = 0; i < Constant.MaxSkills; i++)
+                {
+                    var nm = Strings.Trim(Data.Skill[i].Name);
+                    cmbChainOnHit.Items.Add($"{i}: {nm}");
                 }
 
                 cmbJob.Items.Clear();
@@ -298,6 +309,11 @@ namespace Client
         private void CmbProjectile_SelectedIndexChanged() => Data.Skill[GameState.EditorIndex].Projectile = cmbProjectile.SelectedIndex;
         private void ChkKnockBack_CheckedChanged() => Data.Skill[GameState.EditorIndex].KnockBack = (byte)(chkKnockBack.Checked == true ? 1 : 0);
         private void CmbKnockBackTiles_SelectedIndexChanged() => Data.Skill[GameState.EditorIndex].KnockBackTiles = (byte)cmbKnockBackTiles.SelectedIndex;
+        private void CmbChainOnHit_SelectedIndexChanged()
+        {
+            var idx = cmbChainOnHit.SelectedIndex;
+            Data.Skill[GameState.EditorIndex].ChainOnHitSkillId = idx <= 0 ? -1 : idx - 1;
+        }
         public void SyncMultiDirMask()
         {
             int mask = Data.Skill[GameState.EditorIndex].MultiDirMask;

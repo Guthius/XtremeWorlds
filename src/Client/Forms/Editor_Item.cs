@@ -231,7 +231,7 @@ namespace Client
                 Rows =
                 {
                     new TableRow(new Label{Text="Event Id"}, numEventId),
-                    new TableRow(new Label{Text="Event Val"}, numEventValue)
+                    new TableRow(new Label{Text="Event Value"}, numEventValue)
                 }
             });
 
@@ -388,8 +388,8 @@ namespace Client
                 case ItemCategory.Event:
                     cmbSubType.Items.Add("Switches");
                     cmbSubType.Items.Add("Variables");
-                    cmbSubType.Items.Add("Custom Script");
                     cmbSubType.Items.Add("Key");
+                    cmbSubType.Items.Add("Custom Script");
                     cmbSubType.Enabled = true;
                     break;
             }

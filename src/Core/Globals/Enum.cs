@@ -424,7 +424,7 @@ public enum CommonEventTrigger
 {
     Switch,
     Variable,
-    ItemUsed,
+    Key,
     CustomScript
 }
 

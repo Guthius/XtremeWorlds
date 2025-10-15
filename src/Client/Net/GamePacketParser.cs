@@ -594,7 +594,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Data.Skill[skillNum].CastTime = packetReader.ReadInt32();
         Data.Skill[skillNum].CdTime = packetReader.ReadInt32();
         Data.Skill[skillNum].JobReq = packetReader.ReadInt32();
-        Data.Skill[skillNum].Dir = (byte) packetReader.ReadInt32();
+        Data.Skill[skillNum].Dir = (byte)packetReader.ReadInt32();
         Data.Skill[skillNum].Duration = packetReader.ReadInt32();
         Data.Skill[skillNum].Icon = packetReader.ReadInt32();
         Data.Skill[skillNum].Interval = packetReader.ReadInt32();
@@ -606,15 +606,16 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Data.Skill[skillNum].Range = packetReader.ReadInt32();
         Data.Skill[skillNum].SkillAnim = packetReader.ReadInt32();
         Data.Skill[skillNum].StunDuration = packetReader.ReadInt32();
-        Data.Skill[skillNum].Type = (byte) packetReader.ReadInt32();
+        Data.Skill[skillNum].Type = (byte)packetReader.ReadInt32();
         Data.Skill[skillNum].Vital = packetReader.ReadInt32();
         Data.Skill[skillNum].X = packetReader.ReadInt32();
         Data.Skill[skillNum].Y = packetReader.ReadInt32();
         Data.Skill[skillNum].IsProjectile = packetReader.ReadInt32();
         Data.Skill[skillNum].Projectile = packetReader.ReadInt32();
-        Data.Skill[skillNum].KnockBack = (byte) packetReader.ReadInt32();
-        Data.Skill[skillNum].KnockBackTiles = (byte) packetReader.ReadInt32();
+        Data.Skill[skillNum].KnockBack = (byte)packetReader.ReadInt32();
+        Data.Skill[skillNum].KnockBackTiles = (byte)packetReader.ReadInt32();
         Data.Skill[skillNum].MultiDirMask = packetReader.ReadInt32();
+        Data.Skill[skillNum].ChainOnHitSkillId = packetReader.ReadInt32();
     }
 
     private static void Packet_Skills(ReadOnlyMemory<byte> data)

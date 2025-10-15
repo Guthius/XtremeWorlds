@@ -228,7 +228,7 @@ public class Script
         try
         {
             // removed unused variable 'i'
-            int n;
+            int n, n2;
 
             var tempdata = new int[Enum.GetValues(typeof(Stat)).Length + 4];
             var tempstr = new string[3];
@@ -344,25 +344,44 @@ public class Script
                 case (byte)ItemCategory.Event:
                     {
                         n = Data.Item[itemNum].Data1;
+                        n2 = Data.Item[itemNum].Data2;
 
                         switch (Data.Item[itemNum].SubType)
                         {
-                            case (byte)EventCommand.ModifyVariable:
+                            case (byte)CommonEventTrigger.Switch:
                                 {
-                                    Data.Player[index].Variables[n] = Data.Item[itemNum].Data2;
+                                    Data.Player[index].Switches[n] = (byte)n2;
                                     break;
                                 }
-                            case (byte)EventCommand.ModifySwitch:
+                            case (byte)CommonEventTrigger.Variable:
                                 {
-                                    Data.Player[index].Switches[n] = (byte)Data.Item[itemNum].Data2;
+                                    Data.Player[index].Variables[n] = n2;
                                     break;
                                 }
-                            case (byte)EventCommand.Key:
+                            case (byte)CommonEventTrigger.Key:
                                 {
                                     EventLogic.TriggerEvent(index, 1, 0, GetPlayerX(index), GetPlayerY(index));
                                     break;
                                 }
-                        }
+                                
+                            case (byte)CommonEventTrigger.CustomScript:
+                                {
+                                    switch (n)
+                                    {
+                                        case 0: // Example: Custom script 0
+                                            {
+                                                NetworkSend.PlayerMsg(index, "You feel a strange sensation...", (int)ColorName.BrightCyan);
+                                                break;
+                                            }
+                                        default:
+                                            {
+                                                NetworkSend.PlayerMsg(index, "Nothing happens.", (int)ColorName.Yellow);
+                                                break;
+                                            }
+                                    }
+                                    break;
+                                }
+                            }
 
                         break;
                     }
@@ -1573,6 +1592,13 @@ public class Script
             HandleDeath(attacker, target);
         }
 
+        // Chain casting on hit if this came from a skill and damage actually landed
+        if (skillId.HasValue && skillId.Value >= 0 && dmg.Final > 0)
+        {
+            TryChainOnHit(attacker.Map, attacker, skillId.Value, target);
+            ApplyKnockbackIfAny(attacker, target, skillId);
+        }
+
         // Death is handled inside ApplyDamage now; killed flag returned for external hooks.
         return true;
     }
@@ -2187,7 +2213,7 @@ public class Script
         }
     }
 
-    private Entity? FindEntityAt(int mapNum, int tx, int ty, Entity preferOpponentsOf)
+    public Entity? FindEntityAt(int mapNum, int tx, int ty, Entity preferOpponentsOf)
     {
         // Players first
         foreach (var p in PlayerService.Instance.Players)
@@ -2216,7 +2242,7 @@ public class Script
         return null;
     }
 
-    private void ApplyAoE(int mapNum, Entity caster, int skillId, int centerX, int centerY)
+    public void ApplyAoE(int mapNum, Entity caster, int skillId, int centerX, int centerY)
     {
         ref var skill = ref Data.Skill[skillId];
         int radius = skill.AoE;
@@ -2267,6 +2293,38 @@ public class Script
         if (anim <= 0) return;
         byte tType = (byte)(target.Type == Core.Globals.Entity.EntityType.Player ? TargetType.Player : TargetType.Npc);
         Server.Animation.SendAnimation(mapNum, anim, 0, 0, tType, target.Id);
+    }
+
+    private void TryChainOnHit(int mapNum, Entity caster, int baseSkillId, Entity target)
+    {
+        if (baseSkillId < 0 || baseSkillId >= Data.Skill.Length) return;
+        int chainId = Data.Skill[baseSkillId].ChainOnHitSkillId;
+        if (chainId < 0 || chainId >= Data.Skill.Length) return;
+        // For targeted chaining, we can re-use targeted attack semantics by routing HandleTargetedSkill
+        // but respect the chain skill's own type definitions.
+        ref var chain = ref Data.Skill[chainId];
+        if (chain.IsProjectile == 1)
+        {
+            // Fire projectile(s) from caster using chain skill
+            HandleProjectileSkill(mapNum, caster, chainId, target);
+        }
+        else if (chain.Range == 0 && !chain.IsAoE)
+        {
+            HandleSelfCastSkill(mapNum, caster, chainId);
+        }
+        else if (chain.Range == 0 && chain.IsAoE)
+        {
+            HandleSelfCastAoESkill(mapNum, caster, chainId);
+        }
+        else if (chain.Range > 0 && chain.IsAoE)
+        {
+            HandleTargetedAoESkill(mapNum, caster, chainId, target);
+        }
+        else if (chain.Range > 0)
+        {
+            HandleTargetedSkill(mapNum, caster, chainId, target);
+        }
+        // No cooldown or mana additional cost for automated chain to keep it responsive; adjust if needed.
     }
 
     private void FinalizeCast(int mapNum, Entity caster, int skillId, int playerSkillSlot)
@@ -2449,6 +2507,84 @@ public class Script
             after = Data.MapNpc[target.Map].Npc[target.Id].Vital[(int)Vital.Health];
         }
         return before > 0 && after <= 0; // HandleDeath already executed if true
+    }
+
+    private void ApplyKnockbackIfAny(Entity attacker, Entity target, int? skillId)
+    {
+        if (!skillId.HasValue || skillId.Value < 0 || skillId.Value >= Data.Skill.Length) return;
+        ref var s = ref Data.Skill[skillId.Value];
+        if (s.KnockBack != 1 || s.KnockBackTiles <= 0) return;
+    int steps = Math.Min(5, Math.Max(1, (int)s.KnockBackTiles));
+        int map = attacker.Map;
+        int ax = attacker.X / 32, ay = attacker.Y / 32;
+        int tx = target.X / 32, ty = target.Y / 32;
+        int dx = Math.Sign(tx - ax);
+        int dy = Math.Sign(ty - ay);
+
+        // push away from attacker; if same tile or dx/dy zero, derive from attacker facing
+        if (dx == 0 && dy == 0)
+        {
+            switch ((Direction)attacker.Dir)
+            {
+                case Direction.Up: dy = -1; break;
+                case Direction.Down: dy = 1; break;
+                case Direction.Left: dx = -1; break;
+                case Direction.Right: dx = 1; break;
+                case Direction.UpRight: dx = 1; dy = -1; break;
+                case Direction.UpLeft: dx = -1; dy = -1; break;
+                case Direction.DownRight: dx = 1; dy = 1; break;
+                case Direction.DownLeft: dx = -1; dy = 1; break;
+            }
+        }
+
+        for (int i = 0; i < steps; i++)
+        {
+            int nx = (target.X / 32) + dx;
+            int ny = (target.Y / 32) + dy;
+            // Bounds
+            if (nx < 0 || ny < 0 || nx >= Data.Map[map].MaxX || ny >= Data.Map[map].MaxY) break;
+            // Blocked tiles
+            bool blocked = Data.Map[map].Tile[nx, ny].Type == TileType.Blocked || Data.Map[map].Tile[nx, ny].Type2 == TileType.Blocked;
+            if (blocked) break;
+            // Prevent collisions with other entities
+            bool occ = false;
+            if (target.Type == Entity.EntityType.Player)
+            {
+                foreach (var pid in PlayerService.Instance.PlayerIds)
+                {
+                    if (pid != target.Id && GetPlayerMap(pid) == map && GetPlayerX(pid) == nx && GetPlayerY(pid) == ny) { occ = true; break; }
+                }
+                if (!occ)
+                {
+                    // Move player by setting raw coordinates
+                    SetPlayerX(target.Id, nx * 32);
+                    SetPlayerY(target.Id, ny * 32);
+                    NetworkSend.SendPlayerXYToMap(target.Id);
+                }
+                else break;
+            }
+            else if (target.Type == Entity.EntityType.Npc)
+            {
+                // Ensure no other NPC occupying
+                for (int mi = 0; mi < Constant.MaxMapNpcs; mi++)
+                {
+                    if (mi == target.Id) continue;
+                    if (Data.MapNpc[map].Npc[mi].Num >= 0 && Data.MapNpc[map].Npc[mi].X/32 == nx && Data.MapNpc[map].Npc[mi].Y/32 == ny) { occ = true; break; }
+                }
+                if (!occ)
+                {
+                    Data.MapNpc[map].Npc[target.Id].X = nx * 32;
+                    Data.MapNpc[map].Npc[target.Id].Y = ny * 32;
+                    // Notify clients by sending SNpcDir (keeps anim simple) and vitals/position via SMapNpcData on next sync
+                    var stopPacket = new Core.Net.PacketWriter(9);
+                    stopPacket.WriteEnum(ServerPackets.SNpcDir);
+                    stopPacket.WriteInt32(target.Id);
+                    stopPacket.WriteByte(Data.MapNpc[map].Npc[target.Id].Dir);
+                    NetworkConfig.SendDataToMap(map, stopPacket.GetBytes());
+                }
+                else break;
+            }
+        }
     }
 
     private void DropNpcLoot(int mapNum, int mapNpcNum)

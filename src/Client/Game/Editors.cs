@@ -358,6 +358,10 @@ namespace Client
             withBlock.cmbKnockBackTiles.SelectedIndex = Data.Skill[GameState.EditorIndex].KnockBackTiles;
             withBlock.SyncMultiDirMask();
 
+            // Chain skills: map -1 to None (0), otherwise +1 index
+            int onHit = Data.Skill[GameState.EditorIndex].ChainOnHitSkillId;
+            withBlock.cmbChainOnHit.SelectedIndex = onHit >= 0 && onHit < Constant.MaxSkills ? onHit + 1 : 0;
+
             Editor_Skill.Instance.DrawIcon();
           
             GameState.SkillChanged[GameState.EditorIndex] = true;

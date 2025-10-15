@@ -1622,6 +1622,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Data.Skill[skillNum].KnockBack = (byte) buffer.ReadInt32();
         Data.Skill[skillNum].KnockBackTiles = (byte) buffer.ReadInt32();
         Data.Skill[skillNum].MultiDirMask = buffer.ReadInt32();
+        // chain skills
+        Data.Skill[skillNum].ChainOnHitSkillId = buffer.ReadInt32();
 
         // Save it
         NetworkSend.SendUpdateSkillToAll(skillNum);

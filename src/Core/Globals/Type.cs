@@ -74,6 +74,7 @@ public static class Type
         public byte KnockBack;
         public byte KnockBackTiles;
         public int MultiDirMask; // bitmask of directions to fire simultaneously (0=off)
+        public int ChainOnHitSkillId;
     }
 
     public struct Shop
