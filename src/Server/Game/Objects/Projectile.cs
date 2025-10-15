@@ -301,7 +301,7 @@ public static class Projectile
         NetworkConfig.SendDataToMap(mapNum, packet.GetBytes());
     }
 
-    public static void PlayerFireProjectile(int playerId, int skillNum = -1, int itemNum = -1)
+    public static void HandleProjectileSkill(int playerId, int skillNum = -1, int itemNum = -1)
     {
         var mapNum = GetPlayerMap(playerId);
         var mapProjectileNum = -1;
@@ -425,6 +425,52 @@ public static class Projectile
         mp.DestX = destX; mp.DestY = destY;
         mp.TravelTime = General.GetTimeMs() + Math.Max(1, Data.Projectile[projectileNum].Speed);
         mp.Timer = General.GetTimeMs() + 60000;
+        SendProjectileToMap(mapNum, mapProjectileNum);
+    }
+
+    public static void PlayerFireProjectile(int playerId, int itemNum, int skillNum = -1)
+    {
+        var mapNum = GetPlayerMap(playerId);
+        var mapProjectileNum = -1;
+        for (var i = 0; i < Core.Globals.Constant.MaxProjectiles; i++)
+        {
+            if (Data.MapProjectile[mapNum, i].ProjectileNum < 0)
+            {
+                mapProjectileNum = i;
+                break;
+            }
+        }
+
+        if (mapProjectileNum == -1)
+        {
+            return;
+        }
+
+        var projectileNum = itemNum >= 0 ? Data.Item[itemNum].Projectile : skillNum > 0 ? Data.Skill[skillNum].Projectile : -1;
+        if (projectileNum == -1)
+        {
+            return;
+        }
+
+        if (Data.TempPlayer[playerId].ProjectileTimer > General.GetTimeMs())
+        {
+            return;
+        }
+
+        ref var mapProjectile = ref Data.MapProjectile[mapNum, mapProjectileNum];
+
+        Data.TempPlayer[playerId].ProjectileTimer = General.GetTimeMs() + Data.Item[itemNum].Speed;
+        mapProjectile.ProjectileNum = projectileNum;
+        mapProjectile.Owner = playerId;
+        mapProjectile.OwnerType = (byte) TargetType.Player;
+        mapProjectile.Dir = GetPlayerDir(playerId);
+        mapProjectile.X = GetPlayerRawX(playerId);
+        mapProjectile.Y = GetPlayerRawY(playerId);
+        mapProjectile.SkillId = skillNum;
+        mapProjectile.Range = 0;
+        mapProjectile.TravelTime = General.GetTimeMs() + Math.Max(1, Data.Projectile[projectileNum].Speed);
+        mapProjectile.Timer = General.GetTimeMs() + 60000;
+
         SendProjectileToMap(mapNum, mapProjectileNum);
     }
 
