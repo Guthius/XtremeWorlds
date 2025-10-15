@@ -453,7 +453,7 @@ public static class Projectile
         }
 
         // Skill-defined projectile
-        var projectileNum = skillNum > 0 ? Data.Skill[skillNum].Projectile : -1;
+        var projectileNum = skillNum >= 0 ? Data.Skill[skillNum].Projectile : -1;
         if (projectileNum == -1)
         {
             return;
