@@ -1215,7 +1215,7 @@ namespace Client
                 for (int i = 0; i < Constant.MaxHotbar; i++)
                 {
                     // Check if the corresponding hotbar key is pressed
-                    if (CurrentKeyboardState.IsKeyDown((Keys) ((int) Keys.D0 + i)))
+                    if (CurrentKeyboardState.IsKeyDown((Keys) ((int) Keys.D1 + i)))
                     {
                         Sender.SendUseHotbarSlot(i);
                         return; // Exit once the matching slot is used
