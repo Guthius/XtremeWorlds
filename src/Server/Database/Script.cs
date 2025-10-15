@@ -328,7 +328,7 @@ public class Script
                             }
                             else
                             {
-                                NetworkSend.PlayerMsg(index, "Out of " + Data.Item[Data.Item[GetPlayerEquipment(index, Equipment.Weapon)].Ammo].Name + " !", (int)ColorName.BrightRed);
+                                NetworkSend.PlayerMsg(index, "Out of " + Data.Item[Data.Item[GetPlayerEquipment(index, Equipment.Weapon)].Ammo].Name + "!", (int)ColorName.BrightRed);
                                 return;
                             }
                         }

@@ -650,7 +650,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                     }
                     else
                     {
-                        NetworkSend.PlayerMsg(session.Id, "Out of " + Data.Item[Data.Item[GetPlayerEquipment(session.Id, Equipment.Weapon)].Ammo].Name + " !", (int) ColorName.BrightRed);
+                        NetworkSend.PlayerMsg(session.Id, "Out of " + Data.Item[Data.Item[GetPlayerEquipment(session.Id, Equipment.Weapon)].Ammo].Name + "!", (int) ColorName.BrightRed);
                         return;
                     }
                 }
@@ -823,7 +823,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         int ammoId = Data.Item[itemNum].Ammo;
         if (ammoId >= 0 && Server.Player.HasItem(session.Id, ammoId) <= 0)
         {
-            NetworkSend.PlayerMsg(session.Id, "Out of " + Data.Item[ammoId].Name + " !", (int)ColorName.BrightRed);
+            NetworkSend.PlayerMsg(session.Id, "Out of " + Data.Item[ammoId].Name + "!", (int)ColorName.BrightRed);
             return;
         }
 
