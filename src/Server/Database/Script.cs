@@ -2298,7 +2298,7 @@ public class Script
     private void PlaySkillAnimation(int mapNum, Entity caster, int skillId, Entity target)
     {
         int anim = Data.Skill[skillId].SkillAnim;
-        if (anim <= 0) return;
+        if (anim < 0) return;
         byte tType = (byte)(target.Type == Core.Globals.Entity.EntityType.Player ? TargetType.Player : TargetType.Npc);
         Server.Animation.SendAnimation(mapNum, anim, 0, 0, tType, target.Id);
     }

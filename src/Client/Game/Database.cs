@@ -1,4 +1,5 @@
-﻿using Client.Net;
+﻿using System.Data;
+using Client.Net;
 using Core;
 using Core.Globals;
 using Type = Core.Globals.Type;
@@ -96,6 +97,7 @@ namespace Client
             Data.Skill[index] = default;
             Data.Skill[index].Name = "";
             Data.Skill[index].JobReq = -1;
+            Data.Skill[index].SkillAnim = -1;
             GameState.SkillLoaded[index] = 0;
         }
 
