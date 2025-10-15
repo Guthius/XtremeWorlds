@@ -1624,6 +1624,11 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Data.Skill[skillNum].MultiDirMask = buffer.ReadInt32();
         // chain skills
         Data.Skill[skillNum].ChainOnHitSkillId = buffer.ReadInt32();
+        
+        // common event fields
+        Data.Skill[skillNum].CommonEventType = (byte)buffer.ReadInt32();
+        Data.Skill[skillNum].CommonEventData1 = buffer.ReadInt32();
+        Data.Skill[skillNum].CommonEventData2 = buffer.ReadInt32();
 
         // Save it
         NetworkSend.SendUpdateSkillToAll(skillNum);

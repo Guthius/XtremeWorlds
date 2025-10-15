@@ -616,6 +616,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Data.Skill[skillNum].KnockBackTiles = (byte)packetReader.ReadInt32();
         Data.Skill[skillNum].MultiDirMask = packetReader.ReadInt32();
         Data.Skill[skillNum].ChainOnHitSkillId = packetReader.ReadInt32();
+        Data.Skill[skillNum].CommonEventType = (byte)packetReader.ReadInt32();
+        Data.Skill[skillNum].CommonEventData1 = packetReader.ReadInt32();
+        Data.Skill[skillNum].CommonEventData2 = packetReader.ReadInt32();
     }
 
     private static void Packet_Skills(ReadOnlyMemory<byte> data)

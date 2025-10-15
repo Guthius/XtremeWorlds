@@ -320,6 +320,9 @@ public static class NetworkSend
         packetWriter.WriteInt32(Data.Skill[skillNum].KnockBackTiles);
         packetWriter.WriteInt32(Data.Skill[skillNum].MultiDirMask);
         packetWriter.WriteInt32(Data.Skill[skillNum].ChainOnHitSkillId);
+        packetWriter.WriteInt32(Data.Skill[skillNum].CommonEventType);
+        packetWriter.WriteInt32(Data.Skill[skillNum].CommonEventData1);
+        packetWriter.WriteInt32(Data.Skill[skillNum].CommonEventData2);
 
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
     }
@@ -357,6 +360,9 @@ public static class NetworkSend
         packetWriter.WriteInt32(Data.Skill[skillNum].KnockBackTiles);
         packetWriter.WriteInt32(Data.Skill[skillNum].MultiDirMask);
         packetWriter.WriteInt32(Data.Skill[skillNum].ChainOnHitSkillId);
+        packetWriter.WriteInt32(Data.Skill[skillNum].CommonEventType);
+        packetWriter.WriteInt32(Data.Skill[skillNum].CommonEventData1);
+        packetWriter.WriteInt32(Data.Skill[skillNum].CommonEventData2);
 
         PlayerService.Instance.SendDataToAll(packetWriter.GetBytes());
     }

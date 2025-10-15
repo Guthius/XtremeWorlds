@@ -75,6 +75,10 @@ public static class Type
         public byte KnockBackTiles;
         public int MultiDirMask; // bitmask of directions to fire simultaneously (0=off)
         public int ChainOnHitSkillId;
+        // Common Event support (like items): trigger after cast resolves
+        public byte CommonEventType; // maps to CommonEventTrigger enum
+        public int CommonEventData1; // e.g., switch/variable index or event id
+        public int CommonEventData2; // e.g., value for switch/variable, optional
     }
 
     public struct Shop

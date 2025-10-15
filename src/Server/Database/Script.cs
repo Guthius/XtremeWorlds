@@ -343,46 +343,8 @@ public class Script
 
                 case (byte)ItemCategory.Event:
                     {
-                        n = Data.Item[itemNum].Data1;
-                        n2 = Data.Item[itemNum].Data2;
-
-                        switch (Data.Item[itemNum].SubType)
-                        {
-                            case (byte)CommonEventTrigger.Switch:
-                                {
-                                    Data.Player[index].Switches[n] = (byte)n2;
-                                    break;
-                                }
-                            case (byte)CommonEventTrigger.Variable:
-                                {
-                                    Data.Player[index].Variables[n] = n2;
-                                    break;
-                                }
-                            case (byte)CommonEventTrigger.Key:
-                                {
-                                    EventLogic.TriggerEvent(index, 1, 0, GetPlayerX(index), GetPlayerY(index));
-                                    break;
-                                }
-                                
-                            case (byte)CommonEventTrigger.CustomScript:
-                                {
-                                    switch (n)
-                                    {
-                                        case 0: // Example: Custom script 0
-                                            {
-                                                NetworkSend.PlayerMsg(index, "You feel a strange sensation...", (int)ColorName.BrightCyan);
-                                                break;
-                                            }
-                                        default:
-                                            {
-                                                NetworkSend.PlayerMsg(index, "Nothing happens.", (int)ColorName.Yellow);
-                                                break;
-                                            }
-                                    }
-                                    break;
-                                }
-                            }
-
+                        // Trigger item-driven common event using item's SubType/Data1/Data2
+                        CommonEvent(index, itemNum);
                         break;
                     }
 
@@ -399,7 +361,49 @@ public class Script
         }
     }
 
-    // Helper to equip an item with its own guard to prevent concurrent equip operations
+    private void CommonEvent(int index, int itemNum, int skillNum = -1)
+    {
+        int idxType;
+        int n, n2;
+
+        if (skillNum >= 0)
+        {
+            // Skill common events: 0=None, 1..N mapped to CommonEventTrigger values by -1
+            idxType = Data.Skill[skillNum].CommonEventType - 1;
+            n = Data.Skill[skillNum].CommonEventData1;
+            n2 = Data.Skill[skillNum].CommonEventData2;
+        }
+        else
+        {
+            // Item-driven common events directly use the enum as SubType
+            idxType = Data.Item[itemNum].SubType;
+            n = Data.Item[itemNum].Data1;
+            n2 = Data.Item[itemNum].Data2;
+        }
+
+        switch (idxType)
+        {
+            case (byte)CommonEventTrigger.Switch:
+                Data.Player[index].Switches[Math.Max(0, n)] = (byte)Math.Max(0, n2); break;
+                
+            case (byte)CommonEventTrigger.Variable:
+                Data.Player[index].Variables[Math.Max(0, n)] = n2; break;
+
+            case (byte)CommonEventTrigger.Key:
+                EventLogic.TriggerEvent(index, 1, 0, GetPlayerX(index), GetPlayerY(index)); break;
+
+            case (byte)CommonEventTrigger.CustomScript:
+                // Minimal sample custom scripts same as item path
+                if (n == 0)
+                    NetworkSend.PlayerMsg(index, "You feel a strange sensation...", (int)ColorName.BrightCyan);
+                else
+                    NetworkSend.PlayerMsg(index, "Nothing happens.", (int)ColorName.Yellow);
+                break;
+            default:
+                break;
+        }
+    }
+        
     private void EquipItem(int index, int itemNum, int invNum)
     {
         if (_isEquippingItem[index])
@@ -2373,6 +2377,13 @@ public class Script
                 }
             }
         }
+
+        // Trigger skill common event (like items) after cast resolves on the caster's map
+        if (caster.Type == Core.Globals.Entity.EntityType.Player && skill.CommonEventType > 0)
+        {
+            int pid = caster.Id;
+            CommonEvent(pid, -1, skillId);
+        }
     }
 
     private int GetPlayerProtection(Entity entity)
@@ -2514,7 +2525,7 @@ public class Script
         if (!skillId.HasValue || skillId.Value < 0 || skillId.Value >= Data.Skill.Length) return;
         ref var s = ref Data.Skill[skillId.Value];
         if (s.KnockBack != 1 || s.KnockBackTiles <= 0) return;
-    int steps = Math.Min(5, Math.Max(1, (int)s.KnockBackTiles));
+        int steps = Math.Min(5, Math.Max(1, (int)s.KnockBackTiles));
         int map = attacker.Map;
         int ax = attacker.X / 32, ay = attacker.Y / 32;
         int tx = target.X / 32, ty = target.Y / 32;

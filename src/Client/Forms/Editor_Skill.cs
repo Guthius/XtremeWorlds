@@ -47,6 +47,9 @@ namespace Client
         public CheckBox chkKnockBack = new CheckBox { Text = "Knockback" };
         public ComboBox cmbKnockBackTiles = new ComboBox();
         public ComboBox cmbChainOnHit = new ComboBox();
+        public ComboBox cmbCommonEventType = new ComboBox();
+        public NumericStepper nudCommonEventData1 = new NumericStepper { MinValue = 0 };
+        public NumericStepper nudCommonEventData2 = new NumericStepper { MinValue = 0 };
         // Multi-direction casting UI
         public CheckBox[] chkMultiDirs = new CheckBox[8];
         public Button btnSave = new Button { Text = "Save" };
@@ -139,6 +142,9 @@ namespace Client
             chkKnockBack.CheckedChanged += (s, e) => ChkKnockBack_CheckedChanged();
             cmbKnockBackTiles.SelectedIndexChanged += (s, e) => CmbKnockBackTiles_SelectedIndexChanged();
             cmbChainOnHit.SelectedIndexChanged += (s, e) => CmbChainOnHit_SelectedIndexChanged();
+            cmbCommonEventType.SelectedIndexChanged += (s, e) => { Data.Skill[GameState.EditorIndex].CommonEventType = (byte)Math.Max(0, cmbCommonEventType.SelectedIndex); };
+            nudCommonEventData1.ValueChanged += (s, e) => { Data.Skill[GameState.EditorIndex].CommonEventData1 = (int)Math.Round(nudCommonEventData1.Value); };
+            nudCommonEventData2.ValueChanged += (s, e) => { Data.Skill[GameState.EditorIndex].CommonEventData2 = (int)Math.Round(nudCommonEventData2.Value); };
             btnSave.Click += (s, e) => BtnSave_Click();
             btnDelete.Click += (s, e) => BtnDelete_Click();
             btnCancel.Click += (s, e) => BtnCancel_Click();
@@ -189,6 +195,12 @@ namespace Client
             general.AddRow(dirPanel2);
             general.AddRow(chkKnockBack, "KB Tiles:", cmbKnockBackTiles);
             general.AddRow(new Label{ Text = "Chain on Hit:" }, cmbChainOnHit);
+            // Common Event (like items)
+            var ceRow1 = new DynamicLayout { Spacing = new Size(4,4) };
+            ceRow1.AddRow(new Label{ Text = "Event Type:" }, cmbCommonEventType);
+            ceRow1.AddRow(new Label{ Text = "Data 1:" }, nudCommonEventData1, new Label{ Text = "Data 2:" }, nudCommonEventData2);
+            general.AddRow(new Label{ Text = "Common Event:" });
+            general.AddRow(ceRow1);
 
             var buttons = new StackLayout { Orientation = Orientation.Horizontal, Spacing = 5, Items = { btnSave, btnDelete, btnCopy, btnCancel, btnLearn } }; // order enforced
 
@@ -240,6 +252,13 @@ namespace Client
                 {
                     var nm = Strings.Trim(Data.Skill[i].Name);
                     cmbChainOnHit.Items.Add($"{i}: {nm}");
+                }
+
+                cmbCommonEventType.Items.Clear();
+                foreach (var name in Enum.GetNames(typeof(CommonEventTrigger)))
+                {
+                    // display names already human-friendly in enum
+                    cmbCommonEventType.Items.Add(name);
                 }
 
                 cmbJob.Items.Clear();

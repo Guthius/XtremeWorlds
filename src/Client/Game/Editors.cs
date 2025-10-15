@@ -362,6 +362,11 @@ namespace Client
             int onHit = Data.Skill[GameState.EditorIndex].ChainOnHitSkillId;
             withBlock.cmbChainOnHit.SelectedIndex = onHit >= 0 && onHit < Constant.MaxSkills ? onHit + 1 : 0;
 
+            // Common event init
+            withBlock.cmbCommonEventType.SelectedIndex = Data.Skill[GameState.EditorIndex].CommonEventType;
+            withBlock.nudCommonEventData1.Value = Data.Skill[GameState.EditorIndex].CommonEventData1;
+            withBlock.nudCommonEventData2.Value = Data.Skill[GameState.EditorIndex].CommonEventData2;
+
             Editor_Skill.Instance.DrawIcon();
           
             GameState.SkillChanged[GameState.EditorIndex] = true;
