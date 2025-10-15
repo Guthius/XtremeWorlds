@@ -359,6 +359,7 @@ public static class Projectile
                 mapProjectileNum = i; break;
             }
         }
+        
         if (mapProjectileNum == -1) return;
         int projectileNum = itemNum >= 0 ? Data.Item[itemNum].Projectile : -1;
         if (projectileNum < 0) return;
@@ -369,6 +370,7 @@ public static class Projectile
         mp.ProjectileNum = projectileNum;
         mp.Owner = playerId;
         mp.OwnerType = (byte)TargetType.Player;
+        
         // Derive dir for legacy visuals based on vx,vy in 8 directions
         double ang = Math.Atan2(vy, vx) * 180.0 / Math.PI;
         if (ang > -22.5 && ang <= 22.5) mp.Dir = (byte)Direction.Right;

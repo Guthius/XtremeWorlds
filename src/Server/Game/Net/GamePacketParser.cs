@@ -801,6 +801,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
     public static void Packet_MouseAttack(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
+        
         // read target world pixel coordinates relative to map origin
         int targetX = buffer.ReadInt32();
         int targetY = buffer.ReadInt32();
@@ -847,6 +848,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         {
             Server.Player.TakeInv(session.Id, ammoId, 1);
         }
+
         // Compute vector from player center to target in pixels
         int startX = GetPlayerRawX(session.Id);
         int startY = GetPlayerRawY(session.Id);
