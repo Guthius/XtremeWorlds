@@ -2590,7 +2590,26 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         {
             if (Data.Player[session.Id].Hotbar[slot].SlotType == (byte)DraggablePartType.Item)
             {
-                Server.Player.UseItem(session.Id, Server.Player.FindItemSlot(session.Id, (int)Data.Player[session.Id].Hotbar[slot].Slot));
+                int eqSlot = -1;
+                for (int i = 0; i < 4; i++)
+                {
+                    if (Data.Player[session.Id].Equipment[i].Num == Data.Player[session.Id].Hotbar[slot].Slot)
+                    {
+                        eqSlot = i;
+                        break;
+                    }
+                }
+
+                int m = Server.Player.FindOpenInvSlot(session.Id, (int)Data.Player[session.Id].Equipment[eqSlot].Num);
+
+                if (eqSlot >= 0 && m >= 0)
+                {
+                    Server.Player.UnEquipItem(session.Id, eqSlot, m);
+                }
+                else
+                {
+                    Server.Player.UseItem(session.Id, Server.Player.FindItemSlot(session.Id, (int)Data.Player[session.Id].Hotbar[slot].Slot));
+                }
             }
             else if (Data.Player[session.Id].Hotbar[slot].SlotType == (byte)DraggablePartType.Skill)
             {
