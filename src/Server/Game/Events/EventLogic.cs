@@ -303,7 +303,7 @@ namespace Server
                             int z = p;
 
                             // Reset any active event processing for this event ID.
-                            for (int n = 0; n < Data.TempPlayer[i].EventProcessing.Length; n++)
+                            for (int n = 0; n < Data.TempPlayer[i].EventProcessing?.Length; n++)
                             {
                                 if (Data.TempPlayer[i].EventProcessing[n].EventId == id)
                                 {
