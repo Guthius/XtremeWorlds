@@ -86,14 +86,14 @@ namespace Client
                 int src = GameState.EditorIndex;
                 if (!_hasClipboardResource)
                 {
-                    if (src < 0 || src >= Constant.MaxResources) return;
+                    if (src < 0 || src >= Variables.MaxResources) return;
                     _clipboardResource = Data.Resource[src];
                     _hasClipboardResource = true;
                     btnCopy.Text = "Paste";
                     return;
                 }
                 int def = GameState.EditorIndex + 1;
-                var oneBased = Editors.PromptIndex(this, "Paste Resource", $"Paste resource into index (1..{Constant.MaxResources}):", 1, Constant.MaxResources, def);
+                var oneBased = Editors.PromptIndex(this, "Paste Resource", $"Paste resource into index (1..{Variables.MaxResources}):", 1, Variables.MaxResources, def);
                 if (oneBased == null) return;
                 int dst = oneBased.Value - 1;
                 var nRes = _clipboardResource;
@@ -230,15 +230,15 @@ namespace Client
         {
             _suppressIndexChanged = true;
             lstIndex.Items.Clear();
-            for (int i = 0; i < Constant.MaxResources; i++)
+            for (int i = 0; i < Variables.MaxResources; i++)
                 lstIndex.Items.Add($"{i + 1}: {Data.Resource[i].Name}");
 
             cmbRewardItem.Items.Clear();
-            for (int i = 0; i < Constant.MaxItems; i++)
+            for (int i = 0; i < Variables.MaxItems; i++)
                 cmbRewardItem.Items.Add($"{i + 1}: {Data.Item[i].Name}");
 
             cmbAnimation.Items.Clear();
-            for (int i = 0; i < Constant.MaxAnimations; i++)
+            for (int i = 0; i < Variables.MaxAnimations; i++)
                 cmbAnimation.Items.Add($"{i + 1}: {Data.Animation[i].Name}");
 
             cmbType.Items.Clear();

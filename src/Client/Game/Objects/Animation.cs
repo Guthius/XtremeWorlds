@@ -114,7 +114,7 @@ namespace Client
             {
                 case (byte)TargetType.Player:
                 {
-                    if (lockindex >= 0 && lockindex < Constant.MaxPlayers &&
+                    if (lockindex >= 0 && lockindex < Variables.MaxPlayers &&
                         IsPlaying(lockindex) && GetPlayerMap(lockindex) == GetPlayerMap(GameState.MyIndex))
                     {
                         x = (int)Math.Round(GetPlayerX(lockindex) + 16 - width / 2d);
@@ -341,9 +341,9 @@ namespace Client
         {
             int i;
 
-            Data.Animation = new Type.Animation[Constant.MaxAnimations];
+            Data.Animation = new Type.Animation[Variables.MaxAnimations];
 
-            for (i = 0; i < Constant.MaxAnimations; i++)
+            for (i = 0; i < Variables.MaxAnimations; i++)
                 ClearAnimation(i);
         }
 

@@ -14,7 +14,7 @@ public static class WinShop
             return;
         }
 
-        if (GameState.InShop < 0 || GameState.InShop > Constant.MaxShops)
+        if (GameState.InShop < 0 || GameState.InShop > Variables.MaxShops)
         {
             return;
         }
@@ -206,7 +206,7 @@ public static class WinShop
             return;
         }
 
-        if (GameState.InShop < 0 || GameState.InShop > Constant.MaxShops)
+        if (GameState.InShop < 0 || GameState.InShop > Variables.MaxShops)
         {
             return;
         }
@@ -331,7 +331,7 @@ public static class WinShop
         // NOTE: Buying grid previously had X/Y swapped (using winShop.Y for X and winShop.X for Y) which caused
         // the selection highlight and icons to render in incorrect positions after toggling buying mode.
         // Align with DrawSelling logic: left uses window X, top uses window Y.
-        for (var i = 0; i < Constant.MaxTrades; i++)
+        for (var i = 0; i < Variables.MaxTrades; i++)
         {
             var top = winShop.Y + GameState.ShopTop + (GameState.ShopOffsetY + 32) * (i / GameState.ShopColumns);
             var left = winShop.X + GameState.ShopLeft + (GameState.ShopOffsetX + 32) * (i % GameState.ShopColumns);
@@ -343,7 +343,7 @@ public static class WinShop
             }
 
             var itemNum = Data.Shop[GameState.InShop].TradeItem[i].Item;
-            if (itemNum is < 0 or >= Constant.MaxItems)
+            if (itemNum < 0 || itemNum >= Variables.MaxItems)
             {
                 continue;
             }
@@ -363,7 +363,7 @@ public static class WinShop
 
     private static void DrawSelling(Window winShop)
     {
-        for (var i = 0; i < Constant.MaxTrades; i++)
+        for (var i = 0; i < Variables.MaxTrades; i++)
         {
             var top = winShop.Y + GameState.ShopTop + (GameState.ShopOffsetY + 32) * (i / GameState.ShopColumns);
             var left = winShop.X + GameState.ShopLeft + (GameState.ShopOffsetX + 32) * (i % GameState.ShopColumns);
@@ -376,7 +376,7 @@ public static class WinShop
             }
 
             var itemNum = GetPlayerInv(GameState.MyIndex, i);
-            if (itemNum is < 0 or >= Constant.MaxItems)
+            if (itemNum < 0 || itemNum >= Variables.MaxItems)
             {
                 continue;
             }

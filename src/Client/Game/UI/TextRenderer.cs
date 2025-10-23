@@ -83,8 +83,8 @@ public static class TextRenderer
 
         GameState.ChatHighIndex += wrappedLines.Length;
 
-        if (GameState.ChatHighIndex > Constant.ChatLines)
-            GameState.ChatHighIndex = Constant.ChatLines;
+        if (GameState.ChatHighIndex > Variables.ChatLines)
+            GameState.ChatHighIndex = Variables.ChatLines;
 
         // Move the rest of the chat lines up
         for (var i = (int) GameState.ChatHighIndex - wrappedLines.Length; i > 0; i--)
@@ -318,7 +318,7 @@ public static class TextRenderer
 
         double npcNum = Data.MyMapNpc[mapNpcNum].Num;
 
-        if (npcNum < 0 | npcNum > Constant.MaxNpcs)
+        if (npcNum < 0 | npcNum > Variables.MaxNpcs)
             return;
             
 
@@ -527,7 +527,7 @@ public static class TextRenderer
 
         while (rLines < 8)
         {
-            if (i >= Constant.ChatLines)
+            if (i >= Variables.ChatLines)
                 break;
             var lineCount = 1;
 

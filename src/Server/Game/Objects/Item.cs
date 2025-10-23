@@ -31,7 +31,7 @@ public static class Item
 
     public static async Task LoadItemsAsync()
     {
-        await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Constant.MaxItems), LoadItemAsync);
+        await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxItems), LoadItemAsync);
     }
 
     private static async ValueTask LoadItemAsync(int itemNum, CancellationToken cancellationToken)
@@ -76,7 +76,7 @@ public static class Item
 
         packet.WriteEnum(ServerPackets.SMapItemsData);
 
-        for (var i = 0; i < Core.Globals.Constant.MaxMapItems; i++)
+        for (var i = 0; i < Core.Globals.Variables.MaxMapItems; i++)
         {
             packet.WriteInt32(Data.MapItem[mapNum, i].Num);
             packet.WriteInt32(Data.MapItem[mapNum, i].Value);
@@ -89,7 +89,7 @@ public static class Item
 
     public static void SpawnItem(int itemNum, int itemVal, int mapNum, int x, int y)
     {
-        if (itemNum < 0 || itemNum > Core.Globals.Constant.MaxItems || mapNum < 0 || mapNum >= Core.Globals.Constant.MaxMaps)
+        if (itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems || mapNum < 0 || mapNum >= Core.Globals.Variables.MaxMaps)
         {
             return;
         }
@@ -121,7 +121,7 @@ public static class Item
 
     public static void SpawnItemSlot(int mapItemSlot, int itemNum, int itemVal, int mapNum, int x, int y)
     {
-        if (mapItemSlot < 0 || mapItemSlot > Core.Globals.Constant.MaxMapItems || itemNum < 0 || itemNum > Core.Globals.Constant.MaxItems || mapNum < 0 || mapNum >= Core.Globals.Constant.MaxMaps)
+        if (mapItemSlot < 0 || mapItemSlot > Core.Globals.Variables.MaxMapItems || itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems || mapNum < 0 || mapNum >= Core.Globals.Variables.MaxMaps)
         {
             return;
         }
@@ -148,12 +148,12 @@ public static class Item
 
     public static int FindOpenMapItemSlot(int mapNum)
     {
-        if (mapNum is < 0 or > Core.Globals.Constant.MaxMaps)
+        if (mapNum < 0 || mapNum > global::Script.GetMaxMaps())
         {
             return -1;
         }
 
-        for (var mapItemNum = 0; mapItemNum < Core.Globals.Constant.MaxMapItems; mapItemNum++)
+        for (var mapItemNum = 0; mapItemNum < Core.Globals.Variables.MaxMapItems; mapItemNum++)
         {
             if (Data.MapItem[mapNum, mapItemNum].Num == -1)
             {
@@ -166,7 +166,7 @@ public static class Item
 
     public static void SpawnAllMapsItems()
     {
-        for (var mapNum = 0; mapNum < Core.Globals.Constant.MaxMaps; mapNum++)
+        for (var mapNum = 0; mapNum < global::Script.GetMaxMaps(); mapNum++)
         {
             SpawnMapItems(mapNum);
         }
@@ -174,7 +174,7 @@ public static class Item
 
     public static void SpawnMapItems(int mapNum)
     {
-        if (mapNum is < 0 or > Core.Globals.Constant.MaxMaps)
+        if (mapNum < 0 || mapNum > global::Script.GetMaxMaps())
         {
             return;
         }
@@ -226,7 +226,7 @@ public static class Item
         var packetReader = new PacketReader(bytes);
 
         var itemNum = packetReader.ReadInt32();
-        if (itemNum < 0 || itemNum > Core.Globals.Constant.MaxItems)
+        if (itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems)
         {
             return;
         }
@@ -273,7 +273,7 @@ public static class Item
         }
 
         var itemNum = packetReader.ReadInt32();
-        if (itemNum < 0 || itemNum > Core.Globals.Constant.MaxItems)
+        if (itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems)
         {
             return;
         }
@@ -341,12 +341,12 @@ public static class Item
             return;
         }
 
-        if (invNum < 0 || invNum > Core.Globals.Constant.MaxInv)
+        if (invNum < 0 || invNum > Core.Globals.Variables.MaxInv)
         {
             return;
         }
 
-        if (GetPlayerInv(session.Id, invNum) < 0 || GetPlayerInv(session.Id, invNum) > Core.Globals.Constant.MaxItems)
+        if (GetPlayerInv(session.Id, invNum) < 0 || GetPlayerInv(session.Id, invNum) > Core.Globals.Variables.MaxItems)
         {
             return;
         }
@@ -365,7 +365,7 @@ public static class Item
 
     public static void SendItems(int playerId)
     {
-        for (var itemNum = 0; itemNum < Core.Globals.Constant.MaxItems; itemNum++)
+        for (var itemNum = 0; itemNum < Core.Globals.Variables.MaxItems; itemNum++)
         {
             if (Data.Item[itemNum].Name.Length > 0)
             {

@@ -428,13 +428,13 @@ public static class Sender
             return;
         }
 
-        if (invNum < 0 || invNum > Constant.MaxInv)
+        if (invNum < 0 || invNum > Variables.MaxInv)
         {
             return;
         }
 
         if (Data.Player[GameState.MyIndex].Inv[invNum].Num < 0 ||
-            Data.Player[GameState.MyIndex].Inv[invNum].Num > Constant.MaxItems)
+            Data.Player[GameState.MyIndex].Inv[invNum].Num > Variables.MaxItems)
         {
             return;
         }
@@ -498,7 +498,7 @@ public static class Sender
     public static void ForgetSkill(int skillSlot)
     {
         // Check for subscript out of range
-        if (skillSlot is < 0 or > Constant.MaxPlayerSkills)
+        if (skillSlot < 0 || skillSlot > Variables.MaxPlayerSkills)
         {
             return;
         }
@@ -611,7 +611,7 @@ public static class Sender
         packetWriter.WriteString(Data.Npc[npcNum].AttackSay);
         packetWriter.WriteByte(Data.Npc[npcNum].Behavior);
 
-        for (var i = 0; i < Constant.MaxDropItems; i++)
+        for (var i = 0; i < Variables.MaxDropItems; i++)
         {
             packetWriter.WriteInt32(Data.Npc[npcNum].DropChance[i]);
             packetWriter.WriteInt32(Data.Npc[npcNum].DropItem[i]);
@@ -632,7 +632,7 @@ public static class Sender
             packetWriter.WriteByte(Data.Npc[npcNum].Stat[i]);
         }
 
-        for (var i = 0; i < Constant.MaxNpcSkills; i++)
+        for (var i = 0; i < Variables.MaxNpcSkills; i++)
         {
             packetWriter.WriteByte(Data.Npc[npcNum].Skill[i]);
         }
@@ -705,7 +705,7 @@ public static class Sender
         packetWriter.WriteInt32(Data.Shop[shopNum].BuyRate);
         packetWriter.WriteString(Data.Shop[shopNum].Name);
 
-        for (var i = 0; i < Constant.MaxTrades; i++)
+        for (var i = 0; i < Variables.MaxTrades; i++)
         {
             packetWriter.WriteInt32(Data.Shop[shopNum].TradeItem[i].CostItem);
             packetWriter.WriteInt32(Data.Shop[shopNum].TradeItem[i].CostValue);
@@ -792,7 +792,7 @@ public static class Sender
             packetWriter.WriteInt32(Data.Job[jobNum].Stat[i]);
         }
 
-        for (var i = 0; i < Constant.MaxStartItems; i++)
+        for (var i = 0; i < Variables.MaxStartItems; i++)
         {
             packetWriter.WriteInt32(Data.Job[jobNum].StartItem[i]);
             packetWriter.WriteInt32(Data.Job[jobNum].StartValue[i]);

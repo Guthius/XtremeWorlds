@@ -1,6 +1,5 @@
 ﻿using Core;
 using Microsoft.Toolkit.HighPerformance;
-using Microsoft.VisualBasic;
 using System;
 using System.Data.Common;
 using Client.Game.UI;
@@ -499,7 +498,7 @@ namespace Client
                             }
 
                             // Check to make sure its a valid map #
-                            if (n >= 0 & n < Constant.MaxMaps)
+                            if (n >= 0 & n < Variables.MaxMaps)
                             {
                                 Sender.WarpTo(n);
                             }
@@ -1440,7 +1439,7 @@ namespace Client
             {
                 if (Strings.Len(Data.Chat[(int)(GameState.ChatScroll + 7L)].Text) > 0)
                 {
-                    if (GameState.ChatScroll < Constant.ChatLines)
+                    if (GameState.ChatScroll < Variables.ChatLines)
                     {
                         GameState.ChatScroll = GameState.ChatScroll + 1L;
                     }
@@ -1454,7 +1453,7 @@ namespace Client
 
         public static int IsHotbar(long startX, long startY)
         {
-            for (var i = 0; i < Constant.MaxHotbar; i++)
+            for (var i = 0; i < Variables.MaxHotbar; i++)
             {
                 Rectangle rec;
                 
@@ -1482,7 +1481,7 @@ namespace Client
         {
             // reserved for future use
 
-            if (invNum < 0L | invNum > Constant.MaxInv)
+            if (invNum < 0L | invNum > Variables.MaxInv)
                 return;
 
             // show
@@ -1797,7 +1796,7 @@ namespace Client
             string sUse = string.Empty;
             int tmpWidth = 0;
 
-            if (skillNum < 0 || skillNum > Constant.MaxSkills)
+            if (skillNum < 0 || skillNum > Variables.MaxSkills)
                 return;
 
             // set globals
@@ -1947,7 +1946,7 @@ namespace Client
 
         public static void ShowShopDesc(int x, int y, int itemNum)
         {
-            if (itemNum < 0L | itemNum > Constant.MaxItems)
+            if (itemNum < 0L | itemNum > Variables.MaxItems)
                 return;
             // show
             ShowItemDesc(x, y, itemNum);
@@ -1961,7 +1960,7 @@ namespace Client
             if (eqNum < 0L || eqNum >= equipmentCount)
                 return;
 
-            if (Data.Player[GameState.MyIndex].Equipment[(int)eqNum].Num < 0 || Data.Player[GameState.MyIndex].Equipment[(int)eqNum].Num > Constant.MaxItems)
+            if (Data.Player[GameState.MyIndex].Equipment[(int)eqNum].Num < 0 || Data.Player[GameState.MyIndex].Equipment[(int)eqNum].Num > Variables.MaxItems)
                 return;
 
             // show
@@ -2206,7 +2205,7 @@ namespace Client
             long i;
             var amount = default(long);
 
-            for (i = 0L; i < Constant.MaxInv; i++)
+            for (i = 0L; i < Variables.MaxInv; i++)
             {
                 if (GetPlayerInv(GameState.MyIndex, (int)i) == 1)
                 {

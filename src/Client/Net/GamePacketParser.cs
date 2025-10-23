@@ -20,6 +20,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     {
         Bind(Packets.ServerPackets.SAes, Packet_Aes);
         Bind(Packets.ServerPackets.SAlertMsg, Packet_AlertMsg);
+        Bind(Packets.ServerPackets.SConstants, Packet_Constants);
         Bind(Packets.ServerPackets.SLoginOk, Packet_LoginOk);
         Bind(Packets.ServerPackets.SPlayerChars, Packet_PlayerChars);
         Bind(Packets.ServerPackets.SUpdateJob, Packet_UpdateJob);
@@ -141,6 +142,89 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         General.AesIV = iv;
     }
 
+    // Constants packet: read authoritative sizes and apply to global constants.
+    private static void Packet_Constants(ReadOnlyMemory<byte> data)
+    {
+        var r = new PacketReader(data);
+
+        // Int-sized values (order must match server)
+        Variables.MaxAnimations = r.ReadInt32();
+        Variables.MaxItems = r.ReadInt32();
+        Variables.MaxMaps = r.ReadInt32();
+        Variables.MaxNpcs = r.ReadInt32();
+        Variables.MaxParty = r.ReadInt32();
+        Variables.MaxPartyMembers = r.ReadInt32();
+        Variables.MaxPlayers = r.ReadInt32();
+        Variables.MaxResources = r.ReadInt32();
+        Variables.MaxShops = r.ReadInt32();
+        Variables.MaxSkills = r.ReadInt32();
+        Variables.MaxProjectiles = r.ReadInt32();
+        Variables.MaxSwitches = r.ReadInt32();
+        Variables.MaxVariables = r.ReadInt32();
+        Variables.ChatLines = r.ReadInt32();
+        Variables.MaxEvents = r.ReadInt32();
+        Variables.TileSize = r.ReadInt32();
+        Variables.MaxWeatherParticles = r.ReadInt32();
+
+        // Byte-sized values
+        Variables.MaxBank = r.ReadByte();
+        Variables.MaxJobs = r.ReadByte();
+        Variables.MaxMorals = r.ReadByte();
+        Variables.MaxInv = r.ReadByte();
+        Variables.MaxMapItems = r.ReadByte();
+        Variables.MaxMapNpcs = r.ReadByte();
+        Variables.MaxNpcSkills = r.ReadByte();
+        Variables.MaxPlayerSkills = r.ReadByte();
+        Variables.MaxTrades = r.ReadByte();
+        Variables.NameLength = r.ReadByte();
+        Variables.MinNameLength = r.ReadByte();
+        Variables.ChatLength = r.ReadByte();
+        Variables.MaxHotbar = r.ReadByte();
+        Variables.MaxMapx = r.ReadByte();
+        Variables.MaxMapy = r.ReadByte();
+        Variables.MaxDropItems = r.ReadByte();
+        Variables.MaxStartItems = r.ReadByte();
+        Variables.MaxPoints = r.ReadByte();
+        Variables.MaxChars = r.ReadByte();
+        Variables.MaxStats = r.ReadByte();
+        Variables.MaxQuests = r.ReadByte();
+        Variables.MaxGuilds = r.ReadByte();
+        Variables.MaxEventChoices = r.ReadByte();
+
+        ApplyClientSizing();
+    }
+
+    private static void ApplyClientSizing()
+    {
+        // Character select arrays
+        if (GameState.CharName.Length != Variables.MaxChars)
+        {
+            Array.Resize(ref GameState.CharName, Variables.MaxChars);
+            Array.Resize(ref GameState.CharSprite, Variables.MaxChars);
+            Array.Resize(ref GameState.CharAccess, Variables.MaxChars);
+            Array.Resize(ref GameState.CharJob, Variables.MaxChars);
+            GameState.CharEq = new long[Variables.MaxChars, EquipmentCount];
+        }
+
+        // Bars and map names
+        if (GameState.BarWidthNpcHP.Length != Variables.MaxMapNpcs)
+        {
+            GameState.BarWidthNpcHP = new int[Variables.MaxMapNpcs];
+            GameState.BarWidthNpcHPMax = new int[Variables.MaxMapNpcs];
+        }
+        if (GameState.BarWidthPlayerHP.Length != Variables.MaxPlayers)
+        {
+            GameState.BarWidthPlayerHP = new int[Variables.MaxPlayers];
+            GameState.BarWidthPlayerHPMax = new int[Variables.MaxPlayers];
+            GameState.BarWidthPlayerMP = new int[Variables.MaxPlayers];
+            GameState.BarWidthPlayerMPMax = new int[Variables.MaxPlayers];
+        }
+        if (GameState.MapNames.Length != Variables.MaxMaps)
+        {
+            Array.Resize(ref GameState.MapNames, Variables.MaxMaps);
+        }
+    }
+
     private static void Packet_AlertMsg(ReadOnlyMemory<byte> data)
     {
         var buffer = new PacketReader(data);
@@ -201,7 +285,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     {
         var packetReader = new PacketReader(data);
 
-        var isSlotEmpty = new bool[Constant.MaxChars];
+        var isSlotEmpty = new bool[Variables.MaxChars];
 
         if (WindowManager.TryGetControl("winLogin", "txtUsername", out var usernameCtrl))
         {
@@ -209,7 +293,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
         SettingsManager.Save();
 
-        for (var i = 0; i < Constant.MaxChars; i++)
+        for (var i = 0; i < Variables.MaxChars; i++)
         {
             GameState.CharName[i] = packetReader.ReadString();
             GameState.CharSprite[i] = packetReader.ReadInt32();
@@ -230,7 +314,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         WindowManager.ShowWindow("winChars");
 
         long winNum = WindowManager.GetWindowIndex("winChars");
-        for (var i = 0L; i < Constant.MaxChars; i++)
+        for (var i = 0L; i < Variables.MaxChars; i++)
         {
             long conNum = WindowManager.GetControlIndex("winChars", "lblCharName_" + (i + 1));
             {
@@ -288,7 +372,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             job.Stat[i] = packetReader.ReadInt32();
         }
 
-        for (var i = 0; i < Constant.MaxStartItems; i++)
+        for (var i = 0; i < Variables.MaxStartItems; i++)
         {
             job.StartItem[i] = packetReader.ReadInt32();
             job.StartValue[i] = packetReader.ReadInt32();
@@ -304,7 +388,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     {
         var packetReader = new PacketReader(data);
 
-        for (var jobNum = 0; jobNum < Constant.MaxJobs; jobNum++)
+        for (var jobNum = 0; jobNum < Variables.MaxJobs; jobNum++)
         {
             ref var job = ref Data.Job[jobNum];
 
@@ -318,7 +402,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
                 job.Stat[i] = packetReader.ReadInt32();
             }
 
-            for (var i = 0; i < Constant.MaxStartItems; i++)
+            for (var i = 0; i < Variables.MaxStartItems; i++)
             {
                 job.StartItem[i] = packetReader.ReadInt32();
                 job.StartValue[i] = packetReader.ReadInt32();
@@ -356,7 +440,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     {
         var packetReader = new PacketReader(data);
 
-        for (var i = 0; i < Constant.MaxInv; i++)
+        for (var i = 0; i < Variables.MaxInv; i++)
         {
             var itemNum = packetReader.ReadInt32();
             var amount = packetReader.ReadInt32();
@@ -552,7 +636,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Data.Npc[npcNum].AttackSay = packetReader.ReadString();
         Data.Npc[npcNum].Behavior = packetReader.ReadByte();
 
-        for (var i = 0; i < Constant.MaxDropItems; i++)
+        for (var i = 0; i < Variables.MaxDropItems; i++)
         {
             Data.Npc[npcNum].DropChance[i] = packetReader.ReadInt32();
             Data.Npc[npcNum].DropItem[i] = packetReader.ReadInt32();
@@ -573,7 +657,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             Data.Npc[npcNum].Stat[i] = packetReader.ReadByte();
         }
 
-        for (var i = 0; i < Constant.MaxNpcSkills; i++)
+        for (var i = 0; i < Variables.MaxNpcSkills; i++)
         {
             Data.Npc[npcNum].Skill[i] = packetReader.ReadByte();
         }
@@ -625,7 +709,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     {
         var packetReader = new PacketReader(data);
 
-        for (var i = 0; i < Constant.MaxPlayerSkills; i++)
+        for (var i = 0; i < Variables.MaxPlayerSkills; i++)
         {
             Data.Player[GameState.MyIndex].Skill[i].Num = packetReader.ReadInt32();
         }
@@ -786,7 +870,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     {
         var packetReader = new PacketReader(data);
 
-        for (var i = 0; i < Constant.MaxMaps; i++)
+        for (var i = 0; i < Variables.MaxMaps; i++)
         {
             GameState.MapNames[i] = packetReader.ReadString();
         }
@@ -918,7 +1002,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     {
         var buffer = new PacketReader(data);
 
-        for (var i = 0; i < Constant.MaxHotbar; i++)
+        for (var i = 0; i < Variables.MaxHotbar; i++)
         {
             Data.Player[GameState.MyIndex].Hotbar[i].Slot = buffer.ReadInt32();
             Data.Player[GameState.MyIndex].Hotbar[i].SlotType = buffer.ReadByte();

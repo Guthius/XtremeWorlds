@@ -180,7 +180,7 @@ public static class WinJobs
             return;
         }
 
-        if (GameState.NewCharJob >= Constant.MaxJobs - 1 || string.IsNullOrEmpty(Data.Job[GameState.NewCharJob].Desc) & GameState.NewCharJob >= Constant.MaxJobs)
+        if (GameState.NewCharJob >= Variables.MaxJobs - 1 || string.IsNullOrEmpty(Data.Job[GameState.NewCharJob].Desc) & GameState.NewCharJob >= Variables.MaxJobs)
         {
             return;
         }

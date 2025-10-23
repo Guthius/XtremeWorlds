@@ -425,7 +425,7 @@ namespace Server
         public static void ProcessEventMovement()
         {
             // Iterate through all maps.
-            for (int i = 0; i < Core.Globals.Constant.MaxMaps; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxMaps; i++)
             {
                 // Process global events on this map.
                 for (int x = 0; x < Event.TempEventMap[i].EventCount; x++)
@@ -1887,7 +1887,7 @@ namespace Server
                                             }
                                             else if (command.Data2 == 1) // Forget
                                             {
-                                                for (int p = 0; p < Core.Globals.Constant.MaxPlayerSkills; p++)
+                                                for (int p = 0; p < Core.Globals.Variables.MaxPlayerSkills; p++)
                                                 {
                                                     if (Data.Player[i].Skill[p].Num == command.Data1)
                                                     {
@@ -2569,7 +2569,7 @@ namespace Server
             // Use Task.Run to avoid blocking the main thread.
             await System.Threading.Tasks.Task.Run(() =>
             {
-                for (int i = 0; i < Core.Globals.Constant.MaxMaps; i++)
+                for (int i = 0; i < Core.Globals.Variables.MaxMaps; i++)
                 {
                     SpawnGlobalEvents(i).ConfigureAwait(false);
                 }

@@ -19,9 +19,9 @@ namespace Server
     {
         #region Globals
 
-        public static GlobalEvents[] TempEventMap = new GlobalEvents[Core.Globals.Constant.MaxMaps + 1];
-        public static string[] Switches = new string[Core.Globals.Constant.MaxSwitches];
-        public static string[] Variables = new string[Core.Globals.Constant.MaxVariables];
+        public static GlobalEvents[] TempEventMap = new GlobalEvents[Core.Globals.Variables.MaxMaps + 1];
+        public static string[] Switches = new string[Core.Globals.Variables.MaxSwitches];
+        public static string[] Variables = new string[Core.Globals.Variables.MaxVariables];
         private static readonly ConcurrentBag<ScheduledEvent> ScheduledEvents = new ConcurrentBag<ScheduledEvent>();
         private static readonly object TempEventLock = new object();
 
@@ -47,7 +47,7 @@ namespace Server
 
         public static void CreateSwitches()
         {
-            Switches = new string[Core.Globals.Constant.MaxSwitches];
+            Switches = new string[Core.Globals.Variables.MaxSwitches];
             Array.Fill(Switches, string.Empty);
             SaveSwitches();
             General.Logger.LogInformation("Switches initialized and saved.");
@@ -55,7 +55,7 @@ namespace Server
 
         public static void CreateVariables()
         {
-            Variables = new string[Core.Globals.Constant.MaxVariables];
+            Variables = new string[Core.Globals.Variables.MaxVariables];
             Array.Fill(Variables, string.Empty);
             SaveVariables();
             General.Logger.LogInformation("Variables initialized and saved.");
@@ -102,7 +102,7 @@ namespace Server
                 
                 Switches = JsonSerializer.Deserialize<string[]>(json, options) ?? [];
                 
-                if (Switches.Length != Core.Globals.Constant.MaxSwitches)
+                if (Switches.Length != Core.Globals.Variables.MaxSwitches)
                 {
                     General.Logger.LogWarning("Switches.json not found or invalid. Creating new switches.");
                     CreateSwitches();
@@ -125,7 +125,7 @@ namespace Server
                 
                 Variables = JsonSerializer.Deserialize<string[]>(json, options) ?? [];
 
-                if (Variables.Length != Core.Globals.Constant.MaxVariables)
+                if (Variables.Length != Core.Globals.Variables.MaxVariables)
                 {
                     General.Logger.LogWarning("Variables.json not found or invalid. Creating new variables.");
                     CreateVariables();
@@ -188,7 +188,7 @@ namespace Server
 
         private static bool IsNpcBlocking(int mapNum, int x, int y)
         {
-            for (var i = 0; i < Core.Globals.Constant.MaxMapNpcs; i++)
+            for (var i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
             {
                 if (Data.MapNpc[mapNum].Npc[i].X == x && Data.MapNpc[mapNum].Npc[i].Y == y)
                     return true;
@@ -224,7 +224,7 @@ namespace Server
         }
 
         private static bool IsValidMapAndDirection(int mapNum, byte dir) =>
-            mapNum >= 0 && mapNum < Core.Globals.Constant.MaxMaps && dir >= 0 && dir <= System.Enum.GetValues(typeof(Direction)).Length;
+            mapNum >= 0 && mapNum < Core.Globals.Variables.MaxMaps && dir >= 0 && dir <= System.Enum.GetValues(typeof(Direction)).Length;
 
         public static void EventDir(int playerIndex, int mapNum, int eventId, int dir, bool globalEvent = false)
         {
@@ -375,8 +375,8 @@ namespace Server
         }
 
         private static bool IsValidPlayerEvent(int playerId, int mapNum, int eventId) =>
-            playerId >= 0 && playerId < Core.Globals.Constant.MaxPlayers &&
-            mapNum >= 0 && mapNum < Core.Globals.Constant.MaxMaps &&
+            playerId >= 0 && playerId < Core.Globals.Variables.MaxPlayers &&
+            mapNum >= 0 && mapNum < Core.Globals.Variables.MaxMaps &&
             eventId >= 0 && eventId < Data.TempPlayer[playerId].EventMap.CurrentEvents;
 
         private static (int px, int py, int ex, int ey, int walkThrough) GetPlayerAndEventPositions(int playerId, int mapNum, int eventId)
@@ -626,8 +626,8 @@ namespace Server
         public static void Packet_SwitchesAndVariables(GameSession session, ReadOnlyMemory<byte> bytes)
         {
             var buffer = new PacketReader(bytes);
-            for (var i = 0; i < Core.Globals.Constant.MaxSwitches; i++) Switches[i] = buffer.ReadString();
-            for (var i = 0; i < Core.Globals.Constant.MaxVariables; i++) Variables[i] = buffer.ReadString();
+            for (var i = 0; i < Core.Globals.Variables.MaxSwitches; i++) Switches[i] = buffer.ReadString();
+            for (var i = 0; i < Core.Globals.Variables.MaxVariables; i++) Variables[i] = buffer.ReadString();
 
             SaveSwitches();
             SaveVariables();
@@ -680,10 +680,10 @@ namespace Server
 
         public static void SendSwitchesAndVariables(int index, bool everyone = false)
         {
-            var buffer = new PacketWriter(4 + (Core.Globals.Constant.MaxSwitches + Core.Globals.Constant.MaxVariables) * 256);
+            var buffer = new PacketWriter(4 + (Core.Globals.Variables.MaxSwitches + Core.Globals.Variables.MaxVariables) * 256);
             buffer.WriteEnum(ServerPackets.SSwitchesAndVariables);
-            for (var i = 0; i < Core.Globals.Constant.MaxSwitches; i++) buffer.WriteString(Switches[i]);
-            for (var i = 0; i < Core.Globals.Constant.MaxVariables; i++) buffer.WriteString(Variables[i]);
+            for (var i = 0; i < Core.Globals.Variables.MaxSwitches; i++) buffer.WriteString(Switches[i]);
+            for (var i = 0; i < Core.Globals.Variables.MaxVariables; i++) buffer.WriteString(Variables[i]);
 
             if (everyone)
             {

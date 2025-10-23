@@ -23,9 +23,9 @@ namespace Client
 
         public static void ClearNpcs()
         {
-            Data.Npc = new Type.Npc[Constant.MaxNpcs];
+            Data.Npc = new Type.Npc[Variables.MaxNpcs];
 
-            for (int i = 0; i < Constant.MaxNpcs; i++)
+            for (int i = 0; i < Variables.MaxNpcs; i++)
                 ClearNpc(i);
 
         }
@@ -58,7 +58,7 @@ namespace Client
         #region Jobs
         public static void ClearJobs()
         {
-            for (int i = 0; i < Constant.MaxJobs; i++)
+            for (int i = 0; i < Variables.MaxJobs; i++)
                 ClearJob(i);
         }
 
@@ -69,11 +69,11 @@ namespace Client
             Data.Job[index].Stat = new int[statCount];
             Data.Job[index].Name = "";
             Data.Job[index].Desc = "";
-            Data.Job[index].StartItem = new int[Constant.MaxStartItems];
-            Data.Job[index].StartValue = new int[Constant.MaxStartItems];
+            Data.Job[index].StartItem = new int[Variables.MaxStartItems];
+            Data.Job[index].StartValue = new int[Variables.MaxStartItems];
             Data.Job[index].MaleSprite = 1;
             Data.Job[index].FemaleSprite = 1;
-            for (int i = 0; i < Constant.MaxStartItems; i++)
+            for (int i = 0; i < Variables.MaxStartItems; i++)
             {
                 Data.Job[index].StartItem[i] = -1;
                 Data.Job[index].StartValue[i] = 0;
@@ -87,7 +87,7 @@ namespace Client
         {
             int i;
 
-            for (i = 0; i < Constant.MaxSkills; i++)
+            for (i = 0; i < Variables.MaxSkills; i++)
                 ClearSkill(i);
 
         }

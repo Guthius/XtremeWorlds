@@ -17,11 +17,11 @@ namespace Client
 
         public static void ClearPlayers()
         {
-            Data.Account = new Type.Account[Constant.MaxPlayers];
-            Data.Player = new Type.Player[Constant.MaxPlayers];
-            Data.TempPlayer = new Type.TempPlayer[Constant.MaxPlayers];
+            Data.Account = new Type.Account[Variables.MaxPlayers];
+            Data.Player = new Type.Player[Variables.MaxPlayers];
+            Data.TempPlayer = new Type.TempPlayer[Variables.MaxPlayers];
 
-            for (int i = 0; i < Constant.MaxPlayers; i++)
+            for (int i = 0; i < Variables.MaxPlayers; i++)
             {
                 ClearPlayer(i);
             }
@@ -56,8 +56,8 @@ namespace Client
             Data.Player[index].Points = 0;
             Data.Player[index].Sprite = 0;
 
-            Data.Player[index].Inv = new Type.PlayerInv[Constant.MaxInv];
-            for (int x = 0; x < Constant.MaxInv; x++)
+            Data.Player[index].Inv = new Type.PlayerInv[Variables.MaxInv];
+            for (int x = 0; x < Variables.MaxInv; x++)
             {
                 Data.Player[index].Inv[x].Num = -1;
                 Data.Player[index].Inv[x].Value = 0;
@@ -65,8 +65,8 @@ namespace Client
                 Data.TradeYourOffer[x].Num = -1;
             }
 
-            Data.Player[index].Skill = new Type.PlayerSkill[Constant.MaxPlayerSkills];
-            for (int x = 0; x < Constant.MaxPlayerSkills; x++)
+            Data.Player[index].Skill = new Type.PlayerSkill[Variables.MaxPlayerSkills];
+            for (int x = 0; x < Variables.MaxPlayerSkills; x++)
             {
                 Data.Player[index].Skill[x].Num = -1;
                 Data.Player[index].Skill[x].Cd = 0;
@@ -89,7 +89,7 @@ namespace Client
             Data.Player[index].X = 0;
             Data.Player[index].Y = 0;
 
-            Data.Player[index].Hotbar = new Type.Hotbar[Constant.MaxHotbar];
+            Data.Player[index].Hotbar = new Type.Hotbar[Variables.MaxHotbar];
             Data.Player[index].GatherSkills = new Type.ResourceType[Enum.GetValues(typeof(ResourceSkill)).Length];
 
             Trade.InTrade = -1;
@@ -102,7 +102,7 @@ namespace Client
         public static void CheckMovement()
         {
             // Guard against invalid player or map state
-            if (GameState.MyIndex < 0 || GameState.MyIndex >= Constant.MaxPlayers)
+            if (GameState.MyIndex < 0 || GameState.MyIndex >= Variables.MaxPlayers)
                 return;
             int mapIdx = GetPlayerMap(GameState.MyIndex);
             if (mapIdx < 0 || mapIdx >= Data.Map.Length)
@@ -698,7 +698,7 @@ namespace Client
             {
                 if (Data.Moral[Data.MyMap.Moral].PlayerBlock)
                 {
-                    for (i = 0; i < Constant.MaxPlayers; i++)
+                    for (i = 0; i < Variables.MaxPlayers; i++)
                     {
                         if (IsPlaying(i))
                         {
@@ -714,7 +714,7 @@ namespace Client
                 // Check to see if a Npc is already on that tile
                 if (Data.Moral[Data.MyMap.Moral].NpcBlock)
                 {
-                    for (i = 0; i < Constant.MaxMapNpcs; i++)
+                    for (i = 0; i < Variables.MaxMapNpcs; i++)
                     {
                         if (Data.MyMapNpc[i].Num >= 0 & Data.MyMapNpc[i].X == x & Data.MyMapNpc[i].Y == y)
                         {
@@ -750,7 +750,7 @@ namespace Client
         /// </summary>
         public static void UpdateFacingFromMouse(int mouseScreenX, int mouseScreenY)
         {
-            if (GameState.MyIndex < 0 | GameState.MyIndex > Constant.MaxPlayers) return;
+            if (GameState.MyIndex < 0 | GameState.MyIndex > Variables.MaxPlayers) return;
             int playerScreenX = GameLogic.ConvertMapX(GetPlayerRawX(GameState.MyIndex)) + GameState.SizeX / 2;
             int playerScreenY = GameLogic.ConvertMapY(GetPlayerRawY(GameState.MyIndex)) + GameState.SizeY / 2;
             int dx = mouseScreenX - playerScreenX;
@@ -824,7 +824,7 @@ namespace Client
 
             if (GameState.VbKeyControl || mouse)
             {
-                if (GameState.MyIndex < 0 | GameState.MyIndex > Constant.MaxPlayers)
+                if (GameState.MyIndex < 0 | GameState.MyIndex > Variables.MaxPlayers)
                     return;
 
                 if (Event.InEvent)
@@ -982,7 +982,7 @@ namespace Client
         public static void CastSkill(int skillSlot)
         {
             // Check for subscript out of range
-            if (skillSlot < 0 | skillSlot > Constant.MaxPlayerSkills)
+            if (skillSlot < 0 | skillSlot > Variables.MaxPlayerSkills)
                 return;
 
             if (Data.Player[GameState.MyIndex].Skill[skillSlot].Cd > 0)
@@ -1039,12 +1039,12 @@ namespace Client
             findSkill = 0;
 
             // Check for subscript out of range
-            if (skillNum < 0 | skillNum > Constant.MaxSkills)
+            if (skillNum < 0 | skillNum > Variables.MaxSkills)
             {
                 return findSkill;
             }
 
-            for (i = 0; i < Constant.MaxPlayerSkills; i++)
+            for (i = 0; i < Variables.MaxPlayerSkills; i++)
             {
                 // Check to see if the player has the skill
                 if (GetPlayerSkill(GameState.MyIndex, i) == skillNum)
@@ -1220,7 +1220,7 @@ namespace Client
             i = buffer.ReadInt32();
 
             // Make sure the player is in range
-            if (i < 0 || i >= Constant.MaxPlayers)
+            if (i < 0 || i >= Variables.MaxPlayers)
                 return;
 
             // Stop the player from moving

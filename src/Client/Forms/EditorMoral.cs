@@ -117,7 +117,7 @@ namespace Client
             try
             {
                 lstIndex.Items.Clear();
-                for (int i = 0; i < Constant.MaxMorals; i++)
+                for (int i = 0; i < Variables.MaxMorals; i++)
                 {
                     lstIndex.Items.Add($"{i + 1}: {Data.Moral[i].Name}");
                 }
@@ -188,7 +188,7 @@ namespace Client
             int src = GameState.EditorIndex;
             if (!_hasClipboardMoral)
             {
-                if (src < 0 || src >= Constant.MaxMorals) return;
+                if (src < 0 || src >= Variables.MaxMorals) return;
                 _clipboardMoral = Data.Moral[src];
                 _hasClipboardMoral = true;
                 btnCopy.Text = "Paste";
@@ -196,7 +196,7 @@ namespace Client
             }
 
             int def = GameState.EditorIndex + 1;
-            var oneBased = Editors.PromptIndex(this, "Paste Moral", $"Paste moral into index (1..{Constant.MaxMorals}):", 1, Constant.MaxMorals, def);
+            var oneBased = Editors.PromptIndex(this, "Paste Moral", $"Paste moral into index (1..{Variables.MaxMorals}):", 1, Variables.MaxMorals, def);
             if (oneBased == null) return;
             int dst = oneBased.Value - 1;
             var n = _clipboardMoral;

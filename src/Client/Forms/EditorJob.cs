@@ -184,10 +184,10 @@ namespace Client
         try
         {
             lstIndex!.Items.Clear();
-            for (int i = 0; i < Constant.MaxJobs; i++) lstIndex.Items.Add((i + 1) + ": " + Data.Job[i].Name);
+            for (int i = 0; i < Variables.MaxJobs; i++) lstIndex.Items.Add((i + 1) + ": " + Data.Job[i].Name);
             lstIndex.SelectedIndex = GameState.EditorIndex >= 0 ? GameState.EditorIndex : 0;
             cmbItems!.Items.Clear();
-            for (int i = 0; i < Constant.MaxItems; i++) cmbItems.Items.Add((i + 1) + ": " + Data.Item[i].Name);
+            for (int i = 0; i < Variables.MaxItems; i++) cmbItems.Items.Add((i + 1) + ": " + Data.Item[i].Name);
             cmbItems.SelectedIndex = 0;
         }
         finally { _suppressIndexChanged = false; }
@@ -210,10 +210,10 @@ namespace Client
         numStartMap!.Value = job.StartMap; numStartX!.Value = job.StartX; numStartY!.Value = job.StartY;
         numMaleSprite!.Value = job.MaleSprite; numFemaleSprite!.Value = job.FemaleSprite;
         lstStartItems!.Items.Clear();
-        for (int i = 0; i < Constant.MaxDropItems; i++)
+        for (int i = 0; i < Variables.MaxDropItems; i++)
         {
             int id = job.StartItem[i]; int amt = job.StartValue[i];
-            string name = id >= 0 && id < Constant.MaxItems ? Data.Item[id].Name : "(None)";
+            string name = id >= 0 && id < Variables.MaxItems ? Data.Item[id].Name : "(None)";
             lstStartItems.Items.Add(name + " x " + amt);
         }
         lstStartItems.SelectedIndex = 0;
@@ -239,7 +239,7 @@ namespace Client
         int src = GameState.EditorIndex;
         if (!_hasClipboardJob)
         {
-            if (src < 0 || src >= Constant.MaxJobs) return;
+            if (src < 0 || src >= Variables.MaxJobs) return;
             var s = Data.Job[src];
             _clipboardJob = s;
             if (s.Stat != null) _clipboardJob.Stat = (int[])s.Stat.Clone();
@@ -251,7 +251,7 @@ namespace Client
         }
 
     int def = GameState.EditorIndex + 1;
-    var oneBased = Editors.PromptIndex(this, "Paste Job", $"Paste job into index (1..{Constant.MaxJobs}):", 1, Constant.MaxJobs, def);
+    var oneBased = Editors.PromptIndex(this, "Paste Job", $"Paste job into index (1..{Variables.MaxJobs}):", 1, Variables.MaxJobs, def);
     if (oneBased == null) return;
     int dst = oneBased.Value - 1;
         var n = _clipboardJob;

@@ -1092,12 +1092,12 @@ public class WindowManager
         var yo = winTrade!.Y + picYour!.Y;
 
         // your items
-        for (var i = 0; i < Constant.MaxInv; i++)
+        for (var i = 0; i < Variables.MaxInv; i++)
         {
             if (Data.TradeYourOffer[i].Num >= 0)
             {
                 long itemNum = GetPlayerInv(GameState.MyIndex, Data.TradeYourOffer[i].Num);
-                if (itemNum >= 0 & itemNum < Constant.MaxItems)
+                if (itemNum >= 0 & itemNum < Variables.MaxItems)
                 {
                     Item.StreamItem((int) itemNum);
                     long itemPic = Data.Item[(int) itemNum].Icon;
@@ -1158,10 +1158,10 @@ public class WindowManager
         var yo = winTrade!.Y + picTheir!.Y;
 
         // their items
-        for (var i = 0; i < Constant.MaxInv; i++)
+        for (var i = 0; i < Variables.MaxInv; i++)
         {
             long itemNum = Data.TradeTheirOffer[i].Num;
-            if (itemNum >= 0 & itemNum < Constant.MaxItems)
+            if (itemNum >= 0 & itemNum < Variables.MaxItems)
             {
                 Item.StreamItem((int) itemNum);
                 long itemPic = Data.Item[(int) itemNum].Icon;

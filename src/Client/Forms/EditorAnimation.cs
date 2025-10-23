@@ -238,7 +238,7 @@ namespace Client
                 lstIndex.Items.Clear();
 
                 // Add the names
-                for (int i = 0; i < Constant.MaxAnimations; i++)
+                for (int i = 0; i < Variables.MaxAnimations; i++)
                     lstIndex.Items.Add(i + 1 + ": " + Data.Animation[i].Name);
                 lstIndex.SelectedIndex = GameState.EditorIndex >= 0 ? GameState.EditorIndex : 0;
 
@@ -269,7 +269,7 @@ namespace Client
             int src = GameState.EditorIndex;
             if (!_hasClipboardAnim)
             {
-                if (src < 0 || src >= Constant.MaxAnimations) return;
+                if (src < 0 || src >= Variables.MaxAnimations) return;
                 var a = Data.Animation[src];
                 _clipboardAnim = a; // struct copy
                 if (a.Sprite != null) _clipboardAnim.Sprite = (int[])a.Sprite.Clone();
@@ -282,7 +282,7 @@ namespace Client
             }
 
             int def = GameState.EditorIndex + 1;
-            var oneBased = Editors.PromptIndex(this, "Paste Animation", $"Paste animation into index (1..{Constant.MaxAnimations}):", 1, Constant.MaxAnimations, def);
+            var oneBased = Editors.PromptIndex(this, "Paste Animation", $"Paste animation into index (1..{Variables.MaxAnimations}):", 1, Variables.MaxAnimations, def);
             if (oneBased == null) return;
             int dst = oneBased.Value - 1;
             var n = _clipboardAnim;

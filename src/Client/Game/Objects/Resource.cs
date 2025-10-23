@@ -22,9 +22,9 @@ namespace Client
 
         public static void ClearResources()
         {
-            Array.Resize(ref Data.Resource, Constant.MaxResources);
+            Array.Resize(ref Data.Resource, Variables.MaxResources);
 
-            for (int i = 0; i < Constant.MaxResources; i++)
+            for (int i = 0; i < Variables.MaxResources; i++)
                 ClearResource(i);
 
         }

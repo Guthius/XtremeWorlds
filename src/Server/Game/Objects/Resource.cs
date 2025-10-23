@@ -31,7 +31,7 @@ public static class Resource
 
     public static async Task LoadResourcesAsync()
     {
-        await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Constant.MaxResources), LoadResourceAsync);
+        await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxResources), LoadResourceAsync);
     }
 
     public static async ValueTask LoadResourceAsync(int resourceNum, CancellationToken cancellationToken)
@@ -152,7 +152,7 @@ public static class Resource
         }
 
         var resourcenum = packetReader.ReadInt32();
-        if (resourcenum is < 0 or > Core.Globals.Constant.MaxResources)
+        if (resourcenum < 0 || resourcenum > global::Script.GetMaxResources())
         {
             return;
         }
@@ -185,7 +185,7 @@ public static class Resource
         var packetReader = new PacketReader(bytes);
 
         var resourceNum = packetReader.ReadInt32();
-        if (resourceNum < 0 | resourceNum > Core.Globals.Constant.MaxResources)
+        if (resourceNum < 0 | resourceNum > Core.Globals.Variables.MaxResources)
         {
             return;
         }
@@ -215,7 +215,7 @@ public static class Resource
 
     public static void SendResources(int playerId)
     {
-        for (var resourceNum = 0; resourceNum < Core.Globals.Constant.MaxResources; resourceNum++)
+        for (var resourceNum = 0; resourceNum < Core.Globals.Variables.MaxResources; resourceNum++)
         {
             if (Data.Resource[resourceNum].Name.Length > 0)
             {

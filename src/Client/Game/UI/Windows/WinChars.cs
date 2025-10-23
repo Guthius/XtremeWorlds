@@ -83,7 +83,7 @@ public static class WinChars
             return;
         }
 
-        for (var i = 0; i < Constant.MaxChars; i++)
+        for (var i = 0; i < Variables.MaxChars; i++)
         {
             if (string.IsNullOrEmpty(GameState.CharName[i]))
             {

@@ -227,7 +227,7 @@ namespace Client
         {
             var selected = Data.MyMap.Moral;
             lstMoral.Items.Clear();
-            for (int i = 0; i < Constant.MaxMorals && i < Data.Moral.Length; i++)
+            for (int i = 0; i < Variables.MaxMorals && i < Data.Moral.Length; i++)
                 lstMoral.Items.Add(Data.Moral[i].Name ?? "");
             if (lstMoral.Items.Count == 0)
             {
@@ -243,7 +243,7 @@ namespace Client
             int prev = cmbNpcList.SelectedIndex;
             cmbNpcList.Items.Clear();
             cmbNpcList.Items.Add("None");
-            for (int i = 0; i < Constant.MaxNpcs && i < Data.Npc.Length; i++)
+            for (int i = 0; i < Variables.MaxNpcs && i < Data.Npc.Length; i++)
             {
                 var name = Strings.Trim(Data.Npc[i].Name);
                 cmbNpcList.Items.Add(name);
@@ -255,7 +255,7 @@ namespace Client
         {
             int selected = lstMapNpc.SelectedIndex;
             lstMapNpc.Items.Clear();
-            for (int i = 0; i < Constant.MaxMapNpcs && i < Data.MyMapNpc.Length; i++)
+            for (int i = 0; i < Variables.MaxMapNpcs && i < Data.MyMapNpc.Length; i++)
             {
                 if (i == 0)
                 {
@@ -264,7 +264,7 @@ namespace Client
                 }
 
                 var npcIndex = Data.MyMapNpc[i].Num;
-                if (npcIndex < 0 || npcIndex >= Constant.MaxNpcs)
+                if (npcIndex < 0 || npcIndex >= Variables.MaxNpcs)
                     lstMapNpc.Items.Add($"{i}: None");
                 else
                 {
@@ -286,7 +286,7 @@ namespace Client
         {
             int prev = lstNpc.SelectedIndex;
             lstNpc.Items.Clear();
-            for (int slot = 0; slot < Constant.MaxMapNpcs && slot < Data.MyMap.Npc.Length; slot++)
+            for (int slot = 0; slot < Variables.MaxMapNpcs && slot < Data.MyMap.Npc.Length; slot++)
             {
                 if (slot == 0)
                 {
@@ -295,7 +295,7 @@ namespace Client
                 }
 
                 int npcIndex = Data.MyMap.Npc[slot];
-                string name = (npcIndex >= 0 && npcIndex < Constant.MaxNpcs)
+                string name = (npcIndex >= 0 && npcIndex < Variables.MaxNpcs)
                     ? Strings.Trim(Data.Npc[npcIndex].Name)
                     : "None";
                 lstNpc.Items.Add($"{slot}: {name}");
@@ -519,12 +519,12 @@ namespace Client
             // Right side content: stacked panels; visibility controlled by radio selection
             // Configure default ranges/text
             scrlMapWarpMap.MinValue = 1;
-            scrlMapWarpMap.MaxValue = Constant.MaxMaps;
+            scrlMapWarpMap.MaxValue = Variables.MaxMaps;
             btnMapWarp.Click += BtnMapWarp_Click;
 
             // Populate item combo with names
             cmbMapItem.Items.Clear();
-            for (int i = 0; i < Constant.MaxItems; i++)
+            for (int i = 0; i < Variables.MaxItems; i++)
                 cmbMapItem.Items.Add((i + 1) + ": " + Data.Item[i].Name);
 
             btnMapItem.Click += BtnMapItem_Click;
@@ -533,7 +533,7 @@ namespace Client
             
             // Populate resource list for attribute selection
             cmbResource.Items.Clear();
-            for (int i = 0; i < Constant.MaxResources; i++)
+            for (int i = 0; i < Variables.MaxResources; i++)
                 cmbResource.Items.Add((i + 1) + ": " + Data.Resource[i].Name);
             cmbResource.SelectedIndexChanged += CmbResource_SelectedIndexChanged;
             btnResourceOk.Click += BtnResourceOk_Click;
@@ -774,7 +774,7 @@ namespace Client
                 if (Data.MyMap.Npc != null && slot < Data.MyMap.Npc.Length)
                 {
                     npcIndex = Data.MyMap.Npc[slot];
-                    if (npcIndex < 0 || npcIndex >= Constant.MaxNpcs) npcIndex = 0;
+                    if (npcIndex < 0 || npcIndex >= Variables.MaxNpcs) npcIndex = 0;
                 }
             }
             catch { npcIndex = 0; }
@@ -1306,7 +1306,7 @@ namespace Client
             pnlAttributes.Visible = true;
             fraMapWarp.Visible = true;
 
-            scrlMapWarpMap.MaxValue  = Constant.MaxMaps;
+            scrlMapWarpMap.MaxValue  = Variables.MaxMaps;
             scrlMapWarpMap.Value = 1;
             scrlMapWarpX.MaxValue = byte.MaxValue;
             scrlMapWarpY.MaxValue = byte.MaxValue;
@@ -1342,7 +1342,7 @@ namespace Client
         private void CmbResource_SelectedIndexChanged(object? sender, EventArgs e)
         {
             // Keep the selected resource index in GameState for immediate placement
-            if (cmbResource.SelectedIndex < 0 || cmbResource.SelectedIndex >= Constant.MaxResources)
+            if (cmbResource.SelectedIndex < 0 || cmbResource.SelectedIndex >= Variables.MaxResources)
                 return;
             GameState.ResourceEditorNum = cmbResource.SelectedIndex;
         }
@@ -1408,7 +1408,7 @@ namespace Client
 
             // Ensure shop list is populated when opening the attribute panel
             cmbShop.Items.Clear();
-            for (int i = 0; i < Constant.MaxShops; i++)
+            for (int i = 0; i < Variables.MaxShops; i++)
                 cmbShop.Items.Add((i + 1) + ": " + Data.Shop[i].Name);
             if (cmbShop.Items.Count > 0)
                 cmbShop.SelectedIndex = 0;
@@ -1686,7 +1686,7 @@ namespace Client
             Instance.lstShop.Items.Clear();
             Instance.lstShop.Items.Add("None");
 
-            for (i = 0; i < Constant.MaxShops; i++)
+            for (i = 0; i < Variables.MaxShops; i++)
                 Instance.lstShop.Items.Add(Data.Shop[i].Name);
 
             Instance.lstShop.SelectedIndex = 0;
@@ -1695,7 +1695,7 @@ namespace Client
             for (i = 0; i < loopTo2; i++)
             {
                 // Add bounds checking for Data.MyMap.Shop to prevent IndexOutOfRangeException
-                if (Data.MyMap.Shop >= 0 && Data.MyMap.Shop < Constant.MaxShops && 
+                if (Data.MyMap.Shop >= 0 && Data.MyMap.Shop < Variables.MaxShops && 
                     (Instance.lstShop.Items[i].ToString() ?? "") == (Data.Shop[Data.MyMap.Shop].Name ?? ""))
                 {
                     Instance.lstShop.SelectedIndex = i - 1;
@@ -1703,8 +1703,8 @@ namespace Client
                 }
             }
 
-            var moralNames = new List<string>(Constant.MaxMorals);
-            for (i = 0; i < Constant.MaxMorals; i++)
+            var moralNames = new List<string>(Variables.MaxMorals);
+            for (i = 0; i < Variables.MaxMorals; i++)
             {
                 var moralName = (i < Data.Moral.Length) ? Data.Moral[i].Name : string.Empty;
                 moralNames.Add(moralName ?? string.Empty);
@@ -1728,7 +1728,7 @@ namespace Client
 
             Instance.lstMapNpc.Items.Clear();
 
-            for (x = 0; x < Constant.MaxMapNpcs; x++)
+            for (x = 0; x < Variables.MaxMapNpcs; x++)
             {
                 if (x == 0)
                 {
@@ -1738,7 +1738,7 @@ namespace Client
                 }
 
                 var npcIndex = (x < Data.MyMap.Npc.Length) ? Data.MyMap.Npc[x] : -1;
-                if (npcIndex >= 0 && npcIndex < Constant.MaxNpcs)
+                if (npcIndex >= 0 && npcIndex < Variables.MaxNpcs)
                 {
                     var name = Strings.Trim(Data.Npc[npcIndex].Name);
                     Instance.lstMapNpc.Items.Add($"{x}: {name}");
@@ -1752,8 +1752,8 @@ namespace Client
             Instance.lstMapNpc.SelectedIndex = 0;
 
             // Populate NPC combo (index 0 = None)
-            var npcNames = new List<string>(Constant.MaxNpcs + 1) { "None" };
-            for (y = 0; y < Constant.MaxNpcs; y++)
+            var npcNames = new List<string>(Variables.MaxNpcs + 1) { "None" };
+            for (y = 0; y < Variables.MaxNpcs; y++)
             {
                 var raw = (y < Data.Npc.Length) ? Data.Npc[y].Name : string.Empty;
                 npcNames.Add(Strings.Trim(raw) ?? string.Empty);
@@ -1768,7 +1768,7 @@ namespace Client
 
             Instance.cmbAnimation.Items.Clear();
 
-            for (y = 0; y < Constant.MaxAnimations; y++)
+            for (y = 0; y < Variables.MaxAnimations; y++)
                 Instance.cmbAnimation.Items.Add(y + 1 + ": " + Data.Animation[y].Name);
 
             Instance.cmbAnimation.SelectedIndex = 0;
@@ -1839,7 +1839,7 @@ namespace Client
             GameState.CurTileset = Data.MyMap.Tileset;
 
             // set shops for the shop attribute
-            for (int i = 0; i < Constant.MaxShops; i++)
+            for (int i = 0; i < Variables.MaxShops; i++)
                 Instance.cmbShop.Items.Add((i + 1) + ": " + Data.Shop[i].Name);
 
             // we're not in a shop

@@ -120,7 +120,7 @@ namespace Client
         {
             int i;
 
-            for (i = 0; i < Constant.MaxAnimations; i++)
+            for (i = 0; i < Variables.MaxAnimations; i++)
             {
                 if (GameState.AnimationChanged[i])
                 {
@@ -143,7 +143,7 @@ namespace Client
 
         public static void ClearChanged_Animation()
         {
-            for (int i = 0; i < Constant.MaxAnimations; i++)
+            for (int i = 0; i < Variables.MaxAnimations; i++)
                 GameState.AnimationChanged[i] = false;
         }
 
@@ -219,7 +219,7 @@ namespace Client
 
         public static void NpcEditorOK()
         {
-            for (int i = 0; i < Constant.MaxNpcs; i++)
+            for (int i = 0; i < Variables.MaxNpcs; i++)
             {
                 if (GameState.NpcChanged[i])
                 {
@@ -242,7 +242,7 @@ namespace Client
 
         public static void ClearChanged_Npc()
         {
-            for (int i = 0; i < Constant.MaxNpcs; i++)
+            for (int i = 0; i < Variables.MaxNpcs; i++)
                 GameState.NpcChanged[i] = false;
         }
 
@@ -251,7 +251,7 @@ namespace Client
         #region Resource Editor
         public static void ClearChanged_Resource()
         {
-            GameState.ResourceChanged = new bool[Constant.MaxResources];
+            GameState.ResourceChanged = new bool[Variables.MaxResources];
         }
 
         public static void ResourceEditorInit()
@@ -278,7 +278,7 @@ namespace Client
         {
             int i;
 
-            for (i = 0; i < Constant.MaxResources; i++)
+            for (i = 0; i < Variables.MaxResources; i++)
             {
                 if (GameState.ResourceChanged[i])
                 {
@@ -360,7 +360,7 @@ namespace Client
 
             // Chain skills: map -1 to None (0), otherwise +1 index
             int onHit = Data.Skill[GameState.EditorIndex].ChainOnHitSkillId;
-            withBlock.cmbChainOnHit.SelectedIndex = onHit >= 0 && onHit < Constant.MaxSkills ? onHit + 1 : 0;
+            withBlock.cmbChainOnHit.SelectedIndex = onHit >= 0 && onHit < Variables.MaxSkills ? onHit + 1 : 0;
 
             // Common event init
             withBlock.cmbCommonEventType.SelectedIndex = Data.Skill[GameState.EditorIndex].CommonEventType;
@@ -376,7 +376,7 @@ namespace Client
         {
             int i;
 
-            for (i = 0; i < Constant.MaxSkills; i++)
+            for (i = 0; i < Variables.MaxSkills; i++)
             {
                 if (GameState.SkillChanged[i])
                 {
@@ -399,7 +399,7 @@ namespace Client
 
         public static void ClearChanged_Skill()
         {
-            for (int i = 0; i < Constant.MaxSkills; i++)
+            for (int i = 0; i < Variables.MaxSkills; i++)
                 GameState.SkillChanged[i] = false;
         }
 
@@ -433,7 +433,7 @@ namespace Client
 
             EditorShop.Instance.lstTradeItem.Items.Clear();
 
-            for (i = 0; i < Constant.MaxTrades; i++)
+            for (i = 0; i < Variables.MaxTrades; i++)
             {
                 {
                     ref var withBlock = ref Data.Shop[GameState.EditorIndex].TradeItem[i];
@@ -456,7 +456,7 @@ namespace Client
         {
             int i;
 
-            for (i = 0; i < Constant.MaxShops; i++)
+            for (i = 0; i < Variables.MaxShops; i++)
             {
                 if (GameState.ShopChanged[i])
                 {
@@ -479,7 +479,7 @@ namespace Client
 
         public static void ClearChanged_Shop()
         {
-            for (int i = 0; i < Constant.MaxShops; i++)
+            for (int i = 0; i < Variables.MaxShops; i++)
                 GameState.ShopChanged[i] = false;
         }
 
@@ -488,7 +488,7 @@ namespace Client
         #region Job Editor
         public static void JobEditorOK()
         {
-            for (int i = 0; i < Constant.MaxJobs; i++)
+            for (int i = 0; i < Variables.MaxJobs; i++)
             {
                 if (GameState.JobChanged[i])
                 {
@@ -547,7 +547,7 @@ namespace Client
 
         public static void ClearChanged_Job()
         {
-            for (int i = 0; i < Constant.MaxJobs; i++)
+            for (int i = 0; i < Variables.MaxJobs; i++)
                 GameState.JobChanged[i] = false;
         }
 
@@ -674,7 +674,7 @@ namespace Client
 
             // Build cmbJobReq
             EditorItem.Instance!.cmbJobReq!.Items.Clear();
-            for (int j = 0; j < Constant.MaxJobs; j++)
+            for (int j = 0; j < Variables.MaxJobs; j++)
                 EditorItem.Instance!.cmbJobReq!.Items.Add(Data.Job[j].Name);
 
             EditorItem.Instance!.cmbJobReq!.SelectedIndex = withBlock.JobReq;
@@ -709,7 +709,7 @@ namespace Client
         {
             int i;
 
-            for (i = 0; i < Constant.MaxItems; i++)
+            for (i = 0; i < Variables.MaxItems; i++)
             {
                 if (GameState.ItemChanged[i])
                 {
@@ -727,7 +727,7 @@ namespace Client
         #region Moral Editor
         public static void MoralEditorOK()
         {
-            for (int i = 0; i < Constant.MaxMorals; i++)
+            for (int i = 0; i < Variables.MaxMorals; i++)
             {
                 if (GameState.MoralChanged[i])
                 {
@@ -765,7 +765,7 @@ namespace Client
 
         public static void ClearChanged_Moral()
         {
-            for (int i = 0; i < Constant.MaxMorals; i++)
+            for (int i = 0; i < Variables.MaxMorals; i++)
                 GameState.MoralChanged[i] = false;
         }
         #endregion
@@ -779,14 +779,14 @@ namespace Client
             EditorProjectile.Instance.nudRange.Value = withBlock.Range;
             EditorProjectile.Instance.nudSpeed.Value = withBlock.Speed;
             EditorProjectile.Instance.nudDamage.Value = withBlock.Damage;
-            EditorProjectile.Instance.cmbPlayAnimHit.SelectedIndex = Math.Clamp(withBlock.Animation, 0, Constant.MaxAnimations);
+            EditorProjectile.Instance.cmbPlayAnimHit.SelectedIndex = Math.Clamp(withBlock.Animation, 0, Variables.MaxAnimations);
             EditorProjectile.Instance.Drawicon();
             GameState.ProjectileChanged[GameState.EditorIndex] = true;
         }
 
         public static void ProjectileEditorOK()
         {
-            for (int i = 0; i < Constant.MaxProjectiles;  i++)
+            for (int i = 0; i < Variables.MaxProjectiles;  i++)
             {
                 if (GameState.ProjectileChanged[i])
                 {
@@ -809,7 +809,7 @@ namespace Client
 
         public static void ClearChanged_Projectile()
         {
-            for (int i = 0; i < Constant.MaxProjectiles;  i++)
+            for (int i = 0; i < Variables.MaxProjectiles;  i++)
                 GameState.ProjectileChanged[i] = false;
 
         }

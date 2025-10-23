@@ -184,13 +184,13 @@ namespace Client
             try
             {
                 lstIndex.Items.Clear();
-                for (int i = 0; i < Constant.MaxShops; i++)
+                for (int i = 0; i < Variables.MaxShops; i++)
                     lstIndex.Items.Add($"{i + 1}: {Data.Shop[i].Name}");
                 lstIndex.SelectedIndex = GameState.EditorIndex >= 0 ? GameState.EditorIndex : 0;
 
                 cmbItem.Items.Clear();
                 cmbCostItem.Items.Clear();
-                for (int i = 0; i < Constant.MaxItems; i++)
+                for (int i = 0; i < Variables.MaxItems; i++)
                 {
                     cmbItem.Items.Add($"{i + 1}: {Data.Item[i].Name}");
                     cmbCostItem.Items.Add($"{i + 1}: {Data.Item[i].Name}");
@@ -225,7 +225,7 @@ namespace Client
         private void BtnUpdate_Click()
         {
             int index = lstTradeItem.SelectedIndex;
-            if (index < 0 || index >= Constant.MaxTrades) return;
+            if (index < 0 || index >= Variables.MaxTrades) return;
             ref var trade = ref Data.Shop[GameState.EditorIndex].TradeItem[index];
             trade.Item = cmbItem.SelectedIndex;
             trade.ItemValue = (int)Math.Round(nudItemValue.Value);
@@ -237,7 +237,7 @@ namespace Client
         private void BtnDeleteTrade_Click()
         {
             int index = lstTradeItem.SelectedIndex;
-            if (index < 0 || index >= Constant.MaxTrades) return;
+            if (index < 0 || index >= Variables.MaxTrades) return;
             ref var trade = ref Data.Shop[GameState.EditorIndex].TradeItem[index];
             trade.Item = -1;
             trade.ItemValue = 0;
@@ -268,7 +268,7 @@ namespace Client
             int src = GameState.EditorIndex;
             if (!_hasClipboardShop)
             {
-                if (src < 0 || src >= Constant.MaxShops) return;
+                if (src < 0 || src >= Variables.MaxShops) return;
                 var s = Data.Shop[src];
                 _clipboardShop = s; // struct copy
                 if (s.TradeItem != null)
@@ -282,7 +282,7 @@ namespace Client
             }
 
             int def = GameState.EditorIndex + 1;
-            var oneBased = Editors.PromptIndex(this, "Paste Shop", $"Paste shop into index (1..{Constant.MaxShops}):", 1, Constant.MaxShops, def);
+            var oneBased = Editors.PromptIndex(this, "Paste Shop", $"Paste shop into index (1..{Variables.MaxShops}):", 1, Variables.MaxShops, def);
             if (oneBased == null) return;
             int dst = oneBased.Value - 1;
             var n = _clipboardShop;

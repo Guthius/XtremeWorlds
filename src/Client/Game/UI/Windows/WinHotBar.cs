@@ -10,7 +10,7 @@ public static class WinHotBar
 {
     public static void OnDraw()
     {
-        if (GameState.MyIndex < 0 || GameState.MyIndex > Constant.MaxPlayers)
+        if (GameState.MyIndex < 0 || GameState.MyIndex > Variables.MaxPlayers)
         {
             return;
         }
@@ -26,12 +26,12 @@ public static class WinHotBar
         GameClient.RenderTexture(ref argPath, winHotbar.X - 1, winHotbar.Y + 3, 0, 0, 11, 26, 11, 26);
         GameClient.RenderTexture(ref argPath, winHotbar.X + 407, winHotbar.Y + 3, 0, 0, 11, 26, 11, 26);
 
-        for (var slot = 0; slot < Constant.MaxHotbar; slot++)
+        for (var slot = 0; slot < Variables.MaxHotbar; slot++)
         {
             var x = winHotbar.X + GameState.HotbarLeft + slot * GameState.HotbarOffsetX;
             var y = winHotbar.Y + GameState.HotbarTop;
 
-            if (slot != Constant.MaxHotbar - 1)
+            if (slot != Variables.MaxHotbar - 1)
             {
                 var argPath2 = Path.Combine(DataPath.Gui, "32");
 
@@ -209,7 +209,7 @@ public static class WinHotBar
 
         GameClient.RenderTexture(ref path, x, y, 0, 0, 32, 32, 32, 32);
 
-        for (var i = 0; i < Constant.MaxPlayerSkills; i++)
+        for (var i = 0; i < Variables.MaxPlayerSkills; i++)
         {
             if (GetPlayerSkill(GameState.MyIndex, i) < 0 ||
                 GetPlayerSkill(GameState.MyIndex, i) != skillNum ||

@@ -42,7 +42,7 @@ public static class WinCharacter
 
     public static void OnDrawCharacter()
     {
-        if (GameState.MyIndex < 0 || GameState.MyIndex > Constant.MaxPlayers)
+        if (GameState.MyIndex < 0 || GameState.MyIndex > Variables.MaxPlayers)
         {
             return;
         }

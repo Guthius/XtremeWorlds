@@ -326,7 +326,7 @@ public static class Command
 
     public static string IsEditorLocked(int index, EditorType id)
     {
-        for (int i = 0; i < Constant.MaxPlayers; i++)
+        for (int i = 0; i < Variables.MaxPlayers; i++)
         {
             if (IsPlaying(i))
             {
@@ -346,7 +346,7 @@ public static class Command
 
     public static int FindOpenSkill(int index)
     {
-        for (var slot = 0; slot < Constant.MaxPlayerSkills; slot++)
+        for (var slot = 0; slot < Variables.MaxPlayerSkills; slot++)
         {
             if (GetPlayerSkill(index, slot) == -1)
             {
@@ -364,7 +364,7 @@ public static class Command
 
     public static bool HasSkill(int index, double skillNum)
     {
-        for (var slot = 0; slot < Constant.MaxPlayerSkills; slot++)
+        for (var slot = 0; slot < Variables.MaxPlayerSkills; slot++)
         {
             if (GetPlayerSkill(index, slot) == skillNum)
             {

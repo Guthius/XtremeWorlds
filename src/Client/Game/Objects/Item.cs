@@ -29,16 +29,16 @@ namespace Client
         {
             int i;
 
-            Data.Item = new Type.Item[Constant.MaxItems];
+            Data.Item = new Type.Item[Variables.MaxItems];
 
-            for (i = 0; i < Constant.MaxItems; i++)
+            for (i = 0; i < Variables.MaxItems; i++)
                 ClearItem(i);
 
         }
 
         public static void ClearChangedItem()
         {
-            GameState.ItemChanged = new bool[Constant.MaxItems];
+            GameState.ItemChanged = new bool[Variables.MaxItems];
         }
 
         public static void StreamItem(int itemNum)

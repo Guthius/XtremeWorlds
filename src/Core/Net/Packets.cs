@@ -248,7 +248,10 @@ public static class Packets
         // Death notifications
         SPlayerDead = 108,
 
+        // Server constants for client-side sizing/config
+        SConstants = 109,
+
         // Make sure COUNT is below everything else
-        Count = 109
+        Count = 110
     }
 }

@@ -49,7 +49,7 @@ namespace Client
             cmbAccess.SelectedIndex = 0; // Set default access to 0
 
             nudAdminSprite = new NumericStepper { MinValue = 0, MaxValue = GameState.NumCharacters };
-            nudAdminMap = new NumericStepper { MinValue = 0, MaxValue = Constant.MaxMaps };
+            nudAdminMap = new NumericStepper { MinValue = 0, MaxValue = Variables.MaxMaps };
 
             btnAdminWarpTo = new Button { Text = "Warp To Map" };
             btnAdminBan = new Button { Text = "Ban Player" };

@@ -2,7 +2,6 @@
 using System.Reflection.Metadata;
 using Core.Globals;
 using Color = Microsoft.Xna.Framework.Color;
-using Constant = Core.Globals.Constant;
 using Point = Microsoft.Xna.Framework.Point;
 using Type = Core.Globals.Type;
 using Equipment = Core.Globals.Equipment;
@@ -56,20 +55,20 @@ namespace Client
         public static Sex NewCnarGender;
 
         // chars
-        public static string?[] CharName = new string?[Constant.MaxChars];
-        public static long[] CharSprite = new long[(Constant.MaxChars)];
-        public static long[] CharAccess = new long[(Constant.MaxChars)];
-        public static long[] CharJob = new long[(Constant.MaxChars)];
-        public static long[,] CharEq = new long[Constant.MaxChars, Enum.GetValues<Equipment>().Length];
+        public static string?[] CharName = new string?[Variables.MaxChars];
+        public static long[] CharSprite = new long[(Variables.MaxChars)];
+        public static long[] CharAccess = new long[(Variables.MaxChars)];
+        public static long[] CharJob = new long[(Variables.MaxChars)];
+        public static long[,] CharEq = new long[Variables.MaxChars, Enum.GetValues<Equipment>().Length];
         public static byte CharNum;
 
         // elastic bars
-        public static int[] BarWidthNpcHP = new int[Constant.MaxMapNpcs];
-        public static int[] BarWidthPlayerHP = new int[Constant.MaxPlayers];
-        public static int[] BarWidthPlayerMP = new int[Constant.MaxPlayers];
-        public static int[] BarWidthNpcHPMax = new int[Constant.MaxMapNpcs];
-        public static int[] BarWidthPlayerHPMax = new int[Constant.MaxPlayers];
-        public static int[] BarWidthPlayerMPMax = new int[Constant.MaxPlayers];
+        public static int[] BarWidthNpcHP = new int[Variables.MaxMapNpcs];
+        public static int[] BarWidthPlayerHP = new int[Variables.MaxPlayers];
+        public static int[] BarWidthPlayerMP = new int[Variables.MaxPlayers];
+        public static int[] BarWidthNpcHPMax = new int[Variables.MaxMapNpcs];
+        public static int[] BarWidthPlayerHPMax = new int[Variables.MaxPlayers];
+        public static int[] BarWidthPlayerMPMax = new int[Variables.MaxPlayers];
         public static int BarWidthGuiHP;
         public static int BarWidthGuiMP;
         public static int BarWidthGuiSP;
@@ -99,7 +98,7 @@ namespace Client
 
         public static string? ChatShowLine;
 
-        public static string?[] MapNames = new string?[Constant.MaxMaps];
+        public static string?[] MapNames = new string?[Variables.MaxMaps];
 
         // chat
         public static bool InSmallChat;
@@ -233,14 +232,14 @@ namespace Client
         public static int ShowAnimTimer;
 
         // Stream Content
-        public static int[] ItemLoaded = new int[Constant.MaxItems];
-        public static int[] NpcLoaded = new int[Constant.MaxNpcs];
-        public static int[] ResourceLoaded = new int[Constant.MaxResources];
-        public static int[] AnimationLoaded = new int[Constant.MaxResources];
-        public static int[] SkillLoaded = new int[Constant.MaxSkills];
-        public static int[] ShopLoaded = new int[Constant.MaxShops];
-        public static int[] MoralLoaded = new int[(Constant.MaxMorals)];
-        public static int[] ProjectileLoaded = new int[(Constant.MaxProjectiles)];
+        public static int[] ItemLoaded = new int[Variables.MaxItems];
+        public static int[] NpcLoaded = new int[Variables.MaxNpcs];
+        public static int[] ResourceLoaded = new int[Variables.MaxResources];
+        public static int[] AnimationLoaded = new int[Variables.MaxResources];
+        public static int[] SkillLoaded = new int[Variables.MaxSkills];
+        public static int[] ShopLoaded = new int[Variables.MaxShops];
+        public static int[] MoralLoaded = new int[(Variables.MaxMorals)];
+        public static int[] ProjectileLoaded = new int[(Variables.MaxProjectiles)];
 
         public static int[] AnimEditorFrame = new int[2];
         public static int[] AnimEditorTimer = new int[2];
@@ -387,7 +386,7 @@ namespace Client
         public static int ResourceIndex;
         public static bool ResourcesInit;
 
-        public static Type.WeatherParticle[] WeatherParticle = new Type.WeatherParticle[Constant.MaxWeatherParticles];
+        public static Type.WeatherParticle[] WeatherParticle = new Type.WeatherParticle[Variables.MaxWeatherParticles];
 
         public static int FogOffsetX;
         public static int FogOffsetY;
@@ -444,14 +443,14 @@ namespace Client
         public static bool InitScriptEditor;
 
         // Editor edited items array
-        public static bool[] ItemChanged = new bool[Constant.MaxItems];
-        public static bool[] NpcChanged = new bool[Constant.MaxNpcs];
-        public static bool[] ResourceChanged = new bool[Constant.MaxResources];
-        public static bool[] AnimationChanged = new bool[Constant.MaxAnimations];
-        public static bool[] SkillChanged = new bool[Constant.MaxSkills];
-        public static bool[] ShopChanged = new bool[Constant.MaxShops];
-        public static bool[] JobChanged = new bool[(Constant.MaxJobs)];
-        public static bool[] MoralChanged = new bool[(Constant.MaxMorals)];
-        public static bool[] ProjectileChanged = new bool[Constant.MaxProjectiles];
+        public static bool[] ItemChanged = new bool[Variables.MaxItems];
+        public static bool[] NpcChanged = new bool[Variables.MaxNpcs];
+        public static bool[] ResourceChanged = new bool[Variables.MaxResources];
+        public static bool[] AnimationChanged = new bool[Variables.MaxAnimations];
+        public static bool[] SkillChanged = new bool[Variables.MaxSkills];
+        public static bool[] ShopChanged = new bool[Variables.MaxShops];
+        public static bool[] JobChanged = new bool[(Variables.MaxJobs)];
+        public static bool[] MoralChanged = new bool[(Variables.MaxMorals)];
+        public static bool[] ProjectileChanged = new bool[Variables.MaxProjectiles];
     }
 }

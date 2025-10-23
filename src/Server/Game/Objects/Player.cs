@@ -35,6 +35,7 @@ public static class Player
 
         // Send an ok to client to start receiving in game data
         NetworkSend.SendLoginOk(session.Id);
+        NetworkSend.SendConstants(session);
 
         JoinGame(session.Id);
 
@@ -55,7 +56,7 @@ public static class Player
 
     public static void PlayerWarp(int playerId, int mapNum, int x, int y, int dir, bool send = false)
     {
-        if (!NetworkConfig.IsPlaying(playerId) || mapNum <= 0 || mapNum >= Core.Globals.Constant.MaxMaps || Data.TempPlayer[playerId].GettingMap == true || mapNum < 0 || mapNum >= Core.Globals.Constant.MaxMaps)
+        if (!NetworkConfig.IsPlaying(playerId) || mapNum <= 0 || mapNum >= Core.Globals.Variables.MaxMaps || Data.TempPlayer[playerId].GettingMap == true || mapNum < 0 || mapNum >= Core.Globals.Variables.MaxMaps)
         {
             return;
         }
@@ -109,7 +110,7 @@ public static class Player
         if (GameLogic.GetTotalMapPlayers(oldMapNum) == 0)
         {
             // Regenerate all Npcs' health
-            for (var mapNpcNum = 0; mapNpcNum < Core.Globals.Constant.MaxMapNpcs; mapNpcNum++)
+            for (var mapNpcNum = 0; mapNpcNum < Core.Globals.Variables.MaxMapNpcs; mapNpcNum++)
             {
                 var vitalCount = (int)System.Enum.GetValues(typeof(Vital)).Length;
                 for (var i = 0; i < vitalCount; i++)
@@ -398,7 +399,7 @@ public static class Player
                 y = tile.Data3_2;
             }
 
-            if (mapNum >= 0 && mapNum < Core.Globals.Constant.MaxMaps)
+            if (mapNum >= 0 && mapNum < Core.Globals.Variables.MaxMaps)
             {
                 PlayerWarp(playerId, mapNum, x, y, (int) Direction.Down);
 
@@ -593,7 +594,7 @@ public static class Player
 
             if (Data.Moral[Data.Map[mapNum].Moral].NpcBlock)
             {
-                for (var mapNpcNum = 0; mapNpcNum < Core.Globals.Constant.MaxMapNpcs; mapNpcNum++)
+                for (var mapNpcNum = 0; mapNpcNum < Core.Globals.Variables.MaxMapNpcs; mapNpcNum++)
                 {
                     if (Data.MapNpc[mapNum].Npc[mapNpcNum].Num >= 0 &&
                         Data.MapNpc[mapNum].Npc[mapNpcNum].X == x &&
@@ -621,13 +622,13 @@ public static class Player
 
     public static int HasItem(int playerId, int itemNum)
     {
-        if (itemNum < 0 || itemNum > Core.Globals.Constant.MaxItems)
+        if (itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems)
         {
             return 0;
         }
 
         var totalQuantity = 0;
-        for (var invSlot = 0; invSlot < Core.Globals.Constant.MaxInv; invSlot++)
+        for (var invSlot = 0; invSlot < Core.Globals.Variables.MaxInv; invSlot++)
         {
             if (GetPlayerInv(playerId, invSlot) != itemNum)
             {
@@ -649,12 +650,12 @@ public static class Player
 
     public static int FindItemSlot(int playerId, int itemNum)
     {
-        if (itemNum is < 0 or > Core.Globals.Constant.MaxItems)
+        if (itemNum < 0 || itemNum > global::Script.GetMaxItems())
         {
             return -1;
         }
 
-        for (var invSlot = 0; invSlot < Core.Globals.Constant.MaxInv; invSlot++)
+        for (var invSlot = 0; invSlot < Core.Globals.Variables.MaxInv; invSlot++)
         {
             if (GetPlayerInv(playerId, invSlot) == itemNum)
             {
@@ -669,10 +670,10 @@ public static class Player
     {
         var mapNum = GetPlayerMap(playerId);
 
-        for (var mapItemNum = 0; mapItemNum < Core.Globals.Constant.MaxMapItems; mapItemNum++)
+        for (var mapItemNum = 0; mapItemNum < Core.Globals.Variables.MaxMapItems; mapItemNum++)
         {
             if (Data.MapItem[mapNum, mapItemNum].Num < 0 ||
-                Data.MapItem[mapNum, mapItemNum].Num >= Core.Globals.Constant.MaxItems)
+                Data.MapItem[mapNum, mapItemNum].Num >= Core.Globals.Variables.MaxItems)
             {
                 continue;
             }
@@ -733,7 +734,7 @@ public static class Player
 
     public static int FindOpenInvSlot(int playerId, int itemNum)
     {
-        if (!NetworkConfig.IsPlaying(playerId) || itemNum < 0 || itemNum > Core.Globals.Constant.MaxItems)
+        if (!NetworkConfig.IsPlaying(playerId) || itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems)
         {
             return -1;
         }
@@ -741,7 +742,7 @@ public static class Player
         if (Data.Item[itemNum].Type == (byte) ItemCategory.Currency ||
             Data.Item[itemNum].Stackable == 1)
         {
-            for (var invSlot = 0; invSlot < Core.Globals.Constant.MaxInv; invSlot++)
+            for (var invSlot = 0; invSlot < Core.Globals.Variables.MaxInv; invSlot++)
             {
                 if (GetPlayerInv(playerId, invSlot) == itemNum)
                 {
@@ -750,7 +751,7 @@ public static class Player
             }
         }
 
-        for (var invSlot = 0; invSlot < Core.Globals.Constant.MaxInv; invSlot++)
+        for (var invSlot = 0; invSlot < Core.Globals.Variables.MaxInv; invSlot++)
         {
             if (GetPlayerInv(playerId, invSlot) == -1)
             {
@@ -763,14 +764,14 @@ public static class Player
 
     public static bool TakeInv(int playerId, int itemNum, int itemVal)
     {
-        if (!NetworkConfig.IsPlaying(playerId) || itemNum < 0 || itemNum > Core.Globals.Constant.MaxItems)
+        if (!NetworkConfig.IsPlaying(playerId) || itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems)
         {
             return false;
         }
 
         var clearInvSlot = false;
 
-        for (var invSlot = 0; invSlot < Core.Globals.Constant.MaxInv; invSlot++)
+        for (var invSlot = 0; invSlot < Core.Globals.Variables.MaxInv; invSlot++)
         {
             // Check to see if the player has the item
             if (GetPlayerInv(playerId, invSlot) != itemNum)
@@ -816,7 +817,7 @@ public static class Player
 
     public static bool GiveInv(int playerId, int itemNum, int itemVal, byte bound = 0, bool sendUpdate = true)
     {
-        if (!NetworkConfig.IsPlaying(playerId) || itemNum < 0 || itemNum > Core.Globals.Constant.MaxItems)
+        if (!NetworkConfig.IsPlaying(playerId) || itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems)
         {
             return false;
         }
@@ -844,7 +845,7 @@ public static class Player
 
     public static void MapDropItem(int playerId, int invNum, int amount)
     {
-        if (!NetworkConfig.IsPlaying(playerId) || invNum < 0 || invNum > Core.Globals.Constant.MaxInv)
+        if (!NetworkConfig.IsPlaying(playerId) || invNum < 0 || invNum > Core.Globals.Variables.MaxInv)
         {
             return;
         }
@@ -870,7 +871,7 @@ public static class Player
         }
 
         var itemNum = GetPlayerInv(playerId, invNum);
-        if (itemNum < 0 || itemNum >= Core.Globals.Constant.MaxItems)
+        if (itemNum < 0 || itemNum >= Core.Globals.Variables.MaxItems)
         {
             return;
         }
@@ -910,7 +911,7 @@ public static class Player
     {
         var takeInvSlot = false;
 
-        if (!NetworkConfig.IsPlaying(playerId) || invSlot < 0 || invSlot > Core.Globals.Constant.MaxItems)
+        if (!NetworkConfig.IsPlaying(playerId) || invSlot < 0 || invSlot > Core.Globals.Variables.MaxInv)
         {
             return false;
         }
@@ -998,13 +999,13 @@ public static class Player
 
     public static void UseItem(int playerId, int invNum)
     {
-        if (invNum < 0 || invNum > Core.Globals.Constant.MaxInv)
+        if (invNum < 0 || invNum > Core.Globals.Variables.MaxInv)
         {
             return;
         }
 
         var itemNum = GetPlayerInv(playerId, invNum);
-        if (itemNum < 0 || itemNum > Core.Globals.Constant.MaxItems)
+        if (itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems)
         {
             return;
         }
@@ -1145,12 +1146,12 @@ public static class Player
         }
 
         var itemNum = GetPlayerEquipment(playerId, (Equipment) eqSlot);
-        if (itemNum is < 0 or > Core.Globals.Constant.MaxItems)
+        if (itemNum < 0 || itemNum > global::Script.GetMaxItems())
         {
             return;
         }
 
-        if (GetPlayerEquipment(playerId, (Equipment)eqSlot) < 0 || GetPlayerEquipment(playerId, (Equipment)eqSlot) > Core.Globals.Constant.MaxItems)
+        if (GetPlayerEquipment(playerId, (Equipment)eqSlot) < 0 || GetPlayerEquipment(playerId, (Equipment)eqSlot) > Core.Globals.Variables.MaxItems)
             return;
 
         if (FindOpenInvSlot(playerId, itemNum) >= 0)
@@ -1230,7 +1231,7 @@ public static class Player
 
     public static void GiveBank(int playerId, int invSlot, int amount)
     {
-        if (invSlot is < 0 or > Core.Globals.Constant.MaxInv)
+        if (invSlot < 0 || invSlot > global::Script.GetMaxInv())
         {
             return;
         }
@@ -1308,7 +1309,7 @@ public static class Player
 
     public static int FindOpenbankSlot(int playerId, int itemNum)
     {
-        if (!NetworkConfig.IsPlaying(playerId) || itemNum is < 0 or > Core.Globals.Constant.MaxItems)
+        if (!NetworkConfig.IsPlaying(playerId) || itemNum < 0 || itemNum > global::Script.GetMaxItems())
         {
             return -1;
         }
@@ -1316,7 +1317,7 @@ public static class Player
         if (Data.Item[itemNum].Type == (byte) ItemCategory.Currency ||
             Data.Item[itemNum].Stackable == 1)
         {
-            for (var bankSlot = 0; bankSlot < Core.Globals.Constant.MaxBank; bankSlot++)
+            for (var bankSlot = 0; bankSlot < Core.Globals.Variables.MaxBank; bankSlot++)
             {
                 if (GetPlayerBank(playerId, bankSlot) == itemNum)
                 {
@@ -1325,7 +1326,7 @@ public static class Player
             }
         }
 
-        for (var bankSlot = 0; bankSlot < Core.Globals.Constant.MaxBank; bankSlot++)
+        for (var bankSlot = 0; bankSlot < Core.Globals.Variables.MaxBank; bankSlot++)
         {
             if (GetPlayerBank(playerId, bankSlot) == -1)
             {
@@ -1338,7 +1339,7 @@ public static class Player
 
     public static void TakeBank(int playerId, int bankSlot, int amount)
     {
-        if (bankSlot is < 0 or > Core.Globals.Constant.MaxBank)
+        if (bankSlot < 0 || bankSlot > global::Script.GetMaxBank())
         {
             return;
         }

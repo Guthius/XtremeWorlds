@@ -110,7 +110,7 @@ namespace Client
         {
             int i;
 
-            for (i = 0; i < Constant.MaxProjectiles; i++)
+            for (i = 0; i < Variables.MaxProjectiles; i++)
                 ClearProjectile(i);
         }
 
@@ -159,13 +159,13 @@ namespace Client
             int sprite;
 
             // Defensive: ensure projectile index within bounds
-            if (projectileNum < 0 || projectileNum >= Constant.MaxProjectiles)
+            if (projectileNum < 0 || projectileNum >= Variables.MaxProjectiles)
             {
                 return;
             }
 
             // Defensive: ensure player index and map index are valid before indexing map projectile array
-            if (GameState.MyIndex < 0 || GameState.MyIndex > Constant.MaxPlayers)
+            if (GameState.MyIndex < 0 || GameState.MyIndex > Variables.MaxPlayers)
             {
                 return;
             }

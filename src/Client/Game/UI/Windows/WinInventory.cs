@@ -9,7 +9,7 @@ public static class WinInventory
 {
     public static void OnDraw()
     {
-        if (GameState.MyIndex < 0 || GameState.MyIndex > Constant.MaxPlayers)
+        if (GameState.MyIndex < 0 || GameState.MyIndex > Variables.MaxPlayers)
         {
             return;
         }
@@ -57,10 +57,10 @@ public static class WinInventory
 
         var skipItem = false;
 
-        for (var slot = 0; slot < Constant.MaxInv; slot++)
+        for (var slot = 0; slot < Variables.MaxInv; slot++)
         {
             var itemNum = GetPlayerInv(GameState.MyIndex, slot);
-            if (itemNum is < 0 or >= Constant.MaxItems)
+            if (itemNum < 0 || itemNum >= Variables.MaxItems)
             {
                 continue;
             }
@@ -84,7 +84,7 @@ public static class WinInventory
             var amountModifier = 0;
             if (Trade.InTrade >= 0)
             {
-                for (var tradeSlot = 0; tradeSlot < Constant.MaxInv; tradeSlot++)
+                for (var tradeSlot = 0; tradeSlot < Variables.MaxInv; tradeSlot++)
                 {
                     if (Data.TradeYourOffer[tradeSlot].Num < 0)
                     {
@@ -197,7 +197,7 @@ public static class WinInventory
 
             if (Trade.InTrade >= 0)
             {
-                for (var i = 0; i < Constant.MaxInv; i++)
+                for (var i = 0; i < Variables.MaxInv; i++)
                 {
                     if (Data.TradeYourOffer[i].Num != slot)
                     {
@@ -266,7 +266,7 @@ public static class WinInventory
 
         if (Trade.InTrade >= 0)
         {
-            for (var i = 0; i < Constant.MaxInv; i++)
+            for (var i = 0; i < Variables.MaxInv; i++)
             {
                 if (Data.TradeYourOffer[i].Num != slot)
                 {

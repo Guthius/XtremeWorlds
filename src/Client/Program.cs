@@ -233,7 +233,7 @@ namespace Client
             // Apply changes to GraphicsDeviceManager
             try
             {
-                Graphics.ApplyChanges();
+                Graphics?.ApplyChanges();
             }
             catch (Exception ex)
             {
@@ -400,7 +400,7 @@ namespace Client
                 // Open the file stream with FileShare.Read to allow other processes to read the file  
                 using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
-                    var texture = Texture2D.FromStream(Graphics.GraphicsDevice, stream);
+                    var texture = Texture2D.FromStream(Graphics?.GraphicsDevice, stream);
 
                     // Cache graphics information  
                     var gfxInfo = new GfxInfo()
@@ -424,7 +424,7 @@ namespace Client
 
         protected override void Draw(GameTime gameTime)
         {
-            Graphics.GraphicsDevice.Clear(Color.Black);
+            Graphics?.GraphicsDevice.Clear(Color.Black);
 
             // Update GUI mouse position before drawing GUI (ensures correct UI hover/click)
             var mousePosGame = GetMousePosition("game");
@@ -508,7 +508,7 @@ namespace Client
 
                 GraphicsDevice.SetRenderTarget(_guiRenderTarget);
                 GraphicsDevice.Clear(Color.Transparent);
-                SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
+                SpriteBatch?.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
                 if (GameState.InMenu)
                     WindowManager.DrawMenuBackground();
                 WindowManager.Render();
@@ -819,6 +819,8 @@ namespace Client
         // Compute the native-space pivot for zooming: target center if valid, else player center
         private static Vector2 GetZoomPivotNative()
         {
+            if (!GameState.InGame) return new Vector2(GameState.ResolutionWidth / 2, GameState.ResolutionHeight / 2);
+            
             int worldX = GetPlayerRawX(GameState.MyIndex) + GameState.SizeX / 2;
             int worldY = GetPlayerRawY(GameState.MyIndex) + GameState.SizeY / 2;
 
@@ -903,9 +905,6 @@ namespace Client
 
         public static void ProcessInputs()
         {
-            // Get the mouse position from the cache
-
-            // --- Update both game and GUI mouse/world positions globally ---
             // Game context
             var mousePosGame = GetMousePosition("game");
             int mouseXGame = mousePosGame.Item1;
@@ -1097,9 +1096,12 @@ namespace Client
                 }
             }
 
-            if (CurrentKeyboardState.IsKeyDown(Keys.Space) || (IsMouseButtonDown(MouseButton.Left) && GameState.CurX == GetPlayerX(GameState.MyIndex) && GameState.CurY == GetPlayerY(GameState.MyIndex)))
+            if (GameState.InGame)
             {
-                GameLogic.CheckMapGetItem();
+                if (CurrentKeyboardState.IsKeyDown(Keys.Space) || (IsMouseButtonDown(MouseButton.Left) && GameState.CurX == GetPlayerX(GameState.MyIndex) && GameState.CurY == GetPlayerY(GameState.MyIndex)))
+                {
+                    GameLogic.CheckMapGetItem();
+                }
             }
 
             if (CurrentKeyboardState.IsKeyDown(Keys.Insert))
@@ -1219,7 +1221,7 @@ namespace Client
             if (GameState.InSmallChat)
             {
                 // Iterate through hotbar slots and check for corresponding keys
-                for (int i = 0; i < Constant.MaxHotbar; i++)
+                for (int i = 0; i < Variables.MaxHotbar; i++)
                 {
                     // Check if the corresponding hotbar key is pressed
                     if (CurrentKeyboardState.IsKeyDown((Keys) ((int) Keys.D0 + (i + 1))))
@@ -1514,7 +1516,7 @@ namespace Client
             int mouseXGui = mousePosGui.Item1;
             int mouseYGui = mousePosGui.Item2;
 
-            for (int i = 0; i < Constant.MaxPlayers; i++)
+            for (int i = 0; i < Variables.MaxPlayers; i++)
             {
                 if (IsPlaying(i) && GetPlayerMap(i) == GetPlayerMap(GameState.MyIndex))
                 {
@@ -1547,7 +1549,7 @@ namespace Client
             }
         }
 
-        private void TrySaveBackbufferScreenshot(string path)
+        private void TrySaveBackbufferScreenshot(string? path)
         {
             try
             {
@@ -1899,7 +1901,7 @@ namespace Client
 
             // Check if Npc exists
             if (Data.MyMapNpc[(int)mapNpcNum].Num < 0 ||
-                Data.MyMapNpc[(int)mapNpcNum].Num > Constant.MaxNpcs)
+                Data.MyMapNpc[(int)mapNpcNum].Num > Variables.MaxNpcs)
                 return;
 
             if (EditorType.Map == GameState.MyEditorType)
@@ -1921,7 +1923,7 @@ namespace Client
             Database.StreamNpc((int)Data.MyMapNpc[(int)mapNpcNum].Num);
 
             if (Data.MyMapNpc[(int)mapNpcNum].Num < 0 ||
-                Data.MyMapNpc[(int)mapNpcNum].Num > Constant.MaxNpcs)
+                Data.MyMapNpc[(int)mapNpcNum].Num > Variables.MaxNpcs)
                 return;
                 
             // Get the sprite of the Npc
@@ -2057,7 +2059,7 @@ namespace Client
             int x;
             int y;
 
-            if (Data.MyMapItem[itemNum].Num < 0 | Data.MyMapItem[itemNum].Num > Constant.MaxItems)
+            if (Data.MyMapItem[itemNum].Num < 0 | Data.MyMapItem[itemNum].Num > Variables.MaxItems)
                 return;
 
             Item.StreamItem(Data.MyMapItem[itemNum].Num);
@@ -2149,11 +2151,11 @@ namespace Client
             height = (long) Math.Round(GetGfxInfo(Path.Combine(DataPath.Misc, "Bars")).Height / 4d);
 
             // render Npc health bars
-            for (i = 0L; i < Constant.MaxMapNpcs; i++)
+            for (i = 0L; i < Variables.MaxMapNpcs; i++)
             {
                 npcNum = (long) Data.MyMapNpc[(int) i].Num;
                 // exists?
-                if (npcNum >= 0L && npcNum < Constant.MaxNpcs)
+                if (npcNum >= 0L && npcNum < Variables.MaxNpcs)
                 {
                     // alive?
                     if (Data.MyMapNpc[(int) i].Vital[(int) Vital.Health] > 0 &
@@ -2187,7 +2189,7 @@ namespace Client
                 }
             }
 
-            for (i = 0L; i < Constant.MaxPlayers; i++)
+            for (i = 0L; i < Variables.MaxPlayers; i++)
             {
                 if (GetPlayerMap((int) i) == GetPlayerMap((int) i))
                 {
@@ -2605,7 +2607,7 @@ namespace Client
 
             spriteNum = GetPlayerSprite(index);
 
-            if (index < 0 | index > Constant.MaxPlayers)
+            if (index < 0 | index > Variables.MaxPlayers)
                 return;
 
             if (spriteNum <= 0 | spriteNum > GameState.NumCharacters)
@@ -3238,7 +3240,7 @@ namespace Client
             // Draw out the items
             if (GameState.NumItems > 0)
             {
-                for (i = 0; i < Constant.MaxMapItems; i++)
+                for (i = 0; i < Variables.MaxMapItems; i++)
                 {
                     DrawMapItem(i);
                 }
@@ -3263,7 +3265,7 @@ namespace Client
                 if (GameState.NumCharacters > 0)
                 {
                     // Npcs
-                    for (i = 0; i < Constant.MaxMapNpcs; i++)
+                    for (i = 0; i < Variables.MaxMapNpcs; i++)
                     {
                         if (Math.Floor((decimal) Data.MyMapNpc[i].Y / 32) == y)
                         {
@@ -3272,7 +3274,7 @@ namespace Client
                     }
 
                     // Players
-                    for (i = 0; i < Constant.MaxPlayers; i++)
+                    for (i = 0; i < Variables.MaxPlayers; i++)
                     {
                         if (IsPlaying(i) & GetPlayerMap(i) == GetPlayerMap(GameState.MyIndex))
                         {
@@ -3332,7 +3334,7 @@ namespace Client
                         }
                     }
 
-                    for (i = 0; i < Constant.MaxPlayers; i++)
+                    for (i = 0; i < Variables.MaxPlayers; i++)
                     {
                         if (IsPlaying(i))
                         {
@@ -3391,7 +3393,7 @@ namespace Client
 
             if (GameState.NumProjectiles > 0)
             {
-                for (i = 0; i < Constant.MaxProjectiles; i++)
+                for (i = 0; i < Variables.MaxProjectiles; i++)
                 {
                     if (Data.MapProjectile[Data.Player[GameState.MyIndex].Map, i].ProjectileNum >= 0)
                     {
@@ -3438,7 +3440,7 @@ namespace Client
                 DrawGrid();
             }
 
-            for (i = 0; i < Constant.MaxPlayers; i++)
+            for (i = 0; i < Variables.MaxPlayers; i++)
             {
                 if (IsPlaying(i) & GetPlayerMap(i) == GetPlayerMap(GameState.MyIndex))
                 {
@@ -3464,7 +3466,7 @@ namespace Client
                 }
             }
 
-            for (i = 0; i < Constant.MaxMapNpcs; i++)
+            for (i = 0; i < Variables.MaxMapNpcs; i++)
             {
                 TextRenderer.DrawNpcName(i);
             }

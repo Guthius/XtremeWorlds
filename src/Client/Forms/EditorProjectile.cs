@@ -153,14 +153,14 @@ namespace Client
                 int src = GameState.EditorIndex;
                 if (!_hasClipboardProjectile)
                 {
-                    if (src < 0 || src >= Constant.MaxProjectiles) return;
+                    if (src < 0 || src >= Variables.MaxProjectiles) return;
                     _clipboardProjectile = Data.Projectile[src];
                     _hasClipboardProjectile = true;
                     btnCopy.Text = "Paste";
                     return;
                 }
                 int def = GameState.EditorIndex + 1;
-                var oneBased = Editors.PromptIndex(this, "Paste Projectile", $"Paste projectile into index (1..{Constant.MaxProjectiles}):", 1, Constant.MaxProjectiles, def);
+                var oneBased = Editors.PromptIndex(this, "Paste Projectile", $"Paste projectile into index (1..{Variables.MaxProjectiles}):", 1, Variables.MaxProjectiles, def);
                 if (oneBased == null) return;
                 int dst = oneBased.Value - 1;
                 var n = _clipboardProjectile;
@@ -228,7 +228,7 @@ namespace Client
         {
             _initializing = true;
             lstIndex.Items.Clear();
-            for (int i = 0; i < Constant.MaxProjectiles; i++)
+            for (int i = 0; i < Variables.MaxProjectiles; i++)
             {
                 lstIndex.Items.Add(new ListItem { Text = (i + 1) + ": " + Data.Projectile[i].Name });
             }
@@ -238,7 +238,7 @@ namespace Client
             // Populate animations list (0 = None)
             cmbPlayAnimHit.Items.Clear();
             cmbPlayAnimHit.Items.Add("None");
-            for (int i = 0; i < Constant.MaxAnimations; i++)
+            for (int i = 0; i < Variables.MaxAnimations; i++)
             {
                 cmbPlayAnimHit.Items.Add($"{i + 1}: {Data.Animation[i].Name}");
             }

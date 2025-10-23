@@ -30,7 +30,7 @@ namespace Server
         {
             int getNpcMaxVital = default;
             // Prevent subscript out of range
-            if (npcNum < 0 | npcNum > Core.Globals.Constant.MaxNpcs)
+            if (npcNum < 0 | npcNum > Core.Globals.Variables.MaxNpcs)
                 return getNpcMaxVital;
 
             switch (vital)

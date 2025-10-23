@@ -368,7 +368,7 @@ namespace Client
             int src = GameState.EditorIndex;
             if (!_hasClipboardNpc)
             {
-                if (src < 0 || src >= Constant.MaxNpcs) return;
+                if (src < 0 || src >= Variables.MaxNpcs) return;
                 var sNpc = Data.Npc[src];
                 _clipboardNpc = sNpc; // struct copy
                 // deep copy arrays
@@ -383,7 +383,7 @@ namespace Client
             }
 
             int def = GameState.EditorIndex + 1;
-            var oneBased = Editors.PromptIndex(this, "Paste NPC", $"Paste NPC into index (1..{Constant.MaxNpcs}):", 1, Constant.MaxNpcs, def);
+            var oneBased = Editors.PromptIndex(this, "Paste NPC", $"Paste NPC into index (1..{Variables.MaxNpcs}):", 1, Variables.MaxNpcs, def);
             if (oneBased == null) return;
             int dst = oneBased.Value - 1;
             var nNpc = _clipboardNpc; // copy
@@ -430,19 +430,19 @@ namespace Client
         {
             _initializing = true;
             lstIndex.Items.Clear();
-            for (int i = 0; i < Constant.MaxNpcs; i++)
+            for (int i = 0; i < Variables.MaxNpcs; i++)
             {
                 lstIndex.Items.Add(new ListItem { Text = (i + 1) + ": " + Strings.Trim(Data.Npc[i].Name) });
             }
             // populate animations
             cmbAnimation.Items.Clear();
-            for (int i = 0; i < Constant.MaxAnimations; i++)
+            for (int i = 0; i < Variables.MaxAnimations; i++)
                 cmbAnimation.Items.Add((i + 1) + ": " + Data.Animation[i].Name);
             // populate skills
             void fillSkills(ComboBox cmb)
             {
                 cmb.Items.Clear();
-                for (int i = 0; i < Constant.MaxSkills; i++)
+                for (int i = 0; i < Variables.MaxSkills; i++)
                     cmb.Items.Add((i + 1) + ": " + Data.Skill[i].Name);
             }
             fillSkills(cmbSkill1); fillSkills(cmbSkill2); fillSkills(cmbSkill3);
@@ -450,7 +450,7 @@ namespace Client
 
             // populate items
             cmbItem.Items.Clear();
-            for (int i = 0; i < Constant.MaxItems; i++)
+            for (int i = 0; i < Variables.MaxItems; i++)
                 cmbItem.Items.Add((i + 1) + ": " + Data.Item[i].Name);
 
             cmbBehavior.Items.Clear();

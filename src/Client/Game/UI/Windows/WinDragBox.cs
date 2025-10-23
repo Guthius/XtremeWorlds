@@ -143,7 +143,7 @@ public static class WinDragBox
             case PartOrigin.Bank:
                 if (WindowManager.DragBox.Type == DraggablePartType.Item)
                 {
-                    for (var slot = 0; slot <= Constant.MaxBank; slot++)
+                    for (var slot = 0; slot <= Variables.MaxBank; slot++)
                     {
                         Type.Rect rect;
 
@@ -196,7 +196,7 @@ public static class WinDragBox
             case PartOrigin.Inventory:
                 if (WindowManager.DragBox.Type == DraggablePartType.Item)
                 {
-                    for (var slot = 0; slot < Constant.MaxInv; slot++)
+                    for (var slot = 0; slot < Variables.MaxInv; slot++)
                     {
                         Type.Rect rect;
 
@@ -249,7 +249,7 @@ public static class WinDragBox
             return;
         }
 
-        for (var slot = 0; slot < Constant.MaxPlayerSkills; slot++)
+        for (var slot = 0; slot < Variables.MaxPlayerSkills; slot++)
         {
             Type.Rect rect;
 
@@ -283,7 +283,7 @@ public static class WinDragBox
             return;
         }
 
-        for (var slot = 0; slot < Constant.MaxHotbar; slot++)
+        for (var slot = 0; slot < Variables.MaxHotbar; slot++)
         {
             Type.Rect rect;
 

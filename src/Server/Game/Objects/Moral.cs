@@ -46,7 +46,7 @@ public static class Moral
 
     public static async Task LoadMoralsAsync()
     {
-        await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Constant.MaxMorals), LoadMoralAsync);
+        await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxMorals), LoadMoralAsync);
     }
 
     private static void SaveMoral(int moralNum)
@@ -65,7 +65,7 @@ public static class Moral
 
     public static void SendMorals(int playerId)
     {
-        for (var moralNum = 0; moralNum < Core.Globals.Constant.MaxMorals; moralNum++)
+        for (var moralNum = 0; moralNum < Core.Globals.Variables.MaxMorals; moralNum++)
         {
             if (Data.Moral[moralNum].Name.Length > 0)
             {
@@ -146,7 +146,7 @@ public static class Moral
         }
 
         var moralNum = packetReader.ReadInt32();
-        if (moralNum is < 0 or > Core.Globals.Constant.MaxMorals)
+        if (moralNum < 0 || moralNum > global::Script.GetMaxMorals())
         {
             return;
         }

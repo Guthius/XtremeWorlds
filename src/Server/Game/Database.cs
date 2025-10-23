@@ -1012,7 +1012,7 @@ namespace Server
             using (var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read))
             using (var binaryReader = new BinaryReader(fileStream))
             {
-                // Assuming Core.Constant.MAX_X and Core.Constant.MAX_Y are the dimensions of your map
+                // Assuming Core.Variables.MAX_X and Core.Variables.MAX_Y are the dimensions of your map
                 int maxX = csMap.MapData.MaxX;
                 int maxY = csMap.MapData.MaxY;
 
@@ -2152,7 +2152,7 @@ namespace Server
                 packetWriter.WriteInt32(Data.Job[jobNum].Stat[i]);
             }
 
-            for (var q = 0; q < Core.Globals.Constant.MaxStartItems; q++)
+            for (var q = 0; q < Core.Globals.Variables.MaxStartItems; q++)
             {
                 packetWriter.WriteInt32(Data.Job[jobNum].StartItem[q]);
                 packetWriter.WriteInt32(Data.Job[jobNum].StartValue[q]);

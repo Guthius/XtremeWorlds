@@ -18,14 +18,14 @@ namespace Client
         private const int TileSize = 32;
 
         // Client-side prediction helpers: track remaining pixels and destination for current tile step.
-        private static readonly int[] RemainingPixels = new int[Constant.MaxMapNpcs];
-        private static readonly int[] DestX = new int[Constant.MaxMapNpcs];
-        private static readonly int[] DestY = new int[Constant.MaxMapNpcs];
+        private static readonly int[] RemainingPixels = new int[Variables.MaxMapNpcs];
+        private static readonly int[] DestX = new int[Variables.MaxMapNpcs];
+        private static readonly int[] DestY = new int[Variables.MaxMapNpcs];
 
         // Run animation finishing support: after movement stops, keep rendering the run segment
         // until the current cycle completes (based on Steps and 250ms cadence).
-        private static readonly long[] StopTick = new long[Constant.MaxMapNpcs];
-        private static readonly long[] FinishUntil = new long[Constant.MaxMapNpcs];
+        private static readonly long[] StopTick = new long[Variables.MaxMapNpcs];
+        private static readonly long[] FinishUntil = new long[Variables.MaxMapNpcs];
         private const int StepsCadenceMs = 250; // matches Loop.cs _tmr250 cadence
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Client
         /// </summary>
         public static void MarkMoveStart(int index)
         {
-            if (index < 0 || index >= Constant.MaxMapNpcs) return;
+            if (index < 0 || index >= Variables.MaxMapNpcs) return;
             StopTick[index] = 0;
             FinishUntil[index] = 0;
         }
@@ -44,7 +44,7 @@ namespace Client
         /// </summary>
         public static void StartStep(int index, int startX, int startY, byte dir)
         {
-            if (index < 0 || index >= Constant.MaxMapNpcs) return;
+            if (index < 0 || index >= Variables.MaxMapNpcs) return;
             // Reset finish-tail
             StopTick[index] = 0;
             FinishUntil[index] = 0;
@@ -60,7 +60,7 @@ namespace Client
         /// </summary>
         public static void MarkMoveStop(int index)
         {
-            if (index < 0 || index >= Constant.MaxMapNpcs) return;
+            if (index < 0 || index >= Variables.MaxMapNpcs) return;
             StopTick[index] = General.GetTickCount();
             FinishUntil[index] = 0; // will be set on first ShouldRenderRun call
         }
@@ -70,7 +70,7 @@ namespace Client
         /// </summary>
         public static void SnapToDest(int index)
         {
-            if (index < 0 || index >= Constant.MaxMapNpcs) return;
+            if (index < 0 || index >= Variables.MaxMapNpcs) return;
             if (Data.MyMapNpc == null) return;
             ref var npc = ref Data.MyMapNpc[index];
             if (RemainingPixels[index] > 0)
@@ -91,7 +91,7 @@ namespace Client
         /// <param name="steps">Current Steps counter for this NPC</param>
         public static bool ShouldRenderRun(int index, int runFrames, long tick, int steps)
         {
-            if (index < 0 || index >= Constant.MaxMapNpcs) return false;
+            if (index < 0 || index >= Variables.MaxMapNpcs) return false;
             if (runFrames <= 1) return false; // nothing to finish
             if (Data.MyMapNpc[index].Moving != 0) return false; // currently moving, not finishing
 
@@ -142,7 +142,7 @@ namespace Client
         /// <param name="pixelsPerTick">How many pixels to move this tick (>=1).</param>
         public static void ProcessMovement(int index, int pixelsPerTick)
         {
-            if (index < 0 || index >= Constant.MaxMapNpcs) return;
+            if (index < 0 || index >= Variables.MaxMapNpcs) return;
             if (Data.MyMapNpc == null) return;
 
             ref var npc = ref Data.MyMapNpc[index];
@@ -219,7 +219,7 @@ namespace Client
         /// </summary>
         public static void ProcessAll()
         {
-            for (int i = 0; i < Constant.MaxMapNpcs; i++)
+            for (int i = 0; i < Variables.MaxMapNpcs; i++)
                 ProcessMovement(i, 1);
         }
 
@@ -229,7 +229,7 @@ namespace Client
         public static void ProcessAll(int pixelsPerTick)
         {
             var step = Math.Max(1, pixelsPerTick);
-            for (int i = 0; i < Constant.MaxMapNpcs; i++)
+            for (int i = 0; i < Variables.MaxMapNpcs; i++)
                 ProcessMovement(i, step);
         }
 

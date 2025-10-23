@@ -7,9 +7,8 @@ using Core.Configurations;
 using Core.Globals;
 using Core.Net;
 using static Core.Globals.Command;
-using Microsoft.VisualBasic.CompilerServices;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.VisualBasic;
+
 using Type = Core.Globals.Type;
 
 namespace Client
@@ -23,7 +22,7 @@ namespace Client
             if (GameState.DrawThunder > 0)
             {
                 // Create a temporary texture matching the camera size
-                using (var thunderTexture = new Texture2D(GameClient.Graphics.GraphicsDevice, GameState.ResolutionWidth, GameState.ResolutionHeight))
+                using (var thunderTexture = new Texture2D(GameClient.Graphics?.GraphicsDevice, GameState.ResolutionWidth, GameState.ResolutionHeight))
                 {
                     // Create an array to store pixel data
                     var whitePixels = new Microsoft.Xna.Framework.Color[(GameState.ResolutionWidth * GameState.ResolutionHeight)];
@@ -36,9 +35,9 @@ namespace Client
                     thunderTexture.SetData(whitePixels);
 
                     // Begin SpriteBatch to render the thunder effect
-                    GameClient.SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive);
-                    GameClient.SpriteBatch.Draw(thunderTexture, new Microsoft.Xna.Framework.Rectangle(0, 0, GameState.ResolutionWidth, GameState.ResolutionHeight), Microsoft.Xna.Framework.Color.White);
-                    GameClient.SpriteBatch.End();
+                    GameClient.SpriteBatch?.Begin(SpriteSortMode.Immediate, BlendState.Additive);
+                    GameClient.SpriteBatch?.Draw(thunderTexture, new Microsoft.Xna.Framework.Rectangle(0, 0, GameState.ResolutionWidth, GameState.ResolutionHeight), Microsoft.Xna.Framework.Color.White);
+                    GameClient.SpriteBatch?.End();
                 }
 
                 // Decrease the thunder counter
@@ -51,7 +50,7 @@ namespace Client
             int i;
             int spriteLeft;
 
-            for (i = 0; i < Constant.MaxWeatherParticles; i++)
+            for (i = 0; i < Variables.MaxWeatherParticles; i++)
             {
                 if (Conversions.ToBoolean(GameState.WeatherParticle[i].InUse))
                 {
@@ -228,7 +227,7 @@ namespace Client
             if (Data.MyMap.Tile[x, y].Layer == null)
                 return;
 
-            if (Data.Autotile[x, y].Layer == null)
+            if (Data.Autotile?[x, y].Layer == null)
                 return;
 
             try
@@ -386,6 +385,8 @@ namespace Client
             if (Data.MyMap.Tile[x, y].Layer is null)
                 return;
             string argPath = System.IO.Path.Combine(DataPath.Tilesets, Data.MyMap.Tile[x, y].Layer[layerNum].Tileset.ToString());
+            if (Data.Autotile is null)
+                return;
             GameClient.RenderTexture(ref argPath, dX, dY, Data.Autotile[x, y].Layer[layerNum].SrcX[quarterNum] + xOffset, Data.Autotile[x, y].Layer[layerNum].SrcY[quarterNum] + yOffset, 16, 16, 16, 16);
         }
 
@@ -395,7 +396,7 @@ namespace Client
                 return; // Skip if no tint is applied
 
             // Create a new texture matching the camera size
-            var tintTexture = new Texture2D(GameClient.Graphics.GraphicsDevice, GameState.ResolutionWidth, GameState.ResolutionHeight);
+            var tintTexture = new Texture2D(GameClient.Graphics?.GraphicsDevice, GameState.ResolutionWidth, GameState.ResolutionHeight);
             var tintPixels = new Microsoft.Xna.Framework.Color[(GameState.ResolutionWidth * GameState.ResolutionHeight)];
 
             // Define the tint color with the given RGBA values
@@ -409,12 +410,12 @@ namespace Client
             tintTexture.SetData(tintPixels);
 
             // Start the sprite batch
-            GameClient.SpriteBatch.Begin();
+            GameClient.SpriteBatch?.Begin();
 
             // Draw the tinted texture over the entire camera view
-            GameClient.SpriteBatch.Draw(tintTexture, new Microsoft.Xna.Framework.Rectangle(0, 0, GameState.ResolutionWidth, GameState.ResolutionHeight), Microsoft.Xna.Framework.Color.White);
+            GameClient.SpriteBatch?.Draw(tintTexture, new Microsoft.Xna.Framework.Rectangle(0, 0, GameState.ResolutionWidth, GameState.ResolutionHeight), Microsoft.Xna.Framework.Color.White);
 
-            GameClient.SpriteBatch.End();
+            GameClient.SpriteBatch?.End();
 
             // Dispose of the temporary texture to free resources
             tintTexture.Dispose();
@@ -426,7 +427,7 @@ namespace Client
                 return; // Exit if fading is disabled
 
             // Create a new texture matching the camera view size
-            var fadeTexture = new Texture2D(GameClient.Graphics.GraphicsDevice, GameState.ResolutionWidth, GameState.ResolutionHeight);
+            var fadeTexture = new Texture2D(GameClient.Graphics?.GraphicsDevice, GameState.ResolutionWidth, GameState.ResolutionHeight);
             var blackPixels = new Microsoft.Xna.Framework.Color[(GameState.ResolutionWidth * GameState.ResolutionHeight)];
 
             // Fill the pixel array with black color and specified alpha for the fade effect
@@ -437,12 +438,12 @@ namespace Client
             fadeTexture.SetData(blackPixels);
 
             // Start the sprite batch
-            GameClient.SpriteBatch.Begin();
+            GameClient.SpriteBatch?.Begin();
 
             // Draw the fade texture over the entire camera view
-            GameClient.SpriteBatch.Draw(fadeTexture, new Microsoft.Xna.Framework.Rectangle(0, 0, GameState.ResolutionWidth, GameState.ResolutionHeight), Microsoft.Xna.Framework.Color.White);
+            GameClient.SpriteBatch?.Draw(fadeTexture, new Microsoft.Xna.Framework.Rectangle(0, 0, GameState.ResolutionWidth, GameState.ResolutionHeight), Microsoft.Xna.Framework.Color.White);
 
-            GameClient.SpriteBatch.End();
+            GameClient.SpriteBatch?.End();
 
             // Dispose of the texture to free resources
             fadeTexture.Dispose();
@@ -527,6 +528,11 @@ namespace Client
                         return;
                     }
 
+                    if (Data.MapEvents == null)
+                    {
+                        return;
+                    
+                    }
                     posX = (int) Math.Round(GameLogic.ConvertMapX(Data.MapEvents[Event.Picture.EventId].X) / 2d - Event.Picture.XOffset);
                     posY = (int) Math.Round(GameLogic.ConvertMapY(Data.MapEvents[Event.Picture.EventId].Y) / 2d - Event.Picture.YOffset);
                     break;
@@ -546,8 +552,8 @@ namespace Client
             // Reset basic map properties
             Data.MyMap.Name = string.Empty;
             Data.MyMap.Tileset = 1;
-            Data.MyMap.MaxX = Constant.MaxMapx;
-            Data.MyMap.MaxY = Constant.MaxMapy;
+            Data.MyMap.MaxX = Variables.MaxMapx;
+            Data.MyMap.MaxY = Variables.MaxMapy;
             Data.MyMap.BootMap = 0;
             Data.MyMap.BootX = 0;
             Data.MyMap.BootY = 0;
@@ -560,9 +566,9 @@ namespace Client
             Data.MyMap.Up = 0;
 
             // Initialize Npc and Tile arrays
-            Data.MyMap.Npc = new int[Constant.MaxMapNpcs];
+            Data.MyMap.Npc = new int[Variables.MaxMapNpcs];
 
-            for (int i = 0; i < Constant.MaxMapNpcs; i++)
+            for (int i = 0; i < Variables.MaxMapNpcs; i++)
             {
                 Data.MyMap.Npc[i] = -1;
             }
@@ -622,7 +628,7 @@ namespace Client
 
         public static void ClearMapItems()
         {
-            for (int i = 0; i < Constant.MaxMapItems; i++)
+            for (int i = 0; i < Variables.MaxMapItems; i++)
                 ClearMapItem(i);
         }
 
@@ -658,7 +664,7 @@ namespace Client
 
         public static void ClearMapNpcs()
         {
-            for (int i = 0; i < Constant.MaxMapNpcs; i++)
+            for (int i = 0; i < Variables.MaxMapNpcs; i++)
                 ClearMapNpc(i);
         }
 
@@ -685,7 +691,7 @@ namespace Client
             GameState.GettingMap = true;
 
             // Erase all players except self
-            for (i = 0; i < Constant.MaxPlayers; i++)
+            for (i = 0; i < Variables.MaxPlayers; i++)
             {
                 if (i != GameState.MyIndex)
                 {
@@ -703,8 +709,6 @@ namespace Client
             Animation.ClearAnimInstances();
 
             GameState.ResourceIndex = 0;
-            Data.MyMapResource = default;
-            Data.MapResource = default;
 
             // Get map num
             x = buffer.ReadInt32();
@@ -791,7 +795,7 @@ namespace Client
                     }
                 }
 
-                for (x = 0; x < Constant.MaxMapNpcs; x++)
+                for (x = 0; x < Variables.MaxMapNpcs; x++)
                     Data.MyMap.Npc[x] = buffer.ReadInt32();
 
                 var loopTo = (int) Data.MyMap.MaxX;
@@ -982,7 +986,7 @@ namespace Client
                 }
             }
 
-            for (i = 0; i < Constant.MaxMapItems; i++)
+            for (i = 0; i < Variables.MaxMapItems; i++)
             {
                 Data.MyMapItem[i].Num = buffer.ReadInt32();
                 Data.MyMapItem[i].Value = buffer.ReadInt32();
@@ -992,7 +996,7 @@ namespace Client
 
             int vitalCount = Enum.GetValues(typeof(Vital)).Length;
 
-            for (i = 0; i < Constant.MaxMapNpcs; i++)
+            for (i = 0; i < Variables.MaxMapNpcs; i++)
             {
                 Data.MyMapNpc[i].Num = buffer.ReadInt32();
                 Data.MyMapNpc[i].X = buffer.ReadInt32();
@@ -1007,7 +1011,7 @@ namespace Client
                 GameState.ResourceIndex = buffer.ReadInt32();
                 GameState.ResourcesInit = false;
                 Data.MapResource = new Type.MapResource[GameState.ResourceIndex];
-                Data.MyMapResource = new Type.MapResourceCache[Constant.MaxResources];
+                Data.MyMapResource = new Type.MapResourceCache[Variables.MaxResources];
 
                 if (GameState.ResourceIndex > 0)
                 {
@@ -1066,7 +1070,7 @@ namespace Client
         {
             var buffer = new PacketReader(data);
 
-            for (int i = 0; i < Constant.MaxMapItems; i++)
+            for (int i = 0; i < Variables.MaxMapItems; i++)
             {
                 ref var withBlock = ref Data.MyMapItem[i];
                 withBlock.Num = buffer.ReadInt32();
@@ -1082,7 +1086,7 @@ namespace Client
             int i;
             var buffer = new PacketReader(data);
 
-            for (i = 0; i < Constant.MaxMapNpcs; i++)
+            for (i = 0; i < Variables.MaxMapNpcs; i++)
             {
                 ref var withBlock = ref Data.MyMapNpc[i];
                 withBlock.Num = buffer.ReadInt32();
@@ -1178,7 +1182,7 @@ namespace Client
             packetWriter.WriteBoolean(Data.MyMap.Indoors);
             packetWriter.WriteInt32(Data.MyMap.Shop);
 
-            for (i = 0; i < Constant.MaxMapNpcs; i++)
+            for (i = 0; i < Variables.MaxMapNpcs; i++)
             {
                 packetWriter.WriteInt32(Data.MyMap.Npc[i]);
             }
@@ -1355,7 +1359,6 @@ namespace Client
             for (int i = 0, loopTo = Data.MyMap.EventCount; i < loopTo; i++)
             {
                 Data.MapEvents = default;
-                Data.MyMap.Event = default;
             }
 
             GameState.CurrentEvents = 0;

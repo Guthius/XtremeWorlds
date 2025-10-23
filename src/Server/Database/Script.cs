@@ -25,18 +25,18 @@ using System.Collections.Generic;
 using System.Net.Http.Headers;
 using Core.Configurations;
 using Server.Game;
-using Constant = Core.Globals.Constant;
+using Variables = Core.Globals.Variables;
 using EventCommand = Core.Globals.EventCommand;
 using Type = Core.Globals.Type;
 using Microsoft.Extensions.Logging;
 
 public class Script
-{
+{   
     // Add a per-player pickup lock
-    private static bool[] _isPickingUp = new bool[Constant.MaxPlayers];
-    private static bool[] _isUsingItem = new bool[Constant.MaxPlayers];
-    private static bool[] _isEquippingItem = new bool[Constant.MaxPlayers];
-    private static bool[] _isUnequippingItem = new bool[Constant.MaxPlayers];
+    private static bool[] _isPickingUp = new bool[Variables.MaxPlayers];
+    private static bool[] _isUsingItem = new bool[Variables.MaxPlayers];
+    private static bool[] _isEquippingItem = new bool[Variables.MaxPlayers];
+    private static bool[] _isUnequippingItem = new bool[Variables.MaxPlayers];
 
     // Timers for periodic regeneration
     private static long _lastNpcRegen;
@@ -53,46 +53,46 @@ public class Script
     private const byte MaxLevel = 99;
 
     // Mutable script-driven limits (initialized from engine defaults)
-    public static int MaxAnimations = Constant.MaxAnimations;
-    public static byte MaxBank = Constant.MaxBank;
-    public static byte MaxJobs = Constant.MaxJobs;
-    public static byte MaxMorals = Constant.MaxMorals;
-    public static byte MaxInv = Constant.MaxInv;
-    public static int MaxItems = Constant.MaxItems;
-    public static int MaxMaps = Constant.MaxMaps;
-    public static byte MaxMapItems = Constant.MaxMapItems;
-    public static byte MaxMapNpcs = Constant.MaxMapNpcs;
-    public static int MaxNpcs = Constant.MaxNpcs;
-    public static byte MaxNpcSkills = Constant.MaxNpcSkills;
-    public static int MaxParty = Constant.MaxParty;
-    public static int MaxPartyMembers = Constant.MaxPartyMembers;
-    public static int MaxPlayers = Constant.MaxPlayers;
-    public static byte MaxPlayerSkills = Constant.MaxPlayerSkills;
-    public static int MaxResources = Constant.MaxResources;
-    public static int MaxShops = Constant.MaxShops;
-    public static int MaxSkills = Constant.MaxSkills;
-    public static byte MaxTrades = Constant.MaxTrades;
-    public static byte NameLength = Constant.NameLength;
-    public static byte MinNameLength = Constant.MinNameLength;
-    public static byte ChatLength = Constant.ChatLength;
-    public static byte MaxHotbar = Constant.MaxHotbar;
-    public static byte MaxMapx = Constant.MaxMapx;
-    public static byte MaxMapy = Constant.MaxMapy;
-    public static int MaxProjectiles = Constant.MaxProjectiles;
-    public static byte MaxDropItems = Constant.MaxDropItems;
-    public static byte MaxStartItems = Constant.MaxStartItems;
-    public static int MaxSwitches = Constant.MaxSwitches;
-    public static int MaxVariables = Constant.MaxVariables;
-    public static byte MaxPoints = Constant.MaxPoints;
-    public static byte MaxChars = Constant.MaxChars;
-    public static int ChatLines = Constant.ChatLines;
-    public static byte MaxStats = Constant.MaxStats;
-    public static byte MaxQuests = Constant.MaxQuests;
-    public static int MaxEvents = Constant.MaxEvents;
-    public static byte MaxGuilds = Constant.MaxGuilds;
-    public static byte MaxEventChoices = Constant.MaxEventChoices;
-    public static int TileSize = Constant.TileSize;
-    public static int MaxWeatherParticles = Constant.MaxWeatherParticles;
+    public static int MaxAnimations = Variables.MaxAnimations;
+    public static byte MaxBank = Variables.MaxBank;
+    public static byte MaxJobs = Variables.MaxJobs;
+    public static byte MaxMorals = Variables.MaxMorals;
+    public static byte MaxInv = Variables.MaxInv;
+    public static int MaxItems = Variables.MaxItems;
+    public static int MaxMaps = Variables.MaxMaps;
+    public static byte MaxMapItems = Variables.MaxMapItems;
+    public static byte MaxMapNpcs = Variables.MaxMapNpcs;
+    public static int MaxNpcs = Variables.MaxNpcs;
+    public static byte MaxNpcSkills = Variables.MaxNpcSkills;
+    public static int MaxParty = Variables.MaxParty;
+    public static int MaxPartyMembers = Variables.MaxPartyMembers;
+    public static int MaxPlayers = Variables.MaxPlayers;
+    public static byte MaxPlayerSkills = Variables.MaxPlayerSkills;
+    public static int MaxResources = Variables.MaxResources;
+    public static int MaxShops = Variables.MaxShops;
+    public static int MaxSkills = Variables.MaxSkills;
+    public static byte MaxTrades = Variables.MaxTrades;
+    public static byte NameLength = Variables.NameLength;
+    public static byte MinNameLength = Variables.MinNameLength;
+    public static byte ChatLength = Variables.ChatLength;
+    public static byte MaxHotbar = Variables.MaxHotbar;
+    public static byte MaxMapx = Variables.MaxMapx;
+    public static byte MaxMapy = Variables.MaxMapy;
+    public static int MaxProjectiles = Variables.MaxProjectiles;
+    public static byte MaxDropItems = Variables.MaxDropItems;
+    public static byte MaxStartItems = Variables.MaxStartItems;
+    public static int MaxSwitches = Variables.MaxSwitches;
+    public static int MaxVariables = Variables.MaxVariables;
+    public static byte MaxPoints = Variables.MaxPoints;
+    public static byte MaxChars = Variables.MaxChars;
+    public static int ChatLines = Variables.ChatLines;
+    public static byte MaxStats = Variables.MaxStats;
+    public static byte MaxQuests = Variables.MaxQuests;
+    public static int MaxEvents = Variables.MaxEvents;
+    public static byte MaxGuilds = Variables.MaxGuilds;
+    public static byte MaxEventChoices = Variables.MaxEventChoices;
+    public static int TileSize = Variables.TileSize;
+    public static int MaxWeatherParticles = Variables.MaxWeatherParticles;
 
     // Accessors for use across the server, allowing scripts to override values centrally
     public static int GetMaxAnimations() => MaxAnimations;
@@ -314,7 +314,6 @@ public class Script
         _isUsingItem[index] = true;
         try
         {            
-
             var tempdata = new int[Enum.GetValues(typeof(Stat)).Length + 4];
             var tempstr = new string[3];
 
@@ -517,7 +516,7 @@ public class Script
             n = Data.Item[itemNum].Data1;
         }
 
-        if (n < 0 | n > Constant.MaxSkills)
+        if (n < 0 | n > Variables.MaxSkills)
             return;
 
         // Make sure they are the right class
@@ -753,7 +752,7 @@ public class Script
     public void TrainStat(int index, int tmpStat)
     {
         // make sure their stats are not maxed
-        if (GetPlayerRawStat(index, (Stat)tmpStat) >= Constant.MaxStats)
+        if (GetPlayerRawStat(index, (Stat)tmpStat) >= Variables.MaxStats)
         {
             NetworkSend.PlayerMsg(index, "You cannot spend any more points on that stat.", (int)ColorName.BrightRed);
             return;
@@ -1107,7 +1106,7 @@ public class Script
                 if (e.Num < 0) continue;
                 var npcIndex = e.Id; // Index into Data.MapNpc[map].Npc
                 var map = e.Map;
-                if (map < 0 || map >= Constant.MaxMaps) continue;
+                if (map < 0 || map >= Variables.MaxMaps) continue;
                 if (npcIndex < 0 || npcIndex >= GetMaxMapNpcs()) continue;
 
                 ref var baseNpc = ref Data.MapNpc[map].Npc[npcIndex];
@@ -1213,8 +1212,8 @@ public class Script
         }
 
         var now = General.GetTimeMs();
-        var itemCount = Constant.MaxMapItems;
-        var mapCount = Constant.MaxMaps;
+        var itemCount = Variables.MaxMapItems;
+        var mapCount = Variables.MaxMaps;
 
         for (int mapNum = 0; mapNum < mapCount; mapNum++)
         {
@@ -2206,7 +2205,7 @@ public class Script
                     int destMap = skill.Map;
                     int destX = skill.X;
                     int destY = skill.Y;
-                    if (destMap >= 0 && destMap < Data.Map.Length && destX >= 0 && destX < Constant.MaxMapx && destY >= 0 && destY < Constant.MaxMapy)
+                    if (destMap >= 0 && destMap < Data.Map.Length && destX >= 0 && destX < Variables.MaxMapx && destY >= 0 && destY < Variables.MaxMapy)
                     {
                         if (caster.Type == Core.Globals.Entity.EntityType.Player)
                         {

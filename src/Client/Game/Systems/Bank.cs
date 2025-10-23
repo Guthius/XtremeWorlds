@@ -19,11 +19,11 @@ namespace Client
             int i;
             int x;
 
-            for (x = 0; x < Constant.MaxPlayers; x++)
+            for (x = 0; x < Variables.MaxPlayers; x++)
             {
-                Data.Bank[x].Item = new Type.PlayerInv[(Constant.MaxBank + 1)];
+                Data.Bank[x].Item = new Type.PlayerInv[(Variables.MaxBank + 1)];
 
-                for (i = 0; i < Constant.MaxBank; i++)
+                for (i = 0; i < Variables.MaxBank; i++)
                 {
                     Data.Bank[x].Item[i].Num = -1;
                     Data.Bank[x].Item[i].Value = 0;
@@ -40,7 +40,7 @@ namespace Client
             int i;
             var buffer = new PacketReader(data);
 
-            for (i = 0; i < Constant.MaxBank; i++)
+            for (i = 0; i < Variables.MaxBank; i++)
             {
                 SetBank(GameState.MyIndex, (byte)i, buffer.ReadInt32());
                 SetBankValue(GameState.MyIndex, (byte)i, buffer.ReadInt32());

@@ -22,9 +22,9 @@ namespace Client
         {
             int i;
 
-            Data.Moral = new Type.Moral[(Constant.MaxMorals)];
+            Data.Moral = new Type.Moral[(Variables.MaxMorals)];
 
-            for (i = 0; i < Constant.MaxMorals; i++)
+            for (i = 0; i < Variables.MaxMorals; i++)
                 ClearMoral(i);
         }
 

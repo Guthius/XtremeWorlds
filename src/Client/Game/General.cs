@@ -191,14 +191,14 @@ namespace Client
             Bank.ClearBanks();
             Party.ClearParty();
 
-            for (int i = 0; i < Constant.MaxPlayers; i++)
+            for (int i = 0; i < Variables.MaxPlayers; i++)
                 Player.ClearPlayer(i);
 
             Animation.ClearAnimInstances();
             Autotile.ClearAutotiles();
 
             // clear chat
-            for (int i = 0; i < Constant.ChatLines; i++)
+            for (int i = 0; i < Variables.ChatLines; i++)
                 Data.Chat[i].Text = "";
         }
 
@@ -314,7 +314,7 @@ namespace Client
 
         public static int IsInv(long startX, long startY)
         {
-            for (var i = 0; i < Constant.MaxInv; i++)
+            for (var i = 0; i < Variables.MaxInv; i++)
             {
                 if (GetPlayerInv(GameState.MyIndex, i) < 0)
                 {
@@ -344,7 +344,7 @@ namespace Client
             Type.Rect tempRec;
             int i;
 
-            for (i = 0; i < Constant.MaxPlayerSkills; i++)
+            for (i = 0; i < Variables.MaxPlayerSkills; i++)
             {
                 if (Data.Player[GameState.MyIndex].Skill[(int) i].Num >= 0)
                 {
@@ -370,7 +370,7 @@ namespace Client
             int isBank = default;
             Type.Rect tempRec;
 
-            for (int i = 0; i < Constant.MaxBank; i++)
+            for (int i = 0; i < Variables.MaxBank; i++)
             {
                 if (GetBank(GameState.MyIndex, i) >= 0)
                 {
@@ -397,7 +397,7 @@ namespace Client
             Type.Rect tempRec;
             int i;
 
-            for (i = 0; i < Constant.MaxTrades; i++)
+            for (i = 0; i < Variables.MaxTrades; i++)
             {
                 tempRec.Top = startY + GameState.ShopTop + (GameState.ShopOffsetY + GameState.SizeY) * (i / GameState.ShopColumns);
                 tempRec.Bottom = tempRec.Top + GameState.SizeY;
@@ -421,7 +421,7 @@ namespace Client
             Type.Rect tempRec;
             int i;
 
-            for (i = 0; i < Constant.MaxInv; i++)
+            for (i = 0; i < Variables.MaxInv; i++)
             {
                 tempRec.Top = startY + GameState.TradeTop + (GameState.TradeOffsetY + GameState.SizeY) * (i / GameState.TradeColumns);
                 tempRec.Bottom = tempRec.Top + GameState.SizeY;

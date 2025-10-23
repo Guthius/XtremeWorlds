@@ -27,8 +27,8 @@ namespace Client
         {
             Data.Shop[index] = default;
             Data.Shop[index].Name = "";
-            Data.Shop[index].TradeItem = new Type.TradeItem[Constant.MaxTrades];
-            for (int x = 0; x < Constant.MaxTrades; x++)
+            Data.Shop[index].TradeItem = new Type.TradeItem[Variables.MaxTrades];
+            for (int x = 0; x < Variables.MaxTrades; x++)
             {            
                 Data.Shop[index].TradeItem[x].Item = -1;
                 Data.Shop[index].TradeItem[x].CostItem = - 1;
@@ -40,9 +40,9 @@ namespace Client
         {
             int i;
 
-            Data.Shop = new Type.Shop[Constant.MaxShops];
+            Data.Shop = new Type.Shop[Variables.MaxShops];
 
-            for (i = 0; i < Constant.MaxShops; i++)
+            for (i = 0; i < Variables.MaxShops; i++)
                 ClearShop(i);
 
         }
@@ -84,7 +84,7 @@ namespace Client
             Data.Shop[shopnum].BuyRate = buffer.ReadInt32();
             Data.Shop[shopnum].Name = buffer.ReadString();
 
-            for (int i = 0; i < Constant.MaxTrades; i++)
+            for (int i = 0; i < Variables.MaxTrades; i++)
             {
                 Data.Shop[shopnum].TradeItem[i].CostItem = buffer.ReadInt32();
                 Data.Shop[shopnum].TradeItem[i].CostValue = buffer.ReadInt32();

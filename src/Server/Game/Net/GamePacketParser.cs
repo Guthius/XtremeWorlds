@@ -182,7 +182,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         // Retrieve the version information
         var clientVersionBytes = reader.ReadBytes().ToArray();
-        var serverVersion = assembly.GetName().Version.ToString();
+        var serverVersion = assembly.GetName().Version?.ToString();
         var clientVersion = System.Text.Encoding.UTF8.GetString(session.Decrypt(clientVersionBytes));
 
         // Check versions
@@ -192,7 +192,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             return;
         }
 
-        if (username.Length > Core.Globals.Constant.NameLength | username.Length < Core.Globals.Constant.MinNameLength)
+        if (username.Length > Core.Globals.Variables.NameLength | username.Length < Core.Globals.Variables.MinNameLength)
         {
             NetworkSend.AlertMsg(session, SystemMessage.NameLengthInvalid);
             return;
@@ -231,6 +231,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         General.Logger.LogInformation("{AccountName} has logged in from {IpAddress}",
             GetAccountLogin(session.Id), session.Channel.IpAddress);
 
+        NetworkSend.SendConstants(session);
         NetworkSend.SendPlayerChars(session);
         NetworkSend.SendJobs(session);
     }
@@ -270,7 +271,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         // Retrieve the version information
         var clientVersionBytes = buffer.ReadBytes().ToArray();
-        var serverVersion = assembly.GetName().Version.ToString();
+        var serverVersion = assembly.GetName().Version?.ToString();
         var clientVersion = System.Text.Encoding.UTF8.GetString(session.Decrypt(clientVersionBytes));
 
         // Check versions
@@ -309,6 +310,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Database.RegisterAccount(session.Id, username, password);
 
         // send them to the character portal
+        NetworkSend.SendConstants(session);
         NetworkSend.SendPlayerChars(session);
         NetworkSend.SendJobs(session);
     }
@@ -320,8 +322,6 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         int sexNum;
         int jobNum;
         int sprite;
-        int i;
-        int n;
         var buffer = new PacketReader(bytes);
 
         if (!NetworkConfig.IsPlaying(session.Id))
@@ -331,7 +331,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             sexNum = buffer.ReadInt32();
             jobNum = buffer.ReadInt32();
 
-            if (slot < 1 | slot > Core.Globals.Constant.MaxChars)
+            if (slot < 1 | slot > Core.Globals.Variables.MaxChars)
             {
                 NetworkSend.AlertMsg(session, SystemMessage.MaxCharactersReached, Menu.CharacterSelect);
                 return;
@@ -367,7 +367,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             if (sexNum < (byte) Sex.Male | sexNum > (byte) Sex.Female)
                 return;
 
-            if (jobNum < 0 | jobNum > Core.Globals.Constant.MaxJobs)
+            if (jobNum < 0 | jobNum > Core.Globals.Variables.MaxJobs)
                 return;
 
             if (sexNum == (byte) Sex.Male)
@@ -405,7 +405,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             if (NetworkConfig.IsLoggedIn(session.Id))
             {
                 var slot = reader.ReadByte();
-                if (slot < 1 | slot > Core.Globals.Constant.MaxChars)
+                if (slot < 1 | slot > Core.Globals.Variables.MaxChars)
                 {
                     NetworkSend.AlertMsg(session, SystemMessage.MaxCharactersReached, Menu.CharacterSelect);
                     return;
@@ -432,7 +432,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         if (!NetworkConfig.IsPlaying(session.Id))
         {
             var slot = buffer.ReadByte();
-            if (slot < 1 | slot > Core.Globals.Constant.MaxChars)
+            if (slot < 1 | slot > Core.Globals.Variables.MaxChars)
             {
                 NetworkSend.AlertMsg(session, SystemMessage.MaxCharactersReached, Menu.CharacterSelect);
                 return;
@@ -525,7 +525,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var msg = buffer.ReadString();
 
         NetworkSend.AdminMsg(msg);
-        Log.Add(s, Constant.PlayerLog);
+        Log.Add(s ?? string.Empty, Constant.PlayerLog);
         Console.WriteLine(s);
     }
 
@@ -756,7 +756,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Core.Globals.Entity? targetEntity = null;
 
         // 1. Prefer npc target at tile (x,y)
-        for (int i = 0; i < Core.Globals.Constant.MaxMapNpcs; i++)
+        for (int i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
         {
             var npc = Data.MapNpc[mapNum].Npc[i];
             if (npc.Num < 0) continue;
@@ -981,7 +981,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var n = buffer.ReadInt32();
 
         // Prevent hacking
-        if (n < 0 | n > Core.Globals.Constant.MaxMaps)
+        if (n < 0 | n > Core.Globals.Variables.MaxMaps)
             return;
 
         Server.Player.PlayerWarp(session.Id, n, GetPlayerX(session.Id), GetPlayerY(session.Id), (byte) Direction.Down);
@@ -1087,7 +1087,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         Data.Map[mapNum].Tile = new Type.Tile[Data.Map[mapNum].MaxX, Data.Map[mapNum].MaxY];
         
-        for (x = 0; x < Core.Globals.Constant.MaxMapNpcs; x++)
+        for (x = 0; x < Core.Globals.Variables.MaxMapNpcs; x++)
         {
             Database.ClearMapNpc(x, mapNum);
             
@@ -1295,7 +1295,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         }
 
         // Clear it all out
-        var loopTo11 = Core.Globals.Constant.MaxMapItems;
+        var loopTo11 = Core.Globals.Variables.MaxMapItems;
         for (var i = 0; i < loopTo11; i++)
         {
             Database.ClearMapItem(i, GetPlayerMap(session.Id));
@@ -1333,7 +1333,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             NetworkSend.SendMapData(session.Id, GetPlayerMap(session.Id), false);
         }
 
-        if (Data.Map[GetPlayerMap(session.Id)].Shop >= 0 && Data.Map[GetPlayerMap(session.Id)].Shop < Core.Globals.Constant.MaxShops)
+        if (Data.Map[GetPlayerMap(session.Id)].Shop >= 0 && Data.Map[GetPlayerMap(session.Id)].Shop < Core.Globals.Variables.MaxShops)
         {
             if (!string.IsNullOrEmpty(Data.Shop[Data.Map[GetPlayerMap(session.Id)].Shop].Name))
             {
@@ -1357,7 +1357,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             return;
 
         // Clear out it all
-        var loopTo = Core.Globals.Constant.MaxMapItems;
+        var loopTo = Core.Globals.Variables.MaxMapItems;
         for (i = 0; i < loopTo; i++)
         {
             Database.ClearMapItem(i, GetPlayerMap(session.Id));
@@ -1367,7 +1367,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Item.SpawnMapItems(GetPlayerMap(session.Id));
 
         // Respawn NpcS
-        var loopTo1 = Core.Globals.Constant.MaxMapNpcs;
+        var loopTo1 = Core.Globals.Variables.MaxMapNpcs;
         for (i = 0; i < loopTo1; i++)
             Npc.SpawnNpc(i, GetPlayerMap(session.Id));
 
@@ -1555,13 +1555,13 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var shopNum = buffer.ReadInt32();
 
         // Prevent hacking
-        if (shopNum < 0 | shopNum > Core.Globals.Constant.MaxShops)
+        if (shopNum < 0 | shopNum > Core.Globals.Variables.MaxShops)
             return;
 
         Data.Shop[shopNum].BuyRate = buffer.ReadInt32();
         Data.Shop[shopNum].Name = buffer.ReadString();
 
-        for (int i = 0, loopTo = Core.Globals.Constant.MaxTrades; i < loopTo; i++)
+        for (int i = 0, loopTo = Core.Globals.Variables.MaxTrades; i < loopTo; i++)
         {
             Data.Shop[shopNum].TradeItem[i].CostItem = buffer.ReadInt32();
             Data.Shop[shopNum].TradeItem[i].CostValue = buffer.ReadInt32();
@@ -1611,7 +1611,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var skillNum = buffer.ReadInt32();
 
         // Prevent hacking
-        if (skillNum < 0 | skillNum > Core.Globals.Constant.MaxSkills)
+        if (skillNum < 0 | skillNum > Core.Globals.Variables.MaxSkills)
             return;
 
         Data.Skill[skillNum].AccessReq = buffer.ReadInt32();
@@ -1805,7 +1805,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         }
 
         // Check for an item
-        var loopTo1 = Core.Globals.Constant.MaxMapItems;
+        var loopTo1 = Core.Globals.Variables.MaxMapItems;
         for (var i = 0; i < loopTo1; i++)
         {
             if (Data.MapItem[GetPlayerMap(session.Id), i].Num >= 0)
@@ -1825,7 +1825,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         }
 
         // Check for an npc
-        var loopTo2 = Core.Globals.Constant.MaxMapNpcs;
+        var loopTo2 = Core.Globals.Variables.MaxMapNpcs;
         for (var i = 0; i < loopTo2; i++)
         {
             if (Data.MapNpc[GetPlayerMap(session.Id)].Npc[i].Num >= 0)
@@ -1939,7 +1939,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         var n = buffer.ReadInt32();
 
-        if (n < 0 | n > Core.Globals.Constant.MaxNpcs)
+        if (n < 0 | n > Core.Globals.Variables.MaxNpcs)
             return;
 
         Npc.SendUpdateNpcTo(session.Id, n);
@@ -1986,7 +1986,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         var n = buffer.ReadInt32();
 
-        if (n < 0 | n > Core.Globals.Constant.MaxSkills)
+        if (n < 0 | n > Core.Globals.Variables.MaxSkills)
             return;
 
         NetworkSend.SendUpdateSkillTo(session.Id, n);
@@ -1998,7 +1998,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         var n = buffer.ReadInt32();
 
-        if (n < 0 | n > Core.Globals.Constant.MaxShops)
+        if (n < 0 | n > Core.Globals.Variables.MaxShops)
             return;
 
         NetworkSend.SendUpdateShopTo(session.Id, n);
@@ -2021,7 +2021,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var skillSlot = buffer.ReadInt32();
 
         // Check for subscript out of range
-        if (skillSlot < 0 | skillSlot > Core.Globals.Constant.MaxPlayerSkills)
+        if (skillSlot < 0 | skillSlot > Core.Globals.Variables.MaxPlayerSkills)
             return;
 
         // dont let them forget a skill which is in CD
@@ -2056,7 +2056,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         // not in shop, exit out
         var shopMum = Data.TempPlayer[session.Id].InShop;
 
-        if (shopMum < 0 | shopMum > Core.Globals.Constant.MaxShops)
+        if (shopMum < 0 | shopMum > Core.Globals.Variables.MaxShops)
             return;
 
         ref var withBlock = ref Data.Shop[(int) shopMum].TradeItem[shopSlot];
@@ -2091,18 +2091,18 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var invSlot = buffer.ReadInt32();
 
         // if invalid, exit out
-        if (invSlot < 0 | invSlot > Core.Globals.Constant.MaxInv)
+        if (invSlot < 0 | invSlot > Core.Globals.Variables.MaxInv)
             return;
 
         // has item?
-        if (GetPlayerInv(session.Id, invSlot) < 0 | GetPlayerInv(session.Id, invSlot) > Core.Globals.Constant.MaxItems)
+        if (GetPlayerInv(session.Id, invSlot) < 0 | GetPlayerInv(session.Id, invSlot) > Core.Globals.Variables.MaxItems)
             return;
 
         // seems to be valid
         double itemNum = GetPlayerInv(session.Id, invSlot);
         var shopNum = Data.TempPlayer[session.Id].InShop;
 
-        if (shopNum < 0 || shopNum > Core.Globals.Constant.MaxShops)
+        if (shopNum < 0 || shopNum > Core.Globals.Variables.MaxShops)
         {
             return;
         }
@@ -2197,7 +2197,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         // Check for a player
         var tradeTarget = GameLogic.FindPlayer(name);
 
-        if (tradeTarget < 0 | tradeTarget >= Core.Globals.Constant.MaxPlayers)
+        if (tradeTarget < 0 | tradeTarget >= Core.Globals.Variables.MaxPlayers)
             return;
 
         // can't trade with yourself..
@@ -2225,7 +2225,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         var tradeTarget = Data.TempPlayer[session.Id].TradeRequest;
 
-        if (tradeTarget < 0 | tradeTarget >= Core.Globals.Constant.MaxPlayers)
+        if (tradeTarget < 0 | tradeTarget >= Core.Globals.Variables.MaxPlayers)
             return;
 
         if (status == 0)
@@ -2253,10 +2253,10 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             // clear out their trade offers
             Data.TempPlayer[tradeTarget].InTrade = session.Id;
 
-            Array.Resize(ref Data.TempPlayer[session.Id].TradeOffer, Core.Globals.Constant.MaxInv);
-            Array.Resize(ref Data.TempPlayer[tradeTarget].TradeOffer, Core.Globals.Constant.MaxInv);
+            Array.Resize(ref Data.TempPlayer[session.Id].TradeOffer, Core.Globals.Variables.MaxInv);
+            Array.Resize(ref Data.TempPlayer[tradeTarget].TradeOffer, Core.Globals.Variables.MaxInv);
 
-            for (int i = 0, loopTo = Core.Globals.Constant.MaxInv; i < loopTo; i++)
+            for (int i = 0, loopTo = Core.Globals.Variables.MaxInv; i < loopTo; i++)
             {
                 Data.TempPlayer[session.Id].TradeOffer[i].Num = -1;
                 Data.TempPlayer[session.Id].TradeOffer[i].Value = 0;
@@ -2285,8 +2285,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
     {
         int itemNum;
         int i;
-        var tmpTradeItem = new Type.PlayerInv[Core.Globals.Constant.MaxInv];
-        var tmpTradeItem2 = new Type.PlayerInv[Core.Globals.Constant.MaxInv];
+        var tmpTradeItem = new Type.PlayerInv[Core.Globals.Variables.MaxInv];
+        var tmpTradeItem2 = new Type.PlayerInv[Core.Globals.Variables.MaxInv];
 
         Data.TempPlayer[session.Id].AcceptTrade = true;
 
@@ -2301,7 +2301,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         }
 
         // take their items
-        var loopTo = Core.Globals.Constant.MaxInv;
+        var loopTo = Core.Globals.Variables.MaxInv;
         for (i = 0; i < loopTo; i++)
         {
             tmpTradeItem[i].Num = -1;
@@ -2337,7 +2337,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         }
 
         // taken all items. now they can't not get items because of no inventory space.
-        var loopTo1 = Core.Globals.Constant.MaxInv;
+        var loopTo1 = Core.Globals.Variables.MaxInv;
         for (i = 0; i < loopTo1; i++)
         {
             // player
@@ -2359,7 +2359,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         NetworkSend.SendInventory(tradeTarget);
 
         // they now have all the items. Clear out values + let them out of the trade.
-        var loopTo2 = Core.Globals.Constant.MaxInv;
+        var loopTo2 = Core.Globals.Variables.MaxInv;
         for (i = 0; i < loopTo2; i++)
         {
             Data.TempPlayer[session.Id].TradeOffer[i].Num = -1;
@@ -2382,7 +2382,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
     {
         var tradeTarget = (int) Data.TempPlayer[session.Id].InTrade;
 
-        for (int i = 0, loopTo = Core.Globals.Constant.MaxInv; i < loopTo; i++)
+        for (int i = 0, loopTo = Core.Globals.Variables.MaxInv; i < loopTo; i++)
         {
             Data.TempPlayer[session.Id].TradeOffer[i].Num = -1;
             Data.TempPlayer[session.Id].TradeOffer[i].Value = 0;
@@ -2409,12 +2409,12 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var invslot = buffer.ReadInt32();
         var amount = buffer.ReadInt32();
 
-        if (invslot < 0 | invslot > Core.Globals.Constant.MaxInv)
+        if (invslot < 0 | invslot > Core.Globals.Variables.MaxInv)
             return;
 
         var itemnum = GetPlayerInv(session.Id, invslot);
 
-        if (itemnum < 0 | itemnum > Core.Globals.Constant.MaxItems)
+        if (itemnum < 0 | itemnum > Core.Globals.Variables.MaxItems)
             return;
 
         // make sure they have the amount they offer
@@ -2430,7 +2430,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         if (Data.Item[itemnum].Type == (byte)ItemCategory.Currency | Data.Item[itemnum].Stackable == 1)
         {
             // check if already offering same currency item
-            var loopTo = Core.Globals.Constant.MaxInv;
+            var loopTo = Core.Globals.Variables.MaxInv;
             for (i = 0; i < loopTo; i++)
             {
                 if (Data.TempPlayer[session.Id].TradeOffer[i].Num == invslot)
@@ -2462,7 +2462,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         else
         {
             // make sure they're not already offering it
-            var loopTo1 = Core.Globals.Constant.MaxInv;
+            var loopTo1 = Core.Globals.Variables.MaxInv;
             for (i = 0; i < loopTo1; i++)
             {
                 if (Data.TempPlayer[session.Id].TradeOffer[i].Num == invslot)
@@ -2474,7 +2474,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         }
 
         // not already offering - find earliest empty slot
-        var loopTo2 = Core.Globals.Constant.MaxInv;
+        var loopTo2 = Core.Globals.Variables.MaxInv;
         for (i = 0; i < loopTo2; i++)
         {
             if (Data.TempPlayer[session.Id].TradeOffer[i].Num == -1)
@@ -2507,7 +2507,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var tradeslot = buffer.ReadInt32();
 
 
-        if (tradeslot < 0 | tradeslot > Core.Globals.Constant.MaxInv)
+        if (tradeslot < 0 | tradeslot > Core.Globals.Variables.MaxInv)
             return;
 
         if (Data.TempPlayer[session.Id].TradeOffer[tradeslot].Num < 0)
@@ -2556,12 +2556,12 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var oldSlot = buffer.ReadInt32();
         var skill = buffer.ReadInt32();
 
-        if (newSlot < 0 | newSlot > Core.Globals.Constant.MaxHotbar)
+        if (newSlot < 0 | newSlot > Core.Globals.Variables.MaxHotbar)
             return;
 
         if (type == (byte) PartOrigin.Hotbar)
         {
-            if (oldSlot < 0 | oldSlot > Core.Globals.Constant.MaxHotbar)
+            if (oldSlot < 0 | oldSlot > Core.Globals.Variables.MaxHotbar)
                 return;
 
             var oldItem = Data.Player[session.Id].Hotbar[oldSlot].Slot;
@@ -2590,7 +2590,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         var slot = buffer.ReadInt32();
 
-        if (slot < 0 | slot > Core.Globals.Constant.MaxHotbar)
+        if (slot < 0 | slot > Core.Globals.Variables.MaxHotbar)
             return;
 
         Data.Player[session.Id].Hotbar[slot].Slot = -1;
@@ -2605,7 +2605,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         var slot = buffer.ReadInt32();
 
-        if (slot < 0 | slot > Core.Globals.Constant.MaxHotbar)
+        if (slot < 0 | slot > Core.Globals.Variables.MaxHotbar)
             return;
 
         if (Data.Player[session.Id].Hotbar[slot].Slot >= 0)
@@ -2693,8 +2693,6 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
     public static void Packet_SaveJob(GameSession session, ReadOnlyMemory<byte> bytes)
     {
-        int i;
-        int z;
         int x;
         var buffer = new PacketReader(bytes);
 
@@ -2716,7 +2714,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             for (x = 0; x < loopTo; x++)
                 withBlock.Stat[x] = buffer.ReadInt32();
 
-            for (var q = 0; q < Core.Globals.Constant.MaxStartItems; q++)
+            for (var q = 0; q < Core.Globals.Variables.MaxStartItems; q++)
             {
                 withBlock.StartItem[q] = buffer.ReadInt32();
                 withBlock.StartValue[q] = buffer.ReadInt32();

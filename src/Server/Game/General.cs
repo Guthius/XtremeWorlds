@@ -74,7 +74,7 @@ namespace Server
             if (string.IsNullOrWhiteSpace(username))
                 return -1;
 
-            if (username.Length < Core.Globals.Constant.MinNameLength || username.Length > Core.Globals.Constant.NameLength)
+            if (username.Length < Core.Globals.Variables.MinNameLength || username.Length > Core.Globals.Variables.NameLength)
                 return 0;
 
             return Regex.IsMatch(username, @"^[a-zA-Z0-9_ ]+$") ? 1 : -1;
@@ -137,63 +137,63 @@ namespace Server
 
         public static void InitalizeCoreData()
         {
-            Data.Job = new Type.Job[Core.Globals.Constant.MaxJobs];
-            Data.Moral = new Type.Moral[Core.Globals.Constant.MaxMorals];
-            Data.Map = new Type.Map[Core.Globals.Constant.MaxMaps];
-            Data.Item = new Type.Item[Core.Globals.Constant.MaxItems];
-            Data.Npc = new Type.Npc[Core.Globals.Constant.MaxNpcs];
-            Data.Resource = new Type.Resource[Core.Globals.Constant.MaxResources];
-            Data.Projectile = new Type.Projectile[Core.Globals.Constant.MaxProjectiles];
-            Data.Animation = new Type.Animation[Core.Globals.Constant.MaxAnimations];
-            Data.Shop = new Type.Shop[Core.Globals.Constant.MaxShops];
-            Data.Player = new Type.Player[Core.Globals.Constant.MaxPlayers];
-            Data.Party = new Type.Party[Core.Globals.Constant.MaxParty];
-            Data.MapItem = new Type.MapItem[Core.Globals.Constant.MaxMaps, Core.Globals.Constant.MaxMapItems];
-            Data.Npc = new Type.Npc[Core.Globals.Constant.MaxNpcs];
-            Data.MapNpc = new MapData[Core.Globals.Constant.MaxMaps];
+            Data.Job = new Type.Job[Core.Globals.Variables.MaxJobs];
+            Data.Moral = new Type.Moral[Core.Globals.Variables.MaxMorals];
+            Data.Map = new Type.Map[Core.Globals.Variables.MaxMaps];
+            Data.Item = new Type.Item[Core.Globals.Variables.MaxItems];
+            Data.Npc = new Type.Npc[Core.Globals.Variables.MaxNpcs];
+            Data.Resource = new Type.Resource[Core.Globals.Variables.MaxResources];
+            Data.Projectile = new Type.Projectile[Core.Globals.Variables.MaxProjectiles];
+            Data.Animation = new Type.Animation[Core.Globals.Variables.MaxAnimations];
+            Data.Shop = new Type.Shop[Core.Globals.Variables.MaxShops];
+            Data.Player = new Type.Player[Core.Globals.Variables.MaxPlayers];
+            Data.Party = new Type.Party[Core.Globals.Variables.MaxParty];
+            Data.MapItem = new Type.MapItem[Core.Globals.Variables.MaxMaps, Core.Globals.Variables.MaxMapItems];
+            Data.Npc = new Type.Npc[Core.Globals.Variables.MaxNpcs];
+            Data.MapNpc = new MapData[Core.Globals.Variables.MaxMaps];
 
-            for (int i = 0; i < Core.Globals.Constant.MaxMaps; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxMaps; i++)
             {
-                Data.MapNpc[i].Npc = new MapNpc[Core.Globals.Constant.MaxMapNpcs];
-                for (int x = 0; x < Core.Globals.Constant.MaxMapNpcs; x++)
+                Data.MapNpc[i].Npc = new MapNpc[Core.Globals.Variables.MaxMapNpcs];
+                for (int x = 0; x < Core.Globals.Variables.MaxMapNpcs; x++)
                 {
                     Data.MapNpc[i].Npc[x].Vital = new int[Enum.GetValues(typeof(Vital)).Length];
-                    Data.MapNpc[i].Npc[x].SkillCd = new int[Core.Globals.Constant.MaxNpcSkills];
+                    Data.MapNpc[i].Npc[x].SkillCd = new int[Core.Globals.Variables.MaxNpcSkills];
                     Data.MapNpc[i].Npc[x].Num = -1;
                     Data.MapNpc[i].Npc[x].SkillBuffer = -1;
                 }
 
                 var statCount = Enum.GetNames(typeof(Stat)).Length;
-                for (int x = 0; x < Core.Globals.Constant.MaxItems; x++)
+                for (int x = 0; x < Core.Globals.Variables.MaxItems; x++)
                 {
                     Data.Item[x].AddStat = new byte[statCount];
                     Data.Item[x].StatReq = new byte[statCount];
                 }
 
-                for (int x = 0; x < Core.Globals.Constant.MaxMapItems; x++)
+                for (int x = 0; x < Core.Globals.Variables.MaxMapItems; x++)
                 {
                     Data.MapItem[i, x].Num = -1;
                 }
             }
 
-            Data.Shop = new Type.Shop[Core.Globals.Constant.MaxShops];
-            Data.Skill = new Skill[Core.Globals.Constant.MaxSkills];
-            Data.MapResource = new Type.MapResource[Core.Globals.Constant.MaxMaps];
-            Data.TempPlayer = new Type.TempPlayer[Core.Globals.Constant.MaxPlayers];
-            Data.Account = new Type.Account[Core.Globals.Constant.MaxPlayers];
+            Data.Shop = new Type.Shop[Core.Globals.Variables.MaxShops];
+            Data.Skill = new Skill[Core.Globals.Variables.MaxSkills];
+            Data.MapResource = new Type.MapResource[Core.Globals.Variables.MaxMaps];
+            Data.TempPlayer = new Type.TempPlayer[Core.Globals.Variables.MaxPlayers];
+            Data.Account = new Type.Account[Core.Globals.Variables.MaxPlayers];
 
-            for (int i = 0; i < Core.Globals.Constant.MaxPlayers; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxPlayers; i++)
             {
                 Database.ClearPlayer(i);
             }
 
-            for (int i = 0; i < Core.Globals.Constant.MaxPartyMembers; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxPartyMembers; i++)
             {
                 Party.ClearParty(i);
             }
 
-            Event.TempEventMap = new Type.GlobalEvents[Core.Globals.Constant.MaxMaps];
-            Data.MapProjectile = new Type.MapProjectile[Core.Globals.Constant.MaxMaps, Core.Globals.Constant.MaxProjectiles];
+            Event.TempEventMap = new Type.GlobalEvents[Core.Globals.Variables.MaxMaps];
+            Data.MapProjectile = new Type.MapProjectile[Core.Globals.Variables.MaxMaps, Core.Globals.Variables.MaxProjectiles];
         }
 
         private static async System.Threading.Tasks.Task LoadGameDataAsync()
@@ -246,7 +246,7 @@ namespace Server
 
             try
             {
-                await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Constant.MaxPlayers), Cts.Token, async (i, ct) =>
+                await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxPlayers), Cts.Token, async (i, ct) =>
                 {
                     NetworkSend.SendLeftGame(i);
                     await Player.LeftGame(i);
@@ -330,7 +330,7 @@ namespace Server
                 await semaphore.WaitAsync(Cts.Token);
                 try
                 {
-                    for (int i = 0; i < Core.Globals.Constant.MaxChars; i++)
+                    for (int i = 0; i < Core.Globals.Variables.MaxChars; i++)
                     {
                         var data = await Database.SelectRowByColumnAsync("id", id, "account", $"character{i + 1}");
                         if (data != null && data["Name"] != null)
@@ -495,7 +495,7 @@ namespace Server
 
         private static async System.Threading.Tasks.Task SendServerAnnouncementAsync(string message)
         {
-            await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Constant.MaxPlayers), Cts.Token, async (i, ct) =>
+            await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxPlayers), Cts.Token, async (i, ct) =>
             {
                 if (NetworkConfig.IsPlaying(i))
                     NetworkSend.PlayerMsg(i, message, (int)ColorName.Yellow);
@@ -896,7 +896,7 @@ namespace Server
 
         private static async System.Threading.Tasks.Task<int> FindPlayerByNameAsync(string name)
         {
-            for (int i = 0; i < Core.Globals.Constant.MaxPlayers; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxPlayers; i++)
             {
                 if (NetworkConfig.IsPlaying(i) && Data.Player[i].Name.Equals(name, StringComparison.OrdinalIgnoreCase))
                 {
@@ -924,7 +924,7 @@ namespace Server
                 }
                 else if (channel == "party" && Data.TempPlayer[senderIndex].InParty != 0)
                 {
-                    await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Constant.MaxPlayers), Cts.Token, async (i, ct) =>
+                    await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxPlayers), Cts.Token, async (i, ct) =>
                     {
                         if (NetworkConfig.IsPlaying(i) && Data.TempPlayer[i].InParty == Data.TempPlayer[senderIndex].InParty)
                             NetworkSend.PlayerMsg(i, $"[Party] {Data.Player[senderIndex].Name}: {message}", (int)color);
@@ -932,7 +932,7 @@ namespace Server
                 }
                 else if (channel == "global")
                 {
-                    await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Constant.MaxPlayers), Cts.Token, async (i, ct) =>
+                    await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxPlayers), Cts.Token, async (i, ct) =>
                     {
                         if (NetworkConfig.IsPlaying(i))
                             NetworkSend.PlayerMsg(i, message, (int)color);

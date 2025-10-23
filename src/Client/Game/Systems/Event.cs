@@ -48,14 +48,14 @@ namespace Client
         public static bool EventChat;
         public static string EventText;
         public static bool ShowEventLbl;
-        public static string[] EventChoices = new string[Constant.MaxEventChoices];
-        public static bool[] EventChoiceVisible = new bool[Constant.MaxEventChoices];
+        public static string[] EventChoices = new string[Core.Globals.Variables.MaxEventChoices];
+        public static bool[] EventChoiceVisible = new bool[Core.Globals.Variables.MaxEventChoices];
         public static int EventChatType;
         public static int AnotherChat;
 
         // constants
-        public static string[] Switches = new string[Constant.MaxSwitches];
-        public static string[] Variables = new string[Constant.MaxVariables];
+        public static string[] Switches = new string[Core.Globals.Variables.MaxSwitches];
+        public static string[] Variables = new string[Core.Globals.Variables.MaxVariables];
 
         public static bool EventCopy;
         public static bool EventPaste;
@@ -3440,10 +3440,10 @@ namespace Client
             int i;
             var buffer = new PacketReader(data);
 
-            for (i = 0; i < Constant.MaxSwitches; i++)
+            for (i = 0; i < Core.Globals.Variables.MaxSwitches; i++)
                 Switches[i] = buffer.ReadString();
 
-            for (i = 0; i < Constant.MaxVariables; i++)
+            for (i = 0; i < Core.Globals.Variables.MaxVariables; i++)
                 Variables[i] = buffer.ReadString();
         }
 
@@ -3610,7 +3610,7 @@ namespace Client
             ShowEventLbl = true;
             choices = buffer.ReadInt32();
             
-            for (i = 0; i < Constant.MaxEventChoices; i++)
+            for (i = 0; i < Core.Globals.Variables.MaxEventChoices; i++)
             {
                 EventChoices[i] = "";
                 EventChoiceVisible[i] = false;
@@ -3802,12 +3802,12 @@ namespace Client
 
             packetWriter.WriteEnum(Packets.ClientPackets.CSwitchesAndVariables);
 
-            for (var i = 0; i < Constant.MaxSwitches; i++)
+            for (var i = 0; i < Core.Globals.Variables.MaxSwitches; i++)
             {
                 packetWriter.WriteString(Switches[i]);
             }
 
-            for (var i = 0; i < Constant.MaxVariables; i++)
+            for (var i = 0; i < Core.Globals.Variables.MaxVariables; i++)
             {
                 packetWriter.WriteString(Variables[i]);
             }
@@ -3964,7 +3964,7 @@ namespace Client
 
             if (AnotherChat == 1)
             {
-                for (i = 0; i < Constant.MaxEventChoices; i++)
+                for (i = 0; i < Core.Globals.Variables.MaxEventChoices; i++)
                     EventChoiceVisible[i] = false;
                 EventText = "";
                 EventChatType = 1;
@@ -3972,7 +3972,7 @@ namespace Client
             }
             else if (AnotherChat == 2)
             {
-                for (i = 0; i < Constant.MaxEventChoices; i++)
+                for (i = 0; i < Core.Globals.Variables.MaxEventChoices; i++)
                     EventChoiceVisible[i] = false;
                 EventText = "";
                 EventChatType = 1;

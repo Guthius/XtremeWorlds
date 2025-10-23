@@ -62,7 +62,7 @@ public static class Projectile
         }
 
         // Then NPC target at tile excluding owner NPC
-        for (int n = 0; n < Core.Globals.Constant.MaxMapNpcs; n++)
+        for (int n = 0; n < Core.Globals.Variables.MaxMapNpcs; n++)
         {
             ref var mn = ref Data.MapNpc[map].Npc[n];
             if (mn.Num < 0) continue;
@@ -108,7 +108,7 @@ public static class Projectile
 
     public static async Task LoadProjectilesAsync()
     {
-        await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Constant.MaxProjectiles), LoadProjectileAsync);
+        await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxProjectiles), LoadProjectileAsync);
     }
 
     private static async ValueTask LoadProjectileAsync(int projectileNum, CancellationToken cancellationToken)
@@ -195,7 +195,7 @@ public static class Projectile
         }
 
         var projectileNum = packetReader.ReadInt32();
-        if (projectileNum < 0 || projectileNum > Core.Globals.Constant.MaxProjectiles)
+        if (projectileNum < 0 || projectileNum > Core.Globals.Variables.MaxProjectiles)
         {
             return;
         }
@@ -272,7 +272,7 @@ public static class Projectile
 
     public static void SendProjectiles(int playerId)
     {
-        for (var projectileNum = 0; projectileNum < Core.Globals.Constant.MaxProjectiles; projectileNum++)
+        for (var projectileNum = 0; projectileNum < Core.Globals.Variables.MaxProjectiles; projectileNum++)
         {
             if (Data.Projectile[projectileNum].Name.Length > 0)
             {
@@ -305,7 +305,7 @@ public static class Projectile
     {
         var mapNum = GetPlayerMap(playerId);
         var mapProjectileNum = -1;
-        for (var i = 0; i < Core.Globals.Constant.MaxProjectiles; i++)
+        for (var i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
         {
             if (Data.MapProjectile[mapNum, i].ProjectileNum < 0)
             {
@@ -347,7 +347,7 @@ public static class Projectile
     {
         var mapNum = GetPlayerMap(playerId);
         var mapProjectileNum = -1;
-        for (var i = 0; i < Core.Globals.Constant.MaxProjectiles; i++)
+        for (var i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
         {
             if (Data.MapProjectile[mapNum, i].ProjectileNum < 0)
             { mapProjectileNum = i; break; }
@@ -386,7 +386,7 @@ public static class Projectile
     {
         var mapNum = GetPlayerMap(playerId);
         var mapProjectileNum = -1;
-        for (var i = 0; i < Core.Globals.Constant.MaxProjectiles; i++)
+        for (var i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
         {
             if (Data.MapProjectile[mapNum, i].ProjectileNum < 0)
             {
@@ -438,7 +438,7 @@ public static class Projectile
     {
         // Find free map projectile slot
         var mapProjectileNum = -1;
-        for (var i = 0; i < Core.Globals.Constant.MaxProjectiles; i++)
+        for (var i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
         {
             if (Data.MapProjectile[mapNum, i].ProjectileNum < 0)
             {
@@ -461,7 +461,7 @@ public static class Projectile
 
         // Validate npc is present on map
         if (mapNum < 0 || mapNum >= Data.MapNpc.Length) return;
-        if (mapNpcNum < 0 || mapNpcNum >= Core.Globals.Constant.MaxMapNpcs) return;
+        if (mapNpcNum < 0 || mapNpcNum >= Core.Globals.Variables.MaxMapNpcs) return;
         if (Data.MapNpc[mapNum].Npc[mapNpcNum].Num < 0) return;
 
         ref var mapProjectile = ref Data.MapProjectile[mapNum, mapProjectileNum];
@@ -483,9 +483,9 @@ public static class Projectile
     public static void UpdateProjectiles()
     {
         int now = General.GetTimeMs();
-        for (int map = 0; map < Core.Globals.Constant.MaxMaps; map++)
+        for (int map = 0; map < Core.Globals.Variables.MaxMaps; map++)
         {
-            for (int i = 0; i < Core.Globals.Constant.MaxProjectiles; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
             {
                 ref var mp = ref Data.MapProjectile[map, i];
                 // Skip empty slots
@@ -584,8 +584,8 @@ public static class Projectile
                     }
 
                     // Bounds check
-                    int tileX = Math.Clamp(mp.X / 32, 0, Core.Globals.Constant.MaxMapx - 1);
-                    int tileY = Math.Clamp(mp.Y / 32, 0, Core.Globals.Constant.MaxMapy - 1);
+                    int tileX = Math.Clamp(mp.X / 32, 0, Core.Globals.Variables.MaxMapx - 1);
+                    int tileY = Math.Clamp(mp.Y / 32, 0, Core.Globals.Variables.MaxMapy - 1);
                     if (tileX < 0 || tileY < 0 || tileX >= Data.Map[map].MaxX || tileY >= Data.Map[map].MaxY)
                     {
                         int anim = Data.Projectile[projId].Animation;
@@ -670,7 +670,7 @@ public static class Projectile
                     }
 
                     // Npcs
-                    for (int n = 0; n < Core.Globals.Constant.MaxMapNpcs; n++)
+                    for (int n = 0; n < Core.Globals.Variables.MaxMapNpcs; n++)
                     {
                         ref var mn = ref Data.MapNpc[map].Npc[n];
                         if (mn.Num < 0) continue;

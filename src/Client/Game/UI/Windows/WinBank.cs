@@ -8,7 +8,7 @@ public static class WinBank
 {
     public static void OnDraw()
     {
-        if (GameState.MyIndex < 0 || GameState.MyIndex > Constant.MaxPlayers)
+        if (GameState.MyIndex < 0 || GameState.MyIndex > Variables.MaxPlayers)
         {
             return;
         }
@@ -53,10 +53,10 @@ public static class WinBank
             y += 76;
         }
 
-        for (var slot = 0; slot < Constant.MaxBank; slot++)
+        for (var slot = 0; slot < Variables.MaxBank; slot++)
         {
             var itemNum = GetBank(GameState.MyIndex, slot);
-            if (itemNum is < 0 or >= Constant.MaxItems)
+            if (itemNum < 0 || itemNum >= Variables.MaxItems)
             {
                 continue;
             }

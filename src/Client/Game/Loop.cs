@@ -137,7 +137,7 @@ namespace Client
                 // check if we need to end the CD icon
                 if (GameState.NumSkills > 0)
                 {
-                    for (_i = 0; _i < Constant.MaxPlayerSkills; _i++)
+                    for (_i = 0; _i < Variables.MaxPlayerSkills; _i++)
                     {
                         if (Data.Player[GameState.MyIndex].Skill[_i].Num >= 0)
                         {
@@ -201,7 +201,7 @@ namespace Client
                         }
                     }
                     // Process player movements
-                    for (_i = 0; _i < Constant.MaxPlayers; _i++)
+                    for (_i = 0; _i < Variables.MaxPlayers; _i++)
                     {
                         if (IsPlaying(_i))
                         {
@@ -210,7 +210,7 @@ namespace Client
                     }
 
                     // Process npc movements
-                    for (_i = 0; _i < Constant.MaxMapNpcs; _i++)
+                    for (_i = 0; _i < Variables.MaxMapNpcs; _i++)
                     {
                         Npc.ProcessMovement(_i);
                         
@@ -323,7 +323,7 @@ namespace Client
                     GameLogic.SetBarWidth(ref GameState.BarWidthGuiHPMax, ref GameState.BarWidthGuiHP);
                     GameLogic.SetBarWidth(ref GameState.BarWidthGuiMPMax, ref GameState.BarWidthGuiMP);
                     GameLogic.SetBarWidth(ref GameState.BarWidthGuiExpMax, ref GameState.BarWidthGuiExp);
-                    for (_i = 0; _i < Constant.MaxMapNpcs; _i++)
+                    for (_i = 0; _i < Variables.MaxMapNpcs; _i++)
                     {
                         if (Data.MyMapNpc[_i].Num >= 0)
                         {
@@ -331,7 +331,7 @@ namespace Client
                         }
                     }
 
-                    for (_i = 0; _i < Constant.MaxPlayers; _i++)
+                    for (_i = 0; _i < Variables.MaxPlayers; _i++)
                     {
                         if (IsPlaying(_i) & GetPlayerMap(_i) == GetPlayerMap(GameState.MyIndex))
                         {
@@ -347,7 +347,7 @@ namespace Client
                 // Change map animation
                 if (_tmr250 < _tick)
                 {
-                    for (int i = 0; i < Constant.MaxPlayers; i++)
+                    for (int i = 0; i < Variables.MaxPlayers; i++)
                     {
                         if (!IsPlaying(i)) continue;
                         if (GetPlayerMap(i) != GetPlayerMap(GameState.MyIndex)) continue;
@@ -355,7 +355,7 @@ namespace Client
                         unchecked { Data.Player[i].Steps++; } // byte wraps automatically
                     }
 
-                    for (int i = 0; i < Constant.MaxMapNpcs; i++)
+                    for (int i = 0; i < Variables.MaxMapNpcs; i++)
                     {
                         if (Data.MyMapNpc[i].Num >= 0)
                         {

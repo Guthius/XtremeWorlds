@@ -308,16 +308,16 @@ namespace Client
             try
             {
                 lstIndex!.Items.Clear();
-                for (int i = 0; i < Constant.MaxItems; i++) lstIndex.Items.Add((i+1)+": "+Data.Item[i].Name);
+                for (int i = 0; i < Variables.MaxItems; i++) lstIndex.Items.Add((i+1)+": "+Data.Item[i].Name);
                 lstIndex.SelectedIndex = GameState.EditorIndex >= 0 ? GameState.EditorIndex : 0;
 
-                cmbAnimation!.Items.Clear(); for (int i = 0; i < Constant.MaxAnimations;i++) cmbAnimation.Items.Add((i+1)+": "+Data.Animation[i].Name);
-                cmbProjectile!.Items.Clear(); for (int i = 0; i < Constant.MaxProjectiles;i++) cmbProjectile.Items.Add($"{i+1}: {Data.Projectile[i].Name}");
+                cmbAnimation!.Items.Clear(); for (int i = 0; i < Variables.MaxAnimations;i++) cmbAnimation.Items.Add((i+1)+": "+Data.Animation[i].Name);
+                cmbProjectile!.Items.Clear(); for (int i = 0; i < Variables.MaxProjectiles;i++) cmbProjectile.Items.Add($"{i+1}: {Data.Projectile[i].Name}");
                 cmbAmmo!.Items.Clear();
                 cmbAmmo.Items.Add("None");
-                for (int i = 0; i < Constant.MaxItems;i++) cmbAmmo.Items.Add(($"{i+1}: " + Data.Item[i].Name));
-                cmbSkills!.Items.Clear(); for (int i = 0; i < Constant.MaxSkills;i++) cmbSkills.Items.Add((i+1)+": "+ Data.Skill[i].Name);
-                cmbJobReq!.Items.Clear(); for (int i = 0; i < Constant.MaxJobs;i++) cmbJobReq.Items.Add(Data.Job[i].Name);
+                for (int i = 0; i < Variables.MaxItems;i++) cmbAmmo.Items.Add(($"{i+1}: " + Data.Item[i].Name));
+                cmbSkills!.Items.Clear(); for (int i = 0; i < Variables.MaxSkills;i++) cmbSkills.Items.Add((i+1)+": "+ Data.Skill[i].Name);
+                cmbJobReq!.Items.Clear(); for (int i = 0; i < Variables.MaxJobs;i++) cmbJobReq.Items.Add(Data.Job[i].Name);
                 cmbAccessReq!.Items.Clear();
                 foreach (var name in Enum.GetNames(typeof(Core.Globals.AccessLevel)))
                     cmbAccessReq.Items.Add(name);
@@ -481,7 +481,7 @@ namespace Client
             int src = GameState.EditorIndex;
             if (!_hasClipboardItem)
             {
-                if (src < 0 || src >= Constant.MaxItems) return;
+                if (src < 0 || src >= Variables.MaxItems) return;
                 // Copy
                 var s = Data.Item[src];
                 _clipboardItem = s;
@@ -494,7 +494,7 @@ namespace Client
 
             // Paste
             int def = GameState.EditorIndex + 1;
-            var oneBased = Editors.PromptIndex(this, "Paste Item", $"Paste item into index (1..{Constant.MaxItems}):", 1, Constant.MaxItems, def);
+            var oneBased = Editors.PromptIndex(this, "Paste Item", $"Paste item into index (1..{Variables.MaxItems}):", 1, Variables.MaxItems, def);
             if (oneBased == null) return;
             int dst = oneBased.Value - 1;
             var n = _clipboardItem;

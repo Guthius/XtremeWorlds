@@ -230,27 +230,27 @@ namespace Client
             try
             {
                 lstIndex.Items.Clear();
-                for (int i = 0; i < Constant.MaxSkills; i++)
+                for (int i = 0; i < Variables.MaxSkills; i++)
                     lstIndex.Items.Add($"{i + 1}: {Strings.Trim(Data.Skill[i].Name)}");
                 lstIndex.SelectedIndex = GameState.EditorIndex >= 0 ? GameState.EditorIndex : 0;
 
                 cmbAnimCast.Items.Clear();
                 cmbAnim.Items.Clear();
-                for (int i = 0; i < Constant.MaxAnimations; i++)
+                for (int i = 0; i < Variables.MaxAnimations; i++)
                 {
                     cmbAnimCast.Items.Add($"{i + 1}: {Data.Animation[i].Name}");
                     cmbAnim.Items.Add($"{i + 1}: {Data.Animation[i].Name}");
                 }
 
                 cmbProjectile.Items.Clear();
-                for (int i = 0; i < Constant.MaxProjectiles; i++)
+                for (int i = 0; i < Variables.MaxProjectiles; i++)
                 {
                     cmbProjectile.Items.Add($"{i}: {Data.Projectile[i].Name}");
                 }
 
                 cmbChainOnHit.Items.Clear();
                 cmbChainOnHit.Items.Add("None");
-                for (int i = 0; i < Constant.MaxSkills; i++)
+                for (int i = 0; i < Variables.MaxSkills; i++)
                 {
                     var nm = Strings.Trim(Data.Skill[i].Name);
                     cmbChainOnHit.Items.Add($"{i + 1}: {nm}");
@@ -264,7 +264,7 @@ namespace Client
                 }
 
                 cmbJob.Items.Clear();
-                for (int i = 0; i < Constant.MaxJobs; i++)
+                for (int i = 0; i < Variables.MaxJobs; i++)
                     cmbJob.Items.Add($"{i + 1}: {Data.Job[i].Name.Trim()}");
             }
             finally { _suppressIndexChanged = false; }
@@ -377,7 +377,7 @@ namespace Client
             int src = GameState.EditorIndex;
             if (!_hasClipboardSkill)
             {
-                if (src < 0 || src >= Constant.MaxSkills) return;
+                if (src < 0 || src >= Variables.MaxSkills) return;
                 _clipboardSkill = Data.Skill[src]; // struct copy (no arrays)
                 _hasClipboardSkill = true;
                 btnCopy.Text = "Paste";
@@ -385,7 +385,7 @@ namespace Client
             }
 
             int def = GameState.EditorIndex + 1;
-            var oneBased = Editors.PromptIndex(this, "Paste Skill", $"Paste skill into index (1..{Constant.MaxSkills}):", 1, Constant.MaxSkills, def);
+            var oneBased = Editors.PromptIndex(this, "Paste Skill", $"Paste skill into index (1..{Variables.MaxSkills}):", 1, Variables.MaxSkills, def);
             if (oneBased == null) return;
             int dst = oneBased.Value - 1;
             var n = _clipboardSkill; // struct copy

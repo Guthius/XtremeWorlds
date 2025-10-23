@@ -8,7 +8,7 @@ public static class WinSkills
 {
     public static void OnDraw()
     {
-        if (GameState.MyIndex < 0 || GameState.MyIndex >= Constant.MaxPlayers)
+        if (GameState.MyIndex < 0 || GameState.MyIndex >= Variables.MaxPlayers)
         {
             return;
         }
@@ -51,10 +51,10 @@ public static class WinSkills
             y += 76;
         }
 
-        for (var slot = 0; slot < Constant.MaxPlayerSkills; slot++)
+        for (var slot = 0; slot < Variables.MaxPlayerSkills; slot++)
         {
             var skillNum = Data.Player[GameState.MyIndex].Skill[slot].Num;
-            if (skillNum is < 0 or >= Constant.MaxSkills)
+            if (skillNum < 0 || skillNum >= Variables.MaxSkills)
             {
                 continue;
             }

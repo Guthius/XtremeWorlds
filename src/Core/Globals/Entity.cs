@@ -122,13 +122,13 @@ public class Entity
             Stat = player.Stat,
             Points = player.Points,
             Equipment = player.Equipment,
-            Inv = player.Inv != null ? Array.ConvertAll(player.Inv, x => (object) x) : null,
-            PlayerSkill = player.Skill != null ? Array.ConvertAll(player.Skill, x => (object) x) : null,
+            Inv = player.Inv != null ? Array.ConvertAll(player.Inv, x => (object) x) : new object[Core.Globals.Variables.MaxInv],
+            PlayerSkill = player.Skill != null ? Array.ConvertAll(player.Skill, x => (object) x) : new object[Core.Globals.Variables.MaxSkills],
             Map = player.Map,
             X = player.X,
             Y = player.Y,
             Dir = player.Dir,
-            Hotbar = player.Hotbar != null ? Array.ConvertAll(player.Hotbar, x => (object) x) : null,
+            Hotbar = player.Hotbar != null ? Array.ConvertAll(player.Hotbar, x => (object) x) : new object[Core.Globals.Variables.MaxHotbar],
             Switches = player.Switches,
             Variables = player.Variables,
             Moving = player.Moving,
@@ -138,7 +138,7 @@ public class Entity
             Emote = player.Emote,
             EmoteTimer = player.EmoteTimer,
             EventTimer = player.EventTimer,
-            Quests = player.Quests != null ? Array.ConvertAll(player.Quests, x => (object) x) : null,
+            Quests = player.Quests != null ? Array.ConvertAll(player.Quests, x => (object) x) : new object[Core.Globals.Variables.MaxQuests],
             GuildId = player.GuildId,
             GatherSkills = player.GatherSkills
         };
@@ -161,7 +161,7 @@ public class Entity
             StunTimer = npc.StunTimer,
             SkillBuffer = npc.SkillBuffer,
             SkillBufferTimer = npc.SkillBufferTimer,
-            Skill = npc.SkillCd != null ? (int[])npc.SkillCd.Clone() : null,
+            Skill = npc.SkillCd != null ? (int[])npc.SkillCd.Clone() : new int[Core.Globals.Variables.MaxNpcSkills],
             Attacking = npc.Attacking,
         };
 
