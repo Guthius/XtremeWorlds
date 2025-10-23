@@ -2243,13 +2243,13 @@ namespace Client
             if (y < 0)
                 return default;
 
-            int maxMapX = Data.MyMap.MaxX;
-            int maxMapY = Data.MyMap.MaxY;
+            int MaxMapX = Data.MyMap.MaxX;
+            int MaxMapY = Data.MyMap.MaxY;
 
-            if (x > maxMapX - 1)
+            if (x > MaxMapX - 1)
                 return default;
 
-            if (y > maxMapY - 1)
+            if (y > MaxMapY - 1)
                 return default;
 
             return true;

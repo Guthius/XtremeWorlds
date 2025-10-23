@@ -650,7 +650,7 @@ public static class Player
 
     public static int FindItemSlot(int playerId, int itemNum)
     {
-        if (itemNum < 0 || itemNum > global::Script.GetMaxItems())
+        if (itemNum < 0 || itemNum >= Core.Globals.Variables.MaxItems)
         {
             return -1;
         }
@@ -1146,7 +1146,7 @@ public static class Player
         }
 
         var itemNum = GetPlayerEquipment(playerId, (Equipment) eqSlot);
-        if (itemNum < 0 || itemNum > global::Script.GetMaxItems())
+        if (itemNum < 0 || itemNum >= Core.Globals.Variables.MaxItems)
         {
             return;
         }
@@ -1231,7 +1231,7 @@ public static class Player
 
     public static void GiveBank(int playerId, int invSlot, int amount)
     {
-        if (invSlot < 0 || invSlot > global::Script.GetMaxInv())
+        if (invSlot < 0 || invSlot >= Variables.MaxInv)
         {
             return;
         }
@@ -1309,7 +1309,7 @@ public static class Player
 
     public static int FindOpenbankSlot(int playerId, int itemNum)
     {
-        if (!NetworkConfig.IsPlaying(playerId) || itemNum < 0 || itemNum > global::Script.GetMaxItems())
+        if (!NetworkConfig.IsPlaying(playerId) || itemNum < 0 || itemNum >= Core.Globals.Variables.MaxItems)
         {
             return -1;
         }
@@ -1339,7 +1339,7 @@ public static class Player
 
     public static void TakeBank(int playerId, int bankSlot, int amount)
     {
-        if (bankSlot < 0 || bankSlot > global::Script.GetMaxBank())
+        if (bankSlot < 0 || bankSlot >= Core.Globals.Variables.MaxBank)
         {
             return;
         }

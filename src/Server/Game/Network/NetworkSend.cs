@@ -81,7 +81,7 @@ public static class NetworkSend
 
         packetWriter.WriteEnum(ServerPackets.SPlayerChars);
 
-        for (var i = 0; i < global::Script.GetMaxChars(); i++)
+    for (var i = 0; i < Variables.MaxChars; i++)
         {
             Database.LoadCharacter(session.Id, i + 1);
 
@@ -112,48 +112,49 @@ public static class NetworkSend
 
         // Order matters: keep this in sync with client's Packet_Variables
         // Int-sized values
-        w.WriteInt32(global::Script.GetMaxAnimations());
-        w.WriteInt32(global::Script.GetMaxItems());
-        w.WriteInt32(global::Script.GetMaxMaps());
-        w.WriteInt32(global::Script.GetMaxNpcs());
-        w.WriteInt32(global::Script.GetMaxParty());
-        w.WriteInt32(global::Script.GetMaxPartyMembers());
-        w.WriteInt32(global::Script.GetMaxPlayers());
-        w.WriteInt32(global::Script.GetMaxResources());
-        w.WriteInt32(global::Script.GetMaxShops());
-        w.WriteInt32(global::Script.GetMaxSkills());
-        w.WriteInt32(global::Script.GetMaxProjectiles());
-        w.WriteInt32(global::Script.GetMaxSwitches());
-        w.WriteInt32(global::Script.GetMaxVariables());
-        w.WriteInt32(global::Script.GetChatLines());
-        w.WriteInt32(global::Script.GetMaxEvents());
-        w.WriteInt32(global::Script.GetTileSize());
-        w.WriteInt32(global::Script.GetMaxWeatherParticles());
+        w.WriteInt32(Variables.MaxAnimations);
+        w.WriteInt32(Variables.MaxItems);
+        w.WriteInt32(Variables.MaxMaps);
+        w.WriteInt32(Variables.MaxNpcs);
+        w.WriteInt32(Variables.MaxParty);
+        w.WriteInt32(Variables.MaxPartyMembers);
+        w.WriteInt32(Variables.MaxPlayers);
+        w.WriteInt32(Variables.MaxResources);
+        w.WriteInt32(Variables.MaxShops);
+        w.WriteInt32(Variables.MaxSkills);
+        w.WriteInt32(Variables.MaxProjectiles);
+        w.WriteInt32(Variables.MaxSwitches);
+        w.WriteInt32(Variables.MaxVariables);
+        w.WriteInt32(Variables.ChatLines);
+        w.WriteInt32(Variables.MaxEvents);
+        w.WriteInt32(Variables.TileSize);
+        w.WriteInt32(Variables.MaxWeatherParticles);
 
         // Byte-sized values
-        w.WriteByte((byte)global::Script.GetMaxBank());
-        w.WriteByte((byte)global::Script.GetMaxJobs());
-        w.WriteByte((byte)global::Script.GetMaxMorals());
-        w.WriteByte((byte)global::Script.GetMaxInv());
-        w.WriteByte((byte)global::Script.GetMaxMapItems());
-        w.WriteByte((byte)global::Script.GetMaxMapNpcs());
-        w.WriteByte((byte)global::Script.GetMaxNpcSkills());
-        w.WriteByte((byte)global::Script.GetMaxPlayerSkills());
-        w.WriteByte((byte)global::Script.GetMaxTrades());
-        w.WriteByte((byte)global::Script.GetNameLength());
-        w.WriteByte((byte)global::Script.GetMinNameLength());
-        w.WriteByte((byte)global::Script.GetChatLength());
-        w.WriteByte((byte)global::Script.GetMaxHotbar());
-        w.WriteByte((byte)global::Script.GetMaxMapX());
-        w.WriteByte((byte)global::Script.GetMaxMapY());
-        w.WriteByte((byte)global::Script.GetMaxDropItems());
-        w.WriteByte((byte)global::Script.GetMaxStartItems());
-        w.WriteByte((byte)global::Script.GetMaxPoints());
-        w.WriteByte((byte)global::Script.GetMaxChars());
-        w.WriteByte((byte)global::Script.GetMaxStats());
-        w.WriteByte((byte)global::Script.GetMaxQuests());
-        w.WriteByte((byte)global::Script.GetMaxGuilds());
-        w.WriteByte((byte)global::Script.GetMaxEventChoices());
+        w.WriteByte((byte)Variables.MaxBank);
+        w.WriteByte((byte)Variables.MaxJobs);
+        w.WriteByte((byte)Variables.MaxMorals);
+        w.WriteByte((byte)Variables.MaxInv);
+        w.WriteByte((byte)Variables.MaxMapItems);
+        w.WriteByte((byte)Variables.MaxMapNpcs);
+        w.WriteByte((byte)Variables.MaxNpcSkills);
+        w.WriteByte((byte)Variables.MaxPlayerSkills);
+        w.WriteByte((byte)Variables.MaxTrades);
+        w.WriteByte((byte)Variables.NameLength);
+        w.WriteByte((byte)Variables.MinNameLength);
+        w.WriteByte((byte)Variables.ChatLength);
+        w.WriteByte((byte)Variables.MaxHotbar);
+        w.WriteByte((byte)Variables.MaxMapX);
+        w.WriteByte((byte)Variables.MaxMapY);
+        w.WriteByte((byte)Variables.MaxDropItems);
+        w.WriteByte((byte)Variables.MaxStartItems);
+        w.WriteByte((byte)Variables.MaxStartSkills);
+        w.WriteByte((byte)Variables.MaxPoints);
+        w.WriteByte((byte)Variables.MaxChars);
+        w.WriteByte((byte)Variables.MaxStats);
+        w.WriteByte((byte)Variables.MaxQuests);
+        w.WriteByte((byte)Variables.MaxGuilds);
+        w.WriteByte((byte)Variables.MaxEventChoices);
 
         session.Channel.Send(w.GetBytes());
     }

@@ -20,14 +20,16 @@ namespace Client
     private bool _hasClipboardJob;
     public ListBox? lstIndex = new ListBox { Width = 200 };
     public ListBox? lstStartItems;
+    public ListBox? lstStartSkills;
     public TextBox? txtName;
     public TextArea? txtDesc;
     public TextArea txtDescription => txtDesc!;
     public ComboBox? cmbItems;
+    public ComboBox? cmbSkills;
     public NumericStepper? numStr, numLck, numEnd, numInt, numVit, numSpr, numBaseExp;
     public NumericStepper? numStartMap, numStartX, numStartY;
     public NumericStepper? numMaleSprite, numFemaleSprite, numItemAmount;
-    public Button? btnSetItem, btnSave, btnDelete, btnCopy, btnCancel;
+    public Button? btnSetItem, btnSetSkill, btnSave, btnDelete, btnCopy, btnCancel;
     public Drawable? malePreview, femalePreview;
     Bitmap? maleBmp, femaleBmp;
     public NumericStepper nudStrength => numStr!;
@@ -103,6 +105,12 @@ namespace Client
         btnSetItem = new Button { Text = "Set Slot" };
         btnSetItem.Click += (s, e) => SetStartItem();
 
+        // Skills
+        lstStartSkills = new ListBox { Height = 140, Width = 200 };
+        cmbSkills = new ComboBox { Width = 180 };
+        btnSetSkill = new Button { Text = "Set Slot" };
+        btnSetSkill.Click += (s, e) => SetStartSkill();
+
         // Actions
         btnSave = new Button { Text = "Save" }; btnSave.Click += (s, e) => { Editors.JobEditorOK(); Close(); };
         btnDelete = new Button { Text = "Delete" }; btnDelete.Click += (s, e) => { Database.ClearJob(GameState.EditorIndex); ReloadPanel(); };
@@ -147,6 +155,11 @@ namespace Client
         itemsLayout.AddRow(new Label{Text="Item"}, cmbItems, new Label{Text="Amount"}, numItemAmount, btnSetItem);
         var items = Box("Start Items", itemsLayout);
 
+        var skillsLayout = new DynamicLayout { Spacing = new Size(4,4) };
+        skillsLayout.AddRow(lstStartSkills);
+        skillsLayout.AddRow(new Label{Text="Skill"}, cmbSkills, btnSetSkill);
+        var skills = Box("Start Skills", skillsLayout);
+
         // Left side: just the jobs list (scales vertically)
         var left = new DynamicLayout { Spacing = new Size(4,4) };
         left.Add(lstIndex, yscale: true);
@@ -160,8 +173,12 @@ namespace Client
             Rows = { new TableRow(new Label{Text="Name:"}, new TableCell(txtName, scaleWidth: false), null, null) }
         };
         rightContent.Add(nameRow);
+        // Description block (multiline)
+        var desc = Box("Description", txtDesc!);
+        rightContent.Add(desc);
         rightContent.Add(stats);
         rightContent.Add(items);
+        rightContent.Add(skills);
         rightContent.AddRow(start);
         rightContent.AddRow(sprites);
         rightContent.AddRow(new StackLayout { Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnSave, btnDelete, btnCopy, btnCancel } });
@@ -189,6 +206,9 @@ namespace Client
             cmbItems!.Items.Clear();
             for (int i = 0; i < Variables.MaxItems; i++) cmbItems.Items.Add((i + 1) + ": " + Data.Item[i].Name);
             cmbItems.SelectedIndex = 0;
+            cmbSkills!.Items.Clear();
+            for (int i = 0; i < Variables.MaxSkills; i++) cmbSkills.Items.Add((i + 1) + ": " + Data.Skill[i].Name);
+            cmbSkills.SelectedIndex = 0;
         }
         finally { _suppressIndexChanged = false; }
 
@@ -217,6 +237,18 @@ namespace Client
             lstStartItems.Items.Add(name + " x " + amt);
         }
         lstStartItems.SelectedIndex = 0;
+
+        // Start skills list
+        if (job.StartSkill == null || job.StartSkill.Length != Variables.MaxStartSkills)
+            job.StartSkill = new int[Variables.MaxStartSkills];
+        lstStartSkills!.Items.Clear();
+        for (int i = 0; i < Variables.MaxStartSkills; i++)
+        {
+            int sid = job.StartSkill[i];
+            string sname = sid >= 0 && sid < Variables.MaxSkills ? Data.Skill[sid].Name : "(None)";
+            lstStartSkills.Items.Add(sname);
+        }
+        lstStartSkills.SelectedIndex = 0;
         LoadSprites();
     }
 
@@ -280,6 +312,16 @@ namespace Client
             var job = Data.Job[GameState.EditorIndex];
             job.StartItem[lstStartItems.SelectedIndex] = cmbItems!.SelectedIndex;
             job.StartValue[lstStartItems.SelectedIndex] = (int)numItemAmount!.Value;
+            ReloadPanel();
+        }
+
+        void SetStartSkill()
+        {
+            if (lstStartSkills!.SelectedIndex < 0) return;
+            var job = Data.Job[GameState.EditorIndex];
+            if (job.StartSkill == null || job.StartSkill.Length != Variables.MaxStartSkills)
+                job.StartSkill = new int[Variables.MaxStartSkills];
+            job.StartSkill[lstStartSkills.SelectedIndex] = cmbSkills!.SelectedIndex;
             ReloadPanel();
         }
 

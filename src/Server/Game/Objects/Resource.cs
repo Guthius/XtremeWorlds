@@ -152,7 +152,7 @@ public static class Resource
         }
 
         var resourcenum = packetReader.ReadInt32();
-        if (resourcenum < 0 || resourcenum > global::Script.GetMaxResources())
+        if (resourcenum < 0 || resourcenum >= Core.Globals.Variables.MaxResources)
         {
             return;
         }

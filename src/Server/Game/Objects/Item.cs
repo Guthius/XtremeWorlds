@@ -148,7 +148,7 @@ public static class Item
 
     public static int FindOpenMapItemSlot(int mapNum)
     {
-        if (mapNum < 0 || mapNum > global::Script.GetMaxMaps())
+        if (mapNum < 0 || mapNum >= Core.Globals.Variables.MaxMaps)
         {
             return -1;
         }
@@ -166,7 +166,7 @@ public static class Item
 
     public static void SpawnAllMapsItems()
     {
-        for (var mapNum = 0; mapNum < global::Script.GetMaxMaps(); mapNum++)
+        for (var mapNum = 0; mapNum < Core.Globals.Variables.MaxMaps; mapNum++)
         {
             SpawnMapItems(mapNum);
         }
@@ -174,7 +174,7 @@ public static class Item
 
     public static void SpawnMapItems(int mapNum)
     {
-        if (mapNum < 0 || mapNum > global::Script.GetMaxMaps())
+        if (mapNum < 0 || mapNum >= Core.Globals.Variables.MaxMaps)
         {
             return;
         }

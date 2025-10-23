@@ -221,6 +221,7 @@ public static class Type
         public int FemaleSprite;
         public int[] StartItem;
         public int[] StartValue;
+        public int[] StartSkill;
         public int StartMap;
         public byte StartX;
         public byte StartY;

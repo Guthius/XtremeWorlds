@@ -171,11 +171,11 @@ namespace Server
             // ///////////////////////////////////////////
             // // This is used for respawning map items //
             // ///////////////////////////////////////////
-            var loopTo = global::Script.GetMaxMaps();
+            var loopTo = Core.Globals.Variables.MaxMaps;
             for (y = 0; y < loopTo; y++)
             {
                 // Clear out unnecessary junk
-                var loopTo1 = global::Script.GetMaxMapItems();
+                var loopTo1 = Core.Globals.Variables.MaxMapItems;
                 for (x = 0; x < loopTo1; x++)
                     Database.ClearMapItem(x, y);
 
@@ -192,13 +192,13 @@ namespace Server
             Core.Globals.Entity.Instances.Clear();
 
             var entities = Core.Globals.Entity.Instances;
-            var mapCount = global::Script.GetMaxMaps();
+            var mapCount = Core.Globals.Variables.MaxMaps;
 
             // Use entities from entity class
             for (int mapNum = 0; mapNum < mapCount; mapNum++)
             {
                 // Add Npcs
-                for (int i = 0; i < global::Script.GetMaxMapNpcs(); i++)
+                for (int i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
                 {
                     var npc = Core.Globals.Entity.FromNpc(i, Data.MapNpc[mapNum].Npc[i]);
                     if (npc.Num >= 0)
@@ -224,18 +224,6 @@ namespace Server
             }
 
             Script.Instance?.UpdateMapAi();
-        }
-
-        public static void CastSkill(int index, int skillSlot)
-        {
-            try
-            {
-                Script.Instance?.CastSkill(index, skillSlot);
-            }
-            catch (Exception ex)
-            {
-                General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(CastSkill));
-            }
         }
     }
 }

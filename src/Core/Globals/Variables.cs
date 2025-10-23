@@ -26,11 +26,12 @@ public static class Variables
     public static byte MinNameLength = 3;
     public static byte ChatLength = 70;
     public static byte MaxHotbar = 10;
-    public static byte MaxMapx = 32;
-    public static byte MaxMapy = 24;
+    public static byte MaxMapX = 32;
+    public static byte MaxMapY = 24;
     public static int MaxProjectiles = 255;
     public static byte MaxDropItems = 5;
     public static byte MaxStartItems = 5;
+    public static byte MaxStartSkills = 5;
     public static int MaxSwitches = 100;
     public static int MaxVariables = 100;
     public static byte MaxPoints = 255;

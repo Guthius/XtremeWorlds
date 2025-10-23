@@ -146,7 +146,7 @@ public static class Moral
         }
 
         var moralNum = packetReader.ReadInt32();
-        if (moralNum < 0 || moralNum > global::Script.GetMaxMorals())
+        if (moralNum < 0 || moralNum >= Core.Globals.Variables.MaxMorals)
         {
             return;
         }

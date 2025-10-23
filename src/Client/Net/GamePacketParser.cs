@@ -180,10 +180,11 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Variables.MinNameLength = r.ReadByte();
         Variables.ChatLength = r.ReadByte();
         Variables.MaxHotbar = r.ReadByte();
-        Variables.MaxMapx = r.ReadByte();
-        Variables.MaxMapy = r.ReadByte();
+        Variables.MaxMapX = r.ReadByte();
+        Variables.MaxMapY = r.ReadByte();
         Variables.MaxDropItems = r.ReadByte();
         Variables.MaxStartItems = r.ReadByte();
+        Variables.MaxStartSkills = r.ReadByte();
         Variables.MaxPoints = r.ReadByte();
         Variables.MaxChars = r.ReadByte();
         Variables.MaxStats = r.ReadByte();
@@ -378,6 +379,14 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             job.StartValue[i] = packetReader.ReadInt32();
         }
 
+        // Start skills (IDs)
+        if (job.StartSkill == null || job.StartSkill.Length != Variables.MaxStartSkills)
+            job.StartSkill = new int[Variables.MaxStartSkills];
+        for (var i = 0; i < Variables.MaxStartSkills; i++)
+        {
+            job.StartSkill[i] = packetReader.ReadInt32();
+        }
+
         job.StartMap = packetReader.ReadInt32();
         job.StartX = packetReader.ReadByte();
         job.StartY = packetReader.ReadByte();
@@ -406,6 +415,22 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             {
                 job.StartItem[i] = packetReader.ReadInt32();
                 job.StartValue[i] = packetReader.ReadInt32();
+            }
+
+            // Start skills (IDs)
+            if (job.StartSkill == null || job.StartSkill.Length != Variables.MaxStartSkills)
+                job.StartSkill = new int[Variables.MaxStartSkills];
+            for (var i = 0; i < Variables.MaxStartSkills; i++)
+            {
+                job.StartSkill[i] = packetReader.ReadInt32();
+            }
+
+            // Start skills (IDs)
+            if (job.StartSkill == null || job.StartSkill.Length != Variables.MaxStartSkills)
+                job.StartSkill = new int[Variables.MaxStartSkills];
+            for (var i = 0; i < Variables.MaxStartSkills; i++)
+            {
+                job.StartSkill[i] = packetReader.ReadInt32();
             }
 
             job.StartMap = packetReader.ReadInt32();

@@ -125,7 +125,7 @@ public static class Animation
         var packetReader = new PacketReader(bytes);
 
         var animationNum = packetReader.ReadInt32();
-        if (animationNum < 0 || animationNum > global::Script.GetMaxAnimations())
+        if (animationNum < 0 || animationNum >= Core.Globals.Variables.MaxAnimations)
         {
             return;
         }

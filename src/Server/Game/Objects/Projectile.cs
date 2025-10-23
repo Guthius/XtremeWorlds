@@ -584,8 +584,8 @@ public static class Projectile
                     }
 
                     // Bounds check
-                    int tileX = Math.Clamp(mp.X / 32, 0, Core.Globals.Variables.MaxMapx - 1);
-                    int tileY = Math.Clamp(mp.Y / 32, 0, Core.Globals.Variables.MaxMapy - 1);
+                    int tileX = Math.Clamp(mp.X / 32, 0, Core.Globals.Variables.MaxMapX - 1);
+                    int tileY = Math.Clamp(mp.Y / 32, 0, Core.Globals.Variables.MaxMapY - 1);
                     if (tileX < 0 || tileY < 0 || tileX >= Data.Map[map].MaxX || tileY >= Data.Map[map].MaxY)
                     {
                         int anim = Data.Projectile[projId].Animation;

@@ -73,14 +73,16 @@ public class Script
     public static int MaxSkills = Variables.MaxSkills;
     public static byte MaxTrades = Variables.MaxTrades;
     public static byte NameLength = Variables.NameLength;
+    public static byte MaxNameLength = Variables.NameLength;
     public static byte MinNameLength = Variables.MinNameLength;
     public static byte ChatLength = Variables.ChatLength;
     public static byte MaxHotbar = Variables.MaxHotbar;
-    public static byte MaxMapx = Variables.MaxMapx;
-    public static byte MaxMapy = Variables.MaxMapy;
+    public static byte MaxMapx = Core.Globals.Variables.MaxMapX;
+    public static byte MaxMapy = Core.Globals.Variables.MaxMapY;
     public static int MaxProjectiles = Variables.MaxProjectiles;
     public static byte MaxDropItems = Variables.MaxDropItems;
     public static byte MaxStartItems = Variables.MaxStartItems;
+    public static byte MaxStartSkills = Variables.MaxStartSkills;
     public static int MaxSwitches = Variables.MaxSwitches;
     public static int MaxVariables = Variables.MaxVariables;
     public static byte MaxPoints = Variables.MaxPoints;
@@ -93,48 +95,6 @@ public class Script
     public static byte MaxEventChoices = Variables.MaxEventChoices;
     public static int TileSize = Variables.TileSize;
     public static int MaxWeatherParticles = Variables.MaxWeatherParticles;
-
-    // Accessors for use across the server, allowing scripts to override values centrally
-    public static int GetMaxAnimations() => MaxAnimations;
-    public static int GetMaxBank() => MaxBank;
-    public static int GetMaxJobs() => MaxJobs;
-    public static int GetMaxMorals() => MaxMorals;
-    public static int GetMaxInv() => MaxInv;
-    public static int GetMaxItems() => MaxItems;
-    public static int GetMaxMaps() => MaxMaps;
-    public static int GetMaxMapItems() => MaxMapItems;
-    public static int GetMaxMapNpcs() => MaxMapNpcs;
-    public static int GetMaxNpcs() => MaxNpcs;
-    public static int GetMaxNpcSkills() => MaxNpcSkills;
-    public static int GetMaxParty() => MaxParty;
-    public static int GetMaxPartyMembers() => MaxPartyMembers;
-    public static int GetMaxPlayers() => MaxPlayers;
-    public static int GetMaxPlayerSkills() => MaxPlayerSkills;
-    public static int GetMaxResources() => MaxResources;
-    public static int GetMaxShops() => MaxShops;
-    public static int GetMaxSkills() => MaxSkills;
-    public static int GetMaxTrades() => MaxTrades;
-    public static int GetNameLength() => NameLength;
-    public static int GetMinNameLength() => MinNameLength;
-    public static int GetChatLength() => ChatLength;
-    public static int GetMaxHotbar() => MaxHotbar;
-    public static int GetMaxMapX() => MaxMapx;
-    public static int GetMaxMapY() => MaxMapy;
-    public static int GetMaxProjectiles() => MaxProjectiles;
-    public static int GetMaxDropItems() => MaxDropItems;
-    public static int GetMaxStartItems() => MaxStartItems;
-    public static int GetMaxSwitches() => MaxSwitches;
-    public static int GetMaxVariables() => MaxVariables;
-    public static int GetMaxPoints() => MaxPoints;
-    public static int GetMaxChars() => MaxChars;
-    public static int GetChatLines() => ChatLines;
-    public static int GetMaxStats() => MaxStats;
-    public static int GetMaxQuests() => MaxQuests;
-    public static int GetMaxEvents() => MaxEvents;
-    public static int GetMaxGuilds() => MaxGuilds;
-    public static int GetMaxEventChoices() => MaxEventChoices;
-    public static int GetTileSize() => TileSize;
-    public static int GetMaxWeatherParticles() => MaxWeatherParticles;
 
     public long ItemDespawnTimeMs()
     {
@@ -425,7 +385,6 @@ public class Script
 
         if (skillNum >= 0)
         {
-            // Skill common events: 0=None, 1..N mapped to CommonEventTrigger values by -1
             idxType = Data.Skill[skillNum].CommonEventType - 1;
             n = Data.Skill[skillNum].CommonEventData1;
             n2 = Data.Skill[skillNum].CommonEventData2;
@@ -450,7 +409,7 @@ public class Script
                 EventLogic.TriggerEvent(index, 1, 0, GetPlayerX(index), GetPlayerY(index)); break;
 
             case (byte)CommonEventTrigger.Script:
-                // Minimal sample custom scripts same as item path
+                // Minimal sample custom scripts
                 if (n == 0)
                     NetworkSend.PlayerMsg(index, "You feel a strange sensation...", (int)ColorName.BrightCyan);
                 else
@@ -540,7 +499,7 @@ public class Script
                         if (itemNum >= 0)
                         {
                             Server.Animation.SendAnimation(GetPlayerMap(index), Data.Item[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
-                            TakeInv(index, itemNum, 0);
+                            TakeInv(index, itemNum, 1);
                         }
                         NetworkSend.PlayerMsg(index, "You study the skill carefully.", (int)ColorName.Yellow);
                         NetworkSend.PlayerMsg(index, "You have learned a new skill!", (int)ColorName.BrightGreen);
@@ -651,7 +610,7 @@ public class Script
             }
         }
 
-        for (int i = 0; i < GetMaxMapNpcs(); i++)
+        for (int i = 0; i < Script.MaxMapNpcs; i++)
         {
             if (Data.MapNpc[GetPlayerMap(index)].Npc[i].TargetType == (byte)TargetType.Player & Data.MapNpc[GetPlayerMap(index)].Npc[i].Target == index)
             {
@@ -822,7 +781,7 @@ public class Script
                         // clear snapshot & underlying map npc buffer
                         entity.SkillBuffer = -1;
                         entity.SkillBufferTimer = 0;
-                        if (entity.Id >= 0 && entity.Id < GetMaxMapNpcs() && mapNum >= 0 && mapNum < Data.MapNpc.Length)
+                        if (entity.Id >= 0 && entity.Id < Script.MaxMapNpcs && mapNum >= 0 && mapNum < Data.MapNpc.Length)
                         {
                             ref var baseNpc = ref Data.MapNpc[mapNum].Npc[entity.Id];
                             baseNpc.SkillBuffer = -1;
@@ -865,7 +824,7 @@ public class Script
                                             entity.TargetType = (byte)TargetType.Player;
                                             entity.Target = player.Id;
                                             // Persist target into base map data for movement logic
-                                            if (entity.Id >= 0 && entity.Id < GetMaxMapNpcs() && mapNum >= 0 && mapNum < Data.MapNpc.Length)
+                                            if (entity.Id >= 0 && entity.Id < Script.MaxMapNpcs && mapNum >= 0 && mapNum < Data.MapNpc.Length)
                                             {
                                                 ref var mapNpc = ref Data.MapNpc[mapNum].Npc[entity.Id];
                                                 mapNpc.TargetType = entity.TargetType;
@@ -902,7 +861,7 @@ public class Script
                                         {
                                             entity.TargetType = (byte)TargetType.Npc;
                                             entity.Target = i;
-                                            if (entity.Id >= 0 && entity.Id < GetMaxMapNpcs() && mapNum >= 0 && mapNum < Data.MapNpc.Length)
+                                            if (entity.Id >= 0 && entity.Id < Script.MaxMapNpcs && mapNum >= 0 && mapNum < Data.MapNpc.Length)
                                             {
                                                 ref var mapNpc = ref Data.MapNpc[mapNum].Npc[entity.Id];
                                                 mapNpc.TargetType = entity.TargetType;
@@ -936,7 +895,7 @@ public class Script
                                 entity.Target = -1;
                                 entity.TargetType = 0;
                                 // reflect to base map npc if this is an NPC snapshot
-                                if (entity.Type == Core.Globals.Entity.EntityType.Npc && entity.Id >= 0 && entity.Id < GetMaxMapNpcs())
+                                if (entity.Type == Core.Globals.Entity.EntityType.Npc && entity.Id >= 0 && entity.Id < Script.MaxMapNpcs)
                                 {
                                     ref var baseNpcClr = ref Data.MapNpc[mapNum].Npc[entity.Id];
                                     baseNpcClr.TargetType = 0;
@@ -957,7 +916,7 @@ public class Script
                                         long nowMs = General.GetTimeMs();
                                         // ex, ey, px, py already calculated above in this scope
                                         int dist = Math.Max(Math.Abs(ex - px), Math.Abs(ey - py));
-                                        for (int slot = 0; slot < GetMaxNpcSkills() && slot < skills.Length; slot++)
+                                        for (int slot = 0; slot < Script.MaxNpcSkills && slot < skills.Length; slot++)
                                         {
                                             int sid = skills[slot];
                                             if (sid <= 0 || sid >= Data.Skill.Length) continue;
@@ -966,7 +925,7 @@ public class Script
                                             bool inRange = sk.Range == 0 ? (sk.IsAoE || dist <= 1) : dist <= sk.Range;
                                             if (!inRange) continue;
                                             // Cooldown check
-                                            if (mapNum < 0 || mapNum >= Data.MapNpc.Length || entity.Id < 0 || entity.Id >= GetMaxMapNpcs()) break;
+                                            if (mapNum < 0 || mapNum >= Data.MapNpc.Length || entity.Id < 0 || entity.Id >= Script.MaxMapNpcs) break;
                                             ref var baseNpc = ref Data.MapNpc[mapNum].Npc[entity.Id];
                                             bool cdReady = baseNpc.SkillCd == null || slot >= baseNpc.SkillCd.Length || baseNpc.SkillCd[slot] <= nowMs;
                                             if (!cdReady) continue;
@@ -1010,7 +969,7 @@ public class Script
                                 {
                                     entity.Target = -1;
                                     entity.TargetType = 0;
-                                    if (entity.Type == Core.Globals.Entity.EntityType.Npc && entity.Id >= 0 && entity.Id < GetMaxMapNpcs())
+                                    if (entity.Type == Core.Globals.Entity.EntityType.Npc && entity.Id >= 0 && entity.Id < Script.MaxMapNpcs)
                                     {
                                         ref var baseNpc = ref Data.MapNpc[mapNum].Npc[entity.Id];
                                         baseNpc.TargetType = 0;
@@ -1029,14 +988,14 @@ public class Script
                                             long nowMs2 = General.GetTimeMs();
                                             // ex, ey, tx, ty already calculated above in this scope
                                             int dist2 = Math.Max(Math.Abs(ex - tx), Math.Abs(ey - ty));
-                                            for (int slot2 = 0; slot2 < GetMaxNpcSkills() && slot2 < skills2.Length; slot2++)
+                                            for (int slot2 = 0; slot2 < Script.MaxNpcSkills && slot2 < skills2.Length; slot2++)
                                             {
                                                 int sid2 = skills2[slot2];
                                                 if (sid2 <= 0 || sid2 >= Data.Skill.Length) continue;
                                                 ref var sk2 = ref Data.Skill[sid2];
                                                 bool inRange2 = sk2.Range == 0 ? (sk2.IsAoE || dist2 <= 1) : dist2 <= sk2.Range;
                                                 if (!inRange2) continue;
-                                                if (mapNum < 0 || mapNum >= Data.MapNpc.Length || entity.Id < 0 || entity.Id >= GetMaxMapNpcs()) break;
+                                                if (mapNum < 0 || mapNum >= Data.MapNpc.Length || entity.Id < 0 || entity.Id >= Script.MaxMapNpcs) break;
                                                 ref var baseNpc2 = ref Data.MapNpc[mapNum].Npc[entity.Id];
                                                 bool cdReady2 = baseNpc2.SkillCd == null || slot2 >= baseNpc2.SkillCd.Length || baseNpc2.SkillCd[slot2] <= nowMs2;
                                                 if (!cdReady2) continue;
@@ -1108,7 +1067,7 @@ public class Script
                 var npcIndex = e.Id; // Index into Data.MapNpc[map].Npc
                 var map = e.Map;
                 if (map < 0 || map >= Variables.MaxMaps) continue;
-                if (npcIndex < 0 || npcIndex >= GetMaxMapNpcs()) continue;
+                if (npcIndex < 0 || npcIndex >= Script.MaxMapNpcs) continue;
 
                 ref var baseNpc = ref Data.MapNpc[map].Npc[npcIndex];
 
@@ -1138,7 +1097,7 @@ public class Script
                         baseNpc.Target = -1;
                     }
                 }
-                else if (baseNpc.TargetType == (byte)TargetType.Npc && baseNpc.Target >= 0 && baseNpc.Target < GetMaxMapNpcs())
+                else if (baseNpc.TargetType == (byte)TargetType.Npc && baseNpc.Target >= 0 && baseNpc.Target < Script.MaxMapNpcs)
                 {
                     if (Data.MapNpc[map].Npc[baseNpc.Target].Num >= 0)
                     {
@@ -1170,7 +1129,7 @@ public class Script
                     int ty = GetPlayerY(baseNpc.Target);
                     moved = TryChase(map, npcIndex, sx, sy, tx, ty);
                 }
-                else if (baseNpc.TargetType == (byte)TargetType.Npc && baseNpc.Target >= 0 && baseNpc.Target < GetMaxMapNpcs())
+                else if (baseNpc.TargetType == (byte)TargetType.Npc && baseNpc.Target >= 0 && baseNpc.Target < Script.MaxMapNpcs)
                 {
                     // We only have snapshot entities list with indexes unrelated to mapNpc slot ordering for other NPCs; perform tile search.
                     int targetSlot = baseNpc.Target;
@@ -1280,7 +1239,7 @@ public class Script
             SetPlayerLevel(index, GetPlayerLevel(index) + 1);
             int points = StatPerLevel;
             points += ((int)Math.Floor((decimal)GetPlayerStat(index, Stat.Luck) / 10));
-            SetPlayerPoints(index, GetPlayerPoints(index) + points);
+            SetPlayerPoints(index, expRollover);
             SetPlayerExp(index, expRollover);
             level_count += 1;
         }
@@ -1471,7 +1430,7 @@ public class Script
         {
             var map = target.Map;
             var mapNpcNum = target.Id;
-            if (map >= 0 && map < Data.MapNpc.Length && mapNpcNum >= 0 && mapNpcNum < GetMaxMapNpcs())
+            if (map >= 0 && map < Data.MapNpc.Length && mapNpcNum >= 0 && mapNpcNum < Script.MaxMapNpcs)
             {
                 // Loot
                 DropNpcLoot(map, mapNpcNum);
@@ -1498,7 +1457,7 @@ public class Script
                 mapNpc.Target = -1;
                 mapNpc.TargetType = 0;
 
-                for (int i = 0; i < GetMaxMapNpcs(); i++)
+                for (int i = 0; i < Script.MaxMapNpcs; i++)
                 {
                     if (Data.MapNpc[map].Npc[i].TargetType == (byte)TargetType.Npc && Data.MapNpc[map].Npc[i].Target == mapNpcNum)
                     {
@@ -1620,7 +1579,7 @@ public class Script
             // Acquire underlying map npc to set target persistent
             var map = target.Map;
             var mapNpcIndex = target.Id;
-            if (map >= 0 && map < Data.MapNpc.Length && mapNpcIndex >= 0 && mapNpcIndex < GetMaxMapNpcs())
+            if (map >= 0 && map < Data.MapNpc.Length && mapNpcIndex >= 0 && mapNpcIndex < Script.MaxMapNpcs)
             {
                 ref var baseNpc = ref Data.MapNpc[map].Npc[mapNpcIndex];
                 // Always switch target to the attacker on hit for snappy aggro behavior
@@ -1647,7 +1606,7 @@ public class Script
         {
             var map = attacker.Map;
             var mapNpcIndex = attacker.Id;
-            if (map >= 0 && map < Data.MapNpc.Length && mapNpcIndex >= 0 && mapNpcIndex < GetMaxMapNpcs())
+            if (map >= 0 && map < Data.MapNpc.Length && mapNpcIndex >= 0 && mapNpcIndex < Script.MaxMapNpcs)
             {
                 ref var baseNpc = ref Data.MapNpc[map].Npc[mapNpcIndex];
                 if (baseNpc.TargetType == 0)
@@ -2029,7 +1988,7 @@ public class Script
         else if (target.Type == Core.Globals.Entity.EntityType.Npc)
         {
             if (target.Map < 0 || target.Map >= Data.MapNpc.Length) return;
-            if (target.Id < 0 || target.Id >= GetMaxMapNpcs()) return;
+            if (target.Id < 0 || target.Id >= Script.MaxMapNpcs) return;
             ref var mapNpc = ref Data.MapNpc[target.Map].Npc[target.Id];
             if (mapNpc.Num < 0) return;
             int idx = (int)vital;
@@ -2076,7 +2035,7 @@ public class Script
         }
         else if (entity.Type == Core.Globals.Entity.EntityType.Npc)
         {
-            for (int i = 0; i < GetMaxNpcSkills(); i++)
+            for (int i = 0; i < Script.MaxNpcSkills; i++)
             {
                 if (i == bufferedValue)
                 {
@@ -2226,7 +2185,7 @@ public class Script
                     int destMap = skill.Map;
                     int destX = skill.X;
                     int destY = skill.Y;
-                    if (destMap >= 0 && destMap < Data.Map.Length && destX >= 0 && destX < Variables.MaxMapx && destY >= 0 && destY < Variables.MaxMapy)
+                    if (destMap >= 0 && destMap < Data.Map.Length && destX >= 0 && destX < Core.Globals.Variables.MaxMapX && destY >= 0 && destY < Core.Globals.Variables.MaxMapY)
                     {
                         if (caster.Type == Core.Globals.Entity.EntityType.Player)
                         {
@@ -2320,7 +2279,7 @@ public class Script
         // NPCs
         if (mapNum >= 0 && mapNum < Data.MapNpc.Length)
         {
-            for (int i = 0; i < GetMaxMapNpcs(); i++)
+            for (int i = 0; i < Script.MaxMapNpcs; i++)
             {
                 ref var mn = ref Data.MapNpc[mapNum].Npc[i];
                 if (mn.Num < 0) continue;
@@ -2362,7 +2321,7 @@ public class Script
         // NPCs via map data (avoid LINQ)
         if (mapNum >= 0 && mapNum < Data.MapNpc.Length)
         {
-            for (int i = 0; i < GetMaxMapNpcs(); i++)
+            for (int i = 0; i < Script.MaxMapNpcs; i++)
             {
                 if (Data.MapNpc[mapNum].Npc[i].Num < 0) continue;
                 int nx = Data.MapNpc[mapNum].Npc[i].X / 32;
@@ -2448,13 +2407,13 @@ public class Script
         else if (caster.Type == Core.Globals.Entity.EntityType.Npc)
         {
             // Set NPC cooldown on the slot that matches this skillId
-            if (caster.Map >= 0 && caster.Map < Data.MapNpc.Length && caster.Id >= 0 && caster.Id < GetMaxMapNpcs())
+            if (caster.Map >= 0 && caster.Map < Data.MapNpc.Length && caster.Id >= 0 && caster.Id < Script.MaxMapNpcs)
             {
                 ref var baseNpc = ref Data.MapNpc[caster.Map].Npc[caster.Id];
                 var npcTemplate = caster.Num >= 0 && caster.Num < Data.Npc.Length ? Data.Npc[caster.Num] : default;
                 if (npcTemplate.Skill != null && baseNpc.SkillCd != null)
                 {
-                    for (int slot = 0; slot < GetMaxNpcSkills() && slot < npcTemplate.Skill.Length && slot < baseNpc.SkillCd.Length; slot++)
+                    for (int slot = 0; slot < Script.MaxNpcSkills && slot < npcTemplate.Skill.Length && slot < baseNpc.SkillCd.Length; slot++)
                     {
                         if (npcTemplate.Skill[slot] == skillId)
                         {
@@ -2576,7 +2535,7 @@ public class Script
         }
         else if (entity.Type == Entity.EntityType.Npc)
         {
-            if (entity.Map >= 0 && entity.Map < Data.MapNpc.Length && entity.Id >= 0 && entity.Id < GetMaxMapNpcs())
+            if (entity.Map >= 0 && entity.Map < Data.MapNpc.Length && entity.Id >= 0 && entity.Id < Script.MaxMapNpcs)
             {
                 Data.MapNpc[entity.Map].Npc[entity.Id].AttackTimer = newTime;
             }
@@ -2601,7 +2560,7 @@ public class Script
         var before = target.Vital != null ? target.Vital[(int)Vital.Health] : 0;
         ApplyDamage(attacker, target, dmg, skillId);
         var after = target.Type == Entity.EntityType.Player ? GetPlayerVital(target.Id, Vital.Health) : (target.Vital != null ? target.Vital[(int)Vital.Health] : 0);
-        if (target.Type == Entity.EntityType.Npc && target.Map >= 0 && target.Map < Data.MapNpc.Length && target.Id >= 0 && target.Id < GetMaxMapNpcs())
+        if (target.Type == Entity.EntityType.Npc && target.Map >= 0 && target.Map < Data.MapNpc.Length && target.Id >= 0 && target.Id < Script.MaxMapNpcs)
         {
             after = Data.MapNpc[target.Map].Npc[target.Id].Vital[(int)Vital.Health];
         }
@@ -2665,7 +2624,7 @@ public class Script
             else if (target.Type == Entity.EntityType.Npc)
             {
                 // Ensure no other NPC occupying
-                for (int mi = 0; mi < GetMaxMapNpcs(); mi++)
+                for (int mi = 0; mi < Script.MaxMapNpcs; mi++)
                 {
                     if (mi == target.Id) continue;
                     if (Data.MapNpc[map].Npc[mi].Num >= 0 && Data.MapNpc[map].Npc[mi].X/32 == nx && Data.MapNpc[map].Npc[mi].Y/32 == ny) { occ = true; break; }

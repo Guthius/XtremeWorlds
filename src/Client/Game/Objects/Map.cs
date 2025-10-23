@@ -552,8 +552,8 @@ namespace Client
             // Reset basic map properties
             Data.MyMap.Name = string.Empty;
             Data.MyMap.Tileset = 1;
-            Data.MyMap.MaxX = Variables.MaxMapx;
-            Data.MyMap.MaxY = Variables.MaxMapy;
+            Data.MyMap.MaxX = Variables.MaxMapX;
+            Data.MyMap.MaxY = Variables.MaxMapY;
             Data.MyMap.BootMap = 0;
             Data.MyMap.BootX = 0;
             Data.MyMap.BootY = 0;
