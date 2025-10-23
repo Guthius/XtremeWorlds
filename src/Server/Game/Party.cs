@@ -502,7 +502,7 @@ namespace Server
                         if (GetPlayerMap(tmpindex) == mapNum)
                         {
                             // give them their share
-                            SetPlayerExp(tmpindex, expShare);
+                            SetPlayerExp(tmpindex, GetPlayerExp(tmpindex) + expShare);
                         }
                     }
                 }
@@ -513,7 +513,7 @@ namespace Server
             {
                 tmpindex = Data.Party[partyNum].Member[(int) Math.Round(General.GetRandom.NextDouble(1d, Data.Party[partyNum].MemberCount))];
                 // give the exp
-                SetPlayerExp(tmpindex, leftOver);
+                SetPlayerExp(tmpindex, GetPlayerExp(tmpindex) + leftOver);
             }
         }
 

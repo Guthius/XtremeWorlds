@@ -1423,16 +1423,26 @@ public class Script
             // Apply death penalty & get exp lost
             int lost = Server.Player.KillPlayer(target.Id);
 
-            // Basic attacker reward (if attacker is player)
+            // Basic attacker reward (if attacker is player) with party sharing
             if (attacker.Type == Entity.EntityType.Player && attacker.Id != target.Id)
             {
-                // Simple PK reward: gain fraction of lost exp
                 if (lost > 0)
                 {
                     int gain = Math.Max(1, lost);
-                    SetPlayerExp(attacker.Id, GetPlayerExp(attacker.Id) + gain);
+                    int partyId = Data.TempPlayer[attacker.Id].InParty;
+                    int mapNum = GetPlayerMap(attacker.Id);
+                    if (partyId >= 0)
+                    {
+                        // Share EXP among party members on the same map
+                        ShareExp(partyId, gain, attacker.Id, mapNum);
+                    }
+                    else
+                    {
+                        // Solo award
+                        SetPlayerExp(attacker.Id, GetPlayerExp(attacker.Id) + gain);
+                        NetworkSend.SendExp(attacker.Id);
+                    }
                     NetworkSend.PlayerMsg(attacker.Id, $"You gained {gain} experience for defeating {GetPlayerName(target.Id)}.", (int)ColorName.BrightGreen);
-                    NetworkSend.SendExp(attacker.Id);
                 }
             }
 
@@ -1512,19 +1522,29 @@ public class Script
                     }
                 }
 
-                // Grant exp to attacker if player
+                // Grant exp to attacker if player (share with party if applicable)
                 if (attacker.Type == Entity.EntityType.Player && mapNpc.Num == -1)
                 {
                     int baseExp = 0;
                     if (originalNpcNum >= 0 && originalNpcNum < Data.Npc.Length)
                     {
-                        baseExp = Data.Npc[originalNpcNum].Exp; // assuming Exp field exists
+                        baseExp = Data.Npc[originalNpcNum].Exp; // NPC base EXP
                     }
                     if (baseExp > 0)
                     {
-                        SetPlayerExp(attacker.Id, GetPlayerExp(attacker.Id) + baseExp);
+                        int partyId = Data.TempPlayer[attacker.Id].InParty;
+                        if (partyId >= 0)
+                        {
+                            // Share EXP among eligible party members on the same map
+                            ShareExp(partyId, baseExp, attacker.Id, map);
+                        }
+                        else
+                        {
+                            // Solo: award directly
+                            SetPlayerExp(attacker.Id, GetPlayerExp(attacker.Id) + baseExp);
+                            NetworkSend.SendExp(attacker.Id);
+                        }
                         NetworkSend.PlayerMsg(attacker.Id, $"You gained {baseExp} experience.", (int)ColorName.BrightGreen);
-                        NetworkSend.SendExp(attacker.Id);
                     }
                 }
             }
