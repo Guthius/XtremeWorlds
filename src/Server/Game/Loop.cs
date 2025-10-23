@@ -88,7 +88,7 @@ namespace Server
                     }
                     catch(Exception ex)
                     {
-                        General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(ServerAsync));
+                        General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(Loop));
                     }
 
                     tmr60000 = General.GetTimeMs() + 60000;
