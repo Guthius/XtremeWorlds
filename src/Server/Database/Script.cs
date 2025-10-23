@@ -254,14 +254,7 @@ public class Script
                                     NetworkSend.SendActionMsg(GetPlayerMap(index), "+" + Data.Item[itemNum].Data1, (int)ColorName.BrightGreen, (byte)ActionMessageType.Scroll, GetPlayerX(index) * 32, GetPlayerY(index) * 32);
                                     Server.Animation.SendAnimation(GetPlayerMap(index), Data.Item[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
                                     SetPlayerVital(index, Vital.Health, GetPlayerVital(index, Vital.Health) + Data.Item[itemNum].Data1);
-                                    if (Data.Item[itemNum].Stackable == 1)
-                                    {
-                                        TakeInv(index, itemNum, 1);
-                                    }
-                                    else
-                                    {
-                                        TakeInv(index, itemNum, 0);
-                                    }
+                                    TakeInv(index, itemNum, 1);
                                     NetworkSend.SendVital(index, Vital.Health);
                                     break;
                                 }
@@ -271,14 +264,7 @@ public class Script
                                     NetworkSend.SendActionMsg(GetPlayerMap(index), "+" + Data.Item[itemNum].Data1, (int)ColorName.BrightBlue, (byte)ActionMessageType.Scroll, GetPlayerX(index) * 32, GetPlayerY(index) * 32);
                                     Server.Animation.SendAnimation(GetPlayerMap(index), Data.Item[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
                                     SetPlayerVital(index, Vital.Stamina, GetPlayerVital(index, Vital.Stamina) + Data.Item[itemNum].Data1);
-                                    if (Data.Item[itemNum].Stackable == 1)
-                                    {
-                                        TakeInv(index, itemNum, 1);
-                                    }
-                                    else
-                                    {
-                                        TakeInv(index, itemNum, 0);
-                                    }
+                                    TakeInv(index, itemNum, 1);
                                     NetworkSend.SendVital(index, Vital.Stamina);
                                     break;
                                 }
@@ -287,14 +273,7 @@ public class Script
                                 {
                                     Server.Animation.SendAnimation(GetPlayerMap(index), Data.Item[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
                                     SetPlayerVital(index, Vital.Stamina, GetPlayerVital(index, Vital.Stamina) + Data.Item[itemNum].Data1);
-                                    if (Data.Item[itemNum].Stackable == 1)
-                                    {
-                                        TakeInv(index, itemNum, 1);
-                                    }
-                                    else
-                                    {
-                                        TakeInv(index, itemNum, 0);
-                                    }
+                                    TakeInv(index, itemNum, 1);
                                     NetworkSend.SendVital(index, Vital.Stamina);
                                     break;
                                 }
@@ -303,14 +282,7 @@ public class Script
                                 {
                                     Server.Animation.SendAnimation(GetPlayerMap(index), Data.Item[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
                                     SetPlayerExp(index, GetPlayerExp(index) + Data.Item[itemNum].Data1);
-                                    if (Data.Item[itemNum].Stackable == 1)
-                                    {
-                                        TakeInv(index, itemNum, 1);
-                                    }
-                                    else
-                                    {
-                                        TakeInv(index, itemNum, 0);
-                                    }
+                                    TakeInv(index, itemNum, 1);
                                     NetworkSend.SendExp(index);
                                     break;
                                 }
