@@ -35,7 +35,7 @@ public static class Player
 
         // Send an ok to client to start receiving in game data
         NetworkSend.SendLoginOk(session.Id);
-        NetworkSend.SendConstants(session);
+        NetworkSend.SendVariables(session);
 
         JoinGame(session.Id);
 

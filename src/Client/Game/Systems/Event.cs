@@ -46,7 +46,7 @@ namespace Client
         public static int EventChatTimer;
 
         public static bool EventChat;
-        public static string EventText;
+        public static string EventText = "";
         public static bool ShowEventLbl;
         public static string[] EventChoices = new string[Core.Globals.Variables.MaxEventChoices];
         public static bool[] EventChoiceVisible = new bool[Core.Globals.Variables.MaxEventChoices];
@@ -166,6 +166,8 @@ namespace Client
                 {
                     if (Information.UBound(Data.MapEvents) > 2)
                     {
+                        if (Data.MapEvents == null)
+                            break;
                         Data.MapEvents[i] = Data.MapEvents[i + 1];
                     }
                 }
@@ -754,27 +756,25 @@ namespace Client
                                 }
                                 case 1:
                                 {
-                                    if (!string.IsNullOrEmpty(Strings.Trim(TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[i].Text2)))
-                                    {
-                                        Array.Resize(ref EventList, X + 1);
-                                        EventList[X].CommandList = 7;
-                                        EventList[X].CommandNum = 0;
-                                        EditorEvent.Instance.lstCommands.Items.Add(Strings.Mid(indent, 1, Strings.Len(indent) - 4) + " : " + "When [" + Strings.Trim(TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[i].Text2) + "]");
-                                        listleftoff[curlist] = i;
-                                        conditionalstage[curlist] = 2;
-                                        curlist = TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1;
-                                        goto newlist;
-                                    }
-                                    else
-                                    {
-                                        X = X - 1;
-                                        Array.Resize(ref EventList, X + 1);
-                                        listleftoff[curlist] = i;
-                                        conditionalstage[curlist] = 2;
-                                        goto newlist;
-                                    }
-
-                                    break;
+                                        if (!string.IsNullOrEmpty(Strings.Trim(TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[i].Text2)))
+                                        {
+                                            Array.Resize(ref EventList, X + 1);
+                                            EventList[X].CommandList = 7;
+                                            EventList[X].CommandNum = 0;
+                                            EditorEvent.Instance.lstCommands.Items.Add(Strings.Mid(indent, 1, Strings.Len(indent) - 4) + " : " + "When [" + Strings.Trim(TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[i].Text2) + "]");
+                                            listleftoff[curlist] = i;
+                                            conditionalstage[curlist] = 2;
+                                            curlist = TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1;
+                                            goto newlist;
+                                        }
+                                        else
+                                        {
+                                            X = X - 1;
+                                            Array.Resize(ref EventList, X + 1);
+                                            listleftoff[curlist] = i;
+                                            conditionalstage[curlist] = 2;
+                                            goto newlist;
+                                        }
                                 }
                                 case 2:
                                 {
@@ -795,11 +795,8 @@ namespace Client
                                         Array.Resize(ref EventList, X + 1);
                                         listleftoff[curlist] = i;
                                         conditionalstage[curlist] = 3;
-                                        curlist = curlist;
                                         goto newlist;
                                     }
-
-                                    break;
                                 }
                                 case 3:
                                 {
@@ -820,11 +817,8 @@ namespace Client
                                         Array.Resize(ref EventList, X + 1);
                                         listleftoff[curlist] = i;
                                         conditionalstage[curlist] = 4;
-                                        curlist = curlist;
                                         goto newlist;
                                     }
-
-                                    break;
                                 }
                                 case 4:
                                 {
@@ -845,11 +839,8 @@ namespace Client
                                         Array.Resize(ref EventList, X + 1);
                                         listleftoff[curlist] = i;
                                         conditionalstage[curlist] = 5;
-                                        curlist = curlist;
                                         goto newlist;
                                     }
-
-                                    break;
                                 }
                                 case 5:
                                 {
@@ -1820,7 +1811,11 @@ namespace Client
                 case (int) EventCommand.SetMoveRoute:
                 {
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1 = ListOfEvents[EditorEvent.Instance.cmbEvent.SelectedIndex];
+                    if (ListOfEvents != null)
+                    {
+                        TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1 = ListOfEvents[EditorEvent.Instance.cmbEvent.SelectedIndex];
+                    }
+
                     if (EditorEvent.Instance.chkIgnoreMove.Checked == true)
                     {
                         TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data2 = 1;
@@ -1840,7 +1835,10 @@ namespace Client
                     }
 
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].MoveRouteCount = TempMoveRouteCount;
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].MoveRoute = TempMoveRoute;
+                    if (TempMoveRoute != null)
+                    {
+                        TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].MoveRoute = TempMoveRoute;
+                    }
                     break;
                 }
 
@@ -2021,7 +2019,10 @@ namespace Client
                 case (int) EventCommand.WaitMovementCompletion:
                 {
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = (byte) Index;
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1 = ListOfEvents[EditorEvent.Instance.cmbMoveWait.SelectedIndex];
+                    if (ListOfEvents != null)
+                    {
+                        TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1 = ListOfEvents[EditorEvent.Instance.cmbMoveWait.SelectedIndex];
+                    }
                     break;
                 }
 
@@ -2057,6 +2058,8 @@ namespace Client
 
             EditorEvent.Instance.fraConditionalBranch.Visible = false;
 
+            if (EventList == null)
+                return;
             curlist = EventList[i].CommandList;
             curslot = EventList[i].CommandNum;
 
@@ -2920,6 +2923,8 @@ namespace Client
             if (i > Information.UBound(EventList))
                 return;
 
+            if (EventList == null)
+                return;
             curlist = EventList[i].CommandList;
             curslot = EventList[i].CommandNum;
 
@@ -2985,6 +2990,8 @@ namespace Client
             if (i > Information.UBound(EventList))
                 return;
 
+            if (EventList == null)
+                return;
             curlist = EventList[i].CommandList;
             curslot = EventList[i].CommandNum;
 
@@ -3206,7 +3213,10 @@ namespace Client
                 }
                 case (byte) EventCommand.SetMoveRoute:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1 = ListOfEvents[EditorEvent.Instance.cmbEvent.SelectedIndex];
+                    if (ListOfEvents != null)
+                    {
+                        TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1 = ListOfEvents[EditorEvent.Instance.cmbEvent.SelectedIndex];
+                    }
                     if (EditorEvent.Instance.chkIgnoreMove.Checked == true)
                     {
                         TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data2 = 1;
@@ -3226,7 +3236,8 @@ namespace Client
                     }
 
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].MoveRouteCount = TempMoveRouteCount;
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].MoveRoute = TempMoveRoute;
+                    if (TempMoveRoute != null)
+                        TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].MoveRoute = TempMoveRoute;
                     break;
                 }
                 case (byte) EventCommand.PlayAnimation:
@@ -3335,7 +3346,10 @@ namespace Client
                 }
                 case (byte) EventCommand.WaitMovementCompletion:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1 = ListOfEvents[EditorEvent.Instance.cmbMoveWait.SelectedIndex];
+                    if (ListOfEvents != null)
+                    {
+                        TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1 = ListOfEvents[EditorEvent.Instance.cmbMoveWait.SelectedIndex];
+                    }
                     break;
                 }
             }
@@ -3406,6 +3420,8 @@ namespace Client
                 return;
 
             {
+                if (Data.MapEvents == null)
+                    return;
                 ref var withBlock = ref Data.MapEvents[id];
                 withBlock.X = x;
                 withBlock.Y = y;
@@ -3428,6 +3444,8 @@ namespace Client
                 return;
 
             {
+                if (Data.MapEvents == null)
+                    return;
                 ref var withBlock = ref Data.MapEvents[i];
                 withBlock.Dir = dir;
                 withBlock.ShowDir = dir;

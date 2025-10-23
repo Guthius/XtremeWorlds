@@ -11,6 +11,7 @@ using Core.Net;
 using static Core.Globals.Command;
 using Type = Core.Globals.Type;
 using Serilog.Parsing;
+using System.Threading.Tasks;
 
 namespace Server.Game.Net;
 
@@ -231,7 +232,6 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         General.Logger.LogInformation("{AccountName} has logged in from {IpAddress}",
             GetAccountLogin(session.Id), session.Channel.IpAddress);
 
-        NetworkSend.SendConstants(session);
         NetworkSend.SendPlayerChars(session);
         NetworkSend.SendJobs(session);
     }
@@ -310,7 +310,6 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Database.RegisterAccount(session.Id, username, password);
 
         // send them to the character portal
-        NetworkSend.SendConstants(session);
         NetworkSend.SendPlayerChars(session);
         NetworkSend.SendJobs(session);
     }

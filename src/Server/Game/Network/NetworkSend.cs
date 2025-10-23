@@ -104,13 +104,13 @@ public static class NetworkSend
         session.Channel.Send(packetWriter.GetBytes());
     }
 
-    public static void SendConstants(GameSession session)
+    public static void SendVariables(GameSession session)
     {
-        // Send authoritative constants from script getters so client can size arrays correctly
+        // Send authoritative variables from script getters so client can size arrays correctly
         var w = new PacketWriter();
-        w.WriteEnum(ServerPackets.SConstants);
+        w.WriteEnum(ServerPackets.SVariables);
 
-        // Order matters: keep this in sync with client's Packet_Constants
+        // Order matters: keep this in sync with client's Packet_Variables
         // Int-sized values
         w.WriteInt32(global::Script.GetMaxAnimations());
         w.WriteInt32(global::Script.GetMaxItems());

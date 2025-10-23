@@ -20,7 +20,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     {
         Bind(Packets.ServerPackets.SAes, Packet_Aes);
         Bind(Packets.ServerPackets.SAlertMsg, Packet_AlertMsg);
-        Bind(Packets.ServerPackets.SConstants, Packet_Constants);
+        Bind(Packets.ServerPackets.SVariables, Packet_Variables);
         Bind(Packets.ServerPackets.SLoginOk, Packet_LoginOk);
         Bind(Packets.ServerPackets.SPlayerChars, Packet_PlayerChars);
         Bind(Packets.ServerPackets.SUpdateJob, Packet_UpdateJob);
@@ -142,8 +142,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         General.AesIV = iv;
     }
 
-    // Constants packet: read authoritative sizes and apply to global constants.
-    private static void Packet_Constants(ReadOnlyMemory<byte> data)
+    // Variables packet: read authoritative sizes and apply to global variables.
+    private static void Packet_Variables(ReadOnlyMemory<byte> data)
     {
         var r = new PacketReader(data);
 
