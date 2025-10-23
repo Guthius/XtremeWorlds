@@ -75,7 +75,7 @@ public class SettingsManager
     {
         try
         {
-            var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "XtremeWorlds");
+            var path = Path.Combine(DataPath.Config, "XtremeWorlds");
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
