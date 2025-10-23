@@ -455,7 +455,8 @@ namespace Server
             if (!(exp >= Data.Party[partyNum].MemberCount))
             {
                 // no party - keep exp for self
-                SetPlayerExp(index, exp);
+                SetPlayerExp(index, GetPlayerExp(index) + exp);
+                NetworkSend.SendExp(index);
                 return;
             }
 
