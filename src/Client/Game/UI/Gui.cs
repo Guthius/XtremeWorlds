@@ -852,6 +852,12 @@ public class WindowManager
                                     if (inMenu && idx >= 0 && idx < comboBox.Items.Count)
                                     {
                                         comboBox.Value = idx;
+                                        // If this is the options resolution combobox, apply immediately
+                                        if (string.Equals(curWindow.Name, "winOptions", StringComparison.CurrentCultureIgnoreCase) &&
+                                            string.Equals(comboBox.Name, "cmbRes", StringComparison.CurrentCultureIgnoreCase))
+                                        {
+                                            try { WinOptions.ApplyResolutionSelection(idx); } catch { }
+                                        }
                                         WinComboMenu.Close(); // Hide menu after selection
                                     }
                                     else if (!inMenu)

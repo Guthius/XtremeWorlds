@@ -5,6 +5,36 @@ namespace Client.Game.UI.Windows;
 
 public static class WinOptions
 {
+    // Apply a 0-based resolution index immediately (update settings and graphics)
+    public static void ApplyResolutionSelection(int selIndex)
+    {
+        if (selIndex < 0 || selIndex >= 13) // we currently populate 13 entries in cmbRes
+            return;
+
+        byte newRes = (byte)(selIndex + 1); // stored setting is 1-based
+        if (SettingsManager.Instance.Resolution == newRes)
+            return;
+
+        SettingsManager.Instance.Resolution = newRes;
+        try { SettingsManager.Save(); } catch { }
+
+        try
+        {
+            if (GameClient.Graphics != null)
+            {
+                if (GameClient.Graphics.IsFullScreen)
+                {
+                    var size = General.GetResolutionSize(newRes);
+                    GameClient.Graphics.PreferredBackBufferWidth = size.Width;
+                    GameClient.Graphics.PreferredBackBufferHeight = size.Height;
+                    GameClient.Graphics.ApplyChanges();
+                }
+                // In windowed mode we render to a RenderTarget sized by Settings.Resolution; no backbuffer change needed
+            }
+        }
+        catch { /* ignore apply errors */ }
+    }
+
     public static void OnConfirm()
     {
         var restartRequired = false;
@@ -99,12 +129,8 @@ public static class WinOptions
         }
 
         // Resolution
-        if (comboBoxResolution.Value > 0 & comboBoxResolution.Value <= 13)
-        {
-            SettingsManager.Instance.Resolution = (byte) comboBoxResolution.Value;
-
-            restartRequired = true;
-        }
+        // Resolution (combobox is 0-based; stored value is 1-based). Apply immediately.
+        ApplyResolutionSelection(comboBoxResolution.Value);
 
         SettingsManager.Save();
 
