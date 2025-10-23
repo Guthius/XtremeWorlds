@@ -2046,6 +2046,16 @@ namespace Server
                     }
                 }
 
+                // set start skills
+                for (n = 0; n < Core.Globals.Variables.MaxStartSkills; n++)
+                {
+                    if (Data.Job[jobNum].StartSkill[n] >= 0)
+                    {
+                        Data.Player[index].Skill[n].Num = Data.Job[jobNum].StartSkill[n];
+                        Data.Player[index].Skill[n].Cd = 0;
+                    }
+                }
+
                 for (n = 0; n < Enum.GetValues(typeof(Equipment)).Length; n++)
                 {
                     Data.Player[index].Equipment[n] = new PlayerEq();
