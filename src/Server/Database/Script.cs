@@ -31,7 +31,7 @@ using Type = Core.Globals.Type;
 using Microsoft.Extensions.Logging;
 
 public class Script
-{   
+{
     // Add a per-player pickup lock
     private static bool[] _isPickingUp = new bool[Variables.MaxPlayers];
     private static bool[] _isUsingItem = new bool[Variables.MaxPlayers];
@@ -314,6 +314,7 @@ public class Script
         _isUsingItem[index] = true;
         try
         {            
+
             var tempdata = new int[Enum.GetValues(typeof(Stat)).Length + 4];
             var tempstr = new string[3];
 
@@ -516,7 +517,7 @@ public class Script
             n = Data.Item[itemNum].Data1;
         }
 
-        if (n < 0 | n > Variables.MaxSkills)
+        if (n < 0 | n >= Variables.MaxSkills)
             return;
 
         // Make sure they are the right class
