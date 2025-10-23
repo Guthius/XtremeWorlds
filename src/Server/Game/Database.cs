@@ -183,7 +183,7 @@ namespace Server
                 string dataTable = "id SERIAL PRIMARY KEY, data jsonb";
                 string playerTable = "id BIGINT PRIMARY KEY, data jsonb, bank jsonb";
 
-                for (int i = 1, loopTo = Core.Globals.Constant.MaxChars; i <= loopTo; i++)
+                for (int i = 1, loopTo = global::Script.GetMaxChars(); i <= loopTo; i++)
                     playerTable += $", character{i} jsonb";
 
                 string[] tableNames = new[] { "job", "item", "map", "npc", "shop", "skill", "resource", "animation", "projectile", "moral" };
@@ -765,8 +765,8 @@ namespace Server
         {
             int statCount = Enum.GetValues(typeof(Stat)).Length;
             Data.Job[jobNum].Stat = new int[statCount];
-            Data.Job[jobNum].StartItem = new int[Core.Globals.Constant.MaxStartItems];
-            Data.Job[jobNum].StartValue = new int[Core.Globals.Constant.MaxStartItems];
+            Data.Job[jobNum].StartItem = new int[global::Script.GetMaxStartItems()];
+            Data.Job[jobNum].StartValue = new int[global::Script.GetMaxStartItems()];
 
             Data.Job[jobNum].Name = "";
             Data.Job[jobNum].Desc = "";
@@ -774,7 +774,7 @@ namespace Server
             Data.Job[jobNum].MaleSprite = 0;
             Data.Job[jobNum].FemaleSprite = 0;
 
-            for (int i = 0; i < Core.Globals.Constant.MaxStartItems; i++)
+            for (int i = 0; i < global::Script.GetMaxStartItems(); i++)
             {
                 Data.Job[jobNum].StartItem[i] = -1;
                 Data.Job[jobNum].StartValue[i] = 0;
@@ -799,7 +799,7 @@ namespace Server
 
         public static async System.Threading.Tasks.Task LoadJobsAsync()
         {
-            var tasks = Enumerable.Range(0, Core.Globals.Constant.MaxJobs).Select(i => System.Threading.Tasks.Task.Run(() => LoadJobAsync(i)));
+            var tasks = Enumerable.Range(0, global::Script.GetMaxJobs()).Select(i => System.Threading.Tasks.Task.Run(() => LoadJobAsync(i)));
             await System.Threading.Tasks.Task.WhenAll(tasks);
         }
 
@@ -824,9 +824,9 @@ namespace Server
 
             Data.Map[mapNum].Tileset = 1;
             Data.Map[mapNum].Name = "";
-            Data.Map[mapNum].MaxX = Core.Globals.Constant.MaxMapx;
-            Data.Map[mapNum].MaxY = Core.Globals.Constant.MaxMapy;
-            Data.Map[mapNum].Npc = new int[Core.Globals.Constant.MaxMapNpcs];
+            Data.Map[mapNum].MaxX = (byte)global::Script.GetMaxMapX();
+            Data.Map[mapNum].MaxY = (byte)global::Script.GetMaxMapY();
+            Data.Map[mapNum].Npc = new int[global::Script.GetMaxMapNpcs()];
             Data.Map[mapNum].Tile = new Tile[(Data.Map[mapNum].MaxX), (Data.Map[mapNum].MaxY)];
 
             var loopTo = Data.Map[mapNum].MaxX;
@@ -837,7 +837,7 @@ namespace Server
                     Data.Map[mapNum].Tile[x, y].Layer = new Type.Layer[Enum.GetValues(typeof(MapLayer)).Length];
             }
 
-            var loopTo2 = Core.Globals.Constant.MaxMapNpcs;
+            var loopTo2 = global::Script.GetMaxMapNpcs();
             for (x = 0; x < loopTo2; x++)
             {
                 Data.Map[mapNum].Npc[x] = -1;
@@ -867,25 +867,25 @@ namespace Server
 
         public static async System.Threading.Tasks.Task LoadMapsAsync()
         {
-            var tasks = Enumerable.Range(0, Core.Globals.Constant.MaxMaps).Select(i => System.Threading.Tasks.Task.Run(() => LoadMapAsync(i)));
+            var tasks = Enumerable.Range(0, global::Script.GetMaxMaps()).Select(i => System.Threading.Tasks.Task.Run(() => LoadMapAsync(i)));
             await System.Threading.Tasks.Task.WhenAll(tasks);
         }
 
         public static async System.Threading.Tasks.Task LoadNpcsAsync()
         {
-            var tasks = Enumerable.Range(0, Core.Globals.Constant.MaxNpcs).Select(i => System.Threading.Tasks.Task.Run(() => LoadNpcAsync(i)));
+            var tasks = Enumerable.Range(0, global::Script.GetMaxNpcs()).Select(i => System.Threading.Tasks.Task.Run(() => LoadNpcAsync(i)));
             await System.Threading.Tasks.Task.WhenAll(tasks);
         }
 
         public static async System.Threading.Tasks.Task LoadShopsAsync()
         {
-            var tasks = Enumerable.Range(0, Core.Globals.Constant.MaxShops).Select(i => System.Threading.Tasks.Task.Run(() => LoadShopAsync(i)));
+            var tasks = Enumerable.Range(0, global::Script.GetMaxShops()).Select(i => System.Threading.Tasks.Task.Run(() => LoadShopAsync(i)));
             await System.Threading.Tasks.Task.WhenAll(tasks);
         }
 
         public static async System.Threading.Tasks.Task LoadSkillsAsync()
         {
-            var tasks = Enumerable.Range(0, Core.Globals.Constant.MaxSkills).Select(i => System.Threading.Tasks.Task.Run(() => LoadSkillAsync(i)));
+            var tasks = Enumerable.Range(0, global::Script.GetMaxSkills()).Select(i => System.Threading.Tasks.Task.Run(() => LoadSkillAsync(i)));
             await System.Threading.Tasks.Task.WhenAll(tasks);
         }
 
@@ -1060,7 +1060,7 @@ namespace Server
             var xwMap = new XwMap
             {
                 Tile = new XwTile[16, 12],
-                Npc = new long[Core.Globals.Constant.MaxMapNpcs]
+                Npc = new long[global::Script.GetMaxMapNpcs()]
             };
 
             using (var fs = new FileStream(fileName, FileMode.Open))
@@ -1239,7 +1239,7 @@ namespace Server
             var map = new Map();
 
             map.Tile = new Tile[16, 12];
-            map.Npc = new int[Core.Globals.Constant.MaxMapNpcs];
+            map.Npc = new int[global::Script.GetMaxMapNpcs()];
             map.Name = xwMap.Name;
             map.Music = "Music" + xwMap.Music.ToString() + ".mid";
             map.Revision = (int)xwMap.Revision;
@@ -1269,7 +1269,7 @@ namespace Server
             //    map.Npc = Array.ConvertAll(xwMap.Npc, i => (int)i);
             //}
 
-            for (int i = 0; i < Core.Globals.Constant.MaxMapNpcs; i ++)
+            for (int i = 0; i < global::Script.GetMaxMapNpcs(); i ++)
             {
                 map.Npc[i] = -1;
             }
@@ -1473,7 +1473,7 @@ namespace Server
                 FogOpacity = (byte)csMap.MapData.FogOpacity,
                 FogSpeed = (byte)csMap.MapData.FogSpeed,
                 Tile = new Tile[csMap.MapData.MaxX, csMap.MapData.MaxY],
-                Npc = new int[Core.Globals.Constant.MaxMapNpcs]
+                Npc = new int[global::Script.GetMaxMapNpcs()]
             };
 
             var layerCount = Enum.GetValues(typeof(MapLayer)).Length;
@@ -1573,9 +1573,9 @@ namespace Server
                 }
             }
 
-            mwMap.Npc = new int[Core.Globals.Constant.MaxMapNpcs];
+            mwMap.Npc = new int[global::Script.GetMaxMapNpcs()];
 
-            for (int i = 0; i < Core.Globals.Constant.MaxMapNpcs; i++)
+            for (int i = 0; i < global::Script.GetMaxMapNpcs(); i++)
             {
                 mwMap.Npc[i] = -1;
             }
@@ -1620,7 +1620,7 @@ namespace Server
         {
             var count = Enum.GetValues(typeof(Vital)).Length;
             Data.MapNpc[mapNum].Npc[index].Vital = new int[count];
-            Data.MapNpc[mapNum].Npc[index].SkillCd = new int[Core.Globals.Constant.MaxNpcSkills];
+            Data.MapNpc[mapNum].Npc[index].SkillCd = new int[global::Script.GetMaxNpcSkills()];
             Data.MapNpc[mapNum].Npc[index].Num = -1;
             Data.MapNpc[mapNum].Npc[index].SkillBuffer = -1;
         }
@@ -1632,12 +1632,12 @@ namespace Server
             int statCount = Enum.GetValues(typeof(Stat)).Length;
             Data.Npc[index].Stat = new byte[statCount];
 
-            for (int i = 0, loopTo = Core.Globals.Constant.MaxDropItems; i < loopTo; i++)
+            for (int i = 0, loopTo = global::Script.GetMaxDropItems(); i < loopTo; i++)
             {
-                Data.Npc[index].DropChance = new int[Core.Globals.Constant.MaxDropItems];
-                Data.Npc[index].DropItem = new int[Core.Globals.Constant.MaxDropItems];
-                Data.Npc[index].DropItemValue = new int[Core.Globals.Constant.MaxDropItems];
-                Data.Npc[index].Skill = new byte[Core.Globals.Constant.MaxNpcSkills];
+                Data.Npc[index].DropChance = new int[global::Script.GetMaxDropItems()];
+                Data.Npc[index].DropItem = new int[global::Script.GetMaxDropItems()];
+                Data.Npc[index].DropItemValue = new int[global::Script.GetMaxDropItems()];
+                Data.Npc[index].Skill = new byte[global::Script.GetMaxNpcSkills()];
             }
         }
 
@@ -1663,7 +1663,7 @@ namespace Server
         {
             int i;
 
-            var loopTo = Core.Globals.Constant.MaxShops;
+            var loopTo = global::Script.GetMaxShops();
             for (i = 0; i < loopTo; i++)
                 LoadShopAsync(i);
 
@@ -1690,8 +1690,8 @@ namespace Server
             Data.Shop[index] = default;
             Data.Shop[index].Name = "";
 
-            Data.Shop[index].TradeItem = new Type.TradeItem[Core.Globals.Constant.MaxTrades];
-            for (int i = 0, loopTo = Core.Globals.Constant.MaxTrades; i < loopTo; i++)
+            Data.Shop[index].TradeItem = new Type.TradeItem[global::Script.GetMaxTrades()];
+            for (int i = 0, loopTo = global::Script.GetMaxTrades(); i < loopTo; i++)
             {
                 Data.Shop[index].TradeItem[i].Item = -1;
                 Data.Shop[index].TradeItem[i].CostItem = -1;
@@ -1818,10 +1818,10 @@ namespace Server
             ClearAccount(index);
             ClearBank(index);
 
-            Data.TempPlayer[index].SkillCd = new int[Core.Globals.Constant.MaxPlayerSkills];
-            Data.TempPlayer[index].TradeOffer = new PlayerInv[Core.Globals.Constant.MaxInv];
+            Data.TempPlayer[index].SkillCd = new int[global::Script.GetMaxPlayerSkills()];
+            Data.TempPlayer[index].TradeOffer = new PlayerInv[global::Script.GetMaxInv()];
 
-            Data.TempPlayer[index].SkillCd = new int[Core.Globals.Constant.MaxPlayerSkills];
+            Data.TempPlayer[index].SkillCd = new int[global::Script.GetMaxPlayerSkills()];
             Data.TempPlayer[index].Editor = EditorType.None;
             Data.TempPlayer[index].SkillBuffer = -1;
             Data.TempPlayer[index].InShop = -1;
@@ -1869,8 +1869,8 @@ namespace Server
 
         public static void ClearBank(int index)
         {
-            Data.Bank[index].Item = new PlayerInv[Core.Globals.Constant.MaxBank + 1];
-            for (int i = 0; i < Core.Globals.Constant.MaxBank; i++)
+            Data.Bank[index].Item = new PlayerInv[global::Script.GetMaxBank() + 1];
+            for (int i = 0; i < global::Script.GetMaxBank(); i++)
             {
                 Data.Bank[index].Item[i].Num = -1;
                 Data.Bank[index].Item[i].Value = 0;
@@ -1891,8 +1891,8 @@ namespace Server
                 Data.Player[index].Equipment[i].Num = -1;
             }
             
-            Data.Player[index].Inv = new PlayerInv[Core.Globals.Constant.MaxInv];
-            for (int i = 0, loopTo1 = Core.Globals.Constant.MaxInv; i < loopTo1; i++)
+            Data.Player[index].Inv = new PlayerInv[global::Script.GetMaxInv()];
+            for (int i = 0, loopTo1 = global::Script.GetMaxInv(); i < loopTo1; i++)
             {
                 Data.Player[index].Inv[i].Num = -1;
                 Data.Player[index].Inv[i].Value = 0;
@@ -1906,8 +1906,8 @@ namespace Server
             Data.Player[index].Points = 0;
             Data.Player[index].Sex = 0;
 
-            Data.Player[index].Skill = new Type.PlayerSkill[Core.Globals.Constant.MaxPlayerSkills];
-            for (int i = 0, loopTo2 = Core.Globals.Constant.MaxPlayerSkills; i < loopTo2; i++)
+            Data.Player[index].Skill = new Type.PlayerSkill[global::Script.GetMaxPlayerSkills()];
+            for (int i = 0, loopTo2 = global::Script.GetMaxPlayerSkills(); i < loopTo2; i++)
             {
                 Data.Player[index].Skill[i].Num = -1;
                 Data.Player[index].Skill[i].Cd = 0;
@@ -1930,19 +1930,19 @@ namespace Server
             Data.Player[index].X = 0;
             Data.Player[index].Y = 0;
 
-            Data.Player[index].Hotbar = new Type.Hotbar[Core.Globals.Constant.MaxHotbar];
-            for (int i = 0, loopTo5 = Core.Globals.Constant.MaxHotbar; i < loopTo5; i++)
+            Data.Player[index].Hotbar = new Type.Hotbar[global::Script.GetMaxHotbar()];
+            for (int i = 0, loopTo5 = global::Script.GetMaxHotbar(); i < loopTo5; i++)
             {
                 Data.Player[index].Hotbar[i].Slot = -1;
                 Data.Player[index].Hotbar[i].SlotType = 0;
             }
 
-            Data.Player[index].Switches = new byte[Core.Globals.Constant.MaxSwitches];
-            for (int i = 0, loopTo6 = Core.Globals.Constant.MaxSwitches; i < loopTo6; i++)
+            Data.Player[index].Switches = new byte[global::Script.GetMaxSwitches()];
+            for (int i = 0, loopTo6 = global::Script.GetMaxSwitches(); i < loopTo6; i++)
                 Data.Player[index].Switches[i] = 0;
 
-            Data.Player[index].Variables = new int[Core.Globals.Constant.MaxVariables];
-            for (int i = 0, loopTo7 = Core.Globals.Constant.MaxVariables; i < loopTo7; i++)
+            Data.Player[index].Variables = new int[global::Script.GetMaxVariables()];
+            for (int i = 0, loopTo7 = global::Script.GetMaxVariables(); i < loopTo7; i++)
                 Data.Player[index].Variables[i] = 0;
 
             var resoruceCount = Enum.GetValues(typeof(ResourceSkill)).Length;
@@ -1985,7 +1985,7 @@ namespace Server
             string json = JsonConvert.SerializeObject(Data.Player[index]).ToString();
             long id = GetStringHash(GetAccountLogin(index));
 
-            if (slot < 1 | slot > Core.Globals.Constant.MaxChars)
+            if (slot < 1 | slot > global::Script.GetMaxChars())
                 return;
 
             if (RowExistsByColumn("id", id, "account"))
@@ -2033,7 +2033,7 @@ namespace Server
                 }
 
                 // set starter items
-                for (n = 0; n < Core.Globals.Constant.MaxStartItems; n++)
+                for (n = 0; n < global::Script.GetMaxStartItems(); n++)
                 {
                     if (Data.Job[jobNum].StartItem[n] >= 0)
                     {

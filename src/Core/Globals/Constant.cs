@@ -1,7 +1,8 @@
-﻿namespace Core.Globals;
+namespace Core.Globals;
 
 public static class Constant
 {
+    // Engine-wide defaults; server script can override via Script.cs
     public const int MaxAnimations = 100;
     public const byte MaxBank = 90;
     public const byte MaxJobs = 3;

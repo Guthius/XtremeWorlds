@@ -171,11 +171,11 @@ namespace Server
             // ///////////////////////////////////////////
             // // This is used for respawning map items //
             // ///////////////////////////////////////////
-            var loopTo = Core.Globals.Constant.MaxMaps;
+            var loopTo = global::Script.GetMaxMaps();
             for (y = 0; y < loopTo; y++)
             {
                 // Clear out unnecessary junk
-                var loopTo1 = Core.Globals.Constant.MaxMapItems;
+                var loopTo1 = global::Script.GetMaxMapItems();
                 for (x = 0; x < loopTo1; x++)
                     Database.ClearMapItem(x, y);
 
@@ -192,13 +192,13 @@ namespace Server
             Core.Globals.Entity.Instances.Clear();
 
             var entities = Core.Globals.Entity.Instances;
-            var mapCount = Core.Globals.Constant.MaxMaps;
+            var mapCount = global::Script.GetMaxMaps();
 
             // Use entities from entity class
             for (int mapNum = 0; mapNum < mapCount; mapNum++)
             {
                 // Add Npcs
-                for (int i = 0; i < Core.Globals.Constant.MaxMapNpcs; i++)
+                for (int i = 0; i < global::Script.GetMaxMapNpcs(); i++)
                 {
                     var npc = Core.Globals.Entity.FromNpc(i, Data.MapNpc[mapNum].Npc[i]);
                     if (npc.Num >= 0)
