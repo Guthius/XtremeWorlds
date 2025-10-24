@@ -767,7 +767,7 @@ namespace Server
             Data.Job[jobNum].Stat = new int[statCount];
             Data.Job[jobNum].StartItem = new int[Core.Globals.Variables.MaxStartItems];
             Data.Job[jobNum].StartValue = new int[Core.Globals.Variables.MaxStartItems];
-            Data.Job[jobNum].StartSkill = new int[Core.Globals.Variables.MaxStartItems];
+            Data.Job[jobNum].StartSkill = new int[Core.Globals.Variables.MaxStartSkills];
 
             Data.Job[jobNum].Name = "";
             Data.Job[jobNum].Desc = "";
