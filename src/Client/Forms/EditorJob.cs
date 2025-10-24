@@ -177,8 +177,8 @@ namespace Client
         var desc = Box("Description", txtDesc!);
         rightContent.Add(desc);
         rightContent.Add(stats);
-        rightContent.Add(items);
-        rightContent.Add(skills);
+        // Place Start Items and Start Skills side-by-side
+        rightContent.AddRow(items, skills); 
         rightContent.AddRow(start);
         rightContent.AddRow(sprites);
         rightContent.AddRow(new StackLayout { Orientation = Orientation.Horizontal, Spacing = 6, Items = { btnSave, btnDelete, btnCopy, btnCancel } });
