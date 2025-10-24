@@ -40,8 +40,8 @@ public static class WinJobs
                 }
             }
 
-            spriteIndex = winJobs.GetChild("chkMale").Value == 1 
-                ? Data.Job[GameState.NewCharJob].MaleSprite 
+            spriteIndex = maleFlag == 1
+                ? Data.Job[GameState.NewCharJob].MaleSprite
                 : Data.Job[GameState.NewCharJob].FemaleSprite;
         }
 
