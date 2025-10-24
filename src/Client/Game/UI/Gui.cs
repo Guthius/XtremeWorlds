@@ -655,6 +655,7 @@ public class WindowManager
             Safe("UpdateWindow_PlayerMenu", () => ui.UpdateWindow_PlayerMenu());
             Safe("UpdateWindow_RightClick", () => ui.UpdateWindow_RightClick());
             Safe("UpdateWindow_Combobox", () => ui.UpdateWindow_Combobox());
+            Safe("UpdateWindow_Death", () => ui.UpdateWindow_Death());
         }
         else
         {
