@@ -29,7 +29,7 @@ public static class WinJobs
         }
         else
         {
-               // Some skins may not include a 'chkMale' toggle in winJobs; default to male if missing
+            // Some skins may not include a 'chkMale' toggle in winJobs; default to male if missing
             int maleFlag = 1;
             foreach (var c in winJobs.Controls)
             {
@@ -39,7 +39,7 @@ public static class WinJobs
                     break;
                 }
             }
-            
+
             spriteIndex = winJobs.GetChild("chkMale").Value == 1 
                 ? Data.Job[GameState.NewCharJob].MaleSprite 
                 : Data.Job[GameState.NewCharJob].FemaleSprite;
