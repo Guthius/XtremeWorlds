@@ -819,7 +819,7 @@ namespace Server
             }
             else
             {
-                InsertRow(jobNum, "data", "job");
+                InsertRow(jobNum, json, "job");
             }
         }
 
@@ -2159,17 +2159,10 @@ namespace Server
             packetWriter.WriteString(Data.Job[jobNum].Desc);
             packetWriter.WriteInt32(Data.Job[jobNum].MaleSprite);
             packetWriter.WriteInt32(Data.Job[jobNum].FemaleSprite);
-            
+
             for (var i = 0; i < StatCount; i++)
             {
                 packetWriter.WriteInt32(Data.Job[jobNum].Stat[i]);
-            }
-
-            // Ensure StartSkill array exists for compatibility with older saved data
-            if (Data.Job[jobNum].StartSkill == null || Data.Job[jobNum].StartSkill.Length != Core.Globals.Variables.MaxStartSkills)
-            {
-                Data.Job[jobNum].StartSkill = new int[Core.Globals.Variables.MaxStartSkills];
-                for (int i = 0; i < Core.Globals.Variables.MaxStartSkills; i++) Data.Job[jobNum].StartSkill[i] = -1;
             }
 
             for (var q = 0; q < Core.Globals.Variables.MaxStartItems; q++)
@@ -2177,8 +2170,7 @@ namespace Server
                 packetWriter.WriteInt32(Data.Job[jobNum].StartItem[q]);
                 packetWriter.WriteInt32(Data.Job[jobNum].StartValue[q]);
             }
-
-            // Start skills (IDs)
+            
             for (var q = 0; q < Core.Globals.Variables.MaxStartSkills; q++)
             {
                 packetWriter.WriteInt32(Data.Job[jobNum].StartSkill[q]);

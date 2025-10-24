@@ -379,9 +379,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             job.StartValue[i] = packetReader.ReadInt32();
         }
 
-        // Start skills (IDs)
-        if (job.StartSkill == null || job.StartSkill.Length != Variables.MaxStartSkills)
-            job.StartSkill = new int[Variables.MaxStartSkills];
         for (var i = 0; i < Variables.MaxStartSkills; i++)
         {
             job.StartSkill[i] = packetReader.ReadInt32();
@@ -417,17 +414,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
                 job.StartValue[i] = packetReader.ReadInt32();
             }
 
-            // Start skills (IDs)
-            if (job.StartSkill == null || job.StartSkill.Length != Variables.MaxStartSkills)
-                job.StartSkill = new int[Variables.MaxStartSkills];
-            for (var i = 0; i < Variables.MaxStartSkills; i++)
-            {
-                job.StartSkill[i] = packetReader.ReadInt32();
-            }
-
-            // Start skills (IDs)
-            if (job.StartSkill == null || job.StartSkill.Length != Variables.MaxStartSkills)
-                job.StartSkill = new int[Variables.MaxStartSkills];
             for (var i = 0; i < Variables.MaxStartSkills; i++)
             {
                 job.StartSkill[i] = packetReader.ReadInt32();

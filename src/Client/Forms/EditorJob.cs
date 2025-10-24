@@ -321,8 +321,6 @@ namespace Client
         {
             if (lstStartSkills!.SelectedIndex < 0) return;
             var job = Data.Job[GameState.EditorIndex];
-            if (job.StartSkill == null || job.StartSkill.Length != Variables.MaxStartSkills)
-                job.StartSkill = new int[Variables.MaxStartSkills];
             job.StartSkill[lstStartSkills.SelectedIndex] = cmbSkills!.SelectedIndex;
             ReloadPanel();
         }

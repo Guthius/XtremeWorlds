@@ -2726,7 +2726,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
             withBlock.StartMap = buffer.ReadInt32();
             withBlock.StartX = buffer.ReadByte();
-            withBlock.StartY = (byte) buffer.ReadInt32();
+            withBlock.StartY = buffer.ReadByte();
             withBlock.BaseExp = buffer.ReadInt32();
         }
 

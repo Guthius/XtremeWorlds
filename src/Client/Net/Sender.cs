@@ -798,10 +798,7 @@ public static class Sender
             packetWriter.WriteInt32(Data.Job[jobNum].StartValue[i]);
         }
 
-        // Start skills (IDs)
-        if (Data.Job[jobNum].StartSkill == null || Data.Job[jobNum].StartSkill.Length != Variables.MaxStartItems)
-            Data.Job[jobNum].StartSkill = new int[Variables.MaxStartItems];
-        for (var i = 0; i < Variables.MaxStartItems; i++)
+        for (var i = 0; i < Variables.MaxStartSkills; i++)
         {
             packetWriter.WriteInt32(Data.Job[jobNum].StartSkill[i]);
         }
