@@ -15,6 +15,7 @@ namespace Client
         }
 
         public static float CameraZoom = 1.0f;
+        public static int DeathTimerExpiryMs;
 
         public static int ResolutionHeight;
         public static int ResolutionWidth;

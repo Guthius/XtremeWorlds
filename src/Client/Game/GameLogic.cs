@@ -1406,7 +1406,7 @@ namespace Client
             WindowManager.HideWindows();
             GameState.NewCharJob = 0;
             GameState.NewCharSprite = 1;
-            GameState.NewCnarGender = (long)Sex.Male;
+            GameState.NewCnarGender = Sex.Male;
             if (WindowManager.TryGetControl("winJobs", "lblJobName", out var jobNameLbl)) jobNameLbl!.Text = Data.Job[(int)GameState.NewCharJob].Name;
             WindowManager.ShowWindow("winJobs");
         }
@@ -2243,13 +2243,13 @@ namespace Client
             if (y < 0)
                 return default;
 
-            int MaxMapX = Data.MyMap.MaxX;
-            int MaxMapY = Data.MyMap.MaxY;
+            int maxMapX = Variables.MaxMapX;
+            int maxMapY = Variables.MaxMapY;
 
-            if (x > MaxMapX - 1)
+            if (x >= maxMapX)
                 return default;
 
-            if (y > MaxMapY - 1)
+            if (y >= maxMapY)
                 return default;
 
             return true;
