@@ -71,12 +71,17 @@ namespace Client
             Data.Job[index].Desc = "";
             Data.Job[index].StartItem = new int[Variables.MaxStartItems];
             Data.Job[index].StartValue = new int[Variables.MaxStartItems];
+            Data.Job[index].StartSkill = new int[Variables.MaxStartSkills];
             Data.Job[index].MaleSprite = 1;
             Data.Job[index].FemaleSprite = 1;
             for (int i = 0; i < Variables.MaxStartItems; i++)
             {
                 Data.Job[index].StartItem[i] = -1;
                 Data.Job[index].StartValue[i] = 0;
+            }
+            for (int i = 0; i < Variables.MaxStartSkills; i++)
+            {
+                Data.Job[index].StartSkill[i] = -1;
             }
         }
         #endregion

@@ -2070,32 +2070,6 @@ namespace Server
                     Data.Player[index].GatherSkills[i].SkillCurExp = 0;
                     SetPlayerGatherSkillMaxExp(index, i, (int)GetSkillNextLevel(index, i));
                 }
-
-                // grant start skills (up to Variables.MaxStartItems slots), skipping invalid or duplicate skills
-                if (Data.Job[jobNum].StartSkill == null)
-                    Data.Job[jobNum].StartSkill = new int[Core.Globals.Variables.MaxStartItems];
-                for (n = 0; n < Core.Globals.Variables.MaxStartItems; n++)
-                {
-                    int skillId = Data.Job[jobNum].StartSkill[n];
-                    if (skillId < 0 || skillId >= Core.Globals.Variables.MaxSkills) continue;
-                    // check duplicate
-                    bool alreadyHas = false;
-                    for (int s = 0; s < Core.Globals.Variables.MaxPlayerSkills; s++)
-                    {
-                        if (Data.Player[index].Skill[s].Num == skillId) { alreadyHas = true; break; }
-                    }
-                    if (alreadyHas) continue;
-                    // find open slot
-                    int open = -1;
-                    for (int s = 0; s < Core.Globals.Variables.MaxPlayerSkills; s++)
-                    {
-                        if (Data.Player[index].Skill[s].Num == -1) { open = s; break; }
-                    }
-                    if (open == -1) break; // no more slots
-                    Data.Player[index].Skill[open].Num = skillId;
-                    Data.Player[index].Skill[open].Cd = 0;
-                }
-
                 SaveCharacter(index, slot);
             }
 

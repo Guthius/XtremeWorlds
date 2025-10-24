@@ -230,17 +230,17 @@ namespace Client
         numStartMap!.Value = job.StartMap; numStartX!.Value = job.StartX; numStartY!.Value = job.StartY;
         numMaleSprite!.Value = job.MaleSprite; numFemaleSprite!.Value = job.FemaleSprite;
         lstStartItems!.Items.Clear();
-        for (int i = 0; i < Variables.MaxDropItems; i++)
+        for (int i = 0; i < Variables.MaxStartItems; i++)
         {
-            int id = job.StartItem[i]; int amt = job.StartValue[i];
+            int id = job.StartItem[i];
+            int amt = job.StartValue[i];
             string name = id >= 0 && id < Variables.MaxItems ? Data.Item[id].Name : "(None)";
+            
             lstStartItems.Items.Add(name + " x " + amt);
         }
         lstStartItems.SelectedIndex = 0;
 
         // Start skills list
-        if (job.StartSkill == null || job.StartSkill.Length != Variables.MaxStartSkills)
-            job.StartSkill = new int[Variables.MaxStartSkills];
         lstStartSkills!.Items.Clear();
         for (int i = 0; i < Variables.MaxStartSkills; i++)
         {
@@ -277,6 +277,7 @@ namespace Client
             if (s.Stat != null) _clipboardJob.Stat = (int[])s.Stat.Clone();
             if (s.StartItem != null) _clipboardJob.StartItem = (int[])s.StartItem.Clone();
             if (s.StartValue != null) _clipboardJob.StartValue = (int[])s.StartValue.Clone();
+            if (s.StartSkill != null) _clipboardJob.StartSkill = (int[])s.StartSkill.Clone();
             _hasClipboardJob = true;
             btnCopy!.Text = "Paste";
             return;
@@ -290,6 +291,7 @@ namespace Client
         if (n.Stat != null) n.Stat = (int[])n.Stat.Clone();
         if (n.StartItem != null) n.StartItem = (int[])n.StartItem.Clone();
         if (n.StartValue != null) n.StartValue = (int[])n.StartValue.Clone();
+        if (n.StartSkill != null) n.StartSkill = (int[])n.StartSkill.Clone();
         Data.Job[dst] = n;
         GameState.JobChanged[dst] = true;
 
