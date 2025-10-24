@@ -310,30 +310,6 @@ public class Crystalshire
         window.GetChild("CheckboxSelling").CallBack[(int) ControlState.MouseDown] = WinShop.OnSellingChecked;
     }
 
-    public void UpdateWindow_Death()
-    {
-        var window = WindowLoader.FromLayout("winDeath");
-        // Close hides the window
-        window.GetChild("btnClose").CallBack[(int) ControlState.MouseDown] = () => WindowManager.HideWindow("winDeath");
-        // OnDraw updates the timer label if set
-        window.OnDraw = () =>
-        {
-            if (Client.GameState.DeathTimerExpiryMs > 0)
-            {
-                var now = Client.General.GetTickCount();
-                var remaining = (int) ((Client.GameState.DeathTimerExpiryMs - now) / 1000);
-                if (remaining < 0) remaining = 0;
-                window.GetChild("lblTimer").Text = $"Respawn in {remaining}s";
-                if (remaining <= 0)
-                {
-                    // Auto-hide when timer elapses
-                    Client.GameState.DeathTimerExpiryMs = 0;
-                    WindowManager.HideWindow("winDeath"); 
-                }
-            }
-        };
-    }
-
     // Helper to bind callbacks if a control exists in layout
     private static void TryBind(Window window, string controlName, ControlState state, Action action)
     {
