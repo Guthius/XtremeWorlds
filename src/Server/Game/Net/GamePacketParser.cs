@@ -2719,9 +2719,6 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                 withBlock.StartValue[q] = buffer.ReadInt32();
             }
 
-            // Start skills (IDs)
-            if (withBlock.StartSkill == null || withBlock.StartSkill.Length != Core.Globals.Variables.MaxStartSkills)
-                withBlock.StartSkill = new int[Core.Globals.Variables.MaxStartSkills];
             for (var q = 0; q < Core.Globals.Variables.MaxStartSkills; q++)
             {
                 withBlock.StartSkill[q] = buffer.ReadInt32();
