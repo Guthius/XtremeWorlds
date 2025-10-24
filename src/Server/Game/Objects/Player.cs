@@ -125,6 +125,11 @@ public static class Player
 
         if (oldMapNum != mapNum || send)
         {
+            if (Data.Map[mapNum].Moral < 0 || Data.Map[mapNum].Moral >= Core.Globals.Variables.MaxMorals)
+            {
+                Data.Map[mapNum].Moral = 0;
+            }
+
             Data.TempPlayer[playerId].GettingMap = true;
 
             Moral.SendUpdateMoralTo(playerId, Data.Map[mapNum].Moral);
