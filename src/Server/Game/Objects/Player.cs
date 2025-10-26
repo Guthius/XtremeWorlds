@@ -14,15 +14,15 @@ namespace Server;
 
 public static class Player
 {
-    public static void CheckPlayerLevelUp(int playerId)
+    public static void CheckLevelUp(int playerId)
     {
         try
         {
-            Script.Instance?.CheckPlayerLevelUp(playerId);
+            Script.Instance?.CheckLevelUp(playerId);
         }
         catch (Exception ex)
         {
-            General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(CheckPlayerLevelUp));
+            General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(CheckLevelUp));
         }
     }
 

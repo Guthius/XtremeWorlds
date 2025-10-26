@@ -9,8 +9,8 @@ public static class Network
     private sealed class NetworkEventHandler : INetworkEventHandler
     {
         private const int BufferSize = 0xFFFF;
-    private readonly GamePacketParser _parser = new();
-    private byte[] _buffer = new byte[BufferSize];
+        private readonly GamePacketParser _parser = new();
+        private byte[] _buffer = new byte[BufferSize];
         private int _bufferOffset;
         
         public Task OnBytesReceivedAsync(ReadOnlyMemory<byte> bytes, CancellationToken cancellationToken)

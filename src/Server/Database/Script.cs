@@ -1227,7 +1227,7 @@ public class Script
         RegenVitals();
     }
 
-    public void CheckPlayerLevelUp(int index)
+    public void CheckLevelUp(int index)
     {
         int level_count;
 

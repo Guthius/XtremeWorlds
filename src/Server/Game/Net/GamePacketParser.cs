@@ -1279,8 +1279,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         // Save the map
         Database.SaveMap(mapNum);
-        Npc.SpawnMapNpcs(mapNum);
-        EventLogic.SpawnGlobalEvents(mapNum);
+        Npc.SpawnMapNpcs(mapNum).GetAwaiter().GetResult();
+        EventLogic.SpawnGlobalEvents(mapNum).GetAwaiter().GetResult();
 
         foreach (var i in PlayerService.Instance.PlayerIds)
         {
@@ -2010,7 +2010,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             return;
 
         SetPlayerExp(session.Id, Script.Instance?.GetPlayerNextLevel(session.Id));
-        Server.Player.CheckPlayerLevelUp(session.Id);
+        Server.Player.CheckLevelUp(session.Id);
     }
 
     public static void Packet_ForgetSkill(GameSession session, ReadOnlyMemory<byte> bytes)

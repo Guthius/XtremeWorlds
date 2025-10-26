@@ -1864,7 +1864,7 @@ namespace Server
 
                                         case (byte) EventCommand.GiveExperience:
                                             SetPlayerExp(i, Script.Instance?.GetPlayerNextLevel(i));
-                                            Player.CheckPlayerLevelUp(i);
+                                            Player.CheckLevelUp(i);
                                             NetworkSend.SendExp(i);
                                             NetworkSend.SendPlayerData(i);
                                             break;
