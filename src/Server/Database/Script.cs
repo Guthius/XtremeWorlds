@@ -130,7 +130,7 @@ public class Script
     public void JoinGame(int index)
     {
         // Warp the player to his saved location
-        PlayerWarp(index, GetPlayerMap(index), GetPlayerX(index), GetPlayerY(index), (byte)Direction.Down, true);
+        Warp(index, GetPlayerMap(index), GetPlayerX(index), GetPlayerY(index), (byte)Direction.Down, true);
 
         // Notify everyone that a player has joined the game.
         NetworkSend.GlobalMsg(string.Format("{0} has joined {1}!", GetPlayerName(index), SettingsManager.Instance.GameName));
@@ -622,11 +622,11 @@ public class Script
         // to the bootmap if it is set
         if (withBlock.BootMap > 0)
         {
-            PlayerWarp(index, withBlock.BootMap, withBlock.BootX, withBlock.BootY, (int)Direction.Down);
+            Warp(index, withBlock.BootMap, withBlock.BootX, withBlock.BootY, (int)Direction.Down);
         }
         else
         {
-            PlayerWarp(index, Data.Job[GetPlayerJob(index)].StartMap, Data.Job[GetPlayerJob(index)].StartX, Data.Job[GetPlayerJob(index)].StartY, (int)Direction.Down);
+            Warp(index, Data.Job[GetPlayerJob(index)].StartMap, Data.Job[GetPlayerJob(index)].StartX, Data.Job[GetPlayerJob(index)].StartY, (int)Direction.Down);
         }
     }
 
@@ -2191,7 +2191,7 @@ public class Script
                         {
                             // Accept any of the 8 directions from the editor; default to Down if out of range
                             byte dir = (skill.Dir <= (byte)Direction.UpLeft) ? skill.Dir : (byte)Direction.Down;
-                            PlayerWarp(caster.Id, destMap, destX, destY, dir);
+                            Warp(caster.Id, destMap, destX, destY, dir);
                             NetworkSend.PlayerMsg(caster.Id, "You feel space bend around you...", (int)ColorName.Cyan);
                         }
                     }

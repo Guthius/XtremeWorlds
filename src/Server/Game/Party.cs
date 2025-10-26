@@ -526,7 +526,7 @@ namespace Server
                 {
                     var loopTo = Data.Party[Data.TempPlayer[index].InParty].MemberCount;
                     for (var i = 0; i < loopTo; i++)
-                        Player.PlayerWarp(Data.Party[Data.TempPlayer[index].InParty].Member[i], mapNum, x, y, (byte) Direction.Down);
+                        Player.Warp(Data.Party[Data.TempPlayer[index].InParty].Member[i], mapNum, x, y, (byte) Direction.Down);
                 }
             }
         }

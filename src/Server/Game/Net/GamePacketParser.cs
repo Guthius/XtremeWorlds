@@ -920,7 +920,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         {
             if (n >= 0)
             {
-                Server.Player.PlayerWarp(session.Id, GetPlayerMap(n), GetPlayerX(n), GetPlayerY(n), (byte) Direction.Down);
+                Server.Player.Warp(session.Id, GetPlayerMap(n), GetPlayerX(n), GetPlayerY(n), (byte) Direction.Down);
                 NetworkSend.PlayerMsg(n, GetPlayerName(session.Id) + " has warped to you.", (int) ColorName.Yellow);
                 NetworkSend.PlayerMsg(session.Id, "You have been warped to " + GetPlayerName(n) + ".", (int) ColorName.Yellow);
                 Log.Add(GetPlayerName(session.Id) + " has warped to " + GetPlayerName(n) + ", map #" + GetPlayerMap(n) + ".", Constant.AdminLog);
@@ -952,7 +952,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         {
             if (n >= 0)
             {
-                Server.Player.PlayerWarp(n, GetPlayerMap(session.Id), GetPlayerX(session.Id), GetPlayerY(session.Id), (byte) Direction.Down);
+                Server.Player.Warp(n, GetPlayerMap(session.Id), GetPlayerX(session.Id), GetPlayerY(session.Id), (byte) Direction.Down);
                 NetworkSend.PlayerMsg(n, "You have been summoned by " + GetPlayerName(session.Id) + ".", (int) ColorName.Yellow);
                 NetworkSend.PlayerMsg(session.Id, GetPlayerName(n) + " has been summoned.", (int) ColorName.Yellow);
                 Log.Add(GetPlayerName(session.Id) + " has warped " + GetPlayerName(n) + " to self, map #" + GetPlayerMap(session.Id) + ".", Constant.AdminLog);
@@ -983,7 +983,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         if (n < 0 | n > Core.Globals.Variables.MaxMaps)
             return;
 
-        Server.Player.PlayerWarp(session.Id, n, GetPlayerX(session.Id), GetPlayerY(session.Id), (byte) Direction.Down);
+        Server.Player.Warp(session.Id, n, GetPlayerX(session.Id), GetPlayerY(session.Id), (byte) Direction.Down);
         NetworkSend.PlayerMsg(session.Id, "You have been warped to map #" + n, (int) ColorName.Yellow);
         Log.Add(GetPlayerName(session.Id) + " warped to map #" + n + ".", Constant.AdminLog);
     }
@@ -1309,7 +1309,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         {
             if (NetworkConfig.IsPlaying(i) & GetPlayerMap(i) == mapNum)
             {
-                Server.Player.PlayerWarp(i, mapNum, GetPlayerX(i), GetPlayerY(i), (byte) Direction.Down);
+                Server.Player.Warp(i, mapNum, GetPlayerX(i), GetPlayerY(i), (byte) Direction.Down);
                 NetworkSend.SendMapData(i, mapNum, true);
             }
         }

@@ -1923,7 +1923,7 @@ namespace Server
                                         case (byte) EventCommand.WarpPlayer:
                                         {
                                             int dir = command.Data4 == 0 ? Data.Player[i].Dir : (byte) (command.Data4 - 1);
-                                            Player.PlayerWarp(i, command.Data1, command.Data2, command.Data3, dir);
+                                            Player.Warp(i, command.Data1, command.Data2, command.Data3, dir);
                                             break;
                                         }
 

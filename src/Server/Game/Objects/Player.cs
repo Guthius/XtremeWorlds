@@ -54,7 +54,7 @@ public static class Player
         NetworkConfig.SendDataToMapBut(playerId, mapNum, packet.GetBytes());
     }
 
-    public static void PlayerWarp(int playerId, int mapNum, int x, int y, int dir, bool send = false)
+    public static void Warp(int playerId, int mapNum, int x, int y, int dir, bool send = false)
     {
         if (!NetworkConfig.IsPlaying(playerId) || mapNum <= 0 || mapNum >= Core.Globals.Variables.MaxMaps || Data.TempPlayer[playerId].GettingMap == true || mapNum < 0 || mapNum >= Core.Globals.Variables.MaxMaps)
         {
@@ -215,7 +215,7 @@ public static class Player
                     {
                         var newMapY = Data.Map[Data.Map[GetPlayerMap(playerId)].Up].MaxY;
                         
-                        PlayerWarp(playerId, Data.Map[GetPlayerMap(playerId)].Up, GetPlayerX(playerId), newMapY, (int) Direction.Up);
+                        Warp(playerId, Data.Map[GetPlayerMap(playerId)].Up, GetPlayerX(playerId), newMapY, (int) Direction.Up);
                         
                         didWarp = true;
                         moved = true;
@@ -241,7 +241,7 @@ public static class Player
                 {
                     if (Data.Map[GetPlayerMap(playerId)].Down > 0)
                     {
-                        PlayerWarp(playerId, Data.Map[GetPlayerMap(playerId)].Down, GetPlayerX(playerId), 0, (int) Direction.Down);
+                        Warp(playerId, Data.Map[GetPlayerMap(playerId)].Down, GetPlayerX(playerId), 0, (int) Direction.Down);
                         
                         didWarp = true;
                         moved = true;
@@ -268,9 +268,9 @@ public static class Player
                     if (Data.Map[GetPlayerMap(playerId)].Left > 0)
                     {
                         var newMapX = Data.Map[Data.Map[GetPlayerMap(playerId)].Left].MaxX;
-                        
-                        PlayerWarp(playerId, Data.Map[GetPlayerMap(playerId)].Left, newMapX, GetPlayerY(playerId), (int) Direction.Left);
-                        
+
+                        Warp(playerId, Data.Map[GetPlayerMap(playerId)].Left, newMapX, GetPlayerY(playerId), (int) Direction.Left);
+
                         didWarp = true;
                         moved = true;
                     }
@@ -295,7 +295,7 @@ public static class Player
                 {
                     if (Data.Map[GetPlayerMap(playerId)].Right > 0)
                     {
-                        PlayerWarp(playerId, Data.Map[GetPlayerMap(playerId)].Right, 0, GetPlayerY(playerId), (int) Direction.Right);
+                        Warp(playerId, Data.Map[GetPlayerMap(playerId)].Right, 0, GetPlayerY(playerId), (int) Direction.Right);
                         
                         didWarp = true;
                         moved = true;
@@ -406,7 +406,7 @@ public static class Player
 
             if (mapNum >= 0 && mapNum < Core.Globals.Variables.MaxMaps)
             {
-                PlayerWarp(playerId, mapNum, x, y, (int) Direction.Down);
+                Warp(playerId, mapNum, x, y, (int) Direction.Down);
 
                 didWarp = true;
                 moved = true;
@@ -509,7 +509,7 @@ public static class Player
         // They tried to hack
         if (!moved || (expectingWarp && !didWarp))
         {
-            PlayerWarp(playerId, GetPlayerMap(playerId), GetPlayerX(playerId), GetPlayerY(playerId), (byte) Direction.Down);
+            Warp(playerId, GetPlayerMap(playerId), GetPlayerX(playerId), GetPlayerY(playerId), (byte) Direction.Down);
         }
         
         Data.Player[playerId].IsMoving = true;
