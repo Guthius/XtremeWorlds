@@ -171,13 +171,6 @@ public static class Player
             return;
         }
 
-        // Cant move if in the bank
-        if (Data.TempPlayer[playerId].InBank)
-        {
-            NetworkSend.SendPlayerXY(playerId);
-            return;
-        }
-
         // if stunned, stop them moving
         if (Data.TempPlayer[playerId].StunDuration > 0)
         {
