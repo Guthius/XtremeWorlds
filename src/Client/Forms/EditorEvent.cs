@@ -469,7 +469,7 @@ namespace Client
                 }
             };
 
-        var leftPane = new StackLayout
+            var leftPane = new StackLayout
             {
                 Orientation = Orientation.Vertical,
                 Spacing = 6,
@@ -564,7 +564,7 @@ namespace Client
             var btnLabelCancel = new Button { Text = "Cancel" };
             btnLabelCancel.Click += BtnLabel_Cancel_Click;
 
-        fraLabeling.Content = new TableLayout
+            fraLabeling.Content = new TableLayout
             {
                 Spacing = new Size(8,6),
                 Rows =
@@ -652,7 +652,7 @@ namespace Client
             };
 
             // Use a TableLayout so the grids expand horizontally and vertically
-        var commandArea = new TableLayout
+            var commandArea = new TableLayout
             {
                 Spacing = new Size(6,6),
                 Rows =
@@ -3020,14 +3020,14 @@ namespace Client
 
         }
 
-    private void CmbMoveSpeed_SelectedIndexChanged(object? sender, EventArgs e)
+        private void CmbMoveSpeed_SelectedIndexChanged(object? sender, EventArgs e)
         {
             if (cmbMoveSpeed.SelectedIndex == -1)
                 return;
             Event.TmpEvent.Pages[Event.CurPageNum].MoveSpeed = (byte)cmbMoveSpeed.SelectedIndex;
         }
 
-    private void CmbMoveFreq_SelectedIndexChanged(object? sender, EventArgs e)
+        private void CmbMoveFreq_SelectedIndexChanged(object? sender, EventArgs e)
         {
             if (cmbMoveFreq.SelectedIndex == -1)
                 return;
@@ -3038,7 +3038,7 @@ namespace Client
 
         #region Positioning
 
-    private void CmbPositioning_SelectedIndexChanged(object? sender, EventArgs e)
+        private void CmbPositioning_SelectedIndexChanged(object? sender, EventArgs e)
         {
             if (Event.TmpEvent.Pages == null)
                 return;
@@ -3053,7 +3053,7 @@ namespace Client
 
         #region Trigger
 
-    private void CmbTrigger_SelectedIndexChanged(object? sender, EventArgs e)
+        private void CmbTrigger_SelectedIndexChanged(object? sender, EventArgs e)
         {
             if (Event.TmpEvent.Pages == null)
                 return;
@@ -3100,7 +3100,7 @@ namespace Client
 
         #region Options
 
-    private void ChkWalkAnim_CheckedChanged(object? sender, EventArgs e)
+        private void ChkWalkAnim_CheckedChanged(object? sender, EventArgs e)
         {
             if (chkWalkAnim.Checked == true)
             {
@@ -3113,7 +3113,7 @@ namespace Client
 
         }
 
-    private void ChkDirFix_CheckedChanged(object? sender, EventArgs e)
+        private void ChkDirFix_CheckedChanged(object? sender, EventArgs e)
         {
             if (chkDirFix.Checked == true)
             {
@@ -3126,7 +3126,7 @@ namespace Client
 
         }
 
-    private void ChkWalkThrough_CheckedChanged(object? sender, EventArgs e)
+        private void ChkWalkThrough_CheckedChanged(object? sender, EventArgs e)
         {
             if (chkWalkThrough.Checked == true)
             {
@@ -3139,7 +3139,7 @@ namespace Client
 
         }
 
-    private void ChkShowName_CheckedChanged(object? sender, EventArgs e)
+        private void ChkShowName_CheckedChanged(object? sender, EventArgs e)
         {
             if (chkShowName.Checked == true)
             {
@@ -3430,7 +3430,7 @@ namespace Client
             }
         }
 
-    private void BtnLabel_Ok_Click(object? sender, EventArgs e)
+        private void BtnLabel_Ok_Click(object? sender, EventArgs e)
         {
             Event.SendSwitchesAndVariables();
             // Ensure UI reflects latest names after save
@@ -3445,7 +3445,7 @@ namespace Client
             catch { }
         }
 
-    private void BtnLabel_Cancel_Click(object? sender, EventArgs e)
+        private void BtnLabel_Cancel_Click(object? sender, EventArgs e)
         {
             Event.RequestSwitchesAndVariables();
             // Revert UI to a clean state and close the panel
@@ -3505,7 +3505,7 @@ namespace Client
         }
 
         // MoveRoute Commands
-    private void LstvwMoveRoute_SelectedIndexChanged(object? sender, EventArgs e)
+        private void LstvwMoveRoute_SelectedIndexChanged(object? sender, EventArgs e)
         {
             // Eto ListBox: single SelectedIndex
             if (lstvwMoveRoute.SelectedIndex < 0)
@@ -3533,7 +3533,7 @@ namespace Client
             }
         }
 
-    private void LstMoveRoute_KeyDown(object? sender, KeyEventArgs e)
+        private void LstMoveRoute_KeyDown(object? sender, KeyEventArgs e)
         {
             if (e.Key == Keys.Delete)
             {
@@ -3853,7 +3853,7 @@ namespace Client
 
         }
 
-    private void ChkIgnoreMove_CheckedChanged(object? sender, EventArgs e)
+        private void ChkIgnoreMove_CheckedChanged(object? sender, EventArgs e)
         {
             if (chkIgnoreMove.Checked == true)
             {
@@ -3865,7 +3865,7 @@ namespace Client
             }
         }
 
-    private void ChkRepeatRoute_CheckedChanged(object? sender, EventArgs e)
+        private void ChkRepeatRoute_CheckedChanged(object? sender, EventArgs e)
         {
             if (chkRepeatRoute.Checked == true)
             {
@@ -3877,7 +3877,7 @@ namespace Client
             }
         }
 
-    private void BtnMoveRouteOk_Click(object? sender, EventArgs e)
+        private void BtnMoveRouteOk_Click(object? sender, EventArgs e)
         {
             if (Event.IsMoveRouteCommand == true)
             {
@@ -3903,7 +3903,7 @@ namespace Client
             }
         }
 
-    private void BtnMoveRouteCancel_Click(object? sender, EventArgs e)
+        private void BtnMoveRouteCancel_Click(object? sender, EventArgs e)
         {
             Event.TempMoveRouteCount = 0;
             Event.TempMoveRoute = new Type.MoveRoute[1];
@@ -3916,7 +3916,7 @@ namespace Client
 
         #region Show Text
 
-    private void BtnShowTextOk_Click(object? sender, EventArgs e)
+        private void BtnShowTextOk_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -3929,7 +3929,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnShowTextCancel_Click(object? sender, EventArgs e)
+        private void BtnShowTextCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -3938,7 +3938,7 @@ namespace Client
 
         #region Add Text
 
-    private void BtnAddTextOk_Click(object? sender, EventArgs e)
+        private void BtnAddTextOk_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -3951,7 +3951,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnAddTextCancel_Click(object? sender, EventArgs e)
+        private void BtnAddTextCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -3959,7 +3959,7 @@ namespace Client
         #endregion
 
         #region Show Choices
-    private void BtnShowChoicesOk_Click(object? sender, EventArgs e)
+        private void BtnShowChoicesOk_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -3972,7 +3972,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnShowChoicesCancel_Click(object? sender, EventArgs e)
+        private void BtnShowChoicesCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -3981,7 +3981,7 @@ namespace Client
 
         #region Show Chatbubble
 
-    private void CmbChatBubbleTargetType_SelectedIndexChanged(object? sender, EventArgs e)
+        private void CmbChatBubbleTargetType_SelectedIndexChanged(object? sender, EventArgs e)
         {
             if (cmbChatBubbleTargetType.SelectedIndex == (int)TargetType.None)
             {
@@ -4017,7 +4017,7 @@ namespace Client
 
         }
 
-    private void BtnShowChatBubbleOK_Click(object? sender, EventArgs e)
+        private void BtnShowChatBubbleOK_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -4030,7 +4030,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnShowChatBubbleCancel_Click(object? sender, EventArgs e)
+        private void BtnShowChatBubbleCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -4039,7 +4039,7 @@ namespace Client
 
         #region Set Player Variable
 
-    private void OptVariableAction0_CheckedChanged(object? sender, EventArgs e)
+        private void OptVariableAction0_CheckedChanged(object? sender, EventArgs e)
         {
             if (optVariableAction0.Checked == true)
             {
@@ -4055,7 +4055,7 @@ namespace Client
             }
         }
 
-    private void OptVariableAction1_CheckedChanged(object? sender, EventArgs e)
+        private void OptVariableAction1_CheckedChanged(object? sender, EventArgs e)
         {
             if (optVariableAction1.Checked == true)
             {
@@ -4072,7 +4072,7 @@ namespace Client
             }
         }
 
-    private void OptVariableAction2_CheckedChanged(object? sender, EventArgs e)
+        private void OptVariableAction2_CheckedChanged(object? sender, EventArgs e)
         {
             if (optVariableAction2.Checked == true)
             {
@@ -4089,9 +4089,9 @@ namespace Client
             }
         }
 
-    private void OptVariableAction3_CheckedChanged(object? sender, EventArgs e)
+        private void OptVariableAction3_CheckedChanged(object? sender, EventArgs e)
         {
-            if (optVariableAction2.Checked == true)
+            if (optVariableAction3.Checked == true)
             {
                 nudVariableData0.Enabled = false;
                 nudVariableData0.Value = 0;
@@ -4106,7 +4106,7 @@ namespace Client
             }
         }
 
-    private void BtnPlayerVarOk_Click(object? sender, EventArgs e)
+        private void BtnPlayerVarOk_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -4119,7 +4119,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnPlayerVarCancel_Click(object? sender, EventArgs e)
+        private void BtnPlayerVarCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -4128,7 +4128,7 @@ namespace Client
 
         #region Set Player Switch
 
-    private void BtnSetPlayerSwitchOk_Click(object? sender, EventArgs e)
+        private void BtnSetPlayerSwitchOk_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -4141,7 +4141,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnSetPlayerSwitchCancel_Click(object? sender, EventArgs e)
+        private void BtnSetPlayerSwitchCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -4150,7 +4150,7 @@ namespace Client
 
         #region Set Self Switch
 
-    private void BtnSelfswitchOk_Click(object? sender, EventArgs e)
+        private void BtnSelfswitchOk_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -4163,7 +4163,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnSelfswitchCancel_Click(object? sender, EventArgs e)
+        private void BtnSelfswitchCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -4172,7 +4172,7 @@ namespace Client
 
         #region Conditional Branch
 
-    private void OptCondition_Index0_CheckedChanged(object? sender, EventArgs e)
+        private void OptCondition_Index0_CheckedChanged(object? sender, EventArgs e)
         {
             if (!optCondition0.Checked)
                 return;
@@ -4195,7 +4195,7 @@ namespace Client
             cmbCondtion_PlayerSwitchCondition.Enabled = true;
         }
 
-    private void OptCondition2_CheckedChanged(object? sender, EventArgs e)
+        private void OptCondition2_CheckedChanged(object? sender, EventArgs e)
         {
             if (!optCondition2.Checked)
                 return;
@@ -4216,7 +4216,7 @@ namespace Client
             cmbCondition_JobIs.Enabled = true;
         }
 
-    private void OptCondition4_CheckedChanged(object? sender, EventArgs e)
+        private void OptCondition4_CheckedChanged(object? sender, EventArgs e)
         {
             if (!optCondition4.Checked)
                 return;
@@ -4226,7 +4226,7 @@ namespace Client
         }
 
 
-    private void OptCondition5_CheckedChanged(object? sender, EventArgs e)
+        private void OptCondition5_CheckedChanged(object? sender, EventArgs e)
         {
             if (!optCondition5.Checked)
                 return;
@@ -4237,7 +4237,7 @@ namespace Client
             nudCondition_LevelAmount.Enabled = true;
         }
 
-    private void OptCondition6_CheckedChanged(object? sender, EventArgs e)
+        private void OptCondition6_CheckedChanged(object? sender, EventArgs e)
         {
             if (!optCondition6.Checked)
                 return;
@@ -4248,7 +4248,7 @@ namespace Client
             cmbCondition_SelfSwitchCondition.Enabled = true;
         }
 
-    private void OptCondition8_CheckedChanged(object? sender, EventArgs e)
+        private void OptCondition8_CheckedChanged(object? sender, EventArgs e)
         {
             if (!optCondition8.Checked)
                 return;
@@ -4258,7 +4258,7 @@ namespace Client
             cmbCondition_Gender.Enabled = true;
         }
 
-    private void OptCondition9_CheckedChanged(object? sender, EventArgs e)
+        private void OptCondition9_CheckedChanged(object? sender, EventArgs e)
         {
             if (!optCondition9.Checked)
                 return;
@@ -4268,7 +4268,7 @@ namespace Client
             cmbCondition_Time.Enabled = true;
         }
 
-    private void BtnConditionalBranchOk_Click(object? sender, EventArgs e)
+        private void BtnConditionalBranchOk_Click(object? sender, EventArgs e)
         {
             if (Event.IsEdit == false)
             {
@@ -4281,7 +4281,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnConditionalBranchCancel_Click(object? sender, EventArgs e)
+        private void BtnConditionalBranchCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -4290,7 +4290,7 @@ namespace Client
 
         #region Create Label
 
-    private void BtnCreatelabelOk_Click(object? sender, EventArgs e)
+    private void BtnCreateLabelOk_Click(object? sender, EventArgs e)
         {
             if (Event.IsEdit == false)
             {
@@ -4302,7 +4302,7 @@ namespace Client
             }
             HideAllFrames();
         }
-    private void BtnCreateLabelCancel_Click(object? sender, EventArgs e)
+        private void BtnCreateLabelCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -4311,7 +4311,7 @@ namespace Client
 
         #region GoTo Label
 
-    private void BtnGoToLabelOk_Click(object? sender, EventArgs e)
+        private void BtnGoToLabelOk_Click(object? sender, EventArgs e)
         {
             if (Event.IsEdit == false)
             {
@@ -4324,7 +4324,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnGoToLabelCancel_Click(object? sender, EventArgs e)
+        private void BtnGoToLabelCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -4333,7 +4333,7 @@ namespace Client
 
         #region Change Items
 
-    private void BtnChangeItemsOk_Click(object? sender, EventArgs e)
+         private void BtnChangeItemsOk_Click(object? sender, EventArgs e)
         {
             if (Event.IsEdit == false)
             {
@@ -4346,7 +4346,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnChangeItemsCancel_Click(object? sender, EventArgs e)
+        private void BtnChangeItemsCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -4355,7 +4355,7 @@ namespace Client
 
         #region Change Level
 
-    private void BtnChangeLevelOK_Click(object? sender, EventArgs e)
+        private void BtnChangeLevelOK_Click(object? sender, EventArgs e)
         {
             if (Event.IsEdit == false)
             {
@@ -4368,7 +4368,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnChangeLevelCancel_Click(object? sender, EventArgs e)
+        private void BtnChangeLevelCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -4377,7 +4377,7 @@ namespace Client
 
         #region Change Skills
 
-    private void BtnChangeSkillsOK_Click(object? sender, EventArgs e)
+        private void BtnChangeSkillsOK_Click(object? sender, EventArgs e)
         {
             if (Event.IsEdit == false)
             {
@@ -4390,7 +4390,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnChangeSkillsCancel_Click(object? sender, EventArgs e)
+        private void BtnChangeSkillsCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -4399,7 +4399,7 @@ namespace Client
 
         #region Change Job
 
-    private void BtnChangeJobOK_Click(object? sender, EventArgs e)
+        private void BtnChangeJobOK_Click(object? sender, EventArgs e)
         {
             if (Event.IsEdit == false)
             {
@@ -4412,7 +4412,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnChangeJobCancel_Click(object? sender, EventArgs e)
+        private void BtnChangeJobCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -4421,7 +4421,7 @@ namespace Client
 
         #region Change Sprite
 
-    private void BtnChangeSpriteOK_Click(object? sender, EventArgs e)
+        private void BtnChangeSpriteOK_Click(object? sender, EventArgs e)
         {
             if (Event.IsEdit == false)
             {
@@ -4434,7 +4434,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnChangeSpriteCancel_Click(object? sender, EventArgs e)
+        private void BtnChangeSpriteCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -4443,7 +4443,7 @@ namespace Client
 
         #region Change Gender
 
-    private void BtnChangeGenderOK_Click(object? sender, EventArgs e)
+        private void BtnChangeGenderOK_Click(object? sender, EventArgs e)
         {
             if (Event.IsEdit == false)
             {
@@ -4456,7 +4456,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnChangeGenderCancel_Click(object? sender, EventArgs e)
+        private void BtnChangeGenderCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -4465,7 +4465,7 @@ namespace Client
 
         #region Change PK
 
-    private void BtnChangePkOK_Click(object? sender, EventArgs e)
+        private void BtnChangePkOK_Click(object? sender, EventArgs e)
         {
             if (Event.IsEdit == false)
             {
@@ -4478,7 +4478,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnChangePkCancel_Click(object? sender, EventArgs e)
+        private void BtnChangePkCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -4487,7 +4487,7 @@ namespace Client
 
         #region Give Exp
 
-    private void BtnGiveExpOK_Click(object? sender, EventArgs e)
+        private void BtnGiveExpOK_Click(object? sender, EventArgs e)
         {
             if (Event.IsEdit == false)
             {
@@ -4500,7 +4500,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnGiveExpCancel_Click(object? sender, EventArgs e)
+        private void BtnGiveExpCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -4509,7 +4509,7 @@ namespace Client
 
         #region Player Warp
 
-    private void BtnPlayerWarpOK_Click(object? sender, EventArgs e)
+        private void BtnPlayerWarpOK_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -4522,7 +4522,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnPlayerWarpCancel_Click(object? sender, EventArgs e)
+        private void BtnPlayerWarpCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -4531,7 +4531,7 @@ namespace Client
 
         #region Route Completion
 
-    private void BtnMoveWaitOK_Click(object? sender, EventArgs e)
+        private void BtnMoveWaitOK_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -4544,7 +4544,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnMoveWaitCancel_Click(object? sender, EventArgs e)
+        private void BtnMoveWaitCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -4553,7 +4553,7 @@ namespace Client
 
         #region Spawn Npc
 
-    private void BtnSpawnNpcOK_Click(object? sender, EventArgs e)
+        private void BtnSpawnNpcOK_Click(object? sender, EventArgs e)
         {
             if (Event.IsEdit == false)
             {
@@ -4566,7 +4566,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnSpawnNpcancel_Click(object? sender, EventArgs e)
+        private void BtnSpawnNpcCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -4575,7 +4575,7 @@ namespace Client
 
         #region Play Animation
 
-    private void OptPlayAnimPlayer_CheckedChanged(object? sender, EventArgs e)
+        private void OptPlayAnimPlayer_CheckedChanged(object? sender, EventArgs e)
         {
             lblPlayAnimX.Visible = false;
             lblPlayAnimY.Visible = false;
@@ -4584,7 +4584,7 @@ namespace Client
             cmbPlayAnimEvent.Visible = false;
         }
 
-    private void OptPlayAnimEvent_CheckedChanged(object? sender, EventArgs e)
+        private void OptPlayAnimEvent_CheckedChanged(object? sender, EventArgs e)
         {
             lblPlayAnimX.Visible = false;
             lblPlayAnimY.Visible = false;
@@ -4593,7 +4593,7 @@ namespace Client
             cmbPlayAnimEvent.Visible = true;
         }
 
-    private void OptPlayAnimTile_CheckedChanged(object? sender, EventArgs e)
+        private void OptPlayAnimTile_CheckedChanged(object? sender, EventArgs e)
         {
             lblPlayAnimX.Visible = true;
             lblPlayAnimY.Visible = true;
@@ -4602,7 +4602,7 @@ namespace Client
             cmbPlayAnimEvent.Visible = false;
         }
 
-    private void BtnPlayAnimationOK_Click(object? sender, EventArgs e)
+        private void BtnPlayAnimationOK_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -4615,7 +4615,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnPlayAnimationCancel_Click(object? sender, EventArgs e)
+        private void BtnPlayAnimationCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -4624,7 +4624,7 @@ namespace Client
 
         #region Set Fog
 
-    private void BtnSetFogOK_Click(object? sender, EventArgs e)
+        private void BtnSetFogOK_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -4637,7 +4637,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnSetFogCancel_Click(object? sender, EventArgs e)
+        private void BtnSetFogCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -4646,7 +4646,7 @@ namespace Client
 
         #region Set Weather
 
-    private void BtnSetWeatherOK_Click(object? sender, EventArgs e)
+        private void BtnSetWeatherOK_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -4659,7 +4659,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnSetWeatherCancel_Click(object? sender, EventArgs e)
+        private void BtnSetWeatherCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -4668,7 +4668,7 @@ namespace Client
 
         #region Set Map Tint
 
-    private void BtnMapTintOK_Click(object? sender, EventArgs e)
+        private void BtnMapTintOK_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -4681,7 +4681,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnMapTintCancel_Click(object? sender, EventArgs e)
+        private void BtnMapTintCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -4690,7 +4690,7 @@ namespace Client
 
         #region Play BGM
 
-    private void BtnPlayBgmOK_Click(object? sender, EventArgs e)
+        private void BtnPlayBgmOK_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -4703,7 +4703,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnPlayBgmCancel_Click(object? sender, EventArgs e)
+        private void BtnPlayBgmCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -4712,7 +4712,7 @@ namespace Client
 
         #region Play Sound
 
-    private void BtnPlaySoundOK_Click(object? sender, EventArgs e)
+        private void BtnPlaySoundOK_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -4725,7 +4725,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnPlaySoundCancel_Click(object? sender, EventArgs e)
+        private void BtnPlaySoundCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -4734,7 +4734,7 @@ namespace Client
 
         #region Wait
 
-    private void BtnSetWaitOK_Click(object? sender, EventArgs e)
+        private void BtnSetWaitOK_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -4747,7 +4747,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnSetWaitCancel_Click(object? sender, EventArgs e)
+        private void BtnSetWaitCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -4756,7 +4756,7 @@ namespace Client
 
         #region Set Access
 
-    private void BtnSetAccessOK_Click(object? sender, EventArgs e)
+        private void BtnSetAccessOK_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -4769,7 +4769,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnSetAccessCancel_Click(object? sender, EventArgs e)
+        private void BtnSetAccessCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }
@@ -4778,7 +4778,7 @@ namespace Client
 
         #region Show Pic
 
-    private void BtnShowPicOK_Click(object? sender, EventArgs e)
+        private void BtnShowPicOK_Click(object? sender, EventArgs e)
         {
             if (!Event.IsEdit)
             {
@@ -4845,7 +4845,7 @@ namespace Client
             HideAllFrames();
         }
 
-    private void BtnOpenShopCancel_Click(object? sender, EventArgs e)
+        private void BtnOpenShopCancel_Click(object? sender, EventArgs e)
         {
             HideAllFrames();
         }

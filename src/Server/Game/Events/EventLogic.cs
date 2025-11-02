@@ -2240,12 +2240,6 @@ namespace Server
             ProcessEventMovement();
             ProcessLocalEventMovement();
             ProcessEventCommands();
-
-            // Consider adding a priority system here to determine which events should be processed first.
-            // This is just a conceptual example.  A real priority system would need more work.
-            // ProcessHighPriorityEvents();
-            // ProcessNormalEvents();
-            // ProcessLowPriorityEvents();
         }
 
 

@@ -3863,16 +3863,16 @@ namespace Client
                     switch (dir)
                     {
                         case (int)Direction.Up:
-                            Data.MapEvents[id].Y = (byte)Math.Max(0, Data.MapEvents[id].Y - 1);
+                            Data.MapEvents[id].Y -= 1;
                             break;
                         case (int)Direction.Down:
-                            Data.MapEvents[id].Y = (byte)Math.Min(byte.MaxValue, Data.MapEvents[id].Y + 1);
+                            Data.MapEvents[id].Y += 1;
                             break;
                         case (int)Direction.Left:
-                            Data.MapEvents[id].X = (byte)Math.Max(0, Data.MapEvents[id].X - 1);
+                            Data.MapEvents[id].X -= 1;
                             break;
                         case (int)Direction.Right:
-                            Data.MapEvents[id].X = (byte)Math.Min(byte.MaxValue, Data.MapEvents[id].X + 1);
+                            Data.MapEvents[id].X += 1;
                             break;
                     }
                 }
