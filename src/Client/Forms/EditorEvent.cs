@@ -984,7 +984,7 @@ namespace Client
             // Label
             if (fraCreateLabel.Content == null)
             {
-                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnCreatelabelOk_Click;
+                var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnCreateLabelOk_Click;
                 var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnCreateLabelCancel_Click;
                 fraCreateLabel.Content = new StackLayout
                 {
@@ -1172,7 +1172,7 @@ namespace Client
             if (fraSpawnNpc.Content == null)
             {
                 var btnOk = new Button { Text = "OK" }; btnOk.Click += BtnSpawnNpcOK_Click;
-                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnSpawnNpcancel_Click;
+                var btnCancel = new Button { Text = "Cancel" }; btnCancel.Click += BtnSpawnNpcCancel_Click;
                 fraSpawnNpc.Content = new StackLayout
                 {
                     Orientation = Orientation.Vertical,
@@ -4290,7 +4290,7 @@ namespace Client
 
         #region Create Label
 
-    private void BtnCreateLabelOk_Click(object? sender, EventArgs e)
+        private void BtnCreateLabelOk_Click(object? sender, EventArgs e)
         {
             if (Event.IsEdit == false)
             {
