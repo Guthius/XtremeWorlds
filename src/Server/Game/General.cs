@@ -285,8 +285,9 @@ namespace Server
                 throw new InvalidOperationException("Invalid Port number in configuration");
         }
 
-        private static async System.Threading.Tasks.Task InitializeNetworkAsync()
+        private static System.Threading.Tasks.Task InitializeNetworkAsync()
         {
+            return System.Threading.Tasks.Task.CompletedTask;
         }
 
         private static async System.Threading.Tasks.Task InitializeDatabaseWithRetryAsync(IConfiguration configuration)
@@ -454,18 +455,18 @@ namespace Server
         /// <summary>
         /// Performs a health check on critical server components.
         /// </summary>
-        public static async System.Threading.Tasks.Task<bool> PerformHealthCheckAsync()
+        public static System.Threading.Tasks.Task<bool> PerformHealthCheckAsync()
         {
             try
             {
                 bool networkActive = true; // NetworkConfig.Socket.IsListening;
                 if (!networkActive) Logger.LogWarning("Network socket is not listening.");
-                return networkActive && !Cts.IsCancellationRequested;
+                return System.Threading.Tasks.Task.FromResult(networkActive && !Cts.IsCancellationRequested);
             }
             catch (Exception ex)
             {
                 Logger.LogError(ex, "Health check failed");
-                return false;
+                return System.Threading.Tasks.Task.FromResult(false);
             }
         }
 
@@ -495,18 +496,20 @@ namespace Server
 
         private static async System.Threading.Tasks.Task SendServerAnnouncementAsync(string message)
         {
-            await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxPlayers), Cts.Token, async (i, ct) =>
+            await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxPlayers), Cts.Token, (i, ct) =>
             {
                 if (NetworkConfig.IsPlaying(i))
                     NetworkSend.PlayerMsg(i, message, (int)ColorName.Yellow);
+                return new ValueTask();
             });
             Logger.LogInformation("Server announcement sent.");
         }
 
-        private static async System.Threading.Tasks.Task InitializeChatSystemAsync()
+        private static System.Threading.Tasks.Task InitializeChatSystemAsync()
         {
             Logger.LogInformation("Chat system initialized.");
             // Additional initialization logic can be added here if needed
+            return System.Threading.Tasks.Task.CompletedTask;
         }
 
         /// <summary>
@@ -677,7 +680,7 @@ namespace Server
             }
         }
 
-        private static async System.Threading.Tasks.Task TeleportPlayerAsync(int playerIndex, int x, int y)
+        private static System.Threading.Tasks.Task TeleportPlayerAsync(int playerIndex, int x, int y)
         {
             try
             {               
@@ -686,7 +689,7 @@ namespace Server
                 if (x < 0 || x >= Data.Map[player.Map].MaxX || y < 0 || y >= Data.Map[player.Map].MaxY)
                 {
                     NetworkSend.PlayerMsg(playerIndex, "Invalid coordinates for teleportation.", (int)ColorName.BrightRed);
-                    return;
+                    return System.Threading.Tasks.Task.CompletedTask;
                 }
 
                 player.X = x;
@@ -699,6 +702,7 @@ namespace Server
                 Logger.LogError(ex, $"Failed to teleport player {playerIndex}");
                 NetworkSend.PlayerMsg(playerIndex, "Teleport failed.", (int)ColorName.BrightRed);
             }
+            return System.Threading.Tasks.Task.CompletedTask;
         }
 
         private static async System.Threading.Tasks.Task KickPlayerAsync(int playerIndex)
@@ -744,7 +748,7 @@ namespace Server
             }
         }
 
-        private static async System.Threading.Tasks.Task SendServerStatusAsync(int playerIndex)
+        private static System.Threading.Tasks.Task SendServerStatusAsync(int playerIndex)
         {
             try
             {
@@ -758,9 +762,10 @@ namespace Server
                 Logger.LogError(ex, "Failed to send server status");
                 NetworkSend.PlayerMsg(playerIndex, "Unable to retrieve server status.", (int)ColorName.BrightRed);
             }
+            return System.Threading.Tasks.Task.CompletedTask;
         }
 
-        private static async System.Threading.Tasks.Task SendHelpMessageAsync()
+        private static System.Threading.Tasks.Task SendHelpMessageAsync()
         {
             string help = "Available Commands:\n" +
                           "/teleport <x> <y> - Teleport to coordinates\n" +
@@ -776,6 +781,7 @@ namespace Server
                           "/save - Manually save player data\n" +
                           "/help - Show this message";
             Console.WriteLine(help);
+            return System.Threading.Tasks.Task.CompletedTask;
         }
 
         private static async System.Threading.Tasks.Task SendWhisperAsync(int senderIndex, string targetName, string message)
@@ -861,7 +867,7 @@ namespace Server
             }
         }
 
-        private static async System.Threading.Tasks.Task SendPlayerStatsAsync(int playerIndex)
+        private static System.Threading.Tasks.Task SendPlayerStatsAsync(int playerIndex)
         {
             try
             {
@@ -877,6 +883,7 @@ namespace Server
                 Logger.LogError(ex, $"Failed to send stats for player {playerIndex}");
                 NetworkSend.PlayerMsg(playerIndex, "Failed to retrieve stats.", (int)ColorName.BrightRed);
             }
+            return System.Threading.Tasks.Task.CompletedTask;
         }
 
         private static async System.Threading.Tasks.Task SavePlayerDataAsync(int playerIndex)
@@ -894,16 +901,16 @@ namespace Server
             }
         }
 
-        private static async System.Threading.Tasks.Task<int> FindPlayerByNameAsync(string name)
+        private static System.Threading.Tasks.Task<int> FindPlayerByNameAsync(string name)
         {
             for (int i = 0; i < Core.Globals.Variables.MaxPlayers; i++)
             {
                 if (NetworkConfig.IsPlaying(i) && Data.Player[i].Name.Equals(name, StringComparison.OrdinalIgnoreCase))
                 {
-                    return i;
+                    return System.Threading.Tasks.Task.FromResult(i);
                 }
             }
-            return -1;
+            return System.Threading.Tasks.Task.FromResult(-1);
         }
 
         private static async System.Threading.Tasks.Task SendChatMessageAsync(int senderIndex, string channel, string message, ColorName color)
@@ -924,18 +931,20 @@ namespace Server
                 }
                 else if (channel == "party" && Data.TempPlayer[senderIndex].InParty != 0)
                 {
-                    await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxPlayers), Cts.Token, async (i, ct) =>
+                    await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxPlayers), Cts.Token, (i, ct) =>
                     {
                         if (NetworkConfig.IsPlaying(i) && Data.TempPlayer[i].InParty == Data.TempPlayer[senderIndex].InParty)
                             NetworkSend.PlayerMsg(i, $"[Party] {Data.Player[senderIndex].Name}: {message}", (int)color);
+                        return new ValueTask();
                     });
                 }
                 else if (channel == "global")
                 {
-                    await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxPlayers), Cts.Token, async (i, ct) =>
+                    await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxPlayers), Cts.Token, (i, ct) =>
                     {
                         if (NetworkConfig.IsPlaying(i))
                             NetworkSend.PlayerMsg(i, message, (int)color);
+                        return new ValueTask();
                     });
                 }
             }
@@ -949,17 +958,18 @@ namespace Server
         /// <summary>
         /// Handles player login events.
         /// </summary>
-        public static async System.Threading.Tasks.Task OnPlayerLoginAsync(int playerIndex)
+        public static System.Threading.Tasks.Task OnPlayerLoginAsync(int playerIndex)
         {
             Logger.LogInformation($"Player {playerIndex} logged in.");
             NetworkSend.PlayerMsg(playerIndex, "Welcome to the server!", (int)ColorName.BrightGreen);
             PlayerStatistics.GetOrAdd(playerIndex, new PlayerStats()).LoginTime = GetServerTime();
+            return System.Threading.Tasks.Task.CompletedTask;
         }
 
         /// <summary>
         /// Handles player logout events.
         /// </summary>
-        public static async System.Threading.Tasks.Task OnPlayerLogoutAsync(int playerIndex)
+        public static System.Threading.Tasks.Task OnPlayerLogoutAsync(int playerIndex)
         {
             if (PlayerStatistics.TryGetValue(playerIndex, out var stats) && stats.LoginTime.HasValue)
             {
@@ -967,6 +977,7 @@ namespace Server
                 stats.LoginTime = null;
             }
             Logger.LogInformation($"Player {playerIndex} logged out.");
+            return System.Threading.Tasks.Task.CompletedTask;
         }
 
         private static Task<bool> IsAdminAsync(int playerIndex) =>
