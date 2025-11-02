@@ -93,8 +93,8 @@ namespace Server
                     {
                         command.Parameters.AddWithValue("@value", value);
 
-                        bool exists = (bool)await command.ExecuteScalarAsync();
-                        return exists;
+                        var result = await command.ExecuteScalarAsync();
+                        return result is bool b && b;
                     }
                 }
             }
@@ -411,7 +411,7 @@ namespace Server
             }
         }
 
-        public static async System.Threading.Tasks.Task<JObject> SelectRowByColumnAsync(string columnName, long value, string tableName, string dataColumn)
+        public static async System.Threading.Tasks.Task<JObject?> SelectRowByColumnAsync(string columnName, long value, string tableName, string dataColumn)
         {
             await ConnectionSemaphore.WaitAsync();
             try
@@ -646,7 +646,7 @@ namespace Server
                 }
             }
         }
-        public static JObject SelectRowByColumn(string columnName, long value, string tableName, string dataColumn)
+        public static JObject? SelectRowByColumn(string columnName, long value, string tableName, string dataColumn)
         {
             string sql = $"SELECT {dataColumn} FROM {tableName} WHERE {columnName} = @value;";
 
@@ -718,14 +718,12 @@ namespace Server
         {
             var lines = new List<string>(System.IO.File.ReadAllLines(filePath));
             bool updated = false;
-            bool isInSection = false;
             int i = 0;
 
             while (i < lines.Count)
             {
                 if (lines[i].Equals("[" + section + "]", StringComparison.OrdinalIgnoreCase))
                 {
-                    isInSection = true;
                     i += 0;
                     while (i < lines.Count & !lines[i].StartsWith("["))
                     {
@@ -1397,6 +1395,10 @@ namespace Server
 
             // Parse layer data
             var mapGridNode = root.Element("MapGrid");
+            if (mapGridNode == null)
+            {
+                throw new InvalidDataException("Invalid map data: 'MapGrid' node missing.");
+            }
             var layersNode = mapGridNode.Element("Layers");
             if (layersNode == null)
             {
@@ -1669,7 +1671,7 @@ namespace Server
 
             var loopTo = Core.Globals.Variables.MaxShops;
             for (i = 0; i < loopTo; i++)
-                LoadShopAsync(i);
+                _ = LoadShopAsync(i);
 
         }
 

@@ -146,6 +146,10 @@ public static class WinInventory
         }
 
         var winInventory = WindowManager.GetWindowByName("winInventory");
+        if (winInventory is null)
+        {
+            return;
+        }
         var slot = General.IsInv(winInventory.X, winInventory.Y);
         if (slot >= 0)
         {

@@ -78,7 +78,7 @@ public static class TextRenderer
     public static void AddText(string text, int color, long alpha = 255L, byte channel = 0)
     {
         // wordwrap
-        string[] wrappedLines = null;
+        string[] wrappedLines = System.Array.Empty<string>();
         WordWrap(text, Font.Georgia, WindowManager.Windows[WindowManager.GetWindowIndex("winChat")].Width, ref wrappedLines);
 
         GameState.ChatHighIndex += wrappedLines.Length;
@@ -193,6 +193,9 @@ public static class TextRenderer
     public static void RenderText(string text, int x, int y, Color frontColor, Color backColor, Font font = Font.Georgia)
     {
         if (string.IsNullOrEmpty(text)) return;
+
+        // Ensure we have a valid SpriteBatch before drawing
+        if (GameClient.SpriteBatch == null) return;
 
         // Try to get a sprite font (requested -> Georgia -> any). If none, skip drawing gracefully.
         if (!Fonts.TryGetValue(font, out var spriteFont))
@@ -381,6 +384,9 @@ public static class TextRenderer
 
     public static void DrawEventName(int index)
     {
+        if (Data.MapEvents == null) return;
+        if (index < 0 || index >= Data.MapEvents.Length) return;
+
         var textY = 0;
 
         var color = Color.Yellow;
@@ -510,10 +516,9 @@ public static class TextRenderer
 
     public static void DrawChat()
     {
-        var yOffset = 0L;
-        string tmpText;
+    var yOffset = 0L;
         var topWidth = 0;
-        string[] tmpArray;
+    // removed unused tmpText/tmpArray
 
         // set the position
         var xO = 19L;
@@ -529,7 +534,7 @@ public static class TextRenderer
         {
             if (i >= Variables.ChatLines)
                 break;
-            var lineCount = 1;
+            // removed unused lineCount
 
             // exit out early if we come to a blank string
             if (Strings.Len(Data.Chat[(int) i].Text) == 0)

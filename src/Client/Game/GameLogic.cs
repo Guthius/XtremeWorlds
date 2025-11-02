@@ -1583,7 +1583,8 @@ namespace Client
                             break;
                         }
                 }
-                withBlock.Controls[WindowManager.GetControlIndex("winDescription", "lblName")].Color = color;
+                if (WindowManager.TryGetControl("winDescription", "lblName", out var lblName0))
+                    lblName0!.Color = color;
 
                 // class req
                 if (Data.Item[(int)itemNum].JobReq > 0)
@@ -1605,8 +1606,11 @@ namespace Client
                     color = Microsoft.Xna.Framework.Color.Green;
                 }
 
-                withBlock.Controls[WindowManager.GetControlIndex("winDescription", "lblJob")].Text = jobName;
-                withBlock.Controls[WindowManager.GetControlIndex("winDescription", "lblJob")].Color = color;
+                if (WindowManager.TryGetControl("winDescription", "lblJob", out var lblJob0))
+                {
+                    lblJob0!.Text = jobName;
+                    lblJob0!.Color = color;
+                }
 
                 // level
                 if (Data.Item[(int)itemNum].LevelReq > 0)
@@ -1627,8 +1631,10 @@ namespace Client
                     levelTxt = "No Level Req.";
                     color = Microsoft.Xna.Framework.Color.Green;
                 }
-                withBlock.Controls[WindowManager.GetControlIndex("winDescription", "lblLevel")].Text = levelTxt;
-                withBlock.Controls[WindowManager.GetControlIndex("winDescription", "lblLevel")].Color = color;
+                if (WindowManager.TryGetControl("winDescription", "lblLevel", out var lblLevel0))
+                    lblLevel0!.Text = levelTxt;
+                if (WindowManager.TryGetControl("winDescription", "lblLevel", out var lblLevel1))
+                    lblLevel1!.Color = color;
             }
 
             // clear

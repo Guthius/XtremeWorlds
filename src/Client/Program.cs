@@ -519,6 +519,7 @@ namespace Client
                 {
                     string cursorTex = Path.Combine(DataPath.Misc, "Cursor");
                     var info = GetGfxInfo(cursorTex);
+                    if (info == null) return;
                     int cw = Math.Max(1, info.Width);
                     int ch = Math.Max(1, info.Height);
                     int hotspotX = 0; // adjust if your cursor hotspot is not top-left
@@ -528,7 +529,7 @@ namespace Client
                     RenderTexture(ref cursorTex, cx, cy, 0, 0, cw, ch, cw, ch);
                 }
 
-                SpriteBatch.End();
+                if (SpriteBatch != null) SpriteBatch.End();
 
                 // After drawing to _guiRenderTarget, reset to back buffer
                 GraphicsDevice.SetRenderTarget(null);
@@ -1564,6 +1565,7 @@ namespace Client
                 using var tex = new Texture2D(gd, w, h, false, SurfaceFormat.Color);
                 tex.SetData(data);
 
+                if (string.IsNullOrEmpty(path)) return;
                 using var fs = File.Create(path);
                 tex.SaveAsPng(fs, w, h);
 
@@ -1578,6 +1580,7 @@ namespace Client
         // Draw a filled rectangle with an optional outline
         public static void DrawRectangle(Vector2 position, Vector2 size, Color fillColor, Color outlineColor, float outlineThickness)
         {
+            if (SpriteBatch == null) return;
             // Create a 1x1 white texture for drawing
             var whiteTexture = new Texture2D(SpriteBatch.GraphicsDevice, 1, 1);
 
@@ -2296,6 +2299,7 @@ namespace Client
 
         public void DrawEyeDropper()
         {
+            if (SpriteBatch == null) return;
             SpriteBatch.Begin();
 
             // Define rectangle parameters.
@@ -2313,6 +2317,7 @@ namespace Client
         public static void DrawGrid()
         {
             // Use a single Begin/End pair to improve performance
+            if (SpriteBatch == null) return;
             SpriteBatch.Begin();
 
             // Iterate over the tiles in the visible range
@@ -2405,7 +2410,7 @@ namespace Client
 
         public static void DrawChatBubble(long index)
         {
-            var theArray = default(string[]);
+            var theArray = System.Array.Empty<string>();
             int x;
             int y;
             long i;

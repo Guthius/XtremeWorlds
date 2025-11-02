@@ -1958,7 +1958,7 @@ namespace Client
 
         }
 
-        public static void MouseDown(int x, int y, bool movedMouse = true)
+        public new static void MouseDown(int x, int y, bool movedMouse = true)
         {
 
             int i;

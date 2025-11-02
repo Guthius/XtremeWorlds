@@ -25,7 +25,7 @@ namespace Server
         private static bool _serverDestroyed;
         private static string _myIpAddress = string.Empty;
         private static readonly Stopwatch MyStopwatch = new Stopwatch();
-        public static ILogger Logger;
+        public static ILogger Logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private static readonly object SyncLock = new object();
         private static readonly CancellationTokenSource Cts = new CancellationTokenSource();
         private static Timer? _saveTimer;
@@ -300,6 +300,10 @@ namespace Server
                 try
                 {
                     var name = GetDatabaseName(configuration);
+                    if (string.IsNullOrWhiteSpace(name))
+                    {
+                        throw new InvalidOperationException("Database name is missing from configuration (Database:ConnectionString).");
+                    }
                     await Database.CreateDatabaseAsync(name);
                     await Database.CreateTablesAsync();
                     await LoadCharacterListAsync();
@@ -334,9 +338,9 @@ namespace Server
                     for (int i = 0; i < Core.Globals.Variables.MaxChars; i++)
                     {
                         var data = await Database.SelectRowByColumnAsync("id", id, "account", $"character{i + 1}");
-                        if (data != null && data["Name"] != null)
+                        if (data != null)
                         {
-                            string name = data["Name"].ToString();
+                            string? name = (string?)data["Name"];
                             if (!string.IsNullOrWhiteSpace(name))
                             {
                                 Data.Char.Add(name);

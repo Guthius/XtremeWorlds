@@ -42,6 +42,7 @@ public static class Program
         }
         catch (Exception ex)
         {
+            System.Console.Error.WriteLine(ex);
             app = new Application(Eto.Platforms.Wpf);
         }
 #endif

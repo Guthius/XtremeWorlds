@@ -20,8 +20,14 @@ public static class WinLogin
             return;
         }
 
-        var username = window.GetChild("txtUsername").Text;
-        var password = window.GetChild("txtPassword").Text;
+        var usernameCtrl = window.GetChild("txtUsername");
+        var passwordCtrl = window.GetChild("txtPassword");
+        if (usernameCtrl == null || passwordCtrl == null)
+        {
+            return;
+        }
+        var username = usernameCtrl.Text;
+        var password = passwordCtrl.Text;
 
         if (Network.IsConnected)
         {
@@ -56,8 +62,9 @@ public static class WinLogin
     public static void OnSaveUserClicked()
     {
         var winLogin = WindowManager.GetWindowByName("winLogin");
-        
+        if (winLogin == null) { return; }
         var checkBoxSaveUsername = winLogin.GetChild("chkSaveUsername");
+        if (checkBoxSaveUsername == null) { return; }
         if (checkBoxSaveUsername.Value == 0)
         {
             SettingsManager.Instance.SaveUsername = false;

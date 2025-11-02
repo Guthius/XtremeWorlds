@@ -385,7 +385,7 @@ namespace Client
                 // Play the sound
                 Bass.ChannelSetAttribute(WeatherStream, ChannelAttribute.Volume, SettingsManager.Instance.SoundVolume / 100.0f);
                 Bass.ChannelPlay(WeatherStream, false);
-                CurrentWeatherMusic = fileName;
+                CurrentWeatherMusic = fileName ?? string.Empty;
             }
             else
             {

@@ -115,7 +115,7 @@ public static class WinJobs
             return;
         }
 
-        var lines = default(string[]);
+        var lines = System.Array.Empty<string>();
         var text = "";
 
         // Get job description or use default
