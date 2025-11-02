@@ -2302,7 +2302,7 @@ namespace Client
 
         #region Page Buttons
 
-    private void TabPages_Click(object? sender, EventArgs e)
+        private void TabPages_Click(object? sender, EventArgs e)
         {
             Event.CurPageNum = tabPages.SelectedIndex;
             Event.EventEditorLoadPage(Event.CurPageNum);
@@ -2313,7 +2313,7 @@ namespace Client
             SyncMoveRouteButton();
         }
 
-    private void BtnNewPage_Click(object? sender, EventArgs e)
+        private void BtnNewPage_Click(object? sender, EventArgs e)
         {
             int pageCount;
             int i;
@@ -2347,13 +2347,13 @@ namespace Client
             SyncMoveRouteButton();
         }
 
-    private void BtnCopyPage_Click(object? sender, EventArgs e)
+        private void BtnCopyPage_Click(object? sender, EventArgs e)
         {
             Event.CopyEventPage = Event.TmpEvent.Pages[Event.CurPageNum];
             btnPastePage.Enabled = true;
         }
 
-    private void BtnPastePage_Click(object? sender, EventArgs e)
+        private void BtnPastePage_Click(object? sender, EventArgs e)
         {
             Event.TmpEvent.Pages[Event.CurPageNum] = Event.CopyEventPage;
             Event.EventEditorLoadPage(Event.CurPageNum);
@@ -2362,7 +2362,7 @@ namespace Client
             SyncMoveRouteButton();
         }
 
-    private void BtnDeletePage_Click(object? sender, EventArgs e)
+        private void BtnDeletePage_Click(object? sender, EventArgs e)
         {
             Event.TmpEvent.Pages[Event.CurPageNum] = default;
 
@@ -2397,13 +2397,13 @@ namespace Client
 
         }
 
-    private void BtnClearPage_Click(object? sender, EventArgs e)
+        private void BtnClearPage_Click(object? sender, EventArgs e)
         {
             Event.TmpEvent.Pages[Event.CurPageNum] = default;
             Event.EventEditorLoadPage(Event.CurPageNum);
         }
 
-    private void TxtName_TextChanged(object? sender, EventArgs e)
+        private void TxtName_TextChanged(object? sender, EventArgs e)
         {
             Event.TmpEvent.Name = Strings.Trim(txtName.Text);
         }

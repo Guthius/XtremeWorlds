@@ -384,10 +384,6 @@ namespace Client
         {
             // copy the event data from the temp event
             Data.MyMap.Event[EditorId] = TmpEvent;
-            TmpEvent = default;
-
-            // unload the form
-            EditorEvent.Instance.Dispose();
         }
 
         public static void EventListCommands()
