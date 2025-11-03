@@ -1667,8 +1667,6 @@ namespace Client
                 {
                     tabPages.SelectedIndex = 0;
                     Event.CurPageNum = 0;
-                    Event.EventEditorLoadPage(Event.CurPageNum);
-                    try { DrawGraphic(); } catch { }
                 }
                 // Load page 1 to start off with
                 Event.CurPageNum = 0;

@@ -2843,6 +2843,9 @@ namespace Client
             if (Data.MyMap.Event == null)
                 return;
 
+            if (Event.InEvent)
+                return;
+
             // Iterate only actual events to avoid drawing the trailing empty slot
             int count = Math.Max(0, Data.MyMap.EventCount);
             for (int i = 0; i < count; i++)
@@ -2988,8 +2991,10 @@ namespace Client
             if (frameRowHeight > 32)
                 drawY = y - (frameRowHeight - 32); // lift so feet align to tile
 
+            int drawX = x - GameState.SizeX;
+
             string argPath = Path.Combine(DataPath.Characters, gfxIndex.ToString());
-            RenderTexture(ref argPath, x, drawY, sourceRect.X, sourceRect.Y, sourceRect.Width, sourceRect.Height);
+            RenderTexture(ref argPath, drawX, drawY, sourceRect.X, sourceRect.Y, sourceRect.Width, sourceRect.Height, sourceRect.Width, sourceRect.Height);
         }
 
         private static void RenderTilesetGraphic(Type.Event eventData, int x, int y)

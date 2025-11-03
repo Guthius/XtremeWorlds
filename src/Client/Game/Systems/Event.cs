@@ -156,7 +156,7 @@ namespace Client
             {
                 for (i = lowIndex; i < Data.MyMap.EventCount; i++)
                 {
-                    if (Information.UBound(Data.MyMap.Event) > 2)
+                    if (Information.UBound(Data.MyMap.Event) > i)
                     {
                         Data.MyMap.Event[i] = Data.MyMap.Event[i + 1];
                     }
@@ -164,7 +164,7 @@ namespace Client
 
                 for (i = lowIndex; i < Data.MyMap.EventCount; i++)
                 {
-                    if (Information.UBound(Data.MapEvents) > 2)
+                    if (Information.UBound(Data.MapEvents) > i)
                     {
                         if (Data.MapEvents == null)
                             break;
@@ -255,13 +255,6 @@ namespace Client
             int EventNum = GameState.EventNum;
             EditorId = EventNum;
             TmpEvent = Data.MyMap.Event[EventNum];
-            if (TmpEvent.Pages[0].CommandListCount == 0)
-            {
-                Array.Resize(ref TmpEvent.Pages[0].CommandList, 1);
-                TmpEvent.Pages[0].CommandListCount = 0;
-                TmpEvent.Pages[0].CommandList[0].CommandCount = 0;
-                Array.Resize(ref TmpEvent.Pages[0].CommandList[0].Commands, TmpEvent.Pages[0].CommandList[0].CommandCount);
-            }
         }
 
         public static void EventEditorLoadPage(int pageNum)
