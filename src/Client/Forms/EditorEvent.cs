@@ -1678,8 +1678,6 @@ namespace Client
 
                 Event.EventEditorLoadPage(Event.CurPageNum);
                 AttachEditorHostToSelectedTab();
-                // Ensure type/index and preview are synced on initial load
-                RefreshGraphicControlsFromPage();
                 HideAllFrames();
             }
             catch (Exception ex)
