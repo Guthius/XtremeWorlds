@@ -2991,7 +2991,7 @@ namespace Client
             if (frameRowHeight > 32)
                 drawY = y - (frameRowHeight - 32); // lift so feet align to tile
 
-            int drawX = x - GameState.SizeX;
+            int drawX = x - GameState.SizeX - 8;
 
             string argPath = Path.Combine(DataPath.Characters, gfxIndex.ToString());
             RenderTexture(ref argPath, drawX, drawY, sourceRect.X, sourceRect.Y, sourceRect.Width, sourceRect.Height, sourceRect.Width, sourceRect.Height);
