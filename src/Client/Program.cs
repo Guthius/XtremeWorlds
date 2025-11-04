@@ -2843,9 +2843,6 @@ namespace Client
             if (Data.MyMap.Event == null)
                 return;
 
-            if (Event.InEvent)
-                return;
-
             // Iterate only actual events to avoid drawing the trailing empty slot
             int count = Math.Max(0, Data.MyMap.EventCount);
             for (int i = 0; i < count; i++)
@@ -3039,7 +3036,7 @@ namespace Client
                 {
                     return;
                 }
-                
+
                 if (EditorType.Map == GameState.MyEditorType)
                     return;
 
