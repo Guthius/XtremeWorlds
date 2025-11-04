@@ -147,9 +147,11 @@ namespace Server
         {
             if (x < 0 || x > Data.Map[mapNum].MaxX || y < 0 || y > Data.Map[mapNum].MaxY) return false;
             var tile = Data.Map[mapNum].Tile[x, y];
-            return tile.Type != TileType.Blocked && tile.Type2 != TileType.Blocked &&
-                   (tile.Type == TileType.Item || tile.Type == TileType.NpcSpawn ||
-                    tile.Type2 == TileType.Item || tile.Type2 == TileType.NpcSpawn);
+
+            // Any non-blocked tile is walkable. Special tiles (warp, item, npc spawn, etc.) remain walkable.
+            if (tile.Type == TileType.Blocked || tile.Type2 == TileType.Blocked) return false;
+
+            return true;
         }
 
         private static bool IsPlayerBlocking(int index, int mapNum, int x, int y, int eventId)
@@ -207,20 +209,29 @@ namespace Server
             int targetX = x, targetY = y;
             switch (dir)
             {
-                case (byte) Direction.Up: targetY--; break;
-                case (byte) Direction.Down: targetY++; break;
-                case (byte) Direction.Left: targetX--; break;
-                case (byte) Direction.Right: targetX++; break;
+                case (byte)Direction.Up: targetY--; break;
+                case (byte)Direction.Down: targetY++; break;
+                case (byte)Direction.Left: targetX--; break;
+                case (byte)Direction.Right: targetX++; break;
                 default: return false;
             }
 
-            if (targetX < 0 || targetX > Data.Map[mapNum].MaxX || targetY < 0 || targetY > Data.Map[mapNum].MaxY) return false;
+            // Event X/Y are tile coordinates, not pixels.
+            int realX = targetX;
+            int realY = targetY;
+
+            if (realX < 0 || realX > Data.Map[mapNum].MaxX || realY < 0 || realY > Data.Map[mapNum].MaxY) return false;
             if (walkThrough == 1) return true;
 
-            return IsTileWalkable(mapNum, targetX, targetY) &&
-                   !IsPlayerBlocking(index, mapNum, targetX, targetY, eventId) &&
-                   !IsNpcBlocking(mapNum, targetX, targetY) &&
-                   !IsDirectionBlocked(mapNum, x, y, dir);
+            bool walkable = IsTileWalkable(mapNum, realX, realY);
+            bool playerBlocking = IsPlayerBlocking(index, mapNum, realX, realY, eventId);
+            bool npcBlocking = IsNpcBlocking(mapNum, realX, realY);
+            bool directionBlocked = IsDirectionBlocked(mapNum, realX, realY, dir);
+
+            return walkable &&
+                   !playerBlocking &&
+                   !npcBlocking &&
+                   !directionBlocked;
         }
 
         private static bool IsValidMapAndDirection(int mapNum, byte dir) =>

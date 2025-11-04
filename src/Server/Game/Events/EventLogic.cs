@@ -2528,6 +2528,7 @@ namespace Server
                     int ny = current.y + dy[d];
                     if (nx < 0 || ny < 0 || nx > maxX || ny > maxY)
                         continue;
+                        
                     if (!IsTileWalkable(mapNum, nx, ny))
                         continue;
 
