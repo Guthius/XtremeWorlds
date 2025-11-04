@@ -1092,38 +1092,36 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             
             Data.Map[mapNum].Npc[x] = packetReader.ReadInt32();
         }
-
+        
+        ref var withBlock = ref Data.Map[mapNum];
+        var loopTo1 = (int) withBlock.MaxX;
+        for (x = 0; x < loopTo1; x++)
         {
-            ref var withBlock = ref Data.Map[mapNum];
-            var loopTo1 = (int) withBlock.MaxX;
-            for (x = 0; x < loopTo1; x++)
+            var loopTo2 = (int) withBlock.MaxY;
+            for (y = 0; y < loopTo2; y++)
             {
-                var loopTo2 = (int) withBlock.MaxY;
-                for (y = 0; y < loopTo2; y++)
+                withBlock.Tile[x, y].Data1 = packetReader.ReadInt32();
+                withBlock.Tile[x, y].Data2 = packetReader.ReadInt32();
+                withBlock.Tile[x, y].Data3 = packetReader.ReadInt32();
+                withBlock.Tile[x, y].Data1_2 = packetReader.ReadInt32();
+                withBlock.Tile[x, y].Data2_2 = packetReader.ReadInt32();
+                withBlock.Tile[x, y].Data3_2 = packetReader.ReadInt32();
+                withBlock.Tile[x, y].DirBlock = (byte) packetReader.ReadInt32();
+                var loopTo3 = Enum.GetValues(typeof(MapLayer)).Length;
+                withBlock.Tile[x, y].Layer = new Type.Layer[loopTo3];
+                for (var i = 0; i < (int) loopTo3; i++)
                 {
-                    withBlock.Tile[x, y].Data1 = packetReader.ReadInt32();
-                    withBlock.Tile[x, y].Data2 = packetReader.ReadInt32();
-                    withBlock.Tile[x, y].Data3 = packetReader.ReadInt32();
-                    withBlock.Tile[x, y].Data1_2 = packetReader.ReadInt32();
-                    withBlock.Tile[x, y].Data2_2 = packetReader.ReadInt32();
-                    withBlock.Tile[x, y].Data3_2 = packetReader.ReadInt32();
-                    withBlock.Tile[x, y].DirBlock = (byte) packetReader.ReadInt32();
-                    var loopTo3 = Enum.GetValues(typeof(MapLayer)).Length;
-                    withBlock.Tile[x, y].Layer = new Type.Layer[loopTo3];
-                    for (var i = 0; i < (int) loopTo3; i++)
-                    {
-                        withBlock.Tile[x, y].Layer[i].Tileset = packetReader.ReadInt32();
-                        withBlock.Tile[x, y].Layer[i].X = packetReader.ReadInt32();
-                        withBlock.Tile[x, y].Layer[i].Y = packetReader.ReadInt32();
-                        withBlock.Tile[x, y].Layer[i].AutoTile = (byte) packetReader.ReadInt32();
-                    }
-
-                    withBlock.Tile[x, y].Type = (TileType) packetReader.ReadInt32();
-                    withBlock.Tile[x, y].Type2 = (TileType) packetReader.ReadInt32();
+                    withBlock.Tile[x, y].Layer[i].Tileset = packetReader.ReadInt32();
+                    withBlock.Tile[x, y].Layer[i].X = packetReader.ReadInt32();
+                    withBlock.Tile[x, y].Layer[i].Y = packetReader.ReadInt32();
+                    withBlock.Tile[x, y].Layer[i].AutoTile = (byte) packetReader.ReadInt32();
                 }
+
+                withBlock.Tile[x, y].Type = (TileType) packetReader.ReadInt32();
+                withBlock.Tile[x, y].Type2 = (TileType) packetReader.ReadInt32();
             }
         }
-
+    
         Data.Map[mapNum].EventCount = packetReader.ReadInt32();
 
         if (Data.Map[mapNum].EventCount > 0)
