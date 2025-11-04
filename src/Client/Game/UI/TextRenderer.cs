@@ -389,7 +389,7 @@ public static class TextRenderer
 
         var textY = 0;
 
-        var color = Color.Yellow;
+        var color = Color.Green;
         var backcolor = Color.Black;
 
         var name = Data.MapEvents[index].Name;
