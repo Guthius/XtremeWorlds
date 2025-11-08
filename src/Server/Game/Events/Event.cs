@@ -321,10 +321,6 @@ namespace Server
                         case (byte) Direction.Right: eventData.X++; break;
                     }
 
-                    // Persist tile coordinates (convert from pixel position back to tiles)
-                    eventData.PersistX = eventData.X / 32;
-                    eventData.PersistY = eventData.Y / 32;
-
                     SendEventMove(mapNum, eventId, eventData.X, eventData.Y, dir, eventData.Dir, movementSpeed, index);
                 }
             }

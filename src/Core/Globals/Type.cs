@@ -572,9 +572,6 @@ public static class Type
         public int Dir;
         public int X;
         public int Y;
-        // Persisted position across page respawns within a session (in pixels for local events)
-        public int PersistX;
-        public int PersistY;
         public int WalkingAnim;
         public int FixedDir;
         public int WalkThrough;

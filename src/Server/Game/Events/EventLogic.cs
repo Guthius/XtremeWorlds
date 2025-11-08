@@ -2788,27 +2788,14 @@ namespace Server
                         withBlock1.Y = Event.TempEventMap[mapNum].Event[i].Y * 32;
                         withBlock1.Dir = Event.TempEventMap[mapNum].Event[i].Dir;
                         withBlock1.MoveRouteStep = Event.TempEventMap[mapNum].Event[i].MoveRouteStep;
-                        withBlock1.PersistX = withBlock1.X;
-                        withBlock1.PersistY = withBlock1.Y;
                     }
                     else
                     {
-                        // Use persisted position if available, else initial map position.
-                        if (withBlock1.PersistX >= 0 || withBlock1.PersistY >= 0)
-                        {
-                            // Persist values stored as tiles; convert to pixels
-                            withBlock1.X = withBlock1.PersistX * 32;
-                            withBlock1.Y = withBlock1.PersistY * 32;
-                        }
-                        else
-                        {
-                            withBlock1.X = Data.Map[mapNum].Event[i].X * 32;
-                            withBlock1.Y = Data.Map[mapNum].Event[i].Y * 32;
-                        }
+
+                        withBlock1.X = Data.Map[mapNum].Event[i].X * 32;
+                        withBlock1.Y = Data.Map[mapNum].Event[i].Y * 32;
+
                         withBlock1.MoveRouteStep = 0;
-                        // Initialize persist in tiles if first time (avoid storing pixels)
-                        withBlock1.PersistX = withBlock1.X / 32;
-                        withBlock1.PersistY = withBlock1.Y / 32;
                     }
 
                     withBlock1.Position = eventPage.Position;
