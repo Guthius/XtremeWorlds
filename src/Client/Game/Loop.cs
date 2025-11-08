@@ -18,9 +18,9 @@ namespace Client
         private static int _tick;
         private static int _fogTmr;
         private static int _chatTmr;
-    #pragma warning disable CS0169
-    private static int _tmpFps;
-    private static int _tmpLps;
+        #pragma warning disable CS0169
+        private static int _tmpFps;
+        private static int _tmpLps;
         private static int _walkTimer;
         private static int _frameTime;
         private static int _tmrWeather;
@@ -28,14 +28,14 @@ namespace Client
         private static int _tmr25;
         private static int _tmr500;
         private static int _tmr250;
-    private static int _tmrConnect;
-    private static int _tickFps;
+        private static int _tmrConnect;
+        private static int _tickFps;
         private static int _fadeTmr;
-    private static int _renderTmr;
+        private static int _renderTmr;
     #pragma warning restore CS0169
         private static int[] _animationTmr = new int[2];
-    private static int _lastMouseAttackX = int.MinValue; // cache last facing update
-    private static int _lastMouseAttackY = int.MinValue;
+        private static int _lastMouseAttackX = int.MinValue; // cache last facing update
+        private static int _lastMouseAttackY = int.MinValue;
 
         public static void Game()
         {
