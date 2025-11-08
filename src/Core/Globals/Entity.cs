@@ -49,11 +49,11 @@ public class Entity
     public byte Job { get; set; }
     public byte Level { get; set; }
     public int[]? Vital { get; set; }
-    public byte[] Stat { get; set; }
+    public byte[] Stat { get; set; } = Array.Empty<byte>();
     public byte Points { get; set; }
-    public PlayerEq[] Equipment { get; set; }
-    public object[] Inv { get; set; }
-    public object[] PlayerSkill { get; set; }
+    public PlayerEq[] Equipment { get; set; } = Array.Empty<PlayerEq>();
+    public object[] Inv { get; set; } = Array.Empty<object>();
+    public object[] PlayerSkill { get; set; } = Array.Empty<object>();
     public int Map { get; set; }
     public int X { get; set; }
     public int Y { get; set; }
@@ -61,10 +61,10 @@ public class Entity
     public int Sprite { get; set; }
     public int Exp { get; set; }
     public byte Access { get; set; }
-    public object[] Hotbar { get; set; }
-    public byte[] Switches { get; set; }
-    public int[] Variables { get; set; }
-    public object Pet { get; set; }
+    public object[] Hotbar { get; set; } = Array.Empty<object>();
+    public byte[] Switches { get; set; } = Array.Empty<byte>();
+    public int[] Variables { get; set; } = Array.Empty<int>();
+    public object? Pet { get; set; }
     public byte Moving { get; set; }
     public byte Attacking { get; set; }
     public int AttackTimer { get; set; }
@@ -72,12 +72,12 @@ public class Entity
     public int Emote { get; set; }
     public int EmoteTimer { get; set; }
     public int EventTimer { get; set; }
-    public object[] Quests { get; set; }
+    public object[] Quests { get; set; } = Array.Empty<object>();
     public int GuildId { get; set; }
-    public int[] DropChance { get; set; }
-    public int[] DropItem { get; set; }
-    public int[] DropItemValue { get; set; }
-    public string AttackSay { get; set; }
+    public int[] DropChance { get; set; } = Array.Empty<int>();
+    public int[] DropItem { get; set; } = Array.Empty<int>();
+    public int[] DropItemValue { get; set; } = Array.Empty<int>();
+    public string AttackSay { get; set; } = string.Empty;
     public byte SpawnTime { get; set; }
     public int SpawnSecs { get; set; }
     public byte Behavior { get; set; }
@@ -85,7 +85,7 @@ public class Entity
     public int Animation { get; set; }
     public int Hp { get; set; }
     public int Damage { get; set; }
-    public int[] Skill { get; set; }
+    public int[] Skill { get; set; } = Array.Empty<int>();
     public byte Faction { get; set; }
     public int Num { get; set; }
     public int SkillBuffer { get; set; }
@@ -96,7 +96,7 @@ public class Entity
     public int StunDuration { get; set; }
     public int StunTimer { get; set; }
     public byte StopRegen { get; set; }
-    public ResourceType[] GatherSkills { get; set; }
+    public ResourceType[] GatherSkills { get; set; } = Array.Empty<ResourceType>();
     public object Raw { get; }
 
     private Entity(EntityType type, int id, object raw)
