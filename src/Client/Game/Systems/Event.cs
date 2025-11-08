@@ -254,6 +254,15 @@ namespace Client
         {
             int EventNum = GameState.EventNum;
             EditorId = EventNum;
+            
+            // Check if Event array is null or EventNum is out of bounds
+            if (Data.MyMap.Event == null || EventNum < 0 || EventNum >= Data.MyMap.Event.Length)
+            {
+                // Initialize with a default empty event
+                TmpEvent = new Type.Event();
+                return;
+            }
+            
             TmpEvent = Data.MyMap.Event[EventNum];
         }
 
