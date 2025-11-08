@@ -142,7 +142,6 @@ namespace Server
 
         #region Movement
 
-        // Helper methods for CanEventMove
         private static bool IsTileWalkable(int mapNum, int x, int y)
         {
             if (x < 0 || x > Data.Map[mapNum].MaxX || y < 0 || y > Data.Map[mapNum].MaxY) return false;
@@ -202,7 +201,7 @@ namespace Server
         private static bool IsDirectionBlocked(int mapNum, int x, int y, byte dir) =>
             IsDirBlocked(Data.Map[mapNum].Tile[x, y].DirBlock, (Direction)dir);
 
-        public static bool CanEventMove(int index, int mapNum, int x, int y, int eventId, int walkThrough, byte dir, bool globalEvent = false)
+        public static bool CanMove(int index, int mapNum, int x, int y, int eventId, int walkThrough, byte dir, bool globalEvent = false)
         {
             if (!IsValidMapAndDirection(mapNum, dir)) return false;
 
@@ -371,7 +370,7 @@ namespace Server
             }
         }
 
-        public static int CanEventMoveTowardsPlayer(int playerId, int mapNum, int eventId)
+        public static int CanMoveTowardsPlayer(int playerId, int mapNum, int eventId)
         {
             if (!IsValidPlayerEvent(playerId, mapNum, eventId)) return 4; // Invalid direction as failure
 
@@ -403,7 +402,7 @@ namespace Server
             var i = Random.Shared.Next(0, 4);
             foreach (var dir in GetDirectionOrder(i))
             {
-                if (ShouldMoveTowards(ex, ey, px, py, dir) && CanEventMove(playerId, mapNum, ex, ey, eventId, walkThrough, (byte) dir, false))
+                if (ShouldMoveTowards(ex, ey, px, py, dir) && CanMove(playerId, mapNum, ex, ey, eventId, walkThrough, (byte) dir, false))
                 {
                     return dir;
                 }
@@ -462,7 +461,7 @@ namespace Server
 
         private static bool IsValidMove(int playerId, int mapNum, int eventId, int x, int y, int walkThrough, HashSet<(int, int)> visited) =>
             x >= 0 && x <= Data.Map[mapNum].MaxX && y >= 0 && y <= Data.Map[mapNum].MaxY &&
-            !visited.Contains((x, y)) && CanEventMove(playerId, mapNum, x, y, eventId, walkThrough, 0, false);
+            !visited.Contains((x, y)) && CanMove(playerId, mapNum, x, y, eventId, walkThrough, 0, false);
 
         private static int GetDirectionFromStep(int ex, int ey, int nx, int ny) =>
             nx > ex ? (int) Direction.Right : nx < ex ? (int) Direction.Left : ny > ey ? (int) Direction.Down : (int) Direction.Up;
@@ -490,7 +489,7 @@ namespace Server
                 foreach (var (dx, dy, dir) in new[] {(0, -1, (int) Direction.Up), (0, 1, (int) Direction.Down), (-1, 0, (int) Direction.Left), (1, 0, (int) Direction.Right)})
                 {
                     int nx = x + dx, ny = y + dy;
-                    if (!IsWithinMapBounds(mapNum, nx, ny) || !CanEventMove(playerId, mapNum, x, y, eventId, walkThrough, (byte) dir, false)) continue;
+                    if (!IsWithinMapBounds(mapNum, nx, ny) || !CanMove(playerId, mapNum, x, y, eventId, walkThrough, (byte) dir, false)) continue;
 
                     var tentativeGScore = gScore[(x, y)] + 1;
                     if (!gScore.ContainsKey((nx, ny)) || tentativeGScore < gScore[(nx, ny)])
@@ -513,7 +512,7 @@ namespace Server
 
         private static int RandomDirection() => General.GetRandom.NextInt(0, 4);
 
-        public static int CanEventMoveAwayFromPlayer(int playerId, int mapNum, int eventId)
+        public static int CanMoveAwayFromPlayer(int playerId, int mapNum, int eventId)
         {
             if (!IsValidPlayerEvent(playerId, mapNum, eventId)) return 5;
 
@@ -521,7 +520,7 @@ namespace Server
             var i = General.GetRandom.NextInt(0, 4);
             foreach (var dir in GetDirectionOrder(i))
             {
-                if (ShouldMoveAway(ex, ey, px, py, dir) && CanEventMove(playerId, mapNum, ex, ey, eventId, walkThrough, (byte) dir, false))
+                if (ShouldMoveAway(ex, ey, px, py, dir) && CanMove(playerId, mapNum, ex, ey, eventId, walkThrough, (byte) dir, false))
                     return dir;
             }
 
@@ -563,7 +562,7 @@ namespace Server
             var currentStep = TempEventMap[mapNum].Event[eventId].PatrolStep % patrolPath.Count;
             var (targetX, targetY) = patrolPath[currentStep];
             var dir = GetDirectionToTarget(TempEventMap[mapNum].Event[eventId].X, TempEventMap[mapNum].Event[eventId].Y, targetX, targetY);
-            if (CanEventMove(index, mapNum, TempEventMap[mapNum].Event[eventId].X, TempEventMap[mapNum].Event[eventId].Y, eventId, 0, (byte) dir, globalEvent))
+            if (CanMove(index, mapNum, TempEventMap[mapNum].Event[eventId].X, TempEventMap[mapNum].Event[eventId].Y, eventId, 0, (byte) dir, globalEvent))
             {
                 EventMove(index, mapNum, eventId, dir, speed, globalEvent);
                 if (TempEventMap[mapNum].Event[eventId].X == targetX && TempEventMap[mapNum].Event[eventId].Y == targetY)
@@ -576,7 +575,7 @@ namespace Server
 
         public static void FollowPlayer(int index, int mapNum, int eventId, int targetPlayerId, int speed, bool globalEvent = false)
         {
-            var dir = CanEventMoveTowardsPlayer(targetPlayerId, mapNum, eventId);
+            var dir = CanMoveTowardsPlayer(targetPlayerId, mapNum, eventId);
             if (dir != 4)
                 EventMove(index, mapNum, eventId, dir, speed, globalEvent);
         }

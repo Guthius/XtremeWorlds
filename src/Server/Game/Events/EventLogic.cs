@@ -446,7 +446,7 @@ namespace Server
                         case 1: // Random Movement
                         {
                             int rand = (int) Math.Floor((double) General.GetRandom.NextInt(0, 4)); // 0-3 for direction.
-                            if (Event.CanEventMove(0, i, globalEvent.X, globalEvent.Y, x, globalEvent.WalkThrough, (byte) rand, true))
+                            if (Event.CanMove(0, i, globalEvent.X, globalEvent.Y, x, globalEvent.WalkThrough, (byte) rand, true))
                             {
                                 int actualMoveSpeed = globalEvent.MoveSpeed switch
                                 {
@@ -526,7 +526,7 @@ namespace Server
                                     switch (nextMove.Index)
                                     {
                                         case 1: // Move Up
-                                            if (Event.CanEventMove(playerId, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) Direction.Up, isGlobal))
+                                            if (Event.CanMove(playerId, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) Direction.Up, isGlobal))
                                             {
                                                 Event.EventMove(playerId, mapNum, eventId, (int) Direction.Up, actualmovespeed, isGlobal);
                                             }
@@ -537,7 +537,7 @@ namespace Server
 
                                             break;
                                         case 2: // Move Down
-                                            if (Event.CanEventMove(playerId, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) Direction.Down, isGlobal))
+                                            if (Event.CanMove(playerId, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) Direction.Down, isGlobal))
                                             {
                                                 Event.EventMove(playerId, mapNum, eventId, (int) Direction.Down, actualmovespeed, isGlobal);
                                             }
@@ -548,7 +548,7 @@ namespace Server
 
                                             break;
                                         case 3: // Move Left
-                                            if (Event.CanEventMove(playerId, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) Direction.Left, isGlobal))
+                                            if (Event.CanMove(playerId, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) Direction.Left, isGlobal))
                                             {
                                                 Event.EventMove(playerId, mapNum, eventId, (int) Direction.Left, actualmovespeed, isGlobal);
                                             }
@@ -559,7 +559,7 @@ namespace Server
 
                                             break;
                                         case 4: // Move Right
-                                            if (Event.CanEventMove(playerId, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) Direction.Right, isGlobal))
+                                            if (Event.CanMove(playerId, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) Direction.Right, isGlobal))
                                             {
                                                 Event.EventMove(playerId, mapNum, eventId, (int) Direction.Right, actualmovespeed, isGlobal);
                                             }
@@ -572,7 +572,7 @@ namespace Server
                                         case 5: // Move Random
                                         {
                                             int z = (int) Math.Floor((double) General.GetRandom.NextInt(0, 4)); // 0-3
-                                            if (Event.CanEventMove(playerId, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) z, isGlobal))
+                                            if (Event.CanMove(playerId, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) z, isGlobal))
                                             {
                                                 Event.EventMove(playerId, mapNum, eventId, z, actualmovespeed, isGlobal);
                                             }
@@ -601,10 +601,10 @@ namespace Server
                                                 else
                                                 {
                                                     // Try to move towards the player.
-                                                    int z = Event.CanEventMoveTowardsPlayer(playerId, mapNum, eventId);
+                                                    int z = Event.CanMoveTowardsPlayer(playerId, mapNum, eventId);
                                                     if (z < 4) // Valid direction (0-3).
                                                     {
-                                                        if (Event.CanEventMove(playerId, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) z, isGlobal))
+                                                        if (Event.CanMove(playerId, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) z, isGlobal))
                                                         {
                                                             Event.EventMove(playerId, mapNum, eventId, z, actualmovespeed, isGlobal);
                                                         }
@@ -627,10 +627,10 @@ namespace Server
                                         {
                                             if (!isGlobal)
                                             {
-                                                int z = Event.CanEventMoveAwayFromPlayer(playerId, mapNum, eventId);
+                                                int z = Event.CanMoveAwayFromPlayer(playerId, mapNum, eventId);
                                                 if (z < 5)
                                                 {
-                                                    if (Event.CanEventMove(playerId, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) z, isGlobal))
+                                                    if (Event.CanMove(playerId, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) z, isGlobal))
                                                     {
                                                         Event.EventMove(playerId, mapNum, eventId, z, actualmovespeed, isGlobal);
                                                     }
@@ -645,7 +645,7 @@ namespace Server
                                         }
 
                                         case 8: // Move Forward
-                                            if (Event.CanEventMove(playerId, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) withBlock.Dir, isGlobal))
+                                            if (Event.CanMove(playerId, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) withBlock.Dir, isGlobal))
                                             {
                                                 Event.EventMove(playerId, mapNum, eventId, withBlock.Dir, actualmovespeed, isGlobal);
                                             }
@@ -665,7 +665,7 @@ namespace Server
                                                 (byte) Direction.Right => (byte) Direction.Left,
                                                 _ => withBlock.Dir // Invalid direction, keep current.
                                             };
-                                            if (Event.CanEventMove(playerId, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) z, isGlobal))
+                                            if (Event.CanMove(playerId, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) z, isGlobal))
                                             {
                                                 Event.EventMove(playerId, mapNum, eventId, z, actualmovespeed, isGlobal);
                                             }
@@ -924,7 +924,7 @@ namespace Server
                         case 1: // Random
                         {
                             int rand = (int) Math.Floor((double) General.GetRandom.NextInt(0, 4));
-                            if (Event.CanEventMove(i, mapNum, localEvent.X, localEvent.Y, x, localEvent.WalkThrough, (byte) rand, false))
+                            if (Event.CanMove(i, mapNum, localEvent.X, localEvent.Y, x, localEvent.WalkThrough, (byte) rand, false))
                             {
                                 int actualMoveSpeed = localEvent.MoveSpeed switch
                                 {
@@ -1001,7 +1001,7 @@ namespace Server
                                     switch (nextMove.Index)
                                     {
                                         case 1: // Move Up
-                                            if (Event.CanEventMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) Direction.Up, isGlobal))
+                                            if (Event.CanMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) Direction.Up, isGlobal))
                                             {
                                                 Event.EventMove(i, mapNum, eventId, (int) Direction.Up, actualmovespeed, isGlobal);
                                             }
@@ -1012,7 +1012,7 @@ namespace Server
 
                                             break;
                                         case 2: // Move Down
-                                            if (Event.CanEventMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) Direction.Down, isGlobal))
+                                            if (Event.CanMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) Direction.Down, isGlobal))
                                             {
                                                 Event.EventMove(i, mapNum, eventId, (int) Direction.Down, actualmovespeed, isGlobal);
                                             }
@@ -1023,7 +1023,7 @@ namespace Server
 
                                             break;
                                         case 3: // Move Left
-                                            if (Event.CanEventMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) Direction.Left, isGlobal))
+                                            if (Event.CanMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) Direction.Left, isGlobal))
                                             {
                                                 Event.EventMove(i, mapNum, eventId, (int) Direction.Left, actualmovespeed, isGlobal);
                                             }
@@ -1034,7 +1034,7 @@ namespace Server
 
                                             break;
                                         case 4: // Move Right
-                                            if (Event.CanEventMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) Direction.Right, isGlobal))
+                                            if (Event.CanMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) Direction.Right, isGlobal))
                                             {
                                                 Event.EventMove(i, mapNum, eventId, (int) Direction.Right, actualmovespeed, isGlobal);
                                             }
@@ -1047,7 +1047,7 @@ namespace Server
                                         case 5: // Move Random
                                         {
                                             int z = (int) Math.Floor((double) General.GetRandom.NextInt(0, 4));
-                                            if (Event.CanEventMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) z, isGlobal))
+                                            if (Event.CanMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) z, isGlobal))
                                             {
                                                 Event.EventMove(i, mapNum, eventId, z, actualmovespeed, isGlobal);
                                             }
@@ -1091,10 +1091,10 @@ namespace Server
                                                 }
                                                 else
                                                 {
-                                                    int z = Event.CanEventMoveTowardsPlayer(i, mapNum, eventId);
+                                                    int z = Event.CanMove(i, mapNum, eventId);
                                                     if (z < 4)
                                                     {
-                                                        if (Event.CanEventMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) z, isGlobal))
+                                                        if (Event.CanMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) z, isGlobal))
                                                         {
                                                             Event.EventMove(i, mapNum, eventId, z, actualmovespeed, isGlobal);
                                                         }
@@ -1116,10 +1116,10 @@ namespace Server
                                         {
                                             if (!isGlobal)
                                             {
-                                                int z = Event.CanEventMoveAwayFromPlayer(i, mapNum, eventId);
+                                                int z = Event.CanMoveAwayFromPlayer(i, mapNum, eventId);
                                                 if (z < 5) // Valid direction.
                                                 {
-                                                    if (Event.CanEventMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) z, isGlobal))
+                                                    if (Event.CanMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) z, isGlobal))
                                                     {
                                                         Event.EventMove(i, mapNum, eventId, z, actualmovespeed, isGlobal);
                                                     }
@@ -1133,7 +1133,7 @@ namespace Server
                                             break;
                                         }
                                         case 8: // Move Forward
-                                            if (Event.CanEventMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) withBlock.Dir, isGlobal))
+                                            if (Event.CanMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) withBlock.Dir, isGlobal))
                                             {
                                                 Event.EventMove(i, mapNum, eventId, withBlock.Dir, actualmovespeed, isGlobal);
                                             }
@@ -1154,7 +1154,7 @@ namespace Server
                                                 (byte) Direction.Right => (byte) Direction.Left,
                                                 _ => withBlock.Dir
                                             };
-                                            if (Event.CanEventMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) z, isGlobal))
+                                            if (Event.CanMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) z, isGlobal))
                                             {
                                                 Event.EventMove(i, mapNum, eventId, z, actualmovespeed, isGlobal);
                                             }
