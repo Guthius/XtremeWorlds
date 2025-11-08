@@ -189,22 +189,39 @@ namespace Client
 
         private void DeferredPopulateTimer_Elapsed(object? sender, EventArgs e)
         {
-            _deferredPopulateAttempts++;
-            TryPopulateCombos();
-            if (IsComboDataReady() || _deferredPopulateAttempts >= MaxPopulateAttempts)
-                _deferredPopulateTimer?.Stop();
+            try
+            {
+                _deferredPopulateAttempts++;
+                TryPopulateCombos();
+                if (IsComboDataReady() || _deferredPopulateAttempts >= MaxPopulateAttempts)
+                    _deferredPopulateTimer?.Stop();
+            }
+            catch
+            {
+                // Swallow transient race exceptions and keep trying a bit longer
+                if (_deferredPopulateAttempts >= MaxPopulateAttempts)
+                    _deferredPopulateTimer?.Stop();
+            }
         }
 
         private void TryPopulateCombos()
         {
-            if (lstMoral.Items.Count == 0 || (Data.Moral.Length > 0 && !string.IsNullOrWhiteSpace(Data.Moral[0].Name)))
-                RefreshMoralCombo();
+            try
+            {
+                if (lstMoral != null && (lstMoral.Items.Count == 0 || (Data.Moral?.Length > 0 && !string.IsNullOrWhiteSpace(Data.Moral[0].Name))))
+                    RefreshMoralCombo();
+            }
+            catch { }
 
-            if (cmbNpcList.Items.Count == 0 || (Data.Npc.Length > 0 && !string.IsNullOrWhiteSpace(Data.Npc[0].Name)))
-                RefreshNpcCombo();
+            try
+            {
+                if (cmbNpcList != null && (cmbNpcList.Items.Count == 0 || (Data.Npc?.Length > 0 && !string.IsNullOrWhiteSpace(Data.Npc[0].Name))))
+                    RefreshNpcCombo();
+            }
+            catch { }
 
-            RefreshNpcList();
-            RefreshNpcSpawnList();
+            try { RefreshNpcList(); } catch { }
+            try { RefreshNpcSpawnList(); } catch { }
         }
 
         private bool IsComboDataReady()

@@ -3041,38 +3041,32 @@ namespace Client
                 switch (Data.MapEvents?[id].GraphicType)
                 {
                     case 0:
-                        {
-                            return;
-                        }
+                        return;
                     case 1:
                         {
-                            // Character event using same segmentation logic as NPC, but only idle segment animates.
+                            // Segmented character event (idle/run/attack) mirroring player/NPC logic.
                             if (Data.MapEvents[id].Graphic <= 0 || Data.MapEvents[id].Graphic > GameState.NumCharacters)
                                 return;
-
-                            // Direction row dynamic mapping
-                            // We'll compute rows after loading gfxInfo
 
                             var gfxInfo = GetGfxInfo(Path.Combine(DataPath.Characters, Data.MapEvents[id].Graphic.ToString()));
                             if (gfxInfo == null) return;
 
                             int directionRows = ComputeDirectionRows(gfxInfo.Height, Math.Max(1, SettingsManager.Instance.SpriteDirections));
                             spritetop = MapDirectionToRow((Direction)Data.MapEvents[id].ShowDir, directionRows);
+
                             int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
                             int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
                             int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
                             int expectedTotalColumns = idleFrames + runFrames + attackFrames;
-                            int frameRowHeight = gfxInfo.Height / directionRows;
-                            if (frameRowHeight <= 0) frameRowHeight = gfxInfo.Height; // safety
-                            int autoColsBySquare = frameRowHeight > 0 ? gfxInfo.Width / frameRowHeight : 0;
+                            int frameRowHeight = gfxInfo.Height / Math.Max(1, directionRows);
+                            if (frameRowHeight <= 0) frameRowHeight = gfxInfo.Height; // safety fallback
+                            int autoColsBySquare = frameRowHeight > 0 ? gfxInfo.Width / frameRowHeight : 1;
                             if (autoColsBySquare <= 0) autoColsBySquare = 1;
                             bool widthDivisible = expectedTotalColumns > 0 && gfxInfo.Width % expectedTotalColumns == 0;
-                            int candidateFrameWidth = widthDivisible ? gfxInfo.Width / expectedTotalColumns : 0;
-                            // Relaxed: treat any sheet whose width is divisible by expectedTotalColumns as segmented (match player/NPC logic)
-                            bool canSegment = widthDivisible;
+                            bool canSegment = widthDivisible; // same relaxed heuristic as NPCs
                             int frameColumnsForWidth = canSegment ? expectedTotalColumns : autoColsBySquare;
 
-                            // Dynamic ordering (same parsing as NPC)
+                            // Segment ordering
                             string orderCsv = SettingsManager.Instance.SpriteSegmentOrder ?? "idle,run,attack";
                             var tokens = orderCsv.Split(',', StringSplitOptions.RemoveEmptyEntries);
                             if (tokens.Length != 3) tokens = new[] { "idle", "run", "attack" };
@@ -3080,7 +3074,7 @@ namespace Client
                             if (!(tokens.Contains("idle") && tokens.Contains("run") && tokens.Contains("attack")))
                                 tokens = new[] { "idle", "run", "attack" };
                             int runningOffset = 0;
-                            int idleOffset = 0, runOffset = 0, attackOffset = 0; // (run/attack unused but kept for symmetry)
+                            int idleOffset = 0, runOffset = 0, attackOffset = 0;
                             for (int i = 0; i < tokens.Length; i++)
                             {
                                 string t = tokens[i];
@@ -3092,18 +3086,33 @@ namespace Client
                                 else if (t == "attack") runningOffset += attackFrames;
                             }
 
-                            // Idle animation loop only
-                            byte idleAnim;
-                            if (canSegment)
-                                idleAnim = (byte)(Data.MapEvents[id].Steps % idleFrames);
-                            else
-                                idleAnim = (byte)(Data.MapEvents[id].Steps % frameColumnsForWidth);
+                            bool isMoving = Data.MapEvents[id].Moving != 0 && Data.MapEvents[id].WalkAnim == 1;
+                            bool isAttacking = false; // events currently have no attack cycle; placeholder if added later
 
-                            int frameColumn;
+                            byte frameWithinSegment;
                             if (canSegment)
-                                frameColumn = Math.Min(frameColumnsForWidth - 1, idleOffset + idleAnim);
+                            {
+                                if (isAttacking)
+                                    frameWithinSegment = (byte)(Data.MapEvents[id].Steps % Math.Max(1, attackFrames));
+                                else if (isMoving)
+                                    frameWithinSegment = (byte)(Data.MapEvents[id].Steps % Math.Max(1, runFrames));
+                                else
+                                    frameWithinSegment = (byte)(Data.MapEvents[id].Steps % Math.Max(1, idleFrames));
+                            }
                             else
-                                frameColumn = idleAnim; // legacy continuous sheet
+                            {
+                                frameWithinSegment = (byte)(Data.MapEvents[id].Steps % frameColumnsForWidth);
+                            }
+
+                            int segmentOffset = 0;
+                            if (canSegment)
+                            {
+                                if (isAttacking) segmentOffset = attackOffset;
+                                else if (isMoving) segmentOffset = runOffset;
+                                else segmentOffset = idleOffset;
+                            }
+
+                            int frameColumn = Math.Min(frameColumnsForWidth - 1, segmentOffset + frameWithinSegment);
 
                             double frameWidthD = gfxInfo.Width / (double)frameColumnsForWidth;
                             double frameHeightD = frameRowHeight;
@@ -3116,7 +3125,7 @@ namespace Client
                             width = sRect.Width;
                             height = sRect.Height;
 
-                            // Positioning replicating player/NPC centering
+                            // Center consistent with NPC/Player logic
                             x = (int)Math.Round(Data.MapEvents[id].X - (frameWidthD - 32d) / 2d);
                             if (frameRowHeight > 32)
                                 y = (int)Math.Round(Data.MapEvents[id].Y - (frameHeightD - 32d));
