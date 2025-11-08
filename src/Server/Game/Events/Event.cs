@@ -321,9 +321,9 @@ namespace Server
                         case (byte) Direction.Right: eventData.X++; break;
                     }
 
-                    // Update persisted coordinates for this page so respawns can use last known location
-                    eventData.PersistX = eventData.X;
-                    eventData.PersistY = eventData.Y;
+                    // Persist tile coordinates (convert from pixel position back to tiles)
+                    eventData.PersistX = eventData.X / 32;
+                    eventData.PersistY = eventData.Y / 32;
 
                     SendEventMove(mapNum, eventId, eventData.X, eventData.Y, dir, eventData.Dir, movementSpeed, index);
                 }

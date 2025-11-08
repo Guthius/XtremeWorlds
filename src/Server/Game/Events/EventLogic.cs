@@ -2794,10 +2794,11 @@ namespace Server
                     else
                     {
                         // Use persisted position if available, else initial map position.
-                        if (withBlock1.PersistX > 0 || withBlock1.PersistY > 0)
+                        if (withBlock1.PersistX >= 0 || withBlock1.PersistY >= 0)
                         {
-                            withBlock1.X = withBlock1.PersistX;
-                            withBlock1.Y = withBlock1.PersistY;
+                            // Persist values stored as tiles; convert to pixels
+                            withBlock1.X = withBlock1.PersistX * 32;
+                            withBlock1.Y = withBlock1.PersistY * 32;
                         }
                         else
                         {
@@ -2805,8 +2806,9 @@ namespace Server
                             withBlock1.Y = Data.Map[mapNum].Event[i].Y * 32;
                         }
                         withBlock1.MoveRouteStep = 0;
-                        withBlock1.PersistX = withBlock1.X;
-                        withBlock1.PersistY = withBlock1.Y;
+                        // Initialize persist in tiles if first time (avoid storing pixels)
+                        withBlock1.PersistX = withBlock1.X / 32;
+                        withBlock1.PersistY = withBlock1.Y / 32;
                     }
 
                     withBlock1.Position = eventPage.Position;
