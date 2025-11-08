@@ -1091,7 +1091,7 @@ namespace Server
                                                 }
                                                 else
                                                 {
-                                                    int z = Event.CanMove(i, mapNum, eventId);
+                                                    int z = Event.CanMoveTowardsPlayer(i, mapNum, eventId);
                                                     if (z < 4)
                                                     {
                                                         if (Event.CanMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) z, isGlobal))
