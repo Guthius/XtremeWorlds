@@ -422,7 +422,7 @@ namespace Server
             });
         }
 
-        public static void ProcessEventMovement()
+        public static void ProcessMovement()
         {
             // Iterate through all maps.
             for (int i = 0; i < Core.Globals.Variables.MaxMaps; i++)
@@ -886,7 +886,7 @@ namespace Server
         }
 
 
-        public static void ProcessLocalEventMovement()
+        public static void ProcessLocalMovement()
         {
             // Parallel processing for each player.
             Parallel.ForEach(PlayerService.Instance.PlayerIds, i =>
@@ -2237,8 +2237,8 @@ namespace Server
             // These functions have been optimized to reduce redundant calls and improve clarity.
             RemoveDeadEvents();
             SpawnNewEvents();
-            ProcessEventMovement();
-            ProcessLocalEventMovement();
+            ProcessMovement();
+            ProcessLocalMovement();
             ProcessEventCommands();
         }
 

@@ -221,7 +221,7 @@ namespace Client
                     var loopTo2 = GameState.CurrentEvents;
                     for (_i = 0; _i < loopTo2; _i++)
                     {
-                        Event.ProcessEventMovement(_i);
+                        Event.ProcessMovement(_i);
                     }
 
                     _walkTimer = _tick + 5;

@@ -3835,7 +3835,7 @@ namespace Client
 
         #region Misc
 
-        public static void ProcessEventMovement(int id)
+        public static void ProcessMovement(int id)
         {
             // Guard: ensure event system and target index are valid
             if (id < 0) return;
