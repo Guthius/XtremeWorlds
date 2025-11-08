@@ -321,6 +321,10 @@ namespace Server
                         case (byte) Direction.Right: eventData.X++; break;
                     }
 
+                    // Update persisted coordinates for this page so respawns can use last known location
+                    eventData.PersistX = eventData.X;
+                    eventData.PersistY = eventData.Y;
+
                     SendEventMove(mapNum, eventId, eventData.X, eventData.Y, dir, eventData.Dir, movementSpeed, index);
                 }
             }
@@ -510,14 +514,16 @@ namespace Server
 
         private static int Heuristic(int x1, int y1, int x2, int y2) => Math.Abs(x1 - x2) + Math.Abs(y1 - y2);
 
-        private static int RandomDirection() => General.GetRandom.NextInt(0, 4);
+    // Returns a random cardinal direction (0-3). NextInt upper bound is inclusive, so use 3.
+    private static int RandomDirection() => General.GetRandom.NextInt(0, 3);
 
         public static int CanMoveAwayFromPlayer(int playerId, int mapNum, int eventId)
         {
             if (!IsValidPlayerEvent(playerId, mapNum, eventId)) return 5;
 
             var (px, py, ex, ey, walkThrough) = GetPlayerAndEventPositions(playerId, mapNum, eventId);
-            var i = General.GetRandom.NextInt(0, 4);
+            // Seed selection for direction ordering (0-3 only).
+            var i = General.GetRandom.NextInt(0, 3);
             foreach (var dir in GetDirectionOrder(i))
             {
                 if (ShouldMoveAway(ex, ey, px, py, dir) && CanMove(playerId, mapNum, ex, ey, eventId, walkThrough, (byte) dir, false))

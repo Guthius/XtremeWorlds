@@ -445,7 +445,8 @@ namespace Server
 
                         case 1: // Random Movement
                         {
-                            int rand = (int) Math.Floor((double) General.GetRandom.NextInt(0, 4)); // 0-3 for direction.
+                            // Direction 0-3 (Up/Down/Left/Right). Adjust max to 3 because NextInt is inclusive.
+                            int rand = General.GetRandom.NextInt(0, 3); // 0-3 for direction.
                             if (Event.CanMove(0, i, globalEvent.X, globalEvent.Y, x, globalEvent.WalkThrough, (byte) rand, true))
                             {
                                 int actualMoveSpeed = globalEvent.MoveSpeed switch
@@ -923,7 +924,8 @@ namespace Server
 
                         case 1: // Random
                         {
-                            int rand = (int) Math.Floor((double) General.GetRandom.NextInt(0, 4));
+                            // Direction 0-3 inclusive (NextInt inclusive upper bound).
+                            int rand = General.GetRandom.NextInt(0, 3);
                             if (Event.CanMove(i, mapNum, localEvent.X, localEvent.Y, x, localEvent.WalkThrough, (byte) rand, false))
                             {
                                 int actualMoveSpeed = localEvent.MoveSpeed switch
@@ -2786,13 +2788,25 @@ namespace Server
                         withBlock1.Y = Event.TempEventMap[mapNum].Event[i].Y * 32;
                         withBlock1.Dir = Event.TempEventMap[mapNum].Event[i].Dir;
                         withBlock1.MoveRouteStep = Event.TempEventMap[mapNum].Event[i].MoveRouteStep;
+                        withBlock1.PersistX = withBlock1.X;
+                        withBlock1.PersistY = withBlock1.Y;
                     }
                     else
                     {
-                        // Use the event's initial position.
-                        withBlock1.X = Data.Map[mapNum].Event[i].X * 32;
-                        withBlock1.Y = Data.Map[mapNum].Event[i].Y * 32;
+                        // Use persisted position if available, else initial map position.
+                        if (withBlock1.PersistX > 0 || withBlock1.PersistY > 0)
+                        {
+                            withBlock1.X = withBlock1.PersistX;
+                            withBlock1.Y = withBlock1.PersistY;
+                        }
+                        else
+                        {
+                            withBlock1.X = Data.Map[mapNum].Event[i].X * 32;
+                            withBlock1.Y = Data.Map[mapNum].Event[i].Y * 32;
+                        }
                         withBlock1.MoveRouteStep = 0;
+                        withBlock1.PersistX = withBlock1.X;
+                        withBlock1.PersistY = withBlock1.Y;
                     }
 
                     withBlock1.Position = eventPage.Position;
