@@ -236,7 +236,7 @@ namespace Server
         private static bool IsValidMapAndDirection(int mapNum, byte dir) =>
             mapNum >= 0 && mapNum < Core.Globals.Variables.MaxMaps && dir >= 0 && dir <= System.Enum.GetValues(typeof(Direction)).Length;
 
-        public static void EventDir(int playerIndex, int mapNum, int eventId, int dir, bool globalEvent = false)
+        public static void Dir(int playerIndex, int mapNum, int eventId, int dir, bool globalEvent = false)
         {
             if (!IsValidMapAndDirection(mapNum, (byte) dir)) return;
 

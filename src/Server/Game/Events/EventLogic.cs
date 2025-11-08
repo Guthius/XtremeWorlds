@@ -462,7 +462,7 @@ namespace Server
                             }
                             else
                             {
-                                Event.EventDir(0, i, x, rand, true); // Just change direction.
+                                Event.Dir(0, i, x, rand, true); // Just change direction.
                             }
 
                             break;
@@ -592,7 +592,7 @@ namespace Server
                                                 if (Event.IsOneBlockAway(withBlock.X, withBlock.Y, GetPlayerX(playerId), GetPlayerY(playerId)))
                                                 {
                                                     // Face the player.
-                                                    Event.EventDir(playerId, GetPlayerMap(playerId), eventId, Event.GetDirToPlayer(playerId, GetPlayerMap(playerId), eventId), false);
+                                                    Event.Dir(playerId, GetPlayerMap(playerId), eventId, Event.GetDirToPlayer(playerId, GetPlayerMap(playerId), eventId), false);
                                                     if (withBlock.IgnoreIfCannotMove == 0)
                                                     {
                                                         withBlock.MoveRouteStep--;
@@ -681,10 +681,10 @@ namespace Server
                                         case 11: withBlock.MoveTimer = General.GetTimeMs() + 500; break;
                                         case 12: withBlock.MoveTimer = General.GetTimeMs() + 1000; break;
 
-                                        case 13: Event.EventDir(playerId, mapNum, eventId, (byte) Direction.Up, isGlobal); break;
-                                        case 14: Event.EventDir(playerId, mapNum, eventId, (byte) Direction.Down, isGlobal); break;
-                                        case 15: Event.EventDir(playerId, mapNum, eventId, (byte) Direction.Left, isGlobal); break;
-                                        case 16: Event.EventDir(playerId, mapNum, eventId, (byte) Direction.Right, isGlobal); break;
+                                        case 13: Event.Dir(playerId, mapNum, eventId, (byte) Direction.Up, isGlobal); break;
+                                        case 14: Event.Dir(playerId, mapNum, eventId, (byte) Direction.Down, isGlobal); break;
+                                        case 15: Event.Dir(playerId, mapNum, eventId, (byte) Direction.Left, isGlobal); break;
+                                        case 16: Event.Dir(playerId, mapNum, eventId, (byte) Direction.Right, isGlobal); break;
 
                                         // Turn 90 degrees clockwise, counter-clockwise, 180 degrees, or at random
                                         case 17: // Turn Right 90 Degrees
@@ -697,7 +697,7 @@ namespace Server
                                                 (byte) Direction.Down => (byte) Direction.Left,
                                                 _ => withBlock.Dir
                                             };
-                                            Event.EventDir(playerId, mapNum, eventId, z, isGlobal);
+                                            Event.Dir(playerId, mapNum, eventId, z, isGlobal);
                                             break;
                                         }
                                         case 18: // Turn Left 90 Degrees
@@ -710,7 +710,7 @@ namespace Server
                                                 (byte) Direction.Down => (byte) Direction.Right,
                                                 _ => withBlock.Dir
                                             };
-                                            Event.EventDir(playerId, mapNum, eventId, z, isGlobal);
+                                            Event.Dir(playerId, mapNum, eventId, z, isGlobal);
                                             break;
                                         }
                                         case 19: // Turn 180 Degrees
@@ -723,13 +723,13 @@ namespace Server
                                                 (byte) Direction.Down => (byte) Direction.Up,
                                                 _ => withBlock.Dir
                                             };
-                                            Event.EventDir(playerId, mapNum, eventId, z, isGlobal);
+                                            Event.Dir(playerId, mapNum, eventId, z, isGlobal);
                                             break;
                                         }
                                         case 20: // Turn Random
                                         {
                                             int z = (int) Math.Floor((double) General.GetRandom.NextInt(0, 4));
-                                            Event.EventDir(playerId, mapNum, eventId, z, isGlobal);
+                                            Event.Dir(playerId, mapNum, eventId, z, isGlobal);
                                             break;
                                         }
                                         case 21: // Turn Toward Player
@@ -737,7 +737,7 @@ namespace Server
                                             if (!isGlobal)
                                             {
                                                 int z = Event.GetDirToPlayer(playerId, mapNum, eventId);
-                                                Event.EventDir(playerId, mapNum, eventId, z, isGlobal);
+                                                Event.Dir(playerId, mapNum, eventId, z, isGlobal);
                                             }
 
                                             break;
@@ -748,7 +748,7 @@ namespace Server
                                             if (!isGlobal)
                                             {
                                                 int z = Event.GetDirAwayFromPlayer(playerId, mapNum, eventId);
-                                                Event.EventDir(playerId, mapNum, eventId, z, isGlobal);
+                                                Event.Dir(playerId, mapNum, eventId, z, isGlobal);
                                             }
 
                                             break;
@@ -940,7 +940,7 @@ namespace Server
                             }
                             else
                             {
-                                Event.EventDir(i, mapNum, x, rand, false);
+                                Event.Dir(i, mapNum, x, rand, false);
                             }
 
                             break;
@@ -1065,7 +1065,7 @@ namespace Server
                                             {
                                                 if (Event.IsOneBlockAway(withBlock.X, withBlock.Y, GetPlayerX(i), GetPlayerY(i)))
                                                 {
-                                                    Event.EventDir(i, mapNum, eventId, Event.GetDirToPlayer(i, mapNum, eventId), false);
+                                                    Event.Dir(i, mapNum, eventId, Event.GetDirToPlayer(i, mapNum, eventId), false);
 
                                                     // Activate event if triggered by player action.
                                                     if (Data.Map[mapNum].Event[eventId].Pages[Data.TempPlayer[i].EventMap.EventPages[eventId].PageId].Trigger == 1)
@@ -1170,10 +1170,10 @@ namespace Server
                                         case 11: withBlock.MoveTimer = General.GetTimeMs() + 500; break;
                                         case 12: withBlock.MoveTimer = General.GetTimeMs() + 1000; break;
 
-                                        case 13: Event.EventDir(i, mapNum, eventId, (byte) Direction.Up, isGlobal); break;
-                                        case 14: Event.EventDir(i, mapNum, eventId, (byte) Direction.Down, isGlobal); break;
-                                        case 15: Event.EventDir(i, mapNum, eventId, (byte) Direction.Left, isGlobal); break;
-                                        case 16: Event.EventDir(i, mapNum, eventId, (byte) Direction.Right, isGlobal); break;
+                                        case 13: Event.Dir(i, mapNum, eventId, (byte) Direction.Up, isGlobal); break;
+                                        case 14: Event.Dir(i, mapNum, eventId, (byte) Direction.Down, isGlobal); break;
+                                        case 15: Event.Dir(i, mapNum, eventId, (byte) Direction.Left, isGlobal); break;
+                                        case 16: Event.Dir(i, mapNum, eventId, (byte) Direction.Right, isGlobal); break;
 
                                         // Turn 90 degrees clockwise, counter-clockwise, 180 degrees
                                         case 17: // Turn Right 90 Degrees
@@ -1186,7 +1186,7 @@ namespace Server
                                                 (byte) Direction.Down => (byte) Direction.Left,
                                                 _ => withBlock.Dir
                                             };
-                                            Event.EventDir(i, mapNum, eventId, z, isGlobal);
+                                            Event.Dir(i, mapNum, eventId, z, isGlobal);
                                             break;
                                         }
                                         case 18: // Turn Left 90 Degrees
@@ -1199,7 +1199,7 @@ namespace Server
                                                 (byte) Direction.Down => (byte) Direction.Right,
                                                 _ => withBlock.Dir
                                             };
-                                            Event.EventDir(i, mapNum, eventId, z, isGlobal);
+                                            Event.Dir(i, mapNum, eventId, z, isGlobal);
                                             break;
                                         }
                                         case 19: // Turn 180 Degrees
@@ -1212,13 +1212,13 @@ namespace Server
                                                 (byte) Direction.Down => (byte) Direction.Up,
                                                 _ => withBlock.Dir
                                             };
-                                            Event.EventDir(i, mapNum, eventId, z, isGlobal);
+                                            Event.Dir(i, mapNum, eventId, z, isGlobal);
                                             break;
                                         }
                                         case 20: // Turn Random
                                         {
                                             int z = (int) Math.Floor((double) General.GetRandom.NextInt(0, 4));
-                                            Event.EventDir(i, mapNum, eventId, z, isGlobal);
+                                            Event.Dir(i, mapNum, eventId, z, isGlobal);
                                             break;
                                         }
                                         case 21: // Turn Toward Player
@@ -1226,7 +1226,7 @@ namespace Server
                                             if (!isGlobal)
                                             {
                                                 int z = Event.GetDirToPlayer(i, mapNum, eventId);
-                                                Event.EventDir(i, mapNum, eventId, z, isGlobal);
+                                                Event.Dir(i, mapNum, eventId, z, isGlobal);
                                             }
 
                                             break;
@@ -1236,7 +1236,7 @@ namespace Server
                                             if (!isGlobal)
                                             {
                                                 int z = Event.GetDirAwayFromPlayer(i, mapNum, eventId);
-                                                Event.EventDir(i, mapNum, eventId, z, isGlobal);
+                                                Event.Dir(i, mapNum, eventId, z, isGlobal);
                                             }
 
                                             break;
