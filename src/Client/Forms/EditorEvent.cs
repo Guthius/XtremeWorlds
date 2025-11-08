@@ -270,8 +270,8 @@ namespace Client
         public CheckBox chkHasItem = new CheckBox { Text = "Has Item" };
         public CheckBox chkSelfSwitch = new CheckBox { Text = "Self Switch" };
         public ComboBox cmbSelfSwitchCompare = new ComboBox();
-        public CheckBox chkWalkAnim = new CheckBox { Text = "Walk Anim" };
-        public CheckBox chkDirFix = new CheckBox { Text = "Dir Fix" };
+        public CheckBox chkWalkAnim = new CheckBox { Text = "Idle Animation" };
+        public CheckBox chkDirFix = new CheckBox { Text = "Direction Fix" };
         public CheckBox chkWalkThrough = new CheckBox { Text = "Walk Through" };
         public CheckBox chkShowName = new CheckBox { Text = "Show Name" };
 
