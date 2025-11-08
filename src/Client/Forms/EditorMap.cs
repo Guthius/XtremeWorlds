@@ -1231,32 +1231,7 @@ namespace Client
                 }
             }
 
-            // Send the map to the server. This will trigger a warp + map data refresh broadcast.
-            // Previously we set GameState.GettingMap = true here which blanked the screen until
-            // the server response arrived. That could appear as a persistent black screen if the
-            // response was delayed or dropped. We now keep the current map visible and rely on
-            // the incoming Packet_CheckMap/Packet_MapData sequence to toggle GettingMap.
             MapEditorSend();
-
-            // Safety fallback: if for some reason the server map data does not arrive within a short
-            // window, clear the loading state so the player isn't stuck on a black screen. This keeps
-            // the client usable even if the save packet was lost.
-            System.Threading.Tasks.Task.Run(async () =>
-            {
-                await System.Threading.Tasks.Task.Delay(3000);
-                if (GameState.GettingMap)
-                {
-                    // Fallback: re-request the map data explicitly
-                    try
-                    {
-                        var packetWriter = new PacketWriter(8);
-                        packetWriter.WriteEnum(Packets.ClientPackets.CNeedMap);
-                        packetWriter.WriteInt32(1);
-                        Network.Send(packetWriter);
-                    }
-                    catch { }
-                }
-            });
         }
 
         private void TsbFill_Click(object sender, EventArgs e)
