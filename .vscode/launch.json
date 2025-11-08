@@ -27,17 +27,5 @@
       "stopAtEntry": false,
       "console": "integratedTerminal"
     }
-    ,
-    {
-      "name": "C# Client (macOS .app, net9.0-macos, arm64)",
-      "type": "coreclr",
-      "request": "launch",
-      "preLaunchTask": "build Client",
-      "program": "${workspaceFolder}/Build/Client/osx-arm64/Client.app/Contents/MacOS/Client",
-      "args": [],
-      "cwd": "${workspaceFolder}/Build/Client/osx-arm64",
-      "stopAtEntry": false,
-      "console": "integratedTerminal"
-    }
   ]
 }
