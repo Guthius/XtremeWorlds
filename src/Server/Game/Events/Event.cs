@@ -305,7 +305,7 @@ namespace Server
                         case (byte) Direction.Right: eventData.X++; break;
                     }
 
-                    SendMove(mapNum, eventId, eventData.X, eventData.Y, dir, eventData.Dir, movementSpeed, 0);
+                    SendEventMove(mapNum, eventId, eventData.X, eventData.Y, dir, eventData.Dir, movementSpeed, 0);
                 }
                 else
                 {

@@ -92,7 +92,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Bind(Packets.ServerPackets.SrClick, Packet_RClick);
         Bind(Packets.ServerPackets.SHotbar, Packet_Hotbar);
         Bind(Packets.ServerPackets.SSpawnEvent, Event.Packet_SpawnEvent);
-        Bind(Packets.ServerPackets.SMove, Event.Packet_EventMove);
+        Bind(Packets.ServerPackets.SEventMove, Event.Packet_EventMove);
         Bind(Packets.ServerPackets.SEventDir, Event.Packet_EventDir);
         Bind(Packets.ServerPackets.SEventChat, Event.Packet_EventChat);
         Bind(Packets.ServerPackets.SEventStart, Event.Packet_EventStart);
