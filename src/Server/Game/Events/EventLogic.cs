@@ -186,7 +186,7 @@ namespace Server
                                     packetWriter.WriteInt32(withBlock.Y);
                                     packetWriter.WriteByte(withBlock.Position);
                                     packetWriter.WriteBoolean(withBlock.Visible);
-                                    packetWriter.WriteInt32(Data.Map[mapNum].Event[id].Pages[page].WalkAnim);
+                                    packetWriter.WriteInt32(Data.Map[mapNum].Event[id].Pages[page].IdleAnim);
                                     packetWriter.WriteInt32(Data.Map[mapNum].Event[id].Pages[page].DirFix);
                                     packetWriter.WriteInt32(Data.Map[mapNum].Event[id].Pages[page].WalkThrough);
                                     packetWriter.WriteInt32(Data.Map[mapNum].Event[id].Pages[page].ShowName);
@@ -378,7 +378,7 @@ namespace Server
                             withBlock.MoveSpeed = newPage.MoveSpeed;
                             withBlock.WalkThrough = newPage.WalkThrough;
                             withBlock.ShowName = newPage.ShowName;
-                            withBlock.WalkingAnim = newPage.WalkAnim;
+                            withBlock.WalkingAnim = newPage.IdleAnim;
                             withBlock.FixedDir = newPage.DirFix;
 
                             if (Data.Map[mapNum].Event[id].Globals == 1)
@@ -410,7 +410,7 @@ namespace Server
                             buffer.WriteInt32(withBlock1.Y);
                             buffer.WriteByte(withBlock1.Position);
                             buffer.WriteBoolean(withBlock1.Visible);
-                            buffer.WriteInt32(Data.Map[mapNum].Event[id].Pages[z].WalkAnim);
+                            buffer.WriteInt32(Data.Map[mapNum].Event[id].Pages[z].IdleAnim);
                             buffer.WriteInt32(Data.Map[mapNum].Event[id].Pages[z].DirFix);
                             buffer.WriteInt32(Data.Map[mapNum].Event[id].Pages[z].WalkThrough);
                             buffer.WriteInt32(Data.Map[mapNum].Event[id].Pages[z].ShowName);
@@ -2605,7 +2605,7 @@ namespace Server
                                 0 => (int) Direction.Down,
                                 1 => (int) Direction.Left,
                                 2 => (int) Direction.Right,
-                                _ => (int) Direction.Up //3
+                                _ => (int) Direction.Up
                             }
                             : (int) Direction.Down;
                         tempEvent.Active = 0;
@@ -2639,7 +2639,7 @@ namespace Server
                         tempEvent.MoveSpeed = Data.Map[mapNum].Event[i].Pages[0].MoveSpeed;
                         tempEvent.WalkThrough = Data.Map[mapNum].Event[i].Pages[0].WalkThrough;
                         tempEvent.FixedDir = Data.Map[mapNum].Event[i].Pages[0].DirFix;
-                        tempEvent.WalkingAnim = Data.Map[mapNum].Event[i].Pages[0].WalkAnim;
+                        tempEvent.WalkingAnim = Data.Map[mapNum].Event[i].Pages[0].IdleAnim;
                         tempEvent.ShowName = Data.Map[mapNum].Event[i].Pages[0].ShowName;
                     }
                 }
@@ -2823,7 +2823,7 @@ namespace Server
                     withBlock1.IgnoreIfCannotMove = eventPage.IgnoreMoveRoute;
                     withBlock1.MoveFreq = eventPage.MoveFreq;
                     withBlock1.MoveSpeed = eventPage.MoveSpeed;
-                    withBlock1.WalkingAnim = eventPage.WalkAnim;
+                    withBlock1.WalkingAnim = eventPage.IdleAnim;
                     withBlock1.WalkThrough = eventPage.WalkThrough;
                     withBlock1.ShowName = eventPage.ShowName;
                     withBlock1.FixedDir = eventPage.DirFix;
@@ -2854,7 +2854,7 @@ namespace Server
                 buffer.WriteInt32(eventPage.Y);
                 buffer.WriteByte(eventPage.Position);
                 buffer.WriteBoolean(eventPage.Visible);
-                buffer.WriteInt32(Data.Map[mapNum].Event[eventPage.EventId].Pages[eventPage.PageId].WalkAnim); // Use map event and page IDs
+                buffer.WriteInt32(Data.Map[mapNum].Event[eventPage.EventId].Pages[eventPage.PageId].IdleAnim); // Use map event and page IDs
                 buffer.WriteInt32(Data.Map[mapNum].Event[eventPage.EventId].Pages[eventPage.PageId].DirFix);
                 buffer.WriteInt32(Data.Map[mapNum].Event[eventPage.EventId].Pages[eventPage.PageId].WalkThrough);
                 buffer.WriteInt32(Data.Map[mapNum].Event[eventPage.EventId].Pages[eventPage.PageId].ShowName);

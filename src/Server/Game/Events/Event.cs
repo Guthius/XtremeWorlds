@@ -805,7 +805,7 @@ namespace Server
                 }
             }
 
-            packetWriter.WriteInt32(page.WalkAnim);
+            packetWriter.WriteInt32(page.IdleAnim);
             packetWriter.WriteInt32(page.DirFix);
             packetWriter.WriteInt32(page.WalkThrough);
             packetWriter.WriteInt32(page.ShowName);

@@ -668,7 +668,7 @@ public static class NetworkSend
                             }
                         }
 
-                        packetWriter.WriteInt32(eventPage.WalkAnim);
+                        packetWriter.WriteInt32(eventPage.IdleAnim);
                         packetWriter.WriteInt32(eventPage.DirFix);
                         packetWriter.WriteInt32(eventPage.WalkThrough);
                         packetWriter.WriteInt32(eventPage.ShowName);

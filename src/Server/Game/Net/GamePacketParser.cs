@@ -1196,7 +1196,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                                 }
                             }
 
-                            withBlock2.WalkAnim = packetReader.ReadInt32();
+                            withBlock2.IdleAnim = packetReader.ReadInt32();
                             withBlock2.DirFix = packetReader.ReadInt32();
                             withBlock2.WalkThrough = packetReader.ReadInt32();
                             withBlock2.ShowName = packetReader.ReadInt32();

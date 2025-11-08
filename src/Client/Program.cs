@@ -3086,7 +3086,7 @@ namespace Client
                                 else if (t == "attack") runningOffset += attackFrames;
                             }
 
-                            bool isMoving = Data.MapEvents[id].Moving != 0 && Data.MapEvents[id].WalkAnim == 1;
+                            bool isMoving = Data.MapEvents[id].Moving != 0 && Data.MapEvents[id].IdleAnim == 0;
                             bool isAttacking = false; // events currently have no attack cycle; placeholder if added later
 
                             byte frameWithinSegment;

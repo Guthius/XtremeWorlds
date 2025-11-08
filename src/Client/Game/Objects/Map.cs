@@ -918,7 +918,7 @@ namespace Client
                                         }
                                     }
 
-                                    withBlock1.WalkAnim = buffer.ReadInt32();
+                                    withBlock1.IdleAnim = buffer.ReadInt32();
                                     withBlock1.DirFix = buffer.ReadInt32();
                                     withBlock1.WalkThrough = buffer.ReadInt32();
                                     withBlock1.ShowName = buffer.ReadInt32();
@@ -1276,7 +1276,7 @@ namespace Client
                                     }
                                 }
 
-                                packetWriter.WriteInt32(withBlock1.WalkAnim);
+                                packetWriter.WriteInt32(withBlock1.IdleAnim);
                                 packetWriter.WriteInt32(withBlock1.DirFix);
                                 packetWriter.WriteInt32(withBlock1.WalkThrough);
                                 packetWriter.WriteInt32(withBlock1.ShowName);

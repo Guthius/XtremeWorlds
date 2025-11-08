@@ -3100,11 +3100,11 @@ namespace Client
         {
             if (chkWalkAnim.Checked == true)
             {
-                Event.TmpEvent.Pages[Event.CurPageNum].WalkAnim = 1;
+                Event.TmpEvent.Pages[Event.CurPageNum].IdleAnim = 1;
             }
             else
             {
-                Event.TmpEvent.Pages[Event.CurPageNum].WalkAnim = 0;
+                Event.TmpEvent.Pages[Event.CurPageNum].IdleAnim = 0;
             }
 
         }

@@ -534,7 +534,7 @@ public static class Type
         public MoveRoute[] MoveRoute;
         public int IgnoreMoveRoute;
         public int RepeatMoveRoute;
-        public int WalkAnim;
+        public int IdleAnim;
         public int DirFix;
         public int WalkThrough;
         public int ShowName;
@@ -600,7 +600,7 @@ public static class Type
         public int MoveRouteComplete;
         public int Moving;
         public int ShowDir;
-        public int WalkAnim;
+        public int IdleAnim;
         public int DirFix;
     }
 

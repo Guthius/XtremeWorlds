@@ -313,7 +313,7 @@ namespace Client
             EditorEvent.Instance.chkPlayerVar.Checked = Conversions.ToBoolean(withBlock.ChkVariable);
             EditorEvent.Instance.chkPlayerSwitch.Checked = Conversions.ToBoolean(withBlock.ChkSwitch);
             EditorEvent.Instance.chkSelfSwitch.Checked = Conversions.ToBoolean(withBlock.ChkSelfSwitch);
-            EditorEvent.Instance.chkWalkAnim.Checked = Conversions.ToBoolean(withBlock.WalkAnim);
+            EditorEvent.Instance.chkWalkAnim.Checked = Conversions.ToBoolean(withBlock.IdleAnim);
             EditorEvent.Instance.chkWalkThrough.Checked = Conversions.ToBoolean(withBlock.WalkThrough);
             EditorEvent.Instance.chkShowName.Checked = Conversions.ToBoolean(withBlock.ShowName);
             EditorEvent.Instance.nudPlayerVariable.Value = withBlock.VariableCondition;
@@ -3390,7 +3390,7 @@ namespace Client
                 withBlock.Y = buffer.ReadInt32();
                 withBlock.Position = buffer.ReadByte();
                 withBlock.Visible = buffer.ReadBoolean();
-                withBlock.WalkAnim = buffer.ReadInt32();
+                withBlock.IdleAnim = buffer.ReadInt32();
                 withBlock.DirFix = buffer.ReadInt32();
                 withBlock.WalkThrough = buffer.ReadInt32();
                 withBlock.ShowName = buffer.ReadInt32();
@@ -3540,7 +3540,7 @@ namespace Client
                                     }
                                 }
 
-                                withBlock1.WalkAnim = buffer.ReadInt32();
+                                withBlock1.IdleAnim = buffer.ReadInt32();
                                 withBlock1.DirFix = buffer.ReadInt32();
                                 withBlock1.WalkThrough = buffer.ReadInt32();
                                 withBlock1.ShowName = buffer.ReadInt32();
