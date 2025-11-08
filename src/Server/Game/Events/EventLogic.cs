@@ -458,7 +458,7 @@ namespace Server
                                     5 => 24,
                                     _ => DefaultMovementSpeed
                                 };
-                                Event.EventMove(0, i, x, rand, actualMoveSpeed, true);
+                                Event.Move(0, i, x, rand, actualMoveSpeed, true);
                             }
                             else
                             {
@@ -528,7 +528,7 @@ namespace Server
                                         case 1: // Move Up
                                             if (Event.CanMove(playerId, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) Direction.Up, isGlobal))
                                             {
-                                                Event.EventMove(playerId, mapNum, eventId, (int) Direction.Up, actualmovespeed, isGlobal);
+                                                Event.Move(playerId, mapNum, eventId, (int) Direction.Up, actualmovespeed, isGlobal);
                                             }
                                             else if (withBlock.IgnoreIfCannotMove == 0)
                                             {
@@ -539,7 +539,7 @@ namespace Server
                                         case 2: // Move Down
                                             if (Event.CanMove(playerId, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) Direction.Down, isGlobal))
                                             {
-                                                Event.EventMove(playerId, mapNum, eventId, (int) Direction.Down, actualmovespeed, isGlobal);
+                                                Event.Move(playerId, mapNum, eventId, (int) Direction.Down, actualmovespeed, isGlobal);
                                             }
                                             else if (withBlock.IgnoreIfCannotMove == 0)
                                             {
@@ -550,7 +550,7 @@ namespace Server
                                         case 3: // Move Left
                                             if (Event.CanMove(playerId, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) Direction.Left, isGlobal))
                                             {
-                                                Event.EventMove(playerId, mapNum, eventId, (int) Direction.Left, actualmovespeed, isGlobal);
+                                                Event.Move(playerId, mapNum, eventId, (int) Direction.Left, actualmovespeed, isGlobal);
                                             }
                                             else if (withBlock.IgnoreIfCannotMove == 0)
                                             {
@@ -561,7 +561,7 @@ namespace Server
                                         case 4: // Move Right
                                             if (Event.CanMove(playerId, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) Direction.Right, isGlobal))
                                             {
-                                                Event.EventMove(playerId, mapNum, eventId, (int) Direction.Right, actualmovespeed, isGlobal);
+                                                Event.Move(playerId, mapNum, eventId, (int) Direction.Right, actualmovespeed, isGlobal);
                                             }
                                             else if (withBlock.IgnoreIfCannotMove == 0)
                                             {
@@ -574,7 +574,7 @@ namespace Server
                                             int z = (int) Math.Floor((double) General.GetRandom.NextInt(0, 4)); // 0-3
                                             if (Event.CanMove(playerId, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) z, isGlobal))
                                             {
-                                                Event.EventMove(playerId, mapNum, eventId, z, actualmovespeed, isGlobal);
+                                                Event.Move(playerId, mapNum, eventId, z, actualmovespeed, isGlobal);
                                             }
                                             else if (withBlock.IgnoreIfCannotMove == 0)
                                             {
@@ -606,7 +606,7 @@ namespace Server
                                                     {
                                                         if (Event.CanMove(playerId, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) z, isGlobal))
                                                         {
-                                                            Event.EventMove(playerId, mapNum, eventId, z, actualmovespeed, isGlobal);
+                                                            Event.Move(playerId, mapNum, eventId, z, actualmovespeed, isGlobal);
                                                         }
                                                         else if (withBlock.IgnoreIfCannotMove == 0)
                                                         {
@@ -632,7 +632,7 @@ namespace Server
                                                 {
                                                     if (Event.CanMove(playerId, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) z, isGlobal))
                                                     {
-                                                        Event.EventMove(playerId, mapNum, eventId, z, actualmovespeed, isGlobal);
+                                                        Event.Move(playerId, mapNum, eventId, z, actualmovespeed, isGlobal);
                                                     }
                                                     else if (withBlock.IgnoreIfCannotMove == 0)
                                                     {
@@ -647,7 +647,7 @@ namespace Server
                                         case 8: // Move Forward
                                             if (Event.CanMove(playerId, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) withBlock.Dir, isGlobal))
                                             {
-                                                Event.EventMove(playerId, mapNum, eventId, withBlock.Dir, actualmovespeed, isGlobal);
+                                                Event.Move(playerId, mapNum, eventId, withBlock.Dir, actualmovespeed, isGlobal);
                                             }
                                             else if (withBlock.IgnoreIfCannotMove == 0)
                                             {
@@ -667,7 +667,7 @@ namespace Server
                                             };
                                             if (Event.CanMove(playerId, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) z, isGlobal))
                                             {
-                                                Event.EventMove(playerId, mapNum, eventId, z, actualmovespeed, isGlobal);
+                                                Event.Move(playerId, mapNum, eventId, z, actualmovespeed, isGlobal);
                                             }
                                             else if (withBlock.IgnoreIfCannotMove == 0)
                                             {
@@ -936,7 +936,7 @@ namespace Server
                                     5 => 24,
                                     _ => DefaultMovementSpeed
                                 };
-                                Event.EventMove(i, mapNum, x, rand, actualMoveSpeed, false);
+                                Event.Move(i, mapNum, x, rand, actualMoveSpeed, false);
                             }
                             else
                             {
@@ -1003,7 +1003,7 @@ namespace Server
                                         case 1: // Move Up
                                             if (Event.CanMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) Direction.Up, isGlobal))
                                             {
-                                                Event.EventMove(i, mapNum, eventId, (int) Direction.Up, actualmovespeed, isGlobal);
+                                                Event.Move(i, mapNum, eventId, (int) Direction.Up, actualmovespeed, isGlobal);
                                             }
                                             else if (withBlock.IgnoreIfCannotMove == 0)
                                             {
@@ -1014,7 +1014,7 @@ namespace Server
                                         case 2: // Move Down
                                             if (Event.CanMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) Direction.Down, isGlobal))
                                             {
-                                                Event.EventMove(i, mapNum, eventId, (int) Direction.Down, actualmovespeed, isGlobal);
+                                                Event.Move(i, mapNum, eventId, (int) Direction.Down, actualmovespeed, isGlobal);
                                             }
                                             else if (withBlock.IgnoreIfCannotMove == 0)
                                             {
@@ -1025,7 +1025,7 @@ namespace Server
                                         case 3: // Move Left
                                             if (Event.CanMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) Direction.Left, isGlobal))
                                             {
-                                                Event.EventMove(i, mapNum, eventId, (int) Direction.Left, actualmovespeed, isGlobal);
+                                                Event.Move(i, mapNum, eventId, (int) Direction.Left, actualmovespeed, isGlobal);
                                             }
                                             else if (withBlock.IgnoreIfCannotMove == 0)
                                             {
@@ -1036,7 +1036,7 @@ namespace Server
                                         case 4: // Move Right
                                             if (Event.CanMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) Direction.Right, isGlobal))
                                             {
-                                                Event.EventMove(i, mapNum, eventId, (int) Direction.Right, actualmovespeed, isGlobal);
+                                                Event.Move(i, mapNum, eventId, (int) Direction.Right, actualmovespeed, isGlobal);
                                             }
                                             else if (withBlock.IgnoreIfCannotMove == 0)
                                             {
@@ -1049,7 +1049,7 @@ namespace Server
                                             int z = (int) Math.Floor((double) General.GetRandom.NextInt(0, 4));
                                             if (Event.CanMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) z, isGlobal))
                                             {
-                                                Event.EventMove(i, mapNum, eventId, z, actualmovespeed, isGlobal);
+                                                Event.Move(i, mapNum, eventId, z, actualmovespeed, isGlobal);
                                             }
                                             else if (withBlock.IgnoreIfCannotMove == 0)
                                             {
@@ -1096,7 +1096,7 @@ namespace Server
                                                     {
                                                         if (Event.CanMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) z, isGlobal))
                                                         {
-                                                            Event.EventMove(i, mapNum, eventId, z, actualmovespeed, isGlobal);
+                                                            Event.Move(i, mapNum, eventId, z, actualmovespeed, isGlobal);
                                                         }
                                                         else if (withBlock.IgnoreIfCannotMove == 0)
                                                         {
@@ -1121,7 +1121,7 @@ namespace Server
                                                 {
                                                     if (Event.CanMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) z, isGlobal))
                                                     {
-                                                        Event.EventMove(i, mapNum, eventId, z, actualmovespeed, isGlobal);
+                                                        Event.Move(i, mapNum, eventId, z, actualmovespeed, isGlobal);
                                                     }
                                                     else if (withBlock.IgnoreIfCannotMove == 0)
                                                     {
@@ -1135,7 +1135,7 @@ namespace Server
                                         case 8: // Move Forward
                                             if (Event.CanMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) withBlock.Dir, isGlobal))
                                             {
-                                                Event.EventMove(i, mapNum, eventId, withBlock.Dir, actualmovespeed, isGlobal);
+                                                Event.Move(i, mapNum, eventId, withBlock.Dir, actualmovespeed, isGlobal);
                                             }
                                             else if (withBlock.IgnoreIfCannotMove == 0)
                                             {
@@ -1154,9 +1154,10 @@ namespace Server
                                                 (byte) Direction.Right => (byte) Direction.Left,
                                                 _ => withBlock.Dir
                                             };
+                                            
                                             if (Event.CanMove(i, mapNum, withBlock.X, withBlock.Y, eventId, walkThrough, (byte) z, isGlobal))
                                             {
-                                                Event.EventMove(i, mapNum, eventId, z, actualmovespeed, isGlobal);
+                                                Event.Move(i, mapNum, eventId, z, actualmovespeed, isGlobal);
                                             }
                                             else if (withBlock.IgnoreIfCannotMove == 0)
                                             {

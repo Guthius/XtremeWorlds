@@ -282,7 +282,7 @@ namespace Server
             NetworkConfig.SendDataToMap(mapNum, packetWriter.GetBytes());
         }
 
-        public static void EventMove(int index, int mapNum, int eventId, int dir, int movementSpeed, bool globalEvent = false)
+        public static void Move(int index, int mapNum, int eventId, int dir, int movementSpeed, bool globalEvent = false)
         {
             if (!IsValidMapAndDirection(mapNum, (byte) dir)) return;
 
@@ -305,7 +305,7 @@ namespace Server
                         case (byte) Direction.Right: eventData.X++; break;
                     }
 
-                    SendEventMove(mapNum, eventId, eventData.X, eventData.Y, dir, eventData.Dir, movementSpeed, 0);
+                    SendMove(mapNum, eventId, eventData.X, eventData.Y, dir, eventData.Dir, movementSpeed, 0);
                 }
                 else
                 {
@@ -564,7 +564,7 @@ namespace Server
             var dir = GetDirectionToTarget(TempEventMap[mapNum].Event[eventId].X, TempEventMap[mapNum].Event[eventId].Y, targetX, targetY);
             if (CanMove(index, mapNum, TempEventMap[mapNum].Event[eventId].X, TempEventMap[mapNum].Event[eventId].Y, eventId, 0, (byte) dir, globalEvent))
             {
-                EventMove(index, mapNum, eventId, dir, speed, globalEvent);
+                Move(index, mapNum, eventId, dir, speed, globalEvent);
                 if (TempEventMap[mapNum].Event[eventId].X == targetX && TempEventMap[mapNum].Event[eventId].Y == targetY)
                     TempEventMap[mapNum].Event[eventId].PatrolStep++;
             }
@@ -577,7 +577,7 @@ namespace Server
         {
             var dir = CanMoveTowardsPlayer(targetPlayerId, mapNum, eventId);
             if (dir != 4)
-                EventMove(index, mapNum, eventId, dir, speed, globalEvent);
+                Move(index, mapNum, eventId, dir, speed, globalEvent);
         }
 
         #endregion
