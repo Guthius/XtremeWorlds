@@ -2833,15 +2833,18 @@ namespace Server
             // Send spawn event packets to the player.
             var buffer = new PacketWriter();
             buffer.WriteEnum(ServerPackets.SSpawnEvent);
-            buffer.WriteInt32(Data.TempPlayer[index].EventMap.CurrentEvents);
+            int total = Data.TempPlayer[index].EventMap.CurrentEvents;
+            buffer.WriteInt32(total);
 
-            for (int i = 0; i < Data.TempPlayer[index].EventMap.CurrentEvents; i++)
+            // EventPages is 1-based in this code-path; client expects 0..(count-1) ids.
+            for (int slot = 1; slot <= total; slot++)
             {
-                ref var eventPage = ref Data.TempPlayer[index].EventMap.EventPages[i];
+                ref var eventPage = ref Data.TempPlayer[index].EventMap.EventPages[slot];
 
-                buffer.WriteInt32(eventPage.EventId); // Map event ID.
+                // Write a sequential id for client-side array indexing.
+                buffer.WriteInt32(slot - 1);
 
-                buffer.WriteString(Data.Map[mapNum].Event[eventPage.EventId].Name); // Map event ID
+                buffer.WriteString(Data.Map[mapNum].Event[eventPage.EventId].Name);
                 buffer.WriteInt32(eventPage.Dir);
                 buffer.WriteByte(eventPage.GraphicType);
                 buffer.WriteInt32(eventPage.Graphic);
@@ -2854,7 +2857,7 @@ namespace Server
                 buffer.WriteInt32(eventPage.Y);
                 buffer.WriteByte(eventPage.Position);
                 buffer.WriteBoolean(eventPage.Visible);
-                buffer.WriteInt32(Data.Map[mapNum].Event[eventPage.EventId].Pages[eventPage.PageId].IdleAnim); // Use map event and page IDs
+                buffer.WriteInt32(Data.Map[mapNum].Event[eventPage.EventId].Pages[eventPage.PageId].IdleAnim);
                 buffer.WriteInt32(Data.Map[mapNum].Event[eventPage.EventId].Pages[eventPage.PageId].DirFix);
                 buffer.WriteInt32(Data.Map[mapNum].Event[eventPage.EventId].Pages[eventPage.PageId].WalkThrough);
                 buffer.WriteInt32(Data.Map[mapNum].Event[eventPage.EventId].Pages[eventPage.PageId].ShowName);
