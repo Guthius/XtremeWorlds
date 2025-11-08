@@ -253,56 +253,66 @@ namespace Client
 
         private void RefreshNpcList()
         {
-            int selected = lstMapNpc.SelectedIndex;
-            lstMapNpc.Items.Clear();
-            for (int i = 0; i < Variables.MaxMapNpcs && i < Data.MyMapNpc.Length; i++)
-            {
-                if (i == 0)
-                {
-                    lstMapNpc.Items.Add("None");
-                    continue;
-                }
-
-                var npcIndex = Data.MyMapNpc[i].Num;
-                if (npcIndex < 0 || npcIndex >= Variables.MaxNpcs)
-                    lstMapNpc.Items.Add($"{i}: None");
-                else
-                {
-                    var name = Strings.Trim(Data.Npc[npcIndex].Name);
-                    lstMapNpc.Items.Add($"{i}: {name}");
-                }
-            }
-
-            if (lstMapNpc.Items.Count == 0)
-            {
-                lstMapNpc.SelectedIndex = 0;
+            // Defensive: ensure backing arrays exist
+            if (Data.MyMapNpc == null || Data.Npc == null)
                 return;
+
+            int selected = -1;
+            try { selected = lstMapNpc.SelectedIndex; } catch { selected = -1; }
+
+            lstMapNpc.Items.Clear();
+
+            // Always include slot 0 as "None"
+            lstMapNpc.Items.Add("None");
+
+            int maxSlots = Math.Min(Variables.MaxMapNpcs, Data.MyMapNpc.Length);
+            for (int i = 1; i < maxSlots; i++)
+            {
+                int npcIndex = Data.MyMapNpc[i].Num;
+                string name;
+                if (npcIndex < 0 || npcIndex >= Variables.MaxNpcs || npcIndex >= Data.Npc.Length)
+                    name = "None";
+                else
+                    name = Strings.Trim(Data.Npc[npcIndex].Name);
+                lstMapNpc.Items.Add($"{i}: {name}");
             }
-            lstMapNpc.SelectedIndex = (selected >= 0 && selected < lstMapNpc.Items.Count) ? selected : 0;
+
+            // Clamp selection safely
+            int itemCount = lstMapNpc.Items.Count;
+            if (itemCount == 0)
+            {
+                lstMapNpc.Items.Add("None");
+                itemCount = 1;
+            }
+            int newSel = (selected >= 0 && selected < itemCount) ? selected : 0;
+            try { lstMapNpc.SelectedIndex = newSel; } catch { /* ignore Gtk range issues */ }
         }
 
         // Populate the npc Spawn list (attribute dialog) with Map NPC slots for the current map
         private void RefreshNpcSpawnList()
         {
-            int prev = lstNpc.SelectedIndex;
-            lstNpc.Items.Clear();
-            for (int slot = 0; slot < Variables.MaxMapNpcs && slot < Data.MyMap.Npc.Length; slot++)
-            {
-                if (slot == 0)
-                {
-                    lstNpc.Items.Add("None");
-                    continue;
-                }
+            if (Data.MyMap.Npc == null || Data.Npc == null)
+                return;
 
+            int prev = -1;
+            try { prev = lstNpc.SelectedIndex; } catch { prev = -1; }
+
+            lstNpc.Items.Clear();
+            lstNpc.Items.Add("None");
+
+            int maxSlots = Math.Min(Variables.MaxMapNpcs, Data.MyMap.Npc.Length);
+            for (int slot = 1; slot < maxSlots; slot++)
+            {
                 int npcIndex = Data.MyMap.Npc[slot];
-                string name = (npcIndex >= 0 && npcIndex < Variables.MaxNpcs)
+                string name = (npcIndex >= 0 && npcIndex < Variables.MaxNpcs && npcIndex < Data.Npc.Length)
                     ? Strings.Trim(Data.Npc[npcIndex].Name)
                     : "None";
                 lstNpc.Items.Add($"{slot}: {name}");
             }
 
-            // Keep selection if possible; default to slot 0 (None)
-            lstNpc.SelectedIndex = (prev >= 0 && prev < lstNpc.Items.Count) ? prev : 0;
+            int itemCount = lstNpc.Items.Count;
+            int newSel = (prev >= 0 && prev < itemCount) ? prev : 0;
+            lstNpc.SelectedIndex = newSel;
         }
 
         public EditorMap()
@@ -1204,8 +1214,32 @@ namespace Client
                 }
             }
 
+            // Send the map to the server. This will trigger a warp + map data refresh broadcast.
+            // Previously we set GameState.GettingMap = true here which blanked the screen until
+            // the server response arrived. That could appear as a persistent black screen if the
+            // response was delayed or dropped. We now keep the current map visible and rely on
+            // the incoming Packet_CheckMap/Packet_MapData sequence to toggle GettingMap.
             MapEditorSend();
-            GameState.GettingMap = true;
+
+            // Safety fallback: if for some reason the server map data does not arrive within a short
+            // window, clear the loading state so the player isn't stuck on a black screen. This keeps
+            // the client usable even if the save packet was lost.
+            System.Threading.Tasks.Task.Run(async () =>
+            {
+                await System.Threading.Tasks.Task.Delay(3000);
+                if (GameState.GettingMap)
+                {
+                    // Fallback: re-request the map data explicitly
+                    try
+                    {
+                        var packetWriter = new PacketWriter(8);
+                        packetWriter.WriteEnum(Packets.ClientPackets.CNeedMap);
+                        packetWriter.WriteInt32(1);
+                        Network.Send(packetWriter);
+                    }
+                    catch { }
+                }
+            });
         }
 
         private void TsbFill_Click(object sender, EventArgs e)
@@ -2425,8 +2459,20 @@ namespace Client
 
         public static void MapEditorSend()
         {
+            // Send the edited map to the server
             Map.SendMap();
+
             GameState.MyEditorType = EditorType.None;
+            // Request the refreshed map data immediately so we don't linger on a black screen
+            try
+            {
+                var packetWriter = new PacketWriter(8);
+                packetWriter.WriteEnum(Packets.ClientPackets.CNeedMap);
+                packetWriter.WriteInt32(1);
+                Network.Send(packetWriter);
+            }
+            catch { }
+
             GameState.GettingMap = true;
             Sender.SendCloseEditor();
 
