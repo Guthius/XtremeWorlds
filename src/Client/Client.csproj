@@ -92,22 +92,22 @@
     </ItemGroup>
 
     <!-- Windows-only backends (require -windows TFM) -->
-    <ItemGroup Condition="'$(TargetFramework)' == 'net9.0-windows'">
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-windows'">
         <PackageReference Include="Eto.Platform.Wpf" />
         <PackageReference Include="Eto.Platform.Windows" />
     </ItemGroup>
 
     <!-- Non-Windows backends: Gtk for Linux always; Mac64 only when explicitly enabled -->
-    <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
         <PackageReference Include="Eto.Platform.Gtk" />
     </ItemGroup>
 
     <!-- Opt-in macOS backend and add macOS RIDs when BuildMac=true -->
-    <ItemGroup Condition="'$(BuildMac)' == 'true' and '$(TargetFramework)' == 'net9.0'">
+    <ItemGroup Condition="'$(BuildMac)' == 'true' and '$(TargetFramework)' == 'net10.0'">
         <PackageReference Include="Eto.Platform.Mac64" />
     </ItemGroup>
 
-    <PropertyGroup Condition="'$(BuildMac)' == 'true' and '$(TargetFramework)' == 'net9.0'">
+    <PropertyGroup Condition="'$(BuildMac)' == 'true' and '$(TargetFramework)' == 'net10.0'">
         <RuntimeIdentifiers>linux-x64;osx-x64;osx-arm64</RuntimeIdentifiers>
     </PropertyGroup>
 
