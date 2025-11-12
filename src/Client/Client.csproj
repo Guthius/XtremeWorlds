@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <Version>2.4.4</Version>
-        <TargetFrameworks>net9.0-windows;net9.0</TargetFrameworks>
+        <Version>2.4.9</Version>
+        <TargetFrameworks>net10.0-windows;net10.0</TargetFrameworks>
         <RootNamespace>Client</RootNamespace>
         <ApplicationIcon>Icon.ico</ApplicationIcon>
         <OutputPath>..\..\Build\Client\</OutputPath>
@@ -10,20 +10,15 @@
         <MonoGamePlatform>OpenGL</MonoGamePlatform>
     </PropertyGroup>
 
-    <!-- Opt-in flag to include macOS packaging/backends & RIDs when needed -->
-    <PropertyGroup>
-        <BuildMac>false</BuildMac>
-    </PropertyGroup>
-
 	<!-- Cross-platform TFM: non-Windows RIDs -->
-    <PropertyGroup Condition="'$(TargetFramework)'=='net9.0'">
+    <PropertyGroup Condition="'$(TargetFramework)'=='net10.0'">
         <OutputType>Exe</OutputType>
         <!-- Default to Linux only; macOS can be enabled via -p:BuildMac=true if needed -->
         <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
     </PropertyGroup>
 
     <!-- OutputType must be in PropertyGroup, not ItemGroup -->
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-windows'">
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-windows'">
         <OutputType>WinExe</OutputType>
         <UseWPF>true</UseWPF>
 		<EnableWindowsTargeting>true</EnableWindowsTargeting>
@@ -31,7 +26,7 @@
 		<DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0'">
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0'">
         <OutputType>Exe</OutputType>
     </PropertyGroup>
 
@@ -91,6 +86,8 @@
 
     <!-- Always include Eto.Forms, but only include Gtk on Linux -->
     <ItemGroup>
+        <PackageReference Include="AssimpNetter" />
+        <PackageReference Include="BCnEncoder.Net" />
         <PackageReference Include="Eto.Forms" />
     </ItemGroup>
 
@@ -125,6 +122,11 @@
         <PackageReference Include="Ryujinx.SDL2-CS" />
         <PackageReference Include="SDL2-CS" />
         <PackageReference Include="CS-Script" />
+    </ItemGroup>
+    <ItemGroup>
+      <Reference Include="Eto">
+        <HintPath>..\..\Eto.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
     <Target Name="EnsureContentFolderExists" BeforeTargets="Build">

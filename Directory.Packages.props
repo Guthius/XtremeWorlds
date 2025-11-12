@@ -7,15 +7,10 @@
   <ItemGroup>
     <PackageVersion Include="CS-Script" Version="4.11.2" />
     <PackageVersion Include="CS-Script.Core" Version="2.0.0" />
-    <PackageVersion Include="Eto.Forms" Version="2.10.2" />
-    <PackageVersion Include="Eto.Platform.Gtk" Version="2.10.2" />
-    <PackageVersion Include="Eto.Platform.Windows" Version="2.10.1" />
-    <PackageVersion Include="Eto.Platform.Mac64" Version="2.10.1" />
-    <PackageVersion Include="Eto.Platform.Wpf" Version="2.10.1" />
     <PackageVersion Include="ManagedBass" Version="4.0.2" />
     <PackageVersion Include="ManagedBass.Midi" Version="4.0.2" />
     <PackageVersion Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.10" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
     <PackageVersion Include="MonoGame.Content.Builder.Task" Version="3.8.4.1" />
     <PackageVersion Include="MonoGame.Extended" Version="4.1.0" />
     <PackageVersion Include="MonoGame.Framework.Content.Pipeline" Version="3.8.4.1" />
@@ -31,7 +26,7 @@
     <PackageVersion Include="Serilog.Extensions.Hosting" Version="9.0.0" />
     <PackageVersion Include="Serilog.Extensions.Logging" Version="9.0.2" />
     <PackageVersion Include="Serilog.Settings.Configuration" Version="9.0.0" />
-    <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
     <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageVersion Include="System.Text.Json" Version="9.0.8" />
   </ItemGroup>

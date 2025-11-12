@@ -38,7 +38,7 @@ public static class Program
 #else
         try
         {
-            app = new Application(Eto.Platform.Detect);    
+            app = new Application(Eto.Platform.Detect);
         }
         catch (Exception ex)
         {
