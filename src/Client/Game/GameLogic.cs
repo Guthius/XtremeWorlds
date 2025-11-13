@@ -1,5 +1,4 @@
 ﻿using Core;
-using Microsoft.Toolkit.HighPerformance;
 using System;
 using System.Data.Common;
 using Client.Game.UI;

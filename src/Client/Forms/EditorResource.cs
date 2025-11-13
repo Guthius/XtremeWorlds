@@ -18,15 +18,15 @@ namespace Client
         public TextBox txtMessage = new TextBox { Width = 200 };
         public TextBox txtMessage2 = new TextBox { Width = 200 };
         public ComboBox cmbType = new ComboBox { Width = 200 };
-        public NumericStepper nudNormalPic = new NumericStepper { MinValue = 0, Width = 80 };
-        public NumericStepper nudExhaustedPic = new NumericStepper { MinValue = 0, Width = 80 };
+        public NumericUpDown nudNormalPic = new NumericUpDown { MinValue = 0, Width = 80 };
+        public NumericUpDown nudExhaustedPic = new NumericUpDown { MinValue = 0, Width = 80 };
         public ComboBox cmbRewardItem = new ComboBox { Width = 200 };
-        public NumericStepper nudRewardExp = new NumericStepper { MinValue = 0, MaxValue = 1000000, Width = 120 };
+        public NumericUpDown nudRewardExp = new NumericUpDown { MinValue = 0, MaxValue = 1000000, Width = 120 };
         public ComboBox cmbTool = new ComboBox { Width = 200 };
-        public NumericStepper nudHealth = new NumericStepper { MinValue = 0, Width = 100 };
-        public NumericStepper nudRespawn = new NumericStepper { MinValue = 0, MaxValue = 1000000, Width = 120 };
+        public NumericUpDown nudHealth = new NumericUpDown { MinValue = 0, Width = 100 };
+        public NumericUpDown nudRespawn = new NumericUpDown { MinValue = 0, MaxValue = 1000000, Width = 120 };
         public ComboBox cmbAnimation = new ComboBox { Width = 200 };
-        public NumericStepper nudLvlReq = new NumericStepper { MinValue = 0, Width = 100 };
+        public NumericUpDown nudLvlReq = new NumericUpDown { MinValue = 0, Width = 100 };
         public Button btnSave = new Button { Text = "Save" };
         public Button btnDelete = new Button { Text = "Delete" };
         public Button btnCopy = new Button { Text = "Copy" };
@@ -43,7 +43,6 @@ namespace Client
             ClientSize = new Size(1000, 680);
             Padding = 10;
             InitializeComponent();
-            Editors.AutoSizeWindow(this, 680, 440);
         }
 
         protected override void OnClosed(EventArgs e)

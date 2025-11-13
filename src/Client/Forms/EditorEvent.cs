@@ -32,7 +32,7 @@ namespace Client
         public ComboBox cmbSetSelfSwitch = new ComboBox();
         public ComboBox cmbSetSelfSwitchTo = new ComboBox();
         public TextBox txtGoToLabel = new TextBox();
-        public NumericStepper nudChangeItemsAmount = new NumericStepper();
+        public NumericUpDown nudChangeItemsAmount = new NumericUpDown();
         public CheckBox optChangeItemAdd = new CheckBox { Text = "Add" };
         public CheckBox optChangeItemSet = new CheckBox { Text = "Set" };
         public CheckBox optChangeItemRemove = new CheckBox { Text = "Remove" };
@@ -51,9 +51,9 @@ namespace Client
         public RadioButton optChangeSexMale = new RadioButton { Text = "Male" };
         public RadioButton optChangeSexFemale = new RadioButton { Text = "Female" };
         public ComboBox cmbSetPK = new ComboBox();
-        public NumericStepper nudGiveExp = new NumericStepper();
-        public NumericStepper nudWPX = new NumericStepper();
-        public NumericStepper nudWPY = new NumericStepper();
+        public NumericUpDown nudGiveExp = new NumericUpDown();
+        public NumericUpDown nudWPX = new NumericUpDown();
+        public NumericUpDown nudWPY = new NumericUpDown();
         public ComboBox cmbWarpPlayerDir = new ComboBox();
         public ComboBox cmbMoveWait = new ComboBox();
         // Add Text scope options
@@ -81,24 +81,24 @@ namespace Client
         // Animation play / targeting controls
         public ComboBox cmbPlayAnimEvent = new ComboBox();
         public ComboBox cmbAnimTargetType = new ComboBox();
-        public NumericStepper nudPlayAnimTileX = new NumericStepper();
-        public NumericStepper nudPlayAnimTileY = new NumericStepper();
+        public NumericUpDown nudPlayAnimTileX = new NumericUpDown();
+        public NumericUpDown nudPlayAnimTileY = new NumericUpDown();
         public Label lblPlayAnimX = new Label();
         public Label lblPlayAnimY = new Label();
         // Fog / weather / tint controls referenced later
-        public NumericStepper nudFogData1 = new NumericStepper();
-        public NumericStepper nudFogData2 = new NumericStepper();
+        public NumericUpDown nudFogData1 = new NumericUpDown();
+        public NumericUpDown nudFogData2 = new NumericUpDown();
         public ComboBox CmbWeather = new ComboBox();
-        public NumericStepper nudWeatherIntensity = new NumericStepper();
-        public NumericStepper nudMapTintData0 = new NumericStepper();
-        public NumericStepper nudMapTintData1 = new NumericStepper();
-        public NumericStepper nudMapTintData2 = new NumericStepper();
-        public NumericStepper nudMapTintData3 = new NumericStepper();
-        public NumericStepper nudWaitAmount = new NumericStepper();
+        public NumericUpDown nudWeatherIntensity = new NumericUpDown();
+        public NumericUpDown nudMapTintData0 = new NumericUpDown();
+        public NumericUpDown nudMapTintData1 = new NumericUpDown();
+        public NumericUpDown nudMapTintData2 = new NumericUpDown();
+        public NumericUpDown nudMapTintData3 = new NumericUpDown();
+        public NumericUpDown nudWaitAmount = new NumericUpDown();
         public ComboBox cmbSetAccess = new ComboBox();
         public Panel fraOpenShop = new Panel();
-        public NumericStepper nudPicOffsetX = new NumericStepper();
-        public NumericStepper nudPicOffsetY = new NumericStepper();
+        public NumericUpDown nudPicOffsetX = new NumericUpDown();
+        public NumericUpDown nudPicOffsetY = new NumericUpDown();
         public ComboBox cmbMoveType = new ComboBox();
         public ComboBox cmbMoveSpeed = new ComboBox();
         public ComboBox cmbMoveFreq = new ComboBox();
@@ -126,17 +126,17 @@ namespace Client
         public ComboBox cmbCondition_Time = new ComboBox();
         public ComboBox cmbSwitchSet = new ComboBox();
         public Label txtLabelName = new Label();
-        public NumericStepper nudChangeLevel = new NumericStepper();
+        public NumericUpDown nudChangeLevel = new NumericUpDown();
         public ComboBox cmbChangeSkills = new ComboBox();
         public ComboBox cmbChangeJob = new ComboBox();
-        public NumericStepper nudChangeSprite = new NumericStepper();
+        public NumericUpDown nudChangeSprite = new NumericUpDown();
         public ComboBox cmbPlayAnim = new ComboBox();
         public ComboBox cmbPlayBGM = new ComboBox();
         public ComboBox cmbPlaySound = new ComboBox();
         public ComboBox cmbOpenShop = new ComboBox();
         public ListBox cmbSpawnNpc = new ListBox { Width = 200 };
-        public NumericStepper nudFogData0 = new NumericStepper();
-        public NumericStepper nudWPMap = new NumericStepper();
+        public NumericUpDown nudFogData0 = new NumericUpDown();
+        public NumericUpDown nudWPMap = new NumericUpDown();
         public Panel fraDialogue = new Panel();
         public Panel fraMoveRoute = new Panel();
         public ComboBox cmbEvent = new ComboBox();
@@ -149,14 +149,14 @@ namespace Client
         public Button btnPastePage = new Button { Text = "Paste Page" };
         public Button btnNewPage = new Button { Text = "New Page" };
         public Button btnCopyPage = new Button { Text = "Copy Page" };
-        public NumericStepper nudShowPicture = new NumericStepper();
+        public NumericUpDown nudShowPicture = new NumericUpDown();
         public ComboBox cmbPicLoc = new ComboBox();
         public TextBox txtName = new TextBox { Width = 200 };
         public ImageView picGraphicSel = new ImageView();
         public ImageView picGraphic = new ImageView();
         public Panel fraGraphic = new Panel();
         public ComboBox cmbGraphic = new ComboBox();
-        public NumericStepper nudGraphic = new NumericStepper();
+        public NumericUpDown nudGraphic = new NumericUpDown();
         // Host panel for the full editor content inside the selected tab
         private Panel editorHost = new Panel();
         // Keep a reference to the main splitter so we can enforce sizes and adjust position
@@ -237,11 +237,11 @@ namespace Client
         public TextBox txtChatbubbleText = new TextBox();
         public ComboBox cmbChatBubbleTargetType = new ComboBox();
         public ComboBox cmbChatBubbleTarget = new ComboBox();
-        public NumericStepper nudVariableData0 = new NumericStepper();
-        public NumericStepper nudVariableData1 = new NumericStepper();
-        public NumericStepper nudVariableData2 = new NumericStepper();
-        public NumericStepper nudVariableData3 = new NumericStepper();
-        public NumericStepper nudVariableData4 = new NumericStepper();
+        public NumericUpDown nudVariableData0 = new NumericUpDown();
+        public NumericUpDown nudVariableData1 = new NumericUpDown();
+        public NumericUpDown nudVariableData2 = new NumericUpDown();
+        public NumericUpDown nudVariableData3 = new NumericUpDown();
+        public NumericUpDown nudVariableData4 = new NumericUpDown();
         public CheckBox optAddText_Player = new CheckBox { Text = "Player" };
         public CheckBox optVariableAction0 = new CheckBox { Text = "Set" };
         public CheckBox optVariableAction1 = new CheckBox { Text = "Add" };
@@ -256,14 +256,14 @@ namespace Client
         }
 
         // Condition numeric controls
-        public NumericStepper nudCondition_PlayerVarCondition = new NumericStepper();
-        public NumericStepper nudCondition_HasItem = new NumericStepper();
-        public NumericStepper nudCondition_LevelAmount = new NumericStepper();
+        public NumericUpDown nudCondition_PlayerVarCondition = new NumericUpDown();
+        public NumericUpDown nudCondition_HasItem = new NumericUpDown();
+        public NumericUpDown nudCondition_LevelAmount = new NumericUpDown();
 
         // Additional references used later
         public ComboBox cmbVariableDataType = new ComboBox();
         public ComboBox cmbPlayerVarCompare = new ComboBox();
-        public NumericStepper nudPlayerVariable = new NumericStepper();
+        public NumericUpDown nudPlayerVariable = new NumericUpDown();
         public CheckBox chkPlayerVar = new CheckBox { Text = "Player Variable" };
         public CheckBox chkPlayerSwitch = new CheckBox { Text = "Player Switch" };
         public ComboBox cmbPlayerSwitchCompare = new ComboBox();
@@ -750,8 +750,6 @@ namespace Client
             {
                     // Keep a generous minimum so controls don't clip
                     // Keep minimums smaller for a compact layout
-                    mainSplit.Panel1MinimumSize = 640;
-                    mainSplit.Panel2MinimumSize = 380;
                     // Prefer keeping left width fixed while resizing
                     try { mainSplit.FixedPanel = Eto.Forms.SplitterFixedPanel.Panel1; } catch { }
             }
@@ -1335,7 +1333,6 @@ namespace Client
             {
                 HeaderText = "Command",
                 DataCell = new TextBoxCell(0),
-                Expand = true
             });
 
             var root = new TreeGridItemCollection();
@@ -4866,7 +4863,7 @@ namespace Client
                     sel.Content = tabContentHost;
                     hostedTab = sel;
                     // ensure layout refresh
-                    sel.Invalidate(true);
+                    sel.Invalidate();
                 }
             }
             catch { }
@@ -4898,13 +4895,13 @@ namespace Client
                 fraCommands.Visible = false;
                 frameHost.Visible = true;
                 // Nudge layout
-                try { _rightStack?.Invalidate(true); } catch { }
-                try { _rightScroll?.Invalidate(true); } catch { }
-                try { editorHost?.Invalidate(true); } catch { }
+                try { _rightStack?.Invalidate(); } catch { }
+                try { _rightScroll?.Invalidate(); } catch { }
+                try { editorHost?.Invalidate(); } catch { }
                 // Defer one more size sync after layout on UI thread
                 try { Application.Instance?.Invoke(() => SyncOverlayChildSizes()); } catch { }
                 // Force layout refresh
-                frameHost.Invalidate(true);
+                frameHost.Invalidate();
                 ScrollRightPaneTop();
             }
             catch { }
@@ -4955,9 +4952,9 @@ namespace Client
             fraCommands.Visible = true;
             frameHost.Visible = false;
             SyncOverlayChildSizes();
-            try { _rightStack?.Invalidate(true); } catch { }
-            try { _rightScroll?.Invalidate(true); } catch { }
-            try { editorHost?.Invalidate(true); } catch { }
+            try { _rightStack?.Invalidate(); } catch { }
+            try { _rightScroll?.Invalidate(); } catch { }
+            try { editorHost?.Invalidate(); } catch { }
         }
     }
 }

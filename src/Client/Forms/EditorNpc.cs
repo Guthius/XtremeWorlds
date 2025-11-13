@@ -17,25 +17,25 @@ namespace Client
         public ListBox lstIndex = null!;
         public TextBox txtName = null!;
         public TextBox txtAttackSay = null!;
-        public NumericStepper nudSprite = null!;
-        public NumericStepper nudSpawnSecs = null!;
+        public NumericUpDown nudSprite = null!;
+        public NumericUpDown nudSpawnSecs = null!;
         public ComboBox cmbBehavior = null!;
         public ComboBox cmbFaction = null!;
-        public NumericStepper nudRange = null!;
-        public NumericStepper nudChance = null!;
+        public NumericUpDown nudRange = null!;
+        public NumericUpDown nudChance = null!;
         public ComboBox cmbItem = null!;
-        public NumericStepper nudAmount = null!;
-        public NumericStepper nudHp = null!;
-        public NumericStepper nudExp = null!;
-        public NumericStepper nudLevel = null!;
-        public NumericStepper nudDamage = null!;
+        public NumericUpDown nudAmount = null!;
+        public NumericUpDown nudHp = null!;
+        public NumericUpDown nudExp = null!;
+        public NumericUpDown nudLevel = null!;
+        public NumericUpDown nudDamage = null!;
         public ComboBox cmbSpawnPeriod = null!;
         public ComboBox cmbAnimation = null!;
-        public NumericStepper nudStrength = null!;
-        public NumericStepper nudIntelligence = null!;
-        public NumericStepper nudSpirit = null!;
-        public NumericStepper nudLuck = null!;
-        public NumericStepper nudVitality = null!;
+        public NumericUpDown nudStrength = null!;
+        public NumericUpDown nudIntelligence = null!;
+        public NumericUpDown nudSpirit = null!;
+        public NumericUpDown nudLuck = null!;
+        public NumericUpDown nudVitality = null!;
         public ComboBox cmbSkill1 = null!;
         public ComboBox cmbSkill2 = null!;
         public ComboBox cmbSkill3 = null!;
@@ -62,7 +62,6 @@ namespace Client
             // Ensure Load is subscribed first before building UI and wiring events
             Load += (s, e) => LoadData();
             InitializeComponent();
-            Editors.AutoSizeWindow(this, 900, 560);
         }
 
         private void InitializeComponent()
@@ -95,7 +94,7 @@ namespace Client
                 GameState.NpcChanged[GameState.EditorIndex] = true;
             };
 
-            nudSprite = new NumericStepper { MinValue = 0, MaxValue = GameState.NumCharacters, DecimalPlaces = 0, Width = 80 };
+            nudSprite = new NumericUpDown { MinValue = 0, MaxValue = GameState.NumCharacters, DecimalPlaces = 0, Width = 80 };
             nudSprite.ValueChanged += (s, e) =>
             {
                 if (_initializing) return;
@@ -104,7 +103,7 @@ namespace Client
                 GameState.NpcChanged[GameState.EditorIndex] = true;
             };
 
-            nudSpawnSecs = new NumericStepper { MinValue = 0, MaxValue = 3600, DecimalPlaces = 0, Width = 80 };
+            nudSpawnSecs = new NumericUpDown { MinValue = 0, MaxValue = 3600, DecimalPlaces = 0, Width = 80 };
             nudSpawnSecs.ValueChanged += (s, e) => { if (!_initializing) { Data.Npc[GameState.EditorIndex].SpawnSecs = (int)nudSpawnSecs.Value; GameState.NpcChanged[GameState.EditorIndex] = true; } };
 
             cmbBehavior = new ComboBox();
@@ -113,34 +112,34 @@ namespace Client
             cmbFaction = new ComboBox();
             cmbFaction.SelectedIndexChanged += (s, e) => { if (!_initializing) { Data.Npc[GameState.EditorIndex].Faction = (byte)cmbFaction.SelectedIndex; GameState.NpcChanged[GameState.EditorIndex] = true; } };
 
-            nudRange = new NumericStepper { MinValue = 0, MaxValue = 50, DecimalPlaces = 0, Width = 80 };
+            nudRange = new NumericUpDown { MinValue = 0, MaxValue = 50, DecimalPlaces = 0, Width = 80 };
             nudRange.ValueChanged += (s, e) => { if (!_initializing) { Data.Npc[GameState.EditorIndex].Range = (byte)nudRange.Value; GameState.NpcChanged[GameState.EditorIndex] = true; } };
 
             cmbAnimation = new ComboBox();
             cmbAnimation.SelectedIndexChanged += (s, e) => { if (!_initializing) { Data.Npc[GameState.EditorIndex].Animation = cmbAnimation.SelectedIndex; GameState.NpcChanged[GameState.EditorIndex] = true; } };
 
-            nudHp = new NumericStepper { MinValue = 0, MaxValue = 10000000, DecimalPlaces = 0, Width = 100 };
+            nudHp = new NumericUpDown { MinValue = 0, MaxValue = 10000000, DecimalPlaces = 0, Width = 100 };
             nudHp.ValueChanged += (s, e) => { if (!_initializing) { Data.Npc[GameState.EditorIndex].Hp = (int)nudHp.Value; GameState.NpcChanged[GameState.EditorIndex] = true; } };
-            nudExp = new NumericStepper { MinValue = 0, MaxValue = 10000000, DecimalPlaces = 0, Width = 100 };
+            nudExp = new NumericUpDown { MinValue = 0, MaxValue = 10000000, DecimalPlaces = 0, Width = 100 };
             nudExp.ValueChanged += (s, e) => { if (!_initializing) { Data.Npc[GameState.EditorIndex].Exp = (int)nudExp.Value; GameState.NpcChanged[GameState.EditorIndex] = true; } };
-            nudLevel = new NumericStepper { MinValue = 0, MaxValue = 255, DecimalPlaces = 0, Width = 80 };
+            nudLevel = new NumericUpDown { MinValue = 0, MaxValue = 255, DecimalPlaces = 0, Width = 80 };
             nudLevel.ValueChanged += (s, e) => { if (!_initializing) { Data.Npc[GameState.EditorIndex].Level = (byte)nudLevel.Value; GameState.NpcChanged[GameState.EditorIndex] = true; } };
-            nudDamage = new NumericStepper { MinValue = 0, MaxValue = 1000000, DecimalPlaces = 0, Width = 100 };
+            nudDamage = new NumericUpDown { MinValue = 0, MaxValue = 1000000, DecimalPlaces = 0, Width = 100 };
             nudDamage.ValueChanged += (s, e) => { if (!_initializing) { Data.Npc[GameState.EditorIndex].Damage = (int)nudDamage.Value; GameState.NpcChanged[GameState.EditorIndex] = true; } };
 
             cmbSpawnPeriod = new ComboBox();
             cmbSpawnPeriod.SelectedIndexChanged += (s, e) => { if (!_initializing) { Data.Npc[GameState.EditorIndex].SpawnTime = (byte)cmbSpawnPeriod.SelectedIndex; GameState.NpcChanged[GameState.EditorIndex] = true; } };
 
             // Stats
-            nudStrength = new NumericStepper { MinValue = 0, MaxValue = 255, DecimalPlaces = 0, Width = 70 };
+            nudStrength = new NumericUpDown { MinValue = 0, MaxValue = 255, DecimalPlaces = 0, Width = 70 };
             nudStrength.ValueChanged += (s, e) => { if (!_initializing) { Data.Npc[GameState.EditorIndex].Stat[(int)Stat.Strength] = (byte)nudStrength.Value; GameState.NpcChanged[GameState.EditorIndex] = true; } };
-            nudIntelligence = new NumericStepper { MinValue = 0, MaxValue = 255, DecimalPlaces = 0, Width = 70 };
+            nudIntelligence = new NumericUpDown { MinValue = 0, MaxValue = 255, DecimalPlaces = 0, Width = 70 };
             nudIntelligence.ValueChanged += (s, e) => { if (!_initializing) { Data.Npc[GameState.EditorIndex].Stat[(int)Stat.Intelligence] = (byte)nudIntelligence.Value; GameState.NpcChanged[GameState.EditorIndex] = true; } };
-            nudSpirit = new NumericStepper { MinValue = 0, MaxValue = 255, DecimalPlaces = 0, Width = 70 };
+            nudSpirit = new NumericUpDown { MinValue = 0, MaxValue = 255, DecimalPlaces = 0, Width = 70 };
             nudSpirit.ValueChanged += (s, e) => { if (!_initializing) { Data.Npc[GameState.EditorIndex].Stat[(int)Stat.Spirit] = (byte)nudSpirit.Value; GameState.NpcChanged[GameState.EditorIndex] = true; } };
-            nudLuck = new NumericStepper { MinValue = 0, MaxValue = 255, DecimalPlaces = 0, Width = 70 };
+            nudLuck = new NumericUpDown { MinValue = 0, MaxValue = 255, DecimalPlaces = 0, Width = 70 };
             nudLuck.ValueChanged += (s, e) => { if (!_initializing) { Data.Npc[GameState.EditorIndex].Stat[(int)Stat.Luck] = (byte)nudLuck.Value; GameState.NpcChanged[GameState.EditorIndex] = true; } };
-            nudVitality = new NumericStepper { MinValue = 0, MaxValue = 255, DecimalPlaces = 0, Width = 70 };
+            nudVitality = new NumericUpDown { MinValue = 0, MaxValue = 255, DecimalPlaces = 0, Width = 70 };
             nudVitality.ValueChanged += (s, e) => { if (!_initializing) { Data.Npc[GameState.EditorIndex].Stat[(int)Stat.Vitality] = (byte)nudVitality.Value; GameState.NpcChanged[GameState.EditorIndex] = true; } };
 
             // Skills
@@ -162,9 +161,9 @@ namespace Client
 
             cmbItem = new ComboBox();
             cmbItem.SelectedIndexChanged += (s, e) => { if (!_initializing) { Data.Npc[GameState.EditorIndex].DropItem[cmbDropSlot.SelectedIndex] = cmbItem.SelectedIndex; GameState.NpcChanged[GameState.EditorIndex] = true; } };
-            nudAmount = new NumericStepper { MinValue = 0, MaxValue = 1000000, DecimalPlaces = 0, Width = 100 };
+            nudAmount = new NumericUpDown { MinValue = 0, MaxValue = 1000000, DecimalPlaces = 0, Width = 100 };
             nudAmount.ValueChanged += (s, e) => { if (!_initializing) { Data.Npc[GameState.EditorIndex].DropItemValue[cmbDropSlot.SelectedIndex] = (int)nudAmount.Value; GameState.NpcChanged[GameState.EditorIndex] = true; } };
-            nudChance = new NumericStepper { MinValue = 0, MaxValue = 100, DecimalPlaces = 0, Width = 80 };
+            nudChance = new NumericUpDown { MinValue = 0, MaxValue = 100, DecimalPlaces = 0, Width = 80 };
             nudChance.ValueChanged += (s, e) => { if (!_initializing) { Data.Npc[GameState.EditorIndex].DropChance[cmbDropSlot.SelectedIndex] = (int)nudChance.Value; GameState.NpcChanged[GameState.EditorIndex] = true; } };
 
             picSprite = new Drawable { Size = new Size(96, 96), BackgroundColor = Colors.Transparent };

@@ -10,30 +10,11 @@ namespace Client
 
     static class Editors
     {
-        // Auto size helper: adjusts window size to preferred content size within bounds on first show
-        public static void AutoSizeWindow(Form form, int minWidth = 400, int minHeight = 300, int maxWidth = 1600, int maxHeight = 1000)
-        {
-            form.Shown += (s, e) =>
-            {
-                try
-                {
-                    if (form.Content == null) return;
-                    var pref = form.Content.GetPreferredSize(Size.MaxValue);
-                    int w = Math.Min(Math.Max((int)pref.Width + form.Padding.Left + form.Padding.Right, minWidth), maxWidth);
-                    int h = Math.Min(Math.Max((int)pref.Height + form.Padding.Top + form.Padding.Bottom, minHeight), maxHeight);
-                    // Only enlarge; don't shrink below current if user already resized
-                    if (w > form.ClientSize.Width || h > form.ClientSize.Height)
-                        form.ClientSize = new Size(w, h);
-                }
-                catch { /* ignore sizing errors */ }
-            };
-        }
-
         // Simple modal numeric prompt to replace VB Interaction.InputBox on cross-platform
         public static int? PromptIndex(Form owner, string title, string message, int min, int max, int defaultValue)
         {
             var dlg = new Dialog { Title = title, ClientSize = new Size(360, 140), Padding = 10 };
-            var num = new NumericStepper { MinValue = min, MaxValue = max, Value = defaultValue, DecimalPlaces = 0 };
+            var num = new NumericUpDown { MinValue = min, MaxValue = max, Value = defaultValue, DecimalPlaces = 0 };
             var ok = new Button { Text = "OK" };
             var cancel = new Button { Text = "Cancel" };
             int? result = null;
@@ -417,7 +398,7 @@ namespace Client
             }
             else
             {
-                withBlock.nudBuy.Value = 100d; // NumericStepper uses double
+                withBlock.nudBuy.Value = 100d; // NumericUpDown uses double
             }
 
             withBlock.cmbItem.SelectedIndex = 0;

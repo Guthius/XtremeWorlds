@@ -14,10 +14,10 @@ namespace Client
         public static EditorProjectile Instance => _instance ??= new EditorProjectile();
         public ListBox lstIndex = null!;
         public TextBox txtName = null!;
-        public NumericStepper nudPic = null!;
-        public NumericStepper nudRange = null!;
-        public NumericStepper nudSpeed = null!;
-        public NumericStepper nudDamage = null!;
+        public NumericUpDown nudPic = null!;
+        public NumericUpDown nudRange = null!;
+        public NumericUpDown nudSpeed = null!;
+        public NumericUpDown nudDamage = null!;
         public Drawable picProjectile = null!;
         public ComboBox cmbPlayAnimHit = null!;
 
@@ -67,7 +67,7 @@ namespace Client
                 GameState.ProjectileChanged[GameState.EditorIndex] = true;
             };
 
-            nudPic = new NumericStepper { MinValue = 0, MaxValue = GameState.NumProjectiles, DecimalPlaces = 0, Width = 80 };
+            nudPic = new NumericUpDown { MinValue = 0, MaxValue = GameState.NumProjectiles, DecimalPlaces = 0, Width = 80 };
             nudPic.ValueChanged += (s, e) =>
             {
                 if (_initializing) return;
@@ -76,7 +76,7 @@ namespace Client
                 GameState.ProjectileChanged[GameState.EditorIndex] = true;
             };
 
-            nudRange = new NumericStepper { MinValue = 0, MaxValue = 255, DecimalPlaces = 0, Width = 80 };
+            nudRange = new NumericUpDown { MinValue = 0, MaxValue = 255, DecimalPlaces = 0, Width = 80 };
             nudRange.ValueChanged += (s, e) =>
             {
                 if (_initializing) return;
@@ -84,7 +84,7 @@ namespace Client
                 GameState.ProjectileChanged[GameState.EditorIndex] = true;
             };
 
-            nudSpeed = new NumericStepper { MinValue = 0, MaxValue = 1000, DecimalPlaces = 0, Width = 80 };
+            nudSpeed = new NumericUpDown { MinValue = 0, MaxValue = 1000, DecimalPlaces = 0, Width = 80 };
             nudSpeed.ValueChanged += (s, e) =>
             {
                 if (_initializing) return;
@@ -92,7 +92,7 @@ namespace Client
                 GameState.ProjectileChanged[GameState.EditorIndex] = true;
             };
 
-            nudDamage = new NumericStepper { MinValue = 0, MaxValue = 100000, DecimalPlaces = 0, Width = 80 };
+            nudDamage = new NumericUpDown { MinValue = 0, MaxValue = 100000, DecimalPlaces = 0, Width = 80 };
             nudDamage.ValueChanged += (s, e) =>
             {
                 if (_initializing) return;

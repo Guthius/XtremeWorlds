@@ -22,34 +22,34 @@ namespace Client
         public ListBox lstIndex = new ListBox{ Width = 200 };
         public TextBox txtName = new TextBox { Width = 200 };
         public ComboBox cmbType = new ComboBox();
-        public NumericStepper nudMp = new NumericStepper { MinValue = 0 };
-        public NumericStepper nudLevel = new NumericStepper { MinValue = 0 };
+        public NumericUpDown nudMp = new NumericUpDown { MinValue = 0 };
+        public NumericUpDown nudLevel = new NumericUpDown { MinValue = 0 };
         public ComboBox cmbAccessReq = new ComboBox();
         public ComboBox cmbJob = new ComboBox();
-        public NumericStepper nudCast = new NumericStepper { MinValue = 0 };
-        public NumericStepper nudCool = new NumericStepper { MinValue = 0 };
-        public NumericStepper nudIcon = new NumericStepper { MinValue = 0 };
-        public NumericStepper nudMap = new NumericStepper { MinValue = 0 };
-        public NumericStepper nudX = new NumericStepper { MinValue = 0 };
-        public NumericStepper nudY = new NumericStepper { MinValue = 0 };
+        public NumericUpDown nudCast = new NumericUpDown { MinValue = 0 };
+        public NumericUpDown nudCool = new NumericUpDown { MinValue = 0 };
+        public NumericUpDown nudIcon = new NumericUpDown { MinValue = 0 };
+        public NumericUpDown nudMap = new NumericUpDown { MinValue = 0 };
+        public NumericUpDown nudX = new NumericUpDown { MinValue = 0 };
+        public NumericUpDown nudY = new NumericUpDown { MinValue = 0 };
         public ComboBox cmbDir = new ComboBox();
-        public NumericStepper nudVital = new NumericStepper { MinValue = 0 };
-        public NumericStepper nudDuration = new NumericStepper { MinValue = 0 };
-        public NumericStepper nudInterval = new NumericStepper { MinValue = 0 };
-        public NumericStepper nudRange = new NumericStepper { MinValue = 0 };
+        public NumericUpDown nudVital = new NumericUpDown { MinValue = 0 };
+        public NumericUpDown nudDuration = new NumericUpDown { MinValue = 0 };
+        public NumericUpDown nudInterval = new NumericUpDown { MinValue = 0 };
+        public NumericUpDown nudRange = new NumericUpDown { MinValue = 0 };
         public CheckBox chkAoE = new CheckBox { Text = "AoE" };
-        public NumericStepper nudAoE = new NumericStepper { MinValue = 0 };
+        public NumericUpDown nudAoE = new NumericUpDown { MinValue = 0 };
         public ComboBox cmbAnimCast = new ComboBox();
         public ComboBox cmbAnim = new ComboBox();
-        public NumericStepper nudStun = new NumericStepper { MinValue = 0 };
+        public NumericUpDown nudStun = new NumericUpDown { MinValue = 0 };
         public CheckBox chkProjectile = new CheckBox { Text = "Projectile" };
         public ComboBox cmbProjectile = new ComboBox();
         public CheckBox chkKnockBack = new CheckBox { Text = "Knockback" };
         public ComboBox cmbKnockBackTiles = new ComboBox();
         public ComboBox cmbChainOnHit = new ComboBox();
         public ComboBox cmbCommonEventType = new ComboBox();
-        public NumericStepper nudCommonEventData1 = new NumericStepper { MinValue = 0 };
-        public NumericStepper nudCommonEventData2 = new NumericStepper { MinValue = 0 };
+        public NumericUpDown nudCommonEventData1 = new NumericUpDown { MinValue = 0 };
+        public NumericUpDown nudCommonEventData2 = new NumericUpDown { MinValue = 0 };
         // Multi-direction casting UI
         public CheckBox[] chkMultiDirs = new CheckBox[8];
         public Button btnSave = new Button { Text = "Save" };
@@ -66,7 +66,6 @@ namespace Client
             ClientSize = new Size(900, 560);
             Padding = 10;
             InitializeComponent();
-            Editors.AutoSizeWindow(this, 820, 520);
         }
 
         protected override void OnClosed(EventArgs e)
