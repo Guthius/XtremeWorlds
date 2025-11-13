@@ -117,10 +117,14 @@
         <PackageReference Include="SDL2-CS" />
         <PackageReference Include="CS-Script" />
     </ItemGroup>
+
     <ItemGroup>
-      <Reference Include="Eto">
-        <HintPath>..\..\Eto.dll</HintPath>
-      </Reference>
+        <PackageVersion Include="AssimpNetter" Version="1.0.0" />
+        <PackageVersion Include="BCnEncoder.Net" Version="1.0.0" />
+        <PackageVersion Include="Eto.Forms" Version="2.1.0.2" />
+        <PackageVersion Include="Eto.Platform.Wpf" Version="2.1.0.2" />
+        <PackageVersion Include="Eto.Platform.Windows" Version="2.1.0.2" />
+        <PackageVersion Include="Eto.Platform.Gtk" Version="2.1.0.2" />
     </ItemGroup>
 
     <Target Name="EnsureContentFolderExists" BeforeTargets="Build">
