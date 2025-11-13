@@ -38,7 +38,6 @@ namespace Client
             ClientSize = new Size(500, 420);
             Padding = 10;
             InitializeComponent();
-            Editors.AutoSizeWindow(this, 460, 360);
         }
 
         protected override void OnClosed(EventArgs e)
