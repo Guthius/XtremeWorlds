@@ -62,6 +62,14 @@ public class WindowManager
 
         window.ZOrder = Windows.Count - 1;
     }
+    
+    public static void ComboBox_RemoveItems(int windowIndex, int controlIndex)
+    {
+        if (Windows[windowIndex].Controls[controlIndex] is ComboBox comboBox)
+        {
+            comboBox.Items.Clear();
+        }
+    }
 
     public static void Combobox_AddItem(int windowIndex, int controlIndex, string text)
     {
@@ -655,6 +663,7 @@ public class WindowManager
             Safe("UpdateWindow_PlayerMenu", () => ui.UpdateWindow_PlayerMenu());
             Safe("UpdateWindow_RightClick", () => ui.UpdateWindow_RightClick());
             Safe("UpdateWindow_Combobox", () => ui.UpdateWindow_Combobox());
+            Safe("UpdateWindow_Admin", () => ui.UpdateWindow_Admin());
         }
         else
         {

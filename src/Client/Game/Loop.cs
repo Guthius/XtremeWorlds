@@ -1,6 +1,7 @@
 ﻿using Core;
 using System;
 using Client.Game.UI;
+using Client.Game.UI.Controls;
 using Client.Net;
 using Core.Configurations;
 using Core.Globals;
@@ -54,6 +55,7 @@ namespace Client
                 if (_tmr25 < _tick)
                 {
                     Sound.PlayMusic(Data.MyMap.Music);
+                    UpdateEditors();
                     _tmr25 = _tick + 25;
                 }
 
@@ -407,7 +409,6 @@ namespace Client
                 if (_tmr25 < _tick)
                 {
                     Sound.PlayMusic(SettingsManager.Instance.MenuMusic);
-                    UpdateEditors();
                     _tmr25 = _tick + 25;
                 }
             }
@@ -456,17 +457,23 @@ namespace Client
             if (GameState.InitAdminForm)
             {
                 Sender.SendRequestMapReport();
+                WindowManager.ShowWindow("winAdmin");
                 GameState.AdminPanel = true;
                 GameState.InitAdminForm = false;
             }
 
             if (GameState.InitMapReport)
             {
-                for (int i = 1, loopTo = GameState.MapNames.Length; i < loopTo; i++)
+                // Populate the Admin map list control in the skin window
+                var admin = WindowManager.GetWindowIndex("winAdmin");
+
+                WindowManager.ComboBox_RemoveItems(admin, WindowManager.GetControlIndex("winAdmin", "cmbMaps"));
+                for (int i = 0, loopTo = GameState.MapNames.Length; i < loopTo; i++)
                 {
-                    var admin = Admin.Instance;
+                    var name = GameState.MapNames[i];
+                    WindowManager.Combobox_AddItem(admin, WindowManager.GetControlIndex("winAdmin", "cmbMaps"), (i + 1) + ": " + name);
                 }
-                    
+
                 GameState.InitMapReport = false;
             }
 

@@ -1436,7 +1436,7 @@ namespace Client
             for (int i = 1; i < WindowManager.Windows.Count; i++)
             {
                 // Check if active control is hovered (GUI context)
-                if (WindowManager.Windows[i].Controls != null)
+                if (WindowManager.Windows[i]?.Controls != null)
                 {
                     for (int j = 0; j < WindowManager.Windows[i].Controls.Count; j++)
                     {

@@ -108,6 +108,14 @@ public static class WindowLoader
     {
         switch (xmlReader.Name)
         {
+            case "TabControl":
+                ReadTabControl(xmlReader, windowIndex);
+                return;
+
+            case "TabPage":
+                ReadTabPage(xmlReader, windowIndex);
+                return;
+
             case "Button":
                 ReadButton(xmlReader, windowIndex);
                 break;
@@ -131,6 +139,14 @@ public static class WindowLoader
             case "ComboBox":
                 ReadComboBox(xmlReader, windowIndex);
                 break;
+
+            case "NumericStepper":
+                ReadNumericStepper(xmlReader, windowIndex);
+                break;
+
+            case "ListBox":
+                ReadListBox(xmlReader, windowIndex);
+                break;
         }
 
         if (!xmlReader.IsEmptyElement)
@@ -138,6 +154,101 @@ public static class WindowLoader
             xmlReader.Skip();
         }
 
+    }
+
+    // Treat TabControl/TabPage as transparent containers: load their children
+    private static void ReadTabControl(XmlReader xmlReader, int windowIndex)
+    {
+        if (xmlReader.IsEmptyElement)
+        {
+            return;
+        }
+
+        var depth = xmlReader.Depth;
+        while (xmlReader.Read())
+        {
+            if (xmlReader.NodeType == XmlNodeType.Element)
+            {
+                ReadControl(xmlReader, windowIndex);
+            }
+            else if (xmlReader.NodeType == XmlNodeType.EndElement && xmlReader.Depth == depth && xmlReader.Name == "TabControl")
+            {
+                break;
+            }
+        }
+    }
+
+    private static void ReadTabPage(XmlReader xmlReader, int windowIndex)
+    {
+        if (xmlReader.IsEmptyElement)
+        {
+            return;
+        }
+
+        var depth = xmlReader.Depth;
+        while (xmlReader.Read())
+        {
+            if (xmlReader.NodeType == XmlNodeType.Element)
+            {
+                ReadControl(xmlReader, windowIndex);
+            }
+            else if (xmlReader.NodeType == XmlNodeType.EndElement && xmlReader.Depth == depth && xmlReader.Name == "TabPage")
+            {
+                break;
+            }
+        }
+    }
+
+    // Map NumericStepper to a TextBox for now; numeric parsing handled by consumers
+    private static void ReadNumericStepper(XmlReader xmlReader, int windowIndex)
+    {
+        var name = xmlReader.GetAttribute("Name");
+        var position = xmlReader.GetAttribute("Position");
+        var positionVec = GetVector(position);
+        var size = xmlReader.GetAttribute("Size");
+        var sizeVec = GetVector(size);
+        var fontName = xmlReader.GetAttribute("Font");
+        var font = GetFontByName(fontName, DefaultControlFont);
+
+        WindowManager.CreateTextbox(
+            windowIndex: windowIndex,
+            name: name ?? string.Empty,
+            left: positionVec.X,
+            top: positionVec.Y,
+            width: sizeVec.X,
+            height: sizeVec.Y,
+            text: string.Empty,
+            font: font,
+            xOffset: 5,
+            yOffset: 3,
+            designNorm: Design.TextWhite,
+            designHover: Design.TextWhite,
+            designMousedown: Design.TextWhite,
+            censor: false);
+    }
+
+    // Map ListBox to a PictureBox as a placeholder so it can receive callbacks
+    private static void ReadListBox(XmlReader xmlReader, int windowIndex)
+    {
+        var name = xmlReader.GetAttribute("Name");
+        var position = xmlReader.GetAttribute("Position");
+        var positionVec = GetVector(position);
+        var size = xmlReader.GetAttribute("Size");
+        var sizeVec = GetVector(size);
+
+        WindowManager.CreatePictureBox(
+            windowIndex,
+            name ?? string.Empty,
+            positionVec.X,
+            positionVec.Y,
+            sizeVec.X,
+            sizeVec.Y,
+            imageNorm: 0,
+            imageHover: 0,
+            imageMousedown: 0,
+            designNorm: Design.None,
+            designHover: Design.None,
+            designMousedown: Design.None);
     }
 
     private static void ReadComboBox(XmlReader xmlReader, int windowIndex)

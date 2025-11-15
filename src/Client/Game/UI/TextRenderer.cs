@@ -518,7 +518,6 @@ public static class TextRenderer
     {
     var yOffset = 0L;
         var topWidth = 0;
-    // removed unused tmpText/tmpArray
 
         // set the position
         var xO = 19L;
@@ -534,7 +533,6 @@ public static class TextRenderer
         {
             if (i >= Variables.ChatLines)
                 break;
-            // removed unused lineCount
 
             // exit out early if we come to a blank string
             if (Strings.Len(Data.Chat[(int) i].Text) == 0)

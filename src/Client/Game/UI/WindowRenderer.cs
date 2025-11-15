@@ -10,12 +10,15 @@ public static class WindowRenderer
     {
         if (window.Design[0] == Design.ComboMenuNormal)
         {
-            var path = Path.Combine(DataPath.Gui, "1");
+            // Draw a solid black background area slightly larger than the items
+            // to improve readability of combo menu entries.
+            DesignRenderer.Render(Design.TextBlack,
+                window.X - 2,
+                window.Y - 2,
+                window.Width + 4,
+                window.Height + 4);
 
-            GameClient.RenderTexture(ref path,
-                window.X, window.Y, 0, 0,
-                window.Width, window.Height,
-                157, 0, 0, 0);
+            var path = Path.Combine(DataPath.Gui, "1");
 
             if (window.List.Count == 0)
             {
@@ -25,7 +28,7 @@ public static class WindowRenderer
             var y = window.Y + 2;
             var x = window.X;
 
-            for (var i = 0; i < window.List.Count - 1; i++)
+            for (var i = 0; i < window.List.Count; i++)
             {
                 if (i == window.Value || i == window.Group)
                 {

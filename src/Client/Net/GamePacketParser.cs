@@ -213,6 +213,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             GameState.BarWidthNpcHP = new int[Variables.MaxMapNpcs];
             GameState.BarWidthNpcHPMax = new int[Variables.MaxMapNpcs];
         }
+        
         if (GameState.BarWidthPlayerHP.Length != Variables.MaxPlayers)
         {
             GameState.BarWidthPlayerHP = new int[Variables.MaxPlayers];
@@ -220,6 +221,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             GameState.BarWidthPlayerMP = new int[Variables.MaxPlayers];
             GameState.BarWidthPlayerMPMax = new int[Variables.MaxPlayers];
         }
+
         if (GameState.MapNames.Length != Variables.MaxMaps)
         {
             Array.Resize(ref GameState.MapNames, Variables.MaxMaps);
