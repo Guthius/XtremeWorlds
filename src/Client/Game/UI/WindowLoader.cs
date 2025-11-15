@@ -108,6 +108,10 @@ public static class WindowLoader
     {
         switch (xmlReader.Name)
         {
+            case "ScrollBar":
+                ReadScrollBar(xmlReader, windowIndex);
+                break;
+
             case "TabControl":
                 ReadTabControl(xmlReader, windowIndex);
                 return;
@@ -154,6 +158,37 @@ public static class WindowLoader
             xmlReader.Skip();
         }
 
+    }
+
+    private static void ReadScrollBar(XmlReader xmlReader, int windowIndex)
+    {
+        var name = xmlReader.GetAttribute("Name");
+        var position = xmlReader.GetAttribute("Position");
+        var positionVec = GetVector(position);
+        var size = xmlReader.GetAttribute("Size");
+        var sizeVec = GetVector(size);
+        var min = GetInt32(xmlReader.GetAttribute("Min"), 0);
+        var max = GetInt32(xmlReader.GetAttribute("Max"), 99);
+        var value = GetInt32(xmlReader.GetAttribute("Value"), 0);
+        var orientation = xmlReader.GetAttribute("Orientation");
+        var vertical = true;
+        if (!string.IsNullOrEmpty(orientation))
+        {
+            vertical = !orientation.Equals("Horizontal", StringComparison.OrdinalIgnoreCase);
+        }
+
+        WindowManager.CreateScrollBar(
+            windowIndex: windowIndex,
+            name: name ?? string.Empty,
+            left: positionVec.X,
+            top: positionVec.Y,
+            width: sizeVec.X,
+            height: sizeVec.Y,
+            min: min,
+            max: max,
+            value: value,
+            vertical: vertical
+        );
     }
 
     // Treat TabControl/TabPage as transparent containers: load their children

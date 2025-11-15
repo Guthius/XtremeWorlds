@@ -440,6 +440,41 @@ public class WindowManager
         ZOrderCon++;
     }
 
+    public static void CreateScrollBar(int windowIndex, string name, int left, int top, int width, int height, int min = 0, int max = 100, int value = 0, bool vertical = true)
+    {
+        if (!Windows.TryGetValue(windowIndex, out var window))
+        {
+            throw new UIException($"{windowIndex} is not a valid window index.");
+        }
+
+        var stateCount = Enum.GetValues<ControlState>().Length;
+        var texture = new List<string>(Enumerable.Repeat(DataPath.Designs, stateCount).ToList());
+        var callback = new List<Action?>(Enumerable.Repeat((Action) null, stateCount).ToList());
+
+        texture[0] = DataPath.Gui;
+
+        var scroll = new Controls.ScrollBar
+        {
+            Name = name,
+            X = left,
+            Y = top,
+            Width = width,
+            Height = height,
+            Visible = true,
+            Value = value,
+            ZOrder = ZOrderCon,
+            Texture = texture,
+            CallBack = callback,
+            Min = min,
+            Max = max,
+            Vertical = vertical
+        };
+
+        window.Controls.Add(scroll);
+
+        ZOrderCon++;
+    }
+
     public static int GetWindowIndex(string windowName)
     {
         foreach (var kvp in Windows)
@@ -664,6 +699,7 @@ public class WindowManager
             Safe("UpdateWindow_RightClick", () => ui.UpdateWindow_RightClick());
             Safe("UpdateWindow_Combobox", () => ui.UpdateWindow_Combobox());
             Safe("UpdateWindow_Admin", () => ui.UpdateWindow_Admin());
+            Safe("UpdateWindow_EditorMap", () => ui.UpdateWindow_EditorMap());
         }
         else
         {
@@ -879,6 +915,41 @@ public class WindowManager
                                 {
                                     // Menu not open yet, open it
                                     WinComboMenu.Show(curWindow, curControl);
+                                }
+                            }
+                            break;
+                        }
+                        case Controls.ScrollBar scrollBar:
+                        {
+                            // Allow clicking/draging the scrollbar track to set value
+                            bool interacting = entState == ControlState.MouseDown || (entState == ControlState.MouseMove && GameClient.IsMouseButtonDown(MouseButton.Left));
+                            if (interacting)
+                            {
+                                int mouseX = GameState.CurMouseX - (curWindow.X + scrollBar.X);
+                                int mouseY = GameState.CurMouseY - (curWindow.Y + scrollBar.Y);
+                                int min = scrollBar.Min;
+                                int max = scrollBar.Max;
+                                int range = Math.Max(1, max - min);
+                                int newVal;
+                                if (scrollBar.Vertical)
+                                {
+                                    int usable = Math.Max(1, scrollBar.Height - scrollBar.ThumbSize);
+                                    float t = Math.Clamp(usable == 0 ? 0f : (float)mouseY / usable, 0f, 1f);
+                                    newVal = min + (int)Math.Round(t * range);
+                                }
+                                else
+                                {
+                                    int usable = Math.Max(1, scrollBar.Width - scrollBar.ThumbSize);
+                                    float t = Math.Clamp(usable == 0 ? 0f : (float)mouseX / usable, 0f, 1f);
+                                    newVal = min + (int)Math.Round(t * range);
+                                }
+
+                                newVal = Math.Clamp(newVal, min, max);
+                                if (newVal != scrollBar.Value)
+                                {
+                                    scrollBar.Value = newVal;
+                                    // Notify change via MouseMove callback by convention
+                                    scrollBar.CallBack[(int)ControlState.MouseMove]?.Invoke();
                                 }
                             }
                             break;
