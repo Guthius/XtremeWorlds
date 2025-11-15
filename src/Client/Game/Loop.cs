@@ -9,7 +9,6 @@ using Type = Core.Globals.Type;
 
 namespace Client
 {
-
     public class Loop
     {
         // Declare private fields
@@ -408,6 +407,7 @@ namespace Client
                 if (_tmr25 < _tick)
                 {
                     Sound.PlayMusic(SettingsManager.Instance.MenuMusic);
+                    UpdateEditors();
                     _tmr25 = _tick + 25;
                 }
             }
@@ -449,6 +449,121 @@ namespace Client
             }
 
             WindowManager.ResizeGui();
+        }
+
+        private void UpdateEditors()
+        {
+            if (GameState.InitAdminForm)
+            {
+                Sender.SendRequestMapReport();
+                GameState.AdminPanel = true;
+                GameState.InitAdminForm = false;
+            }
+
+            if (GameState.InitMapReport)
+            {
+                for (int i = 1, loopTo = GameState.MapNames.Length; i < loopTo; i++)
+                {
+                    var admin = Admin.Instance;
+                }
+                    
+                GameState.InitMapReport = false;
+            }
+
+            if (GameState.InitMapEditor)
+            {
+                GameState.MyEditorType = EditorType.Map;
+                GameState.EditorIndex = 0;
+                new EditorMap().Show();
+                GameState.CameraZoom = 1.0f;
+                GameState.InitMapEditor = false;
+            }
+
+            if (GameState.InitEventEditor)
+            {
+                new EditorEvent().Show();
+                GameState.InitEventEditor = false;
+            }
+
+            if (GameState.InitAnimationEditor)
+            {
+                GameState.MyEditorType = EditorType.Animation;
+                GameState.EditorIndex = 0;
+                new EditorAnimation().Show();
+                GameState.InitAnimationEditor = false;
+            }
+
+            if (GameState.InitItemEditor)
+            {
+                GameState.MyEditorType = EditorType.Item;
+                GameState.EditorIndex = 0;
+                new EditorItem().Show();
+                GameState.InitItemEditor = false;
+            }
+
+            if (GameState.InitJobEditor)
+            {
+                GameState.MyEditorType = EditorType.Job;
+                GameState.EditorIndex = 0;
+                new EditorJob().Show();
+                GameState.InitJobEditor = false;
+            }
+
+            if (GameState.InitMoralEditor)
+            {
+                GameState.MyEditorType = EditorType.Moral;
+                GameState.EditorIndex = 0;
+                new EditorMoral().Show();
+                GameState.InitMoralEditor = false;
+            }
+
+            if (GameState.InitResourceEditor)
+            {
+                GameState.MyEditorType = EditorType.Resource;
+                GameState.EditorIndex = 0;
+                new EditorResource().Show();
+                GameState.InitResourceEditor = false;
+            }
+
+            if (GameState.InitNpcEditor)
+            {
+                GameState.MyEditorType = EditorType.Npc;
+                GameState.EditorIndex = 0;
+                new EditorNpc().Show();
+                GameState.InitNpcEditor = false;
+            }
+
+            if (GameState.InitSkillEditor)
+            {
+                GameState.MyEditorType = EditorType.Skill;
+                GameState.EditorIndex = 0;
+                new EditorSkill().Show();
+                GameState.InitSkillEditor = false;
+            }
+
+            if (GameState.InitShopEditor)
+            {
+                GameState.MyEditorType = EditorType.Shop;
+                GameState.EditorIndex = 0;
+                new EditorShop().Show();
+                GameState.InitShopEditor = false;
+            }
+
+            if (GameState.InitProjectileEditor)
+            {
+                GameState.MyEditorType = EditorType.Projectile;
+                GameState.EditorIndex = 0;
+                new EditorProjectile().Show();
+                GameState.InitProjectileEditor = false;
+            }
+
+            if (GameState.InitScriptEditor)
+            {
+                GameState.MyEditorType = EditorType.Script;
+                GameState.EditorIndex = 0;
+                new EditorScript().Show();
+                GameState.InitScriptEditor = false;
+            }
         }
     }
 }

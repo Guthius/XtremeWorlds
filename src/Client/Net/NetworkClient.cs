@@ -26,7 +26,7 @@ public sealed class NetworkClient
             SingleWriter = false
         });
 
-    try
+        try
         {
             Console.WriteLine("Connecting to server...");
             
