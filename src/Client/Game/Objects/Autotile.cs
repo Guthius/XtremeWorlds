@@ -45,134 +45,137 @@ namespace Client
                 layerNum = layerNum - (layerCount);
                 // Null guards for extended layer access
                 if (Data.Autotile == null) return;
-                if (Data.Autotile[x, y].Layer == null) return;
+                if (Data.Autotile?[x, y].Layer == null) return;
                 if (layerNum < 0 || layerNum >= Data.Autotile[x, y].Layer.Length) return;
-                if (Data.Autotile[x, y].Layer[layerNum].Tile == null)
-                    Data.Autotile[x, y].Layer[layerNum].Tile = new Type.Point[5];
+                if (Data.Autotile?[x, y].Layer[layerNum].Tile == null)
+                    Data.Autotile?[x, y].Layer[layerNum].Tile = new Type.Point[5];
                 {
-                    ref var withBlock = ref Data.Autotile[x, y].Layer[layerNum].Tile[tileQuarter];
-                    switch (autoTileLetter ?? "")
+                    if (Data.Autotile != null)
                     {
-                        case "a":
+                        ref var withBlock = ref Data.Autotile[x, y].Layer[layerNum].Tile[tileQuarter];
+                        switch (autoTileLetter ?? "")
+                        {
+                            case "a":
                             {
                                 withBlock.X = Type.AutoIn[1].X;
                                 withBlock.Y = Type.AutoIn[1].Y;
                                 break;
                             }
-                        case "b":
+                            case "b":
                             {
                                 withBlock.X = Type.AutoIn[2].X;
                                 withBlock.Y = Type.AutoIn[2].Y;
                                 break;
                             }
-                        case "c":
+                            case "c":
                             {
                                 withBlock.X = Type.AutoIn[3].X;
                                 withBlock.Y = Type.AutoIn[3].Y;
                                 break;
                             }
-                        case "d":
+                            case "d":
                             {
                                 withBlock.X = Type.AutoIn[4].X;
                                 withBlock.Y = Type.AutoIn[4].Y;
                                 break;
                             }
-                        case "e":
+                            case "e":
                             {
                                 withBlock.X = Type.AutoNw[1].X;
                                 withBlock.Y = Type.AutoNw[1].Y;
                                 break;
                             }
-                        case "f":
+                            case "f":
                             {
                                 withBlock.X = Type.AutoNw[2].X;
                                 withBlock.Y = Type.AutoNw[2].Y;
                                 break;
                             }
-                        case "g":
+                            case "g":
                             {
                                 withBlock.X = Type.AutoNw[3].X;
                                 withBlock.Y = Type.AutoNw[3].Y;
                                 break;
                             }
-                        case "h":
+                            case "h":
                             {
                                 withBlock.X = Type.AutoNw[4].X;
                                 withBlock.Y = Type.AutoNw[4].Y;
                                 break;
                             }
-                        case "i":
+                            case "i":
                             {
                                 withBlock.X = Type.AutoNe[1].X;
                                 withBlock.Y = Type.AutoNe[1].Y;
                                 break;
                             }
-                        case "j":
+                            case "j":
                             {
                                 withBlock.X = Type.AutoNe[2].X;
                                 withBlock.Y = Type.AutoNe[2].Y;
                                 break;
                             }
-                        case "k":
+                            case "k":
                             {
                                 withBlock.X = Type.AutoNe[3].X;
                                 withBlock.Y = Type.AutoNe[3].Y;
                                 break;
                             }
-                        case "l":
+                            case "l":
                             {
                                 withBlock.X = Type.AutoNe[4].X;
                                 withBlock.Y = Type.AutoNe[4].Y;
                                 break;
                             }
-                        case "m":
+                            case "m":
                             {
                                 withBlock.X = Type.AutoSw[1].X;
                                 withBlock.Y = Type.AutoSw[1].Y;
                                 break;
                             }
-                        case "n":
+                            case "n":
                             {
                                 withBlock.X = Type.AutoSw[2].X;
                                 withBlock.Y = Type.AutoSw[2].Y;
                                 break;
                             }
-                        case "o":
+                            case "o":
                             {
                                 withBlock.X = Type.AutoSw[3].X;
                                 withBlock.Y = Type.AutoSw[3].Y;
                                 break;
                             }
-                        case "p":
+                            case "p":
                             {
                                 withBlock.X = Type.AutoSw[4].X;
                                 withBlock.Y = Type.AutoSw[4].Y;
                                 break;
                             }
-                        case "q":
+                            case "q":
                             {
                                 withBlock.X = Type.AutoSe[1].X;
                                 withBlock.Y = Type.AutoSe[1].Y;
                                 break;
                             }
-                        case "r":
+                            case "r":
                             {
                                 withBlock.X = Type.AutoSe[2].X;
                                 withBlock.Y = Type.AutoSe[2].Y;
                                 break;
                             }
-                        case "s":
+                            case "s":
                             {
                                 withBlock.X = Type.AutoSe[3].X;
                                 withBlock.Y = Type.AutoSe[3].Y;
                                 break;
                             }
-                        case "t":
+                            case "t":
                             {
                                 withBlock.X = Type.AutoSe[4].X;
                                 withBlock.Y = Type.AutoSe[4].Y;
                                 break;
                             }
+                        }
                     }
                 }
             }
