@@ -11,14 +11,7 @@
     <PackageVersion Include="ManagedBass.Midi" Version="4.0.2" />
     <PackageVersion Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
-    <PackageVersion Include="MonoGame.Content.Builder.Task" Version="3.8.4.1" />
-    <PackageVersion Include="MonoGame.Extended" Version="4.1.0" />
-    <PackageVersion Include="MonoGame.Framework.Content.Pipeline" Version="3.8.4.1" />
-    <PackageVersion Include="MonoGame.Framework.DesktopGL" Version="3.8.4.1" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageVersion Include="MonoGame.Library.SDL" Version="2.32.10.1" />
-    <PackageVersion Include="Ryujinx.SDL2-CS" Version="2.0.14" />
-    <PackageVersion Include="SDL2-CS" Version="2.0.0" />
     <PackageVersion Include="Npgsql" Version="9.0.4" />
     <PackageVersion Include="Serilog" Version="4.3.0" />
     <PackageVersion Include="Serilog.Enrichers.Environment" Version="3.0.1" />
@@ -28,6 +21,10 @@
     <PackageVersion Include="Serilog.Settings.Configuration" Version="9.0.0" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
     <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
-    <PackageVersion Include="System.Text.Json" Version="9.0.8" />
+    <PackageVersion Include="System.Text.Json" Version="10.0.0" />
+    <PackageVersion Include="Eto.Forms" Version="2.10.2" />
+    <PackageVersion Include="Eto.Platform.Wpf" Version="2.10.2" />
+    <PackageVersion Include="Eto.Platform.Windows" Version="2.10.2" />
+    <PackageVersion Include="Eto.Platform.Gtk" Version="2.10.2" />
   </ItemGroup>
 </Project>
