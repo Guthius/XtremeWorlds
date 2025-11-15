@@ -310,6 +310,106 @@ public class Crystalshire
         window.GetChild("CheckboxSelling").CallBack[(int) ControlState.MouseDown] = WinShop.OnSellingChecked;
     }
 
+    public void UpdateWindow_Admin()
+    {
+        var window = WindowLoader.FromLayout("winAdmin");
+        
+        // Initialize UI with basic player info
+        WinAdmin.UpdatePlayerInfo(window);
+
+        // ===== MODERATION TAB =====
+        TryBind(window, "btnAdminWarpTo", ControlState.MouseDown, WinAdmin.OnWarpToMap);
+        TryBind(window, "btnAdminBan", ControlState.MouseDown, WinAdmin.OnBanPlayer);
+        TryBind(window, "btnAdminKick", ControlState.MouseDown, WinAdmin.OnKickPlayer);
+        TryBind(window, "btnAdminWarp2Me", ControlState.MouseDown, WinAdmin.OnWarpPlayerToMe);
+        TryBind(window, "btnAdminWarpMe2", ControlState.MouseDown, WinAdmin.OnWarpMeToPlayer);
+        TryBind(window, "btnAdminSetAccess", ControlState.MouseDown, WinAdmin.OnSetAccess);
+        TryBind(window, "btnAdminSetSprite", ControlState.MouseDown, WinAdmin.OnSetPlayerSprite);
+        TryBind(window, "btnLevelUp", ControlState.MouseDown, WinAdmin.OnLevelUp);
+
+        // ===== MAP LIST TAB =====
+        TryBind(window, "btnMapReport", ControlState.MouseDown, WinAdmin.OnRefreshMapList);
+        TryBind(window, "lstMaps", ControlState.DoubleClick, WinAdmin.OnMapListDoubleClick);
+
+        // ===== MAP TOOLS TAB =====
+        TryBind(window, "btnRespawn", ControlState.MouseDown, WinAdmin.OnRespawnMap);
+        TryBind(window, "btnALoc", ControlState.MouseDown, WinAdmin.OnToggleLocation);
+
+        // ===== EDITORS TAB =====
+        TryBind(window, "btnAnimationEditor", ControlState.MouseDown, WinAdmin.OnAnimationEditor);
+        TryBind(window, "btnJobEditor", ControlState.MouseDown, WinAdmin.OnJobEditor);
+        TryBind(window, "btnItemEditor", ControlState.MouseDown, WinAdmin.OnItemEditor);
+        TryBind(window, "btnMapEditor", ControlState.MouseDown, WinAdmin.OnMapEditor);
+        TryBind(window, "btnNpcEditor", ControlState.MouseDown, WinAdmin.OnNpcEditor);
+        TryBind(window, "btnProjectiles", ControlState.MouseDown, WinAdmin.OnProjectileEditor);
+        TryBind(window, "btnResourceEditor", ControlState.MouseDown, WinAdmin.OnResourceEditor);
+        TryBind(window, "btnShopEditor", ControlState.MouseDown, WinAdmin.OnShopEditor);
+        TryBind(window, "btnSkillEditor", ControlState.MouseDown, WinAdmin.OnSkillEditor);
+        TryBind(window, "btnMoralEditor", ControlState.MouseDown, WinAdmin.OnMoralEditor);
+        TryBind(window, "btnScriptEditor", ControlState.MouseDown, WinAdmin.OnScriptEditor);
+    }
+
+    // Editor window initialization methods (placeholders for future migration)
+    public void UpdateWindow_EditorMap()
+    {
+        // Initialize EditorMap to use Crystalshire styling
+    }
+
+    public void UpdateWindow_EditorAnimation()
+    {
+        // Initialize EditorAnimation to use Crystalshire styling
+    }
+
+    public void UpdateWindow_EditorEvent()
+    {
+        // Initialize EditorEvent to use Crystalshire styling
+    }
+
+    public void UpdateWindow_EditorItem()
+    {
+        // Initialize EditorItem to use Crystalshire styling
+    }
+
+    public void UpdateWindow_EditorNpc()
+    {
+        // Initialize EditorNpc to use Crystalshire styling
+    }
+
+    public void UpdateWindow_EditorSkill()
+    {
+        // Initialize EditorSkill to use Crystalshire styling
+    }
+
+    public void UpdateWindow_EditorJob()
+    {
+        // Initialize EditorJob to use Crystalshire styling
+    }
+
+    public void UpdateWindow_EditorShop()
+    {
+        // Initialize EditorShop to use Crystalshire styling
+    }
+
+    public void UpdateWindow_EditorResource()
+    {
+        // Initialize EditorResource to use Crystalshire styling
+    }
+
+    public void UpdateWindow_EditorProjectile()
+    {
+        // Initialize EditorProjectile to use Crystalshire styling
+    }
+
+    public void UpdateWindow_EditorScript()
+    {
+        // Initialize EditorScript to use Crystalshire styling
+    }
+
+    public void UpdateWindow_EditorMoral()
+    {
+        // Initialize EditorMoral to use Crystalshire styling
+    }
+
     // Helper to bind callbacks if a control exists in layout
     private static void TryBind(Window window, string controlName, ControlState state, Action action)
     {

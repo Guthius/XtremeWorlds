@@ -174,7 +174,6 @@ namespace Client
             withBlock.PreferredBackBufferHeight = GameState.ResolutionHeight;
             withBlock.SynchronizeWithVerticalRetrace = SettingsManager.Instance.Vsync;
             IsFixedTimeStep = false;
-            withBlock.PreferHalfPixelOffset = true;
             withBlock.PreferMultiSampling = false;
 
             // Allow resizing and keep backbuffer in sync with window size when windowed
@@ -546,7 +545,7 @@ namespace Client
 
                 using (var targetBatch = new SpriteBatch(GraphicsDevice))
                 {
-                    targetBatch.Begin(samplerState: SamplerState.PointClamp);
+                    targetBatch.Begin( SpriteSortMode.Deferred, BlendState.NonPremultiplied);
                     // Draw the game/menu with zoom
                     if (RenderTarget != null)
                         targetBatch.Draw(RenderTarget, zoomedRect, Color.White);
@@ -1587,26 +1586,19 @@ namespace Client
             whiteTexture.SetData([Color.White]);
 
             // Draw the filled rectangle
-            SpriteBatch.Draw(whiteTexture, new Rectangle(position.ToPoint(), size.ToPoint()), fillColor);
+            SpriteBatch.Draw(whiteTexture, new Rectangle((int)position.X, (int)position.Y, (int)size.X, (int)size.Y), fillColor);
 
             // Draw the outline if thickness > 0
             if (outlineThickness > 0f)
             {
                 // Create the four sides of the outline
-                var left = new Rectangle(position.ToPoint(),
-                    new Point((int)Math.Round(outlineThickness), (int)Math.Round(size.Y)));
+                var left = new Rectangle((int)position.X, (int)position.Y, (int)outlineThickness, (int)size.Y);
 
-                var top = new Rectangle(position.ToPoint(),
-                    new Point((int)Math.Round(size.X), (int)Math.Round(outlineThickness)));
+                var top = new Rectangle((int)position.X, (int)position.Y, (int)size.X, (int)outlineThickness);
 
-                var right = new Rectangle(
-                    new Point((int)Math.Round(position.X + size.X - outlineThickness), (int)Math.Round(position.Y)),
-                    new Point((int)Math.Round(outlineThickness), (int)Math.Round(size.Y)));
+                var right = new Rectangle((int)(position.X + size.X - outlineThickness), (int)position.Y, (int)outlineThickness, (int)size.Y);
 
-                var bottom =
-                    new Rectangle(
-                        new Point((int)Math.Round(position.X), (int)Math.Round(position.Y + size.Y - outlineThickness)),
-                        new Point((int)Math.Round(size.X), (int)Math.Round(outlineThickness)));
+                var bottom = new Rectangle((int)position.X, (int)(position.Y + size.Y - outlineThickness), (int)size.X, (int)outlineThickness);
 
                 // Draw the outline rectangles
                 SpriteBatch.Draw(whiteTexture, left, outlineColor);

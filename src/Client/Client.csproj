@@ -7,13 +7,12 @@
         <OutputPath>..\..\Build\Client\</OutputPath>
         <DefineConstants>CLIENT</DefineConstants>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <MonoGamePlatform>OpenGL</MonoGamePlatform>
     </PropertyGroup>
 
 	<!-- Cross-platform TFM: non-Windows RIDs -->
     <PropertyGroup Condition="'$(TargetFramework)'=='net10.0'">
         <OutputType>Exe</OutputType>
-        <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
+        <RuntimeIdentifiers>linux-x64;osx-arm64</RuntimeIdentifiers>
     </PropertyGroup>
 
     <!-- OutputType must be in PropertyGroup, not ItemGroup -->
@@ -85,8 +84,6 @@
 
     <!-- Always include Eto.Forms, but only include Gtk on Linux -->
     <ItemGroup>
-        <PackageReference Include="AssimpNetter" />
-        <PackageReference Include="BCnEncoder.Net" />
         <PackageReference Include="Eto.Forms" />
     </ItemGroup>
 
@@ -109,22 +106,20 @@
     <ItemGroup>
         <PackageReference Include="ManagedBass" />
         <PackageReference Include="ManagedBass.Midi" />
-        <PackageReference Include="MonoGame.Content.Builder.Task" />
-        <PackageReference Include="MonoGame.Framework.Content.Pipeline" />
-        <PackageReference Include="MonoGame.Framework.DesktopGL" />
-        <PackageReference Include="MonoGame.Library.SDL" />
-        <PackageReference Include="Ryujinx.SDL2-CS" />
-        <PackageReference Include="SDL2-CS" />
         <PackageReference Include="CS-Script" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageVersion Include="AssimpNetter" Version="1.0.0" />
-        <PackageVersion Include="BCnEncoder.Net" Version="1.0.0" />
         <PackageVersion Include="Eto.Forms" Version="2.1.0.2" />
         <PackageVersion Include="Eto.Platform.Wpf" Version="2.1.0.2" />
         <PackageVersion Include="Eto.Platform.Windows" Version="2.1.0.2" />
         <PackageVersion Include="Eto.Platform.Gtk" Version="2.1.0.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="FNA">
+        <HintPath>FNA.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
     <Target Name="EnsureContentFolderExists" BeforeTargets="Build">

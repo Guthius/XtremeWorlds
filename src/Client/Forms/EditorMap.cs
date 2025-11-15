@@ -1,6 +1,5 @@
 using Eto.Forms;
 using Eto.Drawing;
-using Assimp.Configs;
 using System.Linq;
 using System.Collections.Generic;
 using Client.Game.UI;

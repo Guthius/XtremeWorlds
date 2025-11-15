@@ -48,7 +48,6 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Hosting"/>
-        <PackageReference Include="MonoGame.Library.SDL"/>
         <PackageReference Include="Serilog"/>
         <PackageReference Include="Serilog.Enrichers.Environment"/>
         <PackageReference Include="Serilog.Enrichers.Thread"/>
