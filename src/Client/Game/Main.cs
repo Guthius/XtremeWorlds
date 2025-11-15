@@ -14,16 +14,6 @@ public static class Program
     [STAThread]
     public static void Main()
     {
-        
-        RunGame();
-    }
-
-    }
-
-    private static void RunGame()
-    {
         General.Client.Run();
-    }
-}
     }
 }
