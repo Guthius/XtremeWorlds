@@ -152,15 +152,20 @@ public sealed class NetworkClient
     {
         try
         {
+            Console.WriteLine("RunSend: Starting send loop");
             var networkStream = tcpClient.GetStream();
 
             await foreach (var bytes in sendChannel.Reader.ReadAllAsync(cancellationToken))
             {
+                Console.WriteLine($"RunSend: Sending {bytes.Length} bytes");
                 await networkStream.WriteAsync(bytes, cancellationToken);
+                Console.WriteLine($"RunSend: Successfully sent {bytes.Length} bytes");
             }
+            Console.WriteLine("RunSend: Send loop ended");
         }
         catch (ObjectDisposedException) // Happens when RunReceive closes the TcpClient and disposes the stream
         {
+            Console.WriteLine("RunSend: ObjectDisposedException (normal during shutdown)");
         }
         catch (SocketException ex)
         {
@@ -174,6 +179,13 @@ public sealed class NetworkClient
 
     public void Send(byte[] bytes)
     {
-        _sendChannel?.Writer.TryWrite(bytes);
+        if (_sendChannel == null)
+        {
+            Console.WriteLine("Send failed: _sendChannel is null");
+            return;
+        }
+
+        var result = _sendChannel.Writer.TryWrite(bytes);
+        Console.WriteLine($"Send attempt: {bytes.Length} bytes, success: {result}");
     }
 }
