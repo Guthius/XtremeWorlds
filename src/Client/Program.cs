@@ -195,8 +195,6 @@ namespace Client
             Exiting += (s, e) => {
                 // Let General perform graceful shutdown tasks
                 General.DestroyGame();
-                // Also end the Eto UI loop cleanly
-                try { Client.Program.QuitEto(); } catch { }
             };
         }
 

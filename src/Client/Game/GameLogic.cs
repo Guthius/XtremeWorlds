@@ -1995,35 +1995,6 @@ namespace Client
             GameState.InMenu = true;
             GameState.GettingMap = false;
             GameState.InGame = false;
-            // Close all open Eto.Forms windows (editors, admin, etc.) when Eto is active
-            try
-            {
-                if (Client.Program.IsEtoAvailable)
-                {
-                    Application.Instance?.AsyncInvoke(() =>
-                    {
-                        try
-                        {
-                            // Only close visible windows to avoid closing the hidden root form
-                            foreach (var win in Application.Instance.Windows.ToList())
-                            {
-                                try
-                                {
-                                    if (win != null && win.Visible)
-                                    {
-                                        // Prefer Close (triggers Closing handlers), then Dispose as a fallback
-                                        try { win.Close(); } catch { }
-                                        try { win.Dispose(); } catch { }
-                                    }
-                                }
-                                catch { }
-                            }
-                        }
-                        catch { }
-                    });
-                }
-            }
-            catch { }
             WindowManager.HideWindows();
             WindowManager.ShowWindow("winLogin");
             General.ClearGameData();

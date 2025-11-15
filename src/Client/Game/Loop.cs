@@ -451,7 +451,7 @@ namespace Client
             WindowManager.ResizeGui();
         }
 
-        private void UpdateEditors()
+        private static void UpdateEditors()
         {
             if (GameState.InitAdminForm)
             {
