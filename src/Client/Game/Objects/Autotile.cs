@@ -43,8 +43,14 @@ namespace Client
             if (layerNum > layerCount)
             {
                 layerNum = layerNum - (layerCount);
+                // Null guards for extended layer access
+                if (Data.Autotile == null) return;
+                if (Data.Autotile[x, y].Layer == null) return;
+                if (layerNum < 0 || layerNum >= Data.Autotile[x, y].Layer.Length) return;
+                if (Data.Autotile[x, y].Layer[layerNum].Tile == null)
+                    Data.Autotile[x, y].Layer[layerNum].Tile = new Type.Point[5];
                 {
-                    ref var withBlock = ref Data.Autotile[x, y].ExLayer[layerNum].Tile[tileQuarter];
+                    ref var withBlock = ref Data.Autotile[x, y].Layer[layerNum].Tile[tileQuarter];
                     switch (autoTileLetter ?? "")
                     {
                         case "a":
@@ -172,6 +178,12 @@ namespace Client
             }
             else
             {
+                // Null guards for normal layer access
+                if (Data.Autotile == null) return;
+                if (Data.Autotile[x, y].Layer == null) return;
+                if (layerNum < 0 || layerNum >= Data.Autotile[x, y].Layer.Length) return;
+                if (Data.Autotile[x, y].Layer[layerNum].Tile == null)
+                    Data.Autotile[x, y].Layer[layerNum].Tile = new Type.Point[5];
                 {
                     ref var withBlock1 = ref Data.Autotile[x, y].Layer[layerNum].Tile[tileQuarter];
                     switch (autoTileLetter ?? "")
@@ -427,6 +439,14 @@ namespace Client
 
             if (x < 0 | x >= Data.MyMap.MaxX | y < 0 | y >= Data.MyMap.MaxY)
                 return;
+
+            // Ensure autotile layer arrays are initialized before dereferencing to avoid CS8602
+            if (Data.Autotile == null || Data.Autotile[x, y].Layer == null)
+                return;
+            if (layerNum < 0 || layerNum >= Data.Autotile[x, y].Layer.Length)
+                return;
+            if (Data.Autotile[x, y].Layer[layerNum].Tile == null)
+                Data.Autotile[x, y].Layer[layerNum].Tile = new Type.Point[5];
 
             ref var withBlock = ref Data.MyMap.Tile[x, y];
 

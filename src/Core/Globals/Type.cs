@@ -945,7 +945,6 @@ public static class Type
     public struct Autotile
     {
         public QuarterTile[] Layer;
-        public QuarterTile[] ExLayer;
     }
 
     public static Point[] AutoIn = new Point[5];
