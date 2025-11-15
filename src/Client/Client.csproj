@@ -52,7 +52,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Include="*.dll;*.dylib;*.so;*.sf2">
+        <Content Include="*.dll;*.dylib;*.so;*o.0;*.sf2">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <Visible>False</Visible>
         </Content>
@@ -119,6 +119,12 @@
     <ItemGroup>
       <Reference Include="FNA">
         <HintPath>FNA.dll</HintPath>
+      </Reference>
+      <Reference Include="SDL2-CS">
+        <HintPath>SDL2-CS.dll</HintPath>
+      </Reference>
+      <Reference Include="SDL3.Core">
+        <HintPath>SDL3.Core.dll</HintPath>
       </Reference>
     </ItemGroup>
 

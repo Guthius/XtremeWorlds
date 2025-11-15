@@ -70,7 +70,6 @@ public static class Program
     if (!IsEtoAvailable) return;
         if (GameState.InitAdminForm)
         {
-            new Admin().Show();
             Sender.SendRequestMapReport();
             GameState.AdminPanel = true;
             GameState.InitAdminForm = false;
@@ -81,7 +80,6 @@ public static class Program
             for (int i = 1, loopTo = GameState.MapNames.Length; i < loopTo; i++)
             {
                 var admin = Admin.Instance;
-                admin.lstMaps.Items.Add(new ListItem { Text = $"{i}: {GameState.MapNames[i]}" });
             }
                 
             GameState.InitMapReport = false;

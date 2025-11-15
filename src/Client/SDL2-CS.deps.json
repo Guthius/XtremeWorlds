@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "SDL2-CS/1.0.0": {
+        "runtime": {
+          "SDL2-CS.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "SDL2-CS/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
