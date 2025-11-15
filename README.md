@@ -21,7 +21,7 @@ collaborative development.
 
 ## Game Features
 
-- Basic Character Creation/Class Selection
+- Basic Character Creation/Job Selection
 - Movement/Attacking
 - NPC/Computer Characters for attacking
 - Items & Spells
@@ -38,7 +38,7 @@ Log in to the game with the client. On the server, type the command /access name
 ## Quick Start
 
 ### Prerequisites
-- [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
+- [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
 - [PostgreSQL](https://www.postgresql.org/download/)
 - Git
 
