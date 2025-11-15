@@ -26,7 +26,7 @@ namespace Server
         private static string _myIpAddress = string.Empty;
         private static readonly Stopwatch MyStopwatch = new Stopwatch();
         public static ILogger Logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
-        private static readonly object SyncLock = new object();
+        private static readonly Lock SyncLock = new Lock();
         private static readonly CancellationTokenSource Cts = new CancellationTokenSource();
         private static Timer? _saveTimer;
         private static Stopwatch _shutDownTimer = new Stopwatch();
