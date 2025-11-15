@@ -76,8 +76,8 @@ public sealed class NetworkClient
                 }
                 finally
                 {
-            try { tcpClient?.Close(); } catch { }
-            _isConnected = false; // mark disconnected on any exit
+                try { tcpClient?.Close(); } catch { }
+                _isConnected = false; // mark disconnected on any exit
                 }
             }
         }
