@@ -22,15 +22,15 @@ namespace Client
         public ListBox? lstIndex; // legacy name used by Editors.cs
         public TextBox? txtName;
         public TextArea? txtDescription;
-        public NumericUpDown? numIcon, numPaperdoll, numItemLvl, numPrice, numRarity, numSpeed, numDamage, numVitalMod, numEventId, numEventValue;
+        public NumericStepper? numIcon, numPaperdoll, numItemLvl, numPrice, numRarity, numSpeed, numDamage, numVitalMod, numEventId, numEventValue;
         public CheckBox? chkStackable, chkKnockBack;
         public ComboBox? cmbType, cmbSubType, cmbAnimation, cmbBind, cmbJobReq, cmbAccessReq, cmbTool, cmbSkills, cmbProjectile, cmbAmmo, cmbKnockBackTiles;
-        public NumericUpDown? numStrReq, numVitReq, numLuckReq, numIntReq, numSprReq, numLevelReq;
-        public NumericUpDown? numStrAdd, numVitAdd, numLuckAdd, numIntAdd, numSprAdd;
+        public NumericStepper? numStrReq, numVitReq, numLuckReq, numIntReq, numSprReq, numLevelReq;
+        public NumericStepper? numStrAdd, numVitAdd, numLuckAdd, numIntAdd, numSprAdd;
         public Drawable? iconPreview, paperdollPreview;
         public Button? btnSave, btnCancel, btnDelete, btnCopy;
         public Button? btnSpawn;
-        public NumericUpDown? numSpawnAmount;
+        public NumericStepper? numSpawnAmount;
 
         // Frames (logical group visibility mimic of old design)
         public GroupBox? fraEquipment, fraVitals, fraSkill, fraProjectile, fraEvents, fraRequirements, fraBasics;
@@ -284,15 +284,15 @@ namespace Client
             };
         }
 
-        NumericUpDown Num(int min, int max) => new NumericUpDown { MinValue = min, MaxValue = max, Increment = 1 };
+        NumericStepper Num(int min, int max) => new NumericStepper { MinValue = min, MaxValue = max, Increment = 1 };
 
-        NumericUpDown StatReq(Stat stat)
+        NumericStepper StatReq(Stat stat)
         {
             var n = Num(0, 999);
             n.ValueChanged += (s,e)=> { Data.Item[GameState.EditorIndex].StatReq[(int)stat] = (byte)n.Value; MarkChanged(); };
             return n;
         }
-        NumericUpDown StatAdd(Stat stat)
+        NumericStepper StatAdd(Stat stat)
         {
             var n = Num(0, 999);
             n.ValueChanged += (s,e)=> { Data.Item[GameState.EditorIndex].AddStat[(int)stat] = (byte)n.Value; MarkChanged(); };
@@ -442,27 +442,27 @@ namespace Client
         }
 
     // Legacy alias properties for Editors.cs naming (nud*, cmb*)
-    public NumericUpDown nudIcon => numIcon!;
-    public NumericUpDown nudPaperdoll => numPaperdoll!;
-    public NumericUpDown nudItemLvl => numItemLvl!;
-    public NumericUpDown nudPrice => numPrice!;
-    public NumericUpDown nudRarity => numRarity!;
-    public NumericUpDown nudSpeed => numSpeed!;
-    public NumericUpDown nudDamage => numDamage!;
-    public NumericUpDown nudVitalMod => numVitalMod!;
-    public NumericUpDown nudEvent => numEventId!;
-    public NumericUpDown nudEventValue => numEventValue!;
-    public NumericUpDown nudLevelReq => numLevelReq!;
-    public NumericUpDown nudStrReq => numStrReq!;
-    public NumericUpDown nudVitReq => numVitReq!;
-    public NumericUpDown nudLuckReq => numLuckReq!;
-    public NumericUpDown nudIntReq => numIntReq!;
-    public NumericUpDown nudSprReq => numSprReq!;
-    public NumericUpDown nudStrength => numStrAdd!;
-    public NumericUpDown nudIntelligence => numIntAdd!;
-    public NumericUpDown nudVitality => numVitAdd!;
-    public NumericUpDown nudLuck => numLuckAdd!;
-    public NumericUpDown nudSpirit => numSprAdd!;
+    public NumericStepper nudIcon => numIcon!;
+    public NumericStepper nudPaperdoll => numPaperdoll!;
+    public NumericStepper nudItemLvl => numItemLvl!;
+    public NumericStepper nudPrice => numPrice!;
+    public NumericStepper nudRarity => numRarity!;
+    public NumericStepper nudSpeed => numSpeed!;
+    public NumericStepper nudDamage => numDamage!;
+    public NumericStepper nudVitalMod => numVitalMod!;
+    public NumericStepper nudEvent => numEventId!;
+    public NumericStepper nudEventValue => numEventValue!;
+    public NumericStepper nudLevelReq => numLevelReq!;
+    public NumericStepper nudStrReq => numStrReq!;
+    public NumericStepper nudVitReq => numVitReq!;
+    public NumericStepper nudLuckReq => numLuckReq!;
+    public NumericStepper nudIntReq => numIntReq!;
+    public NumericStepper nudSprReq => numSprReq!;
+    public NumericStepper nudStrength => numStrAdd!;
+    public NumericStepper nudIntelligence => numIntAdd!;
+    public NumericStepper nudVitality => numVitAdd!;
+    public NumericStepper nudLuck => numLuckAdd!;
+    public NumericStepper nudSpirit => numSprAdd!;
     // ComboBoxes already public by field declaration; no additional alias properties needed
 
     // Legacy drawing methods accessed by Editors.cs

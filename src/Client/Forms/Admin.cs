@@ -19,7 +19,7 @@ namespace Client
         // Controls
         public TextBox txtAdminName = null!;
         public DropDown cmbAccess = null!;
-        public NumericUpDown nudAdminSprite = null!, nudAdminMap = null!;
+        public NumericStepper nudAdminSprite = null!, nudAdminMap = null!;
         public ListBox lstMaps = null!;
         public TabControl tabControl = null!;
         public Button btnAdminWarpTo = null!, btnAdminBan = null!, btnAdminKick = null!, btnAdminWarp2Me = null!, btnAdminWarpMe2 = null!, btnAdminSetAccess = null!, btnAdminSetSprite = null!;
@@ -48,8 +48,8 @@ namespace Client
             }
             cmbAccess.SelectedIndex = 0; // Set default access to 0
 
-            nudAdminSprite = new NumericUpDown { MinValue = 0, MaxValue = GameState.NumCharacters };
-            nudAdminMap = new NumericUpDown { MinValue = 0, MaxValue = Variables.MaxMaps };
+            nudAdminSprite = new NumericStepper { MinValue = 0, MaxValue = GameState.NumCharacters };
+            nudAdminMap = new NumericStepper { MinValue = 0, MaxValue = Variables.MaxMaps };
 
             btnAdminWarpTo = new Button { Text = "Warp To Map" };
             btnAdminBan = new Button { Text = "Ban Player" };

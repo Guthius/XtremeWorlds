@@ -25,13 +25,13 @@
 
             <!-- Map Number Section -->
             <Label Text="Map Number:" Position="15, 85" Size="100, 12"/>
-            <NumericUpDown Name="nudAdminMap" Position="120, 83" Size="100, 18" MinValue="0" MaxValue="999"/>
+            <NumericStepper Name="nudAdminMap" Position="120, 83" Size="100, 18" MinValue="0" MaxValue="999"/>
             <Button Name="btnAdminWarpTo" Text="Warp To Map" Position="225, 83" Size="100, 22"
                     Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 
             <!-- Sprite Section -->
             <Label Text="Sprite:" Position="15, 110" Size="100, 12"/>
-            <NumericUpDown Name="nudAdminSprite" Position="120, 108" Size="100, 18" MinValue="0" MaxValue="999"/>
+            <NumericStepper Name="nudAdminSprite" Position="120, 108" Size="100, 18" MinValue="0" MaxValue="999"/>
             <Button Name="btnAdminSetSprite" Text="Set Sprite" Position="225, 108" Size="100, 22"
                     Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 

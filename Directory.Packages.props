@@ -5,8 +5,9 @@
     <NoWarn>$(NoWarn);NU1507</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="CS-Script" Version="4.11.2" />
     <PackageVersion Include="CS-Script.Core" Version="2.0.0" />
+    <PackageVersion Include="CS-Script" Version="4.12.0.0" />
+    <PackageVersion Include="System.Private.Uri" Version="4.3.2" />
     <PackageVersion Include="ManagedBass" Version="4.0.2" />
     <PackageVersion Include="ManagedBass.Midi" Version="4.0.2" />
     <PackageVersion Include="Microsoft.CSharp" Version="4.7.0" />

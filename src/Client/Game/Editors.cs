@@ -14,7 +14,7 @@ namespace Client
         public static int? PromptIndex(Form owner, string title, string message, int min, int max, int defaultValue)
         {
             var dlg = new Dialog { Title = title, ClientSize = new Size(360, 140), Padding = 10 };
-            var num = new NumericUpDown { MinValue = min, MaxValue = max, Value = defaultValue, DecimalPlaces = 0 };
+            var num = new NumericStepper { MinValue = min, MaxValue = max, Value = defaultValue, DecimalPlaces = 0 };
             var ok = new Button { Text = "OK" };
             var cancel = new Button { Text = "Cancel" };
             int? result = null;
@@ -398,7 +398,7 @@ namespace Client
             }
             else
             {
-                withBlock.nudBuy.Value = 100d; // NumericUpDown uses double
+                withBlock.nudBuy.Value = 100d; // NumericStepper uses double
             }
 
             withBlock.cmbItem.SelectedIndex = 0;

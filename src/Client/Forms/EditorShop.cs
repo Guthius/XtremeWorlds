@@ -16,15 +16,15 @@ namespace Client
         private bool _suppressIndexChanged;
         public ListBox lstIndex = new ListBox();
         public TextBox txtName = new TextBox { Width = 200 };
-        public NumericUpDown nudBuy = new NumericUpDown { MinValue = 0, MaxValue = 10000, Increment = 1 };
+        public NumericStepper nudBuy = new NumericStepper { MinValue = 0, MaxValue = 10000, Increment = 1 };
         public ComboBox cmbItem = new ComboBox();
         public ComboBox cmbCostItem = new ComboBox();
         public ListBox lstTradeItem = new ListBox();
         public ComboBox cmbItemCurrency = new ComboBox();
-        public NumericUpDown nudItemValue = new NumericUpDown { MinValue = 0, MaxValue = 1000000 };
-        public NumericUpDown nudCostValue = new NumericUpDown { MinValue = 0, MaxValue = 1000000 };
+        public NumericStepper nudItemValue = new NumericStepper { MinValue = 0, MaxValue = 1000000 };
+        public NumericStepper nudCostValue = new NumericStepper { MinValue = 0, MaxValue = 1000000 };
         // Width control & scrolling support (implemented locally for this editor)
-        private NumericUpDown? _nudWidth;
+        private NumericStepper? _nudWidth;
         private Splitter? _mainSplitter; // still referenced for inner layout
         private Button btnUpdate = new Button { Text = "Update Trade" };
         private Button btnDeleteTrade = new Button { Text = "Delete Trade" };
@@ -144,7 +144,7 @@ namespace Client
                 Panel2 = rightPanel
             };
             // Inline width control (no external helper to avoid dependency issues)
-            _nudWidth = new NumericUpDown
+            _nudWidth = new NumericStepper
             {
                 MinValue = 900,
                 MaxValue = 2600,

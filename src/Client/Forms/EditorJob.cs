@@ -26,23 +26,23 @@ namespace Client
     public TextArea txtDescription => txtDesc!;
     public ComboBox? cmbItems;
     public ComboBox? cmbSkills;
-    public NumericUpDown? numStr, numLck, numEnd, numInt, numVit, numSpr, numBaseExp;
-    public NumericUpDown? numStartMap, numStartX, numStartY;
-    public NumericUpDown? numMaleSprite, numFemaleSprite, numItemAmount;
+    public NumericStepper? numStr, numLck, numEnd, numInt, numVit, numSpr, numBaseExp;
+    public NumericStepper? numStartMap, numStartX, numStartY;
+    public NumericStepper? numMaleSprite, numFemaleSprite, numItemAmount;
     public Button? btnSetItem, btnSetSkill, btnSave, btnDelete, btnCopy, btnCancel;
     public Drawable? malePreview, femalePreview;
     Bitmap? maleBmp, femaleBmp;
-    public NumericUpDown nudStrength => numStr!;
-    public NumericUpDown nudLuck => numLck!;
-    public NumericUpDown nudIntelligence => numInt!;
-    public NumericUpDown nudVitality => numVit!;
-    public NumericUpDown nudSpirit => numSpr!;
-    public NumericUpDown nudBaseExp => numBaseExp!;
-    public NumericUpDown nudStartMap => numStartMap!;
-    public NumericUpDown nudStartX => numStartX!;
-    public NumericUpDown nudStartY => numStartY!;
-    public NumericUpDown nudMaleSprite => numMaleSprite!;
-    public NumericUpDown nudFemaleSprite => numFemaleSprite!;
+    public NumericStepper nudStrength => numStr!;
+    public NumericStepper nudLuck => numLck!;
+    public NumericStepper nudIntelligence => numInt!;
+    public NumericStepper nudVitality => numVit!;
+    public NumericStepper nudSpirit => numSpr!;
+    public NumericStepper nudBaseExp => numBaseExp!;
+    public NumericStepper nudStartMap => numStartMap!;
+    public NumericStepper nudStartX => numStartX!;
+    public NumericStepper nudStartY => numStartY!;
+    public NumericStepper nudMaleSprite => numMaleSprite!;
+    public NumericStepper nudFemaleSprite => numFemaleSprite!;
 
     public EditorJob()
     {
@@ -80,27 +80,27 @@ namespace Client
         numInt = Stat(); numInt.ValueChanged += (s, e) => SetStat(Core.Globals.Stat.Intelligence, numInt);
         numVit = Stat(); numVit.ValueChanged += (s, e) => SetStat(Core.Globals.Stat.Vitality, numVit);
         numSpr = Stat(); numSpr.ValueChanged += (s, e) => SetStat(Core.Globals.Stat.Spirit, numSpr);
-        numBaseExp = new NumericUpDown { MinValue = 0, MaxValue = 5_000_000, Increment = 10 };
+        numBaseExp = new NumericStepper { MinValue = 0, MaxValue = 5_000_000, Increment = 10 };
         numBaseExp.ValueChanged += (s, e) => Data.Job[GameState.EditorIndex].BaseExp = (int)numBaseExp.Value;
 
         // Start position
-        numStartMap = new NumericUpDown { MinValue = 0, MaxValue = int.MaxValue };
+        numStartMap = new NumericStepper { MinValue = 0, MaxValue = int.MaxValue };
         numStartMap.ValueChanged += (s, e) => Data.Job[GameState.EditorIndex].StartMap = (int)numStartMap.Value;
-        numStartX = new NumericUpDown { MinValue = 0, MaxValue = 255 };
+        numStartX = new NumericStepper { MinValue = 0, MaxValue = 255 };
         numStartX.ValueChanged += (s, e) => Data.Job[GameState.EditorIndex].StartX = (byte)numStartX.Value;
-        numStartY = new NumericUpDown { MinValue = 0, MaxValue = 255 };
+        numStartY = new NumericStepper { MinValue = 0, MaxValue = 255 };
         numStartY.ValueChanged += (s, e) => Data.Job[GameState.EditorIndex].StartY = (byte)numStartY.Value;
 
         // Sprites
-        numMaleSprite = new NumericUpDown { MinValue = 0, MaxValue = GameState.NumCharacters };
+        numMaleSprite = new NumericStepper() { MinValue = 0, MaxValue = GameState.NumCharacters };
         numMaleSprite.ValueChanged += (s, e) => { Data.Job[GameState.EditorIndex].MaleSprite = (int)numMaleSprite.Value; LoadSprites(); };
-        numFemaleSprite = new NumericUpDown { MinValue = 0, MaxValue = GameState.NumCharacters };
+        numFemaleSprite = new NumericStepper { MinValue = 0, MaxValue = GameState.NumCharacters };
         numFemaleSprite.ValueChanged += (s, e) => { Data.Job[GameState.EditorIndex].FemaleSprite = (int)numFemaleSprite.Value; LoadSprites(); };
 
         // Items
         lstStartItems = new ListBox { Height = 140, Width = 200 };
         cmbItems = new ComboBox { Width = 180 };
-        numItemAmount = new NumericUpDown { MinValue = 1, MaxValue = 999, Value = 1 };
+        numItemAmount = new NumericStepper { MinValue = 1, MaxValue = 999, Value = 1 };
         btnSetItem = new Button { Text = "Set Slot" };
         btnSetItem.Click += (s, e) => SetStartItem();
 
@@ -191,7 +191,7 @@ namespace Client
         };
     }
 
-    NumericUpDown Stat() => new NumericUpDown { MinValue = 0, MaxValue = 999, Increment = 1 };
+    NumericStepper Stat() => new NumericStepper { MinValue = 0, MaxValue = 999, Increment = 1 };
 
     private void LstIndex_Click() => Editors.JobEditorInit();
     void InitData()
@@ -306,7 +306,7 @@ namespace Client
         ReloadPanel();
     }
 
-    void SetStat(Stat stat, NumericUpDown ctl) => Data.Job[GameState.EditorIndex].Stat[(int)stat] = (int)ctl.Value;
+    void SetStat(Stat stat, NumericStepper ctl) => Data.Job[GameState.EditorIndex].Stat[(int)stat] = (int)ctl.Value;
         void SetStartItem()
         {
             if (lstStartItems!.SelectedIndex < 0) return;

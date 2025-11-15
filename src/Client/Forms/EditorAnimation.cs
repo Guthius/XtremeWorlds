@@ -11,14 +11,14 @@ namespace Client
         private static EditorAnimation? _instance;
         public static EditorAnimation Instance => _instance ??= new EditorAnimation();
         private bool _suppressIndexChanged;
-        public NumericUpDown nudSprite0 = new();
-        public NumericUpDown nudSprite1 = new();
-        public NumericUpDown nudLoopCount0 = new();
-        public NumericUpDown nudLoopCount1 = new();
-        public NumericUpDown nudFrameCount0 = new();
-        public NumericUpDown nudFrameCount1 = new();
-        public NumericUpDown nudLoopTime0 = new();
-        public NumericUpDown nudLoopTime1 = new();
+        public NumericStepper nudSprite0 = new();
+        public NumericStepper nudSprite1 = new();
+        public NumericStepper nudLoopCount0 = new();
+        public NumericStepper nudLoopCount1 = new();
+        public NumericStepper nudFrameCount0 = new();
+        public NumericStepper nudFrameCount1 = new();
+        public NumericStepper nudLoopTime0 = new();
+        public NumericStepper nudLoopTime1 = new();
         public Button btnSave = new();
         public Button btnDelete = new();
         public Button btnCopy = new();
@@ -51,14 +51,14 @@ namespace Client
             // Subscribe Load first
             Load += Editor_Animation_Load;
 
-            nudSprite0 = new NumericUpDown { MinValue = 0, MaxValue = GameState.NumAnimations };
-            nudSprite1 = new NumericUpDown { MinValue = 0, MaxValue = GameState.NumAnimations };
-            nudLoopCount0 = new NumericUpDown();
-            nudLoopCount1 = new NumericUpDown();
-            nudFrameCount0 = new NumericUpDown();
-            nudFrameCount1 = new NumericUpDown();
-            nudLoopTime0 = new NumericUpDown();
-            nudLoopTime1 = new NumericUpDown();
+            nudSprite0 = new NumericStepper { MinValue = 0, MaxValue = GameState.NumAnimations };
+            nudSprite1 = new NumericStepper { MinValue = 0, MaxValue = GameState.NumAnimations };
+            nudLoopCount0 = new NumericStepper();
+            nudLoopCount1 = new NumericStepper();
+            nudFrameCount0 = new NumericStepper();
+            nudFrameCount1 = new NumericStepper();
+            nudLoopTime0 = new NumericStepper();
+            nudLoopTime1 = new NumericStepper();
             btnSave = new Button { Text = "Save" };
             btnDelete = new Button { Text = "Delete" };
             btnCancel = new Button { Text = "Cancel" };
@@ -321,7 +321,7 @@ namespace Client
             Editors.AnimationEditorCancel();
         }
 
-        public void ProcessAnimation(Graphics graphics, NumericUpDown animationControl, NumericUpDown frameCountControl, NumericUpDown loopCountControl, int animationTimerIndex, Drawable drawable)
+        public void ProcessAnimation(Graphics graphics, NumericStepper animationControl, NumericStepper frameCountControl, NumericStepper loopCountControl, int animationTimerIndex, Drawable drawable)
         {
             try
             {
@@ -398,7 +398,7 @@ namespace Client
             return n;
         }
 
-    private void UpdatePreviewSize(Drawable drawable, NumericUpDown animationControl, NumericUpDown frameCountControl)
+    private void UpdatePreviewSize(Drawable drawable, NumericStepper animationControl, NumericStepper frameCountControl)
         {
             try
             {

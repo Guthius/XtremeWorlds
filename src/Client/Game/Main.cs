@@ -12,7 +12,6 @@ namespace Client;
 public static class Program
 {
     private static UITimer? _uiTimer;
-    private static bool _editorsDisposed;
     public static bool IsEtoAvailable => !RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && Application.Instance != null;
 
     [STAThread]
