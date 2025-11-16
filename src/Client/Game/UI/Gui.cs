@@ -432,6 +432,7 @@ public class WindowManager
             Y = top,
             Width = width,
             Height = height,
+            ZOrder = ZOrderCon,
             Design = design,
             Texture = texture,
             CallBack = callback
