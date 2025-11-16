@@ -20,10 +20,10 @@
       <Label Name="lblTileset" Text="1" Position="342, 106" Size="30, 14"/>
 
       <Label Name="lblLayerCaption" Text="Layer" Position="396, 106" Size="60, 14"/>
-      <ComboBox Name="cmbLayer" Position="440, 104" Size="200, 18" Design="ComboBoxNormal"/>
+      <ComboBox Name="cmbLayer" Position="440, 104" Size="200, 18" Design="ComboBox"/>
 
       <Label Name="lblAutotileCaption" Text="Autotile" Position="656, 106" Size="60, 14"/>
-      <ComboBox Name="cmbAutotile" Position="722, 104" Size="120, 18" Design="ComboBoxNormal"/>
+      <ComboBox Name="cmbAutotile" Position="722, 104" Size="120, 18" Design="ComboBox"/>
 
       <!-- Tools -->
       
@@ -37,11 +37,9 @@
     <!-- ATTRIBUTES TAB -->
     <TabPage Name="tabAttributes" Caption="Attributes">
       <PictureBox Name="picAttrBG" Position="6, 130" Size="836, 560" Design="Parchment"/>
-        <Label Name="lblAttr" Text="Attribute Tools" Position="20, 140" Size="200, 14"/>
-        <Label Name="lblAttrMode" Text="Mode" Position="20, 170" Size="80, 14"/>
-        <ComboBox Name="cmbAttrMode" Position="80, 168" Size="160, 18" Design="ComboBoxNormal"/>
-        <Button Name="btnAttrApply" Text="Apply" Position="250, 168" Size="70, 18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-        <Button Name="btnAttrClear" Text="Clear" Position="326, 168" Size="70, 18" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+        <ComboBox Name="cmbAttrMode" Position="20, 140" Size="220, 18" Design="ComboBox"/>
+        <Button Name="btnAttrApply" Text="Apply" Position="250, 140" Size="70, 18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+        <Button Name="btnAttrClear" Text="Cancel" Position="326, 140" Size="70, 18" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
     </TabPage>
 
     <!-- Additional tabs to mirror Eto.Forms -->

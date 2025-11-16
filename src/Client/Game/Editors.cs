@@ -398,7 +398,7 @@ namespace Client
             }
             else
             {
-                withBlock.nudBuy.Value = 100d; // NumericStepper uses double
+                withBlock.nudBuy.Value = 100d;
             }
 
             withBlock.cmbItem.SelectedIndex = 0;

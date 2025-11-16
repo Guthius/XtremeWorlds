@@ -17,7 +17,7 @@ public sealed class ComboBox : Control
     {
         switch (Design)
         {
-            case Design.ComboBoxNormal:
+            case Design.ComboBox:
                 DesignRenderer.Render(Design.TextBlack, X + x, Y + y, Width, Height);
 
                 // Always display the selected item if Value is in range

@@ -144,10 +144,6 @@ public static class WindowLoader
                 ReadComboBox(xmlReader, windowIndex);
                 break;
 
-            case "NumericStepper":
-                ReadNumericStepper(xmlReader, windowIndex);
-                break;
-
             case "ListBox":
                 ReadListBox(xmlReader, windowIndex);
                 break;
@@ -236,34 +232,6 @@ public static class WindowLoader
         }
     }
 
-    // Map NumericStepper to a TextBox for now; numeric parsing handled by consumers
-    private static void ReadNumericStepper(XmlReader xmlReader, int windowIndex)
-    {
-        var name = xmlReader.GetAttribute("Name");
-        var position = xmlReader.GetAttribute("Position");
-        var positionVec = GetVector(position);
-        var size = xmlReader.GetAttribute("Size");
-        var sizeVec = GetVector(size);
-        var fontName = xmlReader.GetAttribute("Font");
-        var font = GetFontByName(fontName, DefaultControlFont);
-
-        WindowManager.CreateTextbox(
-            windowIndex: windowIndex,
-            name: name ?? string.Empty,
-            left: positionVec.X,
-            top: positionVec.Y,
-            width: sizeVec.X,
-            height: sizeVec.Y,
-            text: string.Empty,
-            font: font,
-            xOffset: 5,
-            yOffset: 3,
-            designNorm: Design.TextWhite,
-            designHover: Design.TextWhite,
-            designMousedown: Design.TextWhite,
-            censor: false);
-    }
-
     // Map ListBox to a PictureBox as a placeholder so it can receive callbacks
     private static void ReadListBox(XmlReader xmlReader, int windowIndex)
     {
@@ -296,7 +264,7 @@ public static class WindowLoader
         var size = xmlReader.GetAttribute("Size");
         var sizeVec = GetVector(size);
         var designName = xmlReader.GetAttribute("Design");
-        var design = GetDesignByName(designName, Design.ComboBoxNormal);
+        var design = GetDesignByName(designName, Design.ComboBox);
 
         WindowManager.CreateComboBox(
             windowIndex: windowIndex,

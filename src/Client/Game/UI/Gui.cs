@@ -791,7 +791,7 @@ public class WindowManager
                     GameState.CurMouseY <= window.Height + window.Y)
                 {
                     // Handle combo menu logic
-                    if (window.Design[0] == Design.ComboMenuNormal)
+                    if (window.Design[0] == Design.ComboMenu)
                     {
                         switch (entState)
                         {

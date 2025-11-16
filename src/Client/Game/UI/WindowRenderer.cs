@@ -8,7 +8,7 @@ public static class WindowRenderer
 {
     public static void Render(Window window)
     {
-        if (window.Design[0] == Design.ComboMenuNormal)
+        if (window.Design[0] == Design.ComboMenu)
         {
             // Draw a solid black background area slightly larger than the items
             // to improve readability of combo menu entries.

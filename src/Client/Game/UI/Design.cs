@@ -53,8 +53,8 @@ public enum Design
     MenuOption,
 
     // Comboboxes
-    ComboBoxNormal,
-    ComboMenuNormal,
+    ComboBox,
+    ComboMenu,
 
     // Tile Selection
     TileSelectionBox

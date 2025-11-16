@@ -219,37 +219,61 @@ public class Crystalshire
 
         // Attributes: mode combo (maps to GameState Opt* flags) and actions
         string[] attrModes = new[] { "Blocked", "Warp", "Item", "Npc Avoid", "Resource", "Npc Spawn", "Shop", "Bank", "Heal", "Trap", "Animation", "No Crossing", "Info" };
+
+        // Helpers to set/clear current attribute flags
+        void ClearAttrFlags()
+        {
+            GameState.OptBlocked = false;
+            GameState.OptWarp = false;
+            GameState.OptItem = false;
+            GameState.OptNpcAvoid = false;
+            GameState.OptResource = false;
+            GameState.OptNpcSpawn = false;
+            GameState.OptShop = false;
+            GameState.OptBank = false;
+            GameState.OptHeal = false;
+            GameState.OptTrap = false;
+            GameState.OptAnimation = false;
+            GameState.OptNoCrossing = false;
+            GameState.OptInfo = false;
+        }
+
+        void SetAttrFlags(int index)
+        {
+            ClearAttrFlags();
+            GameState.OptBlocked = index == 0;
+            GameState.OptWarp = index == 1;
+            GameState.OptItem = index == 2;
+            GameState.OptNpcAvoid = index == 3;
+            GameState.OptResource = index == 4;
+            GameState.OptNpcSpawn = index == 5;
+            GameState.OptShop = index == 6;
+            GameState.OptBank = index == 7;
+            GameState.OptHeal = index == 8;
+            GameState.OptTrap = index == 9;
+            GameState.OptAnimation = index == 10;
+            GameState.OptNoCrossing = index == 11;
+            GameState.OptInfo = index == 12;
+        }
+
         if (WindowManager.TryGetControl("winEditorMap", "cmbAttrMode", out var cmbAttrCtrl) && cmbAttrCtrl is ComboBox cmbAttr)
         {
             cmbAttr.Items.Clear();
             foreach (var n in attrModes) cmbAttr.Items.Add(n);
-            // Default selection mirrors legacy: Blocked
-            cmbAttr.Value = 0;
-            void SetAttrFlags(int index)
-            {
-                GameState.OptBlocked = index == 0;
-                GameState.OptWarp = index == 1;
-                GameState.OptItem = index == 2;
-                GameState.OptNpcAvoid = index == 3;
-                GameState.OptResource = index == 4;
-                GameState.OptNpcSpawn = index == 5;
-                GameState.OptShop = index == 6;
-                GameState.OptBank = index == 7;
-                GameState.OptHeal = index == 8;
-                GameState.OptTrap = index == 9;
-                GameState.OptAnimation = index == 10;
-                GameState.OptNoCrossing = index == 11;
-                GameState.OptInfo = index == 12;
-            }
-            // Initialize flags and update on selection change
-            SetAttrFlags(cmbAttr.Value);
-            cmbAttr.CallBack[(int)ControlState.MouseMove] = () => { var idx = Math.Clamp(cmbAttr.Value, 0, attrModes.Length - 1); SetAttrFlags(idx); };
         }
 
+        // Apply sets the current attribute to the selected mode; Cancel clears all attribute modes
         if (WindowManager.TryGetControl("winEditorMap", "btnAttrApply", out var btnAttrApply))
-            btnAttrApply.CallBack[(int)ControlState.MouseDown] = () => { GameLogic.Dialogue("Map Editor", "Fill Attributes: ", "Are you sure you wish to fill attributes?", DialogueType.FillAttributes, DialogueStyle.YesNo); };
+            btnAttrApply.CallBack[(int)ControlState.MouseDown] = () =>
+            {
+                if (WindowManager.TryGetControl("winEditorMap", "cmbAttrMode", out var attrCtrl) && attrCtrl is ComboBox c)
+                {
+                    var idx = Math.Clamp(c.Value, 0, attrModes.Length - 1);
+                    SetAttrFlags(idx);
+                }
+            };
         if (WindowManager.TryGetControl("winEditorMap", "btnAttrClear", out var btnAttrClear))
-            btnAttrClear.CallBack[(int)ControlState.MouseDown] = () => { GameLogic.Dialogue("Map Editor", "Clear Attributes: ", "Are you sure you wish to clear attributes?", DialogueType.ClearAttributes, DialogueStyle.YesNo); };
+            btnAttrClear.CallBack[(int)ControlState.MouseDown] = () => { ClearAttrFlags(); };
 
         void UpdateTilesetLabel()
         {

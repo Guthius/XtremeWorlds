@@ -159,14 +159,6 @@ public sealed class NetworkClient
                 await networkStream.WriteAsync(bytes, cancellationToken);
             }
         }
-        catch (ObjectDisposedException) // Happens when RunReceive closes the TcpClient and disposes the stream
-        {
-            Console.WriteLine("RunSend: ObjectDisposedException (normal during shutdown)");
-        }
-        catch (SocketException ex)
-        {
-            Console.WriteLine($"Socket error while sending: {ex.Message}");
-        }
         finally
         {
             sendChannel.Writer.TryComplete();
