@@ -16,7 +16,7 @@
 
       <!-- Top selectors under toolbar -->
       <Label Name="lblTilesetCaption" Text="Tileset" Position="16, 106" Size="56, 14"/>
-      <ScrollBar Name="sldTileset" Position="76, 108" Size="260, 12" Min="1" Max="1" Value="1" Orientation="Horizontal" ThumbSize="22"/>
+      <ScrollBar Name="sldTileset" Position="76, 108" Size="260, 12" Min="1" Max="1" Value="1" Orientation="Horizontal" ThumbSize="16"/>
       <Label Name="lblTileset" Text="1" Position="342, 106" Size="30, 14"/>
 
       <Label Name="lblLayerCaption" Text="Layer" Position="396, 106" Size="60, 14"/>
@@ -30,16 +30,16 @@
 
       <!-- Tileset render area -->
       <PictureBox Name="picTileset" Position="174, 150" Size="512, 512" Design="TextBlack"/>
-      <ScrollBar Name="sldTilesetV" Position="700, 150" Size="16, 512" Min="0" Max="0" Value="0" Orientation="Vertical" ThumbSize="24"/>
-      <ScrollBar Name="sldTilesetH" Position="174, 674" Size="512, 12" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="22"/>
+      <ScrollBar Name="sldTilesetV" Position="700, 150" Size="16, 512" Min="0" Max="0" Value="0" Orientation="Vertical" ThumbSize="16"/>
+      <ScrollBar Name="sldTilesetH" Position="174, 674" Size="512, 12" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
     </TabPage>
 
     <!-- ATTRIBUTES TAB -->
     <TabPage Name="tabAttributes" Caption="Attributes">
       <PictureBox Name="picAttrBG" Position="6, 130" Size="836, 560" Design="Parchment"/>
-        <ComboBox Name="cmbAttrMode" Position="20, 140" Size="220, 18" Design="ComboBox"/>
-        <Button Name="btnAttrApply" Text="Apply" Position="250, 140" Size="70, 18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-        <Button Name="btnAttrClear" Text="Cancel" Position="326, 140" Size="70, 18" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+      <ComboBox Name="cmbAttrMode" Position="20, 140" Size="220, 18" Design="ComboBox"/>
+      <Button Name="btnAttrApply" Text="Apply" Position="250, 140" Size="70, 18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+      <Button Name="btnAttrClear" Text="Cancel" Position="326, 140" Size="70, 18" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
     </TabPage>
 
     <!-- Additional tabs to mirror Eto.Forms -->
