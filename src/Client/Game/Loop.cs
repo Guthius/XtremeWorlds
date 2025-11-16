@@ -481,7 +481,7 @@ namespace Client
             {
                 GameState.MyEditorType = EditorType.Map;
                 GameState.EditorIndex = 0;
-                new EditorMap().Show();
+                WindowManager.ShowWindow("winEditorMap");
                 GameState.CameraZoom = 1.0f;
                 GameState.InitMapEditor = false;
             }

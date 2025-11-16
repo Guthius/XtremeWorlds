@@ -119,6 +119,302 @@ public class Crystalshire
         window.GetChild("picTheir").CallBack[(int) ControlState.DoubleClick] = WinTrade.OnTheirTradeMouseMove;
     }
 
+    public void UpdateWindow_EditorMap()
+    {
+        var window = WindowLoader.FromLayout("winEditorMap");
+
+        // Close button
+        if (WindowManager.TryGetControl("winEditorMap", "btnClose", out var btnClose))
+        {
+            btnClose.CallBack[(int)ControlState.MouseDown] = () => WindowManager.HideWindow("winEditorMap");
+        }
+
+        // Footer Close
+        if (WindowManager.TryGetControl("winEditorMap", "btnCloseMap", out var btnCloseMap))
+        {
+            btnCloseMap.CallBack[(int)ControlState.MouseDown] = () => WindowManager.HideWindow("winEditorMap");
+        }
+
+        // Save - reuse existing map save pipeline
+        if (WindowManager.TryGetControl("winEditorMap", "btnSaveMap", out var btnSave))
+        {
+            btnSave.CallBack[(int)ControlState.MouseDown] = () => { Map.SendMap(); };
+        }
+
+        // Discard: cancel map edit and close
+        if (WindowManager.TryGetControl("winEditorMap", "btnDiscard", out var btnDiscard))
+        {
+            btnDiscard.CallBack[(int)ControlState.MouseDown] = () => { EditorMap.MapEditorCancel(); WindowManager.HideWindow("winEditorMap"); };
+        }
+
+        // Layer buttons: update current layer in GameState
+        void BindLayer(string ctrl, int layer)
+        {
+            if (WindowManager.TryGetControl("winEditorMap", ctrl, out var c))
+            {
+                c.CallBack[(int)ControlState.MouseDown] = () => { GameState.CurLayer = (byte)layer; };
+            }
+        }
+        BindLayer("btnLayer0", 0);
+        BindLayer("btnLayer1", 1);
+        BindLayer("btnLayer2", 2);
+        BindLayer("btnLayer3", 3);
+        BindLayer("btnLayer4", 4);
+        BindLayer("btnLayer5", 5);
+
+        // Tools: map to existing editor actions
+        if (WindowManager.TryGetControl("winEditorMap", "btnToolPencil", out var btnPencil))
+            btnPencil.CallBack[(int)ControlState.MouseDown] = () => { GameState.EyeDropper = false; };
+        if (WindowManager.TryGetControl("winEditorMap", "btnToolFill", out var btnFill))
+            btnFill.CallBack[(int)ControlState.MouseDown] = () => { EditorMap.MapEditorFillLayer((MapLayer)GameState.CurLayer, (byte)GameState.CurAutotileType, (byte)GameState.EditorTileX, (byte)GameState.EditorTileY); };
+        if (WindowManager.TryGetControl("winEditorMap", "btnToolEraser", out var btnErase))
+            btnErase.CallBack[(int)ControlState.MouseDown] = () => { EditorMap.MapEditorClearLayer((MapLayer)GameState.CurLayer); };
+
+        // Toolbar buttons
+        if (WindowManager.TryGetControl("winEditorMap", "btnGrid", out var btnGrid))
+            btnGrid.CallBack[(int)ControlState.MouseDown] = () => { GameState.MapGrid = !GameState.MapGrid; };
+        if (WindowManager.TryGetControl("winEditorMap", "btnEyeDropper", out var btnEye))
+            btnEye.CallBack[(int)ControlState.MouseDown] = () => { GameState.EyeDropper = !GameState.EyeDropper; };
+        if (WindowManager.TryGetControl("winEditorMap", "btnUndo", out var btnUndo))
+            btnUndo.CallBack[(int)ControlState.MouseDown] = () => { EditorMap.Undo(); };
+        if (WindowManager.TryGetControl("winEditorMap", "btnRedo", out var btnRedo))
+            btnRedo.CallBack[(int)ControlState.MouseDown] = () => { EditorMap.Redo(); };
+
+        // Quick actions: call into existing helpers if available
+        if (WindowManager.TryGetControl("winEditorMap", "btnFillLayer", out var btnFillLayer))
+            btnFillLayer.CallBack[(int)ControlState.MouseDown] = () => { EditorMap.MapEditorFillLayer((MapLayer)GameState.CurLayer, (byte)GameState.CurAutotileType, (byte)GameState.EditorTileX, (byte)GameState.EditorTileY); };
+        if (WindowManager.TryGetControl("winEditorMap", "btnClearLayer", out var btnClearLayer))
+            btnClearLayer.CallBack[(int)ControlState.MouseDown] = () => { EditorMap.MapEditorClearLayer((MapLayer)GameState.CurLayer); };
+        if (WindowManager.TryGetControl("winEditorMap", "btnCopyMap", out var btnCopy))
+            btnCopy.CallBack[(int)ControlState.MouseDown] = () => { EditorMap.MapEditorCopyMap(); };
+        if (WindowManager.TryGetControl("winEditorMap", "btnPasteMap", out var btnPaste))
+            btnPaste.CallBack[(int)ControlState.MouseDown] = () => { TextRenderer.AddText("Paste not available", (int)ColorName.BrightRed); };
+
+        // Tileset selector wiring
+        string[] autotileNames = new[]{"None","Autotile","Fake Autotile","Animated","Cliff","Waterfall"};
+
+        // Populate Layer and Autotile combos and set defaults
+        if (WindowManager.TryGetControl("winEditorMap", "cmbLayer", out var cmbLayerCtrl) && cmbLayerCtrl is ComboBox cmbLayer)
+        {
+            cmbLayer.Items.Clear();
+            foreach (var name in Enum.GetNames(typeof(MapLayer)))
+            {
+                // Insert spaces before capital letters (except the first letter)
+                string displayName = System.Text.RegularExpressions.Regex.Replace(name, "(?<!^)([A-Z])", " $1");
+                cmbLayer.Items.Add(displayName);
+            }
+            
+            cmbLayer.Value = Math.Clamp(GameState.CurLayer, 0, cmbLayer.Items.Count - 1);
+            // Update GameState when selection changes
+            cmbLayer.CallBack[(int)ControlState.MouseMove] = () => { GameState.CurLayer = (byte)Math.Clamp(cmbLayer.Value, 0, 5); };
+        }
+        
+        if (WindowManager.TryGetControl("winEditorMap", "cmbAutotile", out var cmbAutoCtrl) && cmbAutoCtrl is ComboBox cmbAuto)
+        {
+            cmbAuto.Items.Clear();
+            foreach (var n in autotileNames) cmbAuto.Items.Add(n);
+            cmbAuto.Value = Math.Clamp(GameState.CurAutotileType, 0, autotileNames.Length - 1);
+            cmbAuto.CallBack[(int)ControlState.MouseMove] = () => { GameState.CurAutotileType = (cmbAuto.Value >= 0 && cmbAuto.Value < autotileNames.Length) ? cmbAuto.Value : 0; };
+        }
+
+        // Attributes: mode combo (maps to GameState Opt* flags) and actions
+        string[] attrModes = new[] { "Blocked", "Warp", "Item", "Npc Avoid", "Resource", "Npc Spawn", "Shop", "Bank", "Heal", "Trap", "Animation", "No Crossing", "Info" };
+        if (WindowManager.TryGetControl("winEditorMap", "cmbAttrMode", out var cmbAttrCtrl) && cmbAttrCtrl is ComboBox cmbAttr)
+        {
+            cmbAttr.Items.Clear();
+            foreach (var n in attrModes) cmbAttr.Items.Add(n);
+            // Default selection mirrors legacy: Blocked
+            cmbAttr.Value = 0;
+            void SetAttrFlags(int index)
+            {
+                GameState.OptBlocked = index == 0;
+                GameState.OptWarp = index == 1;
+                GameState.OptItem = index == 2;
+                GameState.OptNpcAvoid = index == 3;
+                GameState.OptResource = index == 4;
+                GameState.OptNpcSpawn = index == 5;
+                GameState.OptShop = index == 6;
+                GameState.OptBank = index == 7;
+                GameState.OptHeal = index == 8;
+                GameState.OptTrap = index == 9;
+                GameState.OptAnimation = index == 10;
+                GameState.OptNoCrossing = index == 11;
+                GameState.OptInfo = index == 12;
+            }
+            // Initialize flags and update on selection change
+            SetAttrFlags(cmbAttr.Value);
+            cmbAttr.CallBack[(int)ControlState.MouseMove] = () => { var idx = Math.Clamp(cmbAttr.Value, 0, attrModes.Length - 1); SetAttrFlags(idx); };
+        }
+
+        if (WindowManager.TryGetControl("winEditorMap", "btnAttrApply", out var btnAttrApply))
+            btnAttrApply.CallBack[(int)ControlState.MouseDown] = () => { GameLogic.Dialogue("Map Editor", "Fill Attributes: ", "Are you sure you wish to fill attributes?", DialogueType.FillAttributes, DialogueStyle.YesNo); };
+        if (WindowManager.TryGetControl("winEditorMap", "btnAttrClear", out var btnAttrClear))
+            btnAttrClear.CallBack[(int)ControlState.MouseDown] = () => { GameLogic.Dialogue("Map Editor", "Clear Attributes: ", "Are you sure you wish to clear attributes?", DialogueType.ClearAttributes, DialogueStyle.YesNo); };
+
+        void UpdateTilesetLabel()
+        {
+            if (WindowManager.TryGetControl("winEditorMap", "lblTileset", out var c))
+                c.Text = GameState.CurTileset.ToString();
+        }
+        void UpdateAutotileLabel() { }
+        // Initialize labels on open
+        if (GameState.CurTileset <= 0) GameState.CurTileset = Math.Max(1, Data.MyMap.Tileset);
+        if (Data.MyMap.Tileset <= 0) Data.MyMap.Tileset = GameState.CurTileset;
+        UpdateTilesetLabel();
+        UpdateAutotileLabel();
+
+        // Horizontal tileset scrollbar selects the tileset number
+        if (WindowManager.TryGetControl("winEditorMap", "sldTileset", out var sldTilesetCtrl) && sldTilesetCtrl is Client.Game.UI.Controls.ScrollBar sldTileset)
+        {
+            sldTileset.Min = 1;
+            sldTileset.Max = Math.Max(1, GameState.NumTileSets);
+            sldTilesetCtrl.Value = Math.Clamp(GameState.CurTileset, sldTileset.Min, sldTileset.Max);
+            sldTileset.CallBack[(int)ControlState.MouseMove] = () =>
+            {
+                GameState.CurTileset = Math.Clamp(sldTilesetCtrl.Value, sldTileset.Min, sldTileset.Max);
+                Data.MyMap.Tileset = GameState.CurTileset;
+                UpdateTilesetLabel();
+            };
+        }
+
+        // Horizontal viewport scroll (for wide tilesets)
+        if (WindowManager.TryGetControl("winEditorMap", "sldTilesetH", out var sldTilesetHCtrl) && sldTilesetHCtrl is Client.Game.UI.Controls.ScrollBar sldTilesetH)
+        {
+            // Range is updated during drawing; still add a callback to trigger redraw behavior on change
+            sldTilesetH.CallBack[(int)ControlState.MouseMove] = () => { /* no-op: OnDraw reads Value */ };
+        }
+
+        if (WindowManager.TryGetControl("winEditorMap", "btnTilesetPrev", out var btnTsPrev))
+            btnTsPrev.CallBack[(int)ControlState.MouseDown] = () => { GameState.CurTileset = Math.Max(1, GameState.CurTileset - 1); Data.MyMap.Tileset = GameState.CurTileset; UpdateTilesetLabel(); };
+        if (WindowManager.TryGetControl("winEditorMap", "btnTilesetNext", out var btnTsNext))
+            btnTsNext.CallBack[(int)ControlState.MouseDown] = () => { var maxTs = Math.Max(1, GameState.NumTileSets); GameState.CurTileset = Math.Min(maxTs, GameState.CurTileset + 1); Data.MyMap.Tileset = GameState.CurTileset; UpdateTilesetLabel(); };
+
+        if (WindowManager.TryGetControl("winEditorMap", "btnAutoPrev", out var btnAutoPrev))
+            btnAutoPrev.CallBack[(int)ControlState.MouseDown] = () => { GameState.CurAutotileType = (GameState.CurAutotileType + autotileNames.Length - 1) % autotileNames.Length; UpdateAutotileLabel(); };
+        if (WindowManager.TryGetControl("winEditorMap", "btnAutoNext", out var btnAutoNext))
+            btnAutoNext.CallBack[(int)ControlState.MouseDown] = () => { GameState.CurAutotileType = (GameState.CurAutotileType + 1) % autotileNames.Length; UpdateAutotileLabel(); };
+
+        if (WindowManager.TryGetControl("winEditorMap", "btnTileApply", out var btnTileApply))
+            btnTileApply.CallBack[(int)ControlState.MouseDown] = () =>
+            {
+                if (WindowManager.TryGetControl("winEditorMap", "txtTileX", out var tbx) && WindowManager.TryGetControl("winEditorMap", "txtTileY", out var tby))
+                {
+                    int x = int.TryParse(tbx.Text?.Trim(), out var ix) ? ix : 0;
+                    int y = int.TryParse(tby.Text?.Trim(), out var iy) ? iy : 0;
+                    x = Math.Max(0, x); y = Math.Max(0, y);
+                    GameState.EditorTileX = x; GameState.EditorTileY = y;
+                    EditorMap.MapEditorChooseTile(1, x * GameState.SizeX, y * GameState.SizeY);
+                }
+            };
+
+        // Faux header tabs like Admin
+        var winIndex = WindowManager.GetWindowIndex("winEditorMap");
+        void MakeTabButton(string name, string text, int x, string tabKey)
+        {
+            WindowManager.CreateButton(
+                windowIndex: winIndex,
+                name: name,
+                left: x,
+                top: 70,
+                width: 100,
+                height: 22,
+                text: text,
+                font: Font.Arial,
+                designNorm: Design.Red,
+                designHover: Design.RedHover,
+                designMousedown: Design.RedClick,
+                callbackMousedown: () => ShowTab(tabKey)
+            );
+        }
+
+        void SetVisible(bool visible, params string[] names)
+        {
+            foreach (var n in names)
+            {
+                if (WindowManager.TryGetControl("winEditorMap", n, out var c)) c.Visible = visible;
+            }
+        }
+
+        void ShowTab(string tab)
+        {
+            var tools = new[]{
+                "picTilesBG",
+                "lblTilesetCaption","sldTileset","lblTileset",
+                "lblLayerCaption","cmbLayer",
+                "lblAutotileCaption","cmbAutotile",
+                "picTileset","sldTilesetV","sldTilesetH"
+            };
+            var attrs = new[]{"picAttrBG","lblAttr","lblAttrMode","cmbAttrMode","btnAttrApply","btnAttrClear"};
+            var npcs = new[]{"picNpcsBG","lblNpcs","lblNpcsHint"};
+            var settings = new[]{"picSettingsBG","lblSettings","lblSettingsHint"};
+            var dirblock = new[]{"picDirBG","lblDir","btnDirUp","btnDirDown","btnDirLeft","btnDirRight","btnDirClear"};
+            var eventsTab = new[]{"picEventsBG","lblEvents","lblEventsHint"};
+            var effects = new[]{"picEffectsBG","lblEffects","lblEffectsHint"};
+
+            SetVisible(false, tools);
+            SetVisible(false, attrs);
+            SetVisible(false, npcs);
+            SetVisible(false, settings);
+            SetVisible(false, dirblock);
+            SetVisible(false, eventsTab);
+            SetVisible(false, effects);
+            switch (tab)
+            {
+                case "Tools":
+                    SetVisible(true, tools);
+                    GameState.MapEditorTab = (int)MapEditorTab.Tiles;
+                    break;
+                case "Attributes":
+                    SetVisible(true, attrs);
+                    GameState.MapEditorTab = (int)MapEditorTab.Attributes;
+                    break;
+                case "Npcs":
+                    SetVisible(true, npcs);
+                    GameState.MapEditorTab = (int)MapEditorTab.Npcs;
+                    break;
+                case "Settings":
+                    SetVisible(true, settings);
+                    GameState.MapEditorTab = (int)MapEditorTab.Settings;
+                    break;
+                case "DirBlock":
+                    SetVisible(true, dirblock);
+                    GameState.MapEditorTab = (int)MapEditorTab.Directions;
+                    break;
+                case "Events":
+                    SetVisible(true, eventsTab);
+                    GameState.MapEditorTab = (int)MapEditorTab.Events;
+                    break;
+                case "Effects":
+                    SetVisible(true, effects);
+                    GameState.MapEditorTab = (int)MapEditorTab.Effects;
+                    break;
+            }
+        }
+
+        MakeTabButton("btnTabTools","Tools",10,"Tools");
+        MakeTabButton("btnTabAttrs","Attributes",120,"Attributes");
+        MakeTabButton("btnTabNpcs","Npcs",230,"Npcs");
+        MakeTabButton("btnTabSettings","Settings",340,"Settings");
+        MakeTabButton("btnTabDirBlock","Dir Block",450,"DirBlock");
+        MakeTabButton("btnTabEvents","Events",560,"Events");
+        MakeTabButton("btnTabEffects","Effects",670,"Effects");
+        ShowTab("Tools");
+
+        // Wire tileset preview draw
+        if (WindowManager.TryGetControl("winEditorMap", "picTileset", out var picTileset))
+        {
+            picTileset.OnDraw = WinEditorMap.OnDrawTileset;
+        }
+
+        // Simple helpers for Dir Block tab: instruct how to toggle on map
+        void DirHint() => TextRenderer.AddText("Click map arrows to toggle blocked directions.", (int)ColorName.Yellow);
+        if (WindowManager.TryGetControl("winEditorMap", "btnDirUp", out var btnDirUp)) btnDirUp.CallBack[(int)ControlState.MouseDown] = DirHint;
+        if (WindowManager.TryGetControl("winEditorMap", "btnDirDown", out var btnDirDown)) btnDirDown.CallBack[(int)ControlState.MouseDown] = DirHint;
+        if (WindowManager.TryGetControl("winEditorMap", "btnDirLeft", out var btnDirLeft)) btnDirLeft.CallBack[(int)ControlState.MouseDown] = DirHint;
+        if (WindowManager.TryGetControl("winEditorMap", "btnDirRight", out var btnDirRight)) btnDirRight.CallBack[(int)ControlState.MouseDown] = DirHint;
+        if (WindowManager.TryGetControl("winEditorMap", "btnDirClear", out var btnDirClear)) btnDirClear.CallBack[(int)ControlState.MouseDown] = DirHint;
+    }
+
     public void UpdateWindow_EscMenu()
     {
         var window = WindowLoader.FromLayout("winEscMenu");
@@ -348,14 +644,14 @@ public class Crystalshire
         }
 
         // Moderation: numeric inputs default
-        window.GetChild("nudAdminMap").Text = window.GetChild("nudAdminMap").Text?.Length > 0 ? window.GetChild("nudAdminMap").Text : "1";
-        window.GetChild("nudAdminSprite").Text = window.GetChild("nudAdminSprite").Text?.Length > 0 ? window.GetChild("nudAdminSprite").Text : "0";
+        window.GetChild("txtAdminMap").Text = window.GetChild("txtAdminMap").Text?.Length > 0 ? window.GetChild("txtAdminMap").Text : "1";
+        window.GetChild("txtAdminSprite").Text = window.GetChild("txtAdminSprite").Text?.Length > 0 ? window.GetChild("txtAdminSprite").Text : "0";
 
         // Wire Moderation actions
         window.GetChild("btnAdminWarpTo").CallBack[(int)ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
-            var mapNum = ReadInt(window.GetChild("nudAdminMap"));
+            var mapNum = ReadInt(window.GetChild("txtAdminMap"));
             Sender.WarpTo(mapNum);
         };
 
@@ -402,7 +698,7 @@ public class Crystalshire
         window.GetChild("btnAdminSetSprite").CallBack[(int)ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
-            var sprite = ReadInt(window.GetChild("nudAdminSprite"));
+            var sprite = ReadInt(window.GetChild("txtAdminSprite"));
             Sender.SendSetSprite(sprite);
         };
 
@@ -536,8 +832,8 @@ public class Crystalshire
                 "picModerationBG",
                 "lblPlayerName","txtAdminName",
                 "lblAccessLevel","cmbAccess","btnAdminSetAccess",
-                "lblMapNumber","nudAdminMap","btnAdminWarpTo",
-                "lblSprite","nudAdminSprite","btnAdminSetSprite",
+                "lblMapNumber","txtAdminMap","btnAdminWarpTo",
+                "lblSprite","txtAdminSprite","btnAdminSetSprite",
                 "btnAdminBan","btnAdminKick","btnLevelUp",
                 "btnAdminWarp2Me","btnAdminWarpMe2"
             };

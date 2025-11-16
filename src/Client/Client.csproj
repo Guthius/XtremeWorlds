@@ -109,12 +109,7 @@
         <PackageReference Include="CS-Script" />
     </ItemGroup>
 
-    <ItemGroup>
-        <PackageVersion Include="Eto.Forms" Version="2.1.0.2" />
-        <PackageVersion Include="Eto.Platform.Wpf" Version="2.1.0.2" />
-        <PackageVersion Include="Eto.Platform.Windows" Version="2.1.0.2" />
-        <PackageVersion Include="Eto.Platform.Gtk" Version="2.1.0.2" />
-    </ItemGroup>
+    
 
     <ItemGroup>
       <Reference Include="FNA">

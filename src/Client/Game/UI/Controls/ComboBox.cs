@@ -25,19 +25,25 @@ public sealed class ComboBox : Control
                 {
                     var text = Items[Value];
                     var tw = TextRenderer.GetTextWidth(text, Font);
-                    var left = X + x + Math.Max(0, (Width - tw) / 2);
-                    var top = Y + y; // keep baseline; dropdown items are centered horizontally
+
+                    // Reserve space for the dropdown arrow when centering text
+                    var arrowW = 5;
+                    var paddingL = 3;
+                    var paddingR = arrowW + 6; // arrow width + margin
+                    var innerWidth = Math.Max(0, Width - paddingL - paddingR);
+                    var left = X + x + paddingL + Math.Max(0, (innerWidth - tw) / 2);
+                    var top = Y + y; // vertical baseline consistent with other controls
                     TextRenderer.RenderText(text, left, top, Color, Color.Black);
                 }
 
                 var path = Path.Combine(Texture[0], ArrowSprite.ToString());
 
                 // Draw arrow inside the control bounds near the right edge
-                var arrowW = 5;
+                var arrowW2 = 5;
                 var arrowH = 4;
-                var arrowX = X + x + Width - arrowW - 3;
+                var arrowX = X + x + Width - arrowW2 - 3;
                 var arrowY = Y + y + (Height - arrowH) / 2;
-                GameClient.RenderTexture(ref path, arrowX, arrowY, 0, 0, arrowW, arrowH, arrowW, arrowH);
+                GameClient.RenderTexture(ref path, arrowX, arrowY, 0, 0, arrowW2, arrowH, arrowW2, arrowH);
                 break;
         }
     }

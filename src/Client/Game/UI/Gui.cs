@@ -31,6 +31,8 @@ public class WindowManager
     private static bool _canDrag; // Flag to control when dragging is allowed
     private static bool _isDragging;
     private static bool _isSelected;
+    // Lock dragging if initial press was over a control or a different window
+    private static bool _dragLockedByPress;
     public static bool IsWindowActive => _isSelected;
 
     public static void UpdateZOrder(long windowIndex, bool forced = false)
@@ -440,7 +442,7 @@ public class WindowManager
         ZOrderCon++;
     }
 
-    public static void CreateScrollBar(int windowIndex, string name, int left, int top, int width, int height, int min = 0, int max = 100, int value = 0, bool vertical = true)
+    public static void CreateScrollBar(int windowIndex, string name, int left, int top, int width, int height, int min = 0, int max = 100, int value = 0, bool vertical = true, int thumbSize = 16)
     {
         if (!Windows.TryGetValue(windowIndex, out var window))
         {
@@ -467,7 +469,8 @@ public class WindowManager
             CallBack = callback,
             Min = min,
             Max = max,
-            Vertical = vertical
+            Vertical = vertical,
+            ThumbSize = Math.Max(8, thumbSize)
         };
 
         window.Controls.Add(scroll);
@@ -732,6 +735,44 @@ public class WindowManager
 
         lock (GameClient.InputLock)
         {
+            // On fresh MouseDown, determine if we should lock dragging for this press
+            if (GameClient.IsMouseButtonDown(MouseButton.Left) && GameClient.PreviousMouseState.LeftButton == ButtonState.Released)
+            {
+                var prevActive = ActiveWindow;
+                Window? clickedWindow = null;
+                // Find top-most visible window under cursor
+                foreach (var w in Windows.Values)
+                {
+                    if (!w.Visible) continue;
+                    if (GameState.CurMouseX >= w.X && GameState.CurMouseX <= w.X + w.Width &&
+                        GameState.CurMouseY >= w.Y && GameState.CurMouseY <= w.Y + w.Height)
+                    {
+                        if (clickedWindow is null || w.ZOrder > clickedWindow.ZOrder)
+                        {
+                            clickedWindow = w;
+                        }
+                    }
+                }
+
+                bool pressedOverControl = false;
+                if (clickedWindow is not null)
+                {
+                    foreach (var c in clickedWindow.Controls)
+                    {
+                        if (!c.Visible) continue;
+                        if (GameState.CurMouseX >= clickedWindow.X + c.X && GameState.CurMouseX <= clickedWindow.X + c.X + c.Width &&
+                            GameState.CurMouseY >= clickedWindow.Y + c.Y && GameState.CurMouseY <= clickedWindow.Y + c.Y + c.Height)
+                        {
+                            pressedOverControl = true;
+                            break;
+                        }
+                    }
+                }
+
+                // Lock dragging if we pressed over a control or we clicked a different window
+                _dragLockedByPress = pressedOverControl || (clickedWindow is not null && clickedWindow != prevActive);
+            }
+
             foreach (var window in Windows.Values)
             {
                 if (!window.Visible)
@@ -785,24 +826,36 @@ public class WindowManager
                     }
                 }
 
-                if (entState != ControlState.MouseMove || !GameClient.IsMouseButtonDown(MouseButton.Left))
+                if (entState == ControlState.MouseMove && GameClient.IsMouseButtonDown(MouseButton.Left))
                 {
-                    continue;
-                }
-
-                if (ActiveWindow is not null && _isDragging)
-                {
-                    if (_canDrag && ActiveWindow is {CanDrag: true, Visible: true})
+                    bool overAnyControl = false;
+                    if (ActiveWindow is not null)
                     {
-                        ActiveWindow.X = GameLogic.Clamp(
-                            ActiveWindow.X +
-                            (GameState.CurMouseX - ActiveWindow.X - ActiveWindow.MovedX), 0,
-                            GameState.ResolutionWidth - ActiveWindow.Width);
-                        ActiveWindow.Y = GameLogic.Clamp(
-                            ActiveWindow.Y +
-                            (GameState.CurMouseY - ActiveWindow.Y - ActiveWindow.MovedY), 0,
-                            GameState.ResolutionHeight - ActiveWindow.Height);
-                        break;
+                        foreach (var c in ActiveWindow.Controls)
+                        {
+                            if (c.Visible && GameState.CurMouseX >= c.X + ActiveWindow.X && GameState.CurMouseX <= c.X + c.Width + ActiveWindow.X &&
+                                GameState.CurMouseY >= c.Y + ActiveWindow.Y && GameState.CurMouseY <= c.Y + c.Height + ActiveWindow.Y)
+                            {
+                                overAnyControl = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (ActiveWindow is not null && _isDragging && !overAnyControl && !_dragLockedByPress)
+                    {
+                        if (_canDrag && ActiveWindow is {CanDrag: true, Visible: true})
+                        {
+                            ActiveWindow.X = GameLogic.Clamp(
+                                ActiveWindow.X +
+                                (GameState.CurMouseX - ActiveWindow.X - ActiveWindow.MovedX), 0,
+                                GameState.ResolutionWidth - ActiveWindow.Width);
+                            ActiveWindow.Y = GameLogic.Clamp(
+                                ActiveWindow.Y +
+                                (GameState.CurMouseY - ActiveWindow.Y - ActiveWindow.MovedY), 0,
+                                GameState.ResolutionHeight - ActiveWindow.Height);
+                            break;
+                        }
                     }
                 }
             }
@@ -879,36 +932,23 @@ public class WindowManager
                         }
                         case ComboBox comboBox:
                         {
-                            int itemHeight = 10;
-                            int menuPadding = 5;
-                            bool menuIsOpen = WinComboMenu.IsOpen(curWindow, curControl); // You may need to implement this check if not present
+                            bool menuIsOpen = WinComboMenu.IsOpen(curWindow, curControl);
                             if (entState == ControlState.MouseDown && GameClient.IsMouseButtonDown(MouseButton.Left))
                             {
                                 if (menuIsOpen)
                                 {
-                                    int menuX = curWindow.X + comboBox.X - menuPadding;
-                                    int menuY = curWindow.Y + comboBox.Y + comboBox.Height;
-                                    int menuWidth = comboBox.Width + menuPadding * 2;
-                                    int menuHeight = comboBox.Items.Count * itemHeight + menuPadding * 2;
-                                    bool inMenu = GameState.CurMouseX >= menuX && GameState.CurMouseX <= menuX + menuWidth &&
-                                                  GameState.CurMouseY >= menuY && GameState.CurMouseY <= menuY + menuHeight;
-                                    int relY = GameState.CurMouseY - (curWindow.Y + comboBox.Y + comboBox.Height + menuPadding);
-                                    int idx = relY / itemHeight;
-                                    if (inMenu && idx >= 0 && idx < comboBox.Items.Count)
+                                    // Let the combo menu window handle selection math. Optionally close if click is outside both.
+                                    var menuWin = GetWindowByName("winComboMenu");
+                                    if (menuWin is not null)
                                     {
-                                        comboBox.Value = idx;
-                                        // If this is the options resolution combobox, apply immediately
-                                        if (string.Equals(curWindow.Name, "winOptions", StringComparison.CurrentCultureIgnoreCase) &&
-                                            string.Equals(comboBox.Name, "cmbRes", StringComparison.CurrentCultureIgnoreCase))
+                                        bool inMenu = GameState.CurMouseX >= menuWin.X && GameState.CurMouseX <= menuWin.X + menuWin.Width &&
+                                                      GameState.CurMouseY >= menuWin.Y && GameState.CurMouseY <= menuWin.Y + menuWin.Height;
+                                        bool inCombo = GameState.CurMouseX >= curWindow.X + comboBox.X && GameState.CurMouseX <= curWindow.X + comboBox.X + comboBox.Width &&
+                                                       GameState.CurMouseY >= curWindow.Y + comboBox.Y && GameState.CurMouseY <= curWindow.Y + comboBox.Y + comboBox.Height;
+                                        if (!inMenu && !inCombo)
                                         {
-                                            try { WinOptions.ApplyResolutionSelection(idx); } catch { }
+                                            WinComboMenu.Close();
                                         }
-                                        WinComboMenu.Close(); // Hide menu after selection
-                                    }
-                                    else if (!inMenu)
-                                    {
-                                        // Clicked outside menu, close it
-                                        WinComboMenu.Close();
                                     }
                                 }
                                 else
@@ -977,6 +1017,7 @@ public class WindowManager
             if (entState == ControlState.MouseUp)
             {
                 ResetMouseDown();
+                // On mouse release, keep lock state until the next MouseDown recomputes it
             }
         }
 
@@ -1059,14 +1100,22 @@ public class WindowManager
     
     private static void ComboMenu_MouseMove(Window window)
     {
-        var y = GameState.CurMouseY - window.Y;
-
-        for (var i = 0; i < window.List.Count - 1; i++)
+        // Account for the 2px interior padding used by WindowRenderer when drawing items
+        int relY = GameState.CurMouseY - (window.Y + 2);
+        if (relY < 0)
         {
-            if (y >= 16 * i && y <= 16 * i)
-            {
-                window.Group = i;
-            }
+            window.Group = -1;
+            return;
+        }
+
+        int idx = relY / 16; // each item row is 16px tall
+        if (idx >= 0 && idx < window.List.Count)
+        {
+            window.Group = idx; // hovered index
+        }
+        else
+        {
+            window.Group = -1; // no hover
         }
     }
 
@@ -1077,20 +1126,23 @@ public class WindowManager
             return;
         }
 
-        var y = GameState.CurMouseY - window.Y;
-        for (var i = 0; i < window.List.Count; i++)
+        int relY = GameState.CurMouseY - (window.Y + 2);
+        int idx = relY / 16;
+        if (idx >= 0 && idx < window.List.Count)
         {
-            if (y >= 16 * i && y < 16 * (i + 1))
+            if (window.ParentControl is not null)
             {
-                if (window.ParentControl is not null)
+                // Set the ComboBox.Value property if possible
+                if (window.ParentControl is Client.Game.UI.Controls.ComboBox comboBox)
                 {
-                    // Set the ComboBox.Value property if possible
-                    if (window.ParentControl is Client.Game.UI.Controls.ComboBox comboBox)
-                        comboBox.Value = i;
-                    else
-                        window.ParentControl.Value = i;
+                    comboBox.Value = idx;
+                    // Notify selection-change listeners (use MouseMove slot by convention)
+                    comboBox.CallBack[(int)ControlState.MouseMove]?.Invoke();
                 }
-                break;
+                else
+                {
+                    window.ParentControl.Value = idx;
+                }
             }
         }
         WinComboMenu.Close();

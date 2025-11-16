@@ -176,6 +176,7 @@ public static class WindowLoader
         {
             vertical = !orientation.Equals("Horizontal", StringComparison.OrdinalIgnoreCase);
         }
+        var thumbSize = GetInt32(xmlReader.GetAttribute("ThumbSize"), 16);
 
         WindowManager.CreateScrollBar(
             windowIndex: windowIndex,
@@ -187,7 +188,8 @@ public static class WindowLoader
             min: min,
             max: max,
             value: value,
-            vertical: vertical
+            vertical: vertical,
+            thumbSize: thumbSize
         );
     }
 

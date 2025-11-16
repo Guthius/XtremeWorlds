@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window Name="winEditorMap" Caption="Map Editor"
+        Size="860, 760"
+        Icon="1133" IconOffset="3, 5"
+        Design="WindowNormal"
+        StartPosition="CenterScreen"
+        Visible="false">
+
+  <TabControl Name="tabEditorMap" Position="6, 46" Size="848, 708">
+
+    <!-- PALETTE / TOOLS TAB -->
+    <TabPage Name="tabTiles" Caption="Tiles">
+      <!-- Background parchment first to ensure it's behind everything -->
+      <PictureBox Name="picTilesBG" Position="6, 130" Size="836, 560" Design="Parchment"/>
+      <!-- Tabs header mimic created from script (like Admin) -->
+
+      <!-- Top selectors under toolbar -->
+      <Label Name="lblTilesetCaption" Text="Tileset" Position="16, 106" Size="56, 14"/>
+      <ScrollBar Name="sldTileset" Position="76, 108" Size="260, 12" Min="1" Max="1" Value="1" Orientation="Horizontal" ThumbSize="22"/>
+      <Label Name="lblTileset" Text="1" Position="342, 106" Size="30, 14"/>
+
+      <Label Name="lblLayerCaption" Text="Layer" Position="396, 106" Size="60, 14"/>
+      <ComboBox Name="cmbLayer" Position="440, 104" Size="200, 18" Design="ComboBoxNormal"/>
+
+      <Label Name="lblAutotileCaption" Text="Autotile" Position="656, 106" Size="60, 14"/>
+      <ComboBox Name="cmbAutotile" Position="722, 104" Size="120, 18" Design="ComboBoxNormal"/>
+
+      <!-- Tools -->
+      
+
+      <!-- Tileset render area -->
+      <PictureBox Name="picTileset" Position="174, 150" Size="512, 512" Design="TextBlack"/>
+      <ScrollBar Name="sldTilesetV" Position="700, 150" Size="16, 512" Min="0" Max="0" Value="0" Orientation="Vertical" ThumbSize="24"/>
+      <ScrollBar Name="sldTilesetH" Position="174, 674" Size="512, 12" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="22"/>
+    </TabPage>
+
+    <!-- ATTRIBUTES TAB -->
+    <TabPage Name="tabAttributes" Caption="Attributes">
+      <PictureBox Name="picAttrBG" Position="6, 130" Size="836, 560" Design="Parchment"/>
+        <Label Name="lblAttr" Text="Attribute Tools" Position="20, 140" Size="200, 14"/>
+        <Label Name="lblAttrMode" Text="Mode" Position="20, 170" Size="80, 14"/>
+        <ComboBox Name="cmbAttrMode" Position="80, 168" Size="160, 18" Design="ComboBoxNormal"/>
+        <Button Name="btnAttrApply" Text="Apply" Position="250, 168" Size="70, 18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+        <Button Name="btnAttrClear" Text="Clear" Position="326, 168" Size="70, 18" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+    </TabPage>
+
+    <!-- Additional tabs to mirror Eto.Forms -->
+    <TabPage Name="tabNpcs" Caption="Npcs">
+      <PictureBox Name="picNpcsBG" Position="6, 130" Size="836, 560" Design="Parchment"/>
+        <Label Name="lblNpcs" Text="NPC Tools" Position="20, 140" Size="200, 14"/>
+        <Label Name="lblNpcsHint" Text="Placeholder - NPC editor UI TBD" Position="20, 168" Size="280, 14"/>
+    </TabPage>
+    <TabPage Name="tabSettings" Caption="Settings">
+      <PictureBox Name="picSettingsBG" Position="6, 130" Size="836, 560" Design="Parchment"/>
+        <Label Name="lblSettings" Text="Map Settings" Position="20, 140" Size="200, 14"/>
+        <Label Name="lblSettingsHint" Text="Placeholder - settings UI TBD" Position="20, 168" Size="240, 14"/>
+    </TabPage>
+    <TabPage Name="tabDirBlock" Caption="Dir Block">
+      <PictureBox Name="picDirBG" Position="6, 130" Size="836, 560" Design="Parchment"/>
+        <Label Name="lblDir" Text="Directional Blocking" Position="20, 140" Size="220, 14"/>
+        <Button Name="btnDirUp" Text="Up" Position="20, 168" Size="60, 18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+        <Button Name="btnDirDown" Text="Down" Position="84, 168" Size="60, 18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+        <Button Name="btnDirLeft" Text="Left" Position="148, 168" Size="60, 18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+        <Button Name="btnDirRight" Text="Right" Position="212, 168" Size="60, 18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+        <Button Name="btnDirClear" Text="Clear" Position="276, 168" Size="60, 18" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+    </TabPage>
+    <TabPage Name="tabEvents" Caption="Events">
+      <PictureBox Name="picEventsBG" Position="6, 130" Size="836, 560" Design="Parchment"/>
+        <Label Name="lblEvents" Text="Map Events" Position="20, 140" Size="200, 14"/>
+        <Label Name="lblEventsHint" Text="Placeholder - events UI TBD" Position="20, 168" Size="240, 14"/>
+    </TabPage>
+    <TabPage Name="tabEffects" Caption="Effects">
+      <PictureBox Name="picEffectsBG" Position="6, 130" Size="836, 560" Design="Parchment"/>
+        <Label Name="lblEffects" Text="Effects" Position="20, 140" Size="200, 14"/>
+        <Label Name="lblEffectsHint" Text="Placeholder - effects UI TBD" Position="20, 168" Size="240, 14"/>
+    </TabPage>
+
+    <Button Name="btnClose" Position="-19, 5" Size="16, 16" Image="8" ImageHover="9" ImageMouseDown="10"/>
+  </TabControl>
+
+  <!-- Toolbar row like Eto.Forms screenshot (moved after TabControl for top z-order) -->
+  <Button Name="btnSaveMap" Text="Save" Position="8, 40" Size="56, 18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+  <Button Name="btnDiscard" Text="Discard" Position="68, 40" Size="64, 18" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+  <Button Name="btnGrid" Text="Grid" Position="136, 40" Size="48, 18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+  <Button Name="btnOpacity" Text="Opacity" Position="188, 40" Size="64, 18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+  <Button Name="btnToolPencil" Text="Pencil" Position="256, 40" Size="56, 18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+  <Button Name="btnToolFill" Text="Fill" Position="316, 40" Size="48, 18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+  <Button Name="btnToolEraser" Text="Eraser" Position="368, 40" Size="56, 18" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+  <Button Name="btnEyeDropper" Text="Eye Dropper" Position="428, 40" Size="80, 18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+  <Button Name="btnCopyMap" Text="Copy" Position="512, 40" Size="52, 18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+  <Button Name="btnPasteMap" Text="Paste" Position="566, 40" Size="60, 18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+  <Button Name="btnDeleteMap" Text="Delete" Position="632, 40" Size="60, 18" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+  <Button Name="btnUndo" Text="Undo" Position="696, 40" Size="48, 18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+  <Button Name="btnRedo" Text="Redo" Position="748, 40" Size="48, 18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+</Window>
