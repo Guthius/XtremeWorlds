@@ -710,7 +710,7 @@ public class WindowManager
         }
     }
 
-    public static bool HandleInterfaceEvents(ControlState entState)
+    public static bool HandleEvents(ControlState entState)
     {
         Window? curWindow = null;
         var curControl = 0;
@@ -932,23 +932,36 @@ public class WindowManager
                         }
                         case ComboBox comboBox:
                         {
-                            bool menuIsOpen = WinComboMenu.IsOpen(curWindow, curControl);
+                            int itemHeight = 10;
+                            int menuPadding = 5;
+                            bool menuIsOpen = WinComboMenu.IsOpen(curWindow, curControl); // You may need to implement this check if not present
                             if (entState == ControlState.MouseDown && GameClient.IsMouseButtonDown(MouseButton.Left))
                             {
                                 if (menuIsOpen)
                                 {
-                                    // Let the combo menu window handle selection math. Optionally close if click is outside both.
-                                    var menuWin = GetWindowByName("winComboMenu");
-                                    if (menuWin is not null)
+                                    int menuX = curWindow.X + comboBox.X - menuPadding;
+                                    int menuY = curWindow.Y + comboBox.Y + comboBox.Height;
+                                    int menuWidth = comboBox.Width + menuPadding * 2;
+                                    int menuHeight = comboBox.Items.Count * itemHeight + menuPadding * 2;
+                                    bool inMenu = GameState.CurMouseX >= menuX && GameState.CurMouseX <= menuX + menuWidth &&
+                                                  GameState.CurMouseY >= menuY && GameState.CurMouseY <= menuY + menuHeight;
+                                    int relY = GameState.CurMouseY - (curWindow.Y + comboBox.Y + comboBox.Height + menuPadding);
+                                    int idx = relY / itemHeight;
+                                    if (inMenu && idx >= 0 && idx < comboBox.Items.Count)
                                     {
-                                        bool inMenu = GameState.CurMouseX >= menuWin.X && GameState.CurMouseX <= menuWin.X + menuWin.Width &&
-                                                      GameState.CurMouseY >= menuWin.Y && GameState.CurMouseY <= menuWin.Y + menuWin.Height;
-                                        bool inCombo = GameState.CurMouseX >= curWindow.X + comboBox.X && GameState.CurMouseX <= curWindow.X + comboBox.X + comboBox.Width &&
-                                                       GameState.CurMouseY >= curWindow.Y + comboBox.Y && GameState.CurMouseY <= curWindow.Y + comboBox.Y + comboBox.Height;
-                                        if (!inMenu && !inCombo)
+                                        comboBox.Value = idx;
+                                        // If this is the options resolution combobox, apply immediately
+                                        if (string.Equals(curWindow.Name, "winOptions", StringComparison.CurrentCultureIgnoreCase) &&
+                                            string.Equals(comboBox.Name, "cmbRes", StringComparison.CurrentCultureIgnoreCase))
                                         {
-                                            WinComboMenu.Close();
+                                            try { WinOptions.ApplyResolutionSelection(idx); } catch { }
                                         }
+                                        WinComboMenu.Close(); // Hide menu after selection
+                                    }
+                                    else if (!inMenu)
+                                    {
+                                        // Clicked outside menu, close it
+                                        WinComboMenu.Close();
                                     }
                                 }
                                 else

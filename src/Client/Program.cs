@@ -1365,9 +1365,8 @@ namespace Client
             GameState.CurY = GameState.CurYGui;
 
             // Dispatch the GUI event
-            WindowManager.HandleInterfaceEvents(state);
-
-            // Restore game legacy values
+            WindowManager.HandleEvents(state);
+            
             GameState.CurMouseX = prevMouseX;
             GameState.CurMouseY = prevMouseY;
             GameState.CurX = prevCurX;
