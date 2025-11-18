@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+Item<?xml version="1.0" encoding="utf-8"?>
 <Window Name="winNpcEditor" Caption="Npc Editor"
-    Size="720, 430"
+  Size="700, 460"
         Icon="113" IconOffset="3, 5"
         Design="WindowNormal"
         StartPosition="CenterScreen"
@@ -8,11 +8,11 @@
 
   <!-- NPC index list on the left -->
   <Label Name="lblNpcList" Text="Npc" Position="16, 24" Size="80, 16"/>
-  <ListBox Name="lstNpcIndex" Position="16, 44" Size="224, 360"/>
-  <ScrollBar Name="sldNpcList" Position="240, 44" Size="16, 360" Min="0" Max="0" Vertical="true"/>
+  <ListBox Name="lstNpcIndex" Position="16, 44" Size="224, 368"/>
+  <ScrollBar Name="sldNpcList" Position="240, 44" Size="16, 368" Min="0" Max="0" Vertical="true"/>
 
   <!-- Parchment background for editor details (mirrors other Crystalshire editors) -->
-	<PictureBox Name="picParchment" Position="272, 24" Size="432, 356" Image="Parchment" Design="Parchment"/>
+  <PictureBox Name="picParchment" Position="272, 24" Size="432, 400" Image="Parchment" Design="Parchment"/>
 
   <!-- Core fields on the right (General group) -->
   <Label Name="lblNpcName" Text="Name" Position="280, 36" Size="80, 16"/>
@@ -72,11 +72,11 @@
   <Label Name="lblNpcChance" Text="Chance" Position="440, 344" Size="60, 16"/>
   <ScrollBar Name="sldNpcChance" Position="500, 346" Size="160, 8" Min="0" Max="100" Value="0" Orientation="Horizontal" ThumbSize="12"/>
 
-  <!-- Buttons centered directly under parchment -->
-  <Button Name="btnSave" Text="Save" Position="328, 384" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-  <Button Name="btnDelete" Text="Delete" Position="416, 384" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
-  <Button Name="btnNpcCopy" Text="Copy" Position="504, 384" Size="80, 24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
-  <Button Name="btnCancel" Text="Cancel" Position="592, 384" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+  <!-- Buttons centered directly under parchment (parchment slightly taller) -->
+  <Button Name="btnSave" Text="Save" Position="328, 392" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+  <Button Name="btnDelete" Text="Delete" Position="416, 392" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+  <Button Name="btnNpcCopy" Text="Copy" Position="504, 392" Size="80, 24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+  <Button Name="btnCancel" Text="Cancel" Position="592, 392" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
 
   <!-- Close button in title bar (like map editor) -->
   <Button Name="btnClose" Position="-19, 5" Size="16, 16" Image="8" ImageHover="9" ImageMouseDown="10"/>

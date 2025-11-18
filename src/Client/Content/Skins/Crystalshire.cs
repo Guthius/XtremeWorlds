@@ -1365,7 +1365,7 @@ public class Crystalshire
 
         // List interactions (NPC index + scrollbar)
         ListBox npcList = null;
-        if (WindowManager.TryGetControl("winNpcEditor", "lstNpcs", out var lstCtrl) && lstCtrl is ListBox list)
+        if (WindowManager.TryGetControl("winNpcEditor", "lstNpcIndex", out var lstCtrl) && lstCtrl is ListBox list)
         {
             npcList = list;
             list.CallBack[(int)ControlState.MouseDown] = WinNpcEditor.OnListMouseDown;
@@ -1396,6 +1396,31 @@ public class Crystalshire
             };
         }
 
+        // Ensure npc editor combos are visible (some skins may default them hidden)
+        string[] npcComboNames =
+        {
+            "cmbNpcBehavior","cmbNpcFaction","cmbNpcSpawnPeriod","cmbNpcAnimation",
+            "cmbNpcSkill1","cmbNpcSkill2","cmbNpcSkill3","cmbNpcSkill4","cmbNpcSkill5","cmbNpcSkill6",
+            "cmbNpcDropSlot","cmbNpcDropItem"
+        };
+        foreach (var comboName in npcComboNames)
+        {
+            if (WindowManager.TryGetControl("winNpcEditor", comboName, out var c) && c is ComboBox cb)
+            {
+                cb.Visible = true;
+            }
+        }
+
+        // Hide redundant amount / chance textboxes: both are slider-only now.
+        if (WindowManager.TryGetControl("winNpcEditor", "nudNpcChance", out var chanceText))
+        {
+            chanceText.Visible = false;
+        }
+        if (WindowManager.TryGetControl("winNpcEditor", "nudNpcAmount", out var amountText))
+        {
+            amountText.Visible = false;
+        }
+
         // Text fields
         if (WindowManager.TryGetControl("winNpcEditor", "txtNpcName", out var txtNameCtrl) && txtNameCtrl is TextBox txtName)
         {
@@ -1414,12 +1439,13 @@ public class Crystalshire
             };
         }
 
-        // Simple helper for combo apply on click
+        // Simple helper for combo apply on selection change (mirror map editor pattern)
         void BindCombo(string name, Action<int> apply)
         {
             if (WindowManager.TryGetControl("winNpcEditor", name, out var c) && c is ComboBox combo)
             {
-                combo.CallBack[(int)ControlState.MouseDown] = () =>
+                // Use MouseMove so we apply after the dropdown selection actually changes.
+                combo.CallBack[(int)ControlState.MouseMove] = () =>
                 {
                     int v = Math.Max(0, combo.Value);
                     apply(v);
@@ -1453,31 +1479,50 @@ public class Crystalshire
         BindSkill("cmbNpcSkill5", 4);
         BindSkill("cmbNpcSkill6", 5);
 
-        // Drop slot change reloads fields
+        // Drop slot change reloads fields and immediately applies the stored item/amount/chance
         if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcDropSlot", out var dropSlotCtrl) && dropSlotCtrl is ComboBox cmbSlot)
         {
-            cmbSlot.CallBack[(int)ControlState.MouseDown] = () => WinNpcEditor.LoadNpc(WinNpcEditor.SelectedIndex);
-        }
-
-        // Drop item combo
-        if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcDropItem", out var dropItemCtrl) && dropItemCtrl is ComboBox cmbItem)
-        {
-            cmbItem.CallBack[(int)ControlState.MouseDown] = () =>
+            // When the user changes the slot selection in the dropdown, reload UI for that slot.
+            cmbSlot.CallBack[(int)ControlState.MouseMove] = () =>
             {
-                int slot = 0;
-                if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcDropSlot", out var ds) && ds is ComboBox s) slot = Math.Clamp(s.Value, 0, 5);
                 if (WinNpcEditor.SelectedIndex >= 0)
                 {
-                    if (Data.Npc[WinNpcEditor.SelectedIndex].DropItem != null && slot < Data.Npc[WinNpcEditor.SelectedIndex].DropItem.Length)
-                    {
-                        Data.Npc[WinNpcEditor.SelectedIndex].DropItem[slot] = Math.Clamp(cmbItem.Value, 0, Variables.MaxItems - 1);
-                        GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
-                    }
+                    WinNpcEditor.LoadNpc(WinNpcEditor.SelectedIndex);
                 }
             };
         }
 
-        // Amount / Chance / Stats textboxes
+        // Drop item combo - save selection for current slot when it changes
+        if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcDropItem", out var dropItemCtrl) && dropItemCtrl is ComboBox cmbItem)
+        {
+            int lastItemValue = cmbItem.Value;
+
+            cmbItem.CallBack[(int)ControlState.MouseMove] = () =>
+            {
+                if (WinNpcEditor.IsLoading)
+                    return;
+
+                // Only act when the selected item actually changes
+                if (cmbItem.Value == lastItemValue)
+                    return;
+
+                lastItemValue = cmbItem.Value;
+
+                int slot = 0;
+                if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcDropSlot", out var ds) && ds is ComboBox s)
+                    slot = Math.Clamp(s.Value, 0, 5);
+
+                if (WinNpcEditor.SelectedIndex >= 0 &&
+                    Data.Npc[WinNpcEditor.SelectedIndex].DropItem != null &&
+                    slot < Data.Npc[WinNpcEditor.SelectedIndex].DropItem.Length)
+                {
+                    Data.Npc[WinNpcEditor.SelectedIndex].DropItem[slot] = Math.Clamp(cmbItem.Value, 0, Variables.MaxItems - 1);
+                    GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
+                }
+            };
+        }
+
+        // Generic int textbox binder (used only when there is no paired slider)
         void BindIntText(string name, Action<int> apply, int min, int max)
         {
             if (WindowManager.TryGetControl("winNpcEditor", name, out var t) && t is TextBox tb)
@@ -1492,8 +1537,8 @@ public class Crystalshire
             }
         }
 
-        // Helper to bind a scrollbar (used as slider) to an int field and a textbox.
-        void BindScrollBar(string name, Func<int> get, Action<int> apply, string textBoxName)
+        // Helper to bind a scrollbar (used as slider) to an int field and an optional textbox.
+        void BindScrollBar(string name, Func<int> get, Action<int> apply, string textBoxName = null)
         {
             if (WindowManager.TryGetControl("winNpcEditor", name, out var c) && c is ScrollBar sb)
             {
@@ -1508,66 +1553,39 @@ public class Crystalshire
                     int v = Math.Clamp(sb.Value, min, max);
                     apply(v);
 
-                    if (WindowManager.TryGetControl("winNpcEditor", textBoxName, out var t) && t is TextBox tb)
+                    if (!string.IsNullOrEmpty(textBoxName) && WindowManager.TryGetControl("winNpcEditor", textBoxName, out var t) && t is TextBox tb)
                     {
                         tb.Text = v.ToString();
                     }
                 };
             }
         }
-        BindIntText("nudNpcAmount", v =>
+        // Amount: textbox only
+        BindIntText("txtNpcAmount", v =>
         {
+            if (WinNpcEditor.IsLoading)
+                return;
+
             int slot = 0;
-            if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcDropSlot", out var ds) && ds is ComboBox s) slot = Math.Clamp(s.Value, 0, 5);
-            if (WinNpcEditor.SelectedIndex >= 0 && Data.Npc[WinNpcEditor.SelectedIndex].DropItemValue != null && slot < Data.Npc[WinNpcEditor.SelectedIndex].DropItemValue.Length)
+            if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcDropSlot", out var ds) && ds is ComboBox s)
+                slot = Math.Clamp(s.Value, 0, 5);
+            if (WinNpcEditor.SelectedIndex >= 0 &&
+                Data.Npc[WinNpcEditor.SelectedIndex].DropItemValue != null &&
+                slot < Data.Npc[WinNpcEditor.SelectedIndex].DropItemValue.Length)
             {
                 Data.Npc[WinNpcEditor.SelectedIndex].DropItemValue[slot] = v;
                 GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
             }
-        }, 0, 1000000);
+        }, 0, 999999);
 
-        BindIntText("nudNpcChance", v =>
-        {
-            int slot = 0;
-            if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcDropSlot", out var ds) && ds is ComboBox s) slot = Math.Clamp(s.Value, 0, 5);
-            if (WinNpcEditor.SelectedIndex >= 0 && Data.Npc[WinNpcEditor.SelectedIndex].DropChance != null && slot < Data.Npc[WinNpcEditor.SelectedIndex].DropChance.Length)
-            {
-                Data.Npc[WinNpcEditor.SelectedIndex].DropChance[slot] = v;
-                GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
-            }
-        }, 0, 1000000);
-
-        // Sliders for drop amount and chance
-        BindScrollBar(
-            "sldNpcAmount",
-            () =>
-            {
-                if (WinNpcEditor.SelectedIndex < 0) return 0;
-                int slot = 0;
-                if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcDropSlot", out var ds) && ds is ComboBox s)
-                    slot = Math.Clamp(s.Value, 0, 5);
-                var npc = Data.Npc[WinNpcEditor.SelectedIndex];
-                return npc.DropItemValue != null && slot < npc.DropItemValue.Length ? npc.DropItemValue[slot] : 0;
-            },
-            v =>
-            {
-                int slot = 0;
-                if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcDropSlot", out var ds) && ds is ComboBox s)
-                    slot = Math.Clamp(s.Value, 0, 5);
-                if (WinNpcEditor.SelectedIndex >= 0 &&
-                    Data.Npc[WinNpcEditor.SelectedIndex].DropItemValue != null &&
-                    slot < Data.Npc[WinNpcEditor.SelectedIndex].DropItemValue.Length)
-                {
-                    Data.Npc[WinNpcEditor.SelectedIndex].DropItemValue[slot] = v;
-                    GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
-                }
-            },
-            "nudNpcAmount");
-
+        // Chance: slider only (no textbox)
         BindScrollBar(
             "sldNpcChance",
             () =>
             {
+                if (WinNpcEditor.IsLoading)
+                    return 0;
+
                 if (WinNpcEditor.SelectedIndex < 0) return 0;
                 int slot = 0;
                 if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcDropSlot", out var ds) && ds is ComboBox s)
@@ -1577,6 +1595,9 @@ public class Crystalshire
             },
             v =>
             {
+                if (WinNpcEditor.IsLoading)
+                    return;
+
                 int slot = 0;
                 if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcDropSlot", out var ds) && ds is ComboBox s)
                     slot = Math.Clamp(s.Value, 0, 5);
@@ -1587,8 +1608,7 @@ public class Crystalshire
                     Data.Npc[WinNpcEditor.SelectedIndex].DropChance[slot] = v;
                     GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
                 }
-            },
-            "nudNpcChance");
+            });
 
         // Basic stats text boxes
         BindIntText("txtNpcHp", v =>
@@ -1627,19 +1647,7 @@ public class Crystalshire
             }
         }, 0, 100000000);
 
-        // Sliders for stats
-        BindScrollBar(
-            "sldNpcHp",
-            () => WinNpcEditor.SelectedIndex >= 0 ? Data.Npc[WinNpcEditor.SelectedIndex].Hp : 0,
-            v =>
-            {
-                if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Variables.MaxNpcs)
-                {
-                    Data.Npc[WinNpcEditor.SelectedIndex].Hp = v;
-                    GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
-                }
-            },
-            "txtNpcHp");
+        // Sliders for stats (HP uses textbox only; no slider binding)
 
         BindScrollBar(
             "sldNpcDamage",
@@ -1654,6 +1662,7 @@ public class Crystalshire
             },
             "txtNpcDamage");
 
+        // Range: slider-only, no textbox sync.
         BindScrollBar(
             "sldNpcRange",
             () => WinNpcEditor.SelectedIndex >= 0 ? Data.Npc[WinNpcEditor.SelectedIndex].Range : 0,
@@ -1664,17 +1673,7 @@ public class Crystalshire
                     Data.Npc[WinNpcEditor.SelectedIndex].Range = (byte)v;
                     GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
                 }
-            },
-            "txtNpcRange");
-
-        BindIntText("txtNpcRange", v =>
-        {
-            if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Variables.MaxNpcs)
-            {
-                Data.Npc[WinNpcEditor.SelectedIndex].Range = (byte)Math.Clamp(v, 0, 255);
-                GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
-            }
-        }, 0, 255);
+            });
 
         // Buttons
         if (WindowManager.TryGetControl("winNpcEditor", "btnSave", out var btnSave))

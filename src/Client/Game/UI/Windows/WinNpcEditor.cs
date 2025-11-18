@@ -8,6 +8,7 @@ namespace Client.Game.UI.Windows;
 public static class WinNpcEditor
 {
     public static int SelectedIndex = 0;
+    public static bool IsLoading = false;
     private static Core.Globals.Type.Npc? _clipboardNpc = null;
 
     // Entry point: populate lists and load first NPC.
@@ -67,7 +68,8 @@ public static class WinNpcEditor
             cmbAnim.Items.Clear();
             for (int i = 0; i < Variables.MaxAnimations; i++)
             {
-                var name = Data.Animation[i].Name;
+                var raw = Data.Animation[i].Name ?? string.Empty;
+                var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
                 cmbAnim.Items.Add($"{i + 1}: {name}");
             }
         }
@@ -80,7 +82,9 @@ public static class WinNpcEditor
                 cmb.Items.Clear();
                 for (int i = 0; i < Variables.MaxSkills; i++)
                 {
-                    cmb.Items.Add($"{i + 1}: {Data.Skill[i].Name}");
+                    var raw = Data.Skill[i].Name ?? string.Empty;
+                    var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
+                    cmb.Items.Add($"{i + 1}: {name}");
                 }
             }
         }
@@ -96,7 +100,11 @@ public static class WinNpcEditor
         {
             cmbItem.Items.Clear();
             for (int i = 0; i < Variables.MaxItems; i++)
-                cmbItem.Items.Add($"{i + 1}: {Data.Item[i].Name}");
+            {
+                var raw = Data.Item[i].Name ?? string.Empty;
+                var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
+                cmbItem.Items.Add($"{i + 1}: {name}");
+            }
         }
 
         // Behavior
@@ -141,6 +149,7 @@ public static class WinNpcEditor
     public static void LoadNpc(int index)
     {
         if (index < 0 || index >= Variables.MaxNpcs) return;
+        IsLoading = true;
         SelectedIndex = index;
         var npc = Data.Npc[index];
 
@@ -210,27 +219,51 @@ public static class WinNpcEditor
         SetSkill("cmbNpcSkill5", 4);
         SetSkill("cmbNpcSkill6", 5);
 
-        // Drop slot fields sync (always refresh current slot)
+        // Drop slot fields sync: use the selected slot to show that slot's item
         int slot = 0;
         if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcDropSlot", out var dsCtrl) && dsCtrl is ComboBox cmbDropSlot)
         {
-            slot = Math.Clamp(cmbDropSlot.Value, 0, 5);
+            // Clamp to valid slot range 0-5
+            cmbDropSlot.Value = Math.Clamp(cmbDropSlot.Value, 0, 5);
+            slot = cmbDropSlot.Value;
         }
+
+        // Item combo always reflects the stored item index for the current slot
         if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcDropItem", out var diCtrl) && diCtrl is ComboBox cmbItem)
         {
             if (npc.DropItem != null && slot < npc.DropItem.Length)
-                cmbItem.Value = Math.Clamp(npc.DropItem[slot], 0, Math.Max(0, cmbItem.Items.Count - 1));
+            {
+                var storedIndex = Math.Clamp(npc.DropItem[slot], 0, Variables.MaxItems - 1);
+                cmbItem.Value = Math.Clamp(storedIndex, 0, Math.Max(0, cmbItem.Items.Count - 1));
+            }
+            else
+            {
+                cmbItem.Value = 0;
+            }
         }
-        if (WindowManager.TryGetControl("winNpcEditor", "nudNpcAmount", out var amtCtrl) && amtCtrl is TextBox txtAmount)
+
+        // Amount textbox reflects DropItemValue for current slot
+        if (WindowManager.TryGetControl("winNpcEditor", "txtNpcAmount", out var amtCtrl) && amtCtrl is TextBox txtAmt)
         {
+            int amount = 0;
             if (npc.DropItemValue != null && slot < npc.DropItemValue.Length)
-                txtAmount.Text = npc.DropItemValue[slot].ToString();
+                amount = npc.DropItemValue[slot];
+            txtAmt.Text = amount.ToString();
         }
-        if (WindowManager.TryGetControl("winNpcEditor", "nudNpcChance", out var chanceCtrl) && chanceCtrl is TextBox txtChance)
+
+        // Chance slider reflects DropChance for current slot (within existing range)
+        if (WindowManager.TryGetControl("winNpcEditor", "sldNpcChance", out var chanceCtrl) && chanceCtrl is ScrollBar sbChance)
         {
+            int min = sbChance.Min;
+            int max = sbChance.Max;
+            int chance = 0;
             if (npc.DropChance != null && slot < npc.DropChance.Length)
-                txtChance.Text = npc.DropChance[slot].ToString();
+                chance = npc.DropChance[slot];
+            sbChance.Value = Math.Clamp(chance, min, max);
         }
+
+        RefreshList();
+        IsLoading = false;
     }
 
     // Handle list click (mouse down) to select NPC.
