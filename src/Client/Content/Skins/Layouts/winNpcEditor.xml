@@ -12,7 +12,7 @@
   <ScrollBar Name="sldNpcList" Position="240, 44" Size="16, 360" Min="0" Max="0" Vertical="true"/>
 
   <!-- Parchment background for editor details (mirrors other Crystalshire editors) -->
-	<PictureBox Name="picParchment" Position="272, 24" Size="432, 356" Image="Parchment" Design="Parchment"/>
+  <PictureBox Name="picParchment" Position="272, 24" Size="432, 356" Image="Parchment" Design="Parchment"/>
 
   <!-- Core fields on the right (General group) -->
   <Label Name="lblNpcName" Text="Name" Position="280, 36" Size="80, 16"/>
@@ -47,7 +47,7 @@
   <TextBox Name="txtNpcDamage" Position="504, 162" Size="80, 18" Design="TextWhite"/>
 
   <Label Name="lblNpcRange" Text="Range" Position="440, 202" Size="60, 16"/>
-  <ScrollBar Name="sldNpcRange" Position="504, 202" Size="160, 10" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+  <ScrollBar Name="sldNpcRange" Position="504, 198" Size="160, 12" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="12"/>
 
   <!-- Skills group (shifted down to clear sliders) -->
   <Label Name="lblNpcSkills" Text="Skills" Position="280, 248" Size="60, 16"/>
@@ -70,7 +70,7 @@
   <TextBox Name="txtNpcAmount" Position="344, 342" Size="80, 18" Design="TextWhite"/>
 
   <Label Name="lblNpcChance" Text="Chance" Position="440, 344" Size="60, 16"/>
-  <ScrollBar Name="sldNpcChance" Position="500, 346" Size="160, 8" Min="0" Max="100" Value="0" Orientation="Horizontal" ThumbSize="12"/>
+  <ScrollBar Name="sldNpcChance" Position="500, 342" Size="160, 12" Min="0" Max="100" Value="0" Orientation="Horizontal" ThumbSize="12"/>
 
   <!-- Buttons centered directly under parchment -->
   <Button Name="btnSave" Text="Save" Position="328, 384" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
