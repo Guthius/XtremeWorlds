@@ -1288,64 +1288,22 @@ namespace Client
                         }
 
                     case DialogueType.FillAttributes:
-                        {
-                            // Capture UI control state safely on the UI thread to avoid UIThreadAccessException.
+                        {                           
                             TileType resolvedType = TileType.None;
-                            int attrIndexCached = 0;
+                            if (GameState.OptBlocked) resolvedType = TileType.Blocked;
+                            if (GameState.OptWarp) resolvedType = TileType.Warp;
+                            if (GameState.OptItem) resolvedType = TileType.Item;
+                            if (GameState.OptNpcAvoid) resolvedType = TileType.NpcAvoid;
+                            if (GameState.OptResource) resolvedType = TileType.Resource;
+                            if (GameState.OptNpcSpawn) resolvedType = TileType.NpcSpawn;
+                            if (GameState.OptShop) resolvedType = TileType.Shop;
+                            if (GameState.OptBank) resolvedType = TileType.Bank;
+                            if (GameState.OptHeal) resolvedType = TileType.Heal;
+                            if (GameState.OptTrap) resolvedType = TileType.Trap;
+                            if (GameState.OptAnimation) resolvedType = TileType.Animation;
+                            if (GameState.OptNoCrossing) resolvedType = TileType.NoCrossing;
 
-                            void Capture()
-                            {
-                                var editor = EditorMap.Instance;
-                                if (editor == null) return;
-
-                                // Sequential overwrite precedence (last true wins) preserved.
-                                if (editor.optBlocked.Checked == true) resolvedType = TileType.Blocked;
-                                if (editor.optWarp.Checked == true) resolvedType = TileType.Warp;
-                                if (editor.optItem.Checked == true) resolvedType = TileType.Item;
-                                if (editor.optNpcAvoid.Checked == true) resolvedType = TileType.NpcAvoid;
-                                if (editor.optResource.Checked == true) resolvedType = TileType.Resource;
-                                if (editor.optNpcSpawn.Checked == true) resolvedType = TileType.NpcSpawn;
-                                if (editor.optShop.Checked == true) resolvedType = TileType.Shop;
-                                if (editor.optBank.Checked == true) resolvedType = TileType.Bank;
-                                if (editor.optHeal.Checked == true) resolvedType = TileType.Heal;
-                                if (editor.optTrap.Checked == true) resolvedType = TileType.Trap;
-                                if (editor.optAnimation.Checked == true) resolvedType = TileType.Animation;
-                                if (editor.optNoCrossing.Checked == true) resolvedType = TileType.NoCrossing;
-                                attrIndexCached = editor.cmbAttribute.SelectedIndex;
-                            }
-
-                            var app = Eto.Forms.Application.Instance;
-                            if (app != null)
-                            {
-                                bool captured = false;
-                                try
-                                {
-                                    // Try synchronous invoke first (fast if already on UI thread, marshals otherwise)
-                                    app.Invoke(() => { Capture(); captured = true; });
-                                }
-                                catch
-                                {
-                                    // Fallback: AsyncInvoke then wait (avoid leaving capture incomplete)
-                                    var mre = new ManualResetEventSlim(false);
-                                    try
-                                    {
-                                        app.AsyncInvoke(() => { Capture(); captured = true; mre.Set(); });
-                                        // Wait with timeout to avoid infinite stall during shutdown
-                                        mre.Wait(200);
-                                    }
-                                    catch { /* swallow */ }
-                                }
-                                if (!captured)
-                                {
-                                    // Last resort direct call (may still throw but prevents silent no-op)
-                                    try { Capture(); } catch { /* ignore */ }
-                                }
-                            }
-                            else
-                            {
-                                // No application instance; proceed best-effort
-                                try { Capture(); } catch { /* ignore */ }
-                            }
+                            int attrIndexCached = Math.Clamp((int)GameState.EditorAttribute, 1, 2) - 1; // 0 => primary, 1 => secondary
 
                             var maxX = (int)Data.MyMap.MaxX;
                             var maxY = (int)Data.MyMap.MaxY;
