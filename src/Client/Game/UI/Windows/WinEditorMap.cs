@@ -303,11 +303,12 @@ public static class WinEditorMap
         var win = WindowManager.GetWindowByName("winEditorMap");
         if (win is null) return;
 
+        DesignRenderer.Render(Design.TextBlack, win.X + ctrl.X, win.Y + ctrl.Y, ctrl.Width, ctrl.Height);
+
         int x0 = win.X + ctrl.X + 6;
         int y0 = win.Y + ctrl.Y + 6;
         int width = ctrl.Width - 12;
         int height = ctrl.Height - 12;
-        // No background fill: keep transparent like combo boxes
         int lineHeight = 18;
         int visible = System.Math.Max(1, height / lineHeight);
 
@@ -330,13 +331,13 @@ public static class WinEditorMap
                 int npcIndex = (Data.MyMap.Npc != null && slot < Data.MyMap.Npc.Length) ? Data.MyMap.Npc[slot] : -1;
                 if (npcIndex >= 0 && npcIndex < Core.Globals.Variables.MaxNpcs && npcIndex < (Data.Npc?.Length ?? 0))
                 {
-                    var n = Data.Npc[npcIndex].Name ?? string.Empty;
+                    var n = Data.Npc?[npcIndex].Name ?? string.Empty;
                     if (!string.IsNullOrWhiteSpace(n)) name = n.Trim();
                 }
             }
             catch { /* ignore */ }
 
-            string line = $"{slot}: {name}";
+            string line = $"{slot + 1}: {name}";
             int y = y0 + i * lineHeight;
             var color = Microsoft.Xna.Framework.Color.White;
             TextRenderer.RenderText(line, x0, y, color, Microsoft.Xna.Framework.Color.Black);
