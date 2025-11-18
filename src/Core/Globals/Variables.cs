@@ -11,7 +11,7 @@ public static class Variables
     public static int MaxItems = 500;
     public static int MaxMaps = 1000;
     public static byte MaxMapItems = 255;
-    public static byte MaxMapNpcs = 30;
+    public static byte MaxMapNpcs = 50;
     public static int MaxNpcs = 500;
     public static byte MaxNpcSkills = 6;
     public static int MaxParty = 100;

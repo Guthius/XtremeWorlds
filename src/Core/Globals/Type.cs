@@ -349,8 +349,6 @@ public static class Type
         public int Shop;
         public bool NoRespawn;
         public bool Indoors;
-        public int[] SpawnPoints; // New: Multiple spawn points
-        public int[] BossNpcs; // New: Boss Npcs on map
     }
 
     public struct MapItem

@@ -839,24 +839,7 @@ public class Crystalshire
 
          // Faux header tabs like Admin
         var winIndex = WindowManager.GetWindowIndex("winEditorMap");
-        void MakeTabButton(string name, string text, int x, string tabKey)
-        {
-            WindowManager.CreateButton(
-                windowIndex: winIndex,
-                name: name,
-                left: x,
-                top: 70,
-                width: 100,
-                height: 22,
-                text: text,
-                font: Font.Arial,
-                designNorm: Design.Red,
-                designHover: Design.RedHover,
-                designMousedown: Design.RedClick,
-                callbackMousedown: () => ShowTab(tabKey)
-            );
-        }
-
+       
         void SetVisible(bool visible, params string[] names)
         {
             foreach (var n in names)
@@ -1287,8 +1270,7 @@ public class Crystalshire
                             int displayIndex = slot;
                             if (displayIndex >= 0 && displayIndex < lst.Items.Count)
                             {
-                                //lst.Items[displayIndex] = $"{slot + 1}: {name}";
-                                lst.Items[displayIndex] = $"{slot + 1}: test";
+                                lst.Items[displayIndex] = $"{slot + 1}: {name}";
                             }
                         }
                     }

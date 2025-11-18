@@ -9,7 +9,6 @@ namespace Client.Game.UI.Windows;
 public static class WinEditorMap
 {
     private static bool _isDraggingTileset = false;
-    private static int _npcListScroll = 0;
     public static int NpcSelectedSlot = 0;
     private const int WheelTileStep = 3; // scroll by 3 tiles per wheel notch
     
