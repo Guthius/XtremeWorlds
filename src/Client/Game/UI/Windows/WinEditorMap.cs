@@ -25,9 +25,9 @@ public static class WinEditors
     // Draw the tileset preview into the picTileset PictureBox area
     public static void OnDrawTileset()
     {
-        var win = WindowManager.GetWindowByName("winEditors");
+        var win = WindowManager.GetWindowByName("winMapEditor");
         if (win is null) return;
-        if (!WindowManager.TryGetControl("winEditors", "picTileset", out var ctrl)) return;
+        if (!WindowManager.TryGetControl("winMapEditor","picTileset", out var ctrl)) return;
 
         int tilesetIndex = GameState.CurTileset;
         if (tilesetIndex <= 0) tilesetIndex = Data.MyMap.Tileset;
@@ -49,7 +49,7 @@ public static class WinEditors
         // Horizontal/Vertical scroll bars determine source X/Y offsets
         int scrollX = 0;
         int scrollY = 0;
-        if (WindowManager.TryGetControl("winEditors", "sldTilesetH", out var sbhCtrl) && sbhCtrl is ScrollBar sbh)
+        if (WindowManager.TryGetControl("winMapEditor","sldTilesetH", out var sbhCtrl) && sbhCtrl is ScrollBar sbh)
         {
             var maxX = System.Math.Max(0, srcW - viewW);
             sbh.Max = maxX;
@@ -57,7 +57,7 @@ public static class WinEditors
             sbhCtrl.Value = System.Math.Clamp(sbhCtrl.Value, sbh.Min, sbh.Max);
             scrollX = sbhCtrl.Value;
         }
-        if (WindowManager.TryGetControl("winEditors", "sldTilesetV", out var sbCtrl) && sbCtrl is ScrollBar sb)
+        if (WindowManager.TryGetControl("winMapEditor","sldTilesetV", out var sbCtrl) && sbCtrl is ScrollBar sb)
         {
             // Update range based on current tileset height
             var max = System.Math.Max(0, srcH - viewH);
@@ -105,9 +105,9 @@ public static class WinEditors
     // Click to choose a tile from the tileset viewport
     public static void OnTilesetMouseDown()
     {
-        var win = WindowManager.GetWindowByName("winEditors");
+        var win = WindowManager.GetWindowByName("winMapEditor");
         if (win is null) return;
-        if (!WindowManager.TryGetControl("winEditors", "picTileset", out var ctrl)) return;
+        if (!WindowManager.TryGetControl("winMapEditor","picTileset", out var ctrl)) return;
 
         int relX = GameState.CurMouseX - (win.X + ctrl.X);
         int relY = GameState.CurMouseY - (win.Y + ctrl.Y);
@@ -129,9 +129,9 @@ public static class WinEditors
 
         // Read scrollbars
         int sX = 0, sY = 0;
-        if (WindowManager.TryGetControl("winEditors", "sldTilesetH", out var sbhCtrl))
+        if (WindowManager.TryGetControl("winMapEditor","sldTilesetH", out var sbhCtrl))
             sX = System.Math.Clamp(sbhCtrl.Value, 0, System.Math.Max(0, srcW - viewW));
-        if (WindowManager.TryGetControl("winEditors", "sldTilesetV", out var sbvCtrl))
+        if (WindowManager.TryGetControl("winMapEditor","sldTilesetV", out var sbvCtrl))
             sY = System.Math.Clamp(sbvCtrl.Value, 0, System.Math.Max(0, srcH - viewH));
 
         int sW = System.Math.Min(viewW, srcW - sX);
@@ -183,9 +183,9 @@ public static class WinEditors
             return;
         }
         if (!_isDraggingTileset) return;
-        var win = WindowManager.GetWindowByName("winEditors");
+        var win = WindowManager.GetWindowByName("winMapEditor");
         if (win is null) return;
-        if (!WindowManager.TryGetControl("winEditors", "picTileset", out var ctrl)) return;
+        if (!WindowManager.TryGetControl("winMapEditor","picTileset", out var ctrl)) return;
 
         int relX = GameState.CurMouseX - (win.X + ctrl.X);
         int relY = GameState.CurMouseY - (win.Y + ctrl.Y);
@@ -204,9 +204,9 @@ public static class WinEditors
         int viewH = ctrl.Height;
 
         int sX = 0, sY = 0;
-        if (WindowManager.TryGetControl("winEditors", "sldTilesetH", out var sbhCtrl))
+        if (WindowManager.TryGetControl("winMapEditor","sldTilesetH", out var sbhCtrl))
             sX = System.Math.Clamp(sbhCtrl.Value, 0, System.Math.Max(0, srcW - viewW));
-        if (WindowManager.TryGetControl("winEditors", "sldTilesetV", out var sbvCtrl))
+        if (WindowManager.TryGetControl("winMapEditor","sldTilesetV", out var sbvCtrl))
             sY = System.Math.Clamp(sbvCtrl.Value, 0, System.Math.Max(0, srcH - viewH));
 
         int sW = System.Math.Min(viewW, srcW - sX);
@@ -248,8 +248,8 @@ public static class WinEditors
     // Mouse wheel support for tileset viewport: scroll vertically by tile rows
     public static void OnTilesetMouseWheel()
     {
-        if (!WindowManager.TryGetControl("winEditors", "picTileset", out var ctrl)) return;
-        var win = WindowManager.GetWindowByName("winEditors");
+        if (!WindowManager.TryGetControl("winMapEditor","picTileset", out var ctrl)) return;
+        var win = WindowManager.GetWindowByName("winMapEditor");
         if (win is null) return;
 
         int tilesetIndex = GameState.CurTileset;
@@ -272,7 +272,7 @@ public static class WinEditors
         bool shift = GameState.VbKeyShift;
         if (shift)
         {
-            if (WindowManager.TryGetControl("winEditors", "sldTilesetH", out var sbhCtrl) && sbhCtrl is ScrollBar sbh)
+            if (WindowManager.TryGetControl("winMapEditor","sldTilesetH", out var sbhCtrl) && sbhCtrl is ScrollBar sbh)
             {
                 sbh.Min = 0; sbh.Max = maxX;
                 int newVal = System.Math.Clamp(sbhCtrl.Value + stepPx, sbh.Min, sbh.Max);
@@ -281,7 +281,7 @@ public static class WinEditors
         }
         else
         {
-            if (WindowManager.TryGetControl("winEditors", "sldTilesetV", out var sbCtrl) && sbCtrl is ScrollBar sb)
+            if (WindowManager.TryGetControl("winMapEditor","sldTilesetV", out var sbCtrl) && sbCtrl is ScrollBar sb)
             {
                 // Ensure range reflects current image size
                 sb.Min = 0; sb.Max = maxY;
@@ -298,7 +298,7 @@ public static class WinEditors
     
     public static void OnDrawNpcList()
     {
-        if (!WindowManager.TryGetControl("winEditors", "lstNpcs", out var ctrl) || ctrl is not ListBox list) return;
+        if (!WindowManager.TryGetControl("winMapEditor","lstNpcs", out var ctrl) || ctrl is not ListBox list) return;
 
         list.Clear();
 
@@ -324,7 +324,7 @@ public static class WinEditors
         list.EnsureVisible(list.SelectedIndex);
 
         // Sync scrollbar from ListBox scroll offset
-        if (WindowManager.TryGetControl("winEditors", "sldNpcList", out var sbCtrl) && sbCtrl is ScrollBar sb)
+        if (WindowManager.TryGetControl("winMapEditor","sldNpcList", out var sbCtrl) && sbCtrl is ScrollBar sb)
         {
             int visible = list.GetVisibleCount();
             int maxScroll = Math.Max(0, total - visible);
@@ -336,8 +336,8 @@ public static class WinEditors
 
     public static void OnNpcListMouseDown()
     {
-        if (!WindowManager.TryGetControl("winEditors", "lstNpcs", out var ctrl) || ctrl is not ListBox list) return;
-        var win = WindowManager.GetWindowByName("winEditors");
+        if (!WindowManager.TryGetControl("winMapEditor","lstNpcs", out var ctrl) || ctrl is not ListBox list) return;
+        var win = WindowManager.GetWindowByName("winMapEditor");
         if (win is null) return;
 
         int relY = GameState.CurMouseY - (win.Y + ctrl.Y);
@@ -349,7 +349,7 @@ public static class WinEditors
         list.SelectedIndex = index;
         list.EnsureVisible(index);
 
-        if (WindowManager.TryGetControl("winEditors", "cmbNpcList", out var npcCtrl) && npcCtrl is ComboBox cmbNpc)
+        if (WindowManager.TryGetControl("winMapEditor","cmbNpcList", out var npcCtrl) && npcCtrl is ComboBox cmbNpc)
         {
             int assigned = -1;
             if (Data.MyMap.Npc != null && index < Data.MyMap.Npc.Length)
@@ -362,7 +362,7 @@ public static class WinEditors
 
     public static void OnNpcListMouseWheel()
     {
-        if (!WindowManager.TryGetControl("winEditors", "lstNpcs", out var ctrl) || ctrl is not ListBox list) return;
+        if (!WindowManager.TryGetControl("winMapEditor","lstNpcs", out var ctrl) || ctrl is not ListBox list) return;
 
         int total = Core.Globals.Variables.MaxMapNpcs;
         int visible = list.GetVisibleCount();
@@ -371,7 +371,7 @@ public static class WinEditors
         int step = (delta > 0) ? -3 : 3;
         list.ScrollOffset = Math.Clamp(list.ScrollOffset + step, 0, maxScroll);
 
-        if (WindowManager.TryGetControl("winEditors", "sldNpcList", out var sbCtrl))
+        if (WindowManager.TryGetControl("winMapEditor","sldNpcList", out var sbCtrl))
         {
             sbCtrl.Value = list.ScrollOffset;
         }
@@ -379,8 +379,8 @@ public static class WinEditors
 
     public static void OnNpcScrollBarMove()
     {
-        if (!WindowManager.TryGetControl("winEditors", "lstNpcs", out var ctrl) || ctrl is not ListBox list) return;
-        if (WindowManager.TryGetControl("winEditors", "sldNpcList", out var sbCtrl))
+        if (!WindowManager.TryGetControl("winMapEditor","lstNpcs", out var ctrl) || ctrl is not ListBox list) return;
+        if (WindowManager.TryGetControl("winMapEditor","sldNpcList", out var sbCtrl))
         {
             list.ScrollOffset = sbCtrl.Value;
         }

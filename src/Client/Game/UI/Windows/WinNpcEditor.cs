@@ -5,7 +5,6 @@ using System;
 
 namespace Client.Game.UI.Windows;
 
-// Crystalshire-based NPC editor helper. Mirrors essential behavior of legacy Eto EditorNpc.
 public static class WinNpcEditor
 {
     public static int SelectedIndex = 0;

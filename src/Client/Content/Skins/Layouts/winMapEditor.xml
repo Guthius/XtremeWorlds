@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Window Name="winEditorMap" Caption="Map Editor"
+<Window Name="winMapEditor" Caption="Map Editor"
   Size="804, 740"
         Icon="1133" IconOffset="3, 5"
         Design="WindowNormal"
@@ -51,7 +51,7 @@
       <!-- Warp group (shifted down to align with Effects layout rhythm) -->
       <Label Name="lblWarp" Text="Warp" Position="20, 168" Size="60, 16"/>
       <Label Name="lblWarpMap" Text="Map" Position="20, 190" Size="36, 16"/>
-      <ScrollBar Name="sldMapWarpMap" Position="60, 192" Size="240, 12" Min="1" Max="1" Value="1" Orientation="Horizontal" ThumbSize="16"/>
+      <ScrollBar Name="sldMapWarp" Position="60, 192" Size="240, 12" Min="1" Max="1" Value="1" Orientation="Horizontal" ThumbSize="16"/>
       <Label Name="lblWarpX" Text="X" Position="306, 190" Size="16, 16"/>
       <ScrollBar Name="sldMapWarpX" Position="324, 192" Size="200, 12" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
       <Label Name="lblWarpY" Text="Y" Position="530, 190" Size="16, 16"/>
@@ -111,21 +111,21 @@
         <Label Name="lblSettings" Text="Settings" Position="20, 84" Size="200, 14"/>
         <Button Name="btnGoTiles" Text="Tiles" Position="20, 100" Size="100, 20" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
         <Button Name="btnGoAttributes" Text="Attributes" Position="124, 100" Size="100, 20" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-        <Button Name="btnGoNpcs" Text="NPCs" Position="228, 100" Size="80, 20" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+        <Button Name="btnGoNpcs" Text="Npc" Position="228, 100" Size="80, 20" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
         <Button Name="btnGoDirBlock" Text="Dir Block" Position="312, 100" Size="90, 20" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
         <Button Name="btnGoEvents" Text="Events" Position="406, 100" Size="80, 20" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
         <Button Name="btnGoEffects" Text="Effects" Position="490, 100" Size="80, 20" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
 
         <!-- NPC header (shown in NPCs view) -->
-        <Label Name="lblNpcs" Text="NPC Tools" Position="20, 84" Size="200, 14"/>
-        <Label Name="lblNpcsHint" Text="Select an NPC to assign to a slot" Position="20, 112" Size="360, 14"/>
+        <Label Name="lblNpcs" Text="Npc Tools" Position="20, 84" Size="200, 14"/>
+        <Label Name="lblNpcsHint" Text="Select an npc to assign to a slot" Position="20, 112" Size="360, 14"/>
 
         <!-- NPC list (left) -->
         <ListBox Name="lstNpcs" Position="20, 142" Size="460, 540"/>
         <ScrollBar Name="sldNpcList" Position="486, 142" Size="12, 540" Min="0" Max="0" Value="0" Orientation="Vertical" ThumbSize="16"/>
 
         <!-- NPC selection (right top) -->
-        <Label Name="lblNpc" Text="NPC" Position="520, 142" Size="40, 16"/>
+        <Label Name="lblNpc" Text="Npc" Position="520, 142" Size="40, 16"/>
         <ComboBox Name="cmbNpcList" Position="564, 140" Size="220, 18" Design="ComboBox"/>
 
         <!-- Settings controls (shown in Settings view) -->
