@@ -2321,7 +2321,7 @@ namespace Client
                     if (!GameLogic.IsValidMapPoint(x, y)) continue;
                     int px = GameLogic.ConvertMapX(x * tileW);
                     int py = GameLogic.ConvertMapY(y * tileH);
-                    GameClient.DrawOutlineRectangle(px, py, tileW, tileH, Color.White, 1f);
+                    GameClient.DrawOutlineRectangle(px, py, tileW, tileH, Color.Red, 1f);
                 }
             }
         }
