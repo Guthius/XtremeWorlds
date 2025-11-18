@@ -666,12 +666,12 @@ namespace Client
             {
                 if (IsKeyStateActive(Keys.Z))
                 {
-                    EditorMap.Undo();
+                    Editors.Undo();
                 }
 
                 if (IsKeyStateActive(Keys.Y))
                 {
-                    EditorMap.Redo();
+                    Editors.Redo();
                 }
             }
 
@@ -680,7 +680,9 @@ namespace Client
             if (currentWheel != _prevScrollWheelValue)
             {
                 int delta = currentWheel - _prevScrollWheelValue;
-                if (delta != 0 && GameState.MyEditorType != EditorType.Map)
+                // Block zoom while over any GUI window, and in map editor
+                bool overGui = WindowManager.IsMouseOverAnyWindow;
+                if (delta != 0 && !overGui && GameState.MyEditorType != EditorType.Map)
                 {
                     float zoomDelta = delta > 0 ? 0.1f : -0.1f;
                     GameState.CameraZoom += zoomDelta;
@@ -1477,7 +1479,7 @@ namespace Client
                     
                     if (!overGui)
                     {
-                        EditorMap.MouseDown(GameState.CurXGame, GameState.CurYGame, false);
+                        Editors.MouseDown(GameState.CurXGame, GameState.CurYGame, false);
                     }
                 }
 

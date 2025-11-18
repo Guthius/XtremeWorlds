@@ -536,7 +536,7 @@ namespace Client
             {
                 GameState.MyEditorType = EditorType.Npc;
                 GameState.EditorIndex = 0;
-                new EditorNpc().Show();
+                WindowManager.ShowWindow("winNpcEditor");
                 GameState.InitNpcEditor = false;
             }
 

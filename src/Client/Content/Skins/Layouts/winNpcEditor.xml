@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window Name="winNpcEditor" Caption="NPC Editor"
+        Size="720, 520"
+        Icon="1133" IconOffset="3, 5"
+        Design="WindowNormal"
+        StartPosition="CenterScreen"
+        Visible="false">
+
+  <!-- NPC index list on the left -->
+  <Label Name="lblNpcList" Text="NPCs" Position="16, 16" Size="80, 16"/>
+  <ListBox Name="lstNpcIndex" Position="16, 36" Size="224, 440"/>
+  <ScrollBar Name="sldNpcList" Position="240, 36" Size="16, 440" Min="0" Max="0" Vertical="true"/>
+
+  <!-- Parchment background for editor details (mirrors other Crystalshire editors) -->
+  <PictureBox Name="picParchment" Position="264, 12" Size="432, 396" Image="Parchment" Design="WindowInner"/>
+
+  <!-- Core fields on the right (General group) -->
+  <Label Name="lblNpcName" Text="Name" Position="280, 24" Size="80, 16"/>
+  <TextBox Name="txtNpcName" Position="344, 22" Size="336, 20" Design="TextWhite"/>
+
+  <Label Name="lblNpcAttackSay" Text="Attack Say" Position="280, 48" Size="80, 16"/>
+  <TextBox Name="txtNpcAttackSay" Position="344, 46" Size="336, 20" Design="TextWhite"/>
+
+  <Label Name="lblNpcBehavior" Text="Behavior" Position="280, 76" Size="70, 16"/>
+  <ComboBox Name="cmbNpcBehavior" Position="344, 74" Size="120, 18" Design="ComboBox"/>
+
+  <Label Name="lblNpcFaction" Text="Faction" Position="472, 76" Size="60, 16"/>
+  <ComboBox Name="cmbNpcFaction" Position="536, 74" Size="144, 18" Design="ComboBox"/>
+
+  <Label Name="lblNpcSpawnPeriod" Text="Spawn" Position="280, 100" Size="60, 16"/>
+  <ComboBox Name="cmbNpcSpawnPeriod" Position="344, 98" Size="120, 18" Design="ComboBox"/>
+
+  <Label Name="lblNpcAnimation" Text="Animation" Position="280, 124" Size="70, 16"/>
+  <ComboBox Name="cmbNpcAnimation" Position="344, 122" Size="336, 18" Design="ComboBox"/>
+
+  <!-- Stats group (simplified to match Eto layout positions) -->
+  <Label Name="lblNpcHp" Text="HP" Position="280, 152" Size="40, 16"/>
+  <TextBox Name="txtNpcHp" Position="320, 150" Size="80, 18" Design="TextWhite"/>
+
+  <Label Name="lblNpcExp" Text="EXP" Position="408, 152" Size="40, 16"/>
+  <TextBox Name="txtNpcExp" Position="448, 150" Size="80, 18" Design="TextWhite"/>
+
+  <Label Name="lblNpcLevel" Text="Level" Position="536, 152" Size="40, 16"/>
+  <TextBox Name="txtNpcLevel" Position="576, 150" Size="80, 18" Design="TextWhite"/>
+
+  <Label Name="lblNpcDamage" Text="Damage" Position="280, 176" Size="60, 16"/>
+  <TextBox Name="txtNpcDamage" Position="344, 174" Size="80, 18" Design="TextWhite"/>
+
+  <Label Name="lblNpcRange" Text="Range" Position="440, 176" Size="60, 16"/>
+  <TextBox Name="txtNpcRange" Position="496, 174" Size="80, 18" Design="TextWhite"/>
+
+  <!-- Skills group -->
+  <Label Name="lblNpcSkills" Text="Skills" Position="280, 204" Size="60, 16"/>
+  <ComboBox Name="cmbNpcSkill1" Position="344, 202" Size="160, 18" Design="ComboBox"/>
+  <ComboBox Name="cmbNpcSkill2" Position="524, 202" Size="156, 18" Design="ComboBox"/>
+  <ComboBox Name="cmbNpcSkill3" Position="344, 226" Size="160, 18" Design="ComboBox"/>
+  <ComboBox Name="cmbNpcSkill4" Position="524, 226" Size="156, 18" Design="ComboBox"/>
+  <ComboBox Name="cmbNpcSkill5" Position="344, 250" Size="160, 18" Design="ComboBox"/>
+  <ComboBox Name="cmbNpcSkill6" Position="524, 250" Size="156, 18" Design="ComboBox"/>
+
+  <!-- Drop configuration -->
+  <Label Name="lblNpcDrops" Text="Drops" Position="280, 280" Size="60, 16"/>
+  <Label Name="lblNpcDropSlot" Text="Slot" Position="344, 280" Size="40, 16"/>
+  <ComboBox Name="cmbNpcDropSlot" Position="384, 278" Size="60, 18" Design="ComboBox"/>
+
+  <Label Name="lblNpcDropItem" Text="Item" Position="452, 280" Size="40, 16"/>
+  <ComboBox Name="cmbNpcDropItem" Position="496, 278" Size="184, 18" Design="ComboBox"/>
+
+  <Label Name="lblNpcAmount" Text="Amount" Position="280, 304" Size="60, 16"/>
+  <TextBox Name="nudNpcAmount" Position="344, 302" Size="80, 20" Design="TextWhite"/>
+
+  <Label Name="lblNpcChance" Text="Chance" Position="436, 304" Size="60, 16"/>
+  <TextBox Name="nudNpcChance" Position="500, 302" Size="80, 20" Design="TextWhite"/>
+
+  <!-- Buttons along bottom right -->
+  <Button Name="btnSave" Text="Save" Position="376, 424" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+  <Button Name="btnDelete" Text="Delete" Position="464, 424" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+  <Button Name="btnNpcCopy" Text="Copy" Position="552, 424" Size="80, 24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+  <Button Name="btnCancel" Text="Cancel" Position="640, 424" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+
+  <!-- Close button in title bar (like map editor) -->
+  <Button Name="btnClose" Position="-19, 5" Size="16, 16" Image="8" ImageHover="9" ImageMouseDown="10"/>
+
+</Window>
