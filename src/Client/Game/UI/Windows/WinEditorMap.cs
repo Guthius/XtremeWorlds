@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 
 namespace Client.Game.UI.Windows;
 
-public static class WinEditors
+public static class WinEditorMap
 {
     private static bool _isDraggingTileset = false;
     public static int NpcSelectedSlot = 0;
@@ -384,5 +384,77 @@ public static class WinEditors
         {
             list.ScrollOffset = sbCtrl.Value;
         }
+    }
+
+    public static void Init()
+    {
+        LoadMap();
+    }
+
+    public static void LoadMap()
+    {
+        // assumes Data.MyMap is already the current map the editor is editing
+        var map = Data.MyMap;
+
+        // Name
+        if (WindowManager.TryGetControl("winMapEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
+            txtName.Text = map.Name ?? string.Empty;
+
+        // Music combo
+        if (WindowManager.TryGetControl("winMapEditor", "cmbMusic", out var musicCtrl) && musicCtrl is ComboBox cmbMusic)
+        {
+            // find the index of the current map music in the combo
+            int idx = 0;
+            for (int i = 0; i < cmbMusic.Items.Count; i++)
+            {
+                if (string.Equals(cmbMusic.Items[i], map.Music, StringComparison.OrdinalIgnoreCase))
+                {
+                    idx = i;
+                    break;
+                }
+            }
+            cmbMusic.Value = idx;
+        }
+
+        // Shop / Moral combos
+        if (WindowManager.TryGetControl("winMapEditor", "lstShop", out var shopCtrl) && shopCtrl is ComboBox cmbShop)
+            cmbShop.Value = Math.Clamp(map.Shop, 0, Math.Max(0, cmbShop.Items.Count - 1));
+
+        if (WindowManager.TryGetControl("winMapEditor", "lstMoral", out var moralCtrl) && moralCtrl is ComboBox cmbMoral)
+            cmbMoral.Value = Math.Clamp(map.Moral, 0, Math.Max(0, cmbMoral.Items.Count - 1));
+
+        // Links
+        int maxMaps = Variables.MaxMaps - 1;
+        if (WindowManager.TryGetControl("winMapEditor", "txtUp", out var txtUp))
+            txtUp.Text = map.Up.ToString();
+        if (WindowManager.TryGetControl("winMapEditor", "txtDown", out var txtDown))
+            txtDown.Text = map.Down.ToString();
+        if (WindowManager.TryGetControl("winMapEditor", "txtLeft", out var txtLeft))
+            txtLeft.Text = map.Left.ToString();
+        if (WindowManager.TryGetControl("winMapEditor", "txtRight", out var txtRight))
+            txtRight.Text = map.Right.ToString();
+
+        // Boot map/coords
+        if (WindowManager.TryGetControl("winMapEditor", "txtBootMap", out var txtBootMap))
+            txtBootMap.Text = map.BootMap.ToString();
+        if (WindowManager.TryGetControl("winMapEditor", "txtBootX", out var txtBootX))
+            txtBootX.Text = map.BootX.ToString();
+        if (WindowManager.TryGetControl("winMapEditor", "txtBootY", out var txtBootY))
+            txtBootY.Text = map.BootY.ToString();
+
+        // Flags
+        if (WindowManager.TryGetControl("winMapEditor", "chkNoMapRespawn", out var chkNoMapRespawn))
+            chkNoMapRespawn.Value = map.NoRespawn ? 1 : 0;
+        if (WindowManager.TryGetControl("winMapEditor", "chkIndoors", out var chkIndoors))
+            chkIndoors.Value = map.Indoors ? 1 : 0;
+
+        // Size
+        if (WindowManager.TryGetControl("winMapEditor", "txtMaxX", out var txtMaxX))
+            txtMaxX.Text = map.MaxX.ToString();
+        if (WindowManager.TryGetControl("winMapEditor", "txtMaxY", out var txtMaxY))
+            txtMaxY.Text = map.MaxY.ToString();
+
+        // Tileset state + NPC list
+        GameState.CurTileset = map.Tileset;
     }
 }

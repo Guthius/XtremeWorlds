@@ -266,7 +266,7 @@ public class Crystalshire
                 }
                 else
                 {
-                    WinEditors.OnFillLayerClick();
+                    WinEditorMap.OnFillLayerClick();
                 }
             };
         if (WindowManager.TryGetControl("winMapEditor","btnToolEraser", out var btnErase))
@@ -275,7 +275,7 @@ public class Crystalshire
                 // Contextual clear: Directions -> clear dir blocks (confirm), Attributes -> clear attributes (confirm), otherwise clear current tiles layer
                 if (GameState.MapEditorTab == (int)MapEditorTab.Directions)
                 {
-                    WinEditors.OnDirClearClick();
+                    WinEditorMap.OnDirClearClick();
                 }
                 else if (GameState.MapEditorTab == (int)MapEditorTab.Attributes)
                 {
@@ -299,7 +299,7 @@ public class Crystalshire
 
         // Quick actions: call into existing helpers if available
         if (WindowManager.TryGetControl("winMapEditor","btnFillLayer", out var btnFillLayer))
-            btnFillLayer.CallBack[(int)ControlState.MouseDown] = () => { WinEditors.OnFillLayerClick(); };
+            btnFillLayer.CallBack[(int)ControlState.MouseDown] = () => { WinEditorMap.OnFillLayerClick(); };
         if (WindowManager.TryGetControl("winMapEditor","btnClearLayer", out var btnClearLayer))
             btnClearLayer.CallBack[(int)ControlState.MouseDown] = () => { Editors.MapEditorClearLayer((MapLayer)GameState.CurLayer); };
         if (WindowManager.TryGetControl("winMapEditor","btnCopyMap", out var btnCopy))
@@ -1255,7 +1255,7 @@ public class Crystalshire
                 // When selection actually changes (mouse move over list), write to map data + list
                 cmbNpc.CallBack[(int)ControlState.MouseMove] = () =>
                 {
-                    int slotIndex = WinEditors.NpcSelectedSlot;
+                    int slotIndex = WinEditorMap.NpcSelectedSlot;
                     if (Data.MyMap.Npc != null && slotIndex >= 0 && slotIndex < Data.MyMap.Npc.Length)
                     {
                         int npcIndex = cmbNpc.Value - 1; // 0 = None
@@ -1327,30 +1327,30 @@ public class Crystalshire
         // Wire tileset preview draw
         if (WindowManager.TryGetControl("winMapEditor","picTileset", out var picTileset))
         {
-            picTileset.OnDraw = WinEditors.OnDrawTileset;
-            picTileset.CallBack[(int)ControlState.MouseDown] = WinEditors.OnTilesetMouseDown;
-            picTileset.CallBack[(int)ControlState.MouseMove] = WinEditors.OnTilesetMouseMove;
-            picTileset.CallBack[(int)ControlState.MouseUp] = WinEditors.OnTilesetMouseUp;
-            picTileset.CallBack[(int)ControlState.MouseScroll] = WinEditors.OnTilesetMouseWheel;
+            picTileset.OnDraw = WinEditorMap.OnDrawTileset;
+            picTileset.CallBack[(int)ControlState.MouseDown] = WinEditorMap.OnTilesetMouseDown;
+            picTileset.CallBack[(int)ControlState.MouseMove] = WinEditorMap.OnTilesetMouseMove;
+            picTileset.CallBack[(int)ControlState.MouseUp] = WinEditorMap.OnTilesetMouseUp;
+            picTileset.CallBack[(int)ControlState.MouseScroll] = WinEditorMap.OnTilesetMouseWheel;
         }
 
         // Npc list drawing and interactions
         if (WindowManager.TryGetControl("winMapEditor","lstNpcs", out var lstNpcs) && lstNpcs is ListBox list)
         {
-            list.OnDraw = WinEditors.OnDrawNpcList;
-            list.CallBack[(int)ControlState.MouseDown] = WinEditors.OnNpcListMouseDown;
+            list.OnDraw = WinEditorMap.OnDrawNpcList;
+            list.CallBack[(int)ControlState.MouseDown] = WinEditorMap.OnNpcListMouseDown;
             // Use MouseScroll (enum) for wheel events
-            list.CallBack[(int)ControlState.MouseScroll] = WinEditors.OnNpcListMouseWheel;
+            list.CallBack[(int)ControlState.MouseScroll] = WinEditorMap.OnNpcListMouseWheel;
         }
         if (WindowManager.TryGetControl("winMapEditor","sldNpcList", out var sldNpcList))
         {
-            sldNpcList.CallBack[(int)ControlState.MouseMove] = WinEditors.OnNpcScrollBarMove;
+            sldNpcList.CallBack[(int)ControlState.MouseMove] = WinEditorMap.OnNpcScrollBarMove;
         }
 
-        // Dir Block: confirmation + clear via WinEditors helper
+        // Dir Block: confirmation + clear via WinEditorMap helper
         if (WindowManager.TryGetControl("winMapEditor","btnDirClear", out var btnDirClear))
         {
-            btnDirClear.CallBack[(int)ControlState.MouseDown] = WinEditors.OnDirClearClick;
+            btnDirClear.CallBack[(int)ControlState.MouseDown] = WinEditorMap.OnDirClearClick;
         }
     }
 
