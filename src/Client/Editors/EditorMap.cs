@@ -1,4 +1,3 @@
-using Eto.Forms;
 using Eto.Drawing;
 using System.Linq;
 using System.Collections.Generic;
@@ -17,16 +16,17 @@ using Command = Eto.Forms.Command;
 using Point = Microsoft.Xna.Framework.Point;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using Type = Core.Globals.Type;
+
 namespace Client
 {
 
-    public partial class EditorMap : Form
+    public partial class EditorMap
     {
         private static float tilesetOffsetX = 0;
         private static float tilesetOffsetY = 0;
-        public static void MapEditorChooseTile(int Button, float X, float Y)
+        public static void MapEditorChooseTile(float X, float Y)
         {
-            if (Button == (int)MouseButtons.Primary) // Primary (Left) Mouse Button
+            if (GameClient.IsMouseButtonDown(MouseButton.Left)) // Primary (Left) Mouse Button
             {
                 GameState.EditorTileWidth = 1;
                 GameState.EditorTileHeight = 1;

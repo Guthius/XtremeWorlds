@@ -833,7 +833,7 @@ public class Crystalshire
                     int y = int.TryParse(tby.Text?.Trim(), out var iy) ? iy : 0;
                     x = Math.Max(0, x); y = Math.Max(0, y);
                     GameState.EditorTileX = x; GameState.EditorTileY = y;
-                    EditorMap.MapEditorChooseTile(1, x * GameState.SizeX, y * GameState.SizeY);
+                    EditorMap.MapEditorChooseTile(x * GameState.SizeX, y * GameState.SizeY);
                 }
             };
 
