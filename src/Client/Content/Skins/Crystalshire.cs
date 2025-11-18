@@ -524,8 +524,9 @@ public class Crystalshire
                     {
                         for (int i = 0; i < Variables.MaxResources; i++)
                         {
-                            var name = (i < Data.Resource.Length) ? (Data.Resource[i].Name ?? string.Empty) : string.Empty;
-                            cmb.Items.Add(string.IsNullOrWhiteSpace(name) ? $"{i + 1}" : $"{i + 1}: {name.Trim()}" );
+                            var raw = (i < Data.Resource.Length) ? (Data.Resource[i].Name ?? string.Empty) : string.Empty;
+                            var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
+                            cmb.Items.Add($"{i + 1}: {name}");
                         }
                         cmb.Value = 0;
                     }
@@ -607,8 +608,9 @@ public class Crystalshire
                     {
                         for (int i = 0; i < Variables.MaxShops; i++)
                         {
-                            var name = (i < Data.Shop.Length) ? (Data.Shop[i].Name ?? string.Empty) : string.Empty;
-                            cmb.Items.Add(string.IsNullOrWhiteSpace(name) ? $"{i + 1}" : $"{i + 1}: {name.Trim()}" );
+                            var raw = (i < Data.Shop.Length) ? (Data.Shop[i].Name ?? string.Empty) : string.Empty;
+                            var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
+                            cmb.Items.Add($"{i + 1}: {name}");
                         }
                         cmb.Value = 0;
                     }
@@ -718,8 +720,9 @@ public class Crystalshire
                     {
                         for (int i = 0; i < Variables.MaxAnimations; i++)
                         {
-                            var name = (i < Data.Animation.Length) ? (Data.Animation[i].Name ?? string.Empty) : string.Empty;
-                            cmb.Items.Add(string.IsNullOrWhiteSpace(name) ? $"{i + 1}" : $"{i + 1}: {name.Trim()}" );
+                            var raw = (i < Data.Animation.Length) ? (Data.Animation[i].Name ?? string.Empty) : string.Empty;
+                            var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
+                            cmb.Items.Add($"{i + 1}: {name}");
                         }
                         cmb.Value = 0;
                     }
@@ -1002,8 +1005,9 @@ public class Crystalshire
                 lstMoral.Items.Clear();
                 for (int i = 0; i < Variables.MaxMorals; i++)
                 {
-                    var name = (i < Data.Moral.Length) ? (Data.Moral[i].Name ?? string.Empty) : string.Empty;
-                    lstMoral.Items.Add(string.IsNullOrWhiteSpace(name) ? $"{i + 1}" : $"{i + 1}: {name.Trim()}");
+                    var raw = (i < Data.Moral.Length) ? (Data.Moral[i].Name ?? string.Empty) : string.Empty;
+                    var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
+                    lstMoral.Items.Add($"{i + 1}: {name}");
                 }
                 lstMoral.Value = Math.Clamp(Data.MyMap.Moral, 0, lstMoral.Items.Count - 1);
                 lstMoral.CallBack[(int)ControlState.MouseMove] = () =>
@@ -1012,15 +1016,16 @@ public class Crystalshire
                 };
             }
 
-            // Shop list: index 0 = None, then shops 0..MaxShops-1 shifted by +1
+            // Shop list: index 0 = None, then shops 0..MaxShops-1 shifted by +1, display "index: Name" with None fallback
             if (WindowManager.TryGetControl("winEditorMap", "lstShop", out var shopCtrl) && shopCtrl is ComboBox lstShop)
             {
                 lstShop.Items.Clear();
                 lstShop.Items.Add("None");
                 for (int i = 0; i < Variables.MaxShops; i++)
                 {
-                    var name = (i < Data.Shop.Length) ? (Data.Shop[i].Name ?? string.Empty) : string.Empty;
-                    lstShop.Items.Add(string.IsNullOrWhiteSpace(name) ? $"{i + 1}" : $"{i + 1}: {name.Trim()}");
+                    var raw = (i < Data.Shop.Length) ? (Data.Shop[i].Name ?? string.Empty) : string.Empty;
+                    var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
+                    lstShop.Items.Add($"{i + 1}: {name}");
                 }
                 var shopIndex = Data.MyMap.Shop >= 0 ? Data.MyMap.Shop + 1 : 0;
                 lstShop.Value = Math.Clamp(shopIndex, 0, lstShop.Items.Count - 1);
@@ -1183,7 +1188,7 @@ public class Crystalshire
             BindSlider("sldIntensity", Data.MyMap.WeatherIntensity, 0, 100, v => Data.MyMap.WeatherIntensity = v, "lblIntensity", "Intensity");
 
             // Fog
-            BindSlider("sldFog", Data.MyMap.Fog, 0, 100, v => Data.MyMap.Fog = v, "lblFog", "Fog Index");
+            BindSlider("sldFog", Data.MyMap.Fog, 0, 100, v => Data.MyMap.Fog = v, "lblFog", "Fog");
             BindSlider("sldFogOpacity", Data.MyMap.FogOpacity, 0, 255, v => Data.MyMap.FogOpacity = (byte)v, "lblFogOpacity", "Opacity");
             BindSlider("sldFogSpeed", Data.MyMap.FogSpeed, 0, 255, v => Data.MyMap.FogSpeed = (byte)v, "lblFogSpeed", "Speed");
 
@@ -1235,7 +1240,7 @@ public class Crystalshire
             BindSlider("sldMapBrightness", Data.MyMap.Brightness, 0, 100, v => Data.MyMap.Brightness = (byte)v, "lblBrightness", "Brightness");
         }
 
-        // Initialize NPC combo list from Data.Npc
+        // Initialize NPC combo list from Data.Npc (use "index: Name" with None fallback)
         void InitNpcList()
         {
             if (WindowManager.TryGetControl("winEditorMap", "cmbNpcList", out var npcCtrl) && npcCtrl is ComboBox cmbNpc)
@@ -1248,8 +1253,9 @@ public class Crystalshire
                 {
                     for (int i = 0; i < npcArr.Length; i++)
                     {
-                        var name = npcArr[i].Name ?? string.Empty;
-                        cmbNpc.Items.Add(string.IsNullOrWhiteSpace(name) ? $"{i + 1}" : $"{i + 1}: {name.Trim()}");
+                        var raw = npcArr[i].Name ?? string.Empty;
+                        var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
+                        cmbNpc.Items.Add($"{i + 1}: {name}");
                     }
                 }
                 cmbNpc.Value = (prev >= 0 && prev < cmbNpc.Items.Count) ? prev : 0;
@@ -1264,6 +1270,17 @@ public class Crystalshire
                     }
                 };
             }
+        }
+
+        // Opacity checkbox on Tiles page: toggles GameState.HideLayers
+        if (WindowManager.TryGetControl("winEditorMap", "chkOpacity", out var chkOpacity))
+        {
+            chkOpacity.Value = GameState.HideLayers ? 1 : 0;
+            chkOpacity.CallBack[(int)ControlState.MouseDown] = () =>
+            {
+                chkOpacity.Value = chkOpacity.Value == 0 ? 1 : 0;
+                GameState.HideLayers = chkOpacity.Value == 1;
+            };
         }
         
         InitSettingsLists();

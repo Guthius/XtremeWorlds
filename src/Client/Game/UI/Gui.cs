@@ -1077,6 +1077,40 @@ public class WindowManager
             }
         }
 
+        // Auto-close combo menu when cursor leaves its area
+        if (entState is ControlState.MouseMove or ControlState.Hover)
+        {
+            if (TryGetWindow("winComboMenu", out var menuWin) && menuWin is not null && menuWin.Visible)
+            {
+                bool overMenu = menuWin.Contains(GameState.CurMouseX, GameState.CurMouseY);
+                bool overParentCombo = false;
+
+                var parentCtrl = menuWin.ParentControl;
+                if (!overMenu && parentCtrl is not null)
+                {
+                    // Find the window that owns the parent control
+                    foreach (var w in Windows.Values)
+                    {
+                        if (!w.Visible) continue;
+                        if (!w.Controls.Contains(parentCtrl)) continue;
+
+                        int px = w.X + parentCtrl.X;
+                        int py = w.Y + parentCtrl.Y;
+                        int pw = parentCtrl.Width;
+                        int ph = parentCtrl.Height;
+                        overParentCombo = GameState.CurMouseX >= px && GameState.CurMouseX <= px + pw &&
+                                          GameState.CurMouseY >= py && GameState.CurMouseY <= py + ph;
+                        break;
+                    }
+                }
+
+                if (!overMenu && !overParentCombo)
+                {
+                    WinComboMenu.Close();
+                }
+            }
+        }
+
         return true;
     }
 

@@ -195,7 +195,7 @@
         <ScrollBar Name="sldIntensity" Position="332, 114" Size="220, 12" Min="0" Max="100" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 
         <!-- Fog -->
-        <Label Name="lblFog" Text="Fog Index" Position="20, 140" Size="80, 16"/>
+        <Label Name="lblFog" Text="Fog" Position="20, 140" Size="80, 16"/>
         <ScrollBar Name="sldFog" Position="104, 142" Size="220, 12" Min="0" Max="100" Value="0" Orientation="Horizontal" ThumbSize="16"/>
         <Label Name="lblFogOpacity" Text="Opacity" Position="336, 140" Size="60, 16"/>
         <ScrollBar Name="sldFogOpacity" Position="400, 142" Size="220, 12" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>

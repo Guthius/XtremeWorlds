@@ -982,7 +982,7 @@ namespace Client
                 Padding = 6, Spacing = 6,
                 Items =
                 {
-                    new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Fog Index" }, scrlFog } },
+                    new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { new Label{ Text = "Fog" }, scrlFog } },
                     new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { lblFogOpacity, scrlFogOpacity } },
                     new StackLayout{ Orientation = Orientation.Horizontal, Spacing = 6, Items = { lblFogSpeed, scrlFogSpeed } },
                 }
