@@ -28,6 +28,9 @@
       <Label Name="lblAutotileCaption" Text="Autotile" Position="575, 104" Size="64, 18"/>
       <ComboBox Name="cmbAutotile" Position="643, 104" Size="140, 18" Design="ComboBox"/>
 
+      <!-- Opacity toggle for current layer visibility -->
+      <CheckBox Name="chkOpacity" Text="Opacity" Position="20, 126" Size="100, 18" Design="None"/>
+
       <!-- Tileset render area -->
       <PictureBox Name="picTileset" Position="179, 124" Size="512, 512" Design="TextBlack"/>
       <ScrollBar Name="sldTilesetV" Position="701, 124" Size="16, 512" Min="0" Max="0" Value="0" Orientation="Vertical" ThumbSize="16"/>
