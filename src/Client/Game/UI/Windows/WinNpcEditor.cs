@@ -9,7 +9,6 @@ namespace Client.Game.UI.Windows;
 public static class WinNpcEditor
 {
     public static int SelectedIndex = 0;
-    private static bool _initializing = false;
     private static Core.Globals.Type.Npc? _clipboardNpc = null;
 
     // Entry point: populate lists and load first NPC.
@@ -18,11 +17,9 @@ public static class WinNpcEditor
         if (!WindowManager.TryGetControl("winNpcEditor", "lstNpcIndex", out _))
             return; // window not present yet
 
-        _initializing = true;
         PopulateStaticCombos();
         SelectedIndex = Math.Clamp(SelectedIndex, 0, Variables.MaxNpcs - 1);
         RefreshList();
-        _initializing = false;
         LoadNpc(SelectedIndex);
     }
 
@@ -33,6 +30,8 @@ public static class WinNpcEditor
             return;
 
         int prevIndex = SelectedIndex;
+        int prevScroll = lst.ScrollOffset;
+
         lst.Clear();
         for (int i = 0; i < Variables.MaxNpcs; i++)
         {
@@ -41,11 +40,22 @@ public static class WinNpcEditor
             lst.AddItem($"{i + 1}: {name}");
         }
 
+        // Restore selection and scroll
         if (prevIndex >= 0 && prevIndex < lst.Items.Count)
         {
             lst.SelectedIndex = prevIndex;
             SelectedIndex = prevIndex;
             lst.EnsureVisible(prevIndex);
+        }
+
+        // Sync scrollbar max/value if present
+        if (WindowManager.TryGetControl("winNpcEditor", "sldNpcList", out var sldCtrl) && sldCtrl is ScrollBar sb)
+        {
+            int visible = lst.GetVisibleCount();
+            int max = Math.Max(0, lst.Items.Count - visible);
+            sb.Min = 0;
+            sb.Max = max;
+            sb.Value = Math.Max(0, Math.Min(prevScroll, max));
         }
     }
 

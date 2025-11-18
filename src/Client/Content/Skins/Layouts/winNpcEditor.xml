@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window Name="winNpcEditor" Caption="NPC Editor"
         Size="720, 520"
-        Icon="1133" IconOffset="3, 5"
+        Icon="113" IconOffset="3, 5"
         Design="WindowNormal"
         StartPosition="CenterScreen"
         Visible="false">
@@ -12,25 +12,25 @@
   <ScrollBar Name="sldNpcList" Position="240, 36" Size="16, 440" Min="0" Max="0" Vertical="true"/>
 
   <!-- Parchment background for editor details (mirrors other Crystalshire editors) -->
-  <PictureBox Name="picParchment" Position="264, 12" Size="432, 396" Image="Parchment" Design="WindowInner"/>
+  <PictureBox Name="picParchment" Position="264, 12" Size="432, 396" Image="Parchment" Design="Parchment"/>
 
   <!-- Core fields on the right (General group) -->
   <Label Name="lblNpcName" Text="Name" Position="280, 24" Size="80, 16"/>
   <TextBox Name="txtNpcName" Position="344, 22" Size="336, 20" Design="TextWhite"/>
 
-  <Label Name="lblNpcAttackSay" Text="Attack Say" Position="280, 48" Size="80, 16"/>
+  <Label Name="lblNpcAttackSay" Text="Attack Say" Position="280, 48" Size="100, 16"/>
   <TextBox Name="txtNpcAttackSay" Position="344, 46" Size="336, 20" Design="TextWhite"/>
 
-  <Label Name="lblNpcBehavior" Text="Behavior" Position="280, 76" Size="70, 16"/>
+  <Label Name="lblNpcBehavior" Text="Behavior" Position="280, 76" Size="80, 16"/>
   <ComboBox Name="cmbNpcBehavior" Position="344, 74" Size="120, 18" Design="ComboBox"/>
 
-  <Label Name="lblNpcFaction" Text="Faction" Position="472, 76" Size="60, 16"/>
+  <Label Name="lblNpcFaction" Text="Faction" Position="472, 76" Size="70, 16"/>
   <ComboBox Name="cmbNpcFaction" Position="536, 74" Size="144, 18" Design="ComboBox"/>
 
-  <Label Name="lblNpcSpawnPeriod" Text="Spawn" Position="280, 100" Size="60, 16"/>
+  <Label Name="lblNpcSpawnPeriod" Text="Spawn" Position="280, 100" Size="70, 16"/>
   <ComboBox Name="cmbNpcSpawnPeriod" Position="344, 98" Size="120, 18" Design="ComboBox"/>
 
-  <Label Name="lblNpcAnimation" Text="Animation" Position="280, 124" Size="70, 16"/>
+  <Label Name="lblNpcAnimation" Text="Animation" Position="280, 124" Size="90, 16"/>
   <ComboBox Name="cmbNpcAnimation" Position="344, 122" Size="336, 18" Design="ComboBox"/>
 
   <!-- Stats group (simplified to match Eto layout positions) -->

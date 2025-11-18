@@ -1363,11 +1363,26 @@ public class Crystalshire
         }
 
         // List interactions (NPC index + scrollbar)
-        ListBox? npcList = null;
+        ListBox npcList = null;
         if (WindowManager.TryGetControl("winNpcEditor", "lstNpcIndex", out var lstCtrl) && lstCtrl is ListBox list)
         {
             npcList = list;
             list.CallBack[(int)ControlState.MouseDown] = WinNpcEditor.OnListMouseDown;
+            list.CallBack[(int)ControlState.MouseScroll] = () =>
+            {
+                int delta = GameClient.CurrentMouseState.ScrollWheelValue - GameClient.PreviousMouseState.ScrollWheelValue;
+                if (delta != 0)
+                {
+                    int step = delta > 0 ? -1 : 1; // wheel up scrolls up
+                    list.ScrollBy(step);
+
+                    // Keep scrollbar in sync if present
+                    if (WindowManager.TryGetControl("winNpcEditor", "sldNpcList", out var sldNpc) && sldNpc is ScrollBar sbSync)
+                    {
+                        sbSync.Value = list.ScrollOffset;
+                    }
+                }
+            };
         }
         if (WindowManager.TryGetControl("winNpcEditor", "sldNpcList", out var sldNpcList) && sldNpcList is ScrollBar sbNpc)
         {
