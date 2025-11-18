@@ -951,7 +951,7 @@ public class Crystalshire
                         UpdateAttrVisibility(idx);
                     }
                     break;
-                case "Npcs":
+                case "Npc":
                     SetVisible(true, npcs);
                     InitNpcList();
                     GameState.MapEditorTab = (int)MapEditorTab.Npcs;
@@ -1249,8 +1249,33 @@ public class Crystalshire
                 }
                 cmbNpc.Value = (prev >= 0 && prev < cmbNpc.Items.Count) ? prev : 0;
 
-                // Ensure the list is refreshed whenever the combo is clicked open
+                // Repopulate items when the dropdown is first clicked open
                 cmbNpc.CallBack[(int)ControlState.MouseDown] = () => InitNpcList();
+
+                // When selection actually changes (mouse move over list), write to map data + list
+                cmbNpc.CallBack[(int)ControlState.MouseMove] = () =>
+                {
+                    int slotIndex = WinEditors.NpcSelectedSlot;
+                    if (Data.MyMap.Npc != null && slotIndex >= 0 && slotIndex < Data.MyMap.Npc.Length)
+                    {
+                        int npcIndex = cmbNpc.Value - 1; // 0 = None
+                        Data.MyMap.Npc[slotIndex] = npcIndex;
+
+                        if (WindowManager.TryGetControl("winMapEditor","lstNpcs", out var lstNpcs) && lstNpcs is ListBox lst)
+                        {
+                            string name = "None";
+                            if (npcIndex >= 0 && npcIndex < (Data.Npc?.Length ?? 0))
+                            {
+                                var rawName = Data.Npc[npcIndex].Name ?? string.Empty;
+                                if (!string.IsNullOrWhiteSpace(rawName)) name = rawName.Trim();
+                            }
+                            if (slotIndex >= 0 && slotIndex < lst.Items.Count)
+                            {
+                                lst.Items[slotIndex] = $"{slotIndex + 1}: {name}";
+                            }
+                        }
+                    }
+                };
             }
         }
 
@@ -1274,7 +1299,7 @@ public class Crystalshire
         if (WindowManager.TryGetControl("winMapEditor","btnGoAttributes", out var btnGoAttributes))
             btnGoAttributes.CallBack[(int)ControlState.MouseDown] = () => ShowTab("Attributes");
         if (WindowManager.TryGetControl("winMapEditor","btnGoNpcs", out var btnGoNpcs))
-            btnGoNpcs.CallBack[(int)ControlState.MouseDown] = () => ShowTab("Npcs");
+            btnGoNpcs.CallBack[(int)ControlState.MouseDown] = () => ShowTab("Npc");
         if (WindowManager.TryGetControl("winMapEditor","btnGoDirBlock", out var btnGoDirBlock))
             btnGoDirBlock.CallBack[(int)ControlState.MouseDown] = () => ShowTab("DirBlock");
         if (WindowManager.TryGetControl("winMapEditor","btnGoEvents", out var btnGoEvents))
