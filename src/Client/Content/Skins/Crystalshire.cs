@@ -892,7 +892,7 @@ public class Crystalshire
             var npcs = new[]{
                 "picNpcsBG","lblNpcs","lblNpcsHint",
                 // Left list
-                "picNpcsList","sldNpcList",
+                "lstNpcs","sldNpcList",
                 // Right selection
                 "lblNpc","cmbNpcList"
             };
@@ -1327,13 +1327,13 @@ public class Crystalshire
             picTileset.CallBack[(int)ControlState.MouseScroll] = WinEditorMap.OnTilesetMouseWheel;
         }
 
-        // Wire NPC list drawing and interactions
-        if (WindowManager.TryGetControl("winEditorMap", "picNpcsList", out var picNpcsList))
+        // Wire NPC list drawing and interactions (ListBox)
+        if (WindowManager.TryGetControl("winEditorMap", "lstNpcs", out var lstNpcs) && lstNpcs is ListBox list)
         {
-            picNpcsList.OnDraw = WinEditorMap.OnDrawNpcList;
-            picNpcsList.CallBack[(int)ControlState.MouseDown] = WinEditorMap.OnNpcListMouseDown;
+            list.OnDraw = WinEditorMap.OnDrawNpcList;
+            list.CallBack[(int)ControlState.MouseDown] = WinEditorMap.OnNpcListMouseDown;
             // Use MouseScroll (enum) for wheel events
-            picNpcsList.CallBack[(int)ControlState.MouseScroll] = WinEditorMap.OnNpcListMouseWheel;
+            list.CallBack[(int)ControlState.MouseScroll] = WinEditorMap.OnNpcListMouseWheel;
         }
         if (WindowManager.TryGetControl("winEditorMap", "sldNpcList", out var sldNpcList))
         {

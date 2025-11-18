@@ -443,6 +443,38 @@ public class WindowManager
         ZOrderCon++;
     }
 
+    public static void CreateListBox(int windowIndex, string name, int left, int top, int width, int height)
+    {
+        if (!Windows.TryGetValue(windowIndex, out var window))
+        {
+            throw new UIException($"{windowIndex} is not a valid window index.");
+        }
+
+        var stateCount = Enum.GetValues<ControlState>().Length;
+        var texture = new List<string>(Enumerable.Repeat(DataPath.Gui, stateCount).ToList());
+        var callback = new List<Action?>(Enumerable.Repeat((Action)null, stateCount).ToList());
+
+        texture[0] = DataPath.Gui;
+
+        var listBox = new Controls.ListBox
+        {
+            Name = name,
+            X = left,
+            Y = top,
+            Width = width,
+            Height = height,
+            Visible = true,
+            ZOrder = ZOrderCon,
+            Texture = texture,
+            CallBack = callback,
+            Design = Design.TextBlack
+        };
+
+        window.Controls.Add(listBox);
+
+        ZOrderCon++;
+    }
+
     public static void CreateScrollBar(int windowIndex, string name, int left, int top, int width, int height, int min = 0, int max = 100, int value = 0, bool vertical = true, int thumbSize = 16)
     {
         if (!Windows.TryGetValue(windowIndex, out var window))

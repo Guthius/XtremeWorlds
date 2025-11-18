@@ -121,7 +121,7 @@
         <Label Name="lblNpcsHint" Text="Select an NPC to assign to a slot" Position="20, 112" Size="360, 14"/>
 
         <!-- NPC list (left) -->
-        <PictureBox Name="picNpcsList" Position="20, 142" Size="460, 540" Design="None"/>
+        <ListBox Name="lstNpcs" Position="20, 142" Size="460, 540"/>
         <ScrollBar Name="sldNpcList" Position="486, 142" Size="12, 540" Min="0" Max="0" Value="0" Orientation="Vertical" ThumbSize="16"/>
 
         <!-- NPC selection (right top) -->

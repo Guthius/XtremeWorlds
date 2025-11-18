@@ -232,7 +232,6 @@ public static class WindowLoader
         }
     }
 
-    // Map ListBox to a PictureBox as a placeholder so it can receive callbacks
     private static void ReadListBox(XmlReader xmlReader, int windowIndex)
     {
         var name = xmlReader.GetAttribute("Name");
@@ -241,19 +240,13 @@ public static class WindowLoader
         var size = xmlReader.GetAttribute("Size");
         var sizeVec = GetVector(size);
 
-        WindowManager.CreatePictureBox(
+        WindowManager.CreateListBox(
             windowIndex,
             name ?? string.Empty,
             positionVec.X,
             positionVec.Y,
             sizeVec.X,
-            sizeVec.Y,
-            imageNorm: 0,
-            imageHover: 0,
-            imageMousedown: 0,
-            designNorm: Design.None,
-            designHover: Design.None,
-            designMousedown: Design.None);
+            sizeVec.Y);
     }
 
     private static void ReadComboBox(XmlReader xmlReader, int windowIndex)

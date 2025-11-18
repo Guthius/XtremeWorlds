@@ -258,10 +258,6 @@ namespace Client
 
         public static void DestroyGame()
         {
-            GameState.InGame = false;
-            GameState.InMenu = false;
-            try { Sound.FreeBass(); } catch { }
-            try { Network.Stop(); } catch { }
             Environment.Exit(0);
         }
 

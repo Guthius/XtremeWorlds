@@ -299,32 +299,13 @@ public static class WinEditorMap
     
     public static void OnDrawNpcList()
     {
-        if (!WindowManager.TryGetControl("winEditorMap", "picNpcsList", out var ctrl)) return;
-        var win = WindowManager.GetWindowByName("winEditorMap");
-        if (win is null) return;
+        if (!WindowManager.TryGetControl("winEditorMap", "lstNpcs", out var ctrl) || ctrl is not ListBox list) return;
 
-        DesignRenderer.Render(Design.TextBlack, win.X + ctrl.X, win.Y + ctrl.Y, ctrl.Width, ctrl.Height);
-
-        int x0 = win.X + ctrl.X + 6;
-        int y0 = win.Y + ctrl.Y + 6;
-        int width = ctrl.Width - 12;
-        int height = ctrl.Height - 12;
-        int lineHeight = 18;
-        int visible = System.Math.Max(1, height / lineHeight);
+        list.Clear();
 
         int total = Core.Globals.Variables.MaxMapNpcs;
-        // Clamp scroll and sync scrollbar
-        int maxScroll = System.Math.Max(0, total - visible);
-        _npcListScroll = System.Math.Clamp(_npcListScroll, 0, maxScroll);
-        if (WindowManager.TryGetControl("winEditorMap", "sldNpcList", out var sbCtrl) && sbCtrl is ScrollBar sb)
+        for (int slot = 0; slot < total; slot++)
         {
-            sb.Min = 0; sb.Max = maxScroll; sbCtrl.Value = System.Math.Clamp(sbCtrl.Value, sb.Min, sb.Max);
-            _npcListScroll = sbCtrl.Value;
-        }
-
-        for (int i = 0; i < visible && (i + _npcListScroll) < total; i++)
-        {
-            int slot = i + _npcListScroll;
             string name = "None";
             try
             {
@@ -337,74 +318,72 @@ public static class WinEditorMap
             }
             catch { /* ignore */ }
 
-            string line = $"{slot + 1}: {name}";
-            int y = y0 + i * lineHeight;
-            var color = Microsoft.Xna.Framework.Color.White;
-            TextRenderer.RenderText(line, x0, y, color, Microsoft.Xna.Framework.Color.Black);
-            if (slot == NpcSelectedSlot)
-            {
-                // Draw selection outline in red (was yellow/gold)
-                GameClient.DrawOutlineRectangle(x0 - 4, y - 2, width, lineHeight, Microsoft.Xna.Framework.Color.Red, 1f);
-            }
+            list.AddItem($"{slot + 1}: {name}");
+        }
+
+        list.SelectedIndex = Math.Clamp(NpcSelectedSlot, -1, total - 1);
+        list.EnsureVisible(list.SelectedIndex);
+
+        // Sync scrollbar from ListBox scroll offset
+        if (WindowManager.TryGetControl("winEditorMap", "sldNpcList", out var sbCtrl) && sbCtrl is ScrollBar sb)
+        {
+            int visible = list.GetVisibleCount();
+            int maxScroll = Math.Max(0, total - visible);
+            sb.Min = 0;
+            sb.Max = maxScroll;
+            sbCtrl.Value = Math.Clamp(list.ScrollOffset, sb.Min, sb.Max);
         }
     }
 
     public static void OnNpcListMouseDown()
     {
-        if (!WindowManager.TryGetControl("winEditorMap", "picNpcsList", out var ctrl)) return;
+        if (!WindowManager.TryGetControl("winEditorMap", "lstNpcs", out var ctrl) || ctrl is not ListBox list) return;
         var win = WindowManager.GetWindowByName("winEditorMap");
         if (win is null) return;
-        int relX = GameState.CurMouseX - (win.X + ctrl.X);
-        int relY = GameState.CurMouseY - (win.Y + ctrl.Y);
-        if (relX < 0 || relY < 0 || relX >= ctrl.Width || relY >= ctrl.Height) return;
 
-        int lineHeight = 18;
-        int index = (relY - 6) / lineHeight;
+        int relY = GameState.CurMouseY - (win.X + ctrl.Y);
+        int index = list.GetItemIndexAtPosition(relY);
         int total = Core.Globals.Variables.MaxMapNpcs;
-        int height = ctrl.Height - 12;
-        int visible = System.Math.Max(1, height / lineHeight);
-        int maxScroll = System.Math.Max(0, total - visible);
-        _npcListScroll = System.Math.Clamp(_npcListScroll, 0, maxScroll);
-        int slot = index + _npcListScroll;
-        if (slot >= 0 && slot < total)
+        if (index < 0 || index >= total) return;
+
+        NpcSelectedSlot = index;
+        list.SelectedIndex = index;
+        list.EnsureVisible(index);
+
+        if (WindowManager.TryGetControl("winEditorMap", "cmbNpcList", out var npcCtrl) && npcCtrl is ComboBox cmbNpc)
         {
-            NpcSelectedSlot = slot;
-            // Sync NPC combo to reflect the NPC assigned to this slot
-            if (WindowManager.TryGetControl("winEditorMap", "cmbNpcList", out var npcCtrl) && npcCtrl is ComboBox cmbNpc)
-            {
-                int assigned = -1;
-                if (Data.MyMap.Npc != null && slot < Data.MyMap.Npc.Length)
-                    assigned = Data.MyMap.Npc[slot];
-                int desired = (assigned >= 0) ? assigned + 1 : 0; // 0 = None
-                if (desired < 0) desired = 0;
-                if (desired >= cmbNpc.Items.Count) desired = cmbNpc.Items.Count - 1;
-                cmbNpc.Value = desired;
-            }
+            int assigned = -1;
+            if (Data.MyMap.Npc != null && index < Data.MyMap.Npc.Length)
+                assigned = Data.MyMap.Npc[index];
+            int desired = (assigned >= 0) ? assigned + 1 : 0;
+            desired = Math.Clamp(desired, 0, cmbNpc.Items.Count - 1);
+            cmbNpc.Value = desired;
         }
     }
 
     public static void OnNpcListMouseWheel()
     {
+        if (!WindowManager.TryGetControl("winEditorMap", "lstNpcs", out var ctrl) || ctrl is not ListBox list) return;
+
         int total = Core.Globals.Variables.MaxMapNpcs;
-        if (!WindowManager.TryGetControl("winEditorMap", "picNpcsList", out var ctrl)) return;
-        int lineHeight = 18;
-        int visible = System.Math.Max(1, (ctrl.Height - 12) / lineHeight);
-        int maxScroll = System.Math.Max(0, total - visible);
-        // Mouse wheel delta sign is platform-specific; use GameClient for delta if available, otherwise step by 3
+        int visible = list.GetVisibleCount();
+        int maxScroll = Math.Max(0, total - visible);
         int delta = GameClient.GetMouseScrollDelta();
         int step = (delta > 0) ? -3 : 3;
-        _npcListScroll = System.Math.Clamp(_npcListScroll + step, 0, maxScroll);
+        list.ScrollOffset = Math.Clamp(list.ScrollOffset + step, 0, maxScroll);
+
         if (WindowManager.TryGetControl("winEditorMap", "sldNpcList", out var sbCtrl))
         {
-            sbCtrl.Value = _npcListScroll;
+            sbCtrl.Value = list.ScrollOffset;
         }
     }
 
     public static void OnNpcScrollBarMove()
     {
+        if (!WindowManager.TryGetControl("winEditorMap", "lstNpcs", out var ctrl) || ctrl is not ListBox list) return;
         if (WindowManager.TryGetControl("winEditorMap", "sldNpcList", out var sbCtrl))
         {
-            _npcListScroll = sbCtrl.Value;
+            list.ScrollOffset = sbCtrl.Value;
         }
     }
 }
