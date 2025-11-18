@@ -1363,6 +1363,12 @@ public class Crystalshire
             btnClose.CallBack[(int)ControlState.MouseDown] = () => WindowManager.HideWindow("winNpcEditor");
         }
 
+        // Sprite preview picture box draws NPC sprite each frame
+        if (WindowManager.TryGetControl("winNpcEditor", "picNpcSprite", out var picSpriteCtrl) && picSpriteCtrl is PictureBox picSprite)
+        {
+            picSprite.OnDraw = WinNpcEditor.OnDrawSprite;
+        }
+
         // List interactions (NPC index + scrollbar)
         ListBox npcList = null;
         if (WindowManager.TryGetControl("winNpcEditor", "lstNpcIndex", out var lstCtrl) && lstCtrl is ListBox list)
@@ -1491,6 +1497,19 @@ public class Crystalshire
                 }
             };
         }
+
+        // Sprite scrollbar: bind like other sliders so drag/wheel work
+        BindScrollBar(
+            "sldNpcSprite",
+            () => WinNpcEditor.SelectedIndex >= 0 ? Data.Npc[WinNpcEditor.SelectedIndex].Sprite : 1,
+            v =>
+            {
+                if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Variables.MaxNpcs)
+                {
+                    Data.Npc[WinNpcEditor.SelectedIndex].Sprite = v;
+                    GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
+                }
+            });
 
         // Drop item combo - save selection for current slot when it changes
         if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcDropItem", out var dropItemCtrl) && dropItemCtrl is ComboBox cmbItem)
@@ -1917,8 +1936,9 @@ public class Crystalshire
         }
 
         // Defaults
+        var playerName = GetPlayerName(GameState.MyIndex);
         var txtName = window.GetChild("txtAdminName");
-        txtName.Text = GetPlayerName(GameState.MyIndex);
+        txtName.Text = playerName;
 
         if (window.GetChild("cmbAccess") is ComboBox cmb)
         {

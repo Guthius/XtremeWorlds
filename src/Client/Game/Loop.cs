@@ -459,6 +459,25 @@ namespace Client
                 Sender.SendRequestMapReport();
                 WindowManager.ShowWindow("winAdmin");
                 GameState.AdminPanel = true;
+
+                // Ensure admin panel shows the current player's name when it opens
+                try
+                {
+                    var playerName = GetPlayerName(GameState.MyIndex);
+                    var adminWindow = WindowManager.GetWindowByName("winAdmin");
+                    if (adminWindow != null)
+                    {
+                        if (adminWindow.GetChild("txtAdminName") is TextBox txtName)
+                        {
+                            txtName.Text = playerName;
+                        }
+                    }
+                }
+                catch
+                {
+                    // If anything goes wrong here, just leave the default caption/text.
+                }
+
                 GameState.InitAdminForm = false;
             }
 
@@ -470,8 +489,13 @@ namespace Client
                 WindowManager.ComboBox_RemoveItems(admin, WindowManager.GetControlIndex("winAdmin", "cmbMaps"));
                 for (int i = 0, loopTo = GameState.MapNames.Length; i < loopTo; i++)
                 {
-                    var name = GameState.MapNames[i];
-                    WindowManager.Combobox_AddItem(admin, WindowManager.GetControlIndex("winAdmin", "cmbMaps"), (i + 1) + ": " + name);
+                    var raw = GameState.MapNames[i] ?? string.Empty;
+                    var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
+                    WindowManager.Combobox_AddItem(
+                        admin,
+                        WindowManager.GetControlIndex("winAdmin", "cmbMaps"),
+                        (i + 1) + ": " + name
+                    );
                 }
 
                 GameState.InitMapReport = false;

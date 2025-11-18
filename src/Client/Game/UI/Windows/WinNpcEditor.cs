@@ -59,6 +59,40 @@ public static class WinNpcEditor
         }
     }
 
+    public static void OnDrawSprite()
+    {
+        var win = WindowManager.GetWindowByName("winNpcEditor");
+        if (win is null) return;
+
+        if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxNpcs) return;
+        var npc = Data.Npc[SelectedIndex];
+
+        int spriteIndex = npc.Sprite;
+
+        var spritePath = System.IO.Path.Combine(DataPath.Characters, spriteIndex.ToString());
+        var sprite = GameClient.GetGfxInfo(spritePath);
+        if (sprite is null) return;
+
+        // Compute frame size similarly to character creator
+        int frameCount = Core.Configurations.SettingsManager.Instance.RunFrames +
+                         Core.Configurations.SettingsManager.Instance.IdleFrames +
+                         Core.Configurations.SettingsManager.Instance.AttackFrames;
+        if (frameCount <= 0) frameCount = 1;
+        int w = sprite.Width / frameCount;
+        int dirs = Math.Max(1, Core.Configurations.SettingsManager.Instance.SpriteDirections);
+        if (sprite.Height % dirs != 0) dirs = 4; // fallback
+        int h = sprite.Height / (dirs == 0 ? 1 : dirs);
+
+        // Center inside picNpcSprite
+        if (!WindowManager.TryGetControl("winNpcEditor", "picNpcSprite", out var ctrl) || ctrl is not PictureBox pic)
+            return;
+
+        int drawX = win.X + pic.X + (pic.Width - w) / 2;
+        int drawY = win.Y + pic.Y + (pic.Height - h) / 2;
+
+        GameClient.RenderTexture(ref spritePath, drawX, drawY, 0, 0, w, h, w, h);
+    }
+
     // Populate behavior/faction/spawn period/animation/skills/items combos.
     private static void PopulateStaticCombos()
     {
@@ -182,6 +216,14 @@ public static class WinNpcEditor
         if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcAnimation", out var animCtrl) && animCtrl is ComboBox cmbAnim)
         {
             cmbAnim.Value = Math.Clamp(npc.Animation, 0, cmbAnim.Items.Count - 1);
+        }
+        // Sprite scrollbar (sldNpcSprite) reflects npc.Sprite; drawing happens in the UI draw phase
+        if (WindowManager.TryGetControl("winNpcEditor", "sldNpcSprite", out var spriteCtrl) && spriteCtrl is ScrollBar sbSprite)
+        {
+            sbSprite.Max = Math.Max(0, GameState.NumCharacters);
+
+            var spriteIndex = npc.Sprite;
+            sbSprite.Value = Math.Clamp(spriteIndex, sbSprite.Min, sbSprite.Max);
         }
         // Basic stats
         if (WindowManager.TryGetControl("winNpcEditor", "txtNpcHp", out var hpCtrl) && hpCtrl is TextBox txtHp)

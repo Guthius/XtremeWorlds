@@ -1,106 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window Name="winAdmin" Caption="Admin Panel"
-        Size="640, 600"
+        Size="640, 260"
         Icon="970" IconOffset="3, 5"
         Design="WindowNormal"
         StartPosition="CenterScreen"
         Visible="false">
 
-    <!-- Tab Control for different admin sections -->
-    <TabControl Name="tabAdmin" Position="6, 26" Size="628, 568">
+        <!-- Tab Control for different admin sections -->
+        <TabControl Name="tabAdmin" Position="6, 26" Size="628, 224">
         
         <!-- MODERATION TAB -->
         <TabPage Name="tabModeration" Caption="Moderation">
-            <PictureBox Name="picModerationBG" Position="6, 54" Size="628, 510" Design="Parchment"/>
+            <PictureBox Name="picModerationBG" Position="6, 46" Size="628, 190" Design="Parchment"/>
 
             <!-- Player Name Section -->
-            <Label Name="lblPlayerName" Text="Player Name:" Position="20, 63" Size="140, 12"/>
-            <TextBox Name="txtAdminName" Position="125, 61" Size="300, 18"/>
+            <Label Name="lblPlayerName" Text="Player Name:" Position="20, 55" Size="140, 12"/>
+            <TextBox Name="txtAdminName" Position="125, 53" Size="300, 18"/>
 
             <!-- Access Level Section -->
-            <Label Name="lblAccessLevel" Text="Access Level:" Position="20, 88" Size="140, 12"/>
-            <ComboBox Name="cmbAccess" Position="125, 86" Size="200, 18"/>
-            <Button Name="btnAdminSetAccess" Text="Set Access" Position="330, 86" Size="80, 22"
-                    Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+            <Label Name="lblAccessLevel" Text="Access Level:" Position="20, 80" Size="140, 12"/>
+            <ComboBox Name="cmbAccess" Position="125, 78" Size="200, 18"/>
+            <Button Name="btnAdminSetAccess" Text="Set Access" Position="330, 78" Size="80, 22"
+             Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 
             <!-- Map Number Section -->
-            <Label Name="lblMapNumber" Text="Map Number:" Position="20, 113" Size="140, 12"/>
-            <TextBox Name="txtAdminMap" Position="125, 111" Size="100, 18"/>
-            <Button Name="btnAdminWarpTo" Text="Warp To Map" Position="230, 111" Size="100, 22"
-                    Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+            <Label Name="lblMapNumber" Text="Map Number:" Position="20, 105" Size="140, 12"/>
+            <TextBox Name="txtAdminMap" Position="125, 103" Size="100, 18"/>
+            <Button Name="btnAdminWarpTo" Text="Warp To Map" Position="230, 103" Size="100, 22"
+            Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 
-            <!-- Sprite Section -->
-            <Label Name="lblSprite" Text="Sprite:" Position="20, 138" Size="100, 12"/>
-            <TextBox Name="txtAdminSprite" Position="125, 136" Size="100, 18"/>
-            <Button Name="btnAdminSetSprite" Text="Set Sprite" Position="230, 136" Size="100, 22"
-                    Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+             <!-- Sprite Section -->
+            <Label Name="lblSprite" Text="Sprite:" Position="20, 130" Size="100, 12"/>
+            <TextBox Name="txtAdminSprite" Position="125, 128" Size="100, 18"/>
+            <Button Name="btnAdminSetSprite" Text="Set Sprite" Position="230, 128" Size="100, 22"
+            Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 
             <!-- Action Buttons Row 1 -->
-            <Button Name="btnAdminBan" Text="Ban Player" Position="20, 168" Size="120, 22"
-                    Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
-            <Button Name="btnAdminKick" Text="Kick Player" Position="145, 168" Size="120, 22"
-                    Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
-            <Button Name="btnLevelUp" Text="Level Up" Position="270, 168" Size="120, 22"
-                    Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+            <Button Name="btnAdminBan" Text="Ban Player" Position="20, 158" Size="120, 22"
+            Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+            <Button Name="btnAdminKick" Text="Kick Player" Position="145, 158" Size="120, 22"
+            Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+            <Button Name="btnLevelUp" Text="Level Up" Position="270, 158" Size="120, 22"
+            Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 
             <!-- Action Buttons Row 2 -->
-            <Button Name="btnAdminWarp2Me" Text="Warp Player To Me" Position="20, 195" Size="145, 22"
-                    Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-            <Button Name="btnAdminWarpMe2" Text="Warp Me To Player" Position="170, 195" Size="145, 22"
-                    Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+            <Button Name="btnAdminWarp2Me" Text="Warp Player To Me" Position="20, 186" Size="145, 22"
+            Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+            <Button Name="btnAdminWarpMe2" Text="Warp Me To Player" Position="170, 186" Size="145, 22"
+            Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
         </TabPage>
 
         <!-- MAP LIST TAB -->
         <TabPage Name="tabMapList" Caption="Map List">
-            <PictureBox Name="picMapListBG" Position="6, 54" Size="628, 510" Design="Parchment"/>
+                <PictureBox Name="picMapListBG" Position="6, 46" Size="628, 190" Design="Parchment"/>
 
-            <ComboBox Name="cmbMaps" Position="25, 63" Size="598, 22"/>
-            <Button Name="btnMapWarp" Text="Warp To Selected" Position="25, 518" Size="220, 22"
-                    Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-            <Button Name="btnMapReport" Text="Refresh List" Position="255, 518" Size="368, 22"
-                    Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+                <ComboBox Name="cmbMaps" Position="25, 55" Size="598, 22"/>
+                <Button Name="btnMapWarp" Text="Warp To Selected" Position="25, 186" Size="220, 22"
+                Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+                <Button Name="btnMapReport" Text="Refresh List" Position="255, 186" Size="368, 22"
+                Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
         </TabPage>
 
         <!-- MAP TOOLS TAB -->
         <TabPage Name="tabMapTools" Caption="Map Tools">
-            <PictureBox Name="picMapToolsBG" Position="6, 54" Size="628, 510" Design="Parchment"/>
+            <PictureBox Name="picMapToolsBG" Position="6, 46" Size="628, 190" Design="Parchment"/>
 
-            <Button Name="btnRespawn" Text="Respawn Map" Position="20, 63" Size="200, 22"
+            <Button Name="btnRespawn" Text="Respawn Map" Position="20, 55" Size="200, 22"
             Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-            <Button Name="btnALoc" Text="Toggle Location Display" Position="225, 63" Size="200, 22"
+            <Button Name="btnALoc" Text="Toggle Location Display" Position="225, 55" Size="200, 22"
             Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
         </TabPage>
 
         <!-- EDITORS TAB -->
         <TabPage Name="tabEditors" Caption="Editors">
-            <PictureBox Name="picEditorsBG" Position="6, 54" Size="628, 510" Design="Parchment"/>
+            <PictureBox Name="picEditorsBG" Position="6, 46" Size="628, 190" Design="Parchment"/>
 
             <!-- Editor Buttons Grid Row 1 -->
-            <Button Name="btnAnimationEditor" Text="Animation" Position="25, 63" Size="140, 22"
+            <Button Name="btnAnimationEditor" Text="Animation" Position="25, 55" Size="140, 22"
             Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-            <Button Name="btnJobEditor" Text="Job" Position="170, 63" Size="140, 22"
+            <Button Name="btnJobEditor" Text="Job" Position="170, 55" Size="140, 22"
             Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-            <Button Name="btnItemEditor" Text="Item" Position="315, 63" Size="140, 22"
+            <Button Name="btnItemEditor" Text="Item" Position="315, 55" Size="140, 22"
             Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-            <Button Name="btnMapEditor" Text="Map" Position="460, 63" Size="155, 22"
+            <Button Name="btnMapEditor" Text="Map" Position="460, 55" Size="155, 22"
             Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 
             <!-- Editor Buttons Grid Row 2 -->
-            <Button Name="btnNpcEditor" Text="Npc" Position="25, 90" Size="140, 22"
+            <Button Name="btnNpcEditor" Text="Npc" Position="25, 82" Size="140, 22"
             Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-            <Button Name="btnProjectiles" Text="Projectile" Position="170, 90" Size="140, 22"
+            <Button Name="btnProjectiles" Text="Projectile" Position="170, 82" Size="140, 22"
             Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-            <Button Name="btnResourceEditor" Text="Resource" Position="315, 90" Size="140, 22"
+            <Button Name="btnResourceEditor" Text="Resource" Position="315, 82" Size="140, 22"
             Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-            <Button Name="btnShopEditor" Text="Shop" Position="460, 90" Size="155, 22"
+            <Button Name="btnShopEditor" Text="Shop" Position="460, 82" Size="155, 22"
             Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 
             <!-- Editor Buttons Grid Row 3 -->
-            <Button Name="btnSkillEditor" Text="Skill" Position="25, 117" Size="140, 22"
+            <Button Name="btnSkillEditor" Text="Skill" Position="25, 109" Size="140, 22"
             Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-            <Button Name="btnMoralEditor" Text="Moral" Position="170, 117" Size="140, 22"
+            <Button Name="btnMoralEditor" Text="Moral" Position="170, 109" Size="140, 22"
             Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-            <Button Name="btnScriptEditor" Text="Script" Position="315, 117" Size="140, 22"
+            <Button Name="btnScriptEditor" Text="Script" Position="315, 109" Size="140, 22"
             Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
         </TabPage>
 
