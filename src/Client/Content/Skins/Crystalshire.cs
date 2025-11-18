@@ -951,7 +951,7 @@ public class Crystalshire
                         UpdateAttrVisibility(idx);
                     }
                     break;
-                case "Npc":
+                case "Npcs":
                     SetVisible(true, npcs);
                     InitNpcList();
                     GameState.MapEditorTab = (int)MapEditorTab.Npcs;
@@ -1299,7 +1299,7 @@ public class Crystalshire
         if (WindowManager.TryGetControl("winMapEditor","btnGoAttributes", out var btnGoAttributes))
             btnGoAttributes.CallBack[(int)ControlState.MouseDown] = () => ShowTab("Attributes");
         if (WindowManager.TryGetControl("winMapEditor","btnGoNpcs", out var btnGoNpcs))
-            btnGoNpcs.CallBack[(int)ControlState.MouseDown] = () => ShowTab("Npc");
+            btnGoNpcs.CallBack[(int)ControlState.MouseDown] = () => ShowTab("Npcs");
         if (WindowManager.TryGetControl("winMapEditor","btnGoDirBlock", out var btnGoDirBlock))
             btnGoDirBlock.CallBack[(int)ControlState.MouseDown] = () => ShowTab("DirBlock");
         if (WindowManager.TryGetControl("winMapEditor","btnGoEvents", out var btnGoEvents))
