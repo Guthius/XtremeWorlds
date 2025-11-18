@@ -1369,7 +1369,7 @@ public class Crystalshire
             picSprite.OnDraw = WinNpcEditor.OnDrawSprite;
         }
 
-        // List interactions (NPC index + scrollbar)
+        // List interactions
         ListBox npcList = null;
         if (WindowManager.TryGetControl("winNpcEditor", "lstNpcIndex", out var lstCtrl) && lstCtrl is ListBox list)
         {
@@ -1715,9 +1715,6 @@ public class Crystalshire
         {
             btnCopy.CallBack[(int)ControlState.MouseDown] = WinNpcEditor.OnCopyOrPaste;
         }
-
-        // Initialize lists and populate controls
-        WinNpcEditor.Init();
     }
 
     public void UpdateWindow_EscMenu()

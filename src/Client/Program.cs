@@ -393,7 +393,12 @@ namespace Client
                 {
                     path += GameState.GfxExt;
                 }
-
+                
+                if (!File.Exists(path))
+                {
+                    throw new FileNotFoundException($"Texture file not found: {path}");
+                }
+                
                 // Open the file stream with FileShare.Read to allow other processes to read the file  
                 using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
@@ -414,8 +419,7 @@ namespace Client
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error loading texture from {path}: {ex.Message}");
-                return new Texture2D(Graphics?.GraphicsDevice, 1, 1);
+                throw new Exception($"Error loading texture '{path}': {ex.Message}", ex);
             }
         }
 

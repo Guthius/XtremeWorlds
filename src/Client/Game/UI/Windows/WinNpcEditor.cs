@@ -69,6 +69,9 @@ public static class WinNpcEditor
 
         int spriteIndex = npc.Sprite;
 
+        if (spriteIndex < 1 || spriteIndex > GameState.NumCharacters)
+            return;
+
         var spritePath = System.IO.Path.Combine(DataPath.Characters, spriteIndex.ToString());
         var sprite = GameClient.GetGfxInfo(spritePath);
         if (sprite is null) return;
@@ -320,6 +323,7 @@ public static class WinNpcEditor
         SelectedIndex = index;
         list.SelectedIndex = index;
         list.EnsureVisible(index);
+        PopulateStaticCombos();
         LoadNpc(index);
     }
 

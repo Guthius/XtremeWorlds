@@ -15,10 +15,9 @@ public static class WinNewChar
         }
 
         var spriteIndex = GameState.NewCnarGender == Sex.Male ? Data.Job[GameState.NewCharJob].MaleSprite : Data.Job[GameState.NewCharJob].FemaleSprite;
-        if (spriteIndex == 0)
-        {
-            spriteIndex = 1;
-        }
+
+        if (spriteIndex < 1 || spriteIndex > GameState.NumCharacters)
+            return;
 
         var spritePath = Path.Combine(DataPath.Characters, spriteIndex.ToString());
         var sprite = GameClient.GetGfxInfo(Path.Combine(DataPath.Characters, spriteIndex.ToString()));
