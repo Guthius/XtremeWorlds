@@ -386,11 +386,6 @@ public static class WinEditorMap
         }
     }
 
-    public static void Init()
-    {
-        LoadMap();
-    }
-
     public static void LoadMap()
     {
         // assumes Data.MyMap is already the current map the editor is editing
