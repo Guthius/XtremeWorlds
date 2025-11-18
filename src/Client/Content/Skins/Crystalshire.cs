@@ -251,6 +251,7 @@ public class Crystalshire
         // Tools: map to existing editor actions
         if (WindowManager.TryGetControl("winEditorMap", "btnToolPencil", out var btnPencil))
             btnPencil.CallBack[(int)ControlState.MouseDown] = () => { GameState.EyeDropper = false; };
+        
         if (WindowManager.TryGetControl("winEditorMap", "btnToolFill", out var btnFill))
             btnFill.CallBack[(int)ControlState.MouseDown] = () =>
             {
@@ -416,6 +417,7 @@ public class Crystalshire
                 {
                     if (WindowManager.TryGetControl("winEditorMap", name, out var l)) l.Text = $"{caption}: {value}";
                 }
+                
                 if (WindowManager.TryGetControl("winEditorMap", "sldMapWarpMap", out var wMapCtrl) && wMapCtrl is Client.Game.UI.Controls.ScrollBar sbMap)
                 {
                     sbMap.Min = 1;
@@ -429,6 +431,7 @@ public class Crystalshire
                         SetWarpLabel("lblWarpMap", "Map", wMapCtrl.Value);
                     };
                 }
+
                 if (WindowManager.TryGetControl("winEditorMap", "sldMapWarpX", out var wXCtrl) && wXCtrl is Client.Game.UI.Controls.ScrollBar sbX)
                 {
                     sbX.Min = 0; sbX.Max = Math.Max(0, Data.MyMap.MaxX - 1);
@@ -440,6 +443,7 @@ public class Crystalshire
                         SetWarpLabel("lblWarpX", "X", wXCtrl.Value);
                     };
                 }
+
                 if (WindowManager.TryGetControl("winEditorMap", "sldMapWarpY", out var wYCtrl) && wYCtrl is Client.Game.UI.Controls.ScrollBar sbY)
                 {
                     sbY.Min = 0; sbY.Max = Math.Max(0, Data.MyMap.MaxY - 1);
@@ -451,6 +455,7 @@ public class Crystalshire
                         SetWarpLabel("lblWarpY", "Y", wYCtrl.Value);
                     };
                 }
+
                 if (WindowManager.TryGetControl("winEditorMap", "btnMapWarp", out var btnMapWarp))
                 {
                     btnMapWarp.CallBack[(int)ControlState.MouseDown] = () =>
@@ -474,6 +479,7 @@ public class Crystalshire
             {
                 if (WindowManager.TryGetControl("winEditorMap", n, out var c)) c.Visible = showItem;
             }
+
             if (showItem)
             {
                 if (WindowManager.TryGetControl("winEditorMap", "cmbMapItem", out var cItem) && cItem is ComboBox cmb)
@@ -549,6 +555,7 @@ public class Crystalshire
             {
                 if (WindowManager.TryGetControl("winEditorMap", n, out var c)) c.Visible = showSpawn;
             }
+
             if (showSpawn)
             {
                 // Populate spawn slot combo from current map NPC slots
@@ -1239,8 +1246,7 @@ public class Crystalshire
             // Brightness
             BindSlider("sldMapBrightness", Data.MyMap.Brightness, 0, 100, v => Data.MyMap.Brightness = (byte)v, "lblBrightness", "Brightness");
         }
-
-        // Initialize NPC combo list from Data.Npc (use "index: Name" with None fallback)
+        
         void InitNpcList()
         {
             if (WindowManager.TryGetControl("winEditorMap", "cmbNpcList", out var npcCtrl) && npcCtrl is ComboBox cmbNpc)
@@ -1259,7 +1265,7 @@ public class Crystalshire
                     }
                 }
                 cmbNpc.Value = (prev >= 0 && prev < cmbNpc.Items.Count) ? prev : 0;
-                cmbNpc.CallBack[(int)ControlState.MouseMove] = () =>
+                cmbNpc.CallBack[(int)ControlState.MouseDown] = () =>
                 {
                     // Assign selected NPC to the currently selected map NPC slot
                     var slot = WinEditorMap.NpcSelectedSlot;
@@ -1267,6 +1273,24 @@ public class Crystalshire
                     {
                         int idx = cmbNpc.Value - 1; // 0 = None; value maps to array index
                         Data.MyMap.Npc[slot] = idx;
+                        // Immediately refresh the listbox display for this slot
+                        if (WindowManager.TryGetControl("winEditorMap", "lstNpcs", out var lstCtrl) && lstCtrl is ListBox lst)
+                        {
+                            int npcIndex = idx;
+                            string name = "None";
+                            if (npcIndex >= 0 && npcIndex < (Data.Npc?.Length ?? 0))
+                            {
+                                var rawName = Data.Npc[npcIndex].Name ?? string.Empty;
+                                if (!string.IsNullOrWhiteSpace(rawName)) name = rawName.Trim();
+                            }
+
+                            int displayIndex = slot;
+                            if (displayIndex >= 0 && displayIndex < lst.Items.Count)
+                            {
+                                //lst.Items[displayIndex] = $"{slot + 1}: {name}";
+                                lst.Items[displayIndex] = $"{slot + 1}: test";
+                            }
+                        }
                     }
                 };
             }

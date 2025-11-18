@@ -1474,6 +1474,7 @@ namespace Client
                             break;
                         }
                     }
+                    
                     if (!overGui)
                     {
                         EditorMap.MouseDown(GameState.CurXGame, GameState.CurYGame, false);

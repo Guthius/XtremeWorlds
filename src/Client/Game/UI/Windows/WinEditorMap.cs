@@ -341,7 +341,7 @@ public static class WinEditorMap
         var win = WindowManager.GetWindowByName("winEditorMap");
         if (win is null) return;
 
-        int relY = GameState.CurMouseY - (win.X + ctrl.Y);
+        int relY = GameState.CurMouseY - (win.Y + ctrl.Y);
         int index = list.GetItemIndexAtPosition(relY);
         int total = Core.Globals.Variables.MaxMapNpcs;
         if (index < 0 || index >= total) return;

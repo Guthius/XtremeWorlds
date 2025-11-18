@@ -1987,7 +1987,6 @@ namespace Client
 
         public new static void MouseDown(int x, int y, bool movedMouse = true)
         {
-
             int i;
             bool isModified = false;
 
@@ -2001,7 +2000,7 @@ namespace Client
             if (!GameLogic.IsInBounds())
                 return;
 
-            if (GameState.EyeDropper)
+            if (GameState.EyeDropper && GameClient.IsMouseButtonDown(MouseButton.Left))
             {
                 MapEditorEyeDropper();
                 return;
