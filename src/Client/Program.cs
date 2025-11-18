@@ -1375,20 +1375,24 @@ namespace Client
 
         private static void HandleScrollWheel()
         {
-            // Handle scroll wheel (assuming delta calculation happens elsewhere)
+            // Dispatch wheel events to GUI and chat for both directions
             int scrollValue = GetMouseScrollDelta();
+            if (scrollValue == 0)
+            {
+                return;
+            }
+
+            // First, let GUI controls react (e.g., combo menus, custom lists)
+            HandleGuiEvent(ControlState.MouseScroll);
+
+            // Then apply default chat scrolling behavior
             if (scrollValue > 0)
             {
-                GameLogic.ScrollChatBox(0); // Scroll up
+                GameLogic.ScrollChatBox(0); // up
             }
-            else if (scrollValue < 0)
+            else
             {
-                GameLogic.ScrollChatBox(1); // Scroll down
-                
-                if (scrollValue != 0)
-                {
-                    HandleGuiEvent(ControlState.MouseScroll);
-                }
+                GameLogic.ScrollChatBox(1); // down
             }
         }
 
@@ -1458,7 +1462,22 @@ namespace Client
             {
                 if (GameState.MyEditorType == EditorType.Map)
                 {
-                    EditorMap.MouseDown(GameState.CurXGame, GameState.CurYGame, false);
+                    // Guard: do not edit map while mouse is over any GUI window/control
+                    bool overGui = false;
+                    foreach (var w in WindowManager.Windows.Values)
+                    {
+                        if (w is null || !w.Visible) continue;
+                        if (GameState.CurMouseXGui >= w.X && GameState.CurMouseXGui <= w.X + w.Width &&
+                            GameState.CurMouseYGui >= w.Y && GameState.CurMouseYGui <= w.Y + w.Height)
+                        {
+                            overGui = true;
+                            break;
+                        }
+                    }
+                    if (!overGui)
+                    {
+                        EditorMap.MouseDown(GameState.CurXGame, GameState.CurYGame, false);
+                    }
                 }
 
                 if (IsSearchCooldownElapsed())
@@ -1576,47 +1595,36 @@ namespace Client
         // Draw a filled rectangle with an optional outline
         public static void DrawRectangle(Vector2 position, Vector2 size, Color fillColor, Color outlineColor, float outlineThickness)
         {
-            if (SpriteBatch == null) return;
-            // Create a 1x1 white texture for drawing
-            var whiteTexture = new Texture2D(SpriteBatch.GraphicsDevice, 1, 1);
-
-            whiteTexture.SetData([Color.White]);
+            if (SpriteBatch == null || PixelTexture == null) return;
 
             // Draw the filled rectangle
-            SpriteBatch.Draw(whiteTexture, new Rectangle((int)position.X, (int)position.Y, (int)size.X, (int)size.Y), fillColor);
+            SpriteBatch.Draw(PixelTexture, new Rectangle((int)position.X, (int)position.Y, (int)size.X, (int)size.Y), fillColor);
 
             // Draw the outline if thickness > 0
             if (outlineThickness > 0f)
             {
-                // Create the four sides of the outline
-                var left = new Rectangle((int)position.X, (int)position.Y, (int)outlineThickness, (int)size.Y);
+                int t = (int)Math.Max(1, Math.Round(outlineThickness));
 
-                var top = new Rectangle((int)position.X, (int)position.Y, (int)size.X, (int)outlineThickness);
+                var left = new Rectangle((int)position.X, (int)position.Y, t, (int)size.Y);
+                var top = new Rectangle((int)position.X, (int)position.Y, (int)size.X, t);
+                var right = new Rectangle((int)(position.X + size.X - t), (int)position.Y, t, (int)size.Y);
+                var bottom = new Rectangle((int)position.X, (int)(position.Y + size.Y - t), (int)size.X, t);
 
-                var right = new Rectangle((int)(position.X + size.X - outlineThickness), (int)position.Y, (int)outlineThickness, (int)size.Y);
-
-                var bottom = new Rectangle((int)position.X, (int)(position.Y + size.Y - outlineThickness), (int)size.X, (int)outlineThickness);
-
-                // Draw the outline rectangles
-                SpriteBatch.Draw(whiteTexture, left, outlineColor);
-                SpriteBatch.Draw(whiteTexture, top, outlineColor);
-                SpriteBatch.Draw(whiteTexture, right, outlineColor);
-                SpriteBatch.Draw(whiteTexture, bottom, outlineColor);
+                SpriteBatch.Draw(PixelTexture, left, outlineColor);
+                SpriteBatch.Draw(PixelTexture, top, outlineColor);
+                SpriteBatch.Draw(PixelTexture, right, outlineColor);
+                SpriteBatch.Draw(PixelTexture, bottom, outlineColor);
             }
-
-            // Dispose the texture to free memory
-            whiteTexture.Dispose();
         }
 
-        private static void DrawOutlineRectangle(int x, int y, int width, int height, Color color, float thickness)
+        public static void DrawOutlineRectangle(int x, int y, int width, int height, Color color, float thickness)
         {
-            if (SpriteBatch == null) return; // safety
+            if (SpriteBatch == null || PixelTexture == null) return; // safety
             if (width <= 0 || height <= 0) return;
 
-            var whiteTexture = new Texture2D(SpriteBatch.GraphicsDevice, 1, 1);
-            whiteTexture.SetData([Color.White]); // ensure texture has visible pixel
-
             int t = (int)Math.Max(1, Math.Round(thickness));
+            if (t > width) t = width;
+            if (t > height) t = height;
 
             // Define four rectangles for the outline
             var left = new Rectangle(x, y, t, height);
@@ -1624,13 +1632,11 @@ namespace Client
             var right = new Rectangle(x + width - t, y, t, height);
             var bottom = new Rectangle(x, y + height - t, width, t);
 
-            // Draw the outline
-            SpriteBatch.Draw(whiteTexture, left, color);
-            SpriteBatch.Draw(whiteTexture, top, color);
-            SpriteBatch.Draw(whiteTexture, right, color);
-            SpriteBatch.Draw(whiteTexture, bottom, color);
-
-            whiteTexture.Dispose();
+            // Draw the outline using cached PixelTexture
+            SpriteBatch.Draw(PixelTexture, left, color);
+            SpriteBatch.Draw(PixelTexture, top, color);
+            SpriteBatch.Draw(PixelTexture, right, color);
+            SpriteBatch.Draw(PixelTexture, bottom, color);
         }
 
         public static Color QbColorToXnaColor(int qbColor)
@@ -2305,47 +2311,19 @@ namespace Client
 
         public static void DrawGrid()
         {
-            // Use a single Begin/End pair to improve performance
-            if (SpriteBatch == null) return;
-            SpriteBatch.Begin();
-
-            // Iterate over the tiles in the visible range
-            for (double x = GameState.TileView.Left - 1d, loopTo = GameState.TileView.Right + 1d; x < loopTo; x++)
+            // Draw tile grid outlines using the existing batch-safe helpers
+            int tileW = GameState.SizeX;
+            int tileH = GameState.SizeY;
+            for (int x = (int)GameState.TileView.Left; x <= (int)GameState.TileView.Right; x++)
             {
-                for (double y = GameState.TileView.Top - 1d, loopTo1 = GameState.TileView.Bottom + 1d; y < loopTo1; y++)
+                for (int y = (int)GameState.TileView.Top; y <= (int)GameState.TileView.Bottom; y++)
                 {
-                    if (GameLogic.IsValidMapPoint((int) Math.Round(x), (int) Math.Round(y)))
-                    {
-                        // Calculate the tile position and size
-                        int posX = GameLogic.ConvertMapX((int) Math.Round((x - 1d)));
-                        int posY = GameLogic.ConvertMapY((int) Math.Round((y - 1d) * GameState.SizeY));
-                        int rectWidth = GameState.SizeX;
-                        int rectHeight = GameState.SizeY;
-
-                        // Draw the transparent rectangle as the tile background
-                        SpriteBatch.Draw(TransparentTexture, new Rectangle(posX, posY, rectWidth, rectHeight),
-                            Color.Transparent);
-
-                        // Define the outline color and thickness
-                        var outlineColor = Color.White;
-                        int thickness = 1;
-
-                        // Draw the tile outline (top, bottom, left, right)
-                        SpriteBatch.Draw(TransparentTexture, new Rectangle(posX, posY, rectWidth, thickness),
-                            outlineColor); // Top
-                        SpriteBatch.Draw(TransparentTexture,
-                            new Rectangle(posX, posY + rectHeight - thickness, rectWidth, thickness),
-                            outlineColor); // Bottom
-                        SpriteBatch.Draw(TransparentTexture, new Rectangle(posX, posY, thickness, rectHeight),
-                            outlineColor); // Left
-                        SpriteBatch.Draw(TransparentTexture,
-                            new Rectangle(posX + rectWidth - thickness, posY, thickness, rectHeight),
-                            outlineColor); // Right
-                    }
+                    if (!GameLogic.IsValidMapPoint(x, y)) continue;
+                    int px = GameLogic.ConvertMapX(x * tileW);
+                    int py = GameLogic.ConvertMapY(y * tileH);
+                    GameClient.DrawOutlineRectangle(px, py, tileW, tileH, Color.White, 1f);
                 }
             }
-
-            SpriteBatch.End();
         }
 
         public static void DrawTarget(int x2, int y2)
@@ -3437,8 +3415,8 @@ namespace Client
             Map.DrawThunderEffect();
             Map.DrawMapTint();
 
-            // Draw out a square at mouse cursor
-            if (Conversions.ToInteger(GameState.MapGrid) == 1 & GameState.MyEditorType == EditorType.Map)
+            // Draw tile grid when enabled in the Map editor
+            if (GameState.MapGrid && GameState.MyEditorType == EditorType.Map)
             {
                 DrawGrid();
             }

@@ -25,6 +25,8 @@ public sealed class Window : Component
 
     public ControlState State { get; set; }
     public List<string> List { get; set; } = []; // Drop down items?
+    // For scrollable popups (e.g., combo menus): starting item index
+    public int ScrollOffset { get; set; }
 
     // Arrays for states
     public List<Design> Design { get; set; } = [];

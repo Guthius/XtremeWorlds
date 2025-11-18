@@ -38,20 +38,42 @@ public static class WinComboMenu
         }
 
         winComboMenu.ParentControl = comboBox;
-        winComboMenu.Height = 2 + comboBox.Items.Count * 16;
         winComboMenu.X = window.X + comboBox.X + 2;
 
+        // Desired dropdown position (below control)
         var y = window.Y + comboBox.Y + comboBox.Height;
-        if (y + winComboMenu.Height > GameState.ResolutionHeight)
-        {
-            y = GameState.ResolutionHeight - winComboMenu.Height;
-        }
-
         winComboMenu.Y = y;
-        winComboMenu.Width = comboBox.Width - 4;
+
+        // Populate list and selection
         winComboMenu.List = comboBox.Items;
         winComboMenu.Value = comboBox.Value;
         winComboMenu.Group = 0;
+
+        // Compute height with clamp to available screen space; enable scrolling via ScrollOffset
+        int desiredHeight = 2 + comboBox.Items.Count * 16;
+        int availableBelow = GameState.ResolutionHeight - y - 10; // 10px margin from bottom
+        int height = desiredHeight;
+        if (availableBelow < desiredHeight)
+        {
+            // If not enough space below, try placing above; else clamp
+            int availableAbove = y - 10; // margin from top
+            if (availableAbove > availableBelow && availableAbove > 2)
+            {
+                // Place above control
+                height = Math.Min(desiredHeight, availableAbove);
+                winComboMenu.Y = y - height - comboBox.Height;
+            }
+            else
+            {
+                height = Math.Max(34, availableBelow); // at least 2 visible rows
+            }
+        }
+        winComboMenu.Height = height;
+        winComboMenu.Width = comboBox.Width - 4;
+        // Center selection within visible area
+        int visibleRows = Math.Max(1, (winComboMenu.Height - 2) / 16);
+        int maxStart = Math.Max(0, winComboMenu.List.Count - visibleRows);
+        winComboMenu.ScrollOffset = Math.Clamp(comboBox.Value - visibleRows / 2, 0, maxStart);
         winComboMenu.Visible = true;
 
         WindowManager.ShowWindow("winComboMenuBG", true, false);

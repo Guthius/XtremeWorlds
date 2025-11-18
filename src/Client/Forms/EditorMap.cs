@@ -1768,11 +1768,11 @@ namespace Client
                 if (npcIndex >= 0 && npcIndex < Variables.MaxNpcs)
                 {
                     var name = Strings.Trim(Data.Npc[npcIndex].Name);
-                    Instance.lstMapNpc.Items.Add($"{x}: {name}");
+                    Instance.lstMapNpc.Items.Add($"{x + 1}: {name}");
                 }
                 else
                 {
-                    Instance.lstMapNpc.Items.Add($"{x}: None");
+                    Instance.lstMapNpc.Items.Add($"{x + 1}: None");
                 }
             }
 
@@ -2610,9 +2610,15 @@ namespace Client
 
             {
                 ref var withBlock = ref Data.MyMap.Tile[GameState.CurX, GameState.CurY];
+                // Set tileset and directly apply the picked tile indices without invoking tileset-offset logic
                 GameState.CurTileset = withBlock.Layer[CurLayer].Tileset;
-                MapEditorChooseTile((int)MouseButtons.Primary, withBlock.Layer[CurLayer].X * GameState.SizeX, withBlock.Layer[CurLayer].Y * GameState.SizeY);
-                GameState.EyeDropper = !GameState.EyeDropper;
+                GameState.EditorTileX = withBlock.Layer[CurLayer].X;
+                GameState.EditorTileY = withBlock.Layer[CurLayer].Y;
+                GameState.EditorTileWidth = 1;
+                GameState.EditorTileHeight = 1;
+                GameState.EditorTileSelStart = new Point(GameState.EditorTileX, GameState.EditorTileY);
+                GameState.EditorTileSelEnd = new Point(GameState.EditorTileX + 1, GameState.EditorTileY + 1);
+                // Keep EyeDropper enabled until toggled off by user
             }
         }
 
@@ -2801,87 +2807,91 @@ namespace Client
             // Get the number of layers from the MapLayer enum
             int layerCount = Enum.GetValues(typeof(MapLayer)).Length;
 
-            if (GameState.CopyMap == false)
+            // Always copy (no implicit paste on second click)
+            Data.TempTile = new Tile[Data.MyMap.MaxX, Data.MyMap.MaxY];
+            GameState.TmpMaxX = Data.MyMap.MaxX;
+            GameState.TmpMaxY = Data.MyMap.MaxY;
+
+            var loopTo = (int)Data.MyMap.MaxX;
+            for (x = 0; x < loopTo; x++)
             {
-                Data.TempTile = new Tile[Data.MyMap.MaxX, Data.MyMap.MaxY];
-                GameState.TmpMaxX = Data.MyMap.MaxX;
-                GameState.TmpMaxY = Data.MyMap.MaxY;
-
-                var loopTo = (int)Data.MyMap.MaxX;
-                for (x = 0; x < loopTo; x++)
+                var loopTo1 = (int)Data.MyMap.MaxY;
+                for (y = 0; y < loopTo1; y++)
                 {
-                    var loopTo1 = (int)Data.MyMap.MaxY;
-                    for (y = 0; y < loopTo1; y++)
+                    ref var withBlock = ref Data.MyMap.Tile[x, y];
+                    Data.TempTile[x, y].Layer = new Type.Layer[layerCount];
+
+                    Data.TempTile[x, y].Data1 = withBlock.Data1;
+                    Data.TempTile[x, y].Data2 = withBlock.Data2;
+                    Data.TempTile[x, y].Data3 = withBlock.Data3;
+                    Data.TempTile[x, y].Type = withBlock.Type;
+                    Data.TempTile[x, y].Data1_2 = withBlock.Data1_2;
+                    Data.TempTile[x, y].Data2_2 = withBlock.Data2_2;
+                    Data.TempTile[x, y].Data3_2 = withBlock.Data3_2;
+                    Data.TempTile[x, y].Type2 = withBlock.Type2;
+                    Data.TempTile[x, y].DirBlock = withBlock.DirBlock;
+
+                    for (i = 0; i < layerCount; i++)
                     {
-                        ref var withBlock = ref Data.MyMap.Tile[x, y];
-                        Data.TempTile[x, y].Layer = new Type.Layer[layerCount];
-
-                        Data.TempTile[x, y].Data1 = withBlock.Data1;
-                        Data.TempTile[x, y].Data2 = withBlock.Data2;
-                        Data.TempTile[x, y].Data3 = withBlock.Data3;
-                        Data.TempTile[x, y].Type = withBlock.Type;
-                        Data.TempTile[x, y].Data1_2 = withBlock.Data1_2;
-                        Data.TempTile[x, y].Data2_2 = withBlock.Data2_2;
-                        Data.TempTile[x, y].Data3_2 = withBlock.Data3_2;
-                        Data.TempTile[x, y].Type2 = withBlock.Type2;
-                        Data.TempTile[x, y].DirBlock = withBlock.DirBlock;
-
-                        for (i = 0; i < layerCount; i++)
-                        {
-                            Data.TempTile[x, y].Layer[i].X = withBlock.Layer[i].X;
-                            Data.TempTile[x, y].Layer[i].Y = withBlock.Layer[i].Y;
-                            Data.TempTile[x, y].Layer[i].Tileset = withBlock.Layer[i].Tileset;
-                            Data.TempTile[x, y].Layer[i].AutoTile = withBlock.Layer[i].AutoTile;
-                        }
+                        Data.TempTile[x, y].Layer[i].X = withBlock.Layer[i].X;
+                        Data.TempTile[x, y].Layer[i].Y = withBlock.Layer[i].Y;
+                        Data.TempTile[x, y].Layer[i].Tileset = withBlock.Layer[i].Tileset;
+                        Data.TempTile[x, y].Layer[i].AutoTile = withBlock.Layer[i].AutoTile;
                     }
                 }
-
-                GameState.CopyMap = true;
-                GameLogic.Dialogue("Map Editor", "Map Copy: ", "Press the button again to paste.", DialogueType.CopyMap, (byte)DialogueStyle.Okay);
             }
-            else
+
+            GameState.CopyMap = true;
+            GameLogic.Dialogue("Map Editor", "Map Copy:", "Copied current map to clipboard.", DialogueType.CopyMap, (byte)DialogueStyle.Okay);
+        }
+
+        public static void MapEditorPasteMap()
+        {
+            if (Data.TempTile == null)
             {
-                Data.MyMap.MaxX = GameState.TmpMaxX;
-                Data.MyMap.MaxY = GameState.TmpMaxY;
+                GameLogic.Dialogue("Map Editor", "Map Paste:", "No copied map available.", DialogueType.PasteMap, (byte)DialogueStyle.Okay);
+                return;
+            }
 
-                var loopTo2 = (int)Data.MyMap.MaxX;
-                for (x = 0; x < loopTo2; x++)
+            int i, x, y;
+            int layerCount = Enum.GetValues(typeof(MapLayer)).Length;
+
+            Data.MyMap.MaxX = GameState.TmpMaxX;
+            Data.MyMap.MaxY = GameState.TmpMaxY;
+
+            var loopTo2 = (int)Data.MyMap.MaxX;
+            for (x = 0; x < loopTo2; x++)
+            {
+                var loopTo3 = (int)Data.MyMap.MaxY;
+                for (y = 0; y < loopTo3; y++)
                 {
-                    var loopTo3 = (int)Data.MyMap.MaxY;
-                    for (y = 0; y < loopTo3; y++)
+                    ref var withBlock1 = ref Data.MyMap.Tile[x, y];
+                    Array.Resize(ref Data.MyMap.Tile[x, y].Layer, layerCount);
+                    Array.Resize(ref Data.Autotile![x, y].Layer, layerCount);
+
+                    withBlock1.Data1 = Data.TempTile![x, y].Data1;
+                    withBlock1.Data2 = Data.TempTile![x, y].Data2;
+                    withBlock1.Data3 = Data.TempTile![x, y].Data3;
+                    withBlock1.Type = Data.TempTile![x, y].Type;
+                    withBlock1.Data1_2 = Data.TempTile![x, y].Data1_2;
+                    withBlock1.Data2_2 = Data.TempTile![x, y].Data2_2;
+                    withBlock1.Data3_2 = Data.TempTile![x, y].Data3_2;
+                    withBlock1.Type2 = Data.TempTile![x, y].Type2;
+                    withBlock1.DirBlock = Data.TempTile![x, y].DirBlock;
+
+                    for (i = 0; i < layerCount; i++)
                     {
-                        ref var withBlock1 = ref Data.MyMap.Tile[x, y];
-                        Array.Resize(ref Data.MyMap.Tile[x, y].Layer, layerCount);
-                        Array.Resize(ref Data.Autotile![x, y].Layer, layerCount);
-
-                        withBlock1.Data1 = Data.TempTile![x, y].Data1;
-                        withBlock1.Data2 = Data.TempTile![x, y].Data2;
-                        withBlock1.Data3 = Data.TempTile![x, y].Data3;
-                        withBlock1.Type = Data.TempTile![x, y].Type;
-                        withBlock1.Data1_2 = Data.TempTile![x, y].Data1_2;
-                        withBlock1.Data2_2 = Data.TempTile![x, y].Data2_2;
-                        withBlock1.Data3_2 = Data.TempTile![x, y].Data3_2;
-                        withBlock1.Type2 = Data.TempTile![x, y].Type2;
-                        withBlock1.DirBlock = Data.TempTile![x, y].DirBlock;
-
-                        for (i = 0; i < layerCount; i++)
-                        {
-                            withBlock1.Layer[i].X = Data.TempTile![x, y].Layer[i].X;
-                            withBlock1.Layer[i].Y = Data.TempTile![x, y].Layer[i].Y;
-                            withBlock1.Layer[i].Tileset = Data.TempTile![x, y].Layer[i].Tileset;
-                            withBlock1.Layer[i].AutoTile = Data.TempTile![x, y].Layer[i].AutoTile;
-                            Autotile.CacheRenderState(x, y, i);
-                        }
+                        withBlock1.Layer[i].X = Data.TempTile![x, y].Layer[i].X;
+                        withBlock1.Layer[i].Y = Data.TempTile![x, y].Layer[i].Y;
+                        withBlock1.Layer[i].Tileset = Data.TempTile![x, y].Layer[i].Tileset;
+                        withBlock1.Layer[i].AutoTile = Data.TempTile![x, y].Layer[i].AutoTile;
+                        Autotile.CacheRenderState(x, y, i);
                     }
                 }
-
-                GameLogic.Dialogue("Map Editor", "Map Paste: ", "Map has been updated.", DialogueType.PasteMap, (byte)DialogueStyle.Okay);
-
-                // do a re-init so we can see our changes
-                Autotile.InitAutotiles();
-
-                GameState.CopyMap = false;
             }
+
+            GameLogic.Dialogue("Map Editor", "Map Paste:", "Map has been updated.", DialogueType.PasteMap, (byte)DialogueStyle.Okay);
+            Autotile.InitAutotiles();
         }
 
         private void tsbCopyMap_Click(object? sender, EventArgs e)
@@ -3003,7 +3013,7 @@ namespace Client
 
         private void tsbDeleteMap_Click(object? sender, EventArgs e)
         {
-            GameLogic.Dialogue("Map Editor", "Clear Map: ", "Are you sure you want to clear this map?", DialogueType.ClearMap, DialogueStyle.YesNo);
+            GameLogic.Dialogue("Map Editor", "Delete Map: ", "Are you sure you want to delete this map?", DialogueType.DeleteMap, DialogueStyle.YesNo);
         }
         private void btnFillAttributes_Click(object? sender, EventArgs e)
         {

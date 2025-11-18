@@ -27,16 +27,21 @@ public static class WindowRenderer
 
             var y = window.Y + 2;
             var x = window.X;
+            int visibleRows = Math.Max(1, (window.Height - 2) / 16);
+            int maxStart = Math.Max(0, window.List.Count - visibleRows);
+            int start = Math.Clamp(window.ScrollOffset, 0, maxStart);
 
-            for (var i = 0; i < window.List.Count; i++)
+            for (var row = 0; row < visibleRows; row++)
             {
+                int i = start + row;
+                if (i >= window.List.Count) break;
+
                 if (i == window.Value || i == window.Group)
                 {
                     GameClient.RenderTexture(ref path, x, y - 1, 0, 0, window.Width, 15, 255, 0, 0, 0);
                 }
-                
-                var left = x + window.Width / 2 - TextRenderer.GetTextWidth(window.List[i], window.Font) / 2;
 
+                var left = x + window.Width / 2 - TextRenderer.GetTextWidth(window.List[i], window.Font) / 2;
                 TextRenderer.RenderText(window.List[i], left, y, Color.White, Color.Black);
 
                 y += 16;

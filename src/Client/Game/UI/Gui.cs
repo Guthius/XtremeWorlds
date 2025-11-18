@@ -803,6 +803,20 @@ public class WindowManager
                             case ControlState.MouseDown:
                                 ComboMenu_MouseDown(window);
                                 break;
+
+                            case ControlState.MouseScroll:
+                                // Scroll dropdown with mouse wheel
+                                int delta = GameClient.CurrentMouseState.ScrollWheelValue - GameClient.PreviousMouseState.ScrollWheelValue;
+                                if (delta != 0)
+                                {
+                                    int visibleRows = Math.Max(1, (window.Height - 2) / 16);
+                                    int maxStart = Math.Max(0, window.List.Count - visibleRows);
+                                    int step = delta > 0 ? -1 : 1; // wheel up -> scroll up
+                                    window.ScrollOffset = Math.Clamp(window.ScrollOffset + step, 0, maxStart);
+                                    // Keep hover aligned with new offset
+                                    ComboMenu_MouseMove(window);
+                                }
+                                break;
                         }
                     }
 
@@ -1006,6 +1020,34 @@ public class WindowManager
                                     scrollBar.CallBack[(int)ControlState.MouseMove]?.Invoke();
                                 }
                             }
+
+                            // Mouse wheel scrolling on hovered scrollbar
+                            if (entState == ControlState.MouseScroll)
+                            {
+                                int delta = GameClient.CurrentMouseState.ScrollWheelValue - GameClient.PreviousMouseState.ScrollWheelValue;
+                                if (delta != 0)
+                                {
+                                    // Default step: 1 unit. For tileset scrollbars, step by tile size * 3.
+                                    int step;
+                                    bool isTilesetV = string.Equals(scrollBar.Name, "sldTilesetV", StringComparison.Ordinal);
+                                    bool isTilesetH = string.Equals(scrollBar.Name, "sldTilesetH", StringComparison.Ordinal);
+                                    if (isTilesetV || isTilesetH)
+                                    {
+                                        int per = (isTilesetV ? GameState.SizeY : GameState.SizeX) * 3;
+                                        step = delta > 0 ? -per : per; // up scrolls up/left
+                                    }
+                                    else
+                                    {
+                                        step = delta > 0 ? -1 : 1; // wheel up -> decrement
+                                    }
+                                    int newVal = Math.Clamp(scrollBar.Value + step, scrollBar.Min, scrollBar.Max);
+                                    if (newVal != scrollBar.Value)
+                                    {
+                                        scrollBar.Value = newVal;
+                                        scrollBar.CallBack[(int)ControlState.MouseMove]?.Invoke();
+                                    }
+                                }
+                            }
                             break;
                         }
                     }
@@ -1122,7 +1164,9 @@ public class WindowManager
             return;
         }
 
-        int idx = relY / 16; // each item row is 16px tall
+        int visibleRows = Math.Max(1, (window.Height - 2) / 16);
+        int start = Math.Clamp(window.ScrollOffset, 0, Math.Max(0, window.List.Count - visibleRows));
+        int idx = start + relY / 16; // each item row is 16px tall
         if (idx >= 0 && idx < window.List.Count)
         {
             window.Group = idx; // hovered index
@@ -1141,7 +1185,9 @@ public class WindowManager
         }
 
         int relY = GameState.CurMouseY - (window.Y + 2);
-        int idx = relY / 16;
+        int visibleRows = Math.Max(1, (window.Height - 2) / 16);
+        int start = Math.Clamp(window.ScrollOffset, 0, Math.Max(0, window.List.Count - visibleRows));
+        int idx = start + relY / 16;
         if (idx >= 0 && idx < window.List.Count)
         {
             if (window.ParentControl is not null)

@@ -1,4 +1,5 @@
 using Core.Globals;
+using Microsoft.Xna.Framework;
 
 namespace Client.Game.UI.Controls;
 
@@ -30,5 +31,12 @@ public sealed class ScrollBar : Control
             var thumbX = X + x + (int)(usable * t);
             DesignRenderer.Render(Design.Green, thumbX, Y + y, ThumbSize, Height, Alpha);
         }
+
+        // Default value label to the right of the scrollbar
+        string label = Value.ToString();
+        var size = TextRenderer.Fonts[Core.Globals.Font.Arial].MeasureString(label);
+        int textX = X + x + Width + 6;
+        int textY = Y + y + (Height - (int)size.Y) / 2;
+        TextRenderer.RenderText(label, textX, textY, Color.White, Color.Black, Core.Globals.Font.Arial);
     }
 }

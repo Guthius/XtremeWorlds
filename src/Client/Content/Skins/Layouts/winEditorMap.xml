@@ -1,76 +1,222 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window Name="winEditorMap" Caption="Map Editor"
-        Size="860, 760"
+  Size="804, 740"
         Icon="1133" IconOffset="3, 5"
         Design="WindowNormal"
         StartPosition="CenterScreen"
         Visible="false">
 
-  <TabControl Name="tabEditorMap" Position="6, 46" Size="848, 708">
+  <TabControl Name="tabEditorMap" Position="6, 46" Size="792, 688">
 
     <!-- PALETTE / TOOLS TAB -->
     <TabPage Name="tabTiles" Caption="Tiles">
       <!-- Background parchment first to ensure it's behind everything -->
-      <PictureBox Name="picTilesBG" Position="6, 130" Size="836, 560" Design="Parchment"/>
+      <PictureBox Name="picTilesBG" Position="11, 70" Size="780, 618" Design="Parchment"/>
       <!-- Tabs header mimic created from script (like Admin) -->
 
-      <!-- Top selectors under toolbar -->
-      <Label Name="lblTilesetCaption" Text="Tileset" Position="16, 106" Size="56, 14"/>
-      <ScrollBar Name="sldTileset" Position="76, 108" Size="260, 12" Min="1" Max="1" Value="1" Orientation="Horizontal" ThumbSize="16"/>
-      <Label Name="lblTileset" Text="1" Position="342, 106" Size="30, 14"/>
+      <!-- Page header like Effects tab -->
+      <Label Name="lblTiles" Text="Tiles" Position="20, 84" Size="200, 14"/>
 
-      <Label Name="lblLayerCaption" Text="Layer" Position="396, 106" Size="60, 14"/>
-      <ComboBox Name="cmbLayer" Position="440, 104" Size="200, 18" Design="ComboBox"/>
+      <!-- Top selectors under header -->
+      <Label Name="lblTilesetCaption" Text="Tileset" Position="21, 104" Size="60, 16"/>
+      <ScrollBar Name="sldTileset" Position="85, 104" Size="230, 12" Min="1" Max="1" Value="1" Orientation="Horizontal" ThumbSize="16"/>
+      <Label Name="lblTileset" Text="1" Position="320, 104" Size="30, 14"/>
 
-      <Label Name="lblAutotileCaption" Text="Autotile" Position="656, 106" Size="60, 14"/>
-      <ComboBox Name="cmbAutotile" Position="722, 104" Size="120, 18" Design="ComboBox"/>
+      <Label Name="lblLayerCaption" Text="Layer" Position="355, 104" Size="48, 18"/>
+      <ComboBox Name="cmbLayer" Position="407, 104" Size="160, 18" Design="ComboBox"/>
 
-      <!-- Tools -->
-      
+      <Label Name="lblAutotileCaption" Text="Autotile" Position="575, 104" Size="64, 18"/>
+      <ComboBox Name="cmbAutotile" Position="643, 104" Size="140, 18" Design="ComboBox"/>
 
       <!-- Tileset render area -->
-      <PictureBox Name="picTileset" Position="174, 150" Size="512, 512" Design="TextBlack"/>
-      <ScrollBar Name="sldTilesetV" Position="700, 150" Size="16, 512" Min="0" Max="0" Value="0" Orientation="Vertical" ThumbSize="16"/>
-      <ScrollBar Name="sldTilesetH" Position="174, 674" Size="512, 12" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+      <PictureBox Name="picTileset" Position="179, 124" Size="512, 512" Design="TextBlack"/>
+      <ScrollBar Name="sldTilesetV" Position="701, 124" Size="16, 512" Min="0" Max="0" Value="0" Orientation="Vertical" ThumbSize="16"/>
+      <ScrollBar Name="sldTilesetH" Position="179, 646" Size="512, 12" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
     </TabPage>
 
     <!-- ATTRIBUTES TAB -->
     <TabPage Name="tabAttributes" Caption="Attributes">
-      <PictureBox Name="picAttrBG" Position="6, 130" Size="836, 560" Design="Parchment"/>
-      <ComboBox Name="cmbAttrMode" Position="20, 140" Size="220, 18" Design="ComboBox"/>
-      <Button Name="btnAttrApply" Text="Apply" Position="250, 140" Size="70, 18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-      <Button Name="btnAttrClear" Text="Cancel" Position="326, 140" Size="70, 18" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+      <PictureBox Name="picAttrBG" Position="11, 70" Size="780, 618" Design="Parchment"/>
+      <Label Name="lblAttributes" Text="Attributes" Position="20, 84" Size="200, 14"/>
+      <ComboBox Name="cmbAttrMode" Position="20, 112" Size="220, 18" Design="ComboBox"/>
+      <Button Name="btnAttrInfo" Text="Info" Position="248, 112" Size="60, 18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+
+      <!-- Attribute layer selection (1 or 2) -->
+      <Label Name="lblAttrLayer" Text="Attribute Layer" Position="20, 140" Size="120, 16"/>
+      <ComboBox Name="cmbAttribute" Position="144, 138" Size="96, 18" Design="ComboBox"/>
+
+      <!-- Warp group (shifted down to align with Effects layout rhythm) -->
+      <Label Name="lblWarp" Text="Warp" Position="20, 168" Size="60, 16"/>
+      <Label Name="lblWarpMap" Text="Map" Position="20, 190" Size="36, 16"/>
+      <ScrollBar Name="sldMapWarpMap" Position="60, 192" Size="240, 12" Min="1" Max="1" Value="1" Orientation="Horizontal" ThumbSize="16"/>
+      <Label Name="lblWarpX" Text="X" Position="306, 190" Size="16, 16"/>
+      <ScrollBar Name="sldMapWarpX" Position="324, 192" Size="200, 12" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+      <Label Name="lblWarpY" Text="Y" Position="530, 190" Size="16, 16"/>
+      <ScrollBar Name="sldMapWarpY" Position="548, 192" Size="200, 12" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+      <Button Name="btnMapWarp" Text="OK" Position="754, 188" Size="60, 18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+
+      <!-- Item group (overlaps warp area; visibility toggled in code) -->
+      <Label Name="lblItem" Text="Item" Position="20, 168" Size="60, 16"/>
+      <ComboBox Name="cmbMapItem" Position="84, 166" Size="300, 18" Design="ComboBox"/>
+      <Label Name="lblItemValue" Text="Value: 1" Position="390, 168" Size="80, 16"/>
+      <ScrollBar Name="sldMapItemValue" Position="470, 170" Size="220, 12" Min="1" Max="1024" Value="1" Orientation="Horizontal" ThumbSize="16"/>
+      <Button Name="btnMapItem" Text="OK" Position="700, 166" Size="60, 18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+
+      <!-- Resource group -->
+      <Label Name="lblResource" Text="Resource" Position="20, 168" Size="80, 16"/>
+      <ComboBox Name="cmbResource" Position="104, 166" Size="300, 18" Design="ComboBox"/>
+      <Button Name="btnResourceOk" Text="OK" Position="410, 166" Size="60, 18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+
+      <!-- NPC Spawn group -->
+      <Label Name="lblNpcSpawn" Text="NPC Spawn" Position="20, 168" Size="90, 16"/>
+      <Label Name="lblNpcSpawnSlot" Text="Slot" Position="20, 190" Size="36, 16"/>
+      <ComboBox Name="cmbNpcSpawnSlot" Position="60, 188" Size="220, 18" Design="ComboBox"/>
+      <Label Name="lblNpcDir" Text="Direction: Up" Position="290, 190" Size="120, 16"/>
+      <ScrollBar Name="sldNpcDir" Position="410, 192" Size="220, 12" Min="0" Max="3" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+      <Button Name="btnNpcSpawn" Text="OK" Position="640, 188" Size="60, 18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+
+      <!-- Shop group -->
+      <Label Name="lblShopAttr" Text="Shop" Position="20, 168" Size="60, 16"/>
+      <ComboBox Name="cmbShopAttr" Position="84, 166" Size="300, 18" Design="ComboBox"/>
+      <Button Name="btnShop" Text="OK" Position="390, 166" Size="60, 18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+
+      <!-- Heal group -->
+      <Label Name="lblHeal" Text="Heal" Position="20, 168" Size="60, 16"/>
+      <ComboBox Name="cmbHeal" Position="84, 166" Size="100, 18" Design="ComboBox"/>
+      <Label Name="lblHealAmount" Text="Amount: 1" Position="190, 168" Size="90, 16"/>
+      <ScrollBar Name="sldHeal" Position="282, 170" Size="220, 12" Min="1" Max="1024" Value="1" Orientation="Horizontal" ThumbSize="16"/>
+      <Button Name="btnHeal" Text="OK" Position="510, 166" Size="60, 18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+
+      <!-- Trap group -->
+      <Label Name="lblTrap" Text="Trap" Position="20, 168" Size="60, 16"/>
+      <Label Name="lblTrapVital" Text="Vital" Position="84, 148" Size="60, 16"/>
+      <ComboBox Name="cmbTrapVital" Position="84, 166" Size="100, 18" Design="ComboBox"/>
+      <Label Name="lblTrapAmount" Text="Amount: 1" Position="190, 168" Size="90, 16"/>
+      <ScrollBar Name="sldTrap" Position="282, 170" Size="220, 12" Min="1" Max="1024" Value="1" Orientation="Horizontal" ThumbSize="16"/>
+      <Button Name="btnTrap" Text="OK" Position="510, 166" Size="60, 18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+
+      <!-- Animation group -->
+      <Label Name="lblAnimation" Text="Animation" Position="20, 168" Size="80, 16"/>
+      <ComboBox Name="cmbAnimation" Position="104, 166" Size="300, 18" Design="ComboBox"/>
+      <Button Name="btnAnimation" Text="OK" Position="410, 166" Size="60, 18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
     </TabPage>
 
     <!-- Additional tabs to mirror Eto.Forms -->
     <TabPage Name="tabNpcs" Caption="Npcs">
-      <PictureBox Name="picNpcsBG" Position="6, 130" Size="836, 560" Design="Parchment"/>
-        <Label Name="lblNpcs" Text="NPC Tools" Position="20, 140" Size="200, 14"/>
-        <Label Name="lblNpcsHint" Text="Placeholder - NPC editor UI TBD" Position="20, 168" Size="280, 14"/>
-    </TabPage>
-    <TabPage Name="tabSettings" Caption="Settings">
-      <PictureBox Name="picSettingsBG" Position="6, 130" Size="836, 560" Design="Parchment"/>
-        <Label Name="lblSettings" Text="Map Settings" Position="20, 140" Size="200, 14"/>
-        <Label Name="lblSettingsHint" Text="Placeholder - settings UI TBD" Position="20, 168" Size="240, 14"/>
+      <PictureBox Name="picNpcsBG" Position="11, 70" Size="780, 618" Design="Parchment"/>
+        <!-- Settings header and section nav (shown in Settings view) -->
+        <Label Name="lblSettings" Text="Settings" Position="20, 84" Size="200, 14"/>
+        <Button Name="btnGoTiles" Text="Tiles" Position="20, 100" Size="100, 20" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+        <Button Name="btnGoAttributes" Text="Attributes" Position="124, 100" Size="100, 20" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+        <Button Name="btnGoNpcs" Text="NPCs" Position="228, 100" Size="80, 20" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+        <Button Name="btnGoDirBlock" Text="Dir Block" Position="312, 100" Size="90, 20" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+        <Button Name="btnGoEvents" Text="Events" Position="406, 100" Size="80, 20" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+        <Button Name="btnGoEffects" Text="Effects" Position="490, 100" Size="80, 20" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+
+        <!-- NPC header (shown in NPCs view) -->
+        <Label Name="lblNpcs" Text="NPC Tools" Position="20, 84" Size="200, 14"/>
+        <Label Name="lblNpcsHint" Text="Select an NPC to assign to a slot" Position="20, 112" Size="360, 14"/>
+
+        <!-- NPC list (left) -->
+        <PictureBox Name="picNpcsList" Position="20, 142" Size="460, 540" Design="None"/>
+        <ScrollBar Name="sldNpcList" Position="486, 142" Size="12, 540" Min="0" Max="0" Value="0" Orientation="Vertical" ThumbSize="16"/>
+
+        <!-- NPC selection (right top) -->
+        <Label Name="lblNpc" Text="NPC" Position="520, 142" Size="40, 16"/>
+        <ComboBox Name="cmbNpcList" Position="564, 140" Size="220, 18" Design="ComboBox"/>
+
+        <!-- Settings controls (shown in Settings view) -->
+        <Label Name="lblMapName" Text="Name" Position="20, 128" Size="60, 16"/>
+        <TextBox Name="txtName" Position="84, 126" Size="260, 20" Design="TextWhite"/>
+
+        <Label Name="lblMoral" Text="Moral" Position="20, 156" Size="60, 16"/>
+        <ComboBox Name="lstMoral" Position="84, 154" Size="220, 18" Design="ComboBox"/>
+        <Label Name="lblShop" Text="Shop" Position="320, 156" Size="60, 16"/>
+        <ComboBox Name="lstShop" Position="372, 154" Size="160, 18" Design="ComboBox"/>
+
+        <!-- Music moved to left column for wider combo/button -->
+        <Label Name="lblMusic" Text="Music" Position="20, 184" Size="60, 16"/>
+        <ComboBox Name="cmbMusic" Position="84, 182" Size="300, 18" Design="ComboBox"/>
+        <Button Name="btnMusicPreview" Text="Preview" Position="390, 182" Size="80, 20" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+
+        
+
+        <!-- Links / Boot / Flags / Sizes -->
+        <Label Name="lblLinks" Text="Links" Position="20, 212" Size="60, 16"/>
+        <Label Name="lblLinkUp" Text="Up" Position="20, 234" Size="24, 16"/>
+        <TextBox Name="txtUp" Position="48, 232" Size="60, 20" Design="TextWhite"/>
+        <Label Name="lblLinkDown" Text="Down" Position="114, 234" Size="40, 16"/>
+        <TextBox Name="txtDown" Position="156, 232" Size="60, 20" Design="TextWhite"/>
+        <Label Name="lblLinkLeft" Text="Left" Position="222, 234" Size="24, 16"/>
+        <TextBox Name="txtLeft" Position="250, 232" Size="60, 20" Design="TextWhite"/>
+        <Label Name="lblLinkRight" Text="Right" Position="316, 234" Size="40, 16"/>
+        <TextBox Name="txtRight" Position="358, 232" Size="60, 20" Design="TextWhite"/>
+
+        <Label Name="lblBoot" Text="Boot" Position="20, 260" Size="60, 16"/>
+        <Label Name="lblBootMap" Text="Map" Position="20, 282" Size="36, 16"/>
+        <TextBox Name="txtBootMap" Position="60, 280" Size="60, 20" Design="TextWhite"/>
+        <Label Name="lblBootX" Text="X" Position="126, 282" Size="16, 16"/>
+        <TextBox Name="txtBootX" Position="144, 280" Size="40, 20" Design="TextWhite"/>
+        <Label Name="lblBootY" Text="Y" Position="188, 282" Size="16, 16"/>
+        <TextBox Name="txtBootY" Position="206, 280" Size="40, 20" Design="TextWhite"/>
+
+        <CheckBox Name="chkNoMapRespawn" Text="No Map Respawn" Position="20, 308" Size="180, 18" Design="None"/>
+        <CheckBox Name="chkIndoors" Text="Indoors" Position="206, 308" Size="120, 18" Design="None"/>
+
+        <Label Name="lblMaxX" Text="Max X" Position="20, 336" Size="50, 16"/>
+        <TextBox Name="txtMaxX" Position="72, 334" Size="50, 20" Design="TextWhite"/>
+        <Label Name="lblMaxY" Text="Max Y" Position="128, 336" Size="50, 16"/>
+        <TextBox Name="txtMaxY" Position="180, 334" Size="50, 20" Design="TextWhite"/>
     </TabPage>
     <TabPage Name="tabDirBlock" Caption="Dir Block">
-      <PictureBox Name="picDirBG" Position="6, 130" Size="836, 560" Design="Parchment"/>
-        <Label Name="lblDir" Text="Directional Blocking" Position="20, 140" Size="220, 14"/>
-        <Button Name="btnDirUp" Text="Up" Position="20, 168" Size="60, 18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
-        <Button Name="btnDirDown" Text="Down" Position="84, 168" Size="60, 18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
-        <Button Name="btnDirLeft" Text="Left" Position="148, 168" Size="60, 18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
-        <Button Name="btnDirRight" Text="Right" Position="212, 168" Size="60, 18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
-        <Button Name="btnDirClear" Text="Clear" Position="276, 168" Size="60, 18" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+      <PictureBox Name="picDirBG" Position="11, 70" Size="780, 618" Design="Parchment"/>
+      <Label Name="lblDir" Text="Dir Block" Position="20, 84" Size="200, 14"/>
     </TabPage>
     <TabPage Name="tabEvents" Caption="Events">
-      <PictureBox Name="picEventsBG" Position="6, 130" Size="836, 560" Design="Parchment"/>
-        <Label Name="lblEvents" Text="Map Events" Position="20, 140" Size="200, 14"/>
-        <Label Name="lblEventsHint" Text="Placeholder - events UI TBD" Position="20, 168" Size="240, 14"/>
+      <PictureBox Name="picEventsBG" Position="11, 70" Size="780, 618" Design="Parchment"/>
+      <Label Name="lblEvents" Text="Events" Position="20, 84" Size="200, 14"/>
+      <Label Name="lblCopyCaption" Text="Copy Mode:" Position="20, 112" Size="80, 16"/>
+      <Label Name="lblCopyMode" Text="Copy Mode Off" Position="104, 112" Size="150, 16"/>
+      <Button Name="btnCopyEvent" Text="Toggle Copy" Position="260, 110" Size="100, 20" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+      <Label Name="lblPasteCaption" Text="Paste Mode:" Position="20, 140" Size="80, 16"/>
+      <Label Name="lblPasteMode" Text="Paste Mode Off" Position="104, 140" Size="150, 16"/>
+      <Button Name="btnPasteEvent" Text="Toggle Paste" Position="260, 138" Size="100, 20" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
     </TabPage>
     <TabPage Name="tabEffects" Caption="Effects">
-      <PictureBox Name="picEffectsBG" Position="6, 130" Size="836, 560" Design="Parchment"/>
-        <Label Name="lblEffects" Text="Effects" Position="20, 140" Size="200, 14"/>
-        <Label Name="lblEffectsHint" Text="Placeholder - effects UI TBD" Position="20, 168" Size="240, 14"/>
+      <PictureBox Name="picEffectsBG" Position="11, 70" Size="780, 618" Design="Parchment"/>
+        <Label Name="lblEffects" Text="Effects" Position="20, 84" Size="200, 14"/>
+        <!-- Weather -->
+        <Label Name="lblWeather" Text="Weather" Position="20, 112" Size="80, 16"/>
+        <ComboBox Name="cmbWeather" Position="104, 110" Size="140, 18" Design="ComboBox"/>
+        <Label Name="lblIntensity" Text="Intensity" Position="260, 112" Size="70, 16"/>
+        <ScrollBar Name="sldIntensity" Position="332, 114" Size="220, 12" Min="0" Max="100" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+
+        <!-- Fog -->
+        <Label Name="lblFog" Text="Fog Index" Position="20, 140" Size="80, 16"/>
+        <ScrollBar Name="sldFog" Position="104, 142" Size="220, 12" Min="0" Max="100" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+        <Label Name="lblFogOpacity" Text="Opacity" Position="336, 140" Size="60, 16"/>
+        <ScrollBar Name="sldFogOpacity" Position="400, 142" Size="220, 12" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+        <Label Name="lblFogSpeed" Text="Speed" Position="20, 164" Size="60, 16"/>
+        <ScrollBar Name="sldFogSpeed" Position="84, 166" Size="220, 12" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+
+        <!-- Tint -->
+        <CheckBox Name="chkTint" Text="Use Tint" Position="20, 194" Size="120, 18" Design="None"/>
+        <Label Name="lblTintR" Text="Red" Position="20, 218" Size="40, 16"/>
+        <ScrollBar Name="sldMapRed" Position="64, 220" Size="300, 12" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+        <Label Name="lblTintG" Text="Green" Position="20, 242" Size="60, 16"/>
+        <ScrollBar Name="sldMapGreen" Position="64, 242" Size="300, 12" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+        <Label Name="lblTintB" Text="Blue" Position="20, 262" Size="60, 16"/>
+        <ScrollBar Name="sldMapBlue" Position="64, 262" Size="300, 12" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+        <Label Name="lblTintA" Text="Alpha" Position="20, 284" Size="60, 16"/>
+        <ScrollBar Name="sldMapAlpha" Position="64, 284" Size="300, 12" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+
+        <!-- Panorama/Parallax/Brightness -->
+        <Label Name="lblPanorama" Text="Panorama" Position="420, 218" Size="90, 16"/>
+        <ComboBox Name="cmbPanorama" Position="514, 216" Size="220, 18" Design="ComboBox"/>
+        <Label Name="lblParallax" Text="Parallax" Position="420, 240" Size="90, 16"/>
+        <ComboBox Name="cmbParallax" Position="514, 238" Size="220, 18" Design="ComboBox"/>
+        <Label Name="lblBrightness" Text="Brightness" Position="420, 264" Size="120, 16"/>
+        <ScrollBar Name="sldMapBrightness" Position="494, 264" Size="220, 12" Min="0" Max="100" Value="0" Orientation="Horizontal" ThumbSize="16"/>
     </TabPage>
 
     <Button Name="btnClose" Position="-19, 5" Size="16, 16" Image="8" ImageHover="9" ImageMouseDown="10"/>
@@ -79,12 +225,12 @@
   <!-- Toolbar row like Eto.Forms screenshot (moved after TabControl for top z-order) -->
   <Button Name="btnSaveMap" Text="Save" Position="8, 40" Size="56, 18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
   <Button Name="btnDiscard" Text="Discard" Position="68, 40" Size="64, 18" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
-  <Button Name="btnGrid" Text="Grid" Position="136, 40" Size="48, 18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
-  <Button Name="btnOpacity" Text="Opacity" Position="188, 40" Size="64, 18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+  <Button Name="btnToolbarSettings" Text="Settings" Position="136, 40" Size="64, 18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+  <Button Name="btnGrid" Text="Grid" Position="204, 40" Size="48, 18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
   <Button Name="btnToolPencil" Text="Pencil" Position="256, 40" Size="56, 18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-  <Button Name="btnToolFill" Text="Fill" Position="316, 40" Size="48, 18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-  <Button Name="btnToolEraser" Text="Eraser" Position="368, 40" Size="56, 18" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
-  <Button Name="btnEyeDropper" Text="Eye Dropper" Position="428, 40" Size="80, 18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+  <Button Name="btnEyeDropper" Text="Eye Dropper" Position="316, 40" Size="80, 18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+  <Button Name="btnToolFill" Text="Fill" Position="400, 40" Size="48, 18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+  <Button Name="btnToolEraser" Text="Clear" Position="452, 40" Size="56, 18" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
   <Button Name="btnCopyMap" Text="Copy" Position="512, 40" Size="52, 18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
   <Button Name="btnPasteMap" Text="Paste" Position="566, 40" Size="60, 18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
   <Button Name="btnDeleteMap" Text="Delete" Position="632, 40" Size="60, 18" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>

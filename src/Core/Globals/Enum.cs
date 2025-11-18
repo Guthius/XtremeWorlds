@@ -573,7 +573,8 @@ public enum DialogueType
     FillLayer,
     ClearAttributes,
     FillAttributes,
-    ClearMap,
+    ClearDirBlocks,
+    DeleteMap,
     Information,
     CopyMap,
     PasteMap

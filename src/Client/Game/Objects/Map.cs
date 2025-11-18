@@ -395,30 +395,13 @@ namespace Client
             if (Conversions.ToInteger(Data.MyMap.MapTint) == 0)
                 return; // Skip if no tint is applied
 
-            // Create a new texture matching the camera size
-            var tintTexture = new Texture2D(GameClient.Graphics?.GraphicsDevice, GameState.ResolutionWidth, GameState.ResolutionHeight);
-            var tintPixels = new Microsoft.Xna.Framework.Color[(GameState.ResolutionWidth * GameState.ResolutionHeight)];
-
-            // Define the tint color with the given RGBA values
             var tintColor = new Microsoft.Xna.Framework.Color(GameState.CurrentTintR, GameState.CurrentTintG, GameState.CurrentTintB, GameState.CurrentTintA);
-
-            // Fill the texture's pixel array with the tint color
-            for (int i = 0, loopTo = tintPixels.Length; i < loopTo; i++)
-                tintPixels[i] = tintColor;
-
-            // Set the pixel data on the texture
-            tintTexture.SetData(tintPixels);
-
-            // Start the sprite batch
-            GameClient.SpriteBatch?.Begin();
-
-            // Draw the tinted texture over the entire camera view
-            GameClient.SpriteBatch?.Draw(tintTexture, new Microsoft.Xna.Framework.Rectangle(0, 0, GameState.ResolutionWidth, GameState.ResolutionHeight), Microsoft.Xna.Framework.Color.White);
-
-            GameClient.SpriteBatch?.End();
-
-            // Dispose of the temporary texture to free resources
-            tintTexture.Dispose();
+            GameClient.DrawRectangle(
+                new Microsoft.Xna.Framework.Vector2(0, 0),
+                new Microsoft.Xna.Framework.Vector2(GameState.ResolutionWidth, GameState.ResolutionHeight),
+                tintColor,
+                Microsoft.Xna.Framework.Color.Transparent,
+                0f);
         }
 
         public static void DrawMapFade()
@@ -426,27 +409,13 @@ namespace Client
             if (!GameState.UseFade)
                 return; // Exit if fading is disabled
 
-            // Create a new texture matching the camera view size
-            var fadeTexture = new Texture2D(GameClient.Graphics?.GraphicsDevice, GameState.ResolutionWidth, GameState.ResolutionHeight);
-            var blackPixels = new Microsoft.Xna.Framework.Color[(GameState.ResolutionWidth * GameState.ResolutionHeight)];
-
-            // Fill the pixel array with black color and specified alpha for the fade effect
-            for (int i = 0, loopTo = blackPixels.Length; i < loopTo; i++)
-                blackPixels[i] = new Microsoft.Xna.Framework.Color(0, 0, 0, GameState.FadeAmount);
-
-            // Set the texture's pixel data
-            fadeTexture.SetData(blackPixels);
-
-            // Start the sprite batch
-            GameClient.SpriteBatch?.Begin();
-
-            // Draw the fade texture over the entire camera view
-            GameClient.SpriteBatch?.Draw(fadeTexture, new Microsoft.Xna.Framework.Rectangle(0, 0, GameState.ResolutionWidth, GameState.ResolutionHeight), Microsoft.Xna.Framework.Color.White);
-
-            GameClient.SpriteBatch?.End();
-
-            // Dispose of the texture to free resources
-            fadeTexture.Dispose();
+            var fadeColor = new Microsoft.Xna.Framework.Color(0, 0, 0, GameState.FadeAmount);
+            GameClient.DrawRectangle(
+                new Microsoft.Xna.Framework.Vector2(0, 0),
+                new Microsoft.Xna.Framework.Vector2(GameState.ResolutionWidth, GameState.ResolutionHeight),
+                fadeColor,
+                Microsoft.Xna.Framework.Color.Transparent,
+                0f);
         }
 
         public static void DrawPanorama(int index)

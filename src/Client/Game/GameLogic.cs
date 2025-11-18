@@ -1054,7 +1054,6 @@ namespace Client
                     }
             }
          
-            // set the dialogue up!
             Dialogue(header ?? string.Empty, body ?? string.Empty, body2 ?? string.Empty, DialogueType.Alert);
 
             // Ensure the dialogue window is visible
@@ -1368,11 +1367,25 @@ namespace Client
                             break;
                         }
 
-                    case DialogueType.ClearMap:
+                    case DialogueType.DeleteMap:
                         Map.ClearMap();
                         Map.ClearMapNpcs();
                         Map.ClearMapItems();
                         break;
+
+                    case DialogueType.ClearDirBlocks:
+                        {
+                            int maxX = Data.MyMap.MaxX;
+                            int maxY = Data.MyMap.MaxY;
+                            for (x = 0; x < maxX; x++)
+                            {
+                                for (y = 0; y < maxY; y++)
+                                {
+                                    Data.MyMap.Tile[x, y].DirBlock = 0;
+                                }
+                            }
+                            break;
+                        }
                 }
             }
 
