@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window Name="winItemEditor" Caption="Item Editor"
+        Size="960, 600"
+        Icon="113" IconOffset="3, 5"
+        Design="WindowNormal"
+        StartPosition="CenterScreen"
+        Visible="false">
+
+  <!-- Item index list on the left -->
+  <Label Name="lblItemList" Text="Items" Position="16, 16" Size="80, 16"/>
+  <ListBox Name="lstItemIndex" Position="16, 36" Size="224, 520"/>
+  <ScrollBar Name="sldItemList" Position="240, 36" Size="16, 520" Min="0" Max="0" Vertical="true"/>
+
+  <!-- Parchment background for editor details -->
+  <PictureBox Name="picItemParchment" Position="264, 12" Size="672, 520" Image="Parchment" Design="WindowInner"/>
+
+  <!-- Basics group -->
+  <Label Name="lblItemName" Text="Name" Position="280, 24" Size="80, 16"/>
+  <TextBox Name="txtItemName" Position="344, 22" Size="280, 20" Design="TextWhite"/>
+
+  <Label Name="lblItemDescription" Text="Description" Position="280, 48" Size="80, 16"/>
+  <TextBox Name="txtItemDescription" Position="344, 46" Size="280, 60" Design="TextWhite"/>
+
+  <Label Name="lblItemIcon" Text="Icon" Position="280, 112" Size="40, 16"/>
+  <TextBox Name="txtItemIcon" Position="344, 110" Size="80, 20" Design="TextWhite"/>
+  <PictureBox Name="picItemIcon" Position="432, 108" Size="32, 32" Image="" Design="WindowInner"/>
+
+  <Label Name="lblItemPaperdoll" Text="Paperdoll" Position="480, 112" Size="70, 16"/>
+  <TextBox Name="txtItemPaperdoll" Position="552, 110" Size="72, 20" Design="TextWhite"/>
+  <PictureBox Name="picItemPaperdoll" Position="632, 100" Size="64, 64" Image="" Design="WindowInner"/>
+
+  <Label Name="lblItemType" Text="Type" Position="280, 144" Size="40, 16"/>
+  <ComboBox Name="cmbItemType" Position="344, 142" Size="120, 18" Design="ComboBox"/>
+
+  <Label Name="lblItemSubType" Text="SubType" Position="480, 144" Size="60, 16"/>
+  <ComboBox Name="cmbItemSubType" Position="552, 142" Size="120, 18" Design="ComboBox"/>
+
+  <Label Name="lblItemAnimation" Text="Animation" Position="280, 168" Size="70, 16"/>
+  <ComboBox Name="cmbItemAnimation" Position="344, 166" Size="160, 18" Design="ComboBox"/>
+
+  <Label Name="lblItemBind" Text="Bind" Position="520, 168" Size="40, 16"/>
+  <ComboBox Name="cmbItemBind" Position="568, 166" Size="120, 18" Design="ComboBox"/>
+
+  <Label Name="lblItemLevel" Text="Item Lvl" Position="280, 192" Size="60, 16"/>
+  <TextBox Name="txtItemLevel" Position="344, 190" Size="80, 20" Design="TextWhite"/>
+
+  <Label Name="lblItemPrice" Text="Price" Position="440, 192" Size="40, 16"/>
+  <TextBox Name="txtItemPrice" Position="488, 190" Size="80, 20" Design="TextWhite"/>
+
+  <Label Name="lblItemRarity" Text="Rarity" Position="584, 192" Size="50, 16"/>
+  <TextBox Name="txtItemRarity" Position="640, 190" Size="72, 20" Design="TextWhite"/>
+
+  <CheckBox Name="chkItemStackable" Text="Stackable" Position="728, 190" Size="80, 20"/>
+
+  <!-- Equipment group -->
+  <Label Name="lblEquipHeader" Text="Equipment" Position="280, 224" Size="80, 16"/>
+
+  <Label Name="lblItemDamage" Text="Damage" Position="280, 244" Size="60, 16"/>
+  <TextBox Name="txtItemDamage" Position="344, 242" Size="80, 20" Design="TextWhite"/>
+
+  <Label Name="lblItemSpeed" Text="Speed" Position="440, 244" Size="50, 16"/>
+  <TextBox Name="txtItemSpeed" Position="496, 242" Size="80, 20" Design="TextWhite"/>
+
+  <CheckBox Name="chkItemKnockBack" Text="Knockback" Position="592, 242" Size="96, 20"/>
+
+  <Label Name="lblItemTool" Text="Tool" Position="280, 268" Size="40, 16"/>
+  <ComboBox Name="cmbItemTool" Position="344, 266" Size="120, 18" Design="ComboBox"/>
+
+  <Label Name="lblItemKnockTiles" Text="Distance" Position="480, 268" Size="60, 16"/>
+  <ComboBox Name="cmbItemKnockBackTiles" Position="544, 266" Size="120, 18" Design="ComboBox"/>
+
+  <!-- Stat bonuses -->
+  <Label Name="lblStatHeader" Text="Stat Bonuses" Position="280, 296" Size="100, 16"/>
+
+  <Label Name="lblAddStr" Text="Add STR" Position="280, 316" Size="60, 16"/>
+  <TextBox Name="txtAddStr" Position="344, 314" Size="60, 20" Design="TextWhite"/>
+
+  <Label Name="lblAddVit" Text="Add VIT" Position="412, 316" Size="60, 16"/>
+  <TextBox Name="txtAddVit" Position="476, 314" Size="60, 20" Design="TextWhite"/>
+
+  <Label Name="lblAddLuck" Text="Add LCK" Position="544, 316" Size="60, 16"/>
+  <TextBox Name="txtAddLuck" Position="608, 314" Size="60, 20" Design="TextWhite"/>
+
+  <Label Name="lblAddInt" Text="Add INT" Position="280, 340" Size="60, 16"/>
+  <TextBox Name="txtAddInt" Position="344, 338" Size="60, 20" Design="TextWhite"/>
+
+  <Label Name="lblAddSpr" Text="Add SPR" Position="412, 340" Size="60, 16"/>
+  <TextBox Name="txtAddSpr" Position="476, 338" Size="60, 20" Design="TextWhite"/>
+
+  <!-- Consumable / Skill / Projectile / Event groups (sharing same area) -->
+  <Label Name="lblConsumableHeader" Text="Consumable" Position="720, 224" Size="80, 16"/>
+  <Label Name="lblVitalMod" Text="Vital Mod" Position="720, 244" Size="70, 16"/>
+  <TextBox Name="txtVitalMod" Position="792, 242" Size="80, 20" Design="TextWhite"/>
+
+  <Label Name="lblSkillHeader" Text="Skill" Position="720, 272" Size="80, 16"/>
+  <ComboBox Name="cmbItemSkill" Position="720, 290" Size="152, 18" Design="ComboBox"/>
+
+  <Label Name="lblProjectileHeader" Text="Projectile" Position="720, 316" Size="80, 16"/>
+  <ComboBox Name="cmbItemProjectile" Position="720, 334" Size="152, 18" Design="ComboBox"/>
+  <Label Name="lblItemAmmo" Text="Ammo" Position="720, 356" Size="40, 16"/>
+  <ComboBox Name="cmbItemAmmo" Position="764, 354" Size="108, 18" Design="ComboBox"/>
+
+  <Label Name="lblEventHeader" Text="Event" Position="720, 384" Size="80, 16"/>
+  <Label Name="lblEventId" Text="Event Id" Position="720, 404" Size="70, 16"/>
+  <TextBox Name="txtEventId" Position="792, 402" Size="80, 20" Design="TextWhite"/>
+  <Label Name="lblEventValue" Text="Event Value" Position="720, 428" Size="80, 16"/>
+  <TextBox Name="txtEventValue" Position="792, 426" Size="80, 20" Design="TextWhite"/>
+
+  <!-- Requirements group -->
+  <Label Name="lblReqHeader" Text="Requirements" Position="280, 368" Size="90, 16"/>
+
+  <Label Name="lblReqJob" Text="Job" Position="280, 388" Size="40, 16"/>
+  <ComboBox Name="cmbItemJobReq" Position="320, 386" Size="120, 18" Design="ComboBox"/>
+
+  <Label Name="lblReqAccess" Text="Access" Position="448, 388" Size="60, 16"/>
+  <ComboBox Name="cmbItemAccessReq" Position="512, 386" Size="120, 18" Design="ComboBox"/>
+
+  <Label Name="lblReqLevel" Text="Level" Position="280, 412" Size="40, 16"/>
+  <TextBox Name="txtReqLevel" Position="320, 410" Size="60, 20" Design="TextWhite"/>
+
+  <Label Name="lblReqStr" Text="Req STR" Position="388, 412" Size="60, 16"/>
+  <TextBox Name="txtReqStr" Position="452, 410" Size="60, 20" Design="TextWhite"/>
+
+  <Label Name="lblReqVit" Text="Req VIT" Position="520, 412" Size="60, 16"/>
+  <TextBox Name="txtReqVit" Position="584, 410" Size="60, 20" Design="TextWhite"/>
+
+  <Label Name="lblReqLuck" Text="Req LCK" Position="652, 412" Size="60, 16"/>
+  <TextBox Name="txtReqLuck" Position="716, 410" Size="60, 20" Design="TextWhite"/>
+
+  <Label Name="lblReqInt" Text="Req INT" Position="280, 436" Size="60, 16"/>
+  <TextBox Name="txtReqInt" Position="344, 434" Size="60, 20" Design="TextWhite"/>
+
+  <Label Name="lblReqSpr" Text="Req SPR" Position="412, 436" Size="60, 16"/>
+  <TextBox Name="txtReqSpr" Position="476, 434" Size="60, 20" Design="TextWhite"/>
+
+  <!-- Bottom buttons -->
+  <Button Name="btnItemSave" Text="Save" Position="376, 540" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+  <Button Name="btnItemDelete" Text="Delete" Position="464, 540" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+  <Button Name="btnItemCopy" Text="Copy" Position="552, 540" Size="80, 24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+  <Button Name="btnItemSpawn" Text="Spawn" Position="640, 540" Size="80, 24" Design="Blue" DesignHover="BlueHover" DesignMouseDown="BlueClick"/>
+  <Button Name="btnItemCancel" Text="Cancel" Position="728, 540" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+
+  <!-- Close button in title bar -->
+  <Button Name="btnClose" Position="-19, 5" Size="16, 16" Image="8" ImageHover="9" ImageMouseDown="10"/>
+
+</Window>

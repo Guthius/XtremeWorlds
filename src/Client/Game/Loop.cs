@@ -529,7 +529,8 @@ namespace Client
             {
                 GameState.MyEditorType = EditorType.Item;
                 GameState.EditorIndex = 0;
-                new EditorItem().Show();
+                WindowManager.ShowWindow("winItemEditor");
+                Client.Game.UI.Windows.WinItemEditor.Init();
                 GameState.InitItemEditor = false;
             }
 

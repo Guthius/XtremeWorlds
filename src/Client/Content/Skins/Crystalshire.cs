@@ -1717,6 +1717,390 @@ public class Crystalshire
         }
     }
 
+    public void UpdateWindow_EditorItem()
+    {
+        var window = WindowLoader.FromLayout("winItemEditor");
+
+        // Close button
+        if (WindowManager.TryGetControl("winItemEditor", "btnClose", out var btnClose))
+        {
+            btnClose.CallBack[(int)ControlState.MouseDown] = () => WindowManager.HideWindow("winItemEditor");
+        }
+
+        // Item list + mouse wheel
+        ListBox itemList = null;
+        if (WindowManager.TryGetControl("winItemEditor", "lstItemIndex", out var lstCtrl) && lstCtrl is ListBox list)
+        {
+            itemList = list;
+            list.CallBack[(int)ControlState.MouseDown] = WinItemEditor.OnListMouseDown;
+            list.CallBack[(int)ControlState.MouseScroll] = () =>
+            {
+                int delta = GameClient.CurrentMouseState.ScrollWheelValue - GameClient.PreviousMouseState.ScrollWheelValue;
+                if (delta != 0)
+                {
+                    int step = delta > 0 ? -1 : 1;
+                    list.ScrollBy(step);
+
+                    if (WindowManager.TryGetControl("winItemEditor", "sldItemList", out var sldItem) && sldItem is ScrollBar sbSync)
+                    {
+                        sbSync.Value = list.ScrollOffset;
+                    }
+                }
+            };
+        }
+        if (WindowManager.TryGetControl("winItemEditor", "sldItemList", out var sldItemList) && sldItemList is ScrollBar sbItem)
+        {
+            sbItem.CallBack[(int)ControlState.MouseMove] = () =>
+            {
+                if (itemList != null)
+                {
+                    itemList.ScrollOffset = sbItem.Value;
+                }
+            };
+        }
+
+        // Name textbox updates list entry
+        if (WindowManager.TryGetControl("winItemEditor", "txtItemName", out var txtNameCtrl) && txtNameCtrl is TextBox txtName)
+        {
+            txtName.CallBack[(int)ControlState.KeyUp] = () => WinItemEditor.UpdateName(txtName.Text ?? string.Empty);
+        }
+
+        // Simple int textbox binder helper
+        void BindIntText(string name, Action<int> apply, int min, int max)
+        {
+            if (WindowManager.TryGetControl("winItemEditor", name, out var t) && t is TextBox tb)
+            {
+                tb.CallBack[(int)ControlState.KeyUp] = () =>
+                {
+                    var s = tb.Text?.Trim();
+                    if (!int.TryParse(s, out var v)) v = min;
+                    v = Math.Clamp(v, min, max);
+                    apply(v);
+                };
+            }
+        }
+
+        // Basics
+        if (WindowManager.TryGetControl("winItemEditor", "txtItemDescription", out var descCtrl) && descCtrl is TextBox txtDesc)
+        {
+            txtDesc.CallBack[(int)ControlState.KeyUp] = () =>
+            {
+                if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
+                {
+                    Data.Item[WinItemEditor.SelectedIndex].Description = txtDesc.Text ?? string.Empty;
+                    GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                }
+            };
+        }
+
+        BindIntText("txtItemIcon", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Data.Item[WinItemEditor.SelectedIndex].Icon = (short)v;
+                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        }, 0, 32000);
+
+        BindIntText("txtItemPaperdoll", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Data.Item[WinItemEditor.SelectedIndex].Paperdoll = (short)v;
+                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        }, 0, 32000);
+
+        BindIntText("txtItemLevel", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Data.Item[WinItemEditor.SelectedIndex].ItemLevel = (byte)Math.Clamp(v, 0, 255);
+                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        }, 0, 255);
+
+        BindIntText("txtItemPrice", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Data.Item[WinItemEditor.SelectedIndex].Price = v;
+                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        }, 0, int.MaxValue);
+
+        BindIntText("txtItemRarity", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Data.Item[WinItemEditor.SelectedIndex].Rarity = (byte)v;
+                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        }, 0, 10);
+
+        if (WindowManager.TryGetControl("winItemEditor", "chkItemStackable", out var stackCtrl) && stackCtrl is CheckBox chkStack)
+        {
+            chkStack.CallBack[(int)ControlState.MouseDown] = () =>
+            {
+                if (WinItemEditor.SelectedIndex >= 0)
+                {
+                    Data.Item[WinItemEditor.SelectedIndex].Stackable = chkStack.Value == 1 ? (byte)1 : (byte)0;
+                    GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                }
+            };
+        }
+
+        // Equipment & stats
+        BindIntText("txtItemDamage", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Data.Item[WinItemEditor.SelectedIndex].Data2 = v;
+                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        }, 0, int.MaxValue);
+
+        BindIntText("txtItemSpeed", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Data.Item[WinItemEditor.SelectedIndex].Speed = v;
+                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        }, 0, int.MaxValue);
+
+        if (WindowManager.TryGetControl("winItemEditor", "chkItemKnockBack", out var kbCtrl) && kbCtrl is CheckBox chkKb)
+        {
+            chkKb.CallBack[(int)ControlState.MouseDown] = () =>
+            {
+                if (WinItemEditor.SelectedIndex >= 0)
+                {
+                    Data.Item[WinItemEditor.SelectedIndex].KnockBack = chkKb.Value == 1 ? (byte)1 : (byte)0;
+                    GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                }
+            };
+        }
+
+        // Stat bonuses
+        void BindStat(string tbName, Stat stat)
+        {
+            BindIntText(tbName, v =>
+            {
+                if (WinItemEditor.SelectedIndex >= 0)
+                {
+                    Data.Item[WinItemEditor.SelectedIndex].AddStat[(int)stat] = (byte)v;
+                    GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                }
+            }, -32000, 32000);
+        }
+        BindStat("txtAddStr", Stat.Strength);
+        BindStat("txtAddVit", Stat.Vitality);
+        BindStat("txtAddLuck", Stat.Luck);
+        BindStat("txtAddInt", Stat.Intelligence);
+        BindStat("txtAddSpr", Stat.Spirit);
+
+        // Vital mod (Data1 for consumables)
+        BindIntText("txtVitalMod", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Data.Item[WinItemEditor.SelectedIndex].Data1 = v;
+                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        }, -32000, 32000);
+
+        // Event id / value reuse Data1 / Data2
+        BindIntText("txtEventId", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Data.Item[WinItemEditor.SelectedIndex].Data1 = v;
+                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        }, 0, int.MaxValue);
+
+        BindIntText("txtEventValue", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Data.Item[WinItemEditor.SelectedIndex].Data2 = v;
+                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        }, 0, int.MaxValue);
+
+        // Requirements
+        void BindStatReq(string tbName, Stat stat)
+        {
+            BindIntText(tbName, v =>
+            {
+                if (WinItemEditor.SelectedIndex >= 0)
+                {
+                    Data.Item[WinItemEditor.SelectedIndex].StatReq[(int)stat] = (byte)v;
+                    GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                }
+            }, 0, 32000);
+        }
+
+            BindIntText("txtReqLevel", v =>
+            {
+                if (WinItemEditor.SelectedIndex >= 0)
+                {
+                    Data.Item[WinItemEditor.SelectedIndex].LevelReq = (byte)Math.Clamp(v, 0, 255);
+                    GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                }
+            }, 0, 255);
+            BindStatReq("txtReqStr", Stat.Strength);
+            BindStatReq("txtReqVit", Stat.Vitality);
+            BindStatReq("txtReqLuck", Stat.Luck);
+            BindStatReq("txtReqInt", Stat.Intelligence);
+            BindStatReq("txtReqSpr", Stat.Spirit);
+
+        // Combos: Type, SubType, Animation, Bind, Tool, Knockback tiles, Skill, Projectile, Ammo, JobReq, AccessReq
+        void BindCombo(string name, Action<int> apply)
+        {
+            if (WindowManager.TryGetControl("winItemEditor", name, out var c) && c is ComboBox combo)
+            {
+                combo.CallBack[(int)ControlState.MouseMove] = () =>
+                {
+                    int v = Math.Max(0, combo.Value);
+                    apply(v);
+                };
+            }
+        }
+
+        BindCombo("cmbItemType", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Data.Item[WinItemEditor.SelectedIndex].Type = (byte)v;
+                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        });
+
+        BindCombo("cmbItemSubType", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Data.Item[WinItemEditor.SelectedIndex].SubType = (byte)v;
+                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        });
+
+        BindCombo("cmbItemAnimation", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Data.Item[WinItemEditor.SelectedIndex].Animation = (byte)v;
+                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        });
+
+        BindCombo("cmbItemBind", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Data.Item[WinItemEditor.SelectedIndex].BindType = (byte)v;
+                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        });
+
+        BindCombo("cmbItemTool", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Data.Item[WinItemEditor.SelectedIndex].Data3 = (byte)v;
+                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        });
+
+        BindCombo("cmbItemKnockBackTiles", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Data.Item[WinItemEditor.SelectedIndex].KnockBackTiles = (byte)v;
+                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        });
+
+        BindCombo("cmbItemSkill", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Data.Item[WinItemEditor.SelectedIndex].Data1 = v;
+                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        });
+
+        BindCombo("cmbItemProjectile", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Data.Item[WinItemEditor.SelectedIndex].Projectile = (short)(v - 1);
+                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        });
+
+        BindCombo("cmbItemAmmo", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Data.Item[WinItemEditor.SelectedIndex].Ammo = (short)(v - 1);
+                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        });
+
+        BindCombo("cmbItemJobReq", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Data.Item[WinItemEditor.SelectedIndex].JobReq = (byte)v;
+                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        });
+
+        BindCombo("cmbItemAccessReq", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Data.Item[WinItemEditor.SelectedIndex].AccessReq = (byte)v;
+                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        });
+
+        // Buttons
+        if (WindowManager.TryGetControl("winItemEditor", "btnItemSave", out var btnSave))
+        {
+            btnSave.CallBack[(int)ControlState.MouseDown] = () => { Editors.ItemEditorOK(); WindowManager.HideWindow("winItemEditor"); };
+        }
+        if (WindowManager.TryGetControl("winItemEditor", "btnItemCancel", out var btnCancel))
+        {
+            btnCancel.CallBack[(int)ControlState.MouseDown] = () => { Editors.ItemEditorCancel(); WindowManager.HideWindow("winItemEditor"); };
+        }
+        if (WindowManager.TryGetControl("winItemEditor", "btnItemDelete", out var btnDelete))
+        {
+            btnDelete.CallBack[(int)ControlState.MouseDown] = () =>
+            {
+                Item.ClearItem(GameState.EditorIndex);
+                WinItemEditor.LoadItem(GameState.EditorIndex);
+            };
+        }
+        if (WindowManager.TryGetControl("winItemEditor", "btnItemCopy", out var btnCopy))
+        {
+            btnCopy.CallBack[(int)ControlState.MouseDown] = WinItemEditor.OnCopyOrPaste;
+        }
+        if (WindowManager.TryGetControl("winItemEditor", "btnItemSpawn", out var btnSpawn))
+        {
+            btnSpawn.CallBack[(int)ControlState.MouseDown] = () =>
+            {
+                if (GameState.MyIndex > 0)
+                {
+                    // Reuse existing spawn packet
+                    Sender.SendSpawnItem(GameState.EditorIndex, 1);
+                }
+            };
+        }
+    }
+
     public void UpdateWindow_EscMenu()
     {
         var window = WindowLoader.FromLayout("winEscMenu");
