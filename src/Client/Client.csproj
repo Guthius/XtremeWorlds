@@ -85,6 +85,7 @@
     <!-- Always include Eto.Forms, but only include Gtk on Linux -->
     <ItemGroup>
         <PackageReference Include="Eto.Forms" />
+        <PackageReference Include="ImeSharp" />
     </ItemGroup>
 
     <!-- Windows-only backends (require -windows TFM) -->
@@ -107,13 +108,14 @@
         <PackageReference Include="ManagedBass" />
         <PackageReference Include="ManagedBass.Midi" />
         <PackageReference Include="CS-Script" />
+        <PackageReference Include="NVorbis" />
     </ItemGroup>
 
     
 
     <ItemGroup>
-      <Reference Include="FNA">
-        <HintPath>FNA.dll</HintPath>
+      <Reference Include="FNA.NET">
+        <HintPath>FNA.NET.dll</HintPath>
       </Reference>
       <Reference Include="SDL2-CS">
         <HintPath>SDL2-CS.dll</HintPath>

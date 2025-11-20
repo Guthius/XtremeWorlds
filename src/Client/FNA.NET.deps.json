@@ -1,0 +1,210 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "FNA.NET/2.1.2.2506": {
+        "dependencies": {
+          "FNA.NET.NativeAssets": "2.0.1.2506",
+          "ImeSharp": "1.4.1",
+          "NVorbis": "0.10.5"
+        },
+        "runtime": {
+          "FNA.NET.dll": {}
+        }
+      },
+      "FNA.NET.NativeAssets/2.0.1.2506": {
+        "runtime": {
+          "lib/net8.0-windows7.0/FNA.NET.NativeAssets.dll": {
+            "assemblyVersion": "2.0.1.2506",
+            "fileVersion": "2.0.1.2506"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/linux-arm64/native/libFAudio.so.0": {
+            "rid": "linux-arm64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/linux-arm64/native/libFNA3D.so.0": {
+            "rid": "linux-arm64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/linux-arm64/native/libSDL3.so.0": {
+            "rid": "linux-arm64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/linux-arm64/native/libtheorafile.so": {
+            "rid": "linux-arm64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/linux-x64/native/libFAudio.so.0": {
+            "rid": "linux-x64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/linux-x64/native/libFNA3D.so.0": {
+            "rid": "linux-x64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/linux-x64/native/libSDL3.so.0": {
+            "rid": "linux-x64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/linux-x64/native/libtheorafile.so": {
+            "rid": "linux-x64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/osx/native/libFAudio.0.dylib": {
+            "rid": "osx",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/osx/native/libFNA3D.0.dylib": {
+            "rid": "osx",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/osx/native/libSDL3.0.dylib": {
+            "rid": "osx",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/osx/native/libtheorafile.dylib": {
+            "rid": "osx",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/win-x64/native/FAudio.dll": {
+            "rid": "win-x64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/win-x64/native/FNA3D.dll": {
+            "rid": "win-x64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/win-x64/native/SDL3.dll": {
+            "rid": "win-x64",
+            "assetType": "native",
+            "fileVersion": "3.2.16.0"
+          },
+          "runtimes/win-x64/native/libtheorafile.dll": {
+            "rid": "win-x64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "ImeSharp/1.4.1": {
+        "dependencies": {
+          "TsfSharp": "1.1.0"
+        },
+        "runtime": {
+          "lib/net8.0/ImeSharp.dll": {
+            "assemblyVersion": "1.4.1.0",
+            "fileVersion": "1.4.1.0"
+          }
+        }
+      },
+      "NVorbis/0.10.5": {
+        "runtime": {
+          "lib/netstandard2.0/NVorbis.dll": {
+            "assemblyVersion": "0.10.5.0",
+            "fileVersion": "0.10.5.0"
+          }
+        }
+      },
+      "SharpGen.Runtime/2.0.0-beta.9": {
+        "runtime": {
+          "lib/net5.0/SharpGen.Runtime.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.0.0"
+          }
+        }
+      },
+      "SharpGen.Runtime.COM/2.0.0-beta.9": {
+        "dependencies": {
+          "SharpGen.Runtime": "2.0.0-beta.9"
+        },
+        "runtime": {
+          "lib/netstandard2.0/SharpGen.Runtime.COM.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.0.0"
+          }
+        }
+      },
+      "TsfSharp/1.1.0": {
+        "dependencies": {
+          "SharpGen.Runtime": "2.0.0-beta.9",
+          "SharpGen.Runtime.COM": "2.0.0-beta.9"
+        },
+        "runtime": {
+          "lib/net8.0/TsfSharp.dll": {
+            "assemblyVersion": "1.1.0.0",
+            "fileVersion": "1.1.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "FNA.NET/2.1.2.2506": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "FNA.NET.NativeAssets/2.0.1.2506": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-q8PlBKzYw+U40kNgd5WYW6qUapIAOGwgBSJdYWKO4AckHLbLV8FhikSje4jU8qcAbvQhukESlzcuFeuiv5avkg==",
+      "path": "fna.net.nativeassets/2.0.1.2506",
+      "hashPath": "fna.net.nativeassets.2.0.1.2506.nupkg.sha512"
+    },
+    "ImeSharp/1.4.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-DyWlB0R7un9KC2j2T58yKs10YrtVFwF8/2/zdw6sYYn/+Kf/VUZ2wTBLXc6JfwvG0Nte5pGnAxJwnYvggbb/dQ==",
+      "path": "imesharp/1.4.1",
+      "hashPath": "imesharp.1.4.1.nupkg.sha512"
+    },
+    "NVorbis/0.10.5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-o+IptCG4Avze39HrGeztC+xIp6fOOwGVAwkoa1J++4Ji1WmZ+KIKlFl5wsgxsXqBkmdpfs/vFSUproiLKYa2bw==",
+      "path": "nvorbis/0.10.5",
+      "hashPath": "nvorbis.0.10.5.nupkg.sha512"
+    },
+    "SharpGen.Runtime/2.0.0-beta.9": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-FFbM9kkmV79tp02etSmqBeUxxtQkvIcn1WTP4kTHSBo/UfHNjtj64fTPnWuscLuY9cL8QX/HsTlCT9xYpLf/Eg==",
+      "path": "sharpgen.runtime/2.0.0-beta.9",
+      "hashPath": "sharpgen.runtime.2.0.0-beta.9.nupkg.sha512"
+    },
+    "SharpGen.Runtime.COM/2.0.0-beta.9": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-pmmx1mFo/OImruk5xZWyeE0Bk8WJUYzAwvtQCxblQVccX9z1+3q1hidmZizy2c/Gwyc4PGSWf/PX/fJyh+G+9A==",
+      "path": "sharpgen.runtime.com/2.0.0-beta.9",
+      "hashPath": "sharpgen.runtime.com.2.0.0-beta.9.nupkg.sha512"
+    },
+    "TsfSharp/1.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-CSukndRKy/Lv1baceAt0xuD9JcL3azpvSSriiVjxxxxSj0RKzwuL8hzNiU2lx0FtPrR9AT80DVjnGDiEYTjsBQ==",
+      "path": "tsfsharp/1.1.0",
+      "hashPath": "tsfsharp.1.1.0.nupkg.sha512"
+    }
+  }
+}

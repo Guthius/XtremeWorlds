@@ -7,6 +7,8 @@
   <ItemGroup>
     <PackageVersion Include="CS-Script.Core" Version="2.0.0" />
     <PackageVersion Include="CS-Script" Version="4.12.0.0" />
+    <PackageVersion Include="ImeSharp" Version="1.4.1" />
+    <PackageVersion Include="NVorbis" Version="0.10.5" />
     <PackageVersion Include="System.Private.Uri" Version="4.3.2" />
     <PackageVersion Include="ManagedBass" Version="4.0.2" />
     <PackageVersion Include="ManagedBass.Midi" Version="4.0.2" />
