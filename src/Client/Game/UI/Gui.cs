@@ -31,6 +31,11 @@ public class WindowManager
     private static bool _canDrag; // Flag to control when dragging is allowed
     private static bool _isDragging;
     private static bool _isSelected;
+
+    public static bool IsMouseOverAnyWindow => _mouseOverAnyWindow;
+
+    private static bool _mouseOverAnyWindow;
+
     // Lock dragging if initial press was over a control or a different window
     private static bool _dragLockedByPress;
     public static bool IsWindowActive => _isSelected;
@@ -64,7 +69,7 @@ public class WindowManager
 
         window.ZOrder = Windows.Count - 1;
     }
-    
+
     public static void ComboBox_RemoveItems(int windowIndex, int controlIndex)
     {
         if (Windows[windowIndex].Controls[controlIndex] is ComboBox comboBox)
@@ -108,27 +113,32 @@ public class WindowManager
         }
     }
 
-    public static int CreateWindow(string name, string caption, Font font, int zOrder, int left, int top, int width, int height, int icon, bool visible = true, int xOffset = 0, int yOffset = 0, Design designNorm = Design.None, Design designHover = Design.None, Design designMousedown = Design.None, int imageNorm = 0, int imageHover = 0, int imageMousedown = 0, Action? callbackNorm = null, Action? callbackHover = null, Action? callbackMousemove = null, Action? callbackMousedown = null, Action? callbackDblclick = null, Action? onDraw = null, bool canDrag = true, byte zChange = 1, bool clickThrough = false)
+    public static int CreateWindow(string name, string caption, Font font, int zOrder, int left, int top, int width,
+        int height, int icon, bool visible = true, int xOffset = 0, int yOffset = 0, Design designNorm = Design.None,
+        Design designHover = Design.None, Design designMousedown = Design.None, int imageNorm = 0, int imageHover = 0,
+        int imageMousedown = 0, Action? callbackNorm = null, Action? callbackHover = null,
+        Action? callbackMousemove = null, Action? callbackMousedown = null, Action? callbackDblclick = null,
+        Action? onDraw = null, bool canDrag = true, byte zChange = 1, bool clickThrough = false)
     {
         var stateCount = Enum.GetValues<ControlState>().Length;
-        var design = new List<Design>(Enumerable.Repeat((Design) 0, stateCount));
+        var design = new List<Design>(Enumerable.Repeat((Design)0, stateCount));
         var image = new List<int>(Enumerable.Repeat(0, stateCount));
-        var callback = new List<Action?>(Enumerable.Repeat((Action) null, stateCount));
+        var callback = new List<Action?>(Enumerable.Repeat((Action)null, stateCount));
 
         // Assign specific values for each state
-        design[(int) ControlState.Normal] = designNorm;
-        design[(int) ControlState.Hover] = designHover;
-        design[(int) ControlState.MouseDown] = designMousedown;
+        design[(int)ControlState.Normal] = designNorm;
+        design[(int)ControlState.Hover] = designHover;
+        design[(int)ControlState.MouseDown] = designMousedown;
 
-        image[(int) ControlState.Normal] = imageNorm;
-        image[(int) ControlState.Hover] = imageHover;
-        image[(int) ControlState.MouseDown] = imageMousedown;
+        image[(int)ControlState.Normal] = imageNorm;
+        image[(int)ControlState.Hover] = imageHover;
+        image[(int)ControlState.MouseDown] = imageMousedown;
 
-        callback[(int) ControlState.Normal] = callbackNorm;
-        callback[(int) ControlState.Hover] = callbackHover;
-        callback[(int) ControlState.MouseDown] = callbackMousedown;
-        callback[(int) ControlState.MouseMove] = callbackMousemove;
-        callback[(int) ControlState.DoubleClick] = callbackDblclick;
+        callback[(int)ControlState.Normal] = callbackNorm;
+        callback[(int)ControlState.Hover] = callbackHover;
+        callback[(int)ControlState.MouseDown] = callbackMousedown;
+        callback[(int)ControlState.MouseMove] = callbackMousemove;
+        callback[(int)ControlState.DoubleClick] = callbackDblclick;
 
         // Create a new instance of Window and populate it
         var window = new Window
@@ -166,18 +176,24 @@ public class WindowManager
         return Windows.Count;
     }
 
-    public static void CreateTextbox(int windowIndex, string name, int left, int top, int width, int height, string text = "", Font font = Font.Georgia, Alignment align = Alignment.Left, bool visible = true, int alpha = 255, bool isActive = true, int xOffset = 0, int yOffset = 0, int? imageNorm = null, int? imageHover = null, int? imageMousedown = null, Design designNorm = Design.None, Design designHover = Design.None, Design designMousedown = Design.None, bool censor = false, int icon = 0, Action? callbackNorm = null, Action? callbackHover = null, Action? callbackMousedown = null, Action? callbackMousemove = null, Action? callbackDblclick = null, Action? callbackEnter = null)
+    public static void CreateTextbox(int windowIndex, string name, int left, int top, int width, int height,
+        string text = "", Font font = Font.Georgia, Alignment align = Alignment.Left, bool visible = true,
+        int alpha = 255, bool isActive = true, int xOffset = 0, int yOffset = 0, int? imageNorm = null,
+        int? imageHover = null, int? imageMousedown = null, Design designNorm = Design.None,
+        Design designHover = Design.None, Design designMousedown = Design.None, bool censor = false, int icon = 0,
+        Action? callbackNorm = null, Action? callbackHover = null, Action? callbackMousedown = null,
+        Action? callbackMousemove = null, Action? callbackDblclick = null, Action? callbackEnter = null)
     {
         var stateCount = Enum.GetValues<ControlState>().Length;
 
-        var callbacks = new List<Action?>(Enumerable.Repeat((Action) null, stateCount).ToList());
+        var callbacks = new List<Action?>(Enumerable.Repeat((Action)null, stateCount).ToList());
 
-        callbacks[(int) ControlState.Normal] = callbackNorm;
-        callbacks[(int) ControlState.Hover] = callbackHover;
-        callbacks[(int) ControlState.MouseDown] = callbackMousedown;
-        callbacks[(int) ControlState.MouseMove] = callbackMousemove;
-        callbacks[(int) ControlState.DoubleClick] = callbackDblclick;
-        callbacks[(int) ControlState.FocusEnter] = callbackEnter;
+        callbacks[(int)ControlState.Normal] = callbackNorm;
+        callbacks[(int)ControlState.Hover] = callbackHover;
+        callbacks[(int)ControlState.MouseDown] = callbackMousedown;
+        callbacks[(int)ControlState.MouseMove] = callbackMousemove;
+        callbacks[(int)ControlState.DoubleClick] = callbackDblclick;
+        callbacks[(int)ControlState.FocusEnter] = callbackEnter;
 
         if (!Windows.TryGetValue(windowIndex, out var window))
         {
@@ -221,7 +237,12 @@ public class WindowManager
         ZOrderCon++;
     }
 
-    public static void CreatePictureBox(int windowIndex, string name, int left, int top, int width, int height, bool visible = true, int alpha = 255, int? imageNorm = null, int? imageHover = null, int? imageMousedown = null, Design designNorm = Design.None, Design? designHover = null, Design? designMousedown = null, string texturePath = "", Action? callbackNorm = null, Action? callbackHover = null, Action? callbackMousedown = null, Action? callbackMousemove = null, Action? callbackDblclick = null, Action? onDraw = null)
+    public static void CreatePictureBox(int windowIndex, string name, int left, int top, int width, int height,
+        bool visible = true, int alpha = 255, int? imageNorm = null, int? imageHover = null, int? imageMousedown = null,
+        Design designNorm = Design.None, Design? designHover = null, Design? designMousedown = null,
+        string texturePath = "", Action? callbackNorm = null, Action? callbackHover = null,
+        Action? callbackMousedown = null, Action? callbackMousemove = null, Action? callbackDblclick = null,
+        Action? onDraw = null)
     {
         if (!Windows.TryGetValue(windowIndex, out var window))
         {
@@ -230,22 +251,22 @@ public class WindowManager
 
         var stateCount = Enum.GetValues<ControlState>().Length;
         var texture = new List<string>(Enumerable.Repeat(string.Empty, stateCount));
-        var callback = new List<Action?>(Enumerable.Repeat((Action) null, stateCount));
+        var callback = new List<Action?>(Enumerable.Repeat((Action)null, stateCount));
 
         if (string.IsNullOrEmpty(texturePath))
         {
             texturePath = DataPath.Gui;
         }
 
-        texture[(int) ControlState.Normal] = texturePath;
-        texture[(int) ControlState.Hover] = texturePath;
-        texture[(int) ControlState.MouseDown] = texturePath;
+        texture[(int)ControlState.Normal] = texturePath;
+        texture[(int)ControlState.Hover] = texturePath;
+        texture[(int)ControlState.MouseDown] = texturePath;
 
-        callback[(int) ControlState.Normal] = callbackNorm;
-        callback[(int) ControlState.Hover] = callbackHover;
-        callback[(int) ControlState.MouseDown] = callbackMousedown;
-        callback[(int) ControlState.MouseMove] = callbackMousemove;
-        callback[(int) ControlState.DoubleClick] = callbackDblclick;
+        callback[(int)ControlState.Normal] = callbackNorm;
+        callback[(int)ControlState.Hover] = callbackHover;
+        callback[(int)ControlState.MouseDown] = callbackMousedown;
+        callback[(int)ControlState.MouseMove] = callbackMousemove;
+        callback[(int)ControlState.DoubleClick] = callbackDblclick;
 
         if (imageNorm == 0) imageNorm = null;
         if (imageHover == 0) imageHover = null;
@@ -278,7 +299,12 @@ public class WindowManager
         ZOrderCon++;
     }
 
-    public static void CreateButton(int windowIndex, string name, int left, int top, int width, int height, string text = "", Font font = Font.Georgia, int icon = 0, int? imageNorm = null, int? imageHover = null, int? imageMousedown = null, bool visible = true, Design designNorm = Design.None, Design? designHover = null, Design? designMousedown = null, Action? callbackNorm = null, Action? callbackHover = null, Action? callbackMousedown = null, Action? callbackMousemove = null, Action? callbackDblclick = null, int xOffset = 0, int yOffset = 0, string tooltip = "")
+    public static void CreateButton(int windowIndex, string name, int left, int top, int width, int height,
+        string text = "", Font font = Font.Georgia, int icon = 0, int? imageNorm = null, int? imageHover = null,
+        int? imageMousedown = null, bool visible = true, Design designNorm = Design.None, Design? designHover = null,
+        Design? designMousedown = null, Action? callbackNorm = null, Action? callbackHover = null,
+        Action? callbackMousedown = null, Action? callbackMousemove = null, Action? callbackDblclick = null,
+        int xOffset = 0, int yOffset = 0, string tooltip = "")
     {
         if (!Windows.TryGetValue(windowIndex, out var window))
         {
@@ -287,17 +313,17 @@ public class WindowManager
 
         var stateCount = Enum.GetValues<ControlState>().Length;
         var texture = new List<string>(Enumerable.Repeat(DataPath.Designs, stateCount).ToList());
-        var callback = new List<Action?>(Enumerable.Repeat((Action) null, stateCount).ToList());
+        var callback = new List<Action?>(Enumerable.Repeat((Action)null, stateCount).ToList());
 
-        texture[(int) ControlState.Normal] = DataPath.Gui;
-        texture[(int) ControlState.Hover] = DataPath.Gui;
-        texture[(int) ControlState.MouseDown] = DataPath.Gui;
+        texture[(int)ControlState.Normal] = DataPath.Gui;
+        texture[(int)ControlState.Hover] = DataPath.Gui;
+        texture[(int)ControlState.MouseDown] = DataPath.Gui;
 
-        callback[(int) ControlState.Normal] = callbackNorm;
-        callback[(int) ControlState.Hover] = callbackHover;
-        callback[(int) ControlState.MouseDown] = callbackMousedown;
-        callback[(int) ControlState.MouseMove] = callbackMousemove;
-        callback[(int) ControlState.DoubleClick] = callbackDblclick;
+        callback[(int)ControlState.Normal] = callbackNorm;
+        callback[(int)ControlState.Hover] = callbackHover;
+        callback[(int)ControlState.MouseDown] = callbackMousedown;
+        callback[(int)ControlState.MouseMove] = callbackMousemove;
+        callback[(int)ControlState.DoubleClick] = callbackDblclick;
 
         if (imageNorm == 0) imageNorm = null;
         if (imageHover == 0) imageHover = null;
@@ -333,7 +359,11 @@ public class WindowManager
         ZOrderCon++;
     }
 
-    public static void CreateLabel(int windowIndex, string name, int left, int top, int width, int height, string text, Font font, Alignment align = Alignment.Left, bool visible = true, bool clickThrough = false, bool censor = false, Action? callbackNorm = null, Action? callbackHover = null, Action? callbackMousedown = null, Action? callbackMousemove = null, Action? callbackDblclick = null, bool enabled = false)
+    public static void CreateLabel(int windowIndex, string name, int left, int top, int width, int height, string text,
+        Font font, Alignment align = Alignment.Left, bool visible = true, bool clickThrough = false,
+        bool censor = false, Action? callbackNorm = null, Action? callbackHover = null,
+        Action? callbackMousedown = null, Action? callbackMousemove = null, Action? callbackDblclick = null,
+        bool enabled = false)
     {
         if (!Windows.TryGetValue(windowIndex, out var window))
         {
@@ -341,13 +371,13 @@ public class WindowManager
         }
 
         var controlStateCount = Enum.GetValues<ControlState>().Length;
-        var callbackLabel = new List<Action?>(Enumerable.Repeat((Action) null, controlStateCount).ToList());
+        var callbackLabel = new List<Action?>(Enumerable.Repeat((Action)null, controlStateCount).ToList());
 
-        callbackLabel[(int) ControlState.Normal] = callbackNorm;
-        callbackLabel[(int) ControlState.Hover] = callbackHover;
-        callbackLabel[(int) ControlState.MouseDown] = callbackMousedown;
-        callbackLabel[(int) ControlState.MouseMove] = callbackMousemove;
-        callbackLabel[(int) ControlState.DoubleClick] = callbackDblclick;
+        callbackLabel[(int)ControlState.Normal] = callbackNorm;
+        callbackLabel[(int)ControlState.Hover] = callbackHover;
+        callbackLabel[(int)ControlState.MouseDown] = callbackMousedown;
+        callbackLabel[(int)ControlState.MouseMove] = callbackMousemove;
+        callbackLabel[(int)ControlState.DoubleClick] = callbackDblclick;
 
         var label = new Label
         {
@@ -370,7 +400,10 @@ public class WindowManager
         ZOrderCon++;
     }
 
-    public static void CreateCheckBox(int windowIndex, string name, int left, int top, int width, int height = 15, int value = 0, string text = "", Font font = Font.Georgia, bool visible = true, Design theDesign = Design.None, int group = 0, Action? callbackNorm = null, Action? callbackHover = null, Action? callbackMousedown = null, Action? callbackMousemove = null, Action? callbackDblclick = null)
+    public static void CreateCheckBox(int windowIndex, string name, int left, int top, int width, int height = 15,
+        int value = 0, string text = "", Font font = Font.Georgia, bool visible = true, Design theDesign = Design.None,
+        int group = 0, Action? callbackNorm = null, Action? callbackHover = null, Action? callbackMousedown = null,
+        Action? callbackMousemove = null, Action? callbackDblclick = null)
     {
         if (!Windows.TryGetValue(windowIndex, out var window))
         {
@@ -379,15 +412,15 @@ public class WindowManager
 
         var stateCount = Enum.GetValues<ControlState>().Length;
         var texture = new List<string>(Enumerable.Repeat(DataPath.Designs, stateCount).ToList());
-        var callback = new List<Action?>(Enumerable.Repeat((Action) null, stateCount).ToList());
+        var callback = new List<Action?>(Enumerable.Repeat((Action)null, stateCount).ToList());
 
         texture[0] = DataPath.Gui;
 
-        callback[(int) ControlState.Normal] = callbackNorm;
-        callback[(int) ControlState.Hover] = callbackHover;
-        callback[(int) ControlState.MouseDown] = callbackMousedown;
-        callback[(int) ControlState.MouseMove] = callbackMousemove;
-        callback[(int) ControlState.DoubleClick] = callbackDblclick;
+        callback[(int)ControlState.Normal] = callbackNorm;
+        callback[(int)ControlState.Hover] = callbackHover;
+        callback[(int)ControlState.MouseDown] = callbackMousedown;
+        callback[(int)ControlState.MouseMove] = callbackMousemove;
+        callback[(int)ControlState.DoubleClick] = callbackDblclick;
 
         var checkBox = new CheckBox
         {
@@ -412,11 +445,12 @@ public class WindowManager
         ZOrderCon++;
     }
 
-    public static void CreateComboBox(int windowIndex, string name, int left, int top, int width, int height, Design design)
+    public static void CreateComboBox(int windowIndex, string name, int left, int top, int width, int height,
+        Design design)
     {
         var controlStateCount = Enum.GetValues<ControlState>().Length;
         var texture = new List<string>(Enumerable.Repeat(DataPath.Gui, controlStateCount).ToList());
-        var callback = new List<Action?>(Enumerable.Repeat((Action) null, controlStateCount).ToList());
+        var callback = new List<Action?>(Enumerable.Repeat((Action)null, controlStateCount).ToList());
 
         texture[0] = DataPath.Gui;
 
@@ -475,7 +509,8 @@ public class WindowManager
         ZOrderCon++;
     }
 
-    public static void CreateScrollBar(int windowIndex, string name, int left, int top, int width, int height, int min = 0, int max = 100, int value = 0, bool vertical = true, int thumbSize = 16)
+    public static void CreateScrollBar(int windowIndex, string name, int left, int top, int width, int height,
+        int min = 0, int max = 100, int value = 0, bool vertical = true, int thumbSize = 16)
     {
         if (!Windows.TryGetValue(windowIndex, out var window))
         {
@@ -484,7 +519,7 @@ public class WindowManager
 
         var stateCount = Enum.GetValues<ControlState>().Length;
         var texture = new List<string>(Enumerable.Repeat(DataPath.Designs, stateCount).ToList());
-        var callback = new List<Action?>(Enumerable.Repeat((Action) null, stateCount).ToList());
+        var callback = new List<Action?>(Enumerable.Repeat((Action)null, stateCount).ToList());
 
         texture[0] = DataPath.Gui;
 
@@ -589,8 +624,8 @@ public class WindowManager
     {
         var window = Windows[windowIndex];
 
-        window.X = (int) Math.Round(GameState.ResolutionWidth / 2d - window.Width / 2d);
-        window.Y = (int) Math.Round(GameState.ResolutionHeight / 2d - window.Height / 2d);
+        window.X = (int)Math.Round(GameState.ResolutionWidth / 2d - window.Width / 2d);
+        window.Y = (int)Math.Round(GameState.ResolutionHeight / 2d - window.Height / 2d);
         window.InitialX = window.X;
         window.InitialY = window.Y;
     }
@@ -704,8 +739,14 @@ public class WindowManager
         {
             void Safe(string name, Action call)
             {
-                try { call(); }
-                catch (Exception ex) { Console.WriteLine($"UI script error in {name}: {ex.Message}"); }
+                try
+                {
+                    call();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"UI script error in {name}: {ex.Message}");
+                }
             }
 
             Safe("UpdateWindow_Menu", () => ui.UpdateWindow_Menu());
@@ -736,6 +777,8 @@ public class WindowManager
             Safe("UpdateWindow_Combobox", () => ui.UpdateWindow_Combobox());
             Safe("UpdateWindow_Admin", () => ui.UpdateWindow_Admin());
             Safe("UpdateWindow_EditorMap", () => ui.UpdateWindow_EditorMap());
+            Safe("UpdateWindow_EditorNpc", () => ui.UpdateWindow_EditorNpc());
+            Safe("UpdateWindow_EditorItem", () => ui.UpdateWindow_EditorItem());
         }
         else
         {
@@ -749,7 +792,8 @@ public class WindowManager
         var curControl = 0;
 
         // Check for MouseDown to start the drag timer
-        if (GameClient.IsMouseButtonDown(MouseButton.Left) && GameClient.PreviousMouseState.LeftButton == ButtonState.Released)
+        if (GameClient.IsMouseButtonDown(MouseButton.Left) &&
+            GameClient.PreviousMouseState.LeftButton == ButtonState.Released)
         {
             DragTimer.Restart(); // Start the timer on initial mouse down
             _canDrag = false; // Reset drag flag to ensure it doesn't drag immediately
@@ -769,7 +813,8 @@ public class WindowManager
         lock (GameClient.InputLock)
         {
             // On fresh MouseDown, determine if we should lock dragging for this press
-            if (GameClient.IsMouseButtonDown(MouseButton.Left) && GameClient.PreviousMouseState.LeftButton == ButtonState.Released)
+            if (GameClient.IsMouseButtonDown(MouseButton.Left) &&
+                GameClient.PreviousMouseState.LeftButton == ButtonState.Released)
             {
                 var prevActive = ActiveWindow;
                 Window? clickedWindow = null;
@@ -793,8 +838,10 @@ public class WindowManager
                     foreach (var c in clickedWindow.Controls)
                     {
                         if (!c.Visible) continue;
-                        if (GameState.CurMouseX >= clickedWindow.X + c.X && GameState.CurMouseX <= clickedWindow.X + c.X + c.Width &&
-                            GameState.CurMouseY >= clickedWindow.Y + c.Y && GameState.CurMouseY <= clickedWindow.Y + c.Y + c.Height)
+                        if (GameState.CurMouseX >= clickedWindow.X + c.X &&
+                            GameState.CurMouseX <= clickedWindow.X + c.X + c.Width &&
+                            GameState.CurMouseY >= clickedWindow.Y + c.Y &&
+                            GameState.CurMouseY <= clickedWindow.Y + c.Y + c.Height)
                         {
                             pressedOverControl = true;
                             break;
@@ -838,7 +885,8 @@ public class WindowManager
 
                             case ControlState.MouseScroll:
                                 // Scroll dropdown with mouse wheel
-                                int delta = GameClient.CurrentMouseState.ScrollWheelValue - GameClient.PreviousMouseState.ScrollWheelValue;
+                                int delta = GameClient.CurrentMouseState.ScrollWheelValue -
+                                            GameClient.PreviousMouseState.ScrollWheelValue;
                                 if (delta != 0)
                                 {
                                     int visibleRows = Math.Max(1, (window.Height - 2) / 16);
@@ -848,6 +896,7 @@ public class WindowManager
                                     // Keep hover aligned with new offset
                                     ComboMenu_MouseMove(window);
                                 }
+
                                 break;
                         }
                     }
@@ -880,8 +929,10 @@ public class WindowManager
                     {
                         foreach (var c in ActiveWindow.Controls)
                         {
-                            if (c.Visible && GameState.CurMouseX >= c.X + ActiveWindow.X && GameState.CurMouseX <= c.X + c.Width + ActiveWindow.X &&
-                                GameState.CurMouseY >= c.Y + ActiveWindow.Y && GameState.CurMouseY <= c.Y + c.Height + ActiveWindow.Y)
+                            if (c.Visible && GameState.CurMouseX >= c.X + ActiveWindow.X &&
+                                GameState.CurMouseX <= c.X + c.Width + ActiveWindow.X &&
+                                GameState.CurMouseY >= c.Y + ActiveWindow.Y &&
+                                GameState.CurMouseY <= c.Y + c.Height + ActiveWindow.Y)
                             {
                                 overAnyControl = true;
                                 break;
@@ -891,7 +942,7 @@ public class WindowManager
 
                     if (ActiveWindow is not null && _isDragging && !overAnyControl && !_dragLockedByPress)
                     {
-                        if (_canDrag && ActiveWindow is {CanDrag: true, Visible: true})
+                        if (_canDrag && ActiveWindow is { CanDrag: true, Visible: true })
                         {
                             ActiveWindow.X = GameLogic.Clamp(
                                 ActiveWindow.X +
@@ -910,9 +961,9 @@ public class WindowManager
             if (curWindow is not null)
             {
                 _isSelected = true;
-                
+
                 // Handle the active window's callback
-                var callBack = curWindow.CallBack[(int) entState];
+                var callBack = curWindow.CallBack[(int)entState];
 
                 // Execute the callback if it exists
                 callBack?.Invoke();
@@ -922,7 +973,7 @@ public class WindowManager
                 {
                     var control = curWindow.Controls[i];
 
-                    if (control is {Enabled: true, Visible: true})
+                    if (control is { Enabled: true, Visible: true })
                     {
                         if ((GameState.CurMouseX >= control.X + curWindow.X &&
                              GameState.CurMouseX <= control.X + control.Width + curWindow.X &&
@@ -981,7 +1032,9 @@ public class WindowManager
                         {
                             int itemHeight = 10;
                             int menuPadding = 5;
-                            bool menuIsOpen = WinComboMenu.IsOpen(curWindow, curControl); // You may need to implement this check if not present
+                            bool menuIsOpen =
+                                WinComboMenu.IsOpen(curWindow,
+                                    curControl); // You may need to implement this check if not present
                             if (entState == ControlState.MouseDown && GameClient.IsMouseButtonDown(MouseButton.Left))
                             {
                                 if (menuIsOpen)
@@ -990,19 +1043,31 @@ public class WindowManager
                                     int menuY = curWindow.Y + comboBox.Y + comboBox.Height;
                                     int menuWidth = comboBox.Width + menuPadding * 2;
                                     int menuHeight = comboBox.Items.Count * itemHeight + menuPadding * 2;
-                                    bool inMenu = GameState.CurMouseX >= menuX && GameState.CurMouseX <= menuX + menuWidth &&
-                                                  GameState.CurMouseY >= menuY && GameState.CurMouseY <= menuY + menuHeight;
-                                    int relY = GameState.CurMouseY - (curWindow.Y + comboBox.Y + comboBox.Height + menuPadding);
+                                    bool inMenu = GameState.CurMouseX >= menuX &&
+                                                  GameState.CurMouseX <= menuX + menuWidth &&
+                                                  GameState.CurMouseY >= menuY &&
+                                                  GameState.CurMouseY <= menuY + menuHeight;
+                                    int relY = GameState.CurMouseY -
+                                               (curWindow.Y + comboBox.Y + comboBox.Height + menuPadding);
                                     int idx = relY / itemHeight;
                                     if (inMenu && idx >= 0 && idx < comboBox.Items.Count)
                                     {
                                         comboBox.Value = idx;
                                         // If this is the options resolution combobox, apply immediately
-                                        if (string.Equals(curWindow.Name, "winOptions", StringComparison.CurrentCultureIgnoreCase) &&
-                                            string.Equals(comboBox.Name, "cmbRes", StringComparison.CurrentCultureIgnoreCase))
+                                        if (string.Equals(curWindow.Name, "winOptions",
+                                                StringComparison.CurrentCultureIgnoreCase) &&
+                                            string.Equals(comboBox.Name, "cmbRes",
+                                                StringComparison.CurrentCultureIgnoreCase))
                                         {
-                                            try { WinOptions.ApplyResolutionSelection(idx); } catch { }
+                                            try
+                                            {
+                                                WinOptions.ApplyResolutionSelection(idx);
+                                            }
+                                            catch
+                                            {
+                                            }
                                         }
+
                                         WinComboMenu.Close(); // Hide menu after selection
                                     }
                                     else if (!inMenu)
@@ -1017,12 +1082,15 @@ public class WindowManager
                                     WinComboMenu.Show(curWindow, curControl);
                                 }
                             }
+
                             break;
                         }
                         case Controls.ScrollBar scrollBar:
                         {
                             // Allow clicking/draging the scrollbar track to set value
-                            bool interacting = entState == ControlState.MouseDown || (entState == ControlState.MouseMove && GameClient.IsMouseButtonDown(MouseButton.Left));
+                            bool interacting = entState == ControlState.MouseDown ||
+                                               (entState == ControlState.MouseMove &&
+                                                GameClient.IsMouseButtonDown(MouseButton.Left));
                             if (interacting)
                             {
                                 int mouseX = GameState.CurMouseX - (curWindow.X + scrollBar.X);
@@ -1056,13 +1124,16 @@ public class WindowManager
                             // Mouse wheel scrolling on hovered scrollbar
                             if (entState == ControlState.MouseScroll)
                             {
-                                int delta = GameClient.CurrentMouseState.ScrollWheelValue - GameClient.PreviousMouseState.ScrollWheelValue;
+                                int delta = GameClient.CurrentMouseState.ScrollWheelValue -
+                                            GameClient.PreviousMouseState.ScrollWheelValue;
                                 if (delta != 0)
                                 {
                                     // Default step: 1 unit. For tileset scrollbars, step by tile size * 3.
                                     int step;
-                                    bool isTilesetV = string.Equals(scrollBar.Name, "sldTilesetV", StringComparison.Ordinal);
-                                    bool isTilesetH = string.Equals(scrollBar.Name, "sldTilesetH", StringComparison.Ordinal);
+                                    bool isTilesetV = string.Equals(scrollBar.Name, "sldTilesetV",
+                                        StringComparison.Ordinal);
+                                    bool isTilesetH = string.Equals(scrollBar.Name, "sldTilesetH",
+                                        StringComparison.Ordinal);
                                     if (isTilesetV || isTilesetH)
                                     {
                                         int per = (isTilesetV ? GameState.SizeY : GameState.SizeX) * 3;
@@ -1072,6 +1143,7 @@ public class WindowManager
                                     {
                                         step = delta > 0 ? -1 : 1; // wheel up -> decrement
                                     }
+
                                     int newVal = Math.Clamp(scrollBar.Value + step, scrollBar.Min, scrollBar.Max);
                                     if (newVal != scrollBar.Value)
                                     {
@@ -1080,6 +1152,7 @@ public class WindowManager
                                     }
                                 }
                             }
+
                             break;
                         }
                     }
@@ -1089,7 +1162,7 @@ public class WindowManager
                         SetActiveControl(curWindow, curControl);
                     }
 
-                    callBack = withBlock2.CallBack[(int) entState];
+                    callBack = withBlock2.CallBack[(int)entState];
 
                     // Execute the callback if it exists
                     callBack?.Invoke();
@@ -1107,43 +1180,71 @@ public class WindowManager
                 ResetMouseDown();
                 // On mouse release, keep lock state until the next MouseDown recomputes it
             }
-        }
 
-        // Auto-close combo menu when cursor leaves its area
-        if (entState is ControlState.MouseMove or ControlState.Hover)
-        {
-            if (TryGetWindow("winComboMenu", out var menuWin) && menuWin is not null && menuWin.Visible)
+            // Auto-close combo menu when cursor leaves its area
+            if (entState is ControlState.MouseMove or ControlState.Hover)
             {
-                bool overMenu = menuWin.Contains(GameState.CurMouseX, GameState.CurMouseY);
-                bool overParentCombo = false;
-
-                var parentCtrl = menuWin.ParentControl;
-                if (!overMenu && parentCtrl is not null)
+                if (TryGetWindow("winComboMenu", out var menuWin) && menuWin is not null && menuWin.Visible)
                 {
-                    // Find the window that owns the parent control
-                    foreach (var w in Windows.Values)
-                    {
-                        if (!w.Visible) continue;
-                        if (!w.Controls.Contains(parentCtrl)) continue;
+                    bool overMenu = menuWin.Contains(GameState.CurMouseX, GameState.CurMouseY);
+                    bool overParentCombo = false;
 
-                        int px = w.X + parentCtrl.X;
-                        int py = w.Y + parentCtrl.Y;
-                        int pw = parentCtrl.Width;
-                        int ph = parentCtrl.Height;
-                        overParentCombo = GameState.CurMouseX >= px && GameState.CurMouseX <= px + pw &&
-                                          GameState.CurMouseY >= py && GameState.CurMouseY <= py + ph;
-                        break;
+                    var parentCtrl = menuWin.ParentControl;
+                    if (!overMenu && parentCtrl is not null)
+                    {
+                        // Find the window that owns the parent control
+                        foreach (var w in Windows.Values)
+                        {
+                            if (!w.Visible) continue;
+                            if (!w.Controls.Contains(parentCtrl)) continue;
+
+                            int px = w.X + parentCtrl.X;
+                            int py = w.Y + parentCtrl.Y;
+                            int pw = parentCtrl.Width;
+                            int ph = parentCtrl.Height;
+                            overParentCombo = GameState.CurMouseX >= px && GameState.CurMouseX <= px + pw &&
+                                              GameState.CurMouseY >= py && GameState.CurMouseY <= py + ph;
+                            break;
+                        }
+                    }
+
+                    if (!overMenu && !overParentCombo)
+                    {
+                        WinComboMenu.Close();
                     }
                 }
+            }
 
-                if (!overMenu && !overParentCombo)
-                {
-                    WinComboMenu.Close();
-                }
+            // Update cached flag for whether mouse is over any visible window
+            _mouseOverAnyWindow = ComputeIsMouseOverAnyWindow();
+
+            return true;
+        }
+    }
+
+    /// <summary>
+    /// Returns true if the current mouse position is over any visible window rectangle.
+    /// This can be used by game systems (e.g. camera zoom) to avoid reacting to input while hovering UI.
+    /// </summary>
+    private static bool ComputeIsMouseOverAnyWindow()
+    {
+        foreach (var window in Windows.Values)
+        {
+            if (!window.Visible)
+            {
+                continue;
+            }
+
+            if (GameState.CurMouseX >= window.X &&
+                GameState.CurMouseX <= window.X + window.Width &&
+                GameState.CurMouseY >= window.Y &&
+                GameState.CurMouseY <= window.Y + window.Height)
+            {
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 
     public static void ResetInterface()
@@ -1179,7 +1280,7 @@ public class WindowManager
                 if (window.State == ControlState.MouseDown)
                 {
                     window.State = ControlState.Normal;
-                    window.CallBack[(int) ControlState.Normal]?.Invoke();
+                    window.CallBack[(int)ControlState.Normal]?.Invoke();
                 }
 
                 if (window.Controls.Count == 0)
@@ -1195,7 +1296,7 @@ public class WindowManager
                     }
 
                     control.State = ControlState.Normal;
-                    control.CallBack[(int) control.State]?.Invoke();
+                    control.CallBack[(int)control.State]?.Invoke();
                 }
             }
         }
@@ -1219,8 +1320,8 @@ public class WindowManager
             }
         }
     }
-    
-    private static void ComboMenu_MouseMove(Window window)
+
+    public static void ComboMenu_MouseMove(Window window)
     {
         // Account for the 2px interior padding used by WindowRenderer when drawing items
         int relY = GameState.CurMouseY - (window.Y + 2);
@@ -1243,7 +1344,7 @@ public class WindowManager
         }
     }
 
-    private static void ComboMenu_MouseDown(Window window)
+    public static void ComboMenu_MouseDown(Window window)
     {
         if (window.List.Count == 0)
         {
@@ -1271,6 +1372,7 @@ public class WindowManager
                 }
             }
         }
+
         WinComboMenu.Close();
     }
 
@@ -1357,17 +1459,19 @@ public class WindowManager
                 long itemNum = GetPlayerInv(GameState.MyIndex, Data.TradeYourOffer[i].Num);
                 if (itemNum >= 0 & itemNum < Variables.MaxItems)
                 {
-                    Item.StreamItem((int) itemNum);
-                    long itemPic = Data.Item[(int) itemNum].Icon;
+                    Item.StreamItem((int)itemNum);
+                    long itemPic = Data.Item[(int)itemNum].Icon;
 
                     if (itemPic > 0 & itemPic <= GameState.NumItems)
                     {
-                        var top = yo + GameState.TradeTop + (GameState.TradeOffsetY + 32L) * (i / GameState.TradeColumns);
-                        var left = xo + GameState.TradeLeft + (GameState.TradeOffsetX + 32L) * (i % GameState.TradeColumns);
+                        var top = yo + GameState.TradeTop +
+                                    (GameState.TradeOffsetY + 32L) * (i / GameState.TradeColumns);
+                        var left = xo + GameState.TradeLeft +
+                                    (GameState.TradeOffsetX + 32L) * (i % GameState.TradeColumns);
 
                         // draw icon
                         var argPath = Path.Combine(DataPath.Items, itemPic.ToString());
-                        GameClient.RenderTexture(ref argPath, (int) left, (int) top, 0, 0, 32, 32, 32, 32);
+                        GameClient.RenderTexture(ref argPath, (int)left, (int)top, 0, 0, 32, 32, 32, 32);
 
                         // If item is a stack - draw the amount you have
                         if (Data.TradeYourOffer[i].Value > 1)
@@ -1379,21 +1483,21 @@ public class WindowManager
                             // Color thresholds: <1M white, 1M-10M yellow, >10M bright green
                             if (amountValue < 1_000_000L)
                             {
-                                color = (int) ColorName.White;
+                                color = (int)ColorName.White;
                             }
                             else if (amountValue > 1_000_000L && amountValue < 10_000_000L)
                             {
-                                color = (int) ColorName.Yellow;
+                                color = (int)ColorName.Yellow;
                             }
                             else if (amountValue > 10_000_000L)
                             {
-                                color = (int) ColorName.BrightGreen;
+                                color = (int)ColorName.BrightGreen;
                             }
 
                             TextRenderer.RenderText(
-                                GameLogic.ConvertCurrency((int) amountValue),
-                                (int) x,
-                                (int) y,
+                                GameLogic.ConvertCurrency((int)amountValue),
+                                (int)x,
+                                (int)y,
                                 GameClient.QbColorToXnaColor(color),
                                 GameClient.QbColorToXnaColor(color));
                         }
@@ -1421,17 +1525,19 @@ public class WindowManager
             long itemNum = Data.TradeTheirOffer[i].Num;
             if (itemNum >= 0 & itemNum < Variables.MaxItems)
             {
-                Item.StreamItem((int) itemNum);
-                long itemPic = Data.Item[(int) itemNum].Icon;
+                Item.StreamItem((int)itemNum);
+                long itemPic = Data.Item[(int)itemNum].Icon;
 
                 if (itemPic > 0 & itemPic <= GameState.NumItems)
                 {
-                    var top = yo + GameState.TradeTop + (GameState.TradeOffsetY + 32L) * (i / GameState.TradeColumns);
-                    var left = xo + GameState.TradeLeft + (GameState.TradeOffsetX + 32L) * (i % GameState.TradeColumns);
+                    var top = yo + GameState.TradeTop +
+                                (GameState.TradeOffsetY + 32L) * (i / GameState.TradeColumns);
+                    var left = xo + GameState.TradeLeft +
+                                (GameState.TradeOffsetX + 32L) * (i % GameState.TradeColumns);
 
                     // draw icon
                     var argPath = Path.Combine(DataPath.Items, itemPic.ToString());
-                    GameClient.RenderTexture(ref argPath, (int) left, (int) top, 0, 0, 32, 32, 32, 32);
+                    GameClient.RenderTexture(ref argPath, (int)left, (int)top, 0, 0, 32, 32, 32, 32);
 
                     // If item is a stack - draw the amount you have
                     if (Data.TradeTheirOffer[i].Value > 1)
@@ -1443,21 +1549,21 @@ public class WindowManager
                         // Color thresholds: <1M white, 1M-10M yellow, >10M bright green
                         if (amountValue < 1_000_000L)
                         {
-                            color = (int) ColorName.White;
+                            color = (int)ColorName.White;
                         }
                         else if (amountValue > 1_000_000L && amountValue < 10_000_000L)
                         {
-                            color = (int) ColorName.Yellow;
+                            color = (int)ColorName.Yellow;
                         }
                         else if (amountValue > 10_000_000L)
                         {
-                            color = (int) ColorName.BrightGreen;
+                            color = (int)ColorName.BrightGreen;
                         }
 
                         TextRenderer.RenderText(
-                            GameLogic.ConvertCurrency((int) amountValue),
-                            (int) x,
-                            (int) y,
+                            GameLogic.ConvertCurrency((int)amountValue),
+                            (int)x,
+                            (int)y,
                             GameClient.QbColorToXnaColor(color),
                             GameClient.QbColorToXnaColor(color));
                     }
@@ -1474,6 +1580,13 @@ public class WindowManager
 
             // Update the control within the active window's Controls array
             ActiveWindow.Controls[index] = modifiedControl;
+
+            // Notify listeners that text changed: reuse KeyUp slot for TextBox
+            var ctrl = ActiveWindow.Controls[index];
+            if (ctrl is TextBox)
+            {
+                ctrl.CallBack[(int)ControlState.KeyUp]?.Invoke();
+            }
         }
     }
 
@@ -1487,7 +1600,7 @@ public class WindowManager
     /// </summary>
     public static void FocusNextControl()
     {
-        if (ActiveWindow?.Controls is not {Count: > 0})
+        if (ActiveWindow?.Controls is not { Count: > 0 })
         {
             return;
         }
@@ -1499,7 +1612,7 @@ public class WindowManager
         while (nextIndex != currentIndex)
         {
             var control = controls[nextIndex];
-            if (control is {Enabled: true, Visible: true} and TextBox)
+            if (control is { Enabled: true, Visible: true } and TextBox)
             {
                 ActiveWindow.ActiveControl = control;
                 return;

@@ -51,7 +51,7 @@ public sealed class NetworkClient
                         continue;
                     }
 
-                    Console.WriteLine("Connected to server successfully");
+                    Console.WriteLine("Connected to server successfully!");
                     _isConnected = true;
 
                     await RunAsync(tcpClient, _sendChannel, eventHandler, cancellationToken);

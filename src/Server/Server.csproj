@@ -58,7 +58,6 @@
         <PackageReference Include="Serilog.Sinks.File"/>
         <PackageReference Include="Npgsql"/>
         <PackageReference Include="Newtonsoft.Json"/>
-        <PackageReference Include="System.Private.Uri" />
     </ItemGroup>
 
     <ItemGroup>
