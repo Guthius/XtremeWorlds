@@ -85,13 +85,14 @@
     <!-- Always include Eto.Forms, but only include Gtk on Linux -->
     <ItemGroup>
         <PackageReference Include="Eto.Forms" />
-        <PackageReference Include="ImeSharp" />
     </ItemGroup>
 
     <!-- Windows-only backends (require -windows TFM) -->
     <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-windows'">
         <PackageReference Include="Eto.Platform.Wpf" />
         <PackageReference Include="Eto.Platform.Windows" />
+        <PackageReference Include="ImeSharp" />
+        <PackageReference Include="NVorbis" />
     </ItemGroup>
 
     <!-- Non-Windows backends: Gtk for Linux always; Mac64 only when explicitly enabled -->
@@ -108,22 +109,28 @@
         <PackageReference Include="ManagedBass" />
         <PackageReference Include="ManagedBass.Midi" />
         <PackageReference Include="CS-Script" />
-        <PackageReference Include="NVorbis" />
-    </ItemGroup>
+         <Reference Include="SDL2-CS">
+                <HintPath>SDL2-CS.dll</HintPath>
+            </Reference>
+            <Reference Include="SDL3.Core">
+                <HintPath>SDL3.Core.dll</HintPath>
+            </Reference>
+        </ItemGroup>
 
-    
+        <!-- Platform-specific FNA references -->
+        <!-- Non-Windows (net10.0): use classic FNA.dll + SDL2-CS -->
+        <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+            <Reference Include="FNA">
+                <HintPath>FNA.dll</HintPath>
+            </Reference>         
+        </ItemGroup>
 
-    <ItemGroup>
-      <Reference Include="FNA.NET">
-        <HintPath>FNA.NET.dll</HintPath>
-      </Reference>
-      <Reference Include="SDL2-CS">
-        <HintPath>SDL2-CS.dll</HintPath>
-      </Reference>
-      <Reference Include="SDL3.Core">
-        <HintPath>SDL3.Core.dll</HintPath>
-      </Reference>
-    </ItemGroup>
+        <!-- Windows (-windows TFM): keep existing FNA.NET/SDL3.Core setup -->
+        <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-windows'">
+            <Reference Include="FNA.NET">
+                <HintPath>FNA.NET.dll</HintPath>
+            </Reference>
+        </ItemGroup>
 
     <Target Name="EnsureContentFolderExists" BeforeTargets="Build">
         <MakeDir Directories="$(OutputPath)Content" />

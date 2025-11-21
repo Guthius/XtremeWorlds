@@ -425,18 +425,26 @@ namespace Client
 
         protected override void Draw(GameTime gameTime)
         {
-            Graphics?.GraphicsDevice.Clear(Color.Black);
+            // If graphics or sprite batch aren’t ready yet, skip this frame safely
+            if (Graphics == null || Graphics.GraphicsDevice == null || SpriteBatch == null)
+            {
+                base.Draw(gameTime);
+                return;
+            }
+
+            var gd = Graphics.GraphicsDevice;
+
+            gd.Clear(Color.Black);
 
             // Update GUI mouse position before drawing GUI (ensures correct UI hover/click)
             var mousePosGame = GetMousePosition("game");
             GameState.CurMouseXGame = mousePosGame.Item1;
             GameState.CurMouseYGame = mousePosGame.Item2;
 
-            // Choose native resolution: window/backbuffer in windowed; selected resolution in fullscreen
-            var ppNow = GraphicsDevice.PresentationParameters;
+            var ppNow = gd.PresentationParameters;
             int bbWNow = ppNow.BackBufferWidth;
             int bbHNow = ppNow.BackBufferHeight;
-            bool isFullscreenNow = Graphics?.IsFullScreen ?? false;
+            bool isFullscreenNow = Graphics.IsFullScreen;
             int nativeWidth, nativeHeight;
             if (isFullscreenNow)
             {
