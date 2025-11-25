@@ -215,13 +215,13 @@ public static class WinItemEditor
 		if (WindowManager.TryGetControl("winItemEditor", "sldItemDamage", out var dmgCtrl) && dmgCtrl is ScrollBar sldDmg)
 		{
 			sldDmg.Min = 0;
-			sldDmg.Max = 999;
+			sldDmg.Max = 1000;
 			sldDmg.Value = Math.Clamp(item.Data2, sldDmg.Min, sldDmg.Max);
 		}
 		if (WindowManager.TryGetControl("winItemEditor", "sldItemSpeed", out var spdCtrl) && spdCtrl is ScrollBar sldSpeed)
 		{
 			sldSpeed.Min = 0;
-			sldSpeed.Max = 999;
+			sldSpeed.Max = 10000;
 			sldSpeed.Value = Math.Clamp(item.Speed, sldSpeed.Min, sldSpeed.Max);
 		}
 		if (WindowManager.TryGetControl("winItemEditor", "chkItemKnockBack", out var kbCtrl2) && kbCtrl2 is CheckBox chkKb)
@@ -233,32 +233,32 @@ public static class WinItemEditor
 
 		if (WindowManager.TryGetControl("winItemEditor", "sldStr", out var aStrCtrl) && aStrCtrl is ScrollBar sldAStr)
 		{
-			sldAStr.Min = -255;
-			sldAStr.Max = 255;
+			sldAStr.Min = -Variables.MaxStats;
+			sldAStr.Max = Variables.MaxStats;
 			sldAStr.Value = Math.Clamp(item.AddStat[(int)Stat.Strength], sldAStr.Min, sldAStr.Max);
 		}
 		if (WindowManager.TryGetControl("winItemEditor", "sldVit", out var aVitCtrl) && aVitCtrl is ScrollBar sldAVit)
 		{
-			sldAVit.Min = -255;
-			sldAVit.Max = 255;
+			sldAVit.Min = -Variables.MaxStats;
+			sldAVit.Max = Variables.MaxStats;
 			sldAVit.Value = Math.Clamp(item.AddStat[(int)Stat.Vitality], sldAVit.Min, sldAVit.Max);
 		}
 		if (WindowManager.TryGetControl("winItemEditor", "sldLuck", out var aLuckCtrl) && aLuckCtrl is ScrollBar sldALuck)
 		{
-			sldALuck.Min = -255;
-			sldALuck.Max = 255;
+			sldALuck.Min = -Variables.MaxStats;
+			sldALuck.Max = Variables.MaxStats;
 			sldALuck.Value = Math.Clamp(item.AddStat[(int)Stat.Luck], sldALuck.Min, sldALuck.Max);
 		}
 		if (WindowManager.TryGetControl("winItemEditor", "sldInt", out var aIntCtrl) && aIntCtrl is ScrollBar sldAInt)
 		{
-			sldAInt.Min = -255;
-			sldAInt.Max = 255;
+			sldAInt.Min = -Variables.MaxStats;
+			sldAInt.Max = Variables.MaxStats;
 			sldAInt.Value = Math.Clamp(item.AddStat[(int)Stat.Intelligence], sldAInt.Min, sldAInt.Max);
 		}
 		if (WindowManager.TryGetControl("winItemEditor", "sldSpr", out var aSprCtrl) && aSprCtrl is ScrollBar sldASpr)
 		{
-			sldASpr.Min = -255;
-			sldASpr.Max = 255;
+			sldASpr.Min = -Variables.MaxStats;
+			sldASpr.Max = Variables.MaxStats;
 			sldASpr.Value = Math.Clamp(item.AddStat[(int)Stat.Spirit], sldASpr.Min, sldASpr.Max);
 		}
 
@@ -285,32 +285,32 @@ public static class WinItemEditor
 		}
 		if (WindowManager.TryGetControl("winItemEditor", "sldReqStr", out var rStrCtrl) && rStrCtrl is ScrollBar sldReqStr)
 		{
-			sldReqStr.Min = -255;
-			sldReqStr.Max = 255;
+			sldReqStr.Min = 0;
+			sldReqStr.Max = Variables.MaxStats;
 			sldReqStr.Value = Math.Clamp(item.StatReq[(int)Stat.Strength], sldReqStr.Min, sldReqStr.Max);
 		}
 		if (WindowManager.TryGetControl("winItemEditor", "sldReqVit", out var rVitCtrl) && rVitCtrl is ScrollBar sldReqVit)
 		{
-			sldReqVit.Min = -255;
-			sldReqVit.Max = 255;
+			sldReqVit.Min = 0;
+			sldReqVit.Max = Variables.MaxStats;
 			sldReqVit.Value = Math.Clamp(item.StatReq[(int)Stat.Vitality], sldReqVit.Min, sldReqVit.Max);
 		}
 		if (WindowManager.TryGetControl("winItemEditor", "sldReqLuck", out var rLuckCtrl) && rLuckCtrl is ScrollBar sldReqLuck)
 		{
-			sldReqLuck.Min = -255;
-			sldReqLuck.Max = 255;
+			sldReqLuck.Min = 0;
+			sldReqLuck.Max = Variables.MaxStats;
 			sldReqLuck.Value = Math.Clamp(item.StatReq[(int)Stat.Luck], sldReqLuck.Min, sldReqLuck.Max);
 		}
 		if (WindowManager.TryGetControl("winItemEditor", "sldReqInt", out var rIntCtrl) && rIntCtrl is ScrollBar sldReqInt)
 		{
-			sldReqInt.Min = -255;
-			sldReqInt.Max = 255;
+			sldReqInt.Min = 0;
+			sldReqInt.Max = Variables.MaxStats;
 			sldReqInt.Value = Math.Clamp(item.StatReq[(int)Stat.Intelligence], sldReqInt.Min, sldReqInt.Max);
 		}
 		if (WindowManager.TryGetControl("winItemEditor", "sldReqSpr", out var rSprCtrl) && rSprCtrl is ScrollBar sldReqSpr)
 		{
-			sldReqSpr.Min = -255;
-			sldReqSpr.Max = 255;
+			sldReqSpr.Min = 0;
+			sldReqSpr.Max = Variables.MaxStats;
 			sldReqSpr.Value = Math.Clamp(item.StatReq[(int)Stat.Spirit], sldReqSpr.Min, sldReqSpr.Max);
 		}
 
