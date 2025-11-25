@@ -6,18 +6,10 @@ public static class DataPath
     {
         get
         {
-            if (OperatingSystem.IsMacOS())
-            {
-                return Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                    "XtremeWorlds");
-            }
-
-            return Environment.CurrentDirectory;
+            return AppContext.BaseDirectory ?? Environment.CurrentDirectory;
         }
     }
     
-    // Use the application base directory so running from bin/Build works and finds Content next to the executable
     public static string Asset => Path.Combine(AppContext.BaseDirectory ?? Environment.CurrentDirectory, "Content");
     public static string Config => Path.Combine(Local, "Config");
     public static string Skins => Path.Combine(Asset, "Skins");
