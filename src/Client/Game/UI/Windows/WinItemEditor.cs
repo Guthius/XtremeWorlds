@@ -309,8 +309,8 @@ public static class WinItemEditor
 		}
 		if (WindowManager.TryGetControl("winItemEditor", "sldReqSpr", out var rSprCtrl) && rSprCtrl is ScrollBar sldReqSpr)
 		{
-			sldReqSpr.Min = 0;
-			sldReqSpr.Max = 100;
+			sldReqSpr.Min = -255;
+			sldReqSpr.Max = 255;
 			sldReqSpr.Value = Math.Clamp(item.StatReq[(int)Stat.Spirit], sldReqSpr.Min, sldReqSpr.Max);
 		}
 
