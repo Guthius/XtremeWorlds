@@ -1402,21 +1402,6 @@ public class Crystalshire
             };
         }
 
-        // Ensure npc editor combos are visible (some skins may default them hidden)
-        string[] npcComboNames =
-        {
-            "cmbNpcBehavior","cmbNpcFaction","cmbNpcSpawnPeriod","cmbNpcAnimation",
-            "cmbNpcSkill1","cmbNpcSkill2","cmbNpcSkill3","cmbNpcSkill4","cmbNpcSkill5","cmbNpcSkill6",
-            "cmbNpcDropSlot","cmbNpcDropItem"
-        };
-        foreach (var comboName in npcComboNames)
-        {
-            if (WindowManager.TryGetControl("winNpcEditor", comboName, out var c) && c is ComboBox cb)
-            {
-                cb.Visible = true;
-            }
-        }
-
         // Hide redundant amount / chance textboxes: both are slider-only now.
         if (WindowManager.TryGetControl("winNpcEditor", "nudNpcChance", out var chanceText))
         {
@@ -1727,6 +1712,13 @@ public class Crystalshire
             btnClose.CallBack[(int)ControlState.MouseDown] = () => WindowManager.HideWindow("winItemEditor");
         }
 
+        // Ensure item editor combos and icon picture are visible (some skins may hide them)
+        // Sprite preview picture box draws item icon each frame
+        if (WindowManager.TryGetControl("winItemEditor", "picItemIcon", out var picIconCtrl) && picIconCtrl is PictureBox picIcon)
+        {
+            picIcon.OnDraw = WinItemEditor.OnDrawIcon;
+        }
+
         // Item list + mouse wheel
         ListBox itemList = null;
         if (WindowManager.TryGetControl("winItemEditor", "lstItemIndex", out var lstCtrl) && lstCtrl is ListBox list)
@@ -1793,14 +1785,18 @@ public class Crystalshire
             };
         }
 
-        BindIntText("txtItemIcon", v =>
+        // Icon scrollbar: update icon and redraw preview
+        if (WindowManager.TryGetControl("winItemEditor", "sldItemIcon", out var iconScrollCtrl) && iconScrollCtrl is ScrollBar sldIcon)
         {
-            if (WinItemEditor.SelectedIndex >= 0)
+            sldIcon.CallBack[(int)ControlState.MouseMove] = () =>
             {
-                Data.Item[WinItemEditor.SelectedIndex].Icon = (short)v;
-                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
-            }
-        }, 0, 32000);
+                if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
+                {
+                    Data.Item[WinItemEditor.SelectedIndex].Icon = (short)sldIcon.Value;
+                    GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                }
+            };
+        }
 
         BindIntText("txtItemPaperdoll", v =>
         {
@@ -1809,7 +1805,7 @@ public class Crystalshire
                 Data.Item[WinItemEditor.SelectedIndex].Paperdoll = (short)v;
                 GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
             }
-        }, 0, 32000);
+        }, 0, GameState.NumPaperdolls);
 
         BindIntText("txtItemLevel", v =>
         {
@@ -1836,7 +1832,7 @@ public class Crystalshire
                 Data.Item[WinItemEditor.SelectedIndex].Rarity = (byte)v;
                 GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
             }
-        }, 0, 10);
+        }, 0, 5);
 
         if (WindowManager.TryGetControl("winItemEditor", "chkItemStackable", out var stackCtrl) && stackCtrl is CheckBox chkStack)
         {
@@ -1850,24 +1846,30 @@ public class Crystalshire
             };
         }
 
-        // Equipment & stats
-        BindIntText("txtItemDamage", v =>
+        // Equipment & stats via sliders
+        if (WindowManager.TryGetControl("winItemEditor", "sldItemDamage", out var dmgCtrl) && dmgCtrl is ScrollBar sldDmg)
         {
-            if (WinItemEditor.SelectedIndex >= 0)
+            sldDmg.CallBack[(int)ControlState.MouseMove] = () =>
             {
-                Data.Item[WinItemEditor.SelectedIndex].Data2 = v;
-                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
-            }
-        }, 0, int.MaxValue);
+                if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
+                {
+                    Data.Item[WinItemEditor.SelectedIndex].Data2 = sldDmg.Value;
+                    GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                }
+            };
+        }
 
-        BindIntText("txtItemSpeed", v =>
+        if (WindowManager.TryGetControl("winItemEditor", "sldItemSpeed", out var spdCtrl) && spdCtrl is ScrollBar sldSpeed)
         {
-            if (WinItemEditor.SelectedIndex >= 0)
+            sldSpeed.CallBack[(int)ControlState.MouseMove] = () =>
             {
-                Data.Item[WinItemEditor.SelectedIndex].Speed = v;
-                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
-            }
-        }, 0, int.MaxValue);
+                if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
+                {
+                    Data.Item[WinItemEditor.SelectedIndex].Speed = sldSpeed.Value;
+                    GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                }
+            };
+        }
 
         if (WindowManager.TryGetControl("winItemEditor", "chkItemKnockBack", out var kbCtrl) && kbCtrl is CheckBox chkKb)
         {
@@ -1881,25 +1883,28 @@ public class Crystalshire
             };
         }
 
-        // Stat bonuses
-        void BindStat(string tbName, Stat stat)
+        // Stat bonuses via sliders
+        void BindStatSlider(string name, Stat stat)
         {
-            BindIntText(tbName, v =>
+            if (WindowManager.TryGetControl("winItemEditor", name, out var ctrl) && ctrl is ScrollBar sld)
             {
-                if (WinItemEditor.SelectedIndex >= 0)
+                sld.CallBack[(int)ControlState.MouseMove] = () =>
                 {
-                    Data.Item[WinItemEditor.SelectedIndex].AddStat[(int)stat] = (byte)v;
-                    GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
-                }
-            }, -32000, 32000);
+                    if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
+                    {
+                        Data.Item[WinItemEditor.SelectedIndex].AddStat[(int)stat] = (byte)sld.Value;
+                        GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                    }
+                };
+            }
         }
-        BindStat("txtAddStr", Stat.Strength);
-        BindStat("txtAddVit", Stat.Vitality);
-        BindStat("txtAddLuck", Stat.Luck);
-        BindStat("txtAddInt", Stat.Intelligence);
-        BindStat("txtAddSpr", Stat.Spirit);
+        BindStatSlider("sldStr", Stat.Strength);
+        BindStatSlider("sldVit", Stat.Vitality);
+        BindStatSlider("sldLuck", Stat.Luck);
+        BindStatSlider("sldInt", Stat.Intelligence);
+        BindStatSlider("sldSpr", Stat.Spirit);
 
-        // Vital mod (Data1 for consumables)
+        // Vital mod (Data1 for consumables)    
         BindIntText("txtVitalMod", v =>
         {
             if (WinItemEditor.SelectedIndex >= 0)
@@ -1928,32 +1933,39 @@ public class Crystalshire
             }
         }, 0, int.MaxValue);
 
-        // Requirements
-        void BindStatReq(string tbName, Stat stat)
+        // Requirements via sliders
+        void BindReqStatSlider(string name, Stat stat)
         {
-            BindIntText(tbName, v =>
+            if (WindowManager.TryGetControl("winItemEditor", name, out var ctrl) && ctrl is ScrollBar sld)
             {
-                if (WinItemEditor.SelectedIndex >= 0)
+                sld.CallBack[(int)ControlState.MouseMove] = () =>
                 {
-                    Data.Item[WinItemEditor.SelectedIndex].StatReq[(int)stat] = (byte)v;
-                    GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
-                }
-            }, 0, 32000);
+                    if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
+                    {
+                        Data.Item[WinItemEditor.SelectedIndex].StatReq[(int)stat] = (byte)sld.Value;
+                        GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                    }
+                };
+            }
         }
 
-            BindIntText("txtReqLevel", v =>
+        if (WindowManager.TryGetControl("winItemEditor", "sldReqLevel", out var rLvlCtrl) && rLvlCtrl is ScrollBar sldReqLevel)
+        {
+            sldReqLevel.CallBack[(int)ControlState.MouseMove] = () =>
             {
-                if (WinItemEditor.SelectedIndex >= 0)
+                if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
                 {
-                    Data.Item[WinItemEditor.SelectedIndex].LevelReq = (byte)Math.Clamp(v, 0, 255);
+                    Data.Item[WinItemEditor.SelectedIndex].LevelReq = (byte)sldReqLevel.Value;
                     GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
                 }
-            }, 0, 255);
-            BindStatReq("txtReqStr", Stat.Strength);
-            BindStatReq("txtReqVit", Stat.Vitality);
-            BindStatReq("txtReqLuck", Stat.Luck);
-            BindStatReq("txtReqInt", Stat.Intelligence);
-            BindStatReq("txtReqSpr", Stat.Spirit);
+            };
+        }
+
+        BindReqStatSlider("sldReqStr", Stat.Strength);
+        BindReqStatSlider("sldReqVit", Stat.Vitality);
+        BindReqStatSlider("sldReqLuck", Stat.Luck);
+        BindReqStatSlider("sldReqInt", Stat.Intelligence);
+        BindReqStatSlider("sldReqSpr", Stat.Spirit);
 
         // Combos: Type, SubType, Animation, Bind, Tool, Knockback tiles, Skill, Projectile, Ammo, JobReq, AccessReq
         void BindCombo(string name, Action<int> apply)

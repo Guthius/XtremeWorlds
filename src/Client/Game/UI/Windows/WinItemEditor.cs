@@ -63,6 +63,14 @@ public static class WinItemEditor
 				cmbType.Items.Add(name);
 		}
 
+		// Item level (0-99)
+		if (WindowManager.TryGetControl("winItemEditor", "cmbItemLevel", out var lvlComboCtrl) && lvlComboCtrl is ComboBox cmbItemLevel)
+		{
+			cmbItemLevel.Items.Clear();
+			for (int i = 0; i <= 99; i++)
+				cmbItemLevel.Items.Add(i.ToString());
+		}
+
 		// Bind
 		if (WindowManager.TryGetControl("winItemEditor", "cmbItemBind", out var bindCtrl) && bindCtrl is ComboBox cmbBind)
 		{
@@ -84,6 +92,14 @@ public static class WinItemEditor
 			}
 		}
 
+		// Rarity (0-5)
+		if (WindowManager.TryGetControl("winItemEditor", "cmbItemRarity", out var rarComboCtrl) && rarComboCtrl is ComboBox cmbRarity)
+		{
+			cmbRarity.Items.Clear();
+			for (int i = 0; i <= 5; i++)
+				cmbRarity.Items.Add(i.ToString());
+		}
+
 		// Job requirements
 		if (WindowManager.TryGetControl("winItemEditor", "cmbItemJobReq", out var jobCtrl) && jobCtrl is ComboBox cmbJob)
 		{
@@ -92,13 +108,16 @@ public static class WinItemEditor
 				cmbJob.Items.Add(Data.Job[i].Name);
 		}
 
-		// Access requirements
+		// Access requirements (use AccessLevel enum with spaced names)
 		if (WindowManager.TryGetControl("winItemEditor", "cmbItemAccessReq", out var accCtrl) && accCtrl is ComboBox cmbAcc)
 		{
 			cmbAcc.Items.Clear();
-			cmbAcc.Items.Add("None");
-			cmbAcc.Items.Add("Moderator");
-			cmbAcc.Items.Add("Administrator");
+			foreach (var name in Enum.GetNames(typeof(AccessLevel)))
+			{
+				// Insert spaces before capital letters after the first character
+				string display = System.Text.RegularExpressions.Regex.Replace(name, "(?<!^)([A-Z])", " $1");
+				cmbAcc.Items.Add(display);
+			}
 		}
 
 		// Tool list
@@ -110,11 +129,11 @@ public static class WinItemEditor
 				cmbTool.Items.Add(Data.Resource[i].Name);
 		}
 
-		// Knockback tiles choices (0..10)
+		// Knockback tiles choices
 		if (WindowManager.TryGetControl("winItemEditor", "cmbItemKnockBackTiles", out var kbCtrl) && kbCtrl is ComboBox cmbKb)
 		{
 			cmbKb.Items.Clear();
-			for (int i = 0; i <= 10; i++)
+			for (int i = 0; i < 6; i++)
 				cmbKb.Items.Add(i.ToString());
 		}
 
@@ -133,7 +152,7 @@ public static class WinItemEditor
 			cmbProj.Items.Clear();
 			cmbProj.Items.Add("None");
 			for (int i = 0; i < Variables.MaxProjectiles; i++)
-				cmbProj.Items.Add(Data.Projectile[i].Name);
+				cmbProj.Items.Add($"{i + 1}: {Data.Projectile[i].Name}");
 		}
 
 		// Ammo list (0 = None, then items)
@@ -162,8 +181,15 @@ public static class WinItemEditor
 			txtName.Text = item.Name ?? string.Empty;
 		if (WindowManager.TryGetControl("winItemEditor", "txtItemDescription", out var descCtrl) && descCtrl is TextBox txtDesc)
 			txtDesc.Text = item.Description ?? string.Empty;
-		if (WindowManager.TryGetControl("winItemEditor", "txtItemIcon", out var iconCtrl) && iconCtrl is TextBox txtIcon)
-			txtIcon.Text = item.Icon.ToString();
+		
+		// icon index is driven by scrollbar; no direct text box anymore
+		if (WindowManager.TryGetControl("winItemEditor", "sldItemIcon", out var iconScrollCtrl) && iconScrollCtrl is ScrollBar sldIcon)
+		{
+			// Max icons is NumItems icons (mirror how item icons are stored: per item index)
+			sldIcon.Min = 0;
+			sldIcon.Max = Math.Max(0, GameState.NumItems);
+			sldIcon.Value = Math.Clamp(item.Icon, sldIcon.Min, sldIcon.Max);
+		}
 		if (WindowManager.TryGetControl("winItemEditor", "txtItemPaperdoll", out var pdCtrl) && pdCtrl is TextBox txtPd)
 			txtPd.Text = item.Paperdoll.ToString();
 
@@ -176,20 +202,28 @@ public static class WinItemEditor
 		if (WindowManager.TryGetControl("winItemEditor", "cmbItemBind", out var bindCtrl) && bindCtrl is ComboBox cmbBind)
 			cmbBind.Value = Math.Clamp(item.BindType, 0, cmbBind.Items.Count - 1);
 
-		if (WindowManager.TryGetControl("winItemEditor", "txtItemLevel", out var lvlCtrl) && lvlCtrl is TextBox txtLvl)
-			txtLvl.Text = item.ItemLevel.ToString();
+		if (WindowManager.TryGetControl("winItemEditor", "cmbItemLevel", out var lvlCtrl) && lvlCtrl is ComboBox cmbItemLevel)
+			cmbItemLevel.Value = Math.Clamp(item.ItemLevel, 0, cmbItemLevel.Items.Count - 1);
 		if (WindowManager.TryGetControl("winItemEditor", "txtItemPrice", out var priceCtrl) && priceCtrl is TextBox txtPrice)
 			txtPrice.Text = item.Price.ToString();
-		if (WindowManager.TryGetControl("winItemEditor", "txtItemRarity", out var rarCtrl) && rarCtrl is TextBox txtRarity)
-			txtRarity.Text = item.Rarity.ToString();
+		if (WindowManager.TryGetControl("winItemEditor", "cmbItemRarity", out var rarCtrl) && rarCtrl is ComboBox cmbRarity)
+			cmbRarity.Value = Math.Clamp(item.Rarity, 0, cmbRarity.Items.Count - 1);
 		if (WindowManager.TryGetControl("winItemEditor", "chkItemStackable", out var stackCtrl) && stackCtrl is CheckBox chkStack)
 			chkStack.Value = item.Stackable != 0 ? 1 : 0;
 
 		// Equipment & stats
-		if (WindowManager.TryGetControl("winItemEditor", "txtItemDamage", out var dmgCtrl) && dmgCtrl is TextBox txtDmg)
-			txtDmg.Text = item.Data2.ToString();
-		if (WindowManager.TryGetControl("winItemEditor", "txtItemSpeed", out var spdCtrl) && spdCtrl is TextBox txtSpeed)
-			txtSpeed.Text = item.Speed.ToString();
+		if (WindowManager.TryGetControl("winItemEditor", "sldItemDamage", out var dmgCtrl) && dmgCtrl is ScrollBar sldDmg)
+		{
+			sldDmg.Min = 0;
+			sldDmg.Max = 999;
+			sldDmg.Value = Math.Clamp(item.Data2, sldDmg.Min, sldDmg.Max);
+		}
+		if (WindowManager.TryGetControl("winItemEditor", "sldItemSpeed", out var spdCtrl) && spdCtrl is ScrollBar sldSpeed)
+		{
+			sldSpeed.Min = 0;
+			sldSpeed.Max = 999;
+			sldSpeed.Value = Math.Clamp(item.Speed, sldSpeed.Min, sldSpeed.Max);
+		}
 		if (WindowManager.TryGetControl("winItemEditor", "chkItemKnockBack", out var kbCtrl2) && kbCtrl2 is CheckBox chkKb)
 			chkKb.Value = item.KnockBack != 0 ? 1 : 0;
 		if (WindowManager.TryGetControl("winItemEditor", "cmbItemTool", out var toolCtrl) && toolCtrl is ComboBox cmbTool)
@@ -197,16 +231,36 @@ public static class WinItemEditor
 		if (WindowManager.TryGetControl("winItemEditor", "cmbItemKnockBackTiles", out var kbtCtrl) && kbtCtrl is ComboBox cmbKbTiles)
 			cmbKbTiles.Value = Math.Clamp(item.KnockBackTiles, 0, cmbKbTiles.Items.Count - 1);
 
-		if (WindowManager.TryGetControl("winItemEditor", "txtAddStr", out var aStrCtrl) && aStrCtrl is TextBox txtAStr)
-			txtAStr.Text = item.AddStat[(int)Stat.Strength].ToString();
-		if (WindowManager.TryGetControl("winItemEditor", "txtAddVit", out var aVitCtrl) && aVitCtrl is TextBox txtAVit)
-			txtAVit.Text = item.AddStat[(int)Stat.Vitality].ToString();
-		if (WindowManager.TryGetControl("winItemEditor", "txtAddLuck", out var aLuckCtrl) && aLuckCtrl is TextBox txtALuck)
-			txtALuck.Text = item.AddStat[(int)Stat.Luck].ToString();
-		if (WindowManager.TryGetControl("winItemEditor", "txtAddInt", out var aIntCtrl) && aIntCtrl is TextBox txtAInt)
-			txtAInt.Text = item.AddStat[(int)Stat.Intelligence].ToString();
-		if (WindowManager.TryGetControl("winItemEditor", "txtAddSpr", out var aSprCtrl) && aSprCtrl is TextBox txtASpr)
-			txtASpr.Text = item.AddStat[(int)Stat.Spirit].ToString();
+		if (WindowManager.TryGetControl("winItemEditor", "sldStr", out var aStrCtrl) && aStrCtrl is ScrollBar sldAStr)
+		{
+			sldAStr.Min = -255;
+			sldAStr.Max = 255;
+			sldAStr.Value = Math.Clamp(item.AddStat[(int)Stat.Strength], sldAStr.Min, sldAStr.Max);
+		}
+		if (WindowManager.TryGetControl("winItemEditor", "sldVit", out var aVitCtrl) && aVitCtrl is ScrollBar sldAVit)
+		{
+			sldAVit.Min = -255;
+			sldAVit.Max = 255;
+			sldAVit.Value = Math.Clamp(item.AddStat[(int)Stat.Vitality], sldAVit.Min, sldAVit.Max);
+		}
+		if (WindowManager.TryGetControl("winItemEditor", "sldLuck", out var aLuckCtrl) && aLuckCtrl is ScrollBar sldALuck)
+		{
+			sldALuck.Min = -255;
+			sldALuck.Max = 255;
+			sldALuck.Value = Math.Clamp(item.AddStat[(int)Stat.Luck], sldALuck.Min, sldALuck.Max);
+		}
+		if (WindowManager.TryGetControl("winItemEditor", "sldInt", out var aIntCtrl) && aIntCtrl is ScrollBar sldAInt)
+		{
+			sldAInt.Min = -255;
+			sldAInt.Max = 255;
+			sldAInt.Value = Math.Clamp(item.AddStat[(int)Stat.Intelligence], sldAInt.Min, sldAInt.Max);
+		}
+		if (WindowManager.TryGetControl("winItemEditor", "sldSpr", out var aSprCtrl) && aSprCtrl is ScrollBar sldASpr)
+		{
+			sldASpr.Min = -255;
+			sldASpr.Max = 255;
+			sldASpr.Value = Math.Clamp(item.AddStat[(int)Stat.Spirit], sldASpr.Min, sldASpr.Max);
+		}
 
 		// Consumable / skill / projectile / event
 		if (WindowManager.TryGetControl("winItemEditor", "txtVitalMod", out var vCtrl) && vCtrl is TextBox txtVital)
@@ -223,23 +277,74 @@ public static class WinItemEditor
 			txtEVal.Text = item.Data2.ToString();
 
 		// Requirements
-		if (WindowManager.TryGetControl("winItemEditor", "txtReqLevel", out var rLvlCtrl) && rLvlCtrl is TextBox txtRLvl)
-			txtRLvl.Text = item.LevelReq.ToString();
-		if (WindowManager.TryGetControl("winItemEditor", "txtReqStr", out var rStrCtrl) && rStrCtrl is TextBox txtRStr)
-			txtRStr.Text = item.StatReq[(int)Stat.Strength].ToString();
-		if (WindowManager.TryGetControl("winItemEditor", "txtReqVit", out var rVitCtrl) && rVitCtrl is TextBox txtRVit)
-			txtRVit.Text = item.StatReq[(int)Stat.Vitality].ToString();
-		if (WindowManager.TryGetControl("winItemEditor", "txtReqLuck", out var rLuckCtrl) && rLuckCtrl is TextBox txtRLuck)
-			txtRLuck.Text = item.StatReq[(int)Stat.Luck].ToString();
-		if (WindowManager.TryGetControl("winItemEditor", "txtReqInt", out var rIntCtrl) && rIntCtrl is TextBox txtRInt)
-			txtRInt.Text = item.StatReq[(int)Stat.Intelligence].ToString();
-		if (WindowManager.TryGetControl("winItemEditor", "txtReqSpr", out var rSprCtrl) && rSprCtrl is TextBox txtRSpr)
-			txtRSpr.Text = item.StatReq[(int)Stat.Spirit].ToString();
+		if (WindowManager.TryGetControl("winItemEditor", "sldReqLevel", out var rLvlCtrl) && rLvlCtrl is ScrollBar sldReqLevel)
+		{
+			sldReqLevel.Min = 1;
+			sldReqLevel.Max = GameState.MaxLevel;
+			sldReqLevel.Value = Math.Clamp(item.LevelReq, sldReqLevel.Min, sldReqLevel.Max);
+		}
+		if (WindowManager.TryGetControl("winItemEditor", "sldReqStr", out var rStrCtrl) && rStrCtrl is ScrollBar sldReqStr)
+		{
+			sldReqStr.Min = -255;
+			sldReqStr.Max = 255;
+			sldReqStr.Value = Math.Clamp(item.StatReq[(int)Stat.Strength], sldReqStr.Min, sldReqStr.Max);
+		}
+		if (WindowManager.TryGetControl("winItemEditor", "sldReqVit", out var rVitCtrl) && rVitCtrl is ScrollBar sldReqVit)
+		{
+			sldReqVit.Min = -255;
+			sldReqVit.Max = 255;
+			sldReqVit.Value = Math.Clamp(item.StatReq[(int)Stat.Vitality], sldReqVit.Min, sldReqVit.Max);
+		}
+		if (WindowManager.TryGetControl("winItemEditor", "sldReqLuck", out var rLuckCtrl) && rLuckCtrl is ScrollBar sldReqLuck)
+		{
+			sldReqLuck.Min = -255;
+			sldReqLuck.Max = 255;
+			sldReqLuck.Value = Math.Clamp(item.StatReq[(int)Stat.Luck], sldReqLuck.Min, sldReqLuck.Max);
+		}
+		if (WindowManager.TryGetControl("winItemEditor", "sldReqInt", out var rIntCtrl) && rIntCtrl is ScrollBar sldReqInt)
+		{
+			sldReqInt.Min = -255;
+			sldReqInt.Max = 255;
+			sldReqInt.Value = Math.Clamp(item.StatReq[(int)Stat.Intelligence], sldReqInt.Min, sldReqInt.Max);
+		}
+		if (WindowManager.TryGetControl("winItemEditor", "sldReqSpr", out var rSprCtrl) && rSprCtrl is ScrollBar sldReqSpr)
+		{
+			sldReqSpr.Min = 0;
+			sldReqSpr.Max = 100;
+			sldReqSpr.Value = Math.Clamp(item.StatReq[(int)Stat.Spirit], sldReqSpr.Min, sldReqSpr.Max);
+		}
 
 		if (WindowManager.TryGetControl("winItemEditor", "cmbItemJobReq", out var jCtrl2) && jCtrl2 is ComboBox cmbJob2)
 			cmbJob2.Value = Math.Clamp(item.JobReq, 0, cmbJob2.Items.Count - 1);
 		if (WindowManager.TryGetControl("winItemEditor", "cmbItemAccessReq", out var aCtrl2) && aCtrl2 is ComboBox cmbAcc2)
 			cmbAcc2.Value = Math.Clamp(item.AccessReq, 0, cmbAcc2.Items.Count - 1);
+	}
+
+	public static void OnDrawIcon()
+	{
+		var win = WindowManager.GetWindowByName("winItemEditor");
+		if (win is null) return;
+
+		if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
+		var item = Data.Item[SelectedIndex];
+
+		if (item.Icon < 1 || item.Icon > GameState.NumItems) return;
+
+		if (!WindowManager.TryGetControl("winItemEditor", "picItemIcon", out var iconCtrl) || iconCtrl is not PictureBox pic)
+			return;
+
+		// Icons are stored as individual textures per icon index (e.g. 1.png, 2.png)
+		string texturePath = System.IO.Path.Combine(DataPath.Items, item.Icon.ToString());
+		var tex = GameClient.GetGfxInfo(texturePath);
+		if (tex is null || tex.Width == 0 || tex.Height == 0) return;
+
+		int iconSize = 32;
+		int iconsPerRow = tex.Width / iconSize;
+		if (iconsPerRow <= 0) iconsPerRow = 1;
+		int drawX = win.X + pic.X + (pic.Width - iconSize) / 2;
+		int drawY = win.Y + pic.Y + (pic.Height - iconSize) / 2;
+
+		GameClient.RenderTexture(ref texturePath, drawX, drawY, 0, 0, iconSize, iconSize, iconSize, iconSize);
 	}
 
 	public static void OnListMouseDown()
