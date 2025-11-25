@@ -51,7 +51,7 @@
   <Label Name="lblNpcDamage" Text="Damage" Position="440, 188" Size="60, 16"/>
   <TextBox Name="txtNpcDamage" Position="504, 186" Size="80, 18" Design="TextWhite"/>
 
-  <Label Name="lblNpcRange" Text="Range" Position="440, 226" Size="60, 16"/>
+  <Label Name="lblNpcRange" Text="Range" Position="440, 220" Size="60, 16"/>
   <ScrollBar Name="sldNpcRange" Position="504, 222" Size="160, 12" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="12"/>
 
   <!-- Skills group (shifted down a bit to follow stats) -->
