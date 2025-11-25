@@ -1717,11 +1717,11 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         if (GetPlayerAccess(session.Id) < (byte) AccessLevel.Mapper)
             return;
 
-        SettingsManager.Instance.Welcome = buffer.ReadString();
+        Variables.Welcome = buffer.ReadString();
         SettingsManager.Save();
 
-        NetworkSend.GlobalMsg("Welcome changed to: " + SettingsManager.Instance.Welcome);
-        Log.Add(GetPlayerName(session.Id) + " changed welcome to: " + SettingsManager.Instance.Welcome, Constant.AdminLog);
+        NetworkSend.GlobalMsg("Welcome changed to: " + Variables.Welcome);
+        Log.Add(GetPlayerName(session.Id) + " changed welcome to: " + Variables.Welcome, Constant.AdminLog);
     }
 
     public static void Packet_PlayerSearch(GameSession session, ReadOnlyMemory<byte> bytes)

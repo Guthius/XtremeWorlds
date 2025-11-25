@@ -487,9 +487,9 @@ public static class NetworkSend
 
     public static void SendWelcome(int playerId)
     {
-        if (SettingsManager.Instance.Welcome.Length > 0)
+        if (Variables.Welcome.Length > 0)
         {
-            PlayerMsg(playerId, SettingsManager.Instance.Welcome, (int)ColorName.BrightCyan);
+            PlayerMsg(playerId, Variables.Welcome, (int)ColorName.BrightCyan);
         }
 
         SendWhosOnline(playerId);

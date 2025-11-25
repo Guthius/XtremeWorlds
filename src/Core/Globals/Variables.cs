@@ -44,4 +44,10 @@ public static class Variables
     public static byte MaxEventChoices = 4;
     public static int TileSize = 32;
     public static int MaxWeatherParticles = 1000;
+    public static int MaxBackups = 500;
+    public static byte SaveInterval = 5;
+    public static byte MaxSqlClients = 10;
+    public static int ServerShutdown = 60;
+    public static string Welcome = "Welcome to XtremeWorlds, enjoy your stay!";
+    public static string Website = "https://xtremeworlds.com/";
 }

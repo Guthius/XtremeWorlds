@@ -31,18 +31,12 @@ public class SettingsManager
     public byte CameraWidth { get; set; } = 32;
     public byte CameraHeight { get; set; } = 24;
     public bool OpenAdminPanelOnLogin { get; set; } = true;
-    public byte[] ChannelState { get; set; } = [1, 1, 1, 1, 1, 1, 1];
-    public string Ip { get; set; } = "127.0.0.1";
-    public int Port { get; set; } = 7001;
-    public string GameName { get; set; } = "XtremeWorlds";
-    public string Website { get; set; } = "https://xtremeworlds.com/";
-    public string Welcome { get; set; } = "Welcome to XtremeWorlds, enjoy your stay!";
+    public byte[] ChannelState { get; set; } = new byte[] {1, 1, 1, 1, 1, 1, 1};
+    public string Ip = "127.0.0.1";
+    public int Port = 7001;
+    public string GameName = "XtremeWorlds";
     public double TimeSpeed { get; set; }
     public bool Autotile { get; set; } = true;
-    public int MaxBackups { get; set; } = 5;
-    public int ServerShutdown { get; set; } = 60;
-    public int SaveInterval { get; set; } = 5;
-    public int MaxSqlClients { get; set; } = 10;
     public string Skin { get; set; } = "Crystalshire";
     public string SpriteSegmentOrder { get; set; } = "idle,run,attack";
     public int IdleFrames { get; set; } = 3;

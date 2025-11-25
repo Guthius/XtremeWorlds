@@ -377,7 +377,7 @@ namespace Server
                 LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading switches..."); await Event.LoadSwitchesAsync(); Logger.LogInformation("Switches loaded."); }),
                 LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading variables..."); await Event.LoadVariablesAsync(); Logger.LogInformation("Variables loaded."); }),
                 LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading projectiles..."); await Projectile.LoadProjectilesAsync(); Logger.LogInformation("Projectiles loaded."); }),
-                LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading script..."); await Script.LoadScriptAsync(0); Logger.LogInformation("Script compiled and loaded."); })
+                LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading script..."); await Script.LoadScriptAsync(0); Logger.LogInformation("Script loaded successfully!"); })
             };
 
             await System.Threading.Tasks.Task.WhenAll(tasks);
@@ -480,7 +480,7 @@ namespace Server
 
         private static void InitializeSaveTimer()
         {
-            int intervalMinutes = SettingsManager.Instance.SaveInterval;
+            int intervalMinutes = Variables.SaveInterval;
             _saveTimer = new Timer(async _ => await SavePlayersPeriodicallyAsync(), null,
                 TimeSpan.FromMinutes(intervalMinutes), TimeSpan.FromMinutes(intervalMinutes));
         }
@@ -586,8 +586,8 @@ namespace Server
                                 General.GetShutDownTimer?.Start();
                             }
 
-                            Console.WriteLine("Server shutdown in " + SettingsManager.Instance.ServerShutdown + " seconds!");
-                            NetworkSend.GlobalMsg("Server shutdown in " + SettingsManager.Instance.ServerShutdown + " seconds!");
+                            Console.WriteLine("Server shutdown in " + Variables.ServerShutdown + " seconds!");
+                            NetworkSend.GlobalMsg("Server shutdown in " + Variables.ServerShutdown + " seconds!");
                         }
                         break;
                     }
@@ -1002,7 +1002,7 @@ namespace Server
 
                 var backups = Directory.GetFiles(backupDir, "backup_*.bak")
                     .OrderByDescending(f => f)
-                    .Skip(SettingsManager.Instance.MaxBackups)
+                    .Skip(Variables.MaxBackups)
                     .ToList();
                 foreach (var oldBackup in backups)
                 {
@@ -1051,11 +1051,11 @@ namespace Server
             int time = _shutDownTimer.Elapsed.Seconds;
             if (_shutDownLastTimer != time)
             {
-                if (SettingsManager.Instance.ServerShutdown - time <= 10)
+                if (Variables.ServerShutdown - time <= 10)
                 {
-                    NetworkSend.GlobalMsg($"Server shutdown in {SettingsManager.Instance.ServerShutdown - time} seconds!");
-                    Console.WriteLine($"Server shutdown in {SettingsManager.Instance.ServerShutdown - time} seconds!");
-                    if (SettingsManager.Instance.ServerShutdown - time <= 1)
+                    NetworkSend.GlobalMsg($"Server shutdown in {Variables.ServerShutdown - time} seconds!");
+                    Console.WriteLine($"Server shutdown in {Variables.ServerShutdown - time} seconds!");
+                    if (Variables.ServerShutdown - time <= 1)
                     {
                         await DestroyServerAsync();
                     }

@@ -37,7 +37,7 @@ namespace Server
     {
         private static readonly int StatCount = Enum.GetValues<Stat>().Length;
         
-        private static readonly SemaphoreSlim ConnectionSemaphore = new SemaphoreSlim(SettingsManager.Instance.MaxSqlClients, SettingsManager.Instance.MaxSqlClients);
+        private static readonly SemaphoreSlim ConnectionSemaphore = new SemaphoreSlim(Variables.MaxSqlClients, Variables.MaxSqlClients);
 
         public static string ConnectionString { get; set; } = string.Empty;
 

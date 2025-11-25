@@ -191,7 +191,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Variables.MaxQuests = r.ReadByte();
         Variables.MaxGuilds = r.ReadByte();
         Variables.MaxEventChoices = r.ReadByte();
-
+        
         ApplyClientSizing();
     }
 

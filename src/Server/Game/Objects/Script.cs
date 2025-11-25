@@ -122,10 +122,11 @@ public static class Script
             if (instance is not null)
             {
                 Instance = instance;
+                Script.Instance?.UpdateMaxValues();
 
                 if (playerId > 0)
                 {
-                    NetworkSend.PlayerMsg(playerId, "Script saved successfully!", (int) ColorName.Yellow);
+                    NetworkSend.PlayerMsg(playerId, "Script saved successfully! If you changed any max values, you may need to restart the server.", (int) ColorName.Yellow);
                 }
             }
         }
