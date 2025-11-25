@@ -469,7 +469,8 @@ public class WindowManager
             ZOrder = ZOrderCon,
             Design = design,
             Texture = texture,
-            CallBack = callback
+            CallBack = callback,
+            Visible = true
         };
 
         window.Controls.Add(comboBox);
