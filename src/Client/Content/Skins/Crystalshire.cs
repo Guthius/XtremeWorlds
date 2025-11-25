@@ -2377,7 +2377,6 @@ public class Crystalshire
             if (IsNumeric(name)) return;
             if (window.GetChild("cmbAccess") is ComboBox combo && combo.Value >= 0)
             {
-                // Mirror legacy behavior: SelectedIndex + 1
                 Sender.SendSetAccess(name, (byte)(combo.Value + 1));
             }
         };

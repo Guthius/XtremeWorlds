@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window Name="winItemEditor" Caption="Item Editor"
         Size="960, 600"
-        Icon="113" IconOffset="3, 5"
+        Icon="625" IconOffset="3, 5"
         Design="WindowNormal"
         StartPosition="CenterScreen"
         Visible="false">
