@@ -51,8 +51,21 @@
         <PublishWizardCompleted>true</PublishWizardCompleted>
     </PropertyGroup>
 
-    <ItemGroup>
-        <Content Include="*.dll;*.dylib;*.so;*o.0;*.sf2">
+    <!-- Include Windows-specific content only for Windows TFM -->
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-windows'">
+        <Content Include="*.dll;*.sf2">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <Visible>False</Visible>
+        </Content>
+        <Content Include="Content\**\*.*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
+        </Content>
+    </ItemGroup>
+
+    <!-- Include native Unix/Mac libraries only for non-Windows TFM -->
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+        <Content Include="*.so;*.so.*;*.dylib;*.sf2">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <Visible>False</Visible>
         </Content>
@@ -115,5 +128,5 @@
 	</ItemGroup>
 	<Target Name="EnsureContentFolderExists" BeforeTargets="Build">
 		<MakeDir Directories="$(OutputPath)Content" />
-	</Target>	
+	</Target>
 	</Project>
