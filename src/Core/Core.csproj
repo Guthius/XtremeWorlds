@@ -1,10 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
+    <PropertyGroup>
     <TargetFrameworks>net10.0-windows;net10.0</TargetFrameworks>
-  </PropertyGroup>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="CS-Script" />
-    <PackageReference Include="CS-Script.Core" />
-  </ItemGroup>
+    <PropertyGroup>
+	    <UseSharedCompilation>false</UseSharedCompilation>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="CS-Script" />
+        <PackageReference Include="CS-Script.Core" />
+    </ItemGroup>
 </Project>
