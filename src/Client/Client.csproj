@@ -111,17 +111,9 @@
         <PackageReference Include="CS-Script" />
         <Reference Include="FNA">
           <HintPath>FNA.dll</HintPath>
-        </Reference>
-         <Reference Include="SDL2-CS">
-                <HintPath>SDL2-CS.dll</HintPath>
-            </Reference>
-            <Reference Include="SDL3.Core">
-                <HintPath>SDL3.Core.dll</HintPath>
-            </Reference>
-        </ItemGroup>
-
-    <Target Name="EnsureContentFolderExists" BeforeTargets="Build">
-        <MakeDir Directories="$(OutputPath)Content" />
-    </Target>
-
-</Project>
+        </Reference> 
+	</ItemGroup>
+	<Target Name="EnsureContentFolderExists" BeforeTargets="Build">
+		<MakeDir Directories="$(OutputPath)Content" />
+	</Target>	
+	</Project>
