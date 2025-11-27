@@ -31,7 +31,7 @@
 				Design="Red"
 				DesignHover="RedHover"
 				DesignMouseDown="RedClick"/>
-
-		<Button Name="btnClose" Position="-19, 5" Size="16, 16" Image="8" ImageHover="9" ImageMouseDown="10"/>
 	</GroupBox>
+
+	<Button Name="btnClose" Position="-19, 5" Size="16, 16" Image="8" ImageHover="9" ImageMouseDown="10"/>
 </Window>
