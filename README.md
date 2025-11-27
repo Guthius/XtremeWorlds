@@ -6,7 +6,7 @@
 
 # XtremeWorlds Game Engine
 
-A simple 2D MMORPG game engine written in C# using async networking.
+A simple 2D MMORPG game engine written in C# using TCP .NET socket async networking.
 
 Based on the Orion+ conversion and MirageBasic frameworks.
 
