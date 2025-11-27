@@ -21,16 +21,25 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
+      # 🔥 IMPORTANT: Kill stale processes BEFORE build
+      - name: Kill stale processes before build
+        run: |
+          echo "Killing lingering processes before build..."
+          taskkill /F /IM dotnet.exe /T || echo "dotnet.exe not running"
+          taskkill /F /IM testhost.exe /T || echo "testhost.exe not running"
+          taskkill /F /IM VBCSCompiler.exe /T || echo "VBCSCompiler.exe not running"
+
       - name: Build
         run: dotnet build -p:TargetFramework=net10.0-windows
 
       - name: Test
         run: dotnet test --no-build --verbosity normal
 
-      # 🔥 Add this cleanup block to kill orphaned processes
+      # 🔥 OPTIONAL: Cleanup after tests too
       - name: Kill leftover dotnet/testhost processes
         if: always()
         run: |
-          echo "Killing lingering testhost.exe and dotnet.exe processes..."
+          echo "Cleaning up lingering processes after tests..."
           taskkill /F /IM testhost.exe /T || echo "testhost.exe not found"
           taskkill /F /IM dotnet.exe /T || echo "dotnet.exe not found"
+          taskkill /F /IM VBCSCompiler.exe /T || echo "VBCSCompiler.exe not found"
