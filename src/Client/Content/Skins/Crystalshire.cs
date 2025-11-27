@@ -906,14 +906,6 @@ public class Crystalshire
 
          // Faux header tabs like Admin
         var winIndex = WindowManager.GetWindowIndex("winMapEditor");
-       
-        void SetVisible(bool visible, params string[] names)
-        {
-            foreach (var n in names)
-            {
-                if (WindowManager.TryGetControl("winMapEditor", n, out var c)) c.Visible = visible;
-            }
-        }
 
         void ShowTab(string tab)
         {
@@ -948,7 +940,7 @@ public class Crystalshire
                     GameState.MapEditorTab = (int)MapEditorTab.Npcs;
                     break;
                 case "Settings":
-                    SetGroupBoxVisible("winMapEditor", "grpNpcs", true);
+                    SetGroupBoxVisible("winMapEditor", "grpSettings", true);
                     GameState.MapEditorTab = (int)MapEditorTab.Settings;
                     break;
                 case "DirBlock":
