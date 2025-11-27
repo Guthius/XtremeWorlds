@@ -202,9 +202,10 @@ public static class WindowLoader
 
         // Record start index of children to compute bounds later
         var window = WindowManager.Windows[windowIndex];
-        int groupIndex = window.Controls.Count - 1; // last added
+        int groupIndex = window.Controls.Count - 1;
         int childStart = window.Controls.Count;
 
+        // Read nested controls
         if (!xmlReader.IsEmptyElement)
         {
             var depth = xmlReader.Depth;
@@ -221,59 +222,41 @@ public static class WindowLoader
             }
         }
 
-        // Autosize to fit enclosed controls if requested
-        if (autoPos || autoSize)
+        // Compute bounds of enclosed controls
+        int minX = int.MaxValue, minY = int.MaxValue, maxX = int.MinValue, maxY = int.MinValue;
+        for (int i = childStart; i < window.Controls.Count; i++)
         {
-            int minX = int.MaxValue, minY = int.MaxValue, maxX = int.MinValue, maxY = int.MinValue;
-            for (int i = childStart; i < window.Controls.Count; i++)
-            {
-                var c = window.Controls[i];
-                minX = Math.Min(minX, c.X);
-                minY = Math.Min(minY, c.Y);
-                maxX = Math.Max(maxX, c.X + c.Width);
-                maxY = Math.Max(maxY, c.Y + c.Height);
-            }
-
-            if (minX != int.MaxValue)
-            {
-                const int padding = 8;
-                var group = (Controls.GroupBox)window.Controls[groupIndex];
-                int newLeft = autoPos ? Math.Max(0, minX - padding) : group.X;
-                int newTop = autoPos ? Math.Max(0, minY - padding) : group.Y;
-                int newWidth = autoSize ? Math.Max(1, (maxX + padding) - newLeft) : group.Width;
-                int newHeight = autoSize ? Math.Max(1, (maxY + padding) - newTop) : group.Height;
-
-                group.X = newLeft;
-                group.Y = newTop;
-                group.Width = newWidth;
-                group.Height = newHeight;
-            }
+            var c = window.Controls[i];
+            minX = Math.Min(minX, c.X);
+            minY = Math.Min(minY, c.Y);
+            maxX = Math.Max(maxX, c.X + c.Width);
+            maxY = Math.Max(maxY, c.Y + c.Height);
         }
 
-        // Assign child range to the group
-        if (window.Controls[groupIndex] is Controls.GroupBox gb)
+        if (window.Controls[groupIndex] is Controls.GroupBox group)
         {
-            gb.FirstChildIndex = childStart;
-            gb.LastChildIndex = window.Controls.Count - 1;
+            // Decide final group bounds
+            const int outerMargin = 10;      // keep group inset from the window edges
+            const int innerPadding = 8;      // add padding around children inside the group
 
-            // Ensure group box stays slightly smaller than the window and inset by a margin
-            const int margin = 8;
-            int maxW = Math.Max(1, window.Width - margin * 2);
-            int maxH = Math.Max(1, window.Height - margin * 2);
+            int newLeft = group.X;
+            int newTop = group.Y;
+            int newWidth = group.Width;
+            int newHeight = group.Height;
 
-            gb.X = Math.Max(margin, gb.X);
-            gb.Y = Math.Max(margin, gb.Y);
-            if (gb.Width > maxW) gb.Width = maxW;
-            if (gb.Height > maxH) gb.Height = maxH;
-
-            // Keep right/bottom within margin as well
-            if (gb.X + gb.Width > window.Width - margin)
+            if (minX != int.MaxValue) // has children
             {
-                gb.Width = Math.Max(1, (window.Width - margin) - gb.X);
-            }
-            if (gb.Y + gb.Height > window.Height - margin)
-            {
-                gb.Height = Math.Max(1, (window.Height - margin) - gb.Y);
+                if (autoPos)
+                {
+                    newLeft = Math.Max(0, minX - innerPadding);
+                    newTop = Math.Max(0, minY - innerPadding);
+                }
+
+                if (autoSize)
+                {
+                    newWidth = Math.Max(1, (maxX + innerPadding) - newLeft);
+                    newHeight = Math.Max(1, (maxY + innerPadding) - newTop);
+                }
             }
         }
     }
