@@ -20,14 +20,8 @@ public sealed class GroupBox : Control
         int absX = X + x;
         int absY = Y + y;
 
-        // Default background: Parchment (no wood)
-        DesignRenderer.Render(Design.Parchment, absX, absY, Width, Height, 255);
-
-        // Optional overlay if a specific design was set (other than None/Parchment)
-        if (Design != Design.None && Design != Design.Parchment)
-        {
-            DesignRenderer.Render(Design, absX, absY, Width, Height, 255);
-        }
+        // Default background
+        DesignRenderer.Render(Design.Parchment, absX, absY, Width, Height);
 
         // Caption
         if (!string.IsNullOrWhiteSpace(Text))
