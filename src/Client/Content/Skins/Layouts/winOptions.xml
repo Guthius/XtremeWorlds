@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
     <Window Name="winOptions" Size="260, 270" Position="0, 0" Font="Georgia" Design="WindowNoBar" StartPosition="CenterScreen">
     <!-- Parchment and decorative boxes to match original -->
-    <PictureBox Name="picParchment" Position="6, 6" Size="248, 254" Design="Parchment"/>
+	<GroupBox Name="grpOptions" Position="6, 26" Size="244, 234">
+		<Label Name="lblGeneral" Text="General Options" Position="20, 10" Size="220, 18" Font="Georgia" Align="Center"/>
 
-    <Label Name="lblGeneral" Text="General Options" Position="20, 18" Size="220, 18" Font="Georgia" Align="Center"/>
+		<CheckBox Name="chkMusic" Text="Music" Position="30, 50" Size="100, 20" Design="CheckboxNormal"/>
+		<CheckBox Name="chkSound" Text="Sound" Position="130, 50" Size="100, 20" Design="CheckboxNormal"/>
+		<CheckBox Name="chkAutotile" Text="Autotile" Position="30, 80" Size="100, 20" Design="CheckboxNormal"/>
+		<CheckBox Name="chkFullscreen" Text="Fullscreen" Position="130, 80" Size="100, 20" Design="CheckboxNormal"/>
+		<CheckBox Name="chkVsync" Text="VSync" Position="30, 110" Size="100, 20" Design="CheckboxNormal"/>
 
-    <CheckBox Name="chkMusic" Text="Music" Position="30, 50" Size="100, 20" Design="CheckboxNormal"/>
-    <CheckBox Name="chkSound" Text="Sound" Position="130, 50" Size="100, 20" Design="CheckboxNormal"/>
-    <CheckBox Name="chkAutotile" Text="Autotile" Position="30, 80" Size="100, 20" Design="CheckboxNormal"/>
-    <CheckBox Name="chkFullscreen" Text="Fullscreen" Position="130, 80" Size="100, 20" Design="CheckboxNormal"/>
-    <CheckBox Name="chkVsync" Text="VSync" Position="30, 110" Size="100, 20" Design="CheckboxNormal"/>
+		<Label Name="lblRes" Text="Resolution" Position="20, 145" Size="220, 18" Font="Georgia" Align="Center"/>
+		<ComboBox Name="cmbRes" Position="55, 175" Size="150, 20"/>
 
-    <Label Name="lblRes" Text="Resolution" Position="20, 145" Size="220, 18" Font="Georgia" Align="Center"/>
-    <ComboBox Name="cmbRes" Position="55, 175" Size="150, 20"/>
-
-    <Button Name="btnConfirm" Text="Confirm" Position="90, 225" Size="80, 28" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+		<Button Name="btnConfirm" Text="Confirm" Position="90, 225" Size="80, 28" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+	</GroupBox>
 </Window>
