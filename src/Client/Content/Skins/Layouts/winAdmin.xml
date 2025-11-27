@@ -10,8 +10,6 @@
     <GroupBox Name="grpAdmin" Position="6, 26" Size="628, 224">
         <!-- MODERATION TAB -->
         <GroupBox Name="grpModeration" Caption="Moderation">
-            <PictureBox Name="picModerationBG" Position="6, 46" Size="628, 190" Design="Parchment"/>
-
             <!-- Player Name Section -->
             <Label Name="lblPlayerName" Text="Player Name:" Position="20, 55" Size="140, 12"/>
             <TextBox Name="txtName" Position="125, 53" Size="300, 18"/>
@@ -69,8 +67,6 @@
 
         <!-- EDITORS TAB -->
         <GroupBox Name="grpEditors" Caption="Editors">
-            <PictureBox Name="picEditorsBG" Position="6, 46" Size="628, 190" Design="Parchment"/>
-
             <!-- Editor Buttons Grid Row 1 -->
             <Button Name="btnAnimationEditor" Text="Animation" Position="25, 55" Size="140, 22"
             Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>

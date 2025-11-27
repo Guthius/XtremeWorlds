@@ -855,7 +855,6 @@ public class Crystalshire
         void ShowTab(string tab)
         {
             var tools = new[]{
-                "picTilesBG",
                 "sldTileset","lblTileset",
                 "cmbLayer",
                 "cmbAutotile",
@@ -863,7 +862,7 @@ public class Crystalshire
             };
 
             var attrs = new[]{
-                "picAttrBG","lblAttributes","cmbAttrMode","btnAttrInfo",
+                "lblAttributes","cmbAttrMode","btnAttrInfo",
                 "lblAttrLayer","cmbAttribute",
                 // Warp
                 "lblWarp","lblWarpMap","sldMapWarp","lblWarpX","sldMapWarpX","lblWarpY","sldMapWarpY","btnMapWarp",
@@ -2615,7 +2614,6 @@ public class Crystalshire
             // Moderation controls (include background + labels)
             var moderation = new[]
             {
-                "picModerationBG",
                 "lblPlayerName","txtName",
                 "lblAccessLevel","cmbAccess","btnSetAccess",
                 "lblMapNumber","txtAdminMap","btnWarpTo",
@@ -2625,15 +2623,14 @@ public class Crystalshire
             };
 
             // Map List controls
-            var mapList = new[] { "picMapListBG", "lstMaps", "btnMapWarp", "btnMapReport", "sldMapList" };
+            var mapList = new[] { "lstMaps", "btnMapWarp", "btnMapReport", "sldMapList" };
 
             // Map Tools controls
-            var mapTools = new[] { "picMapToolsBG", "btnRespawn", "btnALoc" };
+            var mapTools = new[] { "btnRespawn", "btnALoc" };
 
             // Editor controls
             var editors = new[]
             {
-                "picEditorsBG",
                 "btnAnimationEditor","btnJobEditor","btnItemEditor","btnMapEditor",
                 "btnNpcEditor","btnProjectiles","btnResourceEditor","btnShopEditor",
                 "btnSkillEditor","btnMoralEditor","btnScriptEditor"
