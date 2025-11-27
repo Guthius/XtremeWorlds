@@ -95,9 +95,7 @@
             <Button Name="btnScriptEditor" Text="Script" Position="315, 109" Size="140, 22"
             Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
         </GroupBox>
-
-        <Button Name="btnClose" Position="-19, 5" Size="16, 16" Image="8" ImageHover="9" ImageMouseDown="10"/>
-
     </GroupBox>
-
+	
+	<Button Name="btnClose" Position="-19, 5" Size="16, 16" Image="8" ImageHover="9" ImageMouseDown="10"/>
 </Window>
