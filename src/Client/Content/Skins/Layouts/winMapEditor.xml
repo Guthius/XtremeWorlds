@@ -6,20 +6,19 @@
         StartPosition="CenterScreen"
         Visible="false">
 
-  <!-- Former TabControl area replaced by GroupBoxes used as visibility containers -->
   <GroupBox Name="grpTiles" Caption="" Position="6, 46" Size="792, 688">
     <!-- Page header like Effects tab -->
     <Label Name="lblTiles" Text="Tiles" Position="20, 84" Size="200, 14"/>
 
     <!-- Top selectors under header -->
-    <Label Name="lblTilesetCaption" Text="Tileset" Position="21, 104" Size="60, 16"/>
+    <Label Name="lblTileset" Text="Tileset" Position="21, 104" Size="60, 16"/>
     <ScrollBar Name="sldTileset" Position="85, 104" Size="230, 12" Min="1" Max="1" Value="1" Orientation="Horizontal" ThumbSize="16"/>
     <Label Name="lblTileset" Text="1" Position="320, 104" Size="30, 14"/>
 
-    <Label Name="lblLayerCaption" Text="Layer" Position="355, 104" Size="48, 18"/>
+    <Label Name="lblLayer" Text="Layer" Position="355, 104" Size="48, 18"/>
     <ComboBox Name="cmbLayer" Position="407, 104" Size="160, 18"/>
 
-    <Label Name="lblAutotileCaption" Text="Autotile" Position="575, 104" Size="64, 18"/>
+    <Label Name="lblAutotile" Text="Autotile" Position="575, 104" Size="64, 18"/>
     <ComboBox Name="cmbAutotile" Position="643, 104" Size="140, 18"/>
 
     <!-- Opacity toggle for current layer visibility -->
@@ -31,7 +30,7 @@
     <ScrollBar Name="sldTilesetH" Position="179, 646" Size="512, 12" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
   </GroupBox>
 
-  <GroupBox Name="grpAttributes" Caption="" Position="6, 46" Size="792, 688">
+  <GroupBox Name="grpAttributes" Position="6, 46" Size="792, 688">
     <Label Name="lblAttributes" Text="Attributes" Position="20, 84" Size="200, 14"/>
     <ComboBox Name="cmbAttrMode" Position="20, 112" Size="220, 18"/>
     <Button Name="btnAttrInfo" Text="Info" Position="248, 112" Size="60, 18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
