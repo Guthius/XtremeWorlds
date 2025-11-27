@@ -1,5 +1,6 @@
 ﻿using Core.Globals;
 using Core.Net;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,6 +10,47 @@ namespace Server
 {
     public static class MapItem
     {
+        public static void GetItem(int playerId)
+        {
+            var mapNum = Command.GetPlayerMap(playerId);
+
+            for (var mapItemNum = 0; mapItemNum < Core.Globals.Variables.MaxMapItems; mapItemNum++)
+            {
+                if (Data.MapItem[mapNum, mapItemNum].Num < 0 ||
+                    Data.MapItem[mapNum, mapItemNum].Num >= Core.Globals.Variables.MaxItems)
+                {
+                    continue;
+                }
+
+                if (Math.Floor((double)Data.MapItem[mapNum, mapItemNum].X / 32) != Command.GetPlayerX(playerId) || Math.Floor((double)Data.MapItem[mapNum, mapItemNum].Y / 32) != Command.GetPlayerY(playerId))
+                {
+                    continue;
+                }
+
+                var slot = Player.FindOpenInvSlot(playerId, Data.MapItem[mapNum, mapItemNum].Num);
+                if (slot == -1)
+                {
+                    NetworkSend.PlayerMsg(playerId, "Your inventory is full.", (int)ColorName.BrightRed);
+                    break;
+                }
+
+                if (!Player.CanPickup(playerId, mapItemNum))
+                {
+                    break;
+                }
+
+                try
+                {
+                    Script.Instance?.MapGetItem(playerId, mapNum, mapItemNum, slot);
+                }
+                catch (Exception ex)
+                {
+                    General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(GetItem));
+                }
+
+                break;
+            }
+        }
         public static void SpawnAll()
         {
             for (var mapNum = 0; mapNum < Core.Globals.Variables.MaxMaps; mapNum++)

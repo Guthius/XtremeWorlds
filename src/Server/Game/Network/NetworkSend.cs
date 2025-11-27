@@ -1374,5 +1374,305 @@ public static class NetworkSend
         }
     }
 
+    public static void SendUpdateResourceToAll(int resourceNum)
+    {
+        var packet = new PacketWriter();
 
+        packet.WriteEnum(ServerPackets.SUpdateResource);
+
+        WriteResourceDataToPacket(resourceNum, packet);
+
+        PlayerService.Instance.SendDataToAll(packet.GetBytes());
+    }
+
+    public static void SendUpdateResourceTo(int playerId, int resourceNum)
+    {
+        var packet = new PacketWriter();
+
+        packet.WriteEnum(ServerPackets.SUpdateResource);
+
+        WriteResourceDataToPacket(resourceNum, packet);
+
+        PlayerService.Instance.SendDataTo(playerId, packet.GetBytes());
+    }
+
+    private static void WriteResourceDataToPacket(int resourceNum, PacketWriter packet)
+    {
+        packet.WriteInt32(resourceNum);
+        packet.WriteInt32(Data.Resource[resourceNum].Animation);
+        packet.WriteString(Data.Resource[resourceNum].EmptyMessage);
+        packet.WriteInt32(Data.Resource[resourceNum].ExhaustedImage);
+        packet.WriteInt32(Data.Resource[resourceNum].Health);
+        packet.WriteInt32(Data.Resource[resourceNum].ExpReward);
+        packet.WriteInt32(Data.Resource[resourceNum].ItemReward);
+        packet.WriteString(Data.Resource[resourceNum].Name);
+        packet.WriteInt32(Data.Resource[resourceNum].ResourceImage);
+        packet.WriteInt32(Data.Resource[resourceNum].ResourceType);
+        packet.WriteInt32(Data.Resource[resourceNum].RespawnTime);
+        packet.WriteString(Data.Resource[resourceNum].SuccessMessage);
+        packet.WriteInt32(Data.Resource[resourceNum].LvlRequired);
+        packet.WriteInt32(Data.Resource[resourceNum].ToolRequired);
+        packet.WriteBoolean(Data.Resource[resourceNum].Walkthrough);
+    }
+
+    public static void SendMapResourceToMap(int mapNum)
+    {
+        var packet = new PacketWriter();
+
+        packet.WriteEnum(ServerPackets.SMapResource);
+        packet.WriteInt32(Data.MapResource[mapNum].ResourceCount);
+
+        if (Data.MapResource[mapNum].ResourceCount > 0)
+        {
+            for (var i = 0; i < Data.MapResource[mapNum].ResourceCount; i++)
+            {
+                packet.WriteByte(Data.MapResource[mapNum].ResourceData[i].State);
+                packet.WriteInt32(Data.MapResource[mapNum].ResourceData[i].X);
+                packet.WriteInt32(Data.MapResource[mapNum].ResourceData[i].Y);
+            }
+        }
+
+        NetworkConfig.SendDataToMap(mapNum, packet.GetBytes());
+    }
+
+    public static void SendResources(int playerId)
+    {
+        for (var resourceNum = 0; resourceNum < Core.Globals.Variables.MaxResources; resourceNum++)
+        {
+            if (Data.Resource[resourceNum].Name.Length > 0)
+            {
+                NetworkSend.SendUpdateResourceTo(playerId, resourceNum);
+            }
+        }
+    }
+
+
+    public static void SendItems(int playerId)
+    {
+        for (var itemNum = 0; itemNum < Core.Globals.Variables.MaxItems; itemNum++)
+        {
+            if (Data.Item[itemNum].Name.Length > 0)
+            {
+                SendUpdateItemTo(playerId, itemNum);
+            }
+        }
+    }
+
+    public static void SendUpdateItemTo(int playerId, int itemNum)
+    {
+        var packet = new PacketWriter();
+
+        packet.WriteEnum(ServerPackets.SUpdateItem);
+
+        WriteItemDataToPacket(itemNum, packet);
+
+        PlayerService.Instance.SendDataTo(playerId, packet.GetBytes());
+    }
+
+    public static void SendUpdateItemToAll(int itemNum)
+    {
+        var packet = new PacketWriter();
+
+        packet.WriteEnum(ServerPackets.SUpdateItem);
+
+        WriteItemDataToPacket(itemNum, packet);
+
+        PlayerService.Instance.SendDataToAll(packet.GetBytes());
+    }
+
+    private static void WriteItemDataToPacket(int itemNum, PacketWriter packet)
+    {
+        var statCount = Enum.GetNames<Stat>().Length;
+
+        packet.WriteInt32(itemNum);
+        packet.WriteInt32(Data.Item[itemNum].AccessReq);
+
+        for (var i = 0; i < statCount; i++)
+        {
+            packet.WriteInt32(Data.Item[itemNum].AddStat[i]);
+        }
+
+        packet.WriteInt32(Data.Item[itemNum].Animation);
+        packet.WriteByte(Data.Item[itemNum].BindType);
+        packet.WriteInt32(Data.Item[itemNum].JobReq);
+        packet.WriteInt32(Data.Item[itemNum].Data1);
+        packet.WriteInt32(Data.Item[itemNum].Data2);
+        packet.WriteInt32(Data.Item[itemNum].Data3);
+        packet.WriteInt32(Data.Item[itemNum].LevelReq);
+        packet.WriteInt32(Data.Item[itemNum].Mastery);
+        packet.WriteString(Data.Item[itemNum].Name);
+        packet.WriteInt32(Data.Item[itemNum].Paperdoll);
+        packet.WriteInt32(Data.Item[itemNum].Icon);
+        packet.WriteInt32(Data.Item[itemNum].Price);
+        packet.WriteInt32(Data.Item[itemNum].Rarity);
+        packet.WriteInt32(Data.Item[itemNum].Speed);
+        packet.WriteInt32(Data.Item[itemNum].Stackable);
+        packet.WriteString(Data.Item[itemNum].Description);
+
+        for (var i = 0; i < statCount; i++)
+        {
+            packet.WriteInt32(Data.Item[itemNum].StatReq[i]);
+        }
+
+        packet.WriteInt32(Data.Item[itemNum].Type);
+        packet.WriteInt32(Data.Item[itemNum].SubType);
+        packet.WriteInt32(Data.Item[itemNum].ItemLevel);
+        packet.WriteInt32(Data.Item[itemNum].KnockBack);
+        packet.WriteInt32(Data.Item[itemNum].KnockBackTiles);
+        packet.WriteInt32(Data.Item[itemNum].Projectile);
+        packet.WriteInt32(Data.Item[itemNum].Ammo);
+    }
+
+
+    public static void SendAnimation(int mapNum, int anim, int x, int y, byte lockType = 0, int lockindex = 0)
+    {
+        var packet = new PacketWriter(4);
+
+        packet.WriteEnum(ServerPackets.SAnimation);
+        packet.WriteInt32(anim);
+        packet.WriteInt32(x);
+        packet.WriteInt32(y);
+        packet.WriteInt32(lockType);
+        packet.WriteInt32(lockindex);
+
+        NetworkConfig.SendDataToMap(mapNum, packet.GetBytes());
+    }
+
+    public static void SendAnimations(int playerId)
+    {
+        for (var animationNum = 0; animationNum < Core.Globals.Variables.MaxAnimations; animationNum++)
+        {
+            if (Data.Animation[animationNum].Name.Length > 0)
+            {
+                SendUpdateAnimationTo(playerId, animationNum);
+            }
+        }
+    }
+
+    public static void SendUpdateAnimationTo(int playerId, int animationNum)
+    {
+        var packet = new PacketWriter();
+
+        packet.WriteEnum(ServerPackets.SUpdateAnimation);
+
+        WriteAnimationDataToPacket(animationNum, packet);
+
+        PlayerService.Instance.SendDataTo(playerId, packet.GetBytes());
+    }
+
+    public static void SendUpdateAnimationToAll(int animationNum)
+    {
+        var packet = new PacketWriter();
+
+        packet.WriteEnum(ServerPackets.SUpdateAnimation);
+
+        WriteAnimationDataToPacket(animationNum, packet);
+
+        PlayerService.Instance.SendDataToAll(packet.GetBytes());
+    }
+
+    private static void WriteAnimationDataToPacket(int animationNum, PacketWriter packet)
+    {
+        packet.WriteInt32(animationNum);
+
+        foreach (var frame in Data.Animation[animationNum].Frames)
+        {
+            packet.WriteInt32(frame);
+        }
+
+        foreach (var loopCount in Data.Animation[animationNum].LoopCount)
+        {
+            packet.WriteInt32(loopCount);
+        }
+
+        foreach (var loopTime in Data.Animation[animationNum].LoopTime)
+        {
+            packet.WriteInt32(loopTime);
+        }
+
+        packet.WriteString(Data.Animation[animationNum].Name);
+        packet.WriteString(Data.Animation[animationNum].Sound);
+
+        foreach (var sprite in Data.Animation[animationNum].Sprite)
+        {
+            packet.WriteInt32(sprite);
+        }
+    }
+
+
+    public static void SendSpecialEffect(int index, int effectType, int data1 = 0, int data2 = 0, int data3 = 0, int data4 = 0)
+    {
+        var buffer = new PacketWriter(24);
+
+        buffer.WriteEnum(ServerPackets.SSpecialEffect);
+        buffer.WriteInt32(effectType);
+
+        switch (effectType)
+        {
+            case Event.EffectTypeFadeIn:
+            case Event.EffectTypeFadeOut:
+            case Event.EffectTypeFlash:
+                break;
+            case Event.EffectTypeFog:
+                buffer.WriteInt32(data1); // Fog number
+                buffer.WriteInt32(data2); // Movement speed
+                buffer.WriteInt32(data3); // Opacity
+                break;
+            case Event.EffectTypeWeather:
+                buffer.WriteInt32(data1); // Weather type
+                buffer.WriteInt32(data2); // Intensity
+                break;
+            case Event.EffectTypeTint:
+                buffer.WriteInt32(data1); // Red
+                buffer.WriteInt32(data2); // Green
+                buffer.WriteInt32(data3); // Blue
+                buffer.WriteInt32(data4); // Alpha
+                break;
+            case Event.EffectTypeScreenShake:
+                buffer.WriteInt32(data1); // Intensity
+                buffer.WriteInt32(data2); // Duration
+                break;
+            default:
+                General.Logger.LogWarning($"Unknown effect type {effectType} sent to player {index}");
+                return;
+        }
+
+        PlayerService.Instance.SendDataTo(index, buffer.GetBytes());
+    }
+
+    public static void SendSwitchesAndVariables(int index, bool everyone = false)
+    {
+        var buffer = new PacketWriter(4 + (Core.Globals.Variables.MaxSwitches + Core.Globals.Variables.MaxVariables) * 256);
+        buffer.WriteEnum(ServerPackets.SSwitchesAndVariables);
+        for (var i = 0; i < Core.Globals.Variables.MaxSwitches; i++) buffer.WriteString(Event.Switches[i]);
+        for (var i = 0; i < Core.Globals.Variables.MaxVariables; i++) buffer.WriteString(Event.Variables[i]);
+
+        if (everyone)
+        {
+            PlayerService.Instance.SendDataToAll(buffer.GetBytes());
+        }
+        else
+        {
+            PlayerService.Instance.SendDataTo(index, buffer.GetBytes());
+        }
+    }
+
+    public static void SendMapEventData(int index)
+    {
+        var buffer = new PacketWriter(4);
+
+        var mapNum = GetPlayerMap(index);
+
+        buffer.WriteEnum(ServerPackets.SMapEventData);
+        buffer.WriteInt32(Data.Map[mapNum].EventCount);
+
+        if (Data.Map[mapNum].EventCount > 0)
+        {
+            Event.SerializeMapEvents(buffer, mapNum);
+        }
+
+        PlayerService.Instance.SendDataTo(index, buffer.GetBytes());
+
+        SendSwitchesAndVariables(index);
+    }
 }

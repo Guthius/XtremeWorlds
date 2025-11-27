@@ -519,8 +519,8 @@ public static class Npc
 
         Data.TempPlayer[session.Id].Editor = EditorType.Npc;
 
-        Item.SendItems(session.Id);
-        Animation.SendAnimations(session.Id);
+        NetworkSend.SendItems(session.Id);
+        NetworkSend.SendAnimations(session.Id);
         NetworkSend.SendSkills(session.Id);
 
         SendNpcs(session.Id);

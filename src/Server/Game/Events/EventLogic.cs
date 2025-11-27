@@ -1979,7 +1979,7 @@ namespace Server
                                             switch (command.Data2)
                                             {
                                                 case 0: // On Player
-                                                    Animation.SendAnimation(mapNum, command.Data1, GetPlayerX(i), GetPlayerY(i), (byte) TargetType.Player, i);
+                                                    NetworkSend.SendAnimation(mapNum, command.Data1, GetPlayerX(i), GetPlayerY(i), (byte) TargetType.Player, i);
                                                     break;
                                                 case 1: // On Event
                                                 {
@@ -1990,7 +1990,7 @@ namespace Server
                                                     if (Data.Map[mapNum].Event[command.Data3].Globals == 1)
                                                     {
                                                         // Play on global event.
-                                                        Animation.SendAnimation(mapNum, command.Data1,
+                                                        NetworkSend.SendAnimation(mapNum, command.Data1,
                                                             Data.Map[mapNum].Event[command.Data3].X,
                                                             Data.Map[mapNum].Event[command.Data3].Y);
                                                     }
@@ -2001,7 +2001,7 @@ namespace Server
                                                             break;
 
                                                         // Play on local event.
-                                                        Animation.SendAnimation(mapNum, command.Data1,
+                                                        NetworkSend.SendAnimation(mapNum, command.Data1,
                                                             Data.TempPlayer[i].EventMap.EventPages[command.Data3].X,
                                                             Data.TempPlayer[i].EventMap.EventPages[command.Data3].Y,
                                                             (byte) TargetType.Event, command.Data3);
@@ -2010,7 +2010,7 @@ namespace Server
                                                     break;
                                                 }
                                                 case 2: // On Coordinates
-                                                    Animation.SendAnimation(mapNum, command.Data1, command.Data3, command.Data4, 0, 0);
+                                                    NetworkSend.SendAnimation(mapNum, command.Data1, command.Data3, command.Data4, 0, 0);
                                                     break;
                                             }
 
@@ -2117,27 +2117,27 @@ namespace Server
                                             break;
 
                                         case (byte) EventCommand.FadeIn:
-                                            Event.SendSpecialEffect(i, Event.EffectTypeFadein);
+                                            NetworkSend.SendSpecialEffect(i, Event.EffectTypeFadeIn);
                                             break;
 
                                         case (byte) EventCommand.FadeOut:
-                                            Event.SendSpecialEffect(i, Event.EffectTypeFadeout);
+                                            NetworkSend.SendSpecialEffect(i, Event.EffectTypeFadeOut);
                                             break;
 
                                         case (byte) EventCommand.FlashScreen:
-                                            Event.SendSpecialEffect(i, Event.EffectTypeFlash);
+                                            NetworkSend.SendSpecialEffect(i, Event.EffectTypeFlash);
                                             break;
 
                                         case (byte) EventCommand.SetFog:
-                                            Event.SendSpecialEffect(i, Event.EffectTypeFog, command.Data1, command.Data2, command.Data3);
+                                            NetworkSend.SendSpecialEffect(i, Event.EffectTypeFog, command.Data1, command.Data2, command.Data3);
                                             break;
 
                                         case (byte) EventCommand.SetWeather:
-                                            Event.SendSpecialEffect(i, Event.EffectTypeWeather, command.Data1, command.Data2);
+                                            NetworkSend.SendSpecialEffect(i, Event.EffectTypeWeather, command.Data1, command.Data2);
                                             break;
 
                                         case (byte) EventCommand.SetScreenTint:
-                                            Event.SendSpecialEffect(i, Event.EffectTypeTint, command.Data1, command.Data2, command.Data3, command.Data4);
+                                            NetworkSend.SendSpecialEffect(i, Event.EffectTypeTint, command.Data1, command.Data2, command.Data3, command.Data4);
                                             break;
 
                                         case (byte) EventCommand.Wait:

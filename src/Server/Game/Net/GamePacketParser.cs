@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using static Core.Globals.Command;
+using static Core.Globals.Type;
 using static Core.Net.Packets;
 using Type = Core.Globals.Type;
 
@@ -47,8 +48,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Bind(GamePacketId.FromClient.CRequestNewMap, Packet_RequestNewMap);
         Bind(GamePacketId.FromClient.CSaveMap, Packet_MapData);
         Bind(GamePacketId.FromClient.CNeedMap, Packet_NeedMap);
-        Bind(GamePacketId.FromClient.CMapGetItem, Item.HandleGetItem);
-        Bind(GamePacketId.FromClient.CMapDropItem, Item.HandleDropItem);
+        Bind(GamePacketId.FromClient.CMapGetItem, Packet_GetItem);
+        Bind(GamePacketId.FromClient.CMapDropItem, Packet_DropItem);
         Bind(GamePacketId.FromClient.CMapRespawn, Packet_RespawnMap);
         Bind(GamePacketId.FromClient.CMapReport, Packet_MapReport);
         Bind(GamePacketId.FromClient.CKickPlayer, Packet_KickPlayer);
@@ -70,13 +71,13 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Bind(GamePacketId.FromClient.CCheckPing, Packet_CheckPing);
         Bind(GamePacketId.FromClient.CUnequip, Packet_UnEquip);
         Bind(GamePacketId.FromClient.CRequestPlayerData, Packet_RequestPlayerData);
-        Bind(GamePacketId.FromClient.CRequestItem, Item.HandleRequestItem);
+        Bind(GamePacketId.FromClient.CRequestItem, Packet_RequestItem);
         Bind(GamePacketId.FromClient.CRequestNpc, Packet_RequestNpc);
-        Bind(GamePacketId.FromClient.CRequestResource, Resource.HandleRequestResource);
+        Bind(GamePacketId.FromClient.CRequestResource, Packet_RequestResource);
         Bind(GamePacketId.FromClient.CSpawnItem, Packet_SpawnItem);
         Bind(GamePacketId.FromClient.CTrainStat, Packet_TrainStat);
 
-        Bind(GamePacketId.FromClient.CRequestAnimation, Animation.HandleRequestAnimation);
+        Bind(GamePacketId.FromClient.CRequestAnimation, Packet_RequestAnimation);
         Bind(GamePacketId.FromClient.CRequestSkill, Packet_RequestSkill);
         Bind(GamePacketId.FromClient.CRequestShop, Packet_RequestShop);
         Bind(GamePacketId.FromClient.CRequestLevelUp, Packet_RequestLevelUp);
@@ -105,13 +106,13 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         Bind(GamePacketId.FromClient.CSkillLearn, Packet_SkillLearn);
 
-        Bind(GamePacketId.FromClient.CEventChatReply, Event.Packet_EventChatReply);
-        Bind(GamePacketId.FromClient.CEvent, Event.Packet_Event);
-        Bind(GamePacketId.FromClient.CRequestSwitchesAndVariables, Event.Packet_RequestSwitchesAndVariables);
-        Bind(GamePacketId.FromClient.CSwitchesAndVariables, Event.Packet_SwitchesAndVariables);
+        Bind(GamePacketId.FromClient.CEventChatReply, Packet_EventChatReply);
+        Bind(GamePacketId.FromClient.CEvent, Packet_Event);
+        Bind(GamePacketId.FromClient.CRequestSwitchesAndVariables, Packet_RequestSwitchesAndVariables);
+        Bind(GamePacketId.FromClient.CSwitchesAndVariables, Packet_SwitchesAndVariables);
 
-        Bind(GamePacketId.FromClient.CRequestProjectile, HandleRequestProjectile);
-        Bind(GamePacketId.FromClient.CClearProjectile, HandleClearProjectile);
+        Bind(GamePacketId.FromClient.CRequestProjectile, Packet_RequestProjectile);
+        Bind(GamePacketId.FromClient.CClearProjectile, Packet_ClearProjectile);
 
         Bind(GamePacketId.FromClient.CEmote, Packet_Emote);
 
@@ -120,29 +121,29 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Bind(GamePacketId.FromClient.CDeclineParty, Party.Packet_DeclineParty);
         Bind(GamePacketId.FromClient.CLeaveParty, Party.Packet_LeaveParty);
         Bind(GamePacketId.FromClient.CPartyChatMsg, Party.Packet_PartyChatMsg);
-        Bind(GamePacketId.FromClient.CRequestEditItem, Item.HandleRequestEditItem);
-        Bind(GamePacketId.FromClient.CSaveItem, Item.HandleSaveItem);
+        Bind(GamePacketId.FromClient.CRequestEditItem, Packet_RequestEditItem);
+        Bind(GamePacketId.FromClient.CSaveItem, Packet_SaveItem);
         Bind(GamePacketId.FromClient.CRequestEditNpc, Npc.HandleRequestEditNpc);
         Bind(GamePacketId.FromClient.CSaveNpc, Npc.HandleSaveNpc);
         Bind(GamePacketId.FromClient.CRequestEditShop, Packet_RequestEditShop);
         Bind(GamePacketId.FromClient.CSaveShop, Packet_SaveShop);
         Bind(GamePacketId.FromClient.CRequestEditSkill, Packet_RequestEditSkill);
         Bind(GamePacketId.FromClient.CSaveSkill, Packet_SaveSkill);
-        Bind(GamePacketId.FromClient.CRequestEditResource, Resource.HandleRequestEditResource);
-        Bind(GamePacketId.FromClient.CSaveResource, Resource.HandleSaveResource);
-        Bind(GamePacketId.FromClient.CRequestEditAnimation, Animation.HandleRequestEditAnimation);
-        Bind(GamePacketId.FromClient.CSaveAnimation, Animation.HandleSaveAnimation);
-        Bind(GamePacketId.FromClient.CRequestEditProjectile, HandleRequestEditProjectile);
-        Bind(GamePacketId.FromClient.CSaveProjectile, HandleSaveProjectile);
+        Bind(GamePacketId.FromClient.CRequestEditResource, Packet_RequestEditResource);
+        Bind(GamePacketId.FromClient.CSaveResource, Packet_SaveResource);
+        Bind(GamePacketId.FromClient.CRequestEditAnimation, Packet_RequestEditAnimation);
+        Bind(GamePacketId.FromClient.CSaveAnimation, Packet_SaveAnimation);
+        Bind(GamePacketId.FromClient.CRequestEditProjectile, Packet_RequestEditProjectile);
+        Bind(GamePacketId.FromClient.CSaveProjectile, Packet_SaveProjectile);
         Bind(GamePacketId.FromClient.CRequestEditJob, Packet_RequestEditJob);
         Bind(GamePacketId.FromClient.CSaveJob, Packet_SaveJob);
 
-        Bind(GamePacketId.FromClient.CRequestMoral, HandleRequestMoral);
-        Bind(GamePacketId.FromClient.CRequestEditMoral, HandleRequestEditMoral);
-        Bind(GamePacketId.FromClient.CSaveMoral, HandleSaveMoral);
+        Bind(GamePacketId.FromClient.CRequestMoral, Packet_RequestMoral);
+        Bind(GamePacketId.FromClient.CRequestEditMoral, Packet_RequestEditMoral);
+        Bind(GamePacketId.FromClient.CSaveMoral, Packet_SaveMoral);
 
-        Bind(GamePacketId.FromClient.CRequestEditScript, HandleRequestEditScript);
-        Bind(GamePacketId.FromClient.CSaveScript, HandleSaveScript);
+        Bind(GamePacketId.FromClient.CRequestEditScript, Packet_RequestEditScript);
+        Bind(GamePacketId.FromClient.CSaveScript, Packet_SaveScript);
 
         Bind(GamePacketId.FromClient.CCloseEditor, Packet_CloseEditor);
         Bind(GamePacketId.FromClient.CCancelCast, Packet_CancelCast);
@@ -744,7 +745,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                 }
         }
 
-        Resource.CheckResource(session.Id, x, y);
+        MapResource.Check(session.Id, x, y);
 
         // New combat system integration: attempt a melee attack on the entity (player or npc)
         // occupying the targeted tile (x,y). Legacy code only triggered animation + resource checks.                                  
@@ -1499,11 +1500,11 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         }
 
         Npc.SendNpcs(session.Id);
-        Item.SendItems(session.Id);
-        Animation.SendAnimations(session.Id);
+        NetworkSend.SendItems(session.Id);
+        NetworkSend.SendAnimations(session.Id);
         NetworkSend.SendShops(session.Id);
-        Resource.SendResources(session.Id);
-        Event.SendMapEventData(session.Id);
+        NetworkSend.SendResources(session.Id);
+        NetworkSend.SendMapEventData(session.Id);
         NetworkSend.SendMorals(session.Id);
 
         Data.TempPlayer[session.Id].Editor = EditorType.Map;
@@ -1531,7 +1532,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         Data.TempPlayer[session.Id].Editor = EditorType.Shop;
 
-        Item.SendItems(session.Id);
+        NetworkSend.SendItems(session.Id);
         NetworkSend.SendShops(session.Id);
 
         var packetWriter = new PacketWriter(4);
@@ -1591,7 +1592,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         NetworkSend.SendJobs(session);
         NetworkSend.SendProjectiles(session.Id);
-        Animation.SendAnimations(session.Id);
+        NetworkSend.SendAnimations(session.Id);
         NetworkSend.SendSkills(session.Id);
 
         var packetWriter = new PacketWriter(4);
@@ -2680,7 +2681,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             return;
         }
 
-        Item.SendItems(session.Id);
+        NetworkSend.SendItems(session.Id);
         NetworkSend.SendJobs(session);
 
         Data.TempPlayer[session.Id].Editor = EditorType.Job;
@@ -2754,7 +2755,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
     }
 
 
-    public static void HandleRequestEditMoral(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static void Packet_RequestEditMoral(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
         {
@@ -2779,7 +2780,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         PlayerService.Instance.SendDataTo(session.Id, packet.GetBytes());
     }
 
-    public static void HandleSaveMoral(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static void Packet_SaveMoral(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var packetReader = new PacketReader(bytes);
 
@@ -2817,12 +2818,12 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         NetworkSend.SendMorals(session.Id);
     }
 
-    public static void HandleRequestMoral(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static void Packet_RequestMoral(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         NetworkSend.SendMorals(session.Id);
     }
 
-    public static void HandleRequestEditScript(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static void Packet_RequestEditScript(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Owner)
         {
@@ -2867,7 +2868,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         session.Channel.Send(packetWriter.GetBytes());
     }
 
-    public static void HandleSaveScript(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static void Packet_SaveScript(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var packetReader = new PacketReader(bytes);
 
@@ -2891,7 +2892,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         _ = Script.LoadAsync(session.Id);
     }
 
-    public static void HandleRequestProjectile(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static void Packet_RequestProjectile(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var packetReader = new PacketReader(bytes);
 
@@ -2900,7 +2901,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         NetworkSend.SendUpdateProjectileTo(session.Id, projectileNum);
     }
 
-    public static void HandleClearProjectile(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static void Packet_ClearProjectile(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var packetReader = new PacketReader(bytes);
 
@@ -2914,7 +2915,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         MapProjectile.Clear(mapNum, projectileNum);
     }
 
-    public static void HandleRequestEditProjectile(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static void Packet_RequestEditProjectile(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
         {
@@ -2929,7 +2930,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         }
 
         NetworkSend.SendProjectiles(session.Id);
-        Animation.SendAnimations(session.Id);
+        NetworkSend.SendAnimations(session.Id);
 
         Data.TempPlayer[session.Id].Editor = EditorType.Projectile;
 
@@ -2940,7 +2941,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         PlayerService.Instance.SendDataTo(session.Id, buffer.GetBytes());
     }
 
-    public static void HandleSaveProjectile(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static void Packet_SaveProjectile(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var packetReader = new PacketReader(bytes);
 
@@ -2968,5 +2969,336 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             GetAccountLogin(session.Id), projectileNum);
 
         NetworkSend.SendUpdateProjectileToAll(projectileNum);
+    }
+
+    public static void Packet_RequestEditResource(GameSession session, ReadOnlyMemory<byte> bytes)
+    {
+        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        {
+            return;
+        }
+
+        var user = IsEditorLocked(session.Id, EditorType.Resource);
+        if (!string.IsNullOrEmpty(user))
+        {
+            NetworkSend.PlayerMsg(session.Id, "The game editor is locked and being used by " + user + ".", (int)ColorName.BrightRed);
+            return;
+        }
+
+        Data.TempPlayer[session.Id].Editor = EditorType.Resource;
+
+        NetworkSend.SendItems(session.Id);
+        NetworkSend.SendAnimations(session.Id);
+
+        NetworkSend.SendResources(session.Id);
+
+        var packet = new PacketWriter(4);
+
+        packet.WriteEnum(ServerPackets.SResourceEditor);
+
+        PlayerService.Instance.SendDataTo(session.Id, packet.GetBytes());
+    }
+
+    public static void Packet_SaveResource(GameSession session, ReadOnlyMemory<byte> bytes)
+    {
+        var packetReader = new PacketReader(bytes);
+
+        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        {
+            return;
+        }
+
+        var resourcenum = packetReader.ReadInt32();
+        if (resourcenum < 0 || resourcenum >= Core.Globals.Variables.MaxResources)
+        {
+            return;
+        }
+
+        Data.Resource[resourcenum].Animation = packetReader.ReadInt32();
+        Data.Resource[resourcenum].EmptyMessage = packetReader.ReadString();
+        Data.Resource[resourcenum].ExhaustedImage = packetReader.ReadInt32();
+        Data.Resource[resourcenum].Health = packetReader.ReadInt32();
+        Data.Resource[resourcenum].ExpReward = packetReader.ReadInt32();
+        Data.Resource[resourcenum].ItemReward = packetReader.ReadInt32();
+        Data.Resource[resourcenum].Name = packetReader.ReadString();
+        Data.Resource[resourcenum].ResourceImage = packetReader.ReadInt32();
+        Data.Resource[resourcenum].ResourceType = packetReader.ReadInt32();
+        Data.Resource[resourcenum].RespawnTime = packetReader.ReadInt32();
+        Data.Resource[resourcenum].SuccessMessage = packetReader.ReadString();
+        Data.Resource[resourcenum].LvlRequired = packetReader.ReadInt32();
+        Data.Resource[resourcenum].ToolRequired = packetReader.ReadInt32();
+        Data.Resource[resourcenum].Walkthrough = packetReader.ReadBoolean();
+
+        Resource.Save(resourcenum);
+
+        General.Logger.LogInformation("{AccountName} saved Resource #{Resourcenum}",
+            GetAccountLogin(session.Id), resourcenum);
+
+        NetworkSend.SendUpdateResourceToAll(resourcenum);
+    }
+
+    public static void Packet_RequestResource(GameSession session, ReadOnlyMemory<byte> bytes)
+    {
+        var packetReader = new PacketReader(bytes);
+
+        var resourceNum = packetReader.ReadInt32();
+        if (resourceNum < 0 | resourceNum > Core.Globals.Variables.MaxResources)
+        {
+            return;
+        }
+
+        NetworkSend.SendUpdateResourceTo(session.Id, resourceNum);
+    }
+
+    public static void Packet_RequestItem(GameSession session, ReadOnlyMemory<byte> bytes)
+    {
+        var packetReader = new PacketReader(bytes);
+
+        var itemNum = packetReader.ReadInt32();
+        if (itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems)
+        {
+            return;
+        }
+
+        NetworkSend.SendUpdateItemTo(session.Id, itemNum);
+    }
+
+    public static void Packet_RequestEditItem(GameSession session, ReadOnlyMemory<byte> bytes)
+    {
+        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Mapper)
+        {
+            return;
+        }
+
+        var user = IsEditorLocked(session.Id, EditorType.Item);
+        if (!string.IsNullOrEmpty(user))
+        {
+            NetworkSend.PlayerMsg(session.Id, "The game editor is locked and being used by " + user + ".", (int)ColorName.BrightRed);
+            return;
+        }
+
+        Data.TempPlayer[session.Id].Editor = EditorType.Item;
+
+        NetworkSend.SendAnimations(session.Id);
+        NetworkSend.SendProjectiles(session.Id);
+        NetworkSend.SendJobs(session);
+        NetworkSend.SendItems(session.Id);
+
+        var packet = new PacketWriter(4);
+
+        packet.WriteEnum(ServerPackets.SItemEditor);
+
+        PlayerService.Instance.SendDataTo(session.Id, packet.GetBytes());
+    }
+
+    public static void Packet_SaveItem(GameSession session, ReadOnlyMemory<byte> bytes)
+    {
+        var packetReader = new PacketReader(bytes);
+
+        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        {
+            return;
+        }
+
+        var itemNum = packetReader.ReadInt32();
+        if (itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems)
+        {
+            return;
+        }
+
+        Data.Item[itemNum].AccessReq = packetReader.ReadInt32();
+
+        var statCount = Enum.GetNames<Stat>().Length;
+        for (var i = 0; i < statCount; i++)
+        {
+            Data.Item[itemNum].AddStat[i] = (byte)packetReader.ReadInt32();
+        }
+
+        Data.Item[itemNum].Animation = packetReader.ReadInt32();
+        Data.Item[itemNum].BindType = packetReader.ReadByte();
+        Data.Item[itemNum].JobReq = packetReader.ReadInt32();
+        Data.Item[itemNum].Data1 = packetReader.ReadInt32();
+        Data.Item[itemNum].Data2 = packetReader.ReadInt32();
+        Data.Item[itemNum].Data3 = packetReader.ReadInt32();
+        Data.Item[itemNum].LevelReq = packetReader.ReadInt32();
+        Data.Item[itemNum].Mastery = (byte)packetReader.ReadInt32();
+        Data.Item[itemNum].Name = packetReader.ReadString();
+        Data.Item[itemNum].Paperdoll = packetReader.ReadInt32();
+        Data.Item[itemNum].Icon = packetReader.ReadInt32();
+        Data.Item[itemNum].Price = packetReader.ReadInt32();
+        Data.Item[itemNum].Rarity = (byte)packetReader.ReadInt32();
+        Data.Item[itemNum].Speed = packetReader.ReadInt32();
+        Data.Item[itemNum].Stackable = (byte)packetReader.ReadInt32();
+        Data.Item[itemNum].Description = packetReader.ReadString();
+
+        for (var i = 0; i < statCount; i++)
+        {
+            Data.Item[itemNum].StatReq[i] = (byte)packetReader.ReadInt32();
+        }
+
+        Data.Item[itemNum].Type = (byte)packetReader.ReadInt32();
+        Data.Item[itemNum].SubType = (byte)packetReader.ReadInt32();
+        Data.Item[itemNum].ItemLevel = (byte)packetReader.ReadInt32();
+        Data.Item[itemNum].KnockBack = (byte)packetReader.ReadInt32();
+        Data.Item[itemNum].KnockBackTiles = (byte)packetReader.ReadInt32();
+        Data.Item[itemNum].Projectile = packetReader.ReadInt32();
+        Data.Item[itemNum].Ammo = packetReader.ReadInt32();
+
+        Item.Save(itemNum);
+
+        General.Logger.LogInformation("{AccountName} saved item #{ItemNum}",
+            GetAccountLogin(session.Id), itemNum);
+
+        NetworkSend.SendUpdateItemToAll(itemNum);
+    }
+
+    public static void Packet_GetItem(GameSession session, ReadOnlyMemory<byte> bytes)
+    {
+        MapItem.GetItem(session.Id);
+    }
+
+    public static void Packet_DropItem(GameSession session, ReadOnlyMemory<byte> bytes)
+    {
+        var buffer = new PacketReader(bytes);
+
+        var invNum = buffer.ReadInt32();
+        var amount = buffer.ReadInt32();
+
+        if (Data.TempPlayer[session.Id].InBank || Data.TempPlayer[session.Id].InShop >= 0)
+        {
+            return;
+        }
+
+        if (invNum < 0 || invNum > Core.Globals.Variables.MaxInv)
+        {
+            return;
+        }
+
+        if (GetPlayerInv(session.Id, invNum) < 0 || GetPlayerInv(session.Id, invNum) > Core.Globals.Variables.MaxItems)
+        {
+            return;
+        }
+
+        if (Data.Item[GetPlayerInv(session.Id, invNum)].Type == (byte)ItemCategory.Currency ||
+            Data.Item[GetPlayerInv(session.Id, invNum)].Stackable == 1)
+        {
+            if (amount < 0 | amount > GetPlayerInvValue(session.Id, invNum))
+            {
+                return;
+            }
+        }
+
+        try
+        {
+            Script.Instance?.MapDropItem(session.Id, invNum, amount);
+        }
+        catch (Exception ex)
+        {
+            General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(Packet_DropItem));
+        }
+    }
+
+    public static void Packet_RequestEditAnimation(GameSession session, ReadOnlyMemory<byte> bytes)
+    {
+        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        {
+            return;
+        }
+
+        var user = IsEditorLocked(session.Id, EditorType.Animation);
+        if (!string.IsNullOrEmpty(user))
+        {
+            NetworkSend.PlayerMsg(session.Id, "The game editor is locked and being used by " + user + ".", (int)ColorName.BrightRed);
+            return;
+        }
+
+        Data.TempPlayer[session.Id].Editor = EditorType.Animation;
+
+        NetworkSend.SendAnimations(session.Id);
+
+        var packet = new PacketWriter(4);
+
+        packet.WriteEnum(ServerPackets.SAnimationEditor);
+
+        PlayerService.Instance.SendDataTo(session.Id, packet.GetBytes());
+    }
+
+    public static void Packet_SaveAnimation(GameSession session, ReadOnlyMemory<byte> bytes)
+    {
+        var packetReader = new PacketReader(bytes);
+
+        var animationNum = packetReader.ReadInt32();
+
+        for (var i = 0; i < Data.Animation[animationNum].Frames.Length; i++)
+        {
+            Data.Animation[animationNum].Frames[i] = packetReader.ReadInt32();
+        }
+
+        for (var i = 0; i < Data.Animation[animationNum].LoopCount.Length; i++)
+        {
+            Data.Animation[animationNum].LoopCount[i] = packetReader.ReadInt32();
+        }
+
+        for (var i = 0; i < Data.Animation[animationNum].LoopTime.Length; i++)
+        {
+            Data.Animation[animationNum].LoopTime[i] = packetReader.ReadInt32();
+        }
+
+        Data.Animation[animationNum].Name = packetReader.ReadString();
+        Data.Animation[animationNum].Sound = packetReader.ReadString();
+
+        for (var i = 0; i < Data.Animation[animationNum].Sprite.Length; i++)
+        {
+            Data.Animation[animationNum].Sprite[i] = packetReader.ReadInt32();
+        }
+
+        Animation.Save(animationNum);
+
+        General.Logger.LogInformation("{AccountName} saved animation #{AnimationNum}",
+            GetAccountLogin(session.Id), animationNum);
+
+        NetworkSend.SendUpdateAnimationToAll(animationNum);
+    }
+
+    public static void Packet_RequestAnimation(GameSession session, ReadOnlyMemory<byte> bytes)
+    {
+        var packetReader = new PacketReader(bytes);
+
+        var animationNum = packetReader.ReadInt32();
+        if (animationNum < 0 || animationNum >= Core.Globals.Variables.MaxAnimations)
+        {
+            return;
+        }
+
+        NetworkSend.SendUpdateAnimationTo(session.Id, animationNum);
+    }
+
+    public static void Packet_Event(GameSession session, ReadOnlyMemory<byte> bytes)
+    {
+        var buffer = new PacketReader(bytes);
+        var eventId = buffer.ReadInt32();
+        EventLogic.TriggerEvent(session.Id, eventId, 0, GetPlayerX(session.Id), GetPlayerY(session.Id));
+    }
+
+    public static void Packet_RequestSwitchesAndVariables(GameSession session, ReadOnlyMemory<byte> bytes) => NetworkSend.SendSwitchesAndVariables(session.Id);
+
+    public static void Packet_SwitchesAndVariables(GameSession session, ReadOnlyMemory<byte> bytes)
+    {
+        var buffer = new PacketReader(bytes);
+        for (var i = 0; i < Core.Globals.Variables.MaxSwitches; i++) Event.Switches[i] = buffer.ReadString();
+        for (var i = 0; i < Core.Globals.Variables.MaxVariables; i++) Event.Variables[i] = buffer.ReadString();
+
+        Event.SaveSwitches();
+        Event.SaveVariables();
+        NetworkSend.SendSwitchesAndVariables(0, true);
+    }
+
+    public static void Packet_EventChatReply(GameSession session, ReadOnlyMemory<byte> bytes)
+    {
+        var buffer = new PacketReader(bytes);
+        int eventId = buffer.ReadInt32(), pageId = buffer.ReadInt32(), reply = buffer.ReadInt32();
+
+        General.Logger.LogInformation($"Player {session.Id} responded to event {eventId} with reply {reply}");
+        Event.ProcessEventReply(session.Id, eventId, pageId, reply);
     }
 }

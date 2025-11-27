@@ -350,7 +350,7 @@ public class Script
                             case (byte)ConsumableEffect.RestoresHealth:
                                 {
                                     NetworkSend.SendActionMsg(GetPlayerMap(index), "+" + Data.Item[itemNum].Data1, (int)ColorName.BrightGreen, (byte)ActionMessageType.Scroll, GetPlayerX(index) * 32, GetPlayerY(index) * 32);
-                                    Server.Animation.SendAnimation(GetPlayerMap(index), Data.Item[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
+                                    NetworkSend.SendAnimation(GetPlayerMap(index), Data.Item[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
                                     SetPlayerVital(index, Vital.Health, GetPlayerVital(index, Vital.Health) + Data.Item[itemNum].Data1);
                                     TakeInv(index, itemNum, 1);
                                     NetworkSend.SendVital(index, Vital.Health);
@@ -360,7 +360,7 @@ public class Script
                             case (byte)ConsumableEffect.RestoresMana:
                                 {
                                     NetworkSend.SendActionMsg(GetPlayerMap(index), "+" + Data.Item[itemNum].Data1, (int)ColorName.BrightBlue, (byte)ActionMessageType.Scroll, GetPlayerX(index) * 32, GetPlayerY(index) * 32);
-                                    Server.Animation.SendAnimation(GetPlayerMap(index), Data.Item[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
+                                    NetworkSend.SendAnimation(GetPlayerMap(index), Data.Item[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
                                     SetPlayerVital(index, Vital.Stamina, GetPlayerVital(index, Vital.Stamina) + Data.Item[itemNum].Data1);
                                     TakeInv(index, itemNum, 1);
                                     NetworkSend.SendVital(index, Vital.Stamina);
@@ -369,7 +369,7 @@ public class Script
 
                             case (byte)ConsumableEffect.RestoresStamina:
                                 {
-                                    Server.Animation.SendAnimation(GetPlayerMap(index), Data.Item[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
+                                    NetworkSend.SendAnimation(GetPlayerMap(index), Data.Item[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
                                     SetPlayerVital(index, Vital.Stamina, GetPlayerVital(index, Vital.Stamina) + Data.Item[itemNum].Data1);
                                     TakeInv(index, itemNum, 1);
                                     NetworkSend.SendVital(index, Vital.Stamina);
@@ -378,7 +378,7 @@ public class Script
 
                             case (byte)ConsumableEffect.GrantsExperience:
                                 {
-                                    Server.Animation.SendAnimation(GetPlayerMap(index), Data.Item[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
+                                    NetworkSend.SendAnimation(GetPlayerMap(index), Data.Item[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
                                     SetPlayerExp(index, GetPlayerExp(index) + Data.Item[itemNum].Data1);
                                     TakeInv(index, itemNum, 1);
                                     NetworkSend.SendExp(index);
@@ -554,7 +554,7 @@ public class Script
                         SetPlayerSkill(index, i, n);
                         if (itemNum >= 0)
                         {
-                            Server.Animation.SendAnimation(GetPlayerMap(index), Data.Item[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
+                            NetworkSend.SendAnimation(GetPlayerMap(index), Data.Item[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
                             TakeInv(index, itemNum, 1);
                         }
                         NetworkSend.PlayerMsg(index, "You study the skill carefully.", (int)ColorName.Yellow);
@@ -1271,7 +1271,7 @@ public class Script
                                 resData.Timer = now;
                                 resData.State = 0;
                                 resData.Health = (byte)Data.Resource[resourceindex].Health;
-                                Server.Resource.SendMapResourceToMap(mapNum);
+                                NetworkSend.SendMapResourceToMap(mapNum);
                             }
                         }
                     }
@@ -2399,7 +2399,7 @@ public class Script
         int anim = Data.Skill[skillId].SkillAnim;
         if (anim < 0) return;
         byte tType = (byte)(target.Type == Core.Globals.Entity.EntityType.Player ? TargetType.Player : TargetType.Npc);
-        Server.Animation.SendAnimation(mapNum, anim, 0, 0, tType, target.Id);
+        NetworkSend.SendAnimation(mapNum, anim, 0, 0, tType, target.Id);
     }
 
     private void TryChainOnHit(int mapNum, Entity caster, int baseSkillId, Entity target)

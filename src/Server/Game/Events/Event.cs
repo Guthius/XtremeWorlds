@@ -15,7 +15,7 @@ using Type = Core.Globals.Type;
 
 namespace Server
 {
-    public class Event
+    public static class Event
     {
         #region Globals
 
@@ -28,13 +28,13 @@ namespace Server
         internal const int PathfindingType = 0; // 0: None, 1: Random, 2: BFS (existing), 3: A* (new)
 
         // Effect Constants
-        internal const int EffectTypeFadein = 2;
-        internal const int EffectTypeFadeout = 0;
-        internal const int EffectTypeFlash = 3;
-        internal const int EffectTypeFog = 4;
-        internal const int EffectTypeWeather = 5;
-        internal const int EffectTypeTint = 6;
-        internal const int EffectTypeScreenShake = 7; // New effect
+        public const int EffectTypeFadeIn = 2;
+        public const int EffectTypeFadeOut = 0;
+        public const int EffectTypeFlash = 3;
+        public const int EffectTypeFog = 4;
+        public const int EffectTypeWeather = 5;
+        public const int EffectTypeTint = 6;
+        public const int EffectTypeScreenShake = 7; // New effect
 
         #endregion
 
@@ -583,19 +583,8 @@ namespace Server
         }
 
         #endregion
-
-        #region Incoming Packets
-
-        public static void Packet_EventChatReply(GameSession session, ReadOnlyMemory<byte> bytes)
-        {
-            var buffer = new PacketReader(bytes);
-            int eventId = buffer.ReadInt32(), pageId = buffer.ReadInt32(), reply = buffer.ReadInt32();
-
-            General.Logger.LogInformation($"Player {session.Id} responded to event {eventId} with reply {reply}");
-            ProcessEventReply(session.Id, eventId, pageId, reply);
-        }
-
-        private static void ProcessEventReply(int index, int eventId, int pageId, int reply)
+   
+        public static void ProcessEventReply(int index, int eventId, int pageId, int reply)
         {
             for (var i = 0; i < Data.TempPlayer[index].EventProcessingCount; i++)
             {
@@ -625,108 +614,7 @@ namespace Server
             proc.CurSlot = 0;
             proc.WaitingForResponse = 0;
         }
-
-        public static void Packet_Event(GameSession session, ReadOnlyMemory<byte> bytes)
-        {
-            var buffer = new PacketReader(bytes);
-            var eventId = buffer.ReadInt32();
-            EventLogic.TriggerEvent(session.Id, eventId, 0, GetPlayerX(session.Id), GetPlayerY(session.Id));
-        }
-
-        public static void Packet_RequestSwitchesAndVariables(GameSession session, ReadOnlyMemory<byte> bytes) => SendSwitchesAndVariables(session.Id);
-
-        public static void Packet_SwitchesAndVariables(GameSession session, ReadOnlyMemory<byte> bytes)
-        {
-            var buffer = new PacketReader(bytes);
-            for (var i = 0; i < Core.Globals.Variables.MaxSwitches; i++) Switches[i] = buffer.ReadString();
-            for (var i = 0; i < Core.Globals.Variables.MaxVariables; i++) Variables[i] = buffer.ReadString();
-
-            SaveSwitches();
-            SaveVariables();
-            SendSwitchesAndVariables(0, true);
-        }
-
-        #endregion
-
-        #region Outgoing Packets
-
-        public static void SendSpecialEffect(int index, int effectType, int data1 = 0, int data2 = 0, int data3 = 0, int data4 = 0)
-        {
-            var buffer = new PacketWriter(24);
-
-            buffer.WriteEnum(ServerPackets.SSpecialEffect);
-            buffer.WriteInt32(effectType);
-
-            switch (effectType)
-            {
-                case EffectTypeFadein:
-                case EffectTypeFadeout:
-                case EffectTypeFlash:
-                    break;
-                case EffectTypeFog:
-                    buffer.WriteInt32(data1); // Fog number
-                    buffer.WriteInt32(data2); // Movement speed
-                    buffer.WriteInt32(data3); // Opacity
-                    break;
-                case EffectTypeWeather:
-                    buffer.WriteInt32(data1); // Weather type
-                    buffer.WriteInt32(data2); // Intensity
-                    break;
-                case EffectTypeTint:
-                    buffer.WriteInt32(data1); // Red
-                    buffer.WriteInt32(data2); // Green
-                    buffer.WriteInt32(data3); // Blue
-                    buffer.WriteInt32(data4); // Alpha
-                    break;
-                case EffectTypeScreenShake:
-                    buffer.WriteInt32(data1); // Intensity
-                    buffer.WriteInt32(data2); // Duration
-                    break;
-                default:
-                    General.Logger.LogWarning($"Unknown effect type {effectType} sent to player {index}");
-                    return;
-            }
-
-            PlayerService.Instance.SendDataTo(index, buffer.GetBytes());
-        }
-
-        public static void SendSwitchesAndVariables(int index, bool everyone = false)
-        {
-            var buffer = new PacketWriter(4 + (Core.Globals.Variables.MaxSwitches + Core.Globals.Variables.MaxVariables) * 256);
-            buffer.WriteEnum(ServerPackets.SSwitchesAndVariables);
-            for (var i = 0; i < Core.Globals.Variables.MaxSwitches; i++) buffer.WriteString(Switches[i]);
-            for (var i = 0; i < Core.Globals.Variables.MaxVariables; i++) buffer.WriteString(Variables[i]);
-
-            if (everyone)
-            {
-                PlayerService.Instance.SendDataToAll(buffer.GetBytes());
-            }
-            else
-            {
-                PlayerService.Instance.SendDataTo(index, buffer.GetBytes());
-            }
-        }
-
-        public static void SendMapEventData(int index)
-        {
-            var buffer = new PacketWriter(4);
-
-            var mapNum = GetPlayerMap(index);
-
-            buffer.WriteEnum(ServerPackets.SMapEventData);
-            buffer.WriteInt32(Data.Map[mapNum].EventCount);
-
-            if (Data.Map[mapNum].EventCount > 0)
-            {
-                SerializeMapEvents(buffer, mapNum);
-            }
-
-            PlayerService.Instance.SendDataTo(index, buffer.GetBytes());
-
-            SendSwitchesAndVariables(index);
-        }
-
-        private static void SerializeMapEvents(PacketWriter buffer, int mapNum)
+        public static void SerializeMapEvents(PacketWriter buffer, int mapNum)
         {
             for (var i = 0; i < Data.Map[mapNum].EventCount; i++)
             {
@@ -873,8 +761,6 @@ namespace Server
             }
         }
 
-        #endregion
-
         #region New Features
 
         // Scheduled Events
@@ -941,7 +827,7 @@ namespace Server
             foreach (var i in PlayerService.Instance.PlayerIds)
             {
                 if (NetworkConfig.IsPlaying(i) && GetPlayerMap(i) == mapNum)
-                    SendSpecialEffect(i, EffectTypeWeather, weatherType, intensity);
+                    NetworkSend.SendSpecialEffect(i, EffectTypeWeather, weatherType, intensity);
             }
         }
 

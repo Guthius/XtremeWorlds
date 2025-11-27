@@ -391,7 +391,7 @@ public static class Projectile
                             {
                                 int tx = Math.Clamp(mp.X / 32, 0, Data.Map[map].MaxX - 1);
                                 int ty = Math.Clamp(mp.Y / 32, 0, Data.Map[map].MaxY - 1);
-                                Animation.SendAnimation(map, anim, tx, ty);
+                                NetworkSend.SendAnimation(map, anim, tx, ty);
                                 // Try to apply attack on expire at destination
                                 TryAttackAtTile(map, ref mp, tx, ty, projId);
                             }
@@ -410,7 +410,7 @@ public static class Projectile
                         {
                             int tx = Math.Clamp(prevTileX, 0, Data.Map[map].MaxX - 1);
                             int ty = Math.Clamp(prevTileY, 0, Data.Map[map].MaxY - 1);
-                            Animation.SendAnimation(map, anim, tx, ty);
+                            NetworkSend.SendAnimation(map, anim, tx, ty);
                             TryAttackAtTile(map, ref mp, tx, ty, projId);
                         }
                         MapProjectile.Clear(map, i);
@@ -428,7 +428,7 @@ public static class Projectile
                         {
                             int tx = Math.Clamp(prevTileX, 0, Data.Map[map].MaxX - 1);
                             int ty = Math.Clamp(prevTileY, 0, Data.Map[map].MaxY - 1);
-                            Animation.SendAnimation(map, anim, tx, ty);
+                            NetworkSend.SendAnimation(map, anim, tx, ty);
                             TryAttackAtTile(map, ref mp, tx, ty, projId);
                         }
                         MapProjectile.Clear(map, i);
@@ -442,7 +442,7 @@ public static class Projectile
                         int anim = Data.Projectile[projId].Animation;
                         if (anim >= 0)
                         {
-                            Animation.SendAnimation(map, anim, tileX, tileY);
+                            NetworkSend.SendAnimation(map, anim, tileX, tileY);
                             TryAttackAtTile(map, ref mp, tileX, tileY, projId);
                         }
                         
@@ -480,7 +480,7 @@ public static class Projectile
                         int anim = Data.Projectile[projId].Animation;
                         if (anim >= 0)
                         {
-                            Animation.SendAnimation(map, anim, tileX, tileY);
+                            NetworkSend.SendAnimation(map, anim, tileX, tileY);
                         }
 
                         try
@@ -528,7 +528,7 @@ public static class Projectile
                         int anim = Data.Projectile[projId].Animation;
                         if (anim >= 0)
                         {
-                            Animation.SendAnimation(map, anim, tileX, tileY);
+                            NetworkSend.SendAnimation(map, anim, tileX, tileY);
                         }
 
                         try

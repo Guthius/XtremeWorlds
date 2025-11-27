@@ -664,49 +664,7 @@ public static class Player
         return -1;
     }
 
-    public static void MapGetItem(int playerId)
-    {
-        var mapNum = GetPlayerMap(playerId);
-
-        for (var mapItemNum = 0; mapItemNum < Core.Globals.Variables.MaxMapItems; mapItemNum++)
-        {
-            if (Data.MapItem[mapNum, mapItemNum].Num < 0 ||
-                Data.MapItem[mapNum, mapItemNum].Num >= Core.Globals.Variables.MaxItems)
-            {
-                continue;
-            }
-
-            if (Math.Floor((double)Data.MapItem[mapNum, mapItemNum].X / 32) != GetPlayerX(playerId) || Math.Floor((double)Data.MapItem[mapNum, mapItemNum].Y / 32) != GetPlayerY(playerId))
-            {
-                continue;
-            }
-
-            var slot = FindOpenInvSlot(playerId, Data.MapItem[mapNum, mapItemNum].Num);
-            if (slot == -1)
-            {
-                NetworkSend.PlayerMsg(playerId, "Your inventory is full.", (int) ColorName.BrightRed);
-                break;
-            }
-
-            if (!CanPlayerPickupItem(playerId, mapItemNum))
-            {
-                break;
-            }
-
-            try
-            {
-                Script.Instance?.MapGetItem(playerId, mapNum, mapItemNum, slot);
-            }
-            catch (Exception ex)
-            {
-                General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(MapGetItem));
-            }
-
-            break;
-        }
-    }
-
-    public static bool CanPlayerPickupItem(int playerId, int mapitemNum)
+    public static bool CanPickup(int playerId, int mapitemNum)
     {
         var mapNum = GetPlayerMap(playerId);
 
