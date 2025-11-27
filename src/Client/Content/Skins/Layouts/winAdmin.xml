@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window Name="winAdmin" Caption="Admin Panel"
-        Size="640, 260"
-        Icon="970" IconOffset="3, 5"
-        Design="WindowNormal"
-        StartPosition="CenterScreen"
-        Visible="false">
+    Size="640, 260"
+    Icon="970" IconOffset="3, 5"
+    Design="WindowNormal"
+    StartPosition="CenterScreen"
+    Visible="false">
 
-        <!-- Tab Control for different admin sections -->
-        <TabControl Name="tabAdmin" Position="6, 26" Size="628, 224">
-        
+    <!-- Tab Control for different admin sections -->
+    <GroupBox Name="tabAdmin" Position="6, 26" Size="628, 224">
         <!-- MODERATION TAB -->
         <TabPage Name="tabModeration" Caption="Moderation">
             <PictureBox Name="picModerationBG" Position="6, 46" Size="628, 190" Design="Parchment"/>
@@ -51,28 +50,25 @@
         </TabPage>
 
         <!-- MAP LIST TAB -->
-        <TabPage Name="tabMapList" Caption="Maps">
-                <PictureBox Name="picMapListBG" Position="6, 46" Size="628, 190" Design="Parchment"/>
-                <ListBox Name="lstMaps" Position="25, 55" Size="586, 122"/>
-                <ScrollBar Name="sldMapList" Position="611, 55" Size="12, 122" Orientation="Vertical" Min="0" Max="100" Value="0"/>
-                <Button Name="btnMapWarp" Text="Warp" Position="25, 186" Size="220, 22"
-                Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-                <Button Name="btnMapReport" Text="Refresh List" Position="255, 186" Size="368, 22"
-                Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-        </TabPage>
+        <GroupBox Name="tabMapList" Caption="Maps">
+            <ListBox Name="lstMaps" Position="25, 55" Size="586, 122"/>
+            <ScrollBar Name="sldMapList" Position="611, 55" Size="12, 122" Orientation="Vertical" Min="0" Max="100" Value="0"/>
+            <Button Name="btnMapWarp" Text="Warp" Position="25, 186" Size="220, 22"
+            Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+            <Button Name="btnMapReport" Text="Refresh List" Position="255, 186" Size="368, 22"
+            Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+        </GroupBox>
 
         <!-- MAP TOOLS TAB -->
-        <TabPage Name="tabMapTools" Caption="Map Tools">
-            <PictureBox Name="picMapToolsBG" Position="6, 46" Size="628, 190" Design="Parchment"/>
-
+        <GroupBox Name="tabMapTools" Caption="Map Tools">
             <Button Name="btnRespawn" Text="Respawn Map" Position="20, 55" Size="200, 22"
             Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
             <Button Name="btnALoc" Text="Toggle Location Display" Position="225, 55" Size="200, 22"
             Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
-        </TabPage>
+        </GroupBox>
 
         <!-- EDITORS TAB -->
-        <TabPage Name="tabEditors" Caption="Editors">
+        <GroupBox Name="tabEditors" Caption="Editors">
             <PictureBox Name="picEditorsBG" Position="6, 46" Size="628, 190" Design="Parchment"/>
 
             <!-- Editor Buttons Grid Row 1 -->
@@ -102,10 +98,10 @@
             Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
             <Button Name="btnScriptEditor" Text="Script" Position="315, 109" Size="140, 22"
             Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-        </TabPage>
+        </GroupBox>
 
         <Button Name="btnClose" Position="-19, 5" Size="16, 16" Image="8" ImageHover="9" ImageMouseDown="10"/>
 
-    </TabControl>
+    </GroupBox>
 
 </Window>

@@ -30,25 +30,25 @@
   <PictureBox Name="picItemPaperdoll" Position="760, 112" Size="64, 64" Image="" Design="TextBlack"/>
 
   <Label Name="lblItemType" Text="Type" Position="280, 168" Size="40, 16"/>
-  <ComboBox Name="cmbItemType" Position="344, 166" Size="120, 18" Design="ComboBox"/>
+  <ComboBox Name="cmbItemType" Position="344, 166" Size="120, 18"/>
 
   <Label Name="lblItemSubType" Text="SubType" Position="480, 168" Size="60, 16"/>
-  <ComboBox Name="cmbItemSubType" Position="552, 166" Size="120, 18" Design="ComboBox"/>
+  <ComboBox Name="cmbItemSubType" Position="552, 166" Size="120, 18"/>
 
   <Label Name="lblItemAnimation" Text="Animation" Position="280, 192" Size="70, 16"/>
-  <ComboBox Name="cmbItemAnimation" Position="344, 190" Size="160, 18" Design="ComboBox"/>
+  <ComboBox Name="cmbItemAnimation" Position="344, 190" Size="160, 18"/>
 
   <Label Name="lblItemBind" Text="Bind" Position="520, 192" Size="40, 16"/>
-  <ComboBox Name="cmbItemBind" Position="568, 190" Size="120, 18" Design="ComboBox"/>
+  <ComboBox Name="cmbItemBind" Position="568, 190" Size="120, 18"/>
 
   <Label Name="lblItemLevel" Text="Level" Position="280, 216" Size="60, 16"/>
-  <ComboBox Name="cmbItemLevel" Position="344, 214" Size="80, 18" Design="ComboBox"/>
+  <ComboBox Name="cmbItemLevel" Position="344, 214" Size="80, 18"/>
 
   <Label Name="lblItemPrice" Text="Price" Position="440, 216" Size="40, 16"/>
   <TextBox Name="txtItemPrice" Position="488, 214" Size="80, 20" Design="TextWhite"/>
 
   <Label Name="lblItemRarity" Text="Rarity" Position="584, 216" Size="50, 16"/>
-  <ComboBox Name="cmbItemRarity" Position="640, 214" Size="96, 18" Design="ComboBox"/>
+  <ComboBox Name="cmbItemRarity" Position="640, 214" Size="96, 18"/>
 
   <CheckBox Name="chkItemStackable" Text="Stackable" Position="728, 214" Size="80, 20"/>
 
@@ -63,10 +63,10 @@
   <CheckBox Name="chkItemKnockBack" Text="Knockback" Position="592, 266" Size="96, 20"/>
 
   <Label Name="lblItemTool" Text="Tool" Position="280, 292" Size="40, 16"/>
-  <ComboBox Name="cmbItemTool" Position="344, 290" Size="120, 18" Design="ComboBox"/>
+  <ComboBox Name="cmbItemTool" Position="344, 290" Size="120, 18"/>
 
   <Label Name="lblItemKnockTiles" Text="Distance" Position="480, 292" Size="60, 16"/>
-  <ComboBox Name="cmbItemKnockBackTiles" Position="548, 290" Size="120, 18" Design="ComboBox"/>
+  <ComboBox Name="cmbItemKnockBackTiles" Position="548, 290" Size="120, 18"/>
 
   <!-- Stat bonuses -->
 
@@ -91,12 +91,12 @@
   <TextBox Name="txtVitalMod" Position="792, 266" Size="80, 20" Design="TextWhite"/>
 
   <Label Name="lblSkillHeader" Text="Skill" Position="720, 296" Size="80, 16"/>
-  <ComboBox Name="cmbItemSkill" Position="720, 314" Size="152, 18" Design="ComboBox"/>
+  <ComboBox Name="cmbItemSkill" Position="720, 314" Size="152, 18"/>
 
   <Label Name="lblProjectileHeader" Text="Projectile" Position="720, 340" Size="80, 16"/>
-  <ComboBox Name="cmbItemProjectile" Position="720, 358" Size="152, 18" Design="ComboBox"/>
+  <ComboBox Name="cmbItemProjectile" Position="720, 358" Size="152, 18"/>
   <Label Name="lblItemAmmo" Text="Ammo" Position="720, 380" Size="40, 16"/>
-  <ComboBox Name="cmbItemAmmo" Position="764, 378" Size="108, 18" Design="ComboBox"/>
+  <ComboBox Name="cmbItemAmmo" Position="764, 378" Size="108, 18"/>
 
   <Label Name="lblEventHeader" Text="Event" Position="720, 408" Size="80, 16"/>
   <Label Name="lblEventId" Text="Event Id" Position="720, 428" Size="70, 16"/>
@@ -105,10 +105,10 @@
   <TextBox Name="txtEventValue" Position="792, 450" Size="80, 20" Design="TextWhite"/>
 
   <Label Name="lblReqJob" Text="Job" Position="300, 412" Size="60, 16"/>
-  <ComboBox Name="cmbItemJobReq" Position="364, 410" Size="140, 18" Design="ComboBox"/>
+  <ComboBox Name="cmbItemJobReq" Position="364, 410" Size="140, 18"/>
 
   <Label Name="lblReqAccess" Text="Access" Position="524, 412" Size="80, 16"/>
-  <ComboBox Name="cmbItemAccessReq" Position="592, 410" Size="140, 18" Design="ComboBox"/>
+  <ComboBox Name="cmbItemAccessReq" Position="592, 410" Size="140, 18"/>
 
   <Label Name="lblReqLevel" Text="Level" Position="280, 436" Size="60, 16"/>
   <ScrollBar Name="sldReqLevel" Position="320, 438" Size="140, 12" Min="0" Max="99" Orientation="Horizontal" ThumbSize="12"/>

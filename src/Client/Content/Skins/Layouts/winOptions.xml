@@ -12,7 +12,7 @@
     <CheckBox Name="chkVsync" Text="VSync" Position="30, 110" Size="100, 20" Design="CheckboxNormal"/>
 
     <Label Name="lblRes" Text="Resolution" Position="20, 145" Size="220, 18" Font="Georgia" Align="Center"/>
-    <ComboBox Name="cmbRes" Position="55, 175" Size="150, 20" Design="ComboBox"/>
+    <ComboBox Name="cmbRes" Position="55, 175" Size="150, 20"/>
 
     <Button Name="btnConfirm" Text="Confirm" Position="90, 225" Size="80, 28" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 </Window>

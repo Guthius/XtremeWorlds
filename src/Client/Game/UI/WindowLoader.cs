@@ -147,6 +147,10 @@ public static class WindowLoader
             case "ListBox":
                 ReadListBox(xmlReader, windowIndex);
                 break;
+
+            case "GroupBox":
+                ReadGroupBox(xmlReader, windowIndex);
+                return;
         }
 
         if (!xmlReader.IsEmptyElement)
@@ -228,6 +232,100 @@ public static class WindowLoader
             else if (xmlReader.NodeType == XmlNodeType.EndElement && xmlReader.Depth == depth && xmlReader.Name == "TabPage")
             {
                 break;
+            }
+        }
+    }
+
+    private static void ReadGroupBox(XmlReader xmlReader, int windowIndex)
+    {
+        var name = xmlReader.GetAttribute("Name") ?? string.Empty;
+        var caption = xmlReader.GetAttribute("Caption") ?? string.Empty;
+        var posAttr = xmlReader.GetAttribute("Position");
+        var sizeAttr = xmlReader.GetAttribute("Size");
+        var position = GetVector(posAttr);
+        var size = GetVector(sizeAttr);
+
+        // Create the GroupBox first so it renders behind children. We'll autosize later if needed.
+        WindowManager.CreateGroupBox(windowIndex, name, position.X, position.Y, size.X, size.Y, caption);
+
+        // Determine if we should auto-position/size based on children
+        bool autoPos = string.IsNullOrEmpty(posAttr);
+        bool autoSize = string.IsNullOrEmpty(sizeAttr) || size.X <= 0 || size.Y <= 0;
+
+        // Record start index of children to compute bounds later
+        var window = WindowManager.Windows[windowIndex];
+        int groupIndex = window.Controls.Count - 1; // last added
+        int childStart = window.Controls.Count;
+
+        if (!xmlReader.IsEmptyElement)
+        {
+            var depth = xmlReader.Depth;
+            while (xmlReader.Read())
+            {
+                if (xmlReader.NodeType == XmlNodeType.Element)
+                {
+                    ReadControl(xmlReader, windowIndex);
+                }
+                else if (xmlReader.NodeType == XmlNodeType.EndElement && xmlReader.Depth == depth && xmlReader.Name == "GroupBox")
+                {
+                    break;
+                }
+            }
+        }
+
+        // Autosize to fit enclosed controls if requested
+        if (autoPos || autoSize)
+        {
+            int minX = int.MaxValue, minY = int.MaxValue, maxX = int.MinValue, maxY = int.MinValue;
+            for (int i = childStart; i < window.Controls.Count; i++)
+            {
+                var c = window.Controls[i];
+                minX = Math.Min(minX, c.X);
+                minY = Math.Min(minY, c.Y);
+                maxX = Math.Max(maxX, c.X + c.Width);
+                maxY = Math.Max(maxY, c.Y + c.Height);
+            }
+
+            if (minX != int.MaxValue)
+            {
+                const int padding = 8;
+                var group = (Controls.GroupBox)window.Controls[groupIndex];
+                int newLeft = autoPos ? Math.Max(0, minX - padding) : group.X;
+                int newTop = autoPos ? Math.Max(0, minY - padding) : group.Y;
+                int newWidth = autoSize ? Math.Max(1, (maxX + padding) - newLeft) : group.Width;
+                int newHeight = autoSize ? Math.Max(1, (maxY + padding) - newTop) : group.Height;
+
+                group.X = newLeft;
+                group.Y = newTop;
+                group.Width = newWidth;
+                group.Height = newHeight;
+            }
+        }
+
+        // Assign child range to the group
+        if (window.Controls[groupIndex] is Controls.GroupBox gb)
+        {
+            gb.FirstChildIndex = childStart;
+            gb.LastChildIndex = window.Controls.Count - 1;
+
+            // Ensure group box stays slightly smaller than the window and inset by a margin
+            const int margin = 8;
+            int maxW = Math.Max(1, window.Width - margin * 2);
+            int maxH = Math.Max(1, window.Height - margin * 2);
+
+            gb.X = Math.Max(margin, gb.X);
+            gb.Y = Math.Max(margin, gb.Y);
+            if (gb.Width > maxW) gb.Width = maxW;
+            if (gb.Height > maxH) gb.Height = maxH;
+
+            // Keep right/bottom within margin as well
+            if (gb.X + gb.Width > window.Width - margin)
+            {
+                gb.Width = Math.Max(1, (window.Width - margin) - gb.X);
+            }
+            if (gb.Y + gb.Height > window.Height - margin)
+            {
+                gb.Height = Math.Max(1, (window.Height - margin) - gb.Y);
             }
         }
     }

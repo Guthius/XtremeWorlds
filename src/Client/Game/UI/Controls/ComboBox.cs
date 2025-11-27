@@ -15,36 +15,32 @@ public sealed class ComboBox : Control
 
     public override void Render(int x, int y)
     {
-        switch (Design)
+        // Use same panel style as group boxes / text panels
+        DesignRenderer.Render(Design.TextBlack, X + x, Y + y, Width, Height);
+
+        // Center the selected item's text based on its full width (previously divided by 2 causing off-center)
+        if (Items.Count > 0 && Value >= 0 && Value < Items.Count)
         {
-            case Design.ComboBox:
-                DesignRenderer.Render(Design.TextBlack, X + x, Y + y, Width, Height);
+            var text = Items[Value];
+            var textWidth = TextRenderer.GetTextWidth(text, Font);
 
-                // Always display the selected item if Value is in range
-                if (Items.Count > 0 && Value >= 0 && Value < Items.Count)
-                {
-                    var text = Items[Value];
-                    var tw = TextRenderer.GetTextWidth(text, Font) / 2;
-
-                    // Reserve space for the dropdown arrow when centering text
-                    var arrowW = 5;
-                    var paddingL = 3;
-                    var paddingR = arrowW + 6; // arrow width + margin
-                    var innerWidth = Math.Max(0, Width - paddingL - paddingR);
-                    var left = X + x + paddingL + Math.Max(0, (innerWidth - tw) / 2);
-                    var top = Y + y + 2; // vertical baseline consistent with other controls
-                    TextRenderer.RenderText(text, left, top, Color, Color.Black);
-                }
-
-                var path = Path.Combine(Texture[0], ArrowSprite.ToString());
-
-                // Draw arrow inside the control bounds near the right edge
-                var arrowW2 = 5;
-                var arrowH = 4;
-                var arrowX = X + x + Width - arrowW2 - 3;
-                var arrowY = Y + y + (Height - arrowH) / 2;
-                GameClient.RenderTexture(ref path, arrowX, arrowY, 0, 0, arrowW2, arrowH, arrowW2, arrowH);
-                break;
+            // Reserve space for the dropdown arrow when centering text
+            const int arrowW = 5;
+            const int paddingL = 3;
+            int paddingR = arrowW + 6; // arrow width + margin
+            int innerWidth = Math.Max(0, Width - paddingL - paddingR);
+            int left = X + x + paddingL + Math.Max(0, (innerWidth - textWidth) / 2);
+            int top = Y + y + 2; // vertical baseline consistent with other controls
+            TextRenderer.RenderText(text, left, top, Color, Color.Black);
         }
+
+        var path = Path.Combine(Texture[0], ArrowSprite.ToString());
+
+        // Draw arrow inside the control bounds near the right edge
+        const int arrowW2 = 5;
+        const int arrowH = 4;
+        int arrowX = X + x + Width - arrowW2 - 3;
+        int arrowY = Y + y + (Height - arrowH) / 2;
+        GameClient.RenderTexture(ref path, arrowX, arrowY, 0, 0, arrowW2, arrowH, arrowW2, arrowH);
     }
 }

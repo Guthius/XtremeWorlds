@@ -22,16 +22,16 @@
   <TextBox Name="txtNpcAttackSay" Position="344, 58" Size="232, 20" Design="TextWhite"/>
 
   <Label Name="lblNpcBehavior" Text="Behavior" Position="280, 88" Size="80, 16"/>
-  <ComboBox Name="cmbNpcBehavior" Position="344, 86" Size="120, 18" Design="ComboBox"/>
+  <ComboBox Name="cmbNpcBehavior" Position="344, 86" Size="120, 18"/>
 
   <Label Name="lblNpcSpawnPeriod" Text="Spawn" Position="280, 112" Size="70, 16"/>
-  <ComboBox Name="cmbNpcSpawnPeriod" Position="344, 110" Size="120, 18" Design="ComboBox"/>
+  <ComboBox Name="cmbNpcSpawnPeriod" Position="344, 110" Size="120, 18"/>
 
   <Label Name="lblNpcAnimation" Text="Animation" Position="280, 136" Size="90, 16"/>
-  <ComboBox Name="cmbNpcAnimation" Position="344, 134" Size="168, 18" Design="ComboBox"/>
+  <ComboBox Name="cmbNpcAnimation" Position="344, 134" Size="168, 18"/>
 
   <Label Name="lblNpcFaction" Text="Faction" Position="280, 160" Size="70, 16"/>
-  <ComboBox Name="cmbNpcFaction" Position="344, 158" Size="168, 18" Design="ComboBox"/>                     
+  <ComboBox Name="cmbNpcFaction" Position="344, 158" Size="168, 18"/>                     
 
   <!-- Sprite preview -->
   <PictureBox Name="picNpcSprite" Position="592, 36" Size="64, 64" Design="TextBlack"/>
@@ -56,20 +56,20 @@
 
   <!-- Skills group (shifted down a bit to follow stats) -->
   <Label Name="lblNpcSkills" Text="Skills" Position="280, 260" Size="60, 16"/>
-  <ComboBox Name="cmbNpcSkill1" Position="344, 258" Size="160, 18" Design="ComboBox"/>
-  <ComboBox Name="cmbNpcSkill2" Position="524, 258" Size="156, 18" Design="ComboBox"/>
-  <ComboBox Name="cmbNpcSkill3" Position="344, 282" Size="160, 18" Design="ComboBox"/>
-  <ComboBox Name="cmbNpcSkill4" Position="524, 282" Size="156, 18" Design="ComboBox"/>
-  <ComboBox Name="cmbNpcSkill5" Position="344, 306" Size="160, 18" Design="ComboBox"/>
-  <ComboBox Name="cmbNpcSkill6" Position="524, 306" Size="156, 18" Design="ComboBox"/>
+  <ComboBox Name="cmbNpcSkill1" Position="344, 258" Size="160, 18"/>
+  <ComboBox Name="cmbNpcSkill2" Position="524, 258" Size="156, 18"/>
+  <ComboBox Name="cmbNpcSkill3" Position="344, 282" Size="160, 18"/>
+  <ComboBox Name="cmbNpcSkill4" Position="524, 282" Size="156, 18"/>
+  <ComboBox Name="cmbNpcSkill5" Position="344, 306" Size="160, 18"/>
+  <ComboBox Name="cmbNpcSkill6" Position="524, 306" Size="156, 18"/>
 
   <!-- Drop configuration (nudged down slightly) -->
   <Label Name="lblNpcDrops" Text="Drops" Position="280, 332" Size="60, 16"/>
   <Label Name="lblNpcDropSlot" Text="Slot" Position="344, 332" Size="40, 16"/>
-  <ComboBox Name="cmbNpcDropSlot" Position="384, 330" Size="60, 18" Design="ComboBox"/>
+  <ComboBox Name="cmbNpcDropSlot" Position="384, 330" Size="60, 18"/>
 
   <Label Name="lblNpcDropItem" Text="Item" Position="452, 332" Size="40, 16"/>
-  <ComboBox Name="cmbNpcDropItem" Position="496, 330" Size="184, 18" Design="ComboBox"/>
+  <ComboBox Name="cmbNpcDropItem" Position="496, 330" Size="184, 18"/>
 
   <Label Name="lblNpcAmount" Text="Amount" Position="280, 356" Size="60, 16"/>
   <TextBox Name="txtNpcAmount" Position="344, 354" Size="80, 18" Design="TextWhite"/>

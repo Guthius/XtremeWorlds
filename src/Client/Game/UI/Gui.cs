@@ -1308,10 +1308,30 @@ public class WindowManager
         {
             WindowRenderer.Render(window);
 
-            foreach (var control in window.Controls.Where(x => x.Visible))
+            // Render controls in stable passes to ensure layering:
+            // 0 - parchment backgrounds, 1 - group boxes, 2 - all other controls
+            for (int pass = 0; pass < 3; pass++)
             {
-                control.Render(window.X, window.Y);
-                control.OnDraw?.Invoke();
+                for (int i = 0; i < window.Controls.Count; i++)
+                {
+                    var control = window.Controls[i];
+                    if (!control.Visible) continue;
+
+                    int category = 2;
+                    if (control is PictureBox pic && pic.Design == Design.Parchment)
+                    {
+                        category = 0;
+                    }
+                    else if (control is GroupBox)
+                    {
+                        category = 1;
+                    }
+
+                    if (category != pass) continue;
+
+                    control.Render(window.X, window.Y);
+                    control.OnDraw?.Invoke();
+                }
             }
         }
     }
@@ -1617,7 +1637,8 @@ public class WindowManager
         }
     }
 
-    public static void CreateGroupBox(int windowIndex, string name, int left, int top, int width, int height, string caption = "", Design design = Design.None)
+    // Overload that supports custom insertion index and returns created GroupBox
+    public static GroupBox CreateGroupBox(int windowIndex, string name, int left, int top, int width, int height, string caption, Design design, int insertIndex)
     {
         if (!Windows.TryGetValue(windowIndex, out var window))
         {
@@ -1634,10 +1655,48 @@ public class WindowManager
             Visible = true,
             Text = caption,
             ZOrder = ZOrderCon,
-            Design = design
+            Design = design,
+            Enabled = false // visual container; ignore hit-testing
         };
 
-        window.Controls.Add(group);
+        if (insertIndex >= 0 && insertIndex <= window.Controls.Count)
+        {
+            window.Controls.Insert(insertIndex, group);
+        }
+        else
+        {
+            window.Controls.Add(group);
+        }
+
         ZOrderCon++;
+        return group;
+    }
+
+    // Backward-compatible overload
+    public static void CreateGroupBox(int windowIndex, string name, int left, int top, int width, int height, string caption = "", Design design = Design.None)
+    {
+        CreateGroupBox(windowIndex, name, left, top, width, height, caption, design, -1);
+    }
+
+    // Toggle visibility for a GroupBox and its associated child controls recorded by the loader
+    public static void SetGroupVisible(Window window, GroupBox group, bool visible)
+    {
+        if (window == null || group == null)
+        {
+            return;
+        }
+
+        group.Visible = visible;
+
+        // If loader tracked child range, toggle children in that range
+        var start = Math.Max(0, group.FirstChildIndex);
+        var end = Math.Min(window.Controls.Count - 1, group.LastChildIndex);
+        if (start <= end)
+        {
+            for (int i = start; i <= end; i++)
+            {
+                window.Controls[i].Visible = visible;
+            }
+        }
     }
 }
