@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Window Name="winBars" Size="239, 77" Position="10, 10" Font="Georgia" Design="WindowNoBar">
-	<GroupBox Name="grpBars" Position="6, 6" Size="223, 60">
-		<PictureBox Name="picOverlay" Position="0, 0" Size="0, 0"/>
+<Window Name="winBars" Size="239,77" Position="10,10" Font="Georgia" Design="WindowNoBar">
+	<GroupBox Name="grpBars" Position="6,6" Size="224,61">
+		<PictureBox Name="picOverlay" Position="0,0" Size="0,0"/>
 
-		<PictureBox Name="picHP_Blank" Position="15, 15" Size="209, 13" Image="24"/>
-		<PictureBox Name="picMP_Blank" Position="15, 32" Size="209, 13" Image="25"/>
-		<PictureBox Name="picEXP_Blank" Position="15, 49" Size="209, 13" Image="26"/>
+		<!-- Blank bar frames slightly up/left -->
+		<PictureBox Name="picHP_Blank" Position="12,12" Size="207,13" Image="24"/>
+		<PictureBox Name="picMP_Blank" Position="12,29" Size="207,13" Image="25"/>
+		<PictureBox Name="picEXP_Blank" Position="12,46" Size="207,13" Image="26"/>
 
-		<PictureBox Name="picHP" Position="16, 10" Size="44, 14" Image="21"/>
-		<PictureBox Name="picMP" Position="16, 28" Size="44, 14" Image="22"/>
-		<PictureBox Name="picEXP" Position="16, 45" Size="74, 14" Image="23"/>
+		<!-- Filled bars aligned to frames -->
+		<PictureBox Name="picHP" Position="13,7" Size="44,14" Image="21"/>
+		<PictureBox Name="picMP" Position="13,25" Size="44,14" Image="22"/>
+		<PictureBox Name="picEXP" Position="13,42" Size="74,14" Image="23"/>
 
-		<Label Name="lblHP" Text="999/999" Position="15, 14" Size="209, 10" Font="Arial" Align="Center"/>
-		<Label Name="lblMP" Text="999/999" Position="15, 30" Size="209, 10" Font="Arial" Align="Center"/>
-		<Label Name="lblEXP" Text="999/999" Position="15, 48" Size="209, 10" Font="Arial" Align="Center"/>
+		<!-- Centered text inside frames -->
+		<Label Name="lblHP" Text="999/999" Position="12,11" Size="207,10" Font="Arial" Align="Center"/>
+		<Label Name="lblMP" Text="999/999" Position="12,27" Size="207,10" Font="Arial" Align="Center"/>
+		<Label Name="lblEXP" Text="999/999" Position="12,45" Size="207,10" Font="Arial" Align="Center"/>
 	</GroupBox>
 </Window>
