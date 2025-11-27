@@ -24,12 +24,12 @@ collaborative development.
 - Basic Character Creation/Job Selection
 - Movement/Attacking
 - NPC/Computer Characters for attacking
-- Items & Spells
+- Items & Skills
 - Event System
 
 ## Creation Features
 
-The client has editors for the world (maps), items, spells, animations, npcs, morals and more from the in-game admin panel.
+The client has editors for the world maps, items, skills, animations, npcs, morals and more from the in-game admin panel.
 
 ### How do I access the editors?
 
@@ -53,10 +53,10 @@ Log in to the game with the client. On the server, type the command /access name
 #### 2. Set up PostgreSQL
 
 - Install [PostgreSQL](https://www.postgresql.org/download/)
-- Create a user with password: `mirage`
+- Create a user with password: `mirage`, you can do this in the installer
 - You can do this in the installer or by using the command line
-- The database mirage is created by the server
-- *Note: You can modify database credentials in the server settings JSON file*
+- The database mirage is created by default from the server
+- *Note: You can modify database credentials in the server settings JSON file located in the config folder*
 
 #### 3. Build the solution
    ```bash
