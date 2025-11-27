@@ -7,8 +7,6 @@
         Visible="False">
 
 	<GroupBox Name="grpChars" Position="6, 26" Size="348, 193">
-		<Button Name="btnClose" Position="-19, 5" Size="16, 16" Image="8" ImageHover="9" ImageMouseDown="10"/>
-
 		<!-- Slot 1 -->
 		<PictureBox Name="picSlot_1" Position="22, 40" Size="98, 9" Design="BlackOval"/>
 		<Label Name="lblCharName_1" Text="Blank Slot" Position="22, 37" Size="98, 10" Align="Center"/>
@@ -84,4 +82,6 @@
 				DesignMouseDown="RedClick"
 				Visible="False"/>
 	</GroupBox>
+
+	<Button Name="btnClose" Position="-19, 5" Size="16, 16" Image="8" ImageHover="9" ImageMouseDown="10"/>
 </Window>
