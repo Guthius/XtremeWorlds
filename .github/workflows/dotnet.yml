@@ -21,15 +21,6 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
-      # 🔥 Kill stale processes BEFORE build
-      - name: Kill stale processes before build
-        shell: cmd
-        run: |
-          echo Cleaning up processes before build...
-          taskkill /F /IM testhost.exe /T || echo testhost.exe not found
-          taskkill /F /IM dotnet.exe /T || echo dotnet.exe not found
-          taskkill /F /IM VBCSCompiler.exe /T || echo VBCSCompiler.exe not found
-
       - name: Build
         run: dotnet build -p:TargetFramework=net10.0-windows
 
