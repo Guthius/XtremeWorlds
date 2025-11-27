@@ -31,6 +31,9 @@ public static class WindowRenderer
             int maxStart = Math.Max(0, window.List.Count - visibleRows);
             int start = Math.Clamp(window.ScrollOffset, 0, maxStart);
 
+            // Use the same render scale as TextRenderer.RenderText
+            const float scale = 12f / 16f;
+
             for (var row = 0; row < visibleRows; row++)
             {
                 int i = start + row;
@@ -41,8 +44,11 @@ public static class WindowRenderer
                     GameClient.RenderTexture(ref path, x, y - 1, 0, 0, window.Width, 15, 255, 0, 0, 0);
                 }
 
-                var left = x + window.Width / 2 - TextRenderer.GetTextWidth(window.List[i], window.Font) / 2;
-                TextRenderer.RenderText(window.List[i], left, y, Color.White, Color.Black);
+                var line = window.List[i];
+                var lineWidth = TextRenderer.GetTextWidth(line, window.Font, scale);
+                var left = x + (window.Width - lineWidth) / 2;
+
+                TextRenderer.RenderText(line, left, y, Color.White, Color.Black, window.Font);
 
                 y += 16;
             }
