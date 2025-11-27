@@ -193,19 +193,17 @@ public static class WindowLoader
         var position = GetVector(posAttr);
         var size = GetVector(sizeAttr);
 
-        // Create the GroupBox first so it renders behind children. We'll autosize later if needed.
+        // Create the GroupBox first
         WindowManager.CreateGroupBox(windowIndex, name, position.X, position.Y, size.X, size.Y, caption);
 
-        // Determine if we should auto-position/size based on children
         bool autoPos = string.IsNullOrEmpty(posAttr);
         bool autoSize = string.IsNullOrEmpty(sizeAttr) || size.X <= 0 || size.Y <= 0;
 
-        // Record start index of children to compute bounds later
         var window = WindowManager.Windows[windowIndex];
-        int groupIndex = window.Controls.Count - 1;
-        int childStart = window.Controls.Count;
+        int groupIndex = window.Controls.Count - 1; // index of the group just added
+        int childStart = window.Controls.Count;     // first child will be placed after this
 
-        // Read nested controls
+        // Read child controls inside the group
         if (!xmlReader.IsEmptyElement)
         {
             var depth = xmlReader.Depth;
@@ -215,50 +213,77 @@ public static class WindowLoader
                 {
                     ReadControl(xmlReader, windowIndex);
                 }
-                else if (xmlReader.NodeType == XmlNodeType.EndElement && xmlReader.Depth == depth && xmlReader.Name == "GroupBox")
+                else if (xmlReader.NodeType == XmlNodeType.EndElement &&
+                         xmlReader.Depth == depth &&
+                         xmlReader.Name == "GroupBox")
                 {
                     break;
                 }
             }
         }
 
-        // Compute bounds of enclosed controls
-        int minX = int.MaxValue, minY = int.MaxValue, maxX = int.MinValue, maxY = int.MinValue;
-        for (int i = childStart; i < window.Controls.Count; i++)
+        // Autosize to fit enclosed controls if requested (uses child local coordinates before offsetting)
+        if (autoPos || autoSize)
         {
-            var c = window.Controls[i];
-            minX = Math.Min(minX, c.X);
-            minY = Math.Min(minY, c.Y);
-            maxX = Math.Max(maxX, c.X + c.Width);
-            maxY = Math.Max(maxY, c.Y + c.Height);
-        }
-
-        if (window.Controls[groupIndex] is Controls.GroupBox group)
-        {
-            group.FirstChildIndex = childStart;
-            group.LastChildIndex = window.Controls.Count - 1;
-
-            // Decide final group bounds
-            const int outerMargin = 10;
-            const int innerPadding = 10;
-            int newLeft = group.X;
-            int newTop = group.Y;
-            int newWidth = group.Width;
-            int newHeight = group.Height;
+            int minX = int.MaxValue, minY = int.MaxValue, maxX = int.MinValue, maxY = int.MinValue;
+            for (int i = childStart; i < window.Controls.Count; i++)
+            {
+                var c = window.Controls[i];
+                minX = Math.Min(minX, c.X);
+                minY = Math.Min(minY, c.Y);
+                maxX = Math.Max(maxX, c.X + c.Width);
+                maxY = Math.Max(maxY, c.Y + c.Height);
+            }
 
             if (minX != int.MaxValue)
             {
+                const int padding = 8;
+                var group = (Client.Game.UI.Controls.GroupBox)window.Controls[groupIndex];
+
                 if (autoPos)
                 {
-                    newLeft = Math.Max(0, minX - innerPadding);
-                    newTop = Math.Max(0, minY - innerPadding);
+                    // stack vertically below previous group boxes
+                    int lastBottom = padding;
+                    for (int i = 0; i < groupIndex; i++)
+                    {
+                        if (window.Controls[i] is Client.Game.UI.Controls.GroupBox gbPrev && gbPrev.Visible)
+                        {
+                            lastBottom = Math.Max(lastBottom, gbPrev.Y + gbPrev.Height + padding);
+                        }
+                    }
+                    group.X = padding;
+                    group.Y = lastBottom;
                 }
 
                 if (autoSize)
                 {
-                    newWidth = Math.Max(1, (maxX + innerPadding) - newLeft);
-                    newHeight = Math.Max(1, (maxY + innerPadding) - newTop);
+                    group.Width = Math.Max(1, (maxX - minX) + padding * 2);
+                    group.Height = Math.Max(1, (maxY - minY) + padding * 2);
                 }
+            }
+        }
+
+        // Assign child range to group
+        if (window.Controls[groupIndex] is Client.Game.UI.Controls.GroupBox gb)
+        {
+            gb.FirstChildIndex = childStart;
+            gb.LastChildIndex = window.Controls.Count - 1;
+
+            // Constrain group box inside window margins
+            const int margin = 6;
+            if (gb.X < margin) gb.X = margin;
+            if (gb.X + gb.Width > window.Width - margin)
+                gb.Width = Math.Max(1, window.Width - margin - gb.X);
+            if (gb.Y + gb.Height > window.Height - margin)
+                gb.Height = Math.Max(1, window.Height - margin - gb.Y);
+
+            // Offset child controls so their X/Y become relative to the group's origin.
+            for (int i = gb.FirstChildIndex; i <= gb.LastChildIndex; i++)
+            {
+                var child = window.Controls[i];
+                if (ReferenceEquals(child, gb)) continue; // skip the group itself
+                child.X += gb.X;
+                child.Y += gb.Y;
             }
         }
     }
