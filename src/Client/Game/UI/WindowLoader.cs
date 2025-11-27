@@ -235,6 +235,9 @@ public static class WindowLoader
 
         if (window.Controls[groupIndex] is Controls.GroupBox group)
         {
+            group.FirstChildIndex = childStart;
+            group.LastChildIndex = window.Controls.Count - 1;
+
             // Decide final group bounds
             const int outerMargin = 10;      // keep group inset from the window edges
             const int innerPadding = 8;      // add padding around children inside the group
