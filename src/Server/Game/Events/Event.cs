@@ -15,7 +15,7 @@ using Type = Core.Globals.Type;
 
 namespace Server
 {
-    public static class Event
+    public class Event
     {
         #region Globals
 
