@@ -10,7 +10,7 @@ using Server.Net;
 using static Core.Globals.Command;
 using static Core.Net.Packets;
 using Type = Core.Globals.Type;
-using System.Linq; // snapshot enumerations to avoid concurrent modification
+using System.Linq;
 
 namespace Server;
 

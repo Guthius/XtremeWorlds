@@ -467,7 +467,7 @@ namespace Client
                     var adminWindow = WindowManager.GetWindowByName("winAdmin");
                     if (adminWindow != null)
                     {
-                        if (adminWindow.GetChild("txtAdminName") is TextBox txtName)
+                        if (adminWindow.GetChild("txtName") is TextBox txtName)
                         {
                             txtName.Text = playerName;
                         }

@@ -2348,7 +2348,7 @@ public class Crystalshire
 
         // Defaults
         var playerName = GetPlayerName(GameState.MyIndex);
-        var txtName = window.GetChild("txtAdminName");
+        var txtName = window.GetChild("txtName");
         txtName.Text = playerName;
 
         if (window.GetChild("cmbAccess") is ComboBox cmb)
@@ -2618,7 +2618,7 @@ public class Crystalshire
             var moderation = new[]
             {
                 "picModerationBG",
-                "lblPlayerName","txtAdminName",
+                "lblPlayerName","txtName",
                 "lblAccessLevel","cmbAccess","btnSetAccess",
                 "lblMapNumber","txtAdminMap","btnWarpTo",
                 "lblSprite","txtSprite","btnSetSprite",

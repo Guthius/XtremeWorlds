@@ -9,12 +9,12 @@
     <!-- Tab Control for different admin sections -->
     <GroupBox Name="grpAdmin" Position="6, 26" Size="628, 224">
         <!-- MODERATION TAB -->
-        <TabPage Name="grpModeration" Caption="Moderation">
+        <GroupBox Name="grpModeration" Caption="Moderation">
             <PictureBox Name="picModerationBG" Position="6, 46" Size="628, 190" Design="Parchment"/>
 
             <!-- Player Name Section -->
             <Label Name="lblPlayerName" Text="Player Name:" Position="20, 55" Size="140, 12"/>
-            <TextBox Name="txtAdminName" Position="125, 53" Size="300, 18"/>
+            <TextBox Name="txtName" Position="125, 53" Size="300, 18"/>
 
             <!-- Access Level Section -->
             <Label Name="lblAccessLevel" Text="Access Level:" Position="20, 80" Size="140, 12"/>
@@ -47,7 +47,7 @@
             Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
             <Button Name="btnWarpMe2" Text="Warp Me To Player" Position="170, 186" Size="145, 22"
             Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-        </TabPage>
+        </GroupBox>
 
         <!-- MAP LIST TAB -->
         <GroupBox Name="grpMapList" Caption="Maps">
