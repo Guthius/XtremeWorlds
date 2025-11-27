@@ -1,223 +1,138 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <Version>2.4.9</Version>
-        <TargetFrameworks>net10.0-windows;net10.0</TargetFrameworks>
-        <RootNamespace>Client</RootNamespace>
-        <ApplicationIcon>Icon.ico</ApplicationIcon>
-        <OutputPath>..\..\Build\Client\</OutputPath>
-        <DefineConstants>CLIENT</DefineConstants>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<UseSharedCompilation>false</UseSharedCompilation>
-    </PropertyGroup>
+  <PropertyGroup>
+    <Version>2.4.9</Version>
+    <TargetFrameworks>net10.0-windows;net10.0</TargetFrameworks>
+    <RootNamespace>Client</RootNamespace>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
+    <OutputPath>..\..\Build\Client\</OutputPath>
+    <DefineConstants>CLIENT</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <UseSharedCompilation>false</UseSharedCompilation>
+  </PropertyGroup>
 
-	<!-- Cross-platform TFM: non-Windows RIDs -->
-    <PropertyGroup Condition="'$(TargetFramework)'=='net10.0'">
-        <OutputType>Exe</OutputType>
-        <RuntimeIdentifiers>linux-x64;osx-arm64</RuntimeIdentifiers>
-    </PropertyGroup>
+  <!-- Cross-platform TFM: non-Windows RIDs -->
+  <PropertyGroup Condition="'$(TargetFramework)'=='net10.0'">
+    <OutputType>Exe</OutputType>
+    <RuntimeIdentifiers>linux-x64;osx-arm64</RuntimeIdentifiers>
+  </PropertyGroup>
 
-    <!-- OutputType must be in PropertyGroup, not ItemGroup -->
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-windows'">
-        <OutputType>WinExe</OutputType>
-        <UseWPF>true</UseWPF>
-		<EnableWindowsTargeting>true</EnableWindowsTargeting>
-		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
-		<DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
-    </PropertyGroup>
+  <!-- OutputType must be in PropertyGroup, not ItemGroup -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-windows'">
+    <OutputType>WinExe</OutputType>
+    <UseWPF>true</UseWPF>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
+  </PropertyGroup>
 
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0'">
-        <OutputType>Exe</OutputType>
-    </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <Title>XtremeWorlds Client</Title>
-        <Product>Game Client</Product>
-    </PropertyGroup>
+  <PropertyGroup>
+    <Title>XtremeWorlds Client</Title>
+    <Product>Game Client</Product>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <ManifestCertificateThumbprint>181BBD77C201FB969E61DF100063FD42A08B2BE6</ManifestCertificateThumbprint>
-        <TargetZone>LocalIntranet</TargetZone>
-        <SignManifests>false</SignManifests>
-        <Install>true</Install>
-        <InstallFrom>Disk</InstallFrom>
-        <UpdateEnabled>false</UpdateEnabled>
-        <UpdateMode>Foreground</UpdateMode>
-        <UpdateInterval>7</UpdateInterval>
-        <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-        <UpdatePeriodically>false</UpdatePeriodically>
-        <UpdateRequired>false</UpdateRequired>
-        <ApplicationRevision>1</ApplicationRevision>
-        <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-        <UseApplicationTrust>false</UseApplicationTrust>
-        <PublishWizardCompleted>true</PublishWizardCompleted>
-    </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>181BBD77C201FB969E61DF100063FD42A08B2BE6</ManifestCertificateThumbprint>
+    <TargetZone>LocalIntranet</TargetZone>
+    <SignManifests>false</SignManifests>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <ApplicationRevision>1</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+  </PropertyGroup>
 
-    <!-- Include Windows-specific content only for Windows TFM -->
-    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-windows'">
-        <Content Include="*.dll;*.sf2">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <Visible>False</Visible>
-        </Content>
-        <Content Include="Content\**\*.*">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
-        </Content>
-    </ItemGroup>
+  <!-- Windows: copy only .dll and content; exclude Unix/Mac natives -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-windows'">
+    <Content Include="*.dll;*.sf2">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+    <Content Include="Content\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+    <None Remove="*.so;*.so.*;*.dylib" />
+    <Content Remove="*.so;*.so.*;*.dylib" />
+  </ItemGroup>
 
-    <!-- Include native Unix/Mac libraries only for non-Windows TFM -->
-    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
-        <Content Include="*.so;*.so.*;*.dylib;*.sf2">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <Visible>False</Visible>
-        </Content>
-        <Content Include="Content\**\*.*">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
-        </Content>
-    </ItemGroup>
+  <!-- Cross-platform: copy only .so/.dylib and content; exclude Windows natives -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <Content Include="*.so;*.so.*;*.dylib;*.sf2">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+    <Content Include="Content\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+    <None Remove="*.dll" />
+    <Content Remove="*.dll" />
+  </ItemGroup>
 
-    <ItemGroup>
-      <None Remove="FNA3D.exp" />
-      <None Remove="FNA3D.lib" />
-      <None Remove="Icon.bmp" />
-      <None Remove="Icon.ico" />
-      <None Remove="libbass.dylib" />
-      <None Remove="libbass.so" />
-      <None Remove="libbassmidi.dylib" />
-      <None Remove="libbassmidi.so" />
-      <None Remove="libFAudio.0.25.11.dylib" />
-      <None Remove="libFAudio.0.dylib" />
-      <None Remove="libFAudio.dylib" />
-      <None Remove="libFAudio.so" />
-      <None Remove="libFAudio.so.0" />
-      <None Remove="libFAudio.so.0.25.11" />
-      <None Remove="libFNA3D.0.25.11.dylib" />
-      <None Remove="libFNA3D.0.dylib" />
-      <None Remove="libFNA3D.dylib" />
-      <None Remove="libFNA3D.so" />
-      <None Remove="libFNA3D.so.0" />
-      <None Remove="libSDL3.dylib" />
-      <None Remove="libSDL3.so" />
-      <None Remove="libSDL3.so.0" />
-      <None Remove="libtheorafile.so" />
-    </ItemGroup>
+  <!-- Common resources -->
+  <ItemGroup>
+    <Resource Include="Icon.bmp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Icon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
 
-    <ItemGroup>
-      <Resource Include="Icon.bmp">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Resource>
-      <Resource Include="Icon.ico">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Resource>
-      <Resource Include="libbass.dylib">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Resource>
-      <Resource Include="libbass.so">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Resource>
-      <Resource Include="libbassmidi.dylib">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Resource>
-      <Resource Include="libbassmidi.so">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Resource>
-      <Resource Include="libFAudio.0.25.11.dylib">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Resource>
-      <Resource Include="libFAudio.0.dylib">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Resource>
-      <Resource Include="libFAudio.dylib">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Resource>
-      <Resource Include="libFAudio.so">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Resource>
-      <Resource Include="libFAudio.so.0">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Resource>
-      <Resource Include="libFAudio.so.0.25.11">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Resource>
-      <Resource Include="libFNA3D.0.25.11.dylib">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Resource>
-      <Resource Include="libFNA3D.0.dylib">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Resource>
-      <Resource Include="libFNA3D.dylib">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Resource>
-      <Resource Include="libFNA3D.so">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Resource>
-      <Resource Include="libFNA3D.so.0">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Resource>
-      <Resource Include="libSDL3.dylib">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Resource>
-      <Resource Include="libSDL3.so">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Resource>
-      <Resource Include="libSDL3.so.0">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Resource>
-      <Resource Include="libtheorafile.so">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Resource>
-    </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Content\Skins\Crystashire.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+  </ItemGroup>
 
-    <ItemGroup>
-        <Compile Update="Content\Skins\Crystashire.cs">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Compile>
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\Core\Core.csproj" />
-    </ItemGroup>
+  <!-- Always include Eto.Forms, but only include Gtk on Linux -->
+  <ItemGroup>
+    <PackageReference Include="Eto.Forms" />
+  </ItemGroup>
 
-    <!-- Always include Eto.Forms, but only include Gtk on Linux -->
-    <ItemGroup>
-        <PackageReference Include="Eto.Forms" />
-    </ItemGroup>
+  <!-- Windows-only backends (require -windows TFM) -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-windows'">
+    <PackageReference Include="Eto.Platform.Wpf" />
+    <PackageReference Include="Eto.Platform.Windows" />
+    <PackageReference Include="ImeSharp" />
+    <PackageReference Include="NVorbis" />
+  </ItemGroup>
 
-    <!-- Windows-only backends (require -windows TFM) -->
-    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-windows'">
-        <PackageReference Include="Eto.Platform.Wpf" />
-        <PackageReference Include="Eto.Platform.Windows" />
-        <PackageReference Include="ImeSharp" />
-        <PackageReference Include="NVorbis" />
-    </ItemGroup>
+  <!-- Non-Windows backends: Gtk for Linux always; Mac64 only when explicitly enabled -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <PackageReference Include="Eto.Platform.Gtk" />
+  </ItemGroup>
 
-    <!-- Non-Windows backends: Gtk for Linux always; Mac64 only when explicitly enabled -->
-    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
-        <PackageReference Include="Eto.Platform.Gtk" />
-    </ItemGroup>
+  <PropertyGroup Condition="'$(BuildMac)' == 'true' and '$(TargetFramework)' == 'net10.0'">
+    <RuntimeIdentifiers>linux-x64;</RuntimeIdentifiers>
+  </PropertyGroup>
 
-    <PropertyGroup Condition="'$(BuildMac)' == 'true' and '$(TargetFramework)' == 'net10.0'">
-        <RuntimeIdentifiers>linux-x64;</RuntimeIdentifiers>
-    </PropertyGroup>
+  <!-- Other platform-agnostic and always-needed packages -->
+  <ItemGroup>
+    <PackageReference Include="ManagedBass" />
+    <PackageReference Include="ManagedBass.Midi" />
+    <PackageReference Include="CS-Script" />
+    <Reference Include="FNA">
+      <HintPath>FNA.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 
-    <!-- Other platform-agnostic and always-needed packages -->
-    <ItemGroup>
-        <PackageReference Include="ManagedBass" />
-        <PackageReference Include="ManagedBass.Midi" />
-        <PackageReference Include="CS-Script" />
-        <Reference Include="FNA">
-          <HintPath>FNA.dll</HintPath>
-        </Reference> 
-	</ItemGroup>
-    <ItemGroup>
-      <Resource Include="FNA3D.exp">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Resource>
-      <Resource Include="FNA3D.lib">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Resource>
-    </ItemGroup>
-	<Target Name="EnsureContentFolderExists" BeforeTargets="Build">
-		<MakeDir Directories="$(OutputPath)Content" />
-	</Target>
-	</Project>
+  <Target Name="EnsureContentFolderExists" BeforeTargets="Build">
+    <MakeDir Directories="$(OutputPath)Content" />
+  </Target>
+</Project>
