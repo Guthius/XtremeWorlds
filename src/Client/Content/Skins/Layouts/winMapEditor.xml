@@ -105,15 +105,15 @@
     <Button Name="btnGoEvents" Text="Events" Position="406, 100" Size="80, 20" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="GreenClick"/>
     <Button Name="btnGoEffects" Text="Effects" Position="490, 100" Size="80, 20" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="GreenClick"/>
 
-    <!-- NPC header (shown in NPCs view) -->
+    <!-- Npc header (shown in NPCs view) -->
     <Label Name="lblNpcs" Text="Npc Tools" Position="20, 84" Size="200, 14"/>
     <Label Name="lblNpcsHint" Text="Select an npc to assign to a slot" Position="20, 112" Size="360, 14"/>
 
-    <!-- NPC list (left) -->
+    <!-- Npc list (left) -->
     <ListBox Name="lstNpcs" Position="20, 142" Size="460, 540"/>
     <ScrollBar Name="sldNpcList" Position="486, 142" Size="12, 540" Min="0" Max="0" Value="0" Orientation="Vertical" ThumbSize="16"/>
 
-    <!-- NPC selection (right top) -->
+    <!-- Npc selection (right top) -->
     <Label Name="lblNpc" Text="Npc" Position="520, 142" Size="40, 16"/>
     <ComboBox Name="cmbNpcList" Position="564, 140" Size="220, 18"/>
 

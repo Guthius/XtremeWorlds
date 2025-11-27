@@ -13,6 +13,70 @@ using Type = Core.Globals.Type;
 
 public class Crystalshire
 {
+    // Improved: hide/show group box frame and all of its children reliably.
+    // - Prefers loader-recorded child range (FirstChildIndex..LastChildIndex).
+    // - Falls back to rectangle intersection (not just containment) for overlapping layouts.
+    // - Ensures common UI controls within the group region follow visibility.
+    private int SetGroupBoxVisible(string windowName, string groupBoxName, bool visible, bool includeGroupBoxFrame = true)
+    {
+        if (!WindowManager.TryGetWindow(windowName, out var win) || win is null) return 0;
+        if (!WindowManager.TryGetControl(windowName, groupBoxName, out var ctrl) || ctrl is not GroupBox gb) return 0;
+
+        int changed = 0;
+
+        // Optionally toggle the group box frame
+        if (includeGroupBoxFrame && gb.Visible != visible)
+        {
+            gb.Visible = visible;
+            changed++;
+        }
+
+        // Prefer loader-defined children (exact membership)
+        if (gb.FirstChildIndex >= 0 && gb.LastChildIndex >= gb.FirstChildIndex && gb.LastChildIndex < win.Controls.Count)
+        {
+            for (int i = gb.FirstChildIndex; i <= gb.LastChildIndex; i++)
+            {
+                var c = win.Controls[i];
+                if (ReferenceEquals(c, gb)) continue;
+                if (c.Visible != visible)
+                {
+                    c.Visible = visible;
+                    changed++;
+                }
+            }
+            return changed;
+        }
+
+        // Fallback: intersection-based (handles overlapping groups and partial overlaps)
+        int gx = gb.X, gy = gb.Y, gw = gb.Width, gh = gb.Height;
+        int gxr = gx + gw, gyr = gy + gh;
+
+        // Toggle all sibling controls contained within the group box rectangle
+        foreach (var c in win.Controls)
+        {
+            if (ReferenceEquals(c, gb)) continue;
+
+            // Rectangle intersection (any overlap counts as belonging to the group region)
+            bool intersects =
+                c.X < gxr && (c.X + c.Width) > gx &&
+                c.Y < gyr && (c.Y + c.Height) > gy;
+
+            if (!intersects) continue;
+
+            // Respect common UI control classes; skip nested windows
+            if (c is Label || c is ComboBox || c is TextBox || c is PictureBox || c is ScrollBar || c is ListBox || c is Button || c is CheckBox)
+            {
+                if (c.Visible != visible)
+                {
+                    c.Visible = visible;
+                    changed++;
+                }
+            }
+        }
+
+        return changed;
+    }
+
     public void UpdateWindow_Login()
     {
         var window = WindowLoader.FromLayout("winLogin");
@@ -135,7 +199,7 @@ public class Crystalshire
         }
 
         // Save: apply Settings values and mirror Editors.UpdateMap flow
-        if (WindowManager.TryGetControl("winMapEditor","btnSaveMap", out var btnSave))
+        if (WindowManager.TryGetControl("winMapEditor", "btnSaveMap", out var btnSave))
         {
             btnSave.CallBack[(int)ControlState.MouseDown] = () =>
             {
@@ -149,33 +213,33 @@ public class Crystalshire
                 }
                 int maxMaps = Variables.MaxMaps;
                 // Name & Music & Shop & Moral
-                if (WindowManager.TryGetControl("winMapEditor","txtName", out var txtNameCtrl))
+                if (WindowManager.TryGetControl("winMapEditor", "txtName", out var txtNameCtrl))
                     Data.MyMap.Name = txtNameCtrl.Text?.Trim() ?? string.Empty;
-                if (WindowManager.TryGetControl("winMapEditor","cmbMusic", out var musicCtrl) && musicCtrl is ComboBox cmbMusic)
+                if (WindowManager.TryGetControl("winMapEditor", "cmbMusic", out var musicCtrl) && musicCtrl is ComboBox cmbMusic)
                 {
                     var idx = Math.Clamp(cmbMusic.Value, 0, cmbMusic.Items.Count - 1);
                     Data.MyMap.Music = idx <= 0 ? string.Empty : cmbMusic.Items[idx];
                 }
-                if (WindowManager.TryGetControl("winMapEditor","lstShop", out var shopCtrl) && shopCtrl is ComboBox lstShop)
+                if (WindowManager.TryGetControl("winMapEditor", "lstShop", out var shopCtrl) && shopCtrl is ComboBox lstShop)
                     Data.MyMap.Shop = lstShop.Value <= 0 ? -1 : lstShop.Value - 1;
-                if (WindowManager.TryGetControl("winMapEditor","lstMoral", out var moralCtrl) && moralCtrl is ComboBox lstMoral)
+                if (WindowManager.TryGetControl("winMapEditor", "lstMoral", out var moralCtrl) && moralCtrl is ComboBox lstMoral)
                     Data.MyMap.Moral = (byte)Math.Clamp(lstMoral.Value, 0, Variables.MaxMorals - 1);
 
                 // Links
-                if (WindowManager.TryGetControl("winMapEditor","txtUp", out var txtUp)) Data.MyMap.Up = (short)ReadIntSafe(txtUp, 0, maxMaps, 0);
-                if (WindowManager.TryGetControl("winMapEditor","txtDown", out var txtDown)) Data.MyMap.Down = (short)ReadIntSafe(txtDown, 0, maxMaps, 0);
-                if (WindowManager.TryGetControl("winMapEditor","txtLeft", out var txtLeft)) Data.MyMap.Left = (short)ReadIntSafe(txtLeft, 0, maxMaps, 0);
-                if (WindowManager.TryGetControl("winMapEditor","txtRight", out var txtRight)) Data.MyMap.Right = (short)ReadIntSafe(txtRight, 0, maxMaps, 0);
+                if (WindowManager.TryGetControl("winMapEditor", "txtUp", out var txtUp)) Data.MyMap.Up = (short)ReadIntSafe(txtUp, 0, maxMaps, 0);
+                if (WindowManager.TryGetControl("winMapEditor", "txtDown", out var txtDown)) Data.MyMap.Down = (short)ReadIntSafe(txtDown, 0, maxMaps, 0);
+                if (WindowManager.TryGetControl("winMapEditor", "txtLeft", out var txtLeft)) Data.MyMap.Left = (short)ReadIntSafe(txtLeft, 0, maxMaps, 0);
+                if (WindowManager.TryGetControl("winMapEditor", "txtRight", out var txtRight)) Data.MyMap.Right = (short)ReadIntSafe(txtRight, 0, maxMaps, 0);
 
                 // Boot
-                if (WindowManager.TryGetControl("winMapEditor","txtBootMap", out var txtBootMap)) Data.MyMap.BootMap = (short)ReadIntSafe(txtBootMap, 0, maxMaps, 0);
-                if (WindowManager.TryGetControl("winMapEditor","txtBootX", out var txtBootX)) Data.MyMap.BootX = (byte)ReadIntSafe(txtBootX, 0, Math.Max((byte)0, Data.MyMap.MaxX), 0);
-                if (WindowManager.TryGetControl("winMapEditor","txtBootY", out var txtBootY)) Data.MyMap.BootY = (byte)ReadIntSafe(txtBootY, 0, Math.Max((byte)0, Data.MyMap.MaxY), 0);
+                if (WindowManager.TryGetControl("winMapEditor", "txtBootMap", out var txtBootMap)) Data.MyMap.BootMap = (short)ReadIntSafe(txtBootMap, 0, maxMaps, 0);
+                if (WindowManager.TryGetControl("winMapEditor", "txtBootX", out var txtBootX)) Data.MyMap.BootX = (byte)ReadIntSafe(txtBootX, 0, Math.Max((byte)0, Data.MyMap.MaxX), 0);
+                if (WindowManager.TryGetControl("winMapEditor", "txtBootY", out var txtBootY)) Data.MyMap.BootY = (byte)ReadIntSafe(txtBootY, 0, Math.Max((byte)0, Data.MyMap.MaxY), 0);
 
                 // Flags
-                if (WindowManager.TryGetControl("winMapEditor","chkNoMapRespawn", out var chkNoMapRespawn))
+                if (WindowManager.TryGetControl("winMapEditor", "chkNoMapRespawn", out var chkNoMapRespawn))
                     Data.MyMap.NoRespawn = chkNoMapRespawn.Value == 1;
-                if (WindowManager.TryGetControl("winMapEditor","chkIndoors", out var chkIndoors))
+                if (WindowManager.TryGetControl("winMapEditor", "chkIndoors", out var chkIndoors))
                     Data.MyMap.Indoors = chkIndoors.Value == 1;
 
                 // Resize map (mirror Editors.UpdateMap)
@@ -183,9 +247,9 @@ public class Crystalshire
                 int prevMaxX = Data.MyMap.MaxX;
                 int prevMaxY = Data.MyMap.MaxY;
 
-                if (WindowManager.TryGetControl("winMapEditor","txtMaxX", out var txtMaxX))
+                if (WindowManager.TryGetControl("winMapEditor", "txtMaxX", out var txtMaxX))
                     Data.MyMap.MaxX = (byte)ReadIntSafe(txtMaxX, 1, Variables.MaxMapX, Data.MyMap.MaxX);
-                if (WindowManager.TryGetControl("winMapEditor","txtMaxY", out var txtMaxY))
+                if (WindowManager.TryGetControl("winMapEditor", "txtMaxY", out var txtMaxY))
                     Data.MyMap.MaxY = (byte)ReadIntSafe(txtMaxY, 1, Variables.MaxMapY, Data.MyMap.MaxY);
 
                 Data.MyMap.Tile = new Type.Tile[(Data.MyMap.MaxX), (Data.MyMap.MaxY)];
@@ -226,7 +290,7 @@ public class Crystalshire
         }
 
         // Discard: cancel map edit and close
-        if (WindowManager.TryGetControl("winMapEditor","btnDiscard", out var btnDiscard))
+        if (WindowManager.TryGetControl("winMapEditor", "btnDiscard", out var btnDiscard))
         {
             btnDiscard.CallBack[(int)ControlState.MouseDown] = () => { Editors.MapEditorCancel(); WindowManager.HideWindow("winMapEditor"); };
         }
@@ -234,7 +298,7 @@ public class Crystalshire
         // Layer buttons: update current layer in GameState
         void BindLayer(string ctrl, int layer)
         {
-            if (WindowManager.TryGetControl("winMapEditor",ctrl, out var c))
+            if (WindowManager.TryGetControl("winMapEditor", ctrl, out var c))
             {
                 c.CallBack[(int)ControlState.MouseDown] = () => { GameState.CurLayer = (byte)layer; };
             }
@@ -247,10 +311,10 @@ public class Crystalshire
         BindLayer("btnLayer5", 5);
 
         // Tools: map to existing editor actions
-        if (WindowManager.TryGetControl("winMapEditor","btnToolPencil", out var btnPencil))
+        if (WindowManager.TryGetControl("winMapEditor", "btnToolPencil", out var btnPencil))
             btnPencil.CallBack[(int)ControlState.MouseDown] = () => { GameState.EyeDropper = false; };
         
-        if (WindowManager.TryGetControl("winMapEditor","btnToolFill", out var btnFill))
+        if (WindowManager.TryGetControl("winMapEditor", "btnToolFill", out var btnFill))
             btnFill.CallBack[(int)ControlState.MouseDown] = () =>
             {
                 // Contextual fill: Attributes -> fill attributes (confirm), Directions -> not applicable, otherwise fill current tiles layer
@@ -267,7 +331,7 @@ public class Crystalshire
                     WinEditorMap.OnFillLayerClick();
                 }
             };
-        if (WindowManager.TryGetControl("winMapEditor","btnToolEraser", out var btnErase))
+        if (WindowManager.TryGetControl("winMapEditor", "btnToolEraser", out var btnErase))
             btnErase.CallBack[(int)ControlState.MouseDown] = () =>
             {
                 // Contextual clear: Directions -> clear dir blocks (confirm), Attributes -> clear attributes (confirm), otherwise clear current tiles layer
@@ -286,25 +350,25 @@ public class Crystalshire
             };
 
         // Toolbar buttons
-        if (WindowManager.TryGetControl("winMapEditor","btnGrid", out var btnGrid))
+        if (WindowManager.TryGetControl("winMapEditor", "btnGrid", out var btnGrid))
             btnGrid.CallBack[(int)ControlState.MouseDown] = () => { GameState.MapGrid = !GameState.MapGrid; };
-        if (WindowManager.TryGetControl("winMapEditor","btnEyeDropper", out var btnEye))
+        if (WindowManager.TryGetControl("winMapEditor", "btnEyeDropper", out var btnEye))
             btnEye.CallBack[(int)ControlState.MouseDown] = () => { GameState.EyeDropper = !GameState.EyeDropper; };
-        if (WindowManager.TryGetControl("winMapEditor","btnUndo", out var btnUndo))
+        if (WindowManager.TryGetControl("winMapEditor", "btnUndo", out var btnUndo))
             btnUndo.CallBack[(int)ControlState.MouseDown] = () => { Editors.Undo(); };
-        if (WindowManager.TryGetControl("winMapEditor","btnRedo", out var btnRedo))
+        if (WindowManager.TryGetControl("winMapEditor", "btnRedo", out var btnRedo))
             btnRedo.CallBack[(int)ControlState.MouseDown] = () => { Editors.Redo(); };
 
         // Quick actions: call into existing helpers if available
-        if (WindowManager.TryGetControl("winMapEditor","btnFillLayer", out var btnFillLayer))
+        if (WindowManager.TryGetControl("winMapEditor", "btnFillLayer", out var btnFillLayer))
             btnFillLayer.CallBack[(int)ControlState.MouseDown] = () => { WinEditorMap.OnFillLayerClick(); };
-        if (WindowManager.TryGetControl("winMapEditor","btnClearLayer", out var btnClearLayer))
+        if (WindowManager.TryGetControl("winMapEditor", "btnClearLayer", out var btnClearLayer))
             btnClearLayer.CallBack[(int)ControlState.MouseDown] = () => { Editors.MapEditorClearLayer((MapLayer)GameState.CurLayer); };
-        if (WindowManager.TryGetControl("winMapEditor","btnCopyMap", out var btnCopy))
+        if (WindowManager.TryGetControl("winMapEditor", "btnCopyMap", out var btnCopy))
             btnCopy.CallBack[(int)ControlState.MouseDown] = () => { Editors.MapEditorCopyMap(); };
-        if (WindowManager.TryGetControl("winMapEditor","btnPasteMap", out var btnPaste))
+        if (WindowManager.TryGetControl("winMapEditor", "btnPasteMap", out var btnPaste))
             btnPaste.CallBack[(int)ControlState.MouseDown] = () => { Editors.MapEditorPasteMap(); };
-        if (WindowManager.TryGetControl("winMapEditor","btnDeleteMap", out var btnDeleteMap))
+        if (WindowManager.TryGetControl("winMapEditor", "btnDeleteMap", out var btnDeleteMap))
             btnDeleteMap.CallBack[(int)ControlState.MouseDown] = () =>
             {
                 GameLogic.Dialogue("Map Editor", "Delete Map: ", "Are you sure you want to clear this map?", DialogueType.DeleteMap, DialogueStyle.YesNo);
@@ -329,7 +393,7 @@ public class Crystalshire
             cmbLayer.CallBack[(int)ControlState.MouseMove] = () => { GameState.CurLayer = (byte)Math.Clamp(cmbLayer.Value, 0, 5); };
         }
         
-        if (WindowManager.TryGetControl("winMapEditor","cmbAutotile", out var cmbAutoCtrl) && cmbAutoCtrl is ComboBox cmbAuto)
+        if (WindowManager.TryGetControl("winMapEditor", "cmbAutotile", out var cmbAutoCtrl) && cmbAutoCtrl is ComboBox cmbAuto)
         {
             cmbAuto.Items.Clear();
             foreach (var n in autotileNames) cmbAuto.Items.Add(n);
@@ -403,7 +467,7 @@ public class Crystalshire
         {
             // Show only relevant attribute configuration controls per selection (mirror Eto behavior)
             bool showWarp = idx == 1; // Warp
-            string[] warpCtrls = new[]{"lblWarp","lblWarpMap","sldMapWarp","lblWarpX","sldMapWarpX","lblWarpY","sldMapWarpY","btnMapWarp"};
+            string[] warpCtrls = new[]{"lblWarp","lblWarpMap","sldMapWarp","lblWarpX","sldMapWarpX","lblWarpY","sldMapWarpY","btnMapWarp"};;
             foreach (var n in warpCtrls)
             {
                 if (WindowManager.TryGetControl("winMapEditor",n, out var c)) c.Visible = showWarp;
@@ -478,7 +542,7 @@ public class Crystalshire
 
             // Item
             bool showItem = idx == 2;
-            string[] itemCtrls = new[]{"lblItem","cmbMapItem","lblItemValue","sldMapItemValue","btnMapItem"};
+            string[] itemCtrls = new[]{"lblItem","cmbMapItem","lblItemValue","sldMapItemValue","btnMapItem"};;
             foreach (var n in itemCtrls)
             {
                 if (WindowManager.TryGetControl("winMapEditor",n, out var c)) c.Visible = showItem;
@@ -848,106 +912,30 @@ public class Crystalshire
         {
             foreach (var n in names)
             {
-                if (WindowManager.TryGetControl("winMapEditor",n, out var c)) c.Visible = visible;
+                if (WindowManager.TryGetControl("winMapEditor", n, out var c)) c.Visible = visible;
             }
         }
 
         void ShowTab(string tab)
         {
-            var tools = new[]{
-                "lblTileset","lblAutotile","lblLayer",
-                "sldTileset","lblTileset",
-                "cmbLayer",
-                "cmbAutotile",
-                "picTileset","sldTilesetV","sldTilesetH"
-            };
-
-            var attrs = new[]{
-                "lblAttributes","cmbAttrMode","btnAttrInfo",
-                "lblAttrLayer","cmbAttribute",
-                // Warp
-                "lblWarp","lblWarpMap","sldMapWarp","lblWarpX","sldMapWarpX","lblWarpY","sldMapWarpY","btnMapWarp",
-                // Item
-                "lblItem","cmbMapItem","lblItemValue","sldMapItemValue","btnMapItem",
-                // Resource
-                "lblResource","cmbResource","btnResourceOk",
-                // NPC Spawn
-                "lblNpcSpawn","lblNpcSpawnSlot","cmbNpcSpawnSlot","lblNpcDir","sldNpcDir","btnNpcSpawn",
-                // Shop
-                "lblShopAttr","cmbShopAttr","btnShop",
-                // Heal
-                "lblHeal","cmbHeal","lblHealAmount","sldHeal","btnHeal",
-                // Trap
-                "lblTrap","lblTrapVital","cmbTrapVital","lblTrapAmount","sldTrap","btnTrap",
-                // Animation
-                "lblAnimation","cmbAnimation","btnAnimation"
-            };
-
-            var npcs = new[]{
-                "picNpcsBG","lblNpcs","lblNpcsHint",
-                // Left list
-                "lstNpcs","sldNpcList",
-                // Right selection
-                "lblNpc","cmbNpcList"
-            };
-
-            var settings = new[]{
-                // Parchment and header
-                "picNpcsBG","lblSettings",
-                // Section nav
-                "btnGoTiles","btnGoAttributes","btnGoNpcs","btnGoDirBlock","btnGoEvents","btnGoEffects",
-                // Core fields
-                "lblMapName","txtName","lblMoral","lstMoral","lblShop","lstShop",
-                "lblMusic","cmbMusic","btnMusicPreview",
-                // Links
-                "lblLinks","lblLinkUp","txtUp","lblLinkDown","txtDown","lblLinkLeft","txtLeft","lblLinkRight","txtRight",
-                // Boot
-                "lblBoot","lblBootMap","txtBootMap","lblBootX","txtBootX","lblBootY","txtBootY",
-                // Flags
-                "chkNoMapRespawn","chkIndoors",
-                // Sizes
-                "lblMaxX","txtMaxX","lblMaxY","txtMaxY"
-            };
-
-            var dirblock = new[]{
-                "picDirBG","lblDir"
-            };
-
-            var eventsTab = new[]{
-                "picEventsBG","lblEvents",
-                "lblCopyCaption","lblCopyMode","btnCopyEvent",
-                "lblPasteCaption","lblPasteMode","btnPasteEvent"
-            };
-
-            var effects = new[]{
-                "picEffectsBG","lblEffects",
-                // Weather
-                "lblWeather","cmbWeather","lblIntensity","sldIntensity",
-                // Fog
-                "lblFog","sldFog","lblFogOpacity","sldFogOpacity","lblFogSpeed","sldFogSpeed",
-                // Tint
-                "chkTint","lblTintR","sldMapRed","lblTintG","sldMapGreen","lblTintB","sldMapBlue","lblTintA","sldMapAlpha",
-                // Panorama/Parallax/Brightness
-                "lblPanorama","cmbPanorama","lblParallax","cmbParallax","lblBrightness","sldMapBrightness"
-            };
-
-            SetVisible(false, tools);
-            SetVisible(false, attrs);
-            SetVisible(false, npcs);
-            SetVisible(false, settings);
-            SetVisible(false, dirblock);
-            SetVisible(false, eventsTab);
-            SetVisible(false, effects);
+            SetGroupBoxVisible("winMapEditor", "grpTiles", false);
+            SetGroupBoxVisible("winMapEditor", "grpAttributes", false);
+            SetGroupBoxVisible("winMapEditor", "grpNpcs", false);
+            SetGroupBoxVisible("winMapEditor", "grpSettings", false);
+            SetGroupBoxVisible("winMapEditor", "grpDirBlock", false);
+            SetGroupBoxVisible("winMapEditor", "grpEvents", false);
+            SetGroupBoxVisible("winMapEditor", "grpEffects", false);
 
             switch (tab)
             {
                 case "Tools":
-                    SetVisible(true, tools);
+                    SetGroupBoxVisible("winMapEditor", "grpTiles", true);
                     GameState.MapEditorTab = (int)MapEditorTab.Tiles;
                     break;
                 case "Attributes":
-                    SetVisible(true, attrs);
+                    SetGroupBoxVisible("winMapEditor", "grpAttributes", true);
                     GameState.MapEditorTab = (int)MapEditorTab.Attributes;
+
                     // Ensure attribute group visibility matches current mode when tab opens
                     if (WindowManager.TryGetControl("winMapEditor","cmbAttrMode", out var attrModeCtrl) && attrModeCtrl is ComboBox attrCmb)
                     {
@@ -956,24 +944,24 @@ public class Crystalshire
                     }
                     break;
                 case "Npcs":
-                    SetVisible(true, npcs);
+                    SetGroupBoxVisible("winMapEditor", "grpNpcs", true);
                     InitNpcList();
                     GameState.MapEditorTab = (int)MapEditorTab.Npcs;
                     break;
                 case "Settings":
-                    SetVisible(true, settings);
+                    SetGroupBoxVisible("winMapEditor", "grpNpcs", true);
                     GameState.MapEditorTab = (int)MapEditorTab.Settings;
                     break;
                 case "DirBlock":
-                    SetVisible(true, dirblock);
+                    SetGroupBoxVisible("winMapEditor", "grpDirBlock", true);
                     GameState.MapEditorTab = (int)MapEditorTab.Directions;
                     break;
                 case "Events":
-                    SetVisible(true, eventsTab);
+                    SetGroupBoxVisible("winMapEditor", "grpEvents", true);
                     GameState.MapEditorTab = (int)MapEditorTab.Events;
                     break;
                 case "Effects":
-                    SetVisible(true, effects);
+                    SetGroupBoxVisible("winMapEditor", "grpEffects", true);
                     GameState.MapEditorTab = (int)MapEditorTab.Effects;
                     break;
             }
@@ -2599,57 +2587,20 @@ public class Crystalshire
         // Provide tab-like buttons to switch visible groups (because TabPage is a transparent container in our loader)
         var winIndex = WindowManager.GetWindowIndex("winAdmin");
 
-        void SetVisible(bool visible, params string[] names)
-        {
-            foreach (var n in names)
-            {
-                if (WindowManager.TryGetControl("winAdmin", n, out var c))
-                {
-                    c.Visible = visible;
-                }
-            }
-        }
-
         void ShowTab(string tab)
         {
-            // Moderation controls (include background + labels)
-            var moderation = new[]
-            {
-                "lblPlayerName","txtName",
-                "lblAccessLevel","cmbAccess","btnSetAccess",
-                "lblMapNumber","txtAdminMap","btnWarpTo",
-                "lblSprite","txtSprite","btnSetSprite",
-                "btnBan","btnKick","btnLevelUp",
-                "btnWarp2Me","btnWarpMe2"
-            };
-
-            // Map List controls
-            var mapList = new[] { "lstMaps", "btnMapWarp", "btnMapReport", "sldMapList" };
-
-            // Map Tools controls
-            var mapTools = new[] { "btnRespawn", "btnALoc" };
-
-            // Editor controls
-            var editors = new[]
-            {
-                "btnAnimationEditor","btnJobEditor","btnItemEditor","btnMapEditor",
-                "btnNpcEditor","btnProjectiles","btnResourceEditor","btnShopEditor",
-                "btnSkillEditor","btnMoralEditor","btnScriptEditor"
-            };
-
-            // Hide all groups first
-            SetVisible(false, moderation);
-            SetVisible(false, mapList);
-            SetVisible(false, mapTools);
-            SetVisible(false, editors);
+            SetGroupBoxVisible("winAdmin", "grpModeration", false);
+            SetGroupBoxVisible("winAdmin", "grpMapList", false);
+            SetGroupBoxVisible("winAdmin", "grpMapTools", false);
+            SetGroupBoxVisible("winAdmin", "grpEditors", false);
 
             // Show selected
             switch (tab)
             {
-                case "Moderation": SetVisible(true, moderation); break;
-                case "MapList": SetVisible(true, mapList); break;
-                case "MapTools": SetVisible(true, mapTools); break;
-                case "Editors": SetVisible(true, editors); break;
+                case "Moderation": SetGroupBoxVisible("winAdmin", "grpModeration", true); break;
+                case "MapList": SetGroupBoxVisible("winAdmin", "grpMapList", true); break;
+                case "MapTools": SetGroupBoxVisible("winAdmin", "grpMapTools", true); break;
+                case "Editors": SetGroupBoxVisible("winAdmin", "grpEditors", true); break;
             }
         }
 
