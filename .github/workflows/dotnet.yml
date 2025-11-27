@@ -35,13 +35,3 @@ jobs:
 
       - name: Test
         run: dotnet test --no-build --verbosity normal
-
-      # 🔥 OPTIONAL: Clean up after tests too
-      - name: Kill leftover processes after tests
-        if: always()
-        shell: cmd
-        run: |
-          echo Cleaning up lingering processes after tests...
-          taskkill /F /IM testhost.exe /T || echo testhost.exe not found
-          taskkill /F /IM dotnet.exe /T || echo dotnet.exe not found
-          taskkill /F /IM VBCSCompiler.exe /T || echo VBCSCompiler.exe not found
