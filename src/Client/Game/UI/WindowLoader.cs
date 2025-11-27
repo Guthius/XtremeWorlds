@@ -239,15 +239,14 @@ public static class WindowLoader
             group.LastChildIndex = window.Controls.Count - 1;
 
             // Decide final group bounds
-            const int outerMargin = 10;      // keep group inset from the window edges
-            const int innerPadding = 8;      // add padding around children inside the group
-
+            const int outerMargin = 10;
+            const int innerPadding = 10;
             int newLeft = group.X;
             int newTop = group.Y;
             int newWidth = group.Width;
             int newHeight = group.Height;
 
-            if (minX != int.MaxValue) // has children
+            if (minX != int.MaxValue)
             {
                 if (autoPos)
                 {
