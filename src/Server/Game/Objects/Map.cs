@@ -131,7 +131,7 @@ namespace Server
             var mapData = JObject.FromObject(data).ToObject<Core.Globals.Type.Map>();
             Data.Map[mapNum] = mapData;
 
-            Resource.CacheResources(mapNum);
+            MapResource.Cache(mapNum);
         }
 
         public static CsMap LoadCsMap(string fileName)

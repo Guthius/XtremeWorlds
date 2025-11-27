@@ -1299,7 +1299,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         // Respawn
         Item.SpawnMapItems(GetPlayerMap(session.Id));
-        Resource.CacheResources(mapNum);
+        MapResource.Cache(mapNum);
 
         // Refresh map for everyone online
         foreach (var i in PlayerService.Instance.PlayerIds)
@@ -1369,7 +1369,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         EventLogic.SpawnMapEventsFor(session.Id, GetPlayerMap(session.Id));
 
-        Resource.CacheResources(GetPlayerMap(session.Id));
+        MapResource.Cache(GetPlayerMap(session.Id));
         NetworkSend.PlayerMsg(session.Id, "Map respawned.", (int) ColorName.BrightGreen);
         Log.Add(GetPlayerName(session.Id) + " has respawned map #" + GetPlayerMap(session.Id), Constant.AdminLog);
     }

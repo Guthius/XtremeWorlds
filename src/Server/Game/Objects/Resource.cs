@@ -15,7 +15,7 @@ namespace Server;
 
 public static class Resource
 {
-    private static void SaveResource(int resourceNum)
+    private static void Save(int resourceNum)
     {
         var json = JsonConvert.SerializeObject(Data.Resource[resourceNum]);
 
@@ -29,17 +29,17 @@ public static class Resource
         }
     }
 
-    public static async Task LoadResourcesAsync()
+    public static async Task LoadAllAsync()
     {
-        await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxResources), LoadResourceAsync);
+        await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxResources), Resource.LoadAsync);
     }
 
-    public static async ValueTask LoadResourceAsync(int resourceNum, CancellationToken cancellationToken)
+    public static async ValueTask LoadAsync(int resourceNum, CancellationToken cancellationToken)
     {
         var data = await Database.SelectRowAsync(resourceNum, "resource", "data");
         if (data is null)
         {
-            ClearResource(resourceNum);
+            Clear(resourceNum);
             return;
         }
 
@@ -48,70 +48,11 @@ public static class Resource
         Data.Resource[resourceNum] = resourceData;
     }
 
-    public static void ClearResource(int resourceNum)
+    public static void Clear(int resourceNum)
     {
         Data.Resource[resourceNum].Name = "";
         Data.Resource[resourceNum].EmptyMessage = "";
         Data.Resource[resourceNum].SuccessMessage = "";
-    }
-
-    public static void CacheResources(int mapNum)
-    {
-        var resourceCount = 0;
-
-        for (var x = 0; x < Data.Map[mapNum].MaxX; x++)
-        {
-            for (var y = 0; y < Data.Map[mapNum].MaxY; y++)
-            {
-                if (Data.Map[mapNum].Tile[x, y].Type != TileType.Resource &&
-                    Data.Map[mapNum].Tile[x, y].Type2 != TileType.Resource)
-                {
-                    continue;
-                }
-
-                resourceCount++;
-
-                Array.Resize(ref Data.MapResource[mapNum].ResourceData, resourceCount);
-
-                Data.MapResource[mapNum].ResourceData[resourceCount - 1].X = x;
-                Data.MapResource[mapNum].ResourceData[resourceCount - 1].Y = y;
-                Data.MapResource[mapNum].ResourceData[resourceCount - 1].Health = (byte) Data.Resource[Data.Map[mapNum].Tile[x, y].Data1].Health;
-            }
-        }
-
-        Data.MapResource[mapNum].ResourceCount = resourceCount;
-    }
-
-    public static void CheckResourceLevelUp(int playerId, int skillSlot)
-    {
-        var levels = 0;
-
-        if (GetPlayerGatherSkillLevel(playerId, skillSlot) == Script.Instance?.MaxLevel)
-        {
-            return;
-        }
-
-        while (GetPlayerGatherSkillExp(playerId, skillSlot) >= GetPlayerGatherSkillMaxExp(playerId, skillSlot))
-        {
-            var expRollover = GetPlayerGatherSkillExp(playerId, skillSlot) - GetPlayerGatherSkillMaxExp(playerId, skillSlot);
-
-            SetPlayerGatherSkillLevel(playerId, skillSlot, GetPlayerGatherSkillLevel(playerId, skillSlot) + 1);
-            SetPlayerGatherSkillExp(playerId, skillSlot, expRollover);
-            SetPlayerGatherSkillMaxExp(playerId, skillSlot, (int)GetSkillNextLevel(playerId, skillSlot));
-
-            levels++;
-        }
-
-        if (levels == 0)
-        {
-            return;
-        }
-
-        NetworkSend.PlayerMsg(playerId, levels == 1
-            ? $"Your {GetResourceSkillName((ResourceSkill) skillSlot)} has gone up a level!"
-            : $"Your {GetResourceSkillName((ResourceSkill) skillSlot)} has gone up by {levels} levels!", (int) ColorName.BrightGreen);
-
-        NetworkSend.SendPlayerData(playerId);
     }
 
     public static void HandleRequestEditResource(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -172,7 +113,7 @@ public static class Resource
         Data.Resource[resourcenum].ToolRequired = packetReader.ReadInt32();
         Data.Resource[resourcenum].Walkthrough = packetReader.ReadBoolean();
 
-        SaveResource(resourcenum);
+        Resource.Save(resourcenum);
 
         General.Logger.LogInformation("{AccountName} saved Resource #{Resourcenum}",
             GetAccountLogin(session.Id), resourcenum);
@@ -373,6 +314,6 @@ public static class Resource
         NetworkSend.PlayerMsg(playerId, $"Your {GetResourceSkillName((ResourceSkill) resourceType)} has earned {Data.Resource[resourceIndex].ExpReward} experience. ({GetPlayerGatherSkillExp(playerId, resourceType)}/{GetPlayerGatherSkillMaxExp(playerId, resourceType)})", (int) ColorName.BrightGreen);
         NetworkSend.SendPlayerData(playerId);
 
-        CheckResourceLevelUp(playerId, resourceType);
+        MapResource.CheckLevelUp(playerId, resourceType);
     }
 }
