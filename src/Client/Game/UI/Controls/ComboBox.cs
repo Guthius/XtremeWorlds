@@ -24,7 +24,7 @@ public sealed class ComboBox : Control
                 if (Items.Count > 0 && Value >= 0 && Value < Items.Count)
                 {
                     var text = Items[Value];
-                    var tw = TextRenderer.GetTextWidth(text, Font);
+                    var tw = TextRenderer.GetTextWidth(text, Font) / 2;
 
                     // Reserve space for the dropdown arrow when centering text
                     var arrowW = 5;
@@ -32,7 +32,7 @@ public sealed class ComboBox : Control
                     var paddingR = arrowW + 6; // arrow width + margin
                     var innerWidth = Math.Max(0, Width - paddingL - paddingR);
                     var left = X + x + paddingL + Math.Max(0, (innerWidth - tw) / 2);
-                    var top = Y + y; // vertical baseline consistent with other controls
+                    var top = Y + y + 2; // vertical baseline consistent with other controls
                     TextRenderer.RenderText(text, left, top, Color, Color.Black);
                 }
 
