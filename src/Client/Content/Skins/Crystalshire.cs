@@ -2344,7 +2344,7 @@ public class Crystalshire
 
         // Moderation: numeric inputs default
         window.GetChild("txtAdminMap").Text = window.GetChild("txtAdminMap").Text?.Length > 0 ? window.GetChild("txtAdminMap").Text : "1";
-        window.GetChild("txtAdminSprite").Text = window.GetChild("txtAdminSprite").Text?.Length > 0 ? window.GetChild("txtAdminSprite").Text : "0";
+        window.GetChild("txtSprite").Text = window.GetChild("txtSprite").Text?.Length > 0 ? window.GetChild("txtSprite").Text : "0";
 
         // Wire Moderation actions
         window.GetChild("btnAdminWarpTo").CallBack[(int)ControlState.MouseDown] = () =>
@@ -2354,14 +2354,14 @@ public class Crystalshire
             Sender.WarpTo(mapNum);
         };
 
-        window.GetChild("btnAdminBan").CallBack[(int)ControlState.MouseDown] = () =>
+        window.GetChild("btnBan").CallBack[(int)ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
             var name = txtName.Text?.Trim() ?? string.Empty;
             Sender.SendBan(name);
         };
 
-        window.GetChild("btnAdminKick").CallBack[(int)ControlState.MouseDown] = () =>
+        window.GetChild("btnKick").CallBack[(int)ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
             var name = txtName.Text?.Trim() ?? string.Empty;
@@ -2393,10 +2393,10 @@ public class Crystalshire
             }
         };
 
-        window.GetChild("btnAdminSetSprite").CallBack[(int)ControlState.MouseDown] = () =>
+        window.GetChild("btnSetSprite").CallBack[(int)ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
-            var sprite = ReadInt(window.GetChild("txtAdminSprite"));
+            var sprite = ReadInt(window.GetChild("txtSprite"));
             Sender.SendSetSprite(sprite);
         };
 
@@ -2531,8 +2531,8 @@ public class Crystalshire
                 "lblPlayerName","txtAdminName",
                 "lblAccessLevel","cmbAccess","btnAdminSetAccess",
                 "lblMapNumber","txtAdminMap","btnAdminWarpTo",
-                "lblSprite","txtAdminSprite","btnAdminSetSprite",
-                "btnAdminBan","btnAdminKick","btnLevelUp",
+                "lblSprite","txtSprite","btnSetSprite",
+                "btnBan","btnKick","btnLevelUp",
                 "btnAdminWarp2Me","btnAdminWarpMe2"
             };
 
