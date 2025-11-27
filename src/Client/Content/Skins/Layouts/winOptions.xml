@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <Window Name="winOptions" Size="260, 270" Position="0, 0" Font="Georgia" Design="WindowNoBar" StartPosition="CenterScreen">
-    <!-- Parchment and decorative boxes to match original -->
-	<GroupBox Name="grpOptions" Position="6, 26" Size="244, 234">
-		<Label Name="lblGeneral" Text="General Options" Position="20, 10" Size="220, 18" Font="Georgia" Align="Center"/>
+<Window Name="winOptions" Size="260, 270" Position="6, 26" Font="Georgia" Design="WindowNoBar" StartPosition="CenterScreen">
+	<GroupBox Name="grpGeneral" Position="0,6" Size="244,132">
+		<Label Name="lblGeneral" Text="General Options" Position="10,8" Size="224,18" Font="Georgia" Align="Center"/>
 
-		<CheckBox Name="chkMusic" Text="Music" Position="30, 50" Size="100, 20" Design="CheckboxNormal"/>
-		<CheckBox Name="chkSound" Text="Sound" Position="130, 50" Size="100, 20" Design="CheckboxNormal"/>
-		<CheckBox Name="chkAutotile" Text="Autotile" Position="30, 80" Size="100, 20" Design="CheckboxNormal"/>
-		<CheckBox Name="chkFullscreen" Text="Fullscreen" Position="130, 80" Size="100, 20" Design="CheckboxNormal"/>
-		<CheckBox Name="chkVsync" Text="VSync" Position="30, 110" Size="100, 20" Design="CheckboxNormal"/>
+		<CheckBox Name="chkMusic" Text="Music" Position="18,40" Size="100,20" Design="CheckboxNormal"/>
+		<CheckBox Name="chkSound" Text="Sound" Position="128,40" Size="100,20" Design="CheckboxNormal"/>
 
-		<Label Name="lblRes" Text="Resolution" Position="20, 145" Size="220, 18" Font="Georgia" Align="Center"/>
-		<ComboBox Name="cmbRes" Position="55, 175" Size="150, 20"/>
+		<CheckBox Name="chkAutotile" Text="Autotile" Position="18,70" Size="100,20" Design="CheckboxNormal"/>
+		<CheckBox Name="chkFullscreen" Text="Fullscreen" Position="128,70" Size="100,20" Design="CheckboxNormal"/>
 
-		<Button Name="btnConfirm" Text="Confirm" Position="90, 225" Size="80, 28" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+		<CheckBox Name="chkVsync" Text="VSync" Position="18,100" Size="100,20" Design="CheckboxNormal"/>
+	</GroupBox>
+
+	<!-- Resolution group box (shifted up and left to align with first) -->
+	<GroupBox Name="grpResolution" Position="4,158" Size="244,100">
+		<Label Name="lblRes" Text="Resolution" Position="10,8" Size="224,18" Font="Georgia" Align="Center"/>
+		<ComboBox Name="cmbRes" Position="18,40" Size="200,22"/>
+		<Button Name="btnConfirm" Text="Confirm" Position="82,68" Size="80,28" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 	</GroupBox>
 </Window>
