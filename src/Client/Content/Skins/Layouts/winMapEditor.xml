@@ -7,7 +7,7 @@
         Visible="false">
 
   <!-- Former TabControl area replaced by GroupBoxes used as visibility containers -->
-  <GroupBox Name="tabTiles" Caption="" Position="6, 46" Size="792, 688">
+  <GroupBox Name="grpTiles" Caption="" Position="6, 46" Size="792, 688">
     <!-- Page header like Effects tab -->
     <Label Name="lblTiles" Text="Tiles" Position="20, 84" Size="200, 14"/>
 
@@ -31,7 +31,7 @@
     <ScrollBar Name="sldTilesetH" Position="179, 646" Size="512, 12" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
   </GroupBox>
 
-  <GroupBox Name="tabAttributes" Caption="" Position="6, 46" Size="792, 688">
+  <GroupBox Name="grpAttributes" Caption="" Position="6, 46" Size="792, 688">
     <Label Name="lblAttributes" Text="Attributes" Position="20, 84" Size="200, 14"/>
     <ComboBox Name="cmbAttrMode" Position="20, 112" Size="220, 18"/>
     <Button Name="btnAttrInfo" Text="Info" Position="248, 112" Size="60, 18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
@@ -96,7 +96,7 @@
     <Button Name="btnAnimation" Text="OK" Position="410, 166" Size="60, 18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
   </GroupBox>
 
-  <GroupBox Name="tabNpcs" Caption="" Position="6, 46" Size="792, 688">
+  <GroupBox Name="grpNpcs" Caption="" Position="6, 46" Size="792, 688">
     <!-- Settings header and section nav (shown in Settings view) -->
     <Label Name="lblSettings" Text="Settings" Position="20, 84" Size="200, 14"/>
     <Button Name="btnGoTiles" Text="Tiles" Position="20, 100" Size="100, 20" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
@@ -160,11 +160,11 @@
     <TextBox Name="txtMaxY" Position="180, 334" Size="50, 20" Design="TextWhite"/>
   </GroupBox>
 
-  <GroupBox Name="tabDirBlock" Caption="" Position="6, 46" Size="792, 688">
+  <GroupBox Name="grpDirBlock" Caption="" Position="6, 46" Size="792, 688">
     <Label Name="lblDir" Text="Dir Block" Position="20, 84" Size="200, 14"/>
   </GroupBox>
 
-  <GroupBox Name="tabEvents" Caption="" Position="6, 46" Size="792, 688">
+  <GroupBox Name="grpEvents" Caption="" Position="6, 46" Size="792, 688">
     <Label Name="lblEvents" Text="Events" Position="20, 84" Size="200, 14"/>
     <Label Name="lblCopyCaption" Text="Copy Mode:" Position="20, 112" Size="80, 16"/>
     <Label Name="lblCopyMode" Text="Copy Mode Off" Position="104, 112" Size="150, 16"/>
@@ -174,7 +174,7 @@
     <Button Name="btnPasteEvent" Text="Toggle Paste" Position="260, 138" Size="100, 20" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
   </GroupBox>
 
-  <GroupBox Name="tabEffects" Caption="" Position="6, 46" Size="792, 688">
+  <GroupBox Name="grpEffects" Caption="" Position="6, 46" Size="792, 688">
     <Label Name="lblEffects" Text="Effects" Position="20, 84" Size="200, 14"/>
     <!-- Weather -->
     <Label Name="lblWeather" Text="Weather" Position="20, 112" Size="80, 16"/>

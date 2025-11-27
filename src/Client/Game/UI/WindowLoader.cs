@@ -112,11 +112,7 @@ public static class WindowLoader
                 ReadScrollBar(xmlReader, windowIndex);
                 break;
 
-            case "TabControl":
-                ReadTabControl(xmlReader, windowIndex);
-                return;
-
-            case "TabPage":
+            case "grpPage":
                 ReadTabPage(xmlReader, windowIndex);
                 return;
 
@@ -193,28 +189,6 @@ public static class WindowLoader
         );
     }
 
-    // Treat TabControl/TabPage as transparent containers: load their children
-    private static void ReadTabControl(XmlReader xmlReader, int windowIndex)
-    {
-        if (xmlReader.IsEmptyElement)
-        {
-            return;
-        }
-
-        var depth = xmlReader.Depth;
-        while (xmlReader.Read())
-        {
-            if (xmlReader.NodeType == XmlNodeType.Element)
-            {
-                ReadControl(xmlReader, windowIndex);
-            }
-            else if (xmlReader.NodeType == XmlNodeType.EndElement && xmlReader.Depth == depth && xmlReader.Name == "TabControl")
-            {
-                break;
-            }
-        }
-    }
-
     private static void ReadTabPage(XmlReader xmlReader, int windowIndex)
     {
         if (xmlReader.IsEmptyElement)
@@ -229,7 +203,7 @@ public static class WindowLoader
             {
                 ReadControl(xmlReader, windowIndex);
             }
-            else if (xmlReader.NodeType == XmlNodeType.EndElement && xmlReader.Depth == depth && xmlReader.Name == "TabPage")
+            else if (xmlReader.NodeType == XmlNodeType.EndElement && xmlReader.Depth == depth && xmlReader.Name == "grpPage")
             {
                 break;
             }

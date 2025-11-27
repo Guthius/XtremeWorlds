@@ -7,9 +7,9 @@
     Visible="false">
 
     <!-- Tab Control for different admin sections -->
-    <GroupBox Name="tabAdmin" Position="6, 26" Size="628, 224">
+    <GroupBox Name="grpAdmin" Position="6, 26" Size="628, 224">
         <!-- MODERATION TAB -->
-        <TabPage Name="tabModeration" Caption="Moderation">
+        <TabPage Name="grpModeration" Caption="Moderation">
             <PictureBox Name="picModerationBG" Position="6, 46" Size="628, 190" Design="Parchment"/>
 
             <!-- Player Name Section -->
@@ -50,7 +50,7 @@
         </TabPage>
 
         <!-- MAP LIST TAB -->
-        <GroupBox Name="tabMapList" Caption="Maps">
+        <GroupBox Name="grpMapList" Caption="Maps">
             <ListBox Name="lstMaps" Position="25, 55" Size="586, 122"/>
             <ScrollBar Name="sldMapList" Position="611, 55" Size="12, 122" Orientation="Vertical" Min="0" Max="100" Value="0"/>
             <Button Name="btnMapWarp" Text="Warp" Position="25, 186" Size="220, 22"
@@ -60,7 +60,7 @@
         </GroupBox>
 
         <!-- MAP TOOLS TAB -->
-        <GroupBox Name="tabMapTools" Caption="Map Tools">
+        <GroupBox Name="grpMapTools" Caption="Map Tools">
             <Button Name="btnRespawn" Text="Respawn Map" Position="20, 55" Size="200, 22"
             Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
             <Button Name="btnALoc" Text="Toggle Location Display" Position="225, 55" Size="200, 22"
@@ -68,7 +68,7 @@
         </GroupBox>
 
         <!-- EDITORS TAB -->
-        <GroupBox Name="tabEditors" Caption="Editors">
+        <GroupBox Name="grpEditors" Caption="Editors">
             <PictureBox Name="picEditorsBG" Position="6, 46" Size="628, 190" Design="Parchment"/>
 
             <!-- Editor Buttons Grid Row 1 -->
