@@ -581,6 +581,11 @@ public class WindowManager
     {
         var controlIndex = GetControlIndex(window.Name, controlName);
 
+        if (controlIndex < 0 || controlIndex >= window.Controls.Count)
+        {
+            return false;
+        }
+
         switch (window.Controls[controlIndex])
         {
             case TextBox:
@@ -594,6 +599,11 @@ public class WindowManager
 
     public static bool SetActiveControl(Window window, int controlIndex)
     {
+        if (controlIndex < 0 || controlIndex >= window.Controls.Count)
+        {
+            return false;
+        }
+
         switch (window.Controls[controlIndex])
         {
             case TextBox:
@@ -774,7 +784,7 @@ public class WindowManager
     public static bool HandleEvents(ControlState entState)
     {
         Window? curWindow = null;
-        var curControl = 0;
+        var curControl = -1;
 
         // Check for MouseDown to start the drag timer
         if (GameClient.IsMouseButtonDown(MouseButton.Left) &&
@@ -965,7 +975,7 @@ public class WindowManager
                              GameState.CurMouseY >= control.Y + curWindow.Y &&
                              GameState.CurMouseY <= control.Y + control.Height + curWindow.Y))
                         {
-                            if (curControl == 0L || control.ZOrder > curWindow.Controls[curControl].ZOrder)
+                            if (curControl == -1 || (curControl >= 0 && curControl < curWindow.Controls.Count && control.ZOrder > curWindow.Controls[curControl].ZOrder))
                             {
                                 curControl = i;
                             }
@@ -973,7 +983,7 @@ public class WindowManager
                     }
                 }
 
-                if (curControl > 0)
+                if (curControl >= 0 && curControl < curWindow.Controls.Count)
                 {
                     // Reset all control states
                     for (var j = 0; j < curWindow.Controls.Count; j++)
@@ -1605,5 +1615,29 @@ public class WindowManager
 
             nextIndex = (nextIndex + 1) % controls.Count;
         }
+    }
+
+    public static void CreateGroupBox(int windowIndex, string name, int left, int top, int width, int height, string caption = "", Design design = Design.None)
+    {
+        if (!Windows.TryGetValue(windowIndex, out var window))
+        {
+            throw new UIException($"{windowIndex} is not a valid window index.");
+        }
+
+        var group = new GroupBox
+        {
+            Name = name,
+            X = left,
+            Y = top,
+            Width = width,
+            Height = height,
+            Visible = true,
+            Text = caption,
+            ZOrder = ZOrderCon,
+            Design = design
+        };
+
+        window.Controls.Add(group);
+        ZOrderCon++;
     }
 }
