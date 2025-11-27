@@ -12,8 +12,7 @@
 		<CheckBox Name="chkVsync" Text="VSync" Position="18,100" Size="100,20" Design="CheckboxNormal"/>
 	</GroupBox>
 
-	<!-- Resolution group box (shifted up and left to align with first) -->
-	<GroupBox Name="grpResolution" Position="4,158" Size="244,100">
+	<GroupBox Name="grpResolution" Position="4,148" Size="244,112">
 		<Label Name="lblRes" Text="Resolution" Position="10,8" Size="224,18" Font="Georgia" Align="Center"/>
 		<ComboBox Name="cmbRes" Position="18,40" Size="200,22"/>
 		<Button Name="btnConfirm" Text="Confirm" Position="82,68" Size="80,28" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>

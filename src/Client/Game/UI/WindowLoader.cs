@@ -200,8 +200,8 @@ public static class WindowLoader
         bool autoSize = string.IsNullOrEmpty(sizeAttr) || size.X <= 0 || size.Y <= 0;
 
         var window = WindowManager.Windows[windowIndex];
-        int groupIndex = window.Controls.Count - 1; // index of the group just added
-        int childStart = window.Controls.Count;     // first child will be placed after this
+        int groupIndex = window.Controls.Count - 1;
+        int childStart = window.Controls.Count;
 
         // Read child controls inside the group
         if (!xmlReader.IsEmptyElement)
