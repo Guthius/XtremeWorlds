@@ -1975,20 +1975,26 @@ namespace Client
         {
             var windowIndex = WindowManager.GetWindowIndex("winOptions");
             
-            // Resolutions
-            WindowManager.Combobox_AddItem(windowIndex, WindowManager.GetControlIndex("winOptions", "cmbRes"), "1920x1080");
-            WindowManager.Combobox_AddItem(windowIndex, WindowManager.GetControlIndex("winOptions", "cmbRes"), "1680x1050");
-            WindowManager.Combobox_AddItem(windowIndex, WindowManager.GetControlIndex("winOptions", "cmbRes"), "1600x900");
-            WindowManager.Combobox_AddItem(windowIndex, WindowManager.GetControlIndex("winOptions", "cmbRes"), "1440x900");
-            WindowManager.Combobox_AddItem(windowIndex, WindowManager.GetControlIndex("winOptions", "cmbRes"), "1440x1050");
-            WindowManager.Combobox_AddItem(windowIndex, WindowManager.GetControlIndex("winOptions", "cmbRes"), "1366x768");
-            WindowManager.Combobox_AddItem(windowIndex, WindowManager.GetControlIndex("winOptions", "cmbRes"), "1360x1024");
-            WindowManager.Combobox_AddItem(windowIndex, WindowManager.GetControlIndex("winOptions", "cmbRes"), "1360x768");
-            WindowManager.Combobox_AddItem(windowIndex, WindowManager.GetControlIndex("winOptions", "cmbRes"), "1280x1024");
-            WindowManager.Combobox_AddItem(windowIndex, WindowManager.GetControlIndex("winOptions", "cmbRes"), "1280x800");
-            WindowManager.Combobox_AddItem(windowIndex, WindowManager.GetControlIndex("winOptions", "cmbRes"), "1280x768");
-            WindowManager.Combobox_AddItem(windowIndex, WindowManager.GetControlIndex("winOptions", "cmbRes"), "1280x720");
-            WindowManager.Combobox_AddItem(windowIndex, WindowManager.GetControlIndex("winOptions", "cmbRes"), "1120x864");
+            // Resolutions (add directly to ComboBox)
+            if (WindowManager.TryGetControl("winOptions", "cmbRes", out var cmbCtrl) && cmbCtrl is Client.Game.UI.Controls.ComboBox cmbRes)
+            {
+                cmbRes.Items.Clear();
+                cmbRes.Items.Add("1920x1080");
+                cmbRes.Items.Add("1680x1050");
+                cmbRes.Items.Add("1600x900");
+                cmbRes.Items.Add("1440x900");
+                cmbRes.Items.Add("1440x1050");
+                cmbRes.Items.Add("1366x768");
+                cmbRes.Items.Add("1360x1024");
+                cmbRes.Items.Add("1360x768");
+                cmbRes.Items.Add("1280x1024");
+                cmbRes.Items.Add("1280x800");
+                cmbRes.Items.Add("1280x768");
+                cmbRes.Items.Add("1280x720");
+                cmbRes.Items.Add("1120x864");
+                // set selected value from settings (clamp to range)
+                cmbRes.Value = Math.Clamp(SettingsManager.Instance.Resolution, 0, Math.Max(0, cmbRes.Items.Count - 1));
+            }
 
             // fill the options screen
             {
@@ -1998,7 +2004,6 @@ namespace Client
                 withBlock.Controls[WindowManager.GetControlIndex("winOptions", "chkAutotile")].Value = SettingsManager.Instance.Autotile ? 1 : 0;
                 withBlock.Controls[WindowManager.GetControlIndex("winOptions", "chkFullscreen")].Value = SettingsManager.Instance.Fullscreen ? 1 : 0;
                 withBlock.Controls[WindowManager.GetControlIndex("winOptions", "chkVsync")].Value = SettingsManager.Instance.Vsync ? 1 : 0;
-                withBlock.Controls[WindowManager.GetControlIndex("winOptions", "cmbRes")].Value = SettingsManager.Instance.Resolution;
             }
         }
 

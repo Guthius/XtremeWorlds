@@ -70,22 +70,6 @@ public class WindowManager
         window.ZOrder = Windows.Count - 1;
     }
 
-    public static void ComboBox_RemoveItems(int windowIndex, int controlIndex)
-    {
-        if (Windows[windowIndex].Controls[controlIndex] is ComboBox comboBox)
-        {
-            comboBox.Items.Clear();
-        }
-    }
-
-    public static void Combobox_AddItem(int windowIndex, int controlIndex, string text)
-    {
-        if (Windows[windowIndex].Controls[controlIndex] is ComboBox comboBox)
-        {
-            comboBox.Items.Add(text);
-        }
-    }
-
     // Safe helpers to avoid null/KeyNotFound when UI isn't fully initialized
     public static bool TryGetWindow(string windowName, out Window? window)
     {
