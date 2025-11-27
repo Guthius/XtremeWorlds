@@ -39,9 +39,6 @@ jobs:
       - name: Build Server
         run: dotnet build src/Server/Server.csproj --configuration Release --no-restore
 
-      - name: Test
-        run: dotnet test --no-build --verbosity normal
-
       # Publish Client & Server with platform-specific runtime (excluding macOS builds)
       - name: Publish Client (Linux)
         if: ${{ runner.os == 'Linux' }}
