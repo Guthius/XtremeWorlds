@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window Name="winRegister" Caption="Register Account"
-        Size="276,192"
+        Size="276,208"
         Icon="45" IconOffset="3,5"
         Design="WindowNormal"
         StartPosition="CenterScreen"
         Visible="False">
 
-	<GroupBox Name="grpRegister" Position="6,26" Size="260,156">
-		<PictureBox Name="lblLogin" Position="67,16" Size="142,9" Design="BlackOval"/>
-		<PictureBox Name="lblPassword_1" Position="67,52" Size="142,9" Design="BlackOval"/>
-		<PictureBox Name="lblPassword_2" Position="67,88" Size="142,9" Design="BlackOval"/>
+	<GroupBox Name="grpRegister" Position="6,26" Size="260,170">
+		<PictureBox Name="lblLogin" Position="55,16" Size="142,9" Design="BlackOval"/>
+		<PictureBox Name="lblPassword_1" Position="61,60" Size="142,9" Design="BlackOval"/>
+		<PictureBox Name="lblPassword_2" Position="61,96" Size="142,9" Design="BlackOval"/>
 		
-		<Label Text="Username" Position="72,12" Size="142,10" Align="Center"/>
-		<TextBox Name="txtUsername" Position="67,28" Size="142,19"/>
+		<Label Text="Username" Position="60,12" Size="142,10" Align="Center"/>
+		<TextBox Name="txtUsername" Position="55,28" Size="142,19"/>
 
-		<Label Text="Password" Position="72,44" Size="142,10" Align="Center"/>
-		<TextBox Name="txtPassword" Position="67,60" Size="142,19" Censor="True"/>
+		<Label Text="Password" Position="66,52" Size="142,10" Align="Center"/>
+		<TextBox Name="txtPassword" Position="61,68" Size="142,19" Censor="True"/>
 
-		<Label Text="Retype Password" Position="72,88" Size="142,10" Align="Center"/>
-		<TextBox Name="txtRetypePassword" Position="67,104" Size="142,19" Censor="True"/>
+		<Label Text="Retype Password" Position="66,96" Size="142,10" Align="Center"/>
+		<TextBox Name="txtRetypePassword" Position="61,112" Size="142,19" Censor="True"/>
 
 		<!-- Action buttons placed near the bottom of the group -->
 		<Button Name="btnAccept" Text="Accept"
-				Position="68,128" Size="67,22"
+				Position="62,136" Size="67,22"
 				Design="Green"
 				DesignHover="GreenHover"
 				DesignMouseDown="GreenClick"/>
 
 		<Button Name="btnExit" Text="Back"
-				Position="142,128" Size="67,22"
-				Design="Red"
-				DesignHover="RedHover"
-				DesignMouseDown="RedClick"/>
+			Position="136,136" Size="67,22"
+			Design="Red"
+			DesignHover="RedHover"
+			DesignMouseDown="RedClick"/>
 	</GroupBox>
 
 	<Button Name="btnClose" Position="-19,5" Size="16,16" Image="8" ImageHover="9" ImageMouseDown="10"/>
