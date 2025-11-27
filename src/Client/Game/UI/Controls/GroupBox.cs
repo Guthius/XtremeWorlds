@@ -5,11 +5,11 @@ namespace Client.Game.UI.Controls;
 
 public sealed class GroupBox : Control
 {
-    private const int CaptionOffsetX = 8;
-    private const int CaptionOffsetY = 4;
-    private const int BorderPadding = 6; // padding around children when auto-fit is used
+    private const int CaptionOffsetX = 10;
+    private const int CaptionOffsetY = 6;
+    private const int BorderPadding = 10;
 
-    public int BackgroundAlpha { get; set; } = 255; // legacy, not used for opacity anymore
+    public int BackgroundAlpha { get; set; } = 255;
 
     // Child control range in Window.Controls assigned by loader
     public int FirstChildIndex { get; set; } = -1;
@@ -32,7 +32,6 @@ public sealed class GroupBox : Control
 
     /// <summary>
     /// Computes a size that fits all following controls in the parent window starting at startIndex.
-    /// Use in loaders if needed when position/size omitted.
     /// </summary>
     public static (int width, int height) ComputeFit(Window parent, int startIndex)
     {

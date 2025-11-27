@@ -395,8 +395,8 @@ public static class DesignRenderer
 
     private static void RenderParchment(int left, int top, int width, int height, int alpha)
     {
-        const int borderSize = 20;
-
+        // Eto-like container padding (~10px)
+        const int borderSize = 10;
         RenderSquare(4, left, top, width, height, borderSize, alpha);
     }
 
