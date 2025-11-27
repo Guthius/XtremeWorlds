@@ -140,13 +140,26 @@ public class Crystalshire
     {
         var window = WindowLoader.FromLayout("winJobs");
 
-        window.GetChild("btnClose").CallBack[(int) ControlState.MouseDown] = WinJobs.OnClose;
-        window.GetChild("picParchment").OnDraw = WinJobs.OnDrawSprite;
-        window.GetChild("btnLeft").CallBack[(int) ControlState.MouseDown] = WinJobs.OnLeftClick;
-        window.GetChild("btnRight").CallBack[(int) ControlState.MouseDown] = WinJobs.OnRightClick;
-        window.GetChild("btnAccept").CallBack[(int) ControlState.MouseDown] = WinJobs.OnAccept;
-        window.GetChild("picOverlay").CallBack[(int) ControlState.MouseDown] = WinJobs.OnClose;
-        window.GetChild("picOverlay").OnDraw = WinJobs.OnDrawDescription;
+        // Close
+        window.GetChild("btnClose").CallBack[(int)ControlState.MouseDown] = WinJobs.OnClose;
+
+        // Bind nav arrows
+        window.GetChild("btnLeft").CallBack[(int)ControlState.MouseDown] = WinJobs.OnLeftClick;
+        window.GetChild("btnRight").CallBack[(int)ControlState.MouseDown] = WinJobs.OnRightClick;
+
+        // Accept
+        window.GetChild("btnAccept").CallBack[(int)ControlState.MouseDown] = WinJobs.OnAccept;
+
+        // Description overlay click-to-close
+        window.GetChild("picOverlay").CallBack[(int)ControlState.MouseDown] = WinJobs.OnClose;
+        if (WindowManager.TryGetControl("winJobs", "picBackground", out var picBackground) && picBackground is PictureBox bg)
+        {
+            bg.OnDraw = WinJobs.OnDrawSprite;
+        }
+        if (WindowManager.TryGetControl("winJobs", "picOverlay", out var picOverlay) && picOverlay is PictureBox ov)
+        {
+            ov.OnDraw = WinJobs.OnDrawDescription;
+        }   
     }
 
     public void UpdateWindow_Dialogue()
