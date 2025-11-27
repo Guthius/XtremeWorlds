@@ -879,12 +879,6 @@ namespace Server
             await System.Threading.Tasks.Task.WhenAll(tasks);
         }
 
-        public static async System.Threading.Tasks.Task LoadShopsAsync()
-        {
-            var tasks = Enumerable.Range(0, Core.Globals.Variables.MaxShops).Select(i => System.Threading.Tasks.Task.Run(() => LoadShopAsync(i)));
-            await System.Threading.Tasks.Task.WhenAll(tasks);
-        }
-
         public static async System.Threading.Tasks.Task LoadSkillsAsync()
         {
             var tasks = Enumerable.Range(0, Core.Globals.Variables.MaxSkills).Select(i => System.Threading.Tasks.Task.Run(() => LoadSkillAsync(i)));
@@ -1644,63 +1638,6 @@ namespace Server
                 Data.Npc[index].DropItem = new int[Core.Globals.Variables.MaxDropItems];
                 Data.Npc[index].DropItemValue = new int[Core.Globals.Variables.MaxDropItems];
                 Data.Npc[index].Skill = new byte[Core.Globals.Variables.MaxNpcSkills];
-            }
-        }
-
-        #endregion
-
-        #region Shops
-
-        public static void SaveShop(int shopNum)
-        {
-            string json = JsonConvert.SerializeObject(Data.Shop[shopNum]).ToString();
-
-            if (RowExists(shopNum, "shop"))
-            {
-                UpdateRow(shopNum, json, "shop", "data");
-            }
-            else
-            {
-                InsertRow(shopNum, json, "shop");
-            }
-        }
-
-        public static void LoadShops()
-        {
-            int i;
-
-            var loopTo = Core.Globals.Variables.MaxShops;
-            for (i = 0; i < loopTo; i++)
-                _ = LoadShopAsync(i);
-
-        }
-
-        public static async System.Threading.Tasks.Task LoadShopAsync(int shopNum)
-        {
-            JObject data;
-
-            data = await SelectRowAsync(shopNum, "shop", "data");
-
-            if (data is null)
-            {
-                ClearShop(shopNum);
-                return;
-            }
-
-            var shopData = JObject.FromObject(data).ToObject<Shop>();
-            Data.Shop[shopNum] = shopData;
-        }
-
-        public static void ClearShop(int index)
-        {
-            Data.Shop[index] = default;
-            Data.Shop[index].Name = "";
-
-            Data.Shop[index].TradeItem = new Type.TradeItem[Core.Globals.Variables.MaxTrades];
-            for (int i = 0, loopTo = Core.Globals.Variables.MaxTrades; i < loopTo; i++)
-            {
-                Data.Shop[index].TradeItem[i].Item = -1;
-                Data.Shop[index].TradeItem[i].CostItem = -1;
             }
         }
 

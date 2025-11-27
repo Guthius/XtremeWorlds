@@ -1568,7 +1568,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         // Save it
         NetworkSend.SendUpdateShopToAll(shopNum);
-        Database.SaveShop(shopNum);
+        Shop.Save(shopNum);
         Log.Add(GetAccountLogin(session.Id) + " saving shop #" + shopNum + ".", Constant.AdminLog);
     }
 
