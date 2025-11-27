@@ -26,3 +26,6 @@ jobs:
 
       - name: Build
         run: dotnet build -p:TargetFramework=net10.0-windows
+
+      - name: Test
+        run: dotnet test --no-build --verbosity normal

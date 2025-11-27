@@ -1316,7 +1316,7 @@ namespace Server
             }
 
             sdMap.Revision = int.Parse(GetElementValue("Revision"));
-            sdMap.Tileset = int.Parse(GetElementValue("Tileset"));
+            //sdMap.Tileset = int.Parse(GetElementValue("Tileset"));
             sdMap.Name = GetElementValue("Name");
             sdMap.Music = Path.GetFileName(GetElementValue("Music"));
 
