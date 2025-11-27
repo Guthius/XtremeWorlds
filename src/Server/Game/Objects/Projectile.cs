@@ -10,6 +10,7 @@ using Server.Net;
 using static Core.Globals.Command;
 using static Core.Net.Packets;
 using Type = Core.Globals.Type;
+using System.Linq; // snapshot enumerations to avoid concurrent modification
 
 namespace Server;
 
@@ -31,7 +32,8 @@ public static class Projectile
         }
 
         // Prefer player target at tile excluding owner
-        foreach (var p in PlayerService.Instance.Players)
+        var playersSnapshot = PlayerService.Instance.Players.ToArray();
+        foreach (var p in playersSnapshot)
         {
             if (!NetworkConfig.IsPlaying(p.Id)) continue;
             if (GetPlayerMap(p.Id) != map) continue;
@@ -622,7 +624,8 @@ public static class Projectile
                     Entity targetEntity = null;
 
                     // Players
-                    foreach (var p in PlayerService.Instance.Players)
+                    var players = PlayerService.Instance.Players.ToArray();
+                    foreach (var p in players)
                     {
                         if (!NetworkConfig.IsPlaying(p.Id)) continue;
                         if (GetPlayerMap(p.Id) != map) continue;
