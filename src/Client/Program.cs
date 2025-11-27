@@ -152,9 +152,7 @@ namespace Client
 
             if (!GfxInfoCache.TryGetValue(key, out var result) || result is null)
             {
-                // If still not available, return a harmless placeholder size (1x1)
-                Debug.WriteLine($"Warning: GfxInfo for key '{key}' not found; using placeholder 1x1.");
-                return new GfxInfo { Width = 1, Height = 1 };
+                return null;
             }
 
             return result;
@@ -396,7 +394,7 @@ namespace Client
                 
                 if (!File.Exists(path))
                 {
-                    throw new FileNotFoundException($"Texture file not found: {path}");
+                    return null;
                 }
                 
                 // Open the file stream with FileShare.Read to allow other processes to read the file  
@@ -449,10 +447,10 @@ namespace Client
             if (isFullscreenNow)
             {
                 var sel = General.GetResolutionSize(SettingsManager.Instance.Resolution);
-                // Clamp to 16:9 aspect to avoid ultrawide stretching for now
                 int w = sel.Item1;
                 int h = sel.Item2;
                 float aspect = 16f / 9f;
+
                 // Recompute height from width to enforce 16:9
                 h = (int)Math.Round(w / aspect);
                 nativeWidth = Math.Max(1, w);

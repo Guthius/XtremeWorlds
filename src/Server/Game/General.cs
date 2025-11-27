@@ -375,7 +375,7 @@ namespace Server
                 LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading morals..."); await Moral.LoadMoralsAsync(); Logger.LogInformation("Morals loaded."); }),
                 LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading maps..."); await Database.LoadMapsAsync(); Logger.LogInformation("Maps loaded."); }),
                 LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading items..."); await Item.LoadItemsAsync(); Logger.LogInformation("Items loaded."); }),
-                LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading Npcs..."); await Database.LoadNpcsAsync(); Logger.LogInformation("Npcs loaded."); }),
+                LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading npcs..."); await Database.LoadNpcsAsync(); Logger.LogInformation("Npcs loaded."); }),
                 LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading resources..."); await Resource.LoadResourcesAsync(); Logger.LogInformation("Resources loaded."); }),
                 LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading shops..."); await Database.LoadShopsAsync(); Logger.LogInformation("Shops loaded."); }),
                 LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading skills..."); await Database.LoadSkillsAsync(); Logger.LogInformation("Skills loaded."); }),
