@@ -242,7 +242,7 @@ public class Script
         NetworkSend.SendInventoryUpdate(index, invSlot);
 
         // Spawn the item on the map
-        Server.Item.SpawnItemSlot(mapSlot, itemNum, amount, mapNum, GetPlayerX(index), GetPlayerY(index));
+        Server.MapItem.Spawn(itemNum, amount, mapNum, GetPlayerX(index), GetPlayerY(index));
     }
 
     public void MapGetItem(int index, int mapNum, int mapSlot, int invSlot)
@@ -282,7 +282,7 @@ public class Script
         // Erase item from the map
         Data.MapItem[mapNum, mapSlot].Num = -1;
         Data.MapItem[mapNum, mapSlot].Value = 0;
-        Server.Item.SendMapItemToAll(mapNum, mapSlot);
+        NetworkSend.SendMapItemToAll(mapNum, mapSlot);
         NetworkSend.SendInventoryUpdate(index, invSlot);
         NetworkSend.SendActionMsg(GetPlayerMap(index), msg, (int)ColorName.White, (byte)ActionMessageType.Static, GetPlayerX(index) * 32, GetPlayerY(index) * 32);
 
@@ -1243,13 +1243,13 @@ public class Script
                     {
                         item.PlayerName = "";
                         item.PlayerTimer = 0;
-                        Server.Item.SendMapItemToAll(mapNum, i);
+                        NetworkSend.SendMapItemToAll(mapNum, i);
                     }
 
                     if (item.CanDespawn && item.DespawnTimer < now)
                     {
-                        Database.ClearMapItem(i, mapNum);
-                        Server.Item.SendMapItemToAll(mapNum, i);
+                        Server.MapItem.Clear(i, mapNum);
+                        NetworkSend.SendMapItemToAll(mapNum, i);
                     }
                 }
             }
@@ -1428,7 +1428,7 @@ public class Script
                 {
                     if (GetPlayerEquipment(target.Id, (Equipment)i) >= 0)
                     {
-                        Server.Item.SpawnItem(GetPlayerEquipment(target.Id, (Equipment)i), 1, GetPlayerMap(target.Id), GetPlayerX(target.Id), GetPlayerY(target.Id));
+                        Server.MapItem.Spawn(GetPlayerEquipment(target.Id, (Equipment)i), 1, GetPlayerMap(target.Id), GetPlayerX(target.Id), GetPlayerY(target.Id));
                         NetworkSend.PlayerMsg(target.Id, "You have dropped your " + Data.Item[GetPlayerEquipment(target.Id, (Equipment)i)].Name + " upon death.", (int)ColorName.BrightRed);
                         SetPlayerEquipment(target.Id, -1, (Equipment)i);
                     }
@@ -2719,7 +2719,7 @@ public class Script
             var itemVal = Data.Npc[npcNum].DropItemValue[slot];
             if (itemId >= 0 && itemId < Data.Item.Length)
             {
-                Server.Item.SpawnItem(itemId, itemVal, mapNum, mapNpc.X / 32, mapNpc.Y / 32);
+                Server.MapItem.Spawn(itemId, itemVal, mapNum, mapNpc.X / 32, mapNpc.Y / 32);
             }
         }
     }

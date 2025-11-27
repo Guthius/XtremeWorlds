@@ -94,7 +94,7 @@ public static class Projectile
             }
         }
     }
-    private static void SaveProjectile(int projectileNum)
+    public static void Save(int projectileNum)
     {
         var json = JsonConvert.SerializeObject(Data.Projectile[projectileNum]);
 
@@ -108,17 +108,17 @@ public static class Projectile
         }
     }
 
-    public static async Task LoadProjectilesAsync()
+    public static async Task LoadAllAsync()
     {
-        await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxProjectiles), LoadProjectileAsync);
+        await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxProjectiles), LoadAsync);
     }
 
-    private static async ValueTask LoadProjectileAsync(int projectileNum, CancellationToken cancellationToken)
+    public static async ValueTask LoadAsync(int projectileNum, CancellationToken cancellationToken)
     {
         var data = await Database.SelectRowAsync(projectileNum, "projectile", "data");
         if (data is null)
         {
-            ClearProjectile(projectileNum);
+            Clear(projectileNum);
             return;
         }
 
@@ -127,31 +127,7 @@ public static class Projectile
         Data.Projectile[projectileNum] = projectileData;
     }
 
-    private static void ClearMapProjectile(int mapNum, int mapProjectileNum)
-    {
-        ref var mp = ref Data.MapProjectile[mapNum, mapProjectileNum];
-        mp.ProjectileNum = -1;
-        mp.Owner = 0;
-        mp.OwnerType = 0;
-        mp.X = 0;
-        mp.Y = 0;
-        mp.Dir = 0;
-        mp.Vx = 0;
-        mp.Vy = 0;
-        mp.FreeAim = 0;
-        mp.AccX = 0;
-        mp.AccY = 0;
-        mp.DestX = 0;
-        mp.DestY = 0;
-        mp.SkillId = -1;
-        mp.Range = 0;
-        mp.TravelTime = 0;
-        mp.Timer = 0;
-
-        SendProjectileToMap(mapNum, mapProjectileNum);
-    }
-
-    private static void ClearProjectile(int projectileNum)
+    private static void Clear(int projectileNum)
     {
         Data.Projectile[projectileNum].Name = "";
         Data.Projectile[projectileNum].Sprite = 0;
@@ -160,149 +136,6 @@ public static class Projectile
         Data.Projectile[projectileNum].Damage = 0;
         Data.Projectile[projectileNum].Animation = -1;
     }
-
-    public static void HandleRequestEditProjectile(GameSession session, ReadOnlyMemory<byte> bytes)
-    {
-        if (GetPlayerAccess(session.Id) < (byte) AccessLevel.Developer)
-        {
-            return;
-        }
-
-        var user = IsEditorLocked(session.Id, EditorType.Projectile);
-        if (!string.IsNullOrEmpty(user))
-        {
-            NetworkSend.PlayerMsg(session.Id, "The game editor is locked and being used by " + user + ".", (int) ColorName.BrightRed);
-            return;
-        }
-
-        SendProjectiles(session.Id);
-        Animation.SendAnimations(session.Id);
-
-        Data.TempPlayer[session.Id].Editor = EditorType.Projectile;
-
-        var buffer = new PacketWriter(4);
-
-        buffer.WriteEnum(ServerPackets.SProjectileEditor);
-
-        PlayerService.Instance.SendDataTo(session.Id, buffer.GetBytes());
-    }
-
-    public static void HandleSaveProjectile(GameSession session, ReadOnlyMemory<byte> bytes)
-    {
-        var packetReader = new PacketReader(bytes);
-
-        if (GetPlayerAccess(session.Id) < (byte) AccessLevel.Developer)
-        {
-            return;
-        }
-
-        var projectileNum = packetReader.ReadInt32();
-        if (projectileNum < 0 || projectileNum > Core.Globals.Variables.MaxProjectiles)
-        {
-            return;
-        }
-
-        Data.Projectile[projectileNum].Name = packetReader.ReadString();
-        Data.Projectile[projectileNum].Sprite = packetReader.ReadInt32();
-        Data.Projectile[projectileNum].Range = (byte) packetReader.ReadInt32();
-        Data.Projectile[projectileNum].Speed = packetReader.ReadInt32();
-        Data.Projectile[projectileNum].Damage = packetReader.ReadInt32();
-        Data.Projectile[projectileNum].Animation = packetReader.ReadInt32();
-
-        SaveProjectile(projectileNum);
-
-        General.Logger.LogInformation("{AccountName} saved projectile #{ProjectileNum}",
-            GetAccountLogin(session.Id), projectileNum);
-
-        SendUpdateProjectileToAll(projectileNum);
-    }
-
-    public static void HandleRequestProjectile(GameSession session, ReadOnlyMemory<byte> bytes)
-    {
-        var packetReader = new PacketReader(bytes);
-
-        var projectileNum = packetReader.ReadInt32();
-
-        SendUpdateProjectileTo(session.Id, projectileNum);
-    }
-
-    public static void HandleClearProjectile(GameSession session, ReadOnlyMemory<byte> bytes)
-    {
-        var packetReader = new PacketReader(bytes);
-
-        var projectileNum = packetReader.ReadInt32();
-        _ = packetReader.ReadInt32(); // Target Index
-        _ = (TargetType) packetReader.ReadInt32(); // Target TYpe
-        _ = packetReader.ReadInt32(); // Target Zone
-
-        var mapNum = GetPlayerMap(session.Id);
-
-        ClearMapProjectile(mapNum, projectileNum);
-    }
-
-    private static void SendUpdateProjectileToAll(int projectileNum)
-    {
-        var packet = new PacketWriter();
-
-        packet.WriteEnum(ServerPackets.SUpdateProjectile);
-        packet.WriteInt32(projectileNum);
-        packet.WriteString(Data.Projectile[projectileNum].Name);
-        packet.WriteInt32(Data.Projectile[projectileNum].Sprite);
-        packet.WriteInt32(Data.Projectile[projectileNum].Range);
-        packet.WriteInt32(Data.Projectile[projectileNum].Speed);
-        packet.WriteInt32(Data.Projectile[projectileNum].Damage);
-        packet.WriteInt32(Data.Projectile[projectileNum].Animation);
-
-        PlayerService.Instance.SendDataToAll(packet.GetBytes());
-    }
-
-    private static void SendUpdateProjectileTo(int playerId, int projectileNum)
-    {
-        var packet = new PacketWriter();
-
-        packet.WriteEnum(ServerPackets.SUpdateProjectile);
-        packet.WriteInt32(projectileNum);
-        packet.WriteString(Data.Projectile[projectileNum].Name);
-        packet.WriteInt32(Data.Projectile[projectileNum].Sprite);
-        packet.WriteInt32(Data.Projectile[projectileNum].Range);
-        packet.WriteInt32(Data.Projectile[projectileNum].Speed);
-        packet.WriteInt32(Data.Projectile[projectileNum].Damage);
-        packet.WriteInt32(Data.Projectile[projectileNum].Animation);
-
-        PlayerService.Instance.SendDataTo(playerId, packet.GetBytes());
-    }
-
-    public static void SendProjectiles(int playerId)
-    {
-        for (var projectileNum = 0; projectileNum < Core.Globals.Variables.MaxProjectiles; projectileNum++)
-        {
-            if (Data.Projectile[projectileNum].Name.Length > 0)
-            {
-                SendUpdateProjectileTo(playerId, projectileNum);
-            }
-        }
-    }
-
-    private static void SendProjectileToMap(int mapNum, int projectileNum)
-    {
-        var mapProjectile = Data.MapProjectile[mapNum, projectileNum];
-        var packet = new PacketWriter(4);
-
-        packet.WriteEnum(ServerPackets.SMapProjectile);
-        packet.WriteInt32(projectileNum);
-        packet.WriteInt32(mapProjectile.ProjectileNum);
-        packet.WriteInt32(mapProjectile.Owner);
-        packet.WriteByte(mapProjectile.OwnerType);
-        packet.WriteByte(mapProjectile.Dir);
-        packet.WriteInt32(mapProjectile.X);
-        packet.WriteInt32(mapProjectile.Y);
-        packet.WriteInt16(mapProjectile.Vx);
-        packet.WriteInt16(mapProjectile.Vy);
-        packet.WriteByte(mapProjectile.FreeAim);
-
-        NetworkConfig.SendDataToMap(mapNum, packet.GetBytes());
-    }
-    
     public static void PlayerFireProjectileFreeAim(int playerId, short vx, short vy, int itemNum)
     {
         var mapNum = GetPlayerMap(playerId);
@@ -342,7 +175,7 @@ public static class Projectile
         mp.AccX = 0; mp.AccY = 0; mp.Range = 0;
         mp.TravelTime = General.GetTimeMs() + Math.Max(1, Data.Projectile[projectileNum].Speed);
         mp.Timer = General.GetTimeMs() + 60000;
-        SendProjectileToMap(mapNum, mapProjectileNum);
+        NetworkSend.SendProjectileToMap(mapNum, mapProjectileNum);
     }
 
     public static void PlayerFireProjectileFreeAim(int playerId, short vx, short vy, int itemNum, int destX, int destY)
@@ -381,7 +214,7 @@ public static class Projectile
         mp.DestX = destX; mp.DestY = destY;
         mp.TravelTime = General.GetTimeMs() + Math.Max(1, Data.Projectile[projectileNum].Speed);
         mp.Timer = General.GetTimeMs() + 60000;
-        SendProjectileToMap(mapNum, mapProjectileNum);
+        NetworkSend.SendProjectileToMap(mapNum, mapProjectileNum);
     }
 
     public static void PlayerFireProjectile(int playerId, int itemNum, int skillNum = -1, int dir = -1, bool suppressCooldown = false)
@@ -433,7 +266,7 @@ public static class Projectile
         mapProjectile.TravelTime = General.GetTimeMs() + Math.Max(1, Data.Projectile[projectileNum].Speed);
         mapProjectile.Timer = General.GetTimeMs() + 60000;
 
-        SendProjectileToMap(mapNum, mapProjectileNum);
+        NetworkSend.SendProjectileToMap(mapNum, mapProjectileNum);
     }
 
     public static void NpcFireProjectile(int mapNum, int mapNpcNum, int skillNum, int dir = -1)
@@ -479,7 +312,7 @@ public static class Projectile
         mapProjectile.TravelTime = General.GetTimeMs() + Math.Max(1, Data.Projectile[projectileNum].Speed);
         mapProjectile.Timer = General.GetTimeMs() + 60000;
 
-        SendProjectileToMap(mapNum, mapProjectileNum);
+        NetworkSend.SendProjectileToMap(mapNum, mapProjectileNum);
     }
 
     public static void UpdateProjectiles()
@@ -496,14 +329,14 @@ public static class Projectile
                 // Expire long-running projectiles defensively
                 if (mp.Timer > 0 && now > mp.Timer)
                 {
-                    ClearMapProjectile(map, i);
+                    MapProjectile.Clear(map, i);
                     continue;
                 }
 
                 var projId = mp.ProjectileNum;
                 if (projId < 0 || projId >= Data.Projectile.Length)
                 {
-                    ClearMapProjectile(map, i);
+                    MapProjectile.Clear(map, i);
                     continue;
                 }
 
@@ -562,7 +395,7 @@ public static class Projectile
                                 // Try to apply attack on expire at destination
                                 TryAttackAtTile(map, ref mp, tx, ty, projId);
                             }
-                            ClearMapProjectile(map, i);
+                            MapProjectile.Clear(map, i);
                             moved = false;
                             break;
                         }
@@ -580,7 +413,7 @@ public static class Projectile
                             Animation.SendAnimation(map, anim, tx, ty);
                             TryAttackAtTile(map, ref mp, tx, ty, projId);
                         }
-                        ClearMapProjectile(map, i);
+                        MapProjectile.Clear(map, i);
                         moved = false;
                         break;
                     }
@@ -598,7 +431,7 @@ public static class Projectile
                             Animation.SendAnimation(map, anim, tx, ty);
                             TryAttackAtTile(map, ref mp, tx, ty, projId);
                         }
-                        ClearMapProjectile(map, i);
+                        MapProjectile.Clear(map, i);
                         moved = false;
                         break;
                     }
@@ -613,7 +446,7 @@ public static class Projectile
                             TryAttackAtTile(map, ref mp, tileX, tileY, projId);
                         }
                         
-                        ClearMapProjectile(map, i);
+                        MapProjectile.Clear(map, i);
                         moved = false;
                         break;
                     }
@@ -667,7 +500,7 @@ public static class Projectile
                         {
                             General.Logger.LogError(ex, "[Script] Error in {MethodName}", "ProjectileAttack");
                         }
-                        ClearMapProjectile(map, i);
+                        MapProjectile.Clear(map, i);
                         moved = false;
                         break;
                     }
@@ -713,7 +546,7 @@ public static class Projectile
                         {
                             General.Logger.LogError(ex, "[Script] Error in {MethodName}", "ProjectileAttack");
                         }
-                        ClearMapProjectile(map, i);
+                        MapProjectile.Clear(map, i);
                         moved = false;
                         break;
                     }
@@ -721,7 +554,7 @@ public static class Projectile
 
                 if (!moved) continue;
 
-                SendProjectileToMap(map, i);
+                NetworkSend.SendProjectileToMap(map, i);
             }
         }
     }

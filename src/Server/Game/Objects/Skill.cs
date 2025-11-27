@@ -15,7 +15,6 @@ namespace Server
             await System.Threading.Tasks.Task.WhenAll(tasks);
         }
 
-
         public static void Save(int skillNum)
         {
             string json = JsonConvert.SerializeObject(Data.Skill[skillNum]).ToString();

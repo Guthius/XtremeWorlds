@@ -757,76 +757,6 @@ namespace Server
 
         #endregion
 
-        #region Job
-
-        public static void ClearJob(int jobNum)
-        {
-            int statCount = Enum.GetValues(typeof(Stat)).Length;
-            Data.Job[jobNum].Stat = new int[statCount];
-            Data.Job[jobNum].StartItem = new int[Core.Globals.Variables.MaxStartItems];
-            Data.Job[jobNum].StartValue = new int[Core.Globals.Variables.MaxStartItems];
-            Data.Job[jobNum].StartSkill = new int[Core.Globals.Variables.MaxStartSkills];
-
-            Data.Job[jobNum].Name = "";
-            Data.Job[jobNum].Desc = "";
-            Data.Job[jobNum].StartMap = 1;
-            Data.Job[jobNum].MaleSprite = 0;
-            Data.Job[jobNum].FemaleSprite = 0;
-
-            for (int i = 0; i < Core.Globals.Variables.MaxStartItems; i++)
-            {
-                Data.Job[jobNum].StartItem[i] = -1;
-                Data.Job[jobNum].StartValue[i] = 0;
-            }
-
-            for (int i = 0; i < Core.Globals.Variables.MaxStartItems; i++)
-            {
-                Data.Job[jobNum].StartSkill[i] = -1;
-            }
-        }
-
-        public static async System.Threading.Tasks.Task LoadJobAsync(int jobNum)
-        {
-            JObject data;
-
-            data = await SelectRowAsync(jobNum, "job", "data");
-
-            if (data is null)
-            {
-                ClearJob(jobNum);
-                return;
-            }
-
-            var jobData = JObject.FromObject(data).ToObject<Job>();
-            Data.Job[jobNum] = jobData;
-        }
-
-        public static async System.Threading.Tasks.Task LoadJobsAsync()
-        {
-            var tasks = Enumerable.Range(0, Core.Globals.Variables.MaxJobs).Select(i => System.Threading.Tasks.Task.Run(() => LoadJobAsync(i)));
-            await System.Threading.Tasks.Task.WhenAll(tasks);
-        }
-
-        public static void SaveJob(int jobNum)
-        {
-            string json = JsonConvert.SerializeObject(Data.Job[jobNum]).ToString();
-
-            if (RowExists(jobNum, "job"))
-            {
-                UpdateRow(jobNum, json, "job", "data");
-            }
-            else
-            {
-                InsertRow(jobNum, json, "job");
-            }
-        }
-
-        public static void ClearMapItem(int index, int mapNum)
-        {
-            Data.MapItem[mapNum, index].PlayerName = "";
-            Data.MapItem[mapNum, index].Num = -1;
-        }
-
         #region Players
 
         public static async System.Threading.Tasks.Task SaveAllPlayersOnlineAsync()
@@ -1265,5 +1195,4 @@ namespace Server
             packetWriter.WriteInt32(Data.Job[jobNum].BaseExp);
         }
     }
-    #endregion
 }

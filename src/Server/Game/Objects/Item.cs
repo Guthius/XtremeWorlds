@@ -15,7 +15,7 @@ namespace Server;
 
 public static class Item
 {
-    private static void SaveItem(int itemNum)
+    private static void Save(int itemNum)
     {
         var json = JsonConvert.SerializeObject(Data.Item[itemNum]);
 
@@ -29,17 +29,17 @@ public static class Item
         }
     }
 
-    public static async Task LoadItemsAsync()
+    public static async Task LoadAllAsync()
     {
-        await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxItems), LoadItemAsync);
+        await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxItems), LoadAsync);
     }
 
-    private static async ValueTask LoadItemAsync(int itemNum, CancellationToken cancellationToken)
+    private static async ValueTask LoadAsync(int itemNum, CancellationToken cancellationToken)
     {
         var data = await Database.SelectRowAsync(itemNum, "item", "data");
         if (data is null)
         {
-            ClearItem(itemNum);
+            Clear(itemNum);
             return;
         }
 
@@ -48,177 +48,12 @@ public static class Item
         Data.Item[itemNum] = itemData;
     }
 
-    private static void ClearItem(int itemNum)
+    private static void Clear(int itemNum)
     {
         Data.Item[itemNum].Name = "";
         Data.Item[itemNum].Description = "";
         Data.Item[itemNum].Ammo = -1;
         Data.Item[itemNum].Stackable = 1;
-    }
-
-    public static void SendMapItemToAll(int mapNum, int mapSlot)
-    {
-        var packet = new PacketWriter();
-
-        packet.WriteEnum(ServerPackets.SMapItemData);
-        packet.WriteByte((byte)mapSlot);
-        packet.WriteInt32(Data.MapItem[mapNum, mapSlot].Num);
-        packet.WriteInt32(Data.MapItem[mapNum, mapSlot].Value);
-        packet.WriteInt32(Data.MapItem[mapNum, mapSlot].X);
-        packet.WriteInt32(Data.MapItem[mapNum, mapSlot].Y);
-
-        NetworkConfig.SendDataToMap(mapNum, packet.GetBytes());
-    }
-
-    public static void SendMapItemsToAll(int mapNum)
-    {
-        var packet = new PacketWriter();
-
-        packet.WriteEnum(ServerPackets.SMapItemsData);
-
-        for (var i = 0; i < Core.Globals.Variables.MaxMapItems; i++)
-        {
-            packet.WriteInt32(Data.MapItem[mapNum, i].Num);
-            packet.WriteInt32(Data.MapItem[mapNum, i].Value);
-            packet.WriteInt32(Data.MapItem[mapNum, i].X);
-            packet.WriteInt32(Data.MapItem[mapNum, i].Y);
-        }
-
-        NetworkConfig.SendDataToMap(mapNum, packet.GetBytes());
-    }
-
-    public static void SpawnItem(int itemNum, int itemVal, int mapNum, int x, int y)
-    {
-        if (itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems || mapNum < 0 || mapNum >= Core.Globals.Variables.MaxMaps)
-        {
-            return;
-        }
-
-        var slot = FindOpenMapItemSlot(mapNum);
-        if (slot == -1)
-        {
-            return;
-        }
-
-        if (Data.Item[itemNum].Type != (byte)ItemCategory.Currency && Data.Item[itemNum].Stackable != 1)
-        {
-            for (var i = 0; i < itemVal; i++)
-            {
-                slot = FindOpenMapItemSlot(mapNum);
-                if (slot == -1)
-                {
-                    return;
-                }
-
-                SpawnItemSlot(slot, itemNum, 1, mapNum, x, y);
-            }
-        }
-        else
-        {
-            SpawnItemSlot(slot, itemNum, itemVal, mapNum, x, y);
-        }
-    }
-
-    public static void SpawnItemSlot(int mapItemSlot, int itemNum, int itemVal, int mapNum, int x, int y)
-    {
-        if (mapItemSlot < 0 || mapItemSlot > Core.Globals.Variables.MaxMapItems || itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems || mapNum < 0 || mapNum >= Core.Globals.Variables.MaxMaps)
-        {
-            return;
-        }
-
-        x *= 32;
-        y *= 32;
-
-        Data.MapItem[mapNum, mapItemSlot].Num = itemNum;
-        Data.MapItem[mapNum, mapItemSlot].Value = itemVal;
-        Data.MapItem[mapNum, mapItemSlot].X = x;
-        Data.MapItem[mapNum, mapItemSlot].Y = y;
-
-        var packet = new PacketWriter();
-
-        packet.WriteEnum(ServerPackets.SSpawnItem);
-        packet.WriteInt32(mapItemSlot);
-        packet.WriteInt32(itemNum);
-        packet.WriteInt32(itemVal);
-        packet.WriteInt32(x);
-        packet.WriteInt32(y);
-
-        NetworkConfig.SendDataToMap(mapNum, packet.GetBytes());
-    }
-
-    public static int FindOpenMapItemSlot(int mapNum)
-    {
-        if (mapNum < 0 || mapNum >= Core.Globals.Variables.MaxMaps)
-        {
-            return -1;
-        }
-
-        for (var mapItemNum = 0; mapItemNum < Core.Globals.Variables.MaxMapItems; mapItemNum++)
-        {
-            if (Data.MapItem[mapNum, mapItemNum].Num == -1)
-            {
-                return mapItemNum;
-            }
-        }
-
-        return -1;
-    }
-
-    public static void SpawnAllMapsItems()
-    {
-        for (var mapNum = 0; mapNum < Core.Globals.Variables.MaxMaps; mapNum++)
-        {
-            SpawnMapItems(mapNum);
-        }
-    }
-
-    public static void SpawnMapItems(int mapNum)
-    {
-        if (mapNum < 0 || mapNum >= Core.Globals.Variables.MaxMaps)
-        {
-            return;
-        }
-
-        if (Data.Map[mapNum].NoRespawn)
-        {
-            return;
-        }
-
-        for (var x = 0; x < Data.Map[mapNum].MaxX; x++)
-        {
-            for (var y = 0; y < Data.Map[mapNum].MaxY; y++)
-            {
-                if (Data.Map[mapNum].Tile[x, y].Type == TileType.Item)
-                {
-                    if (Data.Item[Data.Map[mapNum].Tile[x, y].Data1].Type == (byte)ItemCategory.Currency ||
-                        Data.Item[Data.Map[mapNum].Tile[x, y].Data1].Stackable == 1)
-                    {
-                        var value = Data.Map[mapNum].Tile[x, y].Data2 < 1 ? 1 : Data.Map[mapNum].Tile[x, y].Data2;
-
-                        SpawnItem(Data.Map[mapNum].Tile[x, y].Data1, value, mapNum, x, y);
-                    }
-                    else
-                    {
-                        SpawnItem(Data.Map[mapNum].Tile[x, y].Data1, Data.Map[mapNum].Tile[x, y].Data2, mapNum, x, y);
-                    }
-                }
-
-                if (Data.Map[mapNum].Tile[x, y].Type2 == TileType.Item)
-                {
-                    if (Data.Item[Data.Map[mapNum].Tile[x, y].Data1_2].Type == (byte)ItemCategory.Currency ||
-                        Data.Item[Data.Map[mapNum].Tile[x, y].Data1_2].Stackable == 1)
-                    {
-                        var value = Data.Map[mapNum].Tile[x, y].Data2_2 < 1 ? 1 : Data.Map[mapNum].Tile[x, y].Data2_2;
-
-                        SpawnItem(Data.Map[mapNum].Tile[x, y].Data1_2, value, mapNum, x, y);
-                    }
-                    else
-                    {
-                        SpawnItem(Data.Map[mapNum].Tile[x, y].Data1_2, Data.Map[mapNum].Tile[x, y].Data2_2, mapNum, x, y);
-                    }
-                }
-            }
-        }
     }
 
     public static void HandleRequestItem(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -251,7 +86,7 @@ public static class Item
         Data.TempPlayer[session.Id].Editor = EditorType.Item;
 
         Animation.SendAnimations(session.Id);
-        Projectile.SendProjectiles(session.Id);
+        NetworkSend.SendProjectiles(session.Id);
         NetworkSend.SendJobs(session);
 
         SendItems(session.Id);
@@ -316,7 +151,7 @@ public static class Item
         Data.Item[itemNum].Projectile = packetReader.ReadInt32();
         Data.Item[itemNum].Ammo = packetReader.ReadInt32();
 
-        SaveItem(itemNum);
+        Item.Save(itemNum);
 
         General.Logger.LogInformation("{AccountName} saved item #{ItemNum}",
             GetAccountLogin(session.Id), itemNum);

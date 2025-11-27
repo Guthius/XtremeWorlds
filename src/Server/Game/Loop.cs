@@ -177,11 +177,11 @@ namespace Server
                 // Clear out unnecessary junk
                 var loopTo1 = Core.Globals.Variables.MaxMapItems;
                 for (x = 0; x < loopTo1; x++)
-                    Database.ClearMapItem(x, y);
+                    MapItem.Clear(x, y);
 
                 // Spawn the items
-                Item.SpawnMapItems(y);
-                Item.SendMapItemsToAll(y);
+                MapItem.Spawn(y);
+                NetworkSend.SendMapItemsToAll(y);
             }
             
         }

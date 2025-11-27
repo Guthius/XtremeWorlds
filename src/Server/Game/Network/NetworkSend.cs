@@ -2,10 +2,12 @@
 using Core.Configurations;
 using Core.Globals;
 using Core.Net;
+using Microsoft.Extensions.Logging;
 using Server.Game;
 using Server.Game.Net;
-using static Core.Net.Packets;
+using System.Text;
 using static Core.Globals.Command;
+using static Core.Net.Packets;
 
 namespace Server;
 
@@ -1228,4 +1230,149 @@ public static class NetworkSend
 
         NetworkConfig.SendDataToMap(mapNum, packetWriter.GetBytes());
     }
+
+
+    public static void SendMapItemToAll(int mapNum, int mapSlot)
+    {
+        var packet = new PacketWriter();
+
+        packet.WriteEnum(ServerPackets.SMapItemData);
+        packet.WriteByte((byte)mapSlot);
+        packet.WriteInt32(Data.MapItem[mapNum, mapSlot].Num);
+        packet.WriteInt32(Data.MapItem[mapNum, mapSlot].Value);
+        packet.WriteInt32(Data.MapItem[mapNum, mapSlot].X);
+        packet.WriteInt32(Data.MapItem[mapNum, mapSlot].Y);
+
+        NetworkConfig.SendDataToMap(mapNum, packet.GetBytes());
+    }
+
+    public static void SendMapItemsToAll(int mapNum)
+    {
+        var packet = new PacketWriter();
+
+        packet.WriteEnum(ServerPackets.SMapItemsData);
+
+        for (var i = 0; i < Core.Globals.Variables.MaxMapItems; i++)
+        {
+            packet.WriteInt32(Data.MapItem[mapNum, i].Num);
+            packet.WriteInt32(Data.MapItem[mapNum, i].Value);
+            packet.WriteInt32(Data.MapItem[mapNum, i].X);
+            packet.WriteInt32(Data.MapItem[mapNum, i].Y);
+        }
+
+        NetworkConfig.SendDataToMap(mapNum, packet.GetBytes());
+    }
+
+    public static void SendMorals(int playerId)
+    {
+        for (var moralNum = 0; moralNum < Core.Globals.Variables.MaxMorals; moralNum++)
+        {
+            if (Data.Moral[moralNum].Name.Length > 0)
+            {
+                SendUpdateMoralTo(playerId, moralNum);
+            }
+        }
+    }
+
+    public static void SendUpdateMoralTo(int playerId, int moralNum)
+    {
+        var packet = new PacketWriter();
+
+        packet.WriteEnum(ServerPackets.SUpdateMoral);
+
+        WriteMoralDataToPacket(moralNum, packet);
+
+        PlayerService.Instance.SendDataTo(playerId, packet.GetBytes());
+    }
+
+    public static void SendUpdateMoralToAll(int moralNum)
+    {
+        var packet = new PacketWriter();
+
+        packet.WriteEnum(ServerPackets.SUpdateMoral);
+
+        WriteMoralDataToPacket(moralNum, packet);
+
+        PlayerService.Instance.SendDataToAll(packet.GetBytes());
+    }
+
+    private static void WriteMoralDataToPacket(int moralNum, PacketWriter packet)
+    {
+        packet.WriteInt32(moralNum);
+        packet.WriteString(Data.Moral[moralNum].Name);
+        packet.WriteByte(Data.Moral[moralNum].Color);
+        packet.WriteBoolean(Data.Moral[moralNum].NpcBlock);
+        packet.WriteBoolean(Data.Moral[moralNum].PlayerBlock);
+        packet.WriteBoolean(Data.Moral[moralNum].CanCast);
+        packet.WriteBoolean(Data.Moral[moralNum].CanDropItem);
+        packet.WriteBoolean(Data.Moral[moralNum].CanPickupItem);
+        packet.WriteBoolean(Data.Moral[moralNum].CanPk);
+        packet.WriteBoolean(Data.Moral[moralNum].DropItems);
+        packet.WriteBoolean(Data.Moral[moralNum].LoseExp);
+    }
+
+    public static void SendProjectileToMap(int mapNum, int projectileNum)
+    {
+        var mapProjectile = Data.MapProjectile[mapNum, projectileNum];
+        var packet = new PacketWriter(4);
+
+        packet.WriteEnum(ServerPackets.SMapProjectile);
+        packet.WriteInt32(projectileNum);
+        packet.WriteInt32(mapProjectile.ProjectileNum);
+        packet.WriteInt32(mapProjectile.Owner);
+        packet.WriteByte(mapProjectile.OwnerType);
+        packet.WriteByte(mapProjectile.Dir);
+        packet.WriteInt32(mapProjectile.X);
+        packet.WriteInt32(mapProjectile.Y);
+        packet.WriteInt16(mapProjectile.Vx);
+        packet.WriteInt16(mapProjectile.Vy);
+        packet.WriteByte(mapProjectile.FreeAim);
+
+        NetworkConfig.SendDataToMap(mapNum, packet.GetBytes());
+    }
+
+    public static void SendUpdateProjectileToAll(int projectileNum)
+    {
+        var packet = new PacketWriter();
+
+        packet.WriteEnum(ServerPackets.SUpdateProjectile);
+        packet.WriteInt32(projectileNum);
+        packet.WriteString(Data.Projectile[projectileNum].Name);
+        packet.WriteInt32(Data.Projectile[projectileNum].Sprite);
+        packet.WriteInt32(Data.Projectile[projectileNum].Range);
+        packet.WriteInt32(Data.Projectile[projectileNum].Speed);
+        packet.WriteInt32(Data.Projectile[projectileNum].Damage);
+        packet.WriteInt32(Data.Projectile[projectileNum].Animation);
+
+        PlayerService.Instance.SendDataToAll(packet.GetBytes());
+    }
+
+    public static void SendUpdateProjectileTo(int playerId, int projectileNum)
+    {
+        var packet = new PacketWriter();
+
+        packet.WriteEnum(ServerPackets.SUpdateProjectile);
+        packet.WriteInt32(projectileNum);
+        packet.WriteString(Data.Projectile[projectileNum].Name);
+        packet.WriteInt32(Data.Projectile[projectileNum].Sprite);
+        packet.WriteInt32(Data.Projectile[projectileNum].Range);
+        packet.WriteInt32(Data.Projectile[projectileNum].Speed);
+        packet.WriteInt32(Data.Projectile[projectileNum].Damage);
+        packet.WriteInt32(Data.Projectile[projectileNum].Animation);
+
+        PlayerService.Instance.SendDataTo(playerId, packet.GetBytes());
+    }
+
+    public static void SendProjectiles(int playerId)
+    {
+        for (var projectileNum = 0; projectileNum < Core.Globals.Variables.MaxProjectiles; projectileNum++)
+        {
+            if (Data.Projectile[projectileNum].Name.Length > 0)
+            {
+                SendUpdateProjectileTo(playerId, projectileNum);
+            }
+        }
+    }
+
+
 }

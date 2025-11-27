@@ -132,7 +132,7 @@ public static class Player
 
             Data.TempPlayer[playerId].GettingMap = true;
 
-            Moral.SendUpdateMoralTo(playerId, Data.Map[mapNum].Moral);
+            NetworkSend.SendUpdateMoralTo(playerId, Data.Map[mapNum].Moral);
 
             var packet = new PacketWriter(12);
 
@@ -874,7 +874,7 @@ public static class Player
             return;
         }
 
-        var slot = Item.FindOpenMapItemSlot(GetPlayerMap(playerId));
+        var slot = MapItem.FindOpenSlot(GetPlayerMap(playerId));
         if (slot != -1)
         {
             var mapNum = GetPlayerMap(playerId);
