@@ -13,7 +13,6 @@ using Type = Core.Globals.Type;
 
 public class Crystalshire
 {
-    // Improved: hide/show group box frame and all of its children reliably.
     // - Prefers loader-recorded child range (FirstChildIndex..LastChildIndex).
     // - Falls back to rectangle intersection (not just containment) for overlapping layouts.
     // - Ensures common UI controls within the group region follow visibility.
