@@ -419,7 +419,9 @@ namespace Server
 
         private static void DisplayServerBanner(int startTime)
         {
-            Console.Clear();
+            try { Console.Clear(); }
+            catch { };
+
             string[] banner = {
                 " __   ___                        __          __        _     _     ",
                 @" \ \ / / |                       \ \        / /       | |   | |",
