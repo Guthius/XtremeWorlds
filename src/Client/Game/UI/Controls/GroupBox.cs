@@ -29,11 +29,8 @@ public sealed class GroupBox : Control
             DesignRenderer.Render(Design, absX, absY, Width, Height, 255);
         }
 
-        // Tab pages should have no caption; use Name prefix convention: "tab..."
-        bool isTabPage = !string.IsNullOrEmpty(Name) && Name.StartsWith("tab", StringComparison.OrdinalIgnoreCase);
-
         // Caption
-        if (!isTabPage && !string.IsNullOrWhiteSpace(Text))
+        if (!string.IsNullOrWhiteSpace(Text))
         {
             TextRenderer.RenderText(Text, absX + CaptionOffsetX, absY + CaptionOffsetY, Color.White, Color.Black);
         }
