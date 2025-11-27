@@ -29,12 +29,12 @@ public static class Animation
         }
     }
 
-    public static Task LoadAnimationsAsync()
+    public static Task LoadAllAsync()
     {
-        return Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxAnimations), LoadAnimationAsync);
+        return Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxAnimations), LoadAsync);
     }
 
-    private static async ValueTask LoadAnimationAsync(int animationNum, CancellationToken cancellationToken)
+    private static async ValueTask LoadAsync(int animationNum, CancellationToken cancellationToken)
     {
         var data = await Database.SelectRowAsync(animationNum, "animation", "data");
         if (data is null)

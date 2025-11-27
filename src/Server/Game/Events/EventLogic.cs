@@ -2938,7 +2938,7 @@ namespace Server
         }
 
         // Helper to calculate tile offsets based on player direction and map bounds
-        private static (int, int)? GetOffsetByDirection(byte direction, int x, int y, Map map)
+        private static (int, int)? GetOffsetByDirection(byte direction, int x, int y, Core.Globals.Type.Map map)
         {
             int newX = x, newY = y;
             switch ((Direction) direction)

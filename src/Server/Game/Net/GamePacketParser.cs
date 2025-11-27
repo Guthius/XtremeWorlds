@@ -1049,7 +1049,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var mapNum = GetPlayerMap(session.Id);
 
         var ii = Data.Map[mapNum].Revision + 1;
-        Database.ClearMap(mapNum);
+        Map.Clear(mapNum);
         
         var packetReader = new PacketReader(bytes);
 
@@ -1088,8 +1088,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         
         for (x = 0; x < Core.Globals.Variables.MaxMapNpcs; x++)
         {
-            Database.ClearMapNpc(x, mapNum);
-            
+            MapNpc.Clear(x, mapNum);        
             Data.Map[mapNum].Npc[x] = packetReader.ReadInt32();
         }
         
@@ -1276,7 +1275,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         } 
 
         // Save the map
-        Database.SaveMap(mapNum);
+        Map.Save(mapNum);
         Npc.SpawnMapNpcs(mapNum).GetAwaiter().GetResult();
         EventLogic.SpawnGlobalEvents(mapNum).GetAwaiter().GetResult();
 
@@ -1650,7 +1649,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         // Save it
         NetworkSend.SendUpdateSkillToAll(skillNum);
-        Database.SaveSkill(skillNum);
+        Skill.Save(skillNum);
         Log.Add(GetAccountLogin(session.Id) + " saved Skill #" + skillNum + ".", Constant.AdminLog);
     }
 
