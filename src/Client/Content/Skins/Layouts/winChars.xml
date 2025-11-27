@@ -6,76 +6,76 @@
         StartPosition="CenterScreen"
         Visible="False">
 
-	<GroupBox Name="grpChars" Position="0,20" Size="356,197">
-		<PictureBox Name="picSlot_1" Position="16,24" Size="98,9" Design="BlackOval"/>
-		<Label Name="lblCharName_1" Text="Blank Slot" Position="16,21" Size="98,10" Align="Center"/>
-		<PictureBox Name="picScene_1" Position="17,39" Size="96,96" Image="11"/>
+	<GroupBox Name="grpChars" Position="6,26" Size="348,193">
+		<PictureBox Name="picSlot_1" Position="16,17" Size="98,9" Design="BlackOval"/>
+		<Label Name="lblCharName_1" Text="Blank Slot" Position="16,14" Size="98,10" Align="Center"/>
+		<PictureBox Name="picScene_1" Position="17,32" Size="96,96" Image="11"/>
 
 		<Button Name="btnSelectChar_1" Text="Select"
-				Position="16,139" Size="98,24"
+				Position="16,132" Size="98,24"
 				Design="Green"
 				DesignHover="GreenHover"
 				DesignMouseDown="GreenClick"
 				Visible="False"/>
 
 		<Button Name="btnCreateChar_1" Text="Create"
-				Position="16,139" Size="98,24"
+				Position="16,132" Size="98,24"
 				Design="Green"
 				DesignHover="GreenHover"
 				DesignMouseDown="GreenClick"/>
 
 		<Button Name="btnDelChar_1" Text="Delete"
-				Position="16,167" Size="98,24"
+				Position="16,160" Size="98,24"
 				Design="Red"
 				DesignHover="RedHover"
 				DesignMouseDown="RedClick"
 				Visible="False"/>
 
 		<!-- Slot 2 -->
-		<PictureBox Name="picSlot_2" Position="126,24" Size="98,9" Design="BlackOval"/>
-		<Label Name="lblCharName_2" Text="Blank Slot" Position="126,21" Size="98,10" Align="Center"/>
-		<PictureBox Name="picScene_2" Position="127,39" Size="96,96" Image="11"/>
+		<PictureBox Name="picSlot_2" Position="126,17" Size="98,9" Design="BlackOval"/>
+		<Label Name="lblCharName_2" Text="Blank Slot" Position="126,14" Size="98,10" Align="Center"/>
+		<PictureBox Name="picScene_2" Position="127,32" Size="96,96" Image="11"/>
 
 		<Button Name="btnSelectChar_2" Text="Select"
-				Position="126,139" Size="98,24"
+				Position="126,132" Size="98,24"
 				Design="Green"
 				DesignHover="GreenHover"
 				DesignMouseDown="GreenClick"
 				Visible="False"/>
 
 		<Button Name="btnCreateChar_2" Text="Create"
-				Position="126,139" Size="98,24"
+				Position="126,132" Size="98,24"
 				Design="Green"
 				DesignHover="GreenHover"
 				DesignMouseDown="GreenClick"/>
 
 		<Button Name="btnDelChar_2" Text="Delete"
-				Position="126,167" Size="98,24"
+				Position="126,160" Size="98,24"
 				Design="Red"
 				DesignHover="RedHover"
 				DesignMouseDown="RedClick"
 				Visible="False"/>
 
 		<!-- Slot 3 -->
-		<PictureBox Name="picSlot_3" Position="236,24" Size="98,9" Design="BlackOval"/>
-		<Label Name="lblCharName_3" Text="Blank Slot" Position="236,21" Size="98,10" Align="Center"/>
-		<PictureBox Name="picScene_3" Position="237,39" Size="96,96" Image="11"/>
+		<PictureBox Name="picSlot_3" Position="236,17" Size="98,9" Design="BlackOval"/>
+		<Label Name="lblCharName_3" Text="Blank Slot" Position="236,14" Size="98,10" Align="Center"/>
+		<PictureBox Name="picScene_3" Position="237,32" Size="96,96" Image="11"/>
 
 		<Button Name="btnSelectChar_3" Text="Select"
-				Position="236,139" Size="98,24"
+				Position="236,132" Size="98,24"
 				Design="Green"
 				DesignHover="GreenHover"
 				DesignMouseDown="GreenClick"
 				Visible="False"/>
 
 		<Button Name="btnCreateChar_3" Text="Create"
-				Position="236,139" Size="98,24"
+				Position="236,132" Size="98,24"
 				Design="Green"
 				DesignHover="GreenHover"
 				DesignMouseDown="GreenClick"/>
 
 		<Button Name="btnDelChar_3" Text="Delete"
-				Position="236,167" Size="98,24"
+				Position="236,160" Size="98,24"
 				Design="Red"
 				DesignHover="RedHover"
 				DesignMouseDown="RedClick"

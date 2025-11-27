@@ -6,7 +6,7 @@
         StartPosition="CenterScreen"
         Visible="False">
 
-	<GroupBox Name="grpRegister" Position="6,26" Size="260,170">
+	<GroupBox Name="grpRegister" Position="6,26" Size="260,172">
 		<PictureBox Name="lblLogin" Position="55,16" Size="142,9" Design="BlackOval"/>
 		<PictureBox Name="lblPassword_1" Position="61,60" Size="142,9" Design="BlackOval"/>
 		<PictureBox Name="lblPassword_2" Position="61,96" Size="142,9" Design="BlackOval"/>

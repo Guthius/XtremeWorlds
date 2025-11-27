@@ -6,7 +6,7 @@
         StartPosition="CenterScreen"
         Visible="true">
 
-	<GroupBox Name="grpLogin" Position="6,26" Size="260,196">
+	<GroupBox Name="grpLogin" Position="6,26" Size="260,192">
 		<PictureBox Name="picLogin_1" Position="55,20" Size="142,9" Design="BlackOval"/>
 		<PictureBox Name="picLogin_2" Position="61,68" Size="142,9" Design="BlackOval"/>
 
