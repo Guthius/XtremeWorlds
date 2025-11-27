@@ -52,20 +52,32 @@ internal sealed class NetworkServiceHost<TSession>(
         {
             tcpListener.Start();
 
-            while (!stoppingToken.IsCancellationRequested)
+            while (true)
             {
-                var tcpClient = await tcpListener.AcceptTcpClientAsync(stoppingToken);
+                TcpClient tcpClient;
+                try
+                {
+                    // Accept will throw OperationCanceledException when stoppingToken is canceled
+                    tcpClient = await tcpListener.AcceptTcpClientAsync(stoppingToken);
+                }
+                catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+                {
+                    // Graceful shutdown
+                    logger.LogDebug("Accept loop canceled");
+                    break;
+                }
+                catch (ObjectDisposedException)
+                {
+                    // Listener stopped while awaiting accept
+                    break;
+                }
 
                 HandleTcpClient(tcpClient, stoppingToken);
             }
         }
-        catch (TaskCanceledException)
-        {
-        }
         finally
         {
-            tcpListener.Stop();
-
+            try { tcpListener.Stop(); } catch { }
             logger.LogInformation("Network service stopped");
         }
     }
