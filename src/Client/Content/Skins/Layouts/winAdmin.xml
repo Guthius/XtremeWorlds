@@ -7,7 +7,7 @@
     Visible="false">
 
     <!-- Tab Control for different admin sections -->
-    <GroupBox Name="grpAdmin" Position="6, 26" Size="628, 224">
+    <GroupBox Name="grpAdmin" Position="6, 26" Size="624, 224">
         <!-- MODERATION TAB -->
         <GroupBox Name="grpModeration" Caption="Moderation">
             <!-- Player Name Section -->
