@@ -112,10 +112,6 @@ public static class WindowLoader
                 ReadScrollBar(xmlReader, windowIndex);
                 break;
 
-            case "grpPage":
-                ReadTabPage(xmlReader, windowIndex);
-                return;
-
             case "Button":
                 ReadButton(xmlReader, windowIndex);
                 break;
@@ -188,28 +184,6 @@ public static class WindowLoader
             thumbSize: thumbSize
         );
     }
-
-    private static void ReadTabPage(XmlReader xmlReader, int windowIndex)
-    {
-        if (xmlReader.IsEmptyElement)
-        {
-            return;
-        }
-
-        var depth = xmlReader.Depth;
-        while (xmlReader.Read())
-        {
-            if (xmlReader.NodeType == XmlNodeType.Element)
-            {
-                ReadControl(xmlReader, windowIndex);
-            }
-            else if (xmlReader.NodeType == XmlNodeType.EndElement && xmlReader.Depth == depth && xmlReader.Name == "grpPage")
-            {
-                break;
-            }
-        }
-    }
-
     private static void ReadGroupBox(XmlReader xmlReader, int windowIndex)
     {
         var name = xmlReader.GetAttribute("Name") ?? string.Empty;
