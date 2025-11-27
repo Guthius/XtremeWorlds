@@ -11,7 +11,7 @@ namespace Server
     {
         public static async System.Threading.Tasks.Task LoadAllAsync()
         {
-            var tasks = Enumerable.Range(0, Core.Globals.Variables.MaxSkills).Select(i => System.Threading.Tasks.Task.Run(() => LoadSkillAsync(i)));
+            var tasks = Enumerable.Range(0, Core.Globals.Variables.MaxSkills).Select(i => System.Threading.Tasks.Task.Run(() => LoadAsync(i)));
             await System.Threading.Tasks.Task.WhenAll(tasks);
         }
 
@@ -30,7 +30,7 @@ namespace Server
             }
         }
 
-        public static async System.Threading.Tasks.Task LoadSkillAsync(int skillNum)
+        public static async System.Threading.Tasks.Task LoadAsync(int skillNum)
         {
             JObject data;
 
