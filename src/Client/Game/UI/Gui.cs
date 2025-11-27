@@ -1374,11 +1374,9 @@ public class WindowManager
         {
             if (window.ParentControl is not null)
             {
-                // Set the ComboBox.Value property if possible
                 if (window.ParentControl is Client.Game.UI.Controls.ComboBox comboBox)
                 {
                     comboBox.Value = idx;
-                    // Notify selection-change listeners (use MouseMove slot by convention)
                     comboBox.CallBack[(int)ControlState.MouseMove]?.Invoke();
                 }
                 else

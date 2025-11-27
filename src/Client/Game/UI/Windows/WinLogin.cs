@@ -8,8 +8,8 @@ public static class WinLogin
 {
     public static void OnExit()
     {
-    // Request the game to exit; Exiting handler will call DestroyGame and end Eto
-    try { General.Client.Exit(); } catch { General.DestroyGame(); }
+        // Request the game to exit; Exiting handler will call DestroyGame and end Eto
+        try { General.Client.Exit(); } catch { General.DestroyGame(); }
     }
     
     public static void OnLogin()
@@ -53,7 +53,6 @@ public static class WinLogin
         }
 
         WindowManager.HideWindows();
-
         WinRegister.ClearPasswords();
 
         WindowManager.ShowWindow("winRegister");
