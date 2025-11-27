@@ -124,16 +124,14 @@ public class Crystalshire
     {
         var window = WindowLoader.FromLayout("winMapEditor");
 
-        // Close button
-        if (WindowManager.TryGetControl("winMapEditor","btnClose", out var btnClose))
+        // Close button should discard changes (same as Discard)
+        if (WindowManager.TryGetControl("winMapEditor", "btnClose", out var btnClose))
         {
-            btnClose.CallBack[(int)ControlState.MouseDown] = () => WindowManager.HideWindow("winMapEditor");
-        }
-
-        // Footer Close
-        if (WindowManager.TryGetControl("winMapEditor","btnCloseMap", out var btnCloseMap))
-        {
-            btnCloseMap.CallBack[(int)ControlState.MouseDown] = () => WindowManager.HideWindow("winMapEditor");
+            btnClose.CallBack[(int)ControlState.MouseDown] = () =>
+            {
+                Editors.MapEditorCancel();
+                WindowManager.HideWindow("winMapEditor");
+            };
         }
 
         // Save: apply Settings values and mirror Editors.UpdateMap flow
