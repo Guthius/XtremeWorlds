@@ -20,7 +20,7 @@
 
 		<PictureBox Name="picBackground" Position="127, 55" Size="210, 124" Design="TextBlack"/>
 		<PictureBox Name="picOverlay" Position="6, 26" Size="0, 0"/>
-
-		<Button Name="btnClose" Position="-19, 5" Size="16, 16" Image="8" ImageHover="9" ImageMouseDown="10"/>
 	</GroupBox>
+
+	<Button Name="btnClose" Position="-19, 5" Size="16, 16" Image="8" ImageHover="9" ImageMouseDown="10"/>
 </Window>
