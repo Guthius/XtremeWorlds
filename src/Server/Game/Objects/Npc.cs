@@ -2,6 +2,8 @@
 using Core.Globals;
 using Core.Net;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Server.Game;
 using Server.Game.Net;
 using Server.Net;
@@ -12,10 +14,65 @@ namespace Server;
 
 public static class Npc
 {
-    // Tracks remaining pixels to finish the current tile step for each NPC on each map.
+    // Tracks remaining pixels to finish the current tile step for each npc on each map.
     private static readonly int[,] _stepRemaining = new int[Core.Globals.Variables.MaxMaps, Core.Globals.Variables.MaxMapNpcs];
-    // Planned multi-tile movement route (as directions) per NPC.
+
+    // Planned multi-tile movement route (as directions) per npc on each map.
     private static readonly System.Collections.Generic.Queue<byte>?[,] _route = new System.Collections.Generic.Queue<byte>?[Core.Globals.Variables.MaxMaps, Core.Globals.Variables.MaxMapNpcs];
+
+    public static async System.Threading.Tasks.Task LoadAllAsync()
+    {
+        var tasks = Enumerable.Range(0, Core.Globals.Variables.MaxNpcs).Select(i => System.Threading.Tasks.Task.Run(() => LoadAsync(i)));
+        await System.Threading.Tasks.Task.WhenAll(tasks);
+    }
+
+    public static void Save(int npcNum)
+    {
+        string json = JsonConvert.SerializeObject(Data.Npc[(int)npcNum]).ToString();
+
+        if (Database.RowExists(npcNum, "npc"))
+        {
+            Database.UpdateRow(npcNum, json, "npc", "data");
+        }
+        else
+        {
+            Database.InsertRow(npcNum, json, "npc");
+        }
+    }
+
+    public static async System.Threading.Tasks.Task LoadAsync(int npcNum)
+    {
+        JObject data;
+
+        data = await Database.SelectRowAsync(npcNum, "npc", "data");
+
+        if (data is null)
+        {
+            Npc.Clear(npcNum);
+            return;
+        }
+
+        var npcData = JObject.FromObject(data).ToObject<Core.Globals.Type.Npc>();
+        Data.Npc[(int)npcNum] = npcData;
+    }
+
+    public static void Clear(int index)
+    {
+        Data.Npc[index].Name = "";
+        Data.Npc[index].AttackSay = "";
+        int statCount = Enum.GetValues(typeof(Stat)).Length;
+        Data.Npc[index].Stat = new byte[statCount];
+
+        for (int i = 0, loopTo = Core.Globals.Variables.MaxDropItems; i < loopTo; i++)
+        {
+            Data.Npc[index].DropChance = new int[Core.Globals.Variables.MaxDropItems];
+            Data.Npc[index].DropItem = new int[Core.Globals.Variables.MaxDropItems];
+            Data.Npc[index].DropItemValue = new int[Core.Globals.Variables.MaxDropItems];
+            Data.Npc[index].Skill = new byte[Core.Globals.Variables.MaxNpcSkills];
+        }
+    }
+
+
     public static async Task SpawnAllMapNpcs()
     {
         await Task.WhenAll(Enumerable
@@ -56,7 +113,7 @@ public static class Npc
 
         if (Data.Npc[npcNum].SpawnTime != (byte) Clock.Instance.TimeOfDay && Data.Npc[npcNum].SpawnTime != 0)
         {
-            Database.ClearMapNpc(mapNpcNum, mapNum);
+            MapNpc.Clear(mapNpcNum, mapNum);
 
             SendMapNpcsToMap(mapNum);
 
@@ -524,7 +581,7 @@ public static class Npc
         Data.Npc[npcNum].Level = packetReader.ReadByte();
         Data.Npc[npcNum].Damage = packetReader.ReadInt32();
 
-        Database.SaveNpc(npcNum);
+        Npc.Save(npcNum);
 
         General.Logger.LogInformation("{AccountName} saved NPC #{NpcNum}",
             GetAccountLogin(session.Id), npcNum);

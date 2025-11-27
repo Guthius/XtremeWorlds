@@ -873,12 +873,6 @@ namespace Server
             await System.Threading.Tasks.Task.WhenAll(tasks);
         }
 
-        public static async System.Threading.Tasks.Task LoadNpcsAsync()
-        {
-            var tasks = Enumerable.Range(0, Core.Globals.Variables.MaxNpcs).Select(i => System.Threading.Tasks.Task.Run(() => LoadNpcAsync(i)));
-            await System.Threading.Tasks.Task.WhenAll(tasks);
-        }
-
         public static async System.Threading.Tasks.Task LoadSkillsAsync()
         {
             var tasks = Enumerable.Range(0, Core.Globals.Variables.MaxSkills).Select(i => System.Threading.Tasks.Task.Run(() => LoadSkillAsync(i)));
@@ -1580,65 +1574,6 @@ namespace Server
                 mwMap.Npc[i] = -1;
             }
             return mwMap;
-        }
-
-        #endregion
-
-        #region Npcs
-
-        public static void SaveNpc(int npcNum)
-        {
-            string json = JsonConvert.SerializeObject(Data.Npc[(int)npcNum]).ToString();
-
-            if (RowExists(npcNum, "npc"))
-            {
-                UpdateRow(npcNum, json, "npc", "data");
-            }
-            else
-            {
-                InsertRow(npcNum, json, "npc");
-            }
-        }
-
-        public static async System.Threading.Tasks.Task LoadNpcAsync(int npcNum)
-        {
-            JObject data;
-
-            data = await SelectRowAsync(npcNum, "npc", "data");
-
-            if (data is null)
-            {
-                ClearNpc(npcNum);
-                return;
-            }
-
-            var npcData = JObject.FromObject(data).ToObject<Type.Npc>();
-            Data.Npc[(int)npcNum] = npcData;
-        }
-
-        public static void ClearMapNpc(int index, int mapNum)
-        {
-            var count = Enum.GetValues(typeof(Vital)).Length;
-            Data.MapNpc[mapNum].Npc[index].Vital = new int[count];
-            Data.MapNpc[mapNum].Npc[index].SkillCd = new int[Core.Globals.Variables.MaxNpcSkills];
-            Data.MapNpc[mapNum].Npc[index].Num = -1;
-            Data.MapNpc[mapNum].Npc[index].SkillBuffer = -1;
-        }
-
-        public static void ClearNpc(int index)
-        {
-            Data.Npc[index].Name = "";
-            Data.Npc[index].AttackSay = "";
-            int statCount = Enum.GetValues(typeof(Stat)).Length;
-            Data.Npc[index].Stat = new byte[statCount];
-
-            for (int i = 0, loopTo = Core.Globals.Variables.MaxDropItems; i < loopTo; i++)
-            {
-                Data.Npc[index].DropChance = new int[Core.Globals.Variables.MaxDropItems];
-                Data.Npc[index].DropItem = new int[Core.Globals.Variables.MaxDropItems];
-                Data.Npc[index].DropItemValue = new int[Core.Globals.Variables.MaxDropItems];
-                Data.Npc[index].Skill = new byte[Core.Globals.Variables.MaxNpcSkills];
-            }
         }
 
         #endregion

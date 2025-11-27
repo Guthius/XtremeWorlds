@@ -160,7 +160,7 @@ namespace Server
 
             for (int i = 0; i < Core.Globals.Variables.MaxMaps; i++)
             {
-                Data.MapNpc[i].Npc = new MapNpc[Core.Globals.Variables.MaxMapNpcs];
+                Data.MapNpc[i].Npc = new Core.Globals.Type.MapNpc[Core.Globals.Variables.MaxMapNpcs];
                 for (int x = 0; x < Core.Globals.Variables.MaxMapNpcs; x++)
                 {
                     Data.MapNpc[i].Npc[x].Vital = new int[Enum.GetValues(typeof(Vital)).Length];
@@ -375,7 +375,7 @@ namespace Server
                 LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading morals..."); await Moral.LoadMoralsAsync(); Logger.LogInformation("Morals loaded."); }),
                 LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading maps..."); await Database.LoadMapsAsync(); Logger.LogInformation("Maps loaded."); }),
                 LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading items..."); await Item.LoadItemsAsync(); Logger.LogInformation("Items loaded."); }),
-                LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading npcs..."); await Database.LoadNpcsAsync(); Logger.LogInformation("Npcs loaded."); }),
+                LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading npcs..."); await Npc.LoadAllAsync(); Logger.LogInformation("Npcs loaded."); }),
                 LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading resources..."); await Resource.LoadAllAsync(); Logger.LogInformation("Resources loaded."); }),
                 LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading shops..."); await Shop.LoadAllAsync(); Logger.LogInformation("Shops loaded."); }),
                 LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading skills..."); await Database.LoadSkillsAsync(); Logger.LogInformation("Skills loaded."); }),
