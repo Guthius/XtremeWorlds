@@ -17,7 +17,7 @@ public static class WinNewChar
         var spriteIndex = GameState.NewCnarGender == Sex.Male ? Data.Job[GameState.NewCharJob].MaleSprite : Data.Job[GameState.NewCharJob].FemaleSprite;
 
         if (spriteIndex < 1 || spriteIndex > GameState.NumCharacters)
-            return;
+            spriteIndex = 1;
 
         var spritePath = Path.Combine(DataPath.Characters, spriteIndex.ToString());
         var sprite = GameClient.GetGfxInfo(Path.Combine(DataPath.Characters, spriteIndex.ToString()));
@@ -34,7 +34,7 @@ public static class WinNewChar
 
         GameClient.RenderTexture(ref spritePath,
             winNewChar.X + (w / 2) + 134,
-            winNewChar.Y + 90, 0, 0,
+            winNewChar.Y + 80, 0, 0,
             w, h, w, h);
     }
 
