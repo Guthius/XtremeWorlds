@@ -49,7 +49,7 @@ public static class Shop
 
     public static void Load(int shopNum)
     {
-        LoadAsync(shopNum);
+        _ = LoadAsync(shopNum);
     }
 
     public static void LoadAll()
