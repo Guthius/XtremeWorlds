@@ -855,6 +855,7 @@ public class Crystalshire
         void ShowTab(string tab)
         {
             var tools = new[]{
+                "lblTileset","lblAutotile","lblLayer",
                 "sldTileset","lblTileset",
                 "cmbLayer",
                 "cmbAutotile",
