@@ -76,13 +76,95 @@
     </ItemGroup>
 
     <ItemGroup>
+      <None Remove="FNA3D.exp" />
+      <None Remove="FNA3D.lib" />
       <None Remove="Icon.bmp" />
+      <None Remove="Icon.ico" />
+      <None Remove="libbass.dylib" />
+      <None Remove="libbass.so" />
+      <None Remove="libbassmidi.dylib" />
+      <None Remove="libbassmidi.so" />
+      <None Remove="libFAudio.0.25.11.dylib" />
+      <None Remove="libFAudio.0.dylib" />
+      <None Remove="libFAudio.dylib" />
+      <None Remove="libFAudio.so" />
+      <None Remove="libFAudio.so.0" />
+      <None Remove="libFAudio.so.0.25.11" />
+      <None Remove="libFNA3D.0.25.11.dylib" />
+      <None Remove="libFNA3D.0.dylib" />
+      <None Remove="libFNA3D.dylib" />
+      <None Remove="libFNA3D.so" />
+      <None Remove="libFNA3D.so.0" />
+      <None Remove="libSDL3.dylib" />
+      <None Remove="libSDL3.so" />
+      <None Remove="libSDL3.so.0" />
+      <None Remove="libtheorafile.so" />
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="Icon.bmp">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </EmbeddedResource>
+      <Resource Include="Icon.bmp">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
+      <Resource Include="Icon.ico">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
+      <Resource Include="libbass.dylib">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
+      <Resource Include="libbass.so">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
+      <Resource Include="libbassmidi.dylib">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
+      <Resource Include="libbassmidi.so">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
+      <Resource Include="libFAudio.0.25.11.dylib">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
+      <Resource Include="libFAudio.0.dylib">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
+      <Resource Include="libFAudio.dylib">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
+      <Resource Include="libFAudio.so">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
+      <Resource Include="libFAudio.so.0">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
+      <Resource Include="libFAudio.so.0.25.11">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
+      <Resource Include="libFNA3D.0.25.11.dylib">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
+      <Resource Include="libFNA3D.0.dylib">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
+      <Resource Include="libFNA3D.dylib">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
+      <Resource Include="libFNA3D.so">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
+      <Resource Include="libFNA3D.so.0">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
+      <Resource Include="libSDL3.dylib">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
+      <Resource Include="libSDL3.so">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
+      <Resource Include="libSDL3.so.0">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
+      <Resource Include="libtheorafile.so">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
     </ItemGroup>
 
     <ItemGroup>
@@ -126,6 +208,14 @@
           <HintPath>FNA.dll</HintPath>
         </Reference> 
 	</ItemGroup>
+    <ItemGroup>
+      <Resource Include="FNA3D.exp">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
+      <Resource Include="FNA3D.lib">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
+    </ItemGroup>
 	<Target Name="EnsureContentFolderExists" BeforeTargets="Build">
 		<MakeDir Directories="$(OutputPath)Content" />
 	</Target>
