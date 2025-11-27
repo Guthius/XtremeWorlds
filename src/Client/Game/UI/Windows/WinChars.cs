@@ -103,7 +103,7 @@ public static class WinChars
             }
 
             var x = winChars.X + 24 + (i * 110);
-            var y = winChars.Y + 90;
+            var y = winChars.Y + 80;
 
             var frameCount = SettingsManager.Instance.RunFrames + SettingsManager.Instance.IdleFrames + SettingsManager.Instance.AttackFrames;
             var w = sprite.Width / frameCount;
