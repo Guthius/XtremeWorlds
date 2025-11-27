@@ -122,8 +122,8 @@ public static class WinNewChar
         GameState.NewCharSprite = 1;
         GameState.NewCnarGender = Sex.Male;
 
-            WindowManager.HideWindows();
-            WindowManager.ShowWindow("winJobs");
+        WindowManager.HideWindows();
+        WindowManager.ShowWindow("winJobs");
     }
 
     public static void OnAccept()
