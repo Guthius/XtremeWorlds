@@ -115,6 +115,10 @@ public static class DesignRenderer
                 RenderTextWhite(left, top, width, height, alpha);
                 break;
 
+            case Design.TextBlackSquare:
+                RenderTextBlackSquare(left, top, width, height, alpha);
+                break;
+
             case Design.TextBox:
                 RenderTextBox(left, top, width, height, alpha);
                 break;
