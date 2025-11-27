@@ -20,13 +20,13 @@
             <!-- Access Level Section -->
             <Label Name="lblAccessLevel" Text="Access Level:" Position="20, 80" Size="140, 12"/>
             <ComboBox Name="cmbAccess" Position="125, 78" Size="200, 18"/>
-            <Button Name="btnAdminSetAccess" Text="Set Access" Position="330, 78" Size="80, 22"
+            <Button Name="btnSetAccess" Text="Set Access" Position="330, 78" Size="80, 22"
              Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 
             <!-- Map Number Section -->
             <Label Name="lblMapNumber" Text="Map Number:" Position="20, 105" Size="140, 12"/>
             <TextBox Name="txtAdminMap" Position="125, 103" Size="100, 18"/>
-            <Button Name="btnAdminWarpTo" Text="Warp To Map" Position="230, 103" Size="100, 22"
+            <Button Name="btnWarpTo" Text="Warp To Map" Position="230, 103" Size="100, 22"
             Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 
              <!-- Sprite Section -->
@@ -44,9 +44,9 @@
             Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 
             <!-- Action Buttons Row 2 -->
-            <Button Name="btnAdminWarp2Me" Text="Warp Player To Me" Position="20, 186" Size="145, 22"
+            <Button Name="btnWarp2Me" Text="Warp Player To Me" Position="20, 186" Size="145, 22"
             Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-            <Button Name="btnAdminWarpMe2" Text="Warp Me To Player" Position="170, 186" Size="145, 22"
+            <Button Name="btnWarpMe2" Text="Warp Me To Player" Position="170, 186" Size="145, 22"
             Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
         </TabPage>
 

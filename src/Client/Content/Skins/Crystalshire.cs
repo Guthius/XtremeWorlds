@@ -2347,7 +2347,7 @@ public class Crystalshire
         window.GetChild("txtSprite").Text = window.GetChild("txtSprite").Text?.Length > 0 ? window.GetChild("txtSprite").Text : "0";
 
         // Wire Moderation actions
-        window.GetChild("btnAdminWarpTo").CallBack[(int)ControlState.MouseDown] = () =>
+        window.GetChild("btnWarpTo").CallBack[(int)ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
             var mapNum = ReadInt(window.GetChild("txtAdminMap"));
@@ -2368,21 +2368,21 @@ public class Crystalshire
             Sender.SendKick(name);
         };
 
-        window.GetChild("btnAdminWarp2Me").CallBack[(int)ControlState.MouseDown] = () =>
+        window.GetChild("btnWarp2Me").CallBack[(int)ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
             var name = txtName.Text?.Trim() ?? string.Empty;
             if (!IsNumeric(name)) Sender.WarpToMe(name);
         };
 
-        window.GetChild("btnAdminWarpMe2").CallBack[(int)ControlState.MouseDown] = () =>
+        window.GetChild("btnWarpMe2").CallBack[(int)ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
             var name = txtName.Text?.Trim() ?? string.Empty;
             if (!IsNumeric(name)) Sender.WarpMeTo(name);
         };
 
-        window.GetChild("btnAdminSetAccess").CallBack[(int)ControlState.MouseDown] = () =>
+        window.GetChild("btnSetAccess").CallBack[(int)ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Owner)) { ShowDenied(); return; }
             var name = txtName.Text?.Trim() ?? string.Empty;
@@ -2529,11 +2529,11 @@ public class Crystalshire
             {
                 "picModerationBG",
                 "lblPlayerName","txtAdminName",
-                "lblAccessLevel","cmbAccess","btnAdminSetAccess",
-                "lblMapNumber","txtAdminMap","btnAdminWarpTo",
+                "lblAccessLevel","cmbAccess","btnSetAccess",
+                "lblMapNumber","txtAdminMap","btnWarpTo",
                 "lblSprite","txtSprite","btnSetSprite",
                 "btnBan","btnKick","btnLevelUp",
-                "btnAdminWarp2Me","btnAdminWarpMe2"
+                "btnWarp2Me","btnWarpMe2"
             };
 
             // Map List controls (combo only)
