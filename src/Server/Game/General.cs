@@ -35,6 +35,12 @@ namespace Server
         
         #region Utility Methods
 
+        private static void SetConsoleTitleSafe(string title)
+        {
+            try { Console.Title = title; }
+            catch (Exception ex) { Logger.LogDebug(ex, "Unable to set console title (no console attached)"); }
+        }
+
         /// <summary>
         /// Retrieves the shutdown timer for server destruction.
         /// </summary>
@@ -271,7 +277,7 @@ namespace Server
             {
                 ValidateConfiguration();
                 Clock.Instance.GameSpeed = SettingsManager.Instance.TimeSpeed;
-                Console.Title = "XtremeWorlds Server";
+                SetConsoleTitleSafe("XtremeWorlds Server");
                 _myIpAddress = GetLocalIpAddress();
             });
         }
@@ -446,13 +452,14 @@ namespace Server
         {
             try
             {
-                Console.Title = $"{SettingsManager.Instance.GameName} <IP {_myIpAddress}:{SettingsManager.Instance.Port}> " +
+                var title = $"{SettingsManager.Instance.GameName} <IP {_myIpAddress}:{SettingsManager.Instance.Port}> " +
                     $"({CountPlayersOnline()} Players Online) - Errors: {Global.ErrorCount} - Time: {Clock.Instance}";
+                SetConsoleTitleSafe(title);
             }
             catch (Exception ex)
             {
                 Logger.LogWarning(ex, "Failed to update console title");
-                Console.Title = SettingsManager.Instance.GameName;
+                SetConsoleTitleSafe(SettingsManager.Instance.GameName);
             }
         }
 
