@@ -486,16 +486,17 @@ namespace Client
                 // Populate the Admin map list control in the skin window
                 var admin = WindowManager.GetWindowIndex("winAdmin");
 
-                WindowManager.ComboBox_RemoveItems(admin, WindowManager.GetControlIndex("winAdmin", "cmbMaps"));
-                for (int i = 0, loopTo = GameState.MapNames.Length; i < loopTo; i++)
+                if (WindowManager.TryGetControl("winAdmin", "lstMaps", out var lstCtrl) && lstCtrl is ListBox lst)
                 {
-                    var raw = GameState.MapNames[i] ?? string.Empty;
-                    var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
-                    WindowManager.Combobox_AddItem(
-                        admin,
-                        WindowManager.GetControlIndex("winAdmin", "cmbMaps"),
-                        (i + 1) + ": " + name
-                    );
+                    lst.Clear();
+                    for (int i = 0, loopTo = GameState.MapNames.Length; i < loopTo; i++)
+                    {
+                        var raw = GameState.MapNames[i] ?? string.Empty;
+                        var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
+                        lst.AddItem((i + 1) + ": " + name);
+                    }
+                    // Ensure view starts at top
+                    lst.Value = 0;
                 }
 
                 GameState.InitMapReport = false;

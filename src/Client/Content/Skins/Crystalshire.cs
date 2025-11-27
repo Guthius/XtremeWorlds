@@ -460,14 +460,20 @@ public class Crystalshire
                 {
                     btnMapWarp.CallBack[(int)ControlState.MouseDown] = () =>
                     {
-                        if (WindowManager.TryGetControl("winMapEditor","sldMapWarp", out var cMap) &&
-                            WindowManager.TryGetControl("winMapEditor","sldMapWarpX", out var cX) &&
-                            WindowManager.TryGetControl("winMapEditor","sldMapWarpY", out var cY))
+                        if (WindowManager.TryGetControl("winAdmin", "lstMaps", out var listCtrl) && listCtrl is ListBox lst)
                         {
-                            GameState.EditorWarpMap = cMap.Value;
-                            GameState.EditorWarpX = cX.Value;
-                            GameState.EditorWarpY = cY.Value;
-                        }
+                            var lines = (lst.Text ?? string.Empty).Split('\n');
+                            if (lines.Length == 0) return;
+                            var start = Math.Clamp(lst.Value, 0, Math.Max(0, lines.Length - 1));
+                            var line = lines[start];
+                            if (string.IsNullOrWhiteSpace(line)) return;
+                            var colon = line.IndexOf(':');
+                            if (colon > 0 && int.TryParse(line.AsSpan(0, colon), out var mapNum))
+                            {
+                                var target = Math.Max(0, mapNum - 1); // convert 1-based display to 0-based map id
+                                Sender.WarpTo(target);
+                              }
+                            }
                     };
                 }
             }
@@ -1295,17 +1301,29 @@ public class Crystalshire
 
         // Wire Settings page section toggles
         if (WindowManager.TryGetControl("winMapEditor","btnGoTiles", out var btnGoTiles))
+        {
             btnGoTiles.CallBack[(int)ControlState.MouseDown] = () => ShowTab("Tools");
+        }
         if (WindowManager.TryGetControl("winMapEditor","btnGoAttributes", out var btnGoAttributes))
+        {
             btnGoAttributes.CallBack[(int)ControlState.MouseDown] = () => ShowTab("Attributes");
+        }
         if (WindowManager.TryGetControl("winMapEditor","btnGoNpcs", out var btnGoNpcs))
+        {
             btnGoNpcs.CallBack[(int)ControlState.MouseDown] = () => ShowTab("Npcs");
+        }
         if (WindowManager.TryGetControl("winMapEditor","btnGoDirBlock", out var btnGoDirBlock))
+        {
             btnGoDirBlock.CallBack[(int)ControlState.MouseDown] = () => ShowTab("DirBlock");
+        }
         if (WindowManager.TryGetControl("winMapEditor","btnGoEvents", out var btnGoEvents))
+        {
             btnGoEvents.CallBack[(int)ControlState.MouseDown] = () => ShowTab("Events");
+        }
         if (WindowManager.TryGetControl("winMapEditor","btnGoEffects", out var btnGoEffects))
+        {
             btnGoEffects.CallBack[(int)ControlState.MouseDown] = () => ShowTab("Effects");
+        }
 
         // Events page: copy/paste toggles and label updates
         void UpdateEventLabels()
@@ -2134,10 +2152,10 @@ public class Crystalshire
 
         // Buttons
         window.GetChild("btnChat").CallBack[(int)ControlState.Normal] = WinChat.OnSayClick;
-        window.GetChild("btnUp").CallBack[(int)ControlState.MouseDown] = WinChat.OnUpButtonMouseDown;
-        window.GetChild("btnDown").CallBack[(int)ControlState.MouseDown] = WinChat.OnDownButtonMouseDown;
-        window.GetChild("btnUp").CallBack[(int)ControlState.MouseUp] = WinChat.OnUpButtonMouseUp;
-        window.GetChild("btnDown").CallBack[(int)ControlState.MouseUp] = WinChat.OnDownButtonMouseUp;
+        window.GetChild("btnUp").CallBack[(int) ControlState.MouseDown] = WinChat.OnUpButtonMouseDown;
+        window.GetChild("btnDown").CallBack[(int) ControlState.MouseDown] = WinChat.OnDownButtonMouseDown;
+        window.GetChild("btnUp").CallBack[(int) ControlState.MouseUp] = WinChat.OnUpButtonMouseUp;
+        window.GetChild("btnDown").CallBack[(int) ControlState.MouseUp] = WinChat.OnDownButtonMouseUp;
 
         // Checkboxes
         window.GetChild("chkGame").CallBack[(int)ControlState.MouseDown] = WinChat.OnGameChannelClicked;
@@ -2350,7 +2368,7 @@ public class Crystalshire
         window.GetChild("btnWarpTo").CallBack[(int)ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
-            var mapNum = ReadInt(window.GetChild("txtAdminMap"));
+            var mapNum = ReadInt(window.GetChild("txtAdminMap")) + 1;
             Sender.WarpTo(mapNum);
         };
 
@@ -2361,7 +2379,7 @@ public class Crystalshire
             Sender.SendBan(name);
         };
 
-        window.GetChild("btnKick").CallBack[(int)ControlState.MouseDown] = () =>
+        window.GetChild("btnKick").CallBack[(int) ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
             var name = txtName.Text?.Trim() ?? string.Empty;
@@ -2413,33 +2431,105 @@ public class Crystalshire
             Sender.SendRequestMapReport();
         };
 
-        // Warp button: use top visible line in the list
+        // Wire `lstMaps` listbox interactions and scrollbar sync
+        if (WindowManager.TryGetControl("winAdmin", "lstMaps", out var lstCtrl) && lstCtrl is ListBox lstMaps)
+        {
+            // Use our custom draw routine for this skin
+            lstMaps.OnDraw = OnDrawMapList;
+
+            // Click selects item (single click) and ensures visibility
+            lstMaps.CallBack[(int)ControlState.MouseDown] = () =>
+            {
+                var win = WindowManager.GetWindowByName("winAdmin");
+                if (win is null) return;
+                int relY = GameClient.CurrentMouseState.Y - (win.Y + lstMaps.Y);
+                int idx = lstMaps.GetItemIndexAtPosition(relY);
+                if (idx >= 0)
+                {
+                    lstMaps.SelectedIndex = idx;
+                    lstMaps.EnsureVisible(idx);
+                }
+            };
+
+            // Double-click to warp to selected map
+            lstMaps.CallBack[(int)ControlState.DoubleClick] = () =>
+            {
+                if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
+                int idx = lstMaps.SelectedIndex;
+                if (idx < 0 || idx >= lstMaps.Items.Count) return;
+                var line = lstMaps.Items[idx] ?? string.Empty;
+                var colon = line.IndexOf(':');
+                if (colon > 0 && int.TryParse(line.AsSpan(0, colon), out var mapNum))
+                {
+                    var target = Math.Max(0, mapNum - 1); // display is 1-based; engine expects 0-based
+                    Sender.WarpTo(target);
+                }
+            };
+
+            // Mouse wheel scrolling
+            lstMaps.CallBack[(int)ControlState.MouseScroll] = () =>
+            {
+                int delta = GameClient.CurrentMouseState.ScrollWheelValue - GameClient.PreviousMouseState.ScrollWheelValue;
+                if (delta != 0)
+                {
+                    int step = delta > 0 ? -1 : 1;
+                    lstMaps.ScrollBy(step);
+                    // Keep scrollbar in sync if present
+                    if (WindowManager.TryGetControl("winAdmin", "sldMapList", out var sldCtrlSync) && sldCtrlSync is ScrollBar sb)
+                    {
+                        // Update scrollbar range to reflect list scroll capacity
+                        int maxScroll = Math.Max(0, lstMaps.Items.Count - lstMaps.GetVisibleCount());
+                        sb.Min = 0; sb.Max = maxScroll;
+                        sb.Value = lstMaps.ScrollOffset;
+                    }
+                }
+            };
+        }
+
+        if (WindowManager.TryGetControl("winAdmin", "sldMapList", out var sldMapListCtrl) && sldMapListCtrl is ScrollBar sldMapList)
+        {
+            sldMapList.CallBack[(int)ControlState.MouseMove] = () =>
+            {
+                if (WindowManager.TryGetControl("winAdmin", "lstMaps", out var lstCtrl2) && lstCtrl2 is ListBox lst2)
+                {
+                    // Keep scrollbar range in sync with list
+                    int maxScroll = Math.Max(0, lst2.Items.Count - lst2.GetVisibleCount());
+                    sldMapList.Min = 0; sldMapList.Max = maxScroll;
+                    lst2.ScrollOffset = Math.Clamp(sldMapList.Value, sldMapList.Min, sldMapList.Max);
+                }
+            };
+        }
+
+        // Warp button: prefer selected item; fallback to top visible line
         if (WindowManager.TryGetControl("winAdmin", "btnMapWarp", out var btnMapWarp2))
         {
             btnMapWarp2.CallBack[(int)ControlState.MouseDown] = () =>
             {
                 if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
-                    if (WindowManager.TryGetControl("winAdmin", "cmbMaps", out var cmbCtrl) && cmbCtrl is ComboBox cmb && cmb.Items.Count > 0 && cmb.Value >= 0 && cmb.Value < cmb.Items.Count)
+                if (WindowManager.TryGetControl("winAdmin", "lstMaps", out var listCtrl) && listCtrl is ListBox lst)
+                {
+                    string line = string.Empty;
+                    if (lst.SelectedIndex >= 0 && lst.SelectedIndex < lst.Items.Count)
                     {
-                        var item = cmb.Items[cmb.Value];
-                        var colon = item.IndexOf(':');
-                        if (colon > 0 && int.TryParse(item.AsSpan(0, colon), out var mapNum)) { Sender.WarpTo(mapNum); }
+                        line = lst.Items[lst.SelectedIndex] ?? string.Empty;
                     }
+                    else
+                    {
+                        var lines = (lst.Text ?? string.Empty).Split('\n');
+                        if (lines.Length == 0) return;
+                        var start = Math.Clamp(lst.Value, 0, Math.Max(0, lines.Length - 1));
+                        line = lines[start];
+                    }
+                    if (string.IsNullOrWhiteSpace(line)) return;
+                    var colon = line.IndexOf(':');
+                    if (colon > 0 && int.TryParse(line.AsSpan(0, colon), out var mapNum))
+                    {
+                        var target = Math.Max(0, mapNum - 1); // convert 1-based display to 0-based map id
+                        Sender.WarpTo(target);
+                    }
+                }
             };
         }
-
-        window.GetChild("btnRespawn").CallBack[(int)ControlState.MouseDown] = () =>
-        {
-            if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
-            Map.SendMapRespawn();
-        };
-
-        window.GetChild("btnALoc").CallBack[(int)ControlState.MouseDown] = () =>
-        {
-            if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
-            GameState.BLoc = !GameState.BLoc;
-        };
-
 
         // Editors
         window.GetChild("btnAnimationEditor").CallBack[(int)ControlState.MouseDown] = () =>
@@ -2460,49 +2550,49 @@ public class Crystalshire
             Sender.SendRequestEditItem();
         };
 
-        window.GetChild("btnMapEditor").CallBack[(int)ControlState.MouseDown] = () =>
+        window.GetChild("btnMapEditor").CallBack[(int) ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
             Map.SendRequestEditMap();
         };
 
-        window.GetChild("btnNpcEditor").CallBack[(int)ControlState.MouseDown] = () =>
+        window.GetChild("btnNpcEditor").CallBack[(int) ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Developer)) { ShowDenied(); return; }
             Sender.SendRequestEditNpc();
         };
 
-        window.GetChild("btnProjectiles").CallBack[(int)ControlState.MouseDown] = () =>
+        window.GetChild("btnProjectiles").CallBack[(int) ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Developer)) { ShowDenied(); return; }
             Projectile.SendRequestEditProjectiles();
         };
 
-        window.GetChild("btnResourceEditor").CallBack[(int)ControlState.MouseDown] = () =>
+        window.GetChild("btnResourceEditor").CallBack[(int) ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Developer)) { ShowDenied(); return; }
             Sender.SendRequestEditResource();
         };
 
-        window.GetChild("btnShopEditor").CallBack[(int)ControlState.MouseDown] = () =>
+        window.GetChild("btnShopEditor").CallBack[(int) ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Developer)) { ShowDenied(); return; }
             Sender.SendRequestEditShop();
         };
 
-        window.GetChild("btnSkillEditor").CallBack[(int)ControlState.MouseDown] = () =>
+        window.GetChild("btnSkillEditor").CallBack[(int) ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Developer)) { ShowDenied(); return; }
             Sender.SendRequestEditSkill();
         };
 
-        window.GetChild("btnMoralEditor").CallBack[(int)ControlState.MouseDown] = () =>
+        window.GetChild("btnMoralEditor").CallBack[(int) ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Developer)) { ShowDenied(); return; }
             Sender.SendRequestEditMoral();
         };
 
-        window.GetChild("btnScriptEditor").CallBack[(int)ControlState.MouseDown] = () =>
+        window.GetChild("btnScriptEditor").CallBack[(int) ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Owner)) { ShowDenied(); return; }
             Sender.SendRequestEditScript(0);
@@ -2536,8 +2626,8 @@ public class Crystalshire
                 "btnWarp2Me","btnWarpMe2"
             };
 
-            // Map List controls (combo only)
-            var mapList = new[] { "picMapListBG", "cmbMaps", "btnMapWarp", "btnMapReport" };
+            // Map List controls
+            var mapList = new[] { "picMapListBG", "lstMaps", "btnMapWarp", "btnMapReport", "sldMapList" };
 
             // Map Tools controls
             var mapTools = new[] { "picMapToolsBG", "btnRespawn", "btnALoc" };

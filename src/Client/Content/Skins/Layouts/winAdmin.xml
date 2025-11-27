@@ -51,11 +51,11 @@
         </TabPage>
 
         <!-- MAP LIST TAB -->
-        <TabPage Name="tabMapList" Caption="Map List">
+        <TabPage Name="tabMapList" Caption="Maps">
                 <PictureBox Name="picMapListBG" Position="6, 46" Size="628, 190" Design="Parchment"/>
-
-                <ComboBox Name="cmbMaps" Position="25, 55" Size="598, 22"/>
-                <Button Name="btnMapWarp" Text="Warp To Selected" Position="25, 186" Size="220, 22"
+                <ListBox Name="lstMaps" Position="25, 55" Size="586, 122"/>
+                <ScrollBar Name="sldMapList" Position="611, 55" Size="12, 122" Orientation="Vertical" Min="0" Max="100" Value="0"/>
+                <Button Name="btnMapWarp" Text="Warp" Position="25, 186" Size="220, 22"
                 Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
                 <Button Name="btnMapReport" Text="Refresh List" Position="255, 186" Size="368, 22"
                 Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
