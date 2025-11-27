@@ -47,7 +47,12 @@ public static class Shop
         }
     }
 
-    public static void LoadShops()
+    public static void Load(int shopNum)
+    {
+        LoadAsync(shopNum);
+    }
+
+    public static void LoadAll()
     {
         int i;
 
