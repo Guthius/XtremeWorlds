@@ -7,6 +7,7 @@
         <OutputPath>..\..\Build\Client\</OutputPath>
         <DefineConstants>CLIENT</DefineConstants>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<UseSharedCompilation>false</UseSharedCompilation>
     </PropertyGroup>
 
 	<!-- Cross-platform TFM: non-Windows RIDs -->
