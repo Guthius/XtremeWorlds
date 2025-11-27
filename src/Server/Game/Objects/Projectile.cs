@@ -460,6 +460,9 @@ public static class Projectile
                     var players = PlayerService.Instance.Players.ToArray();
                     foreach (var p in players)
                     {
+                        if (p == null)
+                            continue;
+
                         if (!NetworkConfig.IsPlaying(p.Id)) continue;
                         if (GetPlayerMap(p.Id) != map) continue;
                         if (GetPlayerX(p.Id) == tileX && GetPlayerY(p.Id) == tileY)
