@@ -27,15 +27,15 @@
 				Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 
 		<!-- Action buttons -->
-		<Button Name="btnBan" Text="Ban Player" Position="12,148" Size="120,22"
+		<Button Name="btnBan" Text="Ban" Position="10,148" Size="120,22"
 				Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
-		<Button Name="btnKick" Text="Kick Player" Position="137,148" Size="120,22"
+		<Button Name="btnKick" Text="Kick" Position="135,148" Size="120,22"
 				Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
-		<Button Name="btnLevelUp" Text="Level Up" Position="262,148" Size="120,22"
+		<Button Name="btnLevelUp" Text="Level Up" Position="260,148" Size="120,22"
 				Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-		<Button Name="btnWarp2Me" Text="Warp Player To Me" Position="387,148" Size="120,22"
+		<Button Name="btnWarp2Me" Text="Warp To Me" Position="385,148" Size="120,22"
 				Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-		<Button Name="btnWarpMe2" Text="Warp Me To Player" Position="512,148" Size="110,22"
+		<Button Name="btnWarpMe2" Text="Warp Me To" Position="510,148" Size="110,22"
 				Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 	</GroupBox>
 
