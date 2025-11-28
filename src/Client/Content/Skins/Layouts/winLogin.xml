@@ -34,7 +34,7 @@
 
 		<!-- Register button stays pinned at the bottom inside the group -->
 		<Button Name="btnRegister" Text="Register Account"
-			Position="8,168" Size="248,22"
+			Position="8,164" Size="248,22"
 			Design="Green"
 			DesignHover="GreenHover"
 			DesignMouseDown="GreenClick"/>
