@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window Name="winCharacter" Caption="Character" Size="174, 356" Position="0,0" Font="Georgia" Icon="62" Design="WindowEmpty" StartPosition="CenterScreen">
-	<GroupBox Name="grpCharacter" Position="6,26" Size="158,282">
+	<GroupBox Name="grpCharacter" Position="6,26" Size="158,284">
 		<PictureBox Name="picWhiteBox1" Position="10,8" Size="142,19" Design="TextWhite"/>
 		<PictureBox Name="picWhiteBox2" Position="10,28" Size="142,19" Design="TextWhite"/>
 		<PictureBox Name="picWhiteBox3" Position="10,48" Size="142,19" Design="TextWhite"/>
