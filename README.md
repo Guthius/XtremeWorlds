@@ -12,6 +12,9 @@ Based on the Orion+ conversion and MirageBasic frameworks.
 
 Game assets such as character base are only permitted to use in XtremeWorlds.
 
+BASS audio requires a copyright license in order to use commercially, this is meant to demo the audio library since I prefer it as a developer over FAudio and Nvorbis.
+https://www.un4seen.com/
+
 ## Overview
 
 XtremeWorlds is a tile-based 2D MMORPG game engine designed for ease of use and
