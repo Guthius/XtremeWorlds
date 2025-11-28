@@ -2445,11 +2445,12 @@ namespace Client
                                 int shift = frameHeight - 32;
                                 y -= shift; // move anchor up to sprite top
                             }
-                            // Nameplate sits (margin + textHeight) above spriteTop. We'll raise bubble further: name height ~=  (LineSpacing*12/16)
+                            // Nameplate sits (margin + textHeight) above spriteTop
                             int textHeight = (int)Math.Ceiling(TextRenderer.Fonts[Font.Georgia].LineSpacing * 12f / 16f);
                             int nameGap = 4; // from TextRenderer
                             int bubbleExtra = 4; // extra visual gap above name
-                            y -= (textHeight + nameGap + bubbleExtra);
+                            y -= (textHeight);
+                            y += nameGap + bubbleExtra; // move anchor up above nameplate
                         }
                     }
                     break;
