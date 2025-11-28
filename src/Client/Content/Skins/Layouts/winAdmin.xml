@@ -43,9 +43,9 @@
 	<GroupBox Name="grpMapList" Position="4,24" Size="632,192" Caption="Maps">
 		<ListBox Name="lstMaps" Position="12,40" Size="596,122"/>
 		<ScrollBar Name="sldMapList" Position="612,40" Size="12,122" Orientation="Vertical" Min="0" Max="100" Value="0"/>
-		<Button Name="btnMapWarp" Text="Warp" Position="12,168" Size="220,22"
+		<Button Name="btnMapWarp" Text="Warp" Position="12,168" Size="220,18"
 				Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-		<Button Name="btnMapReport" Text="Refresh List" Position="242,168" Size="366,22"
+		<Button Name="btnMapReport" Text="Refresh List" Position="242,164" Size="366,22"
 				Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 	</GroupBox>
 
