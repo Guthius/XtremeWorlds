@@ -13,17 +13,17 @@
 
 		<Label Name="lblAccessLevel" Text="Access Level:" Position="12,66" Size="110,14"/>
 		<ComboBox Name="cmbAccess" Position="125,64" Size="200,18"/>
-		<Button Name="btnSetAccess" Text="Set Access" Position="330,64" Size="100,22"
+		<Button Name="btnSetAccess" Text="Set" Position="330,64" Size="100,22"
 				Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 
 		<Label Name="lblMapNumber" Text="Map Number:" Position="12,92" Size="110,14"/>
 		<TextBox Name="txtAdminMap" Position="125,90" Size="100,18"/>
-		<Button Name="btnWarpTo" Text="Warp To Map" Position="230,90" Size="100,22"
+		<Button Name="btnWarpTo" Text="Warp" Position="230,90" Size="100,22"
 				Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 
 		<Label Name="lblSprite" Text="Sprite:" Position="12,118" Size="110,14"/>
 		<TextBox Name="txtSprite" Position="125,116" Size="100,18"/>
-		<Button Name="btnSetSprite" Text="Set Sprite" Position="230,116" Size="100,22"
+		<Button Name="btnSetSprite" Text="Set" Position="230,116" Size="100,22"
 				Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 
 		<!-- Action buttons -->
