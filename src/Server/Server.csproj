@@ -1,98 +1,99 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <Version>2.4.9</Version>
-        <TargetFrameworks>net10.0-windows;net10.0</TargetFrameworks>
-        <RootNamespace>XtremeWorlds.Server</RootNamespace>
-        <ApplicationIcon>Resources\Icon.ico</ApplicationIcon>
-        <OutputPath>..\..\Build\Server\</OutputPath>
-        <DefineConstants>SERVER</DefineConstants>
-		<UseSharedCompilation>false</UseSharedCompilation>
-    </PropertyGroup>
+  <PropertyGroup>
+    <Version>2.4.9</Version>
+    <TargetFrameworks>net10.0-windows;net10.0</TargetFrameworks>
+    <RootNamespace>XtremeWorlds.Server</RootNamespace>
+    <ApplicationIcon>Resources\Icon.ico</ApplicationIcon>
+    <OutputPath>..\..\Build\Server\</OutputPath>
+    <DefineConstants>SERVER</DefineConstants>
+    <UseSharedCompilation>false</UseSharedCompilation>
+  </PropertyGroup>
 
-    <!-- Cross-platform TFM: non-Windows RIDs -->
-	<PropertyGroup Condition="'$(TargetFramework)'=='net10.0'">
-        <OutputType>Exe</OutputType>
-		<RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
-	</PropertyGroup>
+  <!-- Cross-platform TFM: non-Windows RIDs -->
+  <PropertyGroup Condition="'$(TargetFramework)'=='net10.0'">
+    <OutputType>Exe</OutputType>
+    <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
+  </PropertyGroup>
 
-    <!-- OutputType must be in PropertyGroup, not ItemGroup -->
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-windows'">
-        <OutputType>WinExe</OutputType>
-		<EnableWindowsTargeting>true</EnableWindowsTargeting>
-		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
-		<DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
-    </PropertyGroup>
+  <!-- OutputType must be in PropertyGroup, not ItemGroup -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-windows'">
+    <OutputType>WinExe</OutputType>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <Title>XtremeWorlds Server</Title>
-        <Product>Game Server</Product>
-    </PropertyGroup>
+  <PropertyGroup>
+    <Title>XtremeWorlds Server</Title>
+    <Product>Game Server</Product>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <Install>true</Install>
-        <InstallFrom>Disk</InstallFrom>
-        <UpdateEnabled>false</UpdateEnabled>
-        <UpdateMode>Foreground</UpdateMode>
-        <UpdateInterval>7</UpdateInterval>
-        <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-        <UpdatePeriodically>false</UpdatePeriodically>
-        <UpdateRequired>false</UpdateRequired>
-        <ApplicationRevision>0</ApplicationRevision>
-        <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-        <UseApplicationTrust>false</UseApplicationTrust>
-    </PropertyGroup>
+  <PropertyGroup>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <AssemblyName>XtremeWorlds.Server</AssemblyName>
-        <AssemblyTitle>XtremeWorlds.Server</AssemblyTitle>
-    </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyName>XtremeWorlds.Server</AssemblyName>
+    <AssemblyTitle>XtremeWorlds.Server</AssemblyTitle>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\Core\Core.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Hosting" />
-        <PackageReference Include="Serilog" />
-        <PackageReference Include="Serilog.Enrichers.Environment" />
-        <PackageReference Include="Serilog.Enrichers.Thread" />
-        <PackageReference Include="Serilog.Extensions.Hosting" />
-        <PackageReference Include="Serilog.Extensions.Logging" />
-        <PackageReference Include="Serilog.Settings.Configuration" />
-        <PackageReference Include="Serilog.Sinks.Console" />
-        <PackageReference Include="Serilog.Sinks.File" />
-        <PackageReference Include="Npgsql" />
-        <PackageReference Include="Newtonsoft.Json" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Serilog" />
+    <PackageReference Include="Serilog.Enrichers.Environment" />
+    <PackageReference Include="Serilog.Enrichers.Thread" />
+    <PackageReference Include="Serilog.Extensions.Hosting" />
+    <PackageReference Include="Serilog.Extensions.Logging" />
+    <PackageReference Include="Serilog.Settings.Configuration" />
+    <PackageReference Include="Serilog.Sinks.Console" />
+    <PackageReference Include="Serilog.Sinks.File" />
+    <PackageReference Include="Npgsql" />
+    <PackageReference Include="Newtonsoft.Json" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <None Update="appsettings*.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-        </None>
-        <None Update="Database\News.txt">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Switches.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-        </None>
-        <None Update="Variables.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-        </None>
-    </ItemGroup>
+  <ItemGroup>
+    <None Update="appsettings*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </None>
+    <None Update="Database\News.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Switches.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </None>
+    <None Update="Variables.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
 
-    <ItemGroup>
-        <Compile Update="Database\Script.cs">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Compile>
-    </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Database\Script.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+  </ItemGroup>
 
   <Target Name="KillLockingProcesses" BeforeTargets="BeforeBuild">
-    <Exec Command="taskkill /F /IM XtremeWorlds.Server.exe" ContinueOnError="true" />
-    <Exec Command="taskkill /F /IM dotnet.exe" ContinueOnError="true" />
+    <!-- Kill only if running to avoid warnings -->
+    <Exec Command="cmd /c tasklist | findstr /I $(AssemblyName).exe &amp;&amp; taskkill /F /IM $(AssemblyName).exe" ContinueOnError="true" />
+    <Exec Command="cmd /c tasklist | findstr /I dotnet.exe &amp;&amp; taskkill /F /IM dotnet.exe" ContinueOnError="true" />
   </Target>
 
 </Project>

@@ -24,6 +24,7 @@
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0'">
@@ -138,9 +139,9 @@
     <MakeDir Directories="$(OutputPath)Content" />
   </Target>
 
-  <!-- Kill locking processes with new name -->
+  <!-- Kill locking processes with robust success handling -->
   <Target Name="KillLockingProcesses" BeforeTargets="BeforeBuild">
-    <Exec Command="taskkill /F /IM XtremeWorlds.Client.exe" ContinueOnError="true" />
-    <Exec Command="taskkill /F /IM dotnet.exe" ContinueOnError="true" />
+    <Exec Command="cmd /c tasklist | findstr /I $(AssemblyName).exe &gt;nul &amp;&amp; taskkill /F /IM $(AssemblyName).exe || exit /b 0" />
+    <Exec Command="cmd /c tasklist | findstr /I dotnet.exe &gt;nul &amp;&amp; taskkill /F /IM dotnet.exe || exit /b 0" />
   </Target>
 </Project>
