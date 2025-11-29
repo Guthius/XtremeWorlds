@@ -10,7 +10,7 @@ public static class NetworkConfig
 {
     public static bool IsLoggedIn(int index)
     {
-        return Data.Account[index].Login.Length > 0;
+        return Data.Account[index].Login?.Length > 0;
     }
 
     public static bool IsPlaying(int index)
