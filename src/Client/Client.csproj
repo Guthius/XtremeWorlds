@@ -2,12 +2,13 @@
   <PropertyGroup>
     <Version>2.4.9</Version>
     <TargetFrameworks>net10.0-windows;net10.0</TargetFrameworks>
-    <RootNamespace>Client</RootNamespace>
+    <RootNamespace>XtremeWorlds.Client</RootNamespace>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
     <OutputPath>..\..\Build\Client\</OutputPath>
     <DefineConstants>CLIENT</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <UseSharedCompilation>false</UseSharedCompilation>
+    <AssemblyName>XtremeWorlds.Client</AssemblyName>
   </PropertyGroup>
 
   <!-- Cross-platform TFM: non-Windows RIDs -->
@@ -50,6 +51,7 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
+    <AssemblyTitle>XtremeWorlds.Client</AssemblyTitle>
   </PropertyGroup>
 
   <!-- Windows: copy only .dll and content; exclude Unix/Mac natives -->
@@ -134,5 +136,11 @@
 
   <Target Name="EnsureContentFolderExists" BeforeTargets="Build">
     <MakeDir Directories="$(OutputPath)Content" />
+  </Target>
+
+  <!-- Kill locking processes with new name -->
+  <Target Name="KillLockingProcesses" BeforeTargets="BeforeBuild">
+    <Exec Command="taskkill /F /IM XtremeWorlds.Client.exe" ContinueOnError="true" />
+    <Exec Command="taskkill /F /IM dotnet.exe" ContinueOnError="true" />
   </Target>
 </Project>

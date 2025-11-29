@@ -43,22 +43,27 @@
         <UseApplicationTrust>false</UseApplicationTrust>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <AssemblyName>XtremeWorlds.Server</AssemblyName>
+        <AssemblyTitle>XtremeWorlds.Server</AssemblyTitle>
+    </PropertyGroup>
+
     <ItemGroup>
-        <ProjectReference Include="..\Core\Core.csproj"/>
+        <ProjectReference Include="..\Core\Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Hosting"/>
-        <PackageReference Include="Serilog"/>
-        <PackageReference Include="Serilog.Enrichers.Environment"/>
-        <PackageReference Include="Serilog.Enrichers.Thread"/>
-        <PackageReference Include="Serilog.Extensions.Hosting"/>
-        <PackageReference Include="Serilog.Extensions.Logging"/>
-        <PackageReference Include="Serilog.Settings.Configuration"/>
-        <PackageReference Include="Serilog.Sinks.Console"/>
-        <PackageReference Include="Serilog.Sinks.File"/>
-        <PackageReference Include="Npgsql"/>
-        <PackageReference Include="Newtonsoft.Json"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting" />
+        <PackageReference Include="Serilog" />
+        <PackageReference Include="Serilog.Enrichers.Environment" />
+        <PackageReference Include="Serilog.Enrichers.Thread" />
+        <PackageReference Include="Serilog.Extensions.Hosting" />
+        <PackageReference Include="Serilog.Extensions.Logging" />
+        <PackageReference Include="Serilog.Settings.Configuration" />
+        <PackageReference Include="Serilog.Sinks.Console" />
+        <PackageReference Include="Serilog.Sinks.File" />
+        <PackageReference Include="Npgsql" />
+        <PackageReference Include="Newtonsoft.Json" />
     </ItemGroup>
 
     <ItemGroup>
@@ -84,5 +89,10 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Compile>
     </ItemGroup>
+
+  <Target Name="KillLockingProcesses" BeforeTargets="BeforeBuild">
+    <Exec Command="taskkill /F /IM XtremeWorlds.Server.exe" ContinueOnError="true" />
+    <Exec Command="taskkill /F /IM dotnet.exe" ContinueOnError="true" />
+  </Target>
 
 </Project>

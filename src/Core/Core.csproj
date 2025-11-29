@@ -5,10 +5,20 @@
 
     <PropertyGroup>
 	    <UseSharedCompilation>false</UseSharedCompilation>
+	    <AssemblyTitle>XtremeWorlds.Core</AssemblyTitle>
+	    <AssemblyName>XtremeWorlds.Core</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="CS-Script" />
         <PackageReference Include="CS-Script.Core" />
     </ItemGroup>
+
+  <Target Name="KillLockingProcesses" BeforeTargets="BeforeBuild">
+    <!-- Kill running app processes that commonly lock Core.dll during development -->
+    <Exec Command="taskkill /F /IM XtremeWorlds.Client.exe" ContinueOnError="true" />
+    <Exec Command="taskkill /F /IM XtremeWorlds.Server.exe" ContinueOnError="true" />
+    <!-- Kill dotnet host if running this workspace's apps; best-effort -->
+    <Exec Command="taskkill /F /IM dotnet.exe" ContinueOnError="true" />
+  </Target>
 </Project>
