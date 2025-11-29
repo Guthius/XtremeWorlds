@@ -14,7 +14,7 @@ public static class DataPath
     public static string Config => Path.Combine(Local, "Config");
     public static string Skins => Path.Combine(Asset, "Skins");
     public static string Graphics => Path.Combine(Asset, "Graphics");
-    public static string Fonts => Path.Combine("", "Fonts");
+    public static string Fonts => Path.Combine(Asset, "Fonts");
     public static string Gui => Path.Combine(Graphics, "Gui");
     public static string Gradients => Path.Combine(Gui, "Gradients");
     public static string Designs => Path.Combine(Gui, "Designs");

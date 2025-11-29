@@ -27,7 +27,7 @@ public static class TextRenderer
         public char? ColourChar; // special in-text color control marker, if used
         public Dictionary<char,int> Adv = new();
     }
-    private static readonly Dictionary<Font, BitmapFont> _bitmapFonts = new();
+    private static readonly Dictionary<Core.Globals.BitmapFont, BitmapFont> _bitmapFonts = new();
 
     public static Color GetColorForAmount(int amount)
     {
@@ -64,20 +64,20 @@ public static class TextRenderer
         return sanitizedText.ToString();
     }
 
-    public static void RegisterBitmapFont(Font font, Texture2D atlas, Dictionary<char, Rectangle> glyphs, int lineHeight, int spacing = 1, int baseOffset = 32, Dictionary<char,int>? advances = null)
+    public static void RegisterBitmapFont(Core.Globals.BitmapFont font, Texture2D atlas, Dictionary<char, Rectangle> glyphs, int lineHeight, int spacing = 1, int baseOffset = 32, Dictionary<char,int>? advances = null)
     {
         var bf = new BitmapFont{Atlas=atlas, Glyphs=glyphs, LineHeight=lineHeight, Spacing=spacing, BaseOffset=baseOffset};
         if (advances!=null) bf.Adv = advances;
         _bitmapFonts[font] = bf;
     }
 
-    private static bool TryGetBitmapFont(Font font, out BitmapFont bf)
+    private static bool TryGetBitmapFont(Core.Globals.BitmapFont font, out BitmapFont bf)
     {
         return _bitmapFonts.TryGetValue(font, out bf);
     }
 
     // Load legacy .dat header (VFH) + atlas; ignores cached vertex data portion beyond widths.
-    public static bool LoadLegacyBitmapFont(Font font, string datPath, string pngPath, GraphicsDevice gd)
+    public static bool LoadLegacyBitmapFont(Core.Globals.BitmapFont font, string datPath, string pngPath, GraphicsDevice gd)
     {
         if (!File.Exists(datPath) || !File.Exists(pngPath)) return false;
         using var fsImg = File.OpenRead(pngPath);
@@ -90,29 +90,43 @@ public static class TextRenderer
         int cellH = br.ReadInt32();
         byte baseChar = br.ReadByte();
         var widths = br.ReadBytes(256);
-        // Remaining bytes (vertex data) are ignored.
+
         int rowPitch = cellW == 0 ? 1 : bmpW / cellW;
-        float colFactor = cellW / (float)bmpW;
-        float rowFactor = cellH / (float)bmpH;
         var glyphRects = new Dictionary<char, Rectangle>();
-        var advances = new Dictionary<char,int>();
-        for (int code=0; code < 256; code++)
+        var advances = new Dictionary<char, int>();
+
+        for (int code = 0; code < 256; code++)
         {
             int row = (code - baseChar) / rowPitch;
             int col = (code - baseChar) - (row * rowPitch);
             if (row < 0) row = 0; if (col < 0) col = 0;
             int x = col * cellW; int y = row * cellH;
-            if (x + cellW > bmpW || y + cellH > bmpH) continue; // skip out of range
+            if (x + cellW > bmpW || y + cellH > bmpH) continue;
+
             var ch = (char)code;
-            glyphRects[ch] = new Rectangle(x,y,cellW,cellH);
-            advances[ch] = widths[code] == 0 ? cellW : widths[code];
+            glyphRects[ch] = new Rectangle(x, y, cellW, cellH);
+
+            // Use header CharWidth strictly for horizontal advance; fall back to cellW
+            int w = widths[code];
+            advances[ch] = w > 0 ? w : cellW;
         }
-        RegisterBitmapFont(font, atlas, glyphRects, cellH, 1, baseChar, advances);
+
+        RegisterBitmapFont(font, atlas, glyphRects, cellH, 0, baseChar, advances);
+
+        // Apply VB-style metrics
+        if (_bitmapFonts.TryGetValue(font, out var bf))
+        {
+            bf.CharHeight = Math.Max(0, cellH - 4); // VB: CellHeight - 4
+            bf.Spacing = 0; // VB: no extra gap; rely on CharWidth
+            bf.XOffset = 0;
+            bf.YOffset = 0;
+            bf.ColourChar = '�'; // optional inline color marker if used
+        }
         return true;
     }
 
     // Add helper method to check if a font is bitmap-enabled
-    public static bool HasBitmapFont(Font font)
+    public static bool HasBitmapFont(Core.Globals.BitmapFont font)
     {
         return _bitmapFonts.ContainsKey(font);
     }
@@ -122,78 +136,62 @@ public static class TextRenderer
     {
         try
         {
-            var baseDir = AppContext.BaseDirectory;
-            var fontsDir = Path.Combine(baseDir, "Content", "Fonts");
-            var datPath = Path.Combine(fontsDir, fontName + ".dat");
-            var pngPath = Path.Combine(fontsDir, fontName + ".png");
-            if (LoadLegacyBitmapFont(Font.PixelGeorgiaBold, datPath, pngPath, gd)) return;
+            var datPath = Path.Combine(DataPath.Fonts, fontName + ".dat");
+            var pngPath = Path.Combine(DataPath.Fonts, fontName + ".png");
+
+            // Convert fontName to Font enum if possible
+            if (!Enum.TryParse<Core.Globals.BitmapFont>(fontName, out Core.Globals.BitmapFont fontEnum))
+            {
+                fontEnum = Core.Globals.BitmapFont.Default; // Fallback
+            }
+            if (LoadLegacyBitmapFont(fontEnum, datPath, pngPath, gd)) return;
         }
         catch { }
     }
 
-    // Adjust GetTextWidth to use scale parameter for bitmap fonts when needed
-    public static int GetTextWidth(string text, Font font = Font.PixelGeorgiaBold, float textSize = 1.0f)
+    public static int GetTextWidth(string text, Core.Globals.BitmapFont font, float textSize = 1.0f)
     {
         if (TryGetBitmapFont(font, out var bf))
         {
             if (string.IsNullOrEmpty(text)) return 0;
             int maxLine = 0;
             int current = 0;
+            int colorSkip = 0;
             foreach (var ch in text)
             {
-                if (ch == '\n')
-                {
-                    if (current > maxLine) maxLine = current;
-                    current = 0;
-                    continue;
-                }
-
+                if (colorSkip > 0) { colorSkip--; continue; }
+                if (ch == '\r') continue;
+                if (ch == '\n') { if (current > maxLine) maxLine = current; current = 0; continue; }
+                if (bf.ColourChar.HasValue && ch == bf.ColourChar.Value) { colorSkip = 2; continue; }
                 Rectangle rect;
-                int adv;
                 if (!bf.Glyphs.TryGetValue(ch, out rect))
-                {
                     rect = bf.Glyphs.TryGetValue(' ', out var sp) ? sp : new Rectangle(0, 0, bf.LineHeight / 2, bf.LineHeight);
-                }
-                adv = bf.Adv.TryGetValue(ch, out var a) ? a : rect.Width;
-
-                // Add advance; only add spacing if a next printable follows
-                current += adv;
-                current += bf.Spacing;
+                int adv = bf.Adv.TryGetValue(ch, out var a) ? a : rect.Width;
+                current += adv; // no extra spacing
             }
-
-            // Remove spacing after last glyph on each measured line by subtracting spacing if any glyph was added
-            if (current >= bf.Spacing) current -= bf.Spacing;
             int w = Math.Max(maxLine, current);
             return (int)Math.Round(w * textSize);
         }
+        return 0;
+    }
 
-        // SpriteFont fallback unchanged
+    public static int GetTextWidth(string text, Font font = Font.Georgia, float textSize = 1.0f)
+    {
         if (!Fonts.TryGetValue(font, out var spriteFont))
         {
-            if (!Fonts.TryGetValue(Font.PixelGeorgiaBold, out spriteFont))
+            if (!Fonts.TryGetValue(Font.Georgia, out spriteFont))
             {
-                if (Fonts.Count > 0)
-                {
-                    spriteFont = Fonts.Values.First();
-                }
-                else
-                {
-                    // No fonts loaded at all; return an estimated width to avoid crashing.
-                    return (int)Math.Round((text?.Length ?? 0) * 8f * textSize);
-                }
+                if (Fonts.Count > 0) spriteFont = Fonts.Values.First();
+                else return (int)Math.Round((text?.Length ?? 0) * 8f * textSize);
             }
         }
-
         var sanitizedText = SanitizeText(text ?? string.Empty, spriteFont);
         var textDimensions = spriteFont.MeasureString(sanitizedText);
         return (int)Math.Round(textDimensions.X * textSize);
     }
 
-    // Get the height of the text with optional scaling
-
     public static void AddText(string text, int color, long alpha = 255L, byte channel = 0)
     {
-        // wordwrap
         string[] wrappedLines = System.Array.Empty<string>();
         WordWrap(text, Font.PixelGeorgiaBold, WindowManager.Windows[WindowManager.GetWindowIndex("winChat")].Width, ref wrappedLines);
 
@@ -306,10 +304,11 @@ public static class TextRenderer
         }
     }
 
-    public static void RenderText(string text, int x, int y, Color frontColor, Color backColor, Font font = Font.PixelGeorgiaBold, float textSize = 1.0f)
+    public static void RenderText(string text, int x, int y, Color frontColor, Color backColor, Core.Globals.BitmapFont font, float textSize = 1.0f)
     {
         if (string.IsNullOrEmpty(text)) return;
         if (GameClient.SpriteBatch == null) return;
+
         if (TryGetBitmapFont(font, out var bf))
         {
             int originX = x - bf.XOffset;
@@ -324,28 +323,26 @@ public static class TextRenderer
 
             foreach (var ch in text)
             {
-                if (colorSkip > 0)
-                {
-                    colorSkip--;
-                    continue;
-                }
-
-                if (ch == '\r') continue; // VB splits by vbCrLf; ignore CR
+                if (colorSkip > 0) { colorSkip--; continue; }
+                if (ch == '\r') continue;
                 if (ch == '\n')
                 {
-                    // Move to next line
-                    int lineAdvance = (int)Math.Round(bf.LineHeight * textSize) + (int)Math.Round(bf.Spacing * textSize);
+                    int lineAdvance = (int)Math.Round((bf.CharHeight > 0 ? bf.CharHeight : bf.LineHeight) * textSize) + (int)Math.Round(3 * textSize);
                     lineY += lineAdvance;
                     shadowY += lineAdvance;
-                    lineX = x;
-                    shadowX = x + 1;
+                    lineX = originX;
+                    shadowX = originX + 1;
+                    continue;
+                }
+                if (bf.ColourChar.HasValue && ch == bf.ColourChar.Value)
+                {
+                    colorSkip = 2; // skip 2 digits like VB if present
                     continue;
                 }
 
                 if (!bf.Glyphs.TryGetValue(ch, out var rect))
-                {
                     rect = bf.Glyphs.TryGetValue(' ', out var sp) ? sp : new Rectangle(0, 0, bf.LineHeight / 2, bf.LineHeight);
-                }
+
                 int adv = bf.Adv.TryGetValue(ch, out var a) ? a : rect.Width;
 
                 int dw = (int)Math.Round(adv * textSize);
@@ -354,32 +351,30 @@ public static class TextRenderer
                 GameClient.SpriteBatch.Draw(bf.Atlas, new Rectangle(shadowX, shadowY, dw, dh), rect, backColor);
                 GameClient.SpriteBatch.Draw(bf.Atlas, new Rectangle(lineX, lineY, dw, dh), rect, frontColor);
 
-                int gap = (int)Math.Round(bf.Spacing * textSize);
-                shadowX += dw + gap;
-                lineX += dw + gap;
+                // Advance horizontally strictly by CharWidth (adv)
+                shadowX += dw;
+                lineX += dw;
             }
             return;
         }
 
-        // SpriteFont fallback – apply textSize consistently
+    }
+
+    public static void RenderText(string text, int x, int y, Color frontColor, Color backColor, Font font = Font.PixelGeorgiaBold, float textSize = 1.0f)
+    {
+        // SpriteFont fallback; keep scale consistent with textSize
         if (!Fonts.TryGetValue(font, out var spriteFont))
         {
-            if (!Fonts.TryGetValue(Font.PixelGeorgiaBold, out spriteFont))
+            if (!Fonts.TryGetValue(Font.Georgia, out spriteFont))
             {
-                if (Fonts.Count > 0)
-                {
-                    spriteFont = Fonts.Values.First();
-                }
-                else
-                {
-                    return; // No fonts available; nothing to render, but don't crash.
-                }
+                if (Fonts.Count > 0) spriteFont = Fonts.Values.First();
+                else return;
             }
         }
 
         var sanitizedText = SanitizeText(text, spriteFont);
-        GameClient.SpriteBatch.DrawString(spriteFont, sanitizedText, new Vector2(x + 1, y + 1), backColor, 0.0f, Vector2.Zero, 12f / 16.0f, SpriteEffects.None, 0.0f);
-        GameClient.SpriteBatch.DrawString(spriteFont, sanitizedText, new Vector2(x, y), frontColor, 0.0f, Vector2.Zero, 12f / 16.0f, SpriteEffects.None, 0.0f);
+        GameClient.SpriteBatch.DrawString(spriteFont, sanitizedText, new Vector2(x + 1, y + 1), backColor, 0.0f, Vector2.Zero, (12f / 16f) * textSize, SpriteEffects.None, 0.0f);
+        GameClient.SpriteBatch.DrawString(spriteFont, sanitizedText, new Vector2(x, y), frontColor, 0.0f, Vector2.Zero, (12f / 16f) * textSize, SpriteEffects.None, 0.0f);
     }
 
     public static void DrawMapAttributes()
@@ -944,42 +939,35 @@ public static class TextRenderer
         RenderText(name, textX, textY, color, backColor);
     }
 
-    public static int GetTextHeight(string text, Font font = Font.PixelGeorgiaBold, float textSize = 1.0f)
+    public static int GetTextHeight(string text, Core.Globals.BitmapFont font, float textSize = 1.0f)
     {
         if (TryGetBitmapFont(font, out var bf))
         {
             int lines = 1;
             if (!string.IsNullOrEmpty(text))
-            {
                 foreach (var ch in text) if (ch == '\n') lines++;
-            }
             int h = (int)Math.Round((bf.CharHeight > 0 ? bf.CharHeight : bf.LineHeight) * textSize);
             int gap = (int)Math.Round(3 * textSize);
             return lines * h + (lines - 1) * gap;
         }
+        return 0;
+    }
 
-        // SpriteFont fallback unchanged
+    public static int GetTextHeight(string text, Font font = Font.Georgia, float textSize = 1.0f)
+    {
         if (!Fonts.TryGetValue(font, out var spriteFont))
         {
-            if (!Fonts.TryGetValue(Font.PixelGeorgiaBold, out spriteFont))
+            if (!Fonts.TryGetValue(Font.Georgia, out spriteFont))
             {
-                if (Fonts.Count > 0)
-                {
-                    spriteFont = Fonts.Values.First();
-                }
+                if (Fonts.Count > 0) spriteFont = Fonts.Values.First();
                 else
                 {
-                    // Fallback estimate: ~16px per line (Georgia baseline), scaled
                     int lines = 1;
-                    if (!string.IsNullOrEmpty(text))
-                    {
-                        foreach (var ch in text) if (ch == '\n') lines++;
-                    }
+                    if (!string.IsNullOrEmpty(text)) foreach (var ch in text) if (ch == '\n') lines++;
                     return (int)Math.Round(16f * lines * textSize);
                 }
             }
         }
-
         var dimensions = spriteFont.MeasureString(text ?? string.Empty);
         return (int)Math.Round(dimensions.Y * textSize);
     }

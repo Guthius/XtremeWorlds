@@ -517,6 +517,24 @@ public enum Font
 }
 
 /// <summary>
+/// Defines available bitmap fonts.
+/// </summary>
+public enum BitmapFont
+{
+    None,
+    Default,
+    Georgia,
+    Georgia_16,
+    GeorgiaBold_16,
+    GeorgiaDec_16,
+    Rockwell_15,
+    RockwellDec_10,
+    RockwellDec_15,
+    Verdana_12,
+    VerdanaBold_12
+}
+
+/// <summary>
 /// Defines the main game menus or scenes.
 /// </summary>
 public enum Menu

@@ -486,14 +486,14 @@ namespace Client
             if (GameState.IsLoading || GameState.GettingMap)
             {
                 // Draw loading screen onto the RenderTarget
-                SpriteBatch?.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
+                SpriteBatch?.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null);
 
                 SpriteBatch?.End();
             }
             else if (GameState.InGame == true)
             {
                 // Draw the actual game onto the RenderTarget
-                SpriteBatch?.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
+                SpriteBatch?.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null);
                 Render_Game();
                 SpriteBatch?.End();
             }
@@ -518,7 +518,7 @@ namespace Client
 
                 GraphicsDevice.SetRenderTarget(_guiRenderTarget);
                 GraphicsDevice.Clear(Color.Transparent);
-                SpriteBatch?.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
+                SpriteBatch?.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null);
                 if (GameState.InMenu)
                     WindowManager.DrawMenuBackground();
                 WindowManager.Render();
