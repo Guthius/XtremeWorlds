@@ -221,7 +221,7 @@ public static class Command
 
     public static bool IsPlaying(int index)
     {
-        return GetPlayerName(index).Length > 0;
+        return GetPlayerName(index)?.Length > 0;
     }
 
     public static int GetPlayerGatherSkillLevel(int index, int skillSlot)
