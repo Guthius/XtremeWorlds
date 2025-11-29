@@ -57,7 +57,6 @@ Log in to the game with the client. On the server, type the command /access name
 
 - Install [PostgreSQL](https://www.postgresql.org/download/)
 - Create a user with password: `mirage`, you can do this in the installer
-- You can do this in the installer or by using the command line
 - The database mirage is created by default from the server
 - *Note: You can modify database credentials in the server settings JSON file located in the config folder*
 
