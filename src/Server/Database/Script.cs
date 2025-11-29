@@ -61,7 +61,7 @@ public class Script
     public static int MaxItems = Variables.MaxItems;
     public static int MaxMaps = Variables.MaxMaps;
     public static byte MaxMapItems = Variables.MaxMapItems;
-    public static byte MaxMapNpcs = Variables.MaxMapNpcs;
+    public static int MaxMapNpcs = Variables.MaxMapNpcs;
     public static int MaxNpcs = Variables.MaxNpcs;
     public static byte MaxNpcSkills = Variables.MaxNpcSkills;
     public static int MaxParty = Variables.MaxParty;
