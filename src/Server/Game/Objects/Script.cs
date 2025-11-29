@@ -1,12 +1,13 @@
-﻿using System.Text;
-using Core;
+﻿using Core;
 using Core.Globals;
 using Core.Net;
 using CSScriptLib;
 using Microsoft.Extensions.Logging;
+using Serilog.Core;
 using Server.Game.Net;
-using static Core.Net.Packets;
+using System.Text;
 using static Core.Globals.Command;
+using static Core.Net.Packets;
 
 namespace Server;
 
@@ -18,6 +19,7 @@ public static class Script
 
     public static async Task LoadAsync(int playerId)
     {
+        General.Logger.LogInformation("Loading script...");
         var path = System.IO.Path.Combine(DataPath.Database, "Script.cs");
         if (File.Exists(path))
         {
@@ -53,8 +55,11 @@ public static class Script
             if (instance is not null)
             {
                 Instance = instance;
+                General.Logger.LogInformation("Script loaded successfully!");
                 Script.Instance?.UpdateMaxValues();
                 General.InitalizeCoreData();
+                await General.LoadGameContentAsync();
+                await General.SpawnGameObjectsAsync();
 
                 if (playerId > 0)
                 {

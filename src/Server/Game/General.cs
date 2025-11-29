@@ -205,8 +205,7 @@ namespace Server
         private static async System.Threading.Tasks.Task LoadGameDataAsync()
         {
             var stopwatch = Stopwatch.StartNew();
-            await LoadGameContentAsync();
-            await SpawnGameObjectsAsync();           
+            await Script.LoadAsync(0);           
             Logger.LogInformation($"Game data loaded in {stopwatch.ElapsedMilliseconds}ms");
         }
 
@@ -363,14 +362,10 @@ namespace Server
             Logger.LogInformation($"Loaded {Data.Char.Count} character(s).");
         }
 
-        private static async System.Threading.Tasks.Task LoadGameContentAsync()
+        public static async System.Threading.Tasks.Task LoadGameContentAsync()
         {
             const int maxConcurrency = 4;
             using var semaphore = new SemaphoreSlim(maxConcurrency);
-
-            Logger.LogInformation("Loading script..."); 
-            await Script.LoadAsync(0);
-            Logger.LogInformation("Script loaded successfully!");
 
             var tasks = new[]
             {
@@ -405,7 +400,7 @@ namespace Server
             }
         }
 
-        private static async System.Threading.Tasks.Task SpawnGameObjectsAsync()
+        public static async System.Threading.Tasks.Task SpawnGameObjectsAsync()
         {
             await System.Threading.Tasks.Task.WhenAll(
                 System.Threading.Tasks.Task.Run(MapItem.SpawnAll),
