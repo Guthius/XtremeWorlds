@@ -43,6 +43,7 @@ public class SettingsManager
     public int RunFrames { get; set; } = 4;
     public int AttackFrames { get; set; } = 5;
     public int SpriteDirections { get; set; } = 4;
+    public string BitmapFont { get; set; } = "";
     
     private static SettingsManager Load()
     {

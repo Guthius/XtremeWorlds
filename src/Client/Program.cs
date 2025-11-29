@@ -310,6 +310,9 @@ namespace Client
 
             LoadFonts();
 
+            // Load legacy bitmap font atlas/header if present (minimal integration)
+            TextRenderer.TryLoadLegacyFont(GraphicsDevice, SettingsManager.Instance.BitmapFont);
+
             // Kick off heavy startup work on a background thread to avoid freezing the main thread
             GameState.IsLoading = true;
             _ = Task.Run(() =>
