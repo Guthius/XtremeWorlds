@@ -950,6 +950,7 @@ public class Crystalshire
                 case "Npcs":
                     SetGroupBoxVisible("winMapEditor", "grpNpcs", true);
                     InitNpcList();
+                    WinEditorMap.RefreshMapNpcList();
                     GameState.MapEditorTab = (int)MapEditorTab.Npcs;
                     break;
                 case "Settings":
@@ -1257,7 +1258,7 @@ public class Crystalshire
                         int npcIndex = cmbNpc.Value - 1; // 0 = None
                         Data.MyMap.Npc[slotIndex] = npcIndex;
 
-                        if (WindowManager.TryGetControl("winMapEditor","lstNpcs", out var lstNpcs) && lstNpcs is ListBox lst)
+                        if (WindowManager.TryGetControl("winMapEditor", "lstNpcs", out var lstNpcs) && lstNpcs is ListBox lst)
                         {
                             string name = "None";
                             if (npcIndex >= 0 && npcIndex < (Data.Npc?.Length ?? 0))
@@ -1350,7 +1351,7 @@ public class Crystalshire
             // Use MouseScroll (enum) for wheel events
             list.CallBack[(int)ControlState.MouseScroll] = WinEditorMap.OnNpcListMouseWheel;
         }
-        if (WindowManager.TryGetControl("winMapEditor","sldNpcList", out var sldNpcList))
+        if (WindowManager.TryGetControl("winMapEditor", "sldNpcList", out var sldNpcList))
         {
             sldNpcList.CallBack[(int)ControlState.MouseMove] = WinEditorMap.OnNpcScrollBarMove;
         }
@@ -1548,7 +1549,6 @@ public class Crystalshire
                 };
             }
         }
-
         // Helper to bind a scrollbar (used as slider) to an int field and an optional textbox.
         void BindScrollBar(string name, Func<int> get, Action<int> apply, string textBoxName = null)
         {
@@ -2151,9 +2151,9 @@ public class Crystalshire
         window.GetChild("chkGame").CallBack[(int)ControlState.MouseDown] = WinChat.OnGameChannelClicked;
         window.GetChild("chkMap").CallBack[(int)ControlState.MouseDown] = WinChat.OnMapChannelClicked;
         window.GetChild("chkGlobal").CallBack[(int)ControlState.MouseDown] = WinChat.OnBroadcastChannelClicked;
-        window.GetChild("chkParty").CallBack[(int)ControlState.MouseDown] = WinChat.OnPartyChannelClicked;
-        window.GetChild("chkGuild").CallBack[(int)ControlState.MouseDown] = WinChat.OnGuildChannelClicked;
-        window.GetChild("chkPlayer").CallBack[(int)ControlState.MouseDown] = WinChat.OnPrivateChannelClicked;
+        window.GetChild("chkParty").CallBack[(int) ControlState.MouseDown] = WinChat.OnPartyChannelClicked;
+        window.GetChild("chkGuild").CallBack[(int) ControlState.MouseDown] = WinChat.OnGuildChannelClicked;
+        window.GetChild("chkPlayer").CallBack[(int) ControlState.MouseDown] = WinChat.OnPrivateChannelClicked;
 
         WindowManager.SetActiveControl(window, "txtChat");
 

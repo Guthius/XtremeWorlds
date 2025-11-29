@@ -38,7 +38,7 @@
     <Label Name="lblItem" Text="Item" Position="20,126" Size="60,16"/>
     <ComboBox Name="cmbMapItem" Position="84,124" Size="300,18"/>
     <Label Name="lblItemValue" Text="Value: 1" Position="390,126" Size="80,16"/>
-    <ScrollBar Name="sldMapItemValue" Position="470,128" Size="220,12" Min="1" Max="1024" Value="1" Orientation="Horizontal" ThumbSize="16"/>
+    <ScrollBar Name="sldMapItemValue" Position="470,128" Size="220,12" Min="1" Max="1000" Value="1" Orientation="Horizontal" ThumbSize="16"/>
     <Button Name="btnMapItem" Text="OK" Position="700,124" Size="60,18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
     <Label Name="lblResource" Text="Resource" Position="20,126" Size="80,16"/>
     <ComboBox Name="cmbResource" Position="104,124" Size="300,18"/>
@@ -55,13 +55,13 @@
     <Label Name="lblHeal" Text="Heal" Position="20,126" Size="60,16"/>
     <ComboBox Name="cmbHeal" Position="84,124" Size="100,18"/>
     <Label Name="lblHealAmount" Text="Amount: 1" Position="190,126" Size="90,16"/>
-    <ScrollBar Name="sldHeal" Position="282,128" Size="220,12" Min="1" Max="1024" Value="1" Orientation="Horizontal" ThumbSize="16"/>
+    <ScrollBar Name="sldHeal" Position="282,128" Size="220,12" Min="1" Max="1000" Value="1" Orientation="Horizontal" ThumbSize="16"/>
     <Button Name="btnHeal" Text="OK" Position="510,124" Size="60,18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
     <Label Name="lblTrap" Text="Trap" Position="20,126" Size="60,16"/>
     <Label Name="lblTrapVital" Text="Vital" Position="84,106" Size="60,16"/>
     <ComboBox Name="cmbTrapVital" Position="84,124" Size="100,18"/>
     <Label Name="lblTrapAmount" Text="Amount: 1" Position="190,126" Size="90,16"/>
-    <ScrollBar Name="sldTrap" Position="282,128" Size="220,12" Min="1" Max="1024" Value="1" Orientation="Horizontal" ThumbSize="16"/>
+    <ScrollBar Name="sldTrap" Position="282,128" Size="220,12" Min="1" Max="1000" Value="1" Orientation="Horizontal" ThumbSize="16"/>
     <Button Name="btnTrap" Text="OK" Position="510,124" Size="60,18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
     <Label Name="lblAnimation" Text="Animation" Position="20,126" Size="80,16"/>
     <ComboBox Name="cmbAnimation" Position="104,124" Size="300,18"/>
