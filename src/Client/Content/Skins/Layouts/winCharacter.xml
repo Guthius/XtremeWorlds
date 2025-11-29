@@ -35,11 +35,11 @@
 		<PictureBox Name="picBlackBox5" Position="10,242" Size="142,19" Design="TextBlack"/>
 		<PictureBox Name="picBlackBox6" Position="10,262" Size="142,19" Design="TextBlack"/>
 
-		<Label Name="lblStrength" Text="Strength" Position="14,164" Size="96,10" Font="PixelGeorgiaBold"/>
-		<Label Name="lblVitality" Text="Vitality" Position="14,184" Size="96,10" Font="PixelGeorgiaBold"/>
-		<Label Name="lblIntelligence" Text="Intelligence" Position="14,204" Size="96,10" Font="PixelGeorgiaBold"/>
-		<Label Name="lblLuck" Text="Luck" Position="14,224" Size="96,10" Font="PixelGeorgiaBold"/>
-		<Label Name="lblSpiritStat" Text="Spirit" Position="14,244" Size="96,10" Font="PixelGeorgiaBold"/>
+		<Label Name="lblStrength" Text="STR" Position="14,164" Size="96,10" Font="PixelGeorgiaBold"/>
+		<Label Name="lblVitality" Text="VIT" Position="14,184" Size="96,10" Font="PixelGeorgiaBold"/>
+		<Label Name="lblIntelligence" Text="INT" Position="14,204" Size="96,10" Font="PixelGeorgiaBold"/>
+		<Label Name="lblLuck" Text="LCK" Position="14,224" Size="96,10" Font="PixelGeorgiaBold"/>
+		<Label Name="lblSpiritStat" Text="SPR" Position="14,244" Size="96,10" Font="PixelGeorgiaBold"/>
 		<Label Name="lblStatPoints" Text="Stat Points" Position="14,264" Size="96,10" Font="PixelGeorgiaBold"/>
 
 		<Label Name="lblStat_1" Text="0" Position="38,164" Size="96,15" Font="PixelGeorgiaBold" Align="Right"/>
