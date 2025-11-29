@@ -18,11 +18,22 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
+      - name: Display dotnet info
+        run: dotnet --info
+
       - name: Clean
         run: dotnet clean
 
       - name: Restore dependencies
         run: dotnet restore
+
+      - name: Kill leftover processes
+        shell: pwsh
+        run: |
+          $names = @('XtremeWorlds.Server','XtremeWorlds.Client','XtremeWorlds','dotnet')
+          foreach ($n in $names) {
+            Get-Process -Name $n -ErrorAction SilentlyContinue | ForEach-Object { $_ | Stop-Process -Force }
+          }
 
       - name: Build
         run: dotnet build -p:TargetFramework=net10.0-windows
