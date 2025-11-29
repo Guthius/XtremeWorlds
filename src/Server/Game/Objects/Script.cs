@@ -61,8 +61,7 @@ public static class Script
                 {
                     if (IsPlaying(i))
                     {
-                        NetworkSend.AlertMsg(i, SystemMessage.ServerMaintenance, Menu.Login);
-                        await Player.LeftGame(i);
+                        NetworkSend.AlertMsg(i, SystemMessage.ServerMaintenance, Menu.Login);    
                     }
                 }
                 General.InitalizeCoreData();
