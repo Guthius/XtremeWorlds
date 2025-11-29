@@ -185,8 +185,11 @@ public static class TextRenderer
 
     public static int GetTextWidth(string text, Font font = Font.Georgia, float textSize = 1.0f)
     {
-        if (Enum.TryParse<Core.Globals.BitmapFont>(font.ToString(), out var bfEnum) && HasBitmapFont(bfEnum))
-            return GetTextWidth(text ?? string.Empty, bfEnum, textSize);
+        if (SettingsManager.Instance.BitmapFont)
+        {
+            if (Enum.TryParse<Core.Globals.BitmapFont>(font.ToString(), out var bfEnum) && HasBitmapFont(bfEnum))
+                return GetTextWidth(text ?? string.Empty, bfEnum, textSize);
+        }
 
         if (!Fonts.TryGetValue(font, out var spriteFont))
         {
@@ -342,10 +345,13 @@ public static class TextRenderer
     // SpriteFont render with auto-bitmap override
     public static void RenderText(string text, int x, int y, Color frontColor, Color backColor, Font font = Font.Georgia, float textSize = 1.0f)
     {
-        if (Enum.TryParse<Core.Globals.BitmapFont>(font.ToString(), out var bfEnum) && HasBitmapFont(bfEnum))
+        if (SettingsManager.Instance.BitmapFont)
         {
-            RenderText(text, x, y, frontColor, backColor, bfEnum, textSize);
-            return;
+            if (Enum.TryParse<Core.Globals.BitmapFont>(font.ToString(), out var bfEnum) && HasBitmapFont(bfEnum))
+            {
+                RenderText(text, x, y, frontColor, backColor, bfEnum, textSize);
+                return;
+            }
         }
 
         if (!Fonts.TryGetValue(font, out var spriteFont))
@@ -744,8 +750,11 @@ public static class TextRenderer
 
     public static int GetTextHeight(string text, Font font = Font.Georgia, float textSize = 1.0f)
     {
-        if (Enum.TryParse<Core.Globals.BitmapFont>(font.ToString(), out var bfEnum) && HasBitmapFont(bfEnum))
-            return GetTextHeight(text ?? string.Empty, bfEnum, textSize);
+        if (SettingsManager.Instance.BitmapFont)
+        {
+            if (Enum.TryParse<Core.Globals.BitmapFont>(font.ToString(), out var bfEnum) && HasBitmapFont(bfEnum))
+                return GetTextHeight(text ?? string.Empty, bfEnum, textSize);
+        }
 
         if (!Fonts.TryGetValue(font, out var spriteFont))
         {
