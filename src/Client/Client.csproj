@@ -139,8 +139,8 @@
     <MakeDir Directories="$(OutputPath)Content" />
   </Target>
 
-  <!-- Kill locking processes with robust success handling -->
-  <Target Name="KillLockingProcesses" BeforeTargets="BeforeBuild">
+  <!-- Kill locking processes with robust success handling (skip in CI) -->
+  <Target Name="KillLockingProcesses" BeforeTargets="BeforeBuild" Condition="'$(CI)' != 'true' and '$(SkipProcessKill)' != 'true'">
     <Exec Command="cmd /c tasklist | findstr /I $(AssemblyName).exe &gt;nul &amp;&amp; taskkill /F /IM $(AssemblyName).exe || exit /b 0" />
     <Exec Command="cmd /c tasklist | findstr /I dotnet.exe &gt;nul &amp;&amp; taskkill /F /IM dotnet.exe || exit /b 0" />
   </Target>
