@@ -7,6 +7,8 @@
 	    <UseSharedCompilation>false</UseSharedCompilation>
 	    <AssemblyTitle>XtremeWorlds.Core</AssemblyTitle>
 	    <AssemblyName>XtremeWorlds.Core</AssemblyName>
+	    <AssemblyRootSpace>XtremeWorlds.Core</AssemblyRootSpace>
+		
         <!-- Ensure each target framework uses its own output/intermediate folders to prevent locking -->
         <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
         <AppendTargetFrameworkToIntermediateOutputPath>true</AppendTargetFrameworkToIntermediateOutputPath>
