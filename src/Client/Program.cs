@@ -249,29 +249,21 @@ namespace Client
 
         static void LoadFonts()
         {
-            // Attempt to load all fonts; if some fail, map them to a default so callers using
-            // TextRenderer.Fonts[font] don't crash with KeyNotFoundException.
             SpriteFont? defaultFont = null;
 
-            // Get all defined font enum values except None (assumed to be 0)
             var fontValues = Enum.GetValues(typeof(Font));
             for (int i = 1; i < fontValues.Length; i++)
             {
                 var val = fontValues.GetValue(i);
                 if (val is not Font f)
-                {
                     continue;
-                }
 
                 try
                 {
                     var loaded = LoadFont(DataPath.Fonts, f);
                     TextRenderer.Fonts[f] = loaded;
-                    // Prefer Georgia as the default if available; otherwise use the first loaded font.
                     if (defaultFont == null || f == Font.Georgia)
-                    {
                         defaultFont = loaded;
-                    }
                 }
                 catch (Exception ex)
                 {
@@ -279,24 +271,40 @@ namespace Client
                 }
             }
 
-            // Ensure we have at least one font to fall back to
             if (defaultFont == null && TextRenderer.Fonts.Count > 0)
-            {
                 defaultFont = TextRenderer.Fonts.Values.First();
-            }
 
-            // Seed any missing enum entries to the default font to avoid runtime crashes.
             if (defaultFont != null)
             {
                 for (int i = 1; i < fontValues.Length; i++)
                 {
                     var val = fontValues.GetValue(i);
                     if (val is Font f && !TextRenderer.Fonts.ContainsKey(f))
-                    {
                         TextRenderer.Fonts[f] = defaultFont;
-                    }
                 }
             }
+        }
+
+        static void LoadBitmapFonts(GraphicsDevice gd)
+        {
+            try
+            {
+                foreach (var v in Enum.GetValues(typeof(Core.Globals.BitmapFont)))
+                {
+                    if (v is not Core.Globals.BitmapFont bf) continue;
+                    var name = bf.ToString();
+                    if (string.Equals(name, "None", StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    var datPath = Path.Combine(DataPath.Fonts, name + ".dat");
+                    var pngPath = Path.Combine(DataPath.Fonts, name + ".png");
+                    if (!File.Exists(datPath) || !File.Exists(pngPath)) continue;
+                    if (TextRenderer.HasBitmapFont(bf)) continue;
+                    try { TextRenderer.LoadLegacyBitmapFont(bf, datPath, pngPath, gd); }
+                    catch (Exception ex) { Debug.WriteLine($"Bitmap font load failed {name}: {ex.Message}"); }
+                }
+            }
+            catch (Exception ex) { Debug.WriteLine($"Bitmap font loader error: {ex.Message}"); }
         }
 
         protected override void LoadContent()
@@ -308,12 +316,12 @@ namespace Client
             PixelTexture = new Texture2D(GraphicsDevice, 1, 1);
             PixelTexture.SetData([Color.White]);
 
+            // Load SpriteFont assets
             LoadFonts();
+            // Load legacy bitmap fonts (.dat/.png) via enum + configured setting
+            LoadBitmapFonts(GraphicsDevice);
 
-            // Load legacy bitmap font atlas/header if present (minimal integration)
-            TextRenderer.TryLoadLegacyFont(GraphicsDevice, SettingsManager.Instance.BitmapFont);
-
-            // Kick off heavy startup work on a background thread to avoid freezing the main thread
+            // Kick off heavy startup work on a background thread
             GameState.IsLoading = true;
             _ = Task.Run(() =>
             {
@@ -327,7 +335,7 @@ namespace Client
                 }
             });
 
-            // Preload cursor texture into cache (drawn each frame in GUI layer)
+            // Preload cursor texture into cache
             try
             {
                 var preload = Path.Combine(DataPath.Misc, "Cursor");
@@ -1762,7 +1770,7 @@ namespace Client
             y = GameLogic.ConvertMapY(y2) - (GameState.SizeY + 16);
 
             string argPath = Path.Combine(DataPath.Emotes, sprite.ToString());
-            RenderTexture(ref argPath, x, y, rec.X, rec.Y, rec.Width, rec.Height);
+            RenderTexture(ref argPath, x, y, rec.X, rec.Y, rec.Width, rec.Height, rec.Width, rec.Height);
         }
 
         public static void DrawDirections(int x, int y)
@@ -1972,7 +1980,6 @@ namespace Client
             int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
             int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
             int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
-            int[] segmentLengths = { idleFrames, runFrames, attackFrames };
             int expectedTotalColumns = idleFrames + runFrames + attackFrames;
 
             int frameHeight = gfxInfo.Height / directionRows;
@@ -2006,10 +2013,11 @@ namespace Client
                 else if (t == "run") runningOffset += runFrames;
                 else if (t == "attack") runningOffset += attackFrames;
             }
-            // Allow a short post-stop window to finish the running segment frames
-            bool finishingRun = !provisionalMoving && !isAttacking && canSegment && Client.Npc.ShouldRenderRun(mapNpcNum, runFrames, tick, Data.MyMapNpc[mapNpcNum].Steps);
-            bool isMoving = (provisionalMoving || finishingRun) && !isAttacking && canSegment;
 
+            // Moving only meaningful if segmented sheet
+            bool isMoving = provisionalMoving && !isAttacking && canSegment;
+
+            // Determine frame inside its segment (Steps driven for run; idle frame stays 0)
             if (canSegment)
             {
                 if (isAttacking)
@@ -2216,7 +2224,7 @@ namespace Client
                         tmpY = GetPlayerRawY((int) i) + 35;
 
                         // calculate the width to fill
-                        if (width > 0)
+                        if (width > 0L)
                             GameState.BarWidthPlayerHPMax[(int) i] = (int) Math.Round(
                                 GetPlayerVital((int) i, Vital.Health) / (double) width /
                                 (GetPlayerMaxVital((int) i, Vital.Health) / (double) width) * width);
@@ -2728,7 +2736,7 @@ namespace Client
                 anim = (byte)(Data.Player[index].Steps % frameColumnsForWidth); // legacy: cycles while idle too
             }
             // Calculate the X
-            x = (int) Math.Round(Data.Player[index].X - (gfxInfo.Width / (double)frameColumnsForWidth - 32d) / 2d);
+            x = (int)Math.Round(Data.Player[index].X - (gfxInfo.Width / (double)frameColumnsForWidth - 32d) / 2d);
 
             // Is the player's height more than 32..?
             if ((gfxInfo.Height / directionRows) > 32)
@@ -2766,7 +2774,7 @@ namespace Client
 
             // check for paperdolling with directional draw order rules
             // Rule: draw weapon first when facing up (behind), draw weapon last when facing down (in front)
-            var dirVal = (Direction) GetPlayerDir(index);
+            var dirVal = (Direction)GetPlayerDir(index);
             Equipment[] eqOrder = new[] { Equipment.Weapon, Equipment.Armor, Equipment.Helmet, Equipment.Shield };
 
             // Treat diagonals as their vertical tendency
@@ -2870,7 +2878,7 @@ namespace Client
 
                     default:
                     {
-                        // Draw fallback outline rectangle if graphic type is unknown
+                        // Draw fallback outline if the graphic type is unknown
                         DrawOutlineRectangle(GameLogic.ConvertMapX(worldX), GameLogic.ConvertMapY(worldY), GameState.SizeX, GameState.SizeY, Color.Blue, 0.6f);
                         break;
                     }
@@ -3057,6 +3065,7 @@ namespace Client
                             for (int i = 0; i < tokens.Length; i++) tokens[i] = tokens[i].Trim().ToLowerInvariant();
                             if (!(tokens.Contains("idle") && tokens.Contains("run") && tokens.Contains("attack")))
                                 tokens = new[] { "idle", "run", "attack" };
+
                             int runningOffset = 0;
                             int idleOffset = 0, runOffset = 0, attackOffset = 0;
                             for (int i = 0; i < tokens.Length; i++)
@@ -3095,7 +3104,6 @@ namespace Client
                                 else if (isMoving) segmentOffset = runOffset;
                                 else segmentOffset = idleOffset;
                             }
-
                             int frameColumn = Math.Min(frameColumnsForWidth - 1, segmentOffset + frameWithinSegment);
 
                             double frameWidthD = gfxInfo.Width / (double)frameColumnsForWidth;
