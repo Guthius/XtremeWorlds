@@ -2618,7 +2618,7 @@ public class Crystalshire
                 width: 140,
                 height: 22,
                 text: text,
-                font: Font.Arial,
+                font: Font.Georgia,
                 designNorm: Design.Red,
                 designHover: Design.RedHover,
                 designMousedown: Design.RedClick,
