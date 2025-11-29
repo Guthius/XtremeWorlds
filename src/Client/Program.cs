@@ -268,7 +268,7 @@ namespace Client
                     var loaded = LoadFont(DataPath.Fonts, f);
                     TextRenderer.Fonts[f] = loaded;
                     // Prefer Georgia as the default if available; otherwise use the first loaded font.
-                    if (defaultFont == null || f == Font.Georgia)
+                    if (defaultFont == null || f == Font.PixelGeorgiaBold)
                     {
                         defaultFont = loaded;
                     }
@@ -2449,7 +2449,7 @@ namespace Client
                                 y -= shift; // move anchor up to sprite top
                             }
                             // Nameplate sits (margin + textHeight) above spriteTop
-                            int textHeight = (int)Math.Ceiling(TextRenderer.Fonts[Font.Georgia].LineSpacing * 12f / 16f);
+                            int textHeight = (int)Math.Ceiling(TextRenderer.Fonts[Font.PixelGeorgiaBold].LineSpacing * 12f / 16f);
                             int nameGap = 4; // from TextRenderer
                             int bubbleExtra = 4; // extra visual gap above name
                             y -= (textHeight);
@@ -2484,7 +2484,7 @@ namespace Client
             withBlock.Msg = withBlock.Msg.Replace("\0", string.Empty);
 
             // word wrap
-            TextRenderer.WordWrap(withBlock.Msg, Font.Georgia, GameState.ChatBubbleWidth, ref theArray);
+            TextRenderer.WordWrap(withBlock.Msg, Font.PixelGeorgiaBold, GameState.ChatBubbleWidth, ref theArray);
 
             // find max width
             tmpNum = Information.UBound(theArray);
@@ -2492,8 +2492,8 @@ namespace Client
             var loopTo = tmpNum;
             for (i = 0L; i <= loopTo; i++)
             {
-                if (TextRenderer.GetTextWidth(theArray[(int) i], Font.Georgia) > maxWidth)
-                    maxWidth = TextRenderer.GetTextWidth(theArray[(int) i], Font.Georgia);
+                if (TextRenderer.GetTextWidth(theArray[(int) i], Font.PixelGeorgiaBold) > maxWidth)
+                    maxWidth = TextRenderer.GetTextWidth(theArray[(int) i], Font.PixelGeorgiaBold);
             }
 
             // calculate the new position 
@@ -2559,7 +2559,7 @@ namespace Client
                     continue;
 
                 // Measure button text size and apply padding
-                var textSize = TextRenderer.Fonts[Font.Georgia].MeasureString(theArray[(int) i]);
+                var textSize = TextRenderer.Fonts[Font.PixelGeorgiaBold].MeasureString(theArray[(int) i]);
                 float actualWidth = textSize.X;
                 float actualHeight = textSize.Y;
 

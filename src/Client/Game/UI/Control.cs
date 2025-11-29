@@ -8,7 +8,7 @@ public abstract class Control : Component
     public int Value { get; set; }
     public string Text { get; set; } = string.Empty;
     public Alignment Align { get; set; } = Alignment.Left;
-    public Font Font { get; set; } = Font.Georgia;
+    public Font Font { get; set; } = Font.PixelGeorgiaBold;
     public Color Color { get; set; } = Color.White;
     public int Alpha { get; set; } = 255;
     public int XOffset { get; set; }

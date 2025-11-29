@@ -126,13 +126,13 @@ public static class TextRenderer
             var fontsDir = Path.Combine(baseDir, "Content", "Fonts");
             var datPath = Path.Combine(fontsDir, fontName + ".dat");
             var pngPath = Path.Combine(fontsDir, fontName + ".png");
-            if (LoadLegacyBitmapFont(Font.Georgia, datPath, pngPath, gd)) return;
+            if (LoadLegacyBitmapFont(Font.PixelGeorgiaBold, datPath, pngPath, gd)) return;
         }
         catch { }
     }
 
     // Adjust GetTextWidth to use scale parameter for bitmap fonts when needed
-    public static int GetTextWidth(string text, Font font = Font.Georgia, float textSize = 1.0f)
+    public static int GetTextWidth(string text, Font font = Font.PixelGeorgiaBold, float textSize = 1.0f)
     {
         if (TryGetBitmapFont(font, out var bf))
         {
@@ -170,7 +170,7 @@ public static class TextRenderer
         // SpriteFont fallback unchanged
         if (!Fonts.TryGetValue(font, out var spriteFont))
         {
-            if (!Fonts.TryGetValue(Font.Georgia, out spriteFont))
+            if (!Fonts.TryGetValue(Font.PixelGeorgiaBold, out spriteFont))
             {
                 if (Fonts.Count > 0)
                 {
@@ -195,7 +195,7 @@ public static class TextRenderer
     {
         // wordwrap
         string[] wrappedLines = System.Array.Empty<string>();
-        WordWrap(text, Font.Georgia, WindowManager.Windows[WindowManager.GetWindowIndex("winChat")].Width, ref wrappedLines);
+        WordWrap(text, Font.PixelGeorgiaBold, WindowManager.Windows[WindowManager.GetWindowIndex("winChat")].Width, ref wrappedLines);
 
         GameState.ChatHighIndex += wrappedLines.Length;
 
@@ -306,7 +306,7 @@ public static class TextRenderer
         }
     }
 
-    public static void RenderText(string text, int x, int y, Color frontColor, Color backColor, Font font = Font.Georgia, float textSize = 1.0f)
+    public static void RenderText(string text, int x, int y, Color frontColor, Color backColor, Font font = Font.PixelGeorgiaBold, float textSize = 1.0f)
     {
         if (string.IsNullOrEmpty(text)) return;
         if (GameClient.SpriteBatch == null) return;
@@ -364,7 +364,7 @@ public static class TextRenderer
         // SpriteFont fallback – apply textSize consistently
         if (!Fonts.TryGetValue(font, out var spriteFont))
         {
-            if (!Fonts.TryGetValue(Font.Georgia, out spriteFont))
+            if (!Fonts.TryGetValue(Font.PixelGeorgiaBold, out spriteFont))
             {
                 if (Fonts.Count > 0)
                 {
@@ -568,7 +568,7 @@ public static class TextRenderer
         }
 
         int spriteTopScreenY = GameLogic.ConvertMapY(spriteTopWorldY);
-        int textPixelHeight = (int)Math.Ceiling(Fonts[Font.Georgia].LineSpacing * 12f / 16f);
+        int textPixelHeight = (int)Math.Ceiling(Fonts[Font.PixelGeorgiaBold].LineSpacing * 12f / 16f);
         int margin = 8;
 
         textY = spriteTopScreenY - textPixelHeight + margin;
@@ -629,7 +629,7 @@ public static class TextRenderer
                     }
 
                     int spriteTopScreenY = GameLogic.ConvertMapY(spriteTopWorldY);
-                    int textPixelHeight = (int)Math.Ceiling(Fonts[Font.Georgia].LineSpacing * 12f / 16f);
+                    int textPixelHeight = (int)Math.Ceiling(Fonts[Font.PixelGeorgiaBold].LineSpacing * 12f / 16f);
                     int margin = 8;
                     textY = spriteTopScreenY - textPixelHeight + margin;
                 }
@@ -787,7 +787,7 @@ public static class TextRenderer
                 {
                     // word wrap
                     string[] wrappedLines = new string[0];
-                    WordWrap(Data.Chat[(int) i].Text, Font.Georgia, width, ref wrappedLines);
+                    WordWrap(Data.Chat[(int) i].Text, Font.PixelGeorgiaBold, width, ref wrappedLines);
 
                     // continue on
                     yOffset = yOffset - 10 * wrappedLines.Length;
@@ -938,13 +938,13 @@ public static class TextRenderer
         // Convert top of sprite to screen coordinates
         int spriteTopScreenY = GameLogic.ConvertMapY(spriteTopWorldY);
 
-        int textPixelHeight = (int)Math.Ceiling(Fonts[Font.Georgia].LineSpacing * 12f / 16f);
+        int textPixelHeight = (int)Math.Ceiling(Fonts[Font.PixelGeorgiaBold].LineSpacing * 12f / 16f);
         int margin = 8;
         textY = spriteTopScreenY - textPixelHeight + margin;
         RenderText(name, textX, textY, color, backColor);
     }
 
-    public static int GetTextHeight(string text, Font font = Font.Georgia, float textSize = 1.0f)
+    public static int GetTextHeight(string text, Font font = Font.PixelGeorgiaBold, float textSize = 1.0f)
     {
         if (TryGetBitmapFont(font, out var bf))
         {
@@ -961,7 +961,7 @@ public static class TextRenderer
         // SpriteFont fallback unchanged
         if (!Fonts.TryGetValue(font, out var spriteFont))
         {
-            if (!Fonts.TryGetValue(Font.Georgia, out spriteFont))
+            if (!Fonts.TryGetValue(Font.PixelGeorgiaBold, out spriteFont))
             {
                 if (Fonts.Count > 0)
                 {
