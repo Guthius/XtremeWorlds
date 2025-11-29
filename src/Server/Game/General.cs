@@ -896,7 +896,7 @@ namespace Server
             return System.Threading.Tasks.Task.CompletedTask;
         }
 
-        private static async System.Threading.Tasks.Task SavePlayerDataAsync(int playerIndex)
+        public static async System.Threading.Tasks.Task SavePlayerDataAsync(int playerIndex)
         {
             try
             {

@@ -56,15 +56,18 @@ public static class Script
             {
                 Instance = instance;
                 General.Logger.LogInformation("Script loaded successfully!");
-                Script.Instance?.UpdateMaxValues();
+                Script.Instance?.UpdateMaxValues();                
+                for (int i = 0; i < Variables.MaxPlayers; i++)
+                {
+                    if (IsPlaying(i))
+                    {
+                        NetworkSend.AlertMsg(i, SystemMessage.ServerMaintenance, Menu.Login);
+                        await Player.LeftGame(i);
+                    }
+                }
                 General.InitalizeCoreData();
                 await General.LoadGameContentAsync();
                 await General.SpawnGameObjectsAsync();
-
-                if (playerId > 0)
-                {
-                    NetworkSend.PlayerMsg(playerId, "Script saved successfully! If you changed any max values, you may need to restart the server.", (int) ColorName.Yellow);
-                }
             }
         }
         catch (Exception ex)

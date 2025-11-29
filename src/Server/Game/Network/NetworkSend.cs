@@ -33,6 +33,17 @@ public static class NetworkSend
         _ = Player.LeftGame(session.Id);
     }
 
+    public static void AlertMsg(int playerId, SystemMessage menuNo, Menu menuReset = 0, bool kick = true)
+    {
+        var packetWriter = new PacketWriter(16);
+        packetWriter.WriteEnum(ServerPackets.SAlertMsg);
+        packetWriter.WriteByte((byte)menuNo);
+        packetWriter.WriteInt32((byte)menuReset);
+        packetWriter.WriteInt32(kick ? 1 : 0);
+        PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
+        _ = Player.LeftGame(playerId);
+    }
+
     public static void GlobalMsg(string message)
     {
         var packetWriter = new PacketWriter();
