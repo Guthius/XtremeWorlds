@@ -254,7 +254,7 @@ public class Crystalshire
                 if (WindowManager.TryGetControl("winMapEditor", "chkIndoors", out var chkIndoors))
                     Data.MyMap.Indoors = chkIndoors.Value == 1;
 
-                // Resize map (mirror Editors.UpdateMap)
+                // Resize map
                 var tempArr = (Type.Tile[,])Data.MyMap.Tile.Clone();
                 int prevMaxX = Data.MyMap.MaxX;
                 int prevMaxY = Data.MyMap.MaxY;
@@ -2643,6 +2643,7 @@ public class Crystalshire
         if (win is null) return;
         var lst = win.GetChild("lstMaps");
         if (lst is null || string.IsNullOrEmpty(lst.Text)) return;
+
         // Draw a black background panel behind the list area for readability
         DesignRenderer.Render(Design.TextBlack,
             win.X + lst.X,

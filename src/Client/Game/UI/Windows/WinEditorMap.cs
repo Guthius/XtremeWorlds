@@ -350,8 +350,9 @@ public static class WinEditorMap
 
     public static void LoadMap()
     {
-        // assumes Data.MyMap is already the current map the editor is editing
         var map = Data.MyMap;
+
+        map.Tileset = 1;
 
         // Name
         if (WindowManager.TryGetControl("winMapEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
