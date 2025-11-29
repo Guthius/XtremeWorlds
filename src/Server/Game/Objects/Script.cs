@@ -54,6 +54,7 @@ public static class Script
             {
                 Instance = instance;
                 Script.Instance?.UpdateMaxValues();
+                General.InitalizeCoreData();
 
                 if (playerId > 0)
                 {
