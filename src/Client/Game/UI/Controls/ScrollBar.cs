@@ -34,9 +34,9 @@ public sealed class ScrollBar : Control
 
         // Default value label to the right of the scrollbar
         string label = Value.ToString();
-        var size = TextRenderer.Fonts[Core.Globals.Font.Arial].MeasureString(label);
+        var size = TextRenderer.Fonts[Font].MeasureString(label);
         int textX = X + x + Width + 6;
         int textY = Y + y + (Height - (int)size.Y) / 2;
-        TextRenderer.RenderText(label, textX, textY, Color.White, Color.Black, Core.Globals.Font.Arial);
+        TextRenderer.RenderText(label, textX, textY, Color.White, Color.Black, Font);
     }
 }

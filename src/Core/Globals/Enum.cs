@@ -511,7 +511,9 @@ public enum Font
     None,
     Georgia,
     Arial,
-    Verdana
+    Verdana,
+    PixelGeorgia,
+    PixelGeorgiaBold
 }
 
 /// <summary>

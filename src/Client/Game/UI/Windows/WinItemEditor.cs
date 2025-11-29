@@ -2,6 +2,7 @@ using Client.Game.UI;
 using Client.Game.UI.Controls;
 using Core.Globals;
 using System;
+using System.IO;
 
 namespace Client.Game.UI.Windows;
 
@@ -19,6 +20,8 @@ public static class WinItemEditor
 		SelectedIndex = Math.Clamp(GameState.EditorIndex, 0, Variables.MaxItems - 1);
 		RefreshList();
 		LoadItem(SelectedIndex);
+		// Ensure subtype list is built on init
+		BuildSubtypeList();
 	}
 
 	private static void RefreshList()
@@ -63,11 +66,11 @@ public static class WinItemEditor
 				cmbType.Items.Add(name);
 		}
 
-		// Item level (0-99)
+		// Item level
 		if (WindowManager.TryGetControl("winItemEditor", "cmbItemLevel", out var lvlComboCtrl) && lvlComboCtrl is ComboBox cmbItemLevel)
 		{
 			cmbItemLevel.Items.Clear();
-			for (int i = 0; i <= 99; i++)
+			for (int i = 1; i <= GameState.MaxLevel; i++)
 				cmbItemLevel.Items.Add(i.ToString());
 		}
 
@@ -92,11 +95,11 @@ public static class WinItemEditor
 			}
 		}
 
-		// Rarity (0-5)
+		// Rarity (1-6)
 		if (WindowManager.TryGetControl("winItemEditor", "cmbItemRarity", out var rarComboCtrl) && rarComboCtrl is ComboBox cmbRarity)
 		{
 			cmbRarity.Items.Clear();
-			for (int i = 0; i <= 5; i++)
+			for (int i = 1; i <= 6; i++)
 				cmbRarity.Items.Add(i.ToString());
 		}
 
@@ -114,13 +117,12 @@ public static class WinItemEditor
 			cmbAcc.Items.Clear();
 			foreach (var name in Enum.GetNames(typeof(AccessLevel)))
 			{
-				// Insert spaces before capital letters after the first character
 				string display = System.Text.RegularExpressions.Regex.Replace(name, "(?<!^)([A-Z])", " $1");
 				cmbAcc.Items.Add(display);
 			}
 		}
 
-		// Tool list
+		// Tool list (resource names)
 		if (WindowManager.TryGetControl("winItemEditor", "cmbItemTool", out var toolCtrl) && toolCtrl is ComboBox cmbTool)
 		{
 			cmbTool.Items.Clear();
@@ -169,6 +171,43 @@ public static class WinItemEditor
 		}
 	}
 
+	public static void BuildSubtypeList()
+	{
+		if (!WindowManager.TryGetControl("winItemEditor", "cmbItemSubType", out var subCtrl) || subCtrl is not ComboBox cmbSub)
+			return;
+		cmbSub.Items.Clear();
+		var type = (ItemCategory)Math.Clamp(Data.Item[SelectedIndex].Type, 0, int.MaxValue);
+		switch (type)
+		{
+			case ItemCategory.Equipment:
+				cmbSub.Items.Add("Weapon");
+				cmbSub.Items.Add("Armor");
+				cmbSub.Items.Add("Helmet");
+				cmbSub.Items.Add("Shield");
+				break;
+			case ItemCategory.Consumable:
+				cmbSub.Items.Add("HP");
+				cmbSub.Items.Add("MP");
+				cmbSub.Items.Add("SP");
+				cmbSub.Items.Add("Exp");
+				break;
+			case ItemCategory.Event:
+				cmbSub.Items.Add("Switches");
+				cmbSub.Items.Add("Variables");
+				cmbSub.Items.Add("Key");
+				cmbSub.Items.Add("Custom Script");
+				break;
+			default:
+				// no subtype for other categories
+				break;
+		}
+		if (cmbSub.Items.Count > 0)
+		{
+			var sub = Math.Clamp(Data.Item[SelectedIndex].SubType, 0, cmbSub.Items.Count - 1);
+			cmbSub.Value = sub;
+		}
+	}
+
 	public static void LoadItem(int index)
 	{
 		if (index < 0 || index >= Variables.MaxItems) return;
@@ -192,6 +231,16 @@ public static class WinItemEditor
 		}
 		if (WindowManager.TryGetControl("winItemEditor", "txtItemPaperdoll", out var pdCtrl) && pdCtrl is TextBox txtPd)
 			txtPd.Text = item.Paperdoll.ToString();
+		// Paperdoll scrollbar range and value
+		if (WindowManager.TryGetControl("winItemEditor", "sldItemPaperdoll", out var pdScrollCtrl) && pdScrollCtrl is ScrollBar sldPd)
+		{
+			sldPd.Min = 0;
+			sldPd.Max = Math.Max(0, GameState.NumPaperdolls);
+			sldPd.Value = Math.Clamp(item.Paperdoll, sldPd.Min, sldPd.Max);
+		}
+		// Hook paperdoll draw if not already (safe to set repeatedly)
+		if (WindowManager.TryGetControl("winItemEditor", "picItemPaperdoll", out var pdPicCtrl) && pdPicCtrl is PictureBox pdPic)
+			pdPic.OnDraw = OnDrawPaperdoll;
 
 		if (WindowManager.TryGetControl("winItemEditor", "cmbItemType", out var typeCtrl) && typeCtrl is ComboBox cmbType)
 			cmbType.Value = Math.Clamp(item.Type, 0, cmbType.Items.Count - 1);
@@ -203,26 +252,22 @@ public static class WinItemEditor
 			cmbBind.Value = Math.Clamp(item.BindType, 0, cmbBind.Items.Count - 1);
 
 		if (WindowManager.TryGetControl("winItemEditor", "cmbItemLevel", out var lvlCtrl) && lvlCtrl is ComboBox cmbItemLevel)
-			cmbItemLevel.Value = Math.Clamp(item.ItemLevel, 0, cmbItemLevel.Items.Count - 1);
+			cmbItemLevel.Value = Math.Clamp(item.ItemLevel - 1, 0, cmbItemLevel.Items.Count - 1);
 		if (WindowManager.TryGetControl("winItemEditor", "txtItemPrice", out var priceCtrl) && priceCtrl is TextBox txtPrice)
 			txtPrice.Text = item.Price.ToString();
 		if (WindowManager.TryGetControl("winItemEditor", "cmbItemRarity", out var rarCtrl) && rarCtrl is ComboBox cmbRarity)
-			cmbRarity.Value = Math.Clamp(item.Rarity, 0, cmbRarity.Items.Count - 1);
+			cmbRarity.Value = Math.Clamp(item.Rarity - 1, 0, cmbRarity.Items.Count - 1);
 		if (WindowManager.TryGetControl("winItemEditor", "chkItemStackable", out var stackCtrl) && stackCtrl is CheckBox chkStack)
 			chkStack.Value = item.Stackable != 0 ? 1 : 0;
 
 		// Equipment & stats
-		if (WindowManager.TryGetControl("winItemEditor", "sldItemDamage", out var dmgCtrl) && dmgCtrl is ScrollBar sldDmg)
+		if (WindowManager.TryGetControl("winItemEditor", "txtItemDamage", out var dmgText) && dmgText is TextBox txtDmg)
 		{
-			sldDmg.Min = 0;
-			sldDmg.Max = 1000;
-			sldDmg.Value = Math.Clamp(item.Data2, sldDmg.Min, sldDmg.Max);
+			txtDmg.Text = item.Data2.ToString();
 		}
-		if (WindowManager.TryGetControl("winItemEditor", "sldItemSpeed", out var spdCtrl) && spdCtrl is ScrollBar sldSpeed)
+		if (WindowManager.TryGetControl("winItemEditor", "txtItemSpeed", out var spdText) && spdText is TextBox txtSpd)
 		{
-			sldSpeed.Min = 0;
-			sldSpeed.Max = 10000;
-			sldSpeed.Value = Math.Clamp(item.Speed, sldSpeed.Min, sldSpeed.Max);
+			txtSpd.Text = item.Speed.ToString();
 		}
 		if (WindowManager.TryGetControl("winItemEditor", "chkItemKnockBack", out var kbCtrl2) && kbCtrl2 is CheckBox chkKb)
 			chkKb.Value = item.KnockBack != 0 ? 1 : 0;
@@ -318,6 +363,9 @@ public static class WinItemEditor
 			cmbJob2.Value = Math.Clamp(item.JobReq, 0, cmbJob2.Items.Count - 1);
 		if (WindowManager.TryGetControl("winItemEditor", "cmbItemAccessReq", out var aCtrl2) && aCtrl2 is ComboBox cmbAcc2)
 			cmbAcc2.Value = Math.Clamp(item.AccessReq, 0, cmbAcc2.Items.Count - 1);
+
+		// Rebuild subtype list now that type is applied
+		BuildSubtypeList();
 	}
 
 	public static void OnDrawIcon()
@@ -333,18 +381,37 @@ public static class WinItemEditor
 		if (!WindowManager.TryGetControl("winItemEditor", "picItemIcon", out var iconCtrl) || iconCtrl is not PictureBox pic)
 			return;
 
-		// Icons are stored as individual textures per icon index (e.g. 1.png, 2.png)
-		string texturePath = System.IO.Path.Combine(DataPath.Items, item.Icon.ToString());
+		string texturePath = Path.Combine(DataPath.Items, item.Icon.ToString());
 		var tex = GameClient.GetGfxInfo(texturePath);
 		if (tex is null || tex.Width == 0 || tex.Height == 0) return;
 
 		int iconSize = 32;
-		int iconsPerRow = tex.Width / iconSize;
-		if (iconsPerRow <= 0) iconsPerRow = 1;
 		int drawX = win.X + pic.X + (pic.Width - iconSize) / 2;
 		int drawY = win.Y + pic.Y + (pic.Height - iconSize) / 2;
 
 		GameClient.RenderTexture(ref texturePath, drawX, drawY, 0, 0, iconSize, iconSize, iconSize, iconSize);
+	}
+
+	public static void OnDrawPaperdoll()
+	{
+		var win = WindowManager.GetWindowByName("winItemEditor");
+		if (win is null) return;
+		if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
+		var item = Data.Item[SelectedIndex];
+		if (item.Paperdoll < 1 || item.Paperdoll > GameState.NumPaperdolls) return;
+		if (!WindowManager.TryGetControl("winItemEditor", "picItemPaperdoll", out var ctrl) || ctrl is not PictureBox pic)
+			return;
+		string texturePath = Path.Combine(DataPath.Paperdolls, item.Paperdoll.ToString());
+		var tex = GameClient.GetGfxInfo(texturePath);
+		if (tex is null || tex.Width == 0 || tex.Height == 0) return;
+		// Draw top-left frame cropped into 64x64 dest
+		int srcW = Math.Min(64, tex.Width);
+		int srcH = Math.Min(64, tex.Height);
+		int destW = pic.Width;
+		int destH = pic.Height;
+		int drawX = win.X + pic.X + (pic.Width - destW) / 2;
+		int drawY = win.Y + pic.Y + (pic.Height - destH) / 2;
+		GameClient.RenderTexture(ref texturePath, drawX, drawY, 0, 0, srcW, srcH, destW, destH);
 	}
 
 	public static void OnListMouseDown()

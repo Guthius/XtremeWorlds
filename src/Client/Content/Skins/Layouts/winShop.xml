@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Window Name="winShop" Caption="Shop" Size="278, 293" Position="0, 0" Font="Georgia" Icon="17" Design="WindowEmpty" StartPosition="CenterScreen">
+<Window Name="winShop" Caption="Shop" Size="278, 293" Position="0, 0" Font="PixelGeorgiaBold" Icon="17" Design="WindowEmpty" StartPosition="CenterScreen">
 	<!-- Parchment background area drawn into by onDraw (legacy coordinates) -->
 	<PictureBox Name="picParchment" Position="6, 215" Size="266, 50" Design="Parchment"/>
 
@@ -8,19 +8,19 @@
 	<PictureBox Name="picItem" Position="15, 224" Size="32, 32"/>
 
 	<!-- Buy/Sell buttons (Sell hidden by default) -->
-	<Button Name="btnBuy" Text="Buy" Position="190, 228" Size="70, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick" Font="Arial"/>
-	<Button Name="btnSell" Text="Sell" Position="190, 228" Size="70, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick" Font="Arial" Visible="False"/>
+	<Button Name="btnBuy" Text="Buy" Position="190, 228" Size="70, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick" Font="PixelGeorgiaBold"/>
+	<Button Name="btnSell" Text="Sell" Position="190, 228" Size="70, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick" Font="PixelGeorgiaBold" Visible="False"/>
 
 	<!-- Mode checkboxes -->
 	<CheckBox Name="CheckboxBuying" Text="Buying" Position="173, 265" Size="49, 20" Design="CheckboxBuying"/>
 	<CheckBox Name="CheckboxSelling" Text="Selling" Position="222, 265" Size="49, 20" Design="CheckboxSelling"/>
 
 	<!-- Labels for item name & cost (adjusted to avoid overlapping close button) -->
-	<Label Name="lblName" Text="" Position="56, 226" Size="190, 10" Font="Arial"/>
-	<Label Name="lblCost" Text="" Position="56, 238" Size="190, 10" Font="Arial"/>
+	<Label Name="lblName" Text="" Position="56, 226" Size="190, 10" Font="PixelGeorgiaBold"/>
+	<Label Name="lblCost" Text="" Position="56, 238" Size="190, 10" Font="PixelGeorgiaBold"/>
 
 	<!-- Optional gold label (commented out in legacy; add if needed) -->
-	<!-- <Label Name="lblGold" Text="g" Position="44, 269" Size="300, 10" Font="Georgia"/> -->
+	<!-- <Label Name="lblGold" Text="g" Position="44, 269" Size="300, 10" Font="PixelGeorgiaBold"/> -->
 
 	<!-- Close button -->
 	<Button Name="btnClose" Position="259, 6" Size="16, 16" Image="8" ImageHover="9" ImageMouseDown="10"/>

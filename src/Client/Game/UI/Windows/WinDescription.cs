@@ -67,7 +67,7 @@ public static class WinDescription
                 x + 140 - TextRenderer.GetTextWidth(GameState.Description[i].Caption) / 2,
                 y + offset,
                 GameClient.ToXnaColor(GameState.Description[i].Color),
-                Color.Black);
+                Color.Black, winDescription.Font);
 
             offset += 12;
         }

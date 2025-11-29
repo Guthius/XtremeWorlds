@@ -26,7 +26,7 @@ public sealed class GroupBox : Control
         // Caption
         if (!string.IsNullOrWhiteSpace(Text))
         {
-            TextRenderer.RenderText(Text, absX + CaptionOffsetX, absY + CaptionOffsetY, Color.White, Color.Black);
+            TextRenderer.RenderText(Text, absX + CaptionOffsetX, absY + CaptionOffsetY, Color.White, Color.Black, Font);
         }
     }
 

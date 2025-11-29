@@ -2666,7 +2666,7 @@ public class Crystalshire
             var line = lines[start + i];
             if (!string.IsNullOrEmpty(line))
             {
-                TextRenderer.RenderText(line, x, y + i * lineHeight, Microsoft.Xna.Framework.Color.White, Microsoft.Xna.Framework.Color.Black);
+                TextRenderer.RenderText(line, x, y + i * lineHeight, Microsoft.Xna.Framework.Color.White, Microsoft.Xna.Framework.Color.Black, win.Font);
             }
         }
     }

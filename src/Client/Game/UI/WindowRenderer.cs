@@ -110,7 +110,7 @@ public static class WindowRenderer
             window.Width, window.Height,
             window.Width, window.Height);
 
-        TextRenderer.RenderText(window.Text, window.X + 32, window.Y + 4, Color.White, Color.Black);
+        TextRenderer.RenderText(window.Text, window.X + 32, window.Y + 4, Color.White, Color.Black, window.Font);
     }
 
     private static void RenderWindowNoBar(Window window)
@@ -136,7 +136,7 @@ public static class WindowRenderer
             window.Width, window.Height,
             window.Width, window.Height);
 
-        TextRenderer.RenderText(window.Text, window.X + 32, window.Y + 4, Color.White, Color.Black);
+        TextRenderer.RenderText(window.Text, window.X + 32, window.Y + 4, Color.White, Color.Black, window.Font);
     }
 
     private static void RenderWindowDescription(Window window)

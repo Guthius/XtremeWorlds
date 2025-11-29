@@ -1512,7 +1512,7 @@ public class WindowManager
                                 (int)x,
                                 (int)y,
                                 GameClient.QbColorToXnaColor(color),
-                                GameClient.QbColorToXnaColor(color));
+                                GameClient.QbColorToXnaColor(color), winTrade.Font);
                         }
                     }
                 }
@@ -1578,7 +1578,7 @@ public class WindowManager
                             (int)x,
                             (int)y,
                             GameClient.QbColorToXnaColor(color),
-                            GameClient.QbColorToXnaColor(color));
+                            GameClient.QbColorToXnaColor(color), winTrade.Font);
                     }
                 }
             }

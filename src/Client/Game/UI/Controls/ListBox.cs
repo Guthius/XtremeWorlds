@@ -64,7 +64,7 @@ public sealed class ListBox : Control
             // Render item text
             if (!string.IsNullOrEmpty(itemText))
             {
-                TextRenderer.RenderText(itemText, contentX, itemY, TextColor, BackgroundColor);
+                TextRenderer.RenderText(itemText, contentX, itemY, TextColor, BackgroundColor, Font);
             }
         }
     }
