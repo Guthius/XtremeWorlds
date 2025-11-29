@@ -3,7 +3,7 @@
     <PropertyGroup>
         <Version>2.4.9</Version>
         <TargetFrameworks>net10.0-windows;net10.0</TargetFrameworks>
-        <RootNamespace>Server</RootNamespace>
+        <RootNamespace>XtremeWorlds.Server</RootNamespace>
         <ApplicationIcon>Resources\Icon.ico</ApplicationIcon>
         <OutputPath>..\..\Build\Server\</OutputPath>
         <DefineConstants>SERVER</DefineConstants>
