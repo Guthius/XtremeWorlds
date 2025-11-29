@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Window Name="winComboMenu" Caption="ComboMenu" Size="100,100" Position="0,0" Font="PixelGeorgiaBold" Design="ComboMenu" StartPosition="CenterScreen"/>
+<Window Name="winComboMenu" Caption="ComboMenu" Size="100,100" Position="0,0" Font="Georgia" Design="ComboMenu" StartPosition="CenterScreen"/>

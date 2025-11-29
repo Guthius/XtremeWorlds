@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Window Name="winMenu" Size="229, 30" Position="571, 569" Font="PixelGeorgiaBold">
+<Window Name="winMenu" Size="229, 30" Position="571, 569" Font="Georgia">
     <PictureBox Name="picWood" Position="0, 5" Size="228, 20" Design="Wood"/>
 
     <Button Name="btnChar" Position="8, 0" Size="29, 29" Icon="108" Design="Green"/>

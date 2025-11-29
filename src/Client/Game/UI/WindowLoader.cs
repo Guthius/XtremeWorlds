@@ -6,7 +6,7 @@ namespace Client.Game.UI;
 
 public static class WindowLoader
 {
-    private const Font DefaultWindowFont = Font.PixelGeorgiaBold;
+    private const Font DefaultWindowFont = Font.Georgia;
     private const Font DefaultControlFont = Font.Arial;
 
     public static Window FromLayout(string layoutName)

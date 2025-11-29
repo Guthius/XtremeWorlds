@@ -161,7 +161,7 @@ public class WindowManager
     }
 
     public static void CreateTextbox(int windowIndex, string name, int left, int top, int width, int height,
-        string text = "", Font font = Font.PixelGeorgiaBold, Alignment align = Alignment.Left, bool visible = true,
+        string text = "", Font font = Font.Georgia, Alignment align = Alignment.Left, bool visible = true,
         int alpha = 255, bool isActive = true, int xOffset = 0, int yOffset = 0, int? imageNorm = null,
         int? imageHover = null, int? imageMousedown = null, Design designNorm = Design.None,
         Design designHover = Design.None, Design designMousedown = Design.None, bool censor = false, int icon = 0,
@@ -284,7 +284,7 @@ public class WindowManager
     }
 
     public static void CreateButton(int windowIndex, string name, int left, int top, int width, int height,
-        string text = "", Font font = Font.PixelGeorgiaBold, int icon = 0, int? imageNorm = null, int? imageHover = null,
+        string text = "", Font font = Font.Georgia, int icon = 0, int? imageNorm = null, int? imageHover = null,
         int? imageMousedown = null, bool visible = true, Design designNorm = Design.None, Design? designHover = null,
         Design? designMousedown = null, Action? callbackNorm = null, Action? callbackHover = null,
         Action? callbackMousedown = null, Action? callbackMousemove = null, Action? callbackDblclick = null,
@@ -385,7 +385,7 @@ public class WindowManager
     }
 
     public static void CreateCheckBox(int windowIndex, string name, int left, int top, int width, int height = 15,
-        int value = 0, string text = "", Font font = Font.PixelGeorgiaBold, bool visible = true, Design theDesign = Design.None,
+        int value = 0, string text = "", Font font = Font.Georgia, bool visible = true, Design theDesign = Design.None,
         int group = 0, Action? callbackNorm = null, Action? callbackHover = null, Action? callbackMousedown = null,
         Action? callbackMousemove = null, Action? callbackDblclick = null)
     {

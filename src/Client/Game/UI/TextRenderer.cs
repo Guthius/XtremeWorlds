@@ -3,7 +3,6 @@ using Core.Globals;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.IO;
-using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using static Core.Globals.Command;
 
@@ -12,9 +11,9 @@ namespace Client.Game.UI;
 public static class TextRenderer
 {
     public static readonly Dictionary<Font, SpriteFont> Fonts = new();
+    public static readonly Dictionary<Core.Globals.BitmapFont, BitmapFont> BitmapFonts = new();
 
-    // Bitmap font support structures
-    private class BitmapFont
+    public class BitmapFont
     {
         public Texture2D Atlas;
         public Dictionary<char, Rectangle> Glyphs = new();
@@ -22,61 +21,39 @@ public static class TextRenderer
         public int CharHeight; // CellHeight - 4 like VB
         public int Spacing; // glyph gap
         public int BaseOffset; // base char offset from header
-        public int XOffset; // per-font draw offset (baseline tweak)
-        public int YOffset; // per-font draw offset (baseline tweak)
-        public char? ColourChar; // special in-text color control marker, if used
-        public Dictionary<char,int> Adv = new();
+        public int XOffset; // baseline tweak
+        public int YOffset;
+        public char? ColourChar;
+        public Dictionary<char, int> Adv = new();
     }
-    private static readonly Dictionary<Core.Globals.BitmapFont, BitmapFont> _bitmapFonts = new();
-
-    public static Color GetColorForAmount(int amount)
-    {
-        return amount switch
+    public static Color GetColorForAmount(int amount) =>
+        amount switch
         {
-            < 1000000 => Color.White,
-            < 10000000 => Color.Yellow,
+            < 1_000_000 => Color.White,
+            < 10_000_000 => Color.Yellow,
             _ => Color.LightGreen
         };
-    }
 
-    public static string CensorText(string input)
-    {
-        return new string('*', input.Length);
-    }
+    public static string CensorText(string input) => new('*', input.Length);
 
     public static string SanitizeText(string text, SpriteFont font)
     {
-        if (string.IsNullOrEmpty(text))
-        {
-            return "";
-        }
-
-        var sanitizedText = new StringBuilder();
-
+        if (string.IsNullOrEmpty(text)) return "";
+        var sb = new StringBuilder(text.Length);
         foreach (var ch in text)
-        {
-            if (font.Characters.Contains(ch))
-            {
-                sanitizedText.Append(ch);
-            }
-        }
-
-        return sanitizedText.ToString();
+            if (font.Characters.Contains(ch)) sb.Append(ch);
+        return sb.ToString();
     }
 
-    public static void RegisterBitmapFont(Core.Globals.BitmapFont font, Texture2D atlas, Dictionary<char, Rectangle> glyphs, int lineHeight, int spacing = 1, int baseOffset = 32, Dictionary<char,int>? advances = null)
+    public static void RegisterBitmapFont(Core.Globals.BitmapFont font, Texture2D atlas, Dictionary<char, Rectangle> glyphs, int lineHeight, int spacing = 1, int baseOffset = 32, Dictionary<char, int>? advances = null)
     {
-        var bf = new BitmapFont{Atlas=atlas, Glyphs=glyphs, LineHeight=lineHeight, Spacing=spacing, BaseOffset=baseOffset};
-        if (advances!=null) bf.Adv = advances;
-        _bitmapFonts[font] = bf;
+        var bf = new BitmapFont { Atlas = atlas, Glyphs = glyphs, LineHeight = lineHeight, Spacing = spacing, BaseOffset = baseOffset };
+        if (advances != null) bf.Adv = advances;
+        BitmapFonts[font] = bf;
     }
 
-    private static bool TryGetBitmapFont(Core.Globals.BitmapFont font, out BitmapFont bf)
-    {
-        return _bitmapFonts.TryGetValue(font, out bf);
-    }
+    private static bool TryGetBitmapFont(Core.Globals.BitmapFont font, out BitmapFont bf) => BitmapFonts.TryGetValue(font, out bf);
 
-    // Load legacy .dat header (VFH) + atlas; ignores cached vertex data portion beyond widths.
     public static bool LoadLegacyBitmapFont(Core.Globals.BitmapFont font, string datPath, string pngPath, GraphicsDevice gd)
     {
         if (!File.Exists(datPath) || !File.Exists(pngPath)) return false;
@@ -99,39 +76,31 @@ public static class TextRenderer
         {
             int row = (code - baseChar) / rowPitch;
             int col = (code - baseChar) - (row * rowPitch);
-            if (row < 0) row = 0; if (col < 0) col = 0;
+            if (row < 0) row = 0;
+            if (col < 0) col = 0;
             int x = col * cellW; int y = row * cellH;
             if (x + cellW > bmpW || y + cellH > bmpH) continue;
-
             var ch = (char)code;
             glyphRects[ch] = new Rectangle(x, y, cellW, cellH);
-
-            // Use header CharWidth strictly for horizontal advance; fall back to cellW
             int w = widths[code];
             advances[ch] = w > 0 ? w : cellW;
         }
 
         RegisterBitmapFont(font, atlas, glyphRects, cellH, 0, baseChar, advances);
 
-        // Apply VB-style metrics
-        if (_bitmapFonts.TryGetValue(font, out var bf))
+        if (BitmapFonts.TryGetValue(font, out var bf))
         {
-            bf.CharHeight = Math.Max(0, cellH - 4); // VB: CellHeight - 4
-            bf.Spacing = 0; // VB: no extra gap; rely on CharWidth
+            bf.CharHeight = Math.Max(0, cellH - 4);
+            bf.Spacing = 0;
             bf.XOffset = 0;
             bf.YOffset = 0;
-            bf.ColourChar = '�'; // optional inline color marker if used
+            bf.ColourChar = '�';
         }
         return true;
     }
 
-    // Add helper method to check if a font is bitmap-enabled
-    public static bool HasBitmapFont(Core.Globals.BitmapFont font)
-    {
-        return _bitmapFonts.ContainsKey(font);
-    }
+    public static bool HasBitmapFont(Core.Globals.BitmapFont font) => BitmapFonts.ContainsKey(font);
 
-    // Public loader invoked during content load for legacy VB headers
     public static void TryLoadLegacyFont(GraphicsDevice gd, string fontName)
     {
         try
@@ -144,7 +113,8 @@ public static class TextRenderer
             {
                 fontEnum = Core.Globals.BitmapFont.Default; // Fallback
             }
-            if (LoadLegacyBitmapFont(fontEnum, datPath, pngPath, gd)) return;
+
+            _ = LoadLegacyBitmapFont(fontEnum, datPath, pngPath, gd);
         }
         catch { }
     }
@@ -154,20 +124,17 @@ public static class TextRenderer
         if (TryGetBitmapFont(font, out var bf))
         {
             if (string.IsNullOrEmpty(text)) return 0;
-            int maxLine = 0;
-            int current = 0;
-            int colorSkip = 0;
+            int maxLine = 0, current = 0, colorSkip = 0;
             foreach (var ch in text)
             {
                 if (colorSkip > 0) { colorSkip--; continue; }
                 if (ch == '\r') continue;
                 if (ch == '\n') { if (current > maxLine) maxLine = current; current = 0; continue; }
                 if (bf.ColourChar.HasValue && ch == bf.ColourChar.Value) { colorSkip = 2; continue; }
-                Rectangle rect;
-                if (!bf.Glyphs.TryGetValue(ch, out rect))
+                if (!bf.Glyphs.TryGetValue(ch, out var rect))
                     rect = bf.Glyphs.TryGetValue(' ', out var sp) ? sp : new Rectangle(0, 0, bf.LineHeight / 2, bf.LineHeight);
                 int adv = bf.Adv.TryGetValue(ch, out var a) ? a : rect.Width;
-                current += adv; // no extra spacing
+                current += adv;
             }
             int w = Math.Max(maxLine, current);
             return (int)Math.Round(w * textSize);
@@ -175,8 +142,15 @@ public static class TextRenderer
         return 0;
     }
 
+    // SpriteFont width with auto-bitmap override
     public static int GetTextWidth(string text, Font font = Font.Georgia, float textSize = 1.0f)
     {
+        // Prefer bitmap font when available; names are assumed to align across enums
+        if (Enum.TryParse<Core.Globals.BitmapFont>(SettingsManager.Instance.BitmapFont, out var bfEnum) && HasBitmapFont(bfEnum))
+        {
+            return GetTextWidth(text ?? string.Empty, bfEnum, textSize);
+        }
+
         if (!Fonts.TryGetValue(font, out var spriteFont))
         {
             if (!Fonts.TryGetValue(Font.Georgia, out spriteFont))
@@ -193,22 +167,15 @@ public static class TextRenderer
     public static void AddText(string text, int color, long alpha = 255L, byte channel = 0)
     {
         string[] wrappedLines = System.Array.Empty<string>();
-        WordWrap(text, Font.PixelGeorgiaBold, WindowManager.Windows[WindowManager.GetWindowIndex("winChat")].Width, ref wrappedLines);
-
+        WordWrap(text, Font.Georgia, WindowManager.Windows[WindowManager.GetWindowIndex("winChat")].Width, ref wrappedLines);
         GameState.ChatHighIndex += wrappedLines.Length;
+        if (GameState.ChatHighIndex > Variables.ChatLines) GameState.ChatHighIndex = Variables.ChatLines;
 
-        if (GameState.ChatHighIndex > Variables.ChatLines)
-            GameState.ChatHighIndex = Variables.ChatLines;
-
-        // Move the rest of the chat lines up
-        for (var i = (int) GameState.ChatHighIndex - wrappedLines.Length; i > 0; i--)
-        {
+        for (var i = (int)GameState.ChatHighIndex - wrappedLines.Length; i > 0; i--)
             Data.Chat[i] = Data.Chat[i - 1];
-        }
 
         for (int i = wrappedLines.Length - 1, chatIndex = 0; i >= 0; i--, chatIndex++)
         {
-            // Add the wrapped line to the chat
             Data.Chat[chatIndex].Text = wrappedLines[i];
             Data.Chat[chatIndex].Color = color;
             Data.Chat[chatIndex].Visible = true;
@@ -220,8 +187,6 @@ public static class TextRenderer
     public static void WordWrap(string text, Font font, long maxLineLen, ref string[] theArray)
     {
         var lineCount = 0L;
-
-        // Too small of text
         if (Strings.Len(text) < 2)
         {
             theArray = new string[2];
@@ -229,140 +194,104 @@ public static class TextRenderer
             return;
         }
 
-        // default values
         var b = 1L;
         var lastSpace = 1L;
         var size = 0L;
         long tmpNum = Strings.Len(text);
 
-        var loopTo = tmpNum;
-        for (var i = 1L; i <= loopTo; i++)
+        for (var i = 1L; i <= tmpNum; i++)
         {
-            // if it's a space, store it
-            switch (Strings.Mid(text, (int) i, 1) ?? "")
-            {
-                case " ":
-                {
-                    lastSpace = i;
-                    break;
-                }
-            }
+            if (Strings.Mid(text, (int)i, 1) == " ") lastSpace = i;
+            // Approximate width accumulation; fallback uses 10 per char (legacy logic)
+            size += 10L;
 
-            // Add up the size
-            size = size + 10L;
-
-            // Check for too large of a size
             if (size > maxLineLen)
             {
-                // Check if the last space was too far back
                 if (i - lastSpace > 10L)
                 {
-                    // Too far away to the last space, so break at the last character
-                    lineCount = lineCount + 1L;
-                    Array.Resize(ref theArray, (int) (lineCount));
-                    theArray[(int) lineCount - 1] = Strings.Mid(text, (int) b, (int) (i - 1L - b));
+                    lineCount++;
+                    Array.Resize(ref theArray, (int)lineCount);
+                    theArray[(int)lineCount - 1] = Strings.Mid(text, (int)b, (int)(i - 1L - b));
                     b = i - 1L;
                     size = 0L;
                 }
                 else
                 {
-                    // Break at the last space to preserve the word
-                    lineCount = lineCount + 1L;
-                    Array.Resize(ref theArray, (int) (lineCount));
-
-                    // Ensure b is within valid range
-                    if (b < 0L)
-                        b = 0L;
-
-                    if (b > text.Length)
-                        b = text.Length;
-
-                    // Ensure the length parameter is not negative
-                    var substringLength = (int) (lastSpace - b);
-                    if (substringLength < 0)
-                        substringLength = 0;
-
-                    // Extract the substring and assign it to the array
-                    theArray[(int) lineCount - 1] = Strings.Mid(text, (int) b, substringLength);
-
+                    lineCount++;
+                    Array.Resize(ref theArray, (int)lineCount);
+                    if (b < 0L) b = 0L;
+                    if (b > text.Length) b = text.Length;
+                    var substringLength = (int)(lastSpace - b);
+                    if (substringLength < 0) substringLength = 0;
+                    theArray[(int)lineCount - 1] = Strings.Mid(text, (int)b, substringLength);
                     b = lastSpace + 1L;
-                    // Count all the words we ignored (the ones that weren't printed, but are before "i")
-                    size = GetTextWidth(Strings.Mid(text, (int) lastSpace, (int) (i - lastSpace)), font);
+                    size = GetTextWidth(Strings.Mid(text, (int)lastSpace, (int)(i - lastSpace)), font);
                 }
             }
 
-            // Remainder
-            if (i == Strings.Len(text))
+            if (i == Strings.Len(text) && b != i)
             {
-                if (b != i)
-                {
-                    lineCount = lineCount + 1L;
-                    Array.Resize(ref theArray, (int) (lineCount));
-                    theArray[(int) lineCount - 1] = Strings.Mid(text, (int) b, (int) i);
-                }
+                lineCount++;
+                Array.Resize(ref theArray, (int)lineCount);
+                theArray[(int)lineCount - 1] = Strings.Mid(text, (int)b, (int)i);
             }
         }
     }
 
+    // Explicit bitmap render overload
     public static void RenderText(string text, int x, int y, Color frontColor, Color backColor, Core.Globals.BitmapFont font, float textSize = 1.0f)
     {
-        if (string.IsNullOrEmpty(text)) return;
-        if (GameClient.SpriteBatch == null) return;
+        if (string.IsNullOrEmpty(text) || GameClient.SpriteBatch == null) return;
+        if (!TryGetBitmapFont(font, out var bf)) return;
 
-        if (TryGetBitmapFont(font, out var bf))
+        int originX = x - bf.XOffset;
+        int originY = y - bf.YOffset;
+        int lineX = originX;
+        int lineY = originY;
+        int shadowX = lineX + 1;
+        int shadowY = lineY + 1;
+        int colorSkip = 0;
+
+        foreach (var ch in text)
         {
-            int originX = x - bf.XOffset;
-            int originY = y - bf.YOffset;
-
-            int lineX = originX;
-            int lineY = originY;
-            int shadowX = lineX + 1;
-            int shadowY = lineY + 1;
-
-            int colorSkip = 0;
-
-            foreach (var ch in text)
+            if (colorSkip > 0) { colorSkip--; continue; }
+            if (ch == '\r') continue;
+            if (ch == '\n')
             {
-                if (colorSkip > 0) { colorSkip--; continue; }
-                if (ch == '\r') continue;
-                if (ch == '\n')
-                {
-                    int lineAdvance = (int)Math.Round((bf.CharHeight > 0 ? bf.CharHeight : bf.LineHeight) * textSize) + (int)Math.Round(3 * textSize);
-                    lineY += lineAdvance;
-                    shadowY += lineAdvance;
-                    lineX = originX;
-                    shadowX = originX + 1;
-                    continue;
-                }
-                if (bf.ColourChar.HasValue && ch == bf.ColourChar.Value)
-                {
-                    colorSkip = 2; // skip 2 digits like VB if present
-                    continue;
-                }
-
-                if (!bf.Glyphs.TryGetValue(ch, out var rect))
-                    rect = bf.Glyphs.TryGetValue(' ', out var sp) ? sp : new Rectangle(0, 0, bf.LineHeight / 2, bf.LineHeight);
-
-                int adv = bf.Adv.TryGetValue(ch, out var a) ? a : rect.Width;
-
-                int dw = (int)Math.Round(adv * textSize);
-                int dh = (int)Math.Round((bf.CharHeight > 0 ? bf.CharHeight : rect.Height) * textSize);
-
-                GameClient.SpriteBatch.Draw(bf.Atlas, new Rectangle(shadowX, shadowY, dw, dh), rect, backColor);
-                GameClient.SpriteBatch.Draw(bf.Atlas, new Rectangle(lineX, lineY, dw, dh), rect, frontColor);
-
-                // Advance horizontally strictly by CharWidth (adv)
-                shadowX += dw;
-                lineX += dw;
+                int lineAdvance = (int)Math.Round((bf.CharHeight > 0 ? bf.CharHeight : bf.LineHeight) * textSize) + (int)Math.Round(3 * textSize);
+                lineY += lineAdvance;
+                shadowY += lineAdvance;
+                lineX = originX;
+                shadowX = originX + 1;
+                continue;
             }
+            if (bf.ColourChar.HasValue && ch == bf.ColourChar.Value) { colorSkip = 2; continue; }
+
+            if (!bf.Glyphs.TryGetValue(ch, out var rect))
+                rect = bf.Glyphs.TryGetValue(' ', out var sp) ? sp : new Rectangle(0, 0, bf.LineHeight / 2, bf.LineHeight);
+            int adv = bf.Adv.TryGetValue(ch, out var a) ? a : rect.Width;
+
+            int dw = (int)Math.Round(adv * textSize);
+            int dh = (int)Math.Round((bf.CharHeight > 0 ? bf.CharHeight : rect.Height) * textSize);
+
+            GameClient.SpriteBatch.Draw(bf.Atlas, new Rectangle(shadowX, shadowY, dw, dh), rect, backColor);
+            GameClient.SpriteBatch.Draw(bf.Atlas, new Rectangle(lineX, lineY, dw, dh), rect, frontColor);
+
+            shadowX += dw;
+            lineX += dw;
+        }
+    }
+
+    // SpriteFont render with auto-bitmap override
+    public static void RenderText(string text, int x, int y, Color frontColor, Color backColor, Font font = Font.Georgia, float textSize = 1.0f)
+    {
+        // If a bitmap font is registered for this Font, delegate to the bitmap overload.
+        if (Enum.TryParse<Core.Globals.BitmapFont>(SettingsManager.Instance.BitmapFont, out var bfEnum) && HasBitmapFont(bfEnum))
+        {
+            RenderText(text, x, y, frontColor, backColor, bfEnum, textSize);
             return;
         }
 
-    }
-
-    public static void RenderText(string text, int x, int y, Color frontColor, Color backColor, Font font = Font.PixelGeorgiaBold, float textSize = 1.0f)
-    {
-        // SpriteFont fallback; keep scale consistent with textSize
         if (!Fonts.TryGetValue(font, out var spriteFont))
         {
             if (!Fonts.TryGetValue(Font.Georgia, out spriteFont))
@@ -380,93 +309,31 @@ public static class TextRenderer
     public static void DrawMapAttributes()
     {
         int tA;
-
-        var loopTo = (int) GameState.TileView.Right;
-        for (var x = (int) GameState.TileView.Left; x < loopTo; x++)
+        var loopTo = (int)GameState.TileView.Right;
+        for (var x = (int)GameState.TileView.Left; x < loopTo; x++)
         {
-            var loopTo1 = (int) GameState.TileView.Bottom;
-            for (var y = (int) GameState.TileView.Top; y < loopTo1; y++)
+            var loopTo1 = (int)GameState.TileView.Bottom;
+            for (var y = (int)GameState.TileView.Top; y < loopTo1; y++)
             {
-                if (GameLogic.IsValidMapPoint(x, y))
+                if (!GameLogic.IsValidMapPoint(x, y)) continue;
+                ref var withBlock = ref Data.MyMap.Tile[x, y];
+                var tX = (int)Math.Round(GameLogic.ConvertMapX(x * GameState.SizeX) - 4 + GameState.SizeX * 0.5d);
+                var tY = (int)Math.Round(GameLogic.ConvertMapY(y * GameState.SizeY) - 7 + GameState.SizeY * 0.5d);
+                tA = GameState.EditorAttribute == 1 ? (int)withBlock.Type : (int)withBlock.Type2;
+                switch (tA)
                 {
-                    {
-                        ref var withBlock = ref Data.MyMap.Tile[x, y];
-                        var tX = (int) Math.Round(GameLogic.ConvertMapX(x * GameState.SizeX) - 4 + GameState.SizeX * 0.5d);
-                        var tY = (int) Math.Round(GameLogic.ConvertMapY(y * GameState.SizeY) - 7 + GameState.SizeY * 0.5d);
-
-                        if (GameState.EditorAttribute == 1)
-                        {
-                            tA = (int) withBlock.Type;
-                        }
-                        else
-                        {
-                            tA = (int) withBlock.Type2;
-                        }
-
-                        switch (tA)
-                        {
-                            case (int) TileType.Blocked:
-                            {
-                                RenderText("B", tX, tY, Color.Red, Color.Black);
-                                break;
-                            }
-                            case (int) TileType.Warp:
-                            {
-                                RenderText("W", tX, tY, Color.Blue, Color.Black);
-                                break;
-                            }
-                            case (int) TileType.Item:
-                            {
-                                RenderText("I", tX, tY, Color.White, Color.Black);
-                                break;
-                            }
-                            case (int) TileType.NpcAvoid:
-                            {
-                                RenderText("N", tX, tY, Color.White, Color.Black);
-                                break;
-                            }
-                            case (int) TileType.Resource:
-                            {
-                                RenderText("R", tX, tY, Color.Green, Color.Black);
-                                break;
-                            }
-                            case (int) TileType.NpcSpawn:
-                            {
-                                RenderText("S", tX, tY, Color.Yellow, Color.Black);
-                                break;
-                            }
-                            case (int) TileType.Shop:
-                            {
-                                RenderText("S", tX, tY, Color.Blue, Color.Black);
-                                break;
-                            }
-                            case (int) TileType.Bank:
-                            {
-                                RenderText("B", tX, tY, Color.Blue, Color.Black);
-                                break;
-                            }
-                            case (int) TileType.Heal:
-                            {
-                                RenderText("H", tX, tY, Color.Green, Color.Black);
-                                break;
-                            }
-                            case (int) TileType.Trap:
-                            {
-                                RenderText("T", tX, tY, Color.Red, Color.Black);
-                                break;
-                            }
-                            case (int) TileType.Animation:
-                            {
-                                RenderText("A", tX, tY, Color.Red, Color.Black);
-                                break;
-                            }
-                            case (int) TileType.NoCrossing:
-                            {
-                                RenderText("X", tX, tY, Color.Red, Color.Black);
-                                break;
-                            }
-                        }
-                    }
+                    case (int)TileType.Blocked: RenderText("B", tX, tY, Color.Red, Color.Black); break;
+                    case (int)TileType.Warp: RenderText("W", tX, tY, Color.Blue, Color.Black); break;
+                    case (int)TileType.Item: RenderText("I", tX, tY, Color.White, Color.Black); break;
+                    case (int)TileType.NpcAvoid: RenderText("N", tX, tY, Color.White, Color.Black); break;
+                    case (int)TileType.Resource: RenderText("R", tX, tY, Color.Green, Color.Black); break;
+                    case (int)TileType.NpcSpawn: RenderText("S", tX, tY, Color.Yellow, Color.Black); break;
+                    case (int)TileType.Shop: RenderText("S", tX, tY, Color.Blue, Color.Black); break;
+                    case (int)TileType.Bank: RenderText("B", tX, tY, Color.Blue, Color.Black); break;
+                    case (int)TileType.Heal: RenderText("H", tX, tY, Color.Green, Color.Black); break;
+                    case (int)TileType.Trap: RenderText("T", tX, tY, Color.Red, Color.Black); break;
+                    case (int)TileType.Animation: RenderText("A", tX, tY, Color.Red, Color.Black); break;
+                    case (int)TileType.NoCrossing: RenderText("X", tX, tY, Color.Red, Color.Black); break;
                 }
             }
         }
@@ -563,7 +430,7 @@ public static class TextRenderer
         }
 
         int spriteTopScreenY = GameLogic.ConvertMapY(spriteTopWorldY);
-        int textPixelHeight = (int)Math.Ceiling(Fonts[Font.PixelGeorgiaBold].LineSpacing * 12f / 16f);
+        int textPixelHeight = (int)Math.Ceiling(Fonts[Font.Georgia].LineSpacing * 12f / 16f);
         int margin = 8;
 
         textY = spriteTopScreenY - textPixelHeight + margin;
@@ -624,7 +491,7 @@ public static class TextRenderer
                     }
 
                     int spriteTopScreenY = GameLogic.ConvertMapY(spriteTopWorldY);
-                    int textPixelHeight = (int)Math.Ceiling(Fonts[Font.PixelGeorgiaBold].LineSpacing * 12f / 16f);
+                    int textPixelHeight = (int)Math.Ceiling(Fonts[Font.Georgia].LineSpacing * 12f / 16f);
                     int margin = 8;
                     textY = spriteTopScreenY - textPixelHeight + margin;
                 }
@@ -782,7 +649,7 @@ public static class TextRenderer
                 {
                     // word wrap
                     string[] wrappedLines = new string[0];
-                    WordWrap(Data.Chat[(int) i].Text, Font.PixelGeorgiaBold, width, ref wrappedLines);
+                    WordWrap(Data.Chat[(int) i].Text, Font.Georgia, width, ref wrappedLines);
 
                     // continue on
                     yOffset = yOffset - 10 * wrappedLines.Length;
@@ -933,7 +800,7 @@ public static class TextRenderer
         // Convert top of sprite to screen coordinates
         int spriteTopScreenY = GameLogic.ConvertMapY(spriteTopWorldY);
 
-        int textPixelHeight = (int)Math.Ceiling(Fonts[Font.PixelGeorgiaBold].LineSpacing * 12f / 16f);
+        int textPixelHeight = (int)Math.Ceiling(Fonts[Font.Georgia].LineSpacing * 12f / 16f);
         int margin = 8;
         textY = spriteTopScreenY - textPixelHeight + margin;
         RenderText(name, textX, textY, color, backColor);
@@ -955,6 +822,12 @@ public static class TextRenderer
 
     public static int GetTextHeight(string text, Font font = Font.Georgia, float textSize = 1.0f)
     {
+        // Prefer bitmap font when available; names are assumed to align across enums
+        if (Enum.TryParse<Core.Globals.BitmapFont>(SettingsManager.Instance.BitmapFont, out var bfEnum) && HasBitmapFont(bfEnum))
+        {
+            return GetTextHeight(text ?? string.Empty, bfEnum, textSize);
+        }
+
         if (!Fonts.TryGetValue(font, out var spriteFont))
         {
             if (!Fonts.TryGetValue(Font.Georgia, out spriteFont))
