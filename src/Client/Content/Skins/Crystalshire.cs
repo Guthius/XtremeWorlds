@@ -1379,7 +1379,7 @@ public class Crystalshire
 
         // List interactions
         ListBox npcList = null;
-        if (WindowManager.TryGetControl("winNpcEditor", "lstNpcIndex", out var lstCtrl) && lstCtrl is ListBox list)
+        if (WindowManager.TryGetControl("winNpcEditor", "lstNpcs", out var lstCtrl) && lstCtrl is ListBox list)
         {
             npcList = list;
             list.CallBack[(int)ControlState.MouseDown] = WinNpcEditor.OnListMouseDown;

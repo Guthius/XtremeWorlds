@@ -8,7 +8,7 @@
 
   <!-- NPC index list on the left -->
   <Label Name="lblNpcList" Text="Npc" Position="16, 24" Size="80, 16"/>
-  <ListBox Name="lstNpcIndex" Position="16, 44" Size="224, 360"/>
+  <ListBox Name="lstNpcs" Position="16, 44" Size="224, 360"/>
   <ScrollBar Name="sldNpcList" Position="240, 44" Size="16, 360" Min="0" Max="0" Vertical="true"/>
 
   <!-- Parchment background for editor details (mirrors other Crystalshire editors) -->

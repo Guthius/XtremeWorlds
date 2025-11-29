@@ -14,7 +14,7 @@ public static class WinNpcEditor
     // Entry point: populate lists and load first NPC.
     public static void Init()
     {
-        if (!WindowManager.TryGetControl("winNpcEditor", "lstNpcIndex", out _))
+        if (!WindowManager.TryGetControl("winNpcEditor", "lstNpcs", out _))
             return; // window not present yet
 
         PopulateStaticCombos();
@@ -26,7 +26,7 @@ public static class WinNpcEditor
     // Rebuild NPC list box items from data and keep selection.
     private static void RefreshList()
     {
-        if (!WindowManager.TryGetControl("winNpcEditor", "lstNpcIndex", out var lstCtrl) || lstCtrl is not ListBox lst)
+        if (!WindowManager.TryGetControl("winNpcEditor", "lstNpcs", out var lstCtrl) || lstCtrl is not ListBox lst)
             return;
 
         int prevIndex = SelectedIndex;
@@ -314,7 +314,7 @@ public static class WinNpcEditor
     // Handle list click (mouse down) to select NPC.
     public static void OnListMouseDown()
     {
-        if (!WindowManager.TryGetControl("winNpcEditor", "lstNpcIndex", out var ctrl) || ctrl is not ListBox list) return;
+        if (!WindowManager.TryGetControl("winNpcEditor", "lstNpcs", out var ctrl) || ctrl is not ListBox list) return;
         var win = WindowManager.GetWindowByName("winNpcEditor");
         if (win is null) return;
         int relY = GameState.CurMouseY - (win.Y + ctrl.Y);
