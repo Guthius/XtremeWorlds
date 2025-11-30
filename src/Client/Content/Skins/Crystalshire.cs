@@ -196,7 +196,7 @@ public class Crystalshire
         window.GetChild("picTheir").CallBack[(int)ControlState.DoubleClick] = WinTrade.OnTheirTradeMouseMove;
     }
 
-    public void UpdateWindow_EditorMap()
+    public void UpdateWindow_MapEditor()
     {
         var window = WindowLoader.FromLayout("winMapEditor");
 
