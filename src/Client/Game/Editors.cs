@@ -1390,44 +1390,6 @@ namespace Client
             Sender.SendCloseEditor();
         }
 
-        public static void JobEditorInit()
-        {
-            var withBlock = EditorJob.Instance;
-            withBlock.txtName!.Text = Data.Job[GameState.EditorIndex].Name;
-            withBlock.txtDescription!.Text = Data.Job[GameState.EditorIndex].Desc;
-            if (Data.Job[GameState.EditorIndex].MaleSprite == 0)
-                Data.Job[GameState.EditorIndex].MaleSprite = 1;
-            withBlock.nudMaleSprite!.Value = Data.Job[GameState.EditorIndex].MaleSprite;
-            if (Data.Job[GameState.EditorIndex].FemaleSprite == 0)
-                Data.Job[GameState.EditorIndex].FemaleSprite = 1;
-            withBlock.nudFemaleSprite!.Value = Data.Job[GameState.EditorIndex].FemaleSprite;
-
-            withBlock.cmbItems!.SelectedIndex = 0;
-
-            int statCount = Enum.GetValues(typeof(Stat)).Length;
-            for (int i = 0; i < statCount; i++)
-            {
-                if (Data.Job[GameState.EditorIndex].Stat[i] == 0)
-                    Data.Job[GameState.EditorIndex].Stat[i] = 1;
-            }
-
-            withBlock.nudStrength!.Value = Data.Job[GameState.EditorIndex].Stat[(int)Stat.Strength];
-            withBlock.nudLuck!.Value = Data.Job[GameState.EditorIndex].Stat[(int)Stat.Luck];
-            withBlock.nudIntelligence!.Value = Data.Job[GameState.EditorIndex].Stat[(int)Stat.Intelligence];
-            withBlock.nudVitality!.Value = Data.Job[GameState.EditorIndex].Stat[(int)Stat.Vitality];
-            withBlock.nudSpirit!.Value = Data.Job[GameState.EditorIndex].Stat[(int)Stat.Spirit];
-            withBlock.nudBaseExp!.Value = Data.Job[GameState.EditorIndex].BaseExp;
-
-            if (Data.Job[GameState.EditorIndex].StartMap == 0)
-                Data.Job[GameState.EditorIndex].StartMap = 1;
-            withBlock.nudStartMap!.Value = Data.Job[GameState.EditorIndex].StartMap;
-            withBlock.nudStartX!.Value = Data.Job[GameState.EditorIndex].StartX;
-            withBlock.nudStartY!.Value = Data.Job[GameState.EditorIndex].StartY;
-
-            GameState.JobChanged[GameState.EditorIndex] = true;
-            withBlock.DrawPreview();
-        }
-
         public static void ClearChanged_Job()
         {
             for (int i = 0; i < Variables.MaxJobs; i++)
@@ -1508,19 +1470,6 @@ namespace Client
         #endregion
 
         #region Projectile Editor
-        public static void ProjectileEditorInit()
-        {            
-            ref var withBlock = ref Data.Projectile[GameState.EditorIndex];
-            EditorProjectile.Instance.txtName.Text = withBlock.Name;
-            EditorProjectile.Instance.nudPic.Value = withBlock.Sprite;
-            EditorProjectile.Instance.nudRange.Value = withBlock.Range;
-            EditorProjectile.Instance.nudSpeed.Value = withBlock.Speed;
-            EditorProjectile.Instance.nudDamage.Value = withBlock.Damage;
-            EditorProjectile.Instance.cmbPlayAnimHit.SelectedIndex = Math.Clamp(withBlock.Animation, 0, Variables.MaxAnimations);
-            EditorProjectile.Instance.Drawicon();
-            GameState.ProjectileChanged[GameState.EditorIndex] = true;
-        }
-
         public static void ProjectileEditorOK()
         {
             for (int i = 0; i < Variables.MaxProjectiles;  i++)
