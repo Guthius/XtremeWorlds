@@ -29,9 +29,9 @@ public static class Variables
     public static byte MaxMapX = 32;
     public static byte MaxMapY = 24;
     public static int MaxProjectiles = 255;
-    public static byte MaxDropItems = 5;
-    public static byte MaxStartItems = 5;
-    public static byte MaxStartSkills = 5;
+    public static byte MaxDropItems = 10;
+    public static byte MaxStartItems = 10;
+    public static byte MaxStartSkills = 10;
     public static int MaxSwitches = 100;
     public static int MaxVariables = 100;
     public static byte MaxPoints = 255;
