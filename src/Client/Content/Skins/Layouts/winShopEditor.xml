@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window Name="winShopEditor" Caption="Shop Editor"
-        Size="970, 500"
+        Size="970, 447"
         Icon="196" IconOffset="3, 5"
         Design="WindowNormal"
         StartPosition="CenterScreen"
         Visible="false">
 
   <Label Name="lblList" Text="Shops" Position="16, 24" Size="80, 16"/>
-  <ListBox Name="lstIndex" Position="16, 44" Size="220, 436"/>
-  <ScrollBar Name="sldList" Position="236, 44" Size="12, 436" Min="0" Max="0" Vertical="true"/>
+  <ListBox Name="lstIndex" Position="16, 44" Size="220, 364"/>
+  <ScrollBar Name="sldList" Position="236, 44" Size="12, 364" Min="0" Max="0" Vertical="true"/>
 
   <!-- General group -->
   <GroupBox Name="grpGeneral" Caption="" Position="260, 24" Size="700, 60">
@@ -19,31 +19,31 @@
   </GroupBox>
 
   <!-- Trade group: list on left, fields on right -->
-  <GroupBox Name="grpTrade" Caption="" Position="260, 92" Size="700, 320">
+  <GroupBox Name="grpTrade" Caption="" Position="260, 92" Size="700, 310">
     <!-- Trade list (left) -->
     <Label Name="lblTradeItems" Text="Items" Position="8, 8" Size="80, 16"/>
     <ListBox Name="lstTradeItem" Position="8, 28" Size="330, 240"/>
     <ScrollBar Name="sldTradeList" Position="338, 28" Size="12, 240" Min="0" Max="0" Vertical="true"/>
-    <Button Name="btnUpdateTrade" Text="Update Trade" Position="8, 276" Size="140, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-    <Button Name="btnDeleteTrade" Text="Delete Trade" Position="156, 276" Size="140, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+    <Button Name="btnUpdateTrade" Text="Update Trade" Position="28, 276" Size="140, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+    <Button Name="btnDeleteTrade" Text="Delete Trade" Position="176, 276" Size="140, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
 
     <!-- Trade fields (right) -->
-    <Label Name="lblItem" Text="Item" Position="370, 28" Size="60, 16"/>
-    <ComboBox Name="cmbItem" Position="436, 26" Size="240, 18"/>
-    <Label Name="lblItemQuantity" Text="Quantity" Position="370, 52" Size="60, 16"/>
-    <TextBox Name="txtItemQuantity" Position="436, 50" Size="120, 20" Design="TextWhite"/>
+    <Label Name="lblItem" Text="Item" Position="360, 28" Size="60, 16"/>
+    <ComboBox Name="cmbItem" Position="426, 26" Size="240, 18"/>
+    <Label Name="lblItemValue" Text="Value" Position="360, 52" Size="60, 16"/>
+    <TextBox Name="txtItemValue" Position="426, 50" Size="120, 20" Design="TextWhite"/>
 
-    <Label Name="lblCostItem" Text="Cost Item" Position="370, 84" Size="80, 16"/>
-    <ComboBox Name="cmbCostItem" Position="452, 82" Size="224, 18"/>
-    <Label Name="lblCostQuantity" Text="Cost Quantity" Position="370, 108" Size="80, 16"/>
-    <TextBox Name="txtCostQuantity" Position="452, 106" Size="120, 20" Design="TextWhite"/>
+    <Label Name="lblCostItem" Text="Cost Item" Position="360, 84" Size="80, 16"/>
+    <ComboBox Name="cmbCostItem" Position="462, 82" Size="204, 18"/>
+    <Label Name="lblCostValue" Text="Cost Value" Position="360, 108" Size="120, 16"/>
+    <TextBox Name="txtCostValue" Position="452, 106" Size="110, 20" Design="TextWhite"/>
   </GroupBox>
 
   <!-- Action buttons -->
-  <Button Name="btnSave" Text="Save" Position="420, 456" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-  <Button Name="btnDelete" Text="Delete" Position="508, 456" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
-  <Button Name="btnCopy" Text="Copy" Position="596, 456" Size="80, 24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
-  <Button Name="btnCancel" Text="Cancel" Position="684, 456" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+  <Button Name="btnSave" Text="Save" Position="440, 411" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+  <Button Name="btnDelete" Text="Delete" Position="528, 411" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+  <Button Name="btnCopy" Text="Copy" Position="616, 411" Size="80, 24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+  <Button Name="btnCancel" Text="Cancel" Position="704, 411" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
 
   <Button Name="btnClose" Position="-19, 5" Size="16, 16" Image="8" ImageHover="9" ImageMouseDown="10"/>
 

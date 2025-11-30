@@ -2766,9 +2766,9 @@ public class Crystalshire
                     trade.Item = Math.Clamp(ci.Value, -1, Variables.MaxItems - 1);
                 if (WindowManager.TryGetControl("winShopEditor", "cmbCostItem", out var cCtrl) && cCtrl is ComboBox cc)
                     trade.CostItem = Math.Clamp(cc.Value, -1, Variables.MaxItems - 1);
-                if (WindowManager.TryGetControl("winShopEditor", "txtItemQuantity", out var iqCtrl) && iqCtrl is TextBox txtIQ && int.TryParse(txtIQ.Text, out var itemQty))
+                if (WindowManager.TryGetControl("winShopEditor", "txtItemValue", out var iqCtrl) && iqCtrl is TextBox txtIQ && int.TryParse(txtIQ.Text, out var itemQty))
                     trade.ItemValue = Math.Max(0, itemQty);
-                if (WindowManager.TryGetControl("winShopEditor", "txtCostQuantity", out var cqCtrl) && cqCtrl is TextBox txtCQ && int.TryParse(txtCQ.Text, out var costQty))
+                if (WindowManager.TryGetControl("winShopEditor", "txtCostValue", out var cqCtrl) && cqCtrl is TextBox txtCQ && int.TryParse(txtCQ.Text, out var costQty))
                     trade.CostValue = Math.Max(0, costQty);
                 GameState.ShopChanged[WinShopEditor.SelectedIndex] = true;
                 WinShopEditor.LoadShop(WinShopEditor.SelectedIndex);

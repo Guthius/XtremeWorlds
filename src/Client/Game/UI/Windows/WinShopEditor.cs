@@ -61,9 +61,9 @@ public static class WinShopEditor
             ci.Value = Math.Clamp(trade.Item, 0, Math.Max(0, ci.Items.Count - 1));
         if (WindowManager.TryGetControl("winShopEditor", "cmbCostItem", out var cCtrl) && cCtrl is ComboBox cc)
             cc.Value = Math.Clamp(trade.CostItem, 0, Math.Max(0, cc.Items.Count - 1));
-        if (WindowManager.TryGetControl("winShopEditor", "txtItemQuantity", out var iqCtrl) && iqCtrl is TextBox txtIQ)
+        if (WindowManager.TryGetControl("winShopEditor", "txtItemValue", out var iqCtrl) && iqCtrl is TextBox txtIQ)
             txtIQ.Text = trade.ItemValue.ToString();
-        if (WindowManager.TryGetControl("winShopEditor", "txtCostQuantity", out var cqCtrl) && cqCtrl is TextBox txtCQ)
+        if (WindowManager.TryGetControl("winShopEditor", "txtCostValue", out var cqCtrl) && cqCtrl is TextBox txtCQ)
             txtCQ.Text = trade.CostValue.ToString();
     }
 
@@ -155,9 +155,9 @@ public static class WinShopEditor
             cmbItem.Value = 0;
         if (WindowManager.TryGetControl("winShopEditor", "cmbCostItem", out var costCombo) && costCombo is ComboBox cmbCost)
             cmbCost.Value = 0;
-        if (WindowManager.TryGetControl("winShopEditor", "txtItemQuantity", out var itemQtyCtrl) && itemQtyCtrl is TextBox txtIQ)
+        if (WindowManager.TryGetControl("winShopEditor", "txtItemValue", out var itemQtyCtrl) && itemQtyCtrl is TextBox txtIQ)
             txtIQ.Text = "0";
-        if (WindowManager.TryGetControl("winShopEditor", "txtCostQuantity", out var costQtyCtrl) && costQtyCtrl is TextBox txtCQ)
+        if (WindowManager.TryGetControl("winShopEditor", "txtCostValue", out var costQtyCtrl) && costQtyCtrl is TextBox txtCQ)
             txtCQ.Text = "0";
 
         // Update trade scrollbar range
