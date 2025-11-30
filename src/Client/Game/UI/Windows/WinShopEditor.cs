@@ -20,6 +20,7 @@ public static class WinShopEditor
 
         SelectedIndex = Math.Clamp(SelectedIndex, 0, Variables.MaxShops - 1);
         RefreshList();
+        PopulateCombos();
         LoadShop(SelectedIndex);
     }
 
