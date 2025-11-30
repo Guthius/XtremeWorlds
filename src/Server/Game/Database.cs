@@ -525,7 +525,7 @@ namespace Server
         {
             using (var sha256Hash = SHA256.Create())
             {
-                if (input == null)
+                if (input == null || input == "")
                     return -1;
 
                 // ComputeHash - returns byte array
