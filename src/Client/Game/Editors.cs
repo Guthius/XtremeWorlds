@@ -1187,26 +1187,6 @@ namespace Client
             GameState.ResourceChanged = new bool[Variables.MaxResources];
         }
 
-        public static void ResourceEditorInit()
-        {
-            var withBlock = EditorResource.Instance;
-            withBlock.txtName.Text = Data.Resource[GameState.EditorIndex].Name;
-            withBlock.txtMessage.Text = Data.Resource[GameState.EditorIndex].SuccessMessage;
-            withBlock.txtMessage2.Text = Data.Resource[GameState.EditorIndex].EmptyMessage;
-            withBlock.cmbType.SelectedIndex = Data.Resource[GameState.EditorIndex].ResourceType;
-            withBlock.nudNormalPic.Value = Data.Resource[GameState.EditorIndex].ResourceImage;
-            withBlock.nudExhaustedPic.Value = Data.Resource[GameState.EditorIndex].ExhaustedImage;
-            withBlock.cmbRewardItem.SelectedIndex = Data.Resource[GameState.EditorIndex].ItemReward;
-            withBlock.nudRewardExp.Value = Data.Resource[GameState.EditorIndex].ExpReward;
-            withBlock.cmbTool.SelectedIndex = Data.Resource[GameState.EditorIndex].ToolRequired;
-            withBlock.nudHealth.Value = Data.Resource[GameState.EditorIndex].Health;
-            withBlock.nudRespawn.Value = Data.Resource[GameState.EditorIndex].RespawnTime;
-            withBlock.cmbAnimation.SelectedIndex = Data.Resource[GameState.EditorIndex].Animation;
-            withBlock.nudLvlReq.Value = Data.Resource[GameState.EditorIndex].LvlRequired;
- 
-            GameState.ResourceChanged[GameState.EditorIndex] = true;
-        }
-
         public static void ResourceEditorOK()
         {
             int i;

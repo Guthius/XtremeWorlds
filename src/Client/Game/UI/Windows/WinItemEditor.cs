@@ -99,7 +99,7 @@ public static class WinItemEditor
         }
     }
 
-    private static void RefreshList()
+    public static void RefreshList()
     {
         if (!WindowManager.TryGetControl("winItemEditor", "lstIndex", out var ctrl) || ctrl is not ListBox list)
             return;

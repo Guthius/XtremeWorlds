@@ -10,7 +10,6 @@ public sealed class ComboBox : Control
 
     public List<string> Items { get; } = [];
 
-    // Add a public property for Value (selection index)
     public new int Value { get; set; }
 
     public override void Render(int x, int y)

@@ -23,7 +23,7 @@ public static class WinNpcEditor
     }
 
     // Rebuild NPC list box items from data and keep selection.
-    private static void RefreshList()
+    public static void RefreshList()
     {
         if (!WindowManager.TryGetControl("winNpcEditor", "lstIndex", out var lstCtrl) || lstCtrl is not ListBox lst)
             return;

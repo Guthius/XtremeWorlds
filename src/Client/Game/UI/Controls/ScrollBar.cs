@@ -12,7 +12,6 @@ public sealed class ScrollBar : Control
 
     public override void Render(int x, int y)
     {
-        // Track
         DesignRenderer.Render(Design.TextBlack, X + x, Y + y, Width, Height, Alpha);
 
         var range = Math.Max(1, Max - Min);

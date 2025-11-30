@@ -556,7 +556,8 @@ namespace Client
             {
                 GameState.MyEditorType = EditorType.Resource;
                 GameState.EditorIndex = 0;
-                new EditorResource().Show();
+                WindowManager.ShowWindow("winResourceEditor");
+                Client.Game.UI.Windows.WinResourceEditor.Init();
                 GameState.InitResourceEditor = false;
             }
 

@@ -1625,7 +1625,9 @@ public class Crystalshire
             btnDelete.CallBack[(int)ControlState.MouseDown] = () =>
             {
                 Database.ClearNpc(GameState.EditorIndex);
+                GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
                 WinNpcEditor.LoadNpc(GameState.EditorIndex);
+                WinNpcEditor.RefreshList();
             };
         }
         if (WindowManager.TryGetControl("winNpcEditor", "btnCopy", out var btnCopy))
@@ -1998,7 +2000,9 @@ public class Crystalshire
             btnDelete.CallBack[(int)ControlState.MouseDown] = () =>
             {
                 Item.ClearItem(GameState.EditorIndex);
+                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
                 WinItemEditor.LoadItem(GameState.EditorIndex);
+                WinItemEditor.RefreshList();
             };
         }
         if (WindowManager.TryGetControl("winItemEditor", "btnCopy", out var btnCopy))
@@ -2517,7 +2521,7 @@ public class Crystalshire
         WireScrollableList("winShopEditor", "lstTradeItem", "sldTradeList");
 
         // Name textbox
-        if (WindowManager.TryGetControl("winShopEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
+        if (WindowManager.TryGetControl("winShopEditor", "txtName", out var txtNameCtrl) && txtNameCtrl is TextBox txtName)
         {
             txtName.CallBack[(int)ControlState.KeyUp] = () =>
             {
@@ -2552,7 +2556,7 @@ public class Crystalshire
                 int idx = lst.SelectedIndex;
                 if (idx < 0 || idx >= Variables.MaxTrades) return;
                 ref var trade = ref Data.Shop[WinShopEditor.SelectedIndex].TradeItem[idx];
-                if (WindowManager.TryGetControl("winShopEditor", "cmbItem", out var itCtrl) && itCtrl is ComboBox ci)
+                if (WindowManager.TryGetControl("winShopEditor", "cmbItem", out var ic) && ic is ComboBox ci)
                     trade.Item = Math.Clamp(ci.Value, -1, Variables.MaxItems - 1);
                 if (WindowManager.TryGetControl("winShopEditor", "cmbCostItem", out var cCtrl) && cCtrl is ComboBox cc)
                     trade.CostItem = Math.Clamp(cc.Value, -1, Variables.MaxItems - 1);
@@ -2759,7 +2763,6 @@ public class Crystalshire
         {
             btnDelete.CallBack[(int)ControlState.MouseDown] = () =>
             {
-                if (WinJobEditor.SelectedIndex < 0) return;
                 Database.ClearJob(WinJobEditor.SelectedIndex);
                 GameState.JobChanged[WinJobEditor.SelectedIndex] = true;
                 WinJobEditor.LoadJob(WinJobEditor.SelectedIndex);
@@ -2854,5 +2857,125 @@ public class Crystalshire
 
         if (WindowManager.TryGetControl("winScriptEditor", "btnClose", out var btnClose))
             btnClose.CallBack[(int)ControlState.MouseDown] = () => { WindowManager.HideWindow("winScriptEditor"); };
+    }
+
+    public void UpdateWindow_ResourceEditor()
+    {
+        var window = WindowLoader.FromLayout("winResourceEditor");
+
+        // List wiring
+        WireScrollableList("winResourceEditor", "lstIndex", "sldList");
+
+        Type.Resource[] resources = Data.Resource; // shortcut
+
+        void RefreshList()
+        {
+            if (WindowManager.TryGetControl("winResourceEditor", "lstIndex", out var listCtrl) && listCtrl is ListBox lst)
+            {
+                lst.Items.Clear();
+                for (int i = 0; i < Variables.MaxResources; i++)
+                {
+                    var name = resources[i].Name ?? string.Empty;
+                    lst.Items.Add($"{i + 1}: {name}");
+                }
+                int idx = GameState.EditorIndex;
+                if (idx < 0 || idx >= lst.Items.Count) idx = 0;
+                lst.SelectedIndex = idx;
+                lst.EnsureVisible(idx);
+            }
+        }
+
+        // Initial list populate
+        RefreshList();
+        WinResourceEditor.LoadResource(GameState.EditorIndex);
+
+        // List selection callback override to load resource
+        if (WindowManager.TryGetControl("winResourceEditor", "lstIndex", out var lstCtrl2) && lstCtrl2 is ListBox lst2)
+        {
+            lst2.CallBack[(int)ControlState.MouseDown] = () =>
+            {
+                var win = WindowManager.GetWindowByName("winResourceEditor");
+                if (win is null) return;
+                int relY = GameClient.CurrentMouseState.Y - (win.Y + lst2.Y);
+                int idx = lst2.GetItemIndexAtPosition(relY);
+                if (idx < 0 || idx >= lst2.Items.Count) return;
+                lst2.SelectedIndex = idx;
+                lst2.EnsureVisible(idx);
+                WinResourceEditor.LoadResource(idx);
+            };
+        }
+
+        // Text changes
+        if (WindowManager.TryGetControl("winResourceEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
+        {
+            txtName.CallBack[(int)ControlState.KeyUp] = () =>
+            {
+                int idx = GameState.EditorIndex; if (idx < 0 || idx >= Variables.MaxResources) return;
+                resources[idx].Name = txtName.Text ?? string.Empty;
+                RefreshList();
+            };
+        }
+        if (WindowManager.TryGetControl("winResourceEditor", "txtMessage", out var msgCtrl) && msgCtrl is TextBox txtMsg)
+            txtMsg.CallBack[(int)ControlState.KeyUp] = () => { int i = GameState.EditorIndex; if (i >= 0 && i < Variables.MaxResources) resources[i].SuccessMessage = txtMsg.Text ?? string.Empty; };
+        if (WindowManager.TryGetControl("winResourceEditor", "txtMessage2", out var msg2Ctrl) && msg2Ctrl is TextBox txtMsg2)
+            txtMsg2.CallBack[(int)ControlState.KeyUp] = () => { int i = GameState.EditorIndex; if (i >= 0 && i < Variables.MaxResources) resources[i].EmptyMessage = txtMsg2.Text ?? string.Empty; };
+
+        // Combo callbacks
+        void BindCombo(string ctrlName, Action<int> apply)
+        {
+            if (WindowManager.TryGetControl("winResourceEditor", ctrlName, out var c) && c is ComboBox combo)
+            {
+                combo.CallBack[(int)ControlState.MouseMove] = () =>
+                {
+                    int idx = GameState.EditorIndex; if (idx < 0 || idx >= Variables.MaxResources) return;
+                    apply(Math.Max(0, combo.Value));
+                };
+            }
+        }
+        BindCombo("cmbType", v => resources[GameState.EditorIndex].ResourceType = v);
+        BindCombo("cmbRewardItem", v => resources[GameState.EditorIndex].ItemReward = v);
+        BindCombo("cmbTool", v => resources[GameState.EditorIndex].ToolRequired = v);
+        BindCombo("cmbAnimation", v => resources[GameState.EditorIndex].Animation = v);
+
+        // Scrollbar binding
+        void BindBar(string barName, string labelName, Action<int> apply, int min, int max)
+        {
+            if (WindowManager.TryGetControl("winResourceEditor", barName, out var bCtrl) && bCtrl is ScrollBar sb)
+            {
+                sb.Min = min; sb.Max = max; // assume initial value already set
+                sb.CallBack[(int)ControlState.MouseMove] = () =>
+                {
+                    int v = Math.Clamp(sb.Value, sb.Min, sb.Max);
+                    apply(v);
+                    if (WinResourceEditor.SelectedIndex >= 0) GameState.ResourceChanged[WinResourceEditor.SelectedIndex] = true;
+                };
+            }
+        }
+        BindBar("sldRewardExp", "lblRewardExpVal", v => resources[GameState.EditorIndex].ExpReward = v, 0, 1000000);
+        BindBar("sldHealth", "lblHealthVal", v => resources[GameState.EditorIndex].Health = v, 0, 100000);
+        BindBar("sldRespawn", "lblRespawnVal", v => resources[GameState.EditorIndex].RespawnTime = v, 0, 1000000);
+        BindBar("sldLvlReq", "lblLvlReqVal", v => resources[GameState.EditorIndex].LvlRequired = v, 0, GameState.MaxLevel);
+        BindBar("sldNormalPic", "lblNormalPicVal", v => resources[GameState.EditorIndex].ResourceImage = v, 0, GameState.NumResources);
+        BindBar("sldExhaustedPic", "lblExhaustedPicVal", v => resources[GameState.EditorIndex].ExhaustedImage = v, 0, GameState.NumResources);
+
+        // Buttons
+        if (WindowManager.TryGetControl("winResourceEditor", "btnSave", out var btnSave))
+            btnSave.CallBack[(int)ControlState.MouseDown] = () => { Editors.ResourceEditorOK(); WindowManager.HideWindow("winResourceEditor"); };
+        if (WindowManager.TryGetControl("winResourceEditor", "btnCancel", out var btnCancel))
+            btnCancel.CallBack[(int)ControlState.MouseDown] = () => { Editors.ResourceEditorCancel(); WindowManager.HideWindow("winResourceEditor"); };
+        if (WindowManager.TryGetControl("winResourceEditor", "btnDelete", out var btnDelete))
+            btnDelete.CallBack[(int)ControlState.MouseDown] = () =>
+            {
+                MapResource.ClearResource(GameState.EditorIndex);
+                GameState.ResourceChanged[GameState.EditorIndex] = true;
+                WinResourceEditor.LoadResource(GameState.EditorIndex);
+                WinResourceEditor.RefreshList();
+            };
+        if (WindowManager.TryGetControl("winNpcEditor", "btnCopy", out var btnCopy))
+        {
+            btnCopy.CallBack[(int)ControlState.MouseDown] = WinNpcEditor.OnCopyOrPaste;
+        }
+        if (WindowManager.TryGetControl("winResourceEditor", "btnClose", out var btnClose))
+            btnClose.CallBack[(int)ControlState.MouseDown] = () => { Editors.ResourceEditorCancel(); WindowManager.HideWindow("winResourceEditor"); };
     }
 }
