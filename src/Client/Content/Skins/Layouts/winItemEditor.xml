@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window Name="winItemEditor" Caption="Item Editor"
-        Size="1098, 620"
+        Size="1108, 620"
         Icon="625" IconOffset="3, 5"
         Design="WindowNormal"
         StartPosition="CenterScreen"
