@@ -776,6 +776,7 @@ public class WindowManager
             Safe("UpdateWindow_ItemEditor", () => ui.UpdateWindow_ItemEditor());
             Safe("UpdateWindow_ShopEditor", () => ui.UpdateWindow_ShopEditor());
             Safe("UpdateWindow_JobEditor", () => ui.UpdateWindow_JobEditor());
+            Safe("UpdateWindow_ScriptEditor", () => ui.UpdateWindow_ScriptEditor());
         }
         else
         {

@@ -598,7 +598,7 @@ namespace Client
             {
                 GameState.MyEditorType = EditorType.Script;
                 GameState.EditorIndex = 0;
-                new EditorScript().Show();
+                WindowManager.ShowWindow("winScriptEditor");
                 GameState.InitScriptEditor = false;
             }
         }

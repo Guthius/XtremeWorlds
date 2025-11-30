@@ -2839,4 +2839,20 @@ public class Crystalshire
             sb.Value = Math.Clamp(lb.ScrollOffset, sb.Min, sb.Max);
         }
     }
+
+    public void UpdateWindow_ScriptEditor()
+    {
+        var window = WindowLoader.FromLayout("winScriptEditor");
+
+        // Open Script
+        if (WindowManager.TryGetControl("winScriptEditor", "btnOpen", out var btnOpen))
+            btnOpen.CallBack[(int)ControlState.MouseDown] = () => { WinScriptEditor.OpenScript(); };
+
+        // Save Script
+        if (WindowManager.TryGetControl("winScriptEditor", "btnSave", out var btnSaveScript))
+            btnSaveScript.CallBack[(int)ControlState.MouseDown] = () => { WinScriptEditor.SaveScript(); };
+
+        if (WindowManager.TryGetControl("winScriptEditor", "btnClose", out var btnClose))
+            btnClose.CallBack[(int)ControlState.MouseDown] = () => { WindowManager.HideWindow("winScriptEditor"); };
+    }
 }
