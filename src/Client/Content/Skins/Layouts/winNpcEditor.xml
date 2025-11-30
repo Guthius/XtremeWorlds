@@ -59,7 +59,7 @@
     <ComboBox Name="cmbDropSlot" Position="112, 298" Size="60, 18"/>
     <Label Name="lblDropItem" Text="Item" Position="180, 300" Size="40, 16"/>
     <ComboBox Name="cmbDropItem" Position="224, 298" Size="184, 18"/>
-    <Label Name="lblAmount" Text="Amount" Position="8, 324" Size="60, 16"/>
+    <Label Name="lblAmount" Text="Amount" Position="0, 324" Size="60, 16"/>
     <TextBox Name="txtAmount" Position="72, 322" Size="80, 18" Design="TextWhite"/>
     <Label Name="lblChance" Text="Chance" Position="168, 324" Size="60, 16"/>
     <ScrollBar Name="sldChance" Position="228, 322" Size="160, 12" Min="0" Max="100" Value="0" Orientation="Horizontal" ThumbSize="12"/>
