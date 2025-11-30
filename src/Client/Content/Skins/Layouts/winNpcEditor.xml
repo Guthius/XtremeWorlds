@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window Name="winNpcEditor" Caption="Npc Editor"
-    Size="720, 424"
+    Size="720, 420"
         Icon="113" IconOffset="3, 5"
         Design="WindowNormal"
         StartPosition="CenterScreen"
         Visible="false">
 
-  <!-- Index list on the left -->
   <Label Name="lblList" Text="Npc" Position="16, 24" Size="80, 16"/>
-  <ListBox Name="lstIndex" Position="16, 44" Size="224, 360"/>
-  <ScrollBar Name="sldList" Position="240, 44" Size="16, 360" Min="0" Max="0" Vertical="true"/>
+  <ListBox Name="lstIndex" Position="16, 44" Size="224, 340"/>
+  <ScrollBar Name="sldList" Position="240, 44" Size="16, 340" Min="0" Max="0" Vertical="true"/>
 
   <!-- Details group -->
-  <GroupBox Name="grpNpcDetails" Caption="" Position="272, 32" Size="432, 348">
+  <GroupBox Name="gtpDetails" Caption="" Position="272, 32" Size="432, 348">
     <!-- Core fields -->
     <Label Name="lblName" Text="Name" Position="8, 4" Size="80, 16"/>
     <TextBox Name="txtName" Position="72, 2" Size="232, 20" Design="TextWhite"/>
@@ -66,10 +65,10 @@
   </GroupBox>
 
   <!-- Buttons centered directly under groupbox -->
-  <Button Name="btnSave" Text="Save" Position="328, 392" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-  <Button Name="btnDelete" Text="Delete" Position="416, 392" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
-  <Button Name="btnCopy" Text="Copy" Position="504, 392" Size="80, 24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
-  <Button Name="btnCancel" Text="Cancel" Position="592, 392" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+  <Button Name="btnSave" Text="Save" Position="328, 388" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+  <Button Name="btnDelete" Text="Delete" Position="416, 388" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+  <Button Name="btnCopy" Text="Copy" Position="504, 388" Size="80, 24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+  <Button Name="btnCancel" Text="Cancel" Position="592, 388" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
 
   <!-- Close button in title bar -->
   <Button Name="btnClose" Position="-19, 5" Size="16, 16" Image="8" ImageHover="9" ImageMouseDown="10"/>

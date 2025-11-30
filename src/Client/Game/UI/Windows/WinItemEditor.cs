@@ -13,7 +13,7 @@ public static class WinItemEditor
 
     public static void Init()
     {
-        if (!WindowManager.TryGetControl("winItemEditor", "lstItemIndex", out _))
+        if (!WindowManager.TryGetControl("winItemEditor", "lstIndex", out _))
             return;
 
         PopulateStaticCombos();
@@ -24,7 +24,7 @@ public static class WinItemEditor
         BuildSubtypeList();
 
         // Wire critical sliders to update item data immediately when moved
-        if (WindowManager.TryGetControl("winItemEditor", "sldItemIcon", out var iconScrollCtrl) && iconScrollCtrl is ScrollBar sldIcon)
+        if (WindowManager.TryGetControl("winItemEditor", "sldIcon", out var iconScrollCtrl) && iconScrollCtrl is ScrollBar sldIcon)
         {
             sldIcon.CallBack[(int)ControlState.MouseMove] = () =>
             {
@@ -33,7 +33,7 @@ public static class WinItemEditor
                 GameState.ItemChanged[SelectedIndex] = true;
             };
         }
-        if (WindowManager.TryGetControl("winItemEditor", "sldItemPaperdoll", out var pdScrollCtrl) && pdScrollCtrl is ScrollBar sldPd)
+        if (WindowManager.TryGetControl("winItemEditor", "sldPaperdoll", out var pdScrollCtrl) && pdScrollCtrl is ScrollBar sldPd)
         {
             sldPd.CallBack[(int)ControlState.MouseMove] = () =>
             {
@@ -64,7 +64,7 @@ public static class WinItemEditor
 
     private static void RefreshList()
     {
-        if (!WindowManager.TryGetControl("winItemEditor", "lstItemIndex", out var ctrl) || ctrl is not ListBox list)
+        if (!WindowManager.TryGetControl("winItemEditor", "lstIndex", out var ctrl) || ctrl is not ListBox list)
             return;
 
         int prevIndex = SelectedIndex;
@@ -84,7 +84,7 @@ public static class WinItemEditor
             list.EnsureVisible(prevIndex);
         }
 
-        if (WindowManager.TryGetControl("winItemEditor", "sldItemList", out var sldCtrl) && sldCtrl is ScrollBar sb)
+        if (WindowManager.TryGetControl("winItemEditor", "sldList", out var sldCtrl) && sldCtrl is ScrollBar sb)
         {
             int visible = list.GetVisibleCount();
             int max = Math.Max(0, list.Items.Count - visible);
@@ -105,15 +105,15 @@ public static class WinItemEditor
         }
 
         // Item level
-        if (WindowManager.TryGetControl("winItemEditor", "cmbItemLevel", out var lvlComboCtrl) && lvlComboCtrl is ComboBox cmbItemLevel)
+        if (WindowManager.TryGetControl("winItemEditor", "cmbLevel", out var lvlComboCtrl) && lvlComboCtrl is ComboBox cmbLevel)
         {
-            cmbItemLevel.Items.Clear();
+            cmbLevel.Items.Clear();
             for (int i = 1; i <= GameState.MaxLevel; i++)
-                cmbItemLevel.Items.Add(i.ToString());
+                cmbLevel.Items.Add(i.ToString());
         }
 
         // Bind
-        if (WindowManager.TryGetControl("winItemEditor", "cmbItemBind", out var bindCtrl) && bindCtrl is ComboBox cmbBind)
+        if (WindowManager.TryGetControl("winItemEditor", "cmbBind", out var bindCtrl) && bindCtrl is ComboBox cmbBind)
         {
             cmbBind.Items.Clear();
             cmbBind.Items.Add("None");
@@ -122,7 +122,7 @@ public static class WinItemEditor
         }
 
         // Animation
-        if (WindowManager.TryGetControl("winItemEditor", "cmbItemAnimation", out var animCtrl) && animCtrl is ComboBox cmbAnim)
+        if (WindowManager.TryGetControl("winItemEditor", "cmbAnimation", out var animCtrl) && animCtrl is ComboBox cmbAnim)
         {
             cmbAnim.Items.Clear();
             for (int i = 0; i < Variables.MaxAnimations; i++)
@@ -134,7 +134,7 @@ public static class WinItemEditor
         }
 
         // Rarity (1-6)
-        if (WindowManager.TryGetControl("winItemEditor", "cmbItemRarity", out var rarComboCtrl) && rarComboCtrl is ComboBox cmbRarity)
+        if (WindowManager.TryGetControl("winItemEditor", "cmbRarity", out var rarComboCtrl) && rarComboCtrl is ComboBox cmbRarity)
         {
             cmbRarity.Items.Clear();
             for (int i = 1; i <= 6; i++)
@@ -142,7 +142,7 @@ public static class WinItemEditor
         }
 
         // Job requirements
-        if (WindowManager.TryGetControl("winItemEditor", "cmbItemJobReq", out var jobCtrl) && jobCtrl is ComboBox cmbJob)
+        if (WindowManager.TryGetControl("winItemEditor", "cmbJobReq", out var jobCtrl) && jobCtrl is ComboBox cmbJob)
         {
             cmbJob.Items.Clear();
             for (int i = 0; i < Variables.MaxJobs; i++)
@@ -150,7 +150,7 @@ public static class WinItemEditor
         }
 
         // Access requirements (use AccessLevel enum with spaced names)
-        if (WindowManager.TryGetControl("winItemEditor", "cmbItemAccessReq", out var accCtrl) && accCtrl is ComboBox cmbAcc)
+        if (WindowManager.TryGetControl("winItemEditor", "cmbAccessReq", out var accCtrl) && accCtrl is ComboBox cmbAcc)
         {
             cmbAcc.Items.Clear();
             foreach (var name in Enum.GetNames(typeof(AccessLevel)))
@@ -161,7 +161,7 @@ public static class WinItemEditor
         }
 
         // Tool list (resource names)
-        if (WindowManager.TryGetControl("winItemEditor", "cmbItemTool", out var toolCtrl) && toolCtrl is ComboBox cmbTool)
+        if (WindowManager.TryGetControl("winItemEditor", "cmbTool", out var toolCtrl) && toolCtrl is ComboBox cmbTool)
         {
             cmbTool.Items.Clear();
             cmbTool.Items.Add("None");
@@ -170,7 +170,7 @@ public static class WinItemEditor
         }
 
         // Knockback tiles choices
-        if (WindowManager.TryGetControl("winItemEditor", "cmbItemKnockBackTiles", out var kbCtrl) && kbCtrl is ComboBox cmbKb)
+        if (WindowManager.TryGetControl("winItemEditor", "cmbKnockBackTiles", out var kbCtrl) && kbCtrl is ComboBox cmbKb)
         {
             cmbKb.Items.Clear();
             for (int i = 0; i < 6; i++)
@@ -178,7 +178,7 @@ public static class WinItemEditor
         }
 
         // Skill list
-        if (WindowManager.TryGetControl("winItemEditor", "cmbItemSkill", out var skillCtrl) && skillCtrl is ComboBox cmbSkill)
+        if (WindowManager.TryGetControl("winItemEditor", "cmbSkill", out var skillCtrl) && skillCtrl is ComboBox cmbSkill)
         {
             cmbSkill.Items.Clear();
             cmbSkill.Items.Add("None");
@@ -211,7 +211,7 @@ public static class WinItemEditor
 
     public static void BuildSubtypeList()
     {
-        if (!WindowManager.TryGetControl("winItemEditor", "cmbItemSubType", out var subCtrl) || subCtrl is not ComboBox cmbSub)
+        if (!WindowManager.TryGetControl("winItemEditor", "cmbSubType", out var subCtrl) || subCtrl is not ComboBox cmbSub)
             return;
         cmbSub.Items.Clear();
         var type = (ItemCategory)Math.Clamp(Data.Item[SelectedIndex].Type, 0, int.MaxValue);
@@ -255,23 +255,23 @@ public static class WinItemEditor
             if (WindowManager.TryGetControl("winItemEditor", name, out var c) && c is not null)
                 c.Visible = vis;
         }
-        if (WindowManager.TryGetControl("winItemEditor", "grpItemEquip", out var eqCtrl) && eqCtrl is GroupBox grpEquip && WindowManager.TryGetWindow("winItemEditor", out var win))
+        if (WindowManager.TryGetControl("winItemEditor", "grpEquip", out var eqCtrl) && eqCtrl is GroupBox grpEquip && WindowManager.TryGetWindow("winItemEditor", out var win))
         {
             bool eq = type == ItemCategory.Equipment;
             WindowManager.SetGroupVisible(win!, grpEquip, eq);
             // Within equipment group, toggle individual equipment-only controls as extra safety
-            SetVisible("lblItemDamage", eq);
-            SetVisible("txtItemDamage", eq);
-            SetVisible("lblItemSpeed", eq);
-            SetVisible("txtItemSpeed", eq);
-            SetVisible("chkItemKnockBack", eq);
-            SetVisible("lblItemTool", eq);
-            SetVisible("cmbItemTool", eq);
-            SetVisible("lblItemKnockTiles", eq);
-            SetVisible("cmbItemKnockBackTiles", eq);
+            SetVisible("lblDamage", eq);
+            SetVisible("txtDamage", eq);
+            SetVisible("lblSpeed", eq);
+            SetVisible("txtSpeed", eq);
+            SetVisible("chkKnockback", eq);
+            SetVisible("lblTool", eq);
+            SetVisible("cmbTool", eq);
+            SetVisible("lblKnockbackTiles", eq);
+            SetVisible("cmbKnockBackTiles", eq);
             SetVisible("lblPaperdollEquip", eq);
-            SetVisible("sldItemPaperdoll", eq);
-            SetVisible("picItemPaperdoll", eq);
+            SetVisible("sldPaperdoll", eq);
+            SetVisible("picPaperdoll", eq);
         }
 
         if (WindowManager.TryGetControl("winItemEditor", "grpItemUse", out var useCtrl) && useCtrl is GroupBox grpUse && WindowManager.TryGetWindow("winItemEditor", out var win2))
@@ -290,7 +290,7 @@ public static class WinItemEditor
 
         // Skill controls
         SetVisible("lblSkillHeader", isSkill);
-        SetVisible("cmbItemSkill", isSkill);
+        SetVisible("cmbSkill", isSkill);
 
         // Projectile controls
         SetVisible("lblProjectileHeader", isProjectile);
@@ -314,13 +314,13 @@ public static class WinItemEditor
         var item = Data.Item[index];
 
         // Basics
-        if (WindowManager.TryGetControl("winItemEditor", "txtItemName", out var nameCtrl) && nameCtrl is TextBox txtName)
+        if (WindowManager.TryGetControl("winItemEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
             txtName.Text = item.Name ?? string.Empty;
-        if (WindowManager.TryGetControl("winItemEditor", "txtItemDescription", out var descCtrl) && descCtrl is TextBox txtDesc)
+        if (WindowManager.TryGetControl("winItemEditor", "txtDesc", out var descCtrl) && descCtrl is TextBox txtDesc)
             txtDesc.Text = item.Description ?? string.Empty;
         
         // icon index is driven by scrollbar; no direct text box anymore
-        if (WindowManager.TryGetControl("winItemEditor", "sldItemIcon", out var iconScrollCtrl) && iconScrollCtrl is ScrollBar sldIcon)
+        if (WindowManager.TryGetControl("winItemEditor", "sldIcon", out var iconScrollCtrl) && iconScrollCtrl is ScrollBar sldIcon)
         {
             // Max icons is NumItems icons (mirror how item icons are stored: per item index)
             sldIcon.Min = 0;
@@ -330,48 +330,48 @@ public static class WinItemEditor
         if (WindowManager.TryGetControl("winItemEditor", "txtItemPaperdoll", out var pdCtrl) && pdCtrl is TextBox txtPd)
             txtPd.Text = item.Paperdoll.ToString();
         // Paperdoll scrollbar range and value
-        if (WindowManager.TryGetControl("winItemEditor", "sldItemPaperdoll", out var pdScrollCtrl) && pdScrollCtrl is ScrollBar sldPd)
+        if (WindowManager.TryGetControl("winItemEditor", "sldPaperdoll", out var pdScrollCtrl) && pdScrollCtrl is ScrollBar sldPd)
         {
             sldPd.Min = 0;
             sldPd.Max = Math.Max(0, GameState.NumPaperdolls);
             sldPd.Value = Math.Clamp(item.Paperdoll, sldPd.Min, sldPd.Max);
         }
         // Hook paperdoll draw if not already (safe to set repeatedly)
-        if (WindowManager.TryGetControl("winItemEditor", "picItemPaperdoll", out var pdPicCtrl) && pdPicCtrl is PictureBox pdPic)
+        if (WindowManager.TryGetControl("winItemEditor", "picPaperdoll", out var pdPicCtrl) && pdPicCtrl is PictureBox pdPic)
             pdPic.OnDraw = OnDrawPaperdoll;
 
         if (WindowManager.TryGetControl("winItemEditor", "cmbItemType", out var typeCtrl) && typeCtrl is ComboBox cmbType)
             cmbType.Value = Math.Clamp(item.Type, 0, cmbType.Items.Count - 1);
-        if (WindowManager.TryGetControl("winItemEditor", "cmbItemSubType", out var subCtrl) && subCtrl is ComboBox cmbSub)
+        if (WindowManager.TryGetControl("winItemEditor", "cmbSubType", out var subCtrl) && subCtrl is ComboBox cmbSub)
             cmbSub.Value = item.SubType;
-        if (WindowManager.TryGetControl("winItemEditor", "cmbItemAnimation", out var animCtrl) && animCtrl is ComboBox cmbAnim)
+        if (WindowManager.TryGetControl("winItemEditor", "cmbAnimation", out var animCtrl) && animCtrl is ComboBox cmbAnim)
             cmbAnim.Value = Math.Clamp(item.Animation, 0, cmbAnim.Items.Count - 1);
-        if (WindowManager.TryGetControl("winItemEditor", "cmbItemBind", out var bindCtrl) && bindCtrl is ComboBox cmbBind)
+        if (WindowManager.TryGetControl("winItemEditor", "cmbBind", out var bindCtrl) && bindCtrl is ComboBox cmbBind)
             cmbBind.Value = Math.Clamp(item.BindType, 0, cmbBind.Items.Count - 1);
 
-        if (WindowManager.TryGetControl("winItemEditor", "cmbItemLevel", out var lvlCtrl) && lvlCtrl is ComboBox cmbItemLevel)
-            cmbItemLevel.Value = Math.Clamp(item.ItemLevel - 1, 0, cmbItemLevel.Items.Count - 1);
-        if (WindowManager.TryGetControl("winItemEditor", "txtItemPrice", out var priceCtrl) && priceCtrl is TextBox txtPrice)
+        if (WindowManager.TryGetControl("winItemEditor", "cmbLevel", out var lvlCtrl) && lvlCtrl is ComboBox cmbLevel)
+            cmbLevel.Value = Math.Clamp(item.ItemLevel - 1, 0, cmbLevel.Items.Count - 1);
+        if (WindowManager.TryGetControl("winItemEditor", "txtPrice", out var priceCtrl) && priceCtrl is TextBox txtPrice)
             txtPrice.Text = item.Price.ToString();
-        if (WindowManager.TryGetControl("winItemEditor", "cmbItemRarity", out var rarCtrl) && rarCtrl is ComboBox cmbRarity)
+        if (WindowManager.TryGetControl("winItemEditor", "cmbRarity", out var rarCtrl) && rarCtrl is ComboBox cmbRarity)
             cmbRarity.Value = Math.Clamp(item.Rarity - 1, 0, cmbRarity.Items.Count - 1);
-        if (WindowManager.TryGetControl("winItemEditor", "chkItemStackable", out var stackCtrl) && stackCtrl is CheckBox chkStack)
+        if (WindowManager.TryGetControl("winItemEditor", "chkStackable", out var stackCtrl) && stackCtrl is CheckBox chkStack)
             chkStack.Value = item.Stackable != 0 ? 1 : 0;
 
         // Equipment & stats
-        if (WindowManager.TryGetControl("winItemEditor", "txtItemDamage", out var dmgText) && dmgText is TextBox txtDmg)
+        if (WindowManager.TryGetControl("winItemEditor", "txtDamage", out var dmgText) && dmgText is TextBox txtDmg)
         {
             txtDmg.Text = item.Data2.ToString();
         }
-        if (WindowManager.TryGetControl("winItemEditor", "txtItemSpeed", out var spdText) && spdText is TextBox txtSpd)
+        if (WindowManager.TryGetControl("winItemEditor", "txtSpeed", out var spdText) && spdText is TextBox txtSpd)
         {
             txtSpd.Text = item.Speed.ToString();
         }
-        if (WindowManager.TryGetControl("winItemEditor", "chkItemKnockBack", out var kbCtrl2) && kbCtrl2 is CheckBox chkKb)
+        if (WindowManager.TryGetControl("winItemEditor", "chkKnockback", out var kbCtrl2) && kbCtrl2 is CheckBox chkKb)
             chkKb.Value = item.KnockBack != 0 ? 1 : 0;
-        if (WindowManager.TryGetControl("winItemEditor", "cmbItemTool", out var toolCtrl) && toolCtrl is ComboBox cmbTool)
+        if (WindowManager.TryGetControl("winItemEditor", "cmbTool", out var toolCtrl) && toolCtrl is ComboBox cmbTool)
             cmbTool.Value = Math.Clamp(item.Data3, 0, cmbTool.Items.Count - 1);
-        if (WindowManager.TryGetControl("winItemEditor", "cmbItemKnockBackTiles", out var kbtCtrl) && kbtCtrl is ComboBox cmbKbTiles)
+        if (WindowManager.TryGetControl("winItemEditor", "cmbKnockBackTiles", out var kbtCtrl) && kbtCtrl is ComboBox cmbKbTiles)
             cmbKbTiles.Value = Math.Clamp(item.KnockBackTiles, 0, cmbKbTiles.Items.Count - 1);
 
         if (WindowManager.TryGetControl("winItemEditor", "sldStr", out var aStrCtrl) && aStrCtrl is ScrollBar sldAStr)
@@ -408,7 +408,7 @@ public static class WinItemEditor
         // Consumable / skill / projectile / event
         if (WindowManager.TryGetControl("winItemEditor", "txtVitalMod", out var vCtrl) && vCtrl is TextBox txtVital)
             txtVital.Text = item.Data1.ToString();
-        if (WindowManager.TryGetControl("winItemEditor", "cmbItemSkill", out var sCtrl) && sCtrl is ComboBox cmbSkill)
+        if (WindowManager.TryGetControl("winItemEditor", "cmbSkill", out var sCtrl) && sCtrl is ComboBox cmbSkill)
             cmbSkill.Value = Math.Clamp(item.Data1, 0, cmbSkill.Items.Count - 1);
         if (WindowManager.TryGetControl("winItemEditor", "cmbItemProjectile", out var pCtrl) && pCtrl is ComboBox cmbProj)
             cmbProj.Value = Math.Clamp(item.Projectile + 1, 0, cmbProj.Items.Count - 1);
@@ -457,9 +457,9 @@ public static class WinItemEditor
             sldReqSpr.Value = Math.Clamp(item.StatReq[(int)Stat.Spirit], sldReqSpr.Min, sldReqSpr.Max);
         }
 
-        if (WindowManager.TryGetControl("winItemEditor", "cmbItemJobReq", out var jCtrl2) && jCtrl2 is ComboBox cmbJob2)
+        if (WindowManager.TryGetControl("winItemEditor", "cmbJobReq", out var jCtrl2) && jCtrl2 is ComboBox cmbJob2)
             cmbJob2.Value = Math.Clamp(item.JobReq, 0, cmbJob2.Items.Count - 1);
-        if (WindowManager.TryGetControl("winItemEditor", "cmbItemAccessReq", out var aCtrl2) && aCtrl2 is ComboBox cmbAcc2)
+        if (WindowManager.TryGetControl("winItemEditor", "cmbAccessReq", out var aCtrl2) && aCtrl2 is ComboBox cmbAcc2)
             cmbAcc2.Value = Math.Clamp(item.AccessReq, 0, cmbAcc2.Items.Count - 1);
 
         // Rebuild subtype list now that type is applied
@@ -478,7 +478,7 @@ public static class WinItemEditor
 
         if (item.Icon < 1 || item.Icon > GameState.NumItems) return;
 
-        if (!WindowManager.TryGetControl("winItemEditor", "picItemIcon", out var iconCtrl) || iconCtrl is not PictureBox pic)
+        if (!WindowManager.TryGetControl("winItemEditor", "picIcon", out var iconCtrl) || iconCtrl is not PictureBox pic)
             return;
 
         string texturePath = Path.Combine(DataPath.Items, item.Icon.ToString());
@@ -499,7 +499,7 @@ public static class WinItemEditor
         if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
         var item = Data.Item[SelectedIndex];
         if (item.Paperdoll < 1 || item.Paperdoll > GameState.NumPaperdolls) return;
-        if (!WindowManager.TryGetControl("winItemEditor", "picItemPaperdoll", out var ctrl) || ctrl is not PictureBox pic)
+        if (!WindowManager.TryGetControl("winItemEditor", "picPaperdoll", out var ctrl) || ctrl is not PictureBox pic)
             return;
         string texturePath = Path.Combine(DataPath.Paperdolls, item.Paperdoll.ToString());
         var tex = GameClient.GetGfxInfo(texturePath);
@@ -517,7 +517,7 @@ public static class WinItemEditor
 
     public static void OnListMouseDown()
     {
-        if (!WindowManager.TryGetControl("winItemEditor", "lstItemIndex", out var ctrl) || ctrl is not ListBox list) return;
+        if (!WindowManager.TryGetControl("winItemEditor", "lstIndex", out var ctrl) || ctrl is not ListBox list) return;
         var win = WindowManager.GetWindowByName("winItemEditor");
         if (win is null) return;
         int relY = GameState.CurMouseY - (win.Y + ctrl.Y);

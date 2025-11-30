@@ -1722,14 +1722,14 @@ public class Crystalshire
 
         // Ensure item editor combos and icon picture are visible (some skins may hide them)
         // Sprite preview picture box draws item icon each frame
-        if (WindowManager.TryGetControl("winItemEditor", "picItemIcon", out var picIconCtrl) && picIconCtrl is PictureBox picIcon)
+        if (WindowManager.TryGetControl("winItemEditor", "picIcon", out var picIconCtrl) && picIconCtrl is PictureBox picIcon)
         {
             picIcon.OnDraw = WinItemEditor.OnDrawIcon;
         }
 
         // Item list + mouse wheel
         ListBox itemList = null;
-        if (WindowManager.TryGetControl("winItemEditor", "lstItemIndex", out var lstCtrl) && lstCtrl is ListBox list)
+        if (WindowManager.TryGetControl("winItemEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox list)
         {
             itemList = list;
             list.CallBack[(int)ControlState.MouseDown] = WinItemEditor.OnListMouseDown;
@@ -1741,14 +1741,14 @@ public class Crystalshire
                     int step = delta > 0 ? -1 : 1;
                     list.ScrollBy(step);
 
-                    if (WindowManager.TryGetControl("winItemEditor", "sldItemList", out var sldItem) && sldItem is ScrollBar sbSync)
+                    if (WindowManager.TryGetControl("winItemEditor", "sldList", out var sldItem) && sldItem is ScrollBar sbSync)
                     {
                         sbSync.Value = list.ScrollOffset;
                     }
                 }
             };
         }
-        if (WindowManager.TryGetControl("winItemEditor", "sldItemList", out var sldItemList) && sldItemList is ScrollBar sbItem)
+        if (WindowManager.TryGetControl("winItemEditor", "sldList", out var sldList) && sldList is ScrollBar sbItem)
         {
             sbItem.CallBack[(int)ControlState.MouseMove] = () =>
             {
@@ -1760,7 +1760,7 @@ public class Crystalshire
         }
 
         // Name textbox updates list entry
-        if (WindowManager.TryGetControl("winItemEditor", "txtItemName", out var txtNameCtrl) && txtNameCtrl is TextBox txtName)
+        if (WindowManager.TryGetControl("winItemEditor", "txtName", out var txtNameCtrl) && txtNameCtrl is TextBox txtName)
         {
             txtName.CallBack[(int)ControlState.KeyUp] = () => WinItemEditor.UpdateName(txtName.Text ?? string.Empty);
         }
@@ -1781,7 +1781,7 @@ public class Crystalshire
         }
 
         // Basics
-        if (WindowManager.TryGetControl("winItemEditor", "txtItemDescription", out var descCtrl) && descCtrl is TextBox txtDesc)
+        if (WindowManager.TryGetControl("winItemEditor", "txtDesc", out var descCtrl) && descCtrl is TextBox txtDesc)
         {
             txtDesc.CallBack[(int)ControlState.KeyUp] = () =>
             {
@@ -1794,7 +1794,7 @@ public class Crystalshire
         }
 
         // Icon scrollbar: update icon and redraw preview
-        if (WindowManager.TryGetControl("winItemEditor", "sldItemIcon", out var iconScrollCtrl) && iconScrollCtrl is ScrollBar sldIcon)
+        if (WindowManager.TryGetControl("winItemEditor", "sldIcon", out var iconScrollCtrl) && iconScrollCtrl is ScrollBar sldIcon)
         {
             sldIcon.CallBack[(int)ControlState.MouseMove] = () =>
             {
@@ -1824,7 +1824,7 @@ public class Crystalshire
             }
         }, 0, 255);
 
-        BindIntText("txtItemPrice", v =>
+        BindIntText("txtPrice", v =>
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
@@ -1842,7 +1842,7 @@ public class Crystalshire
             }
         }, 0, 5);
 
-        if (WindowManager.TryGetControl("winItemEditor", "chkItemStackable", out var stackCtrl) && stackCtrl is CheckBox chkStack)
+        if (WindowManager.TryGetControl("winItemEditor", "chkStackable", out var stackCtrl) && stackCtrl is CheckBox chkStack)
         {
             chkStack.CallBack[(int)ControlState.MouseDown] = () =>
             {
@@ -1879,7 +1879,7 @@ public class Crystalshire
             };
         }
 
-        if (WindowManager.TryGetControl("winItemEditor", "chkItemKnockBack", out var kbCtrl) && kbCtrl is CheckBox chkKb)
+        if (WindowManager.TryGetControl("winItemEditor", "chkKnockback", out var kbCtrl) && kbCtrl is CheckBox chkKb)
         {
             chkKb.CallBack[(int)ControlState.MouseDown] = () =>
             {
@@ -1997,7 +1997,7 @@ public class Crystalshire
             }
         });
 
-        BindCombo("cmbItemSubType", v =>
+        BindCombo("cmbSubType", v =>
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
@@ -2006,7 +2006,7 @@ public class Crystalshire
             }
         });
 
-        BindCombo("cmbItemAnimation", v =>
+        BindCombo("cmbAnimation", v =>
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
@@ -2015,7 +2015,7 @@ public class Crystalshire
             }
         });
 
-        BindCombo("cmbItemBind", v =>
+        BindCombo("cmbBind", v =>
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
@@ -2024,7 +2024,7 @@ public class Crystalshire
             }
         });
 
-        BindCombo("cmbItemTool", v =>
+        BindCombo("cmbTool", v =>
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
@@ -2033,7 +2033,7 @@ public class Crystalshire
             }
         });
 
-        BindCombo("cmbItemKnockBackTiles", v =>
+        BindCombo("cmbKnockBackTiles", v =>
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
@@ -2042,7 +2042,7 @@ public class Crystalshire
             }
         });
 
-        BindCombo("cmbItemSkill", v =>
+        BindCombo("cmbSkill", v =>
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
@@ -2069,7 +2069,7 @@ public class Crystalshire
             }
         });
 
-        BindCombo("cmbItemJobReq", v =>
+        BindCombo("cmbJobReq", v =>
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
@@ -2078,7 +2078,7 @@ public class Crystalshire
             }
         });
 
-        BindCombo("cmbItemAccessReq", v =>
+        BindCombo("cmbAccessReq", v =>
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
