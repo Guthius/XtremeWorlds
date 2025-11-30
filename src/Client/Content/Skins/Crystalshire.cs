@@ -2262,6 +2262,7 @@ public class Crystalshire
     public void UpdateWindow_Shop()
     {
         var window = WindowLoader.FromLayout("winShop");
+
         window.OnDraw = WinShop.OnDrawBackground;
         window.CallBack[(int)ControlState.MouseMove] = WinShop.OnMouseMove;
         window.CallBack[(int)ControlState.MouseDown] = WinShop.OnMouseDown;
@@ -2547,11 +2548,6 @@ public class Crystalshire
     {
         var window = WindowLoader.FromLayout("winShopEditor");
 
-        // Populate combos and list
-        WinShopEditor.PopulateCombos();
-        WinShopEditor.RefreshList();
-        WinShopEditor.LoadShop(GameState.EditorIndex);
-
         // List interactions
         if (WindowManager.TryGetControl("winShopEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox lstIndex)
         {
@@ -2577,27 +2573,8 @@ public class Crystalshire
         }
 
         // Trade list interactions
-        if (WindowManager.TryGetControl("winShopEditor", "lstTradeItem", out var tradeCtrl) && tradeCtrl is ListBox lstTrade)
-        {
-            lstTrade.CallBack[(int)ControlState.MouseDown] = WinShopEditor.OnTradeListMouseDown;
-            if (WindowManager.TryGetControl("winShopEditor", "sldTradeList", out var sldTrade) && sldTrade is ScrollBar sbTrade)
-            {
-                lstTrade.CallBack[(int)ControlState.MouseScroll] = () =>
-                {
-                    int delta = GameClient.CurrentMouseState.ScrollWheelValue - GameClient.PreviousMouseState.ScrollWheelValue;
-                    if (delta == 0) return;
-                    int step = delta > 0 ? -1 : 1;
-                    sbTrade.Value = Math.Clamp(sbTrade.Value + step, sbTrade.Min, sbTrade.Max);
-                    lstTrade.ScrollOffset = sbTrade.Value;
-                    lstTrade.EnsureVisible(lstTrade.SelectedIndex);
-                };
-                sbTrade.CallBack[(int)ControlState.MouseMove] = () =>
-                {
-                    lstTrade.ScrollOffset = sbTrade.Value;
-                    lstTrade.EnsureVisible(lstTrade.SelectedIndex);
-                };
-            }
-        }
+        WireScrollableList("winShopEditor", "lstIndex", "sldList");
+        WireScrollableList("winShopEditor", "lstTradeItem", "sldTradeList");
 
         // Name textbox
         if (WindowManager.TryGetControl("winShopEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
@@ -2691,7 +2668,7 @@ public class Crystalshire
         }
         if (WindowManager.TryGetControl("winShopEditor", "btnClose", out var closeCtrl) && closeCtrl is Button btnClose)
         {
-            btnClose.CallBack[(int)ControlState.MouseDown] = () => WindowManager.HideWindow("winShopEditor");
+            btnClose.CallBack[(int)ControlState.MouseDown] = () => Editors.ShopEditorCancel(); WindowManager.HideWindow("winShopEditor");
         }
     }
 
