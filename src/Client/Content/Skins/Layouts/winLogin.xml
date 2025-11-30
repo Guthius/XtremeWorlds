@@ -7,27 +7,27 @@
         Visible="true">
 
 	<GroupBox Name="grpLogin" Position="6,26" Size="260,192">
-		<PictureBox Name="picLogin_1" Position="55,20" Size="142,9" Design="BlackOval"/>
-		<PictureBox Name="picLogin_2" Position="61,68" Size="142,9" Design="BlackOval"/>
+		<PictureBox Name="picLogin_1" Position="61,20" Size="142,9" Design="BlackOval"/>
+		<PictureBox Name="picLogin_2" Position="67,68" Size="142,9" Design="BlackOval"/>
 
-		<Label Name="lblLogin" Text="Username" Position="60,16" Size="142,10" Align="Center"/>
-		<TextBox Name="txtUsername" Position="55,32" Size="142,19"/>
+		<Label Name="lblLogin" Text="Username" Position="67,20" Size="142,10" Align="Center"/>
+		<TextBox Name="txtUsername" Position="61,32" Size="142,19"/>
 
-		<Label Name="lblPassword" Text="Password" Position="66,64" Size="142,10" Align="Center"/>
-		<TextBox Name="txtPassword" Position="61,75" Size="142,19" Censor="True"/>
+		<Label Name="lblPassword" Text="Password" Position="73,68" Size="142,10" Align="Center"/>
+		<TextBox Name="txtPassword" Position="67,75" Size="142,19" Censor="True"/>
 
 		<CheckBox Name="chkSaveUsername" Text="Save Username?"
-				Position="61,97" Size="142,10"
+				Position="67,97" Size="142,10"
 				Design="CheckboxNormal"/>
 
 		<Button Name="btnAccept" Text="Accept"
-				Position="61,119" Size="67,22"
+				Position="67,119" Size="67,22"
 				Design="Green"
 				DesignHover="GreenHover"
 				DesignMouseDown="GreenClick"/>
 
 		<Button Name="btnExit" Text="Exit"
-			Position="136,119" Size="67,22"
+			Position="142,119" Size="67,22"
 			Design="Red"
 			DesignHover="RedHover"
 			DesignMouseDown="RedClick"/>

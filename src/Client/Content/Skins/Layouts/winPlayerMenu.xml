@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Window Name="winPlayerMenu" Size="110, 106" Position="0, 0" Font="Georgia" Design="WindowDescription" StartPosition="CenterScreen">
+<Window Name="winPlayerMenu" Size="110, 106" Position="0, 0" Font="PixelGeorgiaBold" Design="WindowDescription" StartPosition="CenterScreen">
     <Button Name="btnName" Text="[Name]" Position="8, 8" Size="94, 18" Design="MenuHeader"/>
     <Button Name="btnTrade" Text="Request Trade" Position="8, 44" Size="94, 18" Design="MenuOption"/>
     <Button Name="btnParty" Text="Invite to Party" Position="8, 26" Size="94, 18" Design="MenuOption"/> 

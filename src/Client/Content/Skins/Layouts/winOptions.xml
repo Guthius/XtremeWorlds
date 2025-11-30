@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Window Name="winOptions" Size="260, 270" Position="6, 26" Font="Georgia" Design="WindowNoBar" StartPosition="CenterScreen">
+<Window Name="winOptions" Size="260, 270" Position="6, 26" Font="PixelGeorgiaBold" Design="WindowNoBar" StartPosition="CenterScreen">
 	<GroupBox Name="grpGeneral" Position="0,6" Size="244,132">
-		<Label Name="lblGeneral" Text="General Options" Position="10,8" Size="224,18" Font="Georgia" Align="Center"/>
+		<Label Name="lblGeneral" Text="General Options" Position="10,8" Size="224,18" Font="PixelGeorgiaBold" Align="Center"/>
 
 		<CheckBox Name="chkMusic" Text="Music" Position="18,40" Size="100,20" Design="CheckboxNormal"/>
 		<CheckBox Name="chkSound" Text="Sound" Position="128,40" Size="100,20" Design="CheckboxNormal"/>
@@ -13,7 +13,7 @@
 	</GroupBox>
 
 	<GroupBox Name="grpResolution" Position="4,148" Size="244,112">
-		<Label Name="lblRes" Text="Resolution" Position="10,8" Size="224,18" Font="Georgia" Align="Center"/>
+		<Label Name="lblRes" Text="Resolution" Position="10,8" Size="224,18" Font="PixelGeorgiaBold" Align="Center"/>
 		<ComboBox Name="cmbRes" Position="18,40" Size="200,22"/>
 		<Button Name="btnConfirm" Text="Confirm" Position="82,68" Size="80,28" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 	</GroupBox>
