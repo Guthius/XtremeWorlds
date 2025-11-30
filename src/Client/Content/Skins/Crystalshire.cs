@@ -1322,7 +1322,7 @@ public class Crystalshire
         // Close button
         if (WindowManager.TryGetControl("winNpcEditor", "btnClose", out var btnClose))
         {
-            btnClose.CallBack[(int)ControlState.MouseDown] = () => WindowManager.HideWindow("winNpcEditor");
+            btnClose.CallBack[(int)ControlState.MouseDown] = () => Editors.NpcEditorCancel(); WindowManager.HideWindow("winNpcEditor");
         }
 
         // Sprite preview picture box draws NPC sprite each frame
@@ -1331,38 +1331,8 @@ public class Crystalshire
             picSprite.OnDraw = WinNpcEditor.OnDrawSprite;
         }
 
-        // List interactions
-        ListBox npcList = null;
-        if (WindowManager.TryGetControl("winNpcEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox list)
-        {
-            npcList = list;
-            list.CallBack[(int)ControlState.MouseDown] = WinNpcEditor.OnListMouseDown;
-            list.CallBack[(int)ControlState.MouseScroll] = () =>
-            {
-                int delta = GameClient.CurrentMouseState.ScrollWheelValue - GameClient.PreviousMouseState.ScrollWheelValue;
-                if (delta != 0)
-                {
-                    int step = delta > 0 ? -1 : 1; // wheel up scrolls up
-                    list.ScrollBy(step);
-
-                    // Keep scrollbar in sync if present
-                    if (WindowManager.TryGetControl("winNpcEditor", "sldList", out var sldNpc) && sldNpc is ScrollBar sbSync)
-                    {
-                        sbSync.Value = list.ScrollOffset;
-                    }
-                }
-            };
-        }
-        if (WindowManager.TryGetControl("winNpcEditor", "sldList", out var sldNpcList) && sldNpcList is ScrollBar sbNpc)
-        {
-            sbNpc.CallBack[(int)ControlState.MouseMove] = () =>
-            {
-                if (npcList != null)
-                {
-                    npcList.ScrollOffset = sbNpc.Value;
-                }
-            };
-        }
+        // Wire listbox + scrollbar
+        WireScrollableList("winNpcEditor", "lstIndex", "sldList");
 
         // Hide redundant amount / chance textboxes: both are slider-only now.
         if (WindowManager.TryGetControl("winNpcEditor", "nudChance", out var chanceText))
@@ -1671,7 +1641,7 @@ public class Crystalshire
         // Close button
         if (WindowManager.TryGetControl("winItemEditor", "btnClose", out var btnClose))
         {
-            btnClose.CallBack[(int)ControlState.MouseDown] = () => WindowManager.HideWindow("winItemEditor");
+            btnClose.CallBack[(int)ControlState.MouseDown] = () => Editors.ItemEditorCancel(); WindowManager.HideWindow("winItemEditor");
         }
 
         // Ensure item editor combos and icon picture are visible (some skins may hide them)
@@ -1681,38 +1651,8 @@ public class Crystalshire
             picIcon.OnDraw = WinItemEditor.OnDrawIcon;
         }
 
-        // Item list + mouse wheel
-        ListBox itemList = null;
-        if (WindowManager.TryGetControl("winItemEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox list)
-        {
-            itemList = list;
-            list.CallBack[(int)ControlState.MouseDown] = WinItemEditor.OnListMouseDown;
-            list.CallBack[(int)ControlState.MouseScroll] = () =>
-            {
-                int delta = GameClient.CurrentMouseState.ScrollWheelValue - GameClient.PreviousMouseState.ScrollWheelValue;
-                if (delta != 0)
-                {
-                    int step = delta > 0 ? -1 : 1;
-                    list.ScrollBy(step);
-
-                    // Keep scrollbar in sync if present
-                    if (WindowManager.TryGetControl("winItemEditor", "sldList", out var sldCtrl) && sldCtrl is ScrollBar sbSync)
-                    {
-                        sbSync.Value = list.ScrollOffset;
-                    }
-                }
-            };
-        }
-        if (WindowManager.TryGetControl("winItemEditor", "sldList", out var sldList) && sldList is ScrollBar sbList)
-        {
-            sbList.CallBack[(int)ControlState.MouseMove] = () =>
-            {
-                if (itemList != null)
-                {
-                    itemList.ScrollOffset = sbList.Value;
-                }
-            };
-        }
+        // Wire listbox + scrollbar
+        WireScrollableList("winItemEditor", "lstIndex", "sldList");
 
         // Name textbox updates list entry
         if (WindowManager.TryGetControl("winItemEditor", "txtName", out var txtNameCtrl) && txtNameCtrl is TextBox txtName)
@@ -2678,7 +2618,7 @@ public class Crystalshire
 
         // Close
         if (WindowManager.TryGetControl("winJobEditor", "btnClose", out var btnClose))
-            btnClose.CallBack[(int)ControlState.MouseDown] = () => WindowManager.HideWindow("winJobEditor");
+            btnClose.CallBack[(int)ControlState.MouseDown] = () => Editors.JobEditorCancel(); WindowManager.HideWindow("winJobEditor");
 
         // Sprite previews
         if (WindowManager.TryGetControl("winJobEditor", "picMale", out var picMaleCtrl) && picMaleCtrl is PictureBox picMale)

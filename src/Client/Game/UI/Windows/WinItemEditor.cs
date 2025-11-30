@@ -20,6 +20,7 @@ public static class WinItemEditor
         SelectedIndex = Math.Clamp(GameState.EditorIndex, 0, Variables.MaxItems - 1);
         RefreshList();
         LoadItem(SelectedIndex);
+
         // Ensure subtype list is built on init
         BuildSubtypeList();
 
