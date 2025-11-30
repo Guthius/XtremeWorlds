@@ -1885,7 +1885,7 @@ public class Crystalshire
             }
         }
 
-        BindCombo("cmbItemType", v =>
+        BindCombo("cmbType", v =>
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {

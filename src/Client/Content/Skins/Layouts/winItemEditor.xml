@@ -40,7 +40,7 @@
     <!-- Type/meta group -->
     <GroupBox Name="grpType" Caption="" Position="272, 194" Size="824, 96">
         <Label Name="lblType" Text="Type" Position="8, 12" Size="60, 16"/>
-        <ComboBox Name="cmbItemType" Position="80, 10" Size="160, 18"/>
+        <ComboBox Name="cmbType" Position="80, 10" Size="160, 18"/>
         <Label Name="lblSubType" Text="SubType" Position="256, 12" Size="80, 16"/>
         <ComboBox Name="cmbSubType" Position="336, 10" Size="160, 18"/>
         <Label Name="lblAnimation" Text="Animation" Position="8, 36" Size="100, 16"/>

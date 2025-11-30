@@ -48,7 +48,7 @@ public static class WinItemEditor
         }
 
         // Wire type ComboBox to toggle group visibility and dependent controls
-        if (WindowManager.TryGetControl("winItemEditor", "cmbItemType", out var typeCtrl) && typeCtrl is ComboBox cmbType)
+        if (WindowManager.TryGetControl("winItemEditor", "cmbType", out var typeCtrl) && typeCtrl is ComboBox cmbType)
         {
             cmbType.CallBack[(int)ControlState.MouseMove] = () =>
             {
@@ -134,7 +134,7 @@ public static class WinItemEditor
     private static void PopulateCombos()
     {
         // Type
-        if (WindowManager.TryGetControl("winItemEditor", "cmbItemType", out var typeCtrl) && typeCtrl is ComboBox cmbType)
+        if (WindowManager.TryGetControl("winItemEditor", "cmbType", out var typeCtrl) && typeCtrl is ComboBox cmbType)
         {
             cmbType.Items.Clear();
             foreach (var name in Enum.GetNames(typeof(ItemCategory)))
@@ -377,7 +377,7 @@ public static class WinItemEditor
         if (WindowManager.TryGetControl("winItemEditor", "picPaperdoll", out var pdPicCtrl) && pdPicCtrl is PictureBox pdPic)
             pdPic.OnDraw = OnDrawPaperdoll;
 
-        if (WindowManager.TryGetControl("winItemEditor", "cmbItemType", out var typeCtrl) && typeCtrl is ComboBox cmbType)
+        if (WindowManager.TryGetControl("winItemEditor", "cmbType", out var typeCtrl) && typeCtrl is ComboBox cmbType)
             cmbType.Value = Math.Clamp(item.Type, 0, cmbType.Items.Count - 1);
         if (WindowManager.TryGetControl("winItemEditor", "cmbSubType", out var subCtrl) && subCtrl is ComboBox cmbSub)
             cmbSub.Value = item.SubType;
