@@ -1316,7 +1316,7 @@ public class Crystalshire
         }
     }
 
-    public void UpdateWindow_EditorNpc()
+    public void UpdateWindow_NpcEditor()
     {
         var window = WindowLoader.FromLayout("winNpcEditor");
         // Close button
@@ -1664,7 +1664,7 @@ public class Crystalshire
         }
     }
 
-    public void UpdateWindow_EditorItem()
+    public void UpdateWindow_ItemEditor()
     {
         var window = WindowLoader.FromLayout("winItemEditor");
 
@@ -2544,7 +2544,7 @@ public class Crystalshire
         // Default tab
         ShowTab("Moderation");
     }
-    public void UpdateWindow_EditorShop()
+    public void UpdateWindow_ShopEditor()
     {
         var window = WindowLoader.FromLayout("winShopEditor");
 
@@ -2672,7 +2672,7 @@ public class Crystalshire
         }
     }
 
-    public void UpdateWindow_EditorJob()
+    public void UpdateWindow_JobEditor()
     {
         var window = WindowLoader.FromLayout("winJobEditor");
 

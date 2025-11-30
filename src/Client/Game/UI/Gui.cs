@@ -772,10 +772,10 @@ public class WindowManager
             Safe("UpdateWindow_Combobox", () => ui.UpdateWindow_Combobox());
             Safe("UpdateWindow_Admin", () => ui.UpdateWindow_Admin());
             Safe("UpdateWindow_MapEditor", () => ui.UpdateWindow_MapEditor());
-            Safe("UpdateWindow_EditorNpc", () => ui.UpdateWindow_EditorNpc());
-            Safe("UpdateWindow_EditorItem", () => ui.UpdateWindow_EditorItem());
-            Safe("UpdateWindow_EditorShop", () => ui.UpdateWindow_EditorShop());
-            Safe("UpdateWindow_EditorJob", () => ui.UpdateWindow_EditorJob());
+            Safe("UpdateWindow_NpcEditor", () => ui.UpdateWindow_NpcEditor());
+            Safe("UpdateWindow_ItemEditor", () => ui.UpdateWindow_ItemEditor());
+            Safe("UpdateWindow_ShopEditor", () => ui.UpdateWindow_ShopEditor());
+            Safe("UpdateWindow_JobEditor", () => ui.UpdateWindow_JobEditor());
         }
         else
         {
