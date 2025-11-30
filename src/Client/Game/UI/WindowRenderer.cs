@@ -55,32 +55,26 @@ public static class WindowRenderer
             return;
         }
 
-        switch (window.Design[(int) window.State])
+        switch (window.Design[(int)window.State])
         {
             case Design.WindowBlack:
                 RenderWindowBlack(window);
                 break;
-
             case Design.WindowNormal:
                 RenderWindowNormal(window);
                 break;
-
             case Design.WindowNoBar:
                 RenderWindowNoBar(window);
                 break;
-
             case Design.WindowEmpty:
                 RenderWindowEmpty(window);
                 break;
-
             case Design.WindowDescription:
                 RenderWindowDescription(window);
                 break;
-
             case Design.WindowWithShadow:
                 RenderWindowWithShadow(window);
                 break;
-
             case Design.WindowParty:
                 RenderWindowParty(window);
                 break;
@@ -92,7 +86,6 @@ public static class WindowRenderer
     private static void RenderWindowBlack(Window window)
     {
         var path = Path.Combine(DataPath.Gui, "61");
-
         GameClient.RenderTexture(ref path, window.X, window.Y, 0, 0, window.Width, window.Height, 190, 255, 255);
     }
 
@@ -125,7 +118,7 @@ public static class WindowRenderer
         {
             return;
         }
-        
+
         DesignRenderer.Render(Design.WoodEmpty, window.X, window.Y, window.Width, window.Height);
         DesignRenderer.Render(Design.Green, window.X, window.Y, window.Width, 23);
 
