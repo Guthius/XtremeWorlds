@@ -1175,6 +1175,8 @@ namespace Server
 
             for (var i = 0; i < StatCount; i++)
             {
+                if (Data.Job[jobNum].Stat == null)
+                    return;
                 packetWriter.WriteInt32(Data.Job[jobNum].Stat[i]);
             }
 
