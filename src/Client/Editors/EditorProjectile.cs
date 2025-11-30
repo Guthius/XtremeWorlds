@@ -51,7 +51,6 @@ namespace Client
                 if (_initializing) return;
                 if (lstIndex.SelectedIndex < 0) return;
                 GameState.EditorIndex = lstIndex.SelectedIndex;
-                Editors.ProjectileEditorInit();
             };
 
             // Right side controls
@@ -144,7 +143,6 @@ namespace Client
                 if (lstIndex.SelectedIndex < 0) return;
                 Projectile.ClearProjectile(GameState.EditorIndex);
                 RefreshListEntry(GameState.EditorIndex);
-                Editors.ProjectileEditorInit();
             };
 
             btnCopy = new Button { Text = "Copy" };
@@ -174,7 +172,6 @@ namespace Client
                     lstIndex.SelectedIndex = dst;
                 }
                 finally { _initializing = false; }
-                Editors.ProjectileEditorInit();
             };
 
             var grid = new TableLayout
@@ -248,7 +245,6 @@ namespace Client
             if (lstIndex.SelectedIndex >= 0)
             {
                 GameState.EditorIndex = lstIndex.SelectedIndex;
-                Editors.ProjectileEditorInit();
             }
         }
 
