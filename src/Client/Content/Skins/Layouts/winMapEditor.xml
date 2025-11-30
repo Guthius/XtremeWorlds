@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window Name="winMapEditor" Caption="Map Editor"
-  Size="804, 740"
+  Size="804, 660"
         Icon="1133" IconOffset="3, 5"
         Design="WindowNormal"
         StartPosition="CenterScreen"
         Visible="false">
 
-  <GroupBox Name="grpTiles" Caption="" Position="6,26" Size="788,662">
+  <GroupBox Name="grpTiles" Caption="" Position="6,26" Size="788,624">
     <Label Name="lblTiles" Text="Tiles" Position="20,42" Size="200,14"/>
     <Label Name="lblTileset" Text="Tileset" Position="21,62" Size="60,16"/>
     <ScrollBar Name="sldTileset" Position="85,62" Size="230,12" Min="1" Max="1" Value="1" Orientation="Horizontal" ThumbSize="16"/>
@@ -21,7 +21,7 @@
     <ScrollBar Name="sldTilesetH" Position="179,604" Size="512,12" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
   </GroupBox>
 
-  <GroupBox Name="grpAttributes" Position="6,26" Size="788,662">
+  <GroupBox Name="grpAttributes" Position="6,26" Size="788,624">
     <Label Name="lblAttributes" Text="Attributes" Position="20,42" Size="200,14"/>
     <ComboBox Name="cmbAttrMode" Position="20,70" Size="220,18"/>
     <Button Name="btnAttrInfo" Text="Info" Position="248,70" Size="60,18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
@@ -68,7 +68,7 @@
     <Button Name="btnAnimation" Text="OK" Position="410,124" Size="60,18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
   </GroupBox>
 
-  <GroupBox Name="grpSettings" Caption="" Position="6,26" Size="788,662">
+  <GroupBox Name="grpSettings" Caption="" Position="6,26" Size="788,624">
     <Label Name="lblSettings" Text="Settings" Position="20,42" Size="200,14"/>
     <Button Name="btnGoTiles" Text="Tiles" Position="20,58" Size="100,20" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
     <Button Name="btnGoAttributes" Text="Attributes" Position="124,58" Size="100,20" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
@@ -109,7 +109,7 @@
     <TextBox Name="txtMaxY" Position="180,292" Size="50,20" Design="TextWhite"/>
   </GroupBox>
 
-  <GroupBox Name="grpNpcs" Caption="" Position="6,26" Size="788,662">
+  <GroupBox Name="grpNpcs" Caption="" Position="6,26" Size="788,624">
     <Label Name="lblNpcs" Text="Npc Tools" Position="20,42" Size="200,14"/>
     <Label Name="lblNpcsHint" Text="Select an npc to assign to a slot" Position="20,70" Size="360,14"/>
     <ListBox Name="lstNpcs" Position="20,100" Size="460,540"/>
@@ -118,11 +118,11 @@
     <ComboBox Name="cmbNpcList" Position="564,98" Size="220,18"/>
   </GroupBox>
 
-  <GroupBox Name="grpDirBlock" Caption="" Position="6,26" Size="788,662">
+  <GroupBox Name="grpDirBlock" Caption="" Position="6,26" Size="788,624">
     <Label Name="lblDir" Text="Dir Block" Position="20,42" Size="200,14"/>
   </GroupBox>
 
-  <GroupBox Name="grpEvents" Caption="" Position="6,26" Size="788,662">
+  <GroupBox Name="grpEvents" Caption="" Position="6,26" Size="788,624">
     <Label Name="lblEvents" Text="Events" Position="20,42" Size="200,14"/>
     <Label Name="lblCopyCaption" Text="Copy Mode:" Position="20,70" Size="80,16"/>
     <Label Name="lblCopyMode" Text="Copy Mode Off" Position="104,70" Size="150,16"/>
@@ -132,7 +132,7 @@
     <Button Name="btnPasteEvent" Text="Toggle Paste" Position="260,96" Size="100,20" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
   </GroupBox>
 
-  <GroupBox Name="grpEffects" Caption="" Position="6,26" Size="788,662">
+  <GroupBox Name="grpEffects" Caption="" Position="6,26" Size="788,624">
     <Label Name="lblEffects" Text="Effects" Position="20,42" Size="200,14"/>
     <Label Name="lblWeather" Text="Weather" Position="20,70" Size="80,16"/>
     <ComboBox Name="cmbWeather" Position="104,68" Size="140,18"/>
