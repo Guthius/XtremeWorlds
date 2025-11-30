@@ -539,7 +539,8 @@ namespace Client
             {
                 GameState.MyEditorType = EditorType.Job;
                 GameState.EditorIndex = 0;
-                new EditorJob().Show();
+                WindowManager.ShowWindow("winJobEditor");
+                Client.Game.UI.Windows.WinJobEditor.Init();
                 GameState.InitJobEditor = false;
             }
 

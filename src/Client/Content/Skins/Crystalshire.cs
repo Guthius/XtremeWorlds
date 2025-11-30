@@ -82,12 +82,12 @@ public class Crystalshire
 
         var userName = SettingsManager.Instance.SaveUsername ? SettingsManager.Instance.Username : string.Empty;
 
-        window.GetChild("btnClose").CallBack[(int) ControlState.MouseDown] = Client.General.DestroyGame;
+        window.GetChild("btnClose").CallBack[(int)ControlState.MouseDown] = Client.General.DestroyGame;
         window.GetChild("txtUsername").Text = userName;
         window.GetChild("chkSaveUsername").Value = SettingsManager.Instance.SaveUsername ? 1 : 0;
-        window.GetChild("btnAccept").CallBack[(int) ControlState.MouseDown] = WinLogin.OnLogin;
-        window.GetChild("btnExit").CallBack[(int) ControlState.MouseDown] = WinLogin.OnExit;
-        window.GetChild("btnRegister").CallBack[(int) ControlState.MouseDown] = WinLogin.OnRegister;
+        window.GetChild("btnAccept").CallBack[(int)ControlState.MouseDown] = WinLogin.OnLogin;
+        window.GetChild("btnExit").CallBack[(int)ControlState.MouseDown] = WinLogin.OnExit;
+        window.GetChild("btnRegister").CallBack[(int)ControlState.MouseDown] = WinLogin.OnRegister;
 
         WindowManager.SetActiveControl(window, userName.Length == 0 ? "txtUsername" : "txtPassword");
     }
@@ -96,9 +96,9 @@ public class Crystalshire
     {
         var window = WindowLoader.FromLayout("winRegister");
 
-        window.GetChild("btnClose").CallBack[(int) ControlState.MouseDown] = WinRegister.OnClose;
-        window.GetChild("btnAccept").CallBack[(int) ControlState.MouseDown] = WinRegister.OnRegister;
-        window.GetChild("btnExit").CallBack[(int) ControlState.MouseDown] = WinRegister.OnClose;
+        window.GetChild("btnClose").CallBack[(int)ControlState.MouseDown] = WinRegister.OnClose;
+        window.GetChild("btnAccept").CallBack[(int)ControlState.MouseDown] = WinRegister.OnRegister;
+        window.GetChild("btnExit").CallBack[(int)ControlState.MouseDown] = WinRegister.OnClose;
 
         WindowManager.SetActiveControl(window, "txtUsername");
     }
@@ -107,14 +107,14 @@ public class Crystalshire
     {
         var window = WindowLoader.FromLayout("winNewChar");
 
-        window.GetChild("btnClose").CallBack[(int) ControlState.MouseDown] = WinNewChar.OnCancel;
-        window.GetChild("btnAccept").CallBack[(int) ControlState.MouseDown] = WinNewChar.OnAccept;
-        window.GetChild("btnCancel").CallBack[(int) ControlState.MouseDown] = WinNewChar.OnCancel;
+        window.GetChild("btnClose").CallBack[(int)ControlState.MouseDown] = WinNewChar.OnCancel;
+        window.GetChild("btnAccept").CallBack[(int)ControlState.MouseDown] = WinNewChar.OnAccept;
+        window.GetChild("btnCancel").CallBack[(int)ControlState.MouseDown] = WinNewChar.OnCancel;
         window.GetChild("picScene").OnDraw = WinNewChar.OnDrawSprite;
-        window.GetChild("btnLeft").CallBack[(int) ControlState.MouseDown] = WinNewChar.OnLeftClick;
-        window.GetChild("btnRight").CallBack[(int) ControlState.MouseDown] = WinNewChar.OnRightClick;
-        window.GetChild("chkMale").CallBack[(int) ControlState.MouseDown] = WinNewChar.OnMaleChecked;
-        window.GetChild("chkFemale").CallBack[(int) ControlState.MouseDown] = WinNewChar.OnFemaleChecked;
+        window.GetChild("btnLeft").CallBack[(int)ControlState.MouseDown] = WinNewChar.OnLeftClick;
+        window.GetChild("btnRight").CallBack[(int)ControlState.MouseDown] = WinNewChar.OnRightClick;
+        window.GetChild("chkMale").CallBack[(int)ControlState.MouseDown] = WinNewChar.OnMaleChecked;
+        window.GetChild("chkFemale").CallBack[(int)ControlState.MouseDown] = WinNewChar.OnFemaleChecked;
 
         WindowManager.SetActiveControl(window, "txtName");
     }
@@ -123,17 +123,17 @@ public class Crystalshire
     {
         var window = WindowLoader.FromLayout("winChars");
 
-        window.GetChild("btnClose").CallBack[(int) ControlState.MouseDown] = WinChars.OnClose;
+        window.GetChild("btnClose").CallBack[(int)ControlState.MouseDown] = WinChars.OnClose;
         window.GetChild("picScene_3").OnDraw = WinChars.OnDraw;
-        window.GetChild("btnSelectChar_1").CallBack[(int) ControlState.MouseDown] = WinChars.OnSelectCharacter1Click;
-        window.GetChild("btnCreateChar_1").CallBack[(int) ControlState.MouseDown] = WinChars.OnCreateCharacter1Click;
-        window.GetChild("btnDelChar_1").CallBack[(int) ControlState.MouseDown] = WinChars.OnDeleteCharacter1Click;
-        window.GetChild("btnSelectChar_2").CallBack[(int) ControlState.MouseDown] = WinChars.OnSelectCharacter2Click;
-        window.GetChild("btnCreateChar_2").CallBack[(int) ControlState.MouseDown] = WinChars.OnCreateCharacter2Click;
-        window.GetChild("btnDelChar_2").CallBack[(int) ControlState.MouseDown] = WinChars.OnDeleteCharacter2Click;
-        window.GetChild("btnSelectChar_3").CallBack[(int) ControlState.MouseDown] = WinChars.OnSelectCharacter3Click;
-        window.GetChild("btnCreateChar_3").CallBack[(int) ControlState.MouseDown] = WinChars.OnCreateCharacter3Click;
-        window.GetChild("btnDelChar_3").CallBack[(int) ControlState.MouseDown] = WinChars.OnDeleteCharacter3Click;
+        window.GetChild("btnSelectChar_1").CallBack[(int)ControlState.MouseDown] = WinChars.OnSelectCharacter1Click;
+        window.GetChild("btnCreateChar_1").CallBack[(int)ControlState.MouseDown] = WinChars.OnCreateCharacter1Click;
+        window.GetChild("btnDelChar_1").CallBack[(int)ControlState.MouseDown] = WinChars.OnDeleteCharacter1Click;
+        window.GetChild("btnSelectChar_2").CallBack[(int)ControlState.MouseDown] = WinChars.OnSelectCharacter2Click;
+        window.GetChild("btnCreateChar_2").CallBack[(int)ControlState.MouseDown] = WinChars.OnCreateCharacter2Click;
+        window.GetChild("btnDelChar_2").CallBack[(int)ControlState.MouseDown] = WinChars.OnDeleteCharacter2Click;
+        window.GetChild("btnSelectChar_3").CallBack[(int)ControlState.MouseDown] = WinChars.OnSelectCharacter3Click;
+        window.GetChild("btnCreateChar_3").CallBack[(int)ControlState.MouseDown] = WinChars.OnCreateCharacter3Click;
+        window.GetChild("btnDelChar_3").CallBack[(int)ControlState.MouseDown] = WinChars.OnDeleteCharacter3Click;
     }
 
     public void UpdateWindow_Jobs()
@@ -159,17 +159,17 @@ public class Crystalshire
         if (WindowManager.TryGetControl("winJobs", "picOverlay", out var picOverlay) && picOverlay is PictureBox ov)
         {
             ov.OnDraw = WinJobs.OnDrawDescription;
-        }   
+        }
     }
 
     public void UpdateWindow_Dialogue()
     {
         var window = WindowLoader.FromLayout("winDialogue");
 
-        window.GetChild("btnClose").CallBack[(int) ControlState.MouseDown] = WinDialogue.OnClose;
-        window.GetChild("btnYes").CallBack[(int) ControlState.MouseDown] = WinDialogue.OnYes;
-        window.GetChild("btnNo").CallBack[(int) ControlState.MouseDown] = WinDialogue.OnNo;
-        window.GetChild("btnOkay").CallBack[(int) ControlState.MouseDown] = WinDialogue.OnOkay;
+        window.GetChild("btnClose").CallBack[(int)ControlState.MouseDown] = WinDialogue.OnClose;
+        window.GetChild("btnYes").CallBack[(int)ControlState.MouseDown] = WinDialogue.OnYes;
+        window.GetChild("btnNo").CallBack[(int)ControlState.MouseDown] = WinDialogue.OnNo;
+        window.GetChild("btnOkay").CallBack[(int)ControlState.MouseDown] = WinDialogue.OnOkay;
         WindowManager.SetActiveControl(window, "txtInput");
     }
 
@@ -182,18 +182,18 @@ public class Crystalshire
     {
         var window = WindowLoader.FromLayout("winTrade");
         window.OnDraw = WinTrade.OnDraw;
-        window.GetChild("btnClose").CallBack[(int) ControlState.MouseDown] = WinTrade.OnClose;
-        window.GetChild("btnAccept").CallBack[(int) ControlState.MouseDown] = WinTrade.OnAccept;
-        window.GetChild("btnDecline").CallBack[(int) ControlState.MouseDown] = WinTrade.OnClose;
+        window.GetChild("btnClose").CallBack[(int)ControlState.MouseDown] = WinTrade.OnClose;
+        window.GetChild("btnAccept").CallBack[(int)ControlState.MouseDown] = WinTrade.OnAccept;
+        window.GetChild("btnDecline").CallBack[(int)ControlState.MouseDown] = WinTrade.OnClose;
 
         // Wire interactive picture boxes for trade regions
-        window.GetChild("picYour").CallBack[(int) ControlState.MouseDown] = WinTrade.OnYourTradeMouseMove;
-        window.GetChild("picYour").CallBack[(int) ControlState.MouseMove] = WinTrade.OnYourTradeMouseMove;
-        window.GetChild("picYour").CallBack[(int) ControlState.DoubleClick] = WinTrade.OnYourTradeClick;
+        window.GetChild("picYour").CallBack[(int)ControlState.MouseDown] = WinTrade.OnYourTradeMouseMove;
+        window.GetChild("picYour").CallBack[(int)ControlState.MouseMove] = WinTrade.OnYourTradeMouseMove;
+        window.GetChild("picYour").CallBack[(int)ControlState.DoubleClick] = WinTrade.OnYourTradeClick;
 
-        window.GetChild("picTheir").CallBack[(int) ControlState.MouseDown] = WinTrade.OnTheirTradeMouseMove;
-        window.GetChild("picTheir").CallBack[(int) ControlState.MouseMove] = WinTrade.OnTheirTradeMouseMove;
-        window.GetChild("picTheir").CallBack[(int) ControlState.DoubleClick] = WinTrade.OnTheirTradeMouseMove;
+        window.GetChild("picTheir").CallBack[(int)ControlState.MouseDown] = WinTrade.OnTheirTradeMouseMove;
+        window.GetChild("picTheir").CallBack[(int)ControlState.MouseMove] = WinTrade.OnTheirTradeMouseMove;
+        window.GetChild("picTheir").CallBack[(int)ControlState.DoubleClick] = WinTrade.OnTheirTradeMouseMove;
     }
 
     public void UpdateWindow_EditorMap()
@@ -325,7 +325,7 @@ public class Crystalshire
         // Tools: map to existing editor actions
         if (WindowManager.TryGetControl("winMapEditor", "btnToolPencil", out var btnPencil))
             btnPencil.CallBack[(int)ControlState.MouseDown] = () => { GameState.EyeDropper = false; };
-        
+
         if (WindowManager.TryGetControl("winMapEditor", "btnToolFill", out var btnFill))
             btnFill.CallBack[(int)ControlState.MouseDown] = () =>
             {
@@ -387,10 +387,10 @@ public class Crystalshire
             };
 
         // Tileset selector wiring
-        string[] autotileNames = new[]{"None","Autotile","Fake Autotile","Animated","Cliff","Waterfall"};
+        string[] autotileNames = new[] { "None", "Autotile", "Fake Autotile", "Animated", "Cliff", "Waterfall" };
 
         // Populate Layer and Autotile combos and set defaults
-        if (WindowManager.TryGetControl("winMapEditor","cmbLayer", out var cmbLayerCtrl) && cmbLayerCtrl is ComboBox cmbLayer)
+        if (WindowManager.TryGetControl("winMapEditor", "cmbLayer", out var cmbLayerCtrl) && cmbLayerCtrl is ComboBox cmbLayer)
         {
             cmbLayer.Items.Clear();
             foreach (var name in Enum.GetNames(typeof(MapLayer)))
@@ -399,12 +399,12 @@ public class Crystalshire
                 string displayName = System.Text.RegularExpressions.Regex.Replace(name, "(?<!^)([A-Z])", " $1");
                 cmbLayer.Items.Add(displayName);
             }
-            
+
             cmbLayer.Value = Math.Clamp(GameState.CurLayer, 0, cmbLayer.Items.Count - 1);
             // Update GameState when selection changes
             cmbLayer.CallBack[(int)ControlState.MouseMove] = () => { GameState.CurLayer = (byte)Math.Clamp(cmbLayer.Value, 0, 5); };
         }
-        
+
         if (WindowManager.TryGetControl("winMapEditor", "cmbAutotile", out var cmbAutoCtrl) && cmbAutoCtrl is ComboBox cmbAuto)
         {
             cmbAuto.Items.Clear();
@@ -479,20 +479,20 @@ public class Crystalshire
         {
             // Show only relevant attribute configuration controls per selection (mirror Eto behavior)
             bool showWarp = idx == 1; // Warp
-            string[] warpCtrls = new[]{"lblWarp","lblWarpMap","sldMapWarp","lblWarpX","sldMapWarpX","lblWarpY","sldMapWarpY","btnMapWarp"};;
+            string[] warpCtrls = new[] { "lblWarp", "lblWarpMap", "sldMapWarp", "lblWarpX", "sldMapWarpX", "lblWarpY", "sldMapWarpY", "btnMapWarp" }; ;
             foreach (var n in warpCtrls)
             {
-                if (WindowManager.TryGetControl("winMapEditor",n, out var c)) c.Visible = showWarp;
+                if (WindowManager.TryGetControl("winMapEditor", n, out var c)) c.Visible = showWarp;
             }
 
             if (showWarp)
             {
                 void SetWarpLabel(string name, string caption, int value)
                 {
-                    if (WindowManager.TryGetControl("winMapEditor",name, out var l)) l.Text = $"{caption}: {value}";
+                    if (WindowManager.TryGetControl("winMapEditor", name, out var l)) l.Text = $"{caption}: {value}";
                 }
-                
-                if (WindowManager.TryGetControl("winMapEditor","sldMapWarp", out var wMapCtrl) && wMapCtrl is Client.Game.UI.Controls.ScrollBar sbMap)
+
+                if (WindowManager.TryGetControl("winMapEditor", "sldMapWarp", out var wMapCtrl) && wMapCtrl is Client.Game.UI.Controls.ScrollBar sbMap)
                 {
                     sbMap.Min = 1;
                     sbMap.Max = Variables.MaxMaps;
@@ -506,7 +506,7 @@ public class Crystalshire
                     };
                 }
 
-                if (WindowManager.TryGetControl("winMapEditor","sldMapWarpX", out var wXCtrl) && wXCtrl is Client.Game.UI.Controls.ScrollBar sbX)
+                if (WindowManager.TryGetControl("winMapEditor", "sldMapWarpX", out var wXCtrl) && wXCtrl is Client.Game.UI.Controls.ScrollBar sbX)
                 {
                     sbX.Min = 0; sbX.Max = Math.Max(0, Data.MyMap.MaxX - 1);
                     wXCtrl.Value = Math.Clamp(wXCtrl.Value, sbX.Min, sbX.Max);
@@ -518,7 +518,7 @@ public class Crystalshire
                     };
                 }
 
-                if (WindowManager.TryGetControl("winMapEditor","sldMapWarpY", out var wYCtrl) && wYCtrl is Client.Game.UI.Controls.ScrollBar sbY)
+                if (WindowManager.TryGetControl("winMapEditor", "sldMapWarpY", out var wYCtrl) && wYCtrl is Client.Game.UI.Controls.ScrollBar sbY)
                 {
                     sbY.Min = 0; sbY.Max = Math.Max(0, Data.MyMap.MaxY - 1);
                     wYCtrl.Value = Math.Clamp(wYCtrl.Value, sbY.Min, sbY.Max);
@@ -530,7 +530,7 @@ public class Crystalshire
                     };
                 }
 
-                if (WindowManager.TryGetControl("winMapEditor","btnMapWarp", out var btnMapWarp))
+                if (WindowManager.TryGetControl("winMapEditor", "btnMapWarp", out var btnMapWarp))
                 {
                     btnMapWarp.CallBack[(int)ControlState.MouseDown] = () =>
                     {
@@ -546,50 +546,50 @@ public class Crystalshire
                             {
                                 var target = Math.Max(0, mapNum - 1); // convert 1-based display to 0-based map id
                                 Sender.WarpTo(target);
-                              }
                             }
+                        }
                     };
                 }
             }
 
             // Item
             bool showItem = idx == 2;
-            string[] itemCtrls = new[]{"lblItem","cmbMapItem","lblItemValue","sldMapItemValue","btnMapItem"};;
+            string[] itemCtrls = new[] { "lblItem", "cmbMapItem", "lblItemValue", "sldMapItemValue", "btnMapItem" };
             foreach (var n in itemCtrls)
             {
-                if (WindowManager.TryGetControl("winMapEditor",n, out var c)) c.Visible = showItem;
+                if (WindowManager.TryGetControl("winMapEditor", n, out var c)) c.Visible = showItem;
             }
 
             if (showItem)
             {
-                if (WindowManager.TryGetControl("winMapEditor","cmbMapItem", out var cItem) && cItem is ComboBox cmb)
+                if (WindowManager.TryGetControl("winMapEditor", "cmbMapItem", out var cItem) && cItem is ComboBox cmb)
                 {
                     if (cmb.Items.Count == 0)
                     {
                         for (int i = 0; i < Variables.MaxItems; i++)
                         {
                             var name = (i < Data.Item.Length) ? (Data.Item[i].Name ?? string.Empty) : string.Empty;
-                            cmb.Items.Add(string.IsNullOrWhiteSpace(name) ? $"{i + 1}" : $"{i + 1}: {name.Trim()}" );
+                            cmb.Items.Add(string.IsNullOrWhiteSpace(name) ? $"{i + 1}" : $"{i + 1}: {name.Trim()}");
                         }
                         cmb.Value = 0;
                     }
                 }
-                if (WindowManager.TryGetControl("winMapEditor","sldMapItemValue", out var sItemCtrl) && sItemCtrl is Client.Game.UI.Controls.ScrollBar sbItem)
+                if (WindowManager.TryGetControl("winMapEditor", "sldMapItemValue", out var sItemCtrl) && sItemCtrl is Client.Game.UI.Controls.ScrollBar sbItem)
                 {
                     sbItem.Min = 1; sbItem.Max = 1024;
-                    if (WindowManager.TryGetControl("winMapEditor","lblItemValue", out var l)) l.Text = $"Amount: {sItemCtrl.Value}";
+                    if (WindowManager.TryGetControl("winMapEditor", "lblItemValue", out var l)) l.Text = $"Amount: {sItemCtrl.Value}";
                     sbItem.CallBack[(int)ControlState.MouseMove] = () =>
                     {
-                        if (WindowManager.TryGetControl("winMapEditor","lblItemValue", out var li)) li.Text = $"Amount: {sItemCtrl.Value}";
+                        if (WindowManager.TryGetControl("winMapEditor", "lblItemValue", out var li)) li.Text = $"Amount: {sItemCtrl.Value}";
                     };
                 }
-                if (WindowManager.TryGetControl("winMapEditor","btnMapItem", out var btn))
+                if (WindowManager.TryGetControl("winMapEditor", "btnMapItem", out var btn))
                 {
                     btn.CallBack[(int)ControlState.MouseDown] = () =>
                     {
-                        if (WindowManager.TryGetControl("winMapEditor","cmbMapItem", out var c) && c is ComboBox cb)
+                        if (WindowManager.TryGetControl("winMapEditor", "cmbMapItem", out var c) && c is ComboBox cb)
                             GameState.ItemEditorNum = Math.Clamp(cb.Value, 0, Variables.MaxItems - 1);
-                        if (WindowManager.TryGetControl("winMapEditor","sldMapItemValue", out var s))
+                        if (WindowManager.TryGetControl("winMapEditor", "sldMapItemValue", out var s))
                             GameState.ItemEditorValue = Math.Clamp(s.Value, 1, 1024);
                     };
                 }
@@ -597,14 +597,14 @@ public class Crystalshire
 
             // Resource
             bool showResource = idx == 4;
-            string[] resCtrls = new[]{"lblResource","cmbResource","btnResourceOk"};
+            string[] resCtrls = new[] { "lblResource", "cmbResource", "btnResourceOk" };
             foreach (var n in resCtrls)
             {
-                if (WindowManager.TryGetControl("winMapEditor",n, out var c)) c.Visible = showResource;
+                if (WindowManager.TryGetControl("winMapEditor", n, out var c)) c.Visible = showResource;
             }
             if (showResource)
             {
-                if (WindowManager.TryGetControl("winMapEditor","cmbResource", out var cRes) && cRes is ComboBox cmb)
+                if (WindowManager.TryGetControl("winMapEditor", "cmbResource", out var cRes) && cRes is ComboBox cmb)
                 {
                     if (cmb.Items.Count == 0)
                     {
@@ -618,11 +618,11 @@ public class Crystalshire
                     }
                     cmb.CallBack[(int)ControlState.MouseMove] = () => { GameState.ResourceEditorNum = Math.Clamp(cmb.Value, 0, Variables.MaxResources - 1); };
                 }
-                if (WindowManager.TryGetControl("winMapEditor","btnResourceOk", out var btn))
+                if (WindowManager.TryGetControl("winMapEditor", "btnResourceOk", out var btn))
                 {
                     btn.CallBack[(int)ControlState.MouseDown] = () =>
                     {
-                        if (WindowManager.TryGetControl("winMapEditor","cmbResource", out var c) && c is ComboBox cb)
+                        if (WindowManager.TryGetControl("winMapEditor", "cmbResource", out var c) && c is ComboBox cb)
                             GameState.ResourceEditorNum = Math.Clamp(cb.Value, 0, Variables.MaxResources - 1);
                     };
                 }
@@ -630,16 +630,16 @@ public class Crystalshire
 
             // NPC Spawn
             bool showSpawn = idx == 5;
-            string[] spawnCtrls = new[]{"lblNpcSpawn","lblNpcSpawnSlot","cmbNpcSpawnSlot","lblNpcDir","sldNpcDir","btnNpcSpawn"};
+            string[] spawnCtrls = new[] { "lblNpcSpawn", "lblNpcSpawnSlot", "cmbNpcSpawnSlot", "lblNpcDir", "sldNpcDir", "btnNpcSpawn" };
             foreach (var n in spawnCtrls)
             {
-                if (WindowManager.TryGetControl("winMapEditor",n, out var c)) c.Visible = showSpawn;
+                if (WindowManager.TryGetControl("winMapEditor", n, out var c)) c.Visible = showSpawn;
             }
 
             if (showSpawn)
             {
                 // Populate spawn slot combo from current map NPC slots
-                if (WindowManager.TryGetControl("winMapEditor","cmbNpcSpawnSlot", out var cSpawn) && cSpawn is ComboBox cmb)
+                if (WindowManager.TryGetControl("winMapEditor", "cmbNpcSpawnSlot", out var cSpawn) && cSpawn is ComboBox cmb)
                 {
                     cmb.Items.Clear();
                     cmb.Items.Add("None");
@@ -655,25 +655,25 @@ public class Crystalshire
                     }
                     cmb.Value = 0;
                 }
-                if (WindowManager.TryGetControl("winMapEditor","sldNpcDir", out var sDirCtrl) && sDirCtrl is Client.Game.UI.Controls.ScrollBar sbDir)
+                if (WindowManager.TryGetControl("winMapEditor", "sldNpcDir", out var sDirCtrl) && sDirCtrl is Client.Game.UI.Controls.ScrollBar sbDir)
                 {
                     sbDir.Min = 0; sbDir.Max = 3;
                     Action updateDir = () =>
                     {
                         string text = sDirCtrl.Value switch { 0 => "Up", 1 => "Down", 2 => "Left", 3 => "Right", _ => "Up" };
-                        if (WindowManager.TryGetControl("winMapEditor","lblNpcDir", out var l)) l.Text = $"Direction: {text}";
+                        if (WindowManager.TryGetControl("winMapEditor", "lblNpcDir", out var l)) l.Text = $"Direction: {text}";
                     };
                     updateDir();
                     sbDir.CallBack[(int)ControlState.MouseMove] = () => updateDir();
                 }
-                if (WindowManager.TryGetControl("winMapEditor","btnNpcSpawn", out var btn))
+                if (WindowManager.TryGetControl("winMapEditor", "btnNpcSpawn", out var btn))
                 {
                     btn.CallBack[(int)ControlState.MouseDown] = () =>
                     {
                         int slot = 0;
-                        if (WindowManager.TryGetControl("winMapEditor","cmbNpcSpawnSlot", out var c) && c is ComboBox cb)
+                        if (WindowManager.TryGetControl("winMapEditor", "cmbNpcSpawnSlot", out var c) && c is ComboBox cb)
                             slot = Math.Max(0, cb.Value); // index maps to slot (0=None, 1..)
-                        if (WindowManager.TryGetControl("winMapEditor","sldNpcDir", out var s))
+                        if (WindowManager.TryGetControl("winMapEditor", "sldNpcDir", out var s))
                             GameState.SpawnNpcDir = Math.Clamp(s.Value, 0, 3);
                         GameState.SpawnNpcNum = slot;
                     };
@@ -682,14 +682,14 @@ public class Crystalshire
 
             // Shop
             bool showShop = idx == 6;
-            string[] shopCtrls = new[]{"lblShopAttr","cmbShopAttr","btnShop"};
+            string[] shopCtrls = new[] { "lblShopAttr", "cmbShopAttr", "btnShop" };
             foreach (var n in shopCtrls)
             {
-                if (WindowManager.TryGetControl("winMapEditor",n, out var c)) c.Visible = showShop;
+                if (WindowManager.TryGetControl("winMapEditor", n, out var c)) c.Visible = showShop;
             }
             if (showShop)
             {
-                if (WindowManager.TryGetControl("winMapEditor","cmbShopAttr", out var cShop) && cShop is ComboBox cmb)
+                if (WindowManager.TryGetControl("winMapEditor", "cmbShopAttr", out var cShop) && cShop is ComboBox cmb)
                 {
                     if (cmb.Items.Count == 0)
                     {
@@ -702,11 +702,11 @@ public class Crystalshire
                         cmb.Value = 0;
                     }
                 }
-                if (WindowManager.TryGetControl("winMapEditor","btnShop", out var btn))
+                if (WindowManager.TryGetControl("winMapEditor", "btnShop", out var btn))
                 {
                     btn.CallBack[(int)ControlState.MouseDown] = () =>
                     {
-                        if (WindowManager.TryGetControl("winMapEditor","cmbShopAttr", out var c) && c is ComboBox cb)
+                        if (WindowManager.TryGetControl("winMapEditor", "cmbShopAttr", out var c) && c is ComboBox cb)
                             GameState.EditorShop = Math.Clamp(cb.Value, 0, Variables.MaxShops - 1);
                     };
                 }
@@ -714,14 +714,14 @@ public class Crystalshire
 
             // Heal
             bool showHeal = idx == 8;
-            string[] healCtrls = new[]{"lblHeal","cmbHeal","lblHealAmount","sldHeal","btnHeal"};
+            string[] healCtrls = new[] { "lblHeal", "cmbHeal", "lblHealAmount", "sldHeal", "btnHeal" };
             foreach (var n in healCtrls)
             {
-                if (WindowManager.TryGetControl("winMapEditor",n, out var c)) c.Visible = showHeal;
+                if (WindowManager.TryGetControl("winMapEditor", n, out var c)) c.Visible = showHeal;
             }
             if (showHeal)
             {
-                if (WindowManager.TryGetControl("winMapEditor","cmbHeal", out var cHeal) && cHeal is ComboBox cmb)
+                if (WindowManager.TryGetControl("winMapEditor", "cmbHeal", out var cHeal) && cHeal is ComboBox cmb)
                 {
                     if (cmb.Items.Count == 0)
                     {
@@ -731,22 +731,22 @@ public class Crystalshire
                         cmb.Value = 0;
                     }
                 }
-                if (WindowManager.TryGetControl("winMapEditor","sldHeal", out var sHealCtrl) && sHealCtrl is Client.Game.UI.Controls.ScrollBar sbHeal)
+                if (WindowManager.TryGetControl("winMapEditor", "sldHeal", out var sHealCtrl) && sHealCtrl is Client.Game.UI.Controls.ScrollBar sbHeal)
                 {
                     sbHeal.Min = 1; sbHeal.Max = 1024;
-                    if (WindowManager.TryGetControl("winMapEditor","lblHealAmount", out var l)) l.Text = $"Amount: {sHealCtrl.Value}";
+                    if (WindowManager.TryGetControl("winMapEditor", "lblHealAmount", out var l)) l.Text = $"Amount: {sHealCtrl.Value}";
                     sbHeal.CallBack[(int)ControlState.MouseMove] = () =>
                     {
-                        if (WindowManager.TryGetControl("winMapEditor","lblHealAmount", out var li)) li.Text = $"Amount: {sHealCtrl.Value}";
+                        if (WindowManager.TryGetControl("winMapEditor", "lblHealAmount", out var li)) li.Text = $"Amount: {sHealCtrl.Value}";
                     };
                 }
-                if (WindowManager.TryGetControl("winMapEditor","btnHeal", out var btn))
+                if (WindowManager.TryGetControl("winMapEditor", "btnHeal", out var btn))
                 {
                     btn.CallBack[(int)ControlState.MouseDown] = () =>
                     {
-                        if (WindowManager.TryGetControl("winMapEditor","cmbHeal", out var c) && c is ComboBox cb)
+                        if (WindowManager.TryGetControl("winMapEditor", "cmbHeal", out var c) && c is ComboBox cb)
                             GameState.MapEditorHealType = Math.Clamp(cb.Value, 0, 2);
-                        if (WindowManager.TryGetControl("winMapEditor","sldHeal", out var s))
+                        if (WindowManager.TryGetControl("winMapEditor", "sldHeal", out var s))
                             GameState.MapEditorHealAmount = Math.Clamp(s.Value, 1, 1024);
                     };
                 }
@@ -754,14 +754,14 @@ public class Crystalshire
 
             // Trap
             bool showTrap = idx == 9;
-            string[] trapCtrls = new[]{"lblTrap","lblTrapVital","cmbTrapVital","lblTrapAmount","sldTrap","btnTrap"};
+            string[] trapCtrls = new[] { "lblTrap", "lblTrapVital", "cmbTrapVital", "lblTrapAmount", "sldTrap", "btnTrap" };
             foreach (var n in trapCtrls)
             {
-                if (WindowManager.TryGetControl("winMapEditor",n, out var c)) c.Visible = showTrap;
+                if (WindowManager.TryGetControl("winMapEditor", n, out var c)) c.Visible = showTrap;
             }
             if (showTrap)
             {
-                if (WindowManager.TryGetControl("winMapEditor","cmbTrapVital", out var cTrap) && cTrap is ComboBox cmb)
+                if (WindowManager.TryGetControl("winMapEditor", "cmbTrapVital", out var cTrap) && cTrap is ComboBox cmb)
                 {
                     if (cmb.Items.Count == 0)
                     {
@@ -771,22 +771,22 @@ public class Crystalshire
                         cmb.Value = 0;
                     }
                 }
-                if (WindowManager.TryGetControl("winMapEditor","sldTrap", out var sTrapCtrl) && sTrapCtrl is Client.Game.UI.Controls.ScrollBar sbTrap)
+                if (WindowManager.TryGetControl("winMapEditor", "sldTrap", out var sTrapCtrl) && sTrapCtrl is Client.Game.UI.Controls.ScrollBar sbTrap)
                 {
                     sbTrap.Min = 1; sbTrap.Max = 1024;
-                    if (WindowManager.TryGetControl("winMapEditor","lblTrapAmount", out var l)) l.Text = $"Amount: {sTrapCtrl.Value}";
+                    if (WindowManager.TryGetControl("winMapEditor", "lblTrapAmount", out var l)) l.Text = $"Amount: {sTrapCtrl.Value}";
                     sbTrap.CallBack[(int)ControlState.MouseMove] = () =>
                     {
-                        if (WindowManager.TryGetControl("winMapEditor","lblTrapAmount", out var li)) li.Text = $"Amount: {sTrapCtrl.Value}";
+                        if (WindowManager.TryGetControl("winMapEditor", "lblTrapAmount", out var li)) li.Text = $"Amount: {sTrapCtrl.Value}";
                     };
                 }
-                if (WindowManager.TryGetControl("winMapEditor","btnTrap", out var btn))
+                if (WindowManager.TryGetControl("winMapEditor", "btnTrap", out var btn))
                 {
                     btn.CallBack[(int)ControlState.MouseDown] = () =>
                     {
-                        if (WindowManager.TryGetControl("winMapEditor","sldTrap", out var s))
+                        if (WindowManager.TryGetControl("winMapEditor", "sldTrap", out var s))
                             GameState.MapEditorHealAmount = Math.Clamp(s.Value, 1, 1024);
-                        if (WindowManager.TryGetControl("winMapEditor","cmbTrapVital", out var c) && c is ComboBox cb)
+                        if (WindowManager.TryGetControl("winMapEditor", "cmbTrapVital", out var c) && c is ComboBox cb)
                             GameState.MapEditorTrapVital = Math.Clamp(cb.Value, 0, 2);
                     };
                 }
@@ -794,14 +794,14 @@ public class Crystalshire
 
             // Animation
             bool showAnimation = idx == 10;
-            string[] animCtrls = new[]{"lblAnimation","cmbAnimation","btnAnimation"};
+            string[] animCtrls = new[] { "lblAnimation", "cmbAnimation", "btnAnimation" };
             foreach (var n in animCtrls)
             {
-                if (WindowManager.TryGetControl("winMapEditor",n, out var c)) c.Visible = showAnimation;
+                if (WindowManager.TryGetControl("winMapEditor", n, out var c)) c.Visible = showAnimation;
             }
             if (showAnimation)
             {
-                if (WindowManager.TryGetControl("winMapEditor","cmbAnimation", out var cAnim) && cAnim is ComboBox cmb)
+                if (WindowManager.TryGetControl("winMapEditor", "cmbAnimation", out var cAnim) && cAnim is ComboBox cmb)
                 {
                     if (cmb.Items.Count == 0)
                     {
@@ -814,18 +814,18 @@ public class Crystalshire
                         cmb.Value = 0;
                     }
                 }
-                if (WindowManager.TryGetControl("winMapEditor","btnAnimation", out var btn))
+                if (WindowManager.TryGetControl("winMapEditor", "btnAnimation", out var btn))
                 {
                     btn.CallBack[(int)ControlState.MouseDown] = () =>
                     {
-                        if (WindowManager.TryGetControl("winMapEditor","cmbAnimation", out var c) && c is ComboBox cb)
+                        if (WindowManager.TryGetControl("winMapEditor", "cmbAnimation", out var c) && c is ComboBox cb)
                             GameState.EditorAnimation = Math.Clamp(cb.Value, 0, Variables.MaxAnimations - 1);
                     };
                 }
             }
         }
 
-        if (WindowManager.TryGetControl("winMapEditor","cmbAttrMode", out var cmbAttrCtrl) && cmbAttrCtrl is ComboBox cmbAttr)
+        if (WindowManager.TryGetControl("winMapEditor", "cmbAttrMode", out var cmbAttrCtrl) && cmbAttrCtrl is ComboBox cmbAttr)
         {
             cmbAttr.Items.Clear();
             foreach (var n in attrModes) cmbAttr.Items.Add(n);
@@ -842,7 +842,7 @@ public class Crystalshire
         }
 
         // Separate Info button wiring
-        if (WindowManager.TryGetControl("winMapEditor","btnAttrInfo", out var btnAttrInfo))
+        if (WindowManager.TryGetControl("winMapEditor", "btnAttrInfo", out var btnAttrInfo))
         {
             btnAttrInfo.CallBack[(int)ControlState.MouseDown] = () =>
             {
@@ -854,7 +854,7 @@ public class Crystalshire
         }
 
         // Attribute layer (1 or 2) builder
-        if (WindowManager.TryGetControl("winMapEditor","cmbAttribute", out var cmbAttributeCtrl) && cmbAttributeCtrl is ComboBox cmbAttribute)
+        if (WindowManager.TryGetControl("winMapEditor", "cmbAttribute", out var cmbAttributeCtrl) && cmbAttributeCtrl is ComboBox cmbAttribute)
         {
             cmbAttribute.Items.Clear();
             cmbAttribute.Items.Add("1");
@@ -867,7 +867,7 @@ public class Crystalshire
                 GameState.EditorAttribute = (byte)Math.Clamp(cmbAttribute.Value + 1, 1, 2);
             };
         }
-        
+
         void UpdateAutotileLabel() { }
         // Initialize labels on open
         if (GameState.CurTileset <= 0) GameState.CurTileset = Math.Max(1, Data.MyMap.Tileset);
@@ -875,7 +875,7 @@ public class Crystalshire
         UpdateAutotileLabel();
 
         // Horizontal tileset scrollbar selects the tileset number
-        if (WindowManager.TryGetControl("winMapEditor","sldTileset", out var sldTilesetCtrl) && sldTilesetCtrl is Client.Game.UI.Controls.ScrollBar sldTileset)
+        if (WindowManager.TryGetControl("winMapEditor", "sldTileset", out var sldTilesetCtrl) && sldTilesetCtrl is Client.Game.UI.Controls.ScrollBar sldTileset)
         {
             sldTileset.Min = 1;
             sldTileset.Max = Math.Max(1, GameState.NumTileSets);
@@ -888,26 +888,26 @@ public class Crystalshire
         }
 
         // Horizontal viewport scroll (for wide tilesets)
-        if (WindowManager.TryGetControl("winMapEditor","sldTilesetH", out var sldTilesetHCtrl) && sldTilesetHCtrl is Client.Game.UI.Controls.ScrollBar sldTilesetH)
+        if (WindowManager.TryGetControl("winMapEditor", "sldTilesetH", out var sldTilesetHCtrl) && sldTilesetHCtrl is Client.Game.UI.Controls.ScrollBar sldTilesetH)
         {
             // Range is updated during drawing; still add a callback to trigger redraw behavior on change
             sldTilesetH.CallBack[(int)ControlState.MouseMove] = () => { /* no-op: OnDraw reads Value */ };
         }
 
-        if (WindowManager.TryGetControl("winMapEditor","btnTilesetPrev", out var btnTsPrev))
+        if (WindowManager.TryGetControl("winMapEditor", "btnTilesetPrev", out var btnTsPrev))
             btnTsPrev.CallBack[(int)ControlState.MouseDown] = () => { GameState.CurTileset = Math.Max(1, GameState.CurTileset - 1); Data.MyMap.Tileset = GameState.CurTileset; };
-        if (WindowManager.TryGetControl("winMapEditor","btnTilesetNext", out var btnTsNext))
+        if (WindowManager.TryGetControl("winMapEditor", "btnTilesetNext", out var btnTsNext))
             btnTsNext.CallBack[(int)ControlState.MouseDown] = () => { var maxTs = Math.Max(1, GameState.NumTileSets); GameState.CurTileset = Math.Min(maxTs, GameState.CurTileset + 1); Data.MyMap.Tileset = GameState.CurTileset; };
 
-        if (WindowManager.TryGetControl("winMapEditor","btnAutoPrev", out var btnAutoPrev))
+        if (WindowManager.TryGetControl("winMapEditor", "btnAutoPrev", out var btnAutoPrev))
             btnAutoPrev.CallBack[(int)ControlState.MouseDown] = () => { GameState.CurAutotileType = (GameState.CurAutotileType + autotileNames.Length - 1) % autotileNames.Length; UpdateAutotileLabel(); };
-        if (WindowManager.TryGetControl("winMapEditor","btnAutoNext", out var btnAutoNext))
+        if (WindowManager.TryGetControl("winMapEditor", "btnAutoNext", out var btnAutoNext))
             btnAutoNext.CallBack[(int)ControlState.MouseDown] = () => { GameState.CurAutotileType = (GameState.CurAutotileType + 1) % autotileNames.Length; UpdateAutotileLabel(); };
 
-        if (WindowManager.TryGetControl("winMapEditor","btnTileApply", out var btnTileApply))
+        if (WindowManager.TryGetControl("winMapEditor", "btnTileApply", out var btnTileApply))
             btnTileApply.CallBack[(int)ControlState.MouseDown] = () =>
             {
-                if (WindowManager.TryGetControl("winMapEditor","txtTileX", out var tbx) && WindowManager.TryGetControl("winMapEditor","txtTileY", out var tby))
+                if (WindowManager.TryGetControl("winMapEditor", "txtTileX", out var tbx) && WindowManager.TryGetControl("winMapEditor", "txtTileY", out var tby))
                 {
                     int x = int.TryParse(tbx.Text?.Trim(), out var ix) ? ix : 0;
                     int y = int.TryParse(tby.Text?.Trim(), out var iy) ? iy : 0;
@@ -917,7 +917,7 @@ public class Crystalshire
                 }
             };
 
-         // Faux header tabs like Admin
+        // Faux header tabs like Admin
         var winIndex = WindowManager.GetWindowIndex("winMapEditor");
 
         void ShowTab(string tab)
@@ -941,7 +941,7 @@ public class Crystalshire
                     GameState.MapEditorTab = (int)MapEditorTab.Attributes;
 
                     // Ensure attribute group visibility matches current mode when tab opens
-                    if (WindowManager.TryGetControl("winMapEditor","cmbAttrMode", out var attrModeCtrl) && attrModeCtrl is ComboBox attrCmb)
+                    if (WindowManager.TryGetControl("winMapEditor", "cmbAttrMode", out var attrModeCtrl) && attrModeCtrl is ComboBox attrCmb)
                     {
                         var idx = Math.Clamp(attrCmb.Value, 0, 12);
                         UpdateAttrVisibility(idx);
@@ -973,7 +973,7 @@ public class Crystalshire
         }
 
         // Wire toolbar Settings to open Settings section
-        if (WindowManager.TryGetControl("winMapEditor","btnToolbarSettings", out var btnToolbarSettings))
+        if (WindowManager.TryGetControl("winMapEditor", "btnToolbarSettings", out var btnToolbarSettings))
         {
             btnToolbarSettings.CallBack[(int)ControlState.MouseDown] = () => ShowTab("Settings");
         }
@@ -982,12 +982,12 @@ public class Crystalshire
         void InitSettingsLists()
         {
             // Name
-            if (WindowManager.TryGetControl("winMapEditor","txtName", out var txtName))
+            if (WindowManager.TryGetControl("winMapEditor", "txtName", out var txtName))
             {
                 txtName.Text = Data.MyMap.Name?.Trim() ?? string.Empty;
             }
             // Moral list
-            if (WindowManager.TryGetControl("winMapEditor","lstMoral", out var moralCtrl) && moralCtrl is ComboBox lstMoral)
+            if (WindowManager.TryGetControl("winMapEditor", "lstMoral", out var moralCtrl) && moralCtrl is ComboBox lstMoral)
             {
                 lstMoral.Items.Clear();
                 for (int i = 0; i < Variables.MaxMorals; i++)
@@ -1004,7 +1004,7 @@ public class Crystalshire
             }
 
             // Shop list: index 0 = None, then shops 0..MaxShops-1 shifted by +1, display "index: Name" with None fallback
-            if (WindowManager.TryGetControl("winMapEditor","lstShop", out var shopCtrl) && shopCtrl is ComboBox lstShop)
+            if (WindowManager.TryGetControl("winMapEditor", "lstShop", out var shopCtrl) && shopCtrl is ComboBox lstShop)
             {
                 lstShop.Items.Clear();
                 lstShop.Items.Add("None");
@@ -1023,7 +1023,7 @@ public class Crystalshire
             }
 
             // Music list: index 0 = None, then cache as "index: name"
-            if (WindowManager.TryGetControl("winMapEditor","cmbMusic", out var musicCtrl) && musicCtrl is ComboBox cmbMusic)
+            if (WindowManager.TryGetControl("winMapEditor", "cmbMusic", out var musicCtrl) && musicCtrl is ComboBox cmbMusic)
             {
                 cmbMusic.Items.Clear();
                 cmbMusic.Items.Add("None");
@@ -1064,7 +1064,7 @@ public class Crystalshire
                     }
                 };
 
-                if (WindowManager.TryGetControl("winMapEditor","btnMusicPreview", out var btnMusicPreview))
+                if (WindowManager.TryGetControl("winMapEditor", "btnMusicPreview", out var btnMusicPreview))
                 {
                     btnMusicPreview.CallBack[(int)ControlState.MouseDown] = () =>
                     {
@@ -1091,7 +1091,7 @@ public class Crystalshire
             }
 
             // Settings checkboxes
-            if (WindowManager.TryGetControl("winMapEditor","chkNoMapRespawn", out var chkNoMapRespawn))
+            if (WindowManager.TryGetControl("winMapEditor", "chkNoMapRespawn", out var chkNoMapRespawn))
             {
                 chkNoMapRespawn.Value = Data.MyMap.NoRespawn ? 1 : 0;
                 chkNoMapRespawn.CallBack[(int)ControlState.MouseDown] = () =>
@@ -1100,7 +1100,7 @@ public class Crystalshire
                     Data.MyMap.NoRespawn = chkNoMapRespawn.Value == 1;
                 };
             }
-            if (WindowManager.TryGetControl("winMapEditor","chkIndoors", out var chkIndoors))
+            if (WindowManager.TryGetControl("winMapEditor", "chkIndoors", out var chkIndoors))
             {
                 chkIndoors.Value = Data.MyMap.Indoors ? 1 : 0;
                 chkIndoors.CallBack[(int)ControlState.MouseDown] = () =>
@@ -1111,17 +1111,17 @@ public class Crystalshire
             }
 
             // Links / Boot / Sizes textboxes (load existing values)
-            if (WindowManager.TryGetControl("winMapEditor","txtUp", out var tUp)) tUp.Text = Data.MyMap.Up.ToString();
-            if (WindowManager.TryGetControl("winMapEditor","txtDown", out var tDown)) tDown.Text = Data.MyMap.Down.ToString();
-            if (WindowManager.TryGetControl("winMapEditor","txtLeft", out var tLeft)) tLeft.Text = Data.MyMap.Left.ToString();
-            if (WindowManager.TryGetControl("winMapEditor","txtRight", out var tRight)) tRight.Text = Data.MyMap.Right.ToString();
+            if (WindowManager.TryGetControl("winMapEditor", "txtUp", out var tUp)) tUp.Text = Data.MyMap.Up.ToString();
+            if (WindowManager.TryGetControl("winMapEditor", "txtDown", out var tDown)) tDown.Text = Data.MyMap.Down.ToString();
+            if (WindowManager.TryGetControl("winMapEditor", "txtLeft", out var tLeft)) tLeft.Text = Data.MyMap.Left.ToString();
+            if (WindowManager.TryGetControl("winMapEditor", "txtRight", out var tRight)) tRight.Text = Data.MyMap.Right.ToString();
 
-            if (WindowManager.TryGetControl("winMapEditor","txtBootMap", out var tBMap)) tBMap.Text = Data.MyMap.BootMap.ToString();
-            if (WindowManager.TryGetControl("winMapEditor","txtBootX", out var tBX)) tBX.Text = Data.MyMap.BootX.ToString();
-            if (WindowManager.TryGetControl("winMapEditor","txtBootY", out var tBY)) tBY.Text = Data.MyMap.BootY.ToString();
+            if (WindowManager.TryGetControl("winMapEditor", "txtBootMap", out var tBMap)) tBMap.Text = Data.MyMap.BootMap.ToString();
+            if (WindowManager.TryGetControl("winMapEditor", "txtBootX", out var tBX)) tBX.Text = Data.MyMap.BootX.ToString();
+            if (WindowManager.TryGetControl("winMapEditor", "txtBootY", out var tBY)) tBY.Text = Data.MyMap.BootY.ToString();
 
-            if (WindowManager.TryGetControl("winMapEditor","txtMaxX", out var tMaxX)) tMaxX.Text = Data.MyMap.MaxX.ToString();
-            if (WindowManager.TryGetControl("winMapEditor","txtMaxY", out var tMaxY)) tMaxY.Text = Data.MyMap.MaxY.ToString();
+            if (WindowManager.TryGetControl("winMapEditor", "txtMaxX", out var tMaxX)) tMaxX.Text = Data.MyMap.MaxX.ToString();
+            if (WindowManager.TryGetControl("winMapEditor", "txtMaxY", out var tMaxY)) tMaxY.Text = Data.MyMap.MaxY.ToString();
         }
 
         // Initialize Effects controls: wire combos, sliders, and live labels
@@ -1129,11 +1129,11 @@ public class Crystalshire
         {
             void SetLabel(string name, string text)
             {
-                if (WindowManager.TryGetControl("winMapEditor",name, out var l)) l.Text = text;
+                if (WindowManager.TryGetControl("winMapEditor", name, out var l)) l.Text = text;
             }
 
             // Weather combo
-            if (WindowManager.TryGetControl("winMapEditor","cmbWeather", out var wCtrl) && wCtrl is ComboBox cmbWeather)
+            if (WindowManager.TryGetControl("winMapEditor", "cmbWeather", out var wCtrl) && wCtrl is ComboBox cmbWeather)
             {
                 cmbWeather.Items.Clear();
                 cmbWeather.Items.Add("None");
@@ -1150,7 +1150,7 @@ public class Crystalshire
             // Helper to bind a horizontal scrollbar to a value + label
             void BindSlider(string barName, int value, int min, int max, Action<int> setter, string labelName = null, string caption = null)
             {
-                if (WindowManager.TryGetControl("winMapEditor",barName, out var sCtrl) && sCtrl is Client.Game.UI.Controls.ScrollBar sb)
+                if (WindowManager.TryGetControl("winMapEditor", barName, out var sCtrl) && sCtrl is Client.Game.UI.Controls.ScrollBar sb)
                 {
                     sb.Min = min; sb.Max = max;
                     sCtrl.Value = Math.Clamp(value, min, max);
@@ -1180,7 +1180,7 @@ public class Crystalshire
             BindSlider("sldFogSpeed", Data.MyMap.FogSpeed, 0, 255, v => Data.MyMap.FogSpeed = (byte)v, "lblFogSpeed", "Speed");
 
             // Tint toggle
-            if (WindowManager.TryGetControl("winMapEditor","chkTint", out var chkTint))
+            if (WindowManager.TryGetControl("winMapEditor", "chkTint", out var chkTint))
             {
                 chkTint.Value = Data.MyMap.MapTint ? 1 : 0;
                 chkTint.CallBack[(int)ControlState.MouseDown] = () =>
@@ -1196,7 +1196,7 @@ public class Crystalshire
             BindSlider("sldMapAlpha", Data.MyMap.MapTintA, 0, 255, v => Data.MyMap.MapTintA = (byte)v, "lblTintA", "Alpha");
 
             // Panorama
-            if (WindowManager.TryGetControl("winMapEditor","cmbPanorama", out var panoCtrl) && panoCtrl is ComboBox cmbPanorama)
+            if (WindowManager.TryGetControl("winMapEditor", "cmbPanorama", out var panoCtrl) && panoCtrl is ComboBox cmbPanorama)
             {
                 cmbPanorama.Items.Clear();
                 cmbPanorama.Items.Add("None");
@@ -1210,7 +1210,7 @@ public class Crystalshire
             }
 
             // Parallax
-            if (WindowManager.TryGetControl("winMapEditor","cmbParallax", out var paraCtrl) && paraCtrl is ComboBox cmbParallax)
+            if (WindowManager.TryGetControl("winMapEditor", "cmbParallax", out var paraCtrl) && paraCtrl is ComboBox cmbParallax)
             {
                 cmbParallax.Items.Clear();
                 cmbParallax.Items.Add("None");
@@ -1226,10 +1226,10 @@ public class Crystalshire
             // Brightness
             BindSlider("sldMapBrightness", Data.MyMap.Brightness, 0, 100, v => Data.MyMap.Brightness = (byte)v, "lblBrightness", "Brightness");
         }
-        
+
         void InitNpcList()
         {
-            if (WindowManager.TryGetControl("winMapEditor","cmbNpcList", out var npcCtrl) && npcCtrl is ComboBox cmbNpc)
+            if (WindowManager.TryGetControl("winMapEditor", "cmbNpcList", out var npcCtrl) && npcCtrl is ComboBox cmbNpc)
             {
                 int prev = cmbNpc.Value;
                 cmbNpc.Items.Clear();
@@ -1277,7 +1277,7 @@ public class Crystalshire
         }
 
         // Opacity checkbox on Tiles page: toggles GameState.HideLayers
-        if (WindowManager.TryGetControl("winMapEditor","chkOpacity", out var chkOpacity))
+        if (WindowManager.TryGetControl("winMapEditor", "chkOpacity", out var chkOpacity))
         {
             chkOpacity.Value = GameState.HideLayers ? 1 : 0;
             chkOpacity.CallBack[(int)ControlState.MouseDown] = () =>
@@ -1286,32 +1286,32 @@ public class Crystalshire
                 GameState.HideLayers = chkOpacity.Value == 1;
             };
         }
-        
+
         InitSettingsLists();
         InitEffectsControls();
 
         // Wire Settings page section toggles
-        if (WindowManager.TryGetControl("winMapEditor","btnGoTiles", out var btnGoTiles))
+        if (WindowManager.TryGetControl("winMapEditor", "btnGoTiles", out var btnGoTiles))
         {
             btnGoTiles.CallBack[(int)ControlState.MouseDown] = () => ShowTab("Tools");
         }
-        if (WindowManager.TryGetControl("winMapEditor","btnGoAttributes", out var btnGoAttributes))
+        if (WindowManager.TryGetControl("winMapEditor", "btnGoAttributes", out var btnGoAttributes))
         {
             btnGoAttributes.CallBack[(int)ControlState.MouseDown] = () => ShowTab("Attributes");
         }
-        if (WindowManager.TryGetControl("winMapEditor","btnGoNpcs", out var btnGoNpcs))
+        if (WindowManager.TryGetControl("winMapEditor", "btnGoNpcs", out var btnGoNpcs))
         {
             btnGoNpcs.CallBack[(int)ControlState.MouseDown] = () => ShowTab("Npcs");
         }
-        if (WindowManager.TryGetControl("winMapEditor","btnGoDirBlock", out var btnGoDirBlock))
+        if (WindowManager.TryGetControl("winMapEditor", "btnGoDirBlock", out var btnGoDirBlock))
         {
             btnGoDirBlock.CallBack[(int)ControlState.MouseDown] = () => ShowTab("DirBlock");
         }
-        if (WindowManager.TryGetControl("winMapEditor","btnGoEvents", out var btnGoEvents))
+        if (WindowManager.TryGetControl("winMapEditor", "btnGoEvents", out var btnGoEvents))
         {
             btnGoEvents.CallBack[(int)ControlState.MouseDown] = () => ShowTab("Events");
         }
-        if (WindowManager.TryGetControl("winMapEditor","btnGoEffects", out var btnGoEffects))
+        if (WindowManager.TryGetControl("winMapEditor", "btnGoEffects", out var btnGoEffects))
         {
             btnGoEffects.CallBack[(int)ControlState.MouseDown] = () => ShowTab("Effects");
         }
@@ -1319,14 +1319,14 @@ public class Crystalshire
         // Events page: copy/paste toggles and label updates
         void UpdateEventLabels()
         {
-            if (WindowManager.TryGetControl("winMapEditor","lblCopyMode", out var lblCopy))
+            if (WindowManager.TryGetControl("winMapEditor", "lblCopyMode", out var lblCopy))
                 lblCopy.Text = Event.EventCopy ? "Copy Mode On" : "Copy Mode Off";
-            if (WindowManager.TryGetControl("winMapEditor","lblPasteMode", out var lblPaste))
+            if (WindowManager.TryGetControl("winMapEditor", "lblPasteMode", out var lblPaste))
                 lblPaste.Text = Event.EventPaste ? "Paste Mode On" : "Paste Mode Off";
         }
-        if (WindowManager.TryGetControl("winMapEditor","btnCopyEvent", out var btnCopyEvent))
+        if (WindowManager.TryGetControl("winMapEditor", "btnCopyEvent", out var btnCopyEvent))
             btnCopyEvent.CallBack[(int)ControlState.MouseDown] = () => { Event.EventCopy = !Event.EventCopy; if (Event.EventCopy) Event.EventPaste = false; UpdateEventLabels(); };
-        if (WindowManager.TryGetControl("winMapEditor","btnPasteEvent", out var btnPasteEvent))
+        if (WindowManager.TryGetControl("winMapEditor", "btnPasteEvent", out var btnPasteEvent))
             btnPasteEvent.CallBack[(int)ControlState.MouseDown] = () => { Event.EventPaste = !Event.EventPaste; if (Event.EventPaste) Event.EventCopy = false; UpdateEventLabels(); };
         UpdateEventLabels();
 
@@ -1334,7 +1334,7 @@ public class Crystalshire
         ShowTab("Tools");
 
         // Wire tileset preview draw
-        if (WindowManager.TryGetControl("winMapEditor","picTileset", out var picTileset))
+        if (WindowManager.TryGetControl("winMapEditor", "picTileset", out var picTileset))
         {
             picTileset.OnDraw = WinEditorMap.OnDrawTileset;
             picTileset.CallBack[(int)ControlState.MouseDown] = WinEditorMap.OnTilesetMouseDown;
@@ -1344,7 +1344,7 @@ public class Crystalshire
         }
 
         // Npc list drawing and interactions
-        if (WindowManager.TryGetControl("winMapEditor","lstIndex", out var lstIndex) && lstIndex is ListBox list)
+        if (WindowManager.TryGetControl("winMapEditor", "lstIndex", out var lstIndex) && lstIndex is ListBox list)
         {
             list.CallBack[(int)ControlState.MouseDown] = WinEditorMap.OnNpcListMouseDown;
             // Use MouseScroll (enum) for wheel events
@@ -1356,7 +1356,7 @@ public class Crystalshire
         }
 
         // Dir Block: confirmation + clear via WinEditorMap helper
-        if (WindowManager.TryGetControl("winMapEditor","btnDirClear", out var btnDirClear))
+        if (WindowManager.TryGetControl("winMapEditor", "btnDirClear", out var btnDirClear))
         {
             btnDirClear.CallBack[(int)ControlState.MouseDown] = WinEditorMap.OnDirClearClick;
         }
@@ -1425,7 +1425,7 @@ public class Crystalshire
         {
             txtName.CallBack[(int)ControlState.KeyUp] = () => WinNpcEditor.UpdateName(txtName.Text ?? string.Empty);
         }
-        
+
         if (WindowManager.TryGetControl("winNpcEditor", "txtAttackSay", out var atkCtrl) && atkCtrl is TextBox txtAtk)
         {
             txtAtk.CallBack[(int)ControlState.KeyUp] = () =>
@@ -1548,6 +1548,7 @@ public class Crystalshire
                 };
             }
         }
+
         // Helper to bind a scrollbar (used as slider) to an int field and an optional textbox.
         void BindScrollBar(string name, Func<int> get, Action<int> apply, string textBoxName = null)
         {
@@ -1589,7 +1590,7 @@ public class Crystalshire
             }
         }, 0, 999999);
 
-        // Chance: slider only (no textbox)
+        // Chance: slider only (no textbox sync).
         BindScrollBar(
             "sldNpcChance",
             () =>
@@ -1703,7 +1704,7 @@ public class Crystalshire
                 WinNpcEditor.LoadNpc(GameState.EditorIndex);
             };
         }
-        if (WindowManager.TryGetControl("winNpcEditor", "btnNpcCopy", out var btnCopy))
+        if (WindowManager.TryGetControl("winNpcEditor", "btnCopy", out var btnCopy))
         {
             btnCopy.CallBack[(int)ControlState.MouseDown] = WinNpcEditor.OnCopyOrPaste;
         }
@@ -1740,20 +1741,21 @@ public class Crystalshire
                     int step = delta > 0 ? -1 : 1;
                     list.ScrollBy(step);
 
-                    if (WindowManager.TryGetControl("winItemEditor", "sldList", out var sldItem) && sldItem is ScrollBar sbSync)
+                    // Keep scrollbar in sync if present
+                    if (WindowManager.TryGetControl("winItemEditor", "sldList", out var sldCtrl) && sldCtrl is ScrollBar sbSync)
                     {
                         sbSync.Value = list.ScrollOffset;
                     }
                 }
             };
         }
-        if (WindowManager.TryGetControl("winItemEditor", "sldList", out var sldList) && sldList is ScrollBar sbItem)
+        if (WindowManager.TryGetControl("winItemEditor", "sldList", out var sldList) && sldList is ScrollBar sbList)
         {
-            sbItem.CallBack[(int)ControlState.MouseMove] = () =>
+            sbList.CallBack[(int)ControlState.MouseMove] = () =>
             {
                 if (itemList != null)
                 {
-                    itemList.ScrollOffset = sbItem.Value;
+                    itemList.ScrollOffset = sbList.Value;
                 }
             };
         }
@@ -1764,11 +1766,12 @@ public class Crystalshire
             txtName.CallBack[(int)ControlState.KeyUp] = () => WinItemEditor.UpdateName(txtName.Text ?? string.Empty);
         }
 
-        // Simple int textbox binder helper
+        // Int binder
         void BindIntText(string name, Action<int> apply, int min, int max)
         {
-            if (WindowManager.TryGetControl("winItemEditor", name, out var t) && t is TextBox tb)
+            if (WindowManager.TryGetControl("winItemEditor", name, out var c) && c is TextBox tb)
             {
+                tb.Enabled = true;
                 tb.CallBack[(int)ControlState.KeyUp] = () =>
                 {
                     var s = tb.Text?.Trim();
@@ -1854,7 +1857,7 @@ public class Crystalshire
         }
 
         // Equipment & stats via sliders
-        if (WindowManager.TryGetControl("winItemEditor", "sldItemDamage", out var dmgCtrl) && dmgCtrl is ScrollBar sldDmg)
+        if (WindowManager.TryGetControl("winItemEditor", "sldItemDamage", out var dmgCtrl) && dmgCtrl is Client.Game.UI.Controls.ScrollBar sldDmg)
         {
             sldDmg.CallBack[(int)ControlState.MouseMove] = () =>
             {
@@ -1866,7 +1869,7 @@ public class Crystalshire
             };
         }
 
-        if (WindowManager.TryGetControl("winItemEditor", "sldItemSpeed", out var spdCtrl) && spdCtrl is ScrollBar sldSpeed)
+        if (WindowManager.TryGetControl("winItemEditor", "sldItemSpeed", out var spdCtrl) && spdCtrl is Client.Game.UI.Controls.ScrollBar sldSpeed)
         {
             sldSpeed.CallBack[(int)ControlState.MouseMove] = () =>
             {
@@ -1891,25 +1894,25 @@ public class Crystalshire
         }
 
         // Stat bonuses via sliders
-        void BindStatSlider(string name, Stat stat)
+        void BindStatSlider(string name, Func<byte> get, Action<byte> apply)
         {
-            if (WindowManager.TryGetControl("winItemEditor", name, out var ctrl) && ctrl is ScrollBar sld)
+            if (WindowManager.TryGetControl("winItemEditor", name, out var ctrl) && ctrl is Client.Game.UI.Controls.ScrollBar sld)
             {
                 sld.CallBack[(int)ControlState.MouseMove] = () =>
                 {
                     if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
                     {
-                        Data.Item[WinItemEditor.SelectedIndex].AddStat[(int)stat] = (byte)sld.Value;
+                        apply((byte)sld.Value);
                         GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
                     }
                 };
             }
         }
-        BindStatSlider("sldStr", Stat.Strength);
-        BindStatSlider("sldVit", Stat.Vitality);
-        BindStatSlider("sldLuck", Stat.Luck);
-        BindStatSlider("sldInt", Stat.Intelligence);
-        BindStatSlider("sldSpr", Stat.Spirit);
+        BindStatSlider("sldStr", () => Data.Item[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Strength], v => Data.Item[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Strength] = v);
+        BindStatSlider("sldVit", () => Data.Item[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Vitality], v => Data.Item[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Vitality] = v);
+        BindStatSlider("sldLuck", () => Data.Item[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Luck], v => Data.Item[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Luck] = v);
+        BindStatSlider("sldInt", () => Data.Item[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Intelligence], v => Data.Item[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Intelligence] = v);
+        BindStatSlider("sldSpr", () => Data.Item[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Spirit], v => Data.Item[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Spirit] = v);
 
         // Vital mod (Data1 for consumables)    
         BindIntText("txtVitalMod", v =>
@@ -1919,7 +1922,7 @@ public class Crystalshire
                 Data.Item[WinItemEditor.SelectedIndex].Data1 = v;
                 GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
             }
-        }, -32000, 32000);
+        }, -1000, 1000);
 
         // Event id / value reuse Data1 / Data2
         BindIntText("txtEventId", v =>
@@ -1941,22 +1944,22 @@ public class Crystalshire
         }, 0, int.MaxValue);
 
         // Requirements via sliders
-        void BindReqStatSlider(string name, Stat stat)
+        void BindReqStatSlider(string name, Func<byte> get, Action<byte> apply)
         {
-            if (WindowManager.TryGetControl("winItemEditor", name, out var ctrl) && ctrl is ScrollBar sld)
+            if (WindowManager.TryGetControl("winItemEditor", name, out var ctrl) && ctrl is Client.Game.UI.Controls.ScrollBar sld)
             {
                 sld.CallBack[(int)ControlState.MouseMove] = () =>
                 {
                     if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
                     {
-                        Data.Item[WinItemEditor.SelectedIndex].StatReq[(int)stat] = (byte)sld.Value;
+                        apply((byte)sld.Value);
                         GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
                     }
                 };
             }
         }
 
-        if (WindowManager.TryGetControl("winItemEditor", "sldReqLevel", out var rLvlCtrl) && rLvlCtrl is ScrollBar sldReqLevel)
+        if (WindowManager.TryGetControl("winItemEditor", "sldReqLevel", out var rLvlCtrl) && rLvlCtrl is Client.Game.UI.Controls.ScrollBar sldReqLevel)
         {
             sldReqLevel.CallBack[(int)ControlState.MouseMove] = () =>
             {
@@ -1968,17 +1971,18 @@ public class Crystalshire
             };
         }
 
-        BindReqStatSlider("sldReqStr", Stat.Strength);
-        BindReqStatSlider("sldReqVit", Stat.Vitality);
-        BindReqStatSlider("sldReqLuck", Stat.Luck);
-        BindReqStatSlider("sldReqInt", Stat.Intelligence);
-        BindReqStatSlider("sldReqSpr", Stat.Spirit);
+        BindReqStatSlider("sldReqStr", () => Data.Item[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Strength], v => Data.Item[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Strength] = v);
+        BindReqStatSlider("sldReqVit", () => Data.Item[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Vitality], v => Data.Item[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Vitality] = v);
+        BindReqStatSlider("sldReqLuck", () => Data.Item[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Luck], v => Data.Item[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Luck] = v);
+        BindReqStatSlider("sldReqInt", () => Data.Item[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Intelligence], v => Data.Item[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Intelligence] = v);
+        BindReqStatSlider("sldReqSpr", () => Data.Item[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Spirit], v => Data.Item[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Spirit] = v);
 
         // Combos: Type, SubType, Animation, Bind, Tool, Knockback tiles, Skill, Projectile, Ammo, JobReq, AccessReq
         void BindCombo(string name, Action<int> apply)
         {
             if (WindowManager.TryGetControl("winItemEditor", name, out var c) && c is ComboBox combo)
             {
+                combo.Enabled = true;
                 combo.CallBack[(int)ControlState.MouseMove] = () =>
                 {
                     int v = Math.Max(0, combo.Value);
@@ -2123,10 +2127,10 @@ public class Crystalshire
     public void UpdateWindow_EscMenu()
     {
         var window = WindowLoader.FromLayout("winEscMenu");
-        window.GetChild("btnReturn").CallBack[(int) ControlState.MouseDown] = WinEscMenu.OnClose;
-        window.GetChild("btnOptions").CallBack[(int) ControlState.MouseDown] = WinEscMenu.OnOptionsClick;
-        window.GetChild("btnMainMenu").CallBack[(int) ControlState.MouseDown] = WinEscMenu.OnMainMenuClick;
-        window.GetChild("btnExit").CallBack[(int) ControlState.MouseDown] = WinEscMenu.OnExitClick;
+        window.GetChild("btnReturn").CallBack[(int)ControlState.MouseDown] = WinEscMenu.OnClose;
+        window.GetChild("btnOptions").CallBack[(int)ControlState.MouseDown] = WinEscMenu.OnOptionsClick;
+        window.GetChild("btnMainMenu").CallBack[(int)ControlState.MouseDown] = WinEscMenu.OnMainMenuClick;
+        window.GetChild("btnExit").CallBack[(int)ControlState.MouseDown] = WinEscMenu.OnExitClick;
     }
 
     public void UpdateWindow_Bars()
@@ -2141,18 +2145,18 @@ public class Crystalshire
 
         // Buttons
         window.GetChild("btnChat").CallBack[(int)ControlState.Normal] = WinChat.OnSayClick;
-        window.GetChild("btnUp").CallBack[(int) ControlState.MouseDown] = WinChat.OnUpButtonMouseDown;
-        window.GetChild("btnDown").CallBack[(int) ControlState.MouseDown] = WinChat.OnDownButtonMouseDown;
-        window.GetChild("btnUp").CallBack[(int) ControlState.MouseUp] = WinChat.OnUpButtonMouseUp;
-        window.GetChild("btnDown").CallBack[(int) ControlState.MouseUp] = WinChat.OnDownButtonMouseUp;
+        window.GetChild("btnUp").CallBack[(int)ControlState.MouseDown] = WinChat.OnUpButtonMouseDown;
+        window.GetChild("btnDown").CallBack[(int)ControlState.MouseDown] = WinChat.OnDownButtonMouseDown;
+        window.GetChild("btnUp").CallBack[(int)ControlState.MouseUp] = WinChat.OnUpButtonMouseUp;
+        window.GetChild("btnDown").CallBack[(int)ControlState.MouseUp] = WinChat.OnDownButtonMouseUp;
 
         // Checkboxes
         window.GetChild("chkGame").CallBack[(int)ControlState.MouseDown] = WinChat.OnGameChannelClicked;
         window.GetChild("chkMap").CallBack[(int)ControlState.MouseDown] = WinChat.OnMapChannelClicked;
         window.GetChild("chkGlobal").CallBack[(int)ControlState.MouseDown] = WinChat.OnBroadcastChannelClicked;
-        window.GetChild("chkParty").CallBack[(int) ControlState.MouseDown] = WinChat.OnPartyChannelClicked;
-        window.GetChild("chkGuild").CallBack[(int) ControlState.MouseDown] = WinChat.OnGuildChannelClicked;
-        window.GetChild("chkPlayer").CallBack[(int) ControlState.MouseDown] = WinChat.OnPrivateChannelClicked;
+        window.GetChild("chkParty").CallBack[(int)ControlState.MouseDown] = WinChat.OnPartyChannelClicked;
+        window.GetChild("chkGuild").CallBack[(int)ControlState.MouseDown] = WinChat.OnGuildChannelClicked;
+        window.GetChild("chkPlayer").CallBack[(int)ControlState.MouseDown] = WinChat.OnPrivateChannelClicked;
 
         WindowManager.SetActiveControl(window, "txtChat");
 
@@ -2176,40 +2180,40 @@ public class Crystalshire
     {
         var window = WindowLoader.FromLayout("winHotbar");
         window.OnDraw = WinHotBar.OnDraw;
-        window.CallBack[(int) ControlState.MouseMove] = WinHotBar.OnMouseMove;
-        window.CallBack[(int) ControlState.MouseDown] = WinHotBar.OnMouseDown;
-        window.CallBack[(int) ControlState.DoubleClick] = WinHotBar.OnDoubleClick;
+        window.CallBack[(int)ControlState.MouseMove] = WinHotBar.OnMouseMove;
+        window.CallBack[(int)ControlState.MouseDown] = WinHotBar.OnMouseDown;
+        window.CallBack[(int)ControlState.DoubleClick] = WinHotBar.OnDoubleClick;
     }
 
     public void UpdateWindow_Menu()
     {
         var window = WindowLoader.FromLayout("winMenu");
-        window.GetChild("btnChar").CallBack[(int) ControlState.MouseDown] = WinMenu.OnCharacterClick;
-        window.GetChild("btnInv").CallBack[(int) ControlState.MouseDown] = WinMenu.OnInventoryClick;
-        window.GetChild("btnSkills").CallBack[(int) ControlState.MouseDown] = WinMenu.OnSkillsClick;
-        window.GetChild("btnMap").CallBack[(int) ControlState.MouseDown] = WinMenu.OnMapClick;
-        window.GetChild("btnGuild").CallBack[(int) ControlState.MouseDown] = WinMenu.OnGuildClick;
-        window.GetChild("btnQuest").CallBack[(int) ControlState.MouseDown] = WinMenu.OnQuestClick;
+        window.GetChild("btnChar").CallBack[(int)ControlState.MouseDown] = WinMenu.OnCharacterClick;
+        window.GetChild("btnInv").CallBack[(int)ControlState.MouseDown] = WinMenu.OnInventoryClick;
+        window.GetChild("btnSkills").CallBack[(int)ControlState.MouseDown] = WinMenu.OnSkillsClick;
+        window.GetChild("btnMap").CallBack[(int)ControlState.MouseDown] = WinMenu.OnMapClick;
+        window.GetChild("btnGuild").CallBack[(int)ControlState.MouseDown] = WinMenu.OnGuildClick;
+        window.GetChild("btnQuest").CallBack[(int)ControlState.MouseDown] = WinMenu.OnQuestClick;
     }
 
     public void UpdateWindow_Inventory()
     {
         var window = WindowLoader.FromLayout("winInventory");
         window.OnDraw = WinInventory.OnDraw;
-        window.CallBack[(int) ControlState.MouseMove] = WinInventory.OnMouseMove;
-        window.CallBack[(int) ControlState.MouseDown] = WinInventory.OnMouseDown;
-        window.CallBack[(int) ControlState.DoubleClick] = WinInventory.OnDoubleClick;
-        window.GetChild("btnClose").CallBack[(int) ControlState.MouseDown] = WinMenu.OnInventoryClick;
+        window.CallBack[(int)ControlState.MouseMove] = WinInventory.OnMouseMove;
+        window.CallBack[(int)ControlState.MouseDown] = WinInventory.OnMouseDown;
+        window.CallBack[(int)ControlState.DoubleClick] = WinInventory.OnDoubleClick;
+        window.GetChild("btnClose").CallBack[(int)ControlState.MouseDown] = WinMenu.OnInventoryClick;
     }
 
     public void UpdateWindow_Character()
     {
         var window = WindowLoader.FromLayout("winCharacter");
         window.OnDraw = WinCharacter.OnDrawCharacter;
-        window.CallBack[(int) ControlState.MouseMove] = WinCharacter.OnMouseMove;
-        window.CallBack[(int) ControlState.MouseDown] = WinCharacter.OnMouseMove;
-        window.CallBack[(int) ControlState.DoubleClick] = WinCharacter.OnDoubleClick;
-        window.GetChild("btnClose").CallBack[(int) ControlState.MouseDown] = WinMenu.OnCharacterClick;
+        window.CallBack[(int)ControlState.MouseMove] = WinCharacter.OnMouseMove;
+        window.CallBack[(int)ControlState.MouseDown] = WinCharacter.OnMouseMove;
+        window.CallBack[(int)ControlState.DoubleClick] = WinCharacter.OnDoubleClick;
+        window.GetChild("btnClose").CallBack[(int)ControlState.MouseDown] = WinMenu.OnCharacterClick;
         // Stat buttons may exist in layout; wire them if present
         window.GetChild("btnStat_1").CallBack[(int)ControlState.MouseDown] = WinCharacter.OnSpendPoint1;
         window.GetChild("btnStat_2").CallBack[(int)ControlState.MouseDown] = WinCharacter.OnSpendPoint2;
@@ -2227,32 +2231,32 @@ public class Crystalshire
     public void UpdateWindow_RightClick()
     {
         var window = WindowLoader.FromLayout("winRightClickBG");
-        window.CallBack[(int) ControlState.MouseDown] = WinPlayerMenu.OnClose;
+        window.CallBack[(int)ControlState.MouseDown] = WinPlayerMenu.OnClose;
     }
 
     public void UpdateWindow_PlayerMenu()
     {
         var window = WindowLoader.FromLayout("winPlayerMenu");
-        window.CallBack[(int) ControlState.MouseDown] = WinPlayerMenu.OnClose;
-        window.GetChild("btnName").CallBack[(int) ControlState.MouseDown] = WinPlayerMenu.OnClose;
-        window.GetChild("btnParty").CallBack[(int) ControlState.MouseDown] = WinPlayerMenu.OnPartyInvite;
-        window.GetChild("btnTrade").CallBack[(int) ControlState.MouseDown] = WinPlayerMenu.OnTradeRequest;
-        window.GetChild("btnGuild").CallBack[(int) ControlState.MouseDown] = WinPlayerMenu.OnGuildInvite;
-        window.GetChild("btnPM").CallBack[(int) ControlState.MouseDown] = WinPlayerMenu.OnPrivateMessage;
+        window.CallBack[(int)ControlState.MouseDown] = WinPlayerMenu.OnClose;
+        window.GetChild("btnName").CallBack[(int)ControlState.MouseDown] = WinPlayerMenu.OnClose;
+        window.GetChild("btnParty").CallBack[(int)ControlState.MouseDown] = WinPlayerMenu.OnPartyInvite;
+        window.GetChild("btnTrade").CallBack[(int)ControlState.MouseDown] = WinPlayerMenu.OnTradeRequest;
+        window.GetChild("btnGuild").CallBack[(int)ControlState.MouseDown] = WinPlayerMenu.OnGuildInvite;
+        window.GetChild("btnPM").CallBack[(int)ControlState.MouseDown] = WinPlayerMenu.OnPrivateMessage;
     }
 
     public void UpdateWindow_DragBox()
     {
         var window = WindowLoader.FromLayout("winDragBox");
         window.OnDraw = WinDragBox.OnDraw;
-        window.CallBack[(int) ControlState.MouseUp] = WinDragBox.DragBox_Check;
+        window.CallBack[(int)ControlState.MouseUp] = WinDragBox.DragBox_Check;
     }
 
     public void UpdateWindow_Options()
     {
         var window = WindowLoader.FromLayout("winOptions");
         // Wire Confirm button
-        window.GetChild("btnConfirm").CallBack[(int) ControlState.MouseDown] = WinOptions.OnConfirm;
+        window.GetChild("btnConfirm").CallBack[(int)ControlState.MouseDown] = WinOptions.OnConfirm;
 
         // Wire checkboxes to toggle their value on click (do not call OnConfirm)
         void ToggleCheckbox(string name)
@@ -2276,7 +2280,7 @@ public class Crystalshire
     public void UpdateWindow_Combobox()
     {
         var bg = WindowLoader.FromLayout("winComboMenuBG");
-        bg.CallBack[(int) ControlState.DoubleClick] = WinComboMenu.Close;
+        bg.CallBack[(int)ControlState.DoubleClick] = WinComboMenu.Close;
 
         WindowLoader.FromLayout("winComboMenu");
     }
@@ -2285,34 +2289,34 @@ public class Crystalshire
     {
         var window = WindowLoader.FromLayout("winSkills");
         window.OnDraw = WinSkills.OnDraw;
-        window.CallBack[(int) ControlState.MouseMove] = WinSkills.OnMouseMove;
-        window.CallBack[(int) ControlState.MouseDown] = WinSkills.OnMouseDown;
-        window.CallBack[(int) ControlState.DoubleClick] = WinSkills.OnDoubleClick;
-        window.GetChild("btnClose").CallBack[(int) ControlState.MouseDown] = WinMenu.OnSkillsClick;
-        }
+        window.CallBack[(int)ControlState.MouseMove] = WinSkills.OnMouseMove;
+        window.CallBack[(int)ControlState.MouseDown] = WinSkills.OnMouseDown;
+        window.CallBack[(int)ControlState.DoubleClick] = WinSkills.OnDoubleClick;
+        window.GetChild("btnClose").CallBack[(int)ControlState.MouseDown] = WinMenu.OnSkillsClick;
+    }
 
     public void UpdateWindow_Bank()
     {
         var window = WindowLoader.FromLayout("winBank");
         window.OnDraw = WinBank.OnDraw;
-        window.CallBack[(int) ControlState.MouseMove] = WinBank.OnMouseMove;
-        window.CallBack[(int) ControlState.MouseDown] = WinBank.OnMouseDown;
-        window.CallBack[(int) ControlState.DoubleClick] = WinBank.OnDoubleClick;
-        window.GetChild("btnClose").CallBack[(int) ControlState.MouseDown] = WinBank.OnClose;
+        window.CallBack[(int)ControlState.MouseMove] = WinBank.OnMouseMove;
+        window.CallBack[(int)ControlState.MouseDown] = WinBank.OnMouseDown;
+        window.CallBack[(int)ControlState.DoubleClick] = WinBank.OnDoubleClick;
+        window.GetChild("btnClose").CallBack[(int)ControlState.MouseDown] = WinBank.OnClose;
     }
 
     public void UpdateWindow_Shop()
     {
         var window = WindowLoader.FromLayout("winShop");
         window.OnDraw = WinShop.OnDrawBackground;
-        window.CallBack[(int) ControlState.MouseMove] = WinShop.OnMouseMove;
-        window.CallBack[(int) ControlState.MouseDown] = WinShop.OnMouseDown;
-        window.GetChild("btnClose").CallBack[(int) ControlState.MouseDown] = WinShop.OnClose;
+        window.CallBack[(int)ControlState.MouseMove] = WinShop.OnMouseMove;
+        window.CallBack[(int)ControlState.MouseDown] = WinShop.OnMouseDown;
+        window.GetChild("btnClose").CallBack[(int)ControlState.MouseDown] = WinShop.OnClose;
         window.GetChild("picParchment").OnDraw = WinShop.OnDraw;
-        window.GetChild("btnBuy").CallBack[(int) ControlState.MouseDown] = WinShop.OnBuy;
-        window.GetChild("btnSell").CallBack[(int) ControlState.MouseDown] = WinShop.OnSell;
-        window.GetChild("CheckboxBuying").CallBack[(int) ControlState.MouseDown] = WinShop.OnBuyingChecked;
-        window.GetChild("CheckboxSelling").CallBack[(int) ControlState.MouseDown] = WinShop.OnSellingChecked;
+        window.GetChild("btnBuy").CallBack[(int)ControlState.MouseDown] = WinShop.OnBuy;
+        window.GetChild("btnSell").CallBack[(int)ControlState.MouseDown] = WinShop.OnSell;
+        window.GetChild("CheckboxBuying").CallBack[(int)ControlState.MouseDown] = WinShop.OnBuyingChecked;
+        window.GetChild("CheckboxSelling").CallBack[(int)ControlState.MouseDown] = WinShop.OnSellingChecked;
     }
 
     public void UpdateWindow_Admin()
@@ -2368,7 +2372,7 @@ public class Crystalshire
             Sender.SendBan(name);
         };
 
-        window.GetChild("btnKick").CallBack[(int) ControlState.MouseDown] = () =>
+        window.GetChild("btnKick").CallBack[(int)ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
             var name = txtName.Text?.Trim() ?? string.Empty;
@@ -2466,9 +2470,6 @@ public class Crystalshire
                     // Keep scrollbar in sync if present
                     if (WindowManager.TryGetControl("winAdmin", "sldMapList", out var sldCtrlSync) && sldCtrlSync is ScrollBar sb)
                     {
-                        // Update scrollbar range to reflect list scroll capacity
-                        int maxScroll = Math.Max(0, lstMaps.Items.Count - lstMaps.GetVisibleCount());
-                        sb.Min = 0; sb.Max = maxScroll;
                         sb.Value = lstMaps.ScrollOffset;
                     }
                 }
@@ -2539,49 +2540,49 @@ public class Crystalshire
             Sender.SendRequestEditItem();
         };
 
-        window.GetChild("btnMapEditor").CallBack[(int) ControlState.MouseDown] = () =>
+        window.GetChild("btnMapEditor").CallBack[(int)ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
             Map.SendRequestEditMap();
         };
 
-        window.GetChild("btnNpcEditor").CallBack[(int) ControlState.MouseDown] = () =>
+        window.GetChild("btnNpcEditor").CallBack[(int)ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Developer)) { ShowDenied(); return; }
             Sender.SendRequestEditNpc();
         };
 
-        window.GetChild("btnProjectiles").CallBack[(int) ControlState.MouseDown] = () =>
+        window.GetChild("btnProjectiles").CallBack[(int)ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Developer)) { ShowDenied(); return; }
             Projectile.SendRequestEditProjectiles();
         };
 
-        window.GetChild("btnResourceEditor").CallBack[(int) ControlState.MouseDown] = () =>
+        window.GetChild("btnResourceEditor").CallBack[(int)ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Developer)) { ShowDenied(); return; }
             Sender.SendRequestEditResource();
         };
 
-        window.GetChild("btnShopEditor").CallBack[(int) ControlState.MouseDown] = () =>
+        window.GetChild("btnShopEditor").CallBack[(int)ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Developer)) { ShowDenied(); return; }
             Sender.SendRequestEditShop();
         };
 
-        window.GetChild("btnSkillEditor").CallBack[(int) ControlState.MouseDown] = () =>
+        window.GetChild("btnSkillEditor").CallBack[(int)ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Developer)) { ShowDenied(); return; }
             Sender.SendRequestEditSkill();
         };
 
-        window.GetChild("btnMoralEditor").CallBack[(int) ControlState.MouseDown] = () =>
+        window.GetChild("btnMoralEditor").CallBack[(int)ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Developer)) { ShowDenied(); return; }
             Sender.SendRequestEditMoral();
         };
 
-        window.GetChild("btnScriptEditor").CallBack[(int) ControlState.MouseDown] = () =>
+        window.GetChild("btnScriptEditor").CallBack[(int)ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Owner)) { ShowDenied(); return; }
             Sender.SendRequestEditScript(0);
@@ -2684,20 +2685,20 @@ public class Crystalshire
         {
             lstIndex.CallBack[(int)ControlState.MouseDown] = WinShopEditor.OnListMouseDown;
             // Wheel scroll sync with scrollbar
-            if (WindowManager.TryGetControl("winShopEditor", "sldList", out var sldCtrl) && sldCtrl is ScrollBar sb)
+            if (WindowManager.TryGetControl("winShopEditor", "sldList", out var sldTradeList) && sldTradeList is ScrollBar sbSync)
             {
                 lstIndex.CallBack[(int)ControlState.MouseScroll] = () =>
                 {
                     int delta = GameClient.CurrentMouseState.ScrollWheelValue - GameClient.PreviousMouseState.ScrollWheelValue;
                     if (delta == 0) return;
                     int step = delta > 0 ? -1 : 1;
-                    sb.Value = Math.Clamp(sb.Value + step, sb.Min, sb.Max);
-                    lstIndex.ScrollOffset = sb.Value;
+                    sbSync.Value = Math.Clamp(sbSync.Value + step, sbSync.Min, sbSync.Max);
+                    lstIndex.ScrollOffset = sbSync.Value;
                     lstIndex.EnsureVisible(lstIndex.SelectedIndex);
                 };
-                sb.CallBack[(int)ControlState.MouseMove] = () =>
+                sbSync.CallBack[(int)ControlState.MouseMove] = () =>
                 {
-                    lstIndex.ScrollOffset = sb.Value;
+                    lstIndex.ScrollOffset = sbSync.Value;
                     lstIndex.EnsureVisible(lstIndex.SelectedIndex);
                 };
             }
@@ -2820,5 +2821,356 @@ public class Crystalshire
         {
             btnClose.CallBack[(int)ControlState.MouseDown] = () => WindowManager.HideWindow("winShopEditor");
         }
+    }
+
+    public void UpdateWindow_EditorJob()
+    {
+        var window = WindowLoader.FromLayout("winJobEditor");
+
+        // Close
+        if (WindowManager.TryGetControl("winJobEditor", "btnClose", out var btnClose))
+            btnClose.CallBack[(int)ControlState.MouseDown] = () => WindowManager.HideWindow("winJobEditor");
+
+        // Sprite previews
+        if (WindowManager.TryGetControl("winJobEditor", "picMale", out var picMaleCtrl) && picMaleCtrl is PictureBox picMale)
+            picMale.OnDraw = WinJobEditor.OnDrawMaleSprite;
+        if (WindowManager.TryGetControl("winJobEditor", "picFemale", out var picFemaleCtrl) && picFemaleCtrl is PictureBox picFemale)
+            picFemale.OnDraw = WinJobEditor.OnDrawFemaleSprite;
+
+        // Main list
+        ListBox jobList = null;
+        if (WindowManager.TryGetControl("winJobEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox list)
+        {
+            list.Enabled = true;
+            list.CallBack[(int)ControlState.MouseDown] = WinJobEditor.OnListMouseDown;
+            list.CallBack[(int)ControlState.MouseScroll] = () =>
+            {
+                int delta = GameClient.CurrentMouseState.ScrollWheelValue - GameClient.PreviousMouseState.ScrollWheelValue;
+                if (delta == 0) return;
+                list.ScrollBy(delta > 0 ? -1 : 1);
+                if (WindowManager.TryGetControl("winJobEditor", "sldList", out var sld) && sld is ScrollBar sbSync)
+                {
+                    int maxScroll = Math.Max(0, list.Items.Count - list.GetVisibleCount());
+                    sbSync.Min = 0; sbSync.Max = maxScroll;
+                    sbSync.Value = list.ScrollOffset;
+                }
+            };
+            jobList = list;
+        }
+        if (WindowManager.TryGetControl("winJobEditor", "sldList", out var sldList) && sldList is ScrollBar sbList)
+        {
+            sbList.CallBack[(int)ControlState.MouseMove] = () =>
+            {
+                if (jobList == null) return;
+                int maxScroll = Math.Max(0, jobList.Items.Count - jobList.GetVisibleCount());
+                sbList.Min = 0; sbList.Max = maxScroll;
+                jobList.ScrollOffset = Math.Clamp(sbList.Value, sbList.Min, sbList.Max);
+            };
+        }
+
+        // Text boxes
+        if (WindowManager.TryGetControl("winJobEditor", "txtName", out var txtNameCtrl) && txtNameCtrl is TextBox txtName)
+        {
+            txtName.Enabled = true;
+            txtName.CallBack[(int)ControlState.KeyUp] = () =>
+            {
+                if (WinJobEditor.SelectedIndex < 0 || WinJobEditor.SelectedIndex >= Variables.MaxJobs) return;
+                Data.Job[WinJobEditor.SelectedIndex].Name = txtName.Text ?? string.Empty;
+                GameState.JobChanged[WinJobEditor.SelectedIndex] = true;
+                WinJobEditor.RefreshList();
+            };
+        }
+        if (WindowManager.TryGetControl("winJobEditor", "txtDesc", out var txtDescCtrl) && txtDescCtrl is TextBox txtDesc)
+        {
+            txtDesc.Enabled = true;
+            txtDesc.CallBack[(int)ControlState.KeyUp] = () =>
+            {
+                if (WinJobEditor.SelectedIndex < 0 || WinJobEditor.SelectedIndex >= Variables.MaxJobs) return;
+                Data.Job[WinJobEditor.SelectedIndex].Desc = txtDesc.Text ?? string.Empty;
+                GameState.JobChanged[WinJobEditor.SelectedIndex] = true;
+            };
+        }
+
+        // Int binder
+        void BindIntText(string name, Action<int> apply, int min, int max)
+        {
+            if (WindowManager.TryGetControl("winJobEditor", name, out var c) && c is TextBox tb)
+            {
+                tb.Enabled = true;
+                tb.CallBack[(int)ControlState.KeyUp] = () =>
+                {
+                    var s = tb.Text?.Trim();
+                    if (!int.TryParse(s, out var v)) v = min;
+                    v = Math.Clamp(v, min, max);
+                    apply(v);
+                };
+            }
+        }
+        BindIntText("txtStartMap", v => { if (WinJobEditor.SelectedIndex >= 0) { Data.Job[WinJobEditor.SelectedIndex].StartMap = v; GameState.JobChanged[WinJobEditor.SelectedIndex] = true; } }, 0, int.MaxValue);
+        BindIntText("txtStartX", v => { if (WinJobEditor.SelectedIndex >= 0) { Data.Job[WinJobEditor.SelectedIndex].StartX = (byte)Math.Clamp(v, 0, 255); GameState.JobChanged[WinJobEditor.SelectedIndex] = true; } }, 0, 255);
+        BindIntText("txtStartY", v => { if (WinJobEditor.SelectedIndex >= 0) { Data.Job[WinJobEditor.SelectedIndex].StartY = (byte)Math.Clamp(v, 0, 255); GameState.JobChanged[WinJobEditor.SelectedIndex] = true; } }, 0, 255);
+
+        // Sprite bars
+        void BindSpriteBar(string name, Func<int> get, Action<int> apply)
+        {
+            if (WindowManager.TryGetControl("winJobEditor", name, out var c) && c is ScrollBar sb)
+            {
+                sb.Enabled = true;
+                sb.Max = Math.Max(sb.Max, GameState.NumCharacters);
+                sb.Value = Math.Clamp(get(), sb.Min, sb.Max);
+                sb.CallBack[(int)ControlState.MouseMove] = () =>
+                {
+                    int v = Math.Clamp(sb.Value, sb.Min, sb.Max);
+                    apply(v);
+                    if (WinJobEditor.SelectedIndex >= 0) GameState.JobChanged[WinJobEditor.SelectedIndex] = true;
+                };
+            }
+        }
+        BindSpriteBar("sldMaleSprite", () => WinJobEditor.SelectedIndex >= 0 ? Data.Job[WinJobEditor.SelectedIndex].MaleSprite : 0,
+            v => { if (WinJobEditor.SelectedIndex >= 0) Data.Job[WinJobEditor.SelectedIndex].MaleSprite = v; });
+        BindSpriteBar("sldFemaleSprite", () => WinJobEditor.SelectedIndex >= 0 ? Data.Job[WinJobEditor.SelectedIndex].FemaleSprite : 0,
+            v => { if (WinJobEditor.SelectedIndex >= 0) Data.Job[WinJobEditor.SelectedIndex].FemaleSprite = v; });
+
+        // Helper to compute and apply selection for a ListBox inside a GroupBox
+        void HandleGroupListClick(ListBox lb)
+        {
+            var (ax, ay) = GetAbsolutePosition("winJobEditor", lb);
+            int relY = GameClient.CurrentMouseState.Y - ay;
+            int idx = lb.GetItemIndexAtPosition(relY);
+            if (idx >= 0 && idx < lb.Items.Count)
+            {
+                lb.SelectedIndex = idx;
+                lb.EnsureVisible(idx);
+            }
+        }
+
+        // Start Items list
+        ListBox startItems = null;
+        if (WindowManager.TryGetControl("winJobEditor", "lstStartItems", out var liCtrl) && liCtrl is ListBox lstItems)
+        {
+            startItems = lstItems;
+            lstItems.Enabled = true;
+            lstItems.CallBack[(int)ControlState.MouseDown] = () => HandleGroupListClick(lstItems);
+            lstItems.CallBack[(int)ControlState.MouseScroll] = () =>
+            {
+                int delta = GameClient.CurrentMouseState.ScrollWheelValue - GameClient.PreviousMouseState.ScrollWheelValue;
+                if (delta == 0) return;
+                lstItems.ScrollBy(delta > 0 ? -1 : 1);
+                if (WindowManager.TryGetControl("winJobEditor", "sldStartItems", out var sld) && sld is ScrollBar sbSync)
+                {
+                    int maxScroll = Math.Max(0, lstItems.Items.Count - lstItems.GetVisibleCount());
+                    sbSync.Min = 0; sbSync.Max = maxScroll;
+                    sbSync.Value = lstItems.ScrollOffset;
+                }
+            };
+        }
+        if (WindowManager.TryGetControl("winJobEditor", "sldStartItems", out var sldStartItems) && sldStartItems is ScrollBar sbStartItems)
+        {
+            sbStartItems.Enabled = true;
+            sbStartItems.CallBack[(int)ControlState.MouseMove] = () =>
+            {
+                if (startItems == null) return;
+                int maxScroll = Math.Max(0, startItems.Items.Count - startItems.GetVisibleCount());
+                sbStartItems.Min = 0; sbStartItems.Max = maxScroll;
+                startItems.ScrollOffset = Math.Clamp(sbStartItems.Value, sbStartItems.Min, sbStartItems.Max);
+            };
+        }
+
+        // Start Skills list
+        ListBox startSkills = null;
+        if (WindowManager.TryGetControl("winJobEditor", "lstStartSkills", out var lsCtrl) && lsCtrl is ListBox lstSkills)
+        {
+            startSkills = lstSkills;
+            lstSkills.Enabled = true;
+            lstSkills.CallBack[(int)ControlState.MouseDown] = () => HandleGroupListClick(lstSkills);
+            lstSkills.CallBack[(int)ControlState.MouseScroll] = () =>
+            {
+                int delta = GameClient.CurrentMouseState.ScrollWheelValue - GameClient.PreviousMouseState.ScrollWheelValue;
+                if (delta == 0) return;
+                lstSkills.ScrollBy(delta > 0 ? -1 : 1);
+                if (WindowManager.TryGetControl("winJobEditor", "sldStartSkills", out var sld) && sld is ScrollBar sbSync)
+                {
+                    int maxScroll = Math.Max(0, lstSkills.Items.Count - lstSkills.GetVisibleCount());
+                    sbSync.Min = 0; sbSync.Max = maxScroll;
+                    sbSync.Value = lstSkills.ScrollOffset;
+                }
+            };
+        }
+        if (WindowManager.TryGetControl("winJobEditor", "sldStartSkills", out var sldStartSkills) && sldStartSkills is ScrollBar sbStartSkills)
+        {
+            sbStartSkills.Enabled = true;
+            sbStartSkills.CallBack[(int)ControlState.MouseMove] = () =>
+            {
+                if (startSkills == null) return;
+                int maxScroll = Math.Max(0, startSkills.Items.Count - startSkills.GetVisibleCount());
+                sbStartSkills.Min = 0; sbStartSkills.Max = maxScroll;
+                startSkills.ScrollOffset = Math.Clamp(sbStartSkills.Value, sbStartSkills.Min, sbStartSkills.Max);
+            };
+        }
+
+        // Fallback global dispatch for clicks (if GroupBox eats child hit-test)
+        window.CallBack[(int)ControlState.MouseDown] = () =>
+        {
+            if (startItems != null)
+            {
+                var (ax, ay) = GetAbsolutePosition("winJobEditor", startItems);
+                if (GameClient.CurrentMouseState.X >= ax && GameClient.CurrentMouseState.X < ax + startItems.Width &&
+                    GameClient.CurrentMouseState.Y >= ay && GameClient.CurrentMouseState.Y < ay + startItems.Height)
+                {
+                    HandleGroupListClick(startItems);
+                }
+            }
+            if (startSkills != null)
+            {
+                var (ax, ay) = GetAbsolutePosition("winJobEditor", startSkills);
+                if (GameClient.CurrentMouseState.X >= ax && GameClient.CurrentMouseState.X < ax + startSkills.Width &&
+                    GameClient.CurrentMouseState.Y >= ay && GameClient.CurrentMouseState.Y < ay + startSkills.Height)
+                {
+                    HandleGroupListClick(startSkills);
+                }
+            }
+        };
+
+        // Fallback wheel routing
+        window.CallBack[(int)ControlState.MouseScroll] = () =>
+        {
+            int delta = GameClient.CurrentMouseState.ScrollWheelValue - GameClient.PreviousMouseState.ScrollWheelValue;
+            if (delta == 0) return;
+            var mx = GameClient.CurrentMouseState.X;
+            var my = GameClient.CurrentMouseState.Y;
+            void Wheel(ListBox lb, string barName)
+            {
+                var (ax, ay) = GetAbsolutePosition("winJobEditor", lb);
+                if (mx >= ax && mx < ax + lb.Width && my >= ay && my < ay + lb.Height)
+                {
+                    lb.ScrollBy(delta > 0 ? -1 : 1);
+                    if (WindowManager.TryGetControl("winJobEditor", barName, out var scl) && scl is ScrollBar sb)
+                    {
+                        int maxScroll = Math.Max(0, lb.Items.Count - lb.GetVisibleCount());
+                        sb.Min = 0; sb.Max = maxScroll;
+                        sb.Value = lb.ScrollOffset;
+                    }
+                }
+            }
+            if (startItems != null) Wheel(startItems, "sldStartItems");
+            if (startSkills != null) Wheel(startSkills, "sldStartSkills");
+            if (jobList != null)
+            {
+                var (ax, ay) = GetAbsolutePosition("winJobEditor", jobList);
+                if (mx >= ax && mx < ax + jobList.Width && my >= ay && my < ay + jobList.Height)
+                {
+                    jobList.ScrollBy(delta > 0 ? -1 : 1);
+                    if (WindowManager.TryGetControl("winJobEditor", "sldList", out var scl) && scl is ScrollBar sb)
+                    {
+                        int maxScroll = Math.Max(0, jobList.Items.Count - jobList.GetVisibleCount());
+                        sb.Min = 0; sb.Max = maxScroll;
+                        sb.Value = jobList.ScrollOffset;
+                    }
+                }
+            }
+        };
+
+        // Set item slot
+        if (WindowManager.TryGetControl("winJobEditor", "btnSetItem", out var btnSetItem))
+        {
+            btnSetItem.Enabled = true;
+            btnSetItem.CallBack[(int)ControlState.MouseDown] = () =>
+            {
+                if (startItems is null) return;
+                int slot = startItems.SelectedIndex;
+                if (slot < 0 || slot >= Variables.MaxStartItems) return;
+                int item = -1, amt = 1;
+                if (WindowManager.TryGetControl("winJobEditor", "cmbItem", out var ic) && ic is ComboBox cmb)
+                    item = cmb.Value <= 0 ? -1 : Math.Clamp(cmb.Value - 1, 0, Variables.MaxItems - 1);
+                if (WindowManager.TryGetControl("winJobEditor", "txtItemAmount", out var ac) && ac is TextBox t && int.TryParse(t.Text, out var parsed))
+                    amt = Math.Max(1, parsed);
+                if (WinJobEditor.SelectedIndex >= 0)
+                {
+                    Data.Job[WinJobEditor.SelectedIndex].StartItem[slot] = item;
+                    Data.Job[WinJobEditor.SelectedIndex].StartValue[slot] = amt;
+                    GameState.JobChanged[WinJobEditor.SelectedIndex] = true;
+                    WinJobEditor.LoadJob(WinJobEditor.SelectedIndex);
+                }
+            };
+        }
+
+        // Set skill slot
+        if (WindowManager.TryGetControl("winJobEditor", "btnSetSkill", out var btnSetSkill))
+        {
+            btnSetSkill.Enabled = true;
+            btnSetSkill.CallBack[(int)ControlState.MouseDown] = () =>
+            {
+                if (startSkills is null) return;
+                int slot = startSkills.SelectedIndex;
+                if (slot < 0 || slot >= Variables.MaxStartSkills) return;
+                int skill = -1;
+                if (WindowManager.TryGetControl("winJobEditor", "cmbSkill", out var skc) && skc is ComboBox cs)
+                    skill = cs.Value <= 0 ? -1 : Math.Clamp(cs.Value - 1, 0, Variables.MaxSkills - 1);
+                if (WinJobEditor.SelectedIndex >= 0)
+                {
+                    Data.Job[WinJobEditor.SelectedIndex].StartSkill[slot] = skill;
+                    GameState.JobChanged[WinJobEditor.SelectedIndex] = true;
+                    WinJobEditor.LoadJob(WinJobEditor.SelectedIndex);
+                }
+            };
+        }
+
+        // Buttons
+        if (WindowManager.TryGetControl("winJobEditor", "btnSave", out var btnSave))
+            btnSave.CallBack[(int)ControlState.MouseDown] = () => { Editors.JobEditorOK(); WindowManager.HideWindow("winJobEditor"); };
+        if (WindowManager.TryGetControl("winJobEditor", "btnCancel", out var btnCancel))
+            btnCancel.CallBack[(int)ControlState.MouseDown] = () => { Editors.JobEditorCancel(); WindowManager.HideWindow("winJobEditor"); };
+        if (WindowManager.TryGetControl("winJobEditor", "btnDelete", out var btnDelete))
+        {
+            btnDelete.CallBack[(int)ControlState.MouseDown] = () =>
+            {
+                if (WinJobEditor.SelectedIndex < 0) return;
+                Database.ClearJob(WinJobEditor.SelectedIndex);
+                GameState.JobChanged[WinJobEditor.SelectedIndex] = true;
+                WinJobEditor.LoadJob(WinJobEditor.SelectedIndex);
+                WinJobEditor.RefreshList();
+            };
+        }
+        if (WindowManager.TryGetControl("winJobEditor", "btnCopy", out var btnCopy))
+            btnCopy.CallBack[(int)ControlState.MouseDown] = WinJobEditor.OnCopyOrPaste;
+
+        // Ensure initial selection (slot 0) for start items/skills
+        if (startItems != null && startItems.Items.Count > 0 && startItems.SelectedIndex < 0) startItems.SelectedIndex = 0;
+        if (startSkills != null && startSkills.Items.Count > 0 && startSkills.SelectedIndex < 0) startSkills.SelectedIndex = 0;
+    }
+
+    // Computes absolute screen position of a control within a window,
+    // accounting for any number of nested GroupBox containers.
+    private static (int ax, int ay) GetAbsolutePosition(string windowName, Control ctrl)
+    {
+        var win = WindowManager.GetWindowByName(windowName);
+        if (win == null || ctrl == null)
+            return (0, 0);
+
+        // Start with window origin + control local position
+        int ax = win.X + ctrl.X;
+        int ay = win.Y + ctrl.Y;
+
+        // Accumulate offsets of all ancestor group boxes (by geometric containment).
+        // If group boxes overlap, each that fully contains the control origin contributes its offset.
+        foreach (var c in win.Controls)
+        {
+            if (c is GroupBox gb)
+            {
+                bool inside =
+                    ctrl.X >= gb.X &&
+                    ctrl.X < gb.X + gb.Width &&
+                    ctrl.Y >= gb.Y &&
+                    ctrl.Y < gb.Y + gb.Height;
+
+                if (inside)
+                {
+                    ax += gb.X;
+                    ay += gb.Y;
+                }
+            }
+        }
+
+        return (ax, ay);
     }
 }
