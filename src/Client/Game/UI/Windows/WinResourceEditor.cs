@@ -4,6 +4,7 @@ using Client.Game.UI.Controls;
 using Core.Globals;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace Client.Game.UI.Windows;
@@ -154,5 +155,28 @@ public static class WinResourceEditor
         if (WindowManager.TryGetControl("winResourceEditor", "btnCopy", out var btn2) && btn2 is Button b2) b2.Text = "Copy";
         LoadResource(SelectedIndex);
         RefreshList();
+    }
+
+    // Draw resource images into preview boxes
+    public static void OnDrawNormal()
+    {
+        if (!WindowManager.TryGetWindow("winResourceEditor", out var win) || win is null) return;
+        if (!WindowManager.TryGetControl("winResourceEditor", "picNormal", out var ctrl) || ctrl is not PictureBox pic) return;
+        int img = Math.Max(0, Data.Resource[SelectedIndex].ResourceImage);
+        if (img <= 0 || img > GameState.NumResources) return;
+        var path = Path.Combine(DataPath.Resources, img + GameState.GfxExt);
+        if (!File.Exists(path)) return;
+        GameClient.RenderTexture(ref path, win.X + pic.X, win.Y + pic.Y, 0, 0, pic.Width, pic.Height, pic.Width, pic.Height);
+    }
+
+    public static void OnDrawExhausted()
+    {
+        if (!WindowManager.TryGetWindow("winResourceEditor", out var win) || win is null) return;
+        if (!WindowManager.TryGetControl("winResourceEditor", "picExhausted", out var ctrl) || ctrl is not PictureBox pic) return;
+        int img = Math.Max(0, Data.Resource[SelectedIndex].ExhaustedImage);
+        if (img <= 0 || img > GameState.NumResources) return;
+        var path = Path.Combine(DataPath.Resources, img + GameState.GfxExt);
+        if (!File.Exists(path)) return;
+        GameClient.RenderTexture(ref path, win.X + pic.X, win.Y + pic.Y, 0, 0, pic.Width, pic.Height, pic.Width, pic.Height);
     }
 }

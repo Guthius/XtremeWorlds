@@ -2866,29 +2866,6 @@ public class Crystalshire
         // List wiring
         WireScrollableList("winResourceEditor", "lstIndex", "sldList");
 
-        Type.Resource[] resources = Data.Resource; // shortcut
-
-        void RefreshList()
-        {
-            if (WindowManager.TryGetControl("winResourceEditor", "lstIndex", out var listCtrl) && listCtrl is ListBox lst)
-            {
-                lst.Items.Clear();
-                for (int i = 0; i < Variables.MaxResources; i++)
-                {
-                    var name = resources[i].Name ?? string.Empty;
-                    lst.Items.Add($"{i + 1}: {name}");
-                }
-                int idx = GameState.EditorIndex;
-                if (idx < 0 || idx >= lst.Items.Count) idx = 0;
-                lst.SelectedIndex = idx;
-                lst.EnsureVisible(idx);
-            }
-        }
-
-        // Initial list populate
-        RefreshList();
-        WinResourceEditor.LoadResource(GameState.EditorIndex);
-
         // List selection callback override to load resource
         if (WindowManager.TryGetControl("winResourceEditor", "lstIndex", out var lstCtrl2) && lstCtrl2 is ListBox lst2)
         {
@@ -2911,14 +2888,14 @@ public class Crystalshire
             txtName.CallBack[(int)ControlState.KeyUp] = () =>
             {
                 int idx = GameState.EditorIndex; if (idx < 0 || idx >= Variables.MaxResources) return;
-                resources[idx].Name = txtName.Text ?? string.Empty;
-                RefreshList();
+                Data.Resource[idx].Name = txtName.Text ?? string.Empty;
+                WinResourceEditor.RefreshList();
             };
         }
         if (WindowManager.TryGetControl("winResourceEditor", "txtMessage", out var msgCtrl) && msgCtrl is TextBox txtMsg)
-            txtMsg.CallBack[(int)ControlState.KeyUp] = () => { int i = GameState.EditorIndex; if (i >= 0 && i < Variables.MaxResources) resources[i].SuccessMessage = txtMsg.Text ?? string.Empty; };
+            txtMsg.CallBack[(int)ControlState.KeyUp] = () => { int i = GameState.EditorIndex; if (i >= 0 && i < Variables.MaxResources) Data.Resource[i].SuccessMessage = txtMsg.Text ?? string.Empty; };
         if (WindowManager.TryGetControl("winResourceEditor", "txtMessage2", out var msg2Ctrl) && msg2Ctrl is TextBox txtMsg2)
-            txtMsg2.CallBack[(int)ControlState.KeyUp] = () => { int i = GameState.EditorIndex; if (i >= 0 && i < Variables.MaxResources) resources[i].EmptyMessage = txtMsg2.Text ?? string.Empty; };
+            txtMsg2.CallBack[(int)ControlState.KeyUp] = () => { int i = GameState.EditorIndex; if (i >= 0 && i < Variables.MaxResources) Data.Resource[i].EmptyMessage = txtMsg2.Text ?? string.Empty; };
 
         // Combo callbacks
         void BindCombo(string ctrlName, Action<int> apply)
@@ -2932,10 +2909,10 @@ public class Crystalshire
                 };
             }
         }
-        BindCombo("cmbType", v => resources[GameState.EditorIndex].ResourceType = v);
-        BindCombo("cmbRewardItem", v => resources[GameState.EditorIndex].ItemReward = v);
-        BindCombo("cmbTool", v => resources[GameState.EditorIndex].ToolRequired = v);
-        BindCombo("cmbAnimation", v => resources[GameState.EditorIndex].Animation = v);
+        BindCombo("cmbType", v => Data.Resource[GameState.EditorIndex].ResourceType = v);
+        BindCombo("cmbRewardItem", v => Data.Resource[GameState.EditorIndex].ItemReward = v);
+        BindCombo("cmbTool", v => Data.Resource[GameState.EditorIndex].ToolRequired = v);
+        BindCombo("cmbAnimation", v => Data.Resource[GameState.EditorIndex].Animation = v);
 
         // Scrollbar binding
         void BindBar(string barName, string labelName, Action<int> apply, int min, int max)
@@ -2951,12 +2928,12 @@ public class Crystalshire
                 };
             }
         }
-        BindBar("sldRewardExp", "lblRewardExpVal", v => resources[GameState.EditorIndex].ExpReward = v, 0, 1000000);
-        BindBar("sldHealth", "lblHealthVal", v => resources[GameState.EditorIndex].Health = v, 0, 100000);
-        BindBar("sldRespawn", "lblRespawnVal", v => resources[GameState.EditorIndex].RespawnTime = v, 0, 1000000);
-        BindBar("sldLvlReq", "lblLvlReqVal", v => resources[GameState.EditorIndex].LvlRequired = v, 0, GameState.MaxLevel);
-        BindBar("sldNormalPic", "lblNormalPicVal", v => resources[GameState.EditorIndex].ResourceImage = v, 0, GameState.NumResources);
-        BindBar("sldExhaustedPic", "lblExhaustedPicVal", v => resources[GameState.EditorIndex].ExhaustedImage = v, 0, GameState.NumResources);
+        BindBar("sldRewardExp", "lblRewardExpVal", v => Data.Resource[GameState.EditorIndex].ExpReward = v, 0, 1000000);
+        BindBar("sldHealth", "lblHealthVal", v => Data.Resource[GameState.EditorIndex].Health = v, 0, 100000);
+        BindBar("sldRespawn", "lblRespawnVal", v => Data.Resource[GameState.EditorIndex].RespawnTime = v, 0, 1000000);
+        BindBar("sldLvlReq", "lblLvlReqVal", v => Data.Resource[GameState.EditorIndex].LvlRequired = v, 0, GameState.MaxLevel);
+        BindBar("sldNormalPic", "lblNormalPicVal", v => Data.Resource[GameState.EditorIndex].ResourceImage = v, 0, GameState.NumResources);
+        BindBar("sldExhaustedPic", "lblExhaustedPicVal", v => Data.Resource[GameState.EditorIndex].ExhaustedImage = v, 0, GameState.NumResources);
 
         // Buttons
         if (WindowManager.TryGetControl("winResourceEditor", "btnSave", out var btnSave))
@@ -2977,5 +2954,11 @@ public class Crystalshire
         }
         if (WindowManager.TryGetControl("winResourceEditor", "btnClose", out var btnClose))
             btnClose.CallBack[(int)ControlState.MouseDown] = () => { Editors.ResourceEditorCancel(); WindowManager.HideWindow("winResourceEditor"); };
+
+        // Bind preview pictures
+        if (WindowManager.TryGetControl("winResourceEditor", "picNormal", out var picNormCtrl) && picNormCtrl is PictureBox picNormal)
+            picNormal.OnDraw = WinResourceEditor.OnDrawNormal;
+        if (WindowManager.TryGetControl("winResourceEditor", "picExhausted", out var picExCtrl) && picExCtrl is PictureBox picExhausted)
+            picExhausted.OnDraw = WinResourceEditor.OnDrawExhausted;
     }
 }
