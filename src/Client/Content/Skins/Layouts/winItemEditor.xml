@@ -6,7 +6,7 @@
         StartPosition="CenterScreen"
         Visible="false">
 
-    <Label Name="lblList" Text="Npc" Position="16, 24" Size="80, 16"/>
+    <Label Name="lblList" Text="Item" Position="16, 24" Size="80, 16"/>
     <ListBox Name="lstIndex" Position="16, 44" Size="224, 540"/>
     <ScrollBar Name="sldList" Position="240, 44" Size="16, 540" Min="0" Max="0" Vertical="true"/>
 
