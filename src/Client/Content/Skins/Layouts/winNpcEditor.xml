@@ -14,9 +14,9 @@
   <GroupBox Name="gtpDetails" Caption="" Position="272, 32" Size="432, 348">
     <!-- Core fields -->
     <Label Name="lblName" Text="Name" Position="8, 4" Size="80, 16"/>
-    <TextBox Name="txtName" Position="72, 2" Size="232, 20" Design="TextWhite"/>
+    <TextBox Name="txtName" Position="72, 2" Size="234, 20" Design="TextWhite"/>
     <Label Name="lblAttackSay" Text="Attack Say" Position="8, 28" Size="100, 16"/>
-    <TextBox Name="txtAttackSay" Position="72, 26" Size="232, 20" Design="TextWhite"/>
+    <TextBox Name="txtAttackSay" Position="72, 26" Size="234, 20" Design="TextWhite"/>
     <Label Name="lblBehavior" Text="Behavior" Position="8, 56" Size="80, 16"/>
     <ComboBox Name="cmbBehavior" Position="72, 54" Size="120, 18"/>
     <Label Name="lblSpawnPeriod" Text="Spawn" Position="8, 80" Size="70, 16"/>
@@ -39,9 +39,9 @@
     <Label Name="lblLevel" Text="Level" Position="8, 200" Size="60, 18"/>
     <TextBox Name="txtLevel" Position="72, 200" Size="80, 18" Design="TextWhite"/>
     <Label Name="lblDamage" Text="Damage" Position="168, 156" Size="60, 16"/>
-    <TextBox Name="txtDamage" Position="232, 154" Size="80, 18" Design="TextWhite"/>
+    <TextBox Name="txtDamage" Position="234, 154" Size="80, 18" Design="TextWhite"/>
     <Label Name="lblRange" Text="Range" Position="168, 188" Size="60, 16"/>
-    <ScrollBar Name="sldRange" Position="232, 190" Size="160, 12" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="12"/>
+    <ScrollBar Name="sldRange" Position="234, 190" Size="160, 12" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="12"/>
 
     <!-- Skills -->
     <Label Name="lblSkills" Text="Skills" Position="8, 228" Size="60, 16"/>
