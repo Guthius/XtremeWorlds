@@ -60,6 +60,42 @@ public static class WinItemEditor
             // Apply initial visibility state
             ToggleTypeSections();
         }
+
+        // Wire Stackable checkbox toggle to update item
+        if (WindowManager.TryGetControl("winItemEditor", "chkStackable", out var stackCtrl) && stackCtrl is CheckBox chkStack)
+        {
+            chkStack.CallBack[(int)ControlState.MouseDown] = () =>
+            {
+                if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
+                // Toggle value locally then push to Data
+                chkStack.Value = chkStack.Value == 0 ? 1 : 0;
+                Data.Item[SelectedIndex].Stackable = chkStack.Value != 0 ? (byte)1 : (byte)0;
+                GameState.ItemChanged[SelectedIndex] = true;
+            };
+        }
+
+        // Wire Knockback checkbox toggle to update item
+        if (WindowManager.TryGetControl("winItemEditor", "chkKnockback", out var kbCtrl) && kbCtrl is CheckBox chkKb)
+        {
+            chkKb.CallBack[(int)ControlState.MouseDown] = () =>
+            {
+                if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
+                chkKb.Value = chkKb.Value == 0 ? 1 : 0;
+                Data.Item[SelectedIndex].KnockBack = chkKb.Value != 0 ? (byte)1 : (byte)0;
+                GameState.ItemChanged[SelectedIndex] = true;
+            };
+        }
+
+        // Keep knockback tiles ComboBox writing back
+        if (WindowManager.TryGetControl("winItemEditor", "cmbKnockBackTiles", out var kbtCtrl) && kbtCtrl is ComboBox cmbKbTiles)
+        {
+            cmbKbTiles.CallBack[(int)ControlState.MouseMove] = () =>
+            {
+                if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
+                Data.Item[SelectedIndex].KnockBackTiles = (byte)Math.Clamp(cmbKbTiles.Value, 0, byte.MaxValue);
+                GameState.ItemChanged[SelectedIndex] = true;
+            };
+        }
     }
 
     private static void RefreshList()
