@@ -342,12 +342,6 @@ public static class WinEditorMap
         }
     }
 
-    // Legacy draw callback now no-ops to avoid resetting list state each frame
-    public static void OnDrawNpcList()
-    {
-        // Intentionally empty: list uses Items collection; call RefreshMapNpcList() when needed.
-    }
-
     public static void LoadMap()
     {
         var map = Data.MyMap;

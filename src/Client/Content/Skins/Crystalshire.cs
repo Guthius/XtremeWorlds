@@ -1346,7 +1346,6 @@ public class Crystalshire
         // Npc list drawing and interactions
         if (WindowManager.TryGetControl("winMapEditor","lstIndex", out var lstIndex) && lstIndex is ListBox list)
         {
-            list.OnDraw = WinEditorMap.OnDrawNpcList;
             list.CallBack[(int)ControlState.MouseDown] = WinEditorMap.OnNpcListMouseDown;
             // Use MouseScroll (enum) for wheel events
             list.CallBack[(int)ControlState.MouseScroll] = WinEditorMap.OnNpcListMouseWheel;
@@ -2668,6 +2667,158 @@ public class Crystalshire
             {
                 TextRenderer.RenderText(line, x, y + i * lineHeight, Microsoft.Xna.Framework.Color.White, Microsoft.Xna.Framework.Color.Black, win.Font);
             }
+        }
+    }
+
+    public void UpdateWindow_EditorShop()
+    {
+        var window = WindowLoader.FromLayout("winShopEditor");
+
+        // Populate combos and list
+        WinShopEditor.PopulateCombos();
+        WinShopEditor.RefreshList();
+        WinShopEditor.LoadShop(GameState.EditorIndex);
+
+        // List interactions
+        if (WindowManager.TryGetControl("winShopEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox lstIndex)
+        {
+            lstIndex.CallBack[(int)ControlState.MouseDown] = WinShopEditor.OnListMouseDown;
+            // Wheel scroll sync with scrollbar
+            if (WindowManager.TryGetControl("winShopEditor", "sldList", out var sldCtrl) && sldCtrl is ScrollBar sb)
+            {
+                lstIndex.CallBack[(int)ControlState.MouseScroll] = () =>
+                {
+                    int delta = GameClient.CurrentMouseState.ScrollWheelValue - GameClient.PreviousMouseState.ScrollWheelValue;
+                    if (delta == 0) return;
+                    int step = delta > 0 ? -1 : 1;
+                    sb.Value = Math.Clamp(sb.Value + step, sb.Min, sb.Max);
+                    lstIndex.ScrollOffset = sb.Value;
+                    lstIndex.EnsureVisible(lstIndex.SelectedIndex);
+                };
+                sb.CallBack[(int)ControlState.MouseMove] = () =>
+                {
+                    lstIndex.ScrollOffset = sb.Value;
+                    lstIndex.EnsureVisible(lstIndex.SelectedIndex);
+                };
+            }
+        }
+
+        // Trade list interactions
+        if (WindowManager.TryGetControl("winShopEditor", "lstTradeItem", out var tradeCtrl) && tradeCtrl is ListBox lstTrade)
+        {
+            lstTrade.CallBack[(int)ControlState.MouseDown] = WinShopEditor.OnTradeListMouseDown;
+            if (WindowManager.TryGetControl("winShopEditor", "sldTradeList", out var sldTrade) && sldTrade is ScrollBar sbTrade)
+            {
+                lstTrade.CallBack[(int)ControlState.MouseScroll] = () =>
+                {
+                    int delta = GameClient.CurrentMouseState.ScrollWheelValue - GameClient.PreviousMouseState.ScrollWheelValue;
+                    if (delta == 0) return;
+                    int step = delta > 0 ? -1 : 1;
+                    sbTrade.Value = Math.Clamp(sbTrade.Value + step, sbTrade.Min, sbTrade.Max);
+                    lstTrade.ScrollOffset = sbTrade.Value;
+                    lstTrade.EnsureVisible(lstTrade.SelectedIndex);
+                };
+                sbTrade.CallBack[(int)ControlState.MouseMove] = () =>
+                {
+                    lstTrade.ScrollOffset = sbTrade.Value;
+                    lstTrade.EnsureVisible(lstTrade.SelectedIndex);
+                };
+            }
+        }
+
+        // Name textbox
+        if (WindowManager.TryGetControl("winShopEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
+        {
+            txtName.CallBack[(int)ControlState.KeyUp] = () =>
+            {
+                if (WinShopEditor.SelectedIndex < 0 || WinShopEditor.SelectedIndex >= Variables.MaxShops) return;
+                Data.Shop[WinShopEditor.SelectedIndex].Name = txtName.Text ?? string.Empty;
+                GameState.ShopChanged[WinShopEditor.SelectedIndex] = true;
+                WinShopEditor.RefreshList();
+            };
+        }
+
+        // Buy rate textbox
+        if (WindowManager.TryGetControl("winShopEditor", "txtBuy", out var buyCtrl) && buyCtrl is TextBox txtBuy)
+        {
+            txtBuy.CallBack[(int)ControlState.KeyUp] = () =>
+            {
+                if (WinShopEditor.SelectedIndex < 0 || WinShopEditor.SelectedIndex >= Variables.MaxShops) return;
+                if (int.TryParse(txtBuy.Text, out var rate))
+                {
+                    Data.Shop[WinShopEditor.SelectedIndex].BuyRate = rate;
+                    GameState.ShopChanged[WinShopEditor.SelectedIndex] = true;
+                }
+            };
+        }
+
+        // Update trade button
+        if (WindowManager.TryGetControl("winShopEditor", "btnUpdateTrade", out var updCtrl) && updCtrl is Button btnUpdate)
+        {
+            btnUpdate.CallBack[(int)ControlState.MouseDown] = () =>
+            {
+                if (WinShopEditor.SelectedIndex < 0 || WinShopEditor.SelectedIndex >= Variables.MaxShops) return;
+                if (!WindowManager.TryGetControl("winShopEditor", "lstTradeItem", out var tradeListCtrl) || tradeListCtrl is not ListBox lst) return;
+                int idx = lst.SelectedIndex;
+                if (idx < 0 || idx >= Variables.MaxTrades) return;
+                ref var trade = ref Data.Shop[WinShopEditor.SelectedIndex].TradeItem[idx];
+                if (WindowManager.TryGetControl("winShopEditor", "cmbItem", out var itCtrl) && itCtrl is ComboBox ci)
+                    trade.Item = Math.Clamp(ci.Value, -1, Variables.MaxItems - 1);
+                if (WindowManager.TryGetControl("winShopEditor", "cmbCostItem", out var cCtrl) && cCtrl is ComboBox cc)
+                    trade.CostItem = Math.Clamp(cc.Value, -1, Variables.MaxItems - 1);
+                if (WindowManager.TryGetControl("winShopEditor", "txtItemQuantity", out var iqCtrl) && iqCtrl is TextBox txtIQ && int.TryParse(txtIQ.Text, out var itemQty))
+                    trade.ItemValue = Math.Max(0, itemQty);
+                if (WindowManager.TryGetControl("winShopEditor", "txtCostQuantity", out var cqCtrl) && cqCtrl is TextBox txtCQ && int.TryParse(txtCQ.Text, out var costQty))
+                    trade.CostValue = Math.Max(0, costQty);
+                GameState.ShopChanged[WinShopEditor.SelectedIndex] = true;
+                WinShopEditor.LoadShop(WinShopEditor.SelectedIndex);
+            };
+        }
+
+        // Delete trade button
+        if (WindowManager.TryGetControl("winShopEditor", "btnDeleteTrade", out var delCtrl) && delCtrl is Button btnDeleteTrade)
+        {
+            btnDeleteTrade.CallBack[(int)ControlState.MouseDown] = () =>
+            {
+                if (WinShopEditor.SelectedIndex < 0 || WinShopEditor.SelectedIndex >= Variables.MaxShops) return;
+                if (!WindowManager.TryGetControl("winShopEditor", "lstTradeItem", out var tradeListCtrl) || tradeListCtrl is not ListBox lst) return;
+                int idx = lst.SelectedIndex;
+                if (idx < 0 || idx >= Variables.MaxTrades) return;
+                ref var trade = ref Data.Shop[WinShopEditor.SelectedIndex].TradeItem[idx];
+                trade.Item = -1; trade.ItemValue = 0; trade.CostItem = -1; trade.CostValue = 0;
+                GameState.ShopChanged[WinShopEditor.SelectedIndex] = true;
+                WinShopEditor.LoadShop(WinShopEditor.SelectedIndex);
+            };
+        }
+
+        // Copy button
+        if (WindowManager.TryGetControl("winShopEditor", "btnCopy", out var copyCtrl) && copyCtrl is Button btnCopy)
+        {
+            btnCopy.CallBack[(int)ControlState.MouseDown] = () => { WinShopEditor.OnCopyOrPaste(); };
+        }
+
+        // Save / Cancel / Delete / Close
+        if (WindowManager.TryGetControl("winShopEditor", "btnSave", out var saveCtrl) && saveCtrl is Button btnSave)
+        {
+            btnSave.CallBack[(int)ControlState.MouseDown] = () => { Editors.ShopEditorOK(); WindowManager.HideWindow("winShopEditor"); };
+        }
+        if (WindowManager.TryGetControl("winShopEditor", "btnCancel", out var cancelCtrl) && cancelCtrl is Button btnCancel)
+        {
+            btnCancel.CallBack[(int)ControlState.MouseDown] = () => { Editors.ShopEditorCancel(); WindowManager.HideWindow("winShopEditor"); };
+        }
+        if (WindowManager.TryGetControl("winShopEditor", "btnDelete", out var delShopCtrl) && delShopCtrl is Button btnDelete)
+        {
+            btnDelete.CallBack[(int)ControlState.MouseDown] = () =>
+            {
+                Shop.ClearShop(WinShopEditor.SelectedIndex);
+                GameState.ShopChanged[WinShopEditor.SelectedIndex] = true;
+                WinShopEditor.LoadShop(WinShopEditor.SelectedIndex);
+                WinShopEditor.RefreshList();
+            };
+        }
+        if (WindowManager.TryGetControl("winShopEditor", "btnClose", out var closeCtrl) && closeCtrl is Button btnClose)
+        {
+            btnClose.CallBack[(int)ControlState.MouseDown] = () => WindowManager.HideWindow("winShopEditor");
         }
     }
 }

@@ -11,7 +11,6 @@ public static class WinNpcEditor
     public static bool IsLoading = false;
     private static Core.Globals.Type.Npc? _clipboardNpc = null;
 
-    // Entry point: populate lists and load first NPC.
     public static void Init()
     {
         if (!WindowManager.TryGetControl("winNpcEditor", "lstIndex", out _))

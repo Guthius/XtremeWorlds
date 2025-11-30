@@ -580,7 +580,8 @@ namespace Client
             {
                 GameState.MyEditorType = EditorType.Shop;
                 GameState.EditorIndex = 0;
-                new EditorShop().Show();
+                WindowManager.ShowWindow("winShopEditor");
+                Client.Game.UI.Windows.WinShopEditor.Init();
                 GameState.InitShopEditor = false;
             }
 
