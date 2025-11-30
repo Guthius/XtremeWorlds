@@ -299,7 +299,7 @@ public static class WinEditorMap
     // Rebuild Map Editor NPC slot list items once and preserve selection/scroll
     public static void RefreshMapNpcList()
     {
-        if (!WindowManager.TryGetControl("winMapEditor", "lstNpcs", out var ctrl) || ctrl is not ListBox list)
+        if (!WindowManager.TryGetControl("winMapEditor", "lstIndex", out var ctrl) || ctrl is not ListBox list)
             return;
 
         int prevIndex = Math.Clamp(NpcSelectedSlot, -1, Core.Globals.Variables.MaxMapNpcs - 1);
@@ -418,7 +418,7 @@ public static class WinEditorMap
 
     public static void OnNpcListMouseDown()
     {
-        if (!WindowManager.TryGetControl("winMapEditor", "lstNpcs", out var ctrl) || ctrl is not ListBox list) return;
+        if (!WindowManager.TryGetControl("winMapEditor", "lstIndex", out var ctrl) || ctrl is not ListBox list) return;
         var win = WindowManager.GetWindowByName("winMapEditor");
         if (win is null) return;
 
@@ -443,7 +443,7 @@ public static class WinEditorMap
 
     public static void OnNpcListMouseWheel()
     {
-        if (!WindowManager.TryGetControl("winMapEditor", "lstNpcs", out var ctrl) || ctrl is not ListBox list) return;
+        if (!WindowManager.TryGetControl("winMapEditor", "lstIndex", out var ctrl) || ctrl is not ListBox list) return;
         int visible = list.GetVisibleCount();
         int max = Math.Max(0, list.Items.Count - visible);
         int delta = GameClient.GetMouseScrollDelta();
@@ -454,7 +454,7 @@ public static class WinEditorMap
 
     public static void OnNpcScrollBarMove()
     {
-        if (!WindowManager.TryGetControl("winMapEditor", "lstNpcs", out var ctrl) || ctrl is not ListBox list) return;
+        if (!WindowManager.TryGetControl("winMapEditor", "lstIndex", out var ctrl) || ctrl is not ListBox list) return;
 
         if (WindowManager.TryGetControl("winMapEditor", "sldNpcList", out var sldCtrl))
         {

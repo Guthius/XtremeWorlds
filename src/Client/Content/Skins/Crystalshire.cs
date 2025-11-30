@@ -1258,7 +1258,7 @@ public class Crystalshire
                         int npcIndex = cmbNpc.Value - 1; // 0 = None
                         Data.MyMap.Npc[slotIndex] = npcIndex;
 
-                        if (WindowManager.TryGetControl("winMapEditor", "lstNpcs", out var lstNpcs) && lstNpcs is ListBox lst)
+                        if (WindowManager.TryGetControl("winMapEditor", "lstIndex", out var lstIndex) && lstIndex is ListBox lst)
                         {
                             string name = "None";
                             if (npcIndex >= 0 && npcIndex < (Data.Npc?.Length ?? 0))
@@ -1344,7 +1344,7 @@ public class Crystalshire
         }
 
         // Npc list drawing and interactions
-        if (WindowManager.TryGetControl("winMapEditor","lstNpcs", out var lstNpcs) && lstNpcs is ListBox list)
+        if (WindowManager.TryGetControl("winMapEditor","lstIndex", out var lstIndex) && lstIndex is ListBox list)
         {
             list.OnDraw = WinEditorMap.OnDrawNpcList;
             list.CallBack[(int)ControlState.MouseDown] = WinEditorMap.OnNpcListMouseDown;
@@ -1373,14 +1373,14 @@ public class Crystalshire
         }
 
         // Sprite preview picture box draws NPC sprite each frame
-        if (WindowManager.TryGetControl("winNpcEditor", "picNpcSprite", out var picSpriteCtrl) && picSpriteCtrl is PictureBox picSprite)
+        if (WindowManager.TryGetControl("winNpcEditor", "picSprite", out var picSpriteCtrl) && picSpriteCtrl is PictureBox picSprite)
         {
             picSprite.OnDraw = WinNpcEditor.OnDrawSprite;
         }
 
         // List interactions
         ListBox npcList = null;
-        if (WindowManager.TryGetControl("winNpcEditor", "lstNpcs", out var lstCtrl) && lstCtrl is ListBox list)
+        if (WindowManager.TryGetControl("winNpcEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox list)
         {
             npcList = list;
             list.CallBack[(int)ControlState.MouseDown] = WinNpcEditor.OnListMouseDown;
@@ -1393,14 +1393,14 @@ public class Crystalshire
                     list.ScrollBy(step);
 
                     // Keep scrollbar in sync if present
-                    if (WindowManager.TryGetControl("winNpcEditor", "sldNpcList", out var sldNpc) && sldNpc is ScrollBar sbSync)
+                    if (WindowManager.TryGetControl("winNpcEditor", "sldList", out var sldNpc) && sldNpc is ScrollBar sbSync)
                     {
                         sbSync.Value = list.ScrollOffset;
                     }
                 }
             };
         }
-        if (WindowManager.TryGetControl("winNpcEditor", "sldNpcList", out var sldNpcList) && sldNpcList is ScrollBar sbNpc)
+        if (WindowManager.TryGetControl("winNpcEditor", "sldList", out var sldNpcList) && sldNpcList is ScrollBar sbNpc)
         {
             sbNpc.CallBack[(int)ControlState.MouseMove] = () =>
             {
@@ -1412,22 +1412,22 @@ public class Crystalshire
         }
 
         // Hide redundant amount / chance textboxes: both are slider-only now.
-        if (WindowManager.TryGetControl("winNpcEditor", "nudNpcChance", out var chanceText))
+        if (WindowManager.TryGetControl("winNpcEditor", "nudChance", out var chanceText))
         {
             chanceText.Visible = false;
         }
-        if (WindowManager.TryGetControl("winNpcEditor", "nudNpcAmount", out var amountText))
+        if (WindowManager.TryGetControl("winNpcEditor", "nudAmount", out var amountText))
         {
             amountText.Visible = false;
         }
 
         // Text fields
-        if (WindowManager.TryGetControl("winNpcEditor", "txtNpcName", out var txtNameCtrl) && txtNameCtrl is TextBox txtName)
+        if (WindowManager.TryGetControl("winNpcEditor", "txtName", out var txtNameCtrl) && txtNameCtrl is TextBox txtName)
         {
             txtName.CallBack[(int)ControlState.KeyUp] = () => WinNpcEditor.UpdateName(txtName.Text ?? string.Empty);
         }
         
-        if (WindowManager.TryGetControl("winNpcEditor", "txtNpcAttackSay", out var atkCtrl) && atkCtrl is TextBox txtAtk)
+        if (WindowManager.TryGetControl("winNpcEditor", "txtAttackSay", out var atkCtrl) && atkCtrl is TextBox txtAtk)
         {
             txtAtk.CallBack[(int)ControlState.KeyUp] = () =>
             {
@@ -1453,10 +1453,10 @@ public class Crystalshire
             }
         }
 
-        BindCombo("cmbNpcBehavior", v => { if (WinNpcEditor.SelectedIndex >= 0) { Data.Npc[WinNpcEditor.SelectedIndex].Behavior = (byte)v; GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true; } });
-        BindCombo("cmbNpcFaction", v => { if (WinNpcEditor.SelectedIndex >= 0) { Data.Npc[WinNpcEditor.SelectedIndex].Faction = (byte)v; GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true; } });
-        BindCombo("cmbNpcSpawnPeriod", v => { if (WinNpcEditor.SelectedIndex >= 0) { Data.Npc[WinNpcEditor.SelectedIndex].SpawnTime = (byte)v; GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true; } });
-        BindCombo("cmbNpcAnimation", v => { if (WinNpcEditor.SelectedIndex >= 0) { Data.Npc[WinNpcEditor.SelectedIndex].Animation = (byte)v; GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true; } });
+        BindCombo("cmbBehavior", v => { if (WinNpcEditor.SelectedIndex >= 0) { Data.Npc[WinNpcEditor.SelectedIndex].Behavior = (byte)v; GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true; } });
+        BindCombo("cmbFaction", v => { if (WinNpcEditor.SelectedIndex >= 0) { Data.Npc[WinNpcEditor.SelectedIndex].Faction = (byte)v; GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true; } });
+        BindCombo("cmbSpawnPeriod", v => { if (WinNpcEditor.SelectedIndex >= 0) { Data.Npc[WinNpcEditor.SelectedIndex].SpawnTime = (byte)v; GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true; } });
+        BindCombo("cmbAnimation", v => { if (WinNpcEditor.SelectedIndex >= 0) { Data.Npc[WinNpcEditor.SelectedIndex].Animation = (byte)v; GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true; } });
 
         // Skills 1..6
         void BindSkill(string ctrlName, int idx)
@@ -1494,7 +1494,7 @@ public class Crystalshire
 
         // Sprite scrollbar: bind like other sliders so drag/wheel work
         BindScrollBar(
-            "sldNpcSprite",
+            "sldSprite",
             () => WinNpcEditor.SelectedIndex >= 0 ? Data.Npc[WinNpcEditor.SelectedIndex].Sprite : 1,
             v =>
             {
@@ -2088,15 +2088,15 @@ public class Crystalshire
         });
 
         // Buttons
-        if (WindowManager.TryGetControl("winItemEditor", "btnItemSave", out var btnSave))
+        if (WindowManager.TryGetControl("winItemEditor", "btnSave", out var btnSave))
         {
             btnSave.CallBack[(int)ControlState.MouseDown] = () => { Editors.ItemEditorOK(); WindowManager.HideWindow("winItemEditor"); };
         }
-        if (WindowManager.TryGetControl("winItemEditor", "btnItemCancel", out var btnCancel))
+        if (WindowManager.TryGetControl("winItemEditor", "btnCancel", out var btnCancel))
         {
             btnCancel.CallBack[(int)ControlState.MouseDown] = () => { Editors.ItemEditorCancel(); WindowManager.HideWindow("winItemEditor"); };
         }
-        if (WindowManager.TryGetControl("winItemEditor", "btnItemDelete", out var btnDelete))
+        if (WindowManager.TryGetControl("winItemEditor", "btnDelete", out var btnDelete))
         {
             btnDelete.CallBack[(int)ControlState.MouseDown] = () =>
             {
@@ -2104,11 +2104,11 @@ public class Crystalshire
                 WinItemEditor.LoadItem(GameState.EditorIndex);
             };
         }
-        if (WindowManager.TryGetControl("winItemEditor", "btnItemCopy", out var btnCopy))
+        if (WindowManager.TryGetControl("winItemEditor", "btnCopy", out var btnCopy))
         {
             btnCopy.CallBack[(int)ControlState.MouseDown] = WinItemEditor.OnCopyOrPaste;
         }
-        if (WindowManager.TryGetControl("winItemEditor", "btnItemSpawn", out var btnSpawn))
+        if (WindowManager.TryGetControl("winItemEditor", "btnSpawn", out var btnSpawn))
         {
             btnSpawn.CallBack[(int)ControlState.MouseDown] = () =>
             {

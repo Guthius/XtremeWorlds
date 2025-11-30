@@ -112,7 +112,7 @@
   <GroupBox Name="grpNpcs" Caption="" Position="6,26" Size="788,624">
     <Label Name="lblNpcs" Text="Npc Tools" Position="20,42" Size="200,14"/>
     <Label Name="lblNpcsHint" Text="Select an npc to assign to a slot" Position="20,70" Size="360,14"/>
-    <ListBox Name="lstNpcs" Position="20,100" Size="460,540"/>
+    <ListBox Name="lstIndex" Position="20,100" Size="460,540"/>
     <ScrollBar Name="sldNpcList" Position="486,100" Size="12,540" Min="0" Max="0" Value="0" Orientation="Vertical" ThumbSize="16"/>
     <Label Name="lblNpc" Text="Npc" Position="520,100" Size="40,16"/>
     <ComboBox Name="cmbNpcList" Position="564,98" Size="220,18"/>

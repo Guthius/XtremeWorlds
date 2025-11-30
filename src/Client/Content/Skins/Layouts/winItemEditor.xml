@@ -1,134 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window Name="winItemEditor" Caption="Item Editor"
-        Size="1120, 760"
+        Size="1120, 708"
         Icon="625" IconOffset="3, 5"
         Design="WindowNormal"
         StartPosition="CenterScreen"
         Visible="false">
 
-  <!-- Item index list on the left -->
   <Label Name="lblItemList" Text="Items" Position="16, 24" Size="80, 16"/>
-  <ListBox Name="lstItemIndex" Position="16, 44" Size="224, 668"/>
-  <ScrollBar Name="sldItemList" Position="240, 44" Size="16, 668" Min="0" Max="0" Vertical="true"/>
+  <ListBox Name="lstItemIndex" Position="16, 44" Size="224, 652"/>
+  <ScrollBar Name="sldItemList" Position="240, 44" Size="16, 652" Min="0" Max="0" Vertical="true"/>
 
-  <!-- Basics group (name/description/icon) -->
-  <GroupBox Name="grpItemBasics" Caption="" Position="264, 24" Size="824, 156"/>
-  <Label Name="lblItemName" Text="Name" Position="280, 40" Size="80, 16"/>
-  <TextBox Name="txtItemName" Position="344, 38" Size="320, 20" Design="TextWhite"/>
+  <!-- Basics group -->
+  <GroupBox Name="grpItemBasics" Caption="" Position="264, 24" Size="824, 156">
+    <Label Name="lblItemName" Text="Name" Position="16, 16" Size="80, 16"/>
+    <TextBox Name="txtItemName" Position="80, 14" Size="320, 20" Design="TextWhite"/>
+    <Label Name="lblItemDescription" Text="Description" Position="16, 40" Size="100, 16"/>
+    <TextBox Name="txtItemDescription" Position="80, 38" Size="560, 60" Design="TextWhite"/>
+    <Label Name="lblItemIcon" Text="Icon" Position="16, 112" Size="40, 16"/>
+    <ScrollBar Name="sldItemIcon" Position="80, 112" Size="200, 12" Min="0" Max="0" Orientation="Horizontal" ThumbSize="12"/>
+    <PictureBox Name="picItemIcon" Position="320, 100" Size="32, 32" Design="TextBlack"/>
+  </GroupBox>
 
-  <Label Name="lblItemDescription" Text="Description" Position="280, 64" Size="100, 16"/>
-  <TextBox Name="txtItemDescription" Position="344, 62" Size="560, 60" Design="TextWhite"/>
+  <!-- Type/meta group -->
+  <GroupBox Name="grpItemType" Caption="" Position="264, 190" Size="824, 96">
+    <Label Name="lblItemType" Text="Type" Position="16, 12" Size="60, 16"/>
+    <ComboBox Name="cmbItemType" Position="80, 10" Size="160, 18"/>
+    <Label Name="lblItemSubType" Text="SubType" Position="256, 12" Size="80, 16"/>
+    <ComboBox Name="cmbItemSubType" Position="336, 10" Size="160, 18"/>
+    <Label Name="lblItemAnimation" Text="Animation" Position="16, 36" Size="100, 16"/>
+    <ComboBox Name="cmbItemAnimation" Position="120, 34" Size="220, 18"/>
+    <Label Name="lblItemBind" Text="Bind" Position="360, 36" Size="60, 16"/>
+    <ComboBox Name="cmbItemBind" Position="424, 34" Size="160, 18"/>
+    <Label Name="lblItemLevel" Text="Level" Position="16, 60" Size="60, 16"/>
+    <ComboBox Name="cmbItemLevel" Position="80, 58" Size="120, 18"/>
+    <Label Name="lblItemPrice" Text="Price" Position="208, 60" Size="60, 16"/>
+    <TextBox Name="txtItemPrice" Position="264, 58" Size="120, 20" Design="TextWhite"/>
+    <Label Name="lblItemRarity" Text="Rarity" Position="392, 60" Size="60, 16"/>
+    <ComboBox Name="cmbItemRarity" Position="452, 58" Size="120, 18"/>
+    <CheckBox Name="chkItemStackable" Text="Stackable" Position="580, 58" Size="120, 20"/>
+  </GroupBox>
 
-  <Label Name="lblItemIcon" Text="Icon" Position="280, 124" Size="40, 16"/>
-  <ScrollBar Name="sldItemIcon" Position="344, 124" Size="200, 12" Min="0" Max="0" Orientation="Horizontal" ThumbSize="12"/>
-  <PictureBox Name="picItemIcon" Position="552, 112" Size="32, 32" Design="TextBlack"/>
+  <!-- Equipment group (now top-level) -->
+  <GroupBox Name="grpItemEquip" Caption="" Position="264, 296" Size="824, 190">
+    <!-- Vital mod moved right to allow speed/damage/knockback on left -->
+    <Label Name="lblVitalMod" Text="Vital Mod" Position="560, 12" Size="100, 16"/>
+    <TextBox Name="txtVitalMod" Position="640, 10" Size="140, 20" Design="TextWhite"/>
+    <!-- Speed, Damage, Knockback moved to left side -->
+    <Label Name="lblItemSpeed" Text="Speed" Position="16, 12" Size="80, 16"/>
+    <TextBox Name="txtItemSpeed" Position="96, 10" Size="120, 20" Design="TextWhite"/>
+    <Label Name="lblItemDamage" Text="Damage" Position="232, 12" Size="80, 16"/>
+    <TextBox Name="txtItemDamage" Position="292, 10" Size="120, 20" Design="TextWhite"/>
+    <CheckBox Name="chkItemKnockBack" Text="Knockback" Position="432, 10" Size="120, 20"/>
+    <Label Name="lblItemTool" Text="Tool" Position="16, 40" Size="60, 16"/>
+    <ComboBox Name="cmbItemTool" Position="96, 38" Size="160, 18"/>
+    <Label Name="lblItemKnockTiles" Text="Distance" Position="272, 40" Size="80, 16"/>
+    <ComboBox Name="cmbItemKnockBackTiles" Position="356, 38" Size="160, 18"/>
+    <Label Name="lblPaperdollEquip" Text="Paperdoll" Position="16, 64" Size="100, 16"/>
+    <ScrollBar Name="sldItemPaperdoll" Position="96, 66" Size="200, 12" Min="0" Max="0" Orientation="Horizontal" ThumbSize="12"/>
+    <PictureBox Name="picItemPaperdoll" Position="320, 54" Size="80, 80" Image="" Design="TextBlack"/>
+    <Label Name="lblSkillHeader" Text="Skill" Position="440, 40" Size="100, 16"/>
+    <ComboBox Name="cmbItemSkill" Position="500, 38" Size="240, 18"/>
+  </GroupBox>
 
-  <!-- Paperdoll numeric input here; preview moved near equipment scrollbar -->
-  <Label Name="lblItemPaperdoll" Text="Paperdoll" Position="600, 124" Size="80, 16"/>
-  <TextBox Name="txtItemPaperdoll" Position="684, 122" Size="60, 20" Design="TextWhite"/>
+  <!-- Stats group (top-level) -->
+  <GroupBox Name="grpItemStats" Caption="" Position="264, 490" Size="824, 70">
+    <Label Name="lblStr" Text="STR" Position="16, 12" Size="60, 16"/>
+    <ScrollBar Name="sldStr" Position="80, 14" Size="200, 12" Min="-255" Max="255" Orientation="Horizontal" ThumbSize="12"/>
+    <Label Name="lblVit" Text="VIT" Position="300, 12" Size="60, 16"/>
+    <ScrollBar Name="sldVit" Position="360, 14" Size="200, 12" Min="-255" Max="255" Orientation="Horizontal" ThumbSize="12"/>
+    <Label Name="lblLuck" Text="LCK" Position="580, 12" Size="60, 16"/>
+    <ScrollBar Name="sldLuck" Position="640, 14" Size="168, 12" Min="-255" Max="255" Orientation="Horizontal" ThumbSize="12"/>
+    <Label Name="lblInt" Text="INT" Position="16, 42" Size="60, 16"/>
+    <ScrollBar Name="sldInt" Position="80, 44" Size="200, 12" Min="-255" Max="255" Orientation="Horizontal" ThumbSize="12"/>
+    <Label Name="lblSpr" Text="SPR" Position="300, 42" Size="60, 16"/>
+    <ScrollBar Name="sldSpr" Position="360, 44" Size="200, 12" Min="-255" Max="255" Orientation="Horizontal" ThumbSize="12"/>
+  </GroupBox>
 
-  <!-- Type/Meta group (type/subtype/animation/bind/level/price/rarity/stackable) -->
-  <GroupBox Name="grpItemType" Caption="" Position="264, 190" Size="824, 96"/>
-  <Label Name="lblItemType" Text="Type" Position="280, 202" Size="60, 16"/>
-  <ComboBox Name="cmbItemType" Position="344, 200" Size="160, 18"/>
+  <!-- Requirements group (top-level) -->
+  <GroupBox Name="grpItemReq" Caption="" Position="264, 566" Size="824, 56">
+    <Label Name="lblReqJob" Text="Job" Position="16, 14" Size="60, 16"/>
+    <ComboBox Name="cmbItemJobReq" Position="80, 12" Size="200, 18"/>
+    <Label Name="lblReqAccess" Text="Access" Position="292, 14" Size="80, 16"/>
+    <ComboBox Name="cmbItemAccessReq" Position="360, 12" Size="200, 18"/>
+    <Label Name="lblReqLevel" Text="Level" Position="572, 14" Size="60, 16"/>
+    <ScrollBar Name="sldReqLevel" Position="632, 14" Size="176, 12" Min="1" Max="99" Orientation="Horizontal" ThumbSize="12"/>
+  </GroupBox>
 
-  <Label Name="lblItemSubType" Text="SubType" Position="520, 202" Size="80, 16"/>
-  <ComboBox Name="cmbItemSubType" Position="604, 200" Size="160, 18"/>
+  <!-- Use group (projectile/ammo/event) -->
+  <GroupBox Name="grpItemUse" Caption="" Position="264, 628" Size="824, 52">
+    <Label Name="lblProjectileHeader" Text="Projectile" Position="16, 14" Size="120, 16"/>
+    <ComboBox Name="cmbItemProjectile" Position="136, 12" Size="240, 18"/>
+    <Label Name="lblItemAmmo" Text="Ammo" Position="384, 14" Size="80, 16"/>
+    <ComboBox Name="cmbItemAmmo" Position="464, 12" Size="200, 18"/>
+    <Label Name="lblEventHeader" Text="Event" Position="672, 14" Size="60, 16"/>
+    <Label Name="lblEventId" Text="Id" Position="732, 14" Size="30, 16"/>
+    <TextBox Name="txtEventId" Position="764, 12" Size="40, 20" Design="TextWhite"/>
+  </GroupBox>
 
-  <Label Name="lblItemAnimation" Text="Animation" Position="280, 226" Size="100, 16"/>
-  <ComboBox Name="cmbItemAnimation" Position="384, 224" Size="220, 18"/>
+  <!-- Bottom buttons using NPC editor spacing (start x = group x + 56, 80 width + 8 gap) -->
+  <Button Name="btnSave" Text="Save" Position="320, 684" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+  <Button Name="btnDelete" Text="Delete" Position="408, 684" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+  <Button Name="btnCopy" Text="Copy" Position="496, 684" Size="80, 24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+  <Button Name="btnSpawn" Text="Spawn" Position="584, 684" Size="80, 24" Design="Blue" DesignHover="BlueHover" DesignMouseDown="BlueClick"/>
+  <Button Name="btnCancel" Text="Cancel" Position="672, 684" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
 
-  <Label Name="lblItemBind" Text="Bind" Position="620, 226" Size="60, 16"/>
-  <ComboBox Name="cmbItemBind" Position="684, 224" Size="160, 18"/>
-
-  <Label Name="lblItemLevel" Text="Level" Position="280, 250" Size="60, 16"/>
-  <ComboBox Name="cmbItemLevel" Position="344, 248" Size="120, 18"/>
-
-  <Label Name="lblItemPrice" Text="Price" Position="472, 250" Size="60, 16"/>
-  <TextBox Name="txtItemPrice" Position="532, 248" Size="120, 20" Design="TextWhite"/>
-
-  <Label Name="lblItemRarity" Text="Rarity" Position="664, 250" Size="60, 16"/>
-  <ComboBox Name="cmbItemRarity" Position="724, 248" Size="120, 18"/>
-
-  <CheckBox Name="chkItemStackable" Text="Stackable" Position="852, 248" Size="120, 20"/>
-
-  <!-- Big frame to contain all lower groups -->
-  <GroupBox Name="grpItemSections" Caption="" Position="264, 292" Size="824, 384"/>
-
-  <!-- Equipment group (stacked first, aligned to left edge) -->
-  <GroupBox Name="grpItemEquip" Caption="" Position="264, 300" Size="824, 150"/>
-  <Label Name="lblItemDamage" Text="Damage" Position="280, 314" Size="80, 16"/>
-  <TextBox Name="txtItemDamage" Position="360, 312" Size="120, 20" Design="TextWhite"/>
-
-  <Label Name="lblItemSpeed" Text="Speed" Position="500, 314" Size="80, 16"/>
-  <TextBox Name="txtItemSpeed" Position="560, 312" Size="120, 20" Design="TextWhite"/>
-
-  <CheckBox Name="chkItemKnockBack" Text="Knockback" Position="700, 312" Size="120, 20"/>
-
-  <Label Name="lblItemTool" Text="Tool" Position="280, 342" Size="60, 16"/>
-  <ComboBox Name="cmbItemTool" Position="360, 340" Size="160, 18"/>
-
-  <Label Name="lblItemKnockTiles" Text="Distance" Position="536, 342" Size="80, 16"/>
-  <ComboBox Name="cmbItemKnockBackTiles" Position="620, 340" Size="160, 18"/>
-
-  <!-- Paperdoll selection + preview moved here -->
-  <Label Name="lblPaperdollEquip" Text="Paperdoll" Position="280, 370" Size="80, 16"/>
-  <ScrollBar Name="sldItemPaperdoll" Position="360, 372" Size="300, 12" Min="0" Max="0" Orientation="Horizontal" ThumbSize="12"/>
-  <PictureBox Name="picItemPaperdoll" Position="672, 332" Size="80, 80" Image="" Design="TextBlack"/>
-
-  <!-- Usage group (stacked second) -->
-  <GroupBox Name="grpItemUse" Caption="" Position="264, 456" Size="824, 160"/>
-  <Label Name="lblConsumableHeader" Text="Consumable" Position="280, 468" Size="160, 16"/>
-  <Label Name="lblVitalMod" Text="Vital Mod" Position="280, 490" Size="100, 16"/>
-  <TextBox Name="txtVitalMod" Position="360, 488" Size="140, 20" Design="TextWhite"/>
-
-  <Label Name="lblSkillHeader" Text="Skill" Position="520, 468" Size="100, 16"/>
-  <ComboBox Name="cmbItemSkill" Position="520, 486" Size="240, 18"/>
-
-  <Label Name="lblProjectileHeader" Text="Projectile" Position="280, 516" Size="120, 16"/>
-  <ComboBox Name="cmbItemProjectile" Position="360, 534" Size="240, 18"/>
-  <Label Name="lblItemAmmo" Text="Ammo" Position="620, 516" Size="80, 16"/>
-  <ComboBox Name="cmbItemAmmo" Position="668, 534" Size="200, 18"/>
-
-  <!-- Event fields in usage group -->
-  <Label Name="lblEventHeader" Text="Event" Position="280, 558" Size="100, 16"/>
-  <Label Name="lblEventId" Text="Event Id" Position="360, 558" Size="80, 16"/>
-  <TextBox Name="txtEventId" Position="440, 556" Size="120, 20" Design="TextWhite"/>
-  <Label Name="lblEventValue" Text="Event Value" Position="572, 558" Size="120, 16"/>
-  <TextBox Name="txtEventValue" Position="692, 556" Size="120, 20" Design="TextWhite"/>
-
-  <!-- Bonuses group (stacked third) -->
-  <GroupBox Name="grpItemBonuses" Caption="" Position="264, 620" Size="824, 120"/>
-  <Label Name="lblStr" Text="STR" Position="280, 636" Size="60, 16"/>
-  <ScrollBar Name="sldStr" Position="344, 638" Size="200, 12" Min="-255" Max="255" Orientation="Horizontal" ThumbSize="12"/>
-  <Label Name="lblVit" Text="VIT" Position="556, 636" Size="60, 16"/>
-  <ScrollBar Name="sldVit" Position="620, 638" Size="200, 12" Min="-255" Max="255" Orientation="Horizontal" ThumbSize="12"/>
-  <Label Name="lblLuck" Text="LCK" Position="280, 660" Size="60, 16"/>
-  <ScrollBar Name="sldLuck" Position="344, 662" Size="200, 12" Min="-255" Max="255" Orientation="Horizontal" ThumbSize="12"/>
-  <Label Name="lblInt" Text="INT" Position="556, 660" Size="60, 16"/>
-  <ScrollBar Name="sldInt" Position="620, 662" Size="200, 12" Min="-255" Max="255" Orientation="Horizontal" ThumbSize="12"/>
-  <Label Name="lblSpr" Text="SPR" Position="832, 636" Size="60, 16"/>
-  <ScrollBar Name="sldSpr" Position="896, 638" Size="180, 12" Min="-255" Max="255" Orientation="Horizontal" ThumbSize="12"/>
-
-  <!-- Requirements group (non-stat reqs only) -->
-  <GroupBox Name="grpItemReq" Caption="" Position="264, 744" Size="824, 80"/>
-  <Label Name="lblReqJob" Text="Job" Position="280, 756" Size="60, 16"/>
-  <ComboBox Name="cmbItemJobReq" Position="344, 754" Size="200, 18"/>
-
-  <Label Name="lblReqAccess" Text="Access" Position="556, 756" Size="80, 16"/>
-  <ComboBox Name="cmbItemAccessReq" Position="624, 754" Size="200, 18"/>
-
-  <Label Name="lblReqLevel" Text="Level" Position="280, 780" Size="60, 16"/>
-  <ScrollBar Name="sldReqLevel" Position="344, 782" Size="480, 12" Min="1" Max="99" Orientation="Horizontal" ThumbSize="12"/>
-
-  <!-- Bottom buttons -->
-  <Button Name="btnItemSave" Text="Save" Position="376, 708" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-  <Button Name="btnItemDelete" Text="Delete" Position="464, 708" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
-  <Button Name="btnItemCopy" Text="Copy" Position="552, 708" Size="80, 24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
-  <Button Name="btnItemSpawn" Text="Spawn" Position="640, 708" Size="80, 24" Design="Blue" DesignHover="BlueHover" DesignMouseDown="BlueClick"/>
-  <Button Name="btnItemCancel" Text="Cancel" Position="728, 708" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
-
-  <!-- Close button in title bar -->
   <Button Name="btnClose" Position="-19, 5" Size="16, 16" Image="8" ImageHover="9" ImageMouseDown="10"/>
 
 </Window>

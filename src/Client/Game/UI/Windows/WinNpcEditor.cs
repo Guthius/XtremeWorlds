@@ -14,7 +14,7 @@ public static class WinNpcEditor
     // Entry point: populate lists and load first NPC.
     public static void Init()
     {
-        if (!WindowManager.TryGetControl("winNpcEditor", "lstNpcs", out _))
+        if (!WindowManager.TryGetControl("winNpcEditor", "lstIndex", out _))
             return; // window not present yet
 
         PopulateStaticCombos();
@@ -26,7 +26,7 @@ public static class WinNpcEditor
     // Rebuild NPC list box items from data and keep selection.
     private static void RefreshList()
     {
-        if (!WindowManager.TryGetControl("winNpcEditor", "lstNpcs", out var lstCtrl) || lstCtrl is not ListBox lst)
+        if (!WindowManager.TryGetControl("winNpcEditor", "lstIndex", out var lstCtrl) || lstCtrl is not ListBox lst)
             return;
 
         int prevIndex = SelectedIndex;
@@ -49,7 +49,7 @@ public static class WinNpcEditor
         }
 
         // Sync scrollbar max/value if present
-        if (WindowManager.TryGetControl("winNpcEditor", "sldNpcList", out var sldCtrl) && sldCtrl is ScrollBar sb)
+        if (WindowManager.TryGetControl("winNpcEditor", "sldList", out var sldCtrl) && sldCtrl is ScrollBar sb)
         {
             int visible = lst.GetVisibleCount();
             int max = Math.Max(0, lst.Items.Count - visible);
@@ -86,8 +86,8 @@ public static class WinNpcEditor
         if (sprite.Height % dirs != 0) dirs = 4; // fallback
         int h = sprite.Height / (dirs == 0 ? 1 : dirs);
 
-        // Center inside picNpcSprite
-        if (!WindowManager.TryGetControl("winNpcEditor", "picNpcSprite", out var ctrl) || ctrl is not PictureBox pic)
+        // Center inside picSprite
+        if (!WindowManager.TryGetControl("winNpcEditor", "picSprite", out var ctrl) || ctrl is not PictureBox pic)
             return;
 
         int drawX = win.X + pic.X + (pic.Width - w) / 2;
@@ -100,7 +100,7 @@ public static class WinNpcEditor
     private static void PopulateStaticCombos()
     {
         // Animation list
-        if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcAnimation", out var animCtrl) && animCtrl is ComboBox cmbAnim)
+        if (WindowManager.TryGetControl("winNpcEditor", "cmbAnimation", out var animCtrl) && animCtrl is ComboBox cmbAnim)
         {
             cmbAnim.Items.Clear();
             for (int i = 0; i < Variables.MaxAnimations; i++)
@@ -125,15 +125,15 @@ public static class WinNpcEditor
                 }
             }
         }
-        FillSkills("cmbNpcSkill1");
-        FillSkills("cmbNpcSkill2");
-        FillSkills("cmbNpcSkill3");
-        FillSkills("cmbNpcSkill4");
-        FillSkills("cmbNpcSkill5");
-        FillSkills("cmbNpcSkill6");
+        FillSkills("cmbSkill1");
+        FillSkills("cmbSkill2");
+        FillSkills("cmbSkill3");
+        FillSkills("cmbSkill4");
+        FillSkills("cmbSkill5");
+        FillSkills("cmbSkill6");
 
         // Items for drop slot
-        if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcDropItem", out var itemCtrl) && itemCtrl is ComboBox cmbItem)
+        if (WindowManager.TryGetControl("winNpcEditor", "cmbDropItem", out var itemCtrl) && itemCtrl is ComboBox cmbItem)
         {
             cmbItem.Items.Clear();
             for (int i = 0; i < Variables.MaxItems; i++)
@@ -145,7 +145,7 @@ public static class WinNpcEditor
         }
 
         // Behavior
-        if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcBehavior", out var behCtrl) && behCtrl is ComboBox cmbBeh)
+        if (WindowManager.TryGetControl("winNpcEditor", "cmbBehavior", out var behCtrl) && behCtrl is ComboBox cmbBeh)
         {
             cmbBeh.Items.Clear();
             cmbBeh.Items.Add("Aggressive");
@@ -154,7 +154,7 @@ public static class WinNpcEditor
         }
 
         // Faction
-        if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcFaction", out var facCtrl) && facCtrl is ComboBox cmbFac)
+        if (WindowManager.TryGetControl("winNpcEditor", "cmbFaction", out var facCtrl) && facCtrl is ComboBox cmbFac)
         {
             cmbFac.Items.Clear();
             cmbFac.Items.Add("Neutral");
@@ -163,7 +163,7 @@ public static class WinNpcEditor
         }
 
         // Spawn period
-        if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcSpawnPeriod", out var perCtrl) && perCtrl is ComboBox cmbPeriod)
+        if (WindowManager.TryGetControl("winNpcEditor", "cmbSpawnPeriod", out var perCtrl) && perCtrl is ComboBox cmbPeriod)
         {
             cmbPeriod.Items.Clear();
             cmbPeriod.Items.Add("Any");
@@ -172,7 +172,7 @@ public static class WinNpcEditor
         }
 
         // Drop slot selector (1..6)
-        if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcDropSlot", out var dropSlotCtrl) && dropSlotCtrl is ComboBox cmbDropSlot)
+        if (WindowManager.TryGetControl("winNpcEditor", "cmbDropSlot", out var dropSlotCtrl) && dropSlotCtrl is ComboBox cmbDropSlot)
         {
             if (cmbDropSlot.Items.Count == 0)
             {
@@ -191,37 +191,37 @@ public static class WinNpcEditor
         var npc = Data.Npc[index];
 
         // Name
-        if (WindowManager.TryGetControl("winNpcEditor", "txtNpcName", out var nameCtrl) && nameCtrl is TextBox txtName)
+        if (WindowManager.TryGetControl("winNpcEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
         {
             txtName.Text = npc.Name ?? string.Empty;
         }
         // Attack say
-        if (WindowManager.TryGetControl("winNpcEditor", "txtNpcAttackSay", out var atkCtrl) && atkCtrl is TextBox txtAtk)
+        if (WindowManager.TryGetControl("winNpcEditor", "txtAttackSay", out var atkCtrl) && atkCtrl is TextBox txtAtk)
         {
             txtAtk.Text = npc.AttackSay ?? string.Empty;
         }
         // Behavior
-        if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcBehavior", out var behCtrl) && behCtrl is ComboBox cmbBeh)
+        if (WindowManager.TryGetControl("winNpcEditor", "cmbBehavior", out var behCtrl) && behCtrl is ComboBox cmbBeh)
         {
             cmbBeh.Value = Math.Clamp(npc.Behavior, 0, cmbBeh.Items.Count - 1);
         }
         // Faction
-        if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcFaction", out var facCtrl) && facCtrl is ComboBox cmbFac)
+        if (WindowManager.TryGetControl("winNpcEditor", "cmbFaction", out var facCtrl) && facCtrl is ComboBox cmbFac)
         {
             cmbFac.Value = Math.Clamp(npc.Faction, 0, cmbFac.Items.Count - 1);
         }
         // Spawn period
-        if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcSpawnPeriod", out var periodCtrl) && periodCtrl is ComboBox cmbPeriod)
+        if (WindowManager.TryGetControl("winNpcEditor", "cmbSpawnPeriod", out var periodCtrl) && periodCtrl is ComboBox cmbPeriod)
         {
             cmbPeriod.Value = Math.Clamp(npc.SpawnTime, 0, cmbPeriod.Items.Count - 1);
         }
         // Animation
-        if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcAnimation", out var animCtrl) && animCtrl is ComboBox cmbAnim)
+        if (WindowManager.TryGetControl("winNpcEditor", "cmbAnimation", out var animCtrl) && animCtrl is ComboBox cmbAnim)
         {
             cmbAnim.Value = Math.Clamp(npc.Animation, 0, cmbAnim.Items.Count - 1);
         }
-        // Sprite scrollbar (sldNpcSprite) reflects npc.Sprite; drawing happens in the UI draw phase
-        if (WindowManager.TryGetControl("winNpcEditor", "sldNpcSprite", out var spriteCtrl) && spriteCtrl is ScrollBar sbSprite)
+        // Sprite scrollbar (sldSprite) reflects npc.Sprite; drawing happens in the UI draw phase
+        if (WindowManager.TryGetControl("winNpcEditor", "sldSprite", out var spriteCtrl) && spriteCtrl is ScrollBar sbSprite)
         {
             sbSprite.Max = Math.Max(0, GameState.NumCharacters);
 
@@ -229,23 +229,23 @@ public static class WinNpcEditor
             sbSprite.Value = Math.Clamp(spriteIndex, sbSprite.Min, sbSprite.Max);
         }
         // Basic stats
-        if (WindowManager.TryGetControl("winNpcEditor", "txtNpcHp", out var hpCtrl) && hpCtrl is TextBox txtHp)
+        if (WindowManager.TryGetControl("winNpcEditor", "txtHp", out var hpCtrl) && hpCtrl is TextBox txtHp)
         {
             txtHp.Text = npc.Hp.ToString();
         }
-        if (WindowManager.TryGetControl("winNpcEditor", "txtNpcExp", out var expCtrl) && expCtrl is TextBox txtExp)
+        if (WindowManager.TryGetControl("winNpcEditor", "txtExp", out var expCtrl) && expCtrl is TextBox txtExp)
         {
             txtExp.Text = npc.Exp.ToString();
         }
-        if (WindowManager.TryGetControl("winNpcEditor", "txtNpcLevel", out var lvlCtrl) && lvlCtrl is TextBox txtLvl)
+        if (WindowManager.TryGetControl("winNpcEditor", "txtLevel", out var lvlCtrl) && lvlCtrl is TextBox txtLvl)
         {
             txtLvl.Text = npc.Level.ToString();
         }
-        if (WindowManager.TryGetControl("winNpcEditor", "txtNpcDamage", out var dmgCtrl) && dmgCtrl is TextBox txtDmg)
+        if (WindowManager.TryGetControl("winNpcEditor", "txtDamage", out var dmgCtrl) && dmgCtrl is TextBox txtDmg)
         {
             txtDmg.Text = npc.Damage.ToString();
         }
-        if (WindowManager.TryGetControl("winNpcEditor", "txtNpcRange", out var rangeCtrl) && rangeCtrl is TextBox txtRange)
+        if (WindowManager.TryGetControl("winNpcEditor", "txtRange", out var rangeCtrl) && rangeCtrl is TextBox txtRange)
         {
             txtRange.Text = npc.Range.ToString();
         }
@@ -257,16 +257,16 @@ public static class WinNpcEditor
                 cmb.Value = Math.Clamp(npc.Skill[skillIdx], 0, Math.Max(0, cmb.Items.Count - 1));
             }
         }
-        SetSkill("cmbNpcSkill1", 0);
-        SetSkill("cmbNpcSkill2", 1);
-        SetSkill("cmbNpcSkill3", 2);
-        SetSkill("cmbNpcSkill4", 3);
-        SetSkill("cmbNpcSkill5", 4);
-        SetSkill("cmbNpcSkill6", 5);
+        SetSkill("cmbSkill1", 0);
+        SetSkill("cmbSkill2", 1);
+        SetSkill("cmbSkill3", 2);
+        SetSkill("cmbSkill4", 3);
+        SetSkill("cmbSkill5", 4);
+        SetSkill("cmbSkill6", 5);
 
         // Drop slot fields sync: use the selected slot to show that slot's item
         int slot = 0;
-        if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcDropSlot", out var dsCtrl) && dsCtrl is ComboBox cmbDropSlot)
+        if (WindowManager.TryGetControl("winNpcEditor", "cmbDropSlot", out var dsCtrl) && dsCtrl is ComboBox cmbDropSlot)
         {
             // Clamp to valid slot range 0-5
             cmbDropSlot.Value = Math.Clamp(cmbDropSlot.Value, 0, 5);
@@ -274,7 +274,7 @@ public static class WinNpcEditor
         }
 
         // Item combo always reflects the stored item index for the current slot
-        if (WindowManager.TryGetControl("winNpcEditor", "cmbNpcDropItem", out var diCtrl) && diCtrl is ComboBox cmbItem)
+        if (WindowManager.TryGetControl("winNpcEditor", "cmbDropItem", out var diCtrl) && diCtrl is ComboBox cmbItem)
         {
             if (npc.DropItem != null && slot < npc.DropItem.Length)
             {
@@ -288,7 +288,7 @@ public static class WinNpcEditor
         }
 
         // Amount textbox reflects DropItemValue for current slot
-        if (WindowManager.TryGetControl("winNpcEditor", "txtNpcAmount", out var amtCtrl) && amtCtrl is TextBox txtAmt)
+        if (WindowManager.TryGetControl("winNpcEditor", "txtAmount", out var amtCtrl) && amtCtrl is TextBox txtAmt)
         {
             int amount = 0;
             if (npc.DropItemValue != null && slot < npc.DropItemValue.Length)
@@ -297,7 +297,7 @@ public static class WinNpcEditor
         }
 
         // Chance slider reflects DropChance for current slot (within existing range)
-        if (WindowManager.TryGetControl("winNpcEditor", "sldNpcChance", out var chanceCtrl) && chanceCtrl is ScrollBar sbChance)
+        if (WindowManager.TryGetControl("winNpcEditor", "sldChance", out var chanceCtrl) && chanceCtrl is ScrollBar sbChance)
         {
             int min = sbChance.Min;
             int max = sbChance.Max;
@@ -314,7 +314,7 @@ public static class WinNpcEditor
     // Handle list click (mouse down) to select NPC.
     public static void OnListMouseDown()
     {
-        if (!WindowManager.TryGetControl("winNpcEditor", "lstNpcs", out var ctrl) || ctrl is not ListBox list) return;
+        if (!WindowManager.TryGetControl("winNpcEditor", "lstIndex", out var ctrl) || ctrl is not ListBox list) return;
         var win = WindowManager.GetWindowByName("winNpcEditor");
         if (win is null) return;
         int relY = GameState.CurMouseY - (win.Y + ctrl.Y);
@@ -351,7 +351,7 @@ public static class WinNpcEditor
             if (s.DropItemValue != null) { n.DropItemValue = new int[s.DropItemValue.Length]; Array.Copy(s.DropItemValue, n.DropItemValue, s.DropItemValue.Length); }
             if (s.DropChance != null) { n.DropChance = new int[s.DropChance.Length]; Array.Copy(s.DropChance, n.DropChance, s.DropChance.Length); }
             _clipboardNpc = n;
-            if (WindowManager.TryGetControl("winNpcEditor", "btnNpcCopy", out var btn)) btn.Text = "Paste";
+            if (WindowManager.TryGetControl("winNpcEditor", "btnCopy", out var btn)) btn.Text = "Paste";
             return;
         }
 
