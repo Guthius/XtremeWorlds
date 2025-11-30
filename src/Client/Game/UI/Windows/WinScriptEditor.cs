@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Client;
+using System.IO;
 
 namespace Client.Game.UI.Windows;
 public static class WinScriptEditor
