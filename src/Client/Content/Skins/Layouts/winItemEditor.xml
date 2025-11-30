@@ -39,15 +39,15 @@
 
     <!-- Type/meta group -->
     <GroupBox Name="grpType" Caption="" Position="272, 194" Size="824, 96">
-        <Label Name="lblType" Text="Type" Position="16, 12" Size="60, 16"/>
+        <Label Name="lblType" Text="Type" Position="8, 12" Size="60, 16"/>
         <ComboBox Name="cmbItemType" Position="80, 10" Size="160, 18"/>
         <Label Name="lblSubType" Text="SubType" Position="256, 12" Size="80, 16"/>
         <ComboBox Name="cmbSubType" Position="336, 10" Size="160, 18"/>
-        <Label Name="lblAnimation" Text="Animation" Position="16, 36" Size="100, 16"/>
+        <Label Name="lblAnimation" Text="Animation" Position="8, 36" Size="100, 16"/>
         <ComboBox Name="cmbAnimation" Position="120, 34" Size="220, 18"/>
         <Label Name="lblBind" Text="Bind" Position="360, 36" Size="60, 16"/>
         <ComboBox Name="cmbBind" Position="424, 34" Size="160, 18"/>
-        <Label Name="lblLevel" Text="Level" Position="16, 60" Size="60, 16"/>
+        <Label Name="lblLevel" Text="Level" Position="8, 60" Size="60, 16"/>
         <ComboBox Name="cmbLevel" Position="80, 58" Size="120, 18"/>
         <Label Name="lblPrice" Text="Price" Position="208, 60" Size="60, 16"/>
         <TextBox Name="txtPrice" Position="264, 58" Size="120, 20" Design="TextWhite"/>
@@ -58,22 +58,22 @@
 
     <!-- Use group -->
     <GroupBox Name="grpItemUse" Caption="" Position="272, 296" Size="824, 150">
-        <Label Name="lblEventHeader" Text="Event" Position="16, 8" Size="60, 16"/>
+        <Label Name="lblEventHeader" Text="Event" Position="8, 8" Size="60, 16"/>
         <Label Name="lblEventId" Text="Id" Position="80, 8" Size="30, 16"/>
         <TextBox Name="txtEventId" Position="116, 6" Size="60, 20" Design="TextWhite"/>
         <Label Name="lblEventValue" Text="Value" Position="182, 8" Size="80, 16"/>
         <TextBox Name="txtEventValue" Position="266, 6" Size="80, 20" Design="TextWhite"/>
 
         <!-- Vital moved to top-left under event -->
-        <Label Name="lblVitalMod" Text="Vital Mod" Position="16, 14" Size="100, 16"/>
+        <Label Name="lblVitalMod" Text="Vital Mod" Position="8, 14" Size="100, 16"/>
         <TextBox Name="txtVitalMod" Position="120, 12" Size="140, 20" Design="TextWhite"/>
 
         <!-- Skill aligned left below vital -->
-        <Label Name="lblSkillHeader" Text="Skill" Position="16, 14" Size="60, 16"/>
+        <Label Name="lblSkillHeader" Text="Skill" Position="8, 14" Size="60, 16"/>
         <ComboBox Name="cmbSkill" Position="80, 12" Size="200, 18"/>
 
         <!-- Projectile left side under Event/Vital/Skill row -->
-        <Label Name="lblProjectileHeader" Text="Projectile" Position="16, 14" Size="80, 16"/>
+        <Label Name="lblProjectileHeader" Text="Projectile" Position="8, 14" Size="80, 16"/>
         <ComboBox Name="cmbProjectile" Position="96, 12" Size="160, 18"/>
         <Label Name="lblAmmo" Text="Ammo" Position="250, 14" Size="50, 16"/>
         <ComboBox Name="cmbAmmo" Position="304, 12" Size="160, 18"/>
@@ -81,13 +81,13 @@
 
     <!-- Stats group immediately below grpEquip -->
     <GroupBox Name="grpStats" Caption="" Position="272, 450" Size="824, 70">
-        <Label Name="lblStr" Text="STR" Position="16, 12" Size="60, 16"/>
+        <Label Name="lblStr" Text="STR" Position="8, 12" Size="60, 16"/>
         <ScrollBar Name="sldStr" Position="80, 14" Size="200, 12" Min="-255" Max="255" Orientation="Horizontal" ThumbSize="12"/>
         <Label Name="lblVit" Text="VIT" Position="300, 12" Size="60, 16"/>
         <ScrollBar Name="sldVit" Position="360, 14" Size="200, 12" Min="-255" Max="255" Orientation="Horizontal" ThumbSize="12"/>
         <Label Name="lblLuck" Text="LCK" Position="580, 12" Size="60, 16"/>
         <ScrollBar Name="sldLuck" Position="640, 14" Size="168, 12" Min="-255" Max="255" Orientation="Horizontal" ThumbSize="12"/>
-        <Label Name="lblInt" Text="INT" Position="16, 42" Size="60, 16"/>
+        <Label Name="lblInt" Text="INT" Position="8, 42" Size="60, 16"/>
         <ScrollBar Name="sldInt" Position="80, 44" Size="200, 12" Min="-255" Max="255" Orientation="Horizontal" ThumbSize="12"/>
         <Label Name="lblSpr" Text="SPR" Position="300, 42" Size="60, 16"/>
         <ScrollBar Name="sldSpr" Position="360, 44" Size="200, 12" Min="-255" Max="255" Orientation="Horizontal" ThumbSize="12"/>
@@ -95,7 +95,7 @@
 
     <!-- Requirements group -->
     <GroupBox Name="grpReq" Caption="" Position="272, 524" Size="824, 56">
-        <Label Name="lblReqJob" Text="Job" Position="16, 14" Size="60, 16"/>
+        <Label Name="lblReqJob" Text="Job" Position="8, 14" Size="60, 16"/>
         <ComboBox Name="cmbJobReq" Position="80, 12" Size="200, 18"/>
         <Label Name="lblReqAccess" Text="Access" Position="292, 14" Size="80, 16"/>
         <ComboBox Name="cmbAccessReq" Position="360, 12" Size="200, 18"/>
