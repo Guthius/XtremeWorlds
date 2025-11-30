@@ -11,13 +11,13 @@
 		<PictureBox Name="lblPassword_1" Position="67,60" Size="142,9" Design="BlackOval"/>
 		<PictureBox Name="lblPassword_2" Position="67,96" Size="142,9" Design="BlackOval"/>
 		
-		<Label Text="Username" Position="67,16" Size="142,10" Align="Center"/>
+		<Label Text="Username" Position="65,16" Size="142,10" Align="Center"/>
 		<TextBox Name="txtUsername" Position="61,28" Size="142,19"/>
 
-		<Label Text="Password" Position="73,60" Size="142,10" Align="Center"/>
+		<Label Text="Password" Position="71,60" Size="142,10" Align="Center"/>
 		<TextBox Name="txtPassword" Position="67,68" Size="142,19" Censor="True"/>
 
-		<Label Text="Retype Password" Position="73,96" Size="142,10" Align="Center"/>
+		<Label Text="Retype Password" Position="71,96" Size="142,10" Align="Center"/>
 		<TextBox Name="txtRetypePassword" Position="67,112" Size="142,19" Censor="True"/>
 
 		<!-- Action buttons placed near the bottom of the group -->

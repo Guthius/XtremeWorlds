@@ -8,7 +8,7 @@
 
 	<GroupBox Name="grpChars" Position="6,26" Size="348,193">
 		<PictureBox Name="picSlot_1" Position="16,17" Size="98,9" Design="BlackOval"/>
-		<Label Name="lblCharName_1" Text="Blank Slot" Position="16,14" Size="98,10" Align="Center"/>
+		<Label Name="lblCharName_1" Text="Blank Slot" Position="20,17" Size="98,10" Align="Center"/>
 		<PictureBox Name="picScene_1" Position="17,32" Size="96,96" Image="11"/>
 
 		<Button Name="btnSelectChar_1" Text="Select"
@@ -33,7 +33,7 @@
 
 		<!-- Slot 2 -->
 		<PictureBox Name="picSlot_2" Position="126,17" Size="98,9" Design="BlackOval"/>
-		<Label Name="lblCharName_2" Text="Blank Slot" Position="126,14" Size="98,10" Align="Center"/>
+		<Label Name="lblCharName_2" Text="Blank Slot" Position="130,17" Size="98,10" Align="Center"/>
 		<PictureBox Name="picScene_2" Position="127,32" Size="96,96" Image="11"/>
 
 		<Button Name="btnSelectChar_2" Text="Select"
@@ -58,7 +58,7 @@
 
 		<!-- Slot 3 -->
 		<PictureBox Name="picSlot_3" Position="236,17" Size="98,9" Design="BlackOval"/>
-		<Label Name="lblCharName_3" Text="Blank Slot" Position="236,14" Size="98,10" Align="Center"/>
+		<Label Name="lblCharName_3" Text="Blank Slot" Position="240,17" Size="98,10" Align="Center"/>
 		<PictureBox Name="picScene_3" Position="237,32" Size="96,96" Image="11"/>
 
 		<Button Name="btnSelectChar_3" Text="Select"
