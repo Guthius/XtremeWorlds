@@ -39,27 +39,27 @@
     <PictureBox Name="picFemale" Position="508, 44" Size="72, 72" Design="TextBlack"/>
   </GroupBox>
 
-  <!-- Start items (left of lower area) -->
-  <GroupBox Name="grpStartItems" Caption="" Position="260, 292" Size="340, 200">
-    <Label Name="lblStartItems" Text="Start Items" Position="8, 8" Size="100, 16"/>
-    <ListBox Name="lstStartItems" Position="8, 28" Size="304, 102"/>
-    <ScrollBar Name="sldStartItems" Position="316, 28" Size="12, 102" Min="0" Max="0" Value="0" Orientation="Vertical" ThumbSize="16"/>
-    <Label Name="lblItem" Text="Item" Position="8, 134" Size="40, 16"/>
-    <ComboBox Name="cmbItem" Position="52, 132" Size="180, 18"/>
-    <Label Name="lblItemAmount" Text="Amount" Position="236, 134" Size="56, 16"/>
-    <TextBox Name="txtItemAmount" Position="292, 132" Size="36, 20" Design="TextWhite"/>
-    <Button Name="btnSetItem" Text="Set Slot" Position="8, 160" Size="80, 22" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-  </GroupBox>
+	<!-- Start items (left of lower area) -->
+	<GroupBox Name="grpStartItems" Caption="" Position="260, 292" Size="340, 200">
+		<Label Name="lblStartItems" Text="Start Items" Position="8, 8" Size="100, 16"/>
+		<ListBox Name="lstStartItems" Position="8, 28" Size="304, 102"/>
+		<ScrollBar Name="sldStartItems" Position="316, 28" Size="12, 102" Min="0" Max="0" Value="0" Vertical="true"/>
+		<Label Name="lblItem" Text="Item" Position="8, 134" Size="40, 16"/>
+		<ComboBox Name="cmbItem" Position="52, 132" Size="180, 18"/>
+		<Label Name="lblItemAmount" Text="Amount" Position="236, 134" Size="56, 16"/>
+		<TextBox Name="txtItemAmount" Position="292, 132" Size="36, 20" Design="TextWhite"/>
+		<Button Name="btnSetItem" Text="Set Slot" Position="8, 160" Size="80, 22" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+	</GroupBox>
 
-  <!-- Start skills (right of lower area) -->
-  <GroupBox Name="grpStartSkills" Caption="" Position="620, 292" Size="340, 200">
-    <Label Name="lblStartSkills" Text="Start Skills" Position="8, 8" Size="100, 16"/>
-    <ListBox Name="lstStartSkills" Position="8, 28" Size="304, 102"/>
-    <ScrollBar Name="sldStartSkills" Position="316, 28" Size="12, 102" Min="0" Max="0" Value="0" Orientation="Vertical" ThumbSize="16"/>
-    <Label Name="lblSkill" Text="Skill" Position="8, 134" Size="40, 16"/>
-    <ComboBox Name="cmbSkill" Position="52, 132" Size="236, 18"/>
-    <Button Name="btnSetSkill" Text="Set Slot" Position="8, 160" Size="80, 22" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-  </GroupBox>
+	<!-- Start skills (right of lower area) -->
+	<GroupBox Name="grpStartSkills" Caption="" Position="620, 292" Size="340, 200">
+		<Label Name="lblStartSkills" Text="Start Skills" Position="8, 8" Size="100, 16"/>
+		<ListBox Name="lstStartSkills" Position="8, 28" Size="304, 102"/>
+		<ScrollBar Name="sldStartSkills" Position="316, 28" Size="12, 102" Min="0" Max="0" Value="0" Vertical="true"/>
+		<Label Name="lblSkill" Text="Skill" Position="8, 134" Size="40, 16"/>
+		<ComboBox Name="cmbSkill" Position="52, 132" Size="236, 18"/>
+		<Button Name="btnSetSkill" Text="Set Slot" Position="8, 160" Size="80, 22" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+	</GroupBox>
 
   <!-- Action buttons -->
   <Button Name="btnSave" Text="Save" Position="440, 500" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>

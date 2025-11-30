@@ -2437,7 +2437,7 @@ public class Crystalshire
                 if (win is null) return;
                 int relY = GameClient.CurrentMouseState.Y - (win.Y + lstMaps.Y);
                 int idx = lstMaps.GetItemIndexAtPosition(relY);
-                if (idx >= 0)
+                if (idx >= 0 && idx < lstMaps.Items.Count)
                 {
                     lstMaps.SelectedIndex = idx;
                     lstMaps.EnsureVisible(idx);
@@ -2837,36 +2837,65 @@ public class Crystalshire
         if (WindowManager.TryGetControl("winJobEditor", "picFemale", out var picFemaleCtrl) && picFemaleCtrl is PictureBox picFemale)
             picFemale.OnDraw = WinJobEditor.OnDrawFemaleSprite;
 
-        // Main list
-        ListBox jobList = null;
-        if (WindowManager.TryGetControl("winJobEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox list)
+        // Set item slot
+        if (WindowManager.TryGetControl("winJobEditor", "lstStartItems", out var lsCtrl) && lsCtrl is ListBox lstStartItems)
         {
-            list.Enabled = true;
-            list.CallBack[(int)ControlState.MouseDown] = WinJobEditor.OnListMouseDown;
-            list.CallBack[(int)ControlState.MouseScroll] = () =>
+            if (WindowManager.TryGetControl("winJobEditor", "btnSetItem", out var btnSetItem))
             {
-                int delta = GameClient.CurrentMouseState.ScrollWheelValue - GameClient.PreviousMouseState.ScrollWheelValue;
-                if (delta == 0) return;
-                list.ScrollBy(delta > 0 ? -1 : 1);
-                if (WindowManager.TryGetControl("winJobEditor", "sldList", out var sld) && sld is ScrollBar sbSync)
+                btnSetItem.Enabled = true;
+                btnSetItem.CallBack[(int)ControlState.MouseDown] = () =>
                 {
-                    int maxScroll = Math.Max(0, list.Items.Count - list.GetVisibleCount());
-                    sbSync.Min = 0; sbSync.Max = maxScroll;
-                    sbSync.Value = list.ScrollOffset;
-                }
-            };
-            jobList = list;
+                    if (lstStartItems is null) return;
+                    int slot = lstStartItems.SelectedIndex;
+                    if (slot < 0 || slot >= Variables.MaxStartItems) return;
+                    int item = -1, amt = 1;
+                    if (WindowManager.TryGetControl("winJobEditor", "cmbItem", out var ic) && ic is ComboBox cmb)
+                        item = cmb.Value <= 0 ? -1 : Math.Clamp(cmb.Value - 1, 0, Variables.MaxItems - 1);
+                    if (WindowManager.TryGetControl("winJobEditor", "txtItemAmount", out var ac) && ac is TextBox t && int.TryParse(t.Text, out var parsed))
+                        amt = Math.Max(1, parsed);
+                    if (WinJobEditor.SelectedIndex >= 0)
+                    {
+                        Data.Job[WinJobEditor.SelectedIndex].StartItem[slot] = item;
+                        Data.Job[WinJobEditor.SelectedIndex].StartValue[slot] = amt;
+                        GameState.JobChanged[WinJobEditor.SelectedIndex] = true;
+                        WinJobEditor.LoadJob(WinJobEditor.SelectedIndex);
+                    }
+                };
+            }
         }
-        if (WindowManager.TryGetControl("winJobEditor", "sldList", out var sldList) && sldList is ScrollBar sbList)
+
+        if (WindowManager.TryGetControl("winJobEditor", "lstStartSkills", out var lstStartSkillsCtrl) && lstStartSkillsCtrl is ListBox lstSkills)
         {
-            sbList.CallBack[(int)ControlState.MouseMove] = () =>
+            // Set skill slot
+            if (WindowManager.TryGetControl("winJobEditor", "btnSetSkill", out var btnSetSkill))
             {
-                if (jobList == null) return;
-                int maxScroll = Math.Max(0, jobList.Items.Count - jobList.GetVisibleCount());
-                sbList.Min = 0; sbList.Max = maxScroll;
-                jobList.ScrollOffset = Math.Clamp(sbList.Value, sbList.Min, sbList.Max);
-            };
+                btnSetSkill.Enabled = true;
+                btnSetSkill.CallBack[(int)ControlState.MouseDown] = () =>
+                {
+                    if (lstSkills is null) return;
+                    int slot = lstSkills.SelectedIndex;
+                    if (slot < 0 || slot >= Variables.MaxStartSkills) return;
+                    int skill = -1;
+                    if (WindowManager.TryGetControl("winJobEditor", "cmbSkill", out var skc) && skc is ComboBox cs)
+                        skill = cs.Value <= 0 ? -1 : Math.Clamp(cs.Value - 1, 0, Variables.MaxSkills - 1);
+                    if (WinJobEditor.SelectedIndex >= 0)
+                    {
+                        Data.Job[WinJobEditor.SelectedIndex].StartSkill[slot] = skill;
+                        GameState.JobChanged[WinJobEditor.SelectedIndex] = true;
+                        WinJobEditor.LoadJob(WinJobEditor.SelectedIndex);
+                    }
+                };
+            }
         }
+
+        // Start Items / Start Skills / lstIndex: unified wiring
+        WireScrollableList("winJobEditor", "lstIndex", "sldList");
+        WireScrollableList("winJobEditor", "lstStartItems", "sldStartItems");
+        WireScrollableList("winJobEditor", "lstStartSkills", "sldStartSkills");
+
+        // Index list: keep Job-specific click, unify wheel/drag via helper
+        if (WindowManager.TryGetControl("winJobEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox lstIndex)
+            lstIndex.CallBack[(int)ControlState.MouseDown] = WinJobEditor.OnListMouseDown;
 
         // Text boxes
         if (WindowManager.TryGetControl("winJobEditor", "txtName", out var txtNameCtrl) && txtNameCtrl is TextBox txtName)
@@ -2880,6 +2909,7 @@ public class Crystalshire
                 WinJobEditor.RefreshList();
             };
         }
+
         if (WindowManager.TryGetControl("winJobEditor", "txtDesc", out var txtDescCtrl) && txtDescCtrl is TextBox txtDesc)
         {
             txtDesc.Enabled = true;
@@ -2931,191 +2961,7 @@ public class Crystalshire
         BindSpriteBar("sldFemaleSprite", () => WinJobEditor.SelectedIndex >= 0 ? Data.Job[WinJobEditor.SelectedIndex].FemaleSprite : 0,
             v => { if (WinJobEditor.SelectedIndex >= 0) Data.Job[WinJobEditor.SelectedIndex].FemaleSprite = v; });
 
-        // Helper to compute and apply selection for a ListBox inside a GroupBox
-        void HandleGroupListClick(ListBox lb)
-        {
-            var (ax, ay) = GetAbsolutePosition("winJobEditor", lb);
-            int relY = GameClient.CurrentMouseState.Y - ay;
-            int idx = lb.GetItemIndexAtPosition(relY);
-            if (idx >= 0 && idx < lb.Items.Count)
-            {
-                lb.SelectedIndex = idx;
-                lb.EnsureVisible(idx);
-            }
-        }
-
-        // Start Items list
-        ListBox startItems = null;
-        if (WindowManager.TryGetControl("winJobEditor", "lstStartItems", out var liCtrl) && liCtrl is ListBox lstItems)
-        {
-            startItems = lstItems;
-            lstItems.Enabled = true;
-            lstItems.CallBack[(int)ControlState.MouseDown] = () => HandleGroupListClick(lstItems);
-            lstItems.CallBack[(int)ControlState.MouseScroll] = () =>
-            {
-                int delta = GameClient.CurrentMouseState.ScrollWheelValue - GameClient.PreviousMouseState.ScrollWheelValue;
-                if (delta == 0) return;
-                lstItems.ScrollBy(delta > 0 ? -1 : 1);
-                if (WindowManager.TryGetControl("winJobEditor", "sldStartItems", out var sld) && sld is ScrollBar sbSync)
-                {
-                    int maxScroll = Math.Max(0, lstItems.Items.Count - lstItems.GetVisibleCount());
-                    sbSync.Min = 0; sbSync.Max = maxScroll;
-                    sbSync.Value = lstItems.ScrollOffset;
-                }
-            };
-        }
-        if (WindowManager.TryGetControl("winJobEditor", "sldStartItems", out var sldStartItems) && sldStartItems is ScrollBar sbStartItems)
-        {
-            sbStartItems.Enabled = true;
-            sbStartItems.CallBack[(int)ControlState.MouseMove] = () =>
-            {
-                if (startItems == null) return;
-                int maxScroll = Math.Max(0, startItems.Items.Count - startItems.GetVisibleCount());
-                sbStartItems.Min = 0; sbStartItems.Max = maxScroll;
-                startItems.ScrollOffset = Math.Clamp(sbStartItems.Value, sbStartItems.Min, sbStartItems.Max);
-            };
-        }
-
-        // Start Skills list
-        ListBox startSkills = null;
-        if (WindowManager.TryGetControl("winJobEditor", "lstStartSkills", out var lsCtrl) && lsCtrl is ListBox lstSkills)
-        {
-            startSkills = lstSkills;
-            lstSkills.Enabled = true;
-            lstSkills.CallBack[(int)ControlState.MouseDown] = () => HandleGroupListClick(lstSkills);
-            lstSkills.CallBack[(int)ControlState.MouseScroll] = () =>
-            {
-                int delta = GameClient.CurrentMouseState.ScrollWheelValue - GameClient.PreviousMouseState.ScrollWheelValue;
-                if (delta == 0) return;
-                lstSkills.ScrollBy(delta > 0 ? -1 : 1);
-                if (WindowManager.TryGetControl("winJobEditor", "sldStartSkills", out var sld) && sld is ScrollBar sbSync)
-                {
-                    int maxScroll = Math.Max(0, lstSkills.Items.Count - lstSkills.GetVisibleCount());
-                    sbSync.Min = 0; sbSync.Max = maxScroll;
-                    sbSync.Value = lstSkills.ScrollOffset;
-                }
-            };
-        }
-        if (WindowManager.TryGetControl("winJobEditor", "sldStartSkills", out var sldStartSkills) && sldStartSkills is ScrollBar sbStartSkills)
-        {
-            sbStartSkills.Enabled = true;
-            sbStartSkills.CallBack[(int)ControlState.MouseMove] = () =>
-            {
-                if (startSkills == null) return;
-                int maxScroll = Math.Max(0, startSkills.Items.Count - startSkills.GetVisibleCount());
-                sbStartSkills.Min = 0; sbStartSkills.Max = maxScroll;
-                startSkills.ScrollOffset = Math.Clamp(sbStartSkills.Value, sbStartSkills.Min, sbStartSkills.Max);
-            };
-        }
-
-        // Fallback global dispatch for clicks (if GroupBox eats child hit-test)
-        window.CallBack[(int)ControlState.MouseDown] = () =>
-        {
-            if (startItems != null)
-            {
-                var (ax, ay) = GetAbsolutePosition("winJobEditor", startItems);
-                if (GameClient.CurrentMouseState.X >= ax && GameClient.CurrentMouseState.X < ax + startItems.Width &&
-                    GameClient.CurrentMouseState.Y >= ay && GameClient.CurrentMouseState.Y < ay + startItems.Height)
-                {
-                    HandleGroupListClick(startItems);
-                }
-            }
-            if (startSkills != null)
-            {
-                var (ax, ay) = GetAbsolutePosition("winJobEditor", startSkills);
-                if (GameClient.CurrentMouseState.X >= ax && GameClient.CurrentMouseState.X < ax + startSkills.Width &&
-                    GameClient.CurrentMouseState.Y >= ay && GameClient.CurrentMouseState.Y < ay + startSkills.Height)
-                {
-                    HandleGroupListClick(startSkills);
-                }
-            }
-        };
-
-        // Fallback wheel routing
-        window.CallBack[(int)ControlState.MouseScroll] = () =>
-        {
-            int delta = GameClient.CurrentMouseState.ScrollWheelValue - GameClient.PreviousMouseState.ScrollWheelValue;
-            if (delta == 0) return;
-            var mx = GameClient.CurrentMouseState.X;
-            var my = GameClient.CurrentMouseState.Y;
-            void Wheel(ListBox lb, string barName)
-            {
-                var (ax, ay) = GetAbsolutePosition("winJobEditor", lb);
-                if (mx >= ax && mx < ax + lb.Width && my >= ay && my < ay + lb.Height)
-                {
-                    lb.ScrollBy(delta > 0 ? -1 : 1);
-                    if (WindowManager.TryGetControl("winJobEditor", barName, out var scl) && scl is ScrollBar sb)
-                    {
-                        int maxScroll = Math.Max(0, lb.Items.Count - lb.GetVisibleCount());
-                        sb.Min = 0; sb.Max = maxScroll;
-                        sb.Value = lb.ScrollOffset;
-                    }
-                }
-            }
-            if (startItems != null) Wheel(startItems, "sldStartItems");
-            if (startSkills != null) Wheel(startSkills, "sldStartSkills");
-            if (jobList != null)
-            {
-                var (ax, ay) = GetAbsolutePosition("winJobEditor", jobList);
-                if (mx >= ax && mx < ax + jobList.Width && my >= ay && my < ay + jobList.Height)
-                {
-                    jobList.ScrollBy(delta > 0 ? -1 : 1);
-                    if (WindowManager.TryGetControl("winJobEditor", "sldList", out var scl) && scl is ScrollBar sb)
-                    {
-                        int maxScroll = Math.Max(0, jobList.Items.Count - jobList.GetVisibleCount());
-                        sb.Min = 0; sb.Max = maxScroll;
-                        sb.Value = jobList.ScrollOffset;
-                    }
-                }
-            }
-        };
-
-        // Set item slot
-        if (WindowManager.TryGetControl("winJobEditor", "btnSetItem", out var btnSetItem))
-        {
-            btnSetItem.Enabled = true;
-            btnSetItem.CallBack[(int)ControlState.MouseDown] = () =>
-            {
-                if (startItems is null) return;
-                int slot = startItems.SelectedIndex;
-                if (slot < 0 || slot >= Variables.MaxStartItems) return;
-                int item = -1, amt = 1;
-                if (WindowManager.TryGetControl("winJobEditor", "cmbItem", out var ic) && ic is ComboBox cmb)
-                    item = cmb.Value <= 0 ? -1 : Math.Clamp(cmb.Value - 1, 0, Variables.MaxItems - 1);
-                if (WindowManager.TryGetControl("winJobEditor", "txtItemAmount", out var ac) && ac is TextBox t && int.TryParse(t.Text, out var parsed))
-                    amt = Math.Max(1, parsed);
-                if (WinJobEditor.SelectedIndex >= 0)
-                {
-                    Data.Job[WinJobEditor.SelectedIndex].StartItem[slot] = item;
-                    Data.Job[WinJobEditor.SelectedIndex].StartValue[slot] = amt;
-                    GameState.JobChanged[WinJobEditor.SelectedIndex] = true;
-                    WinJobEditor.LoadJob(WinJobEditor.SelectedIndex);
-                }
-            };
-        }
-
-        // Set skill slot
-        if (WindowManager.TryGetControl("winJobEditor", "btnSetSkill", out var btnSetSkill))
-        {
-            btnSetSkill.Enabled = true;
-            btnSetSkill.CallBack[(int)ControlState.MouseDown] = () =>
-            {
-                if (startSkills is null) return;
-                int slot = startSkills.SelectedIndex;
-                if (slot < 0 || slot >= Variables.MaxStartSkills) return;
-                int skill = -1;
-                if (WindowManager.TryGetControl("winJobEditor", "cmbSkill", out var skc) && skc is ComboBox cs)
-                    skill = cs.Value <= 0 ? -1 : Math.Clamp(cs.Value - 1, 0, Variables.MaxSkills - 1);
-                if (WinJobEditor.SelectedIndex >= 0)
-                {
-                    Data.Job[WinJobEditor.SelectedIndex].StartSkill[slot] = skill;
-                    GameState.JobChanged[WinJobEditor.SelectedIndex] = true;
-                    WinJobEditor.LoadJob(WinJobEditor.SelectedIndex);
-                }
-            };
-        }
-
-        // Buttons
+        // Remaining buttons
         if (WindowManager.TryGetControl("winJobEditor", "btnSave", out var btnSave))
             btnSave.CallBack[(int)ControlState.MouseDown] = () => { Editors.JobEditorOK(); WindowManager.HideWindow("winJobEditor"); };
         if (WindowManager.TryGetControl("winJobEditor", "btnCancel", out var btnCancel))
@@ -3133,44 +2979,75 @@ public class Crystalshire
         }
         if (WindowManager.TryGetControl("winJobEditor", "btnCopy", out var btnCopy))
             btnCopy.CallBack[(int)ControlState.MouseDown] = WinJobEditor.OnCopyOrPaste;
-
-        // Ensure initial selection (slot 0) for start items/skills
-        if (startItems != null && startItems.Items.Count > 0 && startItems.SelectedIndex < 0) startItems.SelectedIndex = 0;
-        if (startSkills != null && startSkills.Items.Count > 0 && startSkills.SelectedIndex < 0) startSkills.SelectedIndex = 0;
     }
 
-    // Computes absolute screen position of a control within a window,
-    // accounting for any number of nested GroupBox containers.
-    private static (int ax, int ay) GetAbsolutePosition(string windowName, Control ctrl)
+    public void WireScrollableList(string windowName, string listName, string barName)
     {
-        var win = WindowManager.GetWindowByName(windowName);
-        if (win == null || ctrl == null)
-            return (0, 0);
+        if (!WindowManager.TryGetControl(windowName, listName, out var listCtrl) || listCtrl is not ListBox lb)
+            return;
 
-        // Start with window origin + control local position
-        int ax = win.X + ctrl.X;
-        int ay = win.Y + ctrl.Y;
+        ScrollBar sb = null;
+        if (WindowManager.TryGetControl(windowName, barName, out var barCtrl) && barCtrl is ScrollBar sbar)
+            sb = sbar;
 
-        // Accumulate offsets of all ancestor group boxes (by geometric containment).
-        // If group boxes overlap, each that fully contains the control origin contributes its offset.
-        foreach (var c in win.Controls)
+        // Click selection (window-relative). Only clicks change selection.
+        lb.CallBack[(int)ControlState.MouseDown] = () =>
         {
-            if (c is GroupBox gb)
+            var win = WindowManager.GetWindowByName(windowName);
+            if (win is null) return;
+            int relY = GameClient.CurrentMouseState.Y - (win.Y + lb.Y);
+            int idx = lb.GetItemIndexAtPosition(relY);
+            if (idx >= 0 && idx < lb.Items.Count)
             {
-                bool inside =
-                    ctrl.X >= gb.X &&
-                    ctrl.X < gb.X + gb.Width &&
-                    ctrl.Y >= gb.Y &&
-                    ctrl.Y < gb.Y + gb.Height;
+                lb.SelectedIndex = idx;
+                lb.EnsureVisible(idx);
 
-                if (inside)
+                // Keep scrollbar aligned after EnsureVisible
+                if (sb != null)
                 {
-                    ax += gb.X;
-                    ay += gb.Y;
+                    int visible = lb.GetVisibleCount();
+                    int maxScroll = Math.Max(0, lb.Items.Count - visible);
+                    sb.Min = 0; sb.Max = maxScroll;
+                    sb.Value = Math.Clamp(lb.ScrollOffset, sb.Min, sb.Max);
                 }
             }
-        }
+        };
 
-        return (ax, ay);
+        // Mouse wheel: scroll list, then sync scrollbar range/value. Do NOT change SelectedIndex.
+        lb.CallBack[(int)ControlState.MouseScroll] = () =>
+        {
+            int delta = GameClient.CurrentMouseState.ScrollWheelValue - GameClient.PreviousMouseState.ScrollWheelValue;
+            if (delta == 0) return;
+            int step = delta > 0 ? -1 : 1;
+
+            lb.ScrollBy(step);
+
+            if (sb != null)
+            {
+                int visible = lb.GetVisibleCount();
+                int maxScroll = Math.Max(0, lb.Items.Count - visible);
+                sb.Min = 0; sb.Max = maxScroll;
+                sb.Value = Math.Clamp(lb.ScrollOffset, sb.Min, sb.Max);
+            }
+        };
+
+        // Scrollbar drag: clamp within range and assign to list. Do NOT change SelectedIndex.
+        if (sb != null)
+        {
+            sb.CallBack[(int)ControlState.MouseMove] = () =>
+            {
+                int visible = lb.GetVisibleCount();
+                int maxScroll = Math.Max(0, lb.Items.Count - visible);
+                sb.Min = 0; sb.Max = maxScroll;
+                sb.Value = Math.Clamp(sb.Value, sb.Min, sb.Max);
+                lb.ScrollOffset = sb.Value;
+            };
+
+            // Initial sync on wire-up
+            int visible0 = lb.GetVisibleCount();
+            int max0 = Math.Max(0, lb.Items.Count - visible0);
+            sb.Min = 0; sb.Max = max0;
+            sb.Value = Math.Clamp(lb.ScrollOffset, sb.Min, sb.Max);
+        }
     }
 }
