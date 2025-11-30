@@ -16,7 +16,7 @@ public static class WinItemEditor
         if (!WindowManager.TryGetControl("winItemEditor", "lstIndex", out _))
             return;
 
-        PopulateStaticCombos();
+        PopulateCombos();
         SelectedIndex = Math.Clamp(GameState.EditorIndex, 0, Variables.MaxItems - 1);
         RefreshList();
         LoadItem(SelectedIndex);
@@ -130,7 +130,7 @@ public static class WinItemEditor
         }
     }
 
-    private static void PopulateStaticCombos()
+    private static void PopulateCombos()
     {
         // Type
         if (WindowManager.TryGetControl("winItemEditor", "cmbItemType", out var typeCtrl) && typeCtrl is ComboBox cmbType)

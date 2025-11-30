@@ -16,7 +16,7 @@ public static class WinNpcEditor
         if (!WindowManager.TryGetControl("winNpcEditor", "lstIndex", out _))
             return; // window not present yet
 
-        PopulateStaticCombos();
+        PopulateCombos();
         SelectedIndex = Math.Clamp(SelectedIndex, 0, Variables.MaxNpcs - 1);
         RefreshList();
         LoadNpc(SelectedIndex);
@@ -96,7 +96,7 @@ public static class WinNpcEditor
     }
 
     // Populate behavior/faction/spawn period/animation/skills/items combos.
-    private static void PopulateStaticCombos()
+    private static void PopulateCombos()
     {
         // Animation list
         if (WindowManager.TryGetControl("winNpcEditor", "cmbAnimation", out var animCtrl) && animCtrl is ComboBox cmbAnim)
@@ -322,7 +322,7 @@ public static class WinNpcEditor
         SelectedIndex = index;
         list.SelectedIndex = index;
         list.EnsureVisible(index);
-        PopulateStaticCombos();
+        PopulateCombos();
         LoadNpc(index);
     }
 
