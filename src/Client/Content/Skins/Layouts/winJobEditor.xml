@@ -46,8 +46,8 @@
 		<ScrollBar Name="sldStartItems" Position="316, 28" Size="12, 102" Min="0" Max="0" Value="0" Vertical="true"/>
 		<Label Name="lblItem" Text="Item" Position="8, 134" Size="40, 16"/>
 		<ComboBox Name="cmbItem" Position="52, 132" Size="180, 18"/>
-		<Label Name="lblItemAmount" Text="Amount" Position="236, 134" Size="56, 16"/>
-		<TextBox Name="txtItemAmount" Position="292, 132" Size="36, 20" Design="TextWhite"/>
+		<Label Name="lblItemValue" Text="Value" Position="236, 134" Size="60, 16"/>
+		<TextBox Name="txtItemValue" Position="292, 132" Size="36, 20" Design="TextWhite"/>
 		<Button Name="btnSetItem" Text="Set Slot" Position="8, 160" Size="80, 22" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 	</GroupBox>
 
@@ -62,10 +62,10 @@
 	</GroupBox>
 
   <!-- Action buttons -->
-  <Button Name="btnSave" Text="Save" Position="440, 516" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-  <Button Name="btnDelete" Text="Delete" Position="528, 516" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
-  <Button Name="btnCopy" Text="Copy" Position="616, 516" Size="80, 24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="GreenClick"/>
-  <Button Name="btnCancel" Text="Cancel" Position="704, 516" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+  <Button Name="btnSave" Text="Save" Position="440, 520" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+  <Button Name="btnDelete" Text="Delete" Position="528, 520" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+  <Button Name="btnCopy" Text="Copy" Position="616, 520" Size="80, 24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="GreenClick"/>
+  <Button Name="btnCancel" Text="Cancel" Position="704, 520" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
 
   <Button Name="btnClose" Position="-19, 5" Size="16, 16" Image="8" ImageHover="9" ImageMouseDown="10"/>
 </Window>

@@ -2723,7 +2723,7 @@ public class Crystalshire
                     int item = -1, amt = 1;
                     if (WindowManager.TryGetControl("winJobEditor", "cmbItem", out var ic) && ic is ComboBox cmb)
                         item = cmb.Value <= 0 ? -1 : Math.Clamp(cmb.Value - 1, 0, Variables.MaxItems - 1);
-                    if (WindowManager.TryGetControl("winJobEditor", "txtItemAmount", out var ac) && ac is TextBox t && int.TryParse(t.Text, out var parsed))
+                    if (WindowManager.TryGetControl("winJobEditor", "txtItemValue", out var ac) && ac is TextBox t && int.TryParse(t.Text, out var parsed))
                         amt = Math.Max(1, parsed);
                     if (WinJobEditor.SelectedIndex >= 0)
                     {
