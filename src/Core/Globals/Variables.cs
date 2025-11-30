@@ -5,7 +5,7 @@ public static class Variables
     // Engine-wide defaults; server script may override at runtime.
     public static int MaxAnimations = 100;
     public static byte MaxBank = 90;
-    public static byte MaxJobs = 3;
+    public static byte MaxJobs = 50;
     public static byte MaxMorals = 50;
     public static byte MaxInv = 35;
     public static int MaxItems = 500;
