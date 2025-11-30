@@ -187,7 +187,7 @@ public static class WinItemEditor
         }
 
         // Projectile list
-        if (WindowManager.TryGetControl("winItemEditor", "cmbItemProjectile", out var projCtrl) && projCtrl is ComboBox cmbProj)
+        if (WindowManager.TryGetControl("winItemEditor", "cmbProjectile", out var projCtrl) && projCtrl is ComboBox cmbProj)
         {
             cmbProj.Items.Clear();
             cmbProj.Items.Add("None");
@@ -196,7 +196,7 @@ public static class WinItemEditor
         }
 
         // Ammo list (0 = None, then items)
-        if (WindowManager.TryGetControl("winItemEditor", "cmbItemAmmo", out var ammoCtrl) && ammoCtrl is ComboBox cmbAmmo)
+        if (WindowManager.TryGetControl("winItemEditor", "cmbAmmo", out var ammoCtrl) && ammoCtrl is ComboBox cmbAmmo)
         {
             cmbAmmo.Items.Clear();
             cmbAmmo.Items.Add("None");
@@ -294,9 +294,9 @@ public static class WinItemEditor
 
         // Projectile controls
         SetVisible("lblProjectileHeader", isProjectile);
-        SetVisible("cmbItemProjectile", isProjectile);
-        SetVisible("lblItemAmmo", isProjectile);
-        SetVisible("cmbItemAmmo", isProjectile);
+        SetVisible("cmbProjectile", isProjectile);
+        SetVisible("lblAmmo", isProjectile);
+        SetVisible("cmbAmmo", isProjectile);
 
         // Event controls
         SetVisible("lblEventHeader", isEvent);
@@ -410,9 +410,9 @@ public static class WinItemEditor
             txtVital.Text = item.Data1.ToString();
         if (WindowManager.TryGetControl("winItemEditor", "cmbSkill", out var sCtrl) && sCtrl is ComboBox cmbSkill)
             cmbSkill.Value = Math.Clamp(item.Data1, 0, cmbSkill.Items.Count - 1);
-        if (WindowManager.TryGetControl("winItemEditor", "cmbItemProjectile", out var pCtrl) && pCtrl is ComboBox cmbProj)
+        if (WindowManager.TryGetControl("winItemEditor", "cmbProjectile", out var pCtrl) && pCtrl is ComboBox cmbProj)
             cmbProj.Value = Math.Clamp(item.Projectile + 1, 0, cmbProj.Items.Count - 1);
-        if (WindowManager.TryGetControl("winItemEditor", "cmbItemAmmo", out var ammoCtrl) && ammoCtrl is ComboBox cmbAmmo)
+        if (WindowManager.TryGetControl("winItemEditor", "cmbAmmo", out var ammoCtrl) && ammoCtrl is ComboBox cmbAmmo)
             cmbAmmo.Value = Math.Clamp(item.Ammo + 1, 0, cmbAmmo.Items.Count - 1);
         if (WindowManager.TryGetControl("winItemEditor", "txtEventId", out var eIdCtrl) && eIdCtrl is TextBox txtEId)
             txtEId.Text = item.Data1.ToString();

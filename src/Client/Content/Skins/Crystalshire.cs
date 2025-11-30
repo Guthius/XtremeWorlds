@@ -2051,7 +2051,7 @@ public class Crystalshire
             }
         });
 
-        BindCombo("cmbItemProjectile", v =>
+        BindCombo("cmbProjectile", v =>
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
@@ -2060,7 +2060,7 @@ public class Crystalshire
             }
         });
 
-        BindCombo("cmbItemAmmo", v =>
+        BindCombo("cmbAmmo", v =>
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {

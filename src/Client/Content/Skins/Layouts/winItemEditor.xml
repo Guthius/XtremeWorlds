@@ -57,7 +57,7 @@
     </GroupBox>
 
     <!-- Use group -->
-    <GroupBox Name="grpItemUse" Caption="" Position="272, 284" Size="824, 150">
+    <GroupBox Name="grpItemUse" Caption="" Position="272, 296" Size="824, 150">
         <Label Name="lblEventHeader" Text="Event" Position="16, 8" Size="60, 16"/>
         <Label Name="lblEventId" Text="Id" Position="80, 8" Size="30, 16"/>
         <TextBox Name="txtEventId" Position="116, 6" Size="60, 20" Design="TextWhite"/>
@@ -73,10 +73,10 @@
         <ComboBox Name="cmbSkill" Position="80, 12" Size="200, 18"/>
 
         <!-- Projectile left side under Event/Vital/Skill row -->
-        <Label Name="lblProjectileHeader" Text="Projectile" Position="300, 14" Size="80, 16"/>
-        <ComboBox Name="cmbItemProjectile" Position="380, 12" Size="160, 18"/>
-        <Label Name="lblItemAmmo" Text="Ammo" Position="546, 14" Size="50, 16"/>
-        <ComboBox Name="cmbItemAmmo" Position="600, 12" Size="160, 18"/>
+        <Label Name="lblProjectileHeader" Text="Projectile" Position="16, 14" Size="80, 16"/>
+        <ComboBox Name="cmbProjectile" Position="96, 12" Size="160, 18"/>
+        <Label Name="lblAmmo" Text="Ammo" Position="250, 14" Size="50, 16"/>
+        <ComboBox Name="cmbAmmo" Position="304, 12" Size="160, 18"/>
     </GroupBox>
 
     <!-- Stats group immediately below grpEquip -->
