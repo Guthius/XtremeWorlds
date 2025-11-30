@@ -525,6 +525,9 @@ namespace Server
         {
             using (var sha256Hash = SHA256.Create())
             {
+                if (input == null)
+                    return -1;
+
                 // ComputeHash - returns byte array
                 byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(input));
 
@@ -649,6 +652,9 @@ namespace Server
         public static JObject? SelectRowByColumn(string columnName, long value, string tableName, string dataColumn)
         {
             string sql = $"SELECT {dataColumn} FROM {tableName} WHERE {columnName} = @value;";
+
+            if (value == -1)
+                return null;
 
             using (var connection = new NpgsqlConnection(ConnectionString))
             {
