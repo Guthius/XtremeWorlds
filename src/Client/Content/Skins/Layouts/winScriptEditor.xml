@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window Name="winScriptEditor" Caption="Script Editor"
-        Size="120, 120"
+        Size="160, 120"
         Icon="314" IconOffset="3, 5"
         Design="WindowNormal"
         StartPosition="CenterScreen"
         Visible="false">
 
 	 <!-- Action buttons -->
-	<GroupBox Name="grpScript" Position="4,24" Size="104,104" Caption="Script">
-		<Button Name="btnOpen" Text="Open" Position="16, 24" Size="80, 24" Design="Blue" DesignHover="BlueHover" DesignMouseDown="BlueClick"/>
-		<Button Name="btnSave" Text="Save" Position="16, 56" Size="80, 24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<GroupBox Name="grpScript" Position="4,24" Size="144,144" Caption="Script">
+		<Button Name="btnOpen" Text="Open" Position="16, 24" Size="120, 24" Design="Blue" DesignHover="BlueHover" DesignMouseDown="BlueClick"/>
+		<Button Name="btnSave" Text="Save" Position="16, 56" Size="120, 24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
 	</GroupBox>
 	
 	  <!-- Top-right X button -->
