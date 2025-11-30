@@ -29,12 +29,12 @@
 
     <!-- Trade fields (right) -->
     <Label Name="lblItem" Text="Item" Position="360, 28" Size="60, 16"/>
-    <ComboBox Name="cmbItem" Position="426, 26" Size="240, 18"/>
+    <ComboBox Name="cmbItem" Position="452, 26" Size="240, 18"/>
     <Label Name="lblItemValue" Text="Value" Position="360, 52" Size="60, 16"/>
-    <TextBox Name="txtItemValue" Position="426, 50" Size="120, 20" Design="TextWhite"/>
+    <TextBox Name="txtItemValue" Position="452, 50" Size="120, 20" Design="TextWhite"/>
 
     <Label Name="lblCostItem" Text="Cost Item" Position="360, 84" Size="80, 16"/>
-    <ComboBox Name="cmbCostItem" Position="462, 82" Size="204, 18"/>
+    <ComboBox Name="cmbCostItem" Position="452, 82" Size="204, 18"/>
     <Label Name="lblCostValue" Text="Cost Value" Position="360, 108" Size="120, 16"/>
     <TextBox Name="txtCostValue" Position="452, 106" Size="110, 20" Design="TextWhite"/>
   </GroupBox>
