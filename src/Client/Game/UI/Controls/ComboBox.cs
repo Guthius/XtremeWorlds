@@ -15,8 +15,8 @@ public sealed class ComboBox : Control
 
     public override void Render(int x, int y)
     {
-        // Use same panel style as group boxes / text panels
-        DesignRenderer.Render(Design.TextBlack, X + x, Y + y, Width, Height);
+        // Gradient background (new) instead of transparent/text black panel
+        DesignRenderer.Render(Design.ComboBox, X + x, Y + y, Width, Height);
 
         // Center the selected item's text based on its width at render scale
         const float scale = 12f / 16f;

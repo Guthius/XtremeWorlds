@@ -10,9 +10,8 @@ public static class WindowRenderer
     {
         if (window.Design[0] == Design.ComboMenu)
         {
-            // Draw a solid black background area slightly larger than the items
-            // to improve readability of combo menu entries.
-            DesignRenderer.Render(Design.TextBlack,
+            // Use unified ComboMenu design (same dark panel as ComboBox)
+            DesignRenderer.Render(Design.ComboMenu,
                 window.X - 2,
                 window.Y - 2,
                 window.Width + 4,

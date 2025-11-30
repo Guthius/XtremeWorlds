@@ -142,6 +142,14 @@ public static class DesignRenderer
             case Design.TileSelectionBox:
                 RenderTileSelectionBox(left, top, width, height, alpha);
                 break;
+
+            case Design.ComboBox:
+                RenderComboBox(left, top, width, height, alpha);
+                break;
+
+            case Design.ComboMenu:
+                RenderComboMenu(left, top, width, height, alpha);
+                break;
         }
     }
 
@@ -395,7 +403,6 @@ public static class DesignRenderer
 
     private static void RenderParchment(int left, int top, int width, int height, int alpha)
     {
-        // Eto-like container padding (~10px)
         const int borderSize = 10;
         RenderSquare(4, left, top, width, height, borderSize, alpha);
     }
@@ -481,31 +488,22 @@ public static class DesignRenderer
     {
         var path = Path.Combine(DataPath.Designs, sprite.ToString());
 
-        // Draw center
         GameClient.RenderTexture(ref path, x + borderSize, y + borderSize, borderSize + 1, borderSize + 1, width - borderSize * 2, height - borderSize * 2, alpha: (byte)alpha);
 
-        // Draw top side
         GameClient.RenderTexture(ref path, x + borderSize, y, borderSize, 0, width - borderSize * 2, borderSize, 1, borderSize, (byte)alpha);
 
-        // Draw left side
         GameClient.RenderTexture(ref path, x, y + borderSize, 0, borderSize, borderSize, height - borderSize * 2, borderSize, alpha: (byte)alpha);
 
-        // Draw right side
         GameClient.RenderTexture(ref path, x + width - borderSize, y + borderSize, borderSize + 3, borderSize, borderSize, height - borderSize * 2, borderSize, alpha: (byte)alpha);
 
-        // Draw bottom side
         GameClient.RenderTexture(ref path, x + borderSize, y + height - borderSize, borderSize, borderSize + 3, width - borderSize * 2, borderSize, 1, borderSize, (byte)alpha);
 
-        // Draw top left corner
         GameClient.RenderTexture(ref path, x, y, 0, 0, borderSize, borderSize, borderSize, borderSize, (byte)alpha);
 
-        // Draw top right corner
         GameClient.RenderTexture(ref path, x + width - borderSize, y, borderSize + 3, 0, borderSize, borderSize, borderSize, borderSize, (byte)alpha);
 
-        // Draw bottom left corner
         GameClient.RenderTexture(ref path, x, y + height - borderSize, 0, borderSize + 3, borderSize, borderSize, borderSize, borderSize, (byte)alpha);
 
-        // Draw bottom right corner
         GameClient.RenderTexture(ref path, x + width - borderSize, y + height - borderSize, borderSize + 3, borderSize + 3, borderSize, borderSize, borderSize, borderSize, (byte)alpha);
     }
     
@@ -513,5 +511,18 @@ public static class DesignRenderer
     {
         const int borderSize = 4;
         RenderSquare(20, left, top, width, height, borderSize, alpha);
+    }
+
+    private static void RenderComboBox(int left, int top, int width, int height, int alpha)
+    {
+        const int borderSize = 5;
+        RenderSquare(6, left, top, width, height, borderSize, alpha);
+    }
+
+    private static void RenderComboMenu(int left, int top, int width, int height, int alpha)
+    {
+        // Match ComboBox dark panel styling (sprite 6).
+        const int borderSize = 5;
+        RenderSquare(6, left, top, width, height, borderSize, alpha);
     }
 }
