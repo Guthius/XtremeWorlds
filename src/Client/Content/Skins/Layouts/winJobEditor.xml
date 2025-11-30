@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window Name="winJobEditor" Caption="Job Editor"
-        Size="970, 560"
+        Size="974, 550"
         Icon="1127" IconOffset="3, 5"
         Design="WindowNormal"
         StartPosition="CenterScreen"
@@ -8,21 +8,21 @@
 
   <!-- Jobs list -->
   <Label Name="lblList" Text="Jobs" Position="16, 24" Size="80, 16"/>
-  <ListBox Name="lstIndex" Position="16, 44" Size="220, 476"/>
-  <ScrollBar Name="sldList" Position="236, 44" Size="12, 476" Min="0" Max="0" Value="0" Orientation="Vertical" ThumbSize="16"/>
+  <ListBox Name="lstIndex" Position="16, 44" Size="220, 472"/>
+  <ScrollBar Name="sldList" Position="236, 44" Size="12, 472" Min="0" Max="0" Value="0" Orientation="Vertical" ThumbSize="16"/>
 
   <!-- General group: name + description -->
-  <GroupBox Name="grpGeneral" Caption="" Position="260, 24" Size="700, 140">
+  <GroupBox Name="grpGeneral" Caption="" Position="260, 32" Size="700, 140">
     <Label Name="lblName" Text="Name" Position="8, 16" Size="60, 16"/>
     <TextBox Name="txtName" Position="72, 14" Size="240, 20" Design="TextWhite"/>
 
-    <Label Name="lblDesc" Text="Description" Position="8, 44" Size="80, 16"/>
-    <TextBox Name="txtDesc" Position="92, 42" Size="592, 84" Design="TextWhite" Multiline="true"/>
+    <Label Name="lblDesc" Text="Description" Position="8, 44" Size="100, 16"/>
+    <TextBox Name="txtDesc" Position="72, 42" Size="600, 84" Design="TextWhite" Multiline="true"/>
   </GroupBox>
 
   <!-- Start position and sprites -->
-  <GroupBox Name="grpStart" Caption="" Position="260, 168" Size="700, 120">
-    <Label Name="lblStart" Text="Start Position" Position="8, 12" Size="100, 16"/>
+  <GroupBox Name="grpStart" Caption="" Position="260, 180" Size="700, 120">
+    <Label Name="lblStart" Text="Start Position" Position="8, 12" Size="120, 16"/>
     <Label Name="lblStartMap" Text="Map" Position="8, 34" Size="36, 16"/>
     <TextBox Name="txtStartMap" Position="48, 32" Size="60, 20" Design="TextWhite"/>
     <Label Name="lblStartX" Text="X" Position="114, 34" Size="16, 16"/>
@@ -30,17 +30,17 @@
     <Label Name="lblStartY" Text="Y" Position="180, 34" Size="16, 16"/>
     <TextBox Name="txtStartY" Position="198, 32" Size="40, 20" Design="TextWhite"/>
 
-    <Label Name="lblMaleSprite" Text="Male Sprite" Position="260, 20" Size="80, 16"/>
-    <ScrollBar Name="sldMaleSprite" Position="344, 22" Size="150, 12" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
-    <PictureBox Name="picMale" Position="508, 8" Size="72, 72" Design="TextBlack"/>
+    <Label Name="lblMaleSprite" Text="Male Sprite" Position="260, 20" Size="120, 16"/>
+    <ScrollBar Name="sldMaleSprite" Position="344, 22" Size="100, 12" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+    <PictureBox Name="picMale" Position="504, 16" Size="64, 64" Design="TextBlack"/>
 
-    <Label Name="lblFemaleSprite" Text="Female Sprite" Position="260, 56" Size="90, 16"/>
-    <ScrollBar Name="sldFemaleSprite" Position="354, 58" Size="140, 12" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
-    <PictureBox Name="picFemale" Position="508, 44" Size="72, 72" Design="TextBlack"/>
+    <Label Name="lblFemaleSprite" Text="Female Sprite" Position="260, 56" Size="120, 16"/>
+    <ScrollBar Name="sldFemaleSprite" Position="354, 58" Size="100, 12" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+    <PictureBox Name="picFemale" Position="584, 16" Size="64, 64" Design="TextBlack"/>
   </GroupBox>
 
 	<!-- Start items (left of lower area) -->
-	<GroupBox Name="grpStartItems" Caption="" Position="260, 292" Size="340, 200">
+	<GroupBox Name="grpStartItems" Caption="" Position="260, 310" Size="340, 200">
 		<Label Name="lblStartItems" Text="Start Items" Position="8, 8" Size="100, 16"/>
 		<ListBox Name="lstStartItems" Position="8, 28" Size="304, 102"/>
 		<ScrollBar Name="sldStartItems" Position="316, 28" Size="12, 102" Min="0" Max="0" Value="0" Vertical="true"/>
@@ -52,7 +52,7 @@
 	</GroupBox>
 
 	<!-- Start skills (right of lower area) -->
-	<GroupBox Name="grpStartSkills" Caption="" Position="620, 292" Size="340, 200">
+	<GroupBox Name="grpStartSkills" Caption="" Position="620, 310" Size="340, 200">
 		<Label Name="lblStartSkills" Text="Start Skills" Position="8, 8" Size="100, 16"/>
 		<ListBox Name="lstStartSkills" Position="8, 28" Size="304, 102"/>
 		<ScrollBar Name="sldStartSkills" Position="316, 28" Size="12, 102" Min="0" Max="0" Value="0" Vertical="true"/>
@@ -62,10 +62,10 @@
 	</GroupBox>
 
   <!-- Action buttons -->
-  <Button Name="btnSave" Text="Save" Position="440, 500" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-  <Button Name="btnDelete" Text="Delete" Position="528, 500" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
-  <Button Name="btnCopy" Text="Copy" Position="616, 500" Size="80, 24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="GreenClick"/>
-  <Button Name="btnCancel" Text="Cancel" Position="704, 500" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+  <Button Name="btnSave" Text="Save" Position="440, 516" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+  <Button Name="btnDelete" Text="Delete" Position="528, 516" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+  <Button Name="btnCopy" Text="Copy" Position="616, 516" Size="80, 24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="GreenClick"/>
+  <Button Name="btnCancel" Text="Cancel" Position="704, 516" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
 
   <Button Name="btnClose" Position="-19, 5" Size="16, 16" Image="8" ImageHover="9" ImageMouseDown="10"/>
 </Window>

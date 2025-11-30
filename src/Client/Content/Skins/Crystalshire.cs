@@ -200,6 +200,9 @@ public class Crystalshire
     {
         var window = WindowLoader.FromLayout("winMapEditor");
 
+        // Wire scrollable lists
+        WireScrollableList("winMapEditor", "lstIndex", "sldNpcList");
+
         // Close button should discard changes (same as Discard)
         if (WindowManager.TryGetControl("winMapEditor", "btnClose", out var btnClose))
         {
@@ -340,7 +343,7 @@ public class Crystalshire
                 }
                 else
                 {
-                    WinEditorMap.OnFillLayerClick();
+                    WinMapEditor.OnFillLayerClick();
                 }
             };
         if (WindowManager.TryGetControl("winMapEditor", "btnToolEraser", out var btnErase))
@@ -349,7 +352,7 @@ public class Crystalshire
                 // Contextual clear: Directions -> clear dir blocks (confirm), Attributes -> clear attributes (confirm), otherwise clear current tiles layer
                 if (GameState.MapEditorTab == (int)MapEditorTab.Directions)
                 {
-                    WinEditorMap.OnDirClearClick();
+                    WinMapEditor.OnDirClearClick();
                 }
                 else if (GameState.MapEditorTab == (int)MapEditorTab.Attributes)
                 {
@@ -373,7 +376,7 @@ public class Crystalshire
 
         // Quick actions: call into existing helpers if available
         if (WindowManager.TryGetControl("winMapEditor", "btnFillLayer", out var btnFillLayer))
-            btnFillLayer.CallBack[(int)ControlState.MouseDown] = () => { WinEditorMap.OnFillLayerClick(); };
+            btnFillLayer.CallBack[(int)ControlState.MouseDown] = () => { WinMapEditor.OnFillLayerClick(); };
         if (WindowManager.TryGetControl("winMapEditor", "btnClearLayer", out var btnClearLayer))
             btnClearLayer.CallBack[(int)ControlState.MouseDown] = () => { Editors.MapEditorClearLayer((MapLayer)GameState.CurLayer); };
         if (WindowManager.TryGetControl("winMapEditor", "btnCopyMap", out var btnCopy))
@@ -949,8 +952,8 @@ public class Crystalshire
                     break;
                 case "Npcs":
                     SetGroupBoxVisible("winMapEditor", "grpNpcs", true);
-                    InitNpcList();
-                    WinEditorMap.RefreshMapNpcList();
+                    WinMapEditor.InitNpcList();
+                    WinMapEditor.RefreshMapNpcList();
                     GameState.MapEditorTab = (int)MapEditorTab.Npcs;
                     break;
                 case "Settings":
@@ -1227,55 +1230,6 @@ public class Crystalshire
             BindSlider("sldMapBrightness", Data.MyMap.Brightness, 0, 100, v => Data.MyMap.Brightness = (byte)v, "lblBrightness", "Brightness");
         }
 
-        void InitNpcList()
-        {
-            if (WindowManager.TryGetControl("winMapEditor", "cmbNpcList", out var npcCtrl) && npcCtrl is ComboBox cmbNpc)
-            {
-                int prev = cmbNpc.Value;
-                cmbNpc.Items.Clear();
-                cmbNpc.Items.Add("None");
-                var npcArr = Data.Npc;
-                if (npcArr != null)
-                {
-                    for (int i = 0; i < npcArr.Length; i++)
-                    {
-                        var raw = npcArr[i].Name ?? string.Empty;
-                        var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
-                        cmbNpc.Items.Add($"{i + 1}: {name}");
-                    }
-                }
-                cmbNpc.Value = (prev >= 0 && prev < cmbNpc.Items.Count) ? prev : 0;
-
-                // Repopulate items when the dropdown is first clicked open
-                cmbNpc.CallBack[(int)ControlState.MouseDown] = () => InitNpcList();
-
-                // When selection actually changes (mouse move over list), write to map data + list
-                cmbNpc.CallBack[(int)ControlState.MouseMove] = () =>
-                {
-                    int slotIndex = WinEditorMap.NpcSelectedSlot;
-                    if (Data.MyMap.Npc != null && slotIndex >= 0 && slotIndex < Data.MyMap.Npc.Length)
-                    {
-                        int npcIndex = cmbNpc.Value - 1; // 0 = None
-                        Data.MyMap.Npc[slotIndex] = npcIndex;
-
-                        if (WindowManager.TryGetControl("winMapEditor", "lstIndex", out var lstIndex) && lstIndex is ListBox lst)
-                        {
-                            string name = "None";
-                            if (npcIndex >= 0 && npcIndex < (Data.Npc?.Length ?? 0))
-                            {
-                                var rawName = Data.Npc[npcIndex].Name ?? string.Empty;
-                                if (!string.IsNullOrWhiteSpace(rawName)) name = rawName.Trim();
-                            }
-                            if (slotIndex >= 0 && slotIndex < lst.Items.Count)
-                            {
-                                lst.Items[slotIndex] = $"{slotIndex + 1}: {name}";
-                            }
-                        }
-                    }
-                };
-            }
-        }
-
         // Opacity checkbox on Tiles page: toggles GameState.HideLayers
         if (WindowManager.TryGetControl("winMapEditor", "chkOpacity", out var chkOpacity))
         {
@@ -1336,29 +1290,29 @@ public class Crystalshire
         // Wire tileset preview draw
         if (WindowManager.TryGetControl("winMapEditor", "picTileset", out var picTileset))
         {
-            picTileset.OnDraw = WinEditorMap.OnDrawTileset;
-            picTileset.CallBack[(int)ControlState.MouseDown] = WinEditorMap.OnTilesetMouseDown;
-            picTileset.CallBack[(int)ControlState.MouseMove] = WinEditorMap.OnTilesetMouseMove;
-            picTileset.CallBack[(int)ControlState.MouseUp] = WinEditorMap.OnTilesetMouseUp;
-            picTileset.CallBack[(int)ControlState.MouseScroll] = WinEditorMap.OnTilesetMouseWheel;
+            picTileset.OnDraw = WinMapEditor.OnDrawTileset;
+            picTileset.CallBack[(int)ControlState.MouseDown] = WinMapEditor.OnTilesetMouseDown;
+            picTileset.CallBack[(int)ControlState.MouseMove] = WinMapEditor.OnTilesetMouseMove;
+            picTileset.CallBack[(int)ControlState.MouseUp] = WinMapEditor.OnTilesetMouseUp;
+            picTileset.CallBack[(int)ControlState.MouseScroll] = WinMapEditor.OnTilesetMouseWheel;
         }
 
         // Npc list drawing and interactions
         if (WindowManager.TryGetControl("winMapEditor", "lstIndex", out var lstIndex) && lstIndex is ListBox list)
         {
-            list.CallBack[(int)ControlState.MouseDown] = WinEditorMap.OnNpcListMouseDown;
+            list.CallBack[(int)ControlState.MouseDown] = WinMapEditor.OnNpcListMouseDown;
             // Use MouseScroll (enum) for wheel events
-            list.CallBack[(int)ControlState.MouseScroll] = WinEditorMap.OnNpcListMouseWheel;
+            list.CallBack[(int)ControlState.MouseScroll] = WinMapEditor.OnNpcListMouseWheel;
         }
         if (WindowManager.TryGetControl("winMapEditor", "sldNpcList", out var sldNpcList))
         {
-            sldNpcList.CallBack[(int)ControlState.MouseMove] = WinEditorMap.OnNpcScrollBarMove;
+            sldNpcList.CallBack[(int)ControlState.MouseMove] = WinMapEditor.OnNpcScrollBarMove;
         }
 
         // Dir Block: confirmation + clear via WinEditorMap helper
         if (WindowManager.TryGetControl("winMapEditor", "btnDirClear", out var btnDirClear))
         {
-            btnDirClear.CallBack[(int)ControlState.MouseDown] = WinEditorMap.OnDirClearClick;
+            btnDirClear.CallBack[(int)ControlState.MouseDown] = WinMapEditor.OnDirClearClick;
         }
     }
 
@@ -1857,7 +1811,7 @@ public class Crystalshire
         }
 
         // Equipment & stats via sliders
-        if (WindowManager.TryGetControl("winItemEditor", "sldItemDamage", out var dmgCtrl) && dmgCtrl is Client.Game.UI.Controls.ScrollBar sldDmg)
+        if (WindowManager.TryGetControl("winItemEditor", "sldDamage", out var dmgCtrl) && dmgCtrl is Client.Game.UI.Controls.ScrollBar sldDmg)
         {
             sldDmg.CallBack[(int)ControlState.MouseMove] = () =>
             {
@@ -1869,7 +1823,7 @@ public class Crystalshire
             };
         }
 
-        if (WindowManager.TryGetControl("winItemEditor", "sldItemSpeed", out var spdCtrl) && spdCtrl is Client.Game.UI.Controls.ScrollBar sldSpeed)
+        if (WindowManager.TryGetControl("winItemEditor", "sldSpeed", out var spdCtrl) && spdCtrl is Client.Game.UI.Controls.ScrollBar sldSpeed)
         {
             sldSpeed.CallBack[(int)ControlState.MouseMove] = () =>
             {
@@ -2424,26 +2378,10 @@ public class Crystalshire
             Sender.SendRequestMapReport();
         };
 
-        // Wire `lstMaps` listbox interactions and scrollbar sync
+        WireScrollableList("winAdmin", "lstMaps", "sldMapList");
+
         if (WindowManager.TryGetControl("winAdmin", "lstMaps", out var lstCtrl) && lstCtrl is ListBox lstMaps)
         {
-            // Use our custom draw routine for this skin
-            lstMaps.OnDraw = OnDrawMapList;
-
-            // Click selects item (single click) and ensures visibility
-            lstMaps.CallBack[(int)ControlState.MouseDown] = () =>
-            {
-                var win = WindowManager.GetWindowByName("winAdmin");
-                if (win is null) return;
-                int relY = GameClient.CurrentMouseState.Y - (win.Y + lstMaps.Y);
-                int idx = lstMaps.GetItemIndexAtPosition(relY);
-                if (idx >= 0 && idx < lstMaps.Items.Count)
-                {
-                    lstMaps.SelectedIndex = idx;
-                    lstMaps.EnsureVisible(idx);
-                }
-            };
-
             // Double-click to warp to selected map
             lstMaps.CallBack[(int)ControlState.DoubleClick] = () =>
             {
@@ -2456,36 +2394,6 @@ public class Crystalshire
                 {
                     var target = Math.Max(0, mapNum - 1); // display is 1-based; engine expects 0-based
                     Sender.WarpTo(target);
-                }
-            };
-
-            // Mouse wheel scrolling
-            lstMaps.CallBack[(int)ControlState.MouseScroll] = () =>
-            {
-                int delta = GameClient.CurrentMouseState.ScrollWheelValue - GameClient.PreviousMouseState.ScrollWheelValue;
-                if (delta != 0)
-                {
-                    int step = delta > 0 ? -1 : 1;
-                    lstMaps.ScrollBy(step);
-                    // Keep scrollbar in sync if present
-                    if (WindowManager.TryGetControl("winAdmin", "sldMapList", out var sldCtrlSync) && sldCtrlSync is ScrollBar sb)
-                    {
-                        sb.Value = lstMaps.ScrollOffset;
-                    }
-                }
-            };
-        }
-
-        if (WindowManager.TryGetControl("winAdmin", "sldMapList", out var sldMapListCtrl) && sldMapListCtrl is ScrollBar sldMapList)
-        {
-            sldMapList.CallBack[(int)ControlState.MouseMove] = () =>
-            {
-                if (WindowManager.TryGetControl("winAdmin", "lstMaps", out var lstCtrl2) && lstCtrl2 is ListBox lst2)
-                {
-                    // Keep scrollbar range in sync with list
-                    int maxScroll = Math.Max(0, lst2.Items.Count - lst2.GetVisibleCount());
-                    sldMapList.Min = 0; sldMapList.Max = maxScroll;
-                    lst2.ScrollOffset = Math.Clamp(sldMapList.Value, sldMapList.Min, sldMapList.Max);
                 }
             };
         }
@@ -2635,42 +2543,6 @@ public class Crystalshire
         // Default tab
         ShowTab("Moderation");
     }
-
-    // Draw the admin map list using the list control's Text and scroll offset (Value)
-    private static void OnDrawMapList()
-    {
-        var win = WindowManager.GetWindowByName("winAdmin");
-        if (win is null) return;
-        var lst = win.GetChild("lstMaps");
-        if (lst is null || string.IsNullOrEmpty(lst.Text)) return;
-
-        // Draw a black background panel behind the list area for readability
-        DesignRenderer.Render(Design.TextBlack,
-            win.X + lst.X,
-            win.Y + lst.Y,
-            lst.Width,
-            lst.Height);
-
-        var lines = lst.Text.Split('\n');
-        var x = win.X + lst.X + 6;
-        var y = win.Y + lst.Y + 6;
-        var lineHeight = 14;
-
-        // visible capacity
-        var maxLines = Math.Max(0, (lst.Height - 8) / lineHeight);
-        var start = Math.Clamp(lst.Value, 0, Math.Max(0, lines.Length - maxLines));
-        var count = Math.Min(maxLines, Math.Max(0, lines.Length - start));
-
-        for (int i = 0; i < count; i++)
-        {
-            var line = lines[start + i];
-            if (!string.IsNullOrEmpty(line))
-            {
-                TextRenderer.RenderText(line, x, y + i * lineHeight, Microsoft.Xna.Framework.Color.White, Microsoft.Xna.Framework.Color.Black, win.Font);
-            }
-        }
-    }
-
     public void UpdateWindow_EditorShop()
     {
         var window = WindowLoader.FromLayout("winShopEditor");
@@ -2990,7 +2862,7 @@ public class Crystalshire
         if (WindowManager.TryGetControl(windowName, barName, out var barCtrl) && barCtrl is ScrollBar sbar)
             sb = sbar;
 
-        // Click selection (window-relative). Only clicks change selection.
+        // Click selects item (window-relative). Only clicks change selection.
         lb.CallBack[(int)ControlState.MouseDown] = () =>
         {
             var win = WindowManager.GetWindowByName(windowName);

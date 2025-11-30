@@ -6,11 +6,89 @@ using Microsoft.Xna.Framework;
 
 namespace Client.Game.UI.Windows;
 
-public static class WinEditorMap
+public static class WinMapEditor
 {
     private static bool _isDraggingTileset = false;
     public static int NpcSelectedSlot = 0;
     private const int WheelTileStep = 3; // scroll by 3 tiles per wheel notch
+
+    public static void InitNpcList()
+    {
+        if (WindowManager.TryGetControl("winMapEditor", "cmbNpcList", out var npcCtrl) && npcCtrl is ComboBox cmbNpc)
+        {
+            int prev = cmbNpc.Value;
+            cmbNpc.Items.Clear();
+            cmbNpc.Items.Add("None");
+            var npcArr = Data.Npc;
+            if (npcArr != null)
+            {
+                for (int i = 0; i < npcArr.Length; i++)
+                {
+                    var raw = npcArr[i].Name ?? string.Empty;
+                    var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
+                    cmbNpc.Items.Add($"{i + 1}: {name}");
+                }
+            }
+            cmbNpc.Value = (prev >= 0 && prev < cmbNpc.Items.Count) ? prev : 0;
+
+            // Repopulate items when the dropdown is first clicked open
+            cmbNpc.CallBack[(int)ControlState.MouseDown] = () => InitNpcList();
+
+            // When selection actually changes (mouse move over list), write to map data + list
+            cmbNpc.CallBack[(int)ControlState.MouseMove] = () =>
+            {
+                int slotIndex = NpcSelectedSlot;
+                if (Data.MyMap.Npc != null && slotIndex >= 0 && slotIndex < Data.MyMap.Npc.Length)
+                {
+                    int npcIndex = cmbNpc.Value - 1; // 0 = None
+                    Data.MyMap.Npc[slotIndex] = npcIndex;
+
+                    if (WindowManager.TryGetControl("winMapEditor", "lstIndex", out var lstIndex) && lstIndex is ListBox lst)
+                    {
+                        string name = "None";
+                        if (npcIndex >= 0 && npcIndex < (Data.Npc?.Length ?? 0))
+                        {
+                            var rawName = Data.Npc[npcIndex].Name ?? string.Empty;
+                            if (!string.IsNullOrWhiteSpace(rawName)) name = rawName.Trim();
+                        }
+                        if (slotIndex >= 0 && slotIndex < lst.Items.Count)
+                        {
+                            lst.Items[slotIndex] = $"{slotIndex + 1}: {name}";
+                        }
+                    }
+                }
+            };
+        }
+    }
+
+    // Rebuild Map Editor NPC slot list items once and preserve selection/scroll
+    public static void RefreshMapNpcList()
+    {
+        if (!WindowManager.TryGetControl("winMapEditor", "lstIndex", out var ctrl) || ctrl is not ListBox list)
+            return;
+
+        int prevIndex = Math.Clamp(NpcSelectedSlot, -1, Core.Globals.Variables.MaxMapNpcs - 1);
+        int prevScroll = list.ScrollOffset;
+
+        list.Clear();
+        int total = Core.Globals.Variables.MaxMapNpcs;
+        for (int slot = 0; slot < total; slot++)
+        {
+            string name = "None";
+            try
+            {
+                int npcIndex = (Data.MyMap.Npc != null && slot < Data.MyMap.Npc.Length) ? Data.MyMap.Npc[slot] : -1;
+                if (npcIndex >= 0 && npcIndex < Core.Globals.Variables.MaxNpcs && npcIndex < (Data.Npc?.Length ?? 0))
+                {
+                    var raw = Data.Npc[npcIndex].Name ?? string.Empty;
+                    if (!string.IsNullOrWhiteSpace(raw)) name = raw.Trim();
+                }
+            }
+            catch { /* ignore */ }
+
+            list.AddItem($"{slot + 1}: {name}");
+        }
+    }
 
     public static void OnFillLayerClick()
     {
@@ -294,52 +372,6 @@ public static class WinEditorMap
     public static void OnDirClearClick()
     {
         GameLogic.Dialogue("Map Editor", "Clear Directional Blocks", "Are you sure you want to clear all directional blocks?", DialogueType.ClearDirBlocks, DialogueStyle.YesNo);
-    }
-
-    // Rebuild Map Editor NPC slot list items once and preserve selection/scroll
-    public static void RefreshMapNpcList()
-    {
-        if (!WindowManager.TryGetControl("winMapEditor", "lstIndex", out var ctrl) || ctrl is not ListBox list)
-            return;
-
-        int prevIndex = Math.Clamp(NpcSelectedSlot, -1, Core.Globals.Variables.MaxMapNpcs - 1);
-        int prevScroll = list.ScrollOffset;
-
-        list.Clear();
-        int total = Core.Globals.Variables.MaxMapNpcs;
-        for (int slot = 0; slot < total; slot++)
-        {
-            string name = "None";
-            try
-            {
-                int npcIndex = (Data.MyMap.Npc != null && slot < Data.MyMap.Npc.Length) ? Data.MyMap.Npc[slot] : -1;
-                if (npcIndex >= 0 && npcIndex < Core.Globals.Variables.MaxNpcs && npcIndex < (Data.Npc?.Length ?? 0))
-                {
-                    var raw = Data.Npc[npcIndex].Name ?? string.Empty;
-                    if (!string.IsNullOrWhiteSpace(raw)) name = raw.Trim();
-                }
-            }
-            catch { /* ignore */ }
-
-            list.AddItem($"{slot + 1}: {name}");
-        }
-
-        if (prevIndex >= 0 && prevIndex < list.Items.Count)
-        {
-            list.SelectedIndex = prevIndex;
-            NpcSelectedSlot = prevIndex;
-            list.EnsureVisible(prevIndex);
-        }
-
-        // Sync scrollbar
-        if (WindowManager.TryGetControl("winMapEditor", "sldNpcList", out var sbCtrl) && sbCtrl is ScrollBar sb)
-        {
-            int visible = list.GetVisibleCount();
-            int max = Math.Max(0, list.Items.Count - visible);
-            sb.Min = 0; sb.Max = max;
-            sbCtrl.Value = Math.Clamp(prevScroll, sb.Min, sb.Max);
-            list.ScrollOffset = sbCtrl.Value;
-        }
     }
 
     public static void LoadMap()
