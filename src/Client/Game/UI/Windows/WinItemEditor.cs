@@ -10,7 +10,7 @@ namespace Client.Game.UI.Windows;
 public static class WinItemEditor
 {
     public static int SelectedIndex = 0;
-    private static Core.Globals.Type.Item? _clipboardItem;
+    private static Core.Globals.Type.Item? _history;
 
     public static void Init()
     {
@@ -581,15 +581,15 @@ public static class WinItemEditor
     {
         if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
 
-        if (_clipboardItem is null)
+        if (_history is null)
         {
-            _clipboardItem = Data.Item[SelectedIndex];
+            _history = Data.Item[SelectedIndex];
             if (WindowManager.TryGetControl("winItemEditor", "btnCopy", out var btn) && btn is Button b)
                 b.Text = "Paste";
             return;
         }
 
-        Data.Item[SelectedIndex] = _clipboardItem.Value;
+        Data.Item[SelectedIndex] = _history.Value;
         GameState.ItemChanged[SelectedIndex] = true;
         OnLoad(SelectedIndex);
         RefreshList();

@@ -13,7 +13,7 @@ namespace Client
         public static EditorMoral Instance => _instance ??= new EditorMoral();
         private bool _suppressIndexChanged;
         public ListBox lstIndex = new ListBox{ Width = 200 };
-        private Core.Globals.Type.Moral _clipboardMoral;
+        private Core.Globals.Type.Moral _history;
         private bool _hasClipboardMoral;
         public TextBox txtName = new TextBox { Width = 200 };
         public ComboBox cmbColor = new ComboBox();
@@ -188,7 +188,7 @@ namespace Client
             if (!_hasClipboardMoral)
             {
                 if (src < 0 || src >= Variables.MaxMorals) return;
-                _clipboardMoral = Data.Moral[src];
+                _history = Data.Moral[src];
                 _hasClipboardMoral = true;
                 btnCopy.Text = "Paste";
                 return;
@@ -198,7 +198,7 @@ namespace Client
             var oneBased = Editors.PromptIndex(this, "Paste Moral", $"Paste moral into index (1..{Variables.MaxMorals}):", 1, Variables.MaxMorals, def);
             if (oneBased == null) return;
             int dst = oneBased.Value - 1;
-            var n = _clipboardMoral;
+            var n = _history;
             Data.Moral[dst] = n;
             GameState.MoralChanged[dst] = true;
 

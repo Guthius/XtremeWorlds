@@ -25,7 +25,7 @@ namespace Client
         public Button btnCancel = null!;
         public Button btnDelete = null!;
         public Button btnCopy = null!;
-        private Core.Globals.Type.Projectile _clipboardProjectile;
+        private Core.Globals.Type.Projectile _history;
         private bool _hasClipboardProjectile;
 
         private bool _initializing;
@@ -152,7 +152,7 @@ namespace Client
                 if (!_hasClipboardProjectile)
                 {
                     if (src < 0 || src >= Variables.MaxProjectiles) return;
-                    _clipboardProjectile = Data.Projectile[src];
+                    _history = Data.Projectile[src];
                     _hasClipboardProjectile = true;
                     btnCopy.Text = "Paste";
                     return;
@@ -161,7 +161,7 @@ namespace Client
                 var oneBased = Editors.PromptIndex(this, "Paste Projectile", $"Paste projectile into index (1..{Variables.MaxProjectiles}):", 1, Variables.MaxProjectiles, def);
                 if (oneBased == null) return;
                 int dst = oneBased.Value - 1;
-                var n = _clipboardProjectile;
+                var n = _history;
                 Data.Projectile[dst] = n;
                 GameState.ProjectileChanged[dst] = true;
                 _initializing = true;

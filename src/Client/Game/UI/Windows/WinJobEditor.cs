@@ -8,7 +8,7 @@ namespace Client.Game.UI.Windows
     public static class WinJobEditor
     {
         public static int SelectedIndex = 0;
-        private static Core.Globals.Type.Job? _clipboardJob = null;
+        private static Core.Globals.Type.Job? _history = null;
 
         public static void Init()
         {
@@ -221,7 +221,7 @@ namespace Client.Game.UI.Windows
         public static void OnCopyOrPaste()
         {
             if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxJobs) return;
-            if (_clipboardJob is null)
+            if (_history is null)
             {
                 var s = Data.Job[SelectedIndex];
                 var n = s; // struct copy
@@ -229,12 +229,12 @@ namespace Client.Game.UI.Windows
                 if (s.StartItem != null) n.StartItem = (int[])s.StartItem.Clone();
                 if (s.StartValue != null) n.StartValue = (int[])s.StartValue.Clone();
                 if (s.StartSkill != null) n.StartSkill = (int[])s.StartSkill.Clone();
-                _clipboardJob = n;
+                _history = n;
                 if (WindowManager.TryGetControl("winJobEditor", "btnCopy", out var btn)) btn.Text = "Paste";
                 return;
             }
 
-            var pasted = _clipboardJob.Value;
+            var pasted = _history.Value;
             Data.Job[SelectedIndex] = pasted;
             GameState.JobChanged[SelectedIndex] = true;
             LoadJob(SelectedIndex);

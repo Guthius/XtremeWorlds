@@ -12,8 +12,7 @@ public static class WinResourceEditor
 {
     public static int SelectedIndex = 0;
     public static bool IsLoading = false;
-    // Clipboard for resource copy/paste
-    public static Core.Globals.Type.Resource? _clipboardResource = null;
+    public static Core.Globals.Type.Resource? _history = null;
 
     // Initialize window (called after layout is loaded)
     public static void Init()
@@ -135,20 +134,20 @@ public static class WinResourceEditor
     public static void OnCopyOrPaste()
     {
         if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxResources) return;
-        if (_clipboardResource is null)
+        if (_history is null)
         {
             var s = Data.Resource[SelectedIndex];
             var n = s; // struct copy (clone arrays if any added later)
-            _clipboardResource = n;
+            _history = n;
             if (WindowManager.TryGetControl("winResourceEditor", "btnCopy", out var btn) && btn is Button b) b.Text = "Paste";
             return;
         }
 
         // Paste clipboard into current slot
-        var pasted = _clipboardResource.Value;
+        var pasted = _history.Value;
         Data.Resource[SelectedIndex] = pasted;
         GameState.ResourceChanged[SelectedIndex] = true;
-        _clipboardResource = null;
+        _history = null;
         if (WindowManager.TryGetControl("winResourceEditor", "btnCopy", out var btn2) && btn2 is Button b2) b2.Text = "Copy";
         OnLoad(SelectedIndex);
         RefreshList();

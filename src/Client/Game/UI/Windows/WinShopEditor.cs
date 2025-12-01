@@ -10,7 +10,7 @@ public static class WinShopEditor
 {
     public static int SelectedIndex = 0;
 
-    private static Core.Globals.Type.Shop? _clipboardShop = null;
+    private static Core.Globals.Type.Shop? _history = null;
 
     public static void Init()
     {
@@ -175,7 +175,7 @@ public static class WinShopEditor
     public static void OnCopyOrPaste()
     {
         if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxShops) return;
-        if (_clipboardShop is null)
+        if (_history is null)
         {
             // Copy current Shop (deep copy for arrays)
             var s = Data.Shop[SelectedIndex];
@@ -185,13 +185,13 @@ public static class WinShopEditor
                 n.TradeItem = new Core.Globals.Type.TradeItem[s.TradeItem.Length];
                 Array.Copy(s.TradeItem, n.TradeItem, s.TradeItem.Length);
             }
-            _clipboardShop = n;
+            _history = n;
             if (WindowManager.TryGetControl("winShopEditor", "btnCopy", out var btn)) btn.Text = "Paste";
             return;
         }
 
         // Paste clipboard into current index
-        var pasted = _clipboardShop.Value;
+        var pasted = _history.Value;
         Data.Shop[SelectedIndex] = pasted;
         GameState.ShopChanged[SelectedIndex] = true;
         // Refresh UI to reflect pasted data

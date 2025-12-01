@@ -17,7 +17,7 @@ namespace Client
         public static EditorSkill Instance => _instance ??= new EditorSkill();
         private bool _suppressIndexChanged;
         // Copy/Paste clipboard
-        private Core.Globals.Type.Skill _clipboardSkill;
+        private Core.Globals.Type.Skill _history;
         private bool _hasClipboardSkill;
         public ListBox lstIndex = new ListBox{ Width = 200 };
         public TextBox txtName = new TextBox { Width = 200 };
@@ -377,7 +377,7 @@ namespace Client
             if (!_hasClipboardSkill)
             {
                 if (src < 0 || src >= Variables.MaxSkills) return;
-                _clipboardSkill = Data.Skill[src]; // struct copy (no arrays)
+                _history = Data.Skill[src]; // struct copy (no arrays)
                 _hasClipboardSkill = true;
                 btnCopy.Text = "Paste";
                 return;
@@ -387,7 +387,7 @@ namespace Client
             var oneBased = Editors.PromptIndex(this, "Paste Skill", $"Paste skill into index (1..{Variables.MaxSkills}):", 1, Variables.MaxSkills, def);
             if (oneBased == null) return;
             int dst = oneBased.Value - 1;
-            var n = _clipboardSkill; // struct copy
+            var n = _history; // struct copy
             Data.Skill[dst] = n;
             GameState.SkillChanged[dst] = true;
 

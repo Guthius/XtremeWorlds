@@ -28,8 +28,7 @@ namespace Client
         public ComboBox cmbSound = new();
         public Drawable picSprite0 = new() { Size = new Size(192, 192), MinimumSize = new Size(192, 192) };
         public Drawable picSprite1 = new() { Size = new Size(192, 192), MinimumSize = new Size(192, 192) };
-        private Core.Globals.Type.Animation _clipboardAnim;
-        private bool _hasClipboardAnim;
+        private Core.Globals.Type.Animation _history;
 
         public EditorAnimation()
         {
@@ -266,25 +265,21 @@ namespace Client
         private void CopyOrPasteAnimation()
         {
             int src = GameState.EditorIndex;
-            if (!_hasClipboardAnim)
-            {
-                if (src < 0 || src >= Variables.MaxAnimations) return;
-                var a = Data.Animation[src];
-                _clipboardAnim = a; // struct copy
-                if (a.Sprite != null) _clipboardAnim.Sprite = (int[])a.Sprite.Clone();
-                if (a.Frames != null) _clipboardAnim.Frames = (int[])a.Frames.Clone();
-                if (a.LoopCount != null) _clipboardAnim.LoopCount = (int[])a.LoopCount.Clone();
-                if (a.LoopTime != null) _clipboardAnim.LoopTime = (int[])a.LoopTime.Clone();
-                _hasClipboardAnim = true;
-                btnCopy.Text = "Paste";
-                return;
-            }
-
+            if (src < 0 || src >= Variables.MaxAnimations) return;
+            var a = Data.Animation[src];
+            _history = a; // struct copy
+            if (a.Sprite != null) _history.Sprite = (int[])a.Sprite.Clone();
+            if (a.Frames != null) _history.Frames = (int[])a.Frames.Clone();
+            if (a.LoopCount != null) _history.LoopCount = (int[])a.LoopCount.Clone();
+            if (a.LoopTime != null) _history.LoopTime = (int[])a.LoopTime.Clone();
+            btnCopy.Text = "Paste";
+            return;
+            
             int def = GameState.EditorIndex + 1;
             var oneBased = Editors.PromptIndex(this, "Paste Animation", $"Paste animation into index (1..{Variables.MaxAnimations}):", 1, Variables.MaxAnimations, def);
             if (oneBased == null) return;
             int dst = oneBased.Value - 1;
-            var n = _clipboardAnim;
+            var n = _history;
             if (n.Sprite != null) n.Sprite = (int[])n.Sprite.Clone();
             if (n.Frames != null) n.Frames = (int[])n.Frames.Clone();
             if (n.LoopCount != null) n.LoopCount = (int[])n.LoopCount.Clone();

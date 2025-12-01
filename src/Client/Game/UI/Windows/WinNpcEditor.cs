@@ -9,7 +9,7 @@ public static class WinNpcEditor
 {
     public static int SelectedIndex = 0;
     public static bool IsLoading = false;
-    private static Core.Globals.Type.Npc? _clipboardNpc = null;
+    private static Core.Globals.Type.Npc? _history = null;
 
     public static void Init()
     {
@@ -339,7 +339,7 @@ public static class WinNpcEditor
     public static void OnCopyOrPaste()
     {
         if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxNpcs) return;
-        if (_clipboardNpc is null)
+        if (_history is null)
         {
             // Copy current NPC (deep copy for arrays)
             var s = Data.Npc[SelectedIndex];
@@ -349,13 +349,13 @@ public static class WinNpcEditor
             if (s.DropItem != null) { n.DropItem = new int[s.DropItem.Length]; Array.Copy(s.DropItem, n.DropItem, s.DropItem.Length); }
             if (s.DropItemValue != null) { n.DropItemValue = new int[s.DropItemValue.Length]; Array.Copy(s.DropItemValue, n.DropItemValue, s.DropItemValue.Length); }
             if (s.DropChance != null) { n.DropChance = new int[s.DropChance.Length]; Array.Copy(s.DropChance, n.DropChance, s.DropChance.Length); }
-            _clipboardNpc = n;
+            _history = n;
             if (WindowManager.TryGetControl("winNpcEditor", "btnCopy", out var btn)) btn.Text = "Paste";
             return;
         }
 
         // Paste clipboard into current slot
-        var pasted = _clipboardNpc.Value;
+        var pasted = _history.Value;
         Data.Npc[SelectedIndex] = pasted;
         GameState.NpcChanged[SelectedIndex] = true;
         // Refresh UI to reflect pasted data
