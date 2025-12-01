@@ -209,4 +209,16 @@ public static class WinShopEditor
         GameState.ShopChanged[SelectedIndex] = true;
         RefreshList();
     }
+
+    public static void DeleteTrade()
+    {
+        if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxShops) return;
+        if (!WindowManager.TryGetControl("winShopEditor", "lstTradeItem", out var tradeListCtrl) || tradeListCtrl is not ListBox lst) return;
+        int idx = lst.SelectedIndex;
+        if (idx < 0 || idx >= Variables.MaxTrades) return;
+        ref var trade = ref Data.Shop[SelectedIndex].TradeItem[idx];
+        trade.Item = -1; trade.ItemValue = 0; trade.CostItem = -1; trade.CostValue = 0;
+        GameState.ShopChanged[SelectedIndex] = true;
+        LoadShop(SelectedIndex);
+    }
 }

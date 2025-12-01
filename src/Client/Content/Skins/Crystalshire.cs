@@ -2568,14 +2568,7 @@ public class Crystalshire
         {
             btnDeleteTrade.CallBack[(int)ControlState.MouseDown] = () =>
             {
-                if (WinShopEditor.SelectedIndex < 0 || WinShopEditor.SelectedIndex >= Variables.MaxShops) return;
-                if (!WindowManager.TryGetControl("winShopEditor", "lstTradeItem", out var tradeListCtrl) || tradeListCtrl is not ListBox lst) return;
-                int idx = lst.SelectedIndex;
-                if (idx < 0 || idx >= Variables.MaxTrades) return;
-                ref var trade = ref Data.Shop[WinShopEditor.SelectedIndex].TradeItem[idx];
-                trade.Item = -1; trade.ItemValue = 0; trade.CostItem = -1; trade.CostValue = 0;
-                GameState.ShopChanged[WinShopEditor.SelectedIndex] = true;
-                WinShopEditor.LoadShop(WinShopEditor.SelectedIndex);
+                WinShopEditor.DeleteTrade();
             };
         }
 
