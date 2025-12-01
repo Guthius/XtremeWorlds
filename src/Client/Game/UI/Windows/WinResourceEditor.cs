@@ -22,7 +22,7 @@ public static class WinResourceEditor
             return; // window not present yet
         SelectedIndex = Math.Clamp(SelectedIndex, 0, Variables.MaxResources - 1);
         RefreshList();
-        LoadResource(SelectedIndex);
+        OnLoad(SelectedIndex);
     }
 
     // List click handler (window-relative like other editors)
@@ -38,10 +38,10 @@ public static class WinResourceEditor
         GameState.EditorIndex = index;
         list.SelectedIndex = index;
         list.EnsureVisible(index);
-        LoadResource(index);
+        OnLoad(index);
     }
 
-    public static void LoadResource(int idx)
+    public static void OnLoad(int idx)
     {
         if (idx < 0 || idx >= Variables.MaxResources) return;
         SelectedIndex = idx;
@@ -150,7 +150,7 @@ public static class WinResourceEditor
         GameState.ResourceChanged[SelectedIndex] = true;
         _clipboardResource = null;
         if (WindowManager.TryGetControl("winResourceEditor", "btnCopy", out var btn2) && btn2 is Button b2) b2.Text = "Copy";
-        LoadResource(SelectedIndex);
+        OnLoad(SelectedIndex);
         RefreshList();
     }
 
@@ -171,7 +171,7 @@ public static class WinResourceEditor
     {
         MapResource.OnClear(GameState.EditorIndex);
         GameState.ResourceChanged[GameState.EditorIndex] = true;
-        LoadResource(GameState.EditorIndex);
+        OnLoad(GameState.EditorIndex);
         RefreshList();
     }
 

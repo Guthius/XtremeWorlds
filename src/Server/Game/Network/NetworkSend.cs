@@ -495,7 +495,7 @@ public static class NetworkSend
 
         if (Data.TempPlayer[playerId].InParty >= 0)
         {
-            Party.SendPartyVitals(Data.TempPlayer[playerId].InParty, playerId);
+            NetworkSend.SendPartyVitals(Data.TempPlayer[playerId].InParty, playerId);
         }
     }
 
@@ -1686,5 +1686,218 @@ public static class NetworkSend
         PlayerService.Instance.SendDataTo(index, buffer.GetBytes());
 
         SendSwitchesAndVariables(index);
+    }
+
+
+    public static void SendDataToParty(int partyNum, byte[] data)
+    {
+        var loopTo = Data.Party[partyNum].MemberCount;
+        for (var i = 0; i < loopTo; i++)
+        {
+            if (Data.Party[partyNum].Member[i] > 0)
+            {
+                PlayerService.Instance.SendDataTo(Data.Party[partyNum].Member[i], data);
+            }
+        }
+    }
+
+    public static void SendPartyInvite(int playerId, int target)
+    {
+        var packetWriter = new PacketWriter();
+
+        packetWriter.WriteEnum(ServerPackets.SPartyInvite);
+        packetWriter.WriteString(Data.Player[target].Name);
+
+        PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
+    }
+
+    public static void SendPartyUpdate(int partyNum)
+    {
+        var packetWriter = new PacketWriter();
+
+        packetWriter.WriteEnum(ServerPackets.SPartyUpdate);
+        packetWriter.WriteInt32(Data.Party[partyNum].Leader == -1 ? 0 : 1);
+        packetWriter.WriteInt32(Data.Party[partyNum].Leader);
+
+        for (var i = 0; i < Core.Globals.Variables.MaxPartyMembers; i++)
+        {
+            packetWriter.WriteInt32(Data.Party[partyNum].Member[i]);
+        }
+
+        packetWriter.WriteInt32(Data.Party[partyNum].MemberCount);
+
+        SendDataToParty(partyNum, packetWriter.GetBytes());
+    }
+
+    public static void SendPartyUpdateTo(int index)
+    {
+        var packetWriter = new PacketWriter();
+
+        packetWriter.WriteEnum(ServerPackets.SPartyUpdate);
+
+        var partyNum = Data.TempPlayer[index].InParty;
+        if (partyNum >= 0)
+        {
+            packetWriter.WriteInt32(1);
+            packetWriter.WriteInt32(Data.Party[partyNum].Leader);
+
+            for (var i = 0; i < Core.Globals.Variables.MaxPartyMembers; i++)
+            {
+                packetWriter.WriteInt32(Data.Party[partyNum].Member[i]);
+            }
+
+            packetWriter.WriteInt32(Data.Party[partyNum].MemberCount);
+        }
+        else
+        {
+            packetWriter.WriteInt32(0);
+        }
+
+        PlayerService.Instance.SendDataTo(index, packetWriter.GetBytes());
+    }
+    public static void SendPartyVitals(int partyNum, int playerId)
+    {
+        var packetWriter = new PacketWriter();
+
+        packetWriter.WriteEnum(ServerPackets.SPartyVitals);
+        packetWriter.WriteInt32(playerId);
+
+        for (var i = 0; i < VitalCount; i++)
+        {
+            packetWriter.WriteInt32(Data.Player[playerId].Vital[i]);
+        }
+
+        SendDataToParty(partyNum, packetWriter.GetBytes());
+    }
+
+    public static void SendMapNpcsToMap(int mapNum)
+    {
+        var packet = new PacketWriter();
+
+        packet.WriteEnum(ServerPackets.SMapNpcData);
+
+        for (var mapNpcNum = 0; mapNpcNum < Core.Globals.Variables.MaxMapNpcs; mapNpcNum++)
+        {
+            packet.WriteInt32(Data.MapNpc[mapNum].Npc[mapNpcNum].Num);
+            packet.WriteInt32(Data.MapNpc[mapNum].Npc[mapNpcNum].X);
+            packet.WriteInt32(Data.MapNpc[mapNum].Npc[mapNpcNum].Y);
+            packet.WriteByte(Data.MapNpc[mapNum].Npc[mapNpcNum].Dir);
+        }
+
+        NetworkConfig.SendDataToMap(mapNum, packet.GetBytes());
+    }
+
+
+    public static void SendNpcs(int playerId)
+    {
+        for (var npcNum = 0; npcNum < Core.Globals.Variables.MaxNpcs; npcNum++)
+        {
+            if (Data.Npc[npcNum].Name.Length > 0)
+            {
+                SendUpdateNpcTo(playerId, npcNum);
+            }
+        }
+    }
+
+    public static void SendUpdateNpcTo(int playerId, int npcNum)
+    {
+        var buffer = new PacketWriter();
+
+        buffer.WriteEnum(ServerPackets.SUpdateNpc);
+        buffer.WriteInt32(npcNum);
+        buffer.WriteInt32(Data.Npc[npcNum].Animation);
+        buffer.WriteString(Data.Npc[npcNum].AttackSay);
+        buffer.WriteByte(Data.Npc[npcNum].Behavior);
+
+        for (var i = 0; i < Core.Globals.Variables.MaxDropItems; i++)
+        {
+            buffer.WriteInt32(Data.Npc[npcNum].DropChance[i]);
+            buffer.WriteInt32(Data.Npc[npcNum].DropItem[i]);
+            buffer.WriteInt32(Data.Npc[npcNum].DropItemValue[i]);
+        }
+
+        buffer.WriteInt32(Data.Npc[npcNum].Exp);
+        buffer.WriteByte(Data.Npc[npcNum].Faction);
+        buffer.WriteInt32(Data.Npc[npcNum].Hp);
+        buffer.WriteString(Data.Npc[npcNum].Name);
+        buffer.WriteByte(Data.Npc[npcNum].Range);
+        buffer.WriteByte(Data.Npc[npcNum].SpawnTime);
+        buffer.WriteInt32(Data.Npc[npcNum].SpawnSecs);
+        buffer.WriteInt32(Data.Npc[npcNum].Sprite);
+
+        var statCount = Enum.GetValues<Stat>().Length;
+        for (var i = 0; i < statCount; i++)
+        {
+            buffer.WriteByte(Data.Npc[npcNum].Stat[i]);
+        }
+
+        for (var i = 0; i < Core.Globals.Variables.MaxNpcSkills; i++)
+        {
+            buffer.WriteByte(Data.Npc[npcNum].Skill[i]);
+        }
+
+        buffer.WriteInt32(Data.Npc[npcNum].Level);
+        buffer.WriteInt32(Data.Npc[npcNum].Damage);
+
+        PlayerService.Instance.SendDataTo(playerId, buffer.GetBytes());
+    }
+
+    public static void SendUpdateNpcToAll(int npcNum)
+    {
+        var packet = new PacketWriter();
+
+        packet.WriteEnum(ServerPackets.SUpdateNpc);
+        packet.WriteInt32(npcNum);
+        packet.WriteInt32(Data.Npc[npcNum].Animation);
+        packet.WriteString(Data.Npc[npcNum].AttackSay);
+        packet.WriteByte(Data.Npc[npcNum].Behavior);
+
+        for (var i = 0; i < Core.Globals.Variables.MaxDropItems; i++)
+        {
+            packet.WriteInt32(Data.Npc[npcNum].DropChance[i]);
+            packet.WriteInt32(Data.Npc[npcNum].DropItem[i]);
+            packet.WriteInt32(Data.Npc[npcNum].DropItemValue[i]);
+        }
+
+        packet.WriteInt32(Data.Npc[npcNum].Exp);
+        packet.WriteByte(Data.Npc[npcNum].Faction);
+        packet.WriteInt32(Data.Npc[npcNum].Hp);
+        packet.WriteString(Data.Npc[npcNum].Name);
+        packet.WriteByte(Data.Npc[npcNum].Range);
+        packet.WriteByte(Data.Npc[npcNum].SpawnTime);
+        packet.WriteInt32(Data.Npc[npcNum].SpawnSecs);
+        packet.WriteInt32(Data.Npc[npcNum].Sprite);
+
+        var statCount = Enum.GetValues<Stat>().Length;
+        for (var i = 0; i < statCount; i++)
+        {
+            packet.WriteByte(Data.Npc[npcNum].Stat[i]);
+        }
+
+        for (var i = 0; i < Core.Globals.Variables.MaxNpcSkills; i++)
+        {
+            packet.WriteByte(Data.Npc[npcNum].Skill[i]);
+        }
+
+        packet.WriteInt32(Data.Npc[npcNum].Level);
+        packet.WriteInt32(Data.Npc[npcNum].Damage);
+
+        PlayerService.Instance.SendDataToAll(packet.GetBytes());
+    }
+
+    public static void SendMapNpcVitals(int mapNum, byte mapNpcNum)
+    {
+        var packet = new PacketWriter(4);
+
+        packet.WriteInt32((int)ServerPackets.SMapNpcVitals);
+        packet.WriteInt32(mapNpcNum);
+
+        var vitalCount = Enum.GetValues<Vital>().Length;
+        for (var i = 0; i < vitalCount; i++)
+        {
+            packet.WriteInt32(Data.MapNpc[mapNum].Npc[mapNpcNum].Vital[i]);
+        }
+
+        NetworkConfig.SendDataToMap(mapNum, packet.GetBytes());
     }
 }

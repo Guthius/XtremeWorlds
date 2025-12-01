@@ -2553,7 +2553,7 @@ public class Crystalshire
                 if (WindowManager.TryGetControl("winShopEditor", "txtCostValue", out var cqCtrl) && cqCtrl is TextBox txtCQ && int.TryParse(txtCQ.Text, out var costQty))
                     trade.CostValue = Math.Max(0, costQty);
                 GameState.ShopChanged[WinShopEditor.SelectedIndex] = true;
-                WinShopEditor.LoadShop(WinShopEditor.SelectedIndex);
+                WinShopEditor.OnLoad(WinShopEditor.SelectedIndex);
             };
         }
 
@@ -2590,7 +2590,7 @@ public class Crystalshire
         }
         if (WindowManager.TryGetControl("winShopEditor", "btnClose", out var closeCtrl) && closeCtrl is Button btnClose)
         {
-            btnClose.CallBack[(int)ControlState.MouseDown] = () => { Editors.ShopEditorCancel(); WindowManager.HideWindow("winShopEditor"); };
+            btnClose.CallBack[(int)ControlState.MouseDown] = () => { WinShopEditor.OnCancel(); Editors.ShopEditorCancel(); WindowManager.HideWindow("winShopEditor"); };
         }
     }
 
@@ -2849,17 +2849,7 @@ public class Crystalshire
         // List selection callback override to load resource
         if (WindowManager.TryGetControl("winResourceEditor", "lstIndex", out var lstCtrl2) && lstCtrl2 is ListBox lst2)
         {
-            lst2.CallBack[(int)ControlState.MouseDown] = () =>
-            {
-                var win = WindowManager.GetWindowByName("winResourceEditor");
-                if (win is null) return;
-                int relY = GameClient.CurrentMouseState.Y - (win.Y + lst2.Y);
-                int idx = lst2.GetItemIndexAtPosition(relY);
-                if (idx < 0 || idx >= lst2.Items.Count) return;
-                lst2.SelectedIndex = idx;
-                lst2.EnsureVisible(idx);
-                WinResourceEditor.LoadResource(idx);
-            };
+            lst2.CallBack[(int)ControlState.MouseDown] = () => { WinResourceEditor.OnListMouseDown(); };
         }
 
         // Text changes
@@ -2915,23 +2905,14 @@ public class Crystalshire
 
         // Buttons
         if (WindowManager.TryGetControl("winResourceEditor", "btnSave", out var btnSave))
-            btnSave.CallBack[(int)ControlState.MouseDown] = () => { Editors.ResourceEditorOK(); WindowManager.HideWindow("winResourceEditor"); };
+            btnSave.CallBack[(int)ControlState.MouseDown] = () => { WinResourceEditor.OnSave(); };
         if (WindowManager.TryGetControl("winResourceEditor", "btnCancel", out var btnCancel))
-            btnCancel.CallBack[(int)ControlState.MouseDown] = () => { Editors.ResourceEditorCancel(); WindowManager.HideWindow("winResourceEditor"); };
+            btnCancel.CallBack[(int)ControlState.MouseDown] = () => { WinResourceEditor.OnCancel(); };
         if (WindowManager.TryGetControl("winResourceEditor", "btnDelete", out var btnDelete))
-            btnDelete.CallBack[(int)ControlState.MouseDown] = () =>
-            {
-                MapResource.OnClear(GameState.EditorIndex);
-                GameState.ResourceChanged[GameState.EditorIndex] = true;
-                WinResourceEditor.LoadResource(GameState.EditorIndex);
-                WinResourceEditor.RefreshList();
-            };
-        if (WindowManager.TryGetControl("winNpcEditor", "btnCopy", out var btnCopy))
-        {
-            btnCopy.CallBack[(int)ControlState.MouseDown] = WinNpcEditor.OnCopyOrPaste;
-        }
+            btnDelete.CallBack[(int)ControlState.MouseDown] = () => { WinResourceEditor.OnDelete(); };
+        if (WindowManager.TryGetControl("winNpcEditor", "btnCopy", out var btnCopy)) { btnCopy.CallBack[(int)ControlState.MouseDown] = WinNpcEditor.OnCopy; }
         if (WindowManager.TryGetControl("winResourceEditor", "btnClose", out var btnClose))
-            btnClose.CallBack[(int)ControlState.MouseDown] = () => { Editors.ResourceEditorCancel(); WindowManager.HideWindow("winResourceEditor"); };
+            btnClose.CallBack[(int)ControlState.MouseDown] = () => { WinResourceEditor.OnCancel(); };
 
         // Bind preview pictures
         if (WindowManager.TryGetControl("winResourceEditor", "picNormal", out var picNormCtrl) && picNormCtrl is PictureBox picNormal)

@@ -1,4 +1,5 @@
-﻿using Core.Globals;
+﻿using Client.Net;
+using Core.Globals;
 using static Core.Globals.Command;
 
 namespace Client.Game.UI.Windows;
@@ -22,7 +23,7 @@ public static class WinPlayerMenu
     {
         OnClose();
         
-        Trade.SendTradeRequest(GetPlayerName((int) GameState.PlayerMenuIndex));
+        Sender.SendTradeRequest(GetPlayerName((int) GameState.PlayerMenuIndex));
     }
 
     public static void OnGuildInvite()

@@ -253,7 +253,7 @@ namespace Client
 
             if (Trade.InTrade >= 0)
             {
-                Trade.SendDeclineTrade();
+                Sender.SendDeclineTrade();
             }
 
             if (GameState.InShop >= 0)

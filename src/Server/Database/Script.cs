@@ -1342,7 +1342,7 @@ public class Script
                 {
                     int amount = Math.Max(1, Data.Npc[e.Num].Stat[(byte)Stat.Vitality] / 2);
                     e.Vital[(byte)Vital.Health] = Math.Min(maxHp, curHp + amount);
-                    Server.Npc.SendMapNpcVitals(e.Map, (byte)Core.Globals.Entity.Index(e));
+                    NetworkSend.SendMapNpcVitals(e.Map, (byte)Core.Globals.Entity.Index(e));
                 }
                 int maxMana = GameLogic.GetNpcMaxVital(e.Num, Vital.Mana);
                 if (maxMana > 0)
@@ -1352,7 +1352,7 @@ public class Script
                     {
                         int amount = Math.Max(1, Data.Npc[e.Num].Stat[(byte)Stat.Intelligence] / 2);
                         e.Vital[(byte)Vital.Mana] = Math.Min(maxMana, curMana + amount);
-                        Server.Npc.SendMapNpcVitals(e.Map, (byte)Core.Globals.Entity.Index(e));
+                        NetworkSend.SendMapNpcVitals(e.Map, (byte)Core.Globals.Entity.Index(e));
                     }
                 }
 
@@ -1364,7 +1364,7 @@ public class Script
                     {
                         int amount = Math.Max(1, Data.Npc[e.Num].Stat[(byte)Stat.Spirit] / 2);
                         e.Vital[(byte)Vital.Stamina] = (int)Math.Min(maxStam, curStam + amount);
-                        Server.Npc.SendMapNpcVitals(e.Map, (byte)Core.Globals.Entity.Index(e));
+                        NetworkSend.SendMapNpcVitals(e.Map, (byte)Core.Globals.Entity.Index(e));
                     }
                 }
             }
@@ -2068,7 +2068,7 @@ public class Script
                 // show damage amount like existing ApplyDamage does (keep consistent color if possible)
                 NetworkSend.SendActionMsg(target.Map, (isHeal ? "+" : "-") + amount, (int)(isHeal ? ColorName.BrightGreen : ColorName.BrightRed), 1, target.X, target.Y);
             }
-            Server.Npc.SendMapNpcVitals(target.Map, (byte)target.Id);
+            NetworkSend.SendMapNpcVitals(target.Map, (byte)target.Id);
             if (!isHeal && vital == Vital.Health && newVal <= 0)
             {
                 HandleDeath(caster, target);
@@ -2577,7 +2577,7 @@ public class Script
                 if (newHp > 0)
                 {
                     // still alive
-                    Server.Npc.SendMapNpcVitals(map, (byte)mapNpcNum);
+                    NetworkSend.SendMapNpcVitals(map, (byte)mapNpcNum);
                 }
             }
         }

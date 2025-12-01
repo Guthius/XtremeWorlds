@@ -116,15 +116,15 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         Bind(GamePacketId.FromClient.CEmote, Packet_Emote);
 
-        Bind(GamePacketId.FromClient.CRequestParty, Party.Packet_PartyRquest);
-        Bind(GamePacketId.FromClient.CAcceptParty, Party.Packet_AcceptParty);
-        Bind(GamePacketId.FromClient.CDeclineParty, Party.Packet_DeclineParty);
-        Bind(GamePacketId.FromClient.CLeaveParty, Party.Packet_LeaveParty);
-        Bind(GamePacketId.FromClient.CPartyChatMsg, Party.Packet_PartyChatMsg);
+        Bind(GamePacketId.FromClient.CRequestParty, Packet_PartyRquest);
+        Bind(GamePacketId.FromClient.CAcceptParty, Packet_AcceptParty);
+        Bind(GamePacketId.FromClient.CDeclineParty, Packet_DeclineParty);
+        Bind(GamePacketId.FromClient.CLeaveParty, Packet_LeaveParty);
+        Bind(GamePacketId.FromClient.CPartyChatMsg, Packet_PartyChatMsg);
         Bind(GamePacketId.FromClient.CRequestEditItem, Packet_RequestEditItem);
         Bind(GamePacketId.FromClient.CSaveItem, Packet_SaveItem);
-        Bind(GamePacketId.FromClient.CRequestEditNpc, Npc.HandleRequestEditNpc);
-        Bind(GamePacketId.FromClient.CSaveNpc, Npc.HandleSaveNpc);
+        Bind(GamePacketId.FromClient.CRequestEditNpc, Packet_RequestEditNpc);
+        Bind(GamePacketId.FromClient.CSaveNpc, Packet_SaveNpc);
         Bind(GamePacketId.FromClient.CRequestEditShop, Packet_RequestEditShop);
         Bind(GamePacketId.FromClient.CSaveShop, Packet_SaveShop);
         Bind(GamePacketId.FromClient.CRequestEditSkill, Packet_RequestEditSkill);
@@ -1499,7 +1499,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             return;
         }
 
-        Npc.SendNpcs(session.Id);
+        NetworkSend.SendNpcs(session.Id);
         NetworkSend.SendItems(session.Id);
         NetworkSend.SendAnimations(session.Id);
         NetworkSend.SendShops(session.Id);
@@ -1940,7 +1940,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         if (n < 0 | n > Core.Globals.Variables.MaxNpcs)
             return;
 
-        Npc.SendUpdateNpcTo(session.Id, n);
+        NetworkSend.SendUpdateNpcTo(session.Id, n);
     }
 
     public static void Packet_SpawnItem(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -3301,4 +3301,133 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         General.Logger.LogInformation($"Player {session.Id} responded to event {eventId} with reply {reply}");
         Event.ProcessEventReply(session.Id, eventId, pageId, reply);
     }
+
+
+    public static void Packet_PartyRquest(GameSession session, ReadOnlyMemory<byte> bytes)
+    {
+        // Prevent partying with self
+        if (Data.TempPlayer[session.Id].Target == session.Id)
+            return;
+
+        // make sure it's a valid target
+        if (Data.TempPlayer[session.Id].TargetType != (byte)TargetType.Player)
+            return;
+
+        // make sure they're connected and on the same map
+        if (GetPlayerMap(Data.TempPlayer[session.Id].Target) != GetPlayerMap(session.Id))
+            return;
+
+        // init the request
+        Party.OnInvite(session.Id, Data.TempPlayer[session.Id].Target);
+    }
+
+    public static void Packet_AcceptParty(GameSession session, ReadOnlyMemory<byte> bytes)
+    {
+        Party.OnAccept(Data.TempPlayer[session.Id].PartyInvite, session.Id);
+    }
+
+    public static void Packet_DeclineParty(GameSession session, ReadOnlyMemory<byte> bytes)
+    {
+        Party.OnDecline(Data.TempPlayer[session.Id].PartyInvite, session.Id);
+    }
+
+    public static void Packet_LeaveParty(GameSession session, ReadOnlyMemory<byte> bytes)
+    {
+        Party.OnLeave(session.Id);
+    }
+
+    public static void Packet_PartyChatMsg(GameSession session, ReadOnlyMemory<byte> bytes)
+    {
+        var buffer = new PacketReader(bytes);
+
+        Party.OnMessage(session.Id, buffer.ReadString());
+    }
+
+    public static void Packet_RequestEditNpc(GameSession session, ReadOnlyMemory<byte> bytes)
+    {
+        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        {
+            return;
+        }
+
+        var user = IsEditorLocked(session.Id, EditorType.Npc);
+        if (!string.IsNullOrEmpty(user))
+        {
+            NetworkSend.PlayerMsg(session.Id, "The game editor is locked and being used by " + user + ".", (int)ColorName.BrightRed);
+            return;
+        }
+
+        Data.TempPlayer[session.Id].Editor = EditorType.Npc;
+
+        NetworkSend.SendItems(session.Id);
+        NetworkSend.SendAnimations(session.Id);
+        NetworkSend.SendSkills(session.Id);
+
+        NetworkSend.SendNpcs(session.Id);
+
+        var packet = new PacketWriter(4);
+
+        packet.WriteEnum(ServerPackets.SNpcEditor);
+
+        PlayerService.Instance.SendDataTo(session.Id, packet.GetBytes());
+    }
+
+    public static void Packet_SaveNpc(GameSession session, ReadOnlyMemory<byte> bytes)
+    {
+        var packetReader = new PacketReader(bytes);
+
+        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        {
+            return;
+        }
+
+        var npcNum = packetReader.ReadInt32();
+        if (npcNum < 0 | npcNum > Core.Globals.Variables.MaxNpcs)
+        {
+            return;
+        }
+
+        Data.Npc[npcNum].Animation = packetReader.ReadInt32();
+        Data.Npc[npcNum].AttackSay = packetReader.ReadString();
+        Data.Npc[npcNum].Behavior = packetReader.ReadByte();
+
+        for (var i = 0; i < Core.Globals.Variables.MaxDropItems; i++)
+        {
+            Data.Npc[npcNum].DropChance[i] = packetReader.ReadInt32();
+            Data.Npc[npcNum].DropItem[i] = packetReader.ReadInt32();
+            Data.Npc[npcNum].DropItemValue[i] = packetReader.ReadInt32();
+        }
+
+        Data.Npc[npcNum].Exp = packetReader.ReadInt32();
+        Data.Npc[npcNum].Faction = packetReader.ReadByte();
+        Data.Npc[npcNum].Hp = packetReader.ReadInt32();
+        Data.Npc[npcNum].Name = packetReader.ReadString();
+        Data.Npc[npcNum].Range = packetReader.ReadByte();
+        Data.Npc[npcNum].SpawnTime = packetReader.ReadByte();
+        Data.Npc[npcNum].SpawnSecs = packetReader.ReadInt32();
+        Data.Npc[npcNum].Sprite = packetReader.ReadInt32();
+
+        var statCount = Enum.GetValues<Stat>().Length;
+        for (var i = 0; i < statCount; i++)
+        {
+            Data.Npc[npcNum].Stat[i] = packetReader.ReadByte();
+        }
+
+        for (var i = 0; i < Core.Globals.Variables.MaxNpcSkills; i++)
+        {
+            Data.Npc[npcNum].Skill[i] = packetReader.ReadByte();
+        }
+
+        Data.Npc[npcNum].Level = packetReader.ReadByte();
+        Data.Npc[npcNum].Damage = packetReader.ReadInt32();
+
+        Npc.Save(npcNum);
+
+        General.Logger.LogInformation("{AccountName} saved NPC #{NpcNum}",
+            GetAccountLogin(session.Id), npcNum);
+
+        NetworkSend.SendUpdateNpcToAll(npcNum);
+    }
+
+
 }

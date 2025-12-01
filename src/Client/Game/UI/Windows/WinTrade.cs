@@ -1,6 +1,7 @@
 ﻿using Core.Globals;
 using static Core.Globals.Command;
 using System.IO;
+using Client.Net;
 
 namespace Client.Game.UI.Windows;
 
@@ -68,12 +69,12 @@ public static class WinTrade
     {
         WindowManager.HideWindow("winTrade");
 
-        Trade.SendDeclineTrade();
+        Sender.SendDeclineTrade();
     }
 
     public static void OnAccept()
     {
-        Trade.SendAcceptTrade();
+        Sender.SendAcceptTrade();
     }
 
     public static void OnYourTradeClick()
@@ -101,7 +102,7 @@ public static class WinTrade
                 return;
             }
 
-            Trade.UntradeItem(slot);
+            Sender.SendUntradeItem(slot);
         }
 
         OnYourTradeMouseMove();

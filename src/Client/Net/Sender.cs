@@ -1063,4 +1063,64 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
+
+    public static void SendAcceptTrade()
+    {
+        var packetWriter = new PacketWriter(4);
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CAcceptTrade);
+
+        Network.Send(packetWriter);
+    }
+
+    public static void SendDeclineTrade()
+    {
+        var packetWriter = new PacketWriter(4);
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CDeclineTrade);
+
+        Network.Send(packetWriter);
+    }
+
+    public static void SendTradeRequest(string name)
+    {
+        var packetWriter = new PacketWriter();
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CTradeInvite);
+        packetWriter.WriteString(name);
+
+        Network.Send(packetWriter);
+
+    }
+
+    public static void SendHandleTradeInvite(byte answer)
+    {
+        var packetWriter = new PacketWriter(8);
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CHandleTradeInvite);
+        packetWriter.WriteInt32(answer);
+
+        Network.Send(packetWriter);
+    }
+
+    public static void SendTradeItem(int invslot, int amount)
+    {
+        var packetWriter = new PacketWriter(12);
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CTradeItem);
+        packetWriter.WriteInt32(invslot);
+        packetWriter.WriteInt32(amount);
+
+        Network.Send(packetWriter);
+    }
+
+    public static void SendUntradeItem(int invslot)
+    {
+        var packetWriter = new PacketWriter(8);
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CUntradeItem);
+        packetWriter.WriteInt32(invslot);
+
+        Network.Send(packetWriter);
+    }
 }

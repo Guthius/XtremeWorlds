@@ -195,7 +195,7 @@ namespace Server
 
             for (int i = 0; i < Core.Globals.Variables.MaxPartyMembers; i++)
             {
-                Party.ClearParty(i);
+                Party.OnClear(i);
             }
 
             Event.TempEventMap = new Type.GlobalEvents[Core.Globals.Variables.MaxMaps];

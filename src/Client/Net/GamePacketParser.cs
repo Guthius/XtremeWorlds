@@ -81,11 +81,11 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Bind(Packets.ServerPackets.SMapWornEq, Packet_MapWornEquipment);
         Bind(Packets.ServerPackets.SBank, Bank.Packet_OpenBank);
         Bind(Packets.ServerPackets.SLeftGame, Packet_LeftGame);
-        Bind(Packets.ServerPackets.STradeInvite, Trade.Packet_TradeInvite);
-        Bind(Packets.ServerPackets.STrade, Trade.Packet_Trade);
-        Bind(Packets.ServerPackets.SCloseTrade, Trade.Packet_CloseTrade);
-        Bind(Packets.ServerPackets.STradeUpdate, Trade.Packet_TradeUpdate);
-        Bind(Packets.ServerPackets.STradeStatus, Trade.Packet_TradeStatus);
+        Bind(Packets.ServerPackets.STradeInvite, Packet_TradeInvite);
+        Bind(Packets.ServerPackets.STrade, Packet_Trade);
+        Bind(Packets.ServerPackets.SCloseTrade, Packet_CloseTrade);
+        Bind(Packets.ServerPackets.STradeUpdate, Packet_TradeUpdate);
+        Bind(Packets.ServerPackets.STradeStatus, Packet_TradeStatus);
         Bind(Packets.ServerPackets.SMapReport, Packet_MapReport);
         Bind(Packets.ServerPackets.STarget, Packet_Target);
         Bind(Packets.ServerPackets.SAdmin, Packet_Admin);
@@ -1200,12 +1200,12 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
     public static void Packet_OpenShop(ReadOnlyMemory<byte> data)
     {
-        int shopnum;
+        int shopNum;
         var buffer = new PacketReader(data);
 
-        shopnum = buffer.ReadInt32();
+        shopNum = buffer.ReadInt32();
 
-        GameLogic.OpenShop(shopnum);
+        GameLogic.OpenShop(shopNum);
     }
 
     public static void Packet_ResetShopAction(ReadOnlyMemory<byte> data)
@@ -1215,23 +1215,112 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
     public static void Packet_UpdateShop(ReadOnlyMemory<byte> data)
     {
-        int shopnum;
+        int shopNum;
         var buffer = new PacketReader(data);
-        shopnum = buffer.ReadInt32();
+        shopNum = buffer.ReadInt32();
 
-        Data.Shop[shopnum].BuyRate = buffer.ReadInt32();
-        Data.Shop[shopnum].Name = buffer.ReadString();
+        Data.Shop[shopNum].BuyRate = buffer.ReadInt32();
+        Data.Shop[shopNum].Name = buffer.ReadString();
 
         for (int i = 0; i < Variables.MaxTrades; i++)
         {
-            Data.Shop[shopnum].TradeItem[i].CostItem = buffer.ReadInt32();
-            Data.Shop[shopnum].TradeItem[i].CostValue = buffer.ReadInt32();
-            Data.Shop[shopnum].TradeItem[i].Item = buffer.ReadInt32();
-            Data.Shop[shopnum].TradeItem[i].ItemValue = buffer.ReadInt32();
+            Data.Shop[shopNum].TradeItem[i].CostItem = buffer.ReadInt32();
+            Data.Shop[shopNum].TradeItem[i].CostValue = buffer.ReadInt32();
+            Data.Shop[shopNum].TradeItem[i].Item = buffer.ReadInt32();
+            Data.Shop[shopNum].TradeItem[i].ItemValue = buffer.ReadInt32();
         }
 
-        if (Data.Shop[shopnum].Name is null)
-            Data.Shop[shopnum].Name = "";
+        if (Data.Shop[shopNum].Name is null)
+            Data.Shop[shopNum].Name = "";
     }
 
+    public static void Packet_TradeInvite(ReadOnlyMemory<byte> data)
+    {
+        int requester;
+        var buffer = new PacketReader(data);
+
+        requester = buffer.ReadInt32();
+        GameLogic.Dialogue("Trade Invite", string.Format(LocalesManager.Get("Request"), Data.Player[requester].Name), "", (byte)DialogueType.Trade, DialogueStyle.YesNo);
+    }
+
+    public static void Packet_Trade(ReadOnlyMemory<byte> data)
+    {
+        var buffer = new PacketReader(data);
+
+        Trade.InTrade = buffer.ReadInt32();
+
+        GameLogic.ShowTrade();
+    }
+
+    public static void Packet_CloseTrade(ReadOnlyMemory<byte> data)
+    {
+        Trade.OnClose();
+    }
+
+    public static void Packet_TradeUpdate(ReadOnlyMemory<byte> data)
+    {
+        int datatype;
+        var buffer = new PacketReader(data);
+
+        datatype = buffer.ReadInt32();
+
+        if (datatype == 0) // ours!
+        {
+            for (int i = 0; i < Variables.MaxInv; i++)
+            {
+                Data.TradeYourOffer[i].Num = buffer.ReadInt32();
+                Data.TradeYourOffer[i].Value = buffer.ReadInt32();
+            }
+            Trade.YourWorth = buffer.ReadInt32().ToString();
+            if (WindowManager.TryGetControl("winTrade", "lblYourValue", out var lblYourValue))
+            {
+                lblYourValue!.Text = Trade.YourWorth + "g";
+            }
+        }
+        else if (datatype == 1) // theirs
+        {
+            for (int i = 0; i < Variables.MaxInv; i++)
+            {
+                Data.TradeTheirOffer[i].Num = buffer.ReadInt32();
+                Data.TradeTheirOffer[i].Value = buffer.ReadInt32();
+            }
+            Trade.TheirWorth = buffer.ReadInt32().ToString();
+            if (WindowManager.TryGetControl("winTrade", "lblTheirValue", out var lblTheirValue))
+            {
+                lblTheirValue!.Text = Trade.TheirWorth + "g";
+            }
+        }
+    }
+
+    public static void Packet_TradeStatus(ReadOnlyMemory<byte> data)
+    {
+        int tradestatus;
+        var buffer = new PacketReader(data);
+
+        tradestatus = buffer.ReadInt32();
+
+        switch (tradestatus)
+        {
+            case 0: // clear
+                {
+                    if (WindowManager.TryGetControl("winTrade", "lblStatus", out var lblStatus)) lblStatus!.Text = "Choose items to offer.";
+                    break;
+                }
+            case 1: // they've accepted
+                {
+                    if (WindowManager.TryGetControl("winTrade", "lblStatus", out var lblStatus)) lblStatus!.Text = "Other player has accepted.";
+                    break;
+                }
+            case 2: // you've accepted
+                {
+                    if (WindowManager.TryGetControl("winTrade", "lblStatus", out var lblStatus)) lblStatus!.Text = "Waiting for other player to accept.";
+                    break;
+                }
+            case 3: // no room
+                {
+                    if (WindowManager.TryGetControl("winTrade", "lblStatus", out var lblStatus)) lblStatus!.Text = "Not enough inventory space.";
+                    break;
+                }
+        }
+    }
 }

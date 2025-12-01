@@ -1087,7 +1087,7 @@ namespace Client
 
                 if (IsWindowVisible("winTrade"))
                 {
-                    Trade.SendDeclineTrade();
+                    Sender.SendDeclineTrade();
                     return;
                 }
 

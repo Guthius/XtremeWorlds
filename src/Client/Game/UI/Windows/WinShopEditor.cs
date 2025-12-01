@@ -20,7 +20,7 @@ public static class WinShopEditor
         SelectedIndex = Math.Clamp(SelectedIndex, 0, Variables.MaxShops - 1);
         RefreshList();
         PopulateCombos();
-        LoadShop(SelectedIndex);
+        OnLoad(SelectedIndex);
     }
 
     public static void OnListMouseDown()
@@ -35,7 +35,7 @@ public static class WinShopEditor
         GameState.EditorIndex = index;
         list.SelectedIndex = index;
         list.EnsureVisible(index);
-        LoadShop(index);
+        OnLoad(index);
     }
 
     public static void OnTradeListMouseDown()
@@ -127,7 +127,7 @@ public static class WinShopEditor
         }
     }
 
-    public static void LoadShop(int index)
+    public static void OnLoad(int index)
     {
         if (index < 0 || index >= Variables.MaxShops) return;
         SelectedIndex = index;
@@ -195,7 +195,7 @@ public static class WinShopEditor
         Data.Shop[SelectedIndex] = pasted;
         GameState.ShopChanged[SelectedIndex] = true;
         // Refresh UI to reflect pasted data
-        LoadShop(SelectedIndex);
+        OnLoad(SelectedIndex);
         RefreshList();
         // Keep clipboard for further pastes; update button text accordingly
         if (WindowManager.TryGetControl("winShopEditor", "btnCopy", out var btn2)) btn2.Text = "Paste";
@@ -219,14 +219,28 @@ public static class WinShopEditor
         ref var trade = ref Data.Shop[SelectedIndex].TradeItem[idx];
         trade.Item = -1; trade.ItemValue = 0; trade.CostItem = -1; trade.CostValue = 0;
         GameState.ShopChanged[SelectedIndex] = true;
-        LoadShop(SelectedIndex);
+        OnLoad(SelectedIndex);
     }
 
     public static void OnClear()
     {
         Shop.OnClear(SelectedIndex);
         GameState.ShopChanged[SelectedIndex] = true;
-        LoadShop(SelectedIndex);
+        OnLoad(SelectedIndex);
         RefreshList();
     }
+
+    // Unified handlers for callbacks
+    public static void OnSave()
+    {
+        Editors.ShopEditorOK();
+        WindowManager.HideWindow("winShopEditor");
+    }
+
+    public static void OnCancel()
+    {
+        Editors.ShopEditorCancel();
+        WindowManager.HideWindow("winShopEditor");
+    }
+
 }

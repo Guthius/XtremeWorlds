@@ -366,7 +366,7 @@ namespace Client
                             {
                                 if (GameState.MyTargetType == (int)TargetType.Player)
                                 {
-                                    Trade.SendTradeRequest(GetPlayerName(GameState.MyTarget));
+                                    Sender.SendTradeRequest(GetPlayerName(GameState.MyTarget));
                                     goto Continue1;
                                 }
                             }
@@ -378,7 +378,7 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Trade.SendTradeRequest(command[1]);
+                            Sender.SendTradeRequest(command[1]);
                             break;
                         }
 
@@ -1140,7 +1140,7 @@ namespace Client
                     case DialogueType.TradeAmount:
                         {
                             value = (long)Math.Round(Conversion.Val(diaInput));
-                            Trade.TradeItem((int)GameState.DiaData1, (int)value);
+                            Sender.SendTradeItem((int)GameState.DiaData1, (int)value);
                             break;
                         }
 
@@ -1180,7 +1180,7 @@ namespace Client
                 {
                     case DialogueType.Trade:
                         {
-                            Trade.SendHandleTradeInvite(1);
+                            Sender.SendHandleTradeInvite(1);
                             break;
                         }
 
@@ -1354,7 +1354,7 @@ namespace Client
                 {
                     case DialogueType.Trade:
                         {
-                            Trade.SendHandleTradeInvite(0);
+                            Sender.SendHandleTradeInvite(0);
                             break;
                         }
 

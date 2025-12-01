@@ -231,7 +231,7 @@ public static class WinInventory
                     return;
                 }
 
-                Trade.TradeItem(slot, 0);
+                Sender.SendTradeItem(slot, 0);
 
                 return;
             }
