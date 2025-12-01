@@ -200,4 +200,13 @@ public static class WinShopEditor
         // Keep clipboard for further pastes; update button text accordingly
         if (WindowManager.TryGetControl("winShopEditor", "btnCopy", out var btn2)) btn2.Text = "Paste";
     }
+
+    // Update name from text box (called by Crystalshire wiring).
+    public static void UpdateName(string newName)
+    {
+        if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxShops) return;
+        Data.Shop[SelectedIndex].Name = Strings.Trim(newName ?? string.Empty);
+        GameState.ShopChanged[SelectedIndex] = true;
+        RefreshList();
+    }
 }

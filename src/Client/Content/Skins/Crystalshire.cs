@@ -1322,7 +1322,7 @@ public class Crystalshire
         // Close button
         if (WindowManager.TryGetControl("winNpcEditor", "btnClose", out var btnClose))
         {
-            btnClose.CallBack[(int)ControlState.MouseDown] = () => Editors.NpcEditorCancel(); WindowManager.HideWindow("winNpcEditor");
+            btnClose.CallBack[(int)ControlState.MouseDown] = () => { Editors.NpcEditorCancel(); WindowManager.HideWindow("winNpcEditor"); };
         }
 
         // Sprite preview picture box draws NPC sprite each frame
@@ -1643,7 +1643,7 @@ public class Crystalshire
         // Close button
         if (WindowManager.TryGetControl("winItemEditor", "btnClose", out var btnClose))
         {
-            btnClose.CallBack[(int)ControlState.MouseDown] = () => Editors.ItemEditorCancel(); WindowManager.HideWindow("winItemEditor");
+            btnClose.CallBack[(int)ControlState.MouseDown] = () => { Editors.ItemEditorCancel(); WindowManager.HideWindow("winItemEditor"); };
         }
 
         // Ensure item editor combos and icon picture are visible (some skins may hide them)
@@ -2520,16 +2520,10 @@ public class Crystalshire
         WireScrollableList("winShopEditor", "lstIndex", "sldList");
         WireScrollableList("winShopEditor", "lstTradeItem", "sldTradeList");
 
-        // Name textbox
+        // Name textbox updates list entry
         if (WindowManager.TryGetControl("winShopEditor", "txtName", out var txtNameCtrl) && txtNameCtrl is TextBox txtName)
         {
-            txtName.CallBack[(int)ControlState.KeyUp] = () =>
-            {
-                if (WinShopEditor.SelectedIndex < 0 || WinShopEditor.SelectedIndex >= Variables.MaxShops) return;
-                Data.Shop[WinShopEditor.SelectedIndex].Name = txtName.Text ?? string.Empty;
-                GameState.ShopChanged[WinShopEditor.SelectedIndex] = true;
-                WinShopEditor.RefreshList();
-            };
+            txtName.CallBack[(int)ControlState.KeyUp] = () => WinShopEditor.UpdateName(txtName.Text ?? string.Empty);
         }
 
         // Buy rate textbox
@@ -2612,7 +2606,7 @@ public class Crystalshire
         }
         if (WindowManager.TryGetControl("winShopEditor", "btnClose", out var closeCtrl) && closeCtrl is Button btnClose)
         {
-            btnClose.CallBack[(int)ControlState.MouseDown] = () => Editors.ShopEditorCancel(); WindowManager.HideWindow("winShopEditor");
+            btnClose.CallBack[(int)ControlState.MouseDown] = () => { Editors.ShopEditorCancel(); WindowManager.HideWindow("winShopEditor"); };
         }
     }
 
@@ -2622,7 +2616,9 @@ public class Crystalshire
 
         // Close
         if (WindowManager.TryGetControl("winJobEditor", "btnClose", out var btnClose))
-            btnClose.CallBack[(int)ControlState.MouseDown] = () => Editors.JobEditorCancel(); WindowManager.HideWindow("winJobEditor");
+        {
+            btnClose.CallBack[(int)ControlState.MouseDown] = () => { Editors.JobEditorCancel(); WindowManager.HideWindow("winJobEditor"); };
+        }
 
         // Sprite previews
         if (WindowManager.TryGetControl("winJobEditor", "picMale", out var picMaleCtrl) && picMaleCtrl is PictureBox picMale)
