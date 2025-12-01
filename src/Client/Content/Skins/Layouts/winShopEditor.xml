@@ -6,12 +6,13 @@
         StartPosition="CenterScreen"
         Visible="false">
 
-  <Label Name="lblList" Text="Shops" Position="16, 24" Size="80, 16"/>
-  <ListBox Name="lstIndex" Position="16, 44" Size="220, 364"/>
-  <ScrollBar Name="sldList" Position="236, 44" Size="12, 364" Min="0" Max="0" Vertical="true"/>
+  <GroupBox Name="grpList" Position="8,28" Size="246,374" Caption="Shops">
+    <ListBox Name="lstIndex" Position="8,28" Size="200,342"/>
+    <ScrollBar Name="sldList" Position="208,28" Size="12,342" Min="0" Max="0" Vertical="true"/>
+  </GroupBox>
 
   <!-- General group -->
-  <GroupBox Name="grpGeneral" Caption="" Position="260, 24" Size="700, 60">
+  <GroupBox Name="grpGeneral" Caption="" Position="260, 28" Size="700, 60">
     <Label Name="lblName" Text="Name" Position="8, 16" Size="60, 16"/>
     <TextBox Name="txtName" Position="72, 14" Size="240, 20" Design="TextWhite"/>
     <Label Name="lblBuy" Text="Buy Rate" Position="320, 16" Size="80, 16"/>
@@ -31,12 +32,12 @@
     <Label Name="lblItem" Text="Item" Position="360, 28" Size="60, 16"/>
     <ComboBox Name="cmbItem" Position="452, 26" Size="240, 18"/>
     <Label Name="lblItemValue" Text="Value" Position="360, 52" Size="60, 16"/>
-    <TextBox Name="txtItemValue" Position="452, 50" Size="120, 20" Design="TextWhite"/>
+    <TextBox Name="txtItemValue" Position="452, 50" Size="240, 20" Design="TextWhite"/>
 
     <Label Name="lblCostItem" Text="Cost Item" Position="360, 84" Size="80, 16"/>
-    <ComboBox Name="cmbCostItem" Position="452, 82" Size="204, 18"/>
+    <ComboBox Name="cmbCostItem" Position="452, 82" Size="240, 18"/>
     <Label Name="lblCostValue" Text="Cost Value" Position="360, 108" Size="120, 16"/>
-    <TextBox Name="txtCostValue" Position="452, 106" Size="110, 20" Design="TextWhite"/>
+    <TextBox Name="txtCostValue" Position="452, 106" Size="204, 20" Design="TextWhite"/>
   </GroupBox>
 
   <!-- Action buttons -->
