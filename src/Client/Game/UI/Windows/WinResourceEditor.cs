@@ -169,7 +169,7 @@ public static class WinResourceEditor
 
     public static void OnDelete()
     {
-        MapResource.ClearResource(GameState.EditorIndex);
+        MapResource.OnClear(GameState.EditorIndex);
         GameState.ResourceChanged[GameState.EditorIndex] = true;
         LoadResource(GameState.EditorIndex);
         RefreshList();

@@ -268,7 +268,6 @@ namespace Client
             Index = (byte)(Index + 1);
             if (Index >= byte.MaxValue)
                 Index = 1;
-
             {
                 // Ensure AnimInstance is initialized
                 if (Instance == null)
@@ -408,22 +407,8 @@ namespace Client
             if (animationNum >= 0 && string.IsNullOrEmpty(Data.Animation[animationNum].Name) && GameState.AnimationLoaded[animationNum] == 0)
             {
                 GameState.AnimationLoaded[animationNum] = 1;
-                SendRequestAnimation(animationNum);
+                Sender.SendRequestAnimation(animationNum);
             }
-        }
-
-        #endregion
-
-        #region Outgoing Traffic
-
-        public static void SendRequestAnimation(int animationNum)
-        {
-            var packetWriter = new PacketWriter(8);
-
-            packetWriter.WriteEnum(Packets.ClientPackets.CRequestAnimation);
-            packetWriter.WriteInt32(animationNum);
-
-            Network.Send(packetWriter);
         }
 
         #endregion

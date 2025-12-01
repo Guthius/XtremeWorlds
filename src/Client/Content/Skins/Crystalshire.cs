@@ -1997,17 +1997,11 @@ public class Crystalshire
         }
         if (WindowManager.TryGetControl("winItemEditor", "btnDelete", out var btnDelete))
         {
-            btnDelete.CallBack[(int)ControlState.MouseDown] = () =>
-            {
-                Item.OnClear(GameState.EditorIndex);
-                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
-                WinItemEditor.LoadItem(GameState.EditorIndex);
-                WinItemEditor.RefreshList();
-            };
+            btnDelete.CallBack[(int)ControlState.MouseDown] = () => { WinItemEditor.OnDelete(); };
         }
         if (WindowManager.TryGetControl("winItemEditor", "btnCopy", out var btnCopy))
         {
-            btnCopy.CallBack[(int)ControlState.MouseDown] = WinItemEditor.OnCopyOrPaste;
+            btnCopy.CallBack[(int)ControlState.MouseDown] = WinItemEditor.OnCopy;
         }
         if (WindowManager.TryGetControl("winItemEditor", "btnSpawn", out var btnSpawn))
         {
@@ -2927,7 +2921,7 @@ public class Crystalshire
         if (WindowManager.TryGetControl("winResourceEditor", "btnDelete", out var btnDelete))
             btnDelete.CallBack[(int)ControlState.MouseDown] = () =>
             {
-                MapResource.ClearResource(GameState.EditorIndex);
+                MapResource.OnClear(GameState.EditorIndex);
                 GameState.ResourceChanged[GameState.EditorIndex] = true;
                 WinResourceEditor.LoadResource(GameState.EditorIndex);
                 WinResourceEditor.RefreshList();

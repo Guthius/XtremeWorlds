@@ -3377,7 +3377,7 @@ namespace Client
                             for (i = 0; i < loopTo5; i++)                               
                                 if (Data.MyMapResource[i].Y == y)
                                 {
-                                    MapResource.DrawMapResource(i);
+                                    MapResource.OnDraw(i);
                                 }
                             }
                         }

@@ -1208,7 +1208,7 @@ namespace Client
         {
             GameState.MyEditorType = EditorType.None;
             ClearChanged_Resource();
-            MapResource.ClearResources();
+            MapResource.OnClearAll();
             Sender.SendCloseEditor();
         }
 

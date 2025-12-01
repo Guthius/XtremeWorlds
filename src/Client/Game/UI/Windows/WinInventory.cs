@@ -195,7 +195,7 @@ public static class WinInventory
 
             if (GameState.InShop >= 0)
             {
-                Shop.SellItem(slot);
+                Sender.SendSellItem(slot);
                 return;
             }
 

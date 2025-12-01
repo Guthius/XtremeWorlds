@@ -13,100 +13,36 @@ namespace Client
 
         #region Database
 
-        public static void ClearResource(int index)
+        public static void OnClear(int index)
         {
             Data.Resource[index] = default;
             Data.Resource[index].Name = "";
             GameState.ResourceLoaded[index] = 0;
         }
 
-        public static void ClearResources()
+        public static void OnClearAll()
         {
             Array.Resize(ref Data.Resource, Variables.MaxResources);
 
             for (int i = 0; i < Variables.MaxResources; i++)
-                ClearResource(i);
+                OnClear(i);
 
         }
 
-        public static void StreamResource(int resourceNum)
+        public static void OnStream(int resourceNum)
         {
             if (resourceNum >= 0 && string.IsNullOrEmpty(Data.Resource[resourceNum].Name) && GameState.ResourceLoaded[resourceNum] == 0)
             {
                 GameState.ResourceLoaded[resourceNum] = 1;
-                SendRequestResource(resourceNum);
+                Sender.SendRequestResource(resourceNum);
             }
-        }
-
-        #endregion
-
-        #region Incoming Packets
-
-        public static void Packet_MapResource(ReadOnlyMemory<byte> data)
-        {
-            int i;
-            var buffer = new PacketReader(data);
-            GameState.ResourceIndex = buffer.ReadInt32();
-            GameState.ResourcesInit = false;
-
-            if (GameState.ResourceIndex > 0)
-            {
-                Array.Resize(ref Data.MapResource, GameState.ResourceIndex);
-                Array.Resize(ref Data.MyMapResource, GameState.ResourceIndex);
-
-                var loopTo = GameState.ResourceIndex;
-                for (i = 0; i < loopTo; i++)
-                {
-                    Data.MyMapResource[i].State = buffer.ReadByte();
-                    Data.MyMapResource[i].X = buffer.ReadInt32();
-                    Data.MyMapResource[i].Y = buffer.ReadInt32();
-                }
-
-                GameState.ResourcesInit = true;
-            }
-        }
-
-        public static void Packet_UpdateResource(ReadOnlyMemory<byte> data)
-        {
-            int resourceNum;
-            var buffer = new PacketReader(data);
-            resourceNum = buffer.ReadInt32();
-
-            Data.Resource[resourceNum].Animation = buffer.ReadInt32();
-            Data.Resource[resourceNum].EmptyMessage = buffer.ReadString();
-            Data.Resource[resourceNum].ExhaustedImage = buffer.ReadInt32();
-            Data.Resource[resourceNum].Health = buffer.ReadInt32();
-            Data.Resource[resourceNum].ExpReward = buffer.ReadInt32();
-            Data.Resource[resourceNum].ItemReward = buffer.ReadInt32();
-            Data.Resource[resourceNum].Name = buffer.ReadString();
-            Data.Resource[resourceNum].ResourceImage = buffer.ReadInt32();
-            Data.Resource[resourceNum].ResourceType = buffer.ReadInt32();
-            Data.Resource[resourceNum].RespawnTime = buffer.ReadInt32();
-            Data.Resource[resourceNum].SuccessMessage = buffer.ReadString();
-            Data.Resource[resourceNum].LvlRequired = buffer.ReadInt32();
-            Data.Resource[resourceNum].ToolRequired = buffer.ReadInt32();
-            Data.Resource[resourceNum].Walkthrough = buffer.ReadBoolean();
-        }
-
-        #endregion
-
-        #region Outgoing Packets
-
-        public static void SendRequestResource(int resourceNum)
-        {
-            var packetWriter = new PacketWriter(8);
-
-            packetWriter.WriteInt32((int)Packets.ClientPackets.CRequestResource);
-            packetWriter.WriteInt32(resourceNum);
-            
-            Network.Send(packetWriter);
         }
 
         #endregion
 
         #region Drawing
 
-        public static void DrawResource(int resource, int dx, int dy, System.Drawing.Rectangle rec)
+        public static void OnDraw(int resource, int dx, int dy, System.Drawing.Rectangle rec)
         {
             int x;
             int y;
@@ -128,7 +64,7 @@ namespace Client
             GameClient.RenderTexture(ref argPath, x, y, rec.X, rec.Y, rec.Width, rec.Height, rec.Width, rec.Height);
         }
 
-        public static void DrawMapResource(int resourceNum)
+        public static void OnDraw(int resourceNum)
         {
             int mapResourceNum;
             int resourceState;
@@ -154,7 +90,7 @@ namespace Client
             if (mapResourceNum == 0)
                 mapResourceNum = Data.MyMap.Tile[Data.MyMapResource[resourceNum].X, Data.MyMapResource[resourceNum].Y].Data1_2;
 
-            StreamResource(mapResourceNum);
+            OnStream(mapResourceNum);
 
             if (Data.Resource[mapResourceNum].ResourceImage == 0)
                 return;
@@ -181,7 +117,7 @@ namespace Client
             x = (int)Math.Round(Data.MyMapResource[resourceNum].X * GameState.SizeX - GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Resources, resourceSprite.ToString())).Width / 2d + 16d);
             y = Data.MyMapResource[resourceNum].Y * GameState.SizeY - GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Resources, resourceSprite.ToString())).Height + 32;
 
-            DrawResource(resourceSprite, x, y, rec);
+            OnDraw(resourceSprite, x, y, rec);
         }
 
         #endregion

@@ -20,7 +20,7 @@ public static class WinItemEditor
         PopulateCombos();
         SelectedIndex = Math.Clamp(GameState.EditorIndex, 0, Variables.MaxItems - 1);
         RefreshList();
-        LoadItem(SelectedIndex);
+        OnLoad(SelectedIndex);
 
         // Ensure subtype list is built on init
         BuildSubtypeList();
@@ -344,7 +344,7 @@ public static class WinItemEditor
         SetVisible("txtEventValue", isEvent);
     }
 
-    public static void LoadItem(int index)
+    public static void OnLoad(int index)
     {
         if (index < 0 || index >= Variables.MaxItems) return;
         SelectedIndex = index;
@@ -367,6 +367,7 @@ public static class WinItemEditor
         }
         if (WindowManager.TryGetControl("winItemEditor", "txtItemPaperdoll", out var pdCtrl) && pdCtrl is TextBox txtPd)
             txtPd.Text = item.Paperdoll.ToString();
+
         // Paperdoll scrollbar range and value
         if (WindowManager.TryGetControl("winItemEditor", "sldPaperdoll", out var pdScrollCtrl) && pdScrollCtrl is ScrollBar sldPd)
         {
@@ -565,7 +566,7 @@ public static class WinItemEditor
         GameState.EditorIndex = index;
         list.SelectedIndex = index;
         list.EnsureVisible(index);
-        LoadItem(index);
+        OnLoad(index);
     }
 
     public static void UpdateName(string newName)
@@ -590,7 +591,7 @@ public static class WinItemEditor
 
         Data.Item[SelectedIndex] = _clipboardItem.Value;
         GameState.ItemChanged[SelectedIndex] = true;
-        LoadItem(SelectedIndex);
+        OnLoad(SelectedIndex);
         RefreshList();
     }
 
@@ -612,7 +613,7 @@ public static class WinItemEditor
         Item.OnClear(GameState.EditorIndex);
         if (SelectedIndex >= 0 && SelectedIndex < GameState.ItemChanged.Length)
             GameState.ItemChanged[SelectedIndex] = true;
-        LoadItem(GameState.EditorIndex);
+        OnLoad(GameState.EditorIndex);
         RefreshList();
     }
 

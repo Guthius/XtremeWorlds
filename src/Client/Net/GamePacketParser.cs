@@ -58,12 +58,12 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Bind(Packets.ServerPackets.SPlayerDead, Packet_PlayerDead);
         Bind(Packets.ServerPackets.SUpdateNpc, Packet_UpdateNpc);
         Bind(Packets.ServerPackets.SEditMap, Map.Packet_EditMap);
-        Bind(Packets.ServerPackets.SUpdateShop, Shop.Packet_UpdateShop);
+        Bind(Packets.ServerPackets.SUpdateShop, Packet_UpdateShop);
         Bind(Packets.ServerPackets.SUpdateSkill, Packet_UpdateSkill);
         Bind(Packets.ServerPackets.SSkills, Packet_Skills);
         Bind(Packets.ServerPackets.SLeftMap, Packet_LeftMap);
-        Bind(Packets.ServerPackets.SMapResource, MapResource.Packet_MapResource);
-        Bind(Packets.ServerPackets.SUpdateResource, MapResource.Packet_UpdateResource);
+        Bind(Packets.ServerPackets.SMapResource, Packet_MapResource);
+        Bind(Packets.ServerPackets.SUpdateResource, Packet_UpdateResource);
         Bind(Packets.ServerPackets.SSendPing, Packet_Ping);
         Bind(Packets.ServerPackets.SActionMsg, Packet_ActionMessage);
         Bind(Packets.ServerPackets.SPlayerExp, Player.Packet_PlayerExp);
@@ -75,8 +75,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Bind(Packets.ServerPackets.SClearSkillBuffer, Packet_ClearSkillBuffer);
         Bind(Packets.ServerPackets.SStartSkillBuffer, Packet_StartSkillBuffer);
         Bind(Packets.ServerPackets.SSayMsg, Packet_SayMessage);
-        Bind(Packets.ServerPackets.SOpenShop, Shop.Packet_OpenShop);
-        Bind(Packets.ServerPackets.SResetShopAction, Shop.Packet_ResetShopAction);
+        Bind(Packets.ServerPackets.SOpenShop, Packet_OpenShop);
+        Bind(Packets.ServerPackets.SResetShopAction, Packet_ResetShopAction);
         Bind(Packets.ServerPackets.SStunned, Packet_Stunned);
         Bind(Packets.ServerPackets.SMapWornEq, Packet_MapWornEquipment);
         Bind(Packets.ServerPackets.SBank, Bank.Packet_OpenBank);
@@ -904,6 +904,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
     private static void Packet_RClick(ReadOnlyMemory<byte> data)
     {
+
     }
 
     private static void Packet_Emote(ReadOnlyMemory<byte> data)
@@ -934,9 +935,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         GameLogic.LogoutGame();
     }
 
-    // *****************
-    // ***  EDITORS  ***
-    // *****************
     private static void Packet_AnimationEditor(ReadOnlyMemory<byte> data)
     {
         GameState.InitAnimationEditor = true;
@@ -1131,7 +1129,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Animation.Index = (byte)(Animation.Index + 1);
         if (Animation.Index >= byte.MaxValue)
             Animation.Index = 1;
-
         {
             if (Animation.Instance == null)
                 Animation.OnClear();
@@ -1153,4 +1150,88 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             instance.Used[1] = true;
         }
     }
+
+
+    public static void Packet_MapResource(ReadOnlyMemory<byte> data)
+    {
+        int i;
+        var buffer = new PacketReader(data);
+        GameState.ResourceIndex = buffer.ReadInt32();
+        GameState.ResourcesInit = false;
+
+        if (GameState.ResourceIndex > 0)
+        {
+            Array.Resize(ref Data.MapResource, GameState.ResourceIndex);
+            Array.Resize(ref Data.MyMapResource, GameState.ResourceIndex);
+
+            var loopTo = GameState.ResourceIndex;
+            for (i = 0; i < loopTo; i++)
+            {
+                Data.MyMapResource[i].State = buffer.ReadByte();
+                Data.MyMapResource[i].X = buffer.ReadInt32();
+                Data.MyMapResource[i].Y = buffer.ReadInt32();
+            }
+
+            GameState.ResourcesInit = true;
+        }
+    }
+
+    public static void Packet_UpdateResource(ReadOnlyMemory<byte> data)
+    {
+        int resourceNum;
+        var buffer = new PacketReader(data);
+        resourceNum = buffer.ReadInt32();
+
+        Data.Resource[resourceNum].Animation = buffer.ReadInt32();
+        Data.Resource[resourceNum].EmptyMessage = buffer.ReadString();
+        Data.Resource[resourceNum].ExhaustedImage = buffer.ReadInt32();
+        Data.Resource[resourceNum].Health = buffer.ReadInt32();
+        Data.Resource[resourceNum].ExpReward = buffer.ReadInt32();
+        Data.Resource[resourceNum].ItemReward = buffer.ReadInt32();
+        Data.Resource[resourceNum].Name = buffer.ReadString();
+        Data.Resource[resourceNum].ResourceImage = buffer.ReadInt32();
+        Data.Resource[resourceNum].ResourceType = buffer.ReadInt32();
+        Data.Resource[resourceNum].RespawnTime = buffer.ReadInt32();
+        Data.Resource[resourceNum].SuccessMessage = buffer.ReadString();
+        Data.Resource[resourceNum].LvlRequired = buffer.ReadInt32();
+        Data.Resource[resourceNum].ToolRequired = buffer.ReadInt32();
+        Data.Resource[resourceNum].Walkthrough = buffer.ReadBoolean();
+    }
+
+    public static void Packet_OpenShop(ReadOnlyMemory<byte> data)
+    {
+        int shopnum;
+        var buffer = new PacketReader(data);
+
+        shopnum = buffer.ReadInt32();
+
+        GameLogic.OpenShop(shopnum);
+    }
+
+    public static void Packet_ResetShopAction(ReadOnlyMemory<byte> data)
+    {
+        GameState.ShopAction = 0;
+    }
+
+    public static void Packet_UpdateShop(ReadOnlyMemory<byte> data)
+    {
+        int shopnum;
+        var buffer = new PacketReader(data);
+        shopnum = buffer.ReadInt32();
+
+        Data.Shop[shopnum].BuyRate = buffer.ReadInt32();
+        Data.Shop[shopnum].Name = buffer.ReadString();
+
+        for (int i = 0; i < Variables.MaxTrades; i++)
+        {
+            Data.Shop[shopnum].TradeItem[i].CostItem = buffer.ReadInt32();
+            Data.Shop[shopnum].TradeItem[i].CostValue = buffer.ReadInt32();
+            Data.Shop[shopnum].TradeItem[i].Item = buffer.ReadInt32();
+            Data.Shop[shopnum].TradeItem[i].ItemValue = buffer.ReadInt32();
+        }
+
+        if (Data.Shop[shopnum].Name is null)
+            Data.Shop[shopnum].Name = "";
+    }
+
 }

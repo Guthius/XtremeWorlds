@@ -1,6 +1,7 @@
-﻿using Core.Globals;
-using static Core.Globals.Command;
+﻿using Client.Net;
+using Core.Globals;
 using System.IO;
+using static Core.Globals.Command;
 
 namespace Client.Game.UI.Windows;
 
@@ -150,12 +151,12 @@ public static class WinShop
 
     public static void OnBuy()
     {
-        Shop.BuyItem(GameState.ShopSelectedSlot);
+        Sender.SendBuyItem(GameState.ShopSelectedSlot);
     }
 
     public static void OnSell()
     {
-        Shop.SellItem(GameState.ShopSelectedSlot);
+        Sender.SendSellItem(GameState.ShopSelectedSlot);
     }
 
     public static void OnMouseDown()

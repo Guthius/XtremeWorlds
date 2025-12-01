@@ -180,7 +180,7 @@ namespace Client
             Map.ClearMapNpcs();
             Map.ClearMapItems();
             Database.ClearNpcs();
-            MapResource.ClearResources();
+            MapResource.OnClearAll();
             Item.OnClearAll();
             Shop.OnClearAll();
             Database.ClearSkills();

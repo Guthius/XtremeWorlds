@@ -5,6 +5,7 @@ using Core.Net;
 using Microsoft.Extensions.Logging;
 using Server.Game;
 using Server.Game.Net;
+using System.Net;
 using System.Text;
 using static Core.Globals.Command;
 using static Core.Net.Packets;

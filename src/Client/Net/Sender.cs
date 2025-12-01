@@ -1012,4 +1012,55 @@ public static class Sender
 
         Network.Send(packetWriter);
     }
+
+    public static void SendRequestShop(int shopNum)
+    {
+        var packetWriter = new PacketWriter(8);
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CRequestShop);
+        packetWriter.WriteInt32(shopNum);
+
+        Network.Send(packetWriter);
+    }
+
+    public static void SendBuyItem(int shopSlot)
+    {
+        var packetWriter = new PacketWriter(8);
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CBuyItem);
+        packetWriter.WriteInt32(shopSlot);
+
+        Network.Send(packetWriter);
+    }
+
+    public static void SendSellItem(int invslot)
+    {
+        var packetWriter = new PacketWriter(8);
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CSellItem);
+        packetWriter.WriteInt32(invslot);
+
+        Network.Send(packetWriter);
+    }
+
+    public static void SendRequestAnimation(int animationNum)
+    {
+        var packetWriter = new PacketWriter(8);
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CRequestAnimation);
+        packetWriter.WriteInt32(animationNum);
+
+        Network.Send(packetWriter);
+    }
+
+    public static void SendRequestResource(int resourceNum)
+    {
+        var packetWriter = new PacketWriter(8);
+
+        packetWriter.WriteInt32((int)Packets.ClientPackets.CRequestResource);
+        packetWriter.WriteInt32(resourceNum);
+
+        Network.Send(packetWriter);
+    }
+
 }
