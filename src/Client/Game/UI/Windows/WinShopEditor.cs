@@ -221,4 +221,12 @@ public static class WinShopEditor
         GameState.ShopChanged[SelectedIndex] = true;
         LoadShop(SelectedIndex);
     }
+
+    public static void ClearShop()
+    {
+        Shop.ClearShop(SelectedIndex);
+        GameState.ShopChanged[SelectedIndex] = true;
+        LoadShop(SelectedIndex);
+        RefreshList();
+    }
 }

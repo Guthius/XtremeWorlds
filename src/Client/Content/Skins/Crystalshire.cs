@@ -2591,10 +2591,7 @@ public class Crystalshire
         {
             btnDelete.CallBack[(int)ControlState.MouseDown] = () =>
             {
-                Shop.ClearShop(WinShopEditor.SelectedIndex);
-                GameState.ShopChanged[WinShopEditor.SelectedIndex] = true;
-                WinShopEditor.LoadShop(WinShopEditor.SelectedIndex);
-                WinShopEditor.RefreshList();
+                WinShopEditor.ClearShop();
             };
         }
         if (WindowManager.TryGetControl("winShopEditor", "btnClose", out var closeCtrl) && closeCtrl is Button btnClose)
