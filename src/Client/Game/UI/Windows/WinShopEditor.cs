@@ -12,7 +12,6 @@ public static class WinShopEditor
 
     private static Core.Globals.Type.Shop? _clipboardShop = null;
 
-    // Delegate initialization to skin script so all editors remain consistent
     public static void Init()
     {
         if (!WindowManager.TryGetControl("winShopEditor", "lstIndex", out _))

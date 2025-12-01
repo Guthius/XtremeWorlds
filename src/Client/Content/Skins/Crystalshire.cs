@@ -2928,9 +2928,7 @@ public class Crystalshire
                 };
             }
         }
-        BindBar("sldRewardExp", "lblRewardExpVal", v => Data.Resource[GameState.EditorIndex].ExpReward = v, 0, 1000);
-        BindBar("sldHealth", "lblHealthVal", v => Data.Resource[GameState.EditorIndex].Health = v, 0, 1000);
-        BindBar("sldRespawn", "lblRespawnVal", v => Data.Resource[GameState.EditorIndex].RespawnTime = v, 0, 100000);
+
         BindBar("sldLvlReq", "lblLvlReqVal", v => Data.Resource[GameState.EditorIndex].LvlRequired = v, 0, GameState.MaxLevel);
         BindBar("sldNormalPic", "lblNormalPicVal", v => Data.Resource[GameState.EditorIndex].ResourceImage = v, 0, GameState.NumResources);
         BindBar("sldExhaustedPic", "lblExhaustedPicVal", v => Data.Resource[GameState.EditorIndex].ExhaustedImage = v, 0, GameState.NumResources);
