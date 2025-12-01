@@ -29,12 +29,12 @@ public static class Item
         }
     }
 
-    public static async Task LoadAllAsync()
+    public static async Task OnLoadAllAsync()
     {
-        await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxItems), LoadAsync);
+        await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxItems), OnLoadAsync);
     }
 
-    private static async ValueTask LoadAsync(int itemNum, CancellationToken cancellationToken)
+    private static async ValueTask OnLoadAsync(int itemNum, CancellationToken cancellationToken)
     {
         var data = await Database.SelectRowAsync(itemNum, "item", "data");
         if (data is null)

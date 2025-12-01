@@ -59,13 +59,13 @@ namespace Server
             }
         }
 
-        public static async System.Threading.Tasks.Task LoadAllAsync()
+        public static async System.Threading.Tasks.Task OnLoadAllAsync()
         {
-            var tasks = Enumerable.Range(0, Core.Globals.Variables.MaxMaps).Select(i => System.Threading.Tasks.Task.Run(() => LoadAsync(i)));
+            var tasks = Enumerable.Range(0, Core.Globals.Variables.MaxMaps).Select(i => System.Threading.Tasks.Task.Run(() => OnLoadAsync(i)));
             await System.Threading.Tasks.Task.WhenAll(tasks);
         }
 
-        public static async System.Threading.Tasks.Task LoadAsync(int mapNum)
+        public static async System.Threading.Tasks.Task OnLoadAsync(int mapNum)
         {
             string baseDir;
 

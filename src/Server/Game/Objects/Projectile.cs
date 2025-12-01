@@ -108,12 +108,12 @@ public static class Projectile
         }
     }
 
-    public static async Task LoadAllAsync()
+    public static async Task OnLoadAllAsync()
     {
-        await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxProjectiles), LoadAsync);
+        await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxProjectiles), OnLoadAsync);
     }
 
-    public static async ValueTask LoadAsync(int projectileNum, CancellationToken cancellationToken)
+    public static async ValueTask OnLoadAsync(int projectileNum, CancellationToken cancellationToken)
     {
         var data = await Database.SelectRowAsync(projectileNum, "projectile", "data");
         if (data is null)

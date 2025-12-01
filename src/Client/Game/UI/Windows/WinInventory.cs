@@ -65,7 +65,7 @@ public static class WinInventory
                 continue;
             }
 
-            Item.StreamItem(itemNum);
+            Item.OnStream(itemNum);
 
             if (WindowManager.DragBox.Origin == PartOrigin.Inventory &&
                 WindowManager.DragBox.Slot == slot)

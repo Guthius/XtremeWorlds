@@ -205,7 +205,7 @@ namespace Server
         private static async System.Threading.Tasks.Task LoadGameDataAsync()
         {
             var stopwatch = Stopwatch.StartNew();
-            await Script.LoadAsync(0);           
+            await Script.OnLoadAsync(0);           
             Logger.LogInformation($"Game data loaded in {stopwatch.ElapsedMilliseconds}ms");
         }
 
@@ -369,18 +369,18 @@ namespace Server
 
             var tasks = new[]
             {
-                LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading jobs..."); await Job.LoadAllAsync(); Logger.LogInformation("Jobs loaded."); }),
-                LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading morals..."); await Moral.LoadAllAsync(); Logger.LogInformation("Morals loaded."); }),
-                LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading npcs..."); await Npc.LoadAllAsync(); Logger.LogInformation("Npcs loaded."); }),
-                LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading maps..."); await Map.LoadAllAsync(); Logger.LogInformation("Maps loaded."); }),
-                LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading items..."); await Item.LoadAllAsync(); Logger.LogInformation("Items loaded."); }),          
-                LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading resources..."); await Resource.LoadAllAsync(); Logger.LogInformation("Resources loaded."); }),
-                LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading shops..."); await Shop.LoadAllAsync(); Logger.LogInformation("Shops loaded."); }),
-                LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading skills..."); await Skill.LoadAllAsync(); Logger.LogInformation("Skills loaded."); }),
-                LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading animations..."); await Animation.LoadAllAsync(); Logger.LogInformation("Animations loaded."); }),
+                LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading jobs..."); await Job.OnLoadAllAsync(); Logger.LogInformation("Jobs loaded."); }),
+                LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading morals..."); await Moral.OnLoadAllAsync(); Logger.LogInformation("Morals loaded."); }),
+                LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading npcs..."); await Npc.OnLoadAllAsync(); Logger.LogInformation("Npcs loaded."); }),
+                LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading maps..."); await Map.OnLoadAllAsync(); Logger.LogInformation("Maps loaded."); }),
+                LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading items..."); await Item.OnLoadAllAsync(); Logger.LogInformation("Items loaded."); }),          
+                LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading resources..."); await Resource.OnLoadAllAsync(); Logger.LogInformation("Resources loaded."); }),
+                LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading shops..."); await Shop.OnLoadAllAsync(); Logger.LogInformation("Shops loaded."); }),
+                LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading skills..."); await Skill.OnLoadAllAsync(); Logger.LogInformation("Skills loaded."); }),
+                LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading animations..."); await Animation.OnLoadAllAsync(); Logger.LogInformation("Animations loaded."); }),
                 LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading switches..."); await Event.LoadSwitchesAsync(); Logger.LogInformation("Switches loaded."); }),
                 LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading variables..."); await Event.LoadVariablesAsync(); Logger.LogInformation("Variables loaded."); }),
-                LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading projectiles..."); await Projectile.LoadAllAsync(); Logger.LogInformation("Projectiles loaded."); }),
+                LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading projectiles..."); await Projectile.OnLoadAllAsync(); Logger.LogInformation("Projectiles loaded."); }),
             };
 
             await System.Threading.Tasks.Task.WhenAll(tasks);

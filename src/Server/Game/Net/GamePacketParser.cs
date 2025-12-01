@@ -2889,7 +2889,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         File.WriteAllText(path, script, Encoding.UTF8);
 
-        _ = Script.LoadAsync(session.Id);
+        _ = Script.OnLoadAsync(session.Id);
     }
 
     public static void Packet_RequestProjectile(GameSession session, ReadOnlyMemory<byte> bytes)

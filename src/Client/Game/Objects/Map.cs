@@ -675,7 +675,7 @@ namespace Client
             ClearMapItems();
             ClearMapEvents();
             GameLogic.RemoveChatBubbles();
-            Animation.ClearAnimInstances();
+            Animation.OnClear();
 
             GameState.ResourceIndex = 0;
 

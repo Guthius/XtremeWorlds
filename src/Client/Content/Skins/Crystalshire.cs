@@ -1999,7 +1999,7 @@ public class Crystalshire
         {
             btnDelete.CallBack[(int)ControlState.MouseDown] = () =>
             {
-                Item.ClearItem(GameState.EditorIndex);
+                Item.OnClear(GameState.EditorIndex);
                 GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
                 WinItemEditor.LoadItem(GameState.EditorIndex);
                 WinItemEditor.RefreshList();
@@ -2568,7 +2568,7 @@ public class Crystalshire
         {
             btnDeleteTrade.CallBack[(int)ControlState.MouseDown] = () =>
             {
-                WinShopEditor.DeleteTrade();
+                WinShopEditor.OnDelete();
             };
         }
 
@@ -2591,7 +2591,7 @@ public class Crystalshire
         {
             btnDelete.CallBack[(int)ControlState.MouseDown] = () =>
             {
-                WinShopEditor.ClearShop();
+                WinShopEditor.OnClear();
             };
         }
         if (WindowManager.TryGetControl("winShopEditor", "btnClose", out var closeCtrl) && closeCtrl is Button btnClose)

@@ -208,7 +208,7 @@ namespace Client
         {
             int tmpindex;
 
-            Animation.ClearAnimation(GameState.EditorIndex);
+            Animation.OnClear(GameState.EditorIndex);
 
             tmpindex = lstIndex.SelectedIndex;
             _suppressIndexChanged = true;

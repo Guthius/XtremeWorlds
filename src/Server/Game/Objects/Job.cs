@@ -36,7 +36,7 @@ namespace Server
             }
         }
 
-        public static async System.Threading.Tasks.Task LoadAsync(int jobNum)
+        public static async System.Threading.Tasks.Task OnLoadAsync(int jobNum)
         {
             JObject data;
 
@@ -52,9 +52,9 @@ namespace Server
             Data.Job[jobNum] = jobData;
         }
 
-        public static async System.Threading.Tasks.Task LoadAllAsync()
+        public static async System.Threading.Tasks.Task OnLoadAllAsync()
         {
-            var tasks = Enumerable.Range(0, Core.Globals.Variables.MaxJobs).Select(i => System.Threading.Tasks.Task.Run(() => LoadAsync(i)));
+            var tasks = Enumerable.Range(0, Core.Globals.Variables.MaxJobs).Select(i => System.Threading.Tasks.Task.Run(() => OnLoadAsync(i)));
             await System.Threading.Tasks.Task.WhenAll(tasks);
         }
 

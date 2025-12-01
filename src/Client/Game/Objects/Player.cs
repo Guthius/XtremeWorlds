@@ -258,7 +258,7 @@ namespace Client
 
             if (GameState.InShop >= 0)
             {
-                Shop.CloseShop();
+                Shop.OnClose();
             }
 
             if (GameState.InBank)

@@ -362,4 +362,30 @@ public static class WinNpcEditor
         LoadNpc(SelectedIndex);
         RefreshList();
     }
+
+    // Unified handlers
+    public static void OnSave()
+    {
+        Editors.NpcEditorOK();
+        WindowManager.HideWindow("winNpcEditor");
+    }
+
+    public static void OnCancel()
+    {
+        Editors.NpcEditorCancel();
+        WindowManager.HideWindow("winNpcEditor");
+    }
+
+    public static void OnDelete()
+    {
+        Database.ClearNpc(GameState.EditorIndex);
+        GameState.NpcChanged[SelectedIndex] = true;
+        LoadNpc(GameState.EditorIndex);
+        RefreshList();
+    }
+
+    public static void OnCopy()
+    {
+        OnCopyOrPaste();
+    }
 }

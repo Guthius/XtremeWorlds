@@ -30,7 +30,7 @@ public static class Moral
         Data.Moral[moralNum].PlayerBlock = false;
     }
 
-    private static async ValueTask LoadAsync(int moralNum, CancellationToken cancellationToken)
+    private static async ValueTask OnLoadAsync(int moralNum, CancellationToken cancellationToken)
     {
         var data = await Database.SelectRowAsync(moralNum, "moral", "data");
         if (data is null)
@@ -44,9 +44,9 @@ public static class Moral
         Data.Moral[moralNum] = moralData;
     }
 
-    public static async Task LoadAllAsync()
+    public static async Task OnLoadAllAsync()
     {
-        await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxMorals), LoadAsync);
+        await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxMorals), OnLoadAsync);
     }
 
     public static void Save(int moralNum)

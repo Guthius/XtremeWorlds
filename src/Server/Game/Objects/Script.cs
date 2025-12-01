@@ -17,7 +17,7 @@ public static class Script
 
     public static dynamic? Instance { get; private set; }
 
-    public static async Task LoadAsync(int playerId)
+    public static async Task OnLoadAsync(int playerId)
     {
         General.Logger.LogInformation("Loading script...");
         var path = System.IO.Path.Combine(DataPath.Database, "Script.cs");

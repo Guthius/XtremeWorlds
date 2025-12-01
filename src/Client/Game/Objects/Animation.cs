@@ -13,16 +13,16 @@ namespace Client
     {
 
         #region Drawing
-        public static void Draw(int index, int layer)
+        public static void OnDraw(int index, int layer)
         {
             // Validate instance and animation
-            if (AnimInstance == null || index < 0 || index >= AnimInstance.Length)
+            if (Instance == null || index < 0 || index >= Instance.Length)
                 return;
 
             if (GameState.MyEditorType == EditorType.Map && GameState.MapEditorTab != (byte)MapEditorTab.Tiles)
                 return;
 
-            ref var inst = ref AnimInstance[index];
+            ref var inst = ref Instance[index];
             int animIdx = inst.Animation;
             if (animIdx < 0 || animIdx >= Data.Animation.Length)
                 return;
@@ -105,10 +105,10 @@ namespace Client
             int x = 0;
             int y = 0;
 
-            if (AnimInstance == null || index < 0 || index >= AnimInstance.Length)
+            if (Instance == null || index < 0 || index >= Instance.Length)
                 return new Point(x, y);
 
-            byte lockType = AnimInstance[index].LockType;
+            byte lockType = Instance[index].LockType;
 
             switch (lockType)
             {
@@ -145,10 +145,10 @@ namespace Client
         public static void CheckAnimInstance(int index)
         {
             // Validate instance and animation index
-            if (AnimInstance == null || index < 0 || index >= AnimInstance.Length)
+            if (Instance == null || index < 0 || index >= Instance.Length)
                 return;
 
-            ref var inst = ref AnimInstance[index];
+            ref var inst = ref Instance[index];
             int animIdx = inst.Animation;
             if (animIdx < 0 || animIdx >= Data.Animation.Length)
                 return;
@@ -265,20 +265,20 @@ namespace Client
         public static void CreateAnimation(int animationNum, byte x, byte y)
         {
             string sound;
-            AnimationIndex = (byte)(AnimationIndex + 1);
-            if (AnimationIndex >= byte.MaxValue)
-                AnimationIndex = 1;
+            Index = (byte)(Index + 1);
+            if (Index >= byte.MaxValue)
+                Index = 1;
 
             {
                 // Ensure AnimInstance is initialized
-                if (AnimInstance == null)
-                    ClearAnimInstances();
+                if (Instance == null)
+                    OnClear();
 
                 // Safety: if still null, bail
-                if (AnimInstance == null)
+                if (Instance == null)
                     return;
 
-                ref var withBlock = ref AnimInstance[AnimationIndex];
+                ref var withBlock = ref Instance[Index];
                 // Ensure per-instance arrays exist and have at least 2 layers
                 withBlock.Timer ??= new int[2];
                 withBlock.Used ??= new bool[2];
@@ -302,14 +302,14 @@ namespace Client
 
         #region Globals
 
-        public static byte AnimationIndex;
-        public static Type.AnimInstance[]? AnimInstance;
+        public static byte Index;
+        public static Type.AnimInstance[]? Instance;
 
         #endregion
 
         #region Database
 
-        public static void ClearAnimation(int index)
+        public static void OnClear(int index)
         {
             Data.Animation[index] = default;
             Data.Animation[index] = new Type.Animation();
@@ -344,28 +344,28 @@ namespace Client
             Data.Animation = new Type.Animation[Variables.MaxAnimations];
 
             for (i = 0; i < Variables.MaxAnimations; i++)
-                ClearAnimation(i);
+                OnClear(i);
         }
 
-        public static void ClearAnimInstances()
+        public static void OnClear()
         {
             int i;
 
-            AnimInstance = new Type.AnimInstance[(byte.MaxValue)];
+            Instance = new Type.AnimInstance[(byte.MaxValue)];
 
             for (i = 0; i < byte.MaxValue; i++)
             {
                 for (int x = 0; x <= 1; x++)
-                    AnimInstance[i].Timer = new int[x + 1];
+                    Instance[i].Timer = new int[x + 1];
 
                 for (int x = 0; x <= 1; x++)
-                    AnimInstance[i].Used = new bool[x + 1];
+                    Instance[i].Used = new bool[x + 1];
 
                 for (int x = 0; x <= 1; x++)
-                    AnimInstance[i].LoopIndex = new int[x + 1];
+                    Instance[i].LoopIndex = new int[x + 1];
 
                 for (int x = 0; x <= 1; x++)
-                    AnimInstance[i].FrameIndex = new int[x + 1];
+                    Instance[i].FrameIndex = new int[x + 1];
 
                 ClearAnimInstance(i);
             }
@@ -373,10 +373,10 @@ namespace Client
 
         public static void ClearAnimInstance(int index)
         {
-            if (AnimInstance == null || index < 0 || index >= AnimInstance.Length)
+            if (Instance == null || index < 0 || index >= Instance.Length)
                 return;
 
-            ref var inst = ref AnimInstance[index];
+            ref var inst = ref Instance[index];
             inst.Animation = -1;
             inst.X = 0;
             inst.Y = 0;
@@ -414,62 +414,6 @@ namespace Client
 
         #endregion
 
-        #region Incoming Traffic
-
-        public static void Packet_UpdateAnimation(ReadOnlyMemory<byte> data)
-        {
-            int n;
-            int i;
-            var buffer = new PacketReader(data);
-
-            n = buffer.ReadInt32();
-            // Update the Animation
-            for (i = 0; i < Data.Animation[n].Frames.Length; i++)
-                Data.Animation[n].Frames[i] = buffer.ReadInt32();
-
-            for (i = 0; i < Data.Animation[n].LoopCount.Length; i++)
-                Data.Animation[n].LoopCount[i] = buffer.ReadInt32();
-
-            for (i = 0; i < Data.Animation[n].LoopTime.Length; i++)
-                Data.Animation[n].LoopTime[i] = buffer.ReadInt32();
-
-            Data.Animation[n].Name = buffer.ReadString();
-            Data.Animation[n].Sound = buffer.ReadString();
-
-            for (i = 0; i < Data.Animation[n].Sprite.Length; i++)
-                Data.Animation[n].Sprite[i] = buffer.ReadInt32();
-        }
-
-        public static void Packet_Animation(ReadOnlyMemory<byte> data)
-        {
-            var buffer = new PacketReader(data);
-
-            AnimationIndex = (byte)(AnimationIndex + 1);
-            if (AnimationIndex >= byte.MaxValue)
-                AnimationIndex = 1;
-
-            {
-                if (AnimInstance == null)
-                    ClearAnimInstances();
-                if (AnimInstance == null)
-                    return;
-
-                ref var withBlock = ref AnimInstance[AnimationIndex];
-                withBlock.Timer ??= new int[2];
-                withBlock.Used ??= new bool[2];
-                withBlock.LoopIndex ??= new int[2];
-                withBlock.FrameIndex ??= new int[2];
-                withBlock.Animation = buffer.ReadInt32();
-                withBlock.X = buffer.ReadInt32();
-                withBlock.Y = buffer.ReadInt32();
-                withBlock.LockType = (byte)buffer.ReadInt32();
-                withBlock.LockIndex = buffer.ReadInt32();
-                withBlock.Used[0] = true;
-                withBlock.Used[1] = true;
-            }
-        }
-
-        #endregion
         #region Outgoing Traffic
 
         public static void SendRequestAnimation(int animationNum)

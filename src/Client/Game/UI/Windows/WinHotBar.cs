@@ -181,7 +181,7 @@ public static class WinHotBar
     {
         var itemNum = Data.Player[GameState.MyIndex].Hotbar[slot].Slot;
 
-        Item.StreamItem(itemNum);
+        Item.OnStream(itemNum);
 
         if (Data.Item[itemNum].Name.Length <= 0 || Data.Item[itemNum].Icon <= 0)
         {

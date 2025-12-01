@@ -20,9 +20,9 @@ public static class Npc
     // Planned multi-tile movement route (as directions) per npc on each map.
     private static readonly System.Collections.Generic.Queue<byte>?[,] _route = new System.Collections.Generic.Queue<byte>?[Core.Globals.Variables.MaxMaps, Core.Globals.Variables.MaxMapNpcs];
 
-    public static async System.Threading.Tasks.Task LoadAllAsync()
+    public static async System.Threading.Tasks.Task OnLoadAllAsync()
     {
-        var tasks = Enumerable.Range(0, Core.Globals.Variables.MaxNpcs).Select(i => System.Threading.Tasks.Task.Run(() => LoadAsync(i)));
+        var tasks = Enumerable.Range(0, Core.Globals.Variables.MaxNpcs).Select(i => System.Threading.Tasks.Task.Run(() => OnLoadAsync(i)));
         await System.Threading.Tasks.Task.WhenAll(tasks);
     }
 
@@ -40,7 +40,7 @@ public static class Npc
         }
     }
 
-    public static async System.Threading.Tasks.Task LoadAsync(int npcNum)
+    public static async System.Threading.Tasks.Task OnLoadAsync(int npcNum)
     {
         JObject data;
 

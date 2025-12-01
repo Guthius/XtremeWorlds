@@ -154,6 +154,32 @@ public static class WinResourceEditor
         RefreshList();
     }
 
+    // Unified handlers for callbacks
+    public static void OnSave()
+    {
+        Editors.ResourceEditorOK();
+        WindowManager.HideWindow("winResourceEditor");
+    }
+
+    public static void OnCancel()
+    {
+        Editors.ResourceEditorCancel();
+        WindowManager.HideWindow("winResourceEditor");
+    }
+
+    public static void OnDelete()
+    {
+        MapResource.ClearResource(GameState.EditorIndex);
+        GameState.ResourceChanged[GameState.EditorIndex] = true;
+        LoadResource(GameState.EditorIndex);
+        RefreshList();
+    }
+
+    public static void OnCopy()
+    {
+        OnCopyOrPaste();
+    }
+
     // Draw resource images into preview boxes
     public static void OnDrawNormal()
     {

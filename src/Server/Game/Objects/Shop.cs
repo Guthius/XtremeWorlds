@@ -9,14 +9,14 @@ namespace Server;
 
 public static class Shop
 {
-    public static async System.Threading.Tasks.Task LoadAllAsync()
+    public static async System.Threading.Tasks.Task OnLoadAllAsync()
     {
-        var tasks = Enumerable.Range(0, Core.Globals.Variables.MaxShops).Select(i => System.Threading.Tasks.Task.Run(() => LoadAsync(i)));
+        var tasks = Enumerable.Range(0, Core.Globals.Variables.MaxShops).Select(i => System.Threading.Tasks.Task.Run(() => OnLoadAsync(i)));
         await System.Threading.Tasks.Task.WhenAll(tasks);
 
     }
 
-    public static async System.Threading.Tasks.Task LoadAsync(int shopNum)
+    public static async System.Threading.Tasks.Task OnLoadAsync(int shopNum)
     {
         JObject data;
 
@@ -49,7 +49,7 @@ public static class Shop
 
     public static void Load(int shopNum)
     {
-        _ = LoadAsync(shopNum);
+        _ = OnLoadAsync(shopNum);
     }
 
     public static void LoadAll()
@@ -58,7 +58,7 @@ public static class Shop
 
         var loopTo = Core.Globals.Variables.MaxShops;
         for (i = 0; i < loopTo; i++)
-            _ = LoadAsync(i);
+            _ = OnLoadAsync(i);
 
     }
 

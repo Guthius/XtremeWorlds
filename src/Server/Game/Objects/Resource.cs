@@ -29,12 +29,12 @@ public static class Resource
         }
     }
 
-    public static async Task LoadAllAsync()
+    public static async Task OnLoadAllAsync()
     {
-        await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxResources), Resource.LoadAsync);
+        await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxResources), Resource.OnLoadAsync);
     }
 
-    public static async ValueTask LoadAsync(int resourceNum, CancellationToken cancellationToken)
+    public static async ValueTask OnLoadAsync(int resourceNum, CancellationToken cancellationToken)
     {
         var data = await Database.SelectRowAsync(resourceNum, "resource", "data");
         if (data is null)

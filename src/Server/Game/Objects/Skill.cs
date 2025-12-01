@@ -9,9 +9,9 @@ namespace Server
 {
     public static class Skill
     {
-        public static async System.Threading.Tasks.Task LoadAllAsync()
+        public static async System.Threading.Tasks.Task OnLoadAllAsync()
         {
-            var tasks = Enumerable.Range(0, Core.Globals.Variables.MaxSkills).Select(i => System.Threading.Tasks.Task.Run(() => LoadAsync(i)));
+            var tasks = Enumerable.Range(0, Core.Globals.Variables.MaxSkills).Select(i => System.Threading.Tasks.Task.Run(() => OnLoadAsync(i)));
             await System.Threading.Tasks.Task.WhenAll(tasks);
         }
 
@@ -29,7 +29,7 @@ namespace Server
             }
         }
 
-        public static async System.Threading.Tasks.Task LoadAsync(int skillNum)
+        public static async System.Threading.Tasks.Task OnLoadAsync(int skillNum)
         {
             JObject data;
 

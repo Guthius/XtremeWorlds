@@ -1002,4 +1002,14 @@ public static class Sender
 
         Network.Send(packetWriter);
     }
+
+    public static void SendRequestItem(int itemNum)
+    {
+        var packetWriter = new PacketWriter(8);
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CRequestItem);
+        packetWriter.WriteInt32(itemNum);
+
+        Network.Send(packetWriter);
+    }
 }

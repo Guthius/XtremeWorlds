@@ -181,8 +181,8 @@ namespace Client
             Map.ClearMapItems();
             Database.ClearNpcs();
             MapResource.ClearResources();
-            Item.ClearItems();
-            Shop.ClearShops();
+            Item.OnClearAll();
+            Shop.OnClearAll();
             Database.ClearSkills();
             Animation.ClearAnimations();
             Projectile.ClearProjectile();
@@ -194,7 +194,7 @@ namespace Client
             for (int i = 0; i < Variables.MaxPlayers; i++)
                 Player.ClearPlayer(i);
 
-            Animation.ClearAnimInstances();
+            Animation.OnClear();
             Autotile.ClearAutotiles();
 
             // clear chat

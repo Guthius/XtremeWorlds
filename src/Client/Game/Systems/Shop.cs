@@ -10,7 +10,7 @@ namespace Client
 
     public class Shop
     {
-        public static void CloseShop()
+        public static void OnClose()
         {
             Sender.SendCloseShop();
             WindowManager.HideWindow(WindowManager.GetWindowIndex("winShop"));
@@ -23,7 +23,7 @@ namespace Client
 
         #region Database
 
-        public static void ClearShop(int index)
+        public static void OnClear(int index)
         {
             Data.Shop[index] = default;
             Data.Shop[index].Name = "";
@@ -36,18 +36,18 @@ namespace Client
             GameState.ShopLoaded[index] = 0;
         }
 
-        public static void ClearShops()
+        public static void OnClearAll()
         {
             int i;
 
             Data.Shop = new Type.Shop[Variables.MaxShops];
 
             for (i = 0; i < Variables.MaxShops; i++)
-                ClearShop(i);
+                OnClear(i);
 
         }
 
-        public static void StreamShop(int shopNum)
+        public static void OnStream(int shopNum)
         {
             if (shopNum >= 0 && string.IsNullOrEmpty(Data.Shop[shopNum].Name) && GameState.ShopLoaded[shopNum] == 0)
             {

@@ -1476,7 +1476,7 @@ public class WindowManager
                 long itemNum = GetPlayerInv(GameState.MyIndex, Data.TradeYourOffer[i].Num);
                 if (itemNum >= 0 & itemNum < Variables.MaxItems)
                 {
-                    Item.StreamItem((int)itemNum);
+                    Item.OnStream((int)itemNum);
                     long itemPic = Data.Item[(int)itemNum].Icon;
 
                     if (itemPic > 0 & itemPic <= GameState.NumItems)
@@ -1542,7 +1542,7 @@ public class WindowManager
             long itemNum = Data.TradeTheirOffer[i].Num;
             if (itemNum >= 0 & itemNum < Variables.MaxItems)
             {
-                Item.StreamItem((int)itemNum);
+                Item.OnStream((int)itemNum);
                 long itemPic = Data.Item[(int)itemNum].Icon;
 
                 if (itemPic > 0 & itemPic <= GameState.NumItems)

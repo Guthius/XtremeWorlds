@@ -75,7 +75,7 @@ public static class WinCharacter
                 continue;
             }
 
-            Item.StreamItem(itemNum);
+            Item.OnStream(itemNum);
 
             var itemIcon = Data.Item[itemNum].Icon;
             if (itemIcon <= 0 || itemIcon >= GameState.NumItems)

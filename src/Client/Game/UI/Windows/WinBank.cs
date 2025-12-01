@@ -61,7 +61,7 @@ public static class WinBank
                 continue;
             }
 
-            Item.StreamItem(itemNum);
+            Item.OnStream(itemNum);
 
             if (WindowManager.DragBox.Origin == PartOrigin.Bank &&
                 WindowManager.DragBox.Slot == slot)

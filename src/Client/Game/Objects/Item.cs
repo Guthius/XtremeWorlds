@@ -11,7 +11,7 @@ namespace Client
     {
 
         #region Database
-        public static void ClearItem(int index)
+        public static void OnClear(int index)
         {   
             Data.Item[index] = default;
 
@@ -25,103 +25,31 @@ namespace Client
             GameState.ItemLoaded[index] = 0;
         }
 
-        public static void ClearItems()
+        public static void OnClearAll()
         {
             int i;
 
             Data.Item = new Type.Item[Variables.MaxItems];
 
             for (i = 0; i < Variables.MaxItems; i++)
-                ClearItem(i);
+                OnClear(i);
 
         }
 
-        public static void ClearChangedItem()
+        public static void OnClearChanged()
         {
             GameState.ItemChanged = new bool[Variables.MaxItems];
         }
 
-        public static void StreamItem(int itemNum)
+        public static void OnStream(int itemNum)
         {
             if (itemNum >= 0 && string.IsNullOrEmpty(Data.Item[itemNum].Name) && GameState.ItemLoaded[itemNum] == 0)
             {
                 GameState.ItemLoaded[itemNum] = 1;
-                SendRequestItem(itemNum);
+                Sender.SendRequestItem(itemNum);
             }
         }
 
         #endregion
-
-        #region Incoming Packets
-
-        public static void Packet_UpdateItem(ReadOnlyMemory<byte> data)
-        {
-            int n;
-            int i;
-            var buffer = new PacketReader(data);
-
-            n = buffer.ReadInt32();
-
-            // Update the item
-            Data.Item[n].AccessReq = buffer.ReadInt32();
-
-            int statCount = System.Enum.GetValues(typeof(Stat)).Length;
-            for (i = 0; i < statCount; i++)
-                Data.Item[n].AddStat[i] = (byte)buffer.ReadInt32();
-
-            Data.Item[n].Animation = buffer.ReadInt32();
-            Data.Item[n].BindType = buffer.ReadByte();
-            Data.Item[n].JobReq = buffer.ReadInt32();
-            Data.Item[n].Data1 = buffer.ReadInt32();
-            Data.Item[n].Data2 = buffer.ReadInt32();
-            Data.Item[n].Data3 = buffer.ReadInt32();
-            Data.Item[n].LevelReq = buffer.ReadInt32();
-            Data.Item[n].Mastery = (byte)buffer.ReadInt32();
-            Data.Item[n].Name = buffer.ReadString();
-            Data.Item[n].Paperdoll = buffer.ReadInt32();
-            Data.Item[n].Icon = buffer.ReadInt32();
-            Data.Item[n].Price = buffer.ReadInt32();
-            Data.Item[n].Rarity = (byte)buffer.ReadInt32();
-            Data.Item[n].Speed = buffer.ReadInt32();
-
-            Data.Item[n].Stackable = (byte)buffer.ReadInt32();
-            Data.Item[n].Description = buffer.ReadString();
-
-            for (i = 0; i < statCount; i++)
-                Data.Item[n].StatReq[i] = (byte)buffer.ReadInt32();
-
-            Data.Item[n].Type = (byte)buffer.ReadInt32();
-            Data.Item[n].SubType = (byte)buffer.ReadInt32();
-            Data.Item[n].ItemLevel = (byte)buffer.ReadInt32();
-
-            Data.Item[n].KnockBack = (byte)buffer.ReadInt32();
-            Data.Item[n].KnockBackTiles = (byte)buffer.ReadInt32();
-
-            Data.Item[n].Projectile = buffer.ReadInt32();
-            Data.Item[n].Ammo = buffer.ReadInt32();
-
-            if (n == GameState.DescLastItem)
-            {
-                GameState.DescLastType = 0;
-                GameState.DescLastItem = 0L;
-            }
-        }
-
-        #endregion
-
-        #region Outgoing Packets
-
-        public static void SendRequestItem(int itemNum)
-        {
-            var packetWriter = new PacketWriter(8);
-
-            packetWriter.WriteEnum(Packets.ClientPackets.CRequestItem);
-            packetWriter.WriteInt32(itemNum);
-
-            Network.Send(packetWriter);
-        }
-
-        #endregion
-
     }
 }

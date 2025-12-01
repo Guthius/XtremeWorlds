@@ -19,7 +19,7 @@ public static class WinShop
             return;
         }
 
-        Shop.StreamShop(GameState.InShop);
+        Shop.OnStream(GameState.InShop);
 
         if (GameState.ShopIsSelling)
         {
@@ -77,7 +77,7 @@ public static class WinShop
 
     public static void OnClose()
     {
-        Shop.CloseShop();
+        Shop.OnClose();
     }
 
     public static void OnBuyingChecked()
@@ -348,7 +348,7 @@ public static class WinShop
                 continue;
             }
 
-            Item.StreamItem(itemNum);
+            Item.OnStream(itemNum);
 
             var itemIcon = Data.Item[itemNum].Icon;
             if (itemIcon <= 0 || itemIcon > GameState.NumItems)
@@ -381,7 +381,7 @@ public static class WinShop
                 continue;
             }
 
-            Item.StreamItem(itemNum);
+            Item.OnStream(itemNum);
 
             var itemIcon = Data.Item[itemNum].Icon;
             if (itemIcon <= 0 || itemIcon > GameState.NumItems)

@@ -1075,7 +1075,7 @@ namespace Client
 
                 if (IsWindowVisible("winShop"))
                 {
-                    Shop.CloseShop();
+                    Shop.OnClose();
                     return;
                 }
 
@@ -2084,7 +2084,7 @@ namespace Client
             if (Data.MyMapItem[itemNum].Num < 0 | Data.MyMapItem[itemNum].Num > Variables.MaxItems)
                 return;
 
-            Item.StreamItem(Data.MyMapItem[itemNum].Num);
+            Item.OnStream(Data.MyMapItem[itemNum].Num);
 
             picNum = Data.Item[Data.MyMapItem[itemNum].Num].Icon;
 
@@ -3257,9 +3257,9 @@ namespace Client
             {
                 for (i = 0; i < byte.MaxValue; i++)
                 {
-                    if (Animation.AnimInstance?[i].Used[0] == true)
+                    if (Animation.Instance?[i].Used[0] == true)
                     {
-                        Animation.Draw(i, 0);
+                        Animation.OnDraw(i, 0);
                     }         
                 }
             }
@@ -3390,9 +3390,9 @@ namespace Client
             {
                 for (i = 0; i < byte.MaxValue; i++)
                 {
-                    if (Animation.AnimInstance?[i].Used[1] == true)
+                    if (Animation.Instance?[i].Used[1] == true)
                         {
-                            Animation.Draw(i, 1);
+                            Animation.OnDraw(i, 1);
                         }
                     }       
             }

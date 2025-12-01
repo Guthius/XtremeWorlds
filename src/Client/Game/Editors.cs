@@ -1338,7 +1338,7 @@ namespace Client
         {
             GameState.MyEditorType = EditorType.None;
             ClearChanged_Shop();
-            Shop.ClearShops();
+            Shop.OnClearAll();
             Sender.SendCloseEditor();
         }
 
@@ -1379,8 +1379,8 @@ namespace Client
         public static void ItemEditorCancel()
         {
             GameState.MyEditorType = EditorType.None;
-            Item.ClearChangedItem();
-            Item.ClearItems();
+            Item.OnClearChanged();
+            Item.OnClearAll();
             Sender.SendCloseEditor();
         }
 
@@ -1397,7 +1397,7 @@ namespace Client
             }
 
             GameState.MyEditorType = EditorType.None;
-            Item.ClearChangedItem();
+            Item.OnClearChanged();
             Sender.SendCloseEditor();
         }
 

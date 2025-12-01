@@ -240,5 +240,33 @@ namespace Client.Game.UI.Windows
             LoadJob(SelectedIndex);
             RefreshList();
         }
+
+        // Unified handlers for callbacks
+        public static void OnSave()
+        {
+            Editors.JobEditorOK();
+            WindowManager.HideWindow("winJobEditor");
+        }
+
+        public static void OnCancel()
+        {
+            Editors.JobEditorCancel();
+            WindowManager.HideWindow("winJobEditor");
+        }
+
+        public static void OnDelete()
+        {
+            Database.ClearJob(SelectedIndex);
+            GameState.JobChanged[SelectedIndex] = true;
+            LoadJob(SelectedIndex);
+            RefreshList();
+        }
+
+        public static void OnCopy()
+        {
+            OnCopyOrPaste();
+        }
+
+        // keep existing public methods signatures
     }
 }

@@ -1,5 +1,6 @@
 using Client.Game.UI;
 using Client.Game.UI.Controls;
+using Client.Net;
 using Core.Globals;
 using System;
 using System.IO;
@@ -591,6 +592,47 @@ public static class WinItemEditor
         GameState.ItemChanged[SelectedIndex] = true;
         LoadItem(SelectedIndex);
         RefreshList();
+    }
+
+    // Add unified callback handlers for wiring from Crystalshire
+    public static void OnSave()
+    {
+        Editors.ItemEditorOK();
+        WindowManager.HideWindow("winItemEditor");
+    }
+
+    public static void OnCancel()
+    {
+        Editors.ItemEditorCancel();
+        WindowManager.HideWindow("winItemEditor");
+    }
+
+    public static void OnDelete()
+    {
+        Item.OnClear(GameState.EditorIndex);
+        if (SelectedIndex >= 0 && SelectedIndex < GameState.ItemChanged.Length)
+            GameState.ItemChanged[SelectedIndex] = true;
+        LoadItem(GameState.EditorIndex);
+        RefreshList();
+    }
+
+    public static void OnCopy()
+    {
+        OnCopyOrPaste();
+    }
+
+    public static void OnSpawn()
+    {
+        if (GameState.MyIndex > 0)
+        {
+            Sender.SendSpawnItem(GameState.EditorIndex, 1);
+        }
+    }
+
+    public static void OnClose()
+    {
+        Editors.ItemEditorCancel();
+        WindowManager.HideWindow("winItemEditor");
     }
 }
 

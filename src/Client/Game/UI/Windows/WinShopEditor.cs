@@ -210,7 +210,7 @@ public static class WinShopEditor
         RefreshList();
     }
 
-    public static void DeleteTrade()
+    public static void OnDelete()
     {
         if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxShops) return;
         if (!WindowManager.TryGetControl("winShopEditor", "lstTradeItem", out var tradeListCtrl) || tradeListCtrl is not ListBox lst) return;
@@ -222,9 +222,9 @@ public static class WinShopEditor
         LoadShop(SelectedIndex);
     }
 
-    public static void ClearShop()
+    public static void OnClear()
     {
-        Shop.ClearShop(SelectedIndex);
+        Shop.OnClear(SelectedIndex);
         GameState.ShopChanged[SelectedIndex] = true;
         LoadShop(SelectedIndex);
         RefreshList();

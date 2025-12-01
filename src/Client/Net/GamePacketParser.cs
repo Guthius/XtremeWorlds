@@ -4,8 +4,9 @@ using Core;
 using Core.Configurations;
 using Core.Globals;
 using Core.Net;
-using static Core.Globals.Command;
 using System;
+using static Core.Globals.Command;
+using static Core.Globals.Type;
 
 namespace Client.Net;
 
@@ -51,7 +52,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Bind(Packets.ServerPackets.SPlayerMsg, Packet_PlayerMsg);
         Bind(Packets.ServerPackets.SMapMsg, Packet_MapMsg);
         Bind(Packets.ServerPackets.SSpawnItem, Packet_SpawnItem);
-        Bind(Packets.ServerPackets.SUpdateItem, Item.Packet_UpdateItem);
+        Bind(Packets.ServerPackets.SUpdateItem, Packet_UpdateItem);
         Bind(Packets.ServerPackets.SSpawnNpc, Packet_SpawnNpc);
         Bind(Packets.ServerPackets.SNpcDead, Packet_NpcDead);
         Bind(Packets.ServerPackets.SPlayerDead, Packet_PlayerDead);
@@ -67,8 +68,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Bind(Packets.ServerPackets.SActionMsg, Packet_ActionMessage);
         Bind(Packets.ServerPackets.SPlayerExp, Player.Packet_PlayerExp);
         Bind(Packets.ServerPackets.SBlood, Packet_Blood);
-        Bind(Packets.ServerPackets.SUpdateAnimation, Animation.Packet_UpdateAnimation);
-        Bind(Packets.ServerPackets.SAnimation, Animation.Packet_Animation);
+        Bind(Packets.ServerPackets.SUpdateAnimation, Packet_UpdateAnimation);
+        Bind(Packets.ServerPackets.SAnimation, Packet_Animation);
         Bind(Packets.ServerPackets.SMapNpcVitals, Packet_NpcVitals);
         Bind(Packets.ServerPackets.SCooldown, Packet_Cooldown);
         Bind(Packets.ServerPackets.SClearSkillBuffer, Packet_ClearSkillBuffer);
@@ -142,7 +143,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         General.AesIV = iv;
     }
 
-    // Variables packet: read authoritative sizes and apply to global variables.
     private static void Packet_Variables(ReadOnlyMemory<byte> data)
     {
         var r = new PacketReader(data);
@@ -486,7 +486,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             var itemNum = packetReader.ReadInt32();
 
             SetPlayerEquipment(GameState.MyIndex, itemNum, (Equipment)i);
-            Item.StreamItem(itemNum);
+            Item.OnStream(itemNum);
         }
     }
 
@@ -1045,5 +1045,111 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         moral.CanPk = packetReader.ReadBoolean();
         moral.DropItems = packetReader.ReadBoolean();
         moral.LoseExp = packetReader.ReadBoolean();
+    }
+
+    public static void Packet_UpdateItem(ReadOnlyMemory<byte> data)
+    {
+        int n;
+        int i;
+        var buffer = new PacketReader(data);
+
+        n = buffer.ReadInt32();
+
+        // Update the item
+        Data.Item[n].AccessReq = buffer.ReadInt32();
+
+        int statCount = System.Enum.GetValues(typeof(Stat)).Length;
+        for (i = 0; i < statCount; i++)
+            Data.Item[n].AddStat[i] = (byte)buffer.ReadInt32();
+
+        Data.Item[n].Animation = buffer.ReadInt32();
+        Data.Item[n].BindType = buffer.ReadByte();
+        Data.Item[n].JobReq = buffer.ReadInt32();
+        Data.Item[n].Data1 = buffer.ReadInt32();
+        Data.Item[n].Data2 = buffer.ReadInt32();
+        Data.Item[n].Data3 = buffer.ReadInt32();
+        Data.Item[n].LevelReq = buffer.ReadInt32();
+        Data.Item[n].Mastery = (byte)buffer.ReadInt32();
+        Data.Item[n].Name = buffer.ReadString();
+        Data.Item[n].Paperdoll = buffer.ReadInt32();
+        Data.Item[n].Icon = buffer.ReadInt32();
+        Data.Item[n].Price = buffer.ReadInt32();
+        Data.Item[n].Rarity = (byte)buffer.ReadInt32();
+        Data.Item[n].Speed = buffer.ReadInt32();
+
+        Data.Item[n].Stackable = (byte)buffer.ReadInt32();
+        Data.Item[n].Description = buffer.ReadString();
+
+        for (i = 0; i < statCount; i++)
+            Data.Item[n].StatReq[i] = (byte)buffer.ReadInt32();
+
+        Data.Item[n].Type = (byte)buffer.ReadInt32();
+        Data.Item[n].SubType = (byte)buffer.ReadInt32();
+        Data.Item[n].ItemLevel = (byte)buffer.ReadInt32();
+
+        Data.Item[n].KnockBack = (byte)buffer.ReadInt32();
+        Data.Item[n].KnockBackTiles = (byte)buffer.ReadInt32();
+
+        Data.Item[n].Projectile = buffer.ReadInt32();
+        Data.Item[n].Ammo = buffer.ReadInt32();
+
+        if (n == GameState.DescLastItem)
+        {
+            GameState.DescLastType = 0;
+            GameState.DescLastItem = 0L;
+        }
+    }
+
+    public static void Packet_UpdateAnimation(ReadOnlyMemory<byte> data)
+    {
+        int n;
+        int i;
+        var buffer = new PacketReader(data);
+
+        n = buffer.ReadInt32();
+
+        for (i = 0; i < Data.Animation[n].Frames.Length; i++)
+            Data.Animation[n].Frames[i] = buffer.ReadInt32();
+
+        for (i = 0; i < Data.Animation[n].LoopCount.Length; i++)
+            Data.Animation[n].LoopCount[i] = buffer.ReadInt32();
+
+        for (i = 0; i < Data.Animation[n].LoopTime.Length; i++)
+            Data.Animation[n].LoopTime[i] = buffer.ReadInt32();
+
+        Data.Animation[n].Name = buffer.ReadString();
+        Data.Animation[n].Sound = buffer.ReadString();
+
+        for (i = 0; i < Data.Animation[n].Sprite.Length; i++)
+            Data.Animation[n].Sprite[i] = buffer.ReadInt32();
+    }
+
+    public static void Packet_Animation(ReadOnlyMemory<byte> data)
+    {
+        var buffer = new PacketReader(data);
+
+        Animation.Index = (byte)(Animation.Index + 1);
+        if (Animation.Index >= byte.MaxValue)
+            Animation.Index = 1;
+
+        {
+            if (Animation.Instance == null)
+                Animation.OnClear();
+            if (Animation.Instance == null)
+                return;
+
+            ref var withBlock = ref Animation.Instance[Animation.Index];
+            withBlock.Timer ??= new int[2];
+            withBlock.Used ??= new bool[2];
+            withBlock.LoopIndex ??= new int[2];
+            withBlock.FrameIndex ??= new int[2];
+            withBlock.Animation = buffer.ReadInt32();
+            withBlock.X = buffer.ReadInt32();
+            withBlock.Y = buffer.ReadInt32();
+            withBlock.LockType = (byte)buffer.ReadInt32();
+            withBlock.LockIndex = buffer.ReadInt32();
+            withBlock.Used[0] = true;
+            withBlock.Used[1] = true;
+        }
     }
 }
