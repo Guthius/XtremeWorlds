@@ -111,9 +111,9 @@ public static class WinResourceEditor
         SetBar("sldRewardExp", "lblRewardExpVal", r.ExpReward, 0, 1000000);
         SetBar("sldHealth", "lblHealthVal", r.Health, 0, 100000);
         SetBar("sldRespawn", "lblRespawnVal", r.RespawnTime, 0, 1000000);
-        SetBar("sldLvlReq", "lblLvlReqVal", r.LvlRequired, 0, 255);
-        SetBar("sldNormalPic", "lblNormalPicVal", r.ResourceImage, 0, 9999);
-        SetBar("sldExhaustedPic", "lblExhaustedPicVal", r.ExhaustedImage, 0, 9999);
+        SetBar("sldLvlReq", "lblLvlReqVal", r.LvlRequired, 0, GameState.MaxLevel);
+        SetBar("sldNormalPic", "lblNormalPicVal", r.ResourceImage, 0, GameState.NumResources);
+        SetBar("sldExhaustedPic", "lblExhaustedPicVal", r.ExhaustedImage, 0, GameState.NumResources);
     }
 
     // Refresh list display names
