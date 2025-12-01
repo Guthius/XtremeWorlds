@@ -6,12 +6,13 @@
         StartPosition="CenterScreen"
         Visible="false">
 
-    <Label Name="lblList" Text="Item" Position="16, 24" Size="80, 16"/>
-    <ListBox Name="lstIndex" Position="16, 44" Size="224, 540"/>
-    <ScrollBar Name="sldList" Position="240, 44" Size="16, 540" Min="0" Max="0" Vertical="true"/>
+    <GroupBox Name="grpList" Position="8,28" Size="246,548" Caption="Items">
+        <ListBox Name="lstIndex" Position="8,28" Size="200,516"/>
+        <ScrollBar Name="sldList" Position="208,28" Size="16,516" Min="0" Max="0" Vertical="true"/>
+    </GroupBox>
 
     <!-- Basics group -->
-    <GroupBox Name="grpBasics" Caption="" Position="272, 32" Size="824, 156">
+    <GroupBox Name="grpBasics" Caption="" Position="260, 28" Size="842, 156">
         <Label Name="lblName" Text="Name" Position="8, 16" Size="80, 16"/>
         <TextBox Name="txtName" Position="84, 14" Size="320, 20" Design="TextWhite"/>
         <Label Name="lblDesc" Text="Description" Position="8, 40" Size="100, 16"/>
@@ -22,7 +23,7 @@
      </GroupBox>
 
     <!-- Equipment group -->
-    <GroupBox Name="grpEquip" Caption="" Position="272, 294" Size="824, 150">
+    <GroupBox Name="grpEquip" Caption="" Position="260, 294" Size="842, 150">
         <Label Name="lblSpeed" Text="Speed" Position="16, 12" Size="80, 16"/>
         <TextBox Name="txtSpeed" Position="96, 10" Size="120, 20" Design="TextWhite"/>
         <Label Name="lblDamage" Text="Damage" Position="232, 12" Size="80, 16"/>
@@ -38,7 +39,7 @@
     </GroupBox>
 
     <!-- Type/meta group -->
-    <GroupBox Name="grpType" Caption="" Position="272, 194" Size="824, 96">
+    <GroupBox Name="grpType" Caption="" Position="260, 194" Size="842, 96">
         <Label Name="lblType" Text="Type" Position="8, 12" Size="60, 16"/>
         <ComboBox Name="cmbType" Position="80, 10" Size="160, 18"/>
         <Label Name="lblSubType" Text="SubType" Position="256, 12" Size="80, 16"/>
@@ -57,7 +58,7 @@
     </GroupBox>
 
     <!-- Use group -->
-    <GroupBox Name="grpItemUse" Caption="" Position="272, 296" Size="824, 150">
+    <GroupBox Name="grpItemUse" Caption="" Position="260, 296" Size="842, 150">
         <Label Name="lblEventHeader" Text="Event" Position="8, 8" Size="60, 16"/>
         <Label Name="lblEventId" Text="Id" Position="80, 8" Size="30, 16"/>
         <TextBox Name="txtEventId" Position="116, 6" Size="60, 20" Design="TextWhite"/>
@@ -80,7 +81,7 @@
     </GroupBox>
 
     <!-- Stats group immediately below grpEquip -->
-    <GroupBox Name="grpStats" Caption="" Position="272, 450" Size="824, 70">
+    <GroupBox Name="grpStats" Caption="" Position="260, 446" Size="842, 70">
         <Label Name="lblStr" Text="STR" Position="8, 12" Size="60, 16"/>
         <ScrollBar Name="sldStr" Position="80, 14" Size="200, 12" Min="-255" Max="255" Orientation="Horizontal" ThumbSize="12"/>
         <Label Name="lblVit" Text="VIT" Position="300, 12" Size="60, 16"/>
@@ -94,7 +95,7 @@
     </GroupBox>
 
     <!-- Requirements group -->
-    <GroupBox Name="grpReq" Caption="" Position="272, 524" Size="824, 56">
+    <GroupBox Name="grpReq" Caption="" Position="260, 520" Size="842, 56">
         <Label Name="lblReqJob" Text="Job" Position="8, 14" Size="60, 16"/>
         <ComboBox Name="cmbJobReq" Position="80, 12" Size="200, 18"/>
         <Label Name="lblReqAccess" Text="Access" Position="292, 14" Size="80, 16"/>
@@ -103,11 +104,11 @@
         <ScrollBar Name="sldReqLevel" Position="632, 14" Size="176, 12" Min="1" Max="99" Orientation="Horizontal" ThumbSize="12"/>
     </GroupBox>
 
-    <Button Name="btnSave" Text="Save" Position="475, 588" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-    <Button Name="btnDelete" Text="Delete" Position="563, 588" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
-    <Button Name="btnCopy" Text="Copy" Position="651, 588" Size="80, 24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
-    <Button Name="btnSpawn" Text="Spawn" Position="739, 588" Size="80, 24" Design="Blue" DesignHover="BlueHover" DesignMouseDown="BlueClick"/>
-    <Button Name="btnCancel" Text="Cancel" Position="827, 588" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+    <Button Name="btnSave" Text="Save" Position="475, 584" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+    <Button Name="btnDelete" Text="Delete" Position="563, 584" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+    <Button Name="btnCopy" Text="Copy" Position="651, 584" Size="80, 24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+    <Button Name="btnSpawn" Text="Spawn" Position="739, 584" Size="80, 24" Design="Blue" DesignHover="BlueHover" DesignMouseDown="BlueClick"/>
+    <Button Name="btnCancel" Text="Cancel" Position="827, 584" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
 
     <Button Name="btnClose" Position="-19, 5" Size="16, 16" Image="8" ImageHover="9" ImageMouseDown="10"/>
 
