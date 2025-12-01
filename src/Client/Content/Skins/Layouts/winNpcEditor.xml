@@ -6,12 +6,13 @@
         StartPosition="CenterScreen"
         Visible="false">
 
-  <Label Name="lblList" Text="Npc" Position="16, 24" Size="80, 16"/>
-  <ListBox Name="lstIndex" Position="16, 44" Size="224, 340"/>
-  <ScrollBar Name="sldList" Position="240, 44" Size="16, 340" Min="0" Max="0" Vertical="true"/>
+  <GroupBox Name="grpList" Position="8,28" Size="246,352" Caption="Npc">
+    <ListBox Name="lstIndex" Position="8,28" Size="200,316"/>
+    <ScrollBar Name="sldList" Position="208,28" Size="16,316" Min="0" Max="0" Vertical="true"/>
+  </GroupBox>
 
   <!-- Details group -->
-  <GroupBox Name="gtpDetails" Caption="" Position="272, 32" Size="432, 348">
+  <GroupBox Name="gtpDetails" Caption="" Position="260, 28" Size="450, 352">
     <!-- Core fields -->
     <Label Name="lblName" Text="Name" Position="8, 4" Size="80, 16"/>
     <TextBox Name="txtName" Position="72, 2" Size="234, 20" Design="TextWhite"/>
