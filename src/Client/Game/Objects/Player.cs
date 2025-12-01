@@ -865,9 +865,9 @@ namespace Client
                     if (Data.Player[GameState.MyIndex].Attacking == 0)
                     {
                         {
-                            ref var withBlock = ref Data.Player[GameState.MyIndex];
-                            withBlock.Attacking = 1;
-                            withBlock.AttackTimer = General.GetTickCount();
+                            ref var instance = ref Data.Player[GameState.MyIndex];
+                            instance.Attacking = 1;
+                            instance.AttackTimer = General.GetTickCount();
                         }
 
                         // If weapon has a projectile, send mouse-aimed attack with world pixel coords
@@ -1178,34 +1178,34 @@ namespace Client
 
                 // set form
                 {
-                    var withBlock = WindowManager.Windows[WindowManager.GetWindowIndex("winCharacter")];
-                    withBlock.Controls[WindowManager.GetControlIndex("winCharacter", "lblName")].Text = "Name";
-                    withBlock.Controls[WindowManager.GetControlIndex("winCharacter", "lblJob")].Text = "Job";
-                    withBlock.Controls[WindowManager.GetControlIndex("winCharacter", "lblLevel")].Text = "Level";
-                    withBlock.Controls[WindowManager.GetControlIndex("winCharacter", "lblGuild")].Text = "Guild";
-                    withBlock.Controls[WindowManager.GetControlIndex("winCharacter", "lblName2")].Text = GetPlayerName(GameState.MyIndex);
-                    withBlock.Controls[WindowManager.GetControlIndex("winCharacter", "lblJob2")].Text = Data.Job[GetPlayerJob(GameState.MyIndex)].Name;
-                    withBlock.Controls[WindowManager.GetControlIndex("winCharacter", "lblLevel2")].Text = GetPlayerLevel(GameState.MyIndex).ToString();
-                    withBlock.Controls[WindowManager.GetControlIndex("winCharacter", "lblGuild2")].Text = "None";
+                    var instance = WindowManager.Windows[WindowManager.GetWindowIndex("winCharacter")];
+                    instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblName")].Text = "Name";
+                    instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblJob")].Text = "Job";
+                    instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblLevel")].Text = "Level";
+                    instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblGuild")].Text = "Guild";
+                    instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblName2")].Text = GetPlayerName(GameState.MyIndex);
+                    instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblJob2")].Text = Data.Job[GetPlayerJob(GameState.MyIndex)].Name;
+                    instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblLevel2")].Text = GetPlayerLevel(GameState.MyIndex).ToString();
+                    instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblGuild2")].Text = "None";
                     WinCharacter.Update();
 
                     // stats
                     for (x = 0; x < statCount; x++)
-                        withBlock.Controls[WindowManager.GetControlIndex("winCharacter", "lblStat_" + (x + 1))].Text = GetPlayerStat(GameState.MyIndex, (Stat) x).ToString();
+                        instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblStat_" + (x + 1))].Text = GetPlayerStat(GameState.MyIndex, (Stat) x).ToString();
 
                     // points
-                    withBlock.Controls[WindowManager.GetControlIndex("winCharacter", "lblPoints")].Text = GetPlayerPoints(GameState.MyIndex).ToString();
+                    instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblPoints")].Text = GetPlayerPoints(GameState.MyIndex).ToString();
 
                     // grey out buttons
                     if (GetPlayerPoints(GameState.MyIndex) == 0)
                     {
                         for (x = 0; x < statCount; x++)
-                            withBlock.Controls[WindowManager.GetControlIndex("winCharacter", "btnGreyStat_" + (x + 1))].Visible = true;
+                            instance.Controls[WindowManager.GetControlIndex("winCharacter", "btnGreyStat_" + (x + 1))].Visible = true;
                     }
                     else
                     {
                         for (x = 0; x < statCount; x++)
-                            withBlock.Controls[WindowManager.GetControlIndex("winCharacter", "btnGreyStat_" + (x + 1))].Visible = false;
+                            instance.Controls[WindowManager.GetControlIndex("winCharacter", "btnGreyStat_" + (x + 1))].Visible = false;
                     }
                 }
                 GameState.PlayerData = true;
@@ -1242,8 +1242,8 @@ namespace Client
             // Do not reset local player's movement state on our own echoed dir packets; this causes micro-stutters
             if (i != GameState.MyIndex)
             {
-                ref var withBlock = ref Data.Player[i];
-                withBlock.Moving = 0;
+                ref var instance = ref Data.Player[i];
+                instance.Moving = 0;
             }
         }
 

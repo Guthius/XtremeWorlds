@@ -416,10 +416,10 @@ public static class TextRenderer
             for (var y = (int)GameState.TileView.Top; y < loopTo1; y++)
             {
                 if (!GameLogic.IsValidMapPoint(x, y)) continue;
-                ref var withBlock = ref Data.MyMap.Tile[x, y];
+                ref var instance = ref Data.MyMap.Tile[x, y];
                 var tX = (int)Math.Round(GameLogic.ConvertMapX(x * GameState.SizeX) - 4 + GameState.SizeX * 0.5d);
                 var tY = (int)Math.Round(GameLogic.ConvertMapY(y * GameState.SizeY) - 7 + GameState.SizeY * 0.5d);
-                tA = GameState.EditorAttribute == 1 ? (int)withBlock.Type : (int)withBlock.Type2;
+                tA = GameState.EditorAttribute == 1 ? (int)instance.Type : (int)instance.Type2;
                 switch (tA)
                 {
                     case (int)TileType.Blocked: RenderText("B", tX, tY, Color.Red, Color.Black); break;

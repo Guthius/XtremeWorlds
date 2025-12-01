@@ -238,16 +238,16 @@ namespace Client
 
         public static void ClearEvent(int eventNum)
         {
-            ref var withBlock = ref Data.MyMap.Event[eventNum];
-            withBlock.Name = "";
-            withBlock.PageCount = 1;
-            withBlock.Pages = new Type.EventPage[1];
-            Array.Resize(ref withBlock.Pages[0].CommandList, 1);
-            Array.Resize(ref withBlock.Pages[0].CommandList[0].Commands, 1);
-            withBlock.Pages[0].CommandList[0].Commands[0].Index = -1;
-            withBlock.Globals = 0;
-            withBlock.X = 0;
-            withBlock.Y = 0;
+            ref var instance = ref Data.MyMap.Event[eventNum];
+            instance.Name = "";
+            instance.PageCount = 1;
+            instance.Pages = new Type.EventPage[1];
+            Array.Resize(ref instance.Pages[0].CommandList, 1);
+            Array.Resize(ref instance.Pages[0].CommandList[0].Commands, 1);
+            instance.Pages[0].CommandList[0].Commands[0].Index = -1;
+            instance.Globals = 0;
+            instance.X = 0;
+            instance.Y = 0;
         }
 
         public static void EventEditorInit()
@@ -281,47 +281,47 @@ namespace Client
             EditorEvent.Instance.BeginPageSync();
             try
             {
-            ref var withBlock = ref TmpEvent.Pages[pageNum];
-            GraphicSelX = withBlock.GraphicX;
-            GraphicSelY = withBlock.GraphicY;
-            GraphicSelX2 = withBlock.GraphicX2;
-            GraphicSelY2 = withBlock.GraphicY2;
-            EditorEvent.Instance.cmbGraphic.SelectedIndex = withBlock.GraphicType;
-            EditorEvent.Instance.cmbHasItem.SelectedIndex = withBlock.HasItemIndex;
-            if (withBlock.HasItemAmount == 0)
+            ref var instance = ref TmpEvent.Pages[pageNum];
+            GraphicSelX = instance.GraphicX;
+            GraphicSelY = instance.GraphicY;
+            GraphicSelX2 = instance.GraphicX2;
+            GraphicSelY2 = instance.GraphicY2;
+            EditorEvent.Instance.cmbGraphic.SelectedIndex = instance.GraphicType;
+            EditorEvent.Instance.cmbHasItem.SelectedIndex = instance.HasItemIndex;
+            if (instance.HasItemAmount == 0)
             {
                 EditorEvent.Instance.nudCondition_HasItem.Value = 1;
             }
             else
             {
-                EditorEvent.Instance.nudCondition_HasItem.Value = withBlock.HasItemAmount;
+                EditorEvent.Instance.nudCondition_HasItem.Value = instance.HasItemAmount;
             }
 
-            EditorEvent.Instance.cmbMoveFreq.SelectedIndex = withBlock.MoveFreq;
-            EditorEvent.Instance.cmbMoveSpeed.SelectedIndex = withBlock.MoveSpeed;
-            EditorEvent.Instance.cmbMoveType.SelectedIndex = withBlock.MoveType;
-            EditorEvent.Instance.cmbPlayerVar.SelectedIndex = withBlock.VariableIndex;
-            EditorEvent.Instance.cmbPlayerSwitch.SelectedIndex = withBlock.SwitchIndex;
-            EditorEvent.Instance.cmbSelfSwitchCompare.SelectedIndex = withBlock.SelfSwitchCompare;
-            EditorEvent.Instance.cmbSelfSwitch.SelectedIndex = withBlock.SelfSwitchIndex;
-            EditorEvent.Instance.cmbPlayerSwitchCompare.SelectedIndex = withBlock.SwitchCompare;
-            EditorEvent.Instance.cmbPlayerVarCompare.SelectedIndex = withBlock.VariableCompare;
+            EditorEvent.Instance.cmbMoveFreq.SelectedIndex = instance.MoveFreq;
+            EditorEvent.Instance.cmbMoveSpeed.SelectedIndex = instance.MoveSpeed;
+            EditorEvent.Instance.cmbMoveType.SelectedIndex = instance.MoveType;
+            EditorEvent.Instance.cmbPlayerVar.SelectedIndex = instance.VariableIndex;
+            EditorEvent.Instance.cmbPlayerSwitch.SelectedIndex = instance.SwitchIndex;
+            EditorEvent.Instance.cmbSelfSwitchCompare.SelectedIndex = instance.SelfSwitchCompare;
+            EditorEvent.Instance.cmbSelfSwitch.SelectedIndex = instance.SelfSwitchIndex;
+            EditorEvent.Instance.cmbPlayerSwitchCompare.SelectedIndex = instance.SwitchCompare;
+            EditorEvent.Instance.cmbPlayerVarCompare.SelectedIndex = instance.VariableCompare;
             EditorEvent.Instance.chkGlobal.Checked = Conversions.ToBoolean(TmpEvent.Globals);
-            EditorEvent.Instance.cmbTrigger.SelectedIndex = withBlock.Trigger;
-            EditorEvent.Instance.chkDirFix.Checked = Conversions.ToBoolean(withBlock.DirFix);
-            EditorEvent.Instance.chkHasItem.Checked = Conversions.ToBoolean(withBlock.ChkHasItem);
-            EditorEvent.Instance.chkPlayerVar.Checked = Conversions.ToBoolean(withBlock.ChkVariable);
-            EditorEvent.Instance.chkPlayerSwitch.Checked = Conversions.ToBoolean(withBlock.ChkSwitch);
-            EditorEvent.Instance.chkSelfSwitch.Checked = Conversions.ToBoolean(withBlock.ChkSelfSwitch);
-            EditorEvent.Instance.chkWalkAnim.Checked = Conversions.ToBoolean(withBlock.IdleAnim);
-            EditorEvent.Instance.chkWalkThrough.Checked = Conversions.ToBoolean(withBlock.WalkThrough);
-            EditorEvent.Instance.chkShowName.Checked = Conversions.ToBoolean(withBlock.ShowName);
-            EditorEvent.Instance.nudPlayerVariable.Value = withBlock.VariableCondition;
-            EditorEvent.Instance.nudGraphic.Value = withBlock.Graphic;
+            EditorEvent.Instance.cmbTrigger.SelectedIndex = instance.Trigger;
+            EditorEvent.Instance.chkDirFix.Checked = Conversions.ToBoolean(instance.DirFix);
+            EditorEvent.Instance.chkHasItem.Checked = Conversions.ToBoolean(instance.ChkHasItem);
+            EditorEvent.Instance.chkPlayerVar.Checked = Conversions.ToBoolean(instance.ChkVariable);
+            EditorEvent.Instance.chkPlayerSwitch.Checked = Conversions.ToBoolean(instance.ChkSwitch);
+            EditorEvent.Instance.chkSelfSwitch.Checked = Conversions.ToBoolean(instance.ChkSelfSwitch);
+            EditorEvent.Instance.chkWalkAnim.Checked = Conversions.ToBoolean(instance.IdleAnim);
+            EditorEvent.Instance.chkWalkThrough.Checked = Conversions.ToBoolean(instance.WalkThrough);
+            EditorEvent.Instance.chkShowName.Checked = Conversions.ToBoolean(instance.ShowName);
+            EditorEvent.Instance.nudPlayerVariable.Value = instance.VariableCondition;
+            EditorEvent.Instance.nudGraphic.Value = instance.Graphic;
             // Event-level fields
             EditorEvent.Instance.txtName.Text = TmpEvent.Name ?? string.Empty;
 
-            if (withBlock.ChkSelfSwitch == 0)
+            if (instance.ChkSelfSwitch == 0)
             {
                 EditorEvent.Instance.cmbSelfSwitch.Enabled = false;
                 EditorEvent.Instance.cmbSelfSwitchCompare.Enabled = false;
@@ -332,7 +332,7 @@ namespace Client
                 EditorEvent.Instance.cmbSelfSwitchCompare.Enabled = true;
             }
 
-            if (withBlock.ChkSwitch == 0)
+            if (instance.ChkSwitch == 0)
             {
                 EditorEvent.Instance.cmbPlayerSwitch.Enabled = false;
                 EditorEvent.Instance.cmbPlayerSwitchCompare.Enabled = false;
@@ -343,7 +343,7 @@ namespace Client
                 EditorEvent.Instance.cmbPlayerSwitchCompare.Enabled = true;
             }
 
-            if (withBlock.ChkVariable == 0)
+            if (instance.ChkVariable == 0)
             {
                 EditorEvent.Instance.cmbPlayerVar.Enabled = false;
                 EditorEvent.Instance.nudPlayerVariable.Enabled = false;
@@ -365,7 +365,7 @@ namespace Client
                 EditorEvent.Instance.btnMoveRoute.Enabled = false;
             }
 
-            EditorEvent.Instance.cmbPositioning.SelectedIndex = int.Parse(withBlock.Position.ToString());
+            EditorEvent.Instance.cmbPositioning.SelectedIndex = int.Parse(instance.Position.ToString());
             // Refresh the UI list on the UI thread
             try
             {
@@ -3374,26 +3374,26 @@ namespace Client
                 if (id >= GameState.CurrentEvents)
                     break;
 
-                ref var withBlock = ref Data.MapEvents[id];
-                withBlock.Name = buffer.ReadString();
-                withBlock.Dir = buffer.ReadInt32();
-                withBlock.ShowDir = withBlock.Dir;
-                withBlock.GraphicType = buffer.ReadByte();
-                withBlock.Graphic = buffer.ReadInt32();
-                withBlock.GraphicX = buffer.ReadInt32();
-                withBlock.GraphicX2 = buffer.ReadInt32();
-                withBlock.GraphicY = buffer.ReadInt32();
-                withBlock.GraphicY2 = buffer.ReadInt32();
-                withBlock.MovementSpeed = buffer.ReadInt32();
-                withBlock.Moving = 0;
-                withBlock.X = buffer.ReadInt32();
-                withBlock.Y = buffer.ReadInt32();
-                withBlock.Position = buffer.ReadByte();
-                withBlock.Visible = buffer.ReadBoolean();
-                withBlock.IdleAnim = buffer.ReadInt32();
-                withBlock.DirFix = buffer.ReadInt32();
-                withBlock.WalkThrough = buffer.ReadInt32();
-                withBlock.ShowName = buffer.ReadInt32();
+                ref var instance = ref Data.MapEvents[id];
+                instance.Name = buffer.ReadString();
+                instance.Dir = buffer.ReadInt32();
+                instance.ShowDir = instance.Dir;
+                instance.GraphicType = buffer.ReadByte();
+                instance.Graphic = buffer.ReadInt32();
+                instance.GraphicX = buffer.ReadInt32();
+                instance.GraphicX2 = buffer.ReadInt32();
+                instance.GraphicY = buffer.ReadInt32();
+                instance.GraphicY2 = buffer.ReadInt32();
+                instance.MovementSpeed = buffer.ReadInt32();
+                instance.Moving = 0;
+                instance.X = buffer.ReadInt32();
+                instance.Y = buffer.ReadInt32();
+                instance.Position = buffer.ReadByte();
+                instance.Visible = buffer.ReadBoolean();
+                instance.IdleAnim = buffer.ReadInt32();
+                instance.DirFix = buffer.ReadInt32();
+                instance.WalkThrough = buffer.ReadInt32();
+                instance.ShowName = buffer.ReadInt32();
             }
         }
 
@@ -3420,13 +3420,13 @@ namespace Client
             {
                 if (Data.MapEvents == null)
                     return;
-                ref var withBlock = ref Data.MapEvents[id];
-                withBlock.X = x;
-                withBlock.Y = y;
-                withBlock.Dir = dir;
-                withBlock.Moving = 1;
-                withBlock.ShowDir = showDir;
-                withBlock.MovementSpeed = movementSpeed;
+                ref var instance = ref Data.MapEvents[id];
+                instance.X = x;
+                instance.Y = y;
+                instance.Dir = dir;
+                instance.Moving = 1;
+                instance.ShowDir = showDir;
+                instance.MovementSpeed = movementSpeed;
             }
         }
 
@@ -3444,10 +3444,10 @@ namespace Client
             {
                 if (Data.MapEvents == null)
                     return;
-                ref var withBlock = ref Data.MapEvents[i];
-                withBlock.Dir = dir;
-                withBlock.ShowDir = dir;
-                withBlock.Moving = 0;
+                ref var instance = ref Data.MapEvents[i];
+                instance.Dir = dir;
+                instance.ShowDir = dir;
+                instance.Moving = 0;
             }
         }
 
@@ -3481,12 +3481,12 @@ namespace Client
                 for (i = 0; i < loopTo; i++)
                 {
                     {
-                        ref var withBlock = ref Data.MyMap.Event[i];
-                        withBlock.Name = buffer.ReadString();
-                        withBlock.Globals = buffer.ReadByte();
-                        withBlock.X = buffer.ReadInt32();
-                        withBlock.Y = buffer.ReadInt32();
-                        withBlock.PageCount = buffer.ReadInt32();
+                        ref var instance = ref Data.MyMap.Event[i];
+                        instance.Name = buffer.ReadString();
+                        instance.Globals = buffer.ReadByte();
+                        instance.X = buffer.ReadInt32();
+                        instance.Y = buffer.ReadInt32();
+                        instance.PageCount = buffer.ReadInt32();
                     }
 
                     if (Data.MyMap.Event[i].PageCount > 0)
@@ -3496,57 +3496,57 @@ namespace Client
                         for (x = 0; x < loopTo1; x++)
                         {
                             {
-                                ref var withBlock1 = ref Data.MyMap.Event[i].Pages[x];
-                                withBlock1.ChkVariable = buffer.ReadInt32();
-                                withBlock1.VariableIndex = buffer.ReadInt32();
-                                withBlock1.VariableCondition = buffer.ReadInt32();
-                                withBlock1.VariableCompare = buffer.ReadInt32();
-                                withBlock1.ChkSwitch = buffer.ReadInt32();
-                                withBlock1.SwitchIndex = buffer.ReadInt32();
-                                withBlock1.SwitchCompare = buffer.ReadInt32();
-                                withBlock1.ChkHasItem = buffer.ReadInt32();
-                                withBlock1.HasItemIndex = buffer.ReadInt32();
-                                withBlock1.HasItemAmount = buffer.ReadInt32();
-                                withBlock1.ChkSelfSwitch = buffer.ReadInt32();
-                                withBlock1.SelfSwitchIndex = buffer.ReadInt32();
-                                withBlock1.SelfSwitchCompare = buffer.ReadInt32();
-                                withBlock1.GraphicType = buffer.ReadByte();
-                                withBlock1.Graphic = buffer.ReadInt32();
-                                withBlock1.GraphicX = buffer.ReadInt32();
-                                withBlock1.GraphicY = buffer.ReadInt32();
-                                withBlock1.GraphicX2 = buffer.ReadInt32();
-                                withBlock1.GraphicY2 = buffer.ReadInt32();
+                                ref var instance1 = ref Data.MyMap.Event[i].Pages[x];
+                                instance1.ChkVariable = buffer.ReadInt32();
+                                instance1.VariableIndex = buffer.ReadInt32();
+                                instance1.VariableCondition = buffer.ReadInt32();
+                                instance1.VariableCompare = buffer.ReadInt32();
+                                instance1.ChkSwitch = buffer.ReadInt32();
+                                instance1.SwitchIndex = buffer.ReadInt32();
+                                instance1.SwitchCompare = buffer.ReadInt32();
+                                instance1.ChkHasItem = buffer.ReadInt32();
+                                instance1.HasItemIndex = buffer.ReadInt32();
+                                instance1.HasItemAmount = buffer.ReadInt32();
+                                instance1.ChkSelfSwitch = buffer.ReadInt32();
+                                instance1.SelfSwitchIndex = buffer.ReadInt32();
+                                instance1.SelfSwitchCompare = buffer.ReadInt32();
+                                instance1.GraphicType = buffer.ReadByte();
+                                instance1.Graphic = buffer.ReadInt32();
+                                instance1.GraphicX = buffer.ReadInt32();
+                                instance1.GraphicY = buffer.ReadInt32();
+                                instance1.GraphicX2 = buffer.ReadInt32();
+                                instance1.GraphicY2 = buffer.ReadInt32();
 
-                                withBlock1.MoveType = buffer.ReadByte();
-                                withBlock1.MoveSpeed = buffer.ReadByte();
-                                withBlock1.MoveFreq = buffer.ReadByte();
-                                withBlock1.MoveRouteCount = buffer.ReadInt32();
-                                withBlock1.IgnoreMoveRoute = buffer.ReadInt32();
-                                withBlock1.RepeatMoveRoute = buffer.ReadInt32();
+                                instance1.MoveType = buffer.ReadByte();
+                                instance1.MoveSpeed = buffer.ReadByte();
+                                instance1.MoveFreq = buffer.ReadByte();
+                                instance1.MoveRouteCount = buffer.ReadInt32();
+                                instance1.IgnoreMoveRoute = buffer.ReadInt32();
+                                instance1.RepeatMoveRoute = buffer.ReadInt32();
 
-                                if (withBlock1.MoveRouteCount > 0)
+                                if (instance1.MoveRouteCount > 0)
                                 {
-                                    Data.MyMap.Event[i].Pages[x].MoveRoute = new Type.MoveRoute[withBlock1.MoveRouteCount];
-                                    var loopTo2 = withBlock1.MoveRouteCount;
+                                    Data.MyMap.Event[i].Pages[x].MoveRoute = new Type.MoveRoute[instance1.MoveRouteCount];
+                                    var loopTo2 = instance1.MoveRouteCount;
                                     for (y = 0; y < loopTo2; y++)
                                     {
-                                        withBlock1.MoveRoute[y].Index = buffer.ReadInt32();
-                                        withBlock1.MoveRoute[y].Data1 = buffer.ReadInt32();
-                                        withBlock1.MoveRoute[y].Data2 = buffer.ReadInt32();
-                                        withBlock1.MoveRoute[y].Data3 = buffer.ReadInt32();
-                                        withBlock1.MoveRoute[y].Data4 = buffer.ReadInt32();
-                                        withBlock1.MoveRoute[y].Data5 = buffer.ReadInt32();
-                                        withBlock1.MoveRoute[y].Data6 = buffer.ReadInt32();
+                                        instance1.MoveRoute[y].Index = buffer.ReadInt32();
+                                        instance1.MoveRoute[y].Data1 = buffer.ReadInt32();
+                                        instance1.MoveRoute[y].Data2 = buffer.ReadInt32();
+                                        instance1.MoveRoute[y].Data3 = buffer.ReadInt32();
+                                        instance1.MoveRoute[y].Data4 = buffer.ReadInt32();
+                                        instance1.MoveRoute[y].Data5 = buffer.ReadInt32();
+                                        instance1.MoveRoute[y].Data6 = buffer.ReadInt32();
                                     }
                                 }
 
-                                withBlock1.IdleAnim = buffer.ReadInt32();
-                                withBlock1.DirFix = buffer.ReadInt32();
-                                withBlock1.WalkThrough = buffer.ReadInt32();
-                                withBlock1.ShowName = buffer.ReadInt32();
-                                withBlock1.Trigger = buffer.ReadByte();
-                                withBlock1.CommandListCount = buffer.ReadInt32();
-                                withBlock1.Position = buffer.ReadByte();
+                                instance1.IdleAnim = buffer.ReadInt32();
+                                instance1.DirFix = buffer.ReadInt32();
+                                instance1.WalkThrough = buffer.ReadInt32();
+                                instance1.ShowName = buffer.ReadInt32();
+                                instance1.Trigger = buffer.ReadByte();
+                                instance1.CommandListCount = buffer.ReadInt32();
+                                instance1.Position = buffer.ReadByte();
                             }
 
                             if (Data.MyMap.Event[i].Pages[x].CommandListCount > 0)
@@ -3564,40 +3564,40 @@ namespace Client
                                         for (z = 0; z < loopTo4; z++)
                                         {
                                             {
-                                                ref var withBlock2 = ref Data.MyMap.Event[i].Pages[x].CommandList[y].Commands[z];
-                                                withBlock2.Index = buffer.ReadInt32();
-                                                withBlock2.Text1 = buffer.ReadString();
-                                                withBlock2.Text2 = buffer.ReadString();
-                                                withBlock2.Text3 = buffer.ReadString();
-                                                withBlock2.Text4 = buffer.ReadString();
-                                                withBlock2.Text5 = buffer.ReadString();
-                                                withBlock2.Data1 = buffer.ReadInt32();
-                                                withBlock2.Data2 = buffer.ReadInt32();
-                                                withBlock2.Data3 = buffer.ReadInt32();
-                                                withBlock2.Data4 = buffer.ReadInt32();
-                                                withBlock2.Data5 = buffer.ReadInt32();
-                                                withBlock2.Data6 = buffer.ReadInt32();
-                                                withBlock2.ConditionalBranch.CommandList = buffer.ReadInt32();
-                                                withBlock2.ConditionalBranch.Condition = buffer.ReadInt32();
-                                                withBlock2.ConditionalBranch.Data1 = buffer.ReadInt32();
-                                                withBlock2.ConditionalBranch.Data2 = buffer.ReadInt32();
-                                                withBlock2.ConditionalBranch.Data3 = buffer.ReadInt32();
-                                                withBlock2.ConditionalBranch.ElseCommandList = buffer.ReadInt32();
-                                                withBlock2.MoveRouteCount = buffer.ReadInt32();
+                                                ref var instance2 = ref Data.MyMap.Event[i].Pages[x].CommandList[y].Commands[z];
+                                                instance2.Index = buffer.ReadInt32();
+                                                instance2.Text1 = buffer.ReadString();
+                                                instance2.Text2 = buffer.ReadString();
+                                                instance2.Text3 = buffer.ReadString();
+                                                instance2.Text4 = buffer.ReadString();
+                                                instance2.Text5 = buffer.ReadString();
+                                                instance2.Data1 = buffer.ReadInt32();
+                                                instance2.Data2 = buffer.ReadInt32();
+                                                instance2.Data3 = buffer.ReadInt32();
+                                                instance2.Data4 = buffer.ReadInt32();
+                                                instance2.Data5 = buffer.ReadInt32();
+                                                instance2.Data6 = buffer.ReadInt32();
+                                                instance2.ConditionalBranch.CommandList = buffer.ReadInt32();
+                                                instance2.ConditionalBranch.Condition = buffer.ReadInt32();
+                                                instance2.ConditionalBranch.Data1 = buffer.ReadInt32();
+                                                instance2.ConditionalBranch.Data2 = buffer.ReadInt32();
+                                                instance2.ConditionalBranch.Data3 = buffer.ReadInt32();
+                                                instance2.ConditionalBranch.ElseCommandList = buffer.ReadInt32();
+                                                instance2.MoveRouteCount = buffer.ReadInt32();
 
-                                                if (withBlock2.MoveRouteCount > 0)
+                                                if (instance2.MoveRouteCount > 0)
                                                 {
-                                                    withBlock2.MoveRoute = new Type.MoveRoute[withBlock2.MoveRouteCount];
-                                                    var loopTo5 = withBlock2.MoveRouteCount;
+                                                    instance2.MoveRoute = new Type.MoveRoute[instance2.MoveRouteCount];
+                                                    var loopTo5 = instance2.MoveRouteCount;
                                                     for (w = 0; w < loopTo5; w++)
                                                     {
-                                                        withBlock2.MoveRoute[w].Index = buffer.ReadInt32();
-                                                        withBlock2.MoveRoute[w].Data1 = buffer.ReadInt32();
-                                                        withBlock2.MoveRoute[w].Data2 = buffer.ReadInt32();
-                                                        withBlock2.MoveRoute[w].Data3 = buffer.ReadInt32();
-                                                        withBlock2.MoveRoute[w].Data4 = buffer.ReadInt32();
-                                                        withBlock2.MoveRoute[w].Data5 = buffer.ReadInt32();
-                                                        withBlock2.MoveRoute[w].Data6 = buffer.ReadInt32();
+                                                        instance2.MoveRoute[w].Index = buffer.ReadInt32();
+                                                        instance2.MoveRoute[w].Data1 = buffer.ReadInt32();
+                                                        instance2.MoveRoute[w].Data2 = buffer.ReadInt32();
+                                                        instance2.MoveRoute[w].Data3 = buffer.ReadInt32();
+                                                        instance2.MoveRoute[w].Data4 = buffer.ReadInt32();
+                                                        instance2.MoveRoute[w].Data5 = buffer.ReadInt32();
+                                                        instance2.MoveRoute[w].Data6 = buffer.ReadInt32();
                                                     }
                                                 }
                                             }

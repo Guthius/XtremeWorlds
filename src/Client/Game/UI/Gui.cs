@@ -998,21 +998,21 @@ public class WindowManager
                         }
                     }
 
-                    var withBlock2 = curWindow.Controls[curControl];
+                    var instance2 = curWindow.Controls[curControl];
 
-                    withBlock2.State = entState switch
+                    instance2.State = entState switch
                     {
                         ControlState.MouseMove => ControlState.Hover,
                         ControlState.MouseDown => ControlState.MouseDown,
-                        _ => withBlock2.State
+                        _ => instance2.State
                     };
 
                     // Handle specific control types
-                    switch (withBlock2)
+                    switch (instance2)
                     {
                         case CheckBox checkBox:
                         {
-                            if (checkBox.Group > 0 && withBlock2.Value == 0)
+                            if (checkBox.Group > 0 && instance2.Value == 0)
                             {
                                 foreach (var control in curWindow.Controls.OfType<CheckBox>())
                                 {
@@ -1022,7 +1022,7 @@ public class WindowManager
                                     }
                                 }
 
-                                withBlock2.Value = 0;
+                                instance2.Value = 0;
                             }
 
                             break;
@@ -1161,7 +1161,7 @@ public class WindowManager
                         SetActiveControl(curWindow, curControl);
                     }
 
-                    callBack = withBlock2.CallBack[(int)entState];
+                    callBack = instance2.CallBack[(int)entState];
 
                     // Execute the callback if it exists
                     callBack?.Invoke();

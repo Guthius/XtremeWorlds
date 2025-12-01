@@ -52,14 +52,14 @@ namespace Client
             if (GameState.ActionMsgIndex >= byte.MaxValue)
                 GameState.ActionMsgIndex = 1;
             
-            ref var withBlock = ref Data.ActionMsg[GameState.ActionMsgIndex];
-            withBlock.Message = message;
-            withBlock.Color = color;
-            withBlock.Type = msgType;
-            withBlock.Created = General.GetTickCount();
-            withBlock.Scroll = 0;
-            withBlock.X = x;
-            withBlock.Y = y;        
+            ref var instance = ref Data.ActionMsg[GameState.ActionMsgIndex];
+            instance.Message = message;
+            instance.Color = color;
+            instance.Type = msgType;
+            instance.Created = General.GetTickCount();
+            instance.Scroll = 0;
+            instance.X = x;
+            instance.Y = y;        
 
             if (Data.ActionMsg[GameState.ActionMsgIndex].Type == (int)ActionMessageType.Scroll)
             {
@@ -874,13 +874,13 @@ namespace Client
 
             // Set the bubble up
             {
-                ref var withBlock = ref Data.ChatBubble[index];
-                withBlock.Target = target;
-                withBlock.TargetType = targetType;
-                withBlock.Msg = msg;
-                withBlock.Color = color;
-                withBlock.Timer = General.GetTickCount();
-                withBlock.Active = true;
+                ref var instance = ref Data.ChatBubble[index];
+                instance.Target = target;
+                instance.TargetType = targetType;
+                instance.Msg = msg;
+                instance.Color = color;
+                instance.Timer = General.GetTickCount();
+                instance.Active = true;
             }
 
         }
@@ -890,13 +890,13 @@ namespace Client
             // Loop through and see if that player/Npc already has a chat bubble
             for (int i = 0; i <= GameState.ChatBubbleindex; i++)
             {
-                ref var withBlock = ref Data.ChatBubble[i];
-                withBlock.Target = -1;
-                withBlock.TargetType = 0;
-                withBlock.Msg = "";
-                withBlock.Color = 0;
-                withBlock.Timer = 0;
-                withBlock.Active = false;
+                ref var instance = ref Data.ChatBubble[i];
+                instance.Target = -1;
+                instance.TargetType = 0;
+                instance.Msg = "";
+                instance.Color = 0;
+                instance.Timer = 0;
+                instance.Active = false;
 
             }
         }
@@ -1258,11 +1258,11 @@ namespace Client
                                 for (y = 0; y < loopTo5; y++)
                                 {
                                     {
-                                        ref var withBlock = ref Data.MyMap.Tile[x, y];
-                                        withBlock.Layer[(int)GameState.DiaData1].X = 0;
-                                        withBlock.Layer[(int)GameState.DiaData1].Y = 0;
-                                        withBlock.Layer[(int)GameState.DiaData1].Tileset = 0;
-                                        withBlock.Layer[(int)GameState.DiaData1].AutoTile = 0;
+                                        ref var instance = ref Data.MyMap.Tile[x, y];
+                                        instance.Layer[(int)GameState.DiaData1].X = 0;
+                                        instance.Layer[(int)GameState.DiaData1].Y = 0;
+                                        instance.Layer[(int)GameState.DiaData1].Tileset = 0;
+                                        instance.Layer[(int)GameState.DiaData1].AutoTile = 0;
                                         Autotile.CacheRenderState(x, y, (int)GameState.DiaData1);
                                     }
                                 }
@@ -1497,7 +1497,7 @@ namespace Client
 
             // set variables
             {
-                var withBlock = WindowManager.GetWindowByName("winDescription");
+                var instance = WindowManager.GetWindowByName("winDescription");
                 if (invNum >= 0)
                 {
                     if (Data.Player[GameState.MyIndex].Inv[invNum].Bound > 0)
@@ -1802,8 +1802,8 @@ namespace Client
 
             // set variables
             {
-                var withBlock = WindowManager.GetWindowByName("winDescription");
-                if (withBlock is null) return;
+                var instance = WindowManager.GetWindowByName("winDescription");
+                if (instance is null) return;
                 // set name
                 if (WindowManager.TryGetControl("winDescription", "lblName", out var lblName2))
                 {
@@ -1820,7 +1820,7 @@ namespace Client
                     // Else
                     tmpWidth = 66;
                     // End If
-                    withBlock.Controls[WindowManager.GetControlIndex("winDescription", "picBar")].Value = tmpWidth;
+                    instance.Controls[WindowManager.GetControlIndex("winDescription", "picBar")].Value = tmpWidth;
                     // does it rank up?
                     // If Type.Skill(skillNum).NextRank > 0 Then
                     // sUse = "Uses: " & PlayerSkills(SkillSlot).Uses & "/" & Type.Skill(skillNum).NextUses
@@ -1834,17 +1834,17 @@ namespace Client
                     sUse = "Max Rank";
                     // End If
                     // show controls
-                    withBlock.Controls[WindowManager.GetControlIndex("winDescription", "lblJob")].Visible = true;
-                    withBlock.Controls[WindowManager.GetControlIndex("winDescription", "picBar")].Visible = true;
+                    instance.Controls[WindowManager.GetControlIndex("winDescription", "lblJob")].Visible = true;
+                    instance.Controls[WindowManager.GetControlIndex("winDescription", "picBar")].Visible = true;
                     // set vals
-                    withBlock.Controls[WindowManager.GetControlIndex("winDescription", "lblJob")].Text = sUse;
-                    withBlock.Controls[WindowManager.GetControlIndex("winDescription", "lblJob")].Color = Microsoft.Xna.Framework.Color.White;
+                    instance.Controls[WindowManager.GetControlIndex("winDescription", "lblJob")].Text = sUse;
+                    instance.Controls[WindowManager.GetControlIndex("winDescription", "lblJob")].Color = Microsoft.Xna.Framework.Color.White;
                 }
                 else
                 {
                     // hide some controls
-                    withBlock.Controls[WindowManager.GetControlIndex("winDescription", "lblJob")].Visible = false;
-                    withBlock.Controls[WindowManager.GetControlIndex("winDescription", "picBar")].Visible = false;
+                    instance.Controls[WindowManager.GetControlIndex("winDescription", "lblJob")].Visible = false;
+                    instance.Controls[WindowManager.GetControlIndex("winDescription", "picBar")].Visible = false;
                 }
             }
 
@@ -1998,13 +1998,13 @@ namespace Client
 
             // fill the options screen
             {
-                var withBlock = WindowManager.Windows[WindowManager.GetWindowIndex("winOptions")];
-                withBlock.Controls[WindowManager.GetControlIndex("winOptions", "chkMusic")].Value = SettingsManager.Instance.Music ? 1 : 0;
-                withBlock.Controls[WindowManager.GetControlIndex("winOptions", "chkSound")].Value = SettingsManager.Instance.Sound ? 1 : 0;
-                withBlock.Controls[WindowManager.GetControlIndex("winOptions", "chkAutotile")].Value = SettingsManager.Instance.Autotile ? 1 : 0;
-                withBlock.Controls[WindowManager.GetControlIndex("winOptions", "chkFullscreen")].Value = SettingsManager.Instance.Fullscreen ? 1 : 0;
-                withBlock.Controls[WindowManager.GetControlIndex("winOptions", "chkVsync")].Value = SettingsManager.Instance.Vsync ? 1 : 0;
-                withBlock.Controls[WindowManager.GetControlIndex("winOptions", "cmbRes")].Value = SettingsManager.Instance.Resolution;
+                var instance = WindowManager.Windows[WindowManager.GetWindowIndex("winOptions")];
+                instance.Controls[WindowManager.GetControlIndex("winOptions", "chkMusic")].Value = SettingsManager.Instance.Music ? 1 : 0;
+                instance.Controls[WindowManager.GetControlIndex("winOptions", "chkSound")].Value = SettingsManager.Instance.Sound ? 1 : 0;
+                instance.Controls[WindowManager.GetControlIndex("winOptions", "chkAutotile")].Value = SettingsManager.Instance.Autotile ? 1 : 0;
+                instance.Controls[WindowManager.GetControlIndex("winOptions", "chkFullscreen")].Value = SettingsManager.Instance.Fullscreen ? 1 : 0;
+                instance.Controls[WindowManager.GetControlIndex("winOptions", "chkVsync")].Value = SettingsManager.Instance.Vsync ? 1 : 0;
+                instance.Controls[WindowManager.GetControlIndex("winOptions", "cmbRes")].Value = SettingsManager.Instance.Resolution;
             }
         }
 
@@ -2045,13 +2045,13 @@ namespace Client
 
             // make sure we're in a party
             {
-                var withBlock = WindowManager.Windows[WindowManager.GetWindowIndex("winParty")];
+                var instance = WindowManager.Windows[WindowManager.GetWindowIndex("winParty")];
                 for (i = 0L; i <= 3L; i++)
                 {
                     // get the pIndex from the control
-                    if (withBlock.Controls[WindowManager.GetControlIndex("winParty", "picChar" + i)].Visible == true)
+                    if (instance.Controls[WindowManager.GetControlIndex("winParty", "picChar" + i)].Visible == true)
                     {
-                        pIndex = withBlock.Controls[WindowManager.GetControlIndex("winParty", "picChar" + i)].Value;
+                        pIndex = instance.Controls[WindowManager.GetControlIndex("winParty", "picChar" + i)].Value;
                         // make sure they exist
                         if (pIndex > 0L)
                         {
@@ -2061,21 +2061,21 @@ namespace Client
                                 if (GetPlayerVital((int)pIndex, Vital.Health) > 0 & GetPlayerMaxVital((int)pIndex, Vital.Health) > 0)
                                 {
                                     width = (int)Math.Round(GetPlayerVital((int)pIndex, Vital.Health) / (double)barWidth / (GetPlayerMaxVital((int)pIndex, Vital.Health) / (double)barWidth) * barWidth);
-                                    withBlock.Controls[WindowManager.GetControlIndex("winParty", "picBar_HP" + i)].Width = width;
+                                    instance.Controls[WindowManager.GetControlIndex("winParty", "picBar_HP" + i)].Width = width;
                                 }
                                 else
                                 {
-                                    withBlock.Controls[WindowManager.GetControlIndex("winParty", "picBar_HP" + i)].Width = 0;
+                                    instance.Controls[WindowManager.GetControlIndex("winParty", "picBar_HP" + i)].Width = 0;
                                 }
                                 // get their spirit
                                 if (GetPlayerVital((int)pIndex, Vital.Stamina) > 0 & GetPlayerMaxVital((int)pIndex, Vital.Stamina) > 0)
                                 {
                                     width = (int)Math.Round(GetPlayerVital((int)pIndex, Vital.Stamina) / (double)barWidth / (GetPlayerMaxVital((int)pIndex, Vital.Stamina) / (double)barWidth) * barWidth);
-                                    withBlock.Controls[WindowManager.GetControlIndex("winParty", "picBar_SP" + i)].Width = width;
+                                    instance.Controls[WindowManager.GetControlIndex("winParty", "picBar_SP" + i)].Width = width;
                                 }
                                 else
                                 {
-                                    withBlock.Controls[WindowManager.GetControlIndex("winParty", "picBar_SP" + i)].Width = 0;
+                                    instance.Controls[WindowManager.GetControlIndex("winParty", "picBar_SP" + i)].Width = 0;
                                 }
                             }
                         }
@@ -2091,13 +2091,13 @@ namespace Client
 
             // set the controls up
             {
-                var withBlock = WindowManager.Windows[WindowManager.GetWindowIndex("winTrade")];
-                withBlock.Text = "Trading with " + GetPlayerName(Trade.InTrade);
-                withBlock.Controls[WindowManager.GetControlIndex("winTrade", "lblYourTrade")].Text = GetPlayerName(GameState.MyIndex) + "'s Offer";
-                withBlock.Controls[WindowManager.GetControlIndex("winTrade", "lblTheirTrade")].Text = GetPlayerName(Trade.InTrade) + "'s Offer";
-                withBlock.Controls[WindowManager.GetControlIndex("winTrade", "lblYourValue")].Text = "0g";
-                withBlock.Controls[WindowManager.GetControlIndex("winTrade", "lblTheirValue")].Text = "0g";
-                withBlock.Controls[WindowManager.GetControlIndex("winTrade", "lblStatus")].Text = "Choose items to offer.";
+                var instance = WindowManager.Windows[WindowManager.GetWindowIndex("winTrade")];
+                instance.Text = "Trading with " + GetPlayerName(Trade.InTrade);
+                instance.Controls[WindowManager.GetControlIndex("winTrade", "lblYourTrade")].Text = GetPlayerName(GameState.MyIndex) + "'s Offer";
+                instance.Controls[WindowManager.GetControlIndex("winTrade", "lblTheirTrade")].Text = GetPlayerName(Trade.InTrade) + "'s Offer";
+                instance.Controls[WindowManager.GetControlIndex("winTrade", "lblYourValue")].Text = "0g";
+                instance.Controls[WindowManager.GetControlIndex("winTrade", "lblTheirValue")].Text = "0g";
+                instance.Controls[WindowManager.GetControlIndex("winTrade", "lblStatus")].Text = "Choose items to offer.";
             }
         }
 
@@ -2508,16 +2508,16 @@ namespace Client
             long EndY = Data.MyMap.MaxY;
 
             // Update the tile view  
-            ref var withBlock = ref GameState.TileView;
-            withBlock.Top = StartY;
-            withBlock.Bottom = EndY;
-            withBlock.Left = StartX;
-            withBlock.Right = EndX;
+            ref var instance = ref GameState.TileView;
+            instance.Top = StartY;
+            instance.Bottom = EndY;
+            instance.Left = StartX;
+            instance.Right = EndX;
 
             // Update the camera bounds  
-            ref var withBlock1 = ref GameState.Camera;
-            withBlock1.Right = withBlock1.Left;
-            withBlock1.Bottom = withBlock1.Top;
+            ref var instance1 = ref GameState.Camera;
+            instance1.Right = instance1.Left;
+            instance1.Bottom = instance1.Top;
 
             // Optional: Update the map name display  
             UpdateDrawMapName();

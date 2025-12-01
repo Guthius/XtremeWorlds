@@ -641,7 +641,7 @@ public class Script
             SetPlayerPk(index, false);
         }
 
-        ref var withBlock = ref Data.Map[GetPlayerMap(index)];
+        ref var instance = ref Data.Map[GetPlayerMap(index)];
 
         // Warp player away
         SetPlayerDir(index, (byte)Direction.Down);
@@ -676,9 +676,9 @@ public class Script
         }
 
         // to the bootmap if it is set
-        if (withBlock.BootMap > 0)
+        if (instance.BootMap > 0)
         {
-            Warp(index, withBlock.BootMap, withBlock.BootX, withBlock.BootY, (int)Direction.Down);
+            Warp(index, instance.BootMap, instance.BootX, instance.BootY, (int)Direction.Down);
         }
         else
         {

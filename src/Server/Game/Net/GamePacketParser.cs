@@ -1095,32 +1095,32 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             Data.Map[mapNum].Npc[x] = packetReader.ReadInt32();
         }
 
-        ref var withBlock = ref Data.Map[mapNum];
-        var loopTo1 = (int)withBlock.MaxX;
+        ref var instance = ref Data.Map[mapNum];
+        var loopTo1 = (int)instance.MaxX;
         for (x = 0; x < loopTo1; x++)
         {
-            var loopTo2 = (int)withBlock.MaxY;
+            var loopTo2 = (int)instance.MaxY;
             for (y = 0; y < loopTo2; y++)
             {
-                withBlock.Tile[x, y].Data1 = packetReader.ReadInt32();
-                withBlock.Tile[x, y].Data2 = packetReader.ReadInt32();
-                withBlock.Tile[x, y].Data3 = packetReader.ReadInt32();
-                withBlock.Tile[x, y].Data1_2 = packetReader.ReadInt32();
-                withBlock.Tile[x, y].Data2_2 = packetReader.ReadInt32();
-                withBlock.Tile[x, y].Data3_2 = packetReader.ReadInt32();
-                withBlock.Tile[x, y].DirBlock = (byte)packetReader.ReadInt32();
+                instance.Tile[x, y].Data1 = packetReader.ReadInt32();
+                instance.Tile[x, y].Data2 = packetReader.ReadInt32();
+                instance.Tile[x, y].Data3 = packetReader.ReadInt32();
+                instance.Tile[x, y].Data1_2 = packetReader.ReadInt32();
+                instance.Tile[x, y].Data2_2 = packetReader.ReadInt32();
+                instance.Tile[x, y].Data3_2 = packetReader.ReadInt32();
+                instance.Tile[x, y].DirBlock = (byte)packetReader.ReadInt32();
                 var loopTo3 = Enum.GetValues(typeof(MapLayer)).Length;
-                withBlock.Tile[x, y].Layer = new Type.Layer[loopTo3];
+                instance.Tile[x, y].Layer = new Type.Layer[loopTo3];
                 for (var i = 0; i < (int)loopTo3; i++)
                 {
-                    withBlock.Tile[x, y].Layer[i].Tileset = packetReader.ReadInt32();
-                    withBlock.Tile[x, y].Layer[i].X = packetReader.ReadInt32();
-                    withBlock.Tile[x, y].Layer[i].Y = packetReader.ReadInt32();
-                    withBlock.Tile[x, y].Layer[i].AutoTile = (byte)packetReader.ReadInt32();
+                    instance.Tile[x, y].Layer[i].Tileset = packetReader.ReadInt32();
+                    instance.Tile[x, y].Layer[i].X = packetReader.ReadInt32();
+                    instance.Tile[x, y].Layer[i].Y = packetReader.ReadInt32();
+                    instance.Tile[x, y].Layer[i].AutoTile = (byte)packetReader.ReadInt32();
                 }
 
-                withBlock.Tile[x, y].Type = (TileType)packetReader.ReadInt32();
-                withBlock.Tile[x, y].Type2 = (TileType)packetReader.ReadInt32();
+                instance.Tile[x, y].Type = (TileType)packetReader.ReadInt32();
+                instance.Tile[x, y].Type2 = (TileType)packetReader.ReadInt32();
             }
         }
 
@@ -1133,12 +1133,12 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             for (var i = 0; i < loopTo4; i++)
             {
                 {
-                    ref var withBlock1 = ref Data.Map[mapNum].Event[i];
-                    withBlock1.Name = packetReader.ReadString();
-                    withBlock1.Globals = packetReader.ReadByte();
-                    withBlock1.X = packetReader.ReadInt32();
-                    withBlock1.Y = packetReader.ReadInt32();
-                    withBlock1.PageCount = packetReader.ReadInt32();
+                    ref var instance1 = ref Data.Map[mapNum].Event[i];
+                    instance1.Name = packetReader.ReadString();
+                    instance1.Globals = packetReader.ReadByte();
+                    instance1.X = packetReader.ReadInt32();
+                    instance1.Y = packetReader.ReadInt32();
+                    instance1.PageCount = packetReader.ReadInt32();
                 }
 
                 if (Data.Map[mapNum].Event[i].PageCount > 0)
@@ -1150,61 +1150,61 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                     for (x = 0; x < (int)loopTo5; x++)
                     {
                         {
-                            ref var withBlock2 = ref Data.Map[mapNum].Event[i].Pages[x];
-                            withBlock2.ChkVariable = packetReader.ReadInt32();
-                            withBlock2.VariableIndex = packetReader.ReadInt32();
-                            withBlock2.VariableCondition = packetReader.ReadInt32();
-                            withBlock2.VariableCompare = packetReader.ReadInt32();
+                            ref var instance2 = ref Data.Map[mapNum].Event[i].Pages[x];
+                            instance2.ChkVariable = packetReader.ReadInt32();
+                            instance2.VariableIndex = packetReader.ReadInt32();
+                            instance2.VariableCondition = packetReader.ReadInt32();
+                            instance2.VariableCompare = packetReader.ReadInt32();
 
-                            withBlock2.ChkSwitch = packetReader.ReadInt32();
-                            withBlock2.SwitchIndex = packetReader.ReadInt32();
-                            withBlock2.SwitchCompare = packetReader.ReadInt32();
+                            instance2.ChkSwitch = packetReader.ReadInt32();
+                            instance2.SwitchIndex = packetReader.ReadInt32();
+                            instance2.SwitchCompare = packetReader.ReadInt32();
 
-                            withBlock2.ChkHasItem = packetReader.ReadInt32();
-                            withBlock2.HasItemIndex = packetReader.ReadInt32();
-                            withBlock2.HasItemAmount = packetReader.ReadInt32();
+                            instance2.ChkHasItem = packetReader.ReadInt32();
+                            instance2.HasItemIndex = packetReader.ReadInt32();
+                            instance2.HasItemAmount = packetReader.ReadInt32();
 
-                            withBlock2.ChkSelfSwitch = packetReader.ReadInt32();
-                            withBlock2.SelfSwitchIndex = packetReader.ReadInt32();
-                            withBlock2.SelfSwitchCompare = packetReader.ReadInt32();
+                            instance2.ChkSelfSwitch = packetReader.ReadInt32();
+                            instance2.SelfSwitchIndex = packetReader.ReadInt32();
+                            instance2.SelfSwitchCompare = packetReader.ReadInt32();
 
-                            withBlock2.GraphicType = packetReader.ReadByte();
-                            withBlock2.Graphic = packetReader.ReadInt32();
-                            withBlock2.GraphicX = packetReader.ReadInt32();
-                            withBlock2.GraphicY = packetReader.ReadInt32();
-                            withBlock2.GraphicX2 = packetReader.ReadInt32();
-                            withBlock2.GraphicY2 = packetReader.ReadInt32();
+                            instance2.GraphicType = packetReader.ReadByte();
+                            instance2.Graphic = packetReader.ReadInt32();
+                            instance2.GraphicX = packetReader.ReadInt32();
+                            instance2.GraphicY = packetReader.ReadInt32();
+                            instance2.GraphicX2 = packetReader.ReadInt32();
+                            instance2.GraphicY2 = packetReader.ReadInt32();
 
-                            withBlock2.MoveType = packetReader.ReadByte();
-                            withBlock2.MoveSpeed = packetReader.ReadByte();
-                            withBlock2.MoveFreq = packetReader.ReadByte();
-                            withBlock2.MoveRouteCount = packetReader.ReadInt32();
-                            withBlock2.IgnoreMoveRoute = packetReader.ReadInt32();
-                            withBlock2.RepeatMoveRoute = packetReader.ReadInt32();
+                            instance2.MoveType = packetReader.ReadByte();
+                            instance2.MoveSpeed = packetReader.ReadByte();
+                            instance2.MoveFreq = packetReader.ReadByte();
+                            instance2.MoveRouteCount = packetReader.ReadInt32();
+                            instance2.IgnoreMoveRoute = packetReader.ReadInt32();
+                            instance2.RepeatMoveRoute = packetReader.ReadInt32();
 
-                            if (withBlock2.MoveRouteCount > 0)
+                            if (instance2.MoveRouteCount > 0)
                             {
-                                Data.Map[mapNum].Event[i].Pages[x].MoveRoute = new Type.MoveRoute[withBlock2.MoveRouteCount];
-                                var loopTo6 = withBlock2.MoveRouteCount;
+                                Data.Map[mapNum].Event[i].Pages[x].MoveRoute = new Type.MoveRoute[instance2.MoveRouteCount];
+                                var loopTo6 = instance2.MoveRouteCount;
                                 for (y = 0; y < (int)loopTo6; y++)
                                 {
-                                    withBlock2.MoveRoute[y].Index = packetReader.ReadInt32();
-                                    withBlock2.MoveRoute[y].Data1 = packetReader.ReadInt32();
-                                    withBlock2.MoveRoute[y].Data2 = packetReader.ReadInt32();
-                                    withBlock2.MoveRoute[y].Data3 = packetReader.ReadInt32();
-                                    withBlock2.MoveRoute[y].Data4 = packetReader.ReadInt32();
-                                    withBlock2.MoveRoute[y].Data5 = packetReader.ReadInt32();
-                                    withBlock2.MoveRoute[y].Data6 = packetReader.ReadInt32();
+                                    instance2.MoveRoute[y].Index = packetReader.ReadInt32();
+                                    instance2.MoveRoute[y].Data1 = packetReader.ReadInt32();
+                                    instance2.MoveRoute[y].Data2 = packetReader.ReadInt32();
+                                    instance2.MoveRoute[y].Data3 = packetReader.ReadInt32();
+                                    instance2.MoveRoute[y].Data4 = packetReader.ReadInt32();
+                                    instance2.MoveRoute[y].Data5 = packetReader.ReadInt32();
+                                    instance2.MoveRoute[y].Data6 = packetReader.ReadInt32();
                                 }
                             }
 
-                            withBlock2.IdleAnim = packetReader.ReadInt32();
-                            withBlock2.DirFix = packetReader.ReadInt32();
-                            withBlock2.WalkThrough = packetReader.ReadInt32();
-                            withBlock2.ShowName = packetReader.ReadInt32();
-                            withBlock2.Trigger = packetReader.ReadByte();
-                            withBlock2.CommandListCount = packetReader.ReadInt32();
-                            withBlock2.Position = packetReader.ReadByte();
+                            instance2.IdleAnim = packetReader.ReadInt32();
+                            instance2.DirFix = packetReader.ReadInt32();
+                            instance2.WalkThrough = packetReader.ReadInt32();
+                            instance2.ShowName = packetReader.ReadInt32();
+                            instance2.Trigger = packetReader.ReadByte();
+                            instance2.CommandListCount = packetReader.ReadInt32();
+                            instance2.Position = packetReader.ReadByte();
                         }
 
                         if (Data.Map[mapNum].Event[i].Pages[x].CommandListCount > 0)
@@ -1221,39 +1221,39 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                                     for (int z = 0, loopTo8 = Data.Map[mapNum].Event[i].Pages[x].CommandList[y].CommandCount; z < (int)loopTo8; z++)
                                     {
                                         {
-                                            ref var withBlock3 = ref Data.Map[mapNum].Event[i].Pages[x].CommandList[y].Commands[z];
-                                            withBlock3.Index = packetReader.ReadInt32();
-                                            withBlock3.Text1 = packetReader.ReadString();
-                                            withBlock3.Text2 = packetReader.ReadString();
-                                            withBlock3.Text3 = packetReader.ReadString();
-                                            withBlock3.Text4 = packetReader.ReadString();
-                                            withBlock3.Text5 = packetReader.ReadString();
-                                            withBlock3.Data1 = packetReader.ReadInt32();
-                                            withBlock3.Data2 = packetReader.ReadInt32();
-                                            withBlock3.Data3 = packetReader.ReadInt32();
-                                            withBlock3.Data4 = packetReader.ReadInt32();
-                                            withBlock3.Data5 = packetReader.ReadInt32();
-                                            withBlock3.Data6 = packetReader.ReadInt32();
-                                            withBlock3.ConditionalBranch.CommandList = packetReader.ReadInt32();
-                                            withBlock3.ConditionalBranch.Condition = packetReader.ReadInt32();
-                                            withBlock3.ConditionalBranch.Data1 = packetReader.ReadInt32();
-                                            withBlock3.ConditionalBranch.Data2 = packetReader.ReadInt32();
-                                            withBlock3.ConditionalBranch.Data3 = packetReader.ReadInt32();
-                                            withBlock3.ConditionalBranch.ElseCommandList = packetReader.ReadInt32();
-                                            withBlock3.MoveRouteCount = packetReader.ReadInt32();
-                                            var tmpCount = withBlock3.MoveRouteCount;
+                                            ref var instance3 = ref Data.Map[mapNum].Event[i].Pages[x].CommandList[y].Commands[z];
+                                            instance3.Index = packetReader.ReadInt32();
+                                            instance3.Text1 = packetReader.ReadString();
+                                            instance3.Text2 = packetReader.ReadString();
+                                            instance3.Text3 = packetReader.ReadString();
+                                            instance3.Text4 = packetReader.ReadString();
+                                            instance3.Text5 = packetReader.ReadString();
+                                            instance3.Data1 = packetReader.ReadInt32();
+                                            instance3.Data2 = packetReader.ReadInt32();
+                                            instance3.Data3 = packetReader.ReadInt32();
+                                            instance3.Data4 = packetReader.ReadInt32();
+                                            instance3.Data5 = packetReader.ReadInt32();
+                                            instance3.Data6 = packetReader.ReadInt32();
+                                            instance3.ConditionalBranch.CommandList = packetReader.ReadInt32();
+                                            instance3.ConditionalBranch.Condition = packetReader.ReadInt32();
+                                            instance3.ConditionalBranch.Data1 = packetReader.ReadInt32();
+                                            instance3.ConditionalBranch.Data2 = packetReader.ReadInt32();
+                                            instance3.ConditionalBranch.Data3 = packetReader.ReadInt32();
+                                            instance3.ConditionalBranch.ElseCommandList = packetReader.ReadInt32();
+                                            instance3.MoveRouteCount = packetReader.ReadInt32();
+                                            var tmpCount = instance3.MoveRouteCount;
                                             if (tmpCount > 0)
                                             {
-                                                Array.Resize(ref withBlock3.MoveRoute, tmpCount);
+                                                Array.Resize(ref instance3.MoveRoute, tmpCount);
                                                 for (int w = 0, loopTo9 = tmpCount; w < (int)loopTo9; w++)
                                                 {
-                                                    withBlock3.MoveRoute[w].Index = packetReader.ReadInt32();
-                                                    withBlock3.MoveRoute[w].Data1 = packetReader.ReadInt32();
-                                                    withBlock3.MoveRoute[w].Data2 = packetReader.ReadInt32();
-                                                    withBlock3.MoveRoute[w].Data3 = packetReader.ReadInt32();
-                                                    withBlock3.MoveRoute[w].Data4 = packetReader.ReadInt32();
-                                                    withBlock3.MoveRoute[w].Data5 = packetReader.ReadInt32();
-                                                    withBlock3.MoveRoute[w].Data6 = packetReader.ReadInt32();
+                                                    instance3.MoveRoute[w].Index = packetReader.ReadInt32();
+                                                    instance3.MoveRoute[w].Data1 = packetReader.ReadInt32();
+                                                    instance3.MoveRoute[w].Data2 = packetReader.ReadInt32();
+                                                    instance3.MoveRoute[w].Data3 = packetReader.ReadInt32();
+                                                    instance3.MoveRoute[w].Data4 = packetReader.ReadInt32();
+                                                    instance3.MoveRoute[w].Data5 = packetReader.ReadInt32();
+                                                    instance3.MoveRoute[w].Data6 = packetReader.ReadInt32();
                                                 }
                                             }
                                         }
@@ -2057,15 +2057,15 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         if (shopMum < 0 | shopMum > Core.Globals.Variables.MaxShops)
             return;
 
-        ref var withBlock = ref Data.Shop[(int)shopMum].TradeItem[shopSlot];
+        ref var instance = ref Data.Shop[(int)shopMum].TradeItem[shopSlot];
 
         // check trade exists
-        if (withBlock.Item < 0)
+        if (instance.Item < 0)
             return;
 
         // check has the cost item
-        var itemAmount = Server.Player.HasItem(session.Id, withBlock.CostItem);
-        if (itemAmount == 0 | itemAmount < withBlock.CostValue)
+        var itemAmount = Server.Player.HasItem(session.Id, instance.CostItem);
+        if (itemAmount == 0 | itemAmount < instance.CostValue)
         {
             NetworkSend.PlayerMsg(session.Id, "You do not have enough to buy this item.", (int)ColorName.BrightRed);
             NetworkSend.ResetShopAction();
@@ -2073,9 +2073,9 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         }
 
         // it's fine, let's go ahead
-        for (int i = 0, loopTo = withBlock.CostValue; i < loopTo; i++)
-            Server.Player.TakeInv(session.Id, withBlock.CostItem, withBlock.CostValue);
-        Server.Player.GiveInv(session.Id, withBlock.Item, withBlock.ItemValue);
+        for (int i = 0, loopTo = instance.CostValue; i < loopTo; i++)
+            Server.Player.TakeInv(session.Id, instance.CostItem, instance.CostValue);
+        Server.Player.GiveInv(session.Id, instance.Item, instance.ItemValue);
 
         // send confirmation message & reset their shop action
         NetworkSend.PlayerMsg(session.Id, "Trade successful.", (int)ColorName.BrightGreen);
@@ -2701,32 +2701,32 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var jobNum = buffer.ReadInt32();
 
         {
-            ref var withBlock = ref Data.Job[jobNum];
-            withBlock.Name = buffer.ReadString();
-            withBlock.Desc = buffer.ReadString();
+            ref var instance = ref Data.Job[jobNum];
+            instance.Name = buffer.ReadString();
+            instance.Desc = buffer.ReadString();
 
-            withBlock.MaleSprite = buffer.ReadInt32();
-            withBlock.FemaleSprite = buffer.ReadInt32();
+            instance.MaleSprite = buffer.ReadInt32();
+            instance.FemaleSprite = buffer.ReadInt32();
 
             var loopTo = Enum.GetNames(typeof(Stat)).Length;
             for (x = 0; x < loopTo; x++)
-                withBlock.Stat[x] = buffer.ReadInt32();
+                instance.Stat[x] = buffer.ReadInt32();
 
             for (var q = 0; q < Core.Globals.Variables.MaxStartItems; q++)
             {
-                withBlock.StartItem[q] = buffer.ReadInt32();
-                withBlock.StartValue[q] = buffer.ReadInt32();
+                instance.StartItem[q] = buffer.ReadInt32();
+                instance.StartValue[q] = buffer.ReadInt32();
             }
 
             for (var q = 0; q < Core.Globals.Variables.MaxStartSkills; q++)
             {
-                withBlock.StartSkill[q] = buffer.ReadInt32();
+                instance.StartSkill[q] = buffer.ReadInt32();
             }
 
-            withBlock.StartMap = buffer.ReadInt32();
-            withBlock.StartX = buffer.ReadByte();
-            withBlock.StartY = buffer.ReadByte();
-            withBlock.BaseExp = buffer.ReadInt32();
+            instance.StartMap = buffer.ReadInt32();
+            instance.StartX = buffer.ReadByte();
+            instance.StartY = buffer.ReadByte();
+            instance.BaseExp = buffer.ReadInt32();
         }
 
         Job.Save(jobNum);

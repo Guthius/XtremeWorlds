@@ -143,33 +143,33 @@ namespace Server
 
             // General
             {
-                var withBlock = csMap.MapData;
-                withBlock.Name = Database.GetVar(fileName, "General", "Name");
-                withBlock.Music = Database.GetVar(fileName, "General", "Music");
-                withBlock.Moral = Convert.ToByte(Database.GetVar(fileName, "General", "Moral"));
-                withBlock.Up = Convert.ToInt32(Database.GetVar(fileName, "General", "Up"));
-                withBlock.Down = Convert.ToInt32(Database.GetVar(fileName, "General", "Down"));
-                withBlock.Left = Convert.ToInt32(Database.GetVar(fileName, "General", "Left"));
-                withBlock.Right = Convert.ToInt32(Database.GetVar(fileName, "General", "Right"));
-                withBlock.BootMap = Convert.ToInt32(Database.GetVar(fileName, "General", "BootMap"));
-                withBlock.BootX = Convert.ToByte(Database.GetVar(fileName, "General", "BootX"));
-                withBlock.BootY = Convert.ToByte(Database.GetVar(fileName, "General", "BootY"));
-                withBlock.MaxX = Convert.ToByte(Database.GetVar(fileName, "General", "MaxX"));
-                withBlock.MaxY = Convert.ToByte(Database.GetVar(fileName, "General", "MaxY"));
+                var instance = csMap.MapData;
+                instance.Name = Database.GetVar(fileName, "General", "Name");
+                instance.Music = Database.GetVar(fileName, "General", "Music");
+                instance.Moral = Convert.ToByte(Database.GetVar(fileName, "General", "Moral"));
+                instance.Up = Convert.ToInt32(Database.GetVar(fileName, "General", "Up"));
+                instance.Down = Convert.ToInt32(Database.GetVar(fileName, "General", "Down"));
+                instance.Left = Convert.ToInt32(Database.GetVar(fileName, "General", "Left"));
+                instance.Right = Convert.ToInt32(Database.GetVar(fileName, "General", "Right"));
+                instance.BootMap = Convert.ToInt32(Database.GetVar(fileName, "General", "BootMap"));
+                instance.BootX = Convert.ToByte(Database.GetVar(fileName, "General", "BootX"));
+                instance.BootY = Convert.ToByte(Database.GetVar(fileName, "General", "BootY"));
+                instance.MaxX = Convert.ToByte(Database.GetVar(fileName, "General", "MaxX"));
+                instance.MaxY = Convert.ToByte(Database.GetVar(fileName, "General", "MaxY"));
 
-                withBlock.Weather = Convert.ToInt32(Database.GetVar(fileName, "General", "Weather"));
-                withBlock.WeatherIntensity = Convert.ToInt32(Database.GetVar(fileName, "General", "WeatherIntensity"));
+                instance.Weather = Convert.ToInt32(Database.GetVar(fileName, "General", "Weather"));
+                instance.WeatherIntensity = Convert.ToInt32(Database.GetVar(fileName, "General", "WeatherIntensity"));
 
-                withBlock.Fog = Convert.ToInt32(Database.GetVar(fileName, "General", "Fog"));
-                withBlock.FogSpeed = Convert.ToInt32(Database.GetVar(fileName, "General", "FogSpeed"));
-                withBlock.FogOpacity = Convert.ToInt32(Database.GetVar(fileName, "General", "FogOpacity"));
+                instance.Fog = Convert.ToInt32(Database.GetVar(fileName, "General", "Fog"));
+                instance.FogSpeed = Convert.ToInt32(Database.GetVar(fileName, "General", "FogSpeed"));
+                instance.FogOpacity = Convert.ToInt32(Database.GetVar(fileName, "General", "FogOpacity"));
 
-                withBlock.Red = Convert.ToInt32(Database.GetVar(fileName, "General", "Red"));
-                withBlock.Green = Convert.ToInt32(Database.GetVar(fileName, "General", "Green"));
-                withBlock.Blue = Convert.ToInt32(Database.GetVar(fileName, "General", "Blue"));
-                withBlock.Alpha = Convert.ToInt32(Database.GetVar(fileName, "General", "Alpha"));
+                instance.Red = Convert.ToInt32(Database.GetVar(fileName, "General", "Red"));
+                instance.Green = Convert.ToInt32(Database.GetVar(fileName, "General", "Green"));
+                instance.Blue = Convert.ToInt32(Database.GetVar(fileName, "General", "Blue"));
+                instance.Alpha = Convert.ToInt32(Database.GetVar(fileName, "General", "Alpha"));
 
-                withBlock.BossNpc = Convert.ToInt32(Database.GetVar(fileName, "General", "BossNpc"));
+                instance.BossNpc = Convert.ToInt32(Database.GetVar(fileName, "General", "BossNpc"));
             }
 
             // Redim the map
@@ -189,23 +189,23 @@ namespace Server
                         csMap.Tile[x, y].Autotile = new byte[Enum.GetValues(typeof(MapLayer)).Length];
                         csMap.Tile[x, y].Layer = new CsTileType[Enum.GetValues(typeof(MapLayer)).Length];
 
-                        var withBlock1 = csMap.Tile[x, y];
-                        withBlock1.Type = binaryReader.ReadByte();
-                        withBlock1.Data1 = binaryReader.ReadInt32();
-                        withBlock1.Data2 = binaryReader.ReadInt32();
-                        withBlock1.Data3 = binaryReader.ReadInt32();
-                        withBlock1.Data4 = binaryReader.ReadInt32();
-                        withBlock1.Data5 = binaryReader.ReadInt32();
+                        var instance1 = csMap.Tile[x, y];
+                        instance1.Type = binaryReader.ReadByte();
+                        instance1.Data1 = binaryReader.ReadInt32();
+                        instance1.Data2 = binaryReader.ReadInt32();
+                        instance1.Data3 = binaryReader.ReadInt32();
+                        instance1.Data4 = binaryReader.ReadInt32();
+                        instance1.Data5 = binaryReader.ReadInt32();
 
                         for (i = 0L; i < Enum.GetValues(typeof(MapLayer)).Length; i++)
-                            withBlock1.Autotile[i] = binaryReader.ReadByte();
-                        withBlock1.DirBlock = binaryReader.ReadByte();
+                            instance1.Autotile[i] = binaryReader.ReadByte();
+                        instance1.DirBlock = binaryReader.ReadByte();
 
                         for (i = 0L; i < Enum.GetValues(typeof(MapLayer)).Length; i++)
                         {
-                            withBlock1.Layer[i].TileSet = binaryReader.ReadInt32();
-                            withBlock1.Layer[i].X = binaryReader.ReadInt32();
-                            withBlock1.Layer[i].Y = binaryReader.ReadInt32();
+                            instance1.Layer[i].TileSet = binaryReader.ReadInt32();
+                            instance1.Layer[i].X = binaryReader.ReadInt32();
+                            instance1.Layer[i].Y = binaryReader.ReadInt32();
                         }
                     }
                 }

@@ -165,14 +165,14 @@ namespace Client
             Graphics = new GraphicsDeviceManager(this);
 
             // Set basic properties for GraphicsDeviceManager
-            ref var withBlock = ref Graphics;
-            withBlock.GraphicsProfile = GraphicsProfile.Reach;
-            withBlock.IsFullScreen = SettingsManager.Instance.Fullscreen;
-            withBlock.PreferredBackBufferWidth = GameState.ResolutionWidth;
-            withBlock.PreferredBackBufferHeight = GameState.ResolutionHeight;
-            withBlock.SynchronizeWithVerticalRetrace = SettingsManager.Instance.Vsync;
+            ref var instance = ref Graphics;
+            instance.GraphicsProfile = GraphicsProfile.Reach;
+            instance.IsFullScreen = SettingsManager.Instance.Fullscreen;
+            instance.PreferredBackBufferWidth = GameState.ResolutionWidth;
+            instance.PreferredBackBufferHeight = GameState.ResolutionHeight;
+            instance.SynchronizeWithVerticalRetrace = SettingsManager.Instance.Vsync;
             IsFixedTimeStep = false;
-            withBlock.PreferMultiSampling = false;
+            instance.PreferMultiSampling = false;
 
             // Allow resizing and keep backbuffer in sync with window size when windowed
             Window.AllowUserResizing = true;
@@ -1962,11 +1962,11 @@ namespace Client
 
             // Reset attacking state if attack timer has passed
             {
-                ref var withBlock = ref Data.MyMapNpc[(int)mapNpcNum];
-                if (withBlock.AttackTimer + attackSpeed < General.GetTickCount())
+                ref var instance = ref Data.MyMapNpc[(int)mapNpcNum];
+                if (instance.AttackTimer + attackSpeed < General.GetTickCount())
                 {
-                    withBlock.Attacking = 0;
-                    withBlock.AttackTimer = 0;
+                    instance.Attacking = 0;
+                    instance.AttackTimer = 0;
                 }
             }
 
@@ -2091,12 +2091,12 @@ namespace Client
             if (picNum < 1 | picNum > GameState.NumItems)
                 return;
 
-            ref var withBlock = ref Data.MyMapItem[itemNum];
+            ref var instance = ref Data.MyMapItem[itemNum];
 
-            if (Math.Floor((double) withBlock.X / 32) < GameState.TileView.Left | Math.Floor((double) withBlock.X / 32) > GameState.TileView.Right)
+            if (Math.Floor((double) instance.X / 32) < GameState.TileView.Left | Math.Floor((double) instance.X / 32) > GameState.TileView.Right)
                 return;
 
-            if (Math.Floor((double) withBlock.Y / 32) < GameState.TileView.Top | Math.Floor((double) withBlock.Y / 32) > GameState.TileView.Bottom)
+            if (Math.Floor((double) instance.Y / 32) < GameState.TileView.Top | Math.Floor((double) instance.Y / 32) > GameState.TileView.Bottom)
                 return;
 
             srcRec = new Rectangle(0, 0, GameState.SizeX, GameState.SizeY);
@@ -2134,22 +2134,22 @@ namespace Client
             int y;
 
             {
-                ref var withBlock = ref Data.Blood[index];
-                if (withBlock.X < GameState.TileView.Left | withBlock.X > GameState.TileView.Right)
+                ref var instance = ref Data.Blood[index];
+                if (instance.X < GameState.TileView.Left | instance.X > GameState.TileView.Right)
                     return;
-                if (withBlock.Y < GameState.TileView.Top | withBlock.Y > GameState.TileView.Bottom)
+                if (instance.Y < GameState.TileView.Top | instance.Y > GameState.TileView.Bottom)
                     return;
 
                 // check if we should be seeing it
-                if (withBlock.Timer + 20000 < General.GetTickCount())
+                if (instance.Timer + 20000 < General.GetTickCount())
                     return;
 
                 x = GameLogic.ConvertMapX(Data.Blood[index].X);
                 y = GameLogic.ConvertMapY(Data.Blood[index].Y);
 
-                srcRec = new Rectangle((withBlock.Sprite - 1) * GameState.SizeX, 0, GameState.SizeX, GameState.SizeY);
-                destRec = new Rectangle(GameLogic.ConvertMapX(withBlock.X),
-                    GameLogic.ConvertMapY(withBlock.Y), GameState.SizeX, GameState.SizeY);
+                srcRec = new Rectangle((instance.Sprite - 1) * GameState.SizeX, 0, GameState.SizeX, GameState.SizeY);
+                destRec = new Rectangle(GameLogic.ConvertMapX(instance.X),
+                    GameLogic.ConvertMapY(instance.Y), GameState.SizeX, GameState.SizeY);
 
                 string argPath = Path.Combine(DataPath.Misc, "Blood");
                 RenderTexture(ref argPath, x, y, srcRec.X, srcRec.Y, srcRec.Width, srcRec.Height);
@@ -2411,30 +2411,30 @@ namespace Client
             int color;
             long tmpNum;
 
-            ref var withBlock = ref Data.ChatBubble[(int) index];
+            ref var instance = ref Data.ChatBubble[(int) index];
 
             // exit out early
-            if (withBlock.TargetType == 0)
+            if (instance.TargetType == 0)
                 return;
 
-            color = withBlock.Color;
+            color = instance.Color;
 
             // calculate position
-            switch (withBlock.TargetType)
+            switch (instance.TargetType)
             {
                 case (byte) TargetType.Player:
                 {
                     // it's a player
-                    if (GetPlayerMap(withBlock.Target) != GetPlayerMap(GameState.MyIndex))
+                    if (GetPlayerMap(instance.Target) != GetPlayerMap(GameState.MyIndex))
                         return;
 
                     // Base anchor previously used for bubble (top of classic 32px frame)
-                    x = GameLogic.ConvertMapX(Data.Player[withBlock.Target].X) + 16;
-                    y = GameLogic.ConvertMapY(Data.Player[withBlock.Target].Y) - 8;
+                    x = GameLogic.ConvertMapX(Data.Player[instance.Target].X) + 16;
+                    y = GameLogic.ConvertMapY(Data.Player[instance.Target].Y) - 8;
 
                     // Adjust upward so bubble sits above nameplate.
                     // Recreate nameplate top Y (TextRenderer logic simplified):
-                    int spriteNumLocal = GetPlayerSprite((int)withBlock.Target);
+                    int spriteNumLocal = GetPlayerSprite((int)instance.Target);
                     if (spriteNumLocal > 0 && spriteNumLocal <= GameState.NumCharacters)
                     {
                         var gi = GetGfxInfo(Path.Combine(DataPath.Characters, spriteNumLocal.ToString()));
@@ -2449,7 +2449,7 @@ namespace Client
                             else dirs = 1;
                             int frameHeight = gi.Height / dirs;
                             if (frameHeight <= 0) frameHeight = 32;
-                            int worldBaseY = Data.Player[withBlock.Target].Y;
+                            int worldBaseY = Data.Player[instance.Target].Y;
                             if (frameHeight > 32)
                             {
                                 // replicate upward shift used when drawing tall sprites
@@ -2469,15 +2469,15 @@ namespace Client
                 case (byte) TargetType.Event:
                 {
                     // Event X/Y are stored as tile coordinates
-                    x = GameLogic.ConvertMapX(Data.MyMap.Event[withBlock.Target].X * GameState.SizeX) + 16;
-                    y = GameLogic.ConvertMapY(Data.MyMap.Event[withBlock.Target].Y * GameState.SizeY) - 16;
+                    x = GameLogic.ConvertMapX(Data.MyMap.Event[instance.Target].X * GameState.SizeX) + 16;
+                    y = GameLogic.ConvertMapY(Data.MyMap.Event[instance.Target].Y * GameState.SizeY) - 16;
                     break;
                 }
 
                 case (byte) TargetType.Npc:
                 {
-                    x = GameLogic.ConvertMapX(Data.MyMapNpc[withBlock.Target].X) + 16;
-                    y = GameLogic.ConvertMapY(Data.MyMapNpc[withBlock.Target].Y) - 32;
+                    x = GameLogic.ConvertMapX(Data.MyMapNpc[instance.Target].X) + 16;
+                    y = GameLogic.ConvertMapY(Data.MyMapNpc[instance.Target].Y) - 32;
                     break;
                 }
 
@@ -2489,10 +2489,10 @@ namespace Client
                 }
             }
 
-            withBlock.Msg = withBlock.Msg.Replace("\0", string.Empty);
+            instance.Msg = instance.Msg.Replace("\0", string.Empty);
 
             // word wrap
-            TextRenderer.WordWrap(withBlock.Msg, Font.Georgia, GameState.ChatBubbleWidth, ref theArray);
+            TextRenderer.WordWrap(instance.Msg, Font.Georgia, GameState.ChatBubbleWidth, ref theArray);
 
             // find max width
             tmpNum = Information.UBound(theArray);
@@ -2576,15 +2576,15 @@ namespace Client
 
                 TextRenderer.RenderText(theArray[(int) i],
                     (int) Math.Round(x - theArray[(int) i].Length / 2d - TextRenderer.GetTextWidth(theArray[(int) i]) / 2d +
-                                        padding), (int) y2, QbColorToXnaColor(withBlock.Color),
+                                        padding), (int) y2, QbColorToXnaColor(instance.Color),
                     Color.Black);
                 y2 = y2 + 12L;
             }
 
             // check if it's timed out - close it if so
-            if (withBlock.Timer + 5000 < General.GetTickCount())
+            if (instance.Timer + 5000 < General.GetTickCount())
             {
-                withBlock.Active = false;
+                instance.Active = false;
             }
         }
 
@@ -2626,11 +2626,11 @@ namespace Client
 
             // Check to see if we want to stop making him attack
             {
-                ref var withBlock = ref Data.Player[index];
-                if (withBlock.AttackTimer + attackSpeed < General.GetTickCount())
+                ref var instance = ref Data.Player[index];
+                if (instance.AttackTimer + attackSpeed < General.GetTickCount())
                 {
-                    withBlock.Attacking = 0;
-                    withBlock.AttackTimer = 0;
+                    instance.Attacking = 0;
+                    instance.AttackTimer = 0;
                 }
             }
 
@@ -2813,11 +2813,11 @@ namespace Client
 
             // Check to see if we want to stop showing emote
             {
-                ref var withBlock1 = ref Data.Player[index];
-                if (withBlock1.EmoteTimer < General.GetTickCount())
+                ref var instance1 = ref Data.Player[index];
+                if (instance1.EmoteTimer < General.GetTickCount())
                 {
-                    withBlock1.Emote = 0;
-                    withBlock1.EmoteTimer = 0;
+                    instance1.Emote = 0;
+                    instance1.EmoteTimer = 0;
                 }
             }
 

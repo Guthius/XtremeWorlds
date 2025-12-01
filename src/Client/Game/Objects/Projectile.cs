@@ -86,19 +86,19 @@ namespace Client
             int i = buffer.ReadInt32();
 
             {
-                ref var withBlock = ref Data.MapProjectile[Data.Player[GameState.MyIndex].Map, i];
-                withBlock.ProjectileNum = buffer.ReadInt32();
-                withBlock.Owner = buffer.ReadInt32();
-                withBlock.OwnerType = buffer.ReadByte();
-                withBlock.Dir = buffer.ReadByte();
-                withBlock.X = buffer.ReadInt32();
-                withBlock.Y = buffer.ReadInt32();
+                ref var instance = ref Data.MapProjectile[Data.Player[GameState.MyIndex].Map, i];
+                instance.ProjectileNum = buffer.ReadInt32();
+                instance.Owner = buffer.ReadInt32();
+                instance.OwnerType = buffer.ReadByte();
+                instance.Dir = buffer.ReadByte();
+                instance.X = buffer.ReadInt32();
+                instance.Y = buffer.ReadInt32();
                 // New free-aim fields
-                withBlock.Vx = buffer.ReadInt16();
-                withBlock.Vy = buffer.ReadInt16();
-                withBlock.FreeAim = buffer.ReadByte();
-                withBlock.Range = 0;
-                withBlock.Timer = General.GetTickCount() + 60000;
+                instance.Vx = buffer.ReadInt16();
+                instance.Vy = buffer.ReadInt16();
+                instance.FreeAim = buffer.ReadByte();
+                instance.Range = 0;
+                instance.Timer = General.GetTickCount() + 60000;
             }
         }
 

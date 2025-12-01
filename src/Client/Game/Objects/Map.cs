@@ -611,24 +611,24 @@ namespace Client
 
         public static void ClearMapNpc(int index)
         {
-            ref var withBlock = ref Data.MyMapNpc[index];
-            withBlock.Attacking = 0;
-            withBlock.AttackTimer = 0;
-            withBlock.Dir = 0;
-            withBlock.Moving = 0;
-            withBlock.Num = -1;
-            withBlock.SkillBuffer = -1;
-            withBlock.Steps = 0;
-            withBlock.Target = 0;
-            withBlock.TargetType = 0;
-            withBlock.Vital = new int[Enum.GetValues(typeof(Vital)).Length];
+            ref var instance = ref Data.MyMapNpc[index];
+            instance.Attacking = 0;
+            instance.AttackTimer = 0;
+            instance.Dir = 0;
+            instance.Moving = 0;
+            instance.Num = -1;
+            instance.SkillBuffer = -1;
+            instance.Steps = 0;
+            instance.Target = 0;
+            instance.TargetType = 0;
+            instance.Vital = new int[Enum.GetValues(typeof(Vital)).Length];
             for (int i = 0; i < Enum.GetValues(typeof(Vital)).Length; i++)
             {
-                withBlock.Vital[i] = 0;
+                instance.Vital[i] = 0;
             }
 
-            withBlock.X = 0;
-            withBlock.Y = 0;
+            instance.X = 0;
+            instance.Y = 0;
         }
 
         public static void ClearMapNpcs()
@@ -824,12 +824,12 @@ namespace Client
                     for (i = 0; i < loopTo2; i++)
                     {
                         {
-                            ref var withBlock = ref Data.MyMap.Event[i];
-                            withBlock.Name = buffer.ReadString();
-                            withBlock.Globals = buffer.ReadByte();
-                            withBlock.X = buffer.ReadInt32();
-                            withBlock.Y = buffer.ReadInt32();
-                            withBlock.PageCount = buffer.ReadInt32();
+                            ref var instance = ref Data.MyMap.Event[i];
+                            instance.Name = buffer.ReadString();
+                            instance.Globals = buffer.ReadByte();
+                            instance.X = buffer.ReadInt32();
+                            instance.Y = buffer.ReadInt32();
+                            instance.PageCount = buffer.ReadInt32();
                         }
 
                         if (Data.MyMap.Event[i].PageCount > 0)
@@ -839,61 +839,61 @@ namespace Client
                             for (x = 0; x < loopTo3; x++)
                             {
                                 {
-                                    ref var withBlock1 = ref Data.MyMap.Event[i].Pages[x];
-                                    withBlock1.ChkVariable = buffer.ReadInt32();
-                                    withBlock1.VariableIndex = buffer.ReadInt32();
-                                    withBlock1.VariableCondition = buffer.ReadInt32();
-                                    withBlock1.VariableCompare = buffer.ReadInt32();
+                                    ref var instance1 = ref Data.MyMap.Event[i].Pages[x];
+                                    instance1.ChkVariable = buffer.ReadInt32();
+                                    instance1.VariableIndex = buffer.ReadInt32();
+                                    instance1.VariableCondition = buffer.ReadInt32();
+                                    instance1.VariableCompare = buffer.ReadInt32();
 
-                                    withBlock1.ChkSwitch = buffer.ReadInt32();
-                                    withBlock1.SwitchIndex = buffer.ReadInt32();
-                                    withBlock1.SwitchCompare = buffer.ReadInt32();
+                                    instance1.ChkSwitch = buffer.ReadInt32();
+                                    instance1.SwitchIndex = buffer.ReadInt32();
+                                    instance1.SwitchCompare = buffer.ReadInt32();
 
-                                    withBlock1.ChkHasItem = buffer.ReadInt32();
-                                    withBlock1.HasItemIndex = buffer.ReadInt32();
-                                    withBlock1.HasItemAmount = buffer.ReadInt32();
+                                    instance1.ChkHasItem = buffer.ReadInt32();
+                                    instance1.HasItemIndex = buffer.ReadInt32();
+                                    instance1.HasItemAmount = buffer.ReadInt32();
 
-                                    withBlock1.ChkSelfSwitch = buffer.ReadInt32();
-                                    withBlock1.SelfSwitchIndex = buffer.ReadInt32();
-                                    withBlock1.SelfSwitchCompare = buffer.ReadInt32();
+                                    instance1.ChkSelfSwitch = buffer.ReadInt32();
+                                    instance1.SelfSwitchIndex = buffer.ReadInt32();
+                                    instance1.SelfSwitchCompare = buffer.ReadInt32();
 
-                                    withBlock1.GraphicType = buffer.ReadByte();
-                                    withBlock1.Graphic = buffer.ReadInt32();
-                                    withBlock1.GraphicX = buffer.ReadInt32();
-                                    withBlock1.GraphicY = buffer.ReadInt32();
-                                    withBlock1.GraphicX2 = buffer.ReadInt32();
-                                    withBlock1.GraphicY2 = buffer.ReadInt32();
+                                    instance1.GraphicType = buffer.ReadByte();
+                                    instance1.Graphic = buffer.ReadInt32();
+                                    instance1.GraphicX = buffer.ReadInt32();
+                                    instance1.GraphicY = buffer.ReadInt32();
+                                    instance1.GraphicX2 = buffer.ReadInt32();
+                                    instance1.GraphicY2 = buffer.ReadInt32();
 
-                                    withBlock1.MoveType = buffer.ReadByte();
-                                    withBlock1.MoveSpeed = buffer.ReadByte();
-                                    withBlock1.MoveFreq = buffer.ReadByte();
-                                    withBlock1.MoveRouteCount = buffer.ReadInt32();
-                                    withBlock1.IgnoreMoveRoute = buffer.ReadInt32();
-                                    withBlock1.RepeatMoveRoute = buffer.ReadInt32();
+                                    instance1.MoveType = buffer.ReadByte();
+                                    instance1.MoveSpeed = buffer.ReadByte();
+                                    instance1.MoveFreq = buffer.ReadByte();
+                                    instance1.MoveRouteCount = buffer.ReadInt32();
+                                    instance1.IgnoreMoveRoute = buffer.ReadInt32();
+                                    instance1.RepeatMoveRoute = buffer.ReadInt32();
 
-                                    if (withBlock1.MoveRouteCount > 0)
+                                    if (instance1.MoveRouteCount > 0)
                                     {
-                                        Data.MyMap.Event[i].Pages[x].MoveRoute = new Type.MoveRoute[withBlock1.MoveRouteCount];
-                                        var loopTo4 = withBlock1.MoveRouteCount;
+                                        Data.MyMap.Event[i].Pages[x].MoveRoute = new Type.MoveRoute[instance1.MoveRouteCount];
+                                        var loopTo4 = instance1.MoveRouteCount;
                                         for (y = 0; y < loopTo4; y++)
                                         {
-                                            withBlock1.MoveRoute[y].Index = buffer.ReadInt32();
-                                            withBlock1.MoveRoute[y].Data1 = buffer.ReadInt32();
-                                            withBlock1.MoveRoute[y].Data2 = buffer.ReadInt32();
-                                            withBlock1.MoveRoute[y].Data3 = buffer.ReadInt32();
-                                            withBlock1.MoveRoute[y].Data4 = buffer.ReadInt32();
-                                            withBlock1.MoveRoute[y].Data5 = buffer.ReadInt32();
-                                            withBlock1.MoveRoute[y].Data6 = buffer.ReadInt32();
+                                            instance1.MoveRoute[y].Index = buffer.ReadInt32();
+                                            instance1.MoveRoute[y].Data1 = buffer.ReadInt32();
+                                            instance1.MoveRoute[y].Data2 = buffer.ReadInt32();
+                                            instance1.MoveRoute[y].Data3 = buffer.ReadInt32();
+                                            instance1.MoveRoute[y].Data4 = buffer.ReadInt32();
+                                            instance1.MoveRoute[y].Data5 = buffer.ReadInt32();
+                                            instance1.MoveRoute[y].Data6 = buffer.ReadInt32();
                                         }
                                     }
 
-                                    withBlock1.IdleAnim = buffer.ReadInt32();
-                                    withBlock1.DirFix = buffer.ReadInt32();
-                                    withBlock1.WalkThrough = buffer.ReadInt32();
-                                    withBlock1.ShowName = buffer.ReadInt32();
-                                    withBlock1.Trigger = buffer.ReadByte();
-                                    withBlock1.CommandListCount = buffer.ReadInt32();
-                                    withBlock1.Position = buffer.ReadByte();
+                                    instance1.IdleAnim = buffer.ReadInt32();
+                                    instance1.DirFix = buffer.ReadInt32();
+                                    instance1.WalkThrough = buffer.ReadInt32();
+                                    instance1.ShowName = buffer.ReadInt32();
+                                    instance1.Trigger = buffer.ReadByte();
+                                    instance1.CommandListCount = buffer.ReadInt32();
+                                    instance1.Position = buffer.ReadByte();
                                 }
 
                                 if (Data.MyMap.Event[i].Pages[x].CommandListCount > 0)
@@ -910,38 +910,38 @@ namespace Client
                                             for (int z = 0, loopTo6 = Data.MyMap.Event[i].Pages[x].CommandList[y].CommandCount; z < loopTo6; z++)
                                             {
                                                 {
-                                                    ref var withBlock2 = ref Data.MyMap.Event[i].Pages[x].CommandList[y].Commands[z];
-                                                    withBlock2.Index = buffer.ReadInt32();
-                                                    withBlock2.Text1 = buffer.ReadString();
-                                                    withBlock2.Text2 = buffer.ReadString();
-                                                    withBlock2.Text3 = buffer.ReadString();
-                                                    withBlock2.Text4 = buffer.ReadString();
-                                                    withBlock2.Text5 = buffer.ReadString();
-                                                    withBlock2.Data1 = buffer.ReadInt32();
-                                                    withBlock2.Data2 = buffer.ReadInt32();
-                                                    withBlock2.Data3 = buffer.ReadInt32();
-                                                    withBlock2.Data4 = buffer.ReadInt32();
-                                                    withBlock2.Data5 = buffer.ReadInt32();
-                                                    withBlock2.Data6 = buffer.ReadInt32();
-                                                    withBlock2.ConditionalBranch.CommandList = buffer.ReadInt32();
-                                                    withBlock2.ConditionalBranch.Condition = buffer.ReadInt32();
-                                                    withBlock2.ConditionalBranch.Data1 = buffer.ReadInt32();
-                                                    withBlock2.ConditionalBranch.Data2 = buffer.ReadInt32();
-                                                    withBlock2.ConditionalBranch.Data3 = buffer.ReadInt32();
-                                                    withBlock2.ConditionalBranch.ElseCommandList = buffer.ReadInt32();
-                                                    withBlock2.MoveRouteCount = buffer.ReadInt32();
-                                                    if (withBlock2.MoveRouteCount > 0)
+                                                    ref var instance2 = ref Data.MyMap.Event[i].Pages[x].CommandList[y].Commands[z];
+                                                    instance2.Index = buffer.ReadInt32();
+                                                    instance2.Text1 = buffer.ReadString();
+                                                    instance2.Text2 = buffer.ReadString();
+                                                    instance2.Text3 = buffer.ReadString();
+                                                    instance2.Text4 = buffer.ReadString();
+                                                    instance2.Text5 = buffer.ReadString();
+                                                    instance2.Data1 = buffer.ReadInt32();
+                                                    instance2.Data2 = buffer.ReadInt32();
+                                                    instance2.Data3 = buffer.ReadInt32();
+                                                    instance2.Data4 = buffer.ReadInt32();
+                                                    instance2.Data5 = buffer.ReadInt32();
+                                                    instance2.Data6 = buffer.ReadInt32();
+                                                    instance2.ConditionalBranch.CommandList = buffer.ReadInt32();
+                                                    instance2.ConditionalBranch.Condition = buffer.ReadInt32();
+                                                    instance2.ConditionalBranch.Data1 = buffer.ReadInt32();
+                                                    instance2.ConditionalBranch.Data2 = buffer.ReadInt32();
+                                                    instance2.ConditionalBranch.Data3 = buffer.ReadInt32();
+                                                    instance2.ConditionalBranch.ElseCommandList = buffer.ReadInt32();
+                                                    instance2.MoveRouteCount = buffer.ReadInt32();
+                                                    if (instance2.MoveRouteCount > 0)
                                                     {
-                                                        Array.Resize(ref withBlock2.MoveRoute, withBlock2.MoveRouteCount);
-                                                        for (int w = 0, loopTo7 = withBlock2.MoveRouteCount; w < loopTo7; w++)
+                                                        Array.Resize(ref instance2.MoveRoute, instance2.MoveRouteCount);
+                                                        for (int w = 0, loopTo7 = instance2.MoveRouteCount; w < loopTo7; w++)
                                                         {
-                                                            withBlock2.MoveRoute[w].Index = buffer.ReadInt32();
-                                                            withBlock2.MoveRoute[w].Data1 = buffer.ReadInt32();
-                                                            withBlock2.MoveRoute[w].Data2 = buffer.ReadInt32();
-                                                            withBlock2.MoveRoute[w].Data3 = buffer.ReadInt32();
-                                                            withBlock2.MoveRoute[w].Data4 = buffer.ReadInt32();
-                                                            withBlock2.MoveRoute[w].Data5 = buffer.ReadInt32();
-                                                            withBlock2.MoveRoute[w].Data6 = buffer.ReadInt32();
+                                                            instance2.MoveRoute[w].Index = buffer.ReadInt32();
+                                                            instance2.MoveRoute[w].Data1 = buffer.ReadInt32();
+                                                            instance2.MoveRoute[w].Data2 = buffer.ReadInt32();
+                                                            instance2.MoveRoute[w].Data3 = buffer.ReadInt32();
+                                                            instance2.MoveRoute[w].Data4 = buffer.ReadInt32();
+                                                            instance2.MoveRoute[w].Data5 = buffer.ReadInt32();
+                                                            instance2.MoveRoute[w].Data6 = buffer.ReadInt32();
                                                         }
                                                     }
                                                 }
@@ -1027,11 +1027,11 @@ namespace Client
             var buffer = new PacketReader(data);
 
             i = buffer.ReadByte();
-            ref var withBlock = ref Data.MyMapItem[i];
-            withBlock.Num = buffer.ReadInt32();
-            withBlock.Value = buffer.ReadInt32();
-            withBlock.X = buffer.ReadInt32();
-            withBlock.Y = buffer.ReadInt32();
+            ref var instance = ref Data.MyMapItem[i];
+            instance.Num = buffer.ReadInt32();
+            instance.Value = buffer.ReadInt32();
+            instance.X = buffer.ReadInt32();
+            instance.Y = buffer.ReadInt32();
 
         }
 
@@ -1041,11 +1041,11 @@ namespace Client
 
             for (int i = 0; i < Variables.MaxMapItems; i++)
             {
-                ref var withBlock = ref Data.MyMapItem[i];
-                withBlock.Num = buffer.ReadInt32();
-                withBlock.Value = buffer.ReadInt32();
-                withBlock.X = buffer.ReadInt32();
-                withBlock.Y = buffer.ReadInt32();
+                ref var instance = ref Data.MyMapItem[i];
+                instance.Num = buffer.ReadInt32();
+                instance.Value = buffer.ReadInt32();
+                instance.X = buffer.ReadInt32();
+                instance.Y = buffer.ReadInt32();
             }
         
         }
@@ -1057,11 +1057,11 @@ namespace Client
 
             for (i = 0; i < Variables.MaxMapNpcs; i++)
             {
-                ref var withBlock = ref Data.MyMapNpc[i];
-                withBlock.Num = buffer.ReadInt32();
-                withBlock.X = buffer.ReadInt32();
-                withBlock.Y = buffer.ReadInt32();
-                withBlock.Dir = buffer.ReadByte();
+                ref var instance = ref Data.MyMapNpc[i];
+                instance.Num = buffer.ReadInt32();
+                instance.X = buffer.ReadInt32();
+                instance.Y = buffer.ReadInt32();
+                instance.Dir = buffer.ReadByte();
             }
         }
 
@@ -1072,11 +1072,11 @@ namespace Client
 
             npcNum = buffer.ReadInt32();
 
-            ref var withBlock = ref Data.MyMapNpc[npcNum];
-            withBlock.Num = buffer.ReadInt32();
-            withBlock.X = buffer.ReadInt32();
-            withBlock.Y = buffer.ReadInt32();
-            withBlock.Dir = buffer.ReadByte();
+            ref var instance = ref Data.MyMapNpc[npcNum];
+            instance.Num = buffer.ReadInt32();
+            instance.X = buffer.ReadInt32();
+            instance.Y = buffer.ReadInt32();
+            instance.Dir = buffer.ReadByte();
         }
 
         #endregion
@@ -1189,12 +1189,12 @@ namespace Client
                 for (i = 0; i < Data.MyMap.EventCount; i++)
                 {
                     {
-                        ref var withBlock = ref Data.MyMap.Event[i];
-                        packetWriter.WriteString(withBlock.Name);
-                        packetWriter.WriteByte(withBlock.Globals);
-                        packetWriter.WriteInt32(withBlock.X);
-                        packetWriter.WriteInt32(withBlock.Y);
-                        packetWriter.WriteInt32(withBlock.PageCount);
+                        ref var instance = ref Data.MyMap.Event[i];
+                        packetWriter.WriteString(instance.Name);
+                        packetWriter.WriteByte(instance.Globals);
+                        packetWriter.WriteInt32(instance.X);
+                        packetWriter.WriteInt32(instance.Y);
+                        packetWriter.WriteInt32(instance.PageCount);
                     }
                     
                     if (Data.MyMap.Event[i].PageCount > 0)
@@ -1203,55 +1203,55 @@ namespace Client
                         for (x = 0; x < loopTo3; x++)
                         {
                             {
-                                ref var withBlock1 = ref Data.MyMap.Event[i].Pages[x];
-                                packetWriter.WriteInt32(withBlock1.ChkVariable);
-                                packetWriter.WriteInt32(withBlock1.VariableIndex);
-                                packetWriter.WriteInt32(withBlock1.VariableCondition);
-                                packetWriter.WriteInt32(withBlock1.VariableCompare);
-                                packetWriter.WriteInt32(withBlock1.ChkSwitch);
-                                packetWriter.WriteInt32(withBlock1.SwitchIndex);
-                                packetWriter.WriteInt32(withBlock1.SwitchCompare);
-                                packetWriter.WriteInt32(withBlock1.ChkHasItem);
-                                packetWriter.WriteInt32(withBlock1.HasItemIndex);
-                                packetWriter.WriteInt32(withBlock1.HasItemAmount);
-                                packetWriter.WriteInt32(withBlock1.ChkSelfSwitch);
-                                packetWriter.WriteInt32(withBlock1.SelfSwitchIndex);
-                                packetWriter.WriteInt32(withBlock1.SelfSwitchCompare);
-                                packetWriter.WriteByte(withBlock1.GraphicType);
-                                packetWriter.WriteInt32(withBlock1.Graphic);
-                                packetWriter.WriteInt32(withBlock1.GraphicX);
-                                packetWriter.WriteInt32(withBlock1.GraphicY);
-                                packetWriter.WriteInt32(withBlock1.GraphicX2);
-                                packetWriter.WriteInt32(withBlock1.GraphicY2);
-                                packetWriter.WriteByte(withBlock1.MoveType);
-                                packetWriter.WriteByte(withBlock1.MoveSpeed);
-                                packetWriter.WriteByte(withBlock1.MoveFreq);
+                                ref var instance1 = ref Data.MyMap.Event[i].Pages[x];
+                                packetWriter.WriteInt32(instance1.ChkVariable);
+                                packetWriter.WriteInt32(instance1.VariableIndex);
+                                packetWriter.WriteInt32(instance1.VariableCondition);
+                                packetWriter.WriteInt32(instance1.VariableCompare);
+                                packetWriter.WriteInt32(instance1.ChkSwitch);
+                                packetWriter.WriteInt32(instance1.SwitchIndex);
+                                packetWriter.WriteInt32(instance1.SwitchCompare);
+                                packetWriter.WriteInt32(instance1.ChkHasItem);
+                                packetWriter.WriteInt32(instance1.HasItemIndex);
+                                packetWriter.WriteInt32(instance1.HasItemAmount);
+                                packetWriter.WriteInt32(instance1.ChkSelfSwitch);
+                                packetWriter.WriteInt32(instance1.SelfSwitchIndex);
+                                packetWriter.WriteInt32(instance1.SelfSwitchCompare);
+                                packetWriter.WriteByte(instance1.GraphicType);
+                                packetWriter.WriteInt32(instance1.Graphic);
+                                packetWriter.WriteInt32(instance1.GraphicX);
+                                packetWriter.WriteInt32(instance1.GraphicY);
+                                packetWriter.WriteInt32(instance1.GraphicX2);
+                                packetWriter.WriteInt32(instance1.GraphicY2);
+                                packetWriter.WriteByte(instance1.MoveType);
+                                packetWriter.WriteByte(instance1.MoveSpeed);
+                                packetWriter.WriteByte(instance1.MoveFreq);
                                 packetWriter.WriteInt32(Data.MyMap.Event[i].Pages[x].MoveRouteCount);
-                                packetWriter.WriteInt32(withBlock1.IgnoreMoveRoute);
-                                packetWriter.WriteInt32(withBlock1.RepeatMoveRoute);
+                                packetWriter.WriteInt32(instance1.IgnoreMoveRoute);
+                                packetWriter.WriteInt32(instance1.RepeatMoveRoute);
 
-                                if (withBlock1.MoveRouteCount > 0)
+                                if (instance1.MoveRouteCount > 0)
                                 {
-                                    var loopTo4 = withBlock1.MoveRouteCount;
+                                    var loopTo4 = instance1.MoveRouteCount;
                                     for (y = 0; y < loopTo4; y++)
                                     {
-                                        packetWriter.WriteInt32(withBlock1.MoveRoute[y].Index);
-                                        packetWriter.WriteInt32(withBlock1.MoveRoute[y].Data1);
-                                        packetWriter.WriteInt32(withBlock1.MoveRoute[y].Data2);
-                                        packetWriter.WriteInt32(withBlock1.MoveRoute[y].Data3);
-                                        packetWriter.WriteInt32(withBlock1.MoveRoute[y].Data4);
-                                        packetWriter.WriteInt32(withBlock1.MoveRoute[y].Data5);
-                                        packetWriter.WriteInt32(withBlock1.MoveRoute[y].Data6);
+                                        packetWriter.WriteInt32(instance1.MoveRoute[y].Index);
+                                        packetWriter.WriteInt32(instance1.MoveRoute[y].Data1);
+                                        packetWriter.WriteInt32(instance1.MoveRoute[y].Data2);
+                                        packetWriter.WriteInt32(instance1.MoveRoute[y].Data3);
+                                        packetWriter.WriteInt32(instance1.MoveRoute[y].Data4);
+                                        packetWriter.WriteInt32(instance1.MoveRoute[y].Data5);
+                                        packetWriter.WriteInt32(instance1.MoveRoute[y].Data6);
                                     }
                                 }
 
-                                packetWriter.WriteInt32(withBlock1.IdleAnim);
-                                packetWriter.WriteInt32(withBlock1.DirFix);
-                                packetWriter.WriteInt32(withBlock1.WalkThrough);
-                                packetWriter.WriteInt32(withBlock1.ShowName);
-                                packetWriter.WriteByte(withBlock1.Trigger);
-                                packetWriter.WriteInt32(withBlock1.CommandListCount);
-                                packetWriter.WriteByte(withBlock1.Position);
+                                packetWriter.WriteInt32(instance1.IdleAnim);
+                                packetWriter.WriteInt32(instance1.DirFix);
+                                packetWriter.WriteInt32(instance1.WalkThrough);
+                                packetWriter.WriteInt32(instance1.ShowName);
+                                packetWriter.WriteByte(instance1.Trigger);
+                                packetWriter.WriteInt32(instance1.CommandListCount);
+                                packetWriter.WriteByte(instance1.Position);
                             }
 
                             if (Data.MyMap.Event[i].Pages[x].CommandListCount > 0)
@@ -1266,37 +1266,37 @@ namespace Client
                                         for (int z = 0, loopTo6 = Data.MyMap.Event[i].Pages[x].CommandList[y].CommandCount; z < loopTo6; z++)
                                         {
                                             {
-                                                ref var withBlock2 = ref Data.MyMap.Event[i].Pages[x].CommandList[y].Commands[z];
-                                                packetWriter.WriteInt32(withBlock2.Index);
-                                                packetWriter.WriteString(withBlock2.Text1);
-                                                packetWriter.WriteString(withBlock2.Text2);
-                                                packetWriter.WriteString(withBlock2.Text3);
-                                                packetWriter.WriteString(withBlock2.Text4);
-                                                packetWriter.WriteString(withBlock2.Text5);
-                                                packetWriter.WriteInt32(withBlock2.Data1);
-                                                packetWriter.WriteInt32(withBlock2.Data2);
-                                                packetWriter.WriteInt32(withBlock2.Data3);
-                                                packetWriter.WriteInt32(withBlock2.Data4);
-                                                packetWriter.WriteInt32(withBlock2.Data5);
-                                                packetWriter.WriteInt32(withBlock2.Data6);
-                                                packetWriter.WriteInt32(withBlock2.ConditionalBranch.CommandList);
-                                                packetWriter.WriteInt32(withBlock2.ConditionalBranch.Condition);
-                                                packetWriter.WriteInt32(withBlock2.ConditionalBranch.Data1);
-                                                packetWriter.WriteInt32(withBlock2.ConditionalBranch.Data2);
-                                                packetWriter.WriteInt32(withBlock2.ConditionalBranch.Data3);
-                                                packetWriter.WriteInt32(withBlock2.ConditionalBranch.ElseCommandList);
-                                                packetWriter.WriteInt32(withBlock2.MoveRouteCount);
-                                                if (withBlock2.MoveRouteCount > 0)
+                                                ref var instance2 = ref Data.MyMap.Event[i].Pages[x].CommandList[y].Commands[z];
+                                                packetWriter.WriteInt32(instance2.Index);
+                                                packetWriter.WriteString(instance2.Text1);
+                                                packetWriter.WriteString(instance2.Text2);
+                                                packetWriter.WriteString(instance2.Text3);
+                                                packetWriter.WriteString(instance2.Text4);
+                                                packetWriter.WriteString(instance2.Text5);
+                                                packetWriter.WriteInt32(instance2.Data1);
+                                                packetWriter.WriteInt32(instance2.Data2);
+                                                packetWriter.WriteInt32(instance2.Data3);
+                                                packetWriter.WriteInt32(instance2.Data4);
+                                                packetWriter.WriteInt32(instance2.Data5);
+                                                packetWriter.WriteInt32(instance2.Data6);
+                                                packetWriter.WriteInt32(instance2.ConditionalBranch.CommandList);
+                                                packetWriter.WriteInt32(instance2.ConditionalBranch.Condition);
+                                                packetWriter.WriteInt32(instance2.ConditionalBranch.Data1);
+                                                packetWriter.WriteInt32(instance2.ConditionalBranch.Data2);
+                                                packetWriter.WriteInt32(instance2.ConditionalBranch.Data3);
+                                                packetWriter.WriteInt32(instance2.ConditionalBranch.ElseCommandList);
+                                                packetWriter.WriteInt32(instance2.MoveRouteCount);
+                                                if (instance2.MoveRouteCount > 0)
                                                 {
-                                                    for (int w = 0, loopTo7 = withBlock2.MoveRouteCount; w < loopTo7; w++)
+                                                    for (int w = 0, loopTo7 = instance2.MoveRouteCount; w < loopTo7; w++)
                                                     {
-                                                        packetWriter.WriteInt32(withBlock2.MoveRoute[w].Index);
-                                                        packetWriter.WriteInt32(withBlock2.MoveRoute[w].Data1);
-                                                        packetWriter.WriteInt32(withBlock2.MoveRoute[w].Data2);
-                                                        packetWriter.WriteInt32(withBlock2.MoveRoute[w].Data3);
-                                                        packetWriter.WriteInt32(withBlock2.MoveRoute[w].Data4);
-                                                        packetWriter.WriteInt32(withBlock2.MoveRoute[w].Data5);
-                                                        packetWriter.WriteInt32(withBlock2.MoveRoute[w].Data6);
+                                                        packetWriter.WriteInt32(instance2.MoveRoute[w].Index);
+                                                        packetWriter.WriteInt32(instance2.MoveRoute[w].Data1);
+                                                        packetWriter.WriteInt32(instance2.MoveRoute[w].Data2);
+                                                        packetWriter.WriteInt32(instance2.MoveRoute[w].Data3);
+                                                        packetWriter.WriteInt32(instance2.MoveRoute[w].Data4);
+                                                        packetWriter.WriteInt32(instance2.MoveRoute[w].Data5);
+                                                        packetWriter.WriteInt32(instance2.MoveRoute[w].Data6);
                                                     }
                                                 }
                                             }

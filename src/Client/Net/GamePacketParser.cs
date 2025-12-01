@@ -1135,21 +1135,22 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         {
             if (Animation.Instance == null)
                 Animation.OnClear();
+
             if (Animation.Instance == null)
                 return;
 
-            ref var withBlock = ref Animation.Instance[Animation.Index];
-            withBlock.Timer ??= new int[2];
-            withBlock.Used ??= new bool[2];
-            withBlock.LoopIndex ??= new int[2];
-            withBlock.FrameIndex ??= new int[2];
-            withBlock.Animation = buffer.ReadInt32();
-            withBlock.X = buffer.ReadInt32();
-            withBlock.Y = buffer.ReadInt32();
-            withBlock.LockType = (byte)buffer.ReadInt32();
-            withBlock.LockIndex = buffer.ReadInt32();
-            withBlock.Used[0] = true;
-            withBlock.Used[1] = true;
+            ref var instance = ref Animation.Instance[Animation.Index];
+            instance.Timer ??= new int[2];
+            instance.Used ??= new bool[2];
+            instance.LoopIndex ??= new int[2];
+            instance.FrameIndex ??= new int[2];
+            instance.Animation = buffer.ReadInt32();
+            instance.X = buffer.ReadInt32();
+            instance.Y = buffer.ReadInt32();
+            instance.LockType = (byte)buffer.ReadInt32();
+            instance.LockIndex = buffer.ReadInt32();
+            instance.Used[0] = true;
+            instance.Used[1] = true;
         }
     }
 }

@@ -278,23 +278,23 @@ namespace Client
                 if (Instance == null)
                     return;
 
-                ref var withBlock = ref Instance[Index];
+                ref var instance = ref Instance[Index];
                 // Ensure per-instance arrays exist and have at least 2 layers
-                withBlock.Timer ??= new int[2];
-                withBlock.Used ??= new bool[2];
-                withBlock.LoopIndex ??= new int[2];
-                withBlock.FrameIndex ??= new int[2];
-                withBlock.Animation = animationNum;
-                withBlock.X = x;
-                withBlock.Y = y;
-                withBlock.LockType = 0;
-                withBlock.LockIndex = 0;
-                withBlock.Used[0] = true;
-                withBlock.Used[1] = true;
+                instance.Timer ??= new int[2];
+                instance.Used ??= new bool[2];
+                instance.LoopIndex ??= new int[2];
+                instance.FrameIndex ??= new int[2];
+                instance.Animation = animationNum;
+                instance.X = x;
+                instance.Y = y;
+                instance.LockType = 0;
+                instance.LockIndex = 0;
+                instance.Used[0] = true;
+                instance.Used[1] = true;
 
-                sound = Data.Animation[withBlock.Animation].Sound;
+                sound = Data.Animation[instance.Animation].Sound;
                 if (!string.IsNullOrEmpty(sound))
-                    Sound.PlaySound(sound, withBlock.X, withBlock.Y);
+                    Sound.PlaySound(sound, instance.X, instance.Y);
             }
         }
 
