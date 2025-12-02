@@ -34,7 +34,13 @@ public sealed class TextBox : Control
         }
 
         var text = ((Censor ? TextRenderer.CensorText(Text) : Text) + input).Replace("\0", string.Empty);
-        var textSize = TextRenderer.Fonts[Font].MeasureString(text);
+
+        if (!TextRenderer.Fonts.TryGetValue(Font, out var spriteFont))
+        {
+            return; // font not loaded, skip drawing instead of throwing
+        }
+
+        var textSize = spriteFont.MeasureString(text);
 
         TextRenderer.RenderText(
             text,

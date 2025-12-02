@@ -31,6 +31,11 @@ public sealed class Label : Control
 
     private void RenderLeftAligned(int x, int y)
     {
+        if (!TextRenderer.Fonts.TryGetValue(Font, out _))
+        {
+            return; // font not loaded, skip drawing instead of throwing
+        }
+
         if (TextRenderer.GetTextWidth(Text, Font) <= Width)
         {
             TextRenderer.RenderText(Text, X + x + XOffset, Y + y + YOffset, Color, Color.Black, Font);
@@ -58,6 +63,11 @@ public sealed class Label : Control
 
     private void RenderRightAligned(int x, int y)
     {
+        if (!TextRenderer.Fonts.TryGetValue(Font, out _))
+        {
+            return; // font not loaded, skip drawing instead of throwing
+        }
+
         if (TextRenderer.GetTextWidth(Text, Font) <= Width)
         {
             var size = TextRenderer.Fonts[Font].MeasureString(Text);
@@ -91,6 +101,11 @@ public sealed class Label : Control
 
     private void RenderCenterAligned(int x, int y)
     {
+        if (!TextRenderer.Fonts.TryGetValue(Font, out _))
+        {
+            return; // font not loaded, skip drawing instead of throwing
+        }
+
         if (TextRenderer.GetTextWidth(Text, Font) <= Width)
         {
             var size = TextRenderer.Fonts[Font].MeasureString(Text);

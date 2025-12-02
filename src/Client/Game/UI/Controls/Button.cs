@@ -41,7 +41,12 @@ public sealed class Button : Control
             }
         }
 
-        var size = TextRenderer.Fonts[Font].MeasureString(Text);
+        if (!TextRenderer.Fonts.TryGetValue(Font, out var spriteFont))
+        {
+            return; // font not loaded, skip drawing instead of throwing
+        }
+
+        var size = spriteFont.MeasureString(Text);
 
         var paddingX = size.X / 6.0d;
         var paddingY = size.Y / 6.0d;
