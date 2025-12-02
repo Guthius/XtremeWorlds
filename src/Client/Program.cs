@@ -189,11 +189,12 @@ namespace Client
 
             Content.RootDirectory = "Content";
 
-            // Handle Exiting: only ensure subsystems (like networking) are stopped;
-            // avoid re-entering Exit() or forcing a hard process kill here.
+            // Handle Exiting: ensure subsystems (like networking) are stopped and
+            // forward to Cocca.OnExit so the host window/app can react appropriately.
             Exiting += (s, e) =>
             {
                 try { Network.Stop(); } catch { }
+                try { Cocca.OnExit(); } catch { }
             };
         }
 
@@ -494,17 +495,11 @@ namespace Client
 
             if (GameState.IsLoading || GameState.GettingMap)
             {
-                // Draw loading screen onto the RenderTarget (no early returns between Begin/End)
-                if (SpriteBatch != null)
-                {
-                    SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null);
-                    // TODO: draw an actual loading screen texture or text here if desired
-                    SpriteBatch.End();
-                }
+                // Optional: draw a simple loading screen here if desired
             }
-            else
+            else if (GameState.InGame == true)
             {
-                // Draw the actual game/menu onto the RenderTarget whenever we're not loading
+                // Draw the actual game onto the RenderTarget
                 SpriteBatch?.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null);
                 Render_Game();
                 SpriteBatch?.End();
@@ -2182,6 +2177,7 @@ namespace Client
             if (barsInfo == null)
                 return;
 
+            // dynamic bar calculations
             width = barsInfo.Width;
             height = (long) Math.Round(barsInfo.Height / 4d);
 
