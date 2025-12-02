@@ -23,7 +23,7 @@
      </GroupBox>
 
     <!-- Equipment group -->
-    <GroupBox Name="grpEquip" Caption="" Position="260, 294" Size="842, 150">
+    <GroupBox Name="grpEquip" Caption="" Position="260, 290" Size="842, 150">
         <Label Name="lblSpeed" Text="Speed" Position="16, 12" Size="80, 16"/>
         <TextBox Name="txtSpeed" Position="96, 10" Size="120, 20" Design="TextWhite"/>
         <Label Name="lblDamage" Text="Damage" Position="232, 12" Size="80, 16"/>
@@ -39,7 +39,7 @@
     </GroupBox>
 
     <!-- Type/meta group -->
-    <GroupBox Name="grpType" Caption="" Position="260, 194" Size="842, 96">
+    <GroupBox Name="grpType" Caption="" Position="260, 190" Size="842, 96">
         <Label Name="lblType" Text="Type" Position="8, 12" Size="60, 16"/>
         <ComboBox Name="cmbType" Position="80, 10" Size="160, 18"/>
         <Label Name="lblSubType" Text="SubType" Position="256, 12" Size="80, 16"/>
@@ -58,7 +58,7 @@
     </GroupBox>
 
     <!-- Use group -->
-    <GroupBox Name="grpItemUse" Caption="" Position="260, 296" Size="842, 150">
+    <GroupBox Name="grpItemUse" Caption="" Position="260, 292" Size="842, 150">
         <Label Name="lblEventHeader" Text="Event" Position="8, 8" Size="60, 16"/>
         <Label Name="lblEventId" Text="Id" Position="80, 8" Size="30, 16"/>
         <TextBox Name="txtEventId" Position="116, 6" Size="60, 20" Design="TextWhite"/>
