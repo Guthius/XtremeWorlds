@@ -142,10 +142,10 @@ namespace Client
                         {
                             if (SettingsManager.Instance.Autotile)
                             {
-                                DrawAutoTile(layerIndex, GameLogic.ConvertMapX(x * GameState.SizeX), GameLogic.ConvertMapY(y * GameState.SizeY), 1, x, y, 0, false);
-                                DrawAutoTile(layerIndex, GameLogic.ConvertMapX(x * GameState.SizeX) + 16, GameLogic.ConvertMapY(y * GameState.SizeY), 2, x, y, 0, false);
-                                DrawAutoTile(layerIndex, GameLogic.ConvertMapX(x * GameState.SizeX), GameLogic.ConvertMapY(y * GameState.SizeY) + 16, 3, x, y, 0, false);
-                                DrawAutoTile(layerIndex, GameLogic.ConvertMapX(x * GameState.SizeX) + 16, GameLogic.ConvertMapY(y * GameState.SizeY) + 16, 4, x, y, 0, false);
+                                Autotile.OnDraw(layerIndex, GameLogic.ConvertMapX(x * GameState.SizeX), GameLogic.ConvertMapY(y * GameState.SizeY), 1, x, y, 0, false);
+                                Autotile.OnDraw(layerIndex, GameLogic.ConvertMapX(x * GameState.SizeX) + 16, GameLogic.ConvertMapY(y * GameState.SizeY), 2, x, y, 0, false);
+                                Autotile.OnDraw(layerIndex, GameLogic.ConvertMapX(x * GameState.SizeX), GameLogic.ConvertMapY(y * GameState.SizeY) + 16, 3, x, y, 0, false);
+                                Autotile.OnDraw(layerIndex, GameLogic.ConvertMapX(x * GameState.SizeX) + 16, GameLogic.ConvertMapY(y * GameState.SizeY) + 16, 4, x, y, 0, false);
                             }
                         }
                     }
@@ -248,10 +248,10 @@ namespace Client
                             if (SettingsManager.Instance.Autotile)
                             {
                                 // Render autotiles
-                                DrawAutoTile(layerIndex, GameLogic.ConvertMapX(x * GameState.SizeX), GameLogic.ConvertMapY(y * GameState.SizeY), 1, x, y, 0, false);
-                                DrawAutoTile(layerIndex, GameLogic.ConvertMapX(x * GameState.SizeX) + 16, GameLogic.ConvertMapY(y * GameState.SizeY), 2, x, y, 0, false);
-                                DrawAutoTile(layerIndex, GameLogic.ConvertMapX(x * GameState.SizeX), GameLogic.ConvertMapY(y * GameState.SizeY) + 16, 3, x, y, 0, false);
-                                DrawAutoTile(layerIndex, GameLogic.ConvertMapX(x * GameState.SizeX) + 16, GameLogic.ConvertMapY(y * GameState.SizeY) + 16, 4, x, y, 0, false);
+                                Autotile.OnDraw(layerIndex, GameLogic.ConvertMapX(x * GameState.SizeX), GameLogic.ConvertMapY(y * GameState.SizeY), 1, x, y, 0, false);
+                                Autotile.OnDraw(layerIndex, GameLogic.ConvertMapX(x * GameState.SizeX) + 16, GameLogic.ConvertMapY(y * GameState.SizeY), 2, x, y, 0, false);
+                                Autotile.OnDraw(layerIndex, GameLogic.ConvertMapX(x * GameState.SizeX), GameLogic.ConvertMapY(y * GameState.SizeY) + 16, 3, x, y, 0, false);
+                                Autotile.OnDraw(layerIndex, GameLogic.ConvertMapX(x * GameState.SizeX) + 16, GameLogic.ConvertMapY(y * GameState.SizeY) + 16, 4, x, y, 0, false);
                             }
                         }
                     }
@@ -262,82 +262,6 @@ namespace Client
                 Console.WriteLine(ex.Message);
             }
         }
-
-        public static void DrawAutoTile(int layerNum, int dX, int dY, int quarterNum, int x, int y, int forceFrame = 0, bool strict = true)
-        {
-            var yOffset = default(int);
-            var xOffset = default(int);
-
-            // calculate the offset
-            if (forceFrame > 0)
-            {
-                switch (forceFrame - 1)
-                {
-                    case 0:
-                    {
-                        GameState.WaterfallFrame = 1;
-                        break;
-                    }
-                    case 1:
-                    {
-                        GameState.WaterfallFrame = 2;
-                        break;
-                    }
-                    case 2:
-                    {
-                        GameState.WaterfallFrame = 0;
-                        break;
-                    }
-                }
-
-                // animate autotiles
-                switch (forceFrame - 1)
-                {
-                    case 0:
-                    {
-                        GameState.AutoTileFrame = 1;
-                        break;
-                    }
-                    case 1:
-                    {
-                        GameState.AutoTileFrame = 2;
-                        break;
-                    }
-                    case 2:
-                    {
-                        GameState.AutoTileFrame = 0;
-                        break;
-                    }
-                }
-            }
-
-            switch (Data.MyMap.Tile[x, y].Layer[layerNum].AutoTile)
-            {
-                case GameState.AutotileWaterfall:
-                {
-                    yOffset = (GameState.WaterfallFrame - 1) * 32;
-                    break;
-                }
-                case GameState.AutotileAnim:
-                {
-                    xOffset = GameState.AutoTileFrame * 64;
-                    break;
-                }
-                case GameState.AutotileCliff:
-                {
-                    yOffset = -32;
-                    break;
-                }
-            }
-
-            if (Data.MyMap.Tile[x, y].Layer is null)
-                return;
-            string argPath = System.IO.Path.Combine(DataPath.Tilesets, Data.MyMap.Tile[x, y].Layer[layerNum].Tileset.ToString());
-            if (Data.Autotile is null)
-                return;
-            GameClient.RenderTexture(ref argPath, dX, dY, Data.Autotile[x, y].Layer[layerNum].SrcX[quarterNum] + xOffset, Data.Autotile[x, y].Layer[layerNum].SrcY[quarterNum] + yOffset, 16, 16, 16, 16);
-        }
-
         public static void DrawMapTint()
         {
             if (Conversions.ToInteger(Data.MyMap.MapTint) == 0)
