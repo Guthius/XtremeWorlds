@@ -32,8 +32,8 @@ public sealed class PlayerService : IPlayerService
             return false;
         }
 
-        _playerIds.Remove(playerId);
-        _players.Remove(player);
+        _playerIds?.Remove(playerId);
+        _players?.Remove(player);
 
         return true;
     }
