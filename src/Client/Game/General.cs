@@ -186,7 +186,7 @@ namespace Client
             Projectile.ClearProjectile();
             Database.ClearJobs();
             Moral.ClearMorals();
-            Bank.ClearBanks();
+            Bank.OnClearAll();
             Party.OnClear();
 
             for (int i = 0; i < Variables.MaxPlayers; i++)

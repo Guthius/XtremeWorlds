@@ -1,4 +1,5 @@
-﻿using Core.Globals;
+﻿using Client.Net;
+using Core.Globals;
 using System.IO;
 using static Core.Globals.Command;
 
@@ -183,7 +184,7 @@ public static class WinBank
         var slot = General.IsBank(winBank.X, winBank.Y);
         if (slot >= 0)
         {
-            Bank.WithdrawItem(slot, GetBankValue(GameState.MyIndex, slot));
+            Sender.SendWithdrawItem(slot, GetBankValue(GameState.MyIndex, slot));
 
             return;
         }
@@ -201,7 +202,7 @@ public static class WinBank
 
         if (winBank.Visible)
         {
-            Bank.CloseBank();
+            Sender.SendCloseBank();
         }
     }
 }

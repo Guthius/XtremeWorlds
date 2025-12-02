@@ -79,7 +79,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Bind(Packets.ServerPackets.SResetShopAction, Packet_ResetShopAction);
         Bind(Packets.ServerPackets.SStunned, Packet_Stunned);
         Bind(Packets.ServerPackets.SMapWornEq, Packet_MapWornEquipment);
-        Bind(Packets.ServerPackets.SBank, Bank.Packet_OpenBank);
+        Bind(Packets.ServerPackets.SBank, Packet_OpenBank);
         Bind(Packets.ServerPackets.SLeftGame, Packet_LeftGame);
         Bind(Packets.ServerPackets.STradeInvite, Packet_TradeInvite);
         Bind(Packets.ServerPackets.STrade, Packet_Trade);
@@ -116,7 +116,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Bind(Packets.ServerPackets.SPartyVitals, Packet_PartyVitals);
         Bind(Packets.ServerPackets.SClock, Packet_Clock);
         Bind(Packets.ServerPackets.STime, Packet_Time);
-        Bind(Packets.ServerPackets.SScriptEditor, Script.Packet_EditScript);
+        Bind(Packets.ServerPackets.SScriptEditor, Packet_EditScript);
         Bind(Packets.ServerPackets.SItemEditor, Packet_EditItem);
         Bind(Packets.ServerPackets.SNpcEditor, Packet_NpcEditor);
         Bind(Packets.ServerPackets.SShopEditor, Packet_EditShop);
@@ -2563,5 +2563,57 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             Data.Player[playerNum].Vital[i] = buffer.ReadInt32();
 
         GameLogic.UpdatePartyBars();
+    }
+
+
+    public static void Packet_OpenBank(ReadOnlyMemory<byte> data)
+    {
+        int i;
+        var buffer = new PacketReader(data);
+
+        for (i = 0; i < Variables.MaxBank; i++)
+        {
+            SetBank(GameState.MyIndex, (byte)i, buffer.ReadInt32());
+            SetBankValue(GameState.MyIndex, (byte)i, buffer.ReadInt32());
+        }
+
+        GameState.InBank = true;
+
+        if (!(WindowManager.Windows[WindowManager.GetWindowIndex("winBank")].Visible == true))
+        {
+            WindowManager.ShowWindow("winBank", resetPosition: false);
+        }
+    }
+
+
+    public static void Packet_EditScript(ReadOnlyMemory<byte> data)
+    {
+        var packetReader = new PacketReader(data);
+
+        var nextChunk = packetReader.ReadInt32();
+        var lineOffset = packetReader.ReadInt32();
+        var numberOfLinesTotal = packetReader.ReadInt32();
+        var numberOfLinesReceived = packetReader.ReadInt32();
+
+        Array.Resize(ref Data.Script.Code, numberOfLinesTotal);
+
+        for (var i = 0; i < numberOfLinesReceived; i++)
+        {
+            Data.Script.Code[lineOffset + i] = packetReader.ReadString();
+        }
+
+        if (nextChunk != -1) /* Request the next chunk if there is more data... */
+        {
+            var packetWriter = new PacketWriter(8);
+
+            packetWriter.WriteEnum(Packets.ClientPackets.CRequestEditScript);
+            packetWriter.WriteInt32(nextChunk);
+
+            Network.Send(packetWriter);
+
+            return;
+        }
+
+        GameState.InitScriptEditor = true;
     }
 }

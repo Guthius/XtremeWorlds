@@ -1038,7 +1038,7 @@ namespace Client
                     // Notify server to toggle/clear the same tile
                     if (clearTileX.HasValue && clearTileY.HasValue)
                     {
-                        Sender.PlayerSearch(clearTileX.Value, clearTileY.Value, 0);
+                        Sender.SendPlayerSearch(clearTileX.Value, clearTileY.Value, 0);
                     }
 
                     // If we just cleared a target, stop here (don’t open/close menus this press)
@@ -1081,7 +1081,7 @@ namespace Client
 
                 if (IsWindowVisible("winBank"))
                 {
-                    Bank.CloseBank();
+                    Sender.SendCloseBank();
                     return;
                 }
 
@@ -1508,7 +1508,7 @@ namespace Client
                 {
                     if (IsMouseButtonDown(MouseButton.Left))
                     {
-                        Sender.PlayerSearch(GameState.CurXGame, GameState.CurYGame, 0);
+                        Sender.SendPlayerSearch(GameState.CurXGame, GameState.CurYGame, 0);
                         _lastSearchTime = DateTime.Now;
                     }
                 }
@@ -1532,7 +1532,7 @@ namespace Client
                         // Admin warp if Shift is held and the player has moderator access
                         if (GetPlayerAccess(GameState.MyIndex) >= (int) AccessLevel.Moderator)
                         {
-                            Sender.AdminWarp(GameState.CurXGame, GameState.CurYGame);
+                            Sender.SendAdminWarp(GameState.CurXGame, GameState.CurYGame);
                         }
                     }
                     else
@@ -1569,7 +1569,7 @@ namespace Client
             }
 
             // Perform player search at the current cursor position (game-space)
-            Sender.PlayerSearch(GameState.CurXGame, GameState.CurYGame, 1);
+            Sender.SendPlayerSearch(GameState.CurXGame, GameState.CurYGame, 1);
         }
 
 
@@ -3634,7 +3634,7 @@ namespace Client
             // Notify server if we have the tile
             if (tileX >= 0 && tileY >= 0)
             {
-                Sender.PlayerSearch(tileX, tileY, 0);
+                Sender.SendPlayerSearch(tileX, tileY, 0);
             }
         }
 

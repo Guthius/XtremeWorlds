@@ -263,7 +263,7 @@ namespace Client
 
             if (GameState.InBank)
             {
-                Bank.CloseBank();
+                Sender.SendCloseBank();
             }
 
             d = GetPlayerDir(GameState.MyIndex);

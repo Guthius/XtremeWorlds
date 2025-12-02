@@ -457,7 +457,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void PlayerSearch(int curX, int curY, byte rClick)
+    public static void SendPlayerSearch(int curX, int curY, byte rClick)
     {
         if (!GameLogic.IsInBounds())
         {
@@ -474,7 +474,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void AdminWarp(int x, int y)
+    public static void SendAdminWarp(int x, int y)
     {
         var packetWriter = new PacketWriter(12);
 
@@ -495,7 +495,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void ForgetSkill(int skillSlot)
+    public static void SendForgetSkill(int skillSlot)
     {
         // Check for subscript out of range
         if (skillSlot < 0 || skillSlot > Variables.MaxPlayerSkills)
@@ -1438,4 +1438,55 @@ public static class Sender
 
         Network.Send(packetWriter);
     }
+
+    public static void SendDepositItem(int invslot, int amount)
+    {
+        var packetWriter = new PacketWriter(12);
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CDepositItem);
+        packetWriter.WriteInt32(invslot);
+        packetWriter.WriteInt32(amount);
+
+        Network.Send(packetWriter);
+    }
+
+    public static void SendWithdrawItem(int bankSlot, int amount)
+    {
+        var packetWriter = new PacketWriter(9);
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CWithdrawItem);
+        packetWriter.WriteByte((byte)bankSlot);
+        packetWriter.WriteInt32(amount);
+
+        Network.Send(packetWriter);
+    }
+
+    public static void SendChangeBankSlots(int oldSlot, int newSlot)
+    {
+        var packetWriter = new PacketWriter(12);
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CChangeBankSlots);
+        packetWriter.WriteInt32(oldSlot);
+        packetWriter.WriteInt32(newSlot);
+
+        Network.Send(packetWriter);
+    }
+
+    public static void SendCloseBank()
+    {
+        if (WindowManager.Windows[WindowManager.GetWindowIndex("winBank")].Visible == true)
+        {
+            WindowManager.HideWindow(WindowManager.GetWindowIndex("winBank"));
+            WindowManager.HideWindow(WindowManager.GetWindowIndex("winDescription"));
+        }
+
+        var packetWriter = new PacketWriter(4);
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CCloseBank);
+
+        Network.Send(packetWriter);
+
+        GameState.InBank = false;
+    }
+
 }

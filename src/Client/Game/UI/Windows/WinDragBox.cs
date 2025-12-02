@@ -165,7 +165,7 @@ public static class WinDragBox
                             continue;
                         }
 
-                        Bank.ChangeBankSlots(WindowManager.DragBox.Slot, slot);
+                        Sender.SendChangeBankSlots(WindowManager.DragBox.Slot, slot);
                         break;
                     }
                 }
@@ -177,7 +177,7 @@ public static class WinDragBox
                 {
                     if (Data.Item[GetPlayerInv(GameState.MyIndex, WindowManager.DragBox.Slot)].Type != (byte) ItemCategory.Currency)
                     {
-                        Bank.DepositItem(WindowManager.DragBox.Slot, 1);
+                        Sender.SendDepositItem(WindowManager.DragBox.Slot, 1);
                     }
                     else
                     {
@@ -229,7 +229,7 @@ public static class WinDragBox
                 {
                     if (Data.Item[GetBank(GameState.MyIndex, (byte) WindowManager.DragBox.Slot)].Type != (byte) ItemCategory.Currency)
                     {
-                        Bank.WithdrawItem((byte) WindowManager.DragBox.Slot, 0);
+                        Sender.SendWithdrawItem((byte) WindowManager.DragBox.Slot, 0);
                     }
                     else
                     {
@@ -339,7 +339,7 @@ public static class WinDragBox
                 break;
 
             case PartOrigin.SkillTree:
-                Sender.ForgetSkill(WindowManager.DragBox.Slot);
+                Sender.SendForgetSkill(WindowManager.DragBox.Slot);
                 break;
 
             case PartOrigin.Hotbar:

@@ -1147,14 +1147,14 @@ namespace Client
                     case DialogueType.DepositItem:
                         {
                             value = (long)Math.Round(Conversion.Val(diaInput));
-                            Bank.DepositItem((int)GameState.DiaData1, (int)value);
+                            Sender.SendDepositItem((int)GameState.DiaData1, (int)value);
                             break;
                         }
 
                     case DialogueType.WithdrawItem:
                         {
                             value = (long)Math.Round(Conversion.Val(diaInput));
-                            Bank.WithdrawItem((byte)(int)GameState.DiaData1, (int)value);
+                            Sender.SendWithdrawItem((byte)(int)GameState.DiaData1, (int)value);
                             break;
                         }
 
@@ -1186,7 +1186,7 @@ namespace Client
 
                     case DialogueType.ForgetSkill:
                         {
-                            Sender.ForgetSkill((int)GameState.DiaData1);
+                            Sender.SendForgetSkill((int)GameState.DiaData1);
                             break;
                         }
 

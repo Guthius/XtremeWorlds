@@ -14,14 +14,14 @@ namespace Client
 
         #region Database
 
-        public static void ClearBanks()
+        public static void OnClearAll()
         {
             int i;
             int x;
 
             for (x = 0; x < Variables.MaxPlayers; x++)
             {
-                Data.Bank[x].Item = new Type.PlayerInv[(Variables.MaxBank + 1)];
+                Data.Bank[x].Item = new Type.PlayerInv[(Variables.MaxBank)];
 
                 for (i = 0; i < Variables.MaxBank; i++)
                 {
@@ -29,83 +29,6 @@ namespace Client
                     Data.Bank[x].Item[i].Value = 0;
                 }
             }
-        }
-
-        #endregion
-
-        #region Incoming Packets
-
-        public static void Packet_OpenBank(ReadOnlyMemory<byte> data)
-        {
-            int i;
-            var buffer = new PacketReader(data);
-
-            for (i = 0; i < Variables.MaxBank; i++)
-            {
-                SetBank(GameState.MyIndex, (byte)i, buffer.ReadInt32());
-                SetBankValue(GameState.MyIndex, (byte)i, buffer.ReadInt32());
-            }
-
-            GameState.InBank = true;
-
-            if (!(WindowManager.Windows[WindowManager.GetWindowIndex("winBank")].Visible == true))
-            {
-                WindowManager.ShowWindow("winBank", resetPosition: false);
-            }
-        }
-
-        #endregion
-
-        #region Outgoing Packets
-
-        public static void DepositItem(int invslot, int amount)
-        {
-            var packetWriter = new PacketWriter(12);
-
-            packetWriter.WriteEnum(Packets.ClientPackets.CDepositItem);
-            packetWriter.WriteInt32(invslot);
-            packetWriter.WriteInt32(amount);
-
-            Network.Send(packetWriter);
-        }
-
-        public static void WithdrawItem(int bankSlot, int amount)
-        {
-            var packetWriter = new PacketWriter(9);
-
-            packetWriter.WriteEnum(Packets.ClientPackets.CWithdrawItem);
-            packetWriter.WriteByte((byte) bankSlot);
-            packetWriter.WriteInt32(amount);
-
-            Network.Send(packetWriter);
-        }
-
-        public static void ChangeBankSlots(int oldSlot, int newSlot)
-        {
-            var packetWriter = new PacketWriter(12);
-
-            packetWriter.WriteEnum(Packets.ClientPackets.CChangeBankSlots);
-            packetWriter.WriteInt32(oldSlot);
-            packetWriter.WriteInt32(newSlot);
-
-            Network.Send(packetWriter);
-        }
-
-        public static void CloseBank()
-        {
-            if (WindowManager.Windows[WindowManager.GetWindowIndex("winBank")].Visible == true)
-            {
-                WindowManager.HideWindow(WindowManager.GetWindowIndex("winBank"));
-                WindowManager.HideWindow(WindowManager.GetWindowIndex("winDescription"));
-            }
-
-            var packetWriter = new PacketWriter(4);
-
-            packetWriter.WriteEnum(Packets.ClientPackets.CCloseBank);
-
-            Network.Send(packetWriter);
-
-            GameState.InBank = false;
         }
 
         #endregion

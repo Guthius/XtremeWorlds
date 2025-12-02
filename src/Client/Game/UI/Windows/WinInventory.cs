@@ -189,7 +189,7 @@ public static class WinInventory
         {
             if (GameState.InBank)
             {
-                Bank.DepositItem(slot, GetPlayerInvValue(GameState.MyIndex, slot));
+                Sender.SendDepositItem(slot, GetPlayerInvValue(GameState.MyIndex, slot));
                 return;
             }
 
