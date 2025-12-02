@@ -2523,7 +2523,7 @@ public class Crystalshire
 
         if (WindowManager.TryGetControl("winShopEditor", "lstIndex", out var itemListCtrl) && itemListCtrl is ListBox itemList)
         {
-            itemList.CallBack[(int)ControlState.MouseDown] = WinItemEditor.OnListMouseDown;
+            itemList.CallBack[(int)ControlState.MouseDown] = WinShopEditor.OnListMouseDown;
         }
 
         // Text changes
