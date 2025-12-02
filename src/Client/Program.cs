@@ -3403,7 +3403,7 @@ namespace Client
                 {
                     if (Data.MapProjectile[Data.Player[GameState.MyIndex].Map, i].ProjectileNum >= 0)
                     {
-                        Projectile.OnDraw(i);
+                        MapProjectile.OnDraw(i);
                     }
                 }
             }
