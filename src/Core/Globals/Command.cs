@@ -1,4 +1,6 @@
-﻿namespace Core.Globals;
+﻿using Microsoft.VisualBasic;
+
+namespace Core.Globals;
 
 public static class Command
 {
@@ -111,12 +113,12 @@ public static class Command
 
     public static int GetPlayerX(int index)
     {
-        return (int)Math.Floor((double)Data.Player[index].X / 32);
+        return (int)Math.Floor((double)Data.Player[index].X / Constants.TileSize);
     }
 
     public static int GetPlayerY(int index)
     {
-        return (int)Math.Floor((double)Data.Player[index].Y / 32);
+        return (int)Math.Floor((double)Data.Player[index].Y / Constants.TileSize);
     }
 
     public static int GetPlayerRawX(int index)

@@ -342,8 +342,8 @@ public static class Projectile
 
                 int stepMs = Math.Max(1, Data.Projectile[projId].Speed);
                 bool moved = false;
-                int prevTileX = mp.X / 32;
-                int prevTileY = mp.Y / 32;
+                int prevTileX = mp.X / Constants.TileSize;
+                int prevTileY = mp.Y / Constants.TileSize;
                 
                 while (now > mp.TravelTime)
                 {
@@ -389,8 +389,8 @@ public static class Projectile
                             int anim = Data.Projectile[projId].Animation;
                             if (anim >= 0)
                             {
-                                int tx = Math.Clamp(mp.X / 32, 0, Data.Map[map].MaxX - 1);
-                                int ty = Math.Clamp(mp.Y / 32, 0, Data.Map[map].MaxY - 1);
+                                int tx = Math.Clamp(mp.X / Constants.TileSize, 0, Data.Map[map].MaxX - 1);
+                                int ty = Math.Clamp(mp.Y / Constants.TileSize, 0, Data.Map[map].MaxY - 1);
                                 NetworkSend.SendAnimation(map, anim, tx, ty);
                                 // Try to apply attack on expire at destination
                                 TryAttackAtTile(map, ref mp, tx, ty, projId);
@@ -419,8 +419,8 @@ public static class Projectile
                     }
 
                     // Bounds check
-                    int tileX = Math.Clamp(mp.X / 32, 0, Core.Globals.Variables.MaxMapX - 1);
-                    int tileY = Math.Clamp(mp.Y / 32, 0, Core.Globals.Variables.MaxMapY - 1);
+                    int tileX = Math.Clamp(mp.X / Constants.TileSize, 0, Core.Globals.Variables.MaxMapX - 1);
+                    int tileY = Math.Clamp(mp.Y / Constants.TileSize, 0, Core.Globals.Variables.MaxMapY - 1);
                     if (tileX < 0 || tileY < 0 || tileX >= Data.Map[map].MaxX || tileY >= Data.Map[map].MaxY)
                     {
                         int anim = Data.Projectile[projId].Animation;

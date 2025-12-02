@@ -324,13 +324,13 @@ namespace Client
                 }
 
                 // If the range is greater than 32, do not send a sound
-                if (distance / 32d > 32d)
+                if (distance / Constants.TileSize > Constants.TileSize)
                 {
                     calculateSoundVolume = 0d;
                 }
                 else
                 {
-                    calculateSoundVolume = 1d / (distance / 32d);
+                    calculateSoundVolume = 1d / (distance / (double)Constants.TileSize);
 
                     if (calculateSoundVolume > 1d)
                     {

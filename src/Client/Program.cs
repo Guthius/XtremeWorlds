@@ -1026,8 +1026,8 @@ namespace Client
                     {
                         if (prevTarget >= 0 && prevTarget < Data.MyMapNpc.Length && Data.MyMapNpc[prevTarget].Num >= 0)
                         {
-                            clearTileX = (int)Math.Floor(Data.MyMapNpc[prevTarget].X / 32d);
-                            clearTileY = (int)Math.Floor(Data.MyMapNpc[prevTarget].Y / 32d);
+                            clearTileX = (int)Math.Floor(Data.MyMapNpc[prevTarget].X / (double)Constants.TileSize);
+                            clearTileY = (int)Math.Floor(Data.MyMapNpc[prevTarget].Y / (double)Constants.TileSize);
                         }
                     }
 
@@ -1929,8 +1929,8 @@ namespace Client
             if (EditorType.Map == GameState.MyEditorType)
                 return;
 
-            x = (int)Math.Floor((double)Data.MyMapNpc[(int)mapNpcNum].X / 32);
-            y = (int)Math.Floor((double)Data.MyMapNpc[(int)mapNpcNum].Y / 32);
+            x = (int)Math.Floor((double)Data.MyMapNpc[(int)mapNpcNum].X / Constants.TileSize);
+            y = (int)Math.Floor((double)Data.MyMapNpc[(int)mapNpcNum].Y / Constants.TileSize);
 
             // Ensure Npc is within the tile view range
             if (x < GameState.TileView.Left |
@@ -2093,10 +2093,10 @@ namespace Client
 
             ref var instance = ref Data.MyMapItem[itemNum];
 
-            if (Math.Floor((double) instance.X / 32) < GameState.TileView.Left | Math.Floor((double) instance.X / 32) > GameState.TileView.Right)
+            if (Math.Floor((double) instance.X / Constants.TileSize) < GameState.TileView.Left | Math.Floor((double) instance.X / Constants.TileSize) > GameState.TileView.Right)
                 return;
 
-            if (Math.Floor((double) instance.Y / 32) < GameState.TileView.Top | Math.Floor((double) instance.Y / 32) > GameState.TileView.Bottom)
+            if (Math.Floor((double) instance.Y / Constants.TileSize) < GameState.TileView.Top | Math.Floor((double) instance.Y / Constants.TileSize) > GameState.TileView.Bottom)
                 return;
 
             srcRec = new Rectangle(0, 0, GameState.SizeX, GameState.SizeY);
@@ -3273,7 +3273,7 @@ namespace Client
                     // Npcs
                     for (i = 0; i < Variables.MaxMapNpcs; i++)
                     {
-                        if (Math.Floor((decimal) Data.MyMapNpc[i].Y / 32) == y)
+                        if (Math.Floor((decimal) Data.MyMapNpc[i].Y / Constants.TileSize) == y)
                         {
                             DrawNpc(i);
                         }
@@ -3300,7 +3300,7 @@ namespace Client
                             {
                                 if (Data.MapEvents?[i].Position == 1)
                                 {
-                                    if (Math.Floor((decimal) Data.MapEvents[i].Y / 32) == y)
+                                    if (Math.Floor((decimal) Data.MapEvents[i].Y / Constants.TileSize) == y)
                                     {
                                         DrawEvent(i);
                                     }
@@ -3612,8 +3612,8 @@ namespace Client
                     if (Math.Abs(tx - px) >= maxDx || Math.Abs(ty - py) >= maxDy)
                     {
                         shouldClear = true;
-                        tileX = (int)Math.Floor(Data.MyMapNpc[n].X / 32d);
-                        tileY = (int)Math.Floor(Data.MyMapNpc[n].Y / 32d);
+                        tileX = (int)Math.Floor(Data.MyMapNpc[n].X / (double)Constants.TileSize);
+                        tileY = (int)Math.Floor(Data.MyMapNpc[n].Y / (double)Constants.TileSize);
                     }
                 }
             }

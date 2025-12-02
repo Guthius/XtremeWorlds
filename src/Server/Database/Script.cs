@@ -862,8 +862,8 @@ public class Script
                                 {
                                     // Detection range: if NPC template has Range=0, use a sensible default (8 tiles)
                                     int n = entity.Range;
-                                    int ex = entity.X / 32;
-                                    int ey = entity.Y / 32;
+                                    int ex = entity.X / Constants.TileSize;
+                                    int ey = entity.Y / Constants.TileSize;
                                     int px = GetPlayerX(player.Id);
                                     int py = GetPlayerY(player.Id);
                                     int distanceX = Math.Abs(ex - px);
@@ -906,10 +906,10 @@ public class Script
                                     {
                                         // Detection range between NPCs (same default behavior)
                                         int n = otherEntity.Range;
-                                        int ex = entity.X / 32;
-                                        int ey = entity.Y / 32;
-                                        int ox = otherEntity.X / 32;
-                                        int oy = otherEntity.Y / 32;
+                                        int ex = entity.X / Constants.TileSize;
+                                        int ey = entity.Y / Constants.TileSize;
+                                        int ox = otherEntity.X / Constants.TileSize;
+                                        int oy = otherEntity.Y / Constants.TileSize;
                                         int distanceX = Math.Abs(ex - ox);
                                         int distanceY = Math.Abs(ey - oy);
 
@@ -940,8 +940,8 @@ public class Script
                         if (NetworkConfig.IsPlaying(pid) && GetPlayerMap(pid) == mapNum)
                         {
                             // Clear target if out of chase range
-                            int ex = entity.X / 32;
-                            int ey = entity.Y / 32;
+                            int ex = entity.X / Constants.TileSize;
+                            int ey = entity.Y / Constants.TileSize;
                             int px = GetPlayerX(pid);
                             int py = GetPlayerY(pid);
                             // Clear target only if well beyond detection range (leash) to avoid flicker
@@ -1016,10 +1016,10 @@ public class Script
                             if (targetEntity != null && targetEntity.Type == Core.Globals.Entity.EntityType.Npc && targetEntity.Map == mapNum && targetEntity.Num >= 0)
                             {
                                 // Clear target if out of chase range
-                                int ex = entity.X / 32;
-                                int ey = entity.Y / 32;
-                                int tx = targetEntity.X / 32;
-                                int ty = targetEntity.Y / 32;
+                                int ex = entity.X / Constants.TileSize;
+                                int ey = entity.Y / Constants.TileSize;
+                                int tx = targetEntity.X / Constants.TileSize;
+                                int ty = targetEntity.Y / Constants.TileSize;
                                 int r = entity.Range;
                                 if (Math.Abs(ex - tx) > r || Math.Abs(ey - ty) > r)
                                 {
@@ -1142,8 +1142,8 @@ public class Script
                 // If target exists but is out of range, clear it before deciding movement
                 if (baseNpc.TargetType == (byte)TargetType.Player && baseNpc.Target >= 0 && NetworkConfig.IsPlaying(baseNpc.Target) && GetPlayerMap(baseNpc.Target) == map)
                 {
-                    int sxR = baseNpc.X / 32;
-                    int syR = baseNpc.Y / 32;
+                    int sxR = baseNpc.X / Constants.TileSize;
+                    int syR = baseNpc.Y / Constants.TileSize;
                     int txR = GetPlayerX(baseNpc.Target);
                     int tyR = GetPlayerY(baseNpc.Target);
                     int rR = Math.Max(0, (int)Data.Npc[baseNpc.Num].Range);
@@ -1157,10 +1157,10 @@ public class Script
                 {
                     if (Data.MapNpc[map].Npc[baseNpc.Target].Num >= 0)
                     {
-                        int sxR = baseNpc.X / 32;
-                        int syR = baseNpc.Y / 32;
-                        int txR = Data.MapNpc[map].Npc[baseNpc.Target].X / 32;
-                        int tyR = Data.MapNpc[map].Npc[baseNpc.Target].Y / 32;
+                        int sxR = baseNpc.X / Constants.TileSize;
+                        int syR = baseNpc.Y / Constants.TileSize;
+                        int txR = Data.MapNpc[map].Npc[baseNpc.Target].X / Constants.TileSize;
+                        int tyR = Data.MapNpc[map].Npc[baseNpc.Target].Y / Constants.TileSize;
                         int rR = Math.Max(0, (int)Data.Npc[baseNpc.Num].Range);
                         if (Math.Abs(sxR - txR) > rR || Math.Abs(syR - tyR) > rR)
                         {
@@ -1179,8 +1179,8 @@ public class Script
                 // Allow player index 0 as a valid target (some arrays are 1-based but be permissive)
                 if (baseNpc.TargetType == (byte)TargetType.Player && baseNpc.Target >= 0 && NetworkConfig.IsPlaying(baseNpc.Target) && GetPlayerMap(baseNpc.Target) == map)
                 {
-                    int sx = baseNpc.X / 32;
-                    int sy = baseNpc.Y / 32;
+                    int sx = baseNpc.X / Constants.TileSize;
+                    int sy = baseNpc.Y / Constants.TileSize;
                     int tx = GetPlayerX(baseNpc.Target);
                     int ty = GetPlayerY(baseNpc.Target);
                     moved = TryChase(map, npcIndex, sx, sy, tx, ty);
@@ -1192,10 +1192,10 @@ public class Script
                     // Validate the target exists on map
                     if (Data.MapNpc[map].Npc[targetSlot].Num >= 0)
                     {
-                        int sx = baseNpc.X / 32;
-                        int sy = baseNpc.Y / 32;
-                        int tx = Data.MapNpc[map].Npc[targetSlot].X / 32;
-                        int ty = Data.MapNpc[map].Npc[targetSlot].Y / 32;
+                        int sx = baseNpc.X / Constants.TileSize;
+                        int sy = baseNpc.Y / Constants.TileSize;
+                        int tx = Data.MapNpc[map].Npc[targetSlot].X / Constants.TileSize;
+                        int ty = Data.MapNpc[map].Npc[targetSlot].Y / Constants.TileSize;
                         moved = TryChase(map, npcIndex, sx, sy, tx, ty);
                     }
                     else
@@ -1706,8 +1706,8 @@ public class Script
     private bool IsInMeleeRange(Entity a, Entity b)
     {
         // Tile-based adjacency including diagonals (8-direction) so diagonal melee hits connect.
-        var ax = a.X / 32; var ay = a.Y / 32;
-        var bx = b.X / 32; var by = b.Y / 32;
+        var ax = a.X / Constants.TileSize; var ay = a.Y / Constants.TileSize;
+        var bx = b.X / Constants.TileSize; var by = b.Y / Constants.TileSize;
         var dx = Math.Abs(ax - bx);
         var dy = Math.Abs(ay - by);
         if (dx == 0 && dy == 0) return false; // same tile not considered melee
@@ -2259,7 +2259,7 @@ public class Script
 
     private void HandleSelfCastAoESkill(int mapNum, Entity caster, int skillId)
     {
-        ApplyAoE(mapNum, caster, skillId, caster.X / 32, caster.Y / 32);
+        ApplyAoE(mapNum, caster, skillId, caster.X / Constants.TileSize, caster.Y / Constants.TileSize);
     }
 
     private void HandleTargetedSkill(int mapNum, Entity caster, int skillId, Entity? target)
@@ -2301,8 +2301,8 @@ public class Script
 
     private void HandleTargetedAoESkill(int mapNum, Entity caster, int skillId, Entity? target)
     {
-        int baseX = (target != null ? target.X : caster.X) / 32;
-        int baseY = (target != null ? target.Y : caster.Y) / 32;
+        int baseX = (target != null ? target.X : caster.X) / Constants.TileSize;
+        int baseY = (target != null ? target.Y : caster.Y) / Constants.TileSize;
         ref var s = ref Data.Skill[skillId];
         if (s.MultiDirMask == 0)
         {
@@ -2380,8 +2380,8 @@ public class Script
             for (int i = 0; i < Script.MaxMapNpcs; i++)
             {
                 if (Data.MapNpc[mapNum].Npc[i].Num < 0) continue;
-                int nx = Data.MapNpc[mapNum].Npc[i].X / 32;
-                int ny = Data.MapNpc[mapNum].Npc[i].Y / 32;
+                int nx = Data.MapNpc[mapNum].Npc[i].X / Constants.TileSize;
+                int ny = Data.MapNpc[mapNum].Npc[i].Y / Constants.TileSize;
                 if (Math.Abs(nx - centerX) <= radius && Math.Abs(ny - centerY) <= radius)
                 {
                     var npcEntity = Core.Globals.Entity.FromNpc(i, Data.MapNpc[mapNum].Npc[i]);
@@ -2630,8 +2630,8 @@ public class Script
         if (s.KnockBack != 1 || s.KnockBackTiles <= 0) return;
         int steps = Math.Min(5, Math.Max(1, (int)s.KnockBackTiles));
         int map = attacker.Map;
-        int ax = attacker.X / 32, ay = attacker.Y / 32;
-        int tx = target.X / 32, ty = target.Y / 32;
+        int ax = attacker.X / Constants.TileSize, ay = attacker.Y / Constants.TileSize;
+        int tx = target.X / Constants.TileSize, ty = target.Y / Constants.TileSize;
         int dx = Math.Sign(tx - ax);
         int dy = Math.Sign(ty - ay);
 
@@ -2653,8 +2653,8 @@ public class Script
 
         for (int i = 0; i < steps; i++)
         {
-            int nx = (target.X / 32) + dx;
-            int ny = (target.Y / 32) + dy;
+            int nx = (target.X / Constants.TileSize) + dx;
+            int ny = (target.Y / Constants.TileSize) + dy;
             // Bounds
             if (nx < 0 || ny < 0 || nx >= Data.Map[map].MaxX || ny >= Data.Map[map].MaxY) break;
             // Blocked tiles
@@ -2719,7 +2719,7 @@ public class Script
             var itemVal = Data.Npc[npcNum].DropItemValue[slot];
             if (itemId >= 0 && itemId < Data.Item.Length)
             {
-                Server.MapItem.Spawn(itemId, itemVal, mapNum, mapNpc.X / 32, mapNpc.Y / 32);
+                Server.MapItem.Spawn(itemId, itemVal, mapNum, mapNpc.X / Constants.TileSize, mapNpc.Y / Constants.TileSize);
             }
         }
     }

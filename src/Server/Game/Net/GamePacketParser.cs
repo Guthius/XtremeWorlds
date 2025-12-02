@@ -762,8 +762,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         {
             var npc = Data.MapNpc[mapNum].Npc[i];
             if (npc.Num < 0) continue;
-            int npcTileX = npc.X / 32;
-            int npcTileY = npc.Y / 32;
+            int npcTileX = npc.X / Constants.TileSize;
+            int npcTileY = npc.Y / Constants.TileSize;
             if (npcTileX == x && npcTileY == y)
             {
                 targetEntity = Core.Globals.Entity.FromNpc(i, npc);
@@ -1810,9 +1810,9 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             {
                 if (!string.IsNullOrEmpty(Data.Item[(int)Data.MapItem[GetPlayerMap(session.Id), i].Num].Name))
                 {
-                    if (Math.Floor((double)Data.MapItem[GetPlayerMap(session.Id), i].X / 32) == x)
+                    if (Math.Floor((double)Data.MapItem[GetPlayerMap(session.Id), i].X / Constants.TileSize) == x)
                     {
-                        if (Math.Floor((double)Data.MapItem[GetPlayerMap(session.Id), i].Y / 32) == y)
+                        if (Math.Floor((double)Data.MapItem[GetPlayerMap(session.Id), i].Y / Constants.TileSize) == y)
                         {
                             NetworkSend.PlayerMsg(session.Id, "You see " + Data.MapItem[GetPlayerMap(session.Id), i].Value + " " + Data.Item[(int)Data.MapItem[GetPlayerMap(session.Id), i].Num].Name + ".", (int)ColorName.BrightGreen);
                             return;
@@ -1828,9 +1828,9 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         {
             if (Data.MapNpc[GetPlayerMap(session.Id)].Npc[i].Num >= 0)
             {
-                if (Math.Floor((double)Data.MapNpc[GetPlayerMap(session.Id)].Npc[i].X / 32) == x)
+                if (Math.Floor((double)Data.MapNpc[GetPlayerMap(session.Id)].Npc[i].X / Constants.TileSize) == x)
                 {
-                    if (Math.Floor((double)Data.MapNpc[GetPlayerMap(session.Id)].Npc[i].Y / 32) == y)
+                    if (Math.Floor((double)Data.MapNpc[GetPlayerMap(session.Id)].Npc[i].Y / Constants.TileSize) == y)
                     {
                         // Change target
                         if (Data.TempPlayer[session.Id].TargetType == 0)

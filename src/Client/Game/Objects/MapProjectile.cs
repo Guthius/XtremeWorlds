@@ -50,8 +50,8 @@ namespace Client
 
             Projectile.OnStream(projectileNum);
 
-            x = (int)Math.Floor((double)Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].X / 32);
-            y = (int)Math.Floor((double)Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Y / 32);
+            x = (int)Math.Floor((double)Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].X / Constants.TileSize);
+            y = (int)Math.Floor((double)Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Y / Constants.TileSize);
 
             // Check if its been going for over 1 minute, if so clear.
             if (Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Timer < General.GetTickCount())

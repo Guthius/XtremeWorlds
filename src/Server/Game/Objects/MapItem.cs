@@ -22,7 +22,7 @@ namespace Server
                     continue;
                 }
 
-                if (Math.Floor((double)Data.MapItem[mapNum, mapItemNum].X / 32) != Command.GetPlayerX(playerId) || Math.Floor((double)Data.MapItem[mapNum, mapItemNum].Y / 32) != Command.GetPlayerY(playerId))
+                if (Math.Floor((double)Data.MapItem[mapNum, mapItemNum].X / Constants.TileSize) != Command.GetPlayerX(playerId) || Math.Floor((double)Data.MapItem[mapNum, mapItemNum].Y / Constants.TileSize) != Command.GetPlayerY(playerId))
                 {
                     continue;
                 }

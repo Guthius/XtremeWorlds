@@ -2500,8 +2500,8 @@ namespace Client
             GameState.Camera.Left = (long)Math.Round(GameState.CurrentCameraX);
             GameState.Camera.Top = (long)Math.Round(GameState.CurrentCameraY);
 
-            long StartX = Math.Max(0, Math.Min((long)Math.Floor(GameState.Camera.Left), Data.MyMap.MaxX - 1) / 32);
-            long StartY = Math.Max(0, Math.Min((long)Math.Floor(GameState.Camera.Top), Data.MyMap.MaxY - 1) / 32);
+            long StartX = Math.Max(0, Math.Min((long)Math.Floor(GameState.Camera.Left), Data.MyMap.MaxX - 1) / Constants.TileSize);
+            long StartY = Math.Max(0, Math.Min((long)Math.Floor(GameState.Camera.Top), Data.MyMap.MaxY - 1) / Constants.TileSize);
             long EndX = Data.MyMap.MaxX;
             long EndY = Data.MyMap.MaxY;
 

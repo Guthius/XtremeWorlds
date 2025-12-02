@@ -269,8 +269,8 @@ public static class Npc
         if (Data.MapNpc[mapNum].Npc[mapNpcNum].Moving == (byte)MovementState.Walking && _stepRemaining[mapNum, mapNpcNum] > 0)
             return false;
 
-        int tileX = x / 32;
-        int tileY = y / 32;
+        int tileX = x / Constants.TileSize;
+        int tileY = y / Constants.TileSize;
         int nextTileX = tileX;
         int nextTileY = tileY;
         switch (dir)
@@ -314,8 +314,8 @@ public static class Npc
         {
             if (i == mapNpcNum) continue;
             if (Data.MapNpc[mapNum].Npc[i].Num < 0) continue;
-            int npcTileX = (int)Math.Floor((double)Data.MapNpc[mapNum].Npc[i].X / 32);
-            int npcTileY = (int)Math.Floor((double)Data.MapNpc[mapNum].Npc[i].Y / 32);
+            int npcTileX = (int)Math.Floor((double)Data.MapNpc[mapNum].Npc[i].X / Constants.TileSize);
+            int npcTileY = (int)Math.Floor((double)Data.MapNpc[mapNum].Npc[i].Y / Constants.TileSize);
             if (npcTileX == nextTileX && npcTileY == nextTileY)
             {
                 return false;

@@ -16,8 +16,6 @@ namespace Client
     /// </summary>
     public static class Npc
     {
-        private const int TileSize = 32;
-
         // Client-side prediction helpers: track remaining pixels and destination for current tile step.
         private static readonly int[] RemainingPixels = new int[Variables.MaxMapNpcs];
         private static readonly int[] DestX = new int[Variables.MaxMapNpcs];
@@ -50,8 +48,8 @@ namespace Client
             StopTick[index] = 0;
             FinishUntil[index] = 0;
             // Initialize movement bookkeeping
-            RemainingPixels[index] = TileSize;
-            var (fullDx, fullDy) = GetDirectionDelta(dir, TileSize);
+            RemainingPixels[index] = Constants.TileSize;
+            var (fullDx, fullDy) = GetDirectionDelta(dir, Constants.TileSize);
             DestX[index] = startX + fullDx;
             DestY[index] = startY + fullDy;
         }
@@ -162,8 +160,8 @@ namespace Client
             // Initialize a new tile step if just started (RemainingPixels == 0)
             if (RemainingPixels[index] <= 0)
             {
-                RemainingPixels[index] = TileSize;
-                var (fullDx, fullDy) = GetDirectionDelta(npc.Dir, TileSize);
+                RemainingPixels[index] = Constants.TileSize;
+                var (fullDx, fullDy) = GetDirectionDelta(npc.Dir, Constants.TileSize);
                 DestX[index] = npc.X + fullDx;
                 DestY[index] = npc.Y + fullDy;
             }
@@ -176,8 +174,8 @@ namespace Client
             int newY = y + dy;
 
             // Keep within 0 .. (Max-1) * TileSize inclusive to match the original coordinate convention.
-            int maxXpx = Math.Max(0, (Data.MyMap.MaxX - 1) * TileSize);
-            int maxYpx = Math.Max(0, (Data.MyMap.MaxY - 1) * TileSize);
+            int maxXpx = Math.Max(0, (Data.MyMap.MaxX - 1) * Constants.TileSize);
+            int maxYpx = Math.Max(0, (Data.MyMap.MaxY - 1) * Constants.TileSize);
 
             newX = Math.Clamp(newX, 0, maxXpx);
             newY = Math.Clamp(newY, 0, maxYpx);
@@ -188,14 +186,14 @@ namespace Client
             RemainingPixels[index] -= step;
 
             // If we've landed exactly on a tile boundary, notify listeners (e.g., to advance path, stop walking, etc.)
-            if (RemainingPixels[index] <= 0 || ((newX % TileSize == 0) && (newY % TileSize == 0)))
+            if (RemainingPixels[index] <= 0 || ((newX % Constants.TileSize == 0) && (newY % Constants.TileSize == 0)))
             {
                 // Snap to destination to ensure perfect alignment (server authoritative end already snapped)
                 npc.X = DestX[index];
                 npc.Y = DestY[index];
                 RemainingPixels[index] = 0;
-                var tileX = npc.X / TileSize;
-                var tileY = npc.Y / TileSize;
+                var tileX = npc.X / Constants.TileSize;
+                var tileY = npc.Y / Constants.TileSize;
                 OnTileAligned?.Invoke(index, tileX, tileY);
 
                 // If your project requires stopping at tile boundaries, do it here:
