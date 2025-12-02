@@ -1624,25 +1624,22 @@ public class Crystalshire
         // Buttons
         if (WindowManager.TryGetControl("winNpcEditor", "btnSave", out var btnSave))
         {
-            btnSave.CallBack[(int)ControlState.MouseDown] = () => { Editors.NpcEditorOK(); WindowManager.HideWindow("winNpcEditor"); };
+            btnSave.CallBack[(int)ControlState.MouseDown] = () => { WinNpcEditor.OnSave();  };
         }
         if (WindowManager.TryGetControl("winNpcEditor", "btnCancel", out var btnCancel))
         {
-            btnCancel.CallBack[(int)ControlState.MouseDown] = () => { Editors.NpcEditorCancel(); WindowManager.HideWindow("winNpcEditor"); };
+            btnCancel.CallBack[(int)ControlState.MouseDown] = () => { WinNpcEditor.OnCancel(); };
         }
         if (WindowManager.TryGetControl("winNpcEditor", "btnDelete", out var btnDelete))
         {
             btnDelete.CallBack[(int)ControlState.MouseDown] = () =>
             {
-                Npc.OnClear(GameState.EditorIndex);
-                GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
-                WinNpcEditor.OnLoad(GameState.EditorIndex);
-                WinNpcEditor.RefreshList();
+                WinNpcEditor.OnDelete();
             };
         }
         if (WindowManager.TryGetControl("winNpcEditor", "btnCopy", out var btnCopy))
         {
-            btnCopy.CallBack[(int)ControlState.MouseDown] = WinNpcEditor.OnCopyOrPaste;
+            btnCopy.CallBack[(int)ControlState.MouseDown] = () => WinNpcEditor.OnCopy();
         }
     }
 
@@ -2019,11 +2016,11 @@ public class Crystalshire
         // Buttons
         if (WindowManager.TryGetControl("winItemEditor", "btnSave", out var btnSave))
         {
-            btnSave.CallBack[(int)ControlState.MouseDown] = () => { Editors.ItemEditorOK(); WindowManager.HideWindow("winItemEditor"); };
+            btnSave.CallBack[(int)ControlState.MouseDown] = () => { WinItemEditor.OnSave(); };
         }
         if (WindowManager.TryGetControl("winItemEditor", "btnCancel", out var btnCancel))
         {
-            btnCancel.CallBack[(int)ControlState.MouseDown] = () => { Editors.ItemEditorCancel(); WindowManager.HideWindow("winItemEditor"); };
+            btnCancel.CallBack[(int)ControlState.MouseDown] = () => { WinItemEditor.OnCancel();  };
         }
         if (WindowManager.TryGetControl("winItemEditor", "btnDelete", out var btnDelete))
         {
@@ -2846,14 +2843,14 @@ public class Crystalshire
 
         // Open Script
         if (WindowManager.TryGetControl("winScriptEditor", "btnOpen", out var btnOpen))
-            btnOpen.CallBack[(int)ControlState.MouseDown] = () => { WinScriptEditor.OpenScript(); };
+            btnOpen.CallBack[(int)ControlState.MouseDown] = () => { WinScriptEditor.OnLoad(); };
 
         // Save Script
         if (WindowManager.TryGetControl("winScriptEditor", "btnSave", out var btnSaveScript))
-            btnSaveScript.CallBack[(int)ControlState.MouseDown] = () => { WinScriptEditor.SaveScript(); };
+            btnSaveScript.CallBack[(int)ControlState.MouseDown] = () => { WinScriptEditor.OnSave(); };
 
         if (WindowManager.TryGetControl("winScriptEditor", "btnClose", out var btnClose))
-            btnClose.CallBack[(int)ControlState.MouseDown] = () => { WindowManager.HideWindow("winScriptEditor"); };
+            btnClose.CallBack[(int)ControlState.MouseDown] = () => { WinScriptEditor.OnClose(); };
     }
 
     public void UpdateWindow_ResourceEditor()

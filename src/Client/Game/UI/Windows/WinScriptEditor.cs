@@ -9,7 +9,7 @@ using System.IO;
 namespace Client.Game.UI.Windows;
 public static class WinScriptEditor
 {   
-    public static void OpenScript()
+    public static void OnLoad()
     {
         try
         {
@@ -43,7 +43,7 @@ public static class WinScriptEditor
         }
     }
 
-    public static void SaveScript()
+    public static void OnSave()
     {
         if (!File.Exists(Script.TempFile))
         {
@@ -59,5 +59,10 @@ public static class WinScriptEditor
         {
             Interaction.MsgBox($"Failed to save script: {ex.Message}");
         }
+    }
+
+    public static void OnClose()
+    {
+        WindowManager.HideWindow("winScriptEditor");
     }
 }
