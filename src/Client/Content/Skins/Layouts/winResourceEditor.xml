@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window Name="winResourceEditor" Caption="Resource Editor"
-        Size="760, 370"
+        Size="760, 500"
         Icon="590" IconOffset="3, 5"
         Design="WindowNormal"
         StartPosition="CenterScreen"
         Visible="false">
 
 	<!-- Left: Resource index list -->
-	<GroupBox Name="grpList" Position="8,32" Size="200, 296" Caption="Resources">
-		<ListBox Name="lstIndex" Position="8, 24" Size="164, 260"/>
-		<ScrollBar Name="sldList" Position="172, 24" Size="16, 260" Min="0" Max="0" Value="0" Orientation="Vertical"/>
+	<GroupBox Name="grpList" Position="8,32" Size="200, 426" Caption="Resources">
+		<ListBox Name="lstIndex" Position="8, 24" Size="164, 390"/>
+		<ScrollBar Name="sldList" Position="172, 24" Size="16, 390" Min="0" Max="0" Value="0" Orientation="Vertical"/>
 	</GroupBox>
 
 	<!-- Right: Details -->
-	<GroupBox Name="grpDetails" Position="212, 32" Size="536, 296" Caption="Details">
+	<GroupBox Name="grpDetails" Position="212, 32" Size="536, 426" Caption="Details">
 		<!-- Name / Messages -->
 		<Label Name="lblName" Text="Name" Position="8, 28" Size="60, 16"/>
 		<TextBox Name="txtName" Position="84, 24" Size="180, 20" Design="TextWhite"/>
@@ -68,10 +68,10 @@
 	</GroupBox>
 
 	<!-- Action buttons (centered at bottom like other editors) -->
-	<Button Name="btnSave" Text="Save" Position="302, 336" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-	<Button Name="btnDelete" Text="Delete" Position="394, 336" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
-	<Button Name="btnCopy" Text="Copy" Position="486, 336" Size="80, 24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
-	<Button Name="btnCancel" Text="Cancel" Position="578, 336" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+	<Button Name="btnSave" Text="Save" Position="302, 466	" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+	<Button Name="btnDelete" Text="Delete" Position="394, 466" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+	<Button Name="btnCopy" Text="Copy" Position="486, 466" Size="80, 24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnCancel" Text="Cancel" Position="578, 466" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
 
 	<!-- Close -->
 	<Button Name="btnClose" Position="-19, 5" Size="16, 16" Image="8" ImageHover="9" ImageMouseDown="10"/>
