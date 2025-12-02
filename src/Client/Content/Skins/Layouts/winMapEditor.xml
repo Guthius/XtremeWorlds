@@ -72,10 +72,10 @@
     <Label Name="lblSettings" Text="Settings" Position="20,42" Size="200,14"/>
     <Button Name="btnGoTiles" Text="Tiles" Position="20,58" Size="100,20" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
     <Button Name="btnGoAttributes" Text="Attributes" Position="124,58" Size="100,20" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-    <Button Name="btnGoNpcs" Text="Npcs" Position="228,58" Size="80,20" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="GreenClick"/>
-    <Button Name="btnGoDirBlock" Text="Dir Block" Position="312,58" Size="90,20" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="GreenClick"/>
-    <Button Name="btnGoEvents" Text="Events" Position="406,58" Size="80,20" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="GreenClick"/>
-    <Button Name="btnGoEffects" Text="Effects" Position="490,58" Size="80,20" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="GreenClick"/>
+    <Button Name="btnGoNpcs" Text="Npcs" Position="228,58" Size="80,20" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+    <Button Name="btnGoDirBlock" Text="Dir Block" Position="312,58" Size="90,20" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+    <Button Name="btnGoEvents" Text="Events" Position="406,58" Size="80,20" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+    <Button Name="btnGoEffects" Text="Effects" Position="490,58" Size="80,20" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
     <Label Name="lblMapName" Text="Name" Position="20,86" Size="60,16"/>
     <TextBox Name="txtName" Position="84,84" Size="260,20" Design="TextWhite"/>
     <Label Name="lblMoral" Text="Moral" Position="20,114" Size="60,16"/>
@@ -163,16 +163,16 @@
 
   <Button Name="btnSaveMap" Text="Save" Position="16,40" Size="56,18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
   <Button Name="btnDiscard" Text="Discard" Position="74,40" Size="64,18" Design="Red" DesignHover="RedHover" DesignMouseDown="GreenClick"/>
-  <Button Name="btnToolbarSettings" Text="Settings" Position="140,40" Size="64,18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="GreenClick"/>
-  <Button Name="btnGrid" Text="Grid" Position="206,40" Size="48,18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="GreenClick"/>
+  <Button Name="btnToolbarSettings" Text="Settings" Position="140,40" Size="64,18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+  <Button Name="btnGrid" Text="Grid" Position="206,40" Size="48,18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
   <Button Name="btnToolPencil" Text="Pencil" Position="256,40" Size="56,18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-  <Button Name="btnEyeDropper" Text="Eye Dropper" Position="314,40" Size="84,18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="GreenClick"/>
+  <Button Name="btnEyeDropper" Text="Eye Dropper" Position="314,40" Size="84,18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
   <Button Name="btnToolFill" Text="Fill" Position="400,40" Size="48,18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
   <Button Name="btnToolEraser" Text="Clear" Position="450,40" Size="56,18" Design="Red" DesignHover="RedHover" DesignMouseDown="GreenClick"/>
-  <Button Name="btnCopyMap" Text="Copy" Position="508,40" Size="52,18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="GreenClick"/>
-  <Button Name="btnPasteMap" Text="Paste" Position="562,40" Size="64,18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="GreenClick"/>
+  <Button Name="btnCopyMap" Text="Copy" Position="508,40" Size="52,18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+  <Button Name="btnPasteMap" Text="Paste" Position="562,40" Size="64,18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
   <Button Name="btnDeleteMap" Text="Delete" Position="628,40" Size="60,18" Design="Red" DesignHover="RedHover" DesignMouseDown="GreenClick"/>
-  <Button Name="btnUndo" Text="Undo" Position="690,40" Size="48,18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="GreenClick"/>
-  <Button Name="btnRedo" Text="Redo" Position="740,40" Size="48,18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="GreenClick"/>
+  <Button Name="btnUndo" Text="Undo" Position="690,40" Size="48,18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+  <Button Name="btnRedo" Text="Redo" Position="740,40" Size="48,18" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
   <Button Name="btnClose" Position="-19,5" Size="16,16" Image="8" ImageHover="9" ImageMouseDown="10"/>
 </Window>
