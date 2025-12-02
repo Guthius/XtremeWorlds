@@ -8,7 +8,7 @@ namespace Client
 
     public class Autotile
     {
-        public static void ClearAutotiles()
+        public static void OnClear()
         {
             int x;
             int y;
@@ -37,7 +37,7 @@ namespace Client
         // \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
         // All of this code is for auto tiles and the math behind generating them.
         // \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-        private static void PlaceAutotile(int layerNum, int x, int y, byte tileQuarter, string autoTileLetter)
+        private static void OnPlace(int layerNum, int x, int y, byte tileQuarter, string autoTileLetter)
         {
             int layerCount = System.Enum.GetValues(typeof(MapLayer)).Length;
             if (layerNum > layerCount)
@@ -581,27 +581,27 @@ namespace Client
             {
                 case GameState.AutoInner:
                     {
-                        PlaceAutotile(layerNum, x, y, 1, "e");
+                        OnPlace(layerNum, x, y, 1, "e");
                         break;
                     }
                 case GameState.AutoOuter:
                     {
-                        PlaceAutotile(layerNum, x, y, 1, "a");
+                        OnPlace(layerNum, x, y, 1, "a");
                         break;
                     }
                 case GameState.AutoHorizontal:
                     {
-                        PlaceAutotile(layerNum, x, y, 1, "i");
+                        OnPlace(layerNum, x, y, 1, "i");
                         break;
                     }
                 case GameState.AutoVertical:
                     {
-                        PlaceAutotile(layerNum, x, y, 1, "m");
+                        OnPlace(layerNum, x, y, 1, "m");
                         break;
                     }
                 case GameState.AutoFill:
                     {
-                        PlaceAutotile(layerNum, x, y, 1, "q");
+                        OnPlace(layerNum, x, y, 1, "q");
                         break;
                     }
             }
@@ -648,27 +648,27 @@ namespace Client
             {
                 case GameState.AutoInner:
                     {
-                        PlaceAutotile(layerNum, x, y, 2, "j");
+                        OnPlace(layerNum, x, y, 2, "j");
                         break;
                     }
                 case GameState.AutoOuter:
                     {
-                        PlaceAutotile(layerNum, x, y, 2, "b");
+                        OnPlace(layerNum, x, y, 2, "b");
                         break;
                     }
                 case GameState.AutoHorizontal:
                     {
-                        PlaceAutotile(layerNum, x, y, 2, "f");
+                        OnPlace(layerNum, x, y, 2, "f");
                         break;
                     }
                 case GameState.AutoVertical:
                     {
-                        PlaceAutotile(layerNum, x, y, 2, "r");
+                        OnPlace(layerNum, x, y, 2, "r");
                         break;
                     }
                 case GameState.AutoFill:
                     {
-                        PlaceAutotile(layerNum, x, y, 2, "n");
+                        OnPlace(layerNum, x, y, 2, "n");
                         break;
                     }
             }
@@ -717,27 +717,27 @@ namespace Client
             {
                 case GameState.AutoInner:
                     {
-                        PlaceAutotile(layerNum, x, y, 3, "o");
+                        OnPlace(layerNum, x, y, 3, "o");
                         break;
                     }
                 case GameState.AutoOuter:
                     {
-                        PlaceAutotile(layerNum, x, y, 3, "c");
+                        OnPlace(layerNum, x, y, 3, "c");
                         break;
                     }
                 case GameState.AutoHorizontal:
                     {
-                        PlaceAutotile(layerNum, x, y, 3, "s");
+                        OnPlace(layerNum, x, y, 3, "s");
                         break;
                     }
                 case GameState.AutoVertical:
                     {
-                        PlaceAutotile(layerNum, x, y, 3, "g");
+                        OnPlace(layerNum, x, y, 3, "g");
                         break;
                     }
                 case GameState.AutoFill:
                     {
-                        PlaceAutotile(layerNum, x, y, 3, "k");
+                        OnPlace(layerNum, x, y, 3, "k");
                         break;
                     }
             }
@@ -786,27 +786,27 @@ namespace Client
             {
                 case GameState.AutoInner:
                     {
-                        PlaceAutotile(layerNum, x, y, 4, "t");
+                        OnPlace(layerNum, x, y, 4, "t");
                         break;
                     }
                 case GameState.AutoOuter:
                     {
-                        PlaceAutotile(layerNum, x, y, 4, "d");
+                        OnPlace(layerNum, x, y, 4, "d");
                         break;
                     }
                 case GameState.AutoHorizontal:
                     {
-                        PlaceAutotile(layerNum, x, y, 4, "p");
+                        OnPlace(layerNum, x, y, 4, "p");
                         break;
                     }
                 case GameState.AutoVertical:
                     {
-                        PlaceAutotile(layerNum, x, y, 4, "l");
+                        OnPlace(layerNum, x, y, 4, "l");
                         break;
                     }
                 case GameState.AutoFill:
                     {
-                        PlaceAutotile(layerNum, x, y, 4, "h");
+                        OnPlace(layerNum, x, y, 4, "h");
                         break;
                     }
             }
@@ -826,12 +826,12 @@ namespace Client
             if (tmpTile)
             {
                 // Extended
-                PlaceAutotile(layerNum, x, y, 1, "i");
+                OnPlace(layerNum, x, y, 1, "i");
             }
             else
             {
                 // Edge
-                PlaceAutotile(layerNum, x, y, 1, "e");
+                OnPlace(layerNum, x, y, 1, "e");
             }
 
         }
@@ -847,12 +847,12 @@ namespace Client
             if (tmpTile)
             {
                 // Extended
-                PlaceAutotile(layerNum, x, y, 2, "f");
+                OnPlace(layerNum, x, y, 2, "f");
             }
             else
             {
                 // Edge
-                PlaceAutotile(layerNum, x, y, 2, "j");
+                OnPlace(layerNum, x, y, 2, "j");
             }
 
         }
@@ -868,12 +868,12 @@ namespace Client
             if (tmpTile)
             {
                 // Extended
-                PlaceAutotile(layerNum, x, y, 3, "k");
+                OnPlace(layerNum, x, y, 3, "k");
             }
             else
             {
                 // Edge
-                PlaceAutotile(layerNum, x, y, 3, "g");
+                OnPlace(layerNum, x, y, 3, "g");
             }
 
         }
@@ -889,12 +889,12 @@ namespace Client
             if (tmpTile)
             {
                 // Extended
-                PlaceAutotile(layerNum, x, y, 4, "h");
+                OnPlace(layerNum, x, y, 4, "h");
             }
             else
             {
                 // Edge
-                PlaceAutotile(layerNum, x, y, 4, "l");
+                OnPlace(layerNum, x, y, 4, "l");
             }
 
         }
@@ -939,22 +939,22 @@ namespace Client
             {
                 case GameState.AutoInner:
                     {
-                        PlaceAutotile(layerNum, x, y, 1, "e");
+                        OnPlace(layerNum, x, y, 1, "e");
                         break;
                     }
                 case GameState.AutoHorizontal:
                     {
-                        PlaceAutotile(layerNum, x, y, 1, "i");
+                        OnPlace(layerNum, x, y, 1, "i");
                         break;
                     }
                 case GameState.AutoVertical:
                     {
-                        PlaceAutotile(layerNum, x, y, 1, "m");
+                        OnPlace(layerNum, x, y, 1, "m");
                         break;
                     }
                 case GameState.AutoFill:
                     {
-                        PlaceAutotile(layerNum, x, y, 1, "q");
+                        OnPlace(layerNum, x, y, 1, "q");
                         break;
                     }
             }
@@ -1000,22 +1000,22 @@ namespace Client
             {
                 case GameState.AutoInner:
                     {
-                        PlaceAutotile(layerNum, x, y, 2, "j");
+                        OnPlace(layerNum, x, y, 2, "j");
                         break;
                     }
                 case GameState.AutoHorizontal:
                     {
-                        PlaceAutotile(layerNum, x, y, 2, "f");
+                        OnPlace(layerNum, x, y, 2, "f");
                         break;
                     }
                 case GameState.AutoVertical:
                     {
-                        PlaceAutotile(layerNum, x, y, 2, "r");
+                        OnPlace(layerNum, x, y, 2, "r");
                         break;
                     }
                 case GameState.AutoFill:
                     {
-                        PlaceAutotile(layerNum, x, y, 2, "n");
+                        OnPlace(layerNum, x, y, 2, "n");
                         break;
                     }
             }
@@ -1060,22 +1060,22 @@ namespace Client
             {
                 case GameState.AutoInner:
                     {
-                        PlaceAutotile(layerNum, x, y, 3, "o");
+                        OnPlace(layerNum, x, y, 3, "o");
                         break;
                     }
                 case GameState.AutoHorizontal:
                     {
-                        PlaceAutotile(layerNum, x, y, 3, "s");
+                        OnPlace(layerNum, x, y, 3, "s");
                         break;
                     }
                 case GameState.AutoVertical:
                     {
-                        PlaceAutotile(layerNum, x, y, 3, "g");
+                        OnPlace(layerNum, x, y, 3, "g");
                         break;
                     }
                 case GameState.AutoFill:
                     {
-                        PlaceAutotile(layerNum, x, y, 3, "k");
+                        OnPlace(layerNum, x, y, 3, "k");
                         break;
                     }
             }
@@ -1121,22 +1121,22 @@ namespace Client
             {
                 case GameState.AutoInner:
                     {
-                        PlaceAutotile(layerNum, x, y, 4, "t");
+                        OnPlace(layerNum, x, y, 4, "t");
                         break;
                     }
                 case GameState.AutoHorizontal:
                     {
-                        PlaceAutotile(layerNum, x, y, 4, "p");
+                        OnPlace(layerNum, x, y, 4, "p");
                         break;
                     }
                 case GameState.AutoVertical:
                     {
-                        PlaceAutotile(layerNum, x, y, 4, "l");
+                        OnPlace(layerNum, x, y, 4, "l");
                         break;
                     }
                 case GameState.AutoFill:
                     {
-                        PlaceAutotile(layerNum, x, y, 4, "h");
+                        OnPlace(layerNum, x, y, 4, "h");
                         break;
                     }
             }

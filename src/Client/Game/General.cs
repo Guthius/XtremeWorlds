@@ -194,7 +194,7 @@ namespace Client
                 Player.ClearPlayer(i);
 
             Animation.OnClearAll();
-            Autotile.ClearAutotiles();
+            Autotile.OnClear();
 
             // clear chat
             for (int i = 0; i < Variables.ChatLines; i++)
