@@ -502,9 +502,9 @@ namespace Client
                     SpriteBatch.End();
                 }
             }
-            else if (GameState.InGame == true)
+            else
             {
-                // Draw the actual game onto the RenderTarget
+                // Draw the actual game/menu onto the RenderTarget whenever we're not loading
                 SpriteBatch?.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null);
                 Render_Game();
                 SpriteBatch?.End();
@@ -2177,9 +2177,13 @@ namespace Client
             long i;
             long npcNum;
 
-            // dynamic bar calculations
-            width = GetGfxInfo(Path.Combine(DataPath.Misc, "Bars")).Width;
-            height = (long) Math.Round(GetGfxInfo(Path.Combine(DataPath.Misc, "Bars")).Height / 4d);
+            // dynamic bar calculations (defensively handle missing texture)
+            var barsInfo = GetGfxInfo(Path.Combine(DataPath.Misc, "Bars"));
+            if (barsInfo == null)
+                return;
+
+            width = barsInfo.Width;
+            height = (long) Math.Round(barsInfo.Height / 4d);
 
             // render Npc health bars
             for (i = 0L; i < Variables.MaxMapNpcs; i++)
