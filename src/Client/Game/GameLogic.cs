@@ -1427,8 +1427,8 @@ namespace Client
                 
                 rec.Top = (int)(startY + GameState.HotbarTop);
                 rec.Left = (int)(startX + i * GameState.HotbarOffsetX);
-                rec.Right = rec.Left + GameState.SizeX;
-                rec.Bottom = rec.Top + GameState.SizeY;
+                rec.Right = rec.Left + Constants.TileSize;
+                rec.Bottom = rec.Top + Constants.TileSize;
 
                 if (Data.Player[GameState.MyIndex].Hotbar[i].Slot < 0)
                 {
@@ -2412,8 +2412,8 @@ namespace Client
             int nativeHeight = GameState.ResolutionHeight;
 
             // Find the center of the map
-            float mapWidth = Data.MyMap.MaxX * GameState.SizeX;
-            float mapHeight = Data.MyMap.MaxY * GameState.SizeY;
+            float mapWidth = Data.MyMap.MaxX * Constants.TileSize;
+            float mapHeight = Data.MyMap.MaxY * Constants.TileSize;
             float mapCenterX = mapWidth / 2f;
             float mapCenterY = mapHeight / 2f;
 

@@ -842,8 +842,8 @@ namespace Client
         {
             if (!GameState.InGame) return new Vector2(GameState.ResolutionWidth / 2, GameState.ResolutionHeight / 2);
             
-            int worldX = GetPlayerRawX(GameState.MyIndex) + GameState.SizeX / 2;
-            int worldY = GetPlayerRawY(GameState.MyIndex) + GameState.SizeY / 2;
+            int worldX = GetPlayerRawX(GameState.MyIndex) + Constants.TileSize / 2;
+            int worldY = GetPlayerRawY(GameState.MyIndex) + Constants.TileSize / 2;
 
             if (GameState.MyTarget >= 0)
             {
@@ -855,8 +855,8 @@ namespace Client
                         // Same map check
                         if (Data.Player[t].Map == Data.Player[GameState.MyIndex].Map)
                         {
-                            worldX = GetPlayerRawX(t) + GameState.SizeX / 2;
-                            worldY = GetPlayerRawY(t) + GameState.SizeY / 2;
+                            worldX = GetPlayerRawX(t) + Constants.TileSize / 2;
+                            worldY = GetPlayerRawY(t) + Constants.TileSize / 2;
                         }
                     }
                 }
@@ -865,8 +865,8 @@ namespace Client
                     int n = GameState.MyTarget;
                     if (n >= 0 && n < Data.MyMapNpc.Length && Data.MyMapNpc[n].Num >= 0)
                     {
-                        worldX = Data.MyMapNpc[n].X + GameState.SizeX / 2;
-                        worldY = Data.MyMapNpc[n].Y + GameState.SizeY / 2;
+                        worldX = Data.MyMapNpc[n].X + Constants.TileSize / 2;
+                        worldY = Data.MyMapNpc[n].Y + Constants.TileSize / 2;
                     }
                 }
             }
@@ -935,8 +935,8 @@ namespace Client
             if (mouseXGame >= 0 && mouseYGame >= 0)
             {
                 // Absolute world tile under the mouse: floor((cameraOffsetPx + mousePx) / tileSize)
-                GameState.CurXGame = (int)Math.Floor((GameState.Camera.Left + mouseXGame) / (double)GameState.SizeX);
-                GameState.CurYGame = (int)Math.Floor((GameState.Camera.Top + mouseYGame) / (double)GameState.SizeY);
+                GameState.CurXGame = (int)Math.Floor((GameState.Camera.Left + mouseXGame) / (double)Constants.TileSize);
+                GameState.CurYGame = (int)Math.Floor((GameState.Camera.Top + mouseYGame) / (double)Constants.TileSize);
             }
             else
             {
@@ -953,8 +953,8 @@ namespace Client
             if (mouseXGui >= 0 && mouseYGui >= 0)
             {
                 // GUI maps to native space; still convert to absolute world tile using camera offsets
-                GameState.CurXGui = (int)Math.Floor((GameState.Camera.Left + mouseXGui) / (double)GameState.SizeX);
-                GameState.CurYGui = (int)Math.Floor((GameState.Camera.Top + mouseYGui) / (double)GameState.SizeY);
+                GameState.CurXGui = (int)Math.Floor((GameState.Camera.Left + mouseXGui) / (double)Constants.TileSize);
+                GameState.CurYGui = (int)Math.Floor((GameState.Camera.Top + mouseYGui) / (double)Constants.TileSize);
             }
             else
             {
@@ -1759,7 +1759,7 @@ namespace Client
             }
 
             rec.Y = 0;
-            rec.Height = GameState.SizeX;
+            rec.Height = Constants.TileSize;
             rec.X = (int) Math.Round(anim *
                                      (GetGfxInfo(Path.Combine(DataPath.Emotes, sprite.ToString())).Width /
                                       2d));
@@ -1767,7 +1767,7 @@ namespace Client
                                          2d);
                                          
             x = GameLogic.ConvertMapX(x2);
-            y = GameLogic.ConvertMapY(y2) - (GameState.SizeY + 16);
+            y = GameLogic.ConvertMapY(y2) - (Constants.TileSize + 16);
 
             string argPath = Path.Combine(DataPath.Emotes, sprite.ToString());
             RenderTexture(ref argPath, x, y, rec.X, rec.Y, rec.Width, rec.Height, rec.Width, rec.Height);
@@ -1785,8 +1785,8 @@ namespace Client
             rec.Height = 32;
 
             string argPath = Path.Combine(DataPath.Misc, "Direction");
-            RenderTexture(ref argPath, GameLogic.ConvertMapX(x * GameState.SizeX),
-                GameLogic.ConvertMapY(y * GameState.SizeY),
+            RenderTexture(ref argPath, GameLogic.ConvertMapX(x * Constants.TileSize),
+                GameLogic.ConvertMapY(y * Constants.TileSize),
                 rec.X, rec.Y, rec.Width, rec.Height, rec.Width, rec.Height);
 
             // render dir blobs
@@ -1815,8 +1815,8 @@ namespace Client
                 rec.Height = 8;
 
                 string argPath1 = Path.Combine(DataPath.Misc, "Direction");
-                RenderTexture(ref argPath1, GameLogic.ConvertMapX(x * GameState.SizeX) + GameState.DirArrowX[i],
-                    GameLogic.ConvertMapY(y * GameState.SizeY) + GameState.DirArrowY[i], rec.X, rec.Y, rec.Width,
+                RenderTexture(ref argPath1, GameLogic.ConvertMapX(x * Constants.TileSize) + GameState.DirArrowX[i],
+                    GameLogic.ConvertMapY(y * Constants.TileSize) + GameState.DirArrowY[i], rec.X, rec.Y, rec.Width,
                     rec.Height,
                     rec.Width, rec.Height);
             }
@@ -2099,9 +2099,9 @@ namespace Client
             if (Math.Floor((double) instance.Y / Constants.TileSize) < GameState.TileView.Top | Math.Floor((double) instance.Y / Constants.TileSize) > GameState.TileView.Bottom)
                 return;
 
-            srcRec = new Rectangle(0, 0, GameState.SizeX, GameState.SizeY);
+            srcRec = new Rectangle(0, 0, Constants.TileSize, Constants.TileSize);
             destRec = new Rectangle(GameLogic.ConvertMapX(Data.MyMapItem[itemNum].X),
-                GameLogic.ConvertMapY(Data.MyMapItem[itemNum].Y), GameState.SizeX, GameState.SizeY);
+                GameLogic.ConvertMapY(Data.MyMapItem[itemNum].Y), Constants.TileSize, Constants.TileSize);
 
             x = GameLogic.ConvertMapX(Data.MyMapItem[itemNum].X);
             y = GameLogic.ConvertMapY(Data.MyMapItem[itemNum].Y);
@@ -2147,9 +2147,9 @@ namespace Client
                 x = GameLogic.ConvertMapX(Data.Blood[index].X);
                 y = GameLogic.ConvertMapY(Data.Blood[index].Y);
 
-                srcRec = new Rectangle((instance.Sprite - 1) * GameState.SizeX, 0, GameState.SizeX, GameState.SizeY);
+                srcRec = new Rectangle((instance.Sprite - 1) * Constants.TileSize, 0, Constants.TileSize, Constants.TileSize);
                 destRec = new Rectangle(GameLogic.ConvertMapX(instance.X),
-                    GameLogic.ConvertMapY(instance.Y), GameState.SizeX, GameState.SizeY);
+                    GameLogic.ConvertMapY(instance.Y), Constants.TileSize, Constants.TileSize);
 
                 string argPath = Path.Combine(DataPath.Misc, "Blood");
                 RenderTexture(ref argPath, x, y, srcRec.X, srcRec.Y, srcRec.Width, srcRec.Height);
@@ -2323,7 +2323,7 @@ namespace Client
 
             // Define rectangle parameters.
             var position = new Vector2(GameLogic.ConvertMapX(GameState.CurXGame), GameLogic.ConvertMapY(GameState.CurYGame));
-            var size = new Vector2(GameState.SizeX, GameState.SizeX);
+            var size = new Vector2(Constants.TileSize, Constants.TileSize);
             var fillColor = Color.Transparent; // No fill
             var outlineColor = Color.Cyan; // Cyan outline
             int outlineThickness = 1; // Thickness of outline
@@ -2336,8 +2336,8 @@ namespace Client
         public static void DrawGrid()
         {
             // Draw tile grid outlines using the existing batch-safe helpers
-            int tileW = GameState.SizeX;
-            int tileH = GameState.SizeY;
+            int tileW = Constants.TileSize;
+            int tileH = Constants.TileSize;
             for (int x = (int)GameState.TileView.Left; x <= (int)GameState.TileView.Right; x++)
             {
                 for (int y = (int)GameState.TileView.Top; y <= (int)GameState.TileView.Bottom; y++)
@@ -2469,8 +2469,8 @@ namespace Client
                 case (byte) TargetType.Event:
                 {
                     // Event X/Y are stored as tile coordinates
-                    x = GameLogic.ConvertMapX(Data.MyMap.Event[instance.Target].X * GameState.SizeX) + 16;
-                    y = GameLogic.ConvertMapY(Data.MyMap.Event[instance.Target].Y * GameState.SizeY) - 16;
+                    x = GameLogic.ConvertMapX(Data.MyMap.Event[instance.Target].X * Constants.TileSize) + 16;
+                    y = GameLogic.ConvertMapY(Data.MyMap.Event[instance.Target].Y * Constants.TileSize) - 16;
                     break;
                 }
 
@@ -2841,13 +2841,13 @@ namespace Client
                     break;
                     
                 // Treat MyMap.Event.X/Y as tile coordinates; compute world pixel coordinates
-                int worldX = Data.MyMap.Event[i].X * GameState.SizeX;
-                int worldY = Data.MyMap.Event[i].Y * GameState.SizeY;
+                int worldX = Data.MyMap.Event[i].X * Constants.TileSize;
+                int worldY = Data.MyMap.Event[i].Y * Constants.TileSize;
 
                 // Skip event if there are no pages
                 if (Data.MyMap.Event[i].PageCount <= 0)
                 {
-                    DrawOutlineRectangle(GameLogic.ConvertMapX(worldX), GameLogic.ConvertMapY(worldY), GameState.SizeX, GameState.SizeY, Color.Blue, 0.6f);
+                    DrawOutlineRectangle(GameLogic.ConvertMapX(worldX), GameLogic.ConvertMapY(worldY), Constants.TileSize, Constants.TileSize, Color.Blue, 0.6f);
                     continue;
                 }
 
@@ -2879,7 +2879,7 @@ namespace Client
                     default:
                     {
                         // Draw fallback outline if the graphic type is unknown
-                        DrawOutlineRectangle(GameLogic.ConvertMapX(worldX), GameLogic.ConvertMapY(worldY), GameState.SizeX, GameState.SizeY, Color.Blue, 0.6f);
+                        DrawOutlineRectangle(GameLogic.ConvertMapX(worldX), GameLogic.ConvertMapY(worldY), Constants.TileSize, Constants.TileSize, Color.Blue, 0.6f);
                         break;
                     }
                 }
@@ -2978,7 +2978,7 @@ namespace Client
             if (frameRowHeight > 32)
                 drawY = y - (frameRowHeight - 32); // lift so feet align to tile
 
-            int drawX = x - GameState.SizeX - 8;
+            int drawX = x - Constants.TileSize - 8;
 
             string argPath = Path.Combine(DataPath.Characters, gfxIndex.ToString());
             RenderTexture(ref argPath, drawX, drawY, sourceRect.X, sourceRect.Y, sourceRect.Width, sourceRect.Height, sourceRect.Width, sourceRect.Height);
@@ -2991,10 +2991,10 @@ namespace Client
             if (gfxIndex > 0 && gfxIndex <= GameState.NumTileSets)
             {
                 // Define source rectangle from tileset graphics
-                int width = Math.Max(1, eventData.Pages[0].GraphicX2) * GameState.SizeX;
-                int height = Math.Max(1, eventData.Pages[0].GraphicY2) * GameState.SizeY;
-                var srcRect = new Rectangle(eventData.Pages[0].GraphicX * GameState.SizeX,
-                    eventData.Pages[0].GraphicY * GameState.SizeY, width, height);
+                int width = Math.Max(1, eventData.Pages[0].GraphicX2) * Constants.TileSize;
+                int height = Math.Max(1, eventData.Pages[0].GraphicY2) * Constants.TileSize;
+                var srcRect = new Rectangle(eventData.Pages[0].GraphicX * Constants.TileSize,
+                    eventData.Pages[0].GraphicY * Constants.TileSize, width, height);
 
                 // Draw at the tile's top-left in screen space for editor consistency
                 int destX = x;
@@ -3007,7 +3007,7 @@ namespace Client
             else
             {
                 // Draw fallback outline if the tileset graphic is invalid
-                DrawOutlineRectangle(x, y, GameState.SizeX, GameState.SizeY, Color.Blue, 0.6f);
+                DrawOutlineRectangle(x, y, Constants.TileSize, Constants.TileSize, Color.Blue, 0.6f);
             }
         }
 
@@ -3159,7 +3159,7 @@ namespace Client
                                     Data.MapEvents[id].Graphic.ToString());
                                 RenderTexture(ref argPath,
                                     GameLogic.ConvertMapX(Data.MapEvents[id].X),
-                                    GameLogic.ConvertMapY(Data.MapEvents[id].Y) - GameState.SizeY,
+                                    GameLogic.ConvertMapY(Data.MapEvents[id].Y) - Constants.TileSize,
                                     sRect.Left, sRect.Top, sRect.Width, sRect.Height);
                             }
                             else
@@ -3584,10 +3584,10 @@ namespace Client
                 else
                 {
                     // Compare distance between player and target against the view half-size (zoom-aware)
-                    int px = GetPlayerRawX(GameState.MyIndex) + GameState.SizeX / 2;
-                    int py = GetPlayerRawY(GameState.MyIndex) + GameState.SizeY / 2;
-                    int tx = GetPlayerRawX(t) + GameState.SizeX / 2;
-                    int ty = GetPlayerRawY(t) + GameState.SizeY / 2;
+                    int px = GetPlayerRawX(GameState.MyIndex) + Constants.TileSize / 2;
+                    int py = GetPlayerRawY(GameState.MyIndex) + Constants.TileSize / 2;
+                    int tx = GetPlayerRawX(t) + Constants.TileSize / 2;
+                    int ty = GetPlayerRawY(t) + Constants.TileSize / 2;
                     if (Math.Abs(tx - px) >= maxDx || Math.Abs(ty - py) >= maxDy)
                     {
                         shouldClear = true;
@@ -3605,10 +3605,10 @@ namespace Client
                 }
                 else
                 {
-                    int px = GetPlayerRawX(GameState.MyIndex) + GameState.SizeX / 2;
-                    int py = GetPlayerRawY(GameState.MyIndex) + GameState.SizeY / 2;
-                    int tx = Data.MyMapNpc[n].X + GameState.SizeX / 2;
-                    int ty = Data.MyMapNpc[n].Y + GameState.SizeY / 2;
+                    int px = GetPlayerRawX(GameState.MyIndex) + Constants.TileSize / 2;
+                    int py = GetPlayerRawY(GameState.MyIndex) + Constants.TileSize / 2;
+                    int tx = Data.MyMapNpc[n].X + Constants.TileSize / 2;
+                    int ty = Data.MyMapNpc[n].Y + Constants.TileSize / 2;
                     if (Math.Abs(tx - px) >= maxDx || Math.Abs(ty - py) >= maxDy)
                     {
                         shouldClear = true;

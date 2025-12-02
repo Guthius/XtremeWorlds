@@ -751,8 +751,8 @@ namespace Client
         public static void UpdateFacingFromMouse(int mouseScreenX, int mouseScreenY)
         {
             if (GameState.MyIndex < 0 | GameState.MyIndex > Variables.MaxPlayers) return;
-            int playerScreenX = GameLogic.ConvertMapX(GetPlayerRawX(GameState.MyIndex)) + GameState.SizeX / 2;
-            int playerScreenY = GameLogic.ConvertMapY(GetPlayerRawY(GameState.MyIndex)) + GameState.SizeY / 2;
+            int playerScreenX = GameLogic.ConvertMapX(GetPlayerRawX(GameState.MyIndex)) + Constants.TileSize / 2;
+            int playerScreenY = GameLogic.ConvertMapY(GetPlayerRawY(GameState.MyIndex)) + Constants.TileSize / 2;
             int dx = mouseScreenX - playerScreenX;
             int dy = mouseScreenY - playerScreenY; // positive downwards
             if (dx == 0 && dy == 0) return;
@@ -891,55 +891,55 @@ namespace Client
                     case (byte) Direction.Up:
                     {
                         x = GetPlayerRawX(GameState.MyIndex);
-                        y = GetPlayerRawY(GameState.MyIndex) - GameState.SizeY;
+                        y = GetPlayerRawY(GameState.MyIndex) - Constants.TileSize;
                         break;
                     }
 
                     case (byte) Direction.Down:
                     {
                         x = GetPlayerRawX(GameState.MyIndex);
-                        y = GetPlayerRawY(GameState.MyIndex) + GameState.SizeY;
+                        y = GetPlayerRawY(GameState.MyIndex) + Constants.TileSize;
                         break;
                     }
 
                     case (byte) Direction.Left:
                     {
-                        x = GetPlayerRawX(GameState.MyIndex) - GameState.SizeX;
+                        x = GetPlayerRawX(GameState.MyIndex) - Constants.TileSize;
                         y = GetPlayerRawY(GameState.MyIndex);
                         break;
                     }
                     case (byte) Direction.Right:
                     {
-                        x = GetPlayerRawX(GameState.MyIndex) + GameState.SizeX;
+                        x = GetPlayerRawX(GameState.MyIndex) + Constants.TileSize;
                         y = GetPlayerRawY(GameState.MyIndex);
                         break;
                     }
 
                     case (byte) Direction.UpRight:
                     {
-                        x = GetPlayerRawX(GameState.MyIndex) + GameState.SizeX;
-                        y = GetPlayerRawY(GameState.MyIndex) - GameState.SizeY;
+                        x = GetPlayerRawX(GameState.MyIndex) + Constants.TileSize;
+                        y = GetPlayerRawY(GameState.MyIndex) - Constants.TileSize;
                         break;
                     }
 
                     case (byte) Direction.UpLeft:
                     {
-                        x = GetPlayerRawX(GameState.MyIndex) - GameState.SizeX;
-                        y = GetPlayerRawY(GameState.MyIndex) - GameState.SizeY;
+                        x = GetPlayerRawX(GameState.MyIndex) - Constants.TileSize;
+                        y = GetPlayerRawY(GameState.MyIndex) - Constants.TileSize;
                         break;
                     }
 
                     case (byte) Direction.DownRight:
                     {
-                        x = GetPlayerRawX(GameState.MyIndex) + GameState.SizeX;
-                        y = GetPlayerRawY(GameState.MyIndex) + GameState.SizeY;
+                        x = GetPlayerRawX(GameState.MyIndex) + Constants.TileSize;
+                        y = GetPlayerRawY(GameState.MyIndex) + Constants.TileSize;
                         break;
                     }
 
                     case (byte) Direction.DownLeft:
                     {
-                        x = GetPlayerRawX(GameState.MyIndex) - GameState.SizeX;
-                        y = GetPlayerRawY(GameState.MyIndex) + GameState.SizeY;
+                        x = GetPlayerRawX(GameState.MyIndex) - Constants.TileSize;
+                        y = GetPlayerRawY(GameState.MyIndex) + Constants.TileSize;
                         break;
                     }
                 }
@@ -962,7 +962,7 @@ namespace Client
                             int py = y;
                             // If x/y are tile coordinates, multiply by tile size
                             // For now, assume all are pixel coordinates
-                            if (Math.Abs(px - eventX) <= GameState.SizeX && Math.Abs(py - eventY) <= GameState.SizeY)
+                            if (Math.Abs(px - eventX) <= Constants.TileSize && Math.Abs(py - eventY) <= Constants.TileSize)
                             {
                                 var packetWriter = new PacketWriter(8);
 

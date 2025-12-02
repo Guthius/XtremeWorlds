@@ -350,7 +350,6 @@ namespace Client
 
         // Map
         public const int MaxTileHistory = 500;
-        public const byte TileSize = 32; // Tile size is 32x32 pixels
 
         // Autotiles
         public const byte AutoInner = 1;

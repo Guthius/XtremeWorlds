@@ -417,8 +417,8 @@ public static class TextRenderer
             {
                 if (!GameLogic.IsValidMapPoint(x, y)) continue;
                 ref var instance = ref Data.MyMap.Tile[x, y];
-                var tX = (int)Math.Round(GameLogic.ConvertMapX(x * GameState.SizeX) - 4 + GameState.SizeX * 0.5d);
-                var tY = (int)Math.Round(GameLogic.ConvertMapY(y * GameState.SizeY) - 7 + GameState.SizeY * 0.5d);
+                var tX = (int)Math.Round(GameLogic.ConvertMapX(x * Constants.TileSize) - 4 + Constants.TileSize * 0.5d);
+                var tY = (int)Math.Round(GameLogic.ConvertMapY(y * Constants.TileSize) - 7 + Constants.TileSize * 0.5d);
                 tA = GameState.EditorAttribute == 1 ? (int)instance.Type : (int)instance.Type2;
                 switch (tA)
                 {
@@ -464,7 +464,7 @@ public static class TextRenderer
 
         int baseWorldX = Data.MyMapNpc[mapNpcNum].X;
         int baseWorldY = Data.MyMapNpc[mapNpcNum].Y;
-        int centerX = GameLogic.ConvertMapX(baseWorldX) + GameState.SizeX / 2 - 4;
+        int centerX = GameLogic.ConvertMapX(baseWorldX) + Constants.TileSize / 2 - 4;
         var textX = centerX - (int)(GetTextWidth(name) / 6d);
 
         int spriteNum = Data.Npc[(int)npcNum].Sprite;
@@ -514,7 +514,7 @@ public static class TextRenderer
         var backcolor = Color.Black;
         var name = Data.MapEvents[index].Name;
 
-        var textX = GameLogic.ConvertMapX(Data.MapEvents[index].X) + GameState.SizeX / 2 - 6;
+        var textX = GameLogic.ConvertMapX(Data.MapEvents[index].X) + Constants.TileSize / 2 - 6;
         textX -= GetTextWidth(name) / 6;
 
         if (Data.MapEvents[index].GraphicType == 1)
@@ -559,8 +559,8 @@ public static class TextRenderer
         {
             if (Data.MapEvents[index].GraphicY2 > 0)
             {
-                textX = textX + Data.MapEvents[index].GraphicY2 * GameState.SizeY / 2 - 6;
-                textY = GameLogic.ConvertMapY(Data.MapEvents[index].Y) - Data.MapEvents[index].GraphicY2 * GameState.SizeY + 16;
+                textX = textX + Data.MapEvents[index].GraphicY2 * Constants.TileSize / 2 - 6;
+                textY = GameLogic.ConvertMapY(Data.MapEvents[index].Y) - Data.MapEvents[index].GraphicY2 * Constants.TileSize + 16;
             }
             else
             {
@@ -587,13 +587,13 @@ public static class TextRenderer
                 time = 1500;
                 if (Data.ActionMsg[index].Y > 0)
                 {
-                    x = Data.ActionMsg[index].X + Conversion.Int(GameState.SizeX / 2) - Strings.Len(Data.ActionMsg[index].Message) / 2 * 8;
-                    y = Data.ActionMsg[index].Y - Conversion.Int(GameState.SizeY / 2) - 2;
+                    x = Data.ActionMsg[index].X + Conversion.Int(Constants.TileSize / 2) - Strings.Len(Data.ActionMsg[index].Message) / 2 * 8;
+                    y = Data.ActionMsg[index].Y - Conversion.Int(Constants.TileSize / 2) - 2;
                 }
                 else
                 {
-                    x = Data.ActionMsg[index].X + Conversion.Int(GameState.SizeX / 2) - Strings.Len(Data.ActionMsg[index].Message) / 2 * 8;
-                    y = Data.ActionMsg[index].Y - Conversion.Int(GameState.SizeY / 2) + 18;
+                    x = Data.ActionMsg[index].X + Conversion.Int(Constants.TileSize / 2) - Strings.Len(Data.ActionMsg[index].Message) / 2 * 8;
+                    y = Data.ActionMsg[index].Y - Conversion.Int(Constants.TileSize / 2) + 18;
                 }
                 break;
 
@@ -601,14 +601,14 @@ public static class TextRenderer
                 time = 1500;
                 if (Data.ActionMsg[index].Y > 0)
                 {
-                    x = Data.ActionMsg[index].X + Conversion.Int(GameState.SizeX / 2) - Strings.Len(Data.ActionMsg[index].Message) / 2 * 8;
-                    y = (int)Math.Round(Data.ActionMsg[index].Y - Conversion.Int(GameState.SizeY / 2) - 2 - Data.ActionMsg[index].Scroll * 0.6d);
+                    x = Data.ActionMsg[index].X + Conversion.Int(Constants.TileSize / 2) - Strings.Len(Data.ActionMsg[index].Message) / 2 * 8;
+                    y = (int)Math.Round(Data.ActionMsg[index].Y - Conversion.Int(Constants.TileSize / 2) - 2 - Data.ActionMsg[index].Scroll * 0.6d);
                     Data.ActionMsg[index].Scroll++;
                 }
                 else
                 {
-                    x = Data.ActionMsg[index].X + Conversion.Int(GameState.SizeX / 2) - Strings.Len(Data.ActionMsg[index].Message) / 2 * 8;
-                    y = (int)Math.Round(Data.ActionMsg[index].Y - Conversion.Int(GameState.SizeY / 2) + 18 + Data.ActionMsg[index].Scroll * 0.6d);
+                    x = Data.ActionMsg[index].X + Conversion.Int(Constants.TileSize / 2) - Strings.Len(Data.ActionMsg[index].Message) / 2 * 8;
+                    y = (int)Math.Round(Data.ActionMsg[index].Y - Conversion.Int(Constants.TileSize / 2) + 18 + Data.ActionMsg[index].Scroll * 0.6d);
                     Data.ActionMsg[index].Scroll++;
                 }
                 break;
@@ -731,7 +731,7 @@ public static class TextRenderer
 
         int baseWorldX = GetPlayerRawX(index);
         int baseWorldY = GetPlayerRawY(index);
-        int centerX = GameLogic.ConvertMapX(baseWorldX) + GameState.SizeX / 2 - 6;
+        int centerX = GameLogic.ConvertMapX(baseWorldX) + Constants.TileSize / 2 - 6;
         var textX = (int)Math.Round(centerX - GetTextWidth(name) / 6d);
 
         int spriteNum = GetPlayerSprite(index);

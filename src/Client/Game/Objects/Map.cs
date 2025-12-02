@@ -114,10 +114,10 @@ namespace Client
                         // Normal rendering state
                         if (Data.Autotile[x, y].Layer[layerIndex].RenderState == GameState.RenderStateNormal)
                         {
-                            rect.X = Data.MyMap.Tile[x, y].Layer[layerIndex].X * GameState.SizeX;
-                            rect.Y = Data.MyMap.Tile[x, y].Layer[layerIndex].Y * GameState.SizeY;
-                            rect.Width = GameState.SizeX;
-                            rect.Height = GameState.SizeY;
+                            rect.X = Data.MyMap.Tile[x, y].Layer[layerIndex].X * Constants.TileSize;
+                            rect.Y = Data.MyMap.Tile[x, y].Layer[layerIndex].Y * Constants.TileSize;
+                            rect.Width = Constants.TileSize;
+                            rect.Height = Constants.TileSize;
 
                             alpha = 1.0f;
 
@@ -134,7 +134,7 @@ namespace Client
 
                             // Render the tile
                             string argPath = System.IO.Path.Combine(DataPath.Tilesets, Data.MyMap.Tile[x, y].Layer[layerIndex].Tileset.ToString());
-                            GameClient.RenderTexture(ref argPath, GameLogic.ConvertMapX(x * GameState.SizeX), GameLogic.ConvertMapY(y * GameState.SizeY), rect.X, rect.Y, rect.Width, rect.Height, rect.Width, rect.Height, alpha);
+                            GameClient.RenderTexture(ref argPath, GameLogic.ConvertMapX(x * Constants.TileSize), GameLogic.ConvertMapY(y * Constants.TileSize), rect.X, rect.Y, rect.Width, rect.Height, rect.Width, rect.Height, alpha);
                         }
 
                         // Autotile rendering state
@@ -142,10 +142,10 @@ namespace Client
                         {
                             if (SettingsManager.Instance.Autotile)
                             {
-                                Autotile.OnDraw(layerIndex, GameLogic.ConvertMapX(x * GameState.SizeX), GameLogic.ConvertMapY(y * GameState.SizeY), 1, x, y, 0, false);
-                                Autotile.OnDraw(layerIndex, GameLogic.ConvertMapX(x * GameState.SizeX) + 16, GameLogic.ConvertMapY(y * GameState.SizeY), 2, x, y, 0, false);
-                                Autotile.OnDraw(layerIndex, GameLogic.ConvertMapX(x * GameState.SizeX), GameLogic.ConvertMapY(y * GameState.SizeY) + 16, 3, x, y, 0, false);
-                                Autotile.OnDraw(layerIndex, GameLogic.ConvertMapX(x * GameState.SizeX) + 16, GameLogic.ConvertMapY(y * GameState.SizeY) + 16, 4, x, y, 0, false);
+                                Autotile.OnDraw(layerIndex, GameLogic.ConvertMapX(x * Constants.TileSize), GameLogic.ConvertMapY(y * Constants.TileSize), 1, x, y, 0, false);
+                                Autotile.OnDraw(layerIndex, GameLogic.ConvertMapX(x * Constants.TileSize) + 16, GameLogic.ConvertMapY(y * Constants.TileSize), 2, x, y, 0, false);
+                                Autotile.OnDraw(layerIndex, GameLogic.ConvertMapX(x * Constants.TileSize), GameLogic.ConvertMapY(y * Constants.TileSize) + 16, 3, x, y, 0, false);
+                                Autotile.OnDraw(layerIndex, GameLogic.ConvertMapX(x * Constants.TileSize) + 16, GameLogic.ConvertMapY(y * Constants.TileSize) + 16, 4, x, y, 0, false);
                             }
                         }
                     }
@@ -220,10 +220,10 @@ namespace Client
                         // Check if the render state is normal and render the tile
                         if (Data.Autotile[x, y].Layer[layerIndex].RenderState == GameState.RenderStateNormal)
                         {
-                            rect.X = Data.MyMap.Tile[x, y].Layer[layerIndex].X * GameState.SizeX;
-                            rect.Y = Data.MyMap.Tile[x, y].Layer[layerIndex].Y * GameState.SizeY;
-                            rect.Width = GameState.SizeX;
-                            rect.Height = GameState.SizeY;
+                            rect.X = Data.MyMap.Tile[x, y].Layer[layerIndex].X * Constants.TileSize;
+                            rect.Y = Data.MyMap.Tile[x, y].Layer[layerIndex].Y * Constants.TileSize;
+                            rect.Width = Constants.TileSize;
+                            rect.Height = Constants.TileSize;
 
                             alpha = 1.0f;
 
@@ -240,7 +240,7 @@ namespace Client
 
                             // Render the tile with the calculated rectangle and transparency
                             string argPath = System.IO.Path.Combine(DataPath.Tilesets, Data.MyMap.Tile[x, y].Layer[layerIndex].Tileset.ToString());
-                            GameClient.RenderTexture(ref argPath, GameLogic.ConvertMapX(x * GameState.SizeX), GameLogic.ConvertMapY(y * GameState.SizeY), rect.X, rect.Y, rect.Width, rect.Height, rect.Width, rect.Height, alpha);
+                            GameClient.RenderTexture(ref argPath, GameLogic.ConvertMapX(x * Constants.TileSize), GameLogic.ConvertMapY(y * Constants.TileSize), rect.X, rect.Y, rect.Width, rect.Height, rect.Width, rect.Height, alpha);
                         }
                         // Handle autotile rendering
                         else if (Data.Autotile[x, y].Layer[layerIndex].RenderState == GameState.RenderStateAutotile)
@@ -248,10 +248,10 @@ namespace Client
                             if (SettingsManager.Instance.Autotile)
                             {
                                 // Render autotiles
-                                Autotile.OnDraw(layerIndex, GameLogic.ConvertMapX(x * GameState.SizeX), GameLogic.ConvertMapY(y * GameState.SizeY), 1, x, y, 0, false);
-                                Autotile.OnDraw(layerIndex, GameLogic.ConvertMapX(x * GameState.SizeX) + 16, GameLogic.ConvertMapY(y * GameState.SizeY), 2, x, y, 0, false);
-                                Autotile.OnDraw(layerIndex, GameLogic.ConvertMapX(x * GameState.SizeX), GameLogic.ConvertMapY(y * GameState.SizeY) + 16, 3, x, y, 0, false);
-                                Autotile.OnDraw(layerIndex, GameLogic.ConvertMapX(x * GameState.SizeX) + 16, GameLogic.ConvertMapY(y * GameState.SizeY) + 16, 4, x, y, 0, false);
+                                Autotile.OnDraw(layerIndex, GameLogic.ConvertMapX(x * Constants.TileSize), GameLogic.ConvertMapY(y * Constants.TileSize), 1, x, y, 0, false);
+                                Autotile.OnDraw(layerIndex, GameLogic.ConvertMapX(x * Constants.TileSize) + 16, GameLogic.ConvertMapY(y * Constants.TileSize), 2, x, y, 0, false);
+                                Autotile.OnDraw(layerIndex, GameLogic.ConvertMapX(x * Constants.TileSize), GameLogic.ConvertMapY(y * Constants.TileSize) + 16, 3, x, y, 0, false);
+                                Autotile.OnDraw(layerIndex, GameLogic.ConvertMapX(x * Constants.TileSize) + 16, GameLogic.ConvertMapY(y * Constants.TileSize) + 16, 4, x, y, 0, false);
                             }
                         }
                     }

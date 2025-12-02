@@ -1138,7 +1138,7 @@ public class WindowManager
                                         StringComparison.Ordinal);
                                     if (isTilesetV || isTilesetH)
                                     {
-                                        int per = (isTilesetV ? GameState.SizeY : GameState.SizeX) * 3;
+                                        int per = (isTilesetV ? Constants.TileSize : Constants.TileSize) * 3;
                                         step = delta > 0 ? -per : per; // up scrolls up/left
                                     }
                                     else

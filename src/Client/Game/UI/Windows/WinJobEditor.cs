@@ -18,7 +18,7 @@ namespace Client.Game.UI.Windows
             SelectedIndex = Math.Clamp(SelectedIndex, 0, Variables.MaxJobs - 1);
             RefreshList();
             PopulateStaticCombos();
-            LoadJob(SelectedIndex);
+            OnLoad(SelectedIndex);
         }
 
         // Picture previews
@@ -114,7 +114,7 @@ namespace Client.Game.UI.Windows
             GameState.EditorIndex = index;
             list.SelectedIndex = index;
             list.EnsureVisible(index);
-            LoadJob(index);
+            OnLoad(index);
         }
 
         public static void RefreshList()
@@ -149,7 +149,7 @@ namespace Client.Game.UI.Windows
             }
         }
 
-        public static void LoadJob(int index)
+        public static void OnLoad(int index)
         {
             if (index < 0 || index >= Variables.MaxJobs) return;
             SelectedIndex = index;
@@ -217,7 +217,6 @@ namespace Client.Game.UI.Windows
             }
         }
 
-        // Toggle Copy -> Paste on subsequent clicks. Paste overwrites current SelectedIndex.
         public static void OnCopyOrPaste()
         {
             if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxJobs) return;
@@ -237,11 +236,10 @@ namespace Client.Game.UI.Windows
             var pasted = _history.Value;
             Data.Job[SelectedIndex] = pasted;
             GameState.JobChanged[SelectedIndex] = true;
-            LoadJob(SelectedIndex);
+            OnLoad(SelectedIndex);
             RefreshList();
         }
 
-        // Unified handlers for callbacks
         public static void OnSave()
         {
             Editors.JobEditorOK();
@@ -258,7 +256,7 @@ namespace Client.Game.UI.Windows
         {
             Job.OnClear(SelectedIndex);
             GameState.JobChanged[SelectedIndex] = true;
-            LoadJob(SelectedIndex);
+            OnLoad(SelectedIndex);
             RefreshList();
         }
 
@@ -266,7 +264,5 @@ namespace Client.Game.UI.Windows
         {
             OnCopyOrPaste();
         }
-
-        // keep existing public methods signatures
     }
 }

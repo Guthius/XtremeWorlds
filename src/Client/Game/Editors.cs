@@ -51,8 +51,8 @@ namespace Client
                 }
 
                 // Corrected: Use integer division to get the tile index, not Math.Round
-                GameState.EditorTileX = (int)((X + tilesetOffsetX) / GameState.SizeX);
-                GameState.EditorTileY = (int)((Y + tilesetOffsetY) / GameState.SizeY);
+                GameState.EditorTileX = (int)((X + tilesetOffsetX) / Constants.TileSize);
+                GameState.EditorTileY = (int)((Y + tilesetOffsetY) / Constants.TileSize);
 
                 GameState.EditorTileSelStart = new Microsoft.Xna.Framework.Point(GameState.EditorTileX, GameState.EditorTileY);
                 GameState.EditorTileSelEnd = new Microsoft.Xna.Framework.Point(
@@ -348,8 +348,8 @@ namespace Client
                else if (GameState.MapEditorTab == (int)MapEditorTab.Directions)
                 {
                     // Convert adjusted coordinates to game world coordinates
-                    x = (int)Math.Round(GameState.TileView.Left + Math.Floor((GameState.CurMouseX + GameState.Camera.Left) % GameState.SizeX));
-                    y = (int)Math.Round(GameState.TileView.Top + Math.Floor((GameState.CurMouseY + GameState.Camera.Top) % GameState.SizeY));
+                    x = (int)Math.Round(GameState.TileView.Left + Math.Floor((GameState.CurMouseX + GameState.Camera.Left) % Constants.TileSize));
+                    y = (int)Math.Round(GameState.TileView.Top + Math.Floor((GameState.CurMouseY + GameState.Camera.Top) % Constants.TileSize));
 
                     // see if it hits an arrow
                     for (i = 0; i < 4; i++)

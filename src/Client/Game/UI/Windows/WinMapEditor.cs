@@ -160,10 +160,10 @@ public static class WinMapEditor
         GameClient.RenderTexture(ref path, destX, destY, sX, sY, sW, sH, sW, sH);
 
         // Draw selection rectangle (red outline) if in view
-        int selXpx = GameState.EditorTileX * GameState.SizeX;
-        int selYpx = GameState.EditorTileY * GameState.SizeY;
-        int selWpx = System.Math.Max(1, GameState.EditorTileWidth) * GameState.SizeX;
-        int selHpx = System.Math.Max(1, GameState.EditorTileHeight) * GameState.SizeY;
+        int selXpx = GameState.EditorTileX * Constants.TileSize;
+        int selYpx = GameState.EditorTileY * Constants.TileSize;
+        int selWpx = System.Math.Max(1, GameState.EditorTileWidth) * Constants.TileSize;
+        int selHpx = System.Math.Max(1, GameState.EditorTileHeight) * Constants.TileSize;
 
         // Compute intersection with visible src rect (sX,sY,sW,sH)
         int interLeft = System.Math.Max(selXpx, sX);
@@ -223,8 +223,8 @@ public static class WinMapEditor
         int py = sY + localY;
 
         // Translate to tile indices
-        int tileX = System.Math.Clamp(px / GameState.SizeX, 0, int.MaxValue);
-        int tileY = System.Math.Clamp(py / GameState.SizeY, 0, int.MaxValue);
+        int tileX = System.Math.Clamp(px / Constants.TileSize, 0, int.MaxValue);
+        int tileY = System.Math.Clamp(py / Constants.TileSize, 0, int.MaxValue);
 
         _isDraggingTileset = true;
         // Initialize selection
@@ -299,8 +299,8 @@ public static class WinMapEditor
 
         int startX = GameState.EditorTileSelStart.X;
         int startY = GameState.EditorTileSelStart.Y;
-        int curX = System.Math.Clamp(px / GameState.SizeX, 0, int.MaxValue);
-        int curY = System.Math.Clamp(py / GameState.SizeY, 0, int.MaxValue);
+        int curX = System.Math.Clamp(px / Constants.TileSize, 0, int.MaxValue);
+        int curY = System.Math.Clamp(py / Constants.TileSize, 0, int.MaxValue);
 
         int minX = System.Math.Min(startX, curX);
         int minY = System.Math.Min(startY, curY);
@@ -344,7 +344,7 @@ public static class WinMapEditor
         int maxX = System.Math.Max(0, info.Width - viewW);
 
         int delta = GameClient.GetMouseScrollDelta();
-        int stepPx = GameState.SizeY * (delta > 0 ? -WheelTileStep : WheelTileStep);
+        int stepPx = Constants.TileSize * (delta > 0 ? -WheelTileStep : WheelTileStep);
 
         // If Shift is held, scroll horizontally; otherwise scroll vertically
         bool shift = GameState.VbKeyShift;

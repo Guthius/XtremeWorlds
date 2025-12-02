@@ -90,7 +90,7 @@ namespace Client
             int col = 0;
             var mp = Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum];
             var dir = mp.Dir;
-            int cols = Math.Max(1, gfxInfo.Width / GameState.SizeX);
+            int cols = Math.Max(1, gfxInfo.Width / Constants.TileSize);
             bool eightDirEnabled = SettingsManager.Instance.SpriteDirections >= 8;
             if (cols >= 8 && eightDirEnabled)
             {
@@ -127,9 +127,9 @@ namespace Client
                         col = 0; break;
                 }
             }
-            rec.Left = GameState.SizeX * Math.Clamp(col, 0, cols - 1);
+            rec.Left = Constants.TileSize * Math.Clamp(col, 0, cols - 1);
 
-            rec.Right = rec.Left + GameState.SizeX;
+            rec.Right = rec.Left + Constants.TileSize;
 
             // Convert coordinates
             x = GameLogic.ConvertMapX(Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].X);

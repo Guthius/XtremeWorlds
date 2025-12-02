@@ -916,7 +916,7 @@ public class Crystalshire
                     int y = int.TryParse(tby.Text?.Trim(), out var iy) ? iy : 0;
                     x = Math.Max(0, x); y = Math.Max(0, y);
                     GameState.EditorTileX = x; GameState.EditorTileY = y;
-                    Editors.MapEditorChooseTile(x * GameState.SizeX, y * GameState.SizeY);
+                    Editors.MapEditorChooseTile(x * Constants.TileSize, y * Constants.TileSize);
                 }
             };
 
@@ -2626,7 +2626,7 @@ public class Crystalshire
         // Close
         if (WindowManager.TryGetControl("winJobEditor", "btnClose", out var btnClose))
         {
-            btnClose.CallBack[(int)ControlState.MouseDown] = () => { Editors.JobEditorCancel(); WindowManager.HideWindow("winJobEditor"); };
+            btnClose.CallBack[(int)ControlState.MouseDown] = () => { WinJobEditor.OnCancel(); };
         }
 
         // Sprite previews
@@ -2656,7 +2656,7 @@ public class Crystalshire
                         Data.Job[WinJobEditor.SelectedIndex].StartItem[slot] = item;
                         Data.Job[WinJobEditor.SelectedIndex].StartValue[slot] = amt;
                         GameState.JobChanged[WinJobEditor.SelectedIndex] = true;
-                        WinJobEditor.LoadJob(WinJobEditor.SelectedIndex);
+                        WinJobEditor.OnLoad(WinJobEditor.SelectedIndex);
                     }
                 };
             }
@@ -2680,7 +2680,7 @@ public class Crystalshire
                     {
                         Data.Job[WinJobEditor.SelectedIndex].StartSkill[slot] = skill;
                         GameState.JobChanged[WinJobEditor.SelectedIndex] = true;
-                        WinJobEditor.LoadJob(WinJobEditor.SelectedIndex);
+                        WinJobEditor.OnLoad(WinJobEditor.SelectedIndex);
                     }
                 };
             }
@@ -3159,6 +3159,12 @@ public class Crystalshire
         if (WindowManager.TryGetControl("winAnimationEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox lst)
         {
             lst.CallBack[(int)ControlState.MouseDown] = WinAnimationEditor.OnListMouseDown;
+        }
+
+        // Close
+        if (WindowManager.TryGetControl("winAnimationEditor", "btnClose", out var btnClose))
+        {
+            btnClose.CallBack[(int)ControlState.MouseDown] = () => { WinAnimationEditor.OnCancel(); };
         }
 
         // Text changes
