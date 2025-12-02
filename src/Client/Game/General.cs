@@ -269,11 +269,7 @@ namespace Client
                 // ignore shutdown errors
             }
 
-            // macOS: ask OS to terminate this process via SIGTERM
-            if (OperatingSystem.IsMacOS())
-                Cocca.OnExit();
-
-            Environment.Exit(0);
+            Cocca.OnExit();
         }
 
         // Get the shifted version of a digit key (for symbols)
