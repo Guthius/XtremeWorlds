@@ -3147,4 +3147,167 @@ public class Crystalshire
         if (WindowManager.TryGetControl("winProjectileEditor", "picSprite", out var picCtrl) && picCtrl is PictureBox pic)
             pic.OnDraw = WinProjectileEditor.OnDrawSprite;
     }
+
+    public void UpdateWindow_AnimationEditor()
+    {
+        var window = WindowLoader.FromLayout("winAnimationEditor");
+
+        // Wire scrollable list
+        WireScrollableList("winAnimationEditor", "lstIndex", "sldList");
+
+        // Use the class handlers (consistent with other editors)
+        if (WindowManager.TryGetControl("winAnimationEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox lst)
+        {
+            lst.CallBack[(int)ControlState.MouseDown] = WinAnimationEditor.OnListMouseDown;
+        }
+
+        // Text changes
+        if (WindowManager.TryGetControl("winAnimationEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
+        {
+            txtName.CallBack[(int)ControlState.KeyUp] = () =>
+            {
+                int idx = WinAnimationEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxAnimations) return;
+                var newName = txtName.Text?.Trim() ?? string.Empty;
+                Data.Animation[idx].Name = newName;
+
+                // Update list item text and keep selection/scroll
+                if (WindowManager.TryGetControl("winAnimationEditor", "lstIndex", out var lc) && lc is ListBox lb)
+                {
+                    if (idx >= 0 && idx < lb.Items.Count)
+                    {
+                        lb.Items[idx] = $"{idx + 1}: {newName}";
+                        lb.SelectedIndex = idx;
+                        lb.EnsureVisible(idx);
+                    }
+                }
+            };
+        }
+
+        // Sound combo
+        if (WindowManager.TryGetControl("winAnimationEditor", "cmbSound", out var soundCtrl) && soundCtrl is ComboBox cmbSound)
+        {
+            if (cmbSound.Items.Count == 0)
+            {
+                cmbSound.Items.Clear();
+                General.CacheSound();
+                for (int i = 0; i < Sound.SoundCache.Length; i++)
+                {
+                    var s = Sound.SoundCache[i] ?? string.Empty;
+                    if (!string.IsNullOrWhiteSpace(s)) cmbSound.Items.Add(s);
+                }
+                cmbSound.Value = 0;
+            }
+            cmbSound.CallBack[(int)ControlState.MouseMove] = () =>
+            {
+                int idx = WinAnimationEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxAnimations) return;
+                string text = cmbSound.Value >= 0 && cmbSound.Value < cmbSound.Items.Count ? cmbSound.Items[cmbSound.Value] : string.Empty;
+                Data.Animation[idx].Sound = text ?? string.Empty;
+            };
+        }
+
+        // Ensure arrays exist (struct copy-safe)
+        static void EnsureAnimArrays(Core.Globals.Type.Animation a)
+        {
+            a.Sprite ??= new int[2];
+            a.Frames ??= new int[2];
+            a.LoopCount ??= new int[2];
+            a.LoopTime ??= new int[2];
+            if (a.Sprite.Length < 2) Array.Resize(ref a.Sprite, 2);
+            if (a.Frames.Length < 2) Array.Resize(ref a.Frames, 2);
+            if (a.LoopCount.Length < 2) Array.Resize(ref a.LoopCount, 2);
+            if (a.LoopTime.Length < 2) Array.Resize(ref a.LoopTime, 2);
+            if (a.LoopCount[0] == 0) a.LoopCount[0] = 1;
+            if (a.LoopCount[1] == 0) a.LoopCount[1] = 1;
+            if (a.LoopTime[0] == 0) a.LoopTime[0] = 1;
+            if (a.LoopTime[1] == 0) a.LoopTime[1] = 1;
+        }
+
+        // Bind sliders to animation fields (copy-update, assign back)
+        void BindAnimIntBar(string barName, Action<Core.Globals.Type.Animation, int> set, int min, int max)
+        {
+            if (WindowManager.TryGetControl("winAnimationEditor", barName, out var bCtrl) && bCtrl is ScrollBar sb)
+            {
+                sb.Min = min; sb.Max = max;
+                sb.CallBack[(int)ControlState.MouseMove] = () =>
+                {
+                    int i = WinAnimationEditor.SelectedIndex; if (i < 0 || i >= Variables.MaxAnimations) return;
+                    var a = Data.Animation[i];
+                    EnsureAnimArrays(a);
+                    int v = Math.Clamp(sb.Value, sb.Min, sb.Max);
+                    set(a, v);
+                    Data.Animation[i] = a;
+                };
+            }
+        }
+
+        // Sprite numbers
+        BindAnimIntBar("nudSprite0", (a, v) => a.Sprite![0] = v, 0, Math.Max(0, GameState.NumAnimations));
+        BindAnimIntBar("nudSprite1", (a, v) => a.Sprite![1] = v, 0, Math.Max(0, GameState.NumAnimations));
+
+        // Frames per row
+        BindAnimIntBar("nudFrameCount0", (a, v) => a.Frames![0] = v, 0, 64);
+        BindAnimIntBar("nudFrameCount1", (a, v) => a.Frames![1] = v, 0, 64);
+
+        // Loop times
+        BindAnimIntBar("nudLoopTime0", (a, v) => a.LoopTime![0] = Math.Max(1, v), 0, 10000);
+        BindAnimIntBar("nudLoopTime1", (a, v) => a.LoopTime![1] = Math.Max(1, v), 0, 10000);
+
+        // Loop counts
+        BindAnimIntBar("nudLoopCount0", (a, v) => a.LoopCount![0] = Math.Max(1, v), 1, 64);
+        BindAnimIntBar("nudLoopCount1", (a, v) => a.LoopCount![1] = Math.Max(1, v), 1, 64);
+
+        // Buttons -> class handlers
+        if (WindowManager.TryGetControl("winAnimationEditor", "btnSave", out var btnSave) && btnSave is Button bs)
+            bs.CallBack[(int)ControlState.MouseDown] = WinAnimationEditor.OnSave;
+        if (WindowManager.TryGetControl("winAnimationEditor", "btnCancel", out var btnCancel) && btnCancel is Button bc)
+            bc.CallBack[(int)ControlState.MouseDown] = WinAnimationEditor.OnCancel;
+        if (WindowManager.TryGetControl("winAnimationEditor", "btnDelete", out var btnDelete) && btnDelete is Button bd)
+            bd.CallBack[(int)ControlState.MouseDown] = WinAnimationEditor.OnDelete;
+        if (WindowManager.TryGetControl("winAnimationEditor", "btnCopy", out var btnCopy) && btnCopy is Button bcp)
+            bcp.CallBack[(int)ControlState.MouseDown] = WinAnimationEditor.OnCopy;
+
+        // Previews draw (first frame only, centered)
+        void DrawPreview(string barSpriteName, string barFramesName, string picName)
+        {
+            if (WindowManager.TryGetControl("winAnimationEditor", picName, out var pc) && pc is PictureBox pic)
+            {
+                pic.OnDraw = () =>
+                {
+                    var win = WindowManager.GetWindowByName("winAnimationEditor"); if (win is null) return;
+                    int idx = WinAnimationEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxAnimations) return;
+                    var a = Data.Animation[idx];
+                    EnsureAnimArrays(a);
+
+                    int spriteNum = 0;
+                    if (WindowManager.TryGetControl("winAnimationEditor", barSpriteName, out var sc) && sc is ScrollBar sbSprite)
+                        spriteNum = sbSprite.Value;
+
+                    if (spriteNum <= 0 || spriteNum > GameState.NumAnimations) return;
+
+                    var path = System.IO.Path.Combine(DataPath.Animations, spriteNum + GameState.GfxExt);
+                    var tex = GameClient.GetGfxInfo(path);
+                    if (tex is null || tex.Width == 0 || tex.Height == 0) return;
+
+                    int columns = 0;
+                    if (WindowManager.TryGetControl("winAnimationEditor", barFramesName, out var fc) && fc is ScrollBar sbFrames)
+                        columns = Math.Max(0, sbFrames.Value);
+
+                    int fw = columns > 0 ? Math.Max(1, tex.Width / columns) : tex.Width;
+                    int inferredRows = fw > 0 ? tex.Height / fw : 0;
+                    int fh = columns > 0 ? (inferredRows > 0 ? fw : tex.Height) : tex.Height;
+
+                    int drawX = win.X + pic.X + (pic.Width - fw) / 2;
+                    int drawY = win.Y + pic.Y + (pic.Height - fh) / 2;
+
+                    GameClient.RenderTexture(ref path, drawX, drawY, 0, 0, fw, fh, fw, fh);
+                };
+            }
+        }
+
+        DrawPreview("nudSprite0", "nudFrameCount0", "picSprite0");
+        DrawPreview("nudSprite1", "nudFrameCount1", "picSprite1");
+
+        // Initialize list and values via class
+        WinAnimationEditor.Init();
+    }
 }

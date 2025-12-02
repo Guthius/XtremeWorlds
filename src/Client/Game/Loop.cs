@@ -522,7 +522,9 @@ namespace Client
             {
                 GameState.MyEditorType = EditorType.Animation;
                 GameState.EditorIndex = 0;
-                new EditorAnimation().Show();
+                WindowManager.ShowWindow("winAnimationEditor");
+                Client.Game.UI.Windows.WinAnimationEditor.Init();
+
                 GameState.InitAnimationEditor = false;
             }
 
