@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Core.Globals;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -24,7 +25,7 @@ builder.Services.AddSerilog((services, loggerConfiguration) =>
         .ReadFrom.Configuration(builder.Configuration)
         .ReadFrom.Services(services)
         .WriteTo.File(
-            path: Path.Combine(exeDir ?? string.Empty, "errors.log"),
+            path: Path.Combine(DataPath.Logs, "errors.log"),
             restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Error,
             rollingInterval: RollingInterval.Day,
             retainedFileCountLimit: 7,
