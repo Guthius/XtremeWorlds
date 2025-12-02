@@ -42,7 +42,7 @@
     <Label Name="lblDamage" Text="Damage" Position="168, 156" Size="60, 16"/>
     <TextBox Name="txtDamage" Position="234, 154" Size="80, 18" Design="TextWhite"/>
     <Label Name="lblRange" Text="Range" Position="168, 188" Size="60, 16"/>
-    <ScrollBar Name="sldRange" Position="234, 190" Size="160, 12" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="12"/>
+    <ScrollBar Name="sldRange" Position="234, 190" Size="160, 12" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 
     <!-- Skills -->
     <Label Name="lblSkills" Text="Skills" Position="8, 228" Size="60, 16"/>
@@ -62,7 +62,7 @@
     <Label Name="lblAmount" Text="Amount" Position="0, 324" Size="60, 16"/>
     <TextBox Name="txtAmount" Position="72, 322" Size="80, 18" Design="TextWhite"/>
     <Label Name="lblChance" Text="Chance" Position="168, 324" Size="60, 16"/>
-    <ScrollBar Name="sldChance" Position="228, 322" Size="160, 12" Min="0" Max="100" Value="0" Orientation="Horizontal" ThumbSize="12"/>
+    <ScrollBar Name="sldChance" Position="228, 322" Size="160, 12" Min="0" Max="100" Value="0" Orientation="Horizontal" ThumbSize="16"/>
   </GroupBox>
 
   <!-- Buttons centered directly under groupbox -->
