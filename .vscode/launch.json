@@ -1,31 +1,39 @@
 {
-  // Launch configurations for XtremeWorlds
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "C# Server",
+      "name": "Server (macOS)",
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build Server",
-      "program": "${workspaceFolder}/Build/Server/Server.dll",
+      "program": "${workspaceFolder}/Build/Server/XtremeWorlds.Server.dll",
       "args": [],
       "cwd": "${workspaceFolder}/Build/Server",
-      "console": "integratedTerminal",
       "stopAtEntry": false,
+      "console": "integratedTerminal",
       "env": {
         "DOTNET_ENVIRONMENT": "Development"
       }
     },
     {
-      "name": "C# Client",
+      "name": "Client (macOS)",
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build Client",
-      "program": "${workspaceFolder}/Build/Client/Client.dll",
+      "program": "${workspaceFolder}/Build/Client/XtremeWorlds.Client.dll",
       "args": [],
       "cwd": "${workspaceFolder}/Build/Client",
       "stopAtEntry": false,
       "console": "integratedTerminal"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Client + Server (macOS)",
+      "configurations": [
+        "Server (macOS)",
+        "Client (macOS)"
+      ]
     }
   ]
 }
