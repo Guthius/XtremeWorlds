@@ -191,7 +191,7 @@ namespace Server
         {
             for (var i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
             {
-                if (Data.MapNpc[mapNum].Npc[i].X == x && Data.MapNpc[mapNum].Npc[i].Y == y)
+                if (Data.MapNpc[mapNum].Npc?[i].X == x && Data.MapNpc[mapNum].Npc?[i].Y == y)
                     return true;
             }
 

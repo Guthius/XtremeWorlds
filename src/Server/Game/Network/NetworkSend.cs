@@ -552,6 +552,9 @@ public static class NetworkSend
     {
         var packetWriter = new PacketWriter();
 
+        if (Data.Map[mapNum].Npc == null)
+            return;
+
         packetWriter.WriteEnum(ServerPackets.SMapData);
 
         if (sendMap)
@@ -591,8 +594,6 @@ public static class NetworkSend
 
             for (var i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
             {
-                if (Data.Map[mapNum].Npc == null)
-                    return;
                 packetWriter.WriteInt32(Data.Map[mapNum].Npc[i]);
             }
 
