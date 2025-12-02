@@ -16,10 +16,10 @@ BASS audio requires a copyright license in order to use commercially, this is me
 
 ## Overview
 
-XtremeWorlds is a tile-based 2D MMORPG game engine designed for ease of use and
+XtremeWorlds is a dynamic tile-based 2D MMORPG game engine designed for ease of use and
 rapid development. The engine provides both client and server applications with
 an intuitive GUI and built-in live editing features that enable seamless 
-collaborative development.
+collaborative development. The GUI is rendered with the game render pipeline which allows easy skining and customization, including in-game editors.
 
 ## Game Features
 
@@ -40,6 +40,7 @@ Log in to the game with the client. On the server, type the command /access name
 ## Quick Start
 
 ### Prerequisites
+
 - [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
 - [PostgreSQL](https://www.postgresql.org/download/)
 - Git
@@ -47,6 +48,7 @@ Log in to the game with the client. On the server, type the command /access name
 ### Installation
 
 #### 1. Clone the repository
+
    ```bash
    git clone https://github.com/Treeflyx/XtremeWorlds.git
    cd XtremeWorlds
@@ -60,9 +62,12 @@ Log in to the game with the client. On the server, type the command /access name
 - *Note: You can modify database credentials in the server settings JSON called appsettings.json located in the base directory of the server*
 
 #### 3. Build the solution
+
    ```bash
    dotnet build
    ```
+
+- *Note: Copy Content and Config folders found inside the src folder to ```Build``` folder outside the git repository after building if the copy process fails*
 
 #### 4. Run the applications
 
