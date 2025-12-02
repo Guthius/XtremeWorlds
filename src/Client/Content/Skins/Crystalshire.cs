@@ -1334,6 +1334,23 @@ public class Crystalshire
         // Wire listbox + scrollbar
         WireScrollableList("winNpcEditor", "lstIndex", "sldList");
 
+        if (WindowManager.TryGetControl("winNpcEditor", "lstIndex", out var npcListCtrl) && npcListCtrl is ListBox npcList)
+        {
+            npcList.CallBack[(int)ControlState.MouseDown] = WinNpcEditor.OnListMouseDown;
+        }
+
+        // Text changes
+        if (WindowManager.TryGetControl("winNpcEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
+        {
+            txtName.CallBack[(int)ControlState.KeyUp] = () =>
+            {
+                int idx = WinNpcEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxNpcs) return;
+                var newName = txtName.Text ?? string.Empty;
+                Data.Npc[idx].Name = newName;
+                GameState.NpcChanged[idx] = true;
+            };
+        }
+
         // Hide redundant amount / chance textboxes: both are slider-only now.
         if (WindowManager.TryGetControl("winNpcEditor", "nudChance", out var chanceText))
         {
@@ -1342,12 +1359,6 @@ public class Crystalshire
         if (WindowManager.TryGetControl("winNpcEditor", "nudAmount", out var amountText))
         {
             amountText.Visible = false;
-        }
-
-        // Text fields
-        if (WindowManager.TryGetControl("winNpcEditor", "txtName", out var txtNameCtrl) && txtNameCtrl is TextBox txtName)
-        {
-            txtName.CallBack[(int)ControlState.KeyUp] = () => WinNpcEditor.UpdateName(txtName.Text ?? string.Empty);
         }
 
         if (WindowManager.TryGetControl("winNpcEditor", "txtAttackSay", out var atkCtrl) && atkCtrl is TextBox txtAtk)
@@ -1646,8 +1657,6 @@ public class Crystalshire
             btnClose.CallBack[(int)ControlState.MouseDown] = () => { Editors.ItemEditorCancel(); WindowManager.HideWindow("winItemEditor"); };
         }
 
-        // Ensure item editor combos and icon picture are visible (some skins may hide them)
-        // Sprite preview picture box draws item icon each frame
         if (WindowManager.TryGetControl("winItemEditor", "picIcon", out var picIconCtrl) && picIconCtrl is PictureBox picIcon)
         {
             picIcon.OnDraw = WinItemEditor.OnDrawIcon;
@@ -1656,10 +1665,32 @@ public class Crystalshire
         // Wire listbox + scrollbar
         WireScrollableList("winItemEditor", "lstIndex", "sldList");
 
-        // Name textbox updates list entry
-        if (WindowManager.TryGetControl("winItemEditor", "txtName", out var txtNameCtrl) && txtNameCtrl is TextBox txtName)
+        if (WindowManager.TryGetControl("winItemEditor", "lstIndex", out var itemListCtrl) && itemListCtrl is ListBox itemList)
         {
-            txtName.CallBack[(int)ControlState.KeyUp] = () => WinItemEditor.UpdateName(txtName.Text ?? string.Empty);
+            itemList.CallBack[(int)ControlState.MouseDown] = WinItemEditor.OnListMouseDown;
+        }
+
+        // Text changes
+        if (WindowManager.TryGetControl("winItemEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
+        {
+            txtName.CallBack[(int)ControlState.KeyUp] = () =>
+            {
+                int idx = WinItemEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxItems) return;
+                var newName = txtName.Text ?? string.Empty;
+                Data.Item[idx].Name = newName;
+                GameState.ItemChanged[idx] = true;
+
+                // Update list item text without losing selection/scroll
+                if (WindowManager.TryGetControl("winItemEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox lb)
+                {
+                    if (idx >= 0 && idx < lb.Items.Count)
+                    {
+                        lb.Items[idx] = $"{idx + 1}: {newName}";
+                        lb.SelectedIndex = idx;
+                        lb.EnsureVisible(idx);
+                    }
+                }
+            };
         }
 
         // Int binder
@@ -2490,10 +2521,32 @@ public class Crystalshire
         WireScrollableList("winShopEditor", "lstIndex", "sldList");
         WireScrollableList("winShopEditor", "lstTradeItem", "sldTradeList");
 
-        // Name textbox updates list entry
-        if (WindowManager.TryGetControl("winShopEditor", "txtName", out var txtNameCtrl) && txtNameCtrl is TextBox txtName)
+        if (WindowManager.TryGetControl("winShopEditor", "lstIndex", out var itemListCtrl) && itemListCtrl is ListBox itemList)
         {
-            txtName.CallBack[(int)ControlState.KeyUp] = () => WinShopEditor.UpdateName(txtName.Text ?? string.Empty);
+            itemList.CallBack[(int)ControlState.MouseDown] = WinItemEditor.OnListMouseDown;
+        }
+
+        // Text changes
+        if (WindowManager.TryGetControl("winShopEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
+        {
+            txtName.CallBack[(int)ControlState.KeyUp] = () =>
+            {
+                int idx = WinShopEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxShops) return;
+                var newName = txtName.Text ?? string.Empty;
+                Data.Shop[idx].Name = newName;
+                GameState.ShopChanged[idx] = true;
+
+                // Update list item text without losing selection/scroll
+                if (WindowManager.TryGetControl("winShopEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox lb)
+                {
+                    if (idx >= 0 && idx < lb.Items.Count)
+                    {
+                        lb.Items[idx] = $"{idx + 1}: {newName}";
+                        lb.SelectedIndex = idx;
+                        lb.EnsureVisible(idx);
+                    }
+                }
+            };
         }
 
         // Buy rate textbox
@@ -2733,6 +2786,7 @@ public class Crystalshire
             if (win is null) return;
             int relY = GameClient.CurrentMouseState.Y - (win.Y + lb.Y);
             int idx = lb.GetItemIndexAtPosition(relY);
+
             if (idx >= 0 && idx < lb.Items.Count)
             {
                 lb.SelectedIndex = idx;
@@ -2821,11 +2875,24 @@ public class Crystalshire
         {
             txtName.CallBack[(int)ControlState.KeyUp] = () =>
             {
-                int idx = GameState.EditorIndex; if (idx < 0 || idx >= Variables.MaxResources) return;
-                Data.Resource[idx].Name = txtName.Text ?? string.Empty;
-                WinResourceEditor.RefreshList();
+                int idx = WinResourceEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxResources) return;
+                var newName = txtName.Text ?? string.Empty;
+                Data.Resource[idx].Name = newName;
+                GameState.ResourceChanged[idx] = true;
+
+                // Update list item text without losing selection/scroll
+                if (WindowManager.TryGetControl("winResourceEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox lb)
+                {
+                    if (idx >= 0 && idx < lb.Items.Count)
+                    {
+                        lb.Items[idx] = $"{idx + 1}: {newName}";
+                        lb.SelectedIndex = idx;
+                        lb.EnsureVisible(idx);
+                    }
+                }
             };
         }
+
         if (WindowManager.TryGetControl("winResourceEditor", "txtMessage", out var msgCtrl) && msgCtrl is TextBox txtMsg)
             txtMsg.CallBack[(int)ControlState.KeyUp] = () => { int i = GameState.EditorIndex; if (i >= 0 && i < Variables.MaxResources) Data.Resource[i].SuccessMessage = txtMsg.Text ?? string.Empty; };
         if (WindowManager.TryGetControl("winResourceEditor", "txtMessage2", out var msg2Ctrl) && msg2Ctrl is TextBox txtMsg2)
@@ -2876,7 +2943,7 @@ public class Crystalshire
             btnCancel.CallBack[(int)ControlState.MouseDown] = () => { WinResourceEditor.OnCancel(); };
         if (WindowManager.TryGetControl("winResourceEditor", "btnDelete", out var btnDelete))
             btnDelete.CallBack[(int)ControlState.MouseDown] = () => { WinResourceEditor.OnDelete(); };
-        if (WindowManager.TryGetControl("winNpcEditor", "btnCopy", out var btnCopy)) { btnCopy.CallBack[(int)ControlState.MouseDown] = WinNpcEditor.OnCopy; }
+        if (WindowManager.TryGetControl("winResourceEditor", "btnCopy", out var btnCopy)) { btnCopy.CallBack[(int)ControlState.MouseDown] = WinResourceEditor.OnCopy; }
         if (WindowManager.TryGetControl("winResourceEditor", "btnClose", out var btnClose))
             btnClose.CallBack[(int)ControlState.MouseDown] = () => { WinResourceEditor.OnCancel(); };
 
@@ -2887,7 +2954,6 @@ public class Crystalshire
             picExhausted.OnDraw = WinResourceEditor.OnDrawExhausted;
     }
 
-
     public void UpdateWindow_MoralEditor()
     {
         var window = WindowLoader.FromLayout("winMoralEditor");
@@ -2895,14 +2961,31 @@ public class Crystalshire
         // Wire scrollable lists
         WireScrollableList("winMoralEditor", "lstIndex", "sldList");
 
+        if (WindowManager.TryGetControl("winMoralEditor", "lstIndex", out var moralListCtrl) && moralListCtrl is ListBox moralList)
+        {
+            moralList.CallBack[(int)ControlState.MouseDown] = WinMoralEditor.OnListMouseDown;
+        }
+
         // Text changes
         if (WindowManager.TryGetControl("winMoralEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
         {
             txtName.CallBack[(int)ControlState.KeyUp] = () =>
             {
-                int idx = GameState.EditorIndex; if (idx < 0 || idx >= Variables.MaxMorals) return;
-                Data.Resource[idx].Name = txtName.Text ?? string.Empty;
-                WinMoralEditor.RefreshList();
+                int idx = WinMoralEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxMorals) return;
+                var newName = txtName.Text ?? string.Empty;
+                Data.Moral[idx].Name = newName;
+                GameState.MoralChanged[idx] = true;
+
+                // Update list item text without losing selection/scroll
+                if (WindowManager.TryGetControl("winMoralEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox lb)
+                {
+                    if (idx >= 0 && idx < lb.Items.Count)
+                    {
+                        lb.Items[idx] = $"{idx + 1}: {newName}";
+                        lb.SelectedIndex = idx;
+                        lb.EnsureVisible(idx);
+                    }
+                }
             };
         }
 

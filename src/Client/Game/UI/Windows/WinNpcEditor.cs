@@ -324,16 +324,6 @@ public static class WinNpcEditor
         OnLoad(index);
     }
 
-    // Update name from text box (called by Crystalshire wiring).
-    public static void UpdateName(string newName)
-    {
-        if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxNpcs) return;
-        Data.Npc[SelectedIndex].Name = Strings.Trim(newName ?? string.Empty);
-        GameState.NpcChanged[SelectedIndex] = true;
-        RefreshList();
-    }
-
-    // Toggle Copy -> Paste on subsequent clicks. Paste overwrites current SelectedIndex.
     public static void OnCopyOrPaste()
     {
         if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxNpcs) return;

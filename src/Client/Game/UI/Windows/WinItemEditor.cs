@@ -569,14 +569,6 @@ public static class WinItemEditor
         OnLoad(index);
     }
 
-    public static void UpdateName(string newName)
-    {
-        if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
-        Data.Item[SelectedIndex].Name = Strings.Trim(newName ?? string.Empty);
-        GameState.ItemChanged[SelectedIndex] = true;
-        RefreshList();
-    }
-
     public static void OnCopyOrPaste()
     {
         if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
