@@ -8,7 +8,7 @@
 
 A simple 2D MMORPG game engine written in C# using TCP .NET socket async networking.
 
-Based on the Orion+ conversion and MirageBasic frameworks.
+Based on the Orion+ conversion and MirageBasic, making Mirage move to C# from Visual Basic.
 
 Game assets such as character base are only permitted to use in XtremeWorlds.
 
