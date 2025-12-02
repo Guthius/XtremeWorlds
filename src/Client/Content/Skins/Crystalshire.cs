@@ -2390,7 +2390,7 @@ public class Crystalshire
         window.GetChild("btnMapEditor").CallBack[(int)ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
-            Map.SendRequestEditMap();
+            Sender.SendRequestEditMap();
         };
 
         window.GetChild("btnNpcEditor").CallBack[(int)ControlState.MouseDown] = () =>

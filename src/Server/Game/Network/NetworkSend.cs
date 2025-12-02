@@ -561,27 +561,27 @@ public static class NetworkSend
             packetWriter.WriteString(Data.Map[mapNum].Name);
             packetWriter.WriteString(Data.Map[mapNum].Music);
             packetWriter.WriteInt32(Data.Map[mapNum].Revision);
-            packetWriter.WriteInt32(Data.Map[mapNum].Moral);
+            packetWriter.WriteByte(Data.Map[mapNum].Moral);
             packetWriter.WriteInt32(Data.Map[mapNum].Tileset);
             packetWriter.WriteInt32(Data.Map[mapNum].Up);
             packetWriter.WriteInt32(Data.Map[mapNum].Down);
             packetWriter.WriteInt32(Data.Map[mapNum].Left);
             packetWriter.WriteInt32(Data.Map[mapNum].Right);
             packetWriter.WriteInt32(Data.Map[mapNum].BootMap);
-            packetWriter.WriteInt32(Data.Map[mapNum].BootX);
-            packetWriter.WriteInt32(Data.Map[mapNum].BootY);
-            packetWriter.WriteInt32(Data.Map[mapNum].MaxX);
-            packetWriter.WriteInt32(Data.Map[mapNum].MaxY);
-            packetWriter.WriteInt32(Data.Map[mapNum].Weather);
+            packetWriter.WriteByte(Data.Map[mapNum].BootX);
+            packetWriter.WriteByte(Data.Map[mapNum].BootY);
+            packetWriter.WriteByte(Data.Map[mapNum].MaxX);
+            packetWriter.WriteByte(Data.Map[mapNum].MaxY);
+            packetWriter.WriteByte(Data.Map[mapNum].Weather);
             packetWriter.WriteInt32(Data.Map[mapNum].Fog);
             packetWriter.WriteInt32(Data.Map[mapNum].WeatherIntensity);
-            packetWriter.WriteInt32(Data.Map[mapNum].FogOpacity);
-            packetWriter.WriteInt32(Data.Map[mapNum].FogSpeed);
+            packetWriter.WriteByte(Data.Map[mapNum].FogOpacity);
+            packetWriter.WriteByte(Data.Map[mapNum].FogSpeed);
             packetWriter.WriteBoolean(Data.Map[mapNum].MapTint);
-            packetWriter.WriteInt32(Data.Map[mapNum].MapTintR);
-            packetWriter.WriteInt32(Data.Map[mapNum].MapTintG);
-            packetWriter.WriteInt32(Data.Map[mapNum].MapTintB);
-            packetWriter.WriteInt32(Data.Map[mapNum].MapTintA);
+            packetWriter.WriteByte(Data.Map[mapNum].MapTintR);
+            packetWriter.WriteByte(Data.Map[mapNum].MapTintG);
+            packetWriter.WriteByte(Data.Map[mapNum].MapTintB);
+            packetWriter.WriteByte(Data.Map[mapNum].MapTintA);
             packetWriter.WriteByte(Data.Map[mapNum].Panorama);
             packetWriter.WriteByte(Data.Map[mapNum].Parallax);
             packetWriter.WriteByte(Data.Map[mapNum].Brightness);
@@ -604,14 +604,14 @@ public static class NetworkSend
                     packetWriter.WriteInt32(Data.Map[mapNum].Tile[x, y].Data1_2);
                     packetWriter.WriteInt32(Data.Map[mapNum].Tile[x, y].Data2_2);
                     packetWriter.WriteInt32(Data.Map[mapNum].Tile[x, y].Data3_2);
-                    packetWriter.WriteInt32(Data.Map[mapNum].Tile[x, y].DirBlock);
+                    packetWriter.WriteByte(Data.Map[mapNum].Tile[x, y].DirBlock);
 
                     for (var i = 0; i < MapLayerCount; i++)
                     {
                         packetWriter.WriteInt32(Data.Map[mapNum].Tile[x, y].Layer[i].Tileset);
                         packetWriter.WriteInt32(Data.Map[mapNum].Tile[x, y].Layer[i].X);
                         packetWriter.WriteInt32(Data.Map[mapNum].Tile[x, y].Layer[i].Y);
-                        packetWriter.WriteInt32(Data.Map[mapNum].Tile[x, y].Layer[i].AutoTile);
+                        packetWriter.WriteByte(Data.Map[mapNum].Tile[x, y].Layer[i].AutoTile);
                     }
 
                     packetWriter.WriteInt32((int)Data.Map[mapNum].Tile[x, y].Type);

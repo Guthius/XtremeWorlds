@@ -30,23 +30,23 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Bind(Packets.ServerPackets.SPlayerInv, Packet_PlayerInv);
         Bind(Packets.ServerPackets.SPlayerInvUpdate, Packet_PlayerInvUpdate);
         Bind(Packets.ServerPackets.SPlayerWornEq, Packet_PlayerWornEquipment);
-        Bind(Packets.ServerPackets.SPlayerHP, Player.Packet_PlayerHP);
-        Bind(Packets.ServerPackets.SPlayerMP, Player.Packet_PlayerMP);
-        Bind(Packets.ServerPackets.SPlayerSP, Player.Packet_PlayerSP);
-        Bind(Packets.ServerPackets.SPlayerStats, Player.Packet_PlayerStats);
-        Bind(Packets.ServerPackets.SPlayerData, Player.Packet_PlayerData);
+        Bind(Packets.ServerPackets.SPlayerHP, Packet_PlayerHP);
+        Bind(Packets.ServerPackets.SPlayerMP, Packet_PlayerMP);
+        Bind(Packets.ServerPackets.SPlayerSP, Packet_PlayerSP);
+        Bind(Packets.ServerPackets.SPlayerStats, Packet_PlayerStats);
+        Bind(Packets.ServerPackets.SPlayerData, Packet_PlayerData);
         Bind(Packets.ServerPackets.SNpcMove, Packet_NpcMove);
-        Bind(Packets.ServerPackets.SPlayerDir, Player.Packet_PlayerDir);
+        Bind(Packets.ServerPackets.SPlayerDir, Packet_PlayerDir);
         Bind(Packets.ServerPackets.SNpcDir, Packet_NpcDir);
-        Bind(Packets.ServerPackets.SPlayerXY, Player.Packet_PlayerXY);
+        Bind(Packets.ServerPackets.SPlayerXY, Packet_PlayerXY);
         Bind(Packets.ServerPackets.SAttack, Packet_Attack);
         Bind(Packets.ServerPackets.SNpcAttack, Packet_NpcAttack);
-        Bind(Packets.ServerPackets.SCheckForMap, Map.Packet_CheckMap);
-        Bind(Packets.ServerPackets.SMapData, Map.MapData);
-        Bind(Packets.ServerPackets.SMapItemData, Map.Packet_MapItemData);
-        Bind(Packets.ServerPackets.SMapItemsData, Map.Packet_MapItemsData);
-        Bind(Packets.ServerPackets.SMapNpcData, Map.Packet_MapNpcData);
-        Bind(Packets.ServerPackets.SMapNpcUpdate, Map.Packet_MapNpcUpdate);
+        Bind(Packets.ServerPackets.SCheckForMap, Packet_CheckMap);
+        Bind(Packets.ServerPackets.SMapData, Packet_MapData);
+        Bind(Packets.ServerPackets.SMapItemData, Packet_MapItemData);
+        Bind(Packets.ServerPackets.SMapItemsData, Packet_MapItemsData);
+        Bind(Packets.ServerPackets.SMapNpcData, Packet_MapNpcData);
+        Bind(Packets.ServerPackets.SMapNpcUpdate, Packet_MapNpcUpdate);
         Bind(Packets.ServerPackets.SGlobalMsg, Packet_GlobalMsg);
         Bind(Packets.ServerPackets.SAdminMsg, Packet_AdminMsg);
         Bind(Packets.ServerPackets.SPlayerMsg, Packet_PlayerMsg);
@@ -57,7 +57,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Bind(Packets.ServerPackets.SNpcDead, Packet_NpcDead);
         Bind(Packets.ServerPackets.SPlayerDead, Packet_PlayerDead);
         Bind(Packets.ServerPackets.SUpdateNpc, Packet_UpdateNpc);
-        Bind(Packets.ServerPackets.SEditMap, Map.Packet_EditMap);
+        Bind(Packets.ServerPackets.SEditMap, Packet_EditMap);
         Bind(Packets.ServerPackets.SUpdateShop, Packet_UpdateShop);
         Bind(Packets.ServerPackets.SUpdateSkill, Packet_UpdateSkill);
         Bind(Packets.ServerPackets.SSkills, Packet_Skills);
@@ -66,7 +66,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Bind(Packets.ServerPackets.SUpdateResource, Packet_UpdateResource);
         Bind(Packets.ServerPackets.SSendPing, Packet_Ping);
         Bind(Packets.ServerPackets.SActionMsg, Packet_ActionMessage);
-        Bind(Packets.ServerPackets.SPlayerExp, Player.Packet_PlayerExp);
+        Bind(Packets.ServerPackets.SPlayerExp, Packet_PlayerExp);
         Bind(Packets.ServerPackets.SBlood, Packet_Blood);
         Bind(Packets.ServerPackets.SUpdateAnimation, Packet_UpdateAnimation);
         Bind(Packets.ServerPackets.SAnimation, Packet_Animation);
@@ -628,7 +628,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         var mapNpcNum = packetReader.ReadInt32();
 
         Data.MyMapNpc[mapNpcNum].DeathTimer = Client.General.GetTickCount() + timer;
-        Map.ClearMapNpc(mapNpcNum);
+        MapNpc.OnClear(mapNpcNum);
     }
 
     private static void Packet_PlayerDead(ReadOnlyMemory<byte> data)
@@ -1322,5 +1322,706 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
                     break;
                 }
         }
+    }
+
+
+    public static void Packet_PlayerHP(ReadOnlyMemory<byte> data)
+    {
+        var buffer = new PacketReader(data);
+
+        SetPlayerVital(GameState.MyIndex, Vital.Health, buffer.ReadInt32());
+        SetPlayerMaxVital(GameState.MyIndex, Vital.Health, buffer.ReadInt32());
+
+        // set max width
+        if (GetPlayerVital(GameState.MyIndex, Vital.Health) > 0)
+        {
+            GameState.BarWidthGuiHPMax = (int)Math.Round(GetPlayerVital(GameState.MyIndex, Vital.Health) / 209d / (GetPlayerMaxVital(GameState.MyIndex, Vital.Health) / 209d) * 209d);
+        }
+        else
+        {
+            GameState.BarWidthGuiHPMax = 0;
+        }
+
+        WinCharacter.Update();
+    }
+
+    public static void Packet_PlayerMP(ReadOnlyMemory<byte> data)
+    {
+        var buffer = new PacketReader(data);
+
+        SetPlayerVital(GameState.MyIndex, Vital.Mana, buffer.ReadInt32());
+        SetPlayerMaxVital(GameState.MyIndex, Vital.Mana, buffer.ReadInt32());
+
+        // set max width
+        if (GetPlayerVital(GameState.MyIndex, Vital.Mana) > 0)
+        {
+            GameState.BarWidthGuiMPMax = (int)Math.Round(GetPlayerVital(GameState.MyIndex, Vital.Mana) / 209d / (GetPlayerMaxVital(GameState.MyIndex, Vital.Mana) / 209d) * 209d);
+        }
+        else
+        {
+            GameState.BarWidthGuiMPMax = 0;
+        }
+
+        WinCharacter.Update();
+    }
+
+    public static void Packet_PlayerSP(ReadOnlyMemory<byte> data)
+    {
+        var buffer = new PacketReader(data);
+
+        SetPlayerVital(GameState.MyIndex, Vital.Stamina, buffer.ReadInt32());
+        SetPlayerMaxVital(GameState.MyIndex, Vital.Stamina, buffer.ReadInt32());
+
+        // set max width
+        if (GetPlayerVital(GameState.MyIndex, Vital.Stamina) > 0)
+        {
+            GameState.BarWidthGuiSPMax = (int)Math.Round(GetPlayerVital(GameState.MyIndex, Vital.Stamina) / 209d / (GetPlayerMaxVital(GameState.MyIndex, Vital.Stamina) / 209d) * 209d);
+        }
+        else
+        {
+            GameState.BarWidthGuiSPMax = 0;
+        }
+
+        WinCharacter.Update();
+    }
+
+    public static void Packet_PlayerStats(ReadOnlyMemory<byte> data)
+    {
+        int i;
+        int index;
+        var buffer = new PacketReader(data);
+
+        index = buffer.ReadInt32();
+
+        int statCount = Enum.GetValues(typeof(Stat)).Length;
+        for (i = 0; i < statCount; i++)
+            SetPlayerStat(index, (Stat)i, buffer.ReadInt32());
+    }
+
+    public static void Packet_PlayerData(ReadOnlyMemory<byte> data)
+    {
+        int i;
+        int x;
+        var buffer = new PacketReader(data);
+
+        i = buffer.ReadInt32();
+        SetPlayerName(i, buffer.ReadString());
+        SetPlayerJob(i, buffer.ReadInt32());
+        SetPlayerLevel(i, buffer.ReadInt32());
+        SetPlayerPoints(i, buffer.ReadInt32());
+        SetPlayerSprite(i, buffer.ReadInt32());
+        SetPlayerMap(i, buffer.ReadInt32());
+        SetPlayerAccess(i, buffer.ReadByte());
+        SetPlayerPk(i, buffer.ReadBoolean());
+        Data.Player[i].Moving = 0;
+
+        int statCount = Enum.GetValues(typeof(Stat)).Length;
+        for (x = 0; x < statCount; x++)
+            SetPlayerStat(i, (Stat)x, buffer.ReadInt32());
+
+        int resourceSkillCount = Enum.GetValues(typeof(ResourceSkill)).Length;
+        for (x = 0; x < resourceSkillCount; x++)
+        {
+            Data.Player[i].GatherSkills[x].SkillLevel = buffer.ReadInt32();
+            Data.Player[i].GatherSkills[x].SkillCurExp = buffer.ReadInt32();
+            Data.Player[i].GatherSkills[x].SkillNextLevelExp = buffer.ReadInt32();
+        }
+
+        // Check if the player is the client player
+        if (i == GameState.MyIndex)
+        {
+            // Reset directions
+            GameState.DirUp = false;
+            GameState.DirDown = false;
+            GameState.DirLeft = false;
+            GameState.DirRight = false;
+
+            // set form
+            {
+                var instance = WindowManager.Windows[WindowManager.GetWindowIndex("winCharacter")];
+                instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblName")].Text = "Name";
+                instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblJob")].Text = "Job";
+                instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblLevel")].Text = "Level";
+                instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblGuild")].Text = "Guild";
+                instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblName2")].Text = GetPlayerName(GameState.MyIndex);
+                instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblJob2")].Text = Data.Job[GetPlayerJob(GameState.MyIndex)].Name;
+                instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblLevel2")].Text = GetPlayerLevel(GameState.MyIndex).ToString();
+                instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblGuild2")].Text = "None";
+                WinCharacter.Update();
+
+                // stats
+                for (x = 0; x < statCount; x++)
+                    instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblStat_" + (x + 1))].Text = GetPlayerStat(GameState.MyIndex, (Stat)x).ToString();
+
+                // points
+                instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblPoints")].Text = GetPlayerPoints(GameState.MyIndex).ToString();
+
+                // grey out buttons
+                if (GetPlayerPoints(GameState.MyIndex) == 0)
+                {
+                    for (x = 0; x < statCount; x++)
+                        instance.Controls[WindowManager.GetControlIndex("winCharacter", "btnGreyStat_" + (x + 1))].Visible = true;
+                }
+                else
+                {
+                    for (x = 0; x < statCount; x++)
+                        instance.Controls[WindowManager.GetControlIndex("winCharacter", "btnGreyStat_" + (x + 1))].Visible = false;
+                }
+            }
+            GameState.PlayerData = true;
+        }
+    }
+
+    public static void Packet_StopPlayerMove(ReadOnlyMemory<byte> data)
+    {
+        int i;
+        var buffer = new PacketReader(data);
+
+        i = buffer.ReadInt32();
+
+        // Make sure the player is in range
+        if (i < 0 || i >= Variables.MaxPlayers)
+            return;
+
+        // Stop the player from moving
+        Data.Player[i].Moving = 0;
+        Data.Player[i].IsMoving = false; // ensure per-pixel movement halts client-side
+    }
+
+    public static void Packet_PlayerDir(ReadOnlyMemory<byte> data)
+    {
+        int dir;
+        int i;
+        var buffer = new PacketReader(data);
+
+        i = buffer.ReadInt32();
+        dir = buffer.ReadByte();
+
+        SetPlayerDir(i, dir);
+
+        // Do not reset local player's movement state on our own echoed dir packets; this causes micro-stutters
+        if (i != GameState.MyIndex)
+        {
+            ref var instance = ref Data.Player[i];
+            instance.Moving = 0;
+        }
+    }
+
+    public static void Packet_PlayerExp(ReadOnlyMemory<byte> data)
+    {
+        int index;
+        int tnl;
+        var buffer = new PacketReader(data);
+        int maxLevel = 0;
+
+        index = buffer.ReadInt32();
+        maxLevel = buffer.ReadInt32();
+        GameState.MaxLevel = maxLevel;
+        SetPlayerExp(index, buffer.ReadInt32());
+
+        tnl = buffer.ReadInt32();
+        GameState.NextlevelExp = tnl;
+
+        // set max width
+        if (GetPlayerLevel(GameState.MyIndex) < GameState.MaxLevel)
+        {
+            if (GetPlayerExp(GameState.MyIndex) > 0)
+            {
+                GameState.BarWidthGuiExpMax = (int)Math.Round(GetPlayerExp(GameState.MyIndex) / 209d / (tnl / 209d) * 209d);
+            }
+            else
+            {
+                GameState.BarWidthGuiExpMax = 0;
+            }
+        }
+        else
+        {
+            GameState.BarWidthGuiExpMax = 209;
+        }
+
+        // Update GUI
+        WinCharacter.Update();
+    }
+
+    public static void Packet_PlayerXY(ReadOnlyMemory<byte> data)
+    {
+        int x;
+        int y;
+        int dir;
+        int index;
+        byte moving;
+        var buffer = new PacketReader(data);
+
+        index = buffer.ReadInt32();
+        x = buffer.ReadInt32();
+        y = buffer.ReadInt32();
+        dir = buffer.ReadByte();
+        moving = buffer.ReadByte();
+
+        SetPlayerX(index, x);
+        SetPlayerY(index, y);
+        SetPlayerDir(index, dir);
+        Data.Player[index].Moving = moving;
+        Data.Player[index].IsMoving = buffer.ReadBoolean();
+    }
+
+
+    public static void Packet_CheckMap(ReadOnlyMemory<byte> data)
+    {
+        int x;
+        int y;
+        int i;
+        byte needMap;
+        var buffer = new PacketReader(data);
+
+        GameState.GettingMap = true;
+
+        // Erase all players except self
+        for (i = 0; i < Variables.MaxPlayers; i++)
+        {
+            if (i != GameState.MyIndex)
+            {
+                SetPlayerMap(i, 0);
+            }
+        }
+
+        // Erase all temporary tile values
+        for (i = 0; i < Variables.MaxMapNpcs; i++)
+        {
+            MapNpc.OnClear(i);
+        }
+        
+        Database.ClearBlood();
+        Map.OnClear();
+        GameLogic.RemoveChatBubbles();
+        Animation.OnClear();
+
+        GameState.ResourceIndex = 0;
+
+        // Get map num
+        x = buffer.ReadInt32();
+
+        // Get revision
+        y = buffer.ReadInt32();
+
+        needMap = 1;
+
+        var packetWriter = new PacketWriter(8);
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CNeedMap);
+        packetWriter.WriteInt32(needMap);
+
+        Network.Send(packetWriter);
+    }
+
+    public static void Packet_MapData(ReadOnlyMemory<byte> data)
+    {
+        int x;
+        int y;
+        int i;
+        int j;
+        int mapNum;
+        var buffer = new PacketReader(data);
+
+        GameState.MapData = false;
+
+        if (buffer.ReadInt32() == 1)
+        {
+            mapNum = buffer.ReadInt32();
+            Data.MyMap.Name = buffer.ReadString();
+            Data.MyMap.Music = buffer.ReadString();
+            Data.MyMap.Revision = buffer.ReadInt32();
+            Data.MyMap.Moral = buffer.ReadByte();
+            Data.MyMap.Tileset = buffer.ReadInt32();
+            Data.MyMap.Up = buffer.ReadInt32();
+            Data.MyMap.Down = buffer.ReadInt32();
+            Data.MyMap.Left = buffer.ReadInt32();
+            Data.MyMap.Right = buffer.ReadInt32();
+            Data.MyMap.BootMap = buffer.ReadInt32();
+            Data.MyMap.BootX = buffer.ReadByte();
+            Data.MyMap.BootY = buffer.ReadByte();
+            Data.MyMap.MaxX = buffer.ReadByte();
+            Data.MyMap.MaxY = buffer.ReadByte();
+            Data.MyMap.Weather = buffer.ReadByte();
+            Data.MyMap.Fog = buffer.ReadInt32();
+            Data.MyMap.WeatherIntensity = buffer.ReadInt32();
+            Data.MyMap.FogOpacity = buffer.ReadByte();
+            Data.MyMap.FogSpeed = buffer.ReadByte();
+            Data.MyMap.MapTint = buffer.ReadBoolean();
+            Data.MyMap.MapTintR = buffer.ReadByte();
+            Data.MyMap.MapTintG = buffer.ReadByte();
+            Data.MyMap.MapTintB = buffer.ReadByte();
+            Data.MyMap.MapTintA = buffer.ReadByte();
+            Data.MyMap.Panorama = buffer.ReadByte();
+            Data.MyMap.Parallax = buffer.ReadByte();
+            Data.MyMap.Brightness = buffer.ReadByte();
+            Data.MyMap.NoRespawn = buffer.ReadBoolean();
+            Data.MyMap.Indoors = buffer.ReadBoolean();
+            Data.MyMap.Shop = buffer.ReadInt32();
+
+            Data.MyMap.Tile = new Core.Globals.Type.Tile[Data.MyMap.MaxX, Data.MyMap.MaxY];
+            Data.TileHistory = new Core.Globals.Type.TileHistory[GameState.MaxTileHistory];
+
+            for (i = 0; i < GameState.MaxTileHistory; i++)
+            {
+                Data.TileHistory[i].Tile = new Core.Globals.Type.Tile[Data.MyMap.MaxX, Data.MyMap.MaxY];
+            }
+
+            int layerCount = Enum.GetValues(typeof(MapLayer)).Length;
+
+            // Initialize Layer arrays for MyMap tiles
+            for (int xx = 0; xx < Data.MyMap.MaxX; xx++)
+            {
+                for (int yy = 0; yy < Data.MyMap.MaxY; yy++)
+                {
+                    Data.MyMap.Tile[xx, yy].Layer = new Core.Globals.Type.Layer[layerCount];
+
+                    for (int l = 0; l < layerCount; l++)
+                    {
+                        Data.MyMap.Tile[xx, yy].Layer[l] = new Core.Globals.Type.Layer
+                        {
+                            Tileset = 0,
+                            X = 0,
+                            Y = 0,
+                            AutoTile = 0,
+                        };
+
+                        for (int t = 0; t < GameState.MaxTileHistory; t++)
+                        {
+                            Data.TileHistory[t].Tile[xx, yy].Layer = new Core.Globals.Type.Layer[layerCount];
+
+                            Data.TileHistory[t].Tile[xx, yy].Layer[l] = new Core.Globals.Type.Layer
+                            {
+                                Tileset = 0,
+                                X = 0,
+                                Y = 0,
+                                AutoTile = 0
+                            };
+                        }
+                    }
+                }
+            }
+
+            for (x = 0; x < Variables.MaxMapNpcs; x++)
+                Data.MyMap.Npc[x] = buffer.ReadInt32();
+
+            var loopTo = (int)Data.MyMap.MaxX;
+            for (x = 0; x < loopTo; x++)
+            {
+                var loopTo1 = (int)Data.MyMap.MaxY;
+                for (y = 0; y < loopTo1; y++)
+                {
+                    Data.MyMap.Tile[x, y].Data1 = buffer.ReadInt32();
+                    Data.MyMap.Tile[x, y].Data2 = buffer.ReadInt32();
+                    Data.MyMap.Tile[x, y].Data3 = buffer.ReadInt32();
+                    Data.MyMap.Tile[x, y].Data1_2 = buffer.ReadInt32();
+                    Data.MyMap.Tile[x, y].Data2_2 = buffer.ReadInt32();
+                    Data.MyMap.Tile[x, y].Data3_2 = buffer.ReadInt32();
+                    Data.MyMap.Tile[x, y].DirBlock = buffer.ReadByte();
+
+                    for (j = 0; j < GameState.MaxTileHistory; j++)
+                    {
+                        Data.TileHistory[j].Tile[x, y].Data1 = Data.MyMap.Tile[x, y].Data1;
+                        Data.TileHistory[j].Tile[x, y].Data2 = Data.MyMap.Tile[x, y].Data2;
+                        Data.TileHistory[j].Tile[x, y].Data3 = Data.MyMap.Tile[x, y].Data3;
+                        Data.TileHistory[j].Tile[x, y].Data1_2 = Data.MyMap.Tile[x, y].Data1_2;
+                        Data.TileHistory[j].Tile[x, y].Data2_2 = Data.MyMap.Tile[x, y].Data2_2;
+                        Data.TileHistory[j].Tile[x, y].Data3_2 = Data.MyMap.Tile[x, y].Data3_2;
+                        Data.TileHistory[j].Tile[x, y].DirBlock = Data.MyMap.Tile[x, y].DirBlock;
+                        Data.TileHistory[j].Tile[x, y].Type = Data.MyMap.Tile[x, y].Type;
+                        Data.TileHistory[j].Tile[x, y].Type2 = Data.MyMap.Tile[x, y].Type2;
+                    }
+
+                    for (i = 0; i < layerCount; i++)
+                    {
+                        Data.MyMap.Tile[x, y].Layer[i].Tileset = buffer.ReadInt32();
+                        Data.MyMap.Tile[x, y].Layer[i].X = buffer.ReadInt32();
+                        Data.MyMap.Tile[x, y].Layer[i].Y = buffer.ReadInt32();
+                        Data.MyMap.Tile[x, y].Layer[i].AutoTile = buffer.ReadByte();
+
+                        for (j = 0; j < GameState.MaxTileHistory; j++)
+                        {
+                            Data.TileHistory[j].Tile[x, y].Layer[i].Tileset = Data.MyMap.Tile[x, y].Layer[i].Tileset;
+                            Data.TileHistory[j].Tile[x, y].Layer[i].X = Data.MyMap.Tile[x, y].Layer[i].X;
+                            Data.TileHistory[j].Tile[x, y].Layer[i].Y = Data.MyMap.Tile[x, y].Layer[i].Y;
+                            Data.TileHistory[j].Tile[x, y].Layer[i].AutoTile = Data.MyMap.Tile[x, y].Layer[i].AutoTile;
+                        }
+                    }
+
+                    Data.MyMap.Tile[x, y].Type = (TileType)buffer.ReadInt32();
+                    Data.MyMap.Tile[x, y].Type2 = (TileType)buffer.ReadInt32();
+                }
+            }
+
+            Data.MyMap.EventCount = buffer.ReadInt32();
+
+            if (Data.MyMap.EventCount > 0)
+            {
+                Data.MyMap.Event = new Core.Globals.Type.Event[Data.MyMap.EventCount];
+                var loopTo2 = Data.MyMap.EventCount;
+                for (i = 0; i < loopTo2; i++)
+                {
+                    {
+                        ref var instance = ref Data.MyMap.Event[i];
+                        instance.Name = buffer.ReadString();
+                        instance.Globals = buffer.ReadByte();
+                        instance.X = buffer.ReadInt32();
+                        instance.Y = buffer.ReadInt32();
+                        instance.PageCount = buffer.ReadInt32();
+                    }
+
+                    if (Data.MyMap.Event[i].PageCount > 0)
+                    {
+                        Data.MyMap.Event[i].Pages = new Core.Globals.Type.EventPage[Data.MyMap.Event[i].PageCount];
+                        var loopTo3 = Data.MyMap.Event[i].PageCount;
+                        for (x = 0; x < loopTo3; x++)
+                        {
+                            {
+                                ref var instance1 = ref Data.MyMap.Event[i].Pages[x];
+                                instance1.ChkVariable = buffer.ReadInt32();
+                                instance1.VariableIndex = buffer.ReadInt32();
+                                instance1.VariableCondition = buffer.ReadInt32();
+                                instance1.VariableCompare = buffer.ReadInt32();
+
+                                instance1.ChkSwitch = buffer.ReadInt32();
+                                instance1.SwitchIndex = buffer.ReadInt32();
+                                instance1.SwitchCompare = buffer.ReadInt32();
+
+                                instance1.ChkHasItem = buffer.ReadInt32();
+                                instance1.HasItemIndex = buffer.ReadInt32();
+                                instance1.HasItemAmount = buffer.ReadInt32();
+
+                                instance1.ChkSelfSwitch = buffer.ReadInt32();
+                                instance1.SelfSwitchIndex = buffer.ReadInt32();
+                                instance1.SelfSwitchCompare = buffer.ReadInt32();
+
+                                instance1.GraphicType = buffer.ReadByte();
+                                instance1.Graphic = buffer.ReadInt32();
+                                instance1.GraphicX = buffer.ReadInt32();
+                                instance1.GraphicY = buffer.ReadInt32();
+                                instance1.GraphicX2 = buffer.ReadInt32();
+                                instance1.GraphicY2 = buffer.ReadInt32();
+
+                                instance1.MoveType = buffer.ReadByte();
+                                instance1.MoveSpeed = buffer.ReadByte();
+                                instance1.MoveFreq = buffer.ReadByte();
+                                instance1.MoveRouteCount = buffer.ReadInt32();
+                                instance1.IgnoreMoveRoute = buffer.ReadInt32();
+                                instance1.RepeatMoveRoute = buffer.ReadInt32();
+
+                                if (instance1.MoveRouteCount > 0)
+                                {
+                                    Data.MyMap.Event[i].Pages[x].MoveRoute = new Core.Globals.Type.MoveRoute[instance1.MoveRouteCount];
+                                    var loopTo4 = instance1.MoveRouteCount;
+                                    for (y = 0; y < loopTo4; y++)
+                                    {
+                                        instance1.MoveRoute[y].Index = buffer.ReadInt32();
+                                        instance1.MoveRoute[y].Data1 = buffer.ReadInt32();
+                                        instance1.MoveRoute[y].Data2 = buffer.ReadInt32();
+                                        instance1.MoveRoute[y].Data3 = buffer.ReadInt32();
+                                        instance1.MoveRoute[y].Data4 = buffer.ReadInt32();
+                                        instance1.MoveRoute[y].Data5 = buffer.ReadInt32();
+                                        instance1.MoveRoute[y].Data6 = buffer.ReadInt32();
+                                    }
+                                }
+
+                                instance1.IdleAnim = buffer.ReadInt32();
+                                instance1.DirFix = buffer.ReadInt32();
+                                instance1.WalkThrough = buffer.ReadInt32();
+                                instance1.ShowName = buffer.ReadInt32();
+                                instance1.Trigger = buffer.ReadByte();
+                                instance1.CommandListCount = buffer.ReadInt32();
+                                instance1.Position = buffer.ReadByte();
+                            }
+
+                            if (Data.MyMap.Event[i].Pages[x].CommandListCount > 0)
+                            {
+                                Data.MyMap.Event[i].Pages[x].CommandList = new Core.Globals.Type.CommandList[Data.MyMap.Event[i].Pages[x].CommandListCount];
+                                var loopTo5 = Data.MyMap.Event[i].Pages[x].CommandListCount;
+                                for (y = 0; y < loopTo5; y++)
+                                {
+                                    Data.MyMap.Event[i].Pages[x].CommandList[y].CommandCount = buffer.ReadInt32();
+                                    Data.MyMap.Event[i].Pages[x].CommandList[y].ParentList = buffer.ReadInt32();
+                                    if (Data.MyMap.Event[i].Pages[x].CommandList[y].CommandCount > 0)
+                                    {
+                                        Data.MyMap.Event[i].Pages[x].CommandList[y].Commands = new Core.Globals.Type.EventCommand[Data.MyMap.Event[i].Pages[x].CommandList[y].CommandCount];
+                                        for (int z = 0, loopTo6 = Data.MyMap.Event[i].Pages[x].CommandList[y].CommandCount; z < loopTo6; z++)
+                                        {
+                                            {
+                                                ref var instance2 = ref Data.MyMap.Event[i].Pages[x].CommandList[y].Commands[z];
+                                                instance2.Index = buffer.ReadInt32();
+                                                instance2.Text1 = buffer.ReadString();
+                                                instance2.Text2 = buffer.ReadString();
+                                                instance2.Text3 = buffer.ReadString();
+                                                instance2.Text4 = buffer.ReadString();
+                                                instance2.Text5 = buffer.ReadString();
+                                                instance2.Data1 = buffer.ReadInt32();
+                                                instance2.Data2 = buffer.ReadInt32();
+                                                instance2.Data3 = buffer.ReadInt32();
+                                                instance2.Data4 = buffer.ReadInt32();
+                                                instance2.Data5 = buffer.ReadInt32();
+                                                instance2.Data6 = buffer.ReadInt32();
+                                                instance2.ConditionalBranch.CommandList = buffer.ReadInt32();
+                                                instance2.ConditionalBranch.Condition = buffer.ReadInt32();
+                                                instance2.ConditionalBranch.Data1 = buffer.ReadInt32();
+                                                instance2.ConditionalBranch.Data2 = buffer.ReadInt32();
+                                                instance2.ConditionalBranch.Data3 = buffer.ReadInt32();
+                                                instance2.ConditionalBranch.ElseCommandList = buffer.ReadInt32();
+                                                instance2.MoveRouteCount = buffer.ReadInt32();
+                                                if (instance2.MoveRouteCount > 0)
+                                                {
+                                                    Array.Resize(ref instance2.MoveRoute, instance2.MoveRouteCount);
+                                                    for (int w = 0, loopTo7 = instance2.MoveRouteCount; w < loopTo7; w++)
+                                                    {
+                                                        instance2.MoveRoute[w].Index = buffer.ReadInt32();
+                                                        instance2.MoveRoute[w].Data1 = buffer.ReadInt32();
+                                                        instance2.MoveRoute[w].Data2 = buffer.ReadInt32();
+                                                        instance2.MoveRoute[w].Data3 = buffer.ReadInt32();
+                                                        instance2.MoveRoute[w].Data4 = buffer.ReadInt32();
+                                                        instance2.MoveRoute[w].Data5 = buffer.ReadInt32();
+                                                        instance2.MoveRoute[w].Data6 = buffer.ReadInt32();
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        for (i = 0; i < Variables.MaxMapItems; i++)
+        {
+            Data.MyMapItem[i].Num = buffer.ReadInt32();
+            Data.MyMapItem[i].Value = buffer.ReadInt32();
+            Data.MyMapItem[i].X = buffer.ReadInt32();
+            Data.MyMapItem[i].Y = buffer.ReadInt32();
+        }
+
+        int vitalCount = Enum.GetValues(typeof(Vital)).Length;
+
+        for (i = 0; i < Variables.MaxMapNpcs; i++)
+        {
+            Data.MyMapNpc[i].Num = buffer.ReadInt32();
+            Data.MyMapNpc[i].X = buffer.ReadInt32();
+            Data.MyMapNpc[i].Y = buffer.ReadInt32();
+            Data.MyMapNpc[i].Dir = buffer.ReadByte();
+            for (int n = 0; n < vitalCount; n++)
+                Data.MyMapNpc[i].Vital[n] = buffer.ReadInt32();
+        }
+
+        if (buffer.ReadInt32() == 1)
+        {
+            GameState.ResourceIndex = buffer.ReadInt32();
+            GameState.ResourcesInit = false;
+            Data.MapResource = new Core.Globals.Type.MapResource[GameState.ResourceIndex];
+            Data.MyMapResource = new Core.Globals.Type.MapResourceCache[Variables.MaxResources];
+
+            if (GameState.ResourceIndex > 0)
+            {
+                var loopTo8 = GameState.ResourceIndex;
+                for (i = 0; i < loopTo8; i++)
+                {
+                    Data.MyMapResource[i].State = buffer.ReadByte();
+                    Data.MyMapResource[i].X = buffer.ReadInt32();
+                    Data.MyMapResource[i].Y = buffer.ReadInt32();
+                }
+
+                GameState.ResourcesInit = true;
+            }
+        }
+
+        Data.Map[GetPlayerMap(GameState.MyIndex)] = Data.MyMap;
+
+        Autotile.InitAutotiles();
+
+        GameState.MapData = true;
+
+        for (i = 0; i < byte.MaxValue; i++)
+            GameLogic.ClearActionMsg((byte)i);
+
+        GameState.CurrentWeather = Data.MyMap.Weather;
+        GameState.CurrentWeatherIntensity = Data.MyMap.WeatherIntensity;
+        GameState.CurrentFog = Data.MyMap.Fog;
+        GameState.CurrentFogSpeed = Data.MyMap.FogSpeed;
+        GameState.CurrentFogOpacity = Data.MyMap.FogOpacity;
+        GameState.CurrentTintR = Data.MyMap.MapTintR;
+        GameState.CurrentTintG = Data.MyMap.MapTintG;
+        GameState.CurrentTintB = Data.MyMap.MapTintB;
+        GameState.CurrentTintA = Data.MyMap.MapTintA;
+
+        GameLogic.UpdateDrawMapName();
+
+        GameState.GettingMap = false;
+        GameState.CanMoveNow = true;
+    }
+
+    public static void Packet_MapItemData(ReadOnlyMemory<byte> data)
+    {
+        int i;
+        var buffer = new PacketReader(data);
+
+        i = buffer.ReadByte();
+        ref var instance = ref Data.MyMapItem[i];
+        instance.Num = buffer.ReadInt32();
+        instance.Value = buffer.ReadInt32();
+        instance.X = buffer.ReadInt32();
+        instance.Y = buffer.ReadInt32();
+
+    }
+
+    public static void Packet_MapItemsData(ReadOnlyMemory<byte> data)
+    {
+        var buffer = new PacketReader(data);
+
+        for (int i = 0; i < Variables.MaxMapItems; i++)
+        {
+            ref var instance = ref Data.MyMapItem[i];
+            instance.Num = buffer.ReadInt32();
+            instance.Value = buffer.ReadInt32();
+            instance.X = buffer.ReadInt32();
+            instance.Y = buffer.ReadInt32();
+        }
+
+    }
+
+    public static void Packet_MapNpcData(ReadOnlyMemory<byte> data)
+    {
+        int i;
+        var buffer = new PacketReader(data);
+
+        for (i = 0; i < Variables.MaxMapNpcs; i++)
+        {
+            ref var instance = ref Data.MyMapNpc[i];
+            instance.Num = buffer.ReadInt32();
+            instance.X = buffer.ReadInt32();
+            instance.Y = buffer.ReadInt32();
+            instance.Dir = buffer.ReadByte();
+        }
+    }
+
+    public static void Packet_MapNpcUpdate(ReadOnlyMemory<byte> data)
+    {
+        int npcNum;
+        var buffer = new PacketReader(data);
+
+        npcNum = buffer.ReadInt32();
+
+        ref var instance = ref Data.MyMapNpc[npcNum];
+        instance.Num = buffer.ReadInt32();
+        instance.X = buffer.ReadInt32();
+        instance.Y = buffer.ReadInt32();
+        instance.Dir = buffer.ReadByte();
+    }
+
+    public static void Packet_EditMap(ReadOnlyMemory<byte> data)
+    {
+        var buffer = new PacketReader(data);
+
+        GameState.InitMapEditor = true;
+        WindowManager.HideWindows();
     }
 }

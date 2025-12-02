@@ -1123,4 +1123,243 @@ public static class Sender
 
         Network.Send(packetWriter);
     }
+
+    public static void SendPlayerRequestNewMap()
+    {
+        if (GameState.GettingMap)
+        {
+            return;
+        }
+
+        var packetWriter = new PacketWriter(4);
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CRequestNewMap);
+        packetWriter.WriteInt32(GetPlayerDir(GameState.MyIndex));
+
+        Network.Send(packetWriter);
+
+        GameState.GettingMap = true;
+        GameState.CanMoveNow = false;
+    }
+
+    public static void SendRequestEditMap()
+    {
+        var packetWriter = new PacketWriter(4);
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CRequestEditMap);
+
+        Network.Send(packetWriter);
+    }
+
+    public static void SendMap()
+    {
+        int x;
+        int y;
+        int i;
+
+        GameState.CanMoveNow = false;
+
+        var packetWriter = new PacketWriter();
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CSaveMap);
+        packetWriter.WriteString(Data.MyMap.Name);
+        packetWriter.WriteString(Data.MyMap.Music);
+        packetWriter.WriteInt32(Data.MyMap.Moral);
+        packetWriter.WriteInt32(Data.MyMap.Tileset);
+        packetWriter.WriteInt32(Data.MyMap.Up);
+        packetWriter.WriteInt32(Data.MyMap.Down);
+        packetWriter.WriteInt32(Data.MyMap.Left);
+        packetWriter.WriteInt32(Data.MyMap.Right);
+        packetWriter.WriteInt32(Data.MyMap.BootMap);
+        packetWriter.WriteInt32(Data.MyMap.BootX);
+        packetWriter.WriteInt32(Data.MyMap.BootY);
+        packetWriter.WriteInt32(Data.MyMap.MaxX);
+        packetWriter.WriteInt32(Data.MyMap.MaxY);
+        packetWriter.WriteInt32(Data.MyMap.Weather);
+        packetWriter.WriteInt32(Data.MyMap.Fog);
+        packetWriter.WriteInt32(Data.MyMap.WeatherIntensity);
+        packetWriter.WriteInt32(Data.MyMap.FogOpacity);
+        packetWriter.WriteInt32(Data.MyMap.FogSpeed);
+        packetWriter.WriteBoolean(Data.MyMap.MapTint);
+        packetWriter.WriteInt32(Data.MyMap.MapTintR);
+        packetWriter.WriteInt32(Data.MyMap.MapTintG);
+        packetWriter.WriteInt32(Data.MyMap.MapTintB);
+        packetWriter.WriteInt32(Data.MyMap.MapTintA);
+        packetWriter.WriteByte(Data.MyMap.Panorama);
+        packetWriter.WriteByte(Data.MyMap.Parallax);
+        packetWriter.WriteByte(Data.MyMap.Brightness);
+        packetWriter.WriteBoolean(Data.MyMap.NoRespawn);
+        packetWriter.WriteBoolean(Data.MyMap.Indoors);
+        packetWriter.WriteInt32(Data.MyMap.Shop);
+
+        for (i = 0; i < Variables.MaxMapNpcs; i++)
+        {
+            packetWriter.WriteInt32(Data.MyMap.Npc[i]);
+        }
+
+        for (x = 0; x < Data.MyMap.MaxX; x++)
+        {
+            for (y = 0; y < Data.MyMap.MaxY; y++)
+            {
+                packetWriter.WriteInt32(Data.MyMap.Tile[x, y].Data1);
+                packetWriter.WriteInt32(Data.MyMap.Tile[x, y].Data2);
+                packetWriter.WriteInt32(Data.MyMap.Tile[x, y].Data3);
+                packetWriter.WriteInt32(Data.MyMap.Tile[x, y].Data1_2);
+                packetWriter.WriteInt32(Data.MyMap.Tile[x, y].Data2_2);
+                packetWriter.WriteInt32(Data.MyMap.Tile[x, y].Data3_2);
+                packetWriter.WriteInt32(Data.MyMap.Tile[x, y].DirBlock);
+
+                int layerCount = Enum.GetValues<MapLayer>().Length;
+                for (i = 0; i < layerCount; i++)
+                {
+                    packetWriter.WriteInt32(Data.MyMap.Tile[x, y].Layer[i].Tileset);
+                    packetWriter.WriteInt32(Data.MyMap.Tile[x, y].Layer[i].X);
+                    packetWriter.WriteInt32(Data.MyMap.Tile[x, y].Layer[i].Y);
+                    packetWriter.WriteInt32(Data.MyMap.Tile[x, y].Layer[i].AutoTile);
+                }
+
+                packetWriter.WriteInt32((int)Data.MyMap.Tile[x, y].Type);
+                packetWriter.WriteInt32((int)Data.MyMap.Tile[x, y].Type2);
+            }
+        }
+
+        packetWriter.WriteInt32(Data.MyMap.EventCount);
+
+        if (Data.MyMap.EventCount > 0)
+        {
+            for (i = 0; i < Data.MyMap.EventCount; i++)
+            {
+                {
+                    ref var instance = ref Data.MyMap.Event[i];
+                    packetWriter.WriteString(instance.Name);
+                    packetWriter.WriteByte(instance.Globals);
+                    packetWriter.WriteInt32(instance.X);
+                    packetWriter.WriteInt32(instance.Y);
+                    packetWriter.WriteInt32(instance.PageCount);
+                }
+
+                if (Data.MyMap.Event[i].PageCount > 0)
+                {
+                    var loopTo3 = Data.MyMap.Event[i].PageCount;
+                    for (x = 0; x < loopTo3; x++)
+                    {
+                        {
+                            ref var instance1 = ref Data.MyMap.Event[i].Pages[x];
+                            packetWriter.WriteInt32(instance1.ChkVariable);
+                            packetWriter.WriteInt32(instance1.VariableIndex);
+                            packetWriter.WriteInt32(instance1.VariableCondition);
+                            packetWriter.WriteInt32(instance1.VariableCompare);
+                            packetWriter.WriteInt32(instance1.ChkSwitch);
+                            packetWriter.WriteInt32(instance1.SwitchIndex);
+                            packetWriter.WriteInt32(instance1.SwitchCompare);
+                            packetWriter.WriteInt32(instance1.ChkHasItem);
+                            packetWriter.WriteInt32(instance1.HasItemIndex);
+                            packetWriter.WriteInt32(instance1.HasItemAmount);
+                            packetWriter.WriteInt32(instance1.ChkSelfSwitch);
+                            packetWriter.WriteInt32(instance1.SelfSwitchIndex);
+                            packetWriter.WriteInt32(instance1.SelfSwitchCompare);
+                            packetWriter.WriteByte(instance1.GraphicType);
+                            packetWriter.WriteInt32(instance1.Graphic);
+                            packetWriter.WriteInt32(instance1.GraphicX);
+                            packetWriter.WriteInt32(instance1.GraphicY);
+                            packetWriter.WriteInt32(instance1.GraphicX2);
+                            packetWriter.WriteInt32(instance1.GraphicY2);
+                            packetWriter.WriteByte(instance1.MoveType);
+                            packetWriter.WriteByte(instance1.MoveSpeed);
+                            packetWriter.WriteByte(instance1.MoveFreq);
+                            packetWriter.WriteInt32(Data.MyMap.Event[i].Pages[x].MoveRouteCount);
+                            packetWriter.WriteInt32(instance1.IgnoreMoveRoute);
+                            packetWriter.WriteInt32(instance1.RepeatMoveRoute);
+
+                            if (instance1.MoveRouteCount > 0)
+                            {
+                                var loopTo4 = instance1.MoveRouteCount;
+                                for (y = 0; y < loopTo4; y++)
+                                {
+                                    packetWriter.WriteInt32(instance1.MoveRoute[y].Index);
+                                    packetWriter.WriteInt32(instance1.MoveRoute[y].Data1);
+                                    packetWriter.WriteInt32(instance1.MoveRoute[y].Data2);
+                                    packetWriter.WriteInt32(instance1.MoveRoute[y].Data3);
+                                    packetWriter.WriteInt32(instance1.MoveRoute[y].Data4);
+                                    packetWriter.WriteInt32(instance1.MoveRoute[y].Data5);
+                                    packetWriter.WriteInt32(instance1.MoveRoute[y].Data6);
+                                }
+                            }
+
+                            packetWriter.WriteInt32(instance1.IdleAnim);
+                            packetWriter.WriteInt32(instance1.DirFix);
+                            packetWriter.WriteInt32(instance1.WalkThrough);
+                            packetWriter.WriteInt32(instance1.ShowName);
+                            packetWriter.WriteByte(instance1.Trigger);
+                            packetWriter.WriteInt32(instance1.CommandListCount);
+                            packetWriter.WriteByte(instance1.Position);
+                        }
+
+                        if (Data.MyMap.Event[i].Pages[x].CommandListCount > 0)
+                        {
+                            var loopTo5 = Data.MyMap.Event[i].Pages[x].CommandListCount;
+                            for (y = 0; y < loopTo5; y++)
+                            {
+                                packetWriter.WriteInt32(Data.MyMap.Event[i].Pages[x].CommandList[y].CommandCount);
+                                packetWriter.WriteInt32(Data.MyMap.Event[i].Pages[x].CommandList[y].ParentList);
+                                if (Data.MyMap.Event[i].Pages[x].CommandList[y].CommandCount > 0)
+                                {
+                                    for (int z = 0, loopTo6 = Data.MyMap.Event[i].Pages[x].CommandList[y].CommandCount; z < loopTo6; z++)
+                                    {
+                                        {
+                                            ref var instance2 = ref Data.MyMap.Event[i].Pages[x].CommandList[y].Commands[z];
+                                            packetWriter.WriteInt32(instance2.Index);
+                                            packetWriter.WriteString(instance2.Text1);
+                                            packetWriter.WriteString(instance2.Text2);
+                                            packetWriter.WriteString(instance2.Text3);
+                                            packetWriter.WriteString(instance2.Text4);
+                                            packetWriter.WriteString(instance2.Text5);
+                                            packetWriter.WriteInt32(instance2.Data1);
+                                            packetWriter.WriteInt32(instance2.Data2);
+                                            packetWriter.WriteInt32(instance2.Data3);
+                                            packetWriter.WriteInt32(instance2.Data4);
+                                            packetWriter.WriteInt32(instance2.Data5);
+                                            packetWriter.WriteInt32(instance2.Data6);
+                                            packetWriter.WriteInt32(instance2.ConditionalBranch.CommandList);
+                                            packetWriter.WriteInt32(instance2.ConditionalBranch.Condition);
+                                            packetWriter.WriteInt32(instance2.ConditionalBranch.Data1);
+                                            packetWriter.WriteInt32(instance2.ConditionalBranch.Data2);
+                                            packetWriter.WriteInt32(instance2.ConditionalBranch.Data3);
+                                            packetWriter.WriteInt32(instance2.ConditionalBranch.ElseCommandList);
+                                            packetWriter.WriteInt32(instance2.MoveRouteCount);
+                                            if (instance2.MoveRouteCount > 0)
+                                            {
+                                                for (int w = 0, loopTo7 = instance2.MoveRouteCount; w < loopTo7; w++)
+                                                {
+                                                    packetWriter.WriteInt32(instance2.MoveRoute[w].Index);
+                                                    packetWriter.WriteInt32(instance2.MoveRoute[w].Data1);
+                                                    packetWriter.WriteInt32(instance2.MoveRoute[w].Data2);
+                                                    packetWriter.WriteInt32(instance2.MoveRoute[w].Data3);
+                                                    packetWriter.WriteInt32(instance2.MoveRoute[w].Data4);
+                                                    packetWriter.WriteInt32(instance2.MoveRoute[w].Data5);
+                                                    packetWriter.WriteInt32(instance2.MoveRoute[w].Data6);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Network.Send(packetWriter);
+    }
+
+    public static void SendMapRespawn()
+    {
+        var packetWriter = new PacketWriter(4);
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CMapRespawn);
+
+        Network.Send(packetWriter);
+    }
+
 }

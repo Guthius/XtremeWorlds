@@ -527,7 +527,7 @@ namespace Client
         public static void MapEditorSend()
         {
             // Send the edited map to the server
-            Map.SendMap();
+            Sender.SendMap();
 
             GameState.MyEditorType = EditorType.None;
             // Request the refreshed map data immediately so we don't linger on a black screen

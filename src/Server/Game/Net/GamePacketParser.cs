@@ -3428,6 +3428,4 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         NetworkSend.SendUpdateNpcToAll(npcNum);
     }
-
-
 }

@@ -553,7 +553,7 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Map.SendMapRespawn();
+                            Sender.SendMapRespawn();
                             break;
                         }
 
@@ -566,7 +566,7 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Map.SendRequestEditMap();
+                            Sender.SendRequestEditMap();
                             break;
                         }
 
@@ -1326,9 +1326,7 @@ namespace Client
                         }
 
                     case DialogueType.DeleteMap:
-                        Map.ClearMap();
-                        Map.ClearMapNpcs();
-                        Map.ClearMapItems();
+                        Map.OnClear();
                         break;
 
                     case DialogueType.ClearDirBlocks:

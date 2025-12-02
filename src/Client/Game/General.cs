@@ -176,9 +176,7 @@ namespace Client
 
         public static void ClearGameData()
         {
-            Map.ClearMap();
-            Map.ClearMapNpcs();
-            Map.ClearMapItems();
+            Map.OnClear();
             Database.ClearNpcs();
             MapResource.OnClearAll();
             Item.OnClearAll();

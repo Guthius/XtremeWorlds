@@ -454,7 +454,7 @@ namespace Client
                 }
                 else if (Data.MyMap.Up > 0)
                 {
-                    Map.SendPlayerRequestNewMap();
+                    Sender.SendPlayerRequestNewMap();
                     return canMove;
                 }
             }
@@ -474,7 +474,7 @@ namespace Client
                 }
                 else if (Data.MyMap.Down > 0)
                 {
-                    Map.SendPlayerRequestNewMap();
+                    Sender.SendPlayerRequestNewMap();
                     return canMove;
                 }
             }
@@ -494,7 +494,7 @@ namespace Client
                 }
                 else if (Data.MyMap.Left > 0)
                 {
-                    Map.SendPlayerRequestNewMap();
+                    Sender.SendPlayerRequestNewMap();
                     return canMove;
                 }
             }
@@ -514,7 +514,7 @@ namespace Client
                 }
                 else if (Data.MyMap.Right > 0)
                 {
-                    Map.SendPlayerRequestNewMap();
+                    Sender.SendPlayerRequestNewMap();
                     return canMove;
                 }
             }
@@ -535,7 +535,7 @@ namespace Client
                 }
                 else if (Data.MyMap.Up > 0 & Data.MyMap.Right > 0)
                 {
-                    Map.SendPlayerRequestNewMap();
+                    Sender.SendPlayerRequestNewMap();
                     return canMove;
                 }
             }
@@ -554,7 +554,7 @@ namespace Client
                 }
                 else if (Data.MyMap.Up > 0 & Data.MyMap.Left > 0)
                 {
-                    Map.SendPlayerRequestNewMap();
+                    Sender.SendPlayerRequestNewMap();
                     return canMove;
                 }
             }
@@ -573,7 +573,7 @@ namespace Client
                 }
                 else if (Data.MyMap.Down > 0 & Data.MyMap.Right > 0)
                 {
-                    Map.SendPlayerRequestNewMap();
+                    Sender.SendPlayerRequestNewMap();
                     return canMove;
                 }
             }
@@ -592,7 +592,7 @@ namespace Client
                 }
                 else if (Data.MyMap.Down > 0 & Data.MyMap.Left > 0)
                 {
-                    Map.SendPlayerRequestNewMap();
+                    Sender.SendPlayerRequestNewMap();
                     return canMove;
                 }
             }
@@ -1063,248 +1063,5 @@ namespace Client
 
         #endregion
 
-        #region Incoming Traffic
-
-        public static void Packet_PlayerHP(ReadOnlyMemory<byte> data)
-        {
-            var buffer = new PacketReader(data);
-
-            SetPlayerVital(GameState.MyIndex, Vital.Health, buffer.ReadInt32());
-            SetPlayerMaxVital(GameState.MyIndex, Vital.Health, buffer.ReadInt32());
-
-            // set max width
-            if (GetPlayerVital(GameState.MyIndex, Vital.Health) > 0)
-            {
-                GameState.BarWidthGuiHPMax = (int) Math.Round(GetPlayerVital(GameState.MyIndex, Vital.Health) / 209d / (GetPlayerMaxVital(GameState.MyIndex, Vital.Health) / 209d) * 209d);
-            }
-            else
-            {
-                GameState.BarWidthGuiHPMax = 0;
-            }
-
-            WinCharacter.Update();
-        }
-
-        public static void Packet_PlayerMP(ReadOnlyMemory<byte> data)
-        {
-            var buffer = new PacketReader(data);
-
-            SetPlayerVital(GameState.MyIndex, Vital.Mana, buffer.ReadInt32());
-            SetPlayerMaxVital(GameState.MyIndex, Vital.Mana, buffer.ReadInt32());
-
-            // set max width
-            if (GetPlayerVital(GameState.MyIndex, Vital.Mana) > 0)
-            {
-                GameState.BarWidthGuiMPMax = (int) Math.Round(GetPlayerVital(GameState.MyIndex, Vital.Mana) / 209d / (GetPlayerMaxVital(GameState.MyIndex, Vital.Mana) / 209d) * 209d);
-            }
-            else
-            {
-                GameState.BarWidthGuiMPMax = 0;
-            }
-
-            WinCharacter.Update();
-        }
-
-        public static void Packet_PlayerSP(ReadOnlyMemory<byte> data)
-        {
-            var buffer = new PacketReader(data);
-
-            SetPlayerVital(GameState.MyIndex, Vital.Stamina, buffer.ReadInt32());
-            SetPlayerMaxVital(GameState.MyIndex, Vital.Stamina, buffer.ReadInt32());
-
-            // set max width
-            if (GetPlayerVital(GameState.MyIndex, Vital.Stamina) > 0)
-            {
-                GameState.BarWidthGuiSPMax = (int) Math.Round(GetPlayerVital(GameState.MyIndex, Vital.Stamina) / 209d / (GetPlayerMaxVital(GameState.MyIndex, Vital.Stamina) / 209d) * 209d);
-            }
-            else
-            {
-                GameState.BarWidthGuiSPMax = 0;
-            }
-
-            WinCharacter.Update();
-        }
-
-        public static void Packet_PlayerStats(ReadOnlyMemory<byte> data)
-        {
-            int i;
-            int index;
-            var buffer = new PacketReader(data);
-
-            index = buffer.ReadInt32();
-
-            int statCount = Enum.GetValues(typeof(Stat)).Length;
-            for (i = 0; i < statCount; i++)
-                SetPlayerStat(index, (Stat) i, buffer.ReadInt32());
-        }
-
-        public static void Packet_PlayerData(ReadOnlyMemory<byte> data)
-        {
-            int i;
-            int x;
-            var buffer = new PacketReader(data);
-
-            i = buffer.ReadInt32();
-            SetPlayerName(i, buffer.ReadString());
-            SetPlayerJob(i, buffer.ReadInt32());
-            SetPlayerLevel(i, buffer.ReadInt32());
-            SetPlayerPoints(i, buffer.ReadInt32());
-            SetPlayerSprite(i, buffer.ReadInt32());
-            SetPlayerMap(i, buffer.ReadInt32());
-            SetPlayerAccess(i, buffer.ReadByte());
-            SetPlayerPk(i, buffer.ReadBoolean());
-            Data.Player[i].Moving = 0;
-
-            int statCount = Enum.GetValues(typeof(Stat)).Length;
-            for (x = 0; x < statCount; x++)
-                SetPlayerStat(i, (Stat) x, buffer.ReadInt32());
-
-            int resourceSkillCount = Enum.GetValues(typeof(ResourceSkill)).Length;
-            for (x = 0; x < resourceSkillCount; x++)
-            {
-                Data.Player[i].GatherSkills[x].SkillLevel = buffer.ReadInt32();
-                Data.Player[i].GatherSkills[x].SkillCurExp = buffer.ReadInt32();
-                Data.Player[i].GatherSkills[x].SkillNextLevelExp = buffer.ReadInt32();
-            }
-
-            // Check if the player is the client player
-            if (i == GameState.MyIndex)
-            {
-                // Reset directions
-                GameState.DirUp = false;
-                GameState.DirDown = false;
-                GameState.DirLeft = false;
-                GameState.DirRight = false;
-
-                // set form
-                {
-                    var instance = WindowManager.Windows[WindowManager.GetWindowIndex("winCharacter")];
-                    instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblName")].Text = "Name";
-                    instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblJob")].Text = "Job";
-                    instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblLevel")].Text = "Level";
-                    instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblGuild")].Text = "Guild";
-                    instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblName2")].Text = GetPlayerName(GameState.MyIndex);
-                    instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblJob2")].Text = Data.Job[GetPlayerJob(GameState.MyIndex)].Name;
-                    instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblLevel2")].Text = GetPlayerLevel(GameState.MyIndex).ToString();
-                    instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblGuild2")].Text = "None";
-                    WinCharacter.Update();
-
-                    // stats
-                    for (x = 0; x < statCount; x++)
-                        instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblStat_" + (x + 1))].Text = GetPlayerStat(GameState.MyIndex, (Stat) x).ToString();
-
-                    // points
-                    instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblPoints")].Text = GetPlayerPoints(GameState.MyIndex).ToString();
-
-                    // grey out buttons
-                    if (GetPlayerPoints(GameState.MyIndex) == 0)
-                    {
-                        for (x = 0; x < statCount; x++)
-                            instance.Controls[WindowManager.GetControlIndex("winCharacter", "btnGreyStat_" + (x + 1))].Visible = true;
-                    }
-                    else
-                    {
-                        for (x = 0; x < statCount; x++)
-                            instance.Controls[WindowManager.GetControlIndex("winCharacter", "btnGreyStat_" + (x + 1))].Visible = false;
-                    }
-                }
-                GameState.PlayerData = true;
-            }
-        }
-
-        public static void Packet_StopPlayerMove(ReadOnlyMemory<byte> data)
-        {
-            int i;
-            var buffer = new PacketReader(data);
-
-            i = buffer.ReadInt32();
-
-            // Make sure the player is in range
-            if (i < 0 || i >= Variables.MaxPlayers)
-                return;
-
-            // Stop the player from moving
-            Data.Player[i].Moving = 0;
-            Data.Player[i].IsMoving = false; // ensure per-pixel movement halts client-side
-        }
-
-        public static void Packet_PlayerDir(ReadOnlyMemory<byte> data)
-        {
-            int dir;
-            int i;
-            var buffer = new PacketReader(data);
-
-            i = buffer.ReadInt32();
-            dir = buffer.ReadByte();
-
-            SetPlayerDir(i, dir);
-            
-            // Do not reset local player's movement state on our own echoed dir packets; this causes micro-stutters
-            if (i != GameState.MyIndex)
-            {
-                ref var instance = ref Data.Player[i];
-                instance.Moving = 0;
-            }
-        }
-
-        public static void Packet_PlayerExp(ReadOnlyMemory<byte> data)
-        {
-            int index;
-            int tnl;
-            var buffer = new PacketReader(data);
-            int maxLevel = 0;
-
-            index = buffer.ReadInt32();
-            maxLevel = buffer.ReadInt32();
-            GameState.MaxLevel = maxLevel;
-            SetPlayerExp(index, buffer.ReadInt32());
-
-            tnl = buffer.ReadInt32();
-            GameState.NextlevelExp = tnl;
-
-            // set max width
-            if (GetPlayerLevel(GameState.MyIndex) < GameState.MaxLevel)
-            {
-                if (GetPlayerExp(GameState.MyIndex) > 0)
-                {
-                    GameState.BarWidthGuiExpMax = (int) Math.Round(GetPlayerExp(GameState.MyIndex) / 209d / (tnl / 209d) * 209d);
-                }
-                else
-                {
-                    GameState.BarWidthGuiExpMax = 0;
-                }
-            }
-            else
-            {
-                GameState.BarWidthGuiExpMax = 209;
-            }
-
-            // Update GUI
-            WinCharacter.Update();
-        }
-
-        public static void Packet_PlayerXY(ReadOnlyMemory<byte> data)
-        {
-            int x;
-            int y;
-            int dir;
-            int index;
-            byte moving;
-            var buffer = new PacketReader(data);
-
-            index = buffer.ReadInt32();
-            x = buffer.ReadInt32();
-            y = buffer.ReadInt32();
-            dir = buffer.ReadByte();
-            moving = buffer.ReadByte();
-
-            SetPlayerX(index, x);
-            SetPlayerY(index, y);
-            SetPlayerDir(index, dir);
-            Data.Player[index].Moving = moving;
-            Data.Player[index].IsMoving = buffer.ReadBoolean();
-        }
-
-        #endregion
     }
 }
