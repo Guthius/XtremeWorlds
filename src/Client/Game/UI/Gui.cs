@@ -788,7 +788,7 @@ public class WindowManager
         }
     }
 
-    public static bool HandleEvents(ControlState entState)
+    public static bool OnUpdate(ControlState entState)
     {
         Window? curWindow = null;
         var curControl = -1;
