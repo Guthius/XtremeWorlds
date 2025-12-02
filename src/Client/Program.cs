@@ -497,7 +497,7 @@ namespace Client
             {
                 // Optional: draw a simple loading screen here if desired
             }
-            else if (GameState.InGame == true)
+            else
             {
                 // Draw the actual game onto the RenderTarget
                 SpriteBatch?.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null);
