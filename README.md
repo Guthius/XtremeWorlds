@@ -12,8 +12,7 @@ Based on the Orion+ conversion and MirageBasic, making Mirage move to C# from Vi
 
 Game assets such as character base are only permitted to use in XtremeWorlds.
 
-BASS audio requires a copyright license in order to use commercially, this is meant to demo the audio library since I prefer it as a developer over FAudio and Nvorbis.
-https://www.un4seen.com/
+BASS audio requires a copyright license in order to use commercially, this is meant to demo the audio library since I prefer it as a developer over FAudio and Nvorbis. This is mostly due to MIDI support and a proper synthesizer. You can get a license to support the developers, [here](https://www.un4seen.com/).
 
 ## Overview
 
