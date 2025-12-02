@@ -592,7 +592,8 @@ namespace Client
             {
                 GameState.MyEditorType = EditorType.Projectile;
                 GameState.EditorIndex = 0;
-                new EditorProjectile().Show();
+                WindowManager.ShowWindow("winProjectileEditor");
+                Client.Game.UI.Windows.WinProjectileEditor.Init();
                 GameState.InitProjectileEditor = false;
             }
 

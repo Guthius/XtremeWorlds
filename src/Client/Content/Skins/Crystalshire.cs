@@ -3042,4 +3042,109 @@ public class Crystalshire
         if (WindowManager.TryGetControl("winMoralEditor", "btnClose", out var closeCtrl) && closeCtrl is Button btnClose)
             btnClose.CallBack[(int)ControlState.MouseDown] = () => { WinMoralEditor.OnCancel(); };
     }
+
+    public void UpdateWindow_ProjectileEditor()
+    {
+        var window = WindowLoader.FromLayout("winProjectileEditor");
+
+        // Wire list + scrollbar
+        WireScrollableList("winProjectileEditor", "lstIndex", "sldList");
+
+        if (WindowManager.TryGetControl("winProjectileEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox lst)
+        {
+            lst.CallBack[(int)ControlState.MouseDown] = WinProjectileEditor.OnListMouseDown;
+        }
+
+        // Text changes
+        if (WindowManager.TryGetControl("winProjectileEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
+        {
+            txtName.CallBack[(int)ControlState.KeyUp] = () =>
+            {
+                int idx = WinProjectileEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxProjectiles) return;
+                var newName = txtName.Text ?? string.Empty;
+                Data.Projectile[idx].Name = newName;
+                GameState.ProjectileChanged[idx] = true;
+
+                // Update list item text without losing selection/scroll
+                if (WindowManager.TryGetControl("winProjectileEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox lb)
+                {
+                    if (idx >= 0 && idx < lb.Items.Count)
+                    {
+                        lb.Items[idx] = $"{idx + 1}: {newName}";
+                        lb.SelectedIndex = idx;
+                        lb.EnsureVisible(idx);
+                    }
+                }
+            };
+        }
+
+        // Sprite scrollbar
+        if (WindowManager.TryGetControl("winProjectileEditor", "sldSprite", out var spriteCtrl) && spriteCtrl is ScrollBar sbSprite)
+        {
+            sbSprite.CallBack[(int)ControlState.MouseMove] = () =>
+            {
+                int idx = WinProjectileEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxProjectiles) return;
+                Data.Projectile[idx].Sprite = sbSprite.Value;
+                GameState.ProjectileChanged[idx] = true;
+            };
+        }
+
+        // Range / Speed / Damage sliders update value + label
+        void BindBar(string barName, string labelName, Action<int> apply, int min, int max)
+        {
+            if (WindowManager.TryGetControl("winProjectileEditor", barName, out var bCtrl) && bCtrl is ScrollBar sb)
+            {
+                sb.Min = min; sb.Max = max;
+                sb.CallBack[(int)ControlState.MouseMove] = () =>
+                {
+                    int idx = WinProjectileEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxProjectiles) return;
+                    int v = Math.Clamp(sb.Value, sb.Min, sb.Max);
+                    apply(v);
+                    GameState.ProjectileChanged[idx] = true;
+                    if (WindowManager.TryGetControl("winProjectileEditor", labelName, out var lCtrl) && lCtrl is Label lbl) lbl.Text = v.ToString();
+                };
+            }
+        }
+        BindBar("sldRange", "lblRangeVal", v => Data.Projectile[WinProjectileEditor.SelectedIndex].Range = (byte)v, 0, 255);
+        BindBar("sldSpeed", "lblSpeedVal", v => Data.Projectile[WinProjectileEditor.SelectedIndex].Speed = v, 0, 1000);
+        BindBar("sldDamage", "lblDamageVal", v => Data.Projectile[WinProjectileEditor.SelectedIndex].Damage = v, 0, 100000);
+
+        // Animation combo (0=None then +1 offset)
+        if (WindowManager.TryGetControl("winProjectileEditor", "cmbAnimation", out var animCtrl) && animCtrl is ComboBox cmbAnim)
+        {
+            if (cmbAnim.Items.Count == 0)
+            {
+                cmbAnim.Items.Add("None");
+                for (int i = 0; i < Variables.MaxAnimations; i++)
+                {
+                    var raw = Data.Animation[i].Name ?? string.Empty;
+                    var nm = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
+                    cmbAnim.Items.Add($"{i + 1}: {nm}");
+                }
+            }
+            cmbAnim.CallBack[(int)ControlState.MouseMove] = () =>
+            {
+                int idx = WinProjectileEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxProjectiles) return;
+                int sel = Math.Clamp(cmbAnim.Value, 0, cmbAnim.Items.Count - 1);
+                Data.Projectile[idx].Animation = sel == 0 ? -1 : sel - 1;
+                GameState.ProjectileChanged[idx] = true;
+            };
+        }
+
+        // Buttons
+        if (WindowManager.TryGetControl("winProjectileEditor", "btnSave", out var btnSave) && btnSave is Button bs)
+            bs.CallBack[(int)ControlState.MouseDown] = WinProjectileEditor.OnSave;
+        if (WindowManager.TryGetControl("winProjectileEditor", "btnCancel", out var btnCancel) && btnCancel is Button bc)
+            bc.CallBack[(int)ControlState.MouseDown] = WinProjectileEditor.OnCancel;
+        if (WindowManager.TryGetControl("winProjectileEditor", "btnDelete", out var btnDelete) && btnDelete is Button bd)
+            bd.CallBack[(int)ControlState.MouseDown] = WinProjectileEditor.OnDelete;
+        if (WindowManager.TryGetControl("winProjectileEditor", "btnCopy", out var btnCopy) && btnCopy is Button bcp)
+            bcp.CallBack[(int)ControlState.MouseDown] = WinProjectileEditor.OnCopy;
+        if (WindowManager.TryGetControl("winProjectileEditor", "btnClose", out var btnClose) && btnClose is Button bcl)
+            bcl.CallBack[(int)ControlState.MouseDown] = WinProjectileEditor.OnCancel;
+
+        // Preview picture
+        if (WindowManager.TryGetControl("winProjectileEditor", "picSprite", out var picCtrl) && picCtrl is PictureBox pic)
+            pic.OnDraw = WinProjectileEditor.OnDrawSprite;
+    }
 }

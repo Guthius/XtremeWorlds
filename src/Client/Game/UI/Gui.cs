@@ -779,6 +779,7 @@ public class WindowManager
             Safe("UpdateWindow_ScriptEditor", () => ui.UpdateWindow_ScriptEditor());
             Safe("UpdateWindow_ResourceEditor", () => ui.UpdateWindow_ResourceEditor());
             Safe("UpdateWindow_MoralEditor", () => ui.UpdateWindow_MoralEditor());
+            Safe("UpdateWindow_ProjectileEditor", () => ui.UpdateWindow_ProjectileEditor());
         }
         else
         {

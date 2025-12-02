@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Window Name="winProjectileEditor" Caption="Projectile Editor"
+        Size="750,430"
+        Icon="113" IconOffset="3,5"
+        Design="WindowNormal"
+        StartPosition="CenterScreen"
+        Visible="false">
+
+	<!-- List group (left) -->
+	<GroupBox Name="grpList" Caption="Projectiles" Position="8,28" Size="230,380">
+		<ListBox Name="lstIndex" Position="8,24" Size="200,340"/>
+		<ScrollBar Name="sldList" Position="212,24" Size="12,340" Min="0" Max="0" Vertical="true"/>
+	</GroupBox>
+
+	<!-- Details group (right) -->
+	<GroupBox Name="grpDetails" Caption="Details" Position="246,28" Size="496,380">
+
+		<!-- Name -->
+		<Label Name="lblName" Text="Name:" Position="12,24" Size="60,18"/>
+		<TextBox Name="txtName" Position="80,20" Size="220,22" Design="TextWhite"/>
+
+		<!-- Sprite -->
+		<Label Name="lblSprite" Text="Sprite:" Position="12,56" Size="60,18"/>
+		<ScrollBar Name="sldSprite" Position="80,56" Size="180,14" Min="0" Max="1" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+
+		<!-- Range -->
+		<Label Name="lblRange" Text="Range:" Position="12,88" Size="60,18"/>
+		<ScrollBar Name="sldRange" Position="80,88" Size="180,14" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+		<Label Name="lblRangeVal" Text="0" Position="268,86" Size="40,18"/>
+
+		<!-- Speed -->
+		<Label Name="lblSpeed" Text="Speed:" Position="12,120" Size="60,18"/>
+		<ScrollBar Name="sldSpeed" Position="80,120" Size="180,14" Min="0" Max="1000" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+		<Label Name="lblSpeedVal" Text="0" Position="268,118" Size="60,18"/>
+
+		<!-- Damage -->
+		<Label Name="lblDamage" Text="Damage:" Position="12,152" Size="60,18"/>
+		<ScrollBar Name="sldDamage" Position="80,152" Size="180,14" Min="0" Max="100000" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+		<Label Name="lblDamageVal" Text="0" Position="268,150" Size="80,18"/>
+
+		<!-- Animation -->
+		<Label Name="lblAnimation" Text="Animation:" Position="12,184" Size="68,18"/>
+		<ComboBox Name="cmbAnimation" Position="80,182" Size="220,20"/>
+
+		<!-- Preview -->
+		<Label Name="lblPreview" Text="Preview:" Position="12,216" Size="60,18"/>
+		<PictureBox Name="picSprite" Position="80,216" Size="96,96" Design="TextBlack"/>
+
+		<!-- Buttons -->
+		<Button Name="btnSave" Text="Save" Position="320,260" Size="80,24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+		<Button Name="btnDelete" Text="Delete" Position="410,260" Size="80,24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+		<Button Name="btnCopy" Text="Copy" Position="320,292" Size="80,24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+		<Button Name="btnCancel" Text="Cancel" Position="410,292" Size="80,24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+
+	</GroupBox>
+
+	<!-- Titlebar close -->
+	<Button Name="btnClose" Position="-19,5" Size="16,16" Image="8" ImageHover="9" ImageMouseDown="10"/>
+
+</Window>
