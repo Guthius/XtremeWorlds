@@ -8,8 +8,8 @@ public static class WinLogin
 {
     public static void OnExit()
     {
-        // Request the game to exit; Exiting handler will call DestroyGame and end Eto
-        try { General.Client.Exit(); } catch { General.DestroyGame(); }
+        // Request a graceful shutdown via General so network and SDL clean up correctly
+        General.DestroyGame();
     }
     
     public static void OnLogin()

@@ -8,6 +8,8 @@ using Core.Globals;
 using static Core.Globals.Command;
 using Type = Core.Globals.Type;
 using System.IO;
+using System;
+using System.Diagnostics;
 
 namespace Client
 {
@@ -257,6 +259,20 @@ namespace Client
 
         public static void DestroyGame()
         {
+            try
+            {
+                // Stop networking first so background I/O can shut down
+                Network.Stop();
+            }
+            catch
+            {
+                // ignore shutdown errors
+            }
+
+            // macOS: ask OS to terminate this process via SIGTERM
+            if (OperatingSystem.IsMacOS())
+                Cocca.OnExit();
+
             Environment.Exit(0);
         }
 
@@ -434,6 +450,40 @@ namespace Client
             }
 
             return -1;
+        }
+
+        public static void OnExit()
+        {
+            // macOS: ask OS to terminate this process via SIGTERM
+            MacExit.ExitViaMacSignal();
+        }
+    }
+
+    public static class Cocca
+    {
+        private const int SIGTERM = 15;
+
+        [DllImport("libSystem.dylib")]
+        private static extern int kill(int pid, int sig);
+
+        public static void OnExit()
+        {
+            if (!OperatingSystem.IsMacOS())
+            {
+                Environment.Exit(0);
+                return;
+            }
+
+            try
+            {
+                int pid = Process.GetCurrentProcess().Id;
+                kill(pid, SIGTERM);
+            }
+            catch
+            {
+                // Fallback if kill fails
+                Environment.Exit(0);
+            }
         }
     }
 }

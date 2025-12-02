@@ -189,10 +189,11 @@ namespace Client
 
             Content.RootDirectory = "Content";
 
-            // Handle Exiting without forcing a hard shutdown
-            Exiting += (s, e) => {
-                // Let General perform graceful shutdown tasks
-                General.DestroyGame();
+            // Handle Exiting: only ensure subsystems (like networking) are stopped;
+            // avoid re-entering Exit() or forcing a hard process kill here.
+            Exiting += (s, e) =>
+            {
+                try { Network.Stop(); } catch { }
             };
         }
 
