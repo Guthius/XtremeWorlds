@@ -19,7 +19,7 @@ BASS audio requires a copyright license in order to use commercially, this is me
 XtremeWorlds is a dynamic tile-based 2D MMORPG game engine designed for ease of use and
 rapid development. The engine provides both client and server applications with
 an intuitive GUI and built-in live editing features that enable seamless 
-collaborative development. The GUI is rendered with the game render pipeline which allows easy skining and customization, including in-game editors.
+collaborative development. The GUI is rendered with the game render pipeline which allows easy skinning and customization, including in-game editors.
 
 ## Game Features
 
