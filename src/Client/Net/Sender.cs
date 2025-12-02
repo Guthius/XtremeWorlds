@@ -1362,4 +1362,80 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
+
+    public static void SendRequestSwitchesAndVariables()
+    {
+        var packetWriter = new PacketWriter(4);
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CRequestSwitchesAndVariables);
+
+        Network.Send(packetWriter);
+    }
+
+    public static void SendSwitchesAndVariables()
+    {
+        var packetWriter = new PacketWriter(4);
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CSwitchesAndVariables);
+
+        for (var i = 0; i < Core.Globals.Variables.MaxSwitches; i++)
+        {
+            packetWriter.WriteString(Event.Switches[i]);
+        }
+
+        for (var i = 0; i < Core.Globals.Variables.MaxVariables; i++)
+        {
+            packetWriter.WriteString(Event.Variables[i]);
+        }
+
+        Network.Send(packetWriter);
+    }
+
+
+    public static void SendPartyRequest(string name)
+    {
+        var packetWriter = new PacketWriter();
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CRequestParty);
+        packetWriter.WriteString(name);
+
+        Network.Send(packetWriter);
+    }
+
+    public static void SendAcceptParty()
+    {
+        var packetWriter = new PacketWriter(4);
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CAcceptParty);
+
+        Network.Send(packetWriter);
+    }
+
+    public static void SendDeclineParty()
+    {
+        var packetWriter = new PacketWriter(4);
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CDeclineParty);
+
+        Network.Send(packetWriter);
+    }
+
+    public static void SendLeaveParty()
+    {
+        var packetWriter = new PacketWriter(4);
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CLeaveParty);
+
+        Network.Send(packetWriter);
+    }
+
+    public static void SendPartyChatMsg(string text)
+    {
+        var packetWriter = new PacketWriter();
+
+        packetWriter.WriteInt32((int)Packets.ClientPackets.CPartyChatMsg);
+        packetWriter.WriteString(text);
+
+        Network.Send(packetWriter);
+    }
 }

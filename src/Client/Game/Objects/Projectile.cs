@@ -64,46 +64,6 @@ namespace Client
 
         #endregion
 
-        #region Recieving
-
-        public static void HandleUpdateProjectile(ReadOnlyMemory<byte> data)
-        {
-            int projectileNum;
-            var buffer = new PacketReader(data);
-            projectileNum = buffer.ReadInt32();
-
-            Data.Projectile[projectileNum].Name = buffer.ReadString();
-            Data.Projectile[projectileNum].Sprite = buffer.ReadInt32();
-            Data.Projectile[projectileNum].Range = (byte) buffer.ReadInt32();
-            Data.Projectile[projectileNum].Speed = buffer.ReadInt32();
-            Data.Projectile[projectileNum].Damage = buffer.ReadInt32();
-            Data.Projectile[projectileNum].Animation = buffer.ReadInt32();
-        }
-
-        public static void HandleMapProjectile(ReadOnlyMemory<byte> data)
-        {
-            var buffer = new PacketReader(data);
-            int i = buffer.ReadInt32();
-
-            {
-                ref var instance = ref Data.MapProjectile[Data.Player[GameState.MyIndex].Map, i];
-                instance.ProjectileNum = buffer.ReadInt32();
-                instance.Owner = buffer.ReadInt32();
-                instance.OwnerType = buffer.ReadByte();
-                instance.Dir = buffer.ReadByte();
-                instance.X = buffer.ReadInt32();
-                instance.Y = buffer.ReadInt32();
-                // New free-aim fields
-                instance.Vx = buffer.ReadInt16();
-                instance.Vy = buffer.ReadInt16();
-                instance.FreeAim = buffer.ReadByte();
-                instance.Range = 0;
-                instance.Timer = General.GetTickCount() + 60000;
-            }
-        }
-
-        #endregion
-
         #region Database
 
         public static void ClearProjectile()

@@ -8,6 +8,7 @@ using Eto.Drawing;
 using static Core.Globals.Type;
 using EventCommand = Core.Globals.EventCommand;
 using Type = Core.Globals.Type;
+using Client.Net;
 
 namespace Client
 {
@@ -3425,9 +3426,11 @@ namespace Client
 
         private void BtnLabel_Ok_Click(object? sender, EventArgs e)
         {
-            Event.SendSwitchesAndVariables();
+            Sender.SendSwitchesAndVariables();
+
             // Ensure UI reflects latest names after save
             RefreshSwitchAndVariableUI();
+
             // Close the Switches/Variables panel after saving
             try
             {
@@ -3440,7 +3443,8 @@ namespace Client
 
         private void BtnLabel_Cancel_Click(object? sender, EventArgs e)
         {
-            Event.RequestSwitchesAndVariables();
+            Sender.SendRequestSwitchesAndVariables();
+
             // Revert UI to a clean state and close the panel
             try
             {

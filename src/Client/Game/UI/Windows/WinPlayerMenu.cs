@@ -16,7 +16,7 @@ public static class WinPlayerMenu
     {
         OnClose();
         
-        Party.SendPartyRequest(GetPlayerName((int) GameState.PlayerMenuIndex));
+        Sender.SendPartyRequest(GetPlayerName((int) GameState.PlayerMenuIndex));
     }
 
     public static void OnTradeRequest()

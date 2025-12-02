@@ -192,7 +192,7 @@ namespace Client
 
                 if (Strings.Len(chatText) > 0)
                 {
-                    Party.SendPartyChatMsg(chatText);
+                    Sender.SendPartyChatMsg(chatText);
                 }
 
                 if (WindowManager.TryGetControl("winChat", "txtChat", out var chatCtrl5)) chatCtrl5!.Text = "";
@@ -329,7 +329,7 @@ namespace Client
                             {
                                 if (GameState.MyTargetType == (int)TargetType.Player)
                                 {
-                                    Party.SendPartyRequest(GetPlayerName(GameState.MyTarget));
+                                    Sender.SendPartyRequest(GetPlayerName(GameState.MyTarget));
                                     goto Continue1;
                                 }
                             }
@@ -341,21 +341,21 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Party.SendPartyRequest(command[1]);
+                            Sender.SendPartyRequest(command[1]);
                             break;
                         }
 
                     // Join party
                     case "/join":
                         {
-                            Party.SendAcceptParty();
+                            Sender.SendAcceptParty();
                             break;
                         }
 
                     // Leave party
                     case "/leave":
                         {
-                            Party.SendLeaveParty();
+                            Sender.SendLeaveParty();
                             break;
                         }
 
@@ -1192,7 +1192,7 @@ namespace Client
 
                     case DialogueType.PartyInvite:
                         {
-                            Party.SendAcceptParty();
+                            Sender.SendAcceptParty();
                             break;
                         }
 
@@ -1358,7 +1358,7 @@ namespace Client
 
                     case DialogueType.PartyInvite:
                         {
-                            Party.SendDeclineParty();
+                            Sender.SendDeclineParty();
                             break;
                         }
                 }

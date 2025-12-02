@@ -92,28 +92,28 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Bind(Packets.ServerPackets.SCritical, Packet_Critical);
         Bind(Packets.ServerPackets.SrClick, Packet_RClick);
         Bind(Packets.ServerPackets.SHotbar, Packet_Hotbar);
-        Bind(Packets.ServerPackets.SSpawnEvent, Event.Packet_SpawnEvent);
-        Bind(Packets.ServerPackets.SEventMove, Event.Packet_EventMove);
-        Bind(Packets.ServerPackets.SEventDir, Event.Packet_EventDir);
-        Bind(Packets.ServerPackets.SEventChat, Event.Packet_EventChat);
-        Bind(Packets.ServerPackets.SEventStart, Event.Packet_EventStart);
-        Bind(Packets.ServerPackets.SEventEnd, Event.Packet_EventEnd);
-        Bind(Packets.ServerPackets.SPlayBgm, Event.Packet_PlayBGM);
-        Bind(Packets.ServerPackets.SPlaySound, Event.Packet_PlaySound);
-        Bind(Packets.ServerPackets.SFadeoutBgm, Event.Packet_FadeOutBGM);
-        Bind(Packets.ServerPackets.SStopSound, Event.Packet_StopSound);
-        Bind(Packets.ServerPackets.SSwitchesAndVariables, Event.Packet_SwitchesAndVariables);
-        Bind(Packets.ServerPackets.SMapEventData, Event.Packet_MapEventData);
+        Bind(Packets.ServerPackets.SSpawnEvent, Packet_SpawnEvent);
+        Bind(Packets.ServerPackets.SEventMove, Packet_EventMove);
+        Bind(Packets.ServerPackets.SEventDir, Packet_EventDir);
+        Bind(Packets.ServerPackets.SEventChat, Packet_EventChat);
+        Bind(Packets.ServerPackets.SEventStart, Packet_EventStart);
+        Bind(Packets.ServerPackets.SEventEnd, Packet_EventEnd);
+        Bind(Packets.ServerPackets.SPlayBgm, Packet_PlayBGM);
+        Bind(Packets.ServerPackets.SPlaySound, Packet_PlaySound);
+        Bind(Packets.ServerPackets.SFadeoutBgm, Packet_FadeOutBGM);
+        Bind(Packets.ServerPackets.SStopSound, Packet_StopSound);
+        Bind(Packets.ServerPackets.SSwitchesAndVariables, Packet_SwitchesAndVariables);
+        Bind(Packets.ServerPackets.SMapEventData, Packet_MapEventData);
         Bind(Packets.ServerPackets.SChatBubble, Packet_ChatBubble);
-        Bind(Packets.ServerPackets.SSpecialEffect, Event.Packet_SpecialEffect);
-        Bind(Packets.ServerPackets.SPic, Event.Packet_Picture);
-        Bind(Packets.ServerPackets.SHoldPlayer, Event.Packet_HoldPlayer);
-        Bind(Packets.ServerPackets.SUpdateProjectile, Projectile.HandleUpdateProjectile);
-        Bind(Packets.ServerPackets.SMapProjectile, Projectile.HandleMapProjectile);
+        Bind(Packets.ServerPackets.SSpecialEffect, Packet_SpecialEffect);
+        Bind(Packets.ServerPackets.SPic, Packet_Picture);
+        Bind(Packets.ServerPackets.SHoldPlayer, Packet_HoldPlayer);
+        Bind(Packets.ServerPackets.SUpdateProjectile, Packet_UpdateProjectile);
+        Bind(Packets.ServerPackets.SMapProjectile, Packet_MapProjectile);
         Bind(Packets.ServerPackets.SEmote, Packet_Emote);
-        Bind(Packets.ServerPackets.SPartyInvite, Party.Packet_PartyInvite);
-        Bind(Packets.ServerPackets.SPartyUpdate, Party.Packet_PartyUpdate);
-        Bind(Packets.ServerPackets.SPartyVitals, Party.Packet_PartyVitals);
+        Bind(Packets.ServerPackets.SPartyInvite, Packet_PartyInvite);
+        Bind(Packets.ServerPackets.SPartyUpdate, Packet_PartyUpdate);
+        Bind(Packets.ServerPackets.SPartyVitals, Packet_PartyVitals);
         Bind(Packets.ServerPackets.SClock, Packet_Clock);
         Bind(Packets.ServerPackets.STime, Packet_Time);
         Bind(Packets.ServerPackets.SScriptEditor, Script.Packet_EditScript);
@@ -147,7 +147,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     {
         var r = new PacketReader(data);
 
-        // Int-sized values (order must match server)
         Variables.MaxAnimations = r.ReadInt32();
         Variables.MaxItems = r.ReadInt32();
         Variables.MaxMaps = r.ReadInt32();
@@ -166,7 +165,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Variables.TileSize = r.ReadInt32();
         Variables.MaxWeatherParticles = r.ReadInt32();
 
-        // Byte-sized values
         Variables.MaxBank = r.ReadByte();
         Variables.MaxJobs = r.ReadByte();
         Variables.MaxMorals = r.ReadByte();
@@ -2023,5 +2021,547 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         GameState.InitMapEditor = true;
         WindowManager.HideWindows();
+    }
+
+
+    public static void Packet_SpawnEvent(ReadOnlyMemory<byte> data)
+    {
+        int id;
+        var buffer = new PacketReader(data);
+
+        GameState.CurrentEvents = buffer.ReadInt32();
+        Array.Resize(ref Data.MapEvents, GameState.CurrentEvents);
+
+        for (int i = 0; i < GameState.CurrentEvents; i++)
+        {
+            id = buffer.ReadInt32();
+
+            if (id >= GameState.CurrentEvents)
+                break;
+
+            ref var instance = ref Data.MapEvents[id];
+            instance.Name = buffer.ReadString();
+            instance.Dir = buffer.ReadInt32();
+            instance.ShowDir = instance.Dir;
+            instance.GraphicType = buffer.ReadByte();
+            instance.Graphic = buffer.ReadInt32();
+            instance.GraphicX = buffer.ReadInt32();
+            instance.GraphicX2 = buffer.ReadInt32();
+            instance.GraphicY = buffer.ReadInt32();
+            instance.GraphicY2 = buffer.ReadInt32();
+            instance.MovementSpeed = buffer.ReadInt32();
+            instance.Moving = 0;
+            instance.X = buffer.ReadInt32();
+            instance.Y = buffer.ReadInt32();
+            instance.Position = buffer.ReadByte();
+            instance.Visible = buffer.ReadBoolean();
+            instance.IdleAnim = buffer.ReadInt32();
+            instance.DirFix = buffer.ReadInt32();
+            instance.WalkThrough = buffer.ReadInt32();
+            instance.ShowName = buffer.ReadInt32();
+        }
+    }
+
+    public static void Packet_EventMove(ReadOnlyMemory<byte> data)
+    {
+        int id;
+        int x;
+        int y;
+        int dir;
+        int showDir;
+        int movementSpeed;
+        var buffer = new PacketReader(data);
+
+        id = buffer.ReadInt32();
+        x = buffer.ReadInt32();
+        y = buffer.ReadInt32();
+        dir = buffer.ReadInt32();
+        showDir = buffer.ReadInt32();
+        movementSpeed = buffer.ReadInt32();
+
+        if (id > GameState.CurrentEvents)
+            return;
+
+        {
+            if (Data.MapEvents == null)
+                return;
+            ref var instance = ref Data.MapEvents[id];
+            instance.X = x;
+            instance.Y = y;
+            instance.Dir = dir;
+            instance.Moving = 1;
+            instance.ShowDir = showDir;
+            instance.MovementSpeed = movementSpeed;
+        }
+    }
+
+    public static void Packet_EventDir(ReadOnlyMemory<byte> data)
+    {
+        int i;
+        byte dir;
+        var buffer = new PacketReader(data);
+        i = buffer.ReadInt32();
+        dir = (byte)buffer.ReadInt32();
+
+        if (i > GameState.CurrentEvents)
+            return;
+
+        {
+            if (Data.MapEvents == null)
+                return;
+            ref var instance = ref Data.MapEvents[i];
+            instance.Dir = dir;
+            instance.ShowDir = dir;
+            instance.Moving = 0;
+        }
+    }
+
+    public static void Packet_SwitchesAndVariables(ReadOnlyMemory<byte> data)
+    {
+        int i;
+        var buffer = new PacketReader(data);
+
+        for (i = 0; i < Core.Globals.Variables.MaxSwitches; i++)
+            Event.Switches[i] = buffer.ReadString();
+
+        for (i = 0; i < Core.Globals.Variables.MaxVariables; i++)
+            Event.Variables[i] = buffer.ReadString();
+    }
+
+    public static void Packet_MapEventData(ReadOnlyMemory<byte> data)
+    {
+        int i;
+        int x;
+        int y;
+        int z;
+        int w;
+        var buffer = new PacketReader(data);
+
+        Data.MyMap.EventCount = buffer.ReadInt32();
+
+        if (Data.MyMap.EventCount > 0)
+        {
+            Data.MyMap.Event = new Core.Globals.Type.Event[Data.MyMap.EventCount];
+            var loopTo = Data.MyMap.EventCount;
+            for (i = 0; i < loopTo; i++)
+            {
+                {
+                    ref var instance = ref Data.MyMap.Event[i];
+                    instance.Name = buffer.ReadString();
+                    instance.Globals = buffer.ReadByte();
+                    instance.X = buffer.ReadInt32();
+                    instance.Y = buffer.ReadInt32();
+                    instance.PageCount = buffer.ReadInt32();
+                }
+
+                if (Data.MyMap.Event[i].PageCount > 0)
+                {
+                    Data.MyMap.Event[i].Pages = new Core.Globals.Type.EventPage[Data.MyMap.Event[i].PageCount];
+                    var loopTo1 = Data.MyMap.Event[i].PageCount;
+                    for (x = 0; x < loopTo1; x++)
+                    {
+                        {
+                            ref var instance1 = ref Data.MyMap.Event[i].Pages[x];
+                            instance1.ChkVariable = buffer.ReadInt32();
+                            instance1.VariableIndex = buffer.ReadInt32();
+                            instance1.VariableCondition = buffer.ReadInt32();
+                            instance1.VariableCompare = buffer.ReadInt32();
+                            instance1.ChkSwitch = buffer.ReadInt32();
+                            instance1.SwitchIndex = buffer.ReadInt32();
+                            instance1.SwitchCompare = buffer.ReadInt32();
+                            instance1.ChkHasItem = buffer.ReadInt32();
+                            instance1.HasItemIndex = buffer.ReadInt32();
+                            instance1.HasItemAmount = buffer.ReadInt32();
+                            instance1.ChkSelfSwitch = buffer.ReadInt32();
+                            instance1.SelfSwitchIndex = buffer.ReadInt32();
+                            instance1.SelfSwitchCompare = buffer.ReadInt32();
+                            instance1.GraphicType = buffer.ReadByte();
+                            instance1.Graphic = buffer.ReadInt32();
+                            instance1.GraphicX = buffer.ReadInt32();
+                            instance1.GraphicY = buffer.ReadInt32();
+                            instance1.GraphicX2 = buffer.ReadInt32();
+                            instance1.GraphicY2 = buffer.ReadInt32();
+
+                            instance1.MoveType = buffer.ReadByte();
+                            instance1.MoveSpeed = buffer.ReadByte();
+                            instance1.MoveFreq = buffer.ReadByte();
+                            instance1.MoveRouteCount = buffer.ReadInt32();
+                            instance1.IgnoreMoveRoute = buffer.ReadInt32();
+                            instance1.RepeatMoveRoute = buffer.ReadInt32();
+
+                            if (instance1.MoveRouteCount > 0)
+                            {
+                                Data.MyMap.Event[i].Pages[x].MoveRoute = new Core.Globals.Type.MoveRoute[instance1.MoveRouteCount];
+                                var loopTo2 = instance1.MoveRouteCount;
+                                for (y = 0; y < loopTo2; y++)
+                                {
+                                    instance1.MoveRoute[y].Index = buffer.ReadInt32();
+                                    instance1.MoveRoute[y].Data1 = buffer.ReadInt32();
+                                    instance1.MoveRoute[y].Data2 = buffer.ReadInt32();
+                                    instance1.MoveRoute[y].Data3 = buffer.ReadInt32();
+                                    instance1.MoveRoute[y].Data4 = buffer.ReadInt32();
+                                    instance1.MoveRoute[y].Data5 = buffer.ReadInt32();
+                                    instance1.MoveRoute[y].Data6 = buffer.ReadInt32();
+                                }
+                            }
+
+                            instance1.IdleAnim = buffer.ReadInt32();
+                            instance1.DirFix = buffer.ReadInt32();
+                            instance1.WalkThrough = buffer.ReadInt32();
+                            instance1.ShowName = buffer.ReadInt32();
+                            instance1.Trigger = buffer.ReadByte();
+                            instance1.CommandListCount = buffer.ReadInt32();
+                            instance1.Position = buffer.ReadByte();
+                        }
+
+                        if (Data.MyMap.Event[i].Pages[x].CommandListCount > 0)
+                        {
+                            Data.MyMap.Event[i].Pages[x].CommandList = new Core.Globals.Type.CommandList[Data.MyMap.Event[i].Pages[x].CommandListCount];
+                            var loopTo3 = Data.MyMap.Event[i].Pages[x].CommandListCount;
+                            for (y = 0; y < loopTo3; y++)
+                            {
+                                Data.MyMap.Event[i].Pages[x].CommandList[y].CommandCount = buffer.ReadInt32();
+                                Data.MyMap.Event[i].Pages[x].CommandList[y].ParentList = buffer.ReadInt32();
+                                if (Data.MyMap.Event[i].Pages[x].CommandList[y].CommandCount > 0)
+                                {
+                                    Data.MyMap.Event[i].Pages[x].CommandList[y].Commands = new Core.Globals.Type.EventCommand[Data.MyMap.Event[i].Pages[x].CommandList[y].CommandCount];
+                                    var loopTo4 = Data.MyMap.Event[i].Pages[x].CommandList[y].CommandCount;
+                                    for (z = 0; z < loopTo4; z++)
+                                    {
+                                        {
+                                            ref var instance2 = ref Data.MyMap.Event[i].Pages[x].CommandList[y].Commands[z];
+                                            instance2.Index = buffer.ReadInt32();
+                                            instance2.Text1 = buffer.ReadString();
+                                            instance2.Text2 = buffer.ReadString();
+                                            instance2.Text3 = buffer.ReadString();
+                                            instance2.Text4 = buffer.ReadString();
+                                            instance2.Text5 = buffer.ReadString();
+                                            instance2.Data1 = buffer.ReadInt32();
+                                            instance2.Data2 = buffer.ReadInt32();
+                                            instance2.Data3 = buffer.ReadInt32();
+                                            instance2.Data4 = buffer.ReadInt32();
+                                            instance2.Data5 = buffer.ReadInt32();
+                                            instance2.Data6 = buffer.ReadInt32();
+                                            instance2.ConditionalBranch.CommandList = buffer.ReadInt32();
+                                            instance2.ConditionalBranch.Condition = buffer.ReadInt32();
+                                            instance2.ConditionalBranch.Data1 = buffer.ReadInt32();
+                                            instance2.ConditionalBranch.Data2 = buffer.ReadInt32();
+                                            instance2.ConditionalBranch.Data3 = buffer.ReadInt32();
+                                            instance2.ConditionalBranch.ElseCommandList = buffer.ReadInt32();
+                                            instance2.MoveRouteCount = buffer.ReadInt32();
+
+                                            if (instance2.MoveRouteCount > 0)
+                                            {
+                                                instance2.MoveRoute = new Core.Globals.Type.MoveRoute[instance2.MoveRouteCount];
+                                                var loopTo5 = instance2.MoveRouteCount;
+                                                for (w = 0; w < loopTo5; w++)
+                                                {
+                                                    instance2.MoveRoute[w].Index = buffer.ReadInt32();
+                                                    instance2.MoveRoute[w].Data1 = buffer.ReadInt32();
+                                                    instance2.MoveRoute[w].Data2 = buffer.ReadInt32();
+                                                    instance2.MoveRoute[w].Data3 = buffer.ReadInt32();
+                                                    instance2.MoveRoute[w].Data4 = buffer.ReadInt32();
+                                                    instance2.MoveRoute[w].Data5 = buffer.ReadInt32();
+                                                    instance2.MoveRoute[w].Data6 = buffer.ReadInt32();
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public static void Packet_EventChat(ReadOnlyMemory<byte> data)
+    {
+        int i;
+        int choices;
+        var buffer = new PacketReader(data);
+        Event.EventReplyId = buffer.ReadInt32();
+        Event.EventReplyPage = buffer.ReadInt32();
+        Event.EventChatFace = buffer.ReadInt32();
+        Event.EventText = buffer.ReadString();
+        if (string.IsNullOrEmpty(Event.EventText))
+            Event.EventText = " ";
+        Event.EventChat = true;
+        Event.ShowEventLbl = true;
+        choices = buffer.ReadInt32();
+
+        for (i = 0; i < Core.Globals.Variables.MaxEventChoices; i++)
+        {
+            Event.EventChoices[i] = "";
+            Event.EventChoiceVisible[i] = false;
+        }
+
+        Event.EventChatType = 0;
+        if (choices == 0)
+        {
+        }
+        else
+        {
+            Event.EventChatType = 1;
+            var loopTo = choices;
+            for (i = 0; i < loopTo; i++)
+            {
+                Event.EventChoices[i] = buffer.ReadString();
+                Event.EventChoiceVisible[i] = true;
+            }
+        }
+
+        Event.AnotherChat = buffer.ReadInt32();
+    }
+
+    public static void Packet_EventStart(ReadOnlyMemory<byte> data)
+    {
+        Event.InEvent = true;
+    }
+
+    public static void Packet_EventEnd(ReadOnlyMemory<byte> data)
+    {
+        Event.InEvent = false;
+    }
+
+    public static void Packet_Picture(ReadOnlyMemory<byte> data)
+    {
+        var buffer = new PacketReader(data);
+        int picIndex;
+        int spriteType;
+        int xOffset;
+        int yOffset;
+        int eventid;
+
+        eventid = buffer.ReadInt32();
+        picIndex = buffer.ReadByte();
+
+        if (picIndex == 0)
+        {
+            Event.Picture.Index = 0;
+            Event.Picture.EventId = 0;
+            Event.Picture.SpriteType = 0;
+            Event.Picture.XOffset = 0;
+            Event.Picture.YOffset = 0;
+            return;
+        }
+
+        spriteType = buffer.ReadByte();
+        xOffset = buffer.ReadByte();
+        yOffset = buffer.ReadByte();
+
+        Event.Picture.Index = (byte)picIndex;
+        Event.Picture.EventId = eventid;
+        Event.Picture.SpriteType = (byte)spriteType;
+        Event.Picture.XOffset = (byte)xOffset;
+        Event.Picture.YOffset = (byte)yOffset;
+    }
+
+    public static void Packet_HidePicture(ReadOnlyMemory<byte> data)
+    {
+        var buffer = new PacketReader(data);
+
+        Event.Picture = default;
+    }
+
+    public static void Packet_HoldPlayer(ReadOnlyMemory<byte> data)
+    {
+        var buffer = new PacketReader(data);
+        if (buffer.ReadInt32() == 0)
+        {
+            Event.HoldPlayer = true;
+        }
+        else
+        {
+            Event.HoldPlayer = false;
+        }
+    }
+
+    public static void Packet_PlayBGM(ReadOnlyMemory<byte> data)
+    {
+        string music;
+        var buffer = new PacketReader(data);
+
+        music = buffer.ReadString();
+        Data.MyMap.Music = music;
+    }
+
+    public static void Packet_FadeOutBGM(ReadOnlyMemory<byte> data)
+    {
+        Sound.CurrentMusic = "";
+        Sound.FadeOutSwitch = true;
+    }
+
+    public static void Packet_PlaySound(ReadOnlyMemory<byte> data)
+    {
+        string sound;
+        var buffer = new PacketReader(data);
+        int x;
+        int y;
+
+        sound = buffer.ReadString();
+        x = buffer.ReadInt32();
+        y = buffer.ReadInt32();
+
+        Sound.PlaySound(sound, x, y);
+    }
+
+    public static void Packet_StopSound(ReadOnlyMemory<byte> data)
+    {
+        Sound.StopSound();
+    }
+
+    public static void Packet_SpecialEffect(ReadOnlyMemory<byte> data)
+    {
+        int effectType;
+        var buffer = new PacketReader(data);
+        effectType = buffer.ReadInt32();
+
+        switch (effectType)
+        {
+            case GameState.EffectTypeFadein:
+                {
+                    GameState.UseFade = true;
+                    GameState.FadeType = 1;
+                    GameState.FadeAmount = 0;
+                    break;
+                }
+            case GameState.EffectTypeFadeout:
+                {
+                    GameState.UseFade = true;
+                    GameState.FadeType = 0;
+                    GameState.FadeAmount = 255;
+                    break;
+                }
+            case GameState.EffectTypeFlash:
+                {
+                    GameState.FlashTimer = General.GetTickCount() + 150;
+                    break;
+                }
+            case GameState.EffectTypeFog:
+                {
+                    GameState.CurrentFog = buffer.ReadInt32();
+                    GameState.CurrentFogSpeed = buffer.ReadInt32();
+                    GameState.CurrentFogOpacity = buffer.ReadInt32();
+                    break;
+                }
+            case GameState.EffectTypeWeather:
+                {
+                    GameState.CurrentWeather = buffer.ReadInt32();
+                    GameState.CurrentWeatherIntensity = buffer.ReadInt32();
+                    break;
+                }
+            case GameState.EffectTypeTint:
+                {
+                    Data.MyMap.MapTint = true;
+                    GameState.CurrentTintR = buffer.ReadInt32();
+                    GameState.CurrentTintG = buffer.ReadInt32();
+                    GameState.CurrentTintB = buffer.ReadInt32();
+                    GameState.CurrentTintA = buffer.ReadInt32();
+                    break;
+                }
+        }
+    }
+
+    public static void Packet_UpdateProjectile(ReadOnlyMemory<byte> data)
+    {
+        int projectileNum;
+        var buffer = new PacketReader(data);
+        projectileNum = buffer.ReadInt32();
+
+        Data.Projectile[projectileNum].Name = buffer.ReadString();
+        Data.Projectile[projectileNum].Sprite = buffer.ReadInt32();
+        Data.Projectile[projectileNum].Range = (byte)buffer.ReadInt32();
+        Data.Projectile[projectileNum].Speed = buffer.ReadInt32();
+        Data.Projectile[projectileNum].Damage = buffer.ReadInt32();
+        Data.Projectile[projectileNum].Animation = buffer.ReadInt32();
+    }
+
+    public static void Packet_MapProjectile(ReadOnlyMemory<byte> data)
+    {
+        var buffer = new PacketReader(data);
+        int i = buffer.ReadInt32();
+
+        {
+            ref var instance = ref Data.MapProjectile[Data.Player[GameState.MyIndex].Map, i];
+            instance.ProjectileNum = buffer.ReadInt32();
+            instance.Owner = buffer.ReadInt32();
+            instance.OwnerType = buffer.ReadByte();
+            instance.Dir = buffer.ReadByte();
+            instance.X = buffer.ReadInt32();
+            instance.Y = buffer.ReadInt32();
+            // New free-aim fields
+            instance.Vx = buffer.ReadInt16();
+            instance.Vy = buffer.ReadInt16();
+            instance.FreeAim = buffer.ReadByte();
+            instance.Range = 0;
+            instance.Timer = General.GetTickCount() + 60000;
+        }
+    }
+
+    public static void Packet_PartyInvite(ReadOnlyMemory<byte> data)
+    {
+        string name;
+        var buffer = new PacketReader(data);
+
+        name = buffer.ReadString();
+        GameLogic.Dialogue("Party Invite", name + " has invited you to a party.", "Would you like to join?", DialogueType.PartyInvite, DialogueStyle.YesNo);
+    }
+
+    public static void Packet_PartyUpdate(ReadOnlyMemory<byte> data)
+    {
+        int i;
+        int inParty;
+        var buffer = new PacketReader(data);
+
+        inParty = buffer.ReadInt32();
+
+        // exit out if we're not in a party
+        if (inParty == -1)
+        {
+            Party.OnClear();
+            WinParty.Update();
+            // exit out early
+            return;
+        }
+
+        // carry on otherwise
+        Data.MyParty.Leader = buffer.ReadInt32();
+        for (i = 0; i < Variables.MaxPartyMembers; i++)
+            Data.MyParty.Member[i] = buffer.ReadInt32();
+        Data.MyParty.MemberCount = buffer.ReadInt32();
+
+        WinParty.Update();
+    }
+
+    public static void Packet_PartyVitals(ReadOnlyMemory<byte> data)
+    {
+        int playerNum;
+        var partyindex = -1;
+        var buffer = new PacketReader(data);
+
+        // which player?
+        playerNum = buffer.ReadInt32();
+
+        // find the party number
+        for (int i = 0; i < Variables.MaxPartyMembers; i++)
+        {
+            if (Data.MyParty.Member[i] == playerNum)
+            {
+                partyindex = i;
+            }
+        }
+
+        // exit out if wrong data
+        if (partyindex < 0 | partyindex >= Variables.MaxPartyMembers)
+            return;
+
+        // set vitals
+        var vitalCount = Enum.GetNames(typeof(Vital)).Length;
+        for (int i = 0; i < vitalCount; i++)
+            Data.Player[playerNum].Vital[i] = buffer.ReadInt32();
+
+        GameLogic.UpdatePartyBars();
     }
 }
