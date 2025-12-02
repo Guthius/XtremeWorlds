@@ -19,10 +19,9 @@ public static class WinNpcEditor
         PopulateCombos();
         SelectedIndex = Math.Clamp(SelectedIndex, 0, Variables.MaxNpcs - 1);
         RefreshList();
-        LoadNpc(SelectedIndex);
+        OnLoad(SelectedIndex);
     }
 
-    // Rebuild NPC list box items from data and keep selection.
     public static void RefreshList()
     {
         if (!WindowManager.TryGetControl("winNpcEditor", "lstIndex", out var lstCtrl) || lstCtrl is not ListBox lst)
@@ -95,7 +94,6 @@ public static class WinNpcEditor
         GameClient.RenderTexture(ref spritePath, drawX, drawY, 0, 0, w, h, w, h);
     }
 
-    // Populate behavior/faction/spawn period/animation/skills/items combos.
     private static void PopulateCombos()
     {
         // Animation list
@@ -182,7 +180,7 @@ public static class WinNpcEditor
     }
 
     // Load selected NPC data into UI controls.
-    public static void LoadNpc(int index)
+    public static void OnLoad(int index)
     {
         if (index < 0 || index >= Variables.MaxNpcs) return;
         IsLoading = true;
@@ -323,7 +321,7 @@ public static class WinNpcEditor
         list.SelectedIndex = index;
         list.EnsureVisible(index);
         PopulateCombos();
-        LoadNpc(index);
+        OnLoad(index);
     }
 
     // Update name from text box (called by Crystalshire wiring).
@@ -359,7 +357,7 @@ public static class WinNpcEditor
         Data.Npc[SelectedIndex] = pasted;
         GameState.NpcChanged[SelectedIndex] = true;
         // Refresh UI to reflect pasted data
-        LoadNpc(SelectedIndex);
+        OnLoad(SelectedIndex);
         RefreshList();
     }
 
@@ -380,7 +378,7 @@ public static class WinNpcEditor
     {
         Npc.OnClear(GameState.EditorIndex);
         GameState.NpcChanged[SelectedIndex] = true;
-        LoadNpc(GameState.EditorIndex);
+        OnLoad(GameState.EditorIndex);
         RefreshList();
     }
 

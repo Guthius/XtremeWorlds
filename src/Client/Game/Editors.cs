@@ -1425,23 +1425,6 @@ namespace Client
             Sender.SendCloseEditor();
         }
 
-        public static void MoralEditorInit()
-        {
-            var moralBlock = EditorMoral.Instance;
-            moralBlock.txtName!.Text = Data.Moral[GameState.EditorIndex].Name;
-            moralBlock.cmbColor!.SelectedIndex = Data.Moral[GameState.EditorIndex].Color;
-            moralBlock.chkCanCast!.Checked = Data.Moral[GameState.EditorIndex].CanCast;
-            moralBlock.chkCanPK!.Checked = Data.Moral[GameState.EditorIndex].CanPk;
-            moralBlock.chkCanPickupItem!.Checked = Data.Moral[GameState.EditorIndex].CanPickupItem;
-            moralBlock.chkCanDropItem!.Checked = Data.Moral[GameState.EditorIndex].CanDropItem;
-            moralBlock.chkCanUseItem!.Checked = Data.Moral[GameState.EditorIndex].CanUseItem;
-            moralBlock.chkDropItems!.Checked = Data.Moral[GameState.EditorIndex].DropItems;
-            moralBlock.chkLoseExp!.Checked = Data.Moral[GameState.EditorIndex].LoseExp;
-            moralBlock.chkPlayerBlock!.Checked = Data.Moral[GameState.EditorIndex].PlayerBlock;
-            moralBlock.chkNpcBlock!.Checked = Data.Moral[GameState.EditorIndex].NpcBlock;
-            GameState.MoralChanged[GameState.EditorIndex] = true;
-        }
-
         public static void ClearChanged_Moral()
         {
             for (int i = 0; i < Variables.MaxMorals; i++)

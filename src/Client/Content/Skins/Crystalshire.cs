@@ -1410,7 +1410,7 @@ public class Crystalshire
             {
                 if (WinNpcEditor.SelectedIndex >= 0)
                 {
-                    WinNpcEditor.LoadNpc(WinNpcEditor.SelectedIndex);
+                    WinNpcEditor.OnLoad(WinNpcEditor.SelectedIndex);
                 }
             };
         }
@@ -1626,7 +1626,7 @@ public class Crystalshire
             {
                 Npc.OnClear(GameState.EditorIndex);
                 GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
-                WinNpcEditor.LoadNpc(GameState.EditorIndex);
+                WinNpcEditor.OnLoad(GameState.EditorIndex);
                 WinNpcEditor.RefreshList();
             };
         }
@@ -2486,30 +2486,6 @@ public class Crystalshire
     {
         var window = WindowLoader.FromLayout("winShopEditor");
 
-        // List interactions
-        if (WindowManager.TryGetControl("winShopEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox lstIndex)
-        {
-            lstIndex.CallBack[(int)ControlState.MouseDown] = WinShopEditor.OnListMouseDown;
-            // Wheel scroll sync with scrollbar
-            if (WindowManager.TryGetControl("winShopEditor", "sldList", out var sldTradeList) && sldTradeList is ScrollBar sbSync)
-            {
-                lstIndex.CallBack[(int)ControlState.MouseScroll] = () =>
-                {
-                    int delta = GameClient.CurrentMouseState.ScrollWheelValue - GameClient.PreviousMouseState.ScrollWheelValue;
-                    if (delta == 0) return;
-                    int step = delta > 0 ? -1 : 1;
-                    sbSync.Value = Math.Clamp(sbSync.Value + step, sbSync.Min, sbSync.Max);
-                    lstIndex.ScrollOffset = sbSync.Value;
-                    lstIndex.EnsureVisible(lstIndex.SelectedIndex);
-                };
-                sbSync.CallBack[(int)ControlState.MouseMove] = () =>
-                {
-                    lstIndex.ScrollOffset = sbSync.Value;
-                    lstIndex.EnsureVisible(lstIndex.SelectedIndex);
-                };
-            }
-        }
-
         // Trade list interactions
         WireScrollableList("winShopEditor", "lstIndex", "sldList");
         WireScrollableList("winShopEditor", "lstTradeItem", "sldTradeList");
@@ -2569,28 +2545,24 @@ public class Crystalshire
         // Copy button
         if (WindowManager.TryGetControl("winShopEditor", "btnCopy", out var copyCtrl) && copyCtrl is Button btnCopy)
         {
-            btnCopy.CallBack[(int)ControlState.MouseDown] = () => { WinShopEditor.OnCopyOrPaste(); };
+            btnCopy.CallBack[(int)ControlState.MouseDown] = () => { WinShopEditor.OnCopy(); };
         }
 
         // Save / Cancel / Delete / Close
         if (WindowManager.TryGetControl("winShopEditor", "btnSave", out var saveCtrl) && saveCtrl is Button btnSave)
         {
-            btnSave.CallBack[(int)ControlState.MouseDown] = () => { Editors.ShopEditorOK(); WindowManager.HideWindow("winShopEditor"); };
+            btnSave.CallBack[(int)ControlState.MouseDown] = () => { WinShopEditor.OnSave(); };
         }
         if (WindowManager.TryGetControl("winShopEditor", "btnCancel", out var cancelCtrl) && cancelCtrl is Button btnCancel)
         {
-            btnCancel.CallBack[(int)ControlState.MouseDown] = () => { Editors.ShopEditorCancel(); WindowManager.HideWindow("winShopEditor"); };
+            btnCancel.CallBack[(int)ControlState.MouseDown] = () => { WinShopEditor.OnCancel(); };
         }
-        if (WindowManager.TryGetControl("winShopEditor", "btnDelete", out var delShopCtrl) && delShopCtrl is Button btnDelete)
+        if (WindowManager.TryGetControl("winShopEditor", "btnDelete", out var delShopCtrl) && delShopCtrl is Button btnDelete) 
         {
-            btnDelete.CallBack[(int)ControlState.MouseDown] = () =>
-            {
-                WinShopEditor.OnClear();
-            };
+            btnDelete.CallBack[(int)ControlState.MouseDown] = () => { WinShopEditor.OnDelete(); };
         }
-        if (WindowManager.TryGetControl("winShopEditor", "btnClose", out var closeCtrl) && closeCtrl is Button btnClose)
-        {
-            btnClose.CallBack[(int)ControlState.MouseDown] = () => { WinShopEditor.OnCancel(); Editors.ShopEditorCancel(); WindowManager.HideWindow("winShopEditor"); };
+        if (WindowManager.TryGetControl("winShopEditor", "btnClose", out var closeCtrl) && closeCtrl is Button btnClose) {
+            btnClose.CallBack[(int)ControlState.MouseDown] = () => { WinShopEditor.OnCancel(); };
         }
     }
 
@@ -2736,21 +2708,13 @@ public class Crystalshire
 
         // Remaining buttons
         if (WindowManager.TryGetControl("winJobEditor", "btnSave", out var btnSave))
-            btnSave.CallBack[(int)ControlState.MouseDown] = () => { Editors.JobEditorOK(); WindowManager.HideWindow("winJobEditor"); };
+            btnSave.CallBack[(int)ControlState.MouseDown] = () => { WinJobEditor.OnSave(); };
         if (WindowManager.TryGetControl("winJobEditor", "btnCancel", out var btnCancel))
-            btnCancel.CallBack[(int)ControlState.MouseDown] = () => { Editors.JobEditorCancel(); WindowManager.HideWindow("winJobEditor"); };
+            btnCancel.CallBack[(int)ControlState.MouseDown] = () => { WinJobEditor.OnCancel(); };
         if (WindowManager.TryGetControl("winJobEditor", "btnDelete", out var btnDelete))
-        {
-            btnDelete.CallBack[(int)ControlState.MouseDown] = () =>
-            {
-                Job.OnClear(WinJobEditor.SelectedIndex);
-                GameState.JobChanged[WinJobEditor.SelectedIndex] = true;
-                WinJobEditor.LoadJob(WinJobEditor.SelectedIndex);
-                WinJobEditor.RefreshList();
-            };
-        }
+            btnDelete.CallBack[(int)ControlState.MouseDown] = () => { WinJobEditor.OnDelete(); };
         if (WindowManager.TryGetControl("winJobEditor", "btnCopy", out var btnCopy))
-            btnCopy.CallBack[(int)ControlState.MouseDown] = WinJobEditor.OnCopyOrPaste;
+            btnCopy.CallBack[(int)ControlState.MouseDown] = WinJobEditor.OnCopy;
     }
 
     public void WireScrollableList(string windowName, string listName, string barName)
@@ -2921,5 +2885,78 @@ public class Crystalshire
             picNormal.OnDraw = WinResourceEditor.OnDrawNormal;
         if (WindowManager.TryGetControl("winResourceEditor", "picExhausted", out var picExCtrl) && picExCtrl is PictureBox picExhausted)
             picExhausted.OnDraw = WinResourceEditor.OnDrawExhausted;
+    }
+
+
+    public void UpdateWindow_MoralEditor()
+    {
+        var window = WindowLoader.FromLayout("winMoralEditor");
+
+        // Wire scrollable lists
+        WireScrollableList("winMoralEditor", "lstIndex", "sldList");
+
+        // Text changes
+        if (WindowManager.TryGetControl("winMoralEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
+        {
+            txtName.CallBack[(int)ControlState.KeyUp] = () =>
+            {
+                int idx = GameState.EditorIndex; if (idx < 0 || idx >= Variables.MaxMorals) return;
+                Data.Resource[idx].Name = txtName.Text ?? string.Empty;
+                WinMoralEditor.RefreshList();
+            };
+        }
+
+        // Color combo
+        if (WindowManager.TryGetControl("winMoralEditor", "cmbColor", out var colorCtrl) && colorCtrl is ComboBox cmbColor)
+        {
+            if (cmbColor.Items.Count == 0)
+            {
+                foreach (var n in Enum.GetNames(typeof(ColorName))) cmbColor.Items.Add(n);
+            }
+            cmbColor.CallBack[(int)ControlState.MouseMove] = () =>
+            {
+                int idx = WinMoralEditor.SelectedIndex;
+                if (idx < 0 || idx >= Variables.MaxMorals) return;
+                Data.Moral[idx].Color = (byte)Math.Clamp(cmbColor.Value, 0, Math.Max(0, cmbColor.Items.Count - 1));
+                GameState.MoralChanged[idx] = true;
+            };
+        }
+
+        // Helper for checkbox toggle
+        void BindCheckbox(string name, Action<int> apply)
+        {
+            if (WindowManager.TryGetControl("winMoralEditor", name, out var c) && c is CheckBox cb)
+            {
+                cb.CallBack[(int)ControlState.MouseDown] = () =>
+                {
+                    cb.Value = cb.Value == 0 ? 1 : 0;
+                    apply(cb.Value);
+                    int idx = WinMoralEditor.SelectedIndex;
+                    if (idx >= 0 && idx < Variables.MaxMorals) GameState.MoralChanged[idx] = true;
+                };
+            }
+        }
+
+        BindCheckbox("chkCanCast", v => { int i = WinMoralEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxMorals) Data.Moral[i].CanCast = v == 1; });
+        BindCheckbox("chkCanPK", v => { int i = WinMoralEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxMorals) Data.Moral[i].CanPk = v == 1; });
+        BindCheckbox("chkCanPickupItem", v => { int i = WinMoralEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxMorals) Data.Moral[i].CanPickupItem = v == 1; });
+        BindCheckbox("chkCanDropItem", v => { int i = WinMoralEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxMorals) Data.Moral[i].CanDropItem = v == 1; });
+        BindCheckbox("chkCanUseItem", v => { int i = WinMoralEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxMorals) Data.Moral[i].CanUseItem = v == 1; });
+        BindCheckbox("chkDropItems", v => { int i = WinMoralEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxMorals) Data.Moral[i].DropItems = v == 1; });
+        BindCheckbox("chkLoseExp", v => { int i = WinMoralEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxMorals) Data.Moral[i].LoseExp = v == 1; });
+        BindCheckbox("chkPlayerBlock", v => { int i = WinMoralEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxMorals) Data.Moral[i].PlayerBlock = v == 1; });
+        BindCheckbox("chkNpcBlock", v => { int i = WinMoralEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxMorals) Data.Moral[i].NpcBlock = v == 1; });
+
+        // Buttons
+        if (WindowManager.TryGetControl("winMoralEditor", "btnSave", out var saveCtrl) && saveCtrl is Button btnSave)
+            btnSave.CallBack[(int)ControlState.MouseDown] = () => { WinMoralEditor.OnSave(); };
+        if (WindowManager.TryGetControl("winMoralEditor", "btnCancel", out var cancelCtrl) && cancelCtrl is Button btnCancel)
+            btnCancel.CallBack[(int)ControlState.MouseDown] = () => { WinMoralEditor.OnCancel(); };
+        if (WindowManager.TryGetControl("winMoralEditor", "btnDelete", out var deleteCtrl) && deleteCtrl is Button btnDelete)
+            btnDelete.CallBack[(int)ControlState.MouseDown] = () => { WinMoralEditor.OnDelete(); };
+        if (WindowManager.TryGetControl("winMoralEditor", "btnCopy", out var copyCtrl) && copyCtrl is Button btnCopy)
+            btnCopy.CallBack[(int)ControlState.MouseDown] = () => { WinMoralEditor.OnCopy(); };
+        if (WindowManager.TryGetControl("winMoralEditor", "btnClose", out var closeCtrl) && closeCtrl is Button btnClose)
+            btnClose.CallBack[(int)ControlState.MouseDown] = () => { WinMoralEditor.OnCancel(); };
     }
 }

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window Name="winMoralEditor" Caption="Moral Editor"
+        Size="760, 370"
+        Icon="940" IconOffset="3, 5"
+        Design="WindowNormal"
+        StartPosition="CenterScreen"
+        Visible="false">
+
+	<!-- Left: Moral index list -->
+	<GroupBox Name="grpList" Position="8,32" Size="200, 296" Caption="Morals">
+		<ListBox Name="lstIndex" Position="8, 24" Size="164, 260"/>
+		<ScrollBar Name="sldList" Position="172, 24" Size="16, 260" Min="0" Max="0" Value="0" Orientation="Vertical"/>
+	</GroupBox>
+
+	<!-- Right: Details -->
+	<GroupBox Name="grpDetails" Position="212, 32" Size="536, 296" Caption="Details">
+		<!-- Name / Color -->
+		<Label Name="lblName" Text="Name" Position="8, 28" Size="60, 16"/>
+		<TextBox Name="txtName" Position="84, 24" Size="180, 20" Design="TextWhite"/>
+
+		<Label Name="lblColor" Text="Color" Position="276, 28" Size="60, 16"/>
+		<ComboBox Name="cmbColor" Position="368, 24" Size="156, 20"/>
+
+		<!-- Toggles (two columns) -->
+		<CheckBox Name="chkCanCast" Text="Can Cast" Position="8, 64" Size="160, 16"/>
+		<CheckBox Name="chkCanPK" Text="Can PK" Position="276, 64" Size="160, 16"/>
+
+		<CheckBox Name="chkCanPickupItem" Text="Can Pickup Item" Position="8, 96" Size="160, 16"/>
+		<CheckBox Name="chkCanDropItem" Text="Can Drop Item" Position="276, 96" Size="160, 16"/>
+
+		<CheckBox Name="chkCanUseItem" Text="Can Use Item" Position="8, 128" Size="160, 16"/>
+		<CheckBox Name="chkDropItems" Text="Drop Items" Position="276, 128" Size="160, 16"/>
+
+		<CheckBox Name="chkLoseExp" Text="Lose Experience" Position="8, 160" Size="160, 16"/>
+		<!-- spacer on the right column for this row -->
+
+		<CheckBox Name="chkPlayerBlock" Text="Player Block" Position="8, 192" Size="160, 16"/>
+		<CheckBox Name="chkNpcBlock" Text="Npc Block" Position="276, 192" Size="160, 16"/>
+	</GroupBox>
+
+	<!-- Action buttons (centered at bottom like other editors) -->
+	<Button Name="btnSave" Text="Save" Position="302, 336" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+	<Button Name="btnDelete" Text="Delete" Position="394, 336" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+	<Button Name="btnCopy" Text="Copy" Position="486, 336" Size="80, 24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnCancel" Text="Cancel" Position="578, 336" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+
+	<!-- Close -->
+	<Button Name="btnClose" Position="-19, 5" Size="16, 16" Image="8" ImageHover="9" ImageMouseDown="10"/>
+</Window>

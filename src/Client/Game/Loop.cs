@@ -548,7 +548,8 @@ namespace Client
             {
                 GameState.MyEditorType = EditorType.Moral;
                 GameState.EditorIndex = 0;
-                new EditorMoral().Show();
+                WindowManager.ShowWindow("winMoralEditor");
+                Client.Game.UI.Windows.WinMoralEditor.Init();
                 GameState.InitMoralEditor = false;
             }
 

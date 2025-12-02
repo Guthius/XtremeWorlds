@@ -230,7 +230,11 @@ public static class WinShopEditor
         RefreshList();
     }
 
-    // Unified handlers for callbacks
+    public static void OnCopy()
+    {
+        OnCopyOrPaste();
+    }
+
     public static void OnSave()
     {
         Editors.ShopEditorOK();
@@ -242,5 +246,4 @@ public static class WinShopEditor
         Editors.ShopEditorCancel();
         WindowManager.HideWindow("winShopEditor");
     }
-
 }
