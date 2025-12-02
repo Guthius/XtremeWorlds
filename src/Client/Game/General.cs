@@ -455,7 +455,7 @@ namespace Client
         public static void OnExit()
         {
             // macOS: ask OS to terminate this process via SIGTERM
-            MacExit.ExitViaMacSignal();
+            Cocca.OnExit();
         }
     }
 
