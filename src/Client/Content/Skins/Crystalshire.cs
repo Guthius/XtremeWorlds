@@ -2866,6 +2866,8 @@ public class Crystalshire
             txtMsg.CallBack[(int)ControlState.KeyUp] = () => { int i = GameState.EditorIndex; if (i >= 0 && i < Variables.MaxResources) Data.Resource[i].SuccessMessage = txtMsg.Text ?? string.Empty; };
         if (WindowManager.TryGetControl("winResourceEditor", "txtMessage2", out var msg2Ctrl) && msg2Ctrl is TextBox txtMsg2)
             txtMsg2.CallBack[(int)ControlState.KeyUp] = () => { int i = GameState.EditorIndex; if (i >= 0 && i < Variables.MaxResources) Data.Resource[i].EmptyMessage = txtMsg2.Text ?? string.Empty; };
+        if (WindowManager.TryGetControl("winResourceEditor", "txtRewardExp", out var expCtrl) && expCtrl is TextBox txtExp)
+            txtExp.CallBack[(int)ControlState.KeyUp] = () => { int i = GameState.EditorIndex; if (i >= 0 && i < Variables.MaxResources) Data.Resource[i].ExpReward = int.TryParse(txtExp.Text, out var exp) ? exp : 0; };
 
         // Combo callbacks
         void BindCombo(string ctrlName, Action<int> apply)

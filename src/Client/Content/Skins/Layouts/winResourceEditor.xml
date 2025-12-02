@@ -1,79 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window Name="winResourceEditor" Caption="Resource Editor"
-        Size="760, 520"
-        Icon="314" IconOffset="3, 5"
+        Size="760, 370"
+        Icon="590" IconOffset="3, 5"
         Design="WindowNormal"
         StartPosition="CenterScreen"
         Visible="false">
 
-  <!-- Left: Resource index list -->
-  <GroupBox Name="grpList" Position="8,32" Size="200,452" Caption="Resources">
-    <ListBox Name="lstIndex" Position="8,24" Size="164,404"/>
-    <ScrollBar Name="sldList" Position="172,24" Size="8,404" Min="0" Max="0" Value="0" Orientation="Vertical" ThumbSize="16"/>
-  </GroupBox>
+	<!-- Left: Resource index list -->
+	<GroupBox Name="grpList" Position="8,32" Size="200, 296" Caption="Resources">
+		<ListBox Name="lstIndex" Position="8, 24" Size="164, 260"/>
+		<ScrollBar Name="sldList" Position="172, 24" Size="16, 260" Min="0" Max="0" Value="0" Orientation="Vertical"/>
+	</GroupBox>
 
-  <!-- Right: Details -->
-  <GroupBox Name="grpDetails" Position="216,32" Size="536,452" Caption="Details">
-    <!-- Name / Messages -->
-    <Label Name="lblName" Text="Name" Position="8,28" Size="60,16"/>
-    <TextBox Name="txtName" Position="84,24" Size="180,20" Design="TextWhite"/>
+	<!-- Right: Details -->
+	<GroupBox Name="grpDetails" Position="212, 32" Size="536, 296" Caption="Details">
+		<!-- Name / Messages -->
+		<Label Name="lblName" Text="Name" Position="8, 28" Size="60, 16"/>
+		<TextBox Name="txtName" Position="84, 24" Size="180, 20" Design="TextWhite"/>
 
-    <Label Name="lblSuccess" Text="Success Msg" Position="276,28" Size="84,16"/>
-    <TextBox Name="txtMessage" Position="368,24" Size="156,20" Design="TextWhite"/>
+		<Label Name="lblSuccess" Text="Success" Position="276, 28" Size="84, 16"/>
+		<TextBox Name="txtMessage" Position="368,24" Size="156, 20" Design="TextWhite"/>
 
-    <Label Name="lblEmpty" Text="Empty Msg" Position="8,64" Size="72,16"/>
-    <TextBox Name="txtMessage2" Position="84,60" Size="180,20" Design="TextWhite"/>
+		<Label Name="lblEmpty" Text="Empty" Position="8, 64" Size="90, 16"/>
+		<TextBox Name="txtMessage2" Position="84,60" Size="180, 20" Design="TextWhite"/>
 
-    <!-- Type / Reward Item -->
-    <Label Name="lblType" Text="Type" Position="276,64" Size="40,16"/>
-    <ComboBox Name="cmbType" Position="368,60" Size="156,20"/>
+		<!-- Type / Reward Item -->
+		<Label Name="lblType" Text="Type" Position="272,64" Size="40, 16"/>
+		<ComboBox Name="cmbType" Position="368,60" Size="156, 20"/>
 
-    <Label Name="lblRewardItem" Text="Reward Item" Position="8,100" Size="84,16"/>
-    <ComboBox Name="cmbRewardItem" Position="84,96" Size="180,20"/>
+		<Label Name="lblRewardItem" Text="Reward" Position="8, 100" Size="100, 16"/>
+		<ComboBox Name="cmbRewardItem" Position="84,96" Size="180,20"/>
 
-    <Label Name="lblRewardExp" Text="Reward Exp" Position="276,100" Size="84,16"/>
-    <ScrollBar Name="sldRewardExp" Position="368,96" Size="156,16" Min="0" Max="1000000" Value="0" Orientation="Horizontal" ThumbSize="16"/>
-    <Label Name="lblRewardExpVal" Text="0" Position="528,100" Size="32,16"/>
+		<Label Name="lblRewardExp" Text="Experience" Position="276, 96" Size="100, 16"/>
+		<TextBox Name="txtRewardExp" Position="368,96" Size="156, 16" Min="0" Max="1000000" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 
-    <!-- Tool / Animation -->
-    <Label Name="lblTool" Text="Tool Req" Position="8,136" Size="72,16"/>
-    <ComboBox Name="cmbTool" Position="84,132" Size="180,20"/>
+		<!-- Tool / Animation -->
+		<Label Name="lblTool" Text="Tool Req" Position="8, 136" Size="80, 16"/>
+		<ComboBox Name="cmbTool" Position="84,132" Size="180, 20"/>
 
-    <Label Name="lblAnimation" Text="Animation" Position="276,136" Size="72,16"/>
-    <ComboBox Name="cmbAnimation" Position="368,132" Size="156,20"/>
+		<Label Name="lblAnimation" Text="Animation" Position="276,134" Size="90,16"/>
+		<ComboBox Name="cmbAnimation" Position="368,132" Size="156,20"/>
 
-    <!-- Health / Respawn -->
-    <Label Name="lblHealth" Text="Health" Position="8,172" Size="60,16"/>
-    <ScrollBar Name="sldHealth" Position="84,168" Size="180,16" Min="0" Max="100000" Value="0" Orientation="Horizontal" ThumbSize="16"/>
-    <Label Name="lblHealthVal" Text="0" Position="268,172" Size="40,16"/>
+		<!-- Health / Respawn -->
+		<Label Name="lblHealth" Text="Health" Position="8, 172" Size="60, 16"/>
+		<TextBox Name="txtHp" Position="84,168" Size="180, 16" Orientation="Horizontal" ThumbSize="16"/>
+		<Label Name="lblHp" Text="0" Position="268,172" Size="40, 16"/>
 
-    <Label Name="lblRespawn" Text="Respawn" Position="276,172" Size="72,16"/>
-    <ScrollBar Name="sldRespawn" Position="368,168" Size="156,16" Min="0" Max="1000000" Value="0" Orientation="Horizontal" ThumbSize="16"/>
-    <Label Name="lblRespawnVal" Text="0" Position="528,172" Size="32,16"/>
+		<Label Name="lblRespawn" Text="Respawn" Position="272,172" Size="72, 16"/>
+		<TextBox Name="txtRespawn" Position="368,168" Size="156, 16" Orientation="Horizontal"/>
+		<Label Name="lblRespawn" Text="0" Position="528,172" Size="32, 16"/>
 
-    <!-- Level Required -->
-    <Label Name="lblLvlReq" Text="Level Req" Position="8,208" Size="72,16"/>
-    <ScrollBar Name="sldLvlReq" Position="84,204" Size="180,16" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
-    <Label Name="lblLvlReqVal" Text="0" Position="268,208" Size="40,16"/>
+		<!-- Level Required -->
+		<Label Name="lblLvlReq" Text="Level Req" Position="8, 208" Size="80, 16"/>
+		<ScrollBar Name="sldLvlReq" Position="84,204" Size="180, 16" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+		<Label Name="lblLvlReqVal" Text="0" Position="268,208" Size="40, 16"/>
 
-    <!-- Normal / Exhausted Images -->
-    <Label Name="lblNormalPic" Text="Normal Pic" Position="8,244" Size="72,16"/>
-    <ScrollBar Name="sldNormalPic" Position="84,240" Size="180,16" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
-    <Label Name="lblNormalPicVal" Text="0" Position="268,244" Size="40,16"/>
-    <PictureBox Name="picNormal" Position="84,260" Size="150,130"/>
+		<!-- Normal / Exhausted Images -->
+		<Label Name="lblNormalPic" Text="Sprite" Position="8,244" Size="72, 16"/>
+		<ScrollBar Name="sldNormalPic" Position="84,240" Size="180, 16" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+		<Label Name="lblNormalPicVal" Text="0" Position="268,244" Size="40, 16"/>
+		<PictureBox Name="picNormal" Position="84,260" Size="150,130"/>
 
-    <Label Name="lblExhaustedPic" Text="Exhausted Pic" Position="276,244" Size="92,16"/>
-    <ScrollBar Name="sldExhaustedPic" Position="368,240" Size="156,16" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
-    <Label Name="lblExhaustedPicVal" Text="0" Position="528,244" Size="32,16"/>
-    <PictureBox Name="picExhausted" Position="368,260" Size="150,130"/>
+		<Label Name="lblExhaustedPic" Text="Dead" Position="280, 238" Size="92, 16"/>
+		<ScrollBar Name="sldExhaustedPic" Position="368,240" Size="156, 16" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+		<Label Name="lblExhaustedPicVal" Text="0" Position="528,244" Size="32, 16"/>
+		<PictureBox Name="picExhausted" Position="368,260" Size="150,130"/>
+	</GroupBox>
 
-	<!-- Action buttons -->
-	<Button Name="btnSave" Text="Save" Position="440, 520" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-	<Button Name="btnDelete" Text="Delete" Position="528, 520" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
-	<Button Name="btnCopy" Text="Copy" Position="616, 520" Size="80, 24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="GreenClick"/>
-	<Button Name="btnCancel" Text="Cancel" Position="704, 520" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
-  </GroupBox>
+	<!-- Action buttons (centered at bottom like other editors) -->
+	<Button Name="btnSave" Text="Save" Position="302, 336" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+	<Button Name="btnDelete" Text="Delete" Position="394, 336" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+	<Button Name="btnCopy" Text="Copy" Position="486, 336" Size="80, 24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnCancel" Text="Cancel" Position="578, 336" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
 
-  <!-- Close -->
-  <Button Name="btnClose" Position="-19, 5" Size="16, 16" Image="8" ImageHover="9" ImageMouseDown="10"/>
+	<!-- Close -->
+	<Button Name="btnClose" Position="-19, 5" Size="16, 16" Image="8" ImageHover="9" ImageMouseDown="10"/>
 </Window>
