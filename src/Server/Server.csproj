@@ -90,9 +90,9 @@
     </Compile>
   </ItemGroup>
 
-  <Target Name="KillLockingProcesses" BeforeTargets="BeforeBuild" Condition="'$(CI)' != 'true' and '$(SkipProcessKill)' != 'true'">
-    <Exec Command="cmd /c tasklist | findstr /I $(AssemblyName).exe >nul &amp;&amp; taskkill /F /IM $(AssemblyName).exe || exit /b 0" />
-    <Exec Command="cmd /c tasklist | findstr /I dotnet.exe >nul &amp;&amp; taskkill /F /IM dotnet.exe || exit /b 0" />
+  <Target Name="KillLockingProcesses" BeforeTargets="BeforeBuild" Condition="'$(CI)' != 'true' and '$(SkipProcessKill)' != 'true' and '$(OS)' == 'Windows_NT'">
+    <Exec Command="cmd /c tasklist | findstr /I $(AssemblyName).exe &amp;&amp; taskkill /F /IM $(AssemblyName).exe || exit /b 0" />
+    <Exec Command="cmd /c tasklist | findstr /I dotnet.exe &amp;&amp; taskkill /F /IM dotnet.exe || exit /b 0" />
   </Target>
 
 </Project>
