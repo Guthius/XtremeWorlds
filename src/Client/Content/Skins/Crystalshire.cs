@@ -1031,9 +1031,9 @@ public class Crystalshire
                 cmbMusic.Items.Clear();
                 cmbMusic.Items.Add("None");
                 General.CacheMusic();
-                for (int i = 0; i < Sound.MusicCache.Length; i++)
+                for (int i = 0; i < Audio.MusicCache.Length; i++)
                 {
-                    var name = Sound.MusicCache[i] ?? string.Empty;
+                    var name = Audio.MusicCache[i] ?? string.Empty;
                     if (!string.IsNullOrWhiteSpace(name)) cmbMusic.Items.Add($"{i + 1}: {name}");
                 }
                 // Select current map music if present
@@ -1083,11 +1083,11 @@ public class Crystalshire
                         var ext = System.IO.Path.GetExtension(file)?.ToLowerInvariant();
                         if (ext == ".mid")
                         {
-                            Sound.PlayMidi(System.IO.Path.Combine(DataPath.Music, file));
+                            Audio.PlayMidi(System.IO.Path.Combine(DataPath.Music, file));
                         }
                         else
                         {
-                            Sound.PlayMusic(file);
+                            Audio.PlayMusic(file);
                         }
                     };
                 }
@@ -3190,9 +3190,9 @@ public class Crystalshire
             {
                 cmbSound.Items.Clear();
                 General.CacheSound();
-                for (int i = 0; i < Sound.SoundCache.Length; i++)
+                for (int i = 0; i < Audio.SoundCache.Length; i++)
                 {
-                    var s = Sound.SoundCache[i] ?? string.Empty;
+                    var s = Audio.SoundCache[i] ?? string.Empty;
                     if (!string.IsNullOrWhiteSpace(s)) cmbSound.Items.Add(s);
                 }
                 cmbSound.Value = 0;

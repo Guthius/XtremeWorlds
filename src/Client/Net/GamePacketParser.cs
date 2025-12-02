@@ -2389,8 +2389,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
     public static void Packet_FadeOutBGM(ReadOnlyMemory<byte> data)
     {
-        Sound.CurrentMusic = "";
-        Sound.FadeOutSwitch = true;
+        Audio.CurrentMusic = "";
+        Audio.FadeOutSwitch = true;
     }
 
     public static void Packet_PlaySound(ReadOnlyMemory<byte> data)
@@ -2404,12 +2404,12 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         x = buffer.ReadInt32();
         y = buffer.ReadInt32();
 
-        Sound.PlaySound(sound, x, y);
+        Audio.PlaySound(sound, x, y);
     }
 
     public static void Packet_StopSound(ReadOnlyMemory<byte> data)
     {
-        Sound.StopSound();
+        Audio.StopSound();
     }
 
     public static void Packet_SpecialEffect(ReadOnlyMemory<byte> data)

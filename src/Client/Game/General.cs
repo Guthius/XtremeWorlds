@@ -53,7 +53,7 @@ namespace Client
             CheckInterface();
             CheckGradients();
             CheckDesigns();
-            Sound.InitializeBass();
+            Audio.InitializeBass();
             UIScript.Load();
             WindowManager.Init();
             GameState.Ping = -1;
@@ -217,28 +217,28 @@ namespace Client
 
         public static void CacheMusic()
         {
-            Sound.MusicCache = new string[Directory.GetFiles(DataPath.Music, "*" + SettingsManager.Instance.MusicExt).Count() + 1];
+            Audio.MusicCache = new string[Directory.GetFiles(DataPath.Music, "*" + SettingsManager.Instance.MusicExt).Count() + 1];
             string[] files = Directory.GetFiles(DataPath.Music, "*" + SettingsManager.Instance.MusicExt);
             string maxNum = Directory.GetFiles(DataPath.Music, "*" + SettingsManager.Instance.MusicExt).Count().ToString();
             int counter = 0;
 
             foreach (var fileName in files)
             {
-                Sound.MusicCache[counter] = System.IO.Path.GetFileName(fileName);
+                Audio.MusicCache[counter] = System.IO.Path.GetFileName(fileName);
                 counter = counter + 1;
             }
         }
 
         public static void CacheSound()
         {
-            Sound.SoundCache = new string[Directory.GetFiles(DataPath.Sounds, "*" + SettingsManager.Instance.SoundExt).Count() + 1];
+            Audio.SoundCache = new string[Directory.GetFiles(DataPath.Sounds, "*" + SettingsManager.Instance.SoundExt).Count() + 1];
             string[] files = Directory.GetFiles(DataPath.Sounds, "*" + SettingsManager.Instance.SoundExt);
             string maxNum = Directory.GetFiles(DataPath.Sounds, "*" + SettingsManager.Instance.SoundExt).Count().ToString();
             int counter = 0;
 
             foreach (var fileName in files)
             {
-                Sound.SoundCache[counter] = System.IO.Path.GetFileName(fileName);
+                Audio.SoundCache[counter] = System.IO.Path.GetFileName(fileName);
                 counter = counter + 1;
             }
         }

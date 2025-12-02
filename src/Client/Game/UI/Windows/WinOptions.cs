@@ -62,7 +62,7 @@ public static class WinOptions
             {
                 TextRenderer.AddText("Music turned off.", (int) ColorName.BrightGreen);
 
-                Sound.StopMusic();
+                Audio.StopMusic();
             }
             else
             {
@@ -71,11 +71,11 @@ public static class WinOptions
                 var music = GameState.InGame ? Data.MyMap.Music : SettingsManager.Instance.Music.ToString();
                 if (music != "None.")
                 {
-                    Sound.PlayMusic(music);
+                    Audio.PlayMusic(music);
                 }
                 else
                 {
-                    Sound.StopMusic();
+                    Audio.StopMusic();
                 }
             }
         }

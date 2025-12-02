@@ -54,7 +54,7 @@ namespace Client
 
                 if (_tmr25 < _tick)
                 {
-                    Sound.PlayMusic(Data.MyMap.Music);
+                    Audio.PlayMusic(Data.MyMap.Music);
                     UpdateEditors();
                     _tmr25 = _tick + 25;
                 }
@@ -379,14 +379,14 @@ namespace Client
                     _tmr250 = _tick + 250;
                 }
 
-                if (Sound.FadeInSwitch == true)
+                if (Audio.FadeInSwitch == true)
                 {
-                    Sound.FadeIn();
+                    Audio.FadeIn();
                 }
 
-                if (Sound.FadeOutSwitch == true)
+                if (Audio.FadeOutSwitch == true)
                 {
-                    Sound.FadeOut();
+                    Audio.FadeOut();
                 }
             }
             else
@@ -408,7 +408,7 @@ namespace Client
 
                 if (_tmr25 < _tick)
                 {
-                    Sound.PlayMusic(SettingsManager.Instance.MenuMusic);
+                    Audio.PlayMusic(SettingsManager.Instance.MenuMusic);
                     _tmr25 = _tick + 25;
                 }
             }

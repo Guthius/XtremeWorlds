@@ -20,7 +20,7 @@ namespace Client
             {
                 if (GameState.CurrentWeather == (int)WeatherType.Rain | GameState.CurrentWeather == (int)WeatherType.Storm)
                 {
-                    Sound.PlayWeatherSound("Rain.ogg", true);
+                    Audio.PlayWeatherSound("Rain.ogg", true);
                 }
 
                 x = GameLogic.Rand(1, Variables.MaxWeatherParticles - GameState.CurrentWeatherIntensity);
@@ -53,7 +53,7 @@ namespace Client
             }
             else
             {
-                Sound.StopWeatherSound();
+                Audio.StopWeatherSound();
             }
 
             if (GameState.CurrentWeather == (int)WeatherType.Storm)
@@ -62,7 +62,7 @@ namespace Client
                 if (x == 1)
                 {
                     GameState.DrawThunder = GameLogic.Rand(15, 22);
-                    Sound.PlayExtraSound("Thunder.ogg");
+                    Audio.PlayExtraSound("Thunder.ogg");
                 }
             }
 

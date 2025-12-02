@@ -1529,16 +1529,16 @@ namespace Client
                 cmbPlayBGM.Items.Clear();
 
                 General.CacheMusic();
-                var loopTo = Information.UBound(Sound.MusicCache);
+                var loopTo = Information.UBound(Audio.MusicCache);
                 for (i = 0; i < loopTo; i++)
-                    cmbPlayBGM.Items.Add(Sound.MusicCache[i]);
+                    cmbPlayBGM.Items.Add(Audio.MusicCache[i]);
                 cmbPlayBGM.SelectedIndex = 0;
                 cmbPlaySound.Items.Clear();
 
                 General.CacheSound();
-                var loopTo1 = Information.UBound(Sound.SoundCache);
+                var loopTo1 = Information.UBound(Audio.SoundCache);
                 for (i = 0; i < loopTo1; i++)
-                    cmbPlaySound.Items.Add(Sound.SoundCache[i]);
+                    cmbPlaySound.Items.Add(Audio.SoundCache[i]);
                 cmbPlaySound.SelectedIndex = 0;
                 cmbOpenShop.Items.Clear();
 

@@ -1866,7 +1866,7 @@ namespace Client
                 case (int) EventCommand.PlayBgm:
                 {
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Text1 = Sound.MusicCache[EditorEvent.Instance.cmbPlayBGM.SelectedIndex];
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Text1 = Audio.MusicCache[EditorEvent.Instance.cmbPlayBGM.SelectedIndex];
                     break;
                 }
 
@@ -1879,7 +1879,7 @@ namespace Client
                 case (int) EventCommand.PlaySound:
                 {
                     TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Index = Index;
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Text1 = Sound.SoundCache[EditorEvent.Instance.cmbPlaySound.SelectedIndex];
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Text1 = Audio.SoundCache[EditorEvent.Instance.cmbPlaySound.SelectedIndex];
                     break;
                 }
 
@@ -2722,10 +2722,10 @@ namespace Client
                 case (byte) EventCommand.PlayBgm:
                 {
                     IsEdit = true;
-                    var loopTo3 = Information.UBound(Sound.MusicCache);
+                    var loopTo3 = Information.UBound(Audio.MusicCache);
                     for (i = 0; i < loopTo3; i++)
                     {
-                        if ((Sound.MusicCache[i] ?? "") == (TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Text1 ?? ""))
+                        if ((Audio.MusicCache[i] ?? "") == (TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Text1 ?? ""))
                         {
                             EditorEvent.Instance.cmbPlayBGM.SelectedIndex = i;
                         }
@@ -2739,10 +2739,10 @@ namespace Client
                 case (byte) EventCommand.PlaySound:
                 {
                     IsEdit = true;
-                    var loopTo4 = Information.UBound(Sound.SoundCache);
+                    var loopTo4 = Information.UBound(Audio.SoundCache);
                     for (i = 0; i < loopTo4; i++)
                     {
-                        if ((Sound.SoundCache[i] ?? "") == (TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Text1 ?? ""))
+                        if ((Audio.SoundCache[i] ?? "") == (TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Text1 ?? ""))
                         {
                             EditorEvent.Instance.cmbPlaySound.SelectedIndex = i;
                         }
@@ -3261,12 +3261,12 @@ namespace Client
                 }
                 case (byte) EventCommand.PlayBgm:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Text1 = Sound.MusicCache[EditorEvent.Instance.cmbPlayBGM.SelectedIndex];
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Text1 = Audio.MusicCache[EditorEvent.Instance.cmbPlayBGM.SelectedIndex];
                     break;
                 }
                 case (byte) EventCommand.PlaySound:
                 {
-                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Text1 = Sound.SoundCache[EditorEvent.Instance.cmbPlaySound.SelectedIndex];
+                    TmpEvent.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Text1 = Audio.SoundCache[EditorEvent.Instance.cmbPlaySound.SelectedIndex];
                     break;
                 }
                 case (byte) EventCommand.OpenShop:

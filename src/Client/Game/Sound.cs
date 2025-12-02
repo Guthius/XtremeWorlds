@@ -10,7 +10,7 @@ using ManagedBass.Midi;
 namespace Client
 {
 
-    public class Sound
+    public class Audio
     {
 
         // Sound and Music handles for ManagedBass

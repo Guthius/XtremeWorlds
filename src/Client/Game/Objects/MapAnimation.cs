@@ -221,7 +221,7 @@ namespace Client
                             frameIndexArr[layer] = 1;
                             var sound = anim.Sound;
                             if (!string.IsNullOrEmpty(sound))
-                                Sound.PlaySound(sound, inst.X, inst.Y);
+                                Audio.PlaySound(sound, inst.X, inst.Y);
                         }
                     }
                     else
@@ -293,7 +293,7 @@ namespace Client
 
                 sound = Data.Animation[instance.Animation].Sound;
                 if (!string.IsNullOrEmpty(sound))
-                    Sound.PlaySound(sound, instance.X, instance.Y);
+                    Audio.PlaySound(sound, instance.X, instance.Y);
             }
         }
 
