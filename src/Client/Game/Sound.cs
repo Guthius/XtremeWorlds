@@ -12,7 +12,6 @@ namespace Client
 
     public class Audio
     {
-
         // Sound and Music handles for ManagedBass
         public static int MusicStream;
         public static int SoundStream;

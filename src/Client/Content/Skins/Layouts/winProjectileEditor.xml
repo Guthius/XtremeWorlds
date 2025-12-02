@@ -42,7 +42,7 @@
 		<ComboBox Name="cmbAnimation" Position="80,182" Size="220,20"/>
 
 		<!-- Preview -->
-		<Label Name="lblPreview" Text="Preview:" Position="12,216" Size="60,18"/>
+		<Label Name="lblPreview" Text="Preview" Position="12,216" Size="80,18"/>
 		<PictureBox Name="picSprite" Position="80,216" Size="96,96" Design="TextBlack"/>
 
 		<!-- Buttons -->
