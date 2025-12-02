@@ -69,9 +69,9 @@
     <Content Remove="*.so;*.so.*;*.dylib" />
   </ItemGroup>
 
-  <!-- Cross-platform: copy only .so/.dylib and content; exclude Windows natives -->
-  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
-    <Content Include="*.so;*.so.*;*.dylib;*.sf2">
+  <!-- macOS: copy only .dylib and content; exclude Windows and Linux .so -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0' and '$(RuntimeIdentifier)' == 'osx-arm64'">
+    <Content Include="*.dylib;*.sf2">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>False</Visible>
     </Content>
@@ -79,8 +79,22 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Content>
-    <None Remove="*.dll" />
-    <Content Remove="*.dll" />
+    <None Remove="*.dll;*.so;*.so.*" />
+    <Content Remove="*.dll;*.so;*.so.*" />
+  </ItemGroup>
+
+  <!-- Linux: copy only .so and content; exclude Windows and macOS .dylib -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0' and '$(RuntimeIdentifier)' == 'linux-x64'">
+    <Content Include="*.so;*.so.*;*.sf2">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+    <Content Include="Content\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+    <None Remove="*.dll;*.dylib" />
+    <Content Remove="*.dll;*.dylib" />
   </ItemGroup>
 
   <!-- Common resources -->
@@ -139,8 +153,21 @@
     <MakeDir Directories="$(OutputPath)Content" />
   </Target>
 
+  <!-- macOS: adjust dylib dependency paths so libFNA3D loads local libSDL3.dylib -->
+  <Target Name="FixMacDylibRpaths" AfterTargets="Build" Condition="'$(TargetFramework)' == 'net10.0' and '$(OS)' != 'Windows_NT'">
+    <Message Importance="high" Text="Fixing macOS dylib references in $(OutputPath)" />
+    <Exec Command="/usr/bin/install_name_tool -change /opt/homebrew/opt/sdl3/lib/libSDL3.0.dylib @loader_path/libSDL3.0.dylib &quot;$(OutputPath)libFNA3D.dylib&quot;" ContinueOnError="true" />
+  </Target>
+
+  <!-- Ensure only one SDL3 dylib in output: keep libSDL3.0.dylib and replace plain libSDL3.dylib with a symlink -->
+  <Target Name="NormalizeSDL3" AfterTargets="Build" Condition="'$(TargetFramework)' == 'net10.0' and '$(OS)' != 'Windows_NT'">
+    <Message Importance="high" Text="Normalizing SDL3 dylib filenames in $(OutputPath)" />
+    <Exec Command="/bin/rm -f &quot;$(OutputPath)libSDL3.dylib&quot;" ContinueOnError="true" />
+    <Exec WorkingDirectory="$(OutputPath)" Command="/bin/ln -sf libSDL3.0.dylib libSDL3.dylib" ContinueOnError="true" />
+  </Target>
+
   <!-- Kill locking processes with robust success handling (skip in CI) -->
-  <Target Name="KillLockingProcesses" BeforeTargets="BeforeBuild" Condition="'$(CI)' != 'true' and '$(SkipProcessKill)' != 'true'">
+  <Target Name="KillLockingProcesses" BeforeTargets="BeforeBuild" Condition="'$(CI)' != 'true' and '$(SkipProcessKill)' != 'true' and '$(OS)' == 'Windows_NT'">
     <Exec Command="cmd /c tasklist | findstr /I $(AssemblyName).exe &gt;nul &amp;&amp; taskkill /F /IM $(AssemblyName).exe || exit /b 0" />
     <Exec Command="cmd /c tasklist | findstr /I dotnet.exe &gt;nul &amp;&amp; taskkill /F /IM dotnet.exe || exit /b 0" />
   </Target>
