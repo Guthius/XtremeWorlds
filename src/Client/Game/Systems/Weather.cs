@@ -1,6 +1,7 @@
-﻿using System;
+﻿using Core.Globals;
+using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Reflection.Metadata;
-using Core.Globals;
 
 namespace Client
 {
@@ -10,7 +11,7 @@ namespace Client
 
         #region Functions
 
-        public static void ProcessWeather()
+        public static void OnUpdate()
         {
             int i;
             int x;
@@ -81,6 +82,56 @@ namespace Client
                 }
             }
 
+        }
+
+        public static void OnDraw()
+        {
+            int i;
+            int spriteLeft;
+
+            for (i = 0; i < Variables.MaxWeatherParticles; i++)
+            {
+                if (Conversions.ToBoolean(GameState.WeatherParticle[i].InUse))
+                {
+                    if (GameState.WeatherParticle[i].Type == (int)WeatherType.Storm)
+                    {
+                        spriteLeft = 0;
+                    }
+                    else
+                    {
+                        spriteLeft = GameState.WeatherParticle[i].Type - 1;
+                    }
+
+                    string argPath = System.IO.Path.Combine(DataPath.Misc, "Weather");
+                    GameClient.RenderTexture(ref argPath, GameLogic.ConvertMapX(GameState.WeatherParticle[i].X), GameLogic.ConvertMapY(GameState.WeatherParticle[i].Y), spriteLeft * 32, 0, 32, 32, 32, 32);
+                }
+            }
+
+            if (GameState.DrawThunder > 0)
+            {
+                // Create a temporary texture matching the camera size
+                using (var thunderTexture = new Texture2D(GameClient.Graphics?.GraphicsDevice, GameState.ResolutionWidth, GameState.ResolutionHeight))
+                {
+                    // Create an array to store pixel data
+                    var whitePixels = new Microsoft.Xna.Framework.Color[(GameState.ResolutionWidth * GameState.ResolutionHeight)];
+                    var loopTo = 0;
+
+                    // Fill the pixel array with semi-transparent white pixels
+                    for (i = 0, loopTo = whitePixels.Length; i < loopTo; i++)
+                        whitePixels[i] = new Microsoft.Xna.Framework.Color(255, 255, 255, 150); // White with 150 alpha
+
+                    // Set the pixel data for the texture
+                    thunderTexture.SetData(whitePixels);
+
+                    // Begin SpriteBatch to render the thunder effect
+                    GameClient.SpriteBatch?.Begin(SpriteSortMode.Immediate, BlendState.Additive);
+                    GameClient.SpriteBatch?.Draw(thunderTexture, new Microsoft.Xna.Framework.Rectangle(0, 0, GameState.ResolutionWidth, GameState.ResolutionHeight), Microsoft.Xna.Framework.Color.White);
+                    GameClient.SpriteBatch?.End();
+                }
+
+                // Decrease the thunder counter
+                GameState.DrawThunder -= 1;
+            }
         }
 
         #endregion

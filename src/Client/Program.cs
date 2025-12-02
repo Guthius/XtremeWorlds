@@ -3436,8 +3436,7 @@ namespace Client
                 }
             }
 
-            Map.DrawWeather();
-            Map.DrawThunderEffect();
+            Weather.OnDraw();
             Map.DrawMapTint();
 
             // Draw tile grid when enabled in the Map editor

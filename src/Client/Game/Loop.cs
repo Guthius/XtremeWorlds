@@ -415,7 +415,7 @@ namespace Client
 
             if (_tmrWeather < _tick)
             {
-                Weather.ProcessWeather();
+                Weather.OnUpdate();
                 _tmrWeather = _tick + 50;
             }
 
