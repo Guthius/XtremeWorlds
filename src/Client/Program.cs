@@ -494,10 +494,13 @@ namespace Client
 
             if (GameState.IsLoading || GameState.GettingMap)
             {
-                // Draw loading screen onto the RenderTarget
-                SpriteBatch?.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null);
-
-                SpriteBatch?.End();
+                // Draw loading screen onto the RenderTarget (no early returns between Begin/End)
+                if (SpriteBatch != null)
+                {
+                    SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null);
+                    // TODO: draw an actual loading screen texture or text here if desired
+                    SpriteBatch.End();
+                }
             }
             else if (GameState.InGame == true)
             {
@@ -527,28 +530,33 @@ namespace Client
 
                 GraphicsDevice.SetRenderTarget(_guiRenderTarget);
                 GraphicsDevice.Clear(Color.Transparent);
-                SpriteBatch?.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null);
-                if (GameState.InMenu)
-                    WindowManager.DrawMenuBackground();
-                WindowManager.Render();
-                TextRenderer.DrawMapName();
-
-                // Draw custom cursor on the GUI layer at GUI mouse coords
-                if (GameState.CurMouseXGui >= 0 && GameState.CurMouseYGui >= 0)
+                if (SpriteBatch != null)
                 {
-                    string cursorTex = Path.Combine(DataPath.Misc, "Cursor");
-                    var info = GetGfxInfo(cursorTex);
-                    if (info == null) return;
-                    int cw = Math.Max(1, info.Width);
-                    int ch = Math.Max(1, info.Height);
-                    int hotspotX = 0; // adjust if your cursor hotspot is not top-left
-                    int hotspotY = 0;
-                    int cx = GameState.CurMouseXGui - hotspotX;
-                    int cy = GameState.CurMouseYGui - hotspotY;
-                    RenderTexture(ref cursorTex, cx, cy, 0, 0, cw, ch, cw, ch);
-                }
+                    SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null);
+                    if (GameState.InMenu)
+                        WindowManager.DrawMenuBackground();
+                    WindowManager.Render();
+                    TextRenderer.DrawMapName();
 
-                if (SpriteBatch != null) SpriteBatch.End();
+                    // Draw custom cursor on the GUI layer at GUI mouse coords
+                    if (GameState.CurMouseXGui >= 0 && GameState.CurMouseYGui >= 0)
+                    {
+                        string cursorTex = Path.Combine(DataPath.Misc, "Cursor");
+                        var info = GetGfxInfo(cursorTex);
+                        if (info != null)
+                        {
+                            int cw = Math.Max(1, info.Width);
+                            int ch = Math.Max(1, info.Height);
+                            int hotspotX = 0; // adjust if your cursor hotspot is not top-left
+                            int hotspotY = 0;
+                            int cx = GameState.CurMouseXGui - hotspotX;
+                            int cy = GameState.CurMouseYGui - hotspotY;
+                            RenderTexture(ref cursorTex, cx, cy, 0, 0, cw, ch, cw, ch);
+                        }
+                    }
+
+                    SpriteBatch.End();
+                }
 
                 // After drawing to _guiRenderTarget, reset to back buffer
                 GraphicsDevice.SetRenderTarget(null);
