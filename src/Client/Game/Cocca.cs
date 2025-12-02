@@ -2,7 +2,9 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-public static class Cocca
+namespace Client
+{
+    public static class Cocca
     {
         private const int SIGTERM = 15;
 
@@ -29,3 +31,4 @@ public static class Cocca
             }
         }
     }
+}
