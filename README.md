@@ -8,12 +8,11 @@
 
 A simple 2D MMORPG game engine written in C# using TCP .NET socket async networking.
 
-Based on the Orion+ conversion and MirageBasic frameworks.
+Based on the Orion+ conversion and MirageBasic, making Mirage move to C# from Visual Basic. Mirage Source has been in works for over 20 years, and we're still a firm believer that no engine has ever came close.
 
-Game assets such as character base are only permitted to use in XtremeWorlds.
+Game assets such as character base are only permitted to use in this engine.
 
-BASS audio requires a copyright license in order to use commercially, this is meant to demo the audio library since I prefer it as a developer over FAudio and Nvorbis.
-https://www.un4seen.com/
+BASS audio requires a copyright license in order to use commercially, this is meant to demo the audio library since I prefer it as a developer over FAudio and Nvorbis. This is mostly due to MIDI support and a proper synthesizer. You can get a license to support the developers, [here](https://www.un4seen.com/).
 
 ## Overview
 
@@ -58,7 +57,7 @@ Log in to the game with the client. On the server, type the command /access name
 - Install [PostgreSQL](https://www.postgresql.org/download/)
 - Create a user with password: `mirage`, you can do this in the installer
 - The database mirage is created by default from the server
-- *Note: You can modify database credentials in the server settings JSON file located in the config folder*
+- *Note: You can modify database credentials in the server settings JSON called appsettings.json located in the base directory of the server*
 
 #### 3. Build the solution
    ```bash
