@@ -374,7 +374,7 @@ public static class WinMapEditor
         GameLogic.Dialogue("Map Editor", "Clear Directional Blocks", "Are you sure you want to clear all directional blocks?", DialogueType.ClearDirBlocks, DialogueStyle.YesNo);
     }
 
-    public static void LoadMap()
+    public static void OnLoad()
     {
         var map = Data.MyMap;
 
@@ -499,5 +499,11 @@ public static class WinMapEditor
                 list.ScrollOffset = Math.Clamp(sldCtrl.Value, 0, max);
             }
         }
+    }
+
+    public static void OnCancel()
+    {
+        Editors.MapEditorCancel();
+        WindowManager.HideWindow("winMapEditor");
     }
 }

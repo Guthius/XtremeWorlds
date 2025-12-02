@@ -507,7 +507,7 @@ namespace Client
                 GameState.MyEditorType = EditorType.Map;
                 GameState.EditorIndex = 0;
                 WindowManager.ShowWindow("winMapEditor");
-                Client.Game.UI.Windows.WinMapEditor.LoadMap();
+                Client.Game.UI.Windows.WinMapEditor.OnLoad();
                 GameState.CameraZoom = 1.0f;
                 GameState.InitMapEditor = false;
             }

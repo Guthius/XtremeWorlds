@@ -208,8 +208,7 @@ public class Crystalshire
         {
             btnClose.CallBack[(int)ControlState.MouseDown] = () =>
             {
-                Editors.MapEditorCancel();
-                WindowManager.HideWindow("winMapEditor");
+                WinMapEditor.OnCancel();
             };
         }
 
@@ -1322,7 +1321,7 @@ public class Crystalshire
         // Close button
         if (WindowManager.TryGetControl("winNpcEditor", "btnClose", out var btnClose))
         {
-            btnClose.CallBack[(int)ControlState.MouseDown] = () => { Editors.NpcEditorCancel(); WindowManager.HideWindow("winNpcEditor"); };
+            btnClose.CallBack[(int)ControlState.MouseDown] = () => { WinNpcEditor.OnCancel(); };
         }
 
         // Sprite preview picture box draws NPC sprite each frame
@@ -1654,7 +1653,7 @@ public class Crystalshire
         // Close button
         if (WindowManager.TryGetControl("winItemEditor", "btnClose", out var btnClose))
         {
-            btnClose.CallBack[(int)ControlState.MouseDown] = () => { Editors.ItemEditorCancel(); WindowManager.HideWindow("winItemEditor"); };
+            btnClose.CallBack[(int)ControlState.MouseDown] = () => { WinItemEditor.OnCancel(); };
         }
 
         if (WindowManager.TryGetControl("winItemEditor", "picIcon", out var picIconCtrl) && picIconCtrl is PictureBox picIcon)
