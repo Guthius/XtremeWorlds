@@ -144,7 +144,7 @@ namespace Client
         private void BtnDelete_Click()
         {
             int tmpindex = lstIndex.SelectedIndex;
-            Moral.ClearMoral(GameState.EditorIndex);
+            Moral.OnClear(GameState.EditorIndex);
             _suppressIndexChanged = true;
             try
             {

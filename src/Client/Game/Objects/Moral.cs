@@ -10,7 +10,7 @@ namespace Client
     {
         #region Database
 
-        public static void ClearMoral(int index)
+        public static void OnClear(int index)
         {
             Data.Moral[index] = default;
 
@@ -18,17 +18,17 @@ namespace Client
             GameState.MoralLoaded[index] = 0;
         }
 
-        public static void ClearMorals()
+        public static void OnClearAll()
         {
             int i;
 
             Data.Moral = new Type.Moral[(Variables.MaxMorals)];
 
             for (i = 0; i < Variables.MaxMorals; i++)
-                ClearMoral(i);
+                OnClear(i);
         }
 
-        public static void StreamMoral(int moralNum)
+        public static void OnStream(int moralNum)
         {
             if (moralNum >= 0 & string.IsNullOrEmpty(Data.Moral[moralNum].Name) && GameState.MoralLoaded[moralNum] == 0)
             {
@@ -36,10 +36,6 @@ namespace Client
                 Sender.SendRequestMoral(moralNum);
             }
         }
-
-        #endregion
-
-        #region Incoming Packets
 
         #endregion
     }

@@ -169,7 +169,7 @@ public static class Type
         public int Ammo;
     }
 
-    public struct AnimInstance
+    public struct MapAnimation
     {
         public int Animation;
         public int X;

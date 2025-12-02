@@ -1,6 +1,7 @@
+using Client.Net;
 using Core;
-using System;
 using Core.Globals;
+using System;
 
 namespace Client
 {
@@ -249,5 +250,39 @@ namespace Client
                 default: return (0, 0);
             }
         }
+
+
+        public static void OnClearAll()
+        {
+            Data.Npc = new Core.Globals.Type.Npc[Variables.MaxNpcs];
+
+            for (int i = 0; i < Variables.MaxNpcs; i++)
+                OnClear(i);
+
+        }
+
+        public static void OnClear(int index)
+        {
+            int statCount = Enum.GetValues(typeof(Stat)).Length;
+            Data.Npc[index].AttackSay = "";
+            Data.Npc[index].Name = "";
+            Data.Npc[index] = default;
+            Data.Npc[index].Stat = new byte[statCount];
+            Data.Npc[index].DropChance = new int[6];
+            Data.Npc[index].DropItem = new int[6];
+            Data.Npc[index].DropItemValue = new int[6];
+            Data.Npc[index].Skill = new byte[7];
+            GameState.NpcLoaded[index] = 0;
+        }
+
+        public static void OnStream(int npcNum)
+        {
+            if (npcNum >= 0 && string.IsNullOrEmpty(Data.Npc[npcNum].Name) && GameState.NpcLoaded[npcNum] == 0)
+            {
+                GameState.NpcLoaded[(int)npcNum] = 1;
+                Sender.SendRequestNpc(npcNum);
+            }
+        }
+
     }
 }

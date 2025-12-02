@@ -256,7 +256,7 @@ namespace Client.Game.UI.Windows
 
         public static void OnDelete()
         {
-            Database.ClearJob(SelectedIndex);
+            Job.OnClear(SelectedIndex);
             GameState.JobChanged[SelectedIndex] = true;
             LoadJob(SelectedIndex);
             RefreshList();

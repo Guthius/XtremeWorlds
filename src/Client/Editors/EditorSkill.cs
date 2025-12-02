@@ -277,7 +277,7 @@ namespace Client
         private void BtnDelete_Click()
         {
             int tmpindex = lstIndex.SelectedIndex;
-            Database.ClearSkill(GameState.EditorIndex);
+            Skill.OnClear(GameState.EditorIndex);
             _suppressIndexChanged = true;
             try
             {

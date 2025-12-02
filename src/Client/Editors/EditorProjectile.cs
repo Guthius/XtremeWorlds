@@ -141,7 +141,7 @@ namespace Client
             btnDelete.Click += (s, e) =>
             {
                 if (lstIndex.SelectedIndex < 0) return;
-                Projectile.ClearProjectile(GameState.EditorIndex);
+                Projectile.OnClear(GameState.EditorIndex);
                 RefreshListEntry(GameState.EditorIndex);
             };
 

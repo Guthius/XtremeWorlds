@@ -1124,17 +1124,17 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     {
         var buffer = new PacketReader(data);
 
-        Animation.Index = (byte)(Animation.Index + 1);
-        if (Animation.Index >= byte.MaxValue)
-            Animation.Index = 1;
+        MapAnimation.Index = (byte)(MapAnimation.Index + 1);
+        if (MapAnimation.Index >= byte.MaxValue)
+            MapAnimation.Index = 1;
         {
-            if (Animation.Instance == null)
-                Animation.OnClear();
+            if (MapAnimation.Instance == null)
+                MapAnimation.OnClearAll();
 
-            if (Animation.Instance == null)
+            if (MapAnimation.Instance == null)
                 return;
 
-            ref var instance = ref Animation.Instance[Animation.Index];
+            ref var instance = ref MapAnimation.Instance[MapAnimation.Index];
             instance.Timer ??= new int[2];
             instance.Used ??= new bool[2];
             instance.LoopIndex ??= new int[2];
@@ -1589,10 +1589,10 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             MapNpc.OnClear(i);
         }
         
-        Database.ClearBlood();
+        Blood.OnClear();
         Map.OnClear();
         GameLogic.RemoveChatBubbles();
-        Animation.OnClear();
+        MapAnimation.OnClearAll();
 
         GameState.ResourceIndex = 0;
 

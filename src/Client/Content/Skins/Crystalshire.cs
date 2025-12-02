@@ -1624,7 +1624,7 @@ public class Crystalshire
         {
             btnDelete.CallBack[(int)ControlState.MouseDown] = () =>
             {
-                Database.ClearNpc(GameState.EditorIndex);
+                Npc.OnClear(GameState.EditorIndex);
                 GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
                 WinNpcEditor.LoadNpc(GameState.EditorIndex);
                 WinNpcEditor.RefreshList();
@@ -2743,7 +2743,7 @@ public class Crystalshire
         {
             btnDelete.CallBack[(int)ControlState.MouseDown] = () =>
             {
-                Database.ClearJob(WinJobEditor.SelectedIndex);
+                Job.OnClear(WinJobEditor.SelectedIndex);
                 GameState.JobChanged[WinJobEditor.SelectedIndex] = true;
                 WinJobEditor.LoadJob(WinJobEditor.SelectedIndex);
                 WinJobEditor.RefreshList();

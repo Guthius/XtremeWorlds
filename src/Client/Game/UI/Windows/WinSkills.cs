@@ -59,7 +59,7 @@ public static class WinSkills
                 continue;
             }
 
-            Database.StreamSkill(skillNum);
+            Skill.OnStream(skillNum);
 
             if (WindowManager.DragBox.Origin == PartOrigin.SkillTree &&
                 WindowManager.DragBox.Slot == slot)

@@ -378,7 +378,7 @@ public static class WinNpcEditor
 
     public static void OnDelete()
     {
-        Database.ClearNpc(GameState.EditorIndex);
+        Npc.OnClear(GameState.EditorIndex);
         GameState.NpcChanged[SelectedIndex] = true;
         LoadNpc(GameState.EditorIndex);
         RefreshList();

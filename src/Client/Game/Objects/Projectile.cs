@@ -66,15 +66,15 @@ namespace Client
 
         #region Database
 
-        public static void ClearProjectile()
+        public static void OnClearAll()
         {
             int i;
 
             for (i = 0; i < Variables.MaxProjectiles; i++)
-                ClearProjectile(i);
+                OnClear(i);
         }
 
-        public static void ClearProjectile(int index)
+        public static void OnClear(int index)
         {
             Data.Projectile[index].Name = "";
             Data.Projectile[index].Sprite = 0;
@@ -84,21 +84,7 @@ namespace Client
             Data.Projectile[index].Animation = -1;
         }
 
-        public static void ClearMapProjectile(int projectileNum)
-        {
-            Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].ProjectileNum = -1;
-            Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Owner = 0;
-            Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].OwnerType = 0;
-            Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].X = 0;
-            Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Y = 0;
-            Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Dir = 0;
-            Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Vx = 0;
-            Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Vy = 0;
-            Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].FreeAim = 0;
-            Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Timer = 0;
-        }
-
-        public static void StreamProjectile(int projectileNum)
+        public static void OnStream(int projectileNum)
         {
             if (projectileNum >= 0 & string.IsNullOrEmpty(Data.Projectile[projectileNum].Name) && GameState.ProjectileLoaded[projectileNum] == 0)
             {
@@ -111,7 +97,7 @@ namespace Client
 
         #region Drawing
 
-        public static void DrawProjectile(int projectileNum)
+        public static void OnDraw(int projectileNum)
         {
             Type.Rect rec;
             int x;
@@ -136,7 +122,7 @@ namespace Client
                 return;
             }
 
-            StreamProjectile(projectileNum);
+            OnStream(projectileNum);
 
             x = (int)Math.Floor((double)Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].X / 32);
             y = (int)Math.Floor((double)Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Y / 32);

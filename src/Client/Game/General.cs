@@ -177,22 +177,23 @@ namespace Client
         public static void ClearGameData()
         {
             Map.OnClear();
-            Database.ClearNpcs();
+            Npc.OnClearAll();
             MapResource.OnClearAll();
             Item.OnClearAll();
             Shop.OnClearAll();
-            Database.ClearSkills();
-            Animation.ClearAnimations();
-            Projectile.ClearProjectile();
-            Database.ClearJobs();
-            Moral.ClearMorals();
+            Skill.OnClearAll();
+            Animation.OnClearAll();
+            MapAnimation.OnClearAll();
+            Projectile.OnClearAll();
+            Job.OnClearAll();
+            Moral.OnClearAll();
             Bank.OnClearAll();
             Party.OnClear();
 
             for (int i = 0; i < Variables.MaxPlayers; i++)
                 Player.ClearPlayer(i);
 
-            Animation.OnClear();
+            Animation.OnClearAll();
             Autotile.ClearAutotiles();
 
             // clear chat

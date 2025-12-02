@@ -1136,7 +1136,7 @@ namespace Client
         {
             GameState.MyEditorType = EditorType.None;
             ClearChanged_Animation();
-            Animation.ClearAnimations();
+            Animation.OnClearAll();
             Sender.SendCloseEditor();
         }
 
@@ -1169,7 +1169,7 @@ namespace Client
         {
             GameState.MyEditorType = EditorType.None;
             ClearChanged_Npc();
-            Database.ClearNpcs();
+            Npc.OnClearAll();
             Sender.SendCloseEditor();
         }
 
@@ -1306,7 +1306,7 @@ namespace Client
         {
             GameState.MyEditorType = EditorType.None;
             ClearChanged_Skill();
-            Database.ClearSkills();
+            Skill.OnClearAll();
             Sender.SendCloseEditor();
         }
 
@@ -1366,7 +1366,7 @@ namespace Client
         {
             GameState.MyEditorType = EditorType.None;
             ClearChanged_Job();
-            Database.ClearJobs();
+            Job.OnClearAll();
             Sender.SendCloseEditor();
         }
 
@@ -1421,7 +1421,7 @@ namespace Client
         {
             GameState.MyEditorType = EditorType.None;
             ClearChanged_Moral();
-            Moral.ClearMorals();
+            Moral.OnClearAll();
             Sender.SendCloseEditor();
         }
 
@@ -1469,7 +1469,7 @@ namespace Client
         {
             GameState.MyEditorType = EditorType.None;
             ClearChanged_Projectile();
-            Projectile.ClearProjectile();
+            Projectile.OnClearAll();
             Sender.SendCloseEditor();
         }
 

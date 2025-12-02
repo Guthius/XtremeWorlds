@@ -79,12 +79,12 @@ namespace Client
                                 {
                                     if (Data.MyMap.Tile[x, y].Type == TileType.Animation)
                                     {                                      
-                                        _animationTmr[layer] = _tick + Animation.PlayAnimation(Data.Animation[Data.MyMap.Tile[x, y].Data1].Sprite[layer], layer, Data.MyMap.Tile[x, y].Data1, x, y);
+                                        _animationTmr[layer] = _tick + MapAnimation.OnPlay(Data.Animation[Data.MyMap.Tile[x, y].Data1].Sprite[layer], layer, Data.MyMap.Tile[x, y].Data1, x, y);
                                     }
 
                                     if (Data.MyMap.Tile[x, y].Type2 == TileType.Animation)
                                     {
-                                        _animationTmr[layer] = _tick + Animation.PlayAnimation(Data.Animation[Data.MyMap.Tile[x, y].Data1_2].Sprite[layer], layer, Data.MyMap.Tile[x, y].Data1_2, x, y);
+                                        _animationTmr[layer] = _tick + MapAnimation.OnPlay(Data.Animation[Data.MyMap.Tile[x, y].Data1_2].Sprite[layer], layer, Data.MyMap.Tile[x, y].Data1_2, x, y);
                                     }
                                 }
                             }
@@ -95,7 +95,7 @@ namespace Client
 
                 for (_i = 0; _i < byte.MaxValue; _i++)
                 {
-                    Animation.CheckAnimInstance(_i);
+                    MapAnimation.OnCheck(_i);
                 }
 
                 if (_tick > Event.EventChatTimer)

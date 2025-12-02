@@ -197,7 +197,7 @@ public static class WinHotBar
     {
         var skillNum = Data.Player[GameState.MyIndex].Hotbar[slot].Slot;
 
-        Database.StreamSkill(skillNum);
+        Skill.OnStream(skillNum);
 
         if (Data.Skill[skillNum].Name.Length == 0 ||
             Data.Skill[skillNum].Icon <= 0)

@@ -1942,7 +1942,7 @@ namespace Client
                 return;
 
             // Stream Npc if not yet loaded
-            Database.StreamNpc((int)Data.MyMapNpc[(int)mapNpcNum].Num);
+            Npc.OnStream((int)Data.MyMapNpc[(int)mapNpcNum].Num);
 
             if (Data.MyMapNpc[(int)mapNpcNum].Num < 0 ||
                 Data.MyMapNpc[(int)mapNpcNum].Num > Variables.MaxNpcs)
@@ -3257,9 +3257,9 @@ namespace Client
             {
                 for (i = 0; i < byte.MaxValue; i++)
                 {
-                    if (Animation.Instance?[i].Used[0] == true)
+                    if (MapAnimation.Instance?[i].Used[0] == true)
                     {
-                        Animation.OnDraw(i, 0);
+                        MapAnimation.OnDraw(i, 0);
                     }         
                 }
             }
@@ -3390,9 +3390,9 @@ namespace Client
             {
                 for (i = 0; i < byte.MaxValue; i++)
                 {
-                    if (Animation.Instance?[i].Used[1] == true)
+                    if (MapAnimation.Instance?[i].Used[1] == true)
                         {
-                            Animation.OnDraw(i, 1);
+                            MapAnimation.OnDraw(i, 1);
                         }
                     }       
             }
@@ -3403,7 +3403,7 @@ namespace Client
                 {
                     if (Data.MapProjectile[Data.Player[GameState.MyIndex].Map, i].ProjectileNum >= 0)
                     {
-                        Projectile.DrawProjectile(i);
+                        Projectile.OnDraw(i);
                     }
                 }
             }
