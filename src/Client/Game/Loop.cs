@@ -577,7 +577,8 @@ namespace Client
             {
                 GameState.MyEditorType = EditorType.Skill;
                 GameState.EditorIndex = 0;
-                new EditorSkill().Show();
+                WindowManager.ShowWindow("winSkillEditor");
+                Client.Game.UI.Windows.WinSkillEditor.Init();
                 GameState.InitSkillEditor = false;
             }
 

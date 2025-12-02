@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Window Name="winSkillEditor" Caption="Skill Editor"
+        Size="1020,440"
+        Icon="113" IconOffset="3,5"
+        Design="WindowNormal"
+        StartPosition="CenterScreen"
+        Visible="false">
+
+	<!-- Left: list -->
+	<GroupBox Name="grpList" Position="8,28" Size="230,380" Caption="Skills">
+		<ListBox Name="lstIndex" Position="8,24" Size="200,340"/>
+		<ScrollBar Name="sldList" Position="212,24" Size="12,340" Min="0" Max="0" Vertical="true"/>
+	</GroupBox>
+
+	<!-- Right: details -->
+	<GroupBox Name="grpDetails" Position="246,28" Size="766,380" Caption="Details">
+		<Label Name="lblName" Text="Name" Position="12,16" Size="120,18"/>
+		<TextBox Name="txtName" Position="140,14" Size="220,22" Design="TextWhite"/>
+
+		<Label Name="lblType" Text="Type" Position="12,44" Size="120,18"/>
+		<ComboBox Name="cmbType" Position="140,42" Size="220,20"/>
+
+		<Label Name="lblAnimation" Text="Animation" Position="12,72" Size="120,18"/>
+		<ComboBox Name="cmbAnimation" Position="140,70" Size="220,20"/>
+
+		<Label Name="lblIcon" Text="Icon" Position="12,100" Size="120,18"/>
+		<ScrollBar Name="sldIcon" Position="140,100" Size="160,14" Min="0" Max="1024" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+		<Label Name="lblIconPreview" Text="Icon Preview" Position="320,64" Size="120,18"/>
+		<PictureBox Name="picIcon" Position="320,84" Size="64,64" Design="TextBlack"/>
+
+		<Label Name="lblDamage" Text="Damage" Position="12,136" Size="120,18"/>
+		<ScrollBar Name="sldDamage" Position="140,136" Size="160,14" Min="0" Max="100000" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+
+		<Label Name="lblMpCost" Text="MP Cost" Position="12,158" Size="120,18"/>
+		<ScrollBar Name="sldMpCost" Position="140,158" Size="160,14" Min="0" Max="1024" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+
+		<Label Name="lblSpCost" Text="SP Cost" Position="12,180" Size="120,18"/>
+		<ScrollBar Name="sldSpCost" Position="140,180" Size="160,14" Min="0" Max="1024" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+
+		<Label Name="lblCooldown" Text="Cooldown (ms)" Position="12,202" Size="120,18"/>
+		<ScrollBar Name="sldCooldown" Position="140,202" Size="160,14" Min="0" Max="60000" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+
+		<Label Name="lblRange" Text="Range" Position="12,224" Size="120,18"/>
+		<ScrollBar Name="sldRange" Position="140,224" Size="160,14" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+
+		<Label Name="lblCastTime" Text="Cast Time (ms)" Position="12,246" Size="120,18"/>
+		<ScrollBar Name="sldCastTime" Position="140,246" Size="160,14" Min="0" Max="10000" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+
+		<Label Name="lblAoe" Text="AoE Radius" Position="12,268" Size="120,18"/>
+		<ScrollBar Name="sldAoE" Position="140,268" Size="160,14" Min="0" Max="12" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+
+		<Label Name="lblProjectile" Text="Projectile" Position="12,290" Size="120,18"/>
+		<ComboBox Name="cmbProjectile" Position="140,288" Size="220,20"/>
+
+		<Label Name="lblSound" Text="Sound" Position="12,312" Size="120,18"/>
+		<ComboBox Name="cmbSound" Position="140,310" Size="220,20"/>
+
+		<Label Name="lblPreview" Text="Preview" Position="560,156" Size="90,18"/>
+		<PictureBox Name="picPreview" Position="560,176" Size="192,192" Design="TextBlack"/>
+	</GroupBox>
+
+	<!-- Action buttons -->
+	<Button Name="btnSave"   Text="Save"   Position="306,406" Size="80,24" Design="Green"  DesignHover="GreenHover"  DesignMouseDown="GreenClick"/>
+	<Button Name="btnDelete" Text="Delete" Position="396,406" Size="80,24" Design="Red"    DesignHover="RedHover"    DesignMouseDown="RedClick"/>
+	<Button Name="btnCopy"   Text="Copy"   Position="486,406" Size="80,24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnCancel" Text="Cancel" Position="576,406" Size="80,24" Design="Red"    DesignHover="RedHover"    DesignMouseDown="RedClick"/>
+
+	<Button Name="btnClose" Position="-19,5" Size="16,16" Image="8" ImageHover="9" ImageMouseDown="10"/>
+</Window>

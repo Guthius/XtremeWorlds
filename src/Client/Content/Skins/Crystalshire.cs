@@ -3308,8 +3308,157 @@ public class Crystalshire
 
         DrawPreview("nudSprite0", "nudFrameCount0", "picSprite0");
         DrawPreview("nudSprite1", "nudFrameCount1", "picSprite1");
+    }
 
-        // Initialize list and values via class
-        WinAnimationEditor.Init();
+    public void UpdateWindow_SkillEditor()
+    {
+        var window = WindowLoader.FromLayout("winSkillEditor");
+
+        // Close
+        if (WindowManager.TryGetControl("winSkillEditor", "btnClose", out var btnClose))
+        {
+            btnClose.CallBack[(int)ControlState.MouseDown] = () => { WinSkillEditor.OnCancel(); };
+        }
+
+        // List + scrollbar
+        WireScrollableList("winSkillEditor", "lstIndex", "sldList");
+        if (WindowManager.TryGetControl("winSkillEditor", "lstIndex", out var listCtrl) && listCtrl is ListBox list)
+        {
+            list.CallBack[(int)ControlState.MouseDown] = WinSkillEditor.OnListMouseDown;
+        }
+
+        // Icon preview draw
+        if (WindowManager.TryGetControl("winSkillEditor", "picIcon", out var picIconCtrl) && picIconCtrl is PictureBox picIcon)
+        {
+            picIcon.OnDraw = WinSkillEditor.OnDrawIcon;
+        }
+
+        // Name textbox
+        if (WindowManager.TryGetControl("winSkillEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
+        {
+            txtName.CallBack[(int)ControlState.KeyUp] = () =>
+            {
+                int idx = WinSkillEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxSkills) return;
+                var newName = txtName.Text ?? string.Empty;
+                Data.Skill[idx].Name = newName;
+                GameState.SkillChanged[idx] = true;
+
+                // Update list item text
+                if (WindowManager.TryGetControl("winSkillEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox lb)
+                {
+                    if (idx >= 0 && idx < lb.Items.Count)
+                    {
+                        lb.Items[idx] = $"{idx + 1}: {newName}";
+                        lb.SelectedIndex = idx;
+                        lb.EnsureVisible(idx);
+                    }
+                }
+            };
+        }
+
+        // Helper to bind a horizontal slider
+        void BindSlider(string name, int min, int max, Func<int> get, Action<int> apply)
+        {
+            if (WindowManager.TryGetControl("winSkillEditor", name, out var c) && c is ScrollBar sb)
+            {
+                sb.Min = min; sb.Max = max;
+                sb.Value = Math.Clamp(get(), sb.Min, sb.Max);
+                sb.CallBack[(int)ControlState.MouseMove] = () =>
+                {
+                    int v = Math.Clamp(sb.Value, sb.Min, sb.Max);
+                    apply(v);
+                };
+            }
+        }
+
+        // Icon
+        BindSlider("sldIcon", 0, Math.Max(0, GameState.NumSkills),
+            () => { int i = WinSkillEditor.SelectedIndex; return (i >= 0 && i < Variables.MaxSkills) ? Data.Skill[i].Icon : 0; },
+            v => { int i = WinSkillEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxSkills) { Data.Skill[i].Icon = v; GameState.SkillChanged[i] = true; } });
+
+        // Damage/Vital amount
+        BindSlider("sldDamage", 0, 100000,
+            () => { int i = WinSkillEditor.SelectedIndex; return (i >= 0 && i < Variables.MaxSkills) ? Data.Skill[i].Vital : 0; },
+            v => { int i = WinSkillEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxSkills) { Data.Skill[i].Vital = v; GameState.SkillChanged[i] = true; } });
+
+        // MP cost
+        BindSlider("sldMpCost", 0, 1024,
+            () => { int i = WinSkillEditor.SelectedIndex; return (i >= 0 && i < Variables.MaxSkills) ? Data.Skill[i].MpCost : 0; },
+            v => { int i = WinSkillEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxSkills) { Data.Skill[i].MpCost = v; GameState.SkillChanged[i] = true; } });
+
+        // Cast time
+        BindSlider("sldCastTime", 0, 10000,
+            () => { int i = WinSkillEditor.SelectedIndex; return (i >= 0 && i < Variables.MaxSkills) ? Data.Skill[i].CastTime : 0; },
+            v => { int i = WinSkillEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxSkills) { Data.Skill[i].CastTime = v; GameState.SkillChanged[i] = true; } });
+
+        // Cooldown
+        BindSlider("sldCooldown", 0, 60000,
+            () => { int i = WinSkillEditor.SelectedIndex; return (i >= 0 && i < Variables.MaxSkills) ? Data.Skill[i].CdTime : 0; },
+            v => { int i = WinSkillEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxSkills) { Data.Skill[i].CdTime = v; GameState.SkillChanged[i] = true; } });
+
+        // Range
+        BindSlider("sldRange", 0, 255,
+            () => { int i = WinSkillEditor.SelectedIndex; return (i >= 0 && i < Variables.MaxSkills) ? Data.Skill[i].Range : 0; },
+            v => { int i = WinSkillEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxSkills) { Data.Skill[i].Range = v; GameState.SkillChanged[i] = true; } });
+
+        // AoE radius
+        BindSlider("sldAoE", 0, 12,
+            () => { int i = WinSkillEditor.SelectedIndex; return (i >= 0 && i < Variables.MaxSkills) ? Data.Skill[i].AoE : 0; },
+            v => { int i = WinSkillEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxSkills) { Data.Skill[i].AoE = v; Data.Skill[i].IsAoE = v > 0; GameState.SkillChanged[i] = true; } });
+
+        // Combos
+        void BindCombo(string name, Action<int> apply)
+        {
+            if (WindowManager.TryGetControl("winSkillEditor", name, out var c) && c is ComboBox combo)
+            {
+                combo.CallBack[(int)ControlState.MouseMove] = () =>
+                {
+                    int v = Math.Max(0, combo.Value);
+                    apply(v);
+                };
+            }
+        }
+
+        // Type -> Skill.Type
+        BindCombo("cmbType", v =>
+        {
+            int i = WinSkillEditor.SelectedIndex; if (i < 0 || i >= Variables.MaxSkills) return;
+            Data.Skill[i].Type = (byte)v; GameState.SkillChanged[i] = true;
+        });
+
+        // Animation -> SkillAnim
+        BindCombo("cmbAnimation", v =>
+        {
+            int i = WinSkillEditor.SelectedIndex; if (i < 0 || i >= Variables.MaxSkills) return;
+            Data.Skill[i].SkillAnim = Math.Clamp(v, 0, Variables.MaxAnimations - 1);
+            GameState.SkillChanged[i] = true;
+        });
+
+        // Projectile -> IsProjectile + Projectile index (0=None)
+        BindCombo("cmbProjectile", v =>
+        {
+            int i = WinSkillEditor.SelectedIndex; if (i < 0 || i >= Variables.MaxSkills) return;
+            if (v <= 0)
+            {
+                Data.Skill[i].IsProjectile = 0;
+                Data.Skill[i].Projectile = -1;
+            }
+            else
+            {
+                Data.Skill[i].IsProjectile = 1;
+                Data.Skill[i].Projectile = v - 1;
+            }
+            GameState.SkillChanged[i] = true;
+        });
+
+        // Buttons
+        if (WindowManager.TryGetControl("winSkillEditor", "btnSave", out var btnSave))
+            btnSave.CallBack[(int)ControlState.MouseDown] = () => { WinSkillEditor.OnSave(); };
+        if (WindowManager.TryGetControl("winSkillEditor", "btnCancel", out var btnCancel))
+            btnCancel.CallBack[(int)ControlState.MouseDown] = () => { WinSkillEditor.OnCancel(); };
+        if (WindowManager.TryGetControl("winSkillEditor", "btnDelete", out var btnDelete))
+            btnDelete.CallBack[(int)ControlState.MouseDown] = () => { WinSkillEditor.OnDelete(); };
+        if (WindowManager.TryGetControl("winSkillEditor", "btnCopy", out var btnCopy))
+            btnCopy.CallBack[(int)ControlState.MouseDown] = WinSkillEditor.OnCopy;
     }
 }
