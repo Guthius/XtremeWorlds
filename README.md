@@ -8,9 +8,9 @@
 
 A simple 2D MMORPG game engine written in C# using TCP .NET socket async networking.
 
-Based on the Orion+ conversion and MirageBasic, making Mirage move to C# from Visual Basic.
+Based on the Orion+ conversion and MirageBasic, making Mirage move to C# from Visual Basic. Mirage Source has been in works for over 20 years, and we're still a firm believer that no engine has ever came close.
 
-Game assets such as character base are only permitted to use in XtremeWorlds.
+Game assets such as character base are only permitted to use in this engine.
 
 BASS audio requires a copyright license in order to use commercially, this is meant to demo the audio library since I prefer it as a developer over FAudio and Nvorbis. This is mostly due to MIDI support and a proper synthesizer. You can get a license to support the developers, [here](https://www.un4seen.com/).
 
