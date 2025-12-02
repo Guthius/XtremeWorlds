@@ -19,13 +19,13 @@ namespace Client
         public static int WeatherStream;
         public static int ExtraSoundStream;
 
-    public static string[] MusicCache = Array.Empty<string>();
-    public static string[] SoundCache = Array.Empty<string>();
+        public static string[] MusicCache = Array.Empty<string>();
+        public static string[] SoundCache = Array.Empty<string>();
 
         public static bool FadeInSwitch;
         public static bool FadeOutSwitch;
-    public static string CurrentMusic = string.Empty;
-    public static string CurrentWeatherMusic = string.Empty;
+        public static string CurrentMusic = string.Empty;
+        public static string CurrentWeatherMusic = string.Empty;
 
         public static int SoundFontHandle;
 
