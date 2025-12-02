@@ -13,12 +13,6 @@ namespace Client
 
         public static void OnExit()
         {
-            if (!OperatingSystem.IsMacOS())
-            {
-                Environment.Exit(0);
-                return;
-            }
-
             try
             {
                 int pid = Process.GetCurrentProcess().Id;
