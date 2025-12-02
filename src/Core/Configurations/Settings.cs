@@ -32,9 +32,9 @@ public class SettingsManager
     public byte CameraHeight { get; set; } = 24;
     public bool OpenAdminPanelOnLogin { get; set; } = true;
     public byte[] ChannelState { get; set; } = new byte[] {1, 1, 1, 1, 1, 1, 1};
-    public string Ip = "127.0.0.1";
-    public int Port = 7001;
-    public string GameName = "XtremeWorlds";
+    public string Ip { get; set; } = "127.0.0.1";
+    public int Port { get; set; } = 7001;
+    public string GameName { get; set; } = "XtremeWorlds";
     public double TimeSpeed { get; set; }
     public bool Autotile { get; set; } = true;
     public string Skin { get; set; } = "Crystalshire";
