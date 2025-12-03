@@ -23,7 +23,7 @@ public static class Variables
     public static int MaxSkills = 255;
     public static byte MaxTrades = 35;
     public static byte NameLength = 21;
-    public static byte MinNameLength = 3;
+    public static byte Minimum_NameLength = 3;
     public static byte ChatLength = 70;
     public static byte MaxHotbar = 10;
     public static byte MaxMapX = 32;

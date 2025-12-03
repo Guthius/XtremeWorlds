@@ -196,7 +196,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             return;
         }
 
-        if (username.Length > Core.Globals.Variables.NameLength | username.Length < Core.Globals.Variables.MinNameLength)
+        if (username.Length > Core.Globals.Variables.NameLength | username.Length < Core.Globals.Variables.Minimum_NameLength)
         {
             NetworkSend.AlertMsg(session, SystemMessage.NameLengthInvalid);
             return;

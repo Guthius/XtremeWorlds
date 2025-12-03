@@ -80,7 +80,7 @@ namespace Server
             if (string.IsNullOrWhiteSpace(username))
                 return -1;
 
-            if (username.Length < Core.Globals.Variables.MinNameLength || username.Length > Core.Globals.Variables.NameLength)
+            if (username.Length < Core.Globals.Variables.Minimum_NameLength || username.Length > Core.Globals.Variables.NameLength)
                 return 0;
 
             return Regex.IsMatch(username, @"^[a-zA-Z0-9_ ]+$") ? 1 : -1;

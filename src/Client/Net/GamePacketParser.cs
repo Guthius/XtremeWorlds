@@ -170,12 +170,14 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Variables.MaxMorals = r.ReadByte();
         Variables.MaxInv = r.ReadByte();
         Variables.MaxMapItems = r.ReadByte();
+        
         Variables.MaxMapNpcs = r.ReadInt32();
+
         Variables.MaxNpcSkills = r.ReadByte();
         Variables.MaxPlayerSkills = r.ReadByte();
         Variables.MaxTrades = r.ReadByte();
         Variables.NameLength = r.ReadByte();
-        Variables.MinNameLength = r.ReadByte();
+        Variables.Minimum_NameLength = r.ReadByte();
         Variables.ChatLength = r.ReadByte();
         Variables.MaxHotbar = r.ReadByte();
         Variables.MaxMapX = r.ReadByte();

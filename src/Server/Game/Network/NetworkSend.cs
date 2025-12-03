@@ -141,17 +141,20 @@ public static class NetworkSend
         w.WriteInt32(Variables.MaxEvents);
         w.WriteInt32(Variables.TileSize);
         w.WriteInt32(Variables.MaxWeatherParticles);
+
         w.WriteByte(Variables.MaxBank);
         w.WriteByte(Variables.MaxJobs);
         w.WriteByte(Variables.MaxMorals);
         w.WriteByte(Variables.MaxInv);
         w.WriteByte(Variables.MaxMapItems);
+
         w.WriteInt32(Variables.MaxMapNpcs);
+        
         w.WriteByte(Variables.MaxNpcSkills);
         w.WriteByte(Variables.MaxPlayerSkills);
         w.WriteByte(Variables.MaxTrades);
         w.WriteByte(Variables.NameLength);
-        w.WriteByte(Variables.MinNameLength);
+        w.WriteByte(Variables.Minimum_NameLength);
         w.WriteByte(Variables.ChatLength);
         w.WriteByte(Variables.MaxHotbar);
         w.WriteByte(Variables.MaxMapX);

@@ -74,7 +74,7 @@ public class Script
     public static byte MaxTrades = Variables.MaxTrades;
     public static byte NameLength = Variables.NameLength;
     public static byte MaxNameLength = Variables.NameLength;
-    public static byte MinNameLength = Variables.MinNameLength;
+    public static byte Minimum_NameLength = Variables.Minimum_NameLength;
     public static byte ChatLength = Variables.ChatLength;
     public static byte MaxHotbar = Variables.MaxHotbar;
     public static byte MaxMapx = Variables.MaxMapX;
@@ -124,7 +124,7 @@ public class Script
         Variables.MaxSkills = MaxSkills;
         Variables.MaxTrades = MaxTrades;
         Variables.NameLength = NameLength;
-        Variables.MinNameLength = MinNameLength;
+        Variables.Minimum_NameLength = Minimum_NameLength;
         Variables.ChatLength = ChatLength;
         Variables.MaxHotbar = MaxHotbar;
         Variables.MaxMapX = MaxMapx;
