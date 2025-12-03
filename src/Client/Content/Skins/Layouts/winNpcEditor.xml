@@ -15,9 +15,9 @@
   <GroupBox Name="gtpDetails" Caption="" Position="260, 28" Size="450, 352">
     <!-- Core fields -->
     <Label Name="lblName" Text="Name" Position="8, 16" Size="80, 16"/>
-    <TextBox Name="txtName" Position="72, 12" Size="234, 20" Design="TextWhite"/>
-    <Label Name="lblAttackSay" Text="Attack Say" Position="8, 32" Size="100, 20"/>
-    <TextBox Name="txtAttackSay" Position="72, 30" Size="234, 20" Design="TextWhite"/>
+    <TextBox Name="txtName" Position="72, 12" Size="234, 16" Design="TextWhite"/>
+    <Label Name="lblAttackSay" Text="Attack Say" Position="8, 32" Size="100, 16"/>
+    <TextBox Name="txtAttackSay" Position="72, 30" Size="234, 16" Design="TextWhite"/>
     <Label Name="lblBehavior" Text="Behavior" Position="8, 56" Size="80, 16"/>
     <ComboBox Name="cmbBehavior" Position="72, 54" Size="120, 18"/>
     <Label Name="lblSpawnPeriod" Text="Spawn" Position="8, 80" Size="70, 16"/>
