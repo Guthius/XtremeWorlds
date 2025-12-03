@@ -31,7 +31,6 @@ namespace Client
         public static void Startup()
         {
             GameState.InMenu = true;
-            ClearGameData();
             LoadGame();
         }
 

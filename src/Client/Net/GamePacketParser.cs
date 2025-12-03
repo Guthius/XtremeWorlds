@@ -170,7 +170,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Variables.MaxMorals = r.ReadByte();
         Variables.MaxInv = r.ReadByte();
         Variables.MaxMapItems = r.ReadByte();
-        Variables.MaxMapNpcs = r.ReadByte();
+        Variables.MaxMapNpcs = r.ReadInt32();
         Variables.MaxNpcSkills = r.ReadByte();
         Variables.MaxPlayerSkills = r.ReadByte();
         Variables.MaxTrades = r.ReadByte();
@@ -189,6 +189,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Variables.MaxQuests = r.ReadByte();
         Variables.MaxGuilds = r.ReadByte();
         Variables.MaxEventChoices = r.ReadByte();
+        General.ClearGameData();
         
         ApplyClientSizing();
     }

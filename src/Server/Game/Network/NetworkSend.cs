@@ -123,9 +123,6 @@ public static class NetworkSend
         // Send authoritative variables from script getters so client can size arrays correctly
         var w = new PacketWriter();
         w.WriteEnum(ServerPackets.SVariables);
-
-        // Order matters: keep this in sync with client's Packet_Variables
-        // Int-sized values
         w.WriteInt32(Variables.MaxAnimations);
         w.WriteInt32(Variables.MaxItems);
         w.WriteInt32(Variables.MaxMaps);
@@ -143,32 +140,29 @@ public static class NetworkSend
         w.WriteInt32(Variables.MaxEvents);
         w.WriteInt32(Variables.TileSize);
         w.WriteInt32(Variables.MaxWeatherParticles);
-
-        // Byte-sized values
-        w.WriteByte((byte)Variables.MaxBank);
-        w.WriteByte((byte)Variables.MaxJobs);
-        w.WriteByte((byte)Variables.MaxMorals);
-        w.WriteByte((byte)Variables.MaxInv);
-        w.WriteByte((byte)Variables.MaxMapItems);
-        w.WriteByte((byte)Variables.MaxMapNpcs);
-        w.WriteByte((byte)Variables.MaxNpcSkills);
-        w.WriteByte((byte)Variables.MaxPlayerSkills);
-        w.WriteByte((byte)Variables.MaxTrades);
-        w.WriteByte((byte)Variables.NameLength);
-        w.WriteByte((byte)Variables.MinNameLength);
-        w.WriteByte((byte)Variables.ChatLength);
-        w.WriteByte((byte)Variables.MaxHotbar);
-        w.WriteByte((byte)Variables.MaxMapX);
-        w.WriteByte((byte)Variables.MaxMapY);
-        w.WriteByte((byte)Variables.MaxDropItems);
-        w.WriteByte((byte)Variables.MaxStartItems);
-        w.WriteByte((byte)Variables.MaxStartSkills);
-        w.WriteByte((byte)Variables.MaxPoints);
-        w.WriteByte((byte)Variables.MaxChars);
-        w.WriteByte((byte)Variables.MaxStats);
-        w.WriteByte((byte)Variables.MaxQuests);
-        w.WriteByte((byte)Variables.MaxGuilds);
-        w.WriteByte((byte)Variables.MaxEventChoices);
+        w.WriteByte(Variables.MaxBank);
+        w.WriteByte(Variables.MaxJobs);
+        w.WriteByte(Variables.MaxMorals);
+        w.WriteByte(Variables.MaxInv);
+        w.WriteByte(Variables.MaxMapItems);
+        w.WriteInt32(Variables.MaxMapNpcs);
+        w.WriteByte(Variables.MaxNpcSkills);
+        w.WriteByte(Variables.MaxPlayerSkills);
+        w.WriteByte(Variables.MaxTrades);
+        w.WriteByte(Variables.NameLength);
+        w.WriteByte(Variables.MinNameLength);
+        w.WriteByte(Variables.ChatLength);
+        w.WriteByte(Variables.MaxMapX);
+        w.WriteByte(Variables.MaxMapY);
+        w.WriteByte(Variables.MaxDropItems);
+        w.WriteByte(Variables.MaxStartItems);
+        w.WriteByte(Variables.MaxStartSkills);
+        w.WriteByte(Variables.MaxPoints);
+        w.WriteByte(Variables.MaxChars);
+        w.WriteByte(Variables.MaxStats);
+        w.WriteByte(Variables.MaxQuests);
+        w.WriteByte(Variables.MaxGuilds);
+        w.WriteByte(Variables.MaxEventChoices);
 
         session.Channel.Send(w.GetBytes());
     }
