@@ -95,7 +95,7 @@ public static class NetworkSend
 
         packetWriter.WriteEnum(ServerPackets.SPlayerChars);
 
-    for (var i = 0; i < Variables.MaxChars; i++)
+        for (var i = 0; i < Variables.MaxChars; i++)
         {
             Database.LoadCharacter(session.Id, i + 1);
 

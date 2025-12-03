@@ -21,7 +21,7 @@ namespace Client
                 Leader = 0,
                 MemberCount = 0
             };
-            Data.MyParty.Member = new int[5];
+            Data.MyParty.Member = new int[Core.Globals.Variables.MaxPartyMembers];
         }
 
         #endregion
