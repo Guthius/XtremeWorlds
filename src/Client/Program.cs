@@ -2181,6 +2181,9 @@ namespace Client
             width = barsInfo.Width;
             height = (long) Math.Round(barsInfo.Height / 4d);
 
+            if (Data.MyMapNpc == null)
+                return;
+
             // render Npc health bars
             for (i = 0L; i < Variables.MaxMapNpcs; i++)
             {
