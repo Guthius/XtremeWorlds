@@ -35,7 +35,7 @@
 		<!-- spacer on the right column for this row -->
 
 		<CheckBox Name="chkPlayerBlock" Text="Player Block" Position="8, 192" Size="160, 16"/>
-		<CheckBox Name="chkNpcBlock" Text="Npc Block" Position="276, 192" Size="160, 16"/>
+		<CheckBox Name="chkNpcBlock" Text="Npc Block" Position="276, 160" Size="160, 16"/>
 	</GroupBox>
 
 	<!-- Action buttons (centered at bottom like other editors) -->
