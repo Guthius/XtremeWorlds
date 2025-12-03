@@ -23,11 +23,12 @@ collaborative development. The GUI is rendered with the game render pipeline whi
 
 ## Game Features
 
-- Basic Character Creation/Job Selection
-- Movement/Combat
+- Basic character creation/job selection
+- Movement/combat
 - Npc characters for attacking
-- Items & Skills
-- Event System
+- Items & skills
+- Event system
+- Morals
 
 ## Creation Features
 
