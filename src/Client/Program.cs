@@ -3269,6 +3269,9 @@ namespace Client
             {
                 for (i = 0; i < byte.MaxValue; i++)
                 {
+                    if (MapAnimation.Instance == null)
+                        break;
+
                     if (MapAnimation.Instance?[i].Used[0] == true)
                     {
                         MapAnimation.OnDraw(i, 0);
