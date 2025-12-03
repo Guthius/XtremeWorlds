@@ -350,5 +350,6 @@ namespace Client
             int margin = 8;
             textY = spriteTopScreenY - textPixelHeight + margin;
             TextRenderer.RenderText(name, textX, textY, color, backColor);
+        }
     }
 }

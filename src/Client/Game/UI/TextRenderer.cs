@@ -34,7 +34,7 @@ public static class TextRenderer
 
     public const float BaseScale = 12f / 16f;
     public const float AccentScale = 12f / 16f;     
-    private static readonly float EffectiveScale = AccentScale;
+    private static readonly float effectiveScale = AccentScale;
 
     public static Color GetColorForAmount(int amount) =>
         amount switch
@@ -202,7 +202,7 @@ public static class TextRenderer
 
         var sanitized = SanitizeText(text ?? string.Empty, spriteFont);
         var dims = spriteFont.MeasureString(sanitized);
-        return (int)Math.Round(dims.X * (EffectiveScale / BaseScale) * textSize);
+        return (int)Math.Round(dims.X * (effectiveScale / BaseScale) * textSize);
     }
 
     public static int GetTextHeight(string text, Core.Globals.BitmapFont font, float textSize = 1.0f)
@@ -235,14 +235,14 @@ public static class TextRenderer
                     int lines = 1;
                     if (!string.IsNullOrEmpty(text))
                         foreach (var ch in text) if (ch == '\n') lines++;
-                    return (int)Math.Round(16f * lines * (EffectiveScale / BaseScale) * textSize);
+                    return (int)Math.Round(16f * lines * (effectiveScale / BaseScale) * textSize);
                 }
             }
             
         }
 
         var dimensions = spriteFont.MeasureString(text ?? string.Empty);
-        return (int)Math.Round(dimensions.Y * (EffectiveScale / BaseScale) * textSize);
+        return (int)Math.Round(dimensions.Y * (effectiveScale / BaseScale) * textSize);
     }
 
     // Bitmap render with subtle dual shadow (no glow)
@@ -320,7 +320,7 @@ public static class TextRenderer
         }
 
         var sanitizedText = SanitizeText(text ?? string.Empty, spriteFont);
-        float scale = EffectiveScale * textSize;
+        float scale = effectiveScale * textSize;
         Vector2 pos = new(x, y);
 
         // Shadows
