@@ -24,8 +24,8 @@ collaborative development. The GUI is rendered with the game render pipeline whi
 ## Game Features
 
 - Basic Character Creation/Job Selection
-- Movement/Attacking
-- NPC/Computer Characters for attacking
+- Movement/Combat
+- Npc characters for attacking
 - Items & Skills
 - Event System
 

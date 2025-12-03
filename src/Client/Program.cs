@@ -3488,7 +3488,7 @@ namespace Client
 
             for (i = 0; i < Variables.MaxMapNpcs; i++)
             {
-                TextRenderer.DrawNpcName(i);
+                Npc.OnDrawName(i);
             }
 
             Map.DrawFog();

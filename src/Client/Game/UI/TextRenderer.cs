@@ -32,8 +32,8 @@ public static class TextRenderer
         public Dictionary<char, int> Adv = new();
     }
 
-    private const float BaseScale = 12f / 16f;
-    private const float AccentScale = 12f / 16f;     
+    public const float BaseScale = 12f / 16f;
+    public const float AccentScale = 12f / 16f;     
     private static readonly float EffectiveScale = AccentScale;
 
     public static Color GetColorForAmount(int amount) =>
@@ -439,71 +439,6 @@ public static class TextRenderer
         }
     }
 
-    public static void DrawNpcName(int mapNpcNum)
-    {
-        int textY;
-        var color = default(Color);
-        var backColor = default(Color);
-
-        double npcNum = Data.MyMapNpc[mapNpcNum].Num;
-
-        if (npcNum < 0 | npcNum > Variables.MaxNpcs) return;
-        if (EditorType.Map == GameState.MyEditorType) return;
-
-        switch (Data.Npc[(int)npcNum].Behavior)
-        {
-            case 0: color = Color.Red; backColor = Color.Black; break;
-            case 1: color = Color.Green; backColor = Color.Black; break;
-            case 2: color = Color.Yellow; backColor = Color.Black; break;
-        }
-
-        var remaining = Data.MyMapNpc[mapNpcNum].DeathTimer - General.GetTickCount() / 1000;
-        if (remaining < 0) remaining = 0;
-
-        var name = remaining > 0 ? $"{remaining}..." : Data.Npc[(int)npcNum].Name;
-
-        int baseWorldX = Data.MyMapNpc[mapNpcNum].X;
-        int baseWorldY = Data.MyMapNpc[mapNpcNum].Y;
-        int centerX = GameLogic.ConvertMapX(baseWorldX) + Constants.TileSize / 2 - 4;
-        var textX = centerX - (int)(GetTextWidth(name) / 6d);
-
-        int spriteNum = Data.Npc[(int)npcNum].Sprite;
-        if (spriteNum <= 0 || spriteNum > GameState.NumCharacters)
-        {
-            textY = GameLogic.ConvertMapY(baseWorldY) - 16;
-            RenderText(name, textX, textY, color, backColor);
-            return;
-        }
-
-        var gfxInfo = GameClient.GetGfxInfo(Path.Combine(DataPath.Characters, spriteNum.ToString()));
-        if (gfxInfo == null || gfxInfo.Height <= 0)
-        {
-            textY = GameLogic.ConvertMapY(baseWorldY) - 16;
-            RenderText(name, textX, textY, color, backColor);
-            return;
-        }
-
-        int configuredDirs = SettingsManager.Instance.SpriteDirections;
-        if (configuredDirs <= 0) configuredDirs = 4;
-        configuredDirs = Math.Max(1, configuredDirs);
-        int directionRows = 1;
-        if (gfxInfo.Height % configuredDirs == 0) directionRows = configuredDirs;
-        else if (configuredDirs != 8 && gfxInfo.Height % 8 == 0) directionRows = 8;
-        else if (configuredDirs != 4 && gfxInfo.Height % 4 == 0) directionRows = 4;
-
-        int frameHeight = gfxInfo.Height / directionRows;
-        if (frameHeight <= 0) frameHeight = 32;
-
-        int spriteTopWorldY = baseWorldY;
-        if (frameHeight > 32) spriteTopWorldY = baseWorldY - (frameHeight - 32);
-
-        int spriteTopScreenY = GameLogic.ConvertMapY(spriteTopWorldY);
-        int textPixelHeight = (int)Math.Ceiling(Fonts[Font.Georgia].LineSpacing * BaseScale);
-        int margin = 8;
-        textY = spriteTopScreenY - textPixelHeight + margin;
-        RenderText(name, textX, textY, color, backColor);
-    }
-
     public static void DrawEventName(int index)
     {
         if (Data.MapEvents == null) return;
@@ -514,8 +449,10 @@ public static class TextRenderer
         var backcolor = Color.Black;
         var name = Data.MapEvents[index].Name;
 
-        var textX = GameLogic.ConvertMapX(Data.MapEvents[index].X) + Constants.TileSize / 2 - 6;
-        textX -= GetTextWidth(name) / 6;
+        // X position: use same centering math as player names (sprite feet center)
+        int baseWorldX = Data.MapEvents[index].X;
+        int feetCenterX = GameLogic.ConvertMapX(baseWorldX) + Constants.TileSize / 2 - 4;
+        var textX = feetCenterX - (int)(Fonts[Font.Georgia].MeasureString(name).X / 2f);
 
         if (Data.MapEvents[index].GraphicType == 1)
         {
@@ -705,7 +642,6 @@ public static class TextRenderer
 
     public static void DrawPlayerName(int index)
     {
-        int textY;
         var color = default(Color);
         var backColor = default(Color);
 
@@ -729,45 +665,55 @@ public static class TextRenderer
         if (remaining < 0) remaining = 0;
         var name = remaining > 0 ? $"{remaining}..." : Data.Player[index].Name;
 
-        int baseWorldX = GetPlayerRawX(index);
-        int baseWorldY = GetPlayerRawY(index);
-        int centerX = GameLogic.ConvertMapX(baseWorldX) + Constants.TileSize / 2 - 6;
-        var textX = (int)Math.Round(centerX - GetTextWidth(name) / 6d);
+        // X position: keep current label-style centering over the tile
+        var playerWorldX = GetPlayerRawX(index);
+        var playerWorldY = GetPlayerRawY(index);
+        var playerScreenX = GameLogic.ConvertMapX(playerWorldX);
 
-        int spriteNum = GetPlayerSprite(index);
+        var size = Fonts[Font.Georgia].MeasureString(name);
+        var padding = (int)(size.X / 6);
+        var drawX = (int)(playerScreenX + (Constants.TileSize - size.X) / 2 + padding);
+
+        // Y position: mirror NPC/event logic using sprite graphics when available
+        int textY;
+        int spriteNum = Data.Player[index].Sprite;
+
         if (spriteNum <= 0 || spriteNum > GameState.NumCharacters)
         {
-            textY = GameLogic.ConvertMapY(baseWorldY) - 16;
-            RenderText(name, textX, textY, color, backColor);
-            return;
+            // No valid graphic: render at feet (just above base tile)
+            textY = GameLogic.ConvertMapY(playerWorldY) - 16;
         }
-
-        var gfxInfo = GameClient.GetGfxInfo(Path.Combine(DataPath.Characters, spriteNum.ToString()));
-        if (gfxInfo == null || gfxInfo.Height <= 0)
+        else
         {
-            textY = GameLogic.ConvertMapY(baseWorldY) - 16;
-            RenderText(name, textX, textY, color, backColor);
-            return;
+            var gfxInfo = GameClient.GetGfxInfo(Path.Combine(DataPath.Characters, spriteNum.ToString()));
+            if (gfxInfo == null || gfxInfo.Height <= 0)
+            {
+                // Missing or invalid graphic: fallback to feet
+                textY = GameLogic.ConvertMapY(playerWorldY) - 16;
+            }
+            else
+            {
+                int configuredDirs = SettingsManager.Instance.SpriteDirections;
+                if (configuredDirs <= 0) configuredDirs = 4;
+                configuredDirs = Math.Max(1, configuredDirs);
+                int directionRows = 1;
+                if (gfxInfo.Height % configuredDirs == 0) directionRows = configuredDirs;
+                else if (configuredDirs != 8 && gfxInfo.Height % 8 == 0) directionRows = 8;
+                else if (configuredDirs != 4 && gfxInfo.Height % 4 == 0) directionRows = 4;
+
+                int frameHeight = gfxInfo.Height / directionRows;
+                if (frameHeight <= 0) frameHeight = 32;
+
+                int spriteTopWorldY = playerWorldY;
+                if (frameHeight > 32) spriteTopWorldY = playerWorldY - (frameHeight - 32);
+
+                int spriteTopScreenY = GameLogic.ConvertMapY(spriteTopWorldY);
+                int textPixelHeight = (int)Math.Ceiling(Fonts[Font.Georgia].LineSpacing * BaseScale);
+                int margin = 8;
+                textY = spriteTopScreenY - textPixelHeight + margin;
+            }
         }
 
-        int configuredDirs = SettingsManager.Instance.SpriteDirections;
-        if (configuredDirs <= 0) configuredDirs = 4;
-        configuredDirs = Math.Max(1, configuredDirs);
-        int directionRows = 1;
-        if (gfxInfo.Height % configuredDirs == 0) directionRows = configuredDirs;
-        else if (configuredDirs != 8 && gfxInfo.Height % 8 == 0) directionRows = 8;
-        else if (configuredDirs != 4 && gfxInfo.Height % 4 == 0) directionRows = 4;
-
-        int frameHeight = gfxInfo.Height / directionRows;
-        if (frameHeight <= 0) frameHeight = 32;
-
-        int spriteTopWorldY = baseWorldY;
-        if (frameHeight > 32) spriteTopWorldY = baseWorldY - (frameHeight - 32);
-
-        int spriteTopScreenY = GameLogic.ConvertMapY(spriteTopWorldY);
-        int textPixelHeight = (int)Math.Ceiling(Fonts[Font.Georgia].LineSpacing * BaseScale);
-        int margin = 8;
-        textY = spriteTopScreenY - textPixelHeight + margin;
-        RenderText(name, textX, textY, color, backColor);
+        RenderText(name, drawX, textY, color, backColor, Font.Georgia);
     }
 }
