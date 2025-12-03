@@ -235,6 +235,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         General.Logger.LogInformation("{AccountName} has logged in from {IpAddress}",
             GetAccountLogin(session.Id), session.Channel.IpAddress);
 
+        NetworkSend.SendVariables(session);
         NetworkSend.SendPlayerChars(session);
         NetworkSend.SendJobs(session);
     }
