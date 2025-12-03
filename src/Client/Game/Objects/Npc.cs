@@ -328,7 +328,7 @@ namespace Client
                 return;
             }
 
-            var gfxInfo = GameClient.GetGfxInfo(Path.Combine(DataPath.Characters, spriteNum.ToString()));
+            var gfxInfo = GameClient.GetGfxInfo(System.IO.Path.Combine(Core.Globals.DataPath.Characters, spriteNum.ToString()));
             if (gfxInfo == null || gfxInfo.Height <= 0)
             {
                 int feetScreenY = GameLogic.ConvertMapY(baseWorldY);
