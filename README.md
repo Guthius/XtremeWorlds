@@ -29,6 +29,7 @@ collaborative development. The GUI is rendered with the game render pipeline whi
 - Items & skills
 - Event system
 - Morals
+- Projectiles
 
 ## Creation Features
 
