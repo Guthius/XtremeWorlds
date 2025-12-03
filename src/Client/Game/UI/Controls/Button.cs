@@ -54,7 +54,7 @@ public sealed class Button : Control
         var textX = X + x + XOffset + (Width - size.X) / 2 + paddingX - 4;
         var textY = Y + y + YOffset + (Height - size.Y) / 2 + paddingY;
 
-        TextRenderer.RenderText(Text,
+        TextRenderer.OnRender(Text,
             (int) Math.Round(textX),
             (int) Math.Round(textY),
             Color, Color.Black,

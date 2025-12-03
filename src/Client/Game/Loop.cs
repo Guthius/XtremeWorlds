@@ -208,21 +208,21 @@ namespace Client
                     {
                         if (IsPlaying(_i))
                         {
-                            Player.ProcessMovement(_i);                            
+                            Player.OnMove(_i);                            
                         }
                     }
 
                     // Process npc movements
                     for (_i = 0; _i < Variables.MaxMapNpcs; _i++)
                     {
-                        Npc.ProcessMovement(_i);
+                        Npc.OnMove(_i);
                         
                     }
 
                     var loopTo2 = GameState.CurrentEvents;
                     for (_i = 0; _i < loopTo2; _i++)
                     {
-                        Event.ProcessMovement(_i);
+                        Event.OnMove(_i);
                     }
 
                     _walkTimer = _tick + 5;

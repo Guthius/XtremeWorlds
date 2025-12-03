@@ -36,6 +36,6 @@ public sealed class ScrollBar : Control
         var size = TextRenderer.Fonts[Font].MeasureString(label);
         int textX = X + x + Width + 6;
         int textY = Y + y + (Height - (int)size.Y) / 2;
-        TextRenderer.RenderText(label, textX, textY, Color.White, Color.Black, Font);
+        TextRenderer.OnRender(label, textX, textY, Color.White, Color.Black, Font);
     }
 }

@@ -2586,7 +2586,7 @@ namespace Client
                 // Calculate horizontal and vertical centers with padding
                 double padding = (double) actualWidth / 6.0d;
 
-                TextRenderer.RenderText(theArray[(int) i],
+                TextRenderer.OnRender(theArray[(int) i],
                     (int) Math.Round(x - theArray[(int) i].Length / 2d - TextRenderer.GetTextWidth(theArray[(int) i]) / 2d +
                                         padding), (int) y2, QbColorToXnaColor(instance.Color),
                     Color.Black);
@@ -2840,64 +2840,6 @@ namespace Client
             }
         }
 
-        public static void DrawEvents()
-        {
-            if (Data.MyMap.Event == null)
-                return;
-
-            // Iterate only actual events to avoid drawing the trailing empty slot
-            int count = Math.Max(0, Data.MyMap.EventCount);
-            for (int i = 0; i < count; i++)
-            {
-                if (i >= Data.MyMap.Event.Length)
-                    break;
-                    
-                // Treat MyMap.Event.X/Y as tile coordinates; compute world pixel coordinates
-                int worldX = Data.MyMap.Event[i].X * Constants.TileSize;
-                int worldY = Data.MyMap.Event[i].Y * Constants.TileSize;
-
-                // Skip event if there are no pages
-                if (Data.MyMap.Event[i].PageCount <= 0)
-                {
-                    DrawOutlineRectangle(GameLogic.ConvertMapX(worldX), GameLogic.ConvertMapY(worldY), Constants.TileSize, Constants.TileSize, Color.Blue, 0.6f);
-                    continue;
-                }
-
-                // Precompute screen coordinates once
-                int screenX = GameLogic.ConvertMapX(worldX);
-                int screenY = GameLogic.ConvertMapY(worldY);
-
-                // Render event based on its graphic type
-                switch (Data.MyMap.Event[i].Pages[0].GraphicType)
-                {
-                    case 0: // Text Event (draw simple 'E' at the tile origin like other 32x32 textures)
-                    {
-                        TextRenderer.RenderText("E", screenX, screenY, Color.Green, Color.Black);
-                        break;
-                    }
-
-                    case 1: // Character Graphic
-                    {
-                        RenderCharacterGraphic(Data.MyMap.Event[i], screenX, screenY);
-                        break;
-                    }
-
-                    case 2: // Tileset Graphic
-                    {
-                        RenderTilesetGraphic(Data.MyMap.Event[i], screenX, screenY);
-                        break;
-                    }
-
-                    default:
-                    {
-                        // Draw fallback outline if the graphic type is unknown
-                        DrawOutlineRectangle(GameLogic.ConvertMapX(worldX), GameLogic.ConvertMapY(worldY), Constants.TileSize, Constants.TileSize, Color.Blue, 0.6f);
-                        break;
-                    }
-                }
-            }
-        }
-
         public static void RenderCharacterGraphic(Type.Event eventData, int x, int y)
         {
             // Get the graphic index from the event's first page
@@ -2996,7 +2938,7 @@ namespace Client
             RenderTexture(ref argPath, drawX, drawY, sourceRect.X, sourceRect.Y, sourceRect.Width, sourceRect.Height, sourceRect.Width, sourceRect.Height);
         }
 
-        private static void RenderTilesetGraphic(Type.Event eventData, int x, int y)
+        public static void RenderTilesetGraphic(Type.Event eventData, int x, int y)
         {
             int gfxIndex = eventData.Pages[0].Graphic;
 
@@ -3464,7 +3406,7 @@ namespace Client
             {
                 if (IsPlaying(i) & GetPlayerMap(i) == GetPlayerMap(GameState.MyIndex))
                 {
-                    TextRenderer.DrawPlayerName(i);
+                    Player.OnDrawName(i);
                 }
             }
 
@@ -3479,7 +3421,7 @@ namespace Client
                         {
                             if (Data.MapEvents[i].ShowName == 1)
                             {
-                                TextRenderer.DrawEventName(i);
+                                Event.OnDrawName(i);
                             }
                         }
                     }
@@ -3514,7 +3456,7 @@ namespace Client
             if (GameState.Bfps)
             {
                 string fps = "FPS: " + GetFps();
-                TextRenderer.RenderText(fps, (int) Math.Round(GameState.Camera.Left - 24d),
+                TextRenderer.OnRender(fps, (int) Math.Round(GameState.Camera.Left - 24d),
                     (int) Math.Round(GameState.Camera.Top + 60d), Color.Yellow, Color.Black);
             }
 
@@ -3526,16 +3468,16 @@ namespace Client
                 string map = " (Map #" + GetPlayerMap(GameState.MyIndex) + ")";
                 string curMouse = "Mouse X: " + (int)GameState.CurMouseXGame + " Y: " + (int)GameState.CurMouseYGame;
 
-                TextRenderer.RenderText(cur, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 15f),
+                TextRenderer.OnRender(cur, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 15f),
                     Color.Yellow, Color.Black);
 
-                TextRenderer.RenderText(curMouse, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 30f),
+                TextRenderer.OnRender(curMouse, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 30f),
                     Color.Yellow, Color.Black);
 
-                TextRenderer.RenderText(loc, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 45f),
+                TextRenderer.OnRender(loc, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 45f),
                     Color.Yellow, Color.Black);
 
-                TextRenderer.RenderText(map, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 60f),
+                TextRenderer.OnRender(map, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 60f),
                     Color.Yellow, Color.Black);
             }
             
@@ -3543,7 +3485,7 @@ namespace Client
             {
                 if (GameState.MapEditorTab == (int)MapEditorTab.Events)
                 {
-                    DrawEvents();
+                    Event.OnDraw();
                 }
             }
 

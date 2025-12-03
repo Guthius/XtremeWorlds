@@ -1483,11 +1483,11 @@ namespace Client
             {
                 int i;
 
-                // Safety: ensure TmpEvent has at least one page so the tab area isn't empty
-                if (Event.TmpEvent.PageCount <= 0 || Event.TmpEvent.Pages == null || Event.TmpEvent.Pages.Length == 0)
+                // Safety: ensure Instance has at least one page so the tab area isn't empty
+                if (Event.Instance.PageCount <= 0 || Event.Instance.Pages == null || Event.Instance.Pages.Length == 0)
                 {
-                    Event.TmpEvent.PageCount = 1;
-                    Array.Resize(ref Event.TmpEvent.Pages, 1);
+                    Event.Instance.PageCount = 1;
+                    Array.Resize(ref Event.Instance.Pages, 1);
                 }
 
                 // Add a bit of inner margin so content isn't flush with window edges
@@ -1613,7 +1613,7 @@ namespace Client
                 // set the tabs
                 tabPages.Pages.Clear();
 
-                var loopTo2 = Event.TmpEvent.PageCount;
+                var loopTo2 = Event.Instance.PageCount;
                 for (i = 0; i < loopTo2; i++)
                     tabPages.Pages.Add(new TabPage { Text = Conversion.Str(i + 1) });
 
@@ -1654,7 +1654,7 @@ namespace Client
                 cmbSelfSwitchCompare.Items.Add("Off");
 
                 // enable delete button
-                btnDeletePage.Enabled = Event.TmpEvent.PageCount > 1;
+                btnDeletePage.Enabled = Event.Instance.PageCount > 1;
                 btnPastePage.Enabled = false;
 
                 nudShowPicture.MaxValue = GameState.NumPictures;
@@ -1668,9 +1668,9 @@ namespace Client
                 }
                 // Load page 1 to start off with
                 Event.CurPageNum = 0;
-                if (string.IsNullOrEmpty(Event.TmpEvent.Name))
-                    Event.TmpEvent.Name = string.Empty;
-                txtName.Text = Event.TmpEvent.Name;
+                if (string.IsNullOrEmpty(Event.Instance.Name))
+                    Event.Instance.Name = string.Empty;
+                txtName.Text = Event.Instance.Name;
 
                 Event.EventEditorLoadPage(Event.CurPageNum);
                 AttachEditorHostToSelectedTab();
@@ -1693,7 +1693,7 @@ namespace Client
                 picGraphic.Image = null;
 
                 // Validate page and selection
-                if (Event.TmpEvent.Pages == null || Event.CurPageNum < 0 || Event.CurPageNum >= Event.TmpEvent.Pages.Length)
+                if (Event.Instance.Pages == null || Event.CurPageNum < 0 || Event.CurPageNum >= Event.Instance.Pages.Length)
                     return;
 
                 var gfxType = cmbGraphic.SelectedIndex; // 0=None, 1=Character, 2=Tileset
@@ -1802,19 +1802,19 @@ namespace Client
             if (fraGraphic.Visible == false)
             {
                 Event.EventEditorOK();
-                Event.TmpEvent = default;
+                Event.Instance = default;
                 Close();
             }
             else
             {
                 if (Event.GraphicSelType == 0)
                 {
-                    Event.TmpEvent.Pages[Event.CurPageNum].GraphicType = (byte)cmbGraphic.SelectedIndex;
-                    Event.TmpEvent.Pages[Event.CurPageNum].Graphic = (int)Math.Round(nudGraphic.Value);
-                    Event.TmpEvent.Pages[Event.CurPageNum].GraphicX = Event.GraphicSelX;
-                    Event.TmpEvent.Pages[Event.CurPageNum].GraphicY = Event.GraphicSelY;
-                    Event.TmpEvent.Pages[Event.CurPageNum].GraphicX2 = Event.GraphicSelX2;
-                    Event.TmpEvent.Pages[Event.CurPageNum].GraphicY2 = Event.GraphicSelY2;
+                    Event.Instance.Pages[Event.CurPageNum].GraphicType = (byte)cmbGraphic.SelectedIndex;
+                    Event.Instance.Pages[Event.CurPageNum].Graphic = (int)Math.Round(nudGraphic.Value);
+                    Event.Instance.Pages[Event.CurPageNum].GraphicX = Event.GraphicSelX;
+                    Event.Instance.Pages[Event.CurPageNum].GraphicY = Event.GraphicSelY;
+                    Event.Instance.Pages[Event.CurPageNum].GraphicX2 = Event.GraphicSelX2;
+                    Event.Instance.Pages[Event.CurPageNum].GraphicY2 = Event.GraphicSelY2;
                 }
                 else
                 {
@@ -1829,13 +1829,13 @@ namespace Client
         {
             if (fraGraphic.Visible == false)
             {
-                Event.TmpEvent = default;
+                Event.Instance = default;
                 Close();
             }
             else
             {
-                Event.TmpEvent.Pages[Event.CurPageNum].GraphicType = tmpGraphicType;
-                Event.TmpEvent.Pages[Event.CurPageNum].Graphic = tmpGraphicIndex;
+                Event.Instance.Pages[Event.CurPageNum].GraphicType = tmpGraphicType;
+                Event.Instance.Pages[Event.CurPageNum].Graphic = tmpGraphicIndex;
                 fraGraphic.Visible = false;
                 DrawGraphic();
             }     
@@ -2318,22 +2318,22 @@ namespace Client
                 return;
             }
 
-            pageCount = Event.TmpEvent.PageCount + 1;
+            pageCount = Event.Instance.PageCount + 1;
 
             // redim the array
-            Array.Resize(ref Event.TmpEvent.Pages, pageCount);
+            Array.Resize(ref Event.Instance.Pages, pageCount);
 
-            Event.TmpEvent.PageCount = pageCount;
+            Event.Instance.PageCount = pageCount;
 
             // set the tabs
             tabPages.Pages.Clear();
 
-            var loopTo = Event.TmpEvent.PageCount;
+            var loopTo = Event.Instance.PageCount;
             for (i = 0; i < loopTo; i++)
                 tabPages.Pages.Add(new TabPage { Text = Conversion.Str(i + 1) });
             btnDeletePage.Enabled = true;
             // Select and load the newly created page
-            tabPages.SelectedIndex = Math.Max(0, Event.TmpEvent.PageCount - 1);
+            tabPages.SelectedIndex = Math.Max(0, Event.Instance.PageCount - 1);
             Event.CurPageNum = tabPages.SelectedIndex;
             Event.EventEditorLoadPage(Event.CurPageNum);
             RefreshGraphicControlsFromPage();
@@ -2343,13 +2343,13 @@ namespace Client
 
         private void BtnCopyPage_Click(object? sender, EventArgs e)
         {
-            Event.CopyEventPage = Event.TmpEvent.Pages[Event.CurPageNum];
+            Event.CopyEventPage = Event.Instance.Pages[Event.CurPageNum];
             btnPastePage.Enabled = true;
         }
 
         private void BtnPastePage_Click(object? sender, EventArgs e)
         {
-            Event.TmpEvent.Pages[Event.CurPageNum] = Event.CopyEventPage;
+            Event.Instance.Pages[Event.CurPageNum] = Event.CopyEventPage;
             Event.EventEditorLoadPage(Event.CurPageNum);
             RefreshGraphicControlsFromPage();
             AttachEditorHostToSelectedTab();
@@ -2358,31 +2358,31 @@ namespace Client
 
         private void BtnDeletePage_Click(object? sender, EventArgs e)
         {
-            Event.TmpEvent.Pages[Event.CurPageNum] = default;
+            Event.Instance.Pages[Event.CurPageNum] = default;
 
             // move everything else down a notch
-            if (Event.CurPageNum < Event.TmpEvent.PageCount)
+            if (Event.CurPageNum < Event.Instance.PageCount)
             {
-                for (int i = Event.CurPageNum, loopTo = Event.TmpEvent.PageCount - 1; i < loopTo; i++)
-                    Event.TmpEvent.Pages[i] = Event.TmpEvent.Pages[i + 1];
+                for (int i = Event.CurPageNum, loopTo = Event.Instance.PageCount - 1; i < loopTo; i++)
+                    Event.Instance.Pages[i] = Event.Instance.Pages[i + 1];
             }
-            Event.TmpEvent.PageCount = Event.TmpEvent.PageCount - 1;
-            Event.CurPageNum = Event.TmpEvent.PageCount - 1;
+            Event.Instance.PageCount = Event.Instance.PageCount - 1;
+            Event.CurPageNum = Event.Instance.PageCount - 1;
             Event.EventEditorLoadPage(Event.CurPageNum);
 
             // set the tabs
             tabPages.Pages.Clear();
 
-            for (int i = 0, loopTo1 = Event.TmpEvent.PageCount; i < loopTo1; i++)
+            for (int i = 0, loopTo1 = Event.Instance.PageCount; i < loopTo1; i++)
                 tabPages.Pages.Add(new TabPage { Text = Conversion.Str(i + 1) });
 
             // set the tab back
-            tabPages.SelectedIndex = Math.Min(Event.CurPageNum, Math.Max(0, Event.TmpEvent.PageCount - 1));
+            tabPages.SelectedIndex = Math.Min(Event.CurPageNum, Math.Max(0, Event.Instance.PageCount - 1));
             Event.CurPageNum = tabPages.SelectedIndex;
             Event.EventEditorLoadPage(Event.CurPageNum);
             RefreshGraphicControlsFromPage();
             // make sure we disable
-            if (Event.TmpEvent.PageCount == 1)
+            if (Event.Instance.PageCount == 1)
             {
                 btnDeletePage.Enabled = false;
             }
@@ -2393,13 +2393,13 @@ namespace Client
 
         private void BtnClearPage_Click(object? sender, EventArgs e)
         {
-            Event.TmpEvent.Pages[Event.CurPageNum] = default;
+            Event.Instance.Pages[Event.CurPageNum] = default;
             Event.EventEditorLoadPage(Event.CurPageNum);
         }
 
         private void TxtName_TextChanged(object? sender, EventArgs e)
         {
-            Event.TmpEvent.Name = Strings.Trim(txtName.Text);
+            Event.Instance.Name = Strings.Trim(txtName.Text);
         }
 
         #endregion
@@ -2413,14 +2413,14 @@ namespace Client
                 cmbPlayerVar.Enabled = true;
                 nudPlayerVariable.Enabled = true;
                 cmbPlayerVarCompare.Enabled = true;
-                Event.TmpEvent.Pages[Event.CurPageNum].ChkVariable = 1;
+                Event.Instance.Pages[Event.CurPageNum].ChkVariable = 1;
             }
             else
             {
                 cmbPlayerVar.Enabled = false;
                 nudPlayerVariable.Enabled = false;
                 cmbPlayerVarCompare.Enabled = false;
-                Event.TmpEvent.Pages[Event.CurPageNum].ChkVariable = 0;
+                Event.Instance.Pages[Event.CurPageNum].ChkVariable = 0;
             }
         }
 
@@ -2428,19 +2428,19 @@ namespace Client
         {
             if (cmbPlayerVar.SelectedIndex == -1)
                 return;
-            Event.TmpEvent.Pages[Event.CurPageNum].VariableIndex = cmbPlayerVar.SelectedIndex;
+            Event.Instance.Pages[Event.CurPageNum].VariableIndex = cmbPlayerVar.SelectedIndex;
         }
 
         private void CmbPlayervarCompare_SelectedIndexChanged(object? sender, EventArgs e)
         {
             if (cmbPlayerVarCompare.SelectedIndex == -1)
                 return;
-            Event.TmpEvent.Pages[Event.CurPageNum].VariableCompare = cmbPlayerVarCompare.SelectedIndex;
+            Event.Instance.Pages[Event.CurPageNum].VariableCompare = cmbPlayerVarCompare.SelectedIndex;
         }
 
         private void NudPlayerVariable_ValueChanged(object? sender, EventArgs e)
         {
-            Event.TmpEvent.Pages[Event.CurPageNum].VariableCondition = (int)Math.Round(nudPlayerVariable.Value);
+            Event.Instance.Pages[Event.CurPageNum].VariableCondition = (int)Math.Round(nudPlayerVariable.Value);
         }
 
         private void ChkPlayerSwitch_CheckedChanged(object? sender, EventArgs e)
@@ -2449,13 +2449,13 @@ namespace Client
             {
                 cmbPlayerSwitch.Enabled = true;
                 cmbPlayerSwitchCompare.Enabled = true;
-                Event.TmpEvent.Pages[Event.CurPageNum].ChkSwitch = 1;
+                Event.Instance.Pages[Event.CurPageNum].ChkSwitch = 1;
             }
             else
             {
                 cmbPlayerSwitch.Enabled = false;
                 cmbPlayerSwitchCompare.Enabled = false;
-                Event.TmpEvent.Pages[Event.CurPageNum].ChkSwitch = 0;
+                Event.Instance.Pages[Event.CurPageNum].ChkSwitch = 0;
             }
         }
 
@@ -2463,26 +2463,26 @@ namespace Client
         {
             if (cmbPlayerSwitch.SelectedIndex == -1)
                 return;
-            Event.TmpEvent.Pages[Event.CurPageNum].SwitchIndex = cmbPlayerSwitch.SelectedIndex;
+            Event.Instance.Pages[Event.CurPageNum].SwitchIndex = cmbPlayerSwitch.SelectedIndex;
         }
 
         private void CmbPlayerSwitchCompare_SelectedIndexChanged(object? sender, EventArgs e)
         {
             if (cmbPlayerSwitchCompare.SelectedIndex == -1)
                 return;
-            Event.TmpEvent.Pages[Event.CurPageNum].SwitchCompare = cmbPlayerSwitchCompare.SelectedIndex;
+            Event.Instance.Pages[Event.CurPageNum].SwitchCompare = cmbPlayerSwitchCompare.SelectedIndex;
         }
 
         private void ChkHasItem_CheckedChanged(object? sender, EventArgs e)
         {
             if (chkHasItem.Checked == true)
             {
-                Event.TmpEvent.Pages[Event.CurPageNum].ChkHasItem = 1;
+                Event.Instance.Pages[Event.CurPageNum].ChkHasItem = 1;
                 cmbHasItem.Enabled = true;
             }
             else
             {
-                Event.TmpEvent.Pages[Event.CurPageNum].ChkHasItem = 0;
+                Event.Instance.Pages[Event.CurPageNum].ChkHasItem = 0;
                 cmbHasItem.Enabled = false;
             }
 
@@ -2492,8 +2492,8 @@ namespace Client
         {
             if (cmbHasItem.SelectedIndex == -1)
                 return;
-            Event.TmpEvent.Pages[Event.CurPageNum].HasItemIndex = cmbHasItem.SelectedIndex;
-            Event.TmpEvent.Pages[Event.CurPageNum].HasItemAmount = (int)Math.Round(nudCondition_HasItem.Value);
+            Event.Instance.Pages[Event.CurPageNum].HasItemIndex = cmbHasItem.SelectedIndex;
+            Event.Instance.Pages[Event.CurPageNum].HasItemAmount = (int)Math.Round(nudCondition_HasItem.Value);
         }
 
         private void ChkSelfSwitch_CheckedChanged(object? sender, EventArgs e)
@@ -2502,13 +2502,13 @@ namespace Client
             {
                 cmbSelfSwitch.Enabled = true;
                 cmbSelfSwitchCompare.Enabled = true;
-                Event.TmpEvent.Pages[Event.CurPageNum].ChkSelfSwitch = 1;
+                Event.Instance.Pages[Event.CurPageNum].ChkSelfSwitch = 1;
             }
             else
             {
                 cmbSelfSwitch.Enabled = false;
                 cmbSelfSwitchCompare.Enabled = false;
-                Event.TmpEvent.Pages[Event.CurPageNum].ChkSelfSwitch = 0;
+                Event.Instance.Pages[Event.CurPageNum].ChkSelfSwitch = 0;
             }
         }
 
@@ -2517,17 +2517,17 @@ namespace Client
             if (cmbSelfSwitch.SelectedIndex == -1)
                 return;
 
-            if (Event.TmpEvent.Pages == null)
+            if (Event.Instance.Pages == null)
                 return;
 
-            Event.TmpEvent.Pages[Event.CurPageNum].SelfSwitchIndex = cmbSelfSwitch.SelectedIndex;
+            Event.Instance.Pages[Event.CurPageNum].SelfSwitchIndex = cmbSelfSwitch.SelectedIndex;
         }
 
         private void CmbSelfSwitchCompare_SelectedIndexChanged(object? sender, EventArgs e)
         {
             if (cmbSelfSwitchCompare.SelectedIndex == -1)
                 return;
-            Event.TmpEvent.Pages[Event.CurPageNum].SelfSwitchCompare = cmbSelfSwitchCompare.SelectedIndex;
+            Event.Instance.Pages[Event.CurPageNum].SelfSwitchCompare = cmbSelfSwitchCompare.SelectedIndex;
         }
 
         #endregion
@@ -2536,8 +2536,8 @@ namespace Client
 
     private void PicGraphic_Click(object? sender, MouseEventArgs e)
         {
-            tmpGraphicIndex = Event.TmpEvent.Pages[Event.CurPageNum].Graphic;
-            tmpGraphicType = Event.TmpEvent.Pages[Event.CurPageNum].GraphicType;
+            tmpGraphicIndex = Event.Instance.Pages[Event.CurPageNum].Graphic;
+            tmpGraphicType = Event.Instance.Pages[Event.CurPageNum].GraphicType;
             // Show the Set Graphic frame via the overlay host
             HideAllFrames();
             ShowFrame(fraGraphic, false);
@@ -2553,7 +2553,7 @@ namespace Client
                 
             if (_syncingGraphic) return;
 
-            Event.TmpEvent.Pages[Event.CurPageNum].GraphicType = (byte)cmbGraphic.SelectedIndex;
+            Event.Instance.Pages[Event.CurPageNum].GraphicType = (byte)cmbGraphic.SelectedIndex;
             // set the max on the scrollbar
             switch (cmbGraphic.SelectedIndex)
             {
@@ -2578,13 +2578,13 @@ namespace Client
                     }
             }
 
-            if (Event.TmpEvent.Pages[Event.CurPageNum].GraphicType == 1)
+            if (Event.Instance.Pages[Event.CurPageNum].GraphicType == 1)
             {
                 if (nudGraphic.Value <= 0 | nudGraphic.Value > GameState.NumCharacters)
                     return;
             }
 
-            else if (Event.TmpEvent.Pages[Event.CurPageNum].GraphicType == 2)
+            else if (Event.Instance.Pages[Event.CurPageNum].GraphicType == 2)
             {
                 if (nudGraphic.Value <= 0 | nudGraphic.Value > GameState.NumTileSets)
                     return;
@@ -2672,7 +2672,7 @@ namespace Client
             if (!_syncingGraphic)
             {
                 // Persist to page only when this is a user-driven change
-                Event.TmpEvent.Pages[Event.CurPageNum].Graphic = (int)Math.Round(nudGraphic.Value);
+                Event.Instance.Pages[Event.CurPageNum].Graphic = (int)Math.Round(nudGraphic.Value);
             }
             DrawGraphic();
             DrawGraphicSelectionPreview();
@@ -2698,7 +2698,7 @@ namespace Client
         {
             if (cmbMoveType.SelectedIndex == -1)
                 return;
-            Event.TmpEvent.Pages[Event.CurPageNum].MoveType = (byte)cmbMoveType.SelectedIndex;
+            Event.Instance.Pages[Event.CurPageNum].MoveType = (byte)cmbMoveType.SelectedIndex;
             SyncMoveRouteButton();
         }
 
@@ -2726,9 +2726,9 @@ namespace Client
         {
             try
             {
-                if (Event.TmpEvent.Pages == null || Event.CurPageNum < 0 || Event.CurPageNum >= Event.TmpEvent.Pages.Length)
+                if (Event.Instance.Pages == null || Event.CurPageNum < 0 || Event.CurPageNum >= Event.Instance.Pages.Length)
                     return;
-                var page = Event.TmpEvent.Pages[Event.CurPageNum];
+                var page = Event.Instance.Pages[Event.CurPageNum];
 
                 _syncingGraphic = true;
                 try
@@ -2775,19 +2775,19 @@ namespace Client
                 if (cmbMoveType.SelectedIndex != 2)
                 {
                     cmbMoveType.SelectedIndex = 2;
-                    try { Event.TmpEvent.Pages[Event.CurPageNum].MoveType = (byte)2; } catch { }
+                    try { Event.Instance.Pages[Event.CurPageNum].MoveType = (byte)2; } catch { }
                 }
             }
             catch { }
             // BringToFront removed for Eto
             lstMoveRoute.Items.Clear();
             Event.IsMoveRouteCommand = false;
-            chkIgnoreMove.Checked = Conversions.ToBoolean(Event.TmpEvent.Pages[Event.CurPageNum].IgnoreMoveRoute);
-            chkRepeatRoute.Checked = Conversions.ToBoolean(Event.TmpEvent.Pages[Event.CurPageNum].RepeatMoveRoute);
-            Event.TempMoveRouteCount = Event.TmpEvent.Pages[Event.CurPageNum].MoveRouteCount;
+            chkIgnoreMove.Checked = Conversions.ToBoolean(Event.Instance.Pages[Event.CurPageNum].IgnoreMoveRoute);
+            chkRepeatRoute.Checked = Conversions.ToBoolean(Event.Instance.Pages[Event.CurPageNum].RepeatMoveRoute);
+            Event.TempMoveRouteCount = Event.Instance.Pages[Event.CurPageNum].MoveRouteCount;
 
             // Will it let me do this?
-            Event.TempMoveRoute = Event.TmpEvent.Pages[Event.CurPageNum].MoveRoute;
+            Event.TempMoveRoute = Event.Instance.Pages[Event.CurPageNum].MoveRoute;
             for (int i = 0, loopTo = Event.TempMoveRouteCount; i < loopTo; i++)
             {
                 switch (Event.TempMoveRoute[i].Index)
@@ -3018,14 +3018,14 @@ namespace Client
         {
             if (cmbMoveSpeed.SelectedIndex == -1)
                 return;
-            Event.TmpEvent.Pages[Event.CurPageNum].MoveSpeed = (byte)cmbMoveSpeed.SelectedIndex;
+            Event.Instance.Pages[Event.CurPageNum].MoveSpeed = (byte)cmbMoveSpeed.SelectedIndex;
         }
 
         private void CmbMoveFreq_SelectedIndexChanged(object? sender, EventArgs e)
         {
             if (cmbMoveFreq.SelectedIndex == -1)
                 return;
-            Event.TmpEvent.Pages[Event.CurPageNum].MoveFreq = (byte)cmbMoveFreq.SelectedIndex;
+            Event.Instance.Pages[Event.CurPageNum].MoveFreq = (byte)cmbMoveFreq.SelectedIndex;
         }
 
         #endregion
@@ -3034,13 +3034,13 @@ namespace Client
 
         private void CmbPositioning_SelectedIndexChanged(object? sender, EventArgs e)
         {
-            if (Event.TmpEvent.Pages == null)
+            if (Event.Instance.Pages == null)
                 return;
 
             if (cmbPositioning.SelectedIndex == -1)
                 return;
 
-            Event.TmpEvent.Pages[Event.CurPageNum].Position = (byte)cmbPositioning.SelectedIndex;
+            Event.Instance.Pages[Event.CurPageNum].Position = (byte)cmbPositioning.SelectedIndex;
         }
 
         #endregion
@@ -3049,18 +3049,18 @@ namespace Client
 
         private void CmbTrigger_SelectedIndexChanged(object? sender, EventArgs e)
         {
-            if (Event.TmpEvent.Pages == null)
+            if (Event.Instance.Pages == null)
                 return;
 
             if (cmbTrigger.SelectedIndex == -1)
                 return;
-            Event.TmpEvent.Pages[Event.CurPageNum].Trigger = (byte)cmbTrigger.SelectedIndex;
+            Event.Instance.Pages[Event.CurPageNum].Trigger = (byte)cmbTrigger.SelectedIndex;
         }
 
         private void ChkGlobal_CheckedChanged(object? sender, EventArgs e)
         {
             if (IsSyncingPageUI) return; // ignore programmatic updates
-            if (Event.TmpEvent.PageCount > 0)
+            if (Event.Instance.PageCount > 0)
             {
                 if (MessageBox.Show("If you set the event to global you will lose all pages except for your first one. Do you want to continue?", "Confirmation", MessageBoxButtons.YesNo) == DialogResult.No)
                 {
@@ -3069,18 +3069,18 @@ namespace Client
             }
             if (chkGlobal.Checked == true)
             {
-                Event.TmpEvent.Globals = 1;
+                Event.Instance.Globals = 1;
             }
             else
             {
-                Event.TmpEvent.Globals = 0;
+                Event.Instance.Globals = 0;
             }
 
-            Event.TmpEvent.PageCount = 1;
+            Event.Instance.PageCount = 1;
             Event.CurPageNum = 0;
             tabPages.Pages.Clear();
 
-            for (int i = 0, loopTo = Event.TmpEvent.PageCount; i < loopTo; i++)
+            for (int i = 0, loopTo = Event.Instance.PageCount; i < loopTo; i++)
                 tabPages.Pages.Add(new TabPage { Text = (i + 1).ToString() });
             // Always select the first page when globalizing and load it
             tabPages.SelectedIndex = 0;
@@ -3098,11 +3098,11 @@ namespace Client
         {
             if (chkWalkAnim.Checked == true)
             {
-                Event.TmpEvent.Pages[Event.CurPageNum].IdleAnim = 1;
+                Event.Instance.Pages[Event.CurPageNum].IdleAnim = 1;
             }
             else
             {
-                Event.TmpEvent.Pages[Event.CurPageNum].IdleAnim = 0;
+                Event.Instance.Pages[Event.CurPageNum].IdleAnim = 0;
             }
 
         }
@@ -3111,11 +3111,11 @@ namespace Client
         {
             if (chkDirFix.Checked == true)
             {
-                Event.TmpEvent.Pages[Event.CurPageNum].DirFix = 1;
+                Event.Instance.Pages[Event.CurPageNum].DirFix = 1;
             }
             else
             {
-                Event.TmpEvent.Pages[Event.CurPageNum].DirFix = 0;
+                Event.Instance.Pages[Event.CurPageNum].DirFix = 0;
             }
 
         }
@@ -3124,11 +3124,11 @@ namespace Client
         {
             if (chkWalkThrough.Checked == true)
             {
-                Event.TmpEvent.Pages[Event.CurPageNum].WalkThrough = 1;
+                Event.Instance.Pages[Event.CurPageNum].WalkThrough = 1;
             }
             else
             {
-                Event.TmpEvent.Pages[Event.CurPageNum].WalkThrough = 0;
+                Event.Instance.Pages[Event.CurPageNum].WalkThrough = 0;
             }
 
         }
@@ -3137,11 +3137,11 @@ namespace Client
         {
             if (chkShowName.Checked == true)
             {
-                Event.TmpEvent.Pages[Event.CurPageNum].ShowName = 1;
+                Event.Instance.Pages[Event.CurPageNum].ShowName = 1;
             }
             else
             {
-                Event.TmpEvent.Pages[Event.CurPageNum].ShowName = 0;
+                Event.Instance.Pages[Event.CurPageNum].ShowName = 0;
             }
 
         }
@@ -3365,7 +3365,7 @@ namespace Client
 
         private void TxtRename_TextChanged(object? sender, EventArgs e)
         {
-            Event.TmpEvent.Name = Strings.Trim(txtName.Text);
+            Event.Instance.Name = Strings.Trim(txtName.Text);
         }
 
         private void LstVariables_DoubleClick(object? sender, MouseEventArgs e)
@@ -3854,11 +3854,11 @@ namespace Client
         {
             if (chkIgnoreMove.Checked == true)
             {
-                Event.TmpEvent.Pages[Event.CurPageNum].IgnoreMoveRoute = 1;
+                Event.Instance.Pages[Event.CurPageNum].IgnoreMoveRoute = 1;
             }
             else
             {
-                Event.TmpEvent.Pages[Event.CurPageNum].IgnoreMoveRoute = 0;
+                Event.Instance.Pages[Event.CurPageNum].IgnoreMoveRoute = 0;
             }
         }
 
@@ -3866,11 +3866,11 @@ namespace Client
         {
             if (chkRepeatRoute.Checked == true)
             {
-                Event.TmpEvent.Pages[Event.CurPageNum].RepeatMoveRoute = 1;
+                Event.Instance.Pages[Event.CurPageNum].RepeatMoveRoute = 1;
             }
             else
             {
-                Event.TmpEvent.Pages[Event.CurPageNum].RepeatMoveRoute = 0;
+                Event.Instance.Pages[Event.CurPageNum].RepeatMoveRoute = 0;
             }
         }
 
@@ -3892,8 +3892,8 @@ namespace Client
             }
             else
             {
-                Event.TmpEvent.Pages[Event.CurPageNum].MoveRouteCount = Event.TempMoveRouteCount;
-                Event.TmpEvent.Pages[Event.CurPageNum].MoveRoute = Event.TempMoveRoute!;
+                Event.Instance.Pages[Event.CurPageNum].MoveRouteCount = Event.TempMoveRouteCount;
+                Event.Instance.Pages[Event.CurPageNum].MoveRoute = Event.TempMoveRoute!;
                 Event.TempMoveRouteCount = 0;
                 Event.TempMoveRoute = new Type.MoveRoute[1];
                 HideAllFrames();

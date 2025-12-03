@@ -8,6 +8,8 @@ using Core.Globals;
 using Core.Net;
 using static Core.Globals.Command;
 using Type = Core.Globals.Type;
+using Microsoft.Xna.Framework;
+using Core.Configurations;
 
 namespace Client
 {
@@ -773,7 +775,7 @@ namespace Client
             }
         }
 
-        public static void ProcessMovement(int index)
+        public static void OnMove(int index)
         {
             // BUGFIX: Previously gated all players' pixel movement on the LOCAL player's IsMoving flag,
             // causing remote players to slide only while you moved (and freeze otherwise), producing
@@ -1057,11 +1059,83 @@ namespace Client
             return findSkill;
         }
 
-        #endregion
+        public static void OnDrawName(int index)
+        {
+            var color = default(Color);
+            var backColor = default(Color);
 
-        #region Outgoing Traffic
+            if (!GetPlayerPk(index))
+            {
+                switch (GetPlayerAccess(index))
+                {
+                    case (int)AccessLevel.Player: color = Color.White; backColor = Color.Black; break;
+                    case (int)AccessLevel.Moderator: color = Color.Cyan; backColor = Color.White; break;
+                    case (int)AccessLevel.Mapper: color = Color.Green; backColor = Color.Black; break;
+                    case (int)AccessLevel.Developer: color = Color.Blue; backColor = Color.Black; break;
+                    case (int)AccessLevel.Owner: color = Color.Yellow; backColor = Color.Black; break;
+                }
+            }
+            else
+            {
+                color = Color.Red;
+            }
 
-        #endregion
+            var remaining = (Data.Player[index].DeathTimer - General.GetTickCount()) / 1000;
+            if (remaining < 0) remaining = 0;
+            var name = remaining > 0 ? $"{remaining}..." : Data.Player[index].Name;
 
+            // X position: keep current label-style centering over the tile
+            var playerWorldX = GetPlayerRawX(index);
+            var playerWorldY = GetPlayerRawY(index);
+            var playerScreenX = GameLogic.ConvertMapX(playerWorldX);
+
+            var size = TextRenderer.Fonts[Font.Georgia].MeasureString(name);
+            var padding = (int)(size.X / 6);
+            var drawX = (int)(playerScreenX + (Constants.TileSize - size.X) / 2 + padding);
+
+            // Y position: mirror NPC/event logic using sprite graphics when available
+            int textY;
+            int spriteNum = Data.Player[index].Sprite;
+
+            if (spriteNum <= 0 || spriteNum > GameState.NumCharacters)
+            {
+                // No valid graphic: render at feet (just above base tile)
+                textY = GameLogic.ConvertMapY(playerWorldY) - 16;
+            }
+            else
+            {
+                var gfxInfo = GameClient.GetGfxInfo(Path.Combine(DataPath.Characters, spriteNum.ToString()));
+                if (gfxInfo == null || gfxInfo.Height <= 0)
+                {
+                    // Missing or invalid graphic: fallback to feet
+                    textY = GameLogic.ConvertMapY(playerWorldY) - 16;
+                }
+                else
+                {
+                    int configuredDirs = SettingsManager.Instance.SpriteDirections;
+                    if (configuredDirs <= 0) configuredDirs = 4;
+                    configuredDirs = Math.Max(1, configuredDirs);
+                    int directionRows = 1;
+                    if (gfxInfo.Height % configuredDirs == 0) directionRows = configuredDirs;
+                    else if (configuredDirs != 8 && gfxInfo.Height % 8 == 0) directionRows = 8;
+                    else if (configuredDirs != 4 && gfxInfo.Height % 4 == 0) directionRows = 4;
+
+                    int frameHeight = gfxInfo.Height / directionRows;
+                    if (frameHeight <= 0) frameHeight = 32;
+
+                    int spriteTopWorldY = playerWorldY;
+                    if (frameHeight > 32) spriteTopWorldY = playerWorldY - (frameHeight - 32);
+
+                    int spriteTopScreenY = GameLogic.ConvertMapY(spriteTopWorldY);
+                    int textPixelHeight = (int)Math.Ceiling(TextRenderer.Fonts[Font.Georgia].LineSpacing * TextRenderer.BaseScale);
+                    int margin = 8;
+                    textY = spriteTopScreenY - textPixelHeight + margin;
+                }
+            }
+
+            TextRenderer.OnRender(name, drawX, textY, color, backColor, Font.Georgia);
+        }
     }
+    
+    #endregion
 }

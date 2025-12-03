@@ -30,7 +30,7 @@ public static class WindowRenderer
             int maxStart = Math.Max(0, window.List.Count - visibleRows);
             int start = Math.Clamp(window.ScrollOffset, 0, maxStart);
 
-            // Use the same render scale as TextRenderer.RenderText
+            // Use the same render scale as TextRenderer.OnRender
             const float scale = 12f / 16f;
 
             for (var row = 0; row < visibleRows; row++)
@@ -47,7 +47,7 @@ public static class WindowRenderer
                 var lineWidth = TextRenderer.GetTextWidth(line, window.Font, scale);
                 var left = x + (window.Width - lineWidth) / 2;
 
-                TextRenderer.RenderText(line, left, y, Color.White, Color.Black, window.Font);
+                TextRenderer.OnRender(line, left, y, Color.White, Color.Black, window.Font);
 
                 y += 16;
             }
@@ -102,7 +102,7 @@ public static class WindowRenderer
             window.Width, window.Height,
             window.Width, window.Height);
 
-        TextRenderer.RenderText(window.Text, window.X + 32, window.Y + 4, Color.White, Color.Black, window.Font);
+        TextRenderer.OnRender(window.Text, window.X + 32, window.Y + 4, Color.White, Color.Black, window.Font);
     }
 
     private static void RenderWindowNoBar(Window window)
@@ -128,7 +128,7 @@ public static class WindowRenderer
             window.Width, window.Height,
             window.Width, window.Height);
 
-        TextRenderer.RenderText(window.Text, window.X + 32, window.Y + 4, Color.White, Color.Black, window.Font);
+        TextRenderer.OnRender(window.Text, window.X + 32, window.Y + 4, Color.White, Color.Black, window.Font);
     }
 
     private static void RenderWindowDescription(Window window)

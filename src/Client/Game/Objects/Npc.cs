@@ -135,14 +135,14 @@ namespace Client
         /// <summary>
         /// Processes one NPC by index (from a legacy double), moving by 1 pixel per tick.
         /// </summary>
-        public static void ProcessMovement(double mapNpcNum) => ProcessMovement((int)mapNpcNum, 1);
+        public static void OnMove(double mapNpcNum) => OnMove((int)mapNpcNum, 1);
 
         /// <summary>
         /// Processes one NPC by index, moving by a configurable number of pixels per tick.
         /// </summary>
         /// <param name="index">NPC array index (0..MaxMapNpcs-1).</param>
         /// <param name="pixelsPerTick">How many pixels to move this tick (>=1).</param>
-        public static void ProcessMovement(int index, int pixelsPerTick)
+        public static void OnMove(int index, int pixelsPerTick)
         {
             if (index < 0 || index >= Variables.MaxMapNpcs) return;
             if (Data.MyMapNpc == null) return;
@@ -210,10 +210,10 @@ namespace Client
         /// <param name="index">NPC index.</param>
         /// <param name="speedPxPerSecond">Speed in pixels per second.</param>
         /// <param name="deltaTimeSeconds">Elapsed seconds since last tick.</param>
-        public static void ProcessMovementDt(int index, float speedPxPerSecond, float deltaTimeSeconds)
+        public static void OnMoveDt(int index, float speedPxPerSecond, float deltaTimeSeconds)
         {
             var px = Math.Max(1, (int)MathF.Round(MathF.Abs(speedPxPerSecond) * MathF.Max(0.0f, deltaTimeSeconds)));
-            ProcessMovement(index, px);
+            OnMove(index, px);
         }
 
         /// <summary>
@@ -222,7 +222,7 @@ namespace Client
         public static void ProcessAll()
         {
             for (int i = 0; i < Variables.MaxMapNpcs; i++)
-                ProcessMovement(i, 1);
+                OnMove(i, 1);
         }
 
         /// <summary>
@@ -232,7 +232,7 @@ namespace Client
         {
             var step = Math.Max(1, pixelsPerTick);
             for (int i = 0; i < Variables.MaxMapNpcs; i++)
-                ProcessMovement(i, step);
+                OnMove(i, step);
         }
 
         /// <summary>
@@ -307,27 +307,33 @@ namespace Client
             if (remaining < 0) remaining = 0;
 
             var name = remaining > 0 ? $"{remaining}..." : Data.Npc[(int)npcNum].Name;
-            
+
             int baseWorldX = Data.MyMapNpc[mapNpcNum].X;
             int baseWorldY = Data.MyMapNpc[mapNpcNum].Y;
 
-            // X position: use same centering math as player names (sprite feet center)
-            int feetCenterX = GameLogic.ConvertMapX(baseWorldX) + Constants.TileSize / 2 - 4;
-            var textX = feetCenterX - (int)(TextRenderer.Fonts[Font.Georgia].MeasureString(name).X / 2f);
+            if (name == null) return;
+
+            // X position: match player name centering over the tile
+            var size = TextRenderer.Fonts[Font.Georgia].MeasureString(name);
+            int screenX = GameLogic.ConvertMapX(baseWorldX);
+            int drawX = (int)(screenX + (Constants.TileSize - size.X) / 2);
 
             int spriteNum = Data.Npc[(int)npcNum].Sprite;
             if (spriteNum <= 0 || spriteNum > GameState.NumCharacters)
             {
-                textY = GameLogic.ConvertMapY(baseWorldY) - 16;
-                TextRenderer.RenderText(name, textX, textY, color, backColor);
+                // No valid graphic: render just above feet similar to player fallback
+                int feetScreenY = GameLogic.ConvertMapY(baseWorldY);
+                textY = feetScreenY - 16;
+                TextRenderer.OnRender(name, drawX, textY, color, backColor);
                 return;
             }
 
             var gfxInfo = GameClient.GetGfxInfo(Path.Combine(DataPath.Characters, spriteNum.ToString()));
             if (gfxInfo == null || gfxInfo.Height <= 0)
             {
-                textY = GameLogic.ConvertMapY(baseWorldY) - 16;
-                TextRenderer.RenderText(name, textX, textY, color, backColor);
+                int feetScreenY = GameLogic.ConvertMapY(baseWorldY);
+                textY = feetScreenY - 16;
+                TextRenderer.OnRender(name, drawX, textY, color, backColor);
                 return;
             }
 
@@ -346,10 +352,12 @@ namespace Client
             if (frameHeight > 32) spriteTopWorldY = baseWorldY - (frameHeight - 32);
 
             int spriteTopScreenY = GameLogic.ConvertMapY(spriteTopWorldY);
+
+            // Y position: mirror player Y logic (label-style just above head)
             int textPixelHeight = (int)Math.Ceiling(TextRenderer.Fonts[Font.Georgia].LineSpacing * TextRenderer.BaseScale);
             int margin = 8;
             textY = spriteTopScreenY - textPixelHeight + margin;
-            TextRenderer.RenderText(name, textX, textY, color, backColor);
+            TextRenderer.OnRender(name, drawX, textY, color, backColor);
         }
     }
 }

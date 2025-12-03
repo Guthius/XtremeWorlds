@@ -405,7 +405,7 @@ public static class WinShop
             var amount = GetPlayerInvValue(GameState.MyIndex, i);
             var amountColor = TextRenderer.GetColorForAmount(amount);
 
-            TextRenderer.RenderText(GameLogic.ConvertCurrency(amount), x, y, amountColor, amountColor, winShop.Font);
+            TextRenderer.OnRender(GameLogic.ConvertCurrency(amount), x, y, amountColor, amountColor, winShop.Font);
         }
     }
 }

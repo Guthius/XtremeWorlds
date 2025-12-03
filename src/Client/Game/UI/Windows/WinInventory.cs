@@ -129,7 +129,7 @@ public static class WinInventory
                         var amount = GetPlayerInvValue(GameState.MyIndex, slot) - amountModifier;
                         var amountColor = TextRenderer.GetColorForAmount(amount);
 
-                        TextRenderer.RenderText(GameLogic.ConvertCurrency(amount), x, y, amountColor, amountColor, winInventory.Font);
+                        TextRenderer.OnRender(GameLogic.ConvertCurrency(amount), x, y, amountColor, amountColor, winInventory.Font);
                     }
                 }
             }

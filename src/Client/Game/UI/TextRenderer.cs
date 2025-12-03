@@ -246,7 +246,7 @@ public static class TextRenderer
     }
 
     // Bitmap render with subtle dual shadow (no glow)
-    public static void RenderText(string text, int x, int y, Color frontColor, Color backColor, Core.Globals.BitmapFont font, float textSize = 1.0f)
+    public static void OnRender(string text, int x, int y, Color frontColor, Color backColor, Core.Globals.BitmapFont font, float textSize = 1.0f)
     {
         if (string.IsNullOrEmpty(text) || GameClient.SpriteBatch == null) return;
         if (!TryGetBitmapFont(font, out var bf)) return;
@@ -302,14 +302,13 @@ public static class TextRenderer
         }
     }
 
-    // SpriteFont render (clean style)
-    public static void RenderText(string text, int x, int y, Color frontColor, Color backColor, Font font = Font.Georgia, float textSize = 1.0f)
+    public static void OnRender(string text, int x, int y, Color frontColor, Color backColor, Font font = Font.Georgia, float textSize = 1.0f)
     {
         if (SettingsManager.Instance.BitmapFont)
         {
             if (Enum.TryParse<Core.Globals.BitmapFont>(font.ToString(), out var bfEnum) && HasBitmapFont(bfEnum))
             {
-                RenderText(text, x, y, frontColor, backColor, bfEnum, textSize);
+                OnRender(text, x, y, frontColor, backColor, bfEnum, textSize);
                 return;
             }
         }
@@ -422,94 +421,21 @@ public static class TextRenderer
                 tA = GameState.EditorAttribute == 1 ? (int)instance.Type : (int)instance.Type2;
                 switch (tA)
                 {
-                    case (int)TileType.Blocked: RenderText("B", tX, tY, Color.Red, Color.Black); break;
-                    case (int)TileType.Warp: RenderText("W", tX, tY, Color.Blue, Color.Black); break;
-                    case (int)TileType.Item: RenderText("I", tX, tY, Color.White, Color.Black); break;
-                    case (int)TileType.NpcAvoid: RenderText("N", tX, tY, Color.White, Color.Black); break;
-                    case (int)TileType.Resource: RenderText("R", tX, tY, Color.Green, Color.Black); break;
-                    case (int)TileType.NpcSpawn: RenderText("S", tX, tY, Color.Yellow, Color.Black); break;
-                    case (int)TileType.Shop: RenderText("S", tX, tY, Color.Blue, Color.Black); break;
-                    case (int)TileType.Bank: RenderText("B", tX, tY, Color.Blue, Color.Black); break;
-                    case (int)TileType.Heal: RenderText("H", tX, tY, Color.Green, Color.Black); break;
-                    case (int)TileType.Trap: RenderText("T", tX, tY, Color.Red, Color.Black); break;
-                    case (int)TileType.Animation: RenderText("A", tX, tY, Color.Red, Color.Black); break;
-                    case (int)TileType.NoCrossing: RenderText("X", tX, tY, Color.Red, Color.Black); break;
+                    case (int)TileType.Blocked: OnRender("B", tX, tY, Color.Red, Color.Black); break;
+                    case (int)TileType.Warp: OnRender("W", tX, tY, Color.Blue, Color.Black); break;
+                    case (int)TileType.Item: OnRender("I", tX, tY, Color.White, Color.Black); break;
+                    case (int)TileType.NpcAvoid: OnRender("N", tX, tY, Color.White, Color.Black); break;
+                    case (int)TileType.Resource: OnRender("R", tX, tY, Color.Green, Color.Black); break;
+                    case (int)TileType.NpcSpawn: OnRender("S", tX, tY, Color.Yellow, Color.Black); break;
+                    case (int)TileType.Shop: OnRender("S", tX, tY, Color.Blue, Color.Black); break;
+                    case (int)TileType.Bank: OnRender("B", tX, tY, Color.Blue, Color.Black); break;
+                    case (int)TileType.Heal: OnRender("H", tX, tY, Color.Green, Color.Black); break;
+                    case (int)TileType.Trap: OnRender("T", tX, tY, Color.Red, Color.Black); break;
+                    case (int)TileType.Animation: OnRender("A", tX, tY, Color.Red, Color.Black); break;
+                    case (int)TileType.NoCrossing: OnRender("X", tX, tY, Color.Red, Color.Black); break;
                 }
             }
         }
-    }
-
-    public static void DrawEventName(int index)
-    {
-        if (Data.MapEvents == null) return;
-        if (index < 0 || index >= Data.MapEvents.Length) return;
-
-        var textY = 0;
-        var color = Color.Green;
-        var backcolor = Color.Black;
-        var name = Data.MapEvents[index].Name;
-
-        // X position: use same centering math as player names (sprite feet center)
-        int baseWorldX = Data.MapEvents[index].X;
-        int feetCenterX = GameLogic.ConvertMapX(baseWorldX) + Constants.TileSize / 2 - 4;
-        var textX = feetCenterX - (int)(Fonts[Font.Georgia].MeasureString(name).X / 2f);
-
-        if (Data.MapEvents[index].GraphicType == 1)
-        {
-            int spriteNum = Data.MapEvents[index].Graphic;
-            if (spriteNum <= 0 || spriteNum > GameState.NumCharacters)
-            {
-                textY = GameLogic.ConvertMapY(Data.MapEvents[index].Y) - 16;
-            }
-            else
-            {
-                var gfxInfo = GameClient.GetGfxInfo(Path.Combine(DataPath.Characters, spriteNum.ToString()));
-                if (gfxInfo == null || gfxInfo.Height <= 0)
-                {
-                    textY = GameLogic.ConvertMapY(Data.MapEvents[index].Y) - 16;
-                }
-                else
-                {
-                    int configuredDirs = SettingsManager.Instance.SpriteDirections;
-                    if (configuredDirs <= 0) configuredDirs = 4;
-                    configuredDirs = Math.Max(1, configuredDirs);
-                    int directionRows = 1;
-                    if (gfxInfo.Height % configuredDirs == 0) directionRows = configuredDirs;
-                    else if (configuredDirs != 8 && gfxInfo.Height % 8 == 0) directionRows = 8;
-                    else if (configuredDirs != 4 && gfxInfo.Height % 4 == 0) directionRows = 4;
-
-                    int frameHeight = gfxInfo.Height / directionRows;
-                    if (frameHeight <= 0) frameHeight = 32;
-
-                    int baseWorldY = Data.MapEvents[index].Y;
-                    int spriteTopWorldY = baseWorldY;
-                    if (frameHeight > 32) spriteTopWorldY = baseWorldY - (frameHeight - 32);
-
-                    int spriteTopScreenY = GameLogic.ConvertMapY(spriteTopWorldY);
-                    int textPixelHeight = (int)Math.Ceiling(Fonts[Font.Georgia].LineSpacing * BaseScale);
-                    int margin = 8;
-                    textY = spriteTopScreenY - textPixelHeight + margin;
-                }
-            }
-        }
-        else if (Data.MapEvents[index].GraphicType == 2)
-        {
-            if (Data.MapEvents[index].GraphicY2 > 0)
-            {
-                textX = textX + Data.MapEvents[index].GraphicY2 * Constants.TileSize / 2 - 6;
-                textY = GameLogic.ConvertMapY(Data.MapEvents[index].Y) - Data.MapEvents[index].GraphicY2 * Constants.TileSize + 16;
-            }
-            else
-            {
-                textY = GameLogic.ConvertMapY(Data.MapEvents[index].Y) - 32 + 16;
-            }
-        }
-        else
-        {
-            textY = GameLogic.ConvertMapY(Data.MapEvents[index].Y) - 16;
-        }
-
-        RenderText(name, textX, textY, color, backcolor);
     }
 
     public static void DrawActionMsg(int index)
@@ -570,7 +496,7 @@ public static class TextRenderer
 
         if (General.GetTickCount() < Data.ActionMsg[index].Created + time)
         {
-            RenderText(Data.ActionMsg[index].Message, x, y, GameClient.QbColorToXnaColor(Data.ActionMsg[index].Color), Color.Black);
+            OnRender(Data.ActionMsg[index].Message, x, y, GameClient.QbColorToXnaColor(Data.ActionMsg[index].Color), Color.Black);
         }
         else
         {
@@ -612,7 +538,7 @@ public static class TextRenderer
                     yOffset -= 10 * wrappedLines.Length;
                     for (var j = 0; j < wrappedLines.Length; j++)
                     {
-                        RenderText(wrappedLines[j], (int)xO, (int)(yO + yOffset + 10 * j), color2, color2);
+                        OnRender(wrappedLines[j], (int)xO, (int)(yO + yOffset + 10 * j), color2, color2);
                     }
                     rLines += wrappedLines.Length;
                     for (var x = 0; x < wrappedLines.Length; x++)
@@ -621,7 +547,7 @@ public static class TextRenderer
                 else
                 {
                     yOffset -= 12L;
-                    RenderText(Data.Chat[(int)i].Text, (int)xO, (int)(yO + yOffset), color2, color2);
+                    OnRender(Data.Chat[(int)i].Text, (int)xO, (int)(yO + yOffset), color2, color2);
                     rLines++;
                     if (GetTextWidth(Data.Chat[(int)i].Text) > topWidth)
                         topWidth = GetTextWidth(Data.Chat[(int)i].Text);
@@ -637,83 +563,6 @@ public static class TextRenderer
 
     public static void DrawMapName()
     {
-        RenderText(Data.MyMap.Name, (int)Math.Round(GameState.ResolutionWidth / 2d - GetTextWidth(Data.MyMap.Name)), 10, GameState.DrawMapNameColor, Color.Black);
-    }
-
-    public static void DrawPlayerName(int index)
-    {
-        var color = default(Color);
-        var backColor = default(Color);
-
-        if (!GetPlayerPk(index))
-        {
-            switch (GetPlayerAccess(index))
-            {
-                case (int)AccessLevel.Player: color = Color.White; backColor = Color.Black; break;
-                case (int)AccessLevel.Moderator: color = Color.Cyan; backColor = Color.White; break;
-                case (int)AccessLevel.Mapper: color = Color.Green; backColor = Color.Black; break;
-                case (int)AccessLevel.Developer: color = Color.Blue; backColor = Color.Black; break;
-                case (int)AccessLevel.Owner: color = Color.Yellow; backColor = Color.Black; break;
-            }
-        }
-        else
-        {
-            color = Color.Red;
-        }
-
-        var remaining = (Data.Player[index].DeathTimer - General.GetTickCount()) / 1000;
-        if (remaining < 0) remaining = 0;
-        var name = remaining > 0 ? $"{remaining}..." : Data.Player[index].Name;
-
-        // X position: keep current label-style centering over the tile
-        var playerWorldX = GetPlayerRawX(index);
-        var playerWorldY = GetPlayerRawY(index);
-        var playerScreenX = GameLogic.ConvertMapX(playerWorldX);
-
-        var size = Fonts[Font.Georgia].MeasureString(name);
-        var padding = (int)(size.X / 6);
-        var drawX = (int)(playerScreenX + (Constants.TileSize - size.X) / 2 + padding);
-
-        // Y position: mirror NPC/event logic using sprite graphics when available
-        int textY;
-        int spriteNum = Data.Player[index].Sprite;
-
-        if (spriteNum <= 0 || spriteNum > GameState.NumCharacters)
-        {
-            // No valid graphic: render at feet (just above base tile)
-            textY = GameLogic.ConvertMapY(playerWorldY) - 16;
-        }
-        else
-        {
-            var gfxInfo = GameClient.GetGfxInfo(Path.Combine(DataPath.Characters, spriteNum.ToString()));
-            if (gfxInfo == null || gfxInfo.Height <= 0)
-            {
-                // Missing or invalid graphic: fallback to feet
-                textY = GameLogic.ConvertMapY(playerWorldY) - 16;
-            }
-            else
-            {
-                int configuredDirs = SettingsManager.Instance.SpriteDirections;
-                if (configuredDirs <= 0) configuredDirs = 4;
-                configuredDirs = Math.Max(1, configuredDirs);
-                int directionRows = 1;
-                if (gfxInfo.Height % configuredDirs == 0) directionRows = configuredDirs;
-                else if (configuredDirs != 8 && gfxInfo.Height % 8 == 0) directionRows = 8;
-                else if (configuredDirs != 4 && gfxInfo.Height % 4 == 0) directionRows = 4;
-
-                int frameHeight = gfxInfo.Height / directionRows;
-                if (frameHeight <= 0) frameHeight = 32;
-
-                int spriteTopWorldY = playerWorldY;
-                if (frameHeight > 32) spriteTopWorldY = playerWorldY - (frameHeight - 32);
-
-                int spriteTopScreenY = GameLogic.ConvertMapY(spriteTopWorldY);
-                int textPixelHeight = (int)Math.Ceiling(Fonts[Font.Georgia].LineSpacing * BaseScale);
-                int margin = 8;
-                textY = spriteTopScreenY - textPixelHeight + margin;
-            }
-        }
-
-        RenderText(name, drawX, textY, color, backColor, Font.Georgia);
+        OnRender(Data.MyMap.Name, (int)Math.Round(GameState.ResolutionWidth / 2d - GetTextWidth(Data.MyMap.Name)), 10, GameState.DrawMapNameColor, Color.Black);
     }
 }

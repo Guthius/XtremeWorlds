@@ -422,7 +422,7 @@ namespace Server
             });
         }
 
-        public static void ProcessMovement()
+        public static void OnMove()
         {
             // Iterate through all maps.
             for (int i = 0; i < Core.Globals.Variables.MaxMaps; i++)
@@ -2240,7 +2240,7 @@ namespace Server
             // These functions have been optimized to reduce redundant calls and improve clarity.
             RemoveDeadEvents();
             SpawnNewEvents();
-            ProcessMovement();
+            OnMove();
             ProcessLocalMovement();
             ProcessEventCommands();
         }
