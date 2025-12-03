@@ -123,6 +123,7 @@ public static class NetworkSend
         // Send authoritative variables from script getters so client can size arrays correctly
         var w = new PacketWriter();
         w.WriteEnum(ServerPackets.SVariables);
+
         w.WriteInt32(Variables.MaxAnimations);
         w.WriteInt32(Variables.MaxItems);
         w.WriteInt32(Variables.MaxMaps);
@@ -152,6 +153,7 @@ public static class NetworkSend
         w.WriteByte(Variables.NameLength);
         w.WriteByte(Variables.MinNameLength);
         w.WriteByte(Variables.ChatLength);
+        w.WriteByte(Variables.MaxHotbar);
         w.WriteByte(Variables.MaxMapX);
         w.WriteByte(Variables.MaxMapY);
         w.WriteByte(Variables.MaxDropItems);
