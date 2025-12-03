@@ -322,8 +322,8 @@ namespace Client
             if (spriteNum <= 0 || spriteNum > GameState.NumCharacters)
             {
                 // No valid graphic: render just above feet similar to player fallback
-                int feetScreenY = GameLogic.ConvertMapY(baseWorldY);
-                textY = feetScreenY - 16;
+                int screenY = GameLogic.ConvertMapY(baseWorldY);
+                textY = screenY - 16;
                 TextRenderer.OnRender(name, drawX, textY, color, backColor);
                 return;
             }
@@ -331,8 +331,8 @@ namespace Client
             var gfxInfo = GameClient.GetGfxInfo(System.IO.Path.Combine(Core.Globals.DataPath.Characters, spriteNum.ToString()));
             if (gfxInfo == null || gfxInfo.Height <= 0)
             {
-                int feetScreenY = GameLogic.ConvertMapY(baseWorldY);
-                textY = feetScreenY - 16;
+                int screenY = GameLogic.ConvertMapY(baseWorldY);
+                textY = screenY - 16;
                 TextRenderer.OnRender(name, drawX, textY, color, backColor);
                 return;
             }
