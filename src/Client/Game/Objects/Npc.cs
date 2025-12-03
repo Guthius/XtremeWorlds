@@ -266,10 +266,10 @@ namespace Client
             Data.Npc[index].Name = "";
             Data.Npc[index] = default;
             Data.Npc[index].Stat = new byte[statCount];
-            Data.Npc[index].DropChance = new int[6];
-            Data.Npc[index].DropItem = new int[6];
-            Data.Npc[index].DropItemValue = new int[6];
-            Data.Npc[index].Skill = new byte[7];
+            Data.Npc[index].DropChance = new int[Core.Globals.Variables.MaxDropItems];
+            Data.Npc[index].DropItem = new int[Core.Globals.Variables.MaxDropItems];
+            Data.Npc[index].DropItemValue = new int[Core.Globals.Variables.MaxDropItems];
+            Data.Npc[index].Skill = new byte[Core.Globals.Variables.MaxNpcSkills];
             GameState.NpcLoaded[index] = 0;
         }
 
