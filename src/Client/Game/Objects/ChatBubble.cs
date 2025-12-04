@@ -125,7 +125,7 @@ public class ChatBubble
         GameClient.RenderTexture(ref argPath1, (int) (x2 + maxWidth), (int) (y2 - 5L), 119, 0, 9, 5, 9, 5);
 
         // top
-        string argPath2 = Path.Combine(Core.Globals.DataPath.Gui, 33.ToString());
+        string argPath2 = System.IO.Path.Combine(Core.Globals.DataPath.Gui, 33.ToString());
         GameClient.RenderTexture(ref argPath2, (int) x2, (int) (y2 - 5L), 9, 0, (int) maxWidth, 5, 5, 5);
 
         // bottom left

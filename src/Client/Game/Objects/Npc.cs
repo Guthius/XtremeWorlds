@@ -420,7 +420,7 @@ namespace Client
             }
 
             // Segmentation logic
-            var gfxInfo = GameClient.GetGfxInfo(Path.Combine(DataPath.Characters, sprite.ToString()));
+            var gfxInfo = GameClient.GetGfxInfo(System.IO.Path.Combine(Core.Globals.DataPath.Characters, sprite.ToString()));
             if (gfxInfo == null) return;
             int directionRows = GameClient.ComputeDirectionRows(gfxInfo.Height, Math.Max(1, SettingsManager.Instance.SpriteDirections));
 

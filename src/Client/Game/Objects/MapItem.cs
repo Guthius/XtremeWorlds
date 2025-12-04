@@ -42,7 +42,7 @@ namespace Client
             x = GameLogic.ConvertMapX(Data.MyMapItem[itemNum].X);
             y = GameLogic.ConvertMapY(Data.MyMapItem[itemNum].Y);
 
-            string argPath = Path.Combine(DataPath.Items, picNum.ToString());
+            string argPath = System.IO.Path.Combine(Core.Globals.DataPath.Items, picNum.ToString());
             GameClient.RenderTexture(ref argPath, x, y, srcRec.X, srcRec.Y, srcRec.Width, srcRec.Height, srcRec.Width,
                 srcRec.Height);
         }
