@@ -9,12 +9,13 @@ using Type = Core.Globals.Type;
 namespace Client
 {
 
-    public class Bank
+    public class Bank : IContent
     {
-
+        public Data Data { get; set; } = Data.Bank;
+        
         #region Database
 
-        public static void OnClearAll()
+        public void OnReset()
         {
             int i;
             int x;

@@ -7,11 +7,11 @@ using Type = Core.Globals.Type;
 namespace Client
 {
 
-    public class Item
+    public class Item : IContent
     {
-
-        #region Database
-        public static void OnClear(int index)
+        public Data Data { get; set; } = Data.Item;
+        
+        public void OnClear(int index)
         {   
             Data.Item[index] = default;
 
@@ -25,7 +25,7 @@ namespace Client
             GameState.ItemLoaded[index] = 0;
         }
 
-        public static void OnClearAll()
+        public static void OnReset()
         {
             int i;
 
@@ -36,20 +36,18 @@ namespace Client
 
         }
 
-        public static void OnClearChanged()
+        public void OnClearChanged()
         {
             GameState.ItemChanged = new bool[Variables.MaxItems];
         }
 
-        public static void OnStream(int itemNum)
+        public void OnStream(int index)
         {
-            if (itemNum >= 0 && string.IsNullOrEmpty(Data.Item[itemNum].Name) && GameState.ItemLoaded[itemNum] == 0)
+            if (index >= 0 && string.IsNullOrEmpty(Data.Item[index].Name) && GameState.ItemLoaded[index] == 0)
             {
-                GameState.ItemLoaded[itemNum] = 1;
-                Sender.SendRequestItem(itemNum);
+                GameState.ItemLoaded[index] = 1;
+                Sender.SendRequestItem(index);
             }
         }
-
-        #endregion
     }
 }

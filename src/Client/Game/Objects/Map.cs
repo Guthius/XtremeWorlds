@@ -388,49 +388,49 @@ namespace Client
             GameClient.RenderTexture(ref argPath, posX, posY, 0, 0, GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Pictures, index.ToString())).Width, GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Pictures, index.ToString())).Height, GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Pictures, index.ToString())).Width, GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Pictures, index.ToString())).Height);
         }
 
-        public static void OnClear()
+        public void OnClear(int index)
         {
             // Reset basic map properties
-            Data.MyMap.Name = string.Empty;
-            Data.MyMap.Tileset = 1;
-            Data.MyMap.MaxX = Variables.MaxMapX;
-            Data.MyMap.MaxY = Variables.MaxMapY;
-            Data.MyMap.BootMap = 0;
-            Data.MyMap.BootX = 0;
-            Data.MyMap.BootY = 0;
-            Data.MyMap.Down = 0;
-            Data.MyMap.Left = 0;
-            Data.MyMap.Moral = 0;
-            Data.MyMap.Music = string.Empty;
-            Data.MyMap.Revision = 0;
-            Data.MyMap.Right = 0;
-            Data.MyMap.Up = 0;
+            Data[index].MyMap.Name = string.Empty;
+            Data[index].MyMap.Tileset = 1;
+            Data[index].MyMap.MaxX = Variables.MaxMapX;
+            Data[index].MyMap.MaxY = Variables.MaxMapY;
+            Data[index].MyMap.BootMap = 0;
+            Data[index].MyMap.BootX = 0;
+            Data[index].MyMap.BootY = 0;
+            Data[index].MyMap.Down = 0;
+            Data[index].MyMap.Left = 0;
+            Data[index].MyMap.Moral = 0;
+            Data[index].MyMap.Music = string.Empty;
+            Data[index].MyMap.Revision = 0;
+            Data[index].MyMap.Right = 0;
+            Data[index].MyMap.Up = 0;
 
             // Initialize Npc and Tile arrays
-            Data.MyMap.Npc = new int[Variables.MaxMapNpcs];
+            Data[index].MyMap.Npc = new int[Variables.MaxMapNpcs];
 
             for (int i = 0; i < Variables.MaxMapNpcs; i++)
             {
-                Data.MyMap.Npc[i] = -1;
+                Data[index].MyMap.Npc[i] = -1;
             }
 
-            Data.MyMap.Tile = new Type.Tile[Data.MyMap.MaxX, Data.MyMap.MaxY];
-            Data.TileHistory = new Type.TileHistory[GameState.MaxTileHistory]; // Fixed type name
+            Data[index].MyMap.Tile = new Type.Tile[Data[index].MyMap.MaxX, Data[index].MyMap.MaxY];
+            Data[index].TileHistory = new Type.TileHistory[GameState.MaxTileHistory]; // Fixed type name
 
             // Reset tile history indices
             GameState.TileHistoryIndex = 0;
 
             for (int i = 0; i < GameState.MaxTileHistory; i++)
             {
-                Data.TileHistory[i].Tile = new Type.Tile[Data.MyMap.MaxX, Data.MyMap.MaxY];
+                Data.TileHistory[i].Tile = new Type.Tile[Data[index].MyMap.MaxX, Data[index].MyMap.MaxY];
             }
       
             // Clear map events
-            Data.MapEvents = new Type.MapEvent[Data.MyMap.EventCount];
+            Data[index].MapEvents = new Type.MapEvent[Data[index].MyMap.EventCount];
 
-            for (int i = 0, loopTo = Data.MyMap.EventCount; i < loopTo; i++)
+            for (int i = 0, loopTo = Data[index].MyMap.EventCount; i < loopTo; i++)
             {
-                Data.MapEvents = default;
+                Data[index].MapEvents = default;
             }
 
             GameState.CurrentEvents = 0;

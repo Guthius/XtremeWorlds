@@ -8,7 +8,7 @@ namespace Client
 
     public class Autotile
     {
-        public static void OnClear()
+        public void OnClear(int index)
         {
             int x;
             int y;

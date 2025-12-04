@@ -7,10 +7,11 @@ using System.Text;
 
 namespace Client
 {
-    public class Skill
+    public class Skill : Content
     {
+        public Data Data { get; set; } = Data.Skill;
 
-        public static void OnClearAll()
+        public void OnReset()
         {
             int i;
 
@@ -19,7 +20,7 @@ namespace Client
 
         }
 
-        public static void OnClear(int index)
+        public void OnClear(int index)
         {
             Data.Skill[index] = default;
             Data.Skill[index].Name = "";
@@ -28,12 +29,12 @@ namespace Client
             GameState.SkillLoaded[index] = 0;
         }
 
-        public static void OnStream(int skillNum)
+        public void OnStream(int index)
         {
-            if (skillNum >= 0 && string.IsNullOrEmpty(Data.Skill[skillNum].Name) && GameState.SkillLoaded[skillNum] == 0)
+            if (index >= 0 && string.IsNullOrEmpty(Data.Skill[index].Name) && GameState.SkillLoaded[index] == 0)
             {
-                GameState.SkillLoaded[skillNum] = 1;
-                Sender.SendRequestSkill(skillNum);
+                GameState.SkillLoaded[index] = 1;
+                Sender.SendRequestSkill(index);
             }
         }
     }

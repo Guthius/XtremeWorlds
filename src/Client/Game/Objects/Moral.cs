@@ -6,11 +6,13 @@ using Type = Core.Globals.Type;
 namespace Client
 {
 
-    public class Moral
+    public class Moral : IContent
     {
+        public Data Data { get; set; } = Data.Moral;
+
         #region Database
 
-        public static void OnClear(int index)
+        public void OnClear(int index)
         {
             Data.Moral[index] = default;
 
@@ -18,7 +20,7 @@ namespace Client
             GameState.MoralLoaded[index] = 0;
         }
 
-        public static void OnClearAll()
+        public void OnReset()
         {
             int i;
 
@@ -28,7 +30,7 @@ namespace Client
                 OnClear(i);
         }
 
-        public static void OnStream(int moralNum)
+        public void OnStream(int moralNum)
         {
             if (moralNum >= 0 & string.IsNullOrEmpty(Data.Moral[moralNum].Name) && GameState.MoralLoaded[moralNum] == 0)
             {

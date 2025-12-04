@@ -213,7 +213,7 @@ public static class WinShopEditor
         OnLoad(SelectedIndex);
     }
 
-    public static void OnClear()
+    public void OnClear(int index)
     {
         Shop.OnClear(SelectedIndex);
         GameState.ShopChanged[SelectedIndex] = true;

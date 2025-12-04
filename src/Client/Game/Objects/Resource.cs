@@ -8,19 +8,19 @@ using Core.Net;
 namespace Client
 {
 
-    public class MapResource
+    public class MapResource : IContent
     {
 
         #region Database
 
-        public static void OnClear(int index)
+        public void OnClear(int index)
         {
             Data.Resource[index] = default;
             Data.Resource[index].Name = "";
             GameState.ResourceLoaded[index] = 0;
         }
 
-        public static void OnClearAll()
+        public void OnReset()
         {
             Array.Resize(ref Data.Resource, Variables.MaxResources);
 
@@ -29,12 +29,12 @@ namespace Client
 
         }
 
-        public static void OnStream(int resourceNum)
+        public void OnStream(int index)
         {
-            if (resourceNum >= 0 && string.IsNullOrEmpty(Data.Resource[resourceNum].Name) && GameState.ResourceLoaded[resourceNum] == 0)
+            if (index >= 0 && string.IsNullOrEmpty(Data.Resource[index].Name) && GameState.ResourceLoaded[index] == 0)
             {
-                GameState.ResourceLoaded[resourceNum] = 1;
-                Sender.SendRequestResource(resourceNum);
+                GameState.ResourceLoaded[index] = 1;
+                Sender.SendRequestResource(index);
             }
         }
 
@@ -42,7 +42,7 @@ namespace Client
 
         #region Drawing
 
-        public static void OnDraw(int resource, int dx, int dy, System.Drawing.Rectangle rec)
+        public void OnDraw(int resource, int dx, int dy, System.Drawing.Rectangle rec)
         {
             int x;
             int y;

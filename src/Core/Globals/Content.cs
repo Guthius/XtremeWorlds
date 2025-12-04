@@ -2,8 +2,7 @@ namespace Core.Globals
 {
     public interface IContent
     {
-        // Backing data from your Data.* arrays
-        struct Data { get; set; }
+        public Data Data { get; set; }
 
         // Move logic
         void OnMove(int index);
