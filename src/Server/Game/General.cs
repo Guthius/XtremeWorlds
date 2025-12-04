@@ -1040,7 +1040,7 @@ namespace Server
         public static async System.Threading.Tasks.Task LogErrorAsync(Exception ex, string context = "")
         {
             string errorInfo = $"{ex.Message}\nStackTrace: {ex.StackTrace}";
-            string logPath = System.IO.Path.Combine(DataPath.Logs, "Errors.log");
+            string logPath = System.IO.Path.Combine(DataPath.Logs, "errors.log");
             Directory.CreateDirectory(DataPath.Logs);
 
             await File.AppendAllTextAsync(logPath,
