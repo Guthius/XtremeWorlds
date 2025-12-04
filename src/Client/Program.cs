@@ -2130,36 +2130,6 @@ namespace Client
             RenderTexture(ref argPath, x, y, sRect.X, sRect.Y, sRect.Width, sRect.Height, sRect.Width, sRect.Height);
         }
 
-        public static void DrawBlood(int index)
-        {
-            Rectangle srcRec;
-            Rectangle destRec;
-            int x;
-            int y;
-
-            {
-                ref var instance = ref Data.Blood[index];
-                if (instance.X < GameState.TileView.Left | instance.X > GameState.TileView.Right)
-                    return;
-                if (instance.Y < GameState.TileView.Top | instance.Y > GameState.TileView.Bottom)
-                    return;
-
-                // check if we should be seeing it
-                if (instance.Timer + 20000 < General.GetTickCount())
-                    return;
-
-                x = GameLogic.ConvertMapX(Data.Blood[index].X);
-                y = GameLogic.ConvertMapY(Data.Blood[index].Y);
-
-                srcRec = new Rectangle((instance.Sprite - 1) * Constants.TileSize, 0, Constants.TileSize, Constants.TileSize);
-                destRec = new Rectangle(GameLogic.ConvertMapX(instance.X),
-                    GameLogic.ConvertMapY(instance.Y), Constants.TileSize, Constants.TileSize);
-
-                string argPath = Path.Combine(DataPath.Misc, "Blood");
-                RenderTexture(ref argPath, x, y, srcRec.X, srcRec.Y, srcRec.Width, srcRec.Height);
-            }
-        }
-
         public static void DrawBars()
         {
             long left;
@@ -3194,8 +3164,8 @@ namespace Client
             }
 
             // blood
-            for (i = 0; i < byte.MaxValue; i++)
-                DrawBlood(i);
+            for (i = 0; i < Data.Blood.Length; i++)
+                Blood.OnDraw(i);
 
             // Draw out the items
             if (GameState.NumItems > 0)
@@ -3209,12 +3179,9 @@ namespace Client
             // draw animations
             if (GameState.NumAnimations > 0)
             {
-                for (i = 0; i < byte.MaxValue; i++)
+                for (i = 0; i < MapAnimation.Instance?.Length; i++)
                 {
-                    if (MapAnimation.Instance == null)
-                        break;
-
-                    if (MapAnimation.Instance?[i].Used[0] == true)
+                    if (MapAnimation.Instance[i].Used?[0] == true)
                     {
                         MapAnimation.OnDraw(i, 0);
                     }         
@@ -3345,9 +3312,9 @@ namespace Client
             // animations
             if (GameState.NumAnimations > 0)
             {
-                for (i = 0; i < byte.MaxValue; i++)
+                for (i = 0; i < MapAnimation.Instance?.Length; i++)
                 {
-                    if (MapAnimation.Instance?[i].Used[1] == true)
+                    if (MapAnimation.Instance[i].Used?[1] == true)
                         {
                             MapAnimation.OnDraw(i, 1);
                         }
