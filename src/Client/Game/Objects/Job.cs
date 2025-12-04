@@ -1,13 +1,14 @@
 ﻿using Core.Globals;
+using Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Client
 {
-    public class Job
+    public class Job : IData
     {
-        public static void OnClearAll()
+        public static void OnReset()
         {
             for (int i = 0; i < Variables.MaxJobs; i++)
                 OnClear(i);
@@ -34,6 +35,21 @@ namespace Client
             {
                 Data.Job[index].StartSkill[i] = -1;
             }
+        }
+
+        public static void OnDraw(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnStream(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnLoad(int index)
+        {
+            throw new NotImplementedException();
         }
     }
 }

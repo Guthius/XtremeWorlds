@@ -1,6 +1,7 @@
 ﻿using Client.Net;
 using Core;
 using Core.Globals;
+using Core.Interfaces;
 using Core.Net;
 using static Core.Globals.Command;
 using Point = Microsoft.Xna.Framework.Point;
@@ -9,9 +10,8 @@ using Type = Core.Globals.Type;
 
 namespace Client
 {
-    public class Animation
+    public class Animation : IData
     {
-
         #region Database
 
         public static void OnClear(int index)
@@ -42,7 +42,17 @@ namespace Client
             GameState.AnimationLoaded[index] = 0;
         }
 
-        public static void OnClearAll()
+        public static void OnDraw(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnLoad(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnReset()
         {
             int i;
 

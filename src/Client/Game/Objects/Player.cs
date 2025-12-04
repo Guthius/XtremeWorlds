@@ -10,14 +10,15 @@ using static Core.Globals.Command;
 using Type = Core.Globals.Type;
 using Microsoft.Xna.Framework;
 using Core.Configurations;
+using Core.Interfaces;
 
 namespace Client
 {
-    public class Player
+    public class Player : IData
     {
         #region Database
 
-        public static void ClearPlayers()
+        public static void OnReset()
         {
             Data.Account = new Type.Account[Variables.MaxPlayers];
             Data.Player = new Type.Player[Variables.MaxPlayers];
@@ -25,7 +26,7 @@ namespace Client
 
             for (int i = 0; i < Variables.MaxPlayers; i++)
             {
-                ClearPlayer(i);
+                OnClear(i);
             }
         }
 
@@ -35,7 +36,7 @@ namespace Client
             Data.Account[index].Password = "";
         }
 
-        public static void ClearPlayer(int index)
+        public static void OnClear(int index)
         {
             ClearAccount(index);
 
@@ -446,7 +447,7 @@ namespace Client
                 SetPlayerDir(GameState.MyIndex, (int) Direction.Up);
                 if (GetPlayerY(GameState.MyIndex) > 0)
                 {
-                    if (CheckPlayerDir((byte) Direction.Up))
+                    if (OnCheckDir((byte) Direction.Up))
                     {
                         if (d != (int) Direction.Up)
                         {
@@ -466,7 +467,7 @@ namespace Client
                 SetPlayerDir(GameState.MyIndex, (int) Direction.Down);
                 if (GetPlayerY(GameState.MyIndex) < Data.MyMap.MaxY - 1)
                 {
-                    if (CheckPlayerDir((byte) Direction.Down))
+                    if (OnCheckDir((byte) Direction.Down))
                     {
                         if (d != (int) Direction.Down)
                         {
@@ -486,7 +487,7 @@ namespace Client
                 SetPlayerDir(GameState.MyIndex, (int) Direction.Left);
                 if (GetPlayerX(GameState.MyIndex) > 0)
                 {
-                    if (CheckPlayerDir((byte) Direction.Left))
+                    if (OnCheckDir((byte) Direction.Left))
                     {
                         if (d != (int) Direction.Left)
                         {
@@ -506,7 +507,7 @@ namespace Client
                 SetPlayerDir(GameState.MyIndex, (int) Direction.Right);
                 if (GetPlayerX(GameState.MyIndex) < Data.MyMap.MaxX)
                 {
-                    if (CheckPlayerDir((byte) Direction.Right))
+                    if (OnCheckDir((byte) Direction.Right))
                     {
                         if (d != (int) Direction.Right)
                         {
@@ -527,7 +528,7 @@ namespace Client
                 if (GetPlayerY(GameState.MyIndex) > 0 & GetPlayerX(GameState.MyIndex) < Data.MyMap.MaxX)
                 {
                     SetPlayerDir(GameState.MyIndex, (int) Direction.UpRight);
-                    if (CheckPlayerDir((byte)Direction.UpRight))
+                    if (OnCheckDir((byte)Direction.UpRight))
                     {
                         if (d != (int)Direction.UpRight)
                         {
@@ -546,7 +547,7 @@ namespace Client
                 SetPlayerDir(GameState.MyIndex, (int) Direction.UpLeft);
                 if (GetPlayerY(GameState.MyIndex) > 0 & GetPlayerX(GameState.MyIndex) > 0)
                 {
-                    if (CheckPlayerDir((byte) Direction.UpLeft))
+                    if (OnCheckDir((byte) Direction.UpLeft))
                     {
                         if (d != (int) Direction.UpLeft)
                         {
@@ -565,7 +566,7 @@ namespace Client
                 SetPlayerDir(GameState.MyIndex, (int) Direction.DownRight);
                 if (GetPlayerY(GameState.MyIndex) < Data.MyMap.MaxY & GetPlayerX(GameState.MyIndex) < Data.MyMap.MaxX)
                 {
-                    if (CheckPlayerDir((byte) Direction.DownRight))
+                    if (OnCheckDir((byte) Direction.DownRight))
                     {
                         if (d != (int) Direction.DownRight)
                         {
@@ -584,7 +585,7 @@ namespace Client
                 SetPlayerDir(GameState.MyIndex, (int) Direction.DownLeft);
                 if (GetPlayerY(GameState.MyIndex) < Data.MyMap.MaxY & GetPlayerX(GameState.MyIndex) > 0)
                 {
-                    if (CheckPlayerDir((byte) Direction.DownLeft))
+                    if (OnCheckDir((byte) Direction.DownLeft))
                     {
                         if (d != (int) Direction.DownLeft)
                         {
@@ -603,24 +604,24 @@ namespace Client
             return canMove;
         }
 
-        public static bool CheckPlayerDir(byte direction)
+        public static bool OnCheckDir(byte direction)
         {
-            bool checkPlayerDir = default;
+            bool OnCheckDir = default;
             var x = default(int);
             var y = default(int);
             int i;
 
             if (GetPlayerX(GameState.MyIndex) >= Data.Map[GetPlayerMap(GameState.MyIndex)].MaxX || GetPlayerY(GameState.MyIndex) >= Data.Map[GetPlayerMap(GameState.MyIndex)].MaxY)
             {
-                checkPlayerDir = true;
-                return checkPlayerDir;
+                OnCheckDir = true;
+                return OnCheckDir;
             }
 
             // check directional blocking
             if (GameLogic.IsDirBlocked(ref Data.MyMap.Tile[GetPlayerX(GameState.MyIndex), GetPlayerY(GameState.MyIndex)].DirBlock, ref direction))
             {
-                checkPlayerDir = true;
-                return checkPlayerDir;
+                OnCheckDir = true;
+                return OnCheckDir;
             }
 
             switch (direction)
@@ -677,22 +678,22 @@ namespace Client
 
             if (x < 0 || y < 0 || x >= Data.MyMap.MaxX || y >= Data.MyMap.MaxY)
             {
-                checkPlayerDir = true;
-                return checkPlayerDir;
+                OnCheckDir = true;
+                return OnCheckDir;
             }
 
             // Check to see if the map tile is blocked or not
             if (Data.MyMap.Tile[x, y].Type == TileType.Blocked | Data.MyMap.Tile[x, y].Type2 == TileType.Blocked)
             {
-                checkPlayerDir = true;
-                return checkPlayerDir;
+                OnCheckDir = true;
+                return OnCheckDir;
             }
 
             // Check to see if the map tile is tree or not
             if (Data.MyMap.Tile[x, y].Type == TileType.Resource | Data.MyMap.Tile[x, y].Type2 == TileType.Resource)
             {
-                checkPlayerDir = true;
-                return checkPlayerDir;
+                OnCheckDir = true;
+                return OnCheckDir;
             }
 
             // Check to see if a player is already on that tile
@@ -706,8 +707,8 @@ namespace Client
                         {
                             if (Data.Player[i].X == x & Data.Player[i].Y == y)
                             {
-                                checkPlayerDir = true;
-                                return checkPlayerDir;
+                                OnCheckDir = true;
+                                return OnCheckDir;
                             }
                         }
                     }
@@ -720,8 +721,8 @@ namespace Client
                     {
                         if (Data.MyMapNpc[i].Num >= 0 & Data.MyMapNpc[i].X == x & Data.MyMapNpc[i].Y == y)
                         {
-                            checkPlayerDir = true;
-                            return checkPlayerDir;
+                            OnCheckDir = true;
+                            return OnCheckDir;
                         }
                     }
                 }
@@ -736,14 +737,14 @@ namespace Client
                     {
                         if (Data.MapEvents[i].WalkThrough == 0)
                         {
-                            checkPlayerDir = true;
-                            return checkPlayerDir;
+                            OnCheckDir = true;
+                            return OnCheckDir;
                         }
                     }
                 }
             }
 
-            return checkPlayerDir;
+            return OnCheckDir;
         }
 
         /// <summary>
@@ -818,7 +819,7 @@ namespace Client
             }
         }
 
-        public static void CheckAttack(bool mouse = false)
+        public static void OnCheckAttack(bool mouse = false)
         {
             int attackSpeed;
             var x = default(int);
@@ -1374,6 +1375,16 @@ namespace Client
             {
                 GameClient.DrawEmote(x, y, Data.Player[GameState.MyIndex].Emote);
             }
+        }
+
+        public static void OnStream(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnLoad(int index)
+        {
+            throw new NotImplementedException();
         }
     }
     

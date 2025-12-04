@@ -3,6 +3,7 @@ using Client.Net;
 using Core;
 using Core.Configurations;
 using Core.Globals;
+using Core.Interfaces;
 using Core.Net;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -13,7 +14,7 @@ using Type = Core.Globals.Type;
 
 namespace Client
 {
-    public class Map
+    public class Map : IData
     {
         #region Drawing
 
@@ -26,6 +27,10 @@ namespace Client
 
             string argPath = System.IO.Path.Combine(DataPath.Fogs, fogNum.ToString());
             var gfxInfo = GameClient.GetGfxInfo(argPath);
+            if (gfxInfo == null)
+            {
+                return;
+            }
             int sW = gfxInfo.Width;
             int sH = gfxInfo.Height;
 
@@ -299,7 +304,12 @@ namespace Client
                 return;
 
             string argPath = System.IO.Path.Combine(DataPath.Panoramas, index.ToString());
-            GameClient.RenderTexture(ref argPath, 0, 0, 0, 0, GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Panoramas, index.ToString())).Width, GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Panoramas, index.ToString())).Height, GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Panoramas, index.ToString())).Width, GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Panoramas, index.ToString())).Height);
+            var gfx = GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Panoramas, index.ToString()));
+            if (gfx == null)
+            {
+                return;
+            }
+            GameClient.RenderTexture(ref argPath, 0, 0, 0, 0, gfx.Width, gfx.Height, gfx.Width, gfx.Height);
         }
 
         public static void DrawParallax(int index)
@@ -319,7 +329,12 @@ namespace Client
             vert = GameLogic.ConvertMapY(GetPlayerY(GameState.MyIndex)) * 2.5f - 50f;
 
             string argPath = System.IO.Path.Combine(DataPath.Parallax, index.ToString());
-            GameClient.RenderTexture(ref argPath, (int) Math.Round(horz), (int) Math.Round(vert), 0, 0, GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Parallax, index.ToString())).Width, GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Parallax, index.ToString())).Height, GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Parallax, index.ToString())).Width, GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Parallax, index.ToString())).Height);
+            var gfx = GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Parallax, index.ToString()));
+            if (gfx == null)
+            {
+                return;
+            }
+            GameClient.RenderTexture(ref argPath, (int) Math.Round(horz), (int) Math.Round(vert), 0, 0, gfx.Width, gfx.Height, gfx.Width, gfx.Height);
         }
 
         public static void DrawPicture(int index = 0, int type = 0)
@@ -343,6 +358,11 @@ namespace Client
 
             int posX = 0;
             int posY = 0;
+            var gfx = GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Pictures, index.ToString()));
+            if (gfx == null)
+            {
+                return;
+            }
 
             // Determine position based on type
             switch ((PictureOrigin) type)
@@ -353,8 +373,8 @@ namespace Client
                     break;
 
                 case PictureOrigin.CenterScreen:
-                    posX = (int) Math.Round(GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Pictures, index.ToString())).Width / 2d - GameClient.GetGfxInfo(DataPath.Pictures + index).Width / 2d - Event.Picture.XOffset);
-                    posY = (int) Math.Round(GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Pictures, index.ToString())).Height / 2d - GameClient.GetGfxInfo(DataPath.Pictures + index).Height / 2d - Event.Picture.YOffset);
+                    posX = (int) Math.Round(gfx.Width / 2d - gfx.Width / 2d - Event.Picture.XOffset);
+                    posY = (int) Math.Round(gfx.Height / 2d - gfx.Height / 2d - Event.Picture.YOffset);
                     break;
 
                 case PictureOrigin.CenterOnEvent:
@@ -385,7 +405,7 @@ namespace Client
             }
 
             string argPath = System.IO.Path.Combine(DataPath.Pictures, index.ToString());
-            GameClient.RenderTexture(ref argPath, posX, posY, 0, 0, GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Pictures, index.ToString())).Width, GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Pictures, index.ToString())).Height, GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Pictures, index.ToString())).Width, GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Pictures, index.ToString())).Height);
+            GameClient.RenderTexture(ref argPath, posX, posY, 0, 0, gfx.Width, gfx.Height, gfx.Width, gfx.Height);
         }
 
         public static void OnClear()
@@ -444,7 +464,32 @@ namespace Client
             {
                 MapItem.OnClear(i);
             }
-        } 
+        }
+
+        public static void OnDraw(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnClear(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnStream(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnReset()
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnLoad(int index)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     #endregion

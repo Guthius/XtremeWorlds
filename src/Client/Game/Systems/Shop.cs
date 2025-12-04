@@ -2,13 +2,14 @@
 using Client.Net;
 using Core;
 using Core.Globals;
+using Core.Interfaces;
 using Core.Net;
 using Type = Core.Globals.Type;
 
 namespace Client
 {
 
-    public class Shop
+    public class Shop : IData
     {
         public static void OnClose()
         {
@@ -36,7 +37,7 @@ namespace Client
             GameState.ShopLoaded[index] = 0;
         }
 
-        public static void OnClearAll()
+        public static void OnReset()
         {
             int i;
 
@@ -54,6 +55,16 @@ namespace Client
                 GameState.ShopLoaded[shopNum] = 1;
                 Sender.SendRequestShop(shopNum);
             }
+        }
+
+        public static void OnDraw(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnLoad(int index)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

@@ -733,7 +733,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     {
         var packetReader = new PacketReader(data);
 
-        Player.ClearPlayer(packetReader.ReadInt32());
+        Player.OnClear(packetReader.ReadInt32());
     }
 
     private static void Packet_Ping(ReadOnlyMemory<byte> data)
@@ -1132,7 +1132,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             MapAnimation.Index = 1;
         {
             if (MapAnimation.Instance == null)
-                MapAnimation.OnClearAll();
+                MapAnimation.OnReset();
 
             if (MapAnimation.Instance == null)
                 return;
@@ -1592,10 +1592,10 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             MapNpc.OnClear(i);
         }
         
-        Blood.OnClear();
+        Blood.OnReset();
         Map.OnClear();
-        GameLogic.RemoveChatBubbles();
-        MapAnimation.OnClearAll();
+        ChatBubble.OnReset();
+        MapAnimation.OnReset();
 
         GameState.ResourceIndex = 0;
 

@@ -719,7 +719,7 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Projectile.SendRequestEditProjectiles();
+                            Sender.SendRequestEditProjectiles();
                             break;
                         }
 
@@ -883,22 +883,6 @@ namespace Client
                 instance.Active = true;
             }
 
-        }
-
-        public static void RemoveChatBubbles()
-        {
-            // Loop through and see if that player/Npc already has a chat bubble
-            for (int i = 0; i <= GameState.ChatBubbleindex; i++)
-            {
-                ref var instance = ref Data.ChatBubble[i];
-                instance.Target = -1;
-                instance.TargetType = 0;
-                instance.Msg = "";
-                instance.Color = 0;
-                instance.Timer = 0;
-                instance.Active = false;
-
-            }
         }
 
         public static void DialogueAlert(byte index)

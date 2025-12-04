@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 
 namespace Client.Game.UI.Windows;
 
-public static class WinMapEditor
+public class WinMapEditor
 {
     private static bool _isDraggingTileset = false;
     public static int NpcSelectedSlot = 0;
@@ -48,7 +48,7 @@ public static class WinMapEditor
                         string name = "None";
                         if (npcIndex >= 0 && npcIndex < (Data.Npc?.Length ?? 0))
                         {
-                            var rawName = Data.Npc[npcIndex].Name ?? string.Empty;
+                            var rawName = Data.Npc?[npcIndex].Name ?? string.Empty;
                             if (!string.IsNullOrWhiteSpace(rawName)) name = rawName.Trim();
                         }
                         if (slotIndex >= 0 && slotIndex < lst.Items.Count)

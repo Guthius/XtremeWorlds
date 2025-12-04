@@ -3,12 +3,13 @@ using System.Drawing;
 using Client.Net;
 using Core;
 using Core.Globals;
+using Core.Interfaces;
 using Core.Net;
 
 namespace Client
 {
 
-    public class MapResource
+    public class MapResource : IData
     {
 
         #region Database
@@ -20,9 +21,9 @@ namespace Client
             GameState.ResourceLoaded[index] = 0;
         }
 
-        public static void OnClearAll()
+        public static void OnReset()
         {
-            Array.Resize(ref Data.Resource, Variables.MaxResources);
+            Data.Resource = new Core.Globals.Type.Resource[Variables.MaxResources];
 
             for (int i = 0; i < Variables.MaxResources; i++)
                 OnClear(i);
@@ -118,6 +119,11 @@ namespace Client
             y = Data.MyMapResource[resourceNum].Y * Constants.TileSize - GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Resources, resourceSprite.ToString())).Height + 32;
 
             OnDraw(resourceSprite, x, y, rec);
+        }
+
+        public static void OnLoad(int index)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

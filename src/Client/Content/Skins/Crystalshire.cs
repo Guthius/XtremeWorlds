@@ -2429,7 +2429,7 @@ public class Crystalshire
         window.GetChild("btnProjectiles").CallBack[(int)ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Developer)) { ShowDenied(); return; }
-            Projectile.SendRequestEditProjectiles();
+            Sender.SendRequestEditProjectiles();
         };
 
         window.GetChild("btnResourceEditor").CallBack[(int)ControlState.MouseDown] = () =>

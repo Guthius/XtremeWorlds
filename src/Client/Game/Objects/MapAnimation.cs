@@ -1,4 +1,5 @@
 ﻿using Core.Globals;
+using Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -7,7 +8,7 @@ using static Core.Globals.Command;
 
 namespace Client
 {
-    public class MapAnimation
+    public class MapAnimation : IData
     {
         public static byte Index;
         public static Core.Globals.Type.MapAnimation[]? Instance;
@@ -297,7 +298,7 @@ namespace Client
             }
         }
 
-        public static void OnClearAll()
+        public static void OnReset()
         {
             int i;
 
@@ -353,5 +354,19 @@ namespace Client
             inst.LockIndex = 0;
         }
 
+        public static void OnDraw(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnStream(int index)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public static void OnLoad(int index)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -2,12 +2,24 @@ using Client;
 using Client.Game.UI;
 using Core.Configurations;
 using Core.Globals;
+using Core.Interfaces;
 using Microsoft.Xna.Framework;
 using static Core.Globals.Command;
 
-public class ChatBubble
+public class ChatBubble : IData
 {
-    public static void OnDraw(long index)
+    public static void OnClear(int index)
+    {
+        ref var instance = ref Data.ChatBubble[index];
+        instance.Target = -1;
+        instance.TargetType = 0;
+        instance.Msg = "";
+        instance.Color = 0;
+        instance.Timer = 0;
+        instance.Active = false;
+    }
+
+    public static void OnDraw(int index)
     {
         var theArray = System.Array.Empty<string>();
         int x;
@@ -194,5 +206,21 @@ public class ChatBubble
         {
             instance.Active = false;
         }
+    }
+
+    public static void OnReset()
+    {
+        for (int i = 0; i < Data.ChatBubble.Length; i++)
+            OnClear(i);
+    }
+
+    public static void OnLoad(int index)
+    {
+        throw new NotImplementedException();
+    }
+
+    public static void OnStream(int index)
+    {
+        throw new NotImplementedException();
     }
 }

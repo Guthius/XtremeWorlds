@@ -1,12 +1,13 @@
 ﻿using Core;
 using Core.Globals;
+using Core.Interfaces;
 using Microsoft.VisualBasic.CompilerServices;
 using Type = Core.Globals.Type;
 
 namespace Client
 {
 
-    public class Autotile
+    public class Autotile : IData
     {
         public static void OnClear()
         {
@@ -1273,5 +1274,29 @@ namespace Client
             GameClient.RenderTexture(ref argPath, dX, dY, Data.Autotile[x, y].Layer[layerNum].SrcX[quarterNum] + xOffset, Data.Autotile[x, y].Layer[layerNum].SrcY[quarterNum] + yOffset, 16, 16, 16, 16);
         }
 
+        public static void OnDraw(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnClear(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnStream(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnReset()
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnLoad(int index)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

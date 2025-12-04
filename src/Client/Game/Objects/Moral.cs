@@ -1,12 +1,13 @@
 ﻿using Client.Net;
 using Core;
 using Core.Globals;
+using Core.Interfaces;
 using Type = Core.Globals.Type;
 
 namespace Client
 {
 
-    public class Moral
+    public class Moral : IData
     {
         #region Database
 
@@ -18,7 +19,7 @@ namespace Client
             GameState.MoralLoaded[index] = 0;
         }
 
-        public static void OnClearAll()
+        public static void OnReset()
         {
             int i;
 
@@ -35,6 +36,16 @@ namespace Client
                 GameState.MoralLoaded[moralNum] = 1;
                 Sender.SendRequestMoral(moralNum);
             }
+        }
+
+        public static void OnDraw(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnLoad(int index)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

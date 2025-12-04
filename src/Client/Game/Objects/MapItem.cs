@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Core.Configurations;
+using Core.Interfaces;
 
 namespace Client
 {
-    public class MapItem
+    public class MapItem : IData
     {
         public static void OnDraw(int itemNum)
         {
@@ -54,6 +55,22 @@ namespace Client
             instance.Value = 0;
             instance.X = 0;
             instance.Y = 0;
+        }
+
+        public static void OnStream(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnReset()
+        {
+            for (int i = 0; i < Data.MyMapItem.Length; i++)
+                OnClear(i);
+        }
+
+        public static void OnLoad(int index)
+        {
+            throw new NotImplementedException();
         }
     }
 }

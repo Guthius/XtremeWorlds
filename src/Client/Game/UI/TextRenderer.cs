@@ -20,7 +20,7 @@ public static class TextRenderer
 
     public class BitmapFont
     {
-        public Texture2D Atlas;
+        public Texture2D Atlas = null!;
         public Dictionary<char, Rectangle> Glyphs = new();
         public int LineHeight;
         public int CharHeight;

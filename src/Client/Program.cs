@@ -139,7 +139,7 @@ namespace Client
             public int Height;
         }
 
-        public static GfxInfo GetGfxInfo(string key)
+        public static GfxInfo? GetGfxInfo(string key)
         {
             // Check if the key does not end with ".gfxext" and append if needed
             if (!key.EndsWith(GameState.GfxExt, StringComparison.OrdinalIgnoreCase))
@@ -395,7 +395,7 @@ namespace Client
             return TextureCache[path];
         }
 
-        public static Texture2D LoadTexture(string path)
+        public static Texture2D? LoadTexture(string path)
         {
             try
             {
@@ -413,7 +413,7 @@ namespace Client
                 // Open the file stream with FileShare.Read to allow other processes to read the file  
                 using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
-                    var texture = Texture2D.FromStream(Graphics?.GraphicsDevice, stream);
+                    var texture = Texture2D.FromStream(Graphics?.GraphicsDevice!, stream);
 
                     // Cache graphics information  
                     var gfxInfo = new GfxInfo()
@@ -1764,11 +1764,10 @@ namespace Client
 
             rec.Y = 0;
             rec.Height = Constants.TileSize;
-            rec.X = (int) Math.Round(anim *
-                                     (GetGfxInfo(Path.Combine(DataPath.Emotes, sprite.ToString())).Width /
-                                      2d));
-            rec.Width = (int) Math.Round(GetGfxInfo(Path.Combine(DataPath.Emotes, sprite.ToString())).Width /
-                                         2d);
+            var emoteInfo = GetGfxInfo(Path.Combine(DataPath.Emotes, sprite.ToString()));
+            if (emoteInfo == null) return;
+            rec.X = (int)Math.Round(anim * (emoteInfo.Width / 2d));
+            rec.Width = (int)Math.Round(emoteInfo.Width / 2d);
                                          
             x = GameLogic.ConvertMapX(x2);
             y = GameLogic.ConvertMapY(y2) - (Constants.TileSize + 16);
@@ -2141,9 +2140,11 @@ namespace Client
             int height;
 
             rec.Y = 0;
-            rec.Height = GetGfxInfo(Path.Combine(DataPath.Misc, "Target")).Height;
+            var targetInfo = GetGfxInfo(Path.Combine(DataPath.Misc, "Target"));
+            if (targetInfo == null) return;
+            rec.Height = targetInfo.Height;
             rec.X = 0;
-            rec.Width = (int) Math.Round(GetGfxInfo(Path.Combine(DataPath.Misc, "Target")).Width / 2d);
+            rec.Width = (int)Math.Round(targetInfo.Width / 2d);
             x = GameLogic.ConvertMapX(x2 + 4);
             y = GameLogic.ConvertMapY(y2 - 32);
             width = rec.Right - rec.Left;
@@ -2167,10 +2168,11 @@ namespace Client
             int height;
 
             rec.Y = 0;
-            rec.Height = GetGfxInfo(Path.Combine(DataPath.Misc, "Target")).Height;
-            rec.X = (int) Math.Round(GetGfxInfo(Path.Combine(DataPath.Misc, "Target")).Width / 2d);
-            rec.Width = (int) Math.Round(GetGfxInfo(Path.Combine(DataPath.Misc, "Target")).Width / 2d +
-                                         GetGfxInfo(Path.Combine(DataPath.Misc, "Target")).Width / 2d);
+            var targetInfo2 = GetGfxInfo(Path.Combine(DataPath.Misc, "Target"));
+            if (targetInfo2 == null) return;
+            rec.Height = targetInfo2.Height;
+            rec.X = (int)Math.Round(targetInfo2.Width / 2d);
+            rec.Width = (int)Math.Round((double)targetInfo2.Width);
 
             x = GameLogic.ConvertMapX(x2 + 4);
             y = GameLogic.ConvertMapY(y2 - 32);
@@ -2570,7 +2572,7 @@ namespace Client
                     {
                         if (Math.Floor((decimal) Data.MyMapNpc[i].Y / Constants.TileSize) == y)
                         {
-                            Npc.OnDraw(i);
+                            MapNpc.OnDraw(i);
                         }
                     }
 
@@ -2768,7 +2770,7 @@ namespace Client
 
             for (i = 0; i < Variables.MaxMapNpcs; i++)
             {
-                Npc.OnDrawName(i);
+                MapNpc.OnDrawName(i);
             }
 
             Map.DrawFog();

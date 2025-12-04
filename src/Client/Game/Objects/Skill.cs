@@ -1,16 +1,17 @@
 ﻿using Client;
 using Client.Net;
 using Core.Globals;
+using Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Client
 {
-    public class Skill
+    public class Skill : IData
     {
 
-        public static void OnClearAll()
+        public static void OnReset()
         {
             int i;
 
@@ -35,6 +36,16 @@ namespace Client
                 GameState.SkillLoaded[skillNum] = 1;
                 Sender.SendRequestSkill(skillNum);
             }
+        }
+
+        public static void OnDraw(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnLoad(int index)
+        {
+            throw new NotImplementedException();
         }
     }
 }
