@@ -5,11 +5,9 @@ using Core.Globals;
 using Microsoft.Xna.Framework;
 using static Core.Globals.Command;
 
-public class ChatBubble : IContent
+public class ChatBubble
 {
-    public struct Data { get; set; } = Data.ChatBubble;
-
-    public void OnDraw(int index)
+    public static void OnDraw(long index)
     {
         var theArray = System.Array.Empty<string>();
         int x;
@@ -20,8 +18,8 @@ public class ChatBubble : IContent
         long y2;
         int color;
         long tmpNum;
-    
-        ref var instance = ref Data[index];
+
+        ref var instance = ref Data.ChatBubble[(int) index];
 
         // exit out early
         if (instance.TargetType == 0)
@@ -184,7 +182,7 @@ public class ChatBubble : IContent
             // Calculate horizontal and vertical centers with padding
             double padding = (double) actualWidth / 6.0d;
 
-            TextRenderer.OnDraw(theArray[(int) i],
+            TextRenderer.OnRender(theArray[(int) i],
                 (int) Math.Round(x - theArray[(int) i].Length / 2d - TextRenderer.GetTextWidth(theArray[(int) i]) / 2d +
                                     padding), (int) y2, GameClient.QbColorToXnaColor(instance.Color),
                 Color.Black);

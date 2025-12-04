@@ -17,10 +17,8 @@ namespace Client
     /// - Helper utilities for bulk updates and tile alignment callbacks.
     /// - Clear, centralized constants (TileSize).
     /// </summary>
-    public static class Npc : IContent
+    public static class Npc
     {
-        public struct Data { get; set; } = Data.Npc;
-
         // Client-side prediction helpers: track remaining pixels and destination for current tile step.
         private static readonly int[] RemainingPixels = new int[Variables.MaxMapNpcs];
         private static readonly int[] DestX = new int[Variables.MaxMapNpcs];
@@ -254,32 +252,32 @@ namespace Client
             }
         }
 
-        public void OnReset()
+        public static void OnClearAll()
         {
-            Data = new Core.Globals.Type.Npc[Variables.MaxNpcs];
+            Data.Npc = new Core.Globals.Type.Npc[Variables.MaxNpcs];
 
             for (int i = 0; i < Variables.MaxNpcs; i++)
                 OnClear(i);
 
         }
 
-        public void OnClear(int index)
+        public static void OnClear(int index)
         {
             int statCount = Enum.GetValues(typeof(Stat)).Length;
-            Data[index].AttackSay = "";
-            Data[index].Name = "";
-            Data[index] = default;
-            Data[index].Stat = new byte[statCount];
-            Data[index].DropChance = new int[Core.Globals.Variables.MaxDropItems];
-            Data[index].DropItem = new int[Core.Globals.Variables.MaxDropItems];
-            Data[index].DropItemValue = new int[Core.Globals.Variables.MaxDropItems];
-            Data[index].Skill = new byte[Core.Globals.Variables.MaxNpcSkills];
+            Data.Npc[index].AttackSay = "";
+            Data.Npc[index].Name = "";
+            Data.Npc[index] = default;
+            Data.Npc[index].Stat = new byte[statCount];
+            Data.Npc[index].DropChance = new int[Core.Globals.Variables.MaxDropItems];
+            Data.Npc[index].DropItem = new int[Core.Globals.Variables.MaxDropItems];
+            Data.Npc[index].DropItemValue = new int[Core.Globals.Variables.MaxDropItems];
+            Data.Npc[index].Skill = new byte[Core.Globals.Variables.MaxNpcSkills];
             GameState.NpcLoaded[index] = 0;
         }
 
         public static void OnStream(int npcNum)
         {
-            if (npcNum >= 0 && string.IsNullOrEmpty(Data[npcNum].Name) && GameState.NpcLoaded[npcNum] == 0)
+            if (npcNum >= 0 && string.IsNullOrEmpty(Data.Npc[npcNum].Name) && GameState.NpcLoaded[npcNum] == 0)
             {
                 GameState.NpcLoaded[(int)npcNum] = 1;
                 Sender.SendRequestNpc(npcNum);
@@ -297,7 +295,7 @@ namespace Client
             if (npcNum < 0 | npcNum > Variables.MaxNpcs) return;
             if (EditorType.Map == GameState.MyEditorType) return;
 
-            switch (Data[(int)npcNum].Behavior)
+            switch (Data.Npc[(int)npcNum].Behavior)
             {
                 case 0: color = Color.Red; backColor = Color.Black; break;
                 case 1: color = Color.Green; backColor = Color.Black; break;
@@ -307,7 +305,7 @@ namespace Client
             var remaining = Data.MyMapNpc[mapNpcNum].DeathTimer - General.GetTickCount() / 1000;
             if (remaining < 0) remaining = 0;
 
-            var name = remaining > 0 ? $"{remaining}..." : Data[(int)npcNum].Name;
+            var name = remaining > 0 ? $"{remaining}..." : Data.Npc[(int)npcNum].Name;
 
             int baseWorldX = Data.MyMapNpc[mapNpcNum].X;
             int baseWorldY = Data.MyMapNpc[mapNpcNum].Y;
@@ -319,13 +317,13 @@ namespace Client
             var padding = GameLogic.ConvertMapX((int)size.X / 6);
             var drawX = (int)(baseWorldX + (Constants.TileSize - size.X) / 2 + padding);
 
-            int spriteNum = Data[(int)npcNum].Sprite;
+            int spriteNum = Data.Npc[(int)npcNum].Sprite;
             if (spriteNum <= 0 || spriteNum > GameState.NumCharacters)
             {
                 // No valid graphic: render just above feet similar to player fallback
                 int screenY = GameLogic.ConvertMapY(baseWorldY);
                 textY = screenY - 16;
-                TextRenderer.OnDraw(name, drawX, textY, color, backColor);
+                TextRenderer.OnRender(name, drawX, textY, color, backColor);
                 return;
             }
 
@@ -334,7 +332,7 @@ namespace Client
             {
                 int screenY = GameLogic.ConvertMapY(baseWorldY);
                 textY = screenY - 16;
-                TextRenderer.OnDraw(name, drawX, textY, color, backColor);
+                TextRenderer.OnRender(name, drawX, textY, color, backColor);
                 return;
             }
 
@@ -358,7 +356,7 @@ namespace Client
             int textPixelHeight = (int)Math.Ceiling(TextRenderer.Fonts[Font.Georgia].LineSpacing * TextRenderer.BaseScale);
             int margin = 8;
             textY = spriteTopScreenY - textPixelHeight + margin;
-            TextRenderer.OnDraw(name, drawX, textY, color, backColor);
+            TextRenderer.OnRender(name, drawX, textY, color, backColor);
         }
 
         public static void OnDraw(int mapNpcNum)
@@ -400,7 +398,7 @@ namespace Client
                 return;
                 
             // Get the sprite of the Npc
-            sprite = Data[(int)Data.MyMapNpc[(int)mapNpcNum].Num].Sprite;
+            sprite = Data.Npc[(int)Data.MyMapNpc[(int)mapNpcNum].Num].Sprite;
 
             // Validate sprite
             if (sprite < 1 | sprite > GameState.NumCharacters)
