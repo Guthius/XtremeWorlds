@@ -66,7 +66,7 @@ namespace Client
 
         #region Database
 
-        public static void OnReset()
+        public static void OnClearAll()
         {
             int i;
 
@@ -84,7 +84,7 @@ namespace Client
             Data.Projectile[index].Animation = -1;
         }
 
-        public void OnStream(int projectileNum)
+        public static void OnStream(int projectileNum)
         {
             if (projectileNum >= 0 & string.IsNullOrEmpty(Data.Projectile[projectileNum].Name) && GameState.ProjectileLoaded[projectileNum] == 0)
             {

@@ -14,7 +14,7 @@ namespace Client
 
         #region Database
 
-        public void OnClear(int index)
+        public static void OnClear()
         {
             Data.MyParty = new Type.Party()
             {

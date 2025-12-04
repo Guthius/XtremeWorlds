@@ -12,7 +12,7 @@ using Type = Core.Globals.Type;
 namespace Client
 {
 
-    public class Editors
+    public static class Editors
     {
         private static float tilesetOffsetX = 0;
         private static float tilesetOffsetY = 0;
@@ -1069,7 +1069,7 @@ namespace Client
         {
             GameState.MyEditorType = EditorType.None;
             ClearChanged_Animation();
-            Animation.OnReset();
+            Animation.OnClearAll();
             Sender.SendCloseEditor();
         }
 
@@ -1102,7 +1102,7 @@ namespace Client
         {
             GameState.MyEditorType = EditorType.None;
             ClearChanged_Npc();
-            Npc.OnReset();
+            Npc.OnClearAll();
             Sender.SendCloseEditor();
         }
 
@@ -1141,7 +1141,7 @@ namespace Client
         {
             GameState.MyEditorType = EditorType.None;
             ClearChanged_Resource();
-            MapResource.OnReset();
+            MapResource.OnClearAll();
             Sender.SendCloseEditor();
         }
 
@@ -1170,7 +1170,7 @@ namespace Client
         {
             GameState.MyEditorType = EditorType.None;
             ClearChanged_Skill();
-            Skill.OnReset();
+            Skill.OnClearAll();
             Sender.SendCloseEditor();
         }
 
@@ -1202,7 +1202,7 @@ namespace Client
         {
             GameState.MyEditorType = EditorType.None;
             ClearChanged_Shop();
-            Shop.OnReset();
+            Shop.OnClearAll();
             Sender.SendCloseEditor();
         }
 
@@ -1230,7 +1230,7 @@ namespace Client
         {
             GameState.MyEditorType = EditorType.None;
             ClearChanged_Job();
-            Job.OnReset();
+            Job.OnClearAll();
             Sender.SendCloseEditor();
         }
 
@@ -1244,7 +1244,7 @@ namespace Client
         {
             GameState.MyEditorType = EditorType.None;
             Item.OnClearChanged();
-            Item.OnReset();
+            Item.OnClearAll();
             Sender.SendCloseEditor();
         }
 
@@ -1285,7 +1285,7 @@ namespace Client
         {
             GameState.MyEditorType = EditorType.None;
             ClearChanged_Moral();
-            Moral.OnReset();
+            Moral.OnClearAll();
             Sender.SendCloseEditor();
         }
 
@@ -1316,7 +1316,7 @@ namespace Client
         {
             GameState.MyEditorType = EditorType.None;
             ClearChanged_Projectile();
-            Projectile.OnReset();
+            Projectile.OnClearAll();
             Sender.SendCloseEditor();
         }
 

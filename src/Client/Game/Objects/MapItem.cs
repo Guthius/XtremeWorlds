@@ -9,7 +9,7 @@ namespace Client
 {
     public class MapItem : IContent
     {
-        public Data Data { get; set; } = Data.MapItem;
+        public struct Data { get; set; } = Data;
 
         public void OnDraw(int itemNum)
         {

@@ -17,9 +17,9 @@ namespace Client
     /// - Helper utilities for bulk updates and tile alignment callbacks.
     /// - Clear, centralized constants (TileSize).
     /// </summary>
-    public class Npc : IContent
+    public static class Npc : IContent
     {
-        public Struct Data { get; set; } = Data.Npc;
+        public struct Data { get; set; } = Data.Npc;
 
         // Client-side prediction helpers: track remaining pixels and destination for current tile step.
         private static readonly int[] RemainingPixels = new int[Variables.MaxMapNpcs];
@@ -254,10 +254,9 @@ namespace Client
             }
         }
 
-    
         public void OnReset()
         {
-           Data = new Core.Globals.Type.Npc[Variables.MaxNpcs];
+            Data = new Core.Globals.Type.Npc[Variables.MaxNpcs];
 
             for (int i = 0; i < Variables.MaxNpcs; i++)
                 OnClear(i);
@@ -267,23 +266,23 @@ namespace Client
         public void OnClear(int index)
         {
             int statCount = Enum.GetValues(typeof(Stat)).Length;
-            Datc[index].AttackSay = "";
-            Datc[index].Name = "";
-            Datc[index] = default;
-            Datc[index].Stat = new byte[statCount];
-            Datc[index].DropChance = new int[Core.Globals.Variables.MaxDropItems];
-            Datc[index].DropItem = new int[Core.Globals.Variables.MaxDropItems];
-            Datc[index].DropItemValue = new int[Core.Globals.Variables.MaxDropItems];
-            Datc[index].Skill = new byte[Core.Globals.Variables.MaxNpcSkills];
+            Data[index].AttackSay = "";
+            Data[index].Name = "";
+            Data[index] = default;
+            Data[index].Stat = new byte[statCount];
+            Data[index].DropChance = new int[Core.Globals.Variables.MaxDropItems];
+            Data[index].DropItem = new int[Core.Globals.Variables.MaxDropItems];
+            Data[index].DropItemValue = new int[Core.Globals.Variables.MaxDropItems];
+            Data[index].Skill = new byte[Core.Globals.Variables.MaxNpcSkills];
             GameState.NpcLoaded[index] = 0;
         }
 
-       public void OnStreamm(int index)
+        public static void OnStream(int npcNum)
         {
-            if (index >= 0 && string.IsNullOrEmpty(Data[index].Name) && GameState.NpcLoaded[index] == 0)
+            if (npcNum >= 0 && string.IsNullOrEmpty(Data[npcNum].Name) && GameState.NpcLoaded[npcNum] == 0)
             {
-                GameState.NpcLoaded[(int)index] = 1;
-                Sender.SendRequestNpc(index);
+                GameState.NpcLoaded[(int)npcNum] = 1;
+                Sender.SendRequestNpc(npcNum);
             }
         }
 
@@ -293,12 +292,12 @@ namespace Client
             var color = default(Color);
             var backColor = default(Color);
 
-            double npcNum = Data[index].MyMapNpc[mapNpcNum].Num;
+            double npcNum = Data.MyMapNpc[mapNpcNum].Num;
 
             if (npcNum < 0 | npcNum > Variables.MaxNpcs) return;
             if (EditorType.Map == GameState.MyEditorType) return;
 
-            switch (Data[index].Behavior)
+            switch (Data[(int)npcNum].Behavior)
             {
                 case 0: color = Color.Red; backColor = Color.Black; break;
                 case 1: color = Color.Green; backColor = Color.Black; break;
@@ -308,25 +307,25 @@ namespace Client
             var remaining = Data.MyMapNpc[mapNpcNum].DeathTimer - General.GetTickCount() / 1000;
             if (remaining < 0) remaining = 0;
 
-            var name = remaining > 0 ? $"{remaining}..." : Data[index].Name;
+            var name = remaining > 0 ? $"{remaining}..." : Data[(int)npcNum].Name;
 
-            int baseWorldX = Data[index].MyMapNpc[mapNpcNum].X;
-            int baseWorldY = Data[index].MyMapNpc[mapNpcNum].Y;
-
+            int baseWorldX = Data.MyMapNpc[mapNpcNum].X;
+            int baseWorldY = Data.MyMapNpc[mapNpcNum].Y;
+            
             if (name == null) return;
 
             // X position: match player name centering over the tile
             var size = TextRenderer.Fonts[Font.Georgia].MeasureString(name);
-            int screenX = GameLogic.ConvertMapX(baseWorldX);
-            int drawX = (int)(screenX + (Constants.TileSize - size.X) / 2);
+            var padding = GameLogic.ConvertMapX((int)size.X / 6);
+            var drawX = (int)(baseWorldX + (Constants.TileSize - size.X) / 2 + padding);
 
-            int spriteNum = Data[index].Npc[(int)npcNum].Sprite;
+            int spriteNum = Data[(int)npcNum].Sprite;
             if (spriteNum <= 0 || spriteNum > GameState.NumCharacters)
             {
                 // No valid graphic: render just above feet similar to player fallback
                 int screenY = GameLogic.ConvertMapY(baseWorldY);
                 textY = screenY - 16;
-                TextRenderer.OnRender(name, drawX, textY, OnDrawackColor);
+                TextRenderer.OnDraw(name, drawX, textY, color, backColor);
                 return;
             }
 
@@ -335,7 +334,7 @@ namespace Client
             {
                 int screenY = GameLogic.ConvertMapY(baseWorldY);
                 textY = screenY - 16;
-                TextRenderer.OnRender(name, drawX, textY, OnDrawackColor);
+                TextRenderer.OnDraw(name, drawX, textY, color, backColor);
                 return;
             }
 
@@ -359,7 +358,170 @@ namespace Client
             int textPixelHeight = (int)Math.Ceiling(TextRenderer.Fonts[Font.Georgia].LineSpacing * TextRenderer.BaseScale);
             int margin = 8;
             textY = spriteTopScreenY - textPixelHeight + margin;
-            TextRenderer.OnRender(name, drawX, textY, OnDrawackColor);
+            TextRenderer.OnDraw(name, drawX, textY, color, backColor);
+        }
+
+        public static void OnDraw(int mapNpcNum)
+        {
+            // Segmented NPC draw mirroring player logic (Idle/Run/Attack) with fallback.
+            byte anim = 0; // frame within chosen segment
+            int x;
+            int y;
+            int sprite;
+            int spriteLeft = 0; // direction row
+            Rectangle rect;
+            int attackSpeed = 1000; // attack duration (ms) for one full NPC attack animation cycle
+
+            // Check if Npc exists
+            if (Data.MyMapNpc[(int)mapNpcNum].Num < 0 ||
+                Data.MyMapNpc[(int)mapNpcNum].Num > Variables.MaxNpcs)
+                return;
+
+            if (EditorType.Map == GameState.MyEditorType)
+                return;
+
+            x = (int)Math.Floor((double)Data.MyMapNpc[(int)mapNpcNum].X / Constants.TileSize);
+            y = (int)Math.Floor((double)Data.MyMapNpc[(int)mapNpcNum].Y / Constants.TileSize);
+
+            // Ensure Npc is within the tile view range
+            if (x < GameState.TileView.Left |
+                x > GameState.TileView.Right)
+                return;
+
+            if (y < GameState.TileView.Top |
+                y > GameState.TileView.Bottom)
+                return;
+
+            // Stream Npc if not yet loaded
+            Npc.OnStream((int)Data.MyMapNpc[(int)mapNpcNum].Num);
+
+            if (Data.MyMapNpc[(int)mapNpcNum].Num < 0 ||
+                Data.MyMapNpc[(int)mapNpcNum].Num > Variables.MaxNpcs)
+                return;
+                
+            // Get the sprite of the Npc
+            sprite = Data[(int)Data.MyMapNpc[(int)mapNpcNum].Num].Sprite;
+
+            // Validate sprite
+            if (sprite < 1 | sprite > GameState.NumCharacters)
+                return;
+
+            // Timing flags
+            long tick = General.GetTickCount();
+            bool isAttacking = Data.MyMapNpc[mapNpcNum].Attacking == 1; // treat full attack duration as attack
+            bool provisionalMoving = Data.MyMapNpc[mapNpcNum].Moving != 0;
+
+            // Reset attacking state if attack timer has passed
+            {
+                ref var instance = ref Data.MyMapNpc[(int)mapNpcNum];
+                if (instance.AttackTimer + attackSpeed < General.GetTickCount())
+                {
+                    instance.Attacking = 0;
+                    instance.AttackTimer = 0;
+                }
+            }
+
+            // Segmentation logic
+            var gfxInfo = GameClient.GetGfxInfo(System.IO.Path.Combine(Core.Globals.DataPath.Characters, sprite.ToString()));
+            if (gfxInfo == null) return;
+            int directionRows = GameClient.ComputeDirectionRows(gfxInfo.Height, Math.Max(1, SettingsManager.Instance.SpriteDirections));
+
+            // Map direction to row after computing available rows
+            spriteLeft = GameClient.MapDirectionToRow((Direction)Data.MyMapNpc[(int)mapNpcNum].Dir, directionRows);
+            int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
+            int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
+            int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
+            int expectedTotalColumns = idleFrames + runFrames + attackFrames;
+
+            int frameHeight = gfxInfo.Height / directionRows;
+            if (frameHeight <= 0) return;
+            int autoColsBySquare = frameHeight > 0 ? gfxInfo.Width / frameHeight : 0;
+            if (autoColsBySquare <= 0) autoColsBySquare = 1;
+            bool widthDivisible = expectedTotalColumns > 0 && gfxInfo.Width % expectedTotalColumns == 0;
+            int candidateFrameWidth = widthDivisible ? gfxInfo.Width / expectedTotalColumns : 0;
+            
+            // Relaxed segmentation: if width is divisible by expected columns we segment, even if not perfectly square.
+            bool canSegment = widthDivisible; // old heuristic removed to prevent cycling through all segments linearly
+            int frameColumnsForWidth = canSegment ? expectedTotalColumns : autoColsBySquare; // legacy fallback
+
+            // Dynamic segment ordering via settings
+            string orderCsv = SettingsManager.Instance.SpriteSegmentOrder ?? "idle,run,attack";
+            var tokens = orderCsv.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            if (tokens.Length != 3)
+                tokens = new[] { "idle", "run", "attack" };
+            for (int i = 0; i < tokens.Length; i++) tokens[i] = tokens[i].Trim().ToLowerInvariant();
+            if (!(tokens.Contains("idle") && tokens.Contains("run") && tokens.Contains("attack")))
+                tokens = new[] { "idle", "run", "attack" };
+            int runningOffset = 0;
+            int idleOffset = 0, runOffset = 0, attackOffset = 0;
+            for (int i = 0; i < tokens.Length; i++)
+            {
+                string t = tokens[i];
+                if (t == "idle") idleOffset = runningOffset;
+                else if (t == "run") runOffset = runningOffset;
+                else if (t == "attack") attackOffset = runningOffset;
+                if (t == "idle") runningOffset += idleFrames;
+                else if (t == "run") runningOffset += runFrames;
+                else if (t == "attack") runningOffset += attackFrames;
+            }
+
+            // Moving only meaningful if segmented sheet
+            bool isMoving = provisionalMoving && !isAttacking && canSegment;
+
+            // Determine frame inside its segment (Steps driven for run; idle frame stays 0)
+            if (canSegment)
+            {
+                if (isAttacking)
+                {
+                    long elapsed = tick - Data.MyMapNpc[mapNpcNum].AttackTimer;
+                    if (elapsed < 0) elapsed = 0;
+                    long duration = attackSpeed;
+                    if (duration <= 0) duration = 1;
+                    if (elapsed >= duration) elapsed = duration - 1;
+                    double ratio = elapsed / (double)duration;
+                    int frame = (int)(ratio * attackFrames);
+                    if (frame >= attackFrames) frame = attackFrames - 1;
+                    anim = (byte)frame;
+                }
+                else if (isMoving)
+                {
+                    anim = (byte)(Data.MyMapNpc[mapNpcNum].Steps % runFrames);
+                }
+                else
+                {
+                    anim = (byte)(Data.MyMapNpc[mapNpcNum].Steps % idleFrames); // idle animated
+                }
+            }
+            else
+            {
+                anim = (byte)(Data.MyMapNpc[mapNpcNum].Steps % frameColumnsForWidth);
+            }
+
+            // Frame placement
+            int segmentOffset = 0;
+            if (canSegment)
+            {
+                if (isAttacking) segmentOffset = attackOffset;
+                else if (isMoving) segmentOffset = runOffset;
+                else segmentOffset = idleOffset;
+            }
+            int frameColumn = Math.Min(frameColumnsForWidth - 1, segmentOffset + anim);
+            double frameWidth = gfxInfo.Width / (double)frameColumnsForWidth;
+            double frameHeightD = frameHeight;
+            rect = new Rectangle(
+                (int)Math.Round(frameColumn * frameWidth),
+                (int)Math.Round(spriteLeft * frameHeightD),
+                (int)Math.Round(frameWidth),
+                (int)Math.Round(frameHeightD));
+
+            // X/Y positioning
+            x = (int)Math.Round(Data.MyMapNpc[mapNpcNum].X - (gfxInfo.Width / (double)frameColumnsForWidth - 32d) / 2d);
+            if ((gfxInfo.Height / directionRows) > 32)
+                y = (int)Math.Round(Data.MyMapNpc[mapNpcNum].Y - (gfxInfo.Height / (double)directionRows - 32d));
+            else
+                y = Data.MyMapNpc[mapNpcNum].Y;
+
+            GameClient.DrawCharacterSprite(sprite, x, y, rect);
         }
     }
 }

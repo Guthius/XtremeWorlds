@@ -7,7 +7,7 @@ using static Core.Globals.Command;
 
 namespace Client
 {
-    public class MapAnimation : IContent
+    public class MapAnimation
     {
         public static byte Index;
         public static Core.Globals.Type.MapAnimation[]? Instance;
@@ -297,7 +297,7 @@ namespace Client
             }
         }
 
-        public static void OnReset()
+        public static void OnClearAll()
         {
             int i;
 

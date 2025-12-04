@@ -72,6 +72,9 @@ namespace Client
         public static Type.Picture Picture;
 
         #endregion
+
+        #region EventEditor
+
         public static void CopyEvent_Map(int X, int Y)
         {
             int count;
@@ -3524,7 +3527,7 @@ namespace Client
             }
         }
 
-        #endregion
+    #endregion
 
         public static void OnDrawName(int index)
         {
@@ -3596,7 +3599,7 @@ namespace Client
                 textY = GameLogic.ConvertMapY(Data.MapEvents[index].Y) - 16;
             }
 
-            TextRenderer.OnDraw(name, textX, textY, color, backcolor);
+            TextRenderer.OnRender(name, textX, textY, color, backcolor);
         }
 
         public static void OnDraw()
@@ -3631,7 +3634,7 @@ namespace Client
                 {
                     case 0: // Text Event (draw simple 'E' at the tile origin like other 32x32 textures)
                     {
-                        TextRenderer.OnDraw("E", screenX, screenY, Color.Green, Color.Black);
+                        TextRenderer.OnRender("E", screenX, screenY, Color.Green, Color.Black);
                         break;
                     }
 

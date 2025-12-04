@@ -8,7 +8,7 @@ namespace Client
 {
     public class Blood : IContent
     {
-        public Struct Data { get; set; } = Data.Blood;
+        public struct Data { get; set; } = Data.Blood;
 
         public void OnDraw(int index)
         {
@@ -18,7 +18,7 @@ namespace Client
             int y;
 
             ref var instance = ref Data[index];
-
+            
             if (instance.X < GameState.TileView.Left | instance.X > GameState.TileView.Right)
                 return;
 

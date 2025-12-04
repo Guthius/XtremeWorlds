@@ -9,7 +9,7 @@ using Type = Core.Globals.Type;
 
 namespace Client
 {
-    public class Animation : IContent
+    public class Animation
     {
 
         #region Database
@@ -42,7 +42,7 @@ namespace Client
             GameState.AnimationLoaded[index] = 0;
         }
 
-        public static void OnReset()
+        public static void OnClearAll()
         {
             int i;
 
@@ -52,7 +52,7 @@ namespace Client
                 OnClear(i);
         }
 
-        public void OnStream(int animationNum)
+        public static void OnStream(int animationNum)
         {
             if (animationNum >= 0 && string.IsNullOrEmpty(Data.Animation[animationNum].Name) && GameState.AnimationLoaded[animationNum] == 0)
             {

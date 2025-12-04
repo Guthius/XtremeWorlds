@@ -5,17 +5,15 @@ using System.Text;
 
 namespace Client
 {
-    public class Job : IContent
+    public class Job
     {
-        public Data Data { get; set; } = Data.Job;
-        
-        public void OnReset()
+        public static void OnClearAll()
         {
             for (int i = 0; i < Variables.MaxJobs; i++)
                 OnClear(i);
         }
 
-        public void OnClear(int index)
+        public static void OnClear(int index)
         {
             var statCount = System.Enum.GetValues(typeof(Stat)).Length;
             Data.Job[index] = default;

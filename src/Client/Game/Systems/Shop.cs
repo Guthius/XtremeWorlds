@@ -8,7 +8,7 @@ using Type = Core.Globals.Type;
 namespace Client
 {
 
-    public class Shop : IContent
+    public class Shop
     {
         public static void OnClose()
         {
@@ -23,7 +23,7 @@ namespace Client
 
         #region Database
 
-        public void OnClear(int index)
+        public static void OnClear(int index)
         {
             Data.Shop[index] = default;
             Data.Shop[index].Name = "";
@@ -36,7 +36,7 @@ namespace Client
             GameState.ShopLoaded[index] = 0;
         }
 
-        public static void OnReset()
+        public static void OnClearAll()
         {
             int i;
 
@@ -47,9 +47,9 @@ namespace Client
 
         }
 
-        public void OnStream(int index)
+        public static void OnStream(int shopNum)
         {
-            if (index >= 0 && string.IsNullOrEmpty(Data.Shop[index].Name) && GameState.ShopLoaded[index] == 0)
+            if (shopNum >= 0 && string.IsNullOrEmpty(Data.Shop[shopNum].Name) && GameState.ShopLoaded[shopNum] == 0)
             {
                 GameState.ShopLoaded[shopNum] = 1;
                 Sender.SendRequestShop(shopNum);
