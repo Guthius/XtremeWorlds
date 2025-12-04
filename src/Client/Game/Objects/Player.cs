@@ -1135,6 +1135,246 @@ namespace Client
 
             TextRenderer.OnRender(name, drawX, textY, color, backColor, Font.Georgia);
         }
+
+         public static void OnDraw(int index)
+        {
+            // Expect sprite sheet columns grouped evenly into 3 segments: Idle, Run, Attack.
+            // If columns not divisible by 3, we fallback to original linear usage.
+            byte anim; // frame index within chosen segment
+            int x;
+            int y;
+            int spriteNum;
+            var spriteleft = default(int);
+            int attackSpeed; // attack speed duration (ms) controlling full attack cycle length
+            Rectangle rect;
+
+            spriteNum = GetPlayerSprite(index);
+
+            if (index < 0 | index > Variables.MaxPlayers)
+                return;
+
+            if (spriteNum <= 0 | spriteNum > GameState.NumCharacters)
+                return;
+
+            // Derive attack speed duration (ms). If stored as seconds, multiply here; if already ms, keep as-is.
+            if (GetPlayerEquipment(index, Equipment.Weapon) >= 0)
+            {
+                attackSpeed = Data.Item[GetPlayerEquipment(index, Equipment.Weapon)].Speed;
+                if (attackSpeed < 50) attackSpeed *= 1000; // heuristic: treat tiny values as seconds, convert to ms
+            }
+            else
+            {
+                attackSpeed = 1000;
+            }
+
+            long tick = General.GetTickCount();
+            bool isAttacking = Data.Player[index].Attacking == 1; // full attack state
+            bool provisionalMoving = Data.Player[index].IsMoving; // raw flag from network
+            anim = 0; // will be set after texture info (need framesPerSegment)
+
+            // Check to see if we want to stop making him attack
+            {
+                ref var instance = ref Data.Player[index];
+                if (instance.AttackTimer + attackSpeed < General.GetTickCount())
+                {
+                    instance.Attacking = 0;
+                    instance.AttackTimer = 0;
+                }
+            }
+
+            // Dynamic row index from direction
+            // We'll compute directionRows below once gfxInfo known; use placeholder for now
+
+            var gfxInfo = GameClient.GetGfxInfo(Path.Combine(DataPath.Characters, spriteNum.ToString()));
+            if (gfxInfo == null)
+            {
+                // Handle the case where the graphic information is not found
+                return;
+            }
+
+            int directionRows = GameClient.ComputeDirectionRows(gfxInfo.Height, Math.Max(1, SettingsManager.Instance.SpriteDirections)); // dynamic rows (supports 4/8/1)
+            spriteleft = GameClient.MapDirectionToRow((Direction)GetPlayerDir(index), directionRows);
+
+            // Determine segment frame counts (allow variable counts)
+            int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
+            int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
+            int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
+            int[] segmentLengths = { idleFrames, runFrames, attackFrames };
+            int expectedTotalColumns = idleFrames + runFrames + attackFrames;
+
+            // Derive frameHeight from vertical directional stacking
+            int frameHeight = gfxInfo.Height / directionRows;
+            if (frameHeight <= 0) return; // safety
+
+            // Heuristic for legacy sheets: sprites are usually square per frame
+            int autoColsBySquare = frameHeight > 0 ? gfxInfo.Width / frameHeight : 0;
+            if (autoColsBySquare <= 0) autoColsBySquare = 1;
+
+            // Candidate segmented frame width if we attempted 3 segments
+            bool widthDivisible = expectedTotalColumns > 0 && gfxInfo.Width % expectedTotalColumns == 0;
+            int candidateFrameWidth = widthDivisible ? gfxInfo.Width / expectedTotalColumns : 0;
+
+            // Relax segmentation: any width-divisible sheet is treated as segmented.
+            bool canSegment = widthDivisible;
+            bool hasThreeSegments = canSegment;
+
+            int frameColumnsForWidth = canSegment ? expectedTotalColumns : autoColsBySquare;
+
+            // Dynamic segment ordering via settings (e.g. "idle,run,attack" or "attack,idle,run")
+            string orderCsv = SettingsManager.Instance.SpriteSegmentOrder ?? "idle,run,attack";
+            var tokens = orderCsv.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            if (tokens.Length != 3)
+                tokens = new[] { "idle", "run", "attack" };
+            // Normalize & validate
+            for (int i = 0; i < tokens.Length; i++) tokens[i] = tokens[i].Trim().ToLowerInvariant();
+            // Ensure all three unique expected names present; else fallback default
+            if (!(tokens.Contains("idle") && tokens.Contains("run") && tokens.Contains("attack")))
+                tokens = new[] { "idle", "run", "attack" };
+
+            // Build offsets based on order sequence
+            int runningOffset = 0;
+            int idleOffset = 0, runOffset = 0, attackOffset = 0;
+            for (int i = 0; i < tokens.Length; i++)
+            {
+                string t = tokens[i];
+                if (t == "idle") idleOffset = runningOffset;
+                else if (t == "run") runOffset = runningOffset;
+                else if (t == "attack") attackOffset = runningOffset;
+                // advance by that segment's length
+                if (t == "idle") runningOffset += idleFrames;
+                else if (t == "run") runningOffset += runFrames;
+                else if (t == "attack") runningOffset += attackFrames;
+            }
+
+            // Moving only meaningful if segmented sheet
+            bool isMoving = provisionalMoving && !isAttacking && hasThreeSegments;
+
+            // Determine frame inside its segment (Steps driven for run; idle frame stays 0)
+            if (hasThreeSegments)
+            {
+                if (isAttacking)
+                {
+                    // Time-based mapping: elapsed over attackSpeed spans exactly one full attack frame cycle
+                    long elapsed = tick - Data.Player[index].AttackTimer;
+                    if (elapsed < 0) elapsed = 0;
+                    long duration = attackSpeed;
+                    if (duration <= 0) duration = 1;
+                    if (elapsed >= duration) elapsed = duration - 1; // clamp
+                    double ratio = elapsed / (double)duration; // 0.. <1
+                    int frame = (int)(ratio * attackFrames);
+                    if (frame >= attackFrames) frame = attackFrames - 1;
+                    anim = (byte)frame;
+                }
+                else if (isMoving)
+                {
+                    // Run anim: tied to movement steps only
+                    int len = segmentLengths[1];
+                    anim = (byte)(Data.Player[index].Steps % len);
+                }
+                else
+                {
+                    // Idle: animate through idle frames using Steps
+                    int len = segmentLengths[0];
+                    anim = (byte)(Data.Player[index].Steps % len);
+                }
+            }
+            else
+            {
+                // Legacy: single segment; Steps only advance while moving so idle shows frame 0
+                anim = (byte)(Data.Player[index].Steps % frameColumnsForWidth); // legacy: cycles while idle too
+            }
+            // Calculate the X
+            x = (int)Math.Round(Data.Player[index].X - (gfxInfo.Width / (double)frameColumnsForWidth - 32d) / 2d);
+
+            // Is the player's height more than 32..?
+            if ((gfxInfo.Height / directionRows) > 32)
+            {
+                // Create a 32 pixel offset for larger sprites
+                y = (int)Math.Round(GetPlayerRawY(index) - (gfxInfo.Height / (double)directionRows - 32d));
+            }
+            else
+            {
+                // Proceed as normal
+                y = GetPlayerRawY(index);
+            }
+
+            int frameColumn;
+            int segmentOffset = 0;
+            if (hasThreeSegments)
+            {
+                if (isAttacking) segmentOffset = attackOffset;
+                else if (isMoving) segmentOffset = runOffset;
+                else segmentOffset = idleOffset;
+            }
+            frameColumn = Math.Min(frameColumnsForWidth - 1, segmentOffset + anim);
+            double frameWidth = gfxInfo.Width / (double)frameColumnsForWidth;
+            double frameHeightD = frameHeight; // already computed above
+            rect = new Rectangle((int)Math.Round(frameColumn * frameWidth),
+                (int)Math.Round(spriteleft * frameHeightD), (int)Math.Round(frameWidth),
+                (int)Math.Round(frameHeightD));
+
+            // render the actual sprite
+            // DrawShadow(x, y + 16)
+            if (GetPlayerDir(index) == (byte)Direction.Up)
+            {
+                GameClient.DrawCharacterSprite(spriteNum, x, y, rect);
+            }
+
+            // check for paperdolling with directional draw order rules
+            // Rule: draw weapon first when facing up (behind), draw weapon last when facing down (in front)
+            var dirVal = (Direction)GetPlayerDir(index);
+            Equipment[] eqOrder = new[] { Equipment.Weapon, Equipment.Armor, Equipment.Helmet, Equipment.Shield };
+
+            // Treat diagonals as their vertical tendency
+            bool isUp = dirVal == Direction.Up || dirVal == Direction.UpLeft || dirVal == Direction.UpRight;
+            bool isDown = dirVal == Direction.Down || dirVal == Direction.DownLeft || dirVal == Direction.DownRight;
+
+            if (isDown)
+            {
+                // Move weapon to the end so it draws on top
+                eqOrder = new[] { Equipment.Armor, Equipment.Helmet, Equipment.Shield, Equipment.Weapon };
+            }
+            else if (isUp)
+            {
+                // Ensure weapon is first so it draws behind
+                eqOrder = new[] { Equipment.Weapon, Equipment.Armor, Equipment.Helmet, Equipment.Shield };
+            }
+
+            foreach (var eq in eqOrder)
+            {
+                if (GetPlayerEquipment(index, eq) >= 0)
+                {
+                    var itemIndex = GetPlayerEquipment(index, eq);
+                    var paperId = Data.Item[itemIndex].Paperdoll;
+                    if (paperId > 0)
+                    {
+                        // Pass segment context so equipment animates consistently with base sprite.
+                        GameClient.DrawPaperdoll(x, y, paperId, anim, spriteleft, isMoving, isAttacking);
+                    }
+                }
+            }
+
+            if (GetPlayerDir(index) != (byte)Direction.Up)
+            {
+                GameClient.DrawCharacterSprite(spriteNum, x, y, rect);
+            }
+
+            // Check to see if we want to stop showing emote
+            {
+                ref var instance1 = ref Data.Player[index];
+                if (instance1.EmoteTimer < General.GetTickCount())
+                {
+                    instance1.Emote = 0;
+                    instance1.EmoteTimer = 0;
+                }
+            }
+
+            // check for emotes
+            if (Data.Player[GameState.MyIndex].Emote > 0)
+            {
+                GameClient.DrawEmote(x, y, Data.Player[GameState.MyIndex].Emote);
+            }
+        }
     }
     
     #endregion
