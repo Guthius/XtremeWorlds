@@ -182,7 +182,7 @@ public class ChatBubble
             // Calculate horizontal and vertical centers with padding
             double padding = (double) actualWidth / 6.0d;
 
-            TextRenderer.OnRender(theArray[(int) i],
+            TextRenderer.OnDraw(theArray[(int) i],
                 (int) Math.Round(x - theArray[(int) i].Length / 2d - TextRenderer.GetTextWidth(theArray[(int) i]) / 2d +
                                     padding), (int) y2, GameClient.QbColorToXnaColor(instance.Color),
                 Color.Black);

@@ -1133,7 +1133,7 @@ namespace Client
                 }
             }
 
-            TextRenderer.OnRender(name, drawX, textY, color, backColor, Font.Georgia);
+            TextRenderer.OnDraw(name, drawX, textY, color, backColor, Font.Georgia);
         }
 
          public static void OnDraw(int index)

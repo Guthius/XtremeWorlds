@@ -3599,7 +3599,7 @@ namespace Client
                 textY = GameLogic.ConvertMapY(Data.MapEvents[index].Y) - 16;
             }
 
-            TextRenderer.OnRender(name, textX, textY, color, backcolor);
+            TextRenderer.OnDraw(name, textX, textY, color, backcolor);
         }
 
         public static void OnDraw()
@@ -3634,7 +3634,7 @@ namespace Client
                 {
                     case 0: // Text Event (draw simple 'E' at the tile origin like other 32x32 textures)
                     {
-                        TextRenderer.OnRender("E", screenX, screenY, Color.Green, Color.Black);
+                        TextRenderer.OnDraw("E", screenX, screenY, Color.Green, Color.Black);
                         break;
                     }
 

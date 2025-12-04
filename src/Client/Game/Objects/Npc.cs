@@ -323,7 +323,7 @@ namespace Client
                 // No valid graphic: render just above feet similar to player fallback
                 int screenY = GameLogic.ConvertMapY(baseWorldY);
                 textY = screenY - 16;
-                TextRenderer.OnRender(name, drawX, textY, color, backColor);
+                TextRenderer.OnDraw(name, drawX, textY, color, backColor);
                 return;
             }
 
@@ -332,7 +332,7 @@ namespace Client
             {
                 int screenY = GameLogic.ConvertMapY(baseWorldY);
                 textY = screenY - 16;
-                TextRenderer.OnRender(name, drawX, textY, color, backColor);
+                TextRenderer.OnDraw(name, drawX, textY, color, backColor);
                 return;
             }
 
@@ -356,7 +356,7 @@ namespace Client
             int textPixelHeight = (int)Math.Ceiling(TextRenderer.Fonts[Font.Georgia].LineSpacing * TextRenderer.BaseScale);
             int margin = 8;
             textY = spriteTopScreenY - textPixelHeight + margin;
-            TextRenderer.OnRender(name, drawX, textY, color, backColor);
+            TextRenderer.OnDraw(name, drawX, textY, color, backColor);
         }
 
         public static void OnDraw(int mapNpcNum)
