@@ -45,7 +45,7 @@ public class ChatBubble
                 int spriteNumLocal = GetPlayerSprite((int)instance.Target);
                 if (spriteNumLocal > 0 && spriteNumLocal <= GameState.NumCharacters)
                 {
-                    var gi = GameClient.GetGfxInfo(Path.Combine(DataPath.Characters, spriteNumLocal.ToString()));
+                    var gi = GameClient.GetGfxInfo(System.IO.Path.Combine(Core.Globals.DataPath.Characters, spriteNumLocal.ToString()));
                     if (gi != null && gi.Height > 0)
                     {
                         int configuredDirs = SettingsManager.Instance.SpriteDirections <= 0 ? 4 : SettingsManager.Instance.SpriteDirections;
@@ -117,11 +117,11 @@ public class ChatBubble
         y2 = y - (Information.UBound(theArray) + 1) * 12;
 
         // render bubble - top left
-        string argPath = Path.Combine(Core.Globals.DataPath.Gui, 33.ToString());
+        string argPath = System.IO.Path.Combine(Core.Globals.DataPath.Gui, 33.ToString());
         GameClient.RenderTexture(ref argPath, (int) (x2 - 9L), (int) (y2 - 5L), 0, 0, 9, 5, 9, 5);
 
         // top right
-        string argPath1 = Path.Combine(Core.Globals.DataPath.Gui, 33.ToString());
+        string argPath1 = System.IO.Path.Combine(Core.Globals.DataPath.Gui, 33.ToString());
         GameClient.RenderTexture(ref argPath1, (int) (x2 + maxWidth), (int) (y2 - 5L), 119, 0, 9, 5, 9, 5);
 
         // top
@@ -129,40 +129,40 @@ public class ChatBubble
         GameClient.RenderTexture(ref argPath2, (int) x2, (int) (y2 - 5L), 9, 0, (int) maxWidth, 5, 5, 5);
 
         // bottom left
-        string argPath3 = Path.Combine(Core.Globals.DataPath.Gui, 33.ToString());
+        string argPath3 = System.IO.Path.Combine(Core.Globals.DataPath.Gui, 33.ToString());
         GameClient.RenderTexture(ref argPath3, (int) (x2 - 9L), (int) y, 0, 19, 9, 6, 9, 6);
 
         // bottom right
-        string argPath4 = Path.Combine(Core.Globals.DataPath.Gui, 33.ToString());
+        string argPath4 = System.IO.Path.Combine(Core.Globals.DataPath.Gui, 33.ToString());
         GameClient.RenderTexture(ref argPath4, (int) (x2 + maxWidth), (int) y, 119, 19, 9, 6, 9, 6);
 
         // bottom - left half
-        string argPath5 = Path.Combine(Core.Globals.DataPath.Gui, 33.ToString());
+        string argPath5 = System.IO.Path.Combine(Core.Globals.DataPath.Gui, 33.ToString());
         GameClient.RenderTexture(ref argPath5, (int) x2, (int) y, 9, 19, (int) (maxWidth / 2L - 5L), 6, 6, 6);
 
         // bottom - right half
-        string argPath6 = Path.Combine(Core.Globals.DataPath.Gui, 33.ToString());
+        string argPath6 = System.IO.Path.Combine(Core.Globals.DataPath.Gui, 33.ToString());
         GameClient.RenderTexture(ref argPath6, (int) (x2 + maxWidth / 2L + 6L), (int) y, 9, 19, (int) (maxWidth / 2L - 5L), 6,
             9,
             6);
 
         // left
-        string argPath7 = Path.Combine(Core.Globals.DataPath.Gui, 33.ToString());
+        string argPath7 = System.IO.Path.Combine(Core.Globals.DataPath.Gui, 33.ToString());
         GameClient.RenderTexture(ref argPath7, (int) (x2 - 9L), (int) y2, 0, 6, 9, (Information.UBound(theArray) + 1) * 12, 9, 6);
 
         // right
-        string argPath8 = Path.Combine(Core.Globals.DataPath.Gui, 33.ToString());
+        string argPath8 = System.IO.Path.Combine(Core.Globals.DataPath.Gui, 33.ToString());
         GameClient.RenderTexture(ref argPath8, (int) (x2 + maxWidth), (int) y2, 119, 6, 9, (Information.UBound(theArray) + 1) * 12,
             9,
             6);
 
         // center
-        string argPath9 = Path.Combine(Core.Globals.DataPath.Gui, 33.ToString());
+        string argPath9 = System.IO.Path.Combine(Core.Globals.DataPath.Gui, 33.ToString());
         GameClient.RenderTexture(ref argPath9, (int) x2, (int) y2, 9, 5, (int) maxWidth, (Information.UBound(theArray) + 1) * 12, 9,
             5);
 
         // little pointy bit
-        string argPath10 = Path.Combine(Core.Globals.DataPath.Gui, 33.ToString());
+        string argPath10 = System.IO.Path.Combine(Core.Globals.DataPath.Gui, 33.ToString());
         GameClient.RenderTexture(ref argPath10, (int) (x - 5L), (int) y, 58, 19, 11, 11, 11, 11);
 
         // render each line centralized

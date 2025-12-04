@@ -1185,7 +1185,7 @@ namespace Client
             // Dynamic row index from direction
             // We'll compute directionRows below once gfxInfo known; use placeholder for now
 
-            var gfxInfo = GameClient.GetGfxInfo(Path.Combine(DataPath.Characters, spriteNum.ToString()));
+            var gfxInfo = GameClient.GetGfxInfo(System.IO.Path.Combine(Core.Globals.DataPath.Characters, spriteNum.ToString()));
             if (gfxInfo == null)
             {
                 // Handle the case where the graphic information is not found

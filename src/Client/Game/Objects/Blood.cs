@@ -33,7 +33,7 @@ namespace Client
                 destRec = new Rectangle(GameLogic.ConvertMapX(instance.X),
                     GameLogic.ConvertMapY(instance.Y), Constants.TileSize, Constants.TileSize);
 
-                string argPath = Path.Combine(Core.Globals.DataPath.Misc, "Blood");
+                string argPath = System.IO.Path.Combine(Core.Globals.DataPath.Misc, "Blood");
                 GameClient.RenderTexture(ref argPath, x, y, srcRec.X, srcRec.Y, srcRec.Width, srcRec.Height);
             }
         }
