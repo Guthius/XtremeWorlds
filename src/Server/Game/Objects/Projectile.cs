@@ -11,10 +11,11 @@ using static Core.Globals.Command;
 using static Core.Net.Packets;
 using Type = Core.Globals.Type;
 using System.Linq;
+using Core.Interfaces;
 
 namespace Server;
 
-public static class Projectile
+public class Projectile : IData, IAsyncData
 {
     private static void TryAttackAtTile(int map, ref Type.MapProjectile mp, int tileX, int tileY, int projId)
     {
@@ -94,17 +95,17 @@ public static class Projectile
             }
         }
     }
-    public static void Save(int projectileNum)
+    public static void OnSave(int index)
     {
-        var json = JsonConvert.SerializeObject(Data.Projectile[projectileNum]);
+        var json = JsonConvert.SerializeObject(Data.Projectile[index]);
 
-        if (Database.RowExists(projectileNum, "projectile"))
+        if (Database.RowExists(index, "projectile"))
         {
-            Database.UpdateRow(projectileNum, json, "projectile", "data");
+            Database.UpdateRow(index, json, "projectile", "data");
         }
         else
         {
-            Database.InsertRow(projectileNum, json, "projectile");
+            Database.InsertRow(index, json, "projectile");
         }
     }
 
@@ -113,29 +114,30 @@ public static class Projectile
         await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxProjectiles), OnLoadAsync);
     }
 
-    public static async ValueTask OnLoadAsync(int projectileNum, CancellationToken cancellationToken)
+    public static async ValueTask OnLoadAsync(int index, CancellationToken cancellationToken)
     {
-        var data = await Database.SelectRowAsync(projectileNum, "projectile", "data");
+        var data = await Database.SelectRowAsync(index, "projectile", "data");
         if (data is null)
         {
-            Clear(projectileNum);
+            OnClear(index);
             return;
         }
 
         var projectileData = data.ToObject<Type.Projectile>();
 
-        Data.Projectile[projectileNum] = projectileData;
+        Data.Projectile[index] = projectileData;
     }
 
-    private static void Clear(int projectileNum)
+    public static void OnClear(int index)
     {
-        Data.Projectile[projectileNum].Name = "";
-        Data.Projectile[projectileNum].Sprite = 0;
-        Data.Projectile[projectileNum].Range = 0;
-        Data.Projectile[projectileNum].Speed = 0;
-        Data.Projectile[projectileNum].Damage = 0;
-        Data.Projectile[projectileNum].Animation = -1;
+        Data.Projectile[index].Name = "";
+        Data.Projectile[index].Sprite = 0;
+        Data.Projectile[index].Range = 0;
+        Data.Projectile[index].Speed = 0;
+        Data.Projectile[index].Damage = 0;
+        Data.Projectile[index].Animation = -1;
     }
+    
     public static void PlayerFireProjectileFreeAim(int playerId, short vx, short vy, int itemNum)
     {
         var mapNum = GetPlayerMap(playerId);
@@ -329,14 +331,14 @@ public static class Projectile
                 // Expire long-running projectiles defensively
                 if (mp.Timer > 0 && now > mp.Timer)
                 {
-                    MapProjectile.Clear(map, i);
+                    MapProjectile.OnClear(map, i);
                     continue;
                 }
 
                 var projId = mp.ProjectileNum;
                 if (projId < 0 || projId >= Data.Projectile.Length)
                 {
-                    MapProjectile.Clear(map, i);
+                    MapProjectile.OnClear(map, i);
                     continue;
                 }
 
@@ -395,7 +397,7 @@ public static class Projectile
                                 // Try to apply attack on expire at destination
                                 TryAttackAtTile(map, ref mp, tx, ty, projId);
                             }
-                            MapProjectile.Clear(map, i);
+                            MapProjectile.OnClear(map, i);
                             moved = false;
                             break;
                         }
@@ -413,7 +415,7 @@ public static class Projectile
                             NetworkSend.SendAnimation(map, anim, tx, ty);
                             TryAttackAtTile(map, ref mp, tx, ty, projId);
                         }
-                        MapProjectile.Clear(map, i);
+                        MapProjectile.OnClear(map, i);
                         moved = false;
                         break;
                     }
@@ -431,7 +433,7 @@ public static class Projectile
                             NetworkSend.SendAnimation(map, anim, tx, ty);
                             TryAttackAtTile(map, ref mp, tx, ty, projId);
                         }
-                        MapProjectile.Clear(map, i);
+                        MapProjectile.OnClear(map, i);
                         moved = false;
                         break;
                     }
@@ -446,7 +448,7 @@ public static class Projectile
                             TryAttackAtTile(map, ref mp, tileX, tileY, projId);
                         }
                         
-                        MapProjectile.Clear(map, i);
+                        MapProjectile.OnClear(map, i);
                         moved = false;
                         break;
                     }
@@ -503,7 +505,7 @@ public static class Projectile
                         {
                             General.Logger.LogError(ex, "[Script] Error in {MethodName}", "ProjectileAttack");
                         }
-                        MapProjectile.Clear(map, i);
+                        MapProjectile.OnClear(map, i);
                         moved = false;
                         break;
                     }
@@ -549,7 +551,7 @@ public static class Projectile
                         {
                             General.Logger.LogError(ex, "[Script] Error in {MethodName}", "ProjectileAttack");
                         }
-                        MapProjectile.Clear(map, i);
+                        MapProjectile.OnClear(map, i);
                         moved = false;
                         break;
                     }
@@ -560,5 +562,25 @@ public static class Projectile
                 NetworkSend.SendProjectileToMap(map, i);
             }
         }
+    }
+
+    public static void OnDraw(int index)
+    {
+        throw new NotImplementedException();
+    }
+
+    public static void OnStream(int index)
+    {
+        throw new NotImplementedException();
+    }
+
+    public static void OnReset()
+    {
+        throw new NotImplementedException();
+    }
+
+    public static void OnLoad(int index)
+    {
+        throw new NotImplementedException();
     }
 }

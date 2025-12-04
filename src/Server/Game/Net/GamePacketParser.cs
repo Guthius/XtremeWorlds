@@ -1053,7 +1053,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var mapNum = GetPlayerMap(session.Id);
 
         var ii = Data.Map[mapNum].Revision + 1;
-        Map.Clear(mapNum);
+        Map.OnClear(mapNum);
 
         var packetReader = new PacketReader(bytes);
 
@@ -1279,8 +1279,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         }
 
         // Save the map
-        Map.Save(mapNum);
-        Npc.SpawnMapNpcs(mapNum).GetAwaiter().GetResult();
+        Map.OnSave(mapNum);
+        MapNpc.OnSpawn(mapNum).GetAwaiter().GetResult();
         EventLogic.SpawnGlobalEvents(mapNum).GetAwaiter().GetResult();
 
         foreach (var i in PlayerService.Instance.PlayerIds)
@@ -1298,7 +1298,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var loopTo11 = Core.Globals.Variables.MaxMapItems;
         for (var i = 0; i < loopTo11; i++)
         {
-            MapItem.Clear(i, GetPlayerMap(session.Id));
+            MapItem.OnClear(i, GetPlayerMap(session.Id));
         }
 
         // Respawn
@@ -1360,7 +1360,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var loopTo = Core.Globals.Variables.MaxMapItems;
         for (i = 0; i < loopTo; i++)
         {
-            MapItem.Clear(i, GetPlayerMap(session.Id));
+            MapItem.OnClear(i, GetPlayerMap(session.Id));
         }
 
         // Respawn
@@ -1369,7 +1369,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         // Respawn NpcS
         var loopTo1 = Core.Globals.Variables.MaxMapNpcs;
         for (i = 0; i < loopTo1; i++)
-            Npc.SpawnNpc(i, GetPlayerMap(session.Id));
+            MapNpc.OnSpawn(i, GetPlayerMap(session.Id));
 
         EventLogic.SpawnMapEventsFor(session.Id, GetPlayerMap(session.Id));
 
@@ -1571,7 +1571,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         // Save it
         NetworkSend.SendUpdateShopToAll(shopNum);
-        Shop.Save(shopNum);
+        Shop.OnSave(shopNum);
         Log.Add(GetAccountLogin(session.Id) + " saving shop #" + shopNum + ".", Constant.AdminLog);
     }
 
@@ -1653,7 +1653,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         // Save it
         NetworkSend.SendUpdateSkillToAll(skillNum);
-        Skill.Save(skillNum);
+        Skill.OnSave(skillNum);
         Log.Add(GetAccountLogin(session.Id) + " saved Skill #" + skillNum + ".", Constant.AdminLog);
     }
 
@@ -2730,7 +2730,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             instance.BaseExp = buffer.ReadInt32();
         }
 
-        Job.Save(jobNum);
+        Job.OnSave(jobNum);
         NetworkSend.SendJobToAll(session.Id);
     }
 
@@ -2810,7 +2810,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         moral.PlayerBlock = packetReader.ReadBoolean();
         moral.NpcBlock = packetReader.ReadBoolean();
 
-        Moral.Save(moralNum);
+        Moral.OnSave(moralNum);
 
         General.Logger.LogInformation("{AccountName} saved moral #{MoralNum}",
             GetAccountLogin(session.Id), moralNum);
@@ -2913,7 +2913,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         var mapNum = GetPlayerMap(session.Id);
 
-        MapProjectile.Clear(mapNum, projectileNum);
+        MapProjectile.OnClear(mapNum, projectileNum);
     }
 
     public static void Packet_RequestEditProjectile(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -2964,7 +2964,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Data.Projectile[projectileNum].Damage = packetReader.ReadInt32();
         Data.Projectile[projectileNum].Animation = packetReader.ReadInt32();
 
-        Projectile.Save(projectileNum);
+        Projectile.OnSave(projectileNum);
 
         General.Logger.LogInformation("{AccountName} saved projectile #{ProjectileNum}",
             GetAccountLogin(session.Id), projectileNum);
@@ -3145,7 +3145,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Data.Item[itemNum].Projectile = packetReader.ReadInt32();
         Data.Item[itemNum].Ammo = packetReader.ReadInt32();
 
-        Item.Save(itemNum);
+        Item.OnSave(itemNum);
 
         General.Logger.LogInformation("{AccountName} saved item #{ItemNum}",
             GetAccountLogin(session.Id), itemNum);
@@ -3155,7 +3155,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
     public static void Packet_GetItem(GameSession session, ReadOnlyMemory<byte> bytes)
     {
-        MapItem.GetItem(session.Id);
+        Server.Player.OnGetItem(session.Id);
     }
 
     public static void Packet_DropItem(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -3253,7 +3253,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             Data.Animation[animationNum].Sprite[i] = packetReader.ReadInt32();
         }
 
-        Animation.Save(animationNum);
+        Animation.OnSave(animationNum);
 
         General.Logger.LogInformation("{AccountName} saved animation #{AnimationNum}",
             GetAccountLogin(session.Id), animationNum);
@@ -3422,7 +3422,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Data.Npc[npcNum].Level = packetReader.ReadByte();
         Data.Npc[npcNum].Damage = packetReader.ReadInt32();
 
-        Npc.Save(npcNum);
+        Npc.OnSave(npcNum);
 
         General.Logger.LogInformation("{AccountName} saved NPC #{NpcNum}",
             GetAccountLogin(session.Id), npcNum);

@@ -1,5 +1,6 @@
 ﻿using Core;
 using Core.Globals;
+using Core.Interfaces;
 using Core.Net;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -13,46 +14,66 @@ using Type = Core.Globals.Type;
 
 namespace Server;
 
-public static class Item
+public class Item : IData, IAsyncData
 {
-    public static void Save(int itemNum)
+    public static void OnSave(int index)
     {
-        var json = JsonConvert.SerializeObject(Data.Item[itemNum]);
+        var json = JsonConvert.SerializeObject(Data.Item[index]);
 
-        if (Database.RowExists(itemNum, "item"))
+        if (Database.RowExists(index, "item"))
         {
-            Database.UpdateRow(itemNum, json, "item", "data");
+            Database.UpdateRow(index, json, "item", "data");
         }
         else
         {
-            Database.InsertRow(itemNum, json, "item");
+            Database.InsertRow(index, json, "item");
         }
     }
 
-    public static async Task OnLoadAllAsync()
+    public static Task OnLoadAllAsync()
     {
-        await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxItems), OnLoadAsync);
+        return Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxItems), OnLoadAsync);
     }
 
-    private static async ValueTask OnLoadAsync(int itemNum, CancellationToken cancellationToken)
+    public static async ValueTask OnLoadAsync(int index, CancellationToken cancellationToken)
     {
-        var data = await Database.SelectRowAsync(itemNum, "item", "data");
+        var data = await Database.SelectRowAsync(index, "item", "data");
         if (data is null)
         {
-            Clear(itemNum);
+            OnClear(index);
             return;
         }
 
         var itemData = JObject.FromObject(data).ToObject<Type.Item>();
 
-        Data.Item[itemNum] = itemData;
+        Data.Item[index] = itemData;
     }
 
-    private static void Clear(int itemNum)
+    public static void OnClear(int index)
     {
-        Data.Item[itemNum].Name = "";
-        Data.Item[itemNum].Description = "";
-        Data.Item[itemNum].Ammo = -1;
-        Data.Item[itemNum].Stackable = 1;
+        Data.Item[index].Name = "";
+        Data.Item[index].Description = "";
+        Data.Item[index].Ammo = -1;
+        Data.Item[index].Stackable = 1;
+    }
+
+    public static void OnDraw(int index)
+    {
+        throw new NotImplementedException();
+    }
+
+    public static void OnStream(int index)
+    {
+        throw new NotImplementedException();
+    }
+
+    public static void OnReset()
+    {
+        throw new NotImplementedException();
+    }
+
+    public static void OnLoad(int index)
+    {
+        throw new NotImplementedException();
     }
 }

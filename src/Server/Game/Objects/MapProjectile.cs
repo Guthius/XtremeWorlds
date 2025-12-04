@@ -1,13 +1,14 @@
 ﻿using Core.Globals;
+using Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Server
 {
-    public static class MapProjectile
+    public class MapProjectile : IData
     {
-        public static void Clear(int mapNum, int mapProjectileNum)
+        public static void OnClear(int mapNum, int mapProjectileNum)
         {
             ref var mp = ref Data.MapProjectile[mapNum, mapProjectileNum];
             mp.ProjectileNum = -1;
@@ -31,5 +32,40 @@ namespace Server
             NetworkSend.SendProjectileToMap(mapNum, mapProjectileNum);
         }
 
+        public static void OnClear(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnDraw(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnLoad(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnReset()
+        {
+            for (int mapNum = 0; mapNum < Core.Globals.Variables.MaxMaps; mapNum++)
+            {
+                for (int mapProjectileNum = 0; mapProjectileNum < Data.MapProjectile.GetLength(1); mapProjectileNum++)
+                {
+                    OnClear(mapNum, mapProjectileNum);
+                }
+            }
+        }
+
+        public static void OnSave(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnStream(int index)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

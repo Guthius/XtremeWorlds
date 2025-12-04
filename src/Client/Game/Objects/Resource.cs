@@ -108,20 +108,29 @@ namespace Client
                 resourceSprite = Data.Resource[mapResourceNum].ExhaustedImage;
             }
 
+            var gfxInfo = GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Resources, resourceSprite.ToString()));
+            if (gfxInfo == null)
+                return;
+
             // src rect
             rec.Y = 0;
-            rec.Height = GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Resources, resourceSprite.ToString())).Height;
+            rec.Height = gfxInfo.Height;
             rec.X = 0;
-            rec.Width = GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Resources, resourceSprite.ToString())).Width;
+            rec.Width = gfxInfo.Width;
 
             // Set base x + y, then the offset due to size
-            x = (int)Math.Round(Data.MyMapResource[resourceNum].X * Constants.TileSize - GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Resources, resourceSprite.ToString())).Width / 2d + 16d);
-            y = Data.MyMapResource[resourceNum].Y * Constants.TileSize - GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Resources, resourceSprite.ToString())).Height + 32;
+            x = (int)Math.Round(Data.MyMapResource[resourceNum].X * Constants.TileSize - gfxInfo.Width / 2d + 16d);
+            y = Data.MyMapResource[resourceNum].Y * Constants.TileSize - gfxInfo.Height + 32;
 
             OnDraw(resourceSprite, x, y, rec);
         }
 
         public static void OnLoad(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnSave(int index)
         {
             throw new NotImplementedException();
         }

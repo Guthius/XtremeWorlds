@@ -1,4 +1,5 @@
 ﻿using Core.Globals;
+using Core.Interfaces;
 using Core.Net;
 using Microsoft.Extensions.Logging;
 using System;
@@ -8,49 +9,8 @@ using static Core.Net.Packets;
 
 namespace Server
 {
-    public static class MapItem
+    public class MapItem : IData
     {
-        public static void GetItem(int playerId)
-        {
-            var mapNum = Command.GetPlayerMap(playerId);
-
-            for (var mapItemNum = 0; mapItemNum < Core.Globals.Variables.MaxMapItems; mapItemNum++)
-            {
-                if (Data.MapItem[mapNum, mapItemNum].Num < 0 ||
-                    Data.MapItem[mapNum, mapItemNum].Num >= Core.Globals.Variables.MaxItems)
-                {
-                    continue;
-                }
-
-                if (Math.Floor((double)Data.MapItem[mapNum, mapItemNum].X / Constants.TileSize) != Command.GetPlayerX(playerId) || Math.Floor((double)Data.MapItem[mapNum, mapItemNum].Y / Constants.TileSize) != Command.GetPlayerY(playerId))
-                {
-                    continue;
-                }
-
-                var slot = Player.FindOpenInvSlot(playerId, Data.MapItem[mapNum, mapItemNum].Num);
-                if (slot == -1)
-                {
-                    NetworkSend.PlayerMsg(playerId, "Your inventory is full.", (int)ColorName.BrightRed);
-                    break;
-                }
-
-                if (!Player.CanPickup(playerId, mapItemNum))
-                {
-                    break;
-                }
-
-                try
-                {
-                    Script.Instance?.MapGetItem(playerId, mapNum, mapItemNum, slot);
-                }
-                catch (Exception ex)
-                {
-                    General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(GetItem));
-                }
-
-                break;
-            }
-        }
         public static void SpawnAll()
         {
             for (var mapNum = 0; mapNum < Core.Globals.Variables.MaxMaps; mapNum++)
@@ -186,10 +146,46 @@ namespace Server
             return -1;
         }
 
-        public static void Clear(int index, int mapNum)
+        public static void OnClear(int index, int mapNum)
         {
             Data.MapItem[mapNum, index].PlayerName = "";
             Data.MapItem[mapNum, index].Num = -1;
+        }
+
+        public static void OnDraw(int index)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public static void OnStream(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnReset()
+        {
+            for (int mapNum = 0; mapNum < Core.Globals.Variables.MaxMaps; mapNum++)
+            {
+                for (int i = 0; i < Core.Globals.Variables.MaxMapItems; i++)
+                {
+                    OnClear(i, mapNum);
+                }
+            }
+        }
+
+        public static void OnLoad(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnSave(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnClear(int index)
+        {
+            throw new NotImplementedException();
         }
     }
 }

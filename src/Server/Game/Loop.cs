@@ -68,7 +68,7 @@ namespace Server
                 if (tick > tmrNpcWalk)
                 {
                     // NPC pixel step progression (1px per tick) independent of player loop
-                    Npc.ProcessActiveNpcMovement();
+                    MapNpc.ProcessActiveNpcMovement();
                     
                     tmrNpcWalk = General.GetTimeMs() + 5;
                 }
@@ -177,7 +177,7 @@ namespace Server
                 // Clear out unnecessary junk
                 var loopTo1 = Core.Globals.Variables.MaxMapItems;
                 for (x = 0; x < loopTo1; x++)
-                    MapItem.Clear(x, y);
+                    MapItem.OnClear(x, y);
 
                 // Spawn the items
                 MapItem.Spawn(y);

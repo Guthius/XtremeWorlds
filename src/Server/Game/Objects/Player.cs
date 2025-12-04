@@ -12,7 +12,7 @@ using static Core.Net.Packets;
 
 namespace Server;
 
-public static class Player
+public class Player
 {
     public static void CheckLevelUp(int playerId)
     {
@@ -686,6 +686,49 @@ public static class Player
 
         return false;
     }
+
+    public static void OnGetItem(int playerId)
+        {
+            var mapNum = Command.GetPlayerMap(playerId);
+
+            for (var mapItemNum = 0; mapItemNum < Core.Globals.Variables.MaxMapItems; mapItemNum++)
+            {
+                if (Data.MapItem[mapNum, mapItemNum].Num < 0 ||
+                    Data.MapItem[mapNum, mapItemNum].Num >= Core.Globals.Variables.MaxItems)
+                {
+                    continue;
+                }
+
+                if (Math.Floor((double)Data.MapItem[mapNum, mapItemNum].X / Constants.TileSize) != Command.GetPlayerX(playerId) || Math.Floor((double)Data.MapItem[mapNum, mapItemNum].Y / Constants.TileSize) != Command.GetPlayerY(playerId))
+                {
+                    continue;
+                }
+
+                var slot = Player.FindOpenInvSlot(playerId, Data.MapItem[mapNum, mapItemNum].Num);
+                if (slot == -1)
+                {
+                    NetworkSend.PlayerMsg(playerId, "Your inventory is full.", (int)ColorName.BrightRed);
+                    break;
+                }
+
+                if (!Player.CanPickup(playerId, mapItemNum))
+                {
+                    break;
+                }
+
+                try
+                {
+                    Script.Instance?.MapGetItem(playerId, mapNum, mapItemNum, slot);
+                }
+                catch (Exception ex)
+                {
+                    General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(OnGetItem));
+                }
+
+                break;
+            }
+        }
+
 
     public static int FindOpenInvSlot(int playerId, int itemNum)
     {

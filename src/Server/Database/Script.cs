@@ -1101,7 +1101,7 @@ public class Script
                         // Regular respawn logic
                         if (tickCount > entity.SpawnWait)
                         {
-                            Server.Npc.SpawnNpc(x, mapNum);
+                            Server.MapNpc.OnSpawn(x, mapNum);
                         }
                     }
                 }
@@ -1214,9 +1214,9 @@ public class Script
                     if (Random.Shared.NextDouble() < chance)
                     {
                         byte dir = (byte)(Random.Shared.Next(0, 4));
-                        if (Server.Npc.CanNpcMove(map, npcIndex, dir))
+                        if (Server.MapNpc.CanMove(map, npcIndex, dir))
                         {
-                            Server.Npc.NpcMove(map, npcIndex, dir, (int)MovementState.Walking);
+                            Server.MapNpc.OnMove(map, npcIndex, dir, (int)MovementState.Walking);
                         }
                     }
                 }
@@ -1248,7 +1248,7 @@ public class Script
 
                     if (item.CanDespawn && item.DespawnTimer < now)
                     {
-                        Server.MapItem.Clear(i, mapNum);
+                        Server.MapItem.OnClear(i, mapNum);
                         NetworkSend.SendMapItemToAll(mapNum, i);
                     }
                 }
@@ -1724,8 +1724,8 @@ public class Script
         var route = ComputePathAStar(mapNum, sx, sy, tx, ty, maxSteps: 12);
         if (route != null && route.Count > 0)
         {
-            Server.Npc.SetRoute(mapNum, npcIndex, route);
-            Server.Npc.TryStartNextStepNow(mapNum, npcIndex);
+            Server.MapNpc.SetRoute(mapNum, npcIndex, route);
+            Server.MapNpc.TryStartNextStepNow(mapNum, npcIndex);
             return true;
         }
 
@@ -1745,9 +1745,9 @@ public class Script
         for (int i = 0; i < count; i++)
         {
             var d = dirs[i];
-            if (Server.Npc.CanNpcMove(mapNum, npcIndex, d))
+            if (Server.MapNpc.CanMove(mapNum, npcIndex, d))
             {
-                Server.Npc.NpcMove(mapNum, npcIndex, d, (int)MovementState.Walking);
+                Server.MapNpc.OnMove(mapNum, npcIndex, d, (int)MovementState.Walking);
                 return true;
             }
         }

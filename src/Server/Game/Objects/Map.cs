@@ -1,4 +1,5 @@
 ﻿using Core.Globals;
+using Core.Interfaces;
 using CSScripting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -10,62 +11,59 @@ using static Core.Globals.Type;
 
 namespace Server
 {
-    public static class Map
+    public class Map : IData, IAsyncData
     {
-
-        public static void Clear(int mapNum)
+        public static void OnClear(int index)
         {
             int x;
             int y;
-            Data.Map[mapNum].Name = "";
-            Data.Map[mapNum].MaxX = (byte)Core.Globals.Variables.MaxMapX;
-            Data.Map[mapNum].MaxY = (byte)Core.Globals.Variables.MaxMapY;
-            Data.Map[mapNum].Npc = new int[Core.Globals.Variables.MaxMapNpcs];
-            Data.Map[mapNum].Tile = new Tile[(Data.Map[mapNum].MaxX), (Data.Map[mapNum].MaxY)];
+            Data.Map[index].Name = "";
+            Data.Map[index].MaxX = (byte)Core.Globals.Variables.MaxMapX;
+            Data.Map[index].MaxY = (byte)Core.Globals.Variables.MaxMapY;
+            Data.Map[index].Npc = new int[Core.Globals.Variables.MaxMapNpcs];
+            Data.Map[index].Tile = new Tile[(Data.Map[index].MaxX), (Data.Map[index].MaxY)];
 
-            var loopTo = Data.Map[mapNum].MaxX;
+            var loopTo = Data.Map[index].MaxX;
             for (x = 0; x < loopTo; x++)
             {
-                var loopTo1 = Data.Map[mapNum].MaxY;
+                var loopTo1 = Data.Map[index].MaxY;
                 for (y = 0; y < loopTo1; y++)
-                    Data.Map[mapNum].Tile[x, y].Layer = new Core.Globals.Type.Layer[Enum.GetValues(typeof(MapLayer)).Length];
+                    Data.Map[index].Tile[x, y].Layer = new Core.Globals.Type.Layer[Enum.GetValues(typeof(MapLayer)).Length];
             }
 
             var loopTo2 = Core.Globals.Variables.MaxMapNpcs;
             for (x = 0; x < loopTo2; x++)
             {
-                Data.Map[mapNum].Npc[x] = -1;
+                Data.Map[index].Npc[x] = -1;
             }
 
-            Data.Map[mapNum].EventCount = 0;
-            Data.Map[mapNum].Event = new Core.Globals.Type.Event[1];
-
+            Data.Map[index].EventCount = 0;
+            Data.Map[index].Event = new Core.Globals.Type.Event[1];
             // Reset the values for if a player is on the map or not
-            Data.Map[mapNum].Name = "";
-            Data.Map[mapNum].Music = "";
+            Data.Map[index].Name = "";
+            Data.Map[index].Music = "";
         }
 
-        public static void Save(int mapNum)
+        public static void OnSave(int index)
         {
-            string json = JsonConvert.SerializeObject(Data.Map[mapNum]).ToString();
+            string json = JsonConvert.SerializeObject(Data.Map[index]).ToString();
 
-            if (Database.RowExists(mapNum, "map"))
+            if (Database.RowExists(index, "map"))
             {
-                Database.UpdateRow(mapNum, json, "map", "data");
+                Database.UpdateRow(index, json, "map", "data");
             }
             else
             {
-                Database.InsertRow(mapNum, json, "map");
+                Database.InsertRow(index, json, "map");
             }
         }
 
-        public static async System.Threading.Tasks.Task OnLoadAllAsync()
+        public static System.Threading.Tasks.Task OnLoadAllAsync()
         {
-            var tasks = Enumerable.Range(0, Core.Globals.Variables.MaxMaps).Select(i => System.Threading.Tasks.Task.Run(() => OnLoadAsync(i)));
-            await System.Threading.Tasks.Task.WhenAll(tasks);
+            return Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxMaps), OnLoadAsync);
         }
 
-        public static async System.Threading.Tasks.Task OnLoadAsync(int mapNum)
+        public static async ValueTask OnLoadAsync(int index, CancellationToken cancellationToken)
         {
             string baseDir;
 
@@ -96,42 +94,42 @@ namespace Server
                 Directory.CreateDirectory(sdMapDir);
             }
 
-            if (System.IO.File.Exists(xwMapsDir + @"\map" + mapNum + ".dat"))
+            if (System.IO.File.Exists(xwMapsDir + @"\map" + index + ".dat"))
             {
-                var xwMap = LoadXwMap(mapsDir + @"\map" + mapNum + ".dat");
-                Data.Map[mapNum] = MapFromXwMap(xwMap);
+                var xwMap = LoadXwMap(mapsDir + @"\map" + index + ".dat");
+                Data.Map[index] = MapFromXwMap(xwMap);
                 return;
             }
 
-            if (File.Exists(csMapsDir + @"\map" + mapNum + ".ini"))
+            if (File.Exists(csMapsDir + @"\map" + index + ".ini"))
             {
-                var csMap = LoadCsMap(csMapsDir + @"\map" + mapNum + ".ini");
-                Data.Map[mapNum] = MapFromCsMap(csMap);
+                var csMap = LoadCsMap(csMapsDir + @"\map" + index + ".ini");
+                Data.Map[index] = MapFromCsMap(csMap);
                 return;
             }
 
-            var mapPath = Path.Combine(sdMapDir, mapNum + ".map");
+            var mapPath = Path.Combine(sdMapDir, index + ".map");
             if (File.Exists(mapPath))
             {
                 SdMap sdMap = LoadSdMap(mapPath);
-                Data.Map[mapNum] = MapFromSdMap(sdMap);
+                Data.Map[index] = MapFromSdMap(sdMap);
                 return;
             }
 
             JObject data;
 
-            data = await Database.SelectRowAsync(mapNum, "map", "data");
+            data = await Database.SelectRowAsync(index, "map", "data");
 
             if (data is null)
             {
-                Clear(mapNum);
+                OnClear(index);
                 return;
             }
 
             var mapData = JObject.FromObject(data).ToObject<Core.Globals.Type.Map>();
-            Data.Map[mapNum] = mapData;
+            Data.Map[index] = mapData;
 
-            MapResource.Cache(mapNum);
+            MapResource.Cache(index);
         }
 
         public static CsMap LoadCsMap(string fileName)
@@ -748,6 +746,24 @@ namespace Server
             return mwMap;
         }
 
+        public static void OnDraw(int index)
+        {
+            throw new NotImplementedException();
+        }
 
+        public static void OnStream(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnReset()
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnLoad(int index)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

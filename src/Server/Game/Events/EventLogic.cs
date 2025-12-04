@@ -2111,7 +2111,7 @@ namespace Server
                                         case (byte) EventCommand.SpawnNpc:
                                             if (command.Data1 > 0 && command.Data1 < Data.Map[mapNum].Npc.Length) // Check if Npc exists
                                             {
-                                                Npc.SpawnNpc(command.Data1, mapNum);
+                                                MapNpc.OnSpawn(command.Data1, mapNum);
                                             }
 
                                             break;

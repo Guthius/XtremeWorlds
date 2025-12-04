@@ -1,4 +1,5 @@
 ﻿using Core.Globals;
+using Core.Interfaces;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -7,49 +8,66 @@ using System.Text;
 
 namespace Server
 {
-    public static class Skill
+    public class Skill : IData, IAsyncData
     {
-        public static async System.Threading.Tasks.Task OnLoadAllAsync()
+        public static Task OnLoadAllAsync()
         {
-            var tasks = Enumerable.Range(0, Core.Globals.Variables.MaxSkills).Select(i => System.Threading.Tasks.Task.Run(() => OnLoadAsync(i)));
-            await System.Threading.Tasks.Task.WhenAll(tasks);
+            return Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxSkills), OnLoadAsync);
         }
 
-        public static void Save(int skillNum)
+        public static void OnSave(int index)
         {
-            string json = JsonConvert.SerializeObject(Data.Skill[skillNum]).ToString();
+            string json = JsonConvert.SerializeObject(Data.Skill[index]).ToString();
 
-            if (Database.RowExists(skillNum, "skill"))
+            if (Database.RowExists(index, "skill"))
             {
-                Database.UpdateRow(skillNum, json, "skill", "data");
+                Database.UpdateRow(index, json, "skill", "data");
             }
             else
             {
-                Database.InsertRow(skillNum, json, "skill");
+                Database.InsertRow(index, json, "skill");
             }
         }
 
-        public static async System.Threading.Tasks.Task OnLoadAsync(int skillNum)
+        public static async ValueTask OnLoadAsync(int index, System.Threading.CancellationToken cancellationToken)
         {
             JObject data;
 
-            data = await Database.SelectRowAsync(skillNum, "skill", "data");
-
+            data = await Database.SelectRowAsync(index, "skill", "data");
             if (data is null)
             {
-                Clear(skillNum);
+                OnClear(index);
                 return;
             }
 
             var skillData = JObject.FromObject(data).ToObject<Core.Globals.Type.Skill>();
-            Data.Skill[skillNum] = skillData;
+            Data.Skill[index] = skillData;
         }
 
-        public static void Clear(int index)
+        public static void OnClear(int index)
         {
             Data.Skill[index].Name = "";
             Data.Skill[index].LevelReq = 0;
         }
 
+        public static void OnDraw(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnStream(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnReset()
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnLoad(int index)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

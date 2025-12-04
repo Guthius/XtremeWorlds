@@ -62,6 +62,11 @@ namespace Client
                 OnClear(i);
         }
 
+        public static void OnSave(int index)
+        {
+            throw new NotImplementedException();
+        }
+
         public static void OnStream(int animationNum)
         {
             if (animationNum >= 0 && string.IsNullOrEmpty(Data.Animation[animationNum].Name) && GameState.AnimationLoaded[animationNum] == 0)

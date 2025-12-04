@@ -30,15 +30,10 @@ namespace Client
             }
         }
 
-        public static void ClearAccount(int index)
+        public static void OnClear(int index)
         {
             Data.Account[index].Login = "";
             Data.Account[index].Password = "";
-        }
-
-        public static void OnClear(int index)
-        {
-            ClearAccount(index);
 
             Data.Player[index].Name = "";
             Data.Player[index].Attacking = 0;
@@ -1383,6 +1378,11 @@ namespace Client
         }
 
         public static void OnLoad(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnSave(int index)
         {
             throw new NotImplementedException();
         }

@@ -1,4 +1,5 @@
 ﻿using Core.Globals;
+using Core.Interfaces;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -7,62 +8,44 @@ using System.Text;
 
 namespace Server;
 
-public static class Shop
+public class Shop : IData, IAsyncData
 {
-    public static async System.Threading.Tasks.Task OnLoadAllAsync()
+    public static async Task OnLoadAllAsync()
     {
-        var tasks = Enumerable.Range(0, Core.Globals.Variables.MaxShops).Select(i => System.Threading.Tasks.Task.Run(() => OnLoadAsync(i)));
-        await System.Threading.Tasks.Task.WhenAll(tasks);
-
+        await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxShops), OnLoadAsync);
     }
 
-    public static async System.Threading.Tasks.Task OnLoadAsync(int shopNum)
+    public static async ValueTask OnLoadAsync(int index, CancellationToken cancellationToken)
     {
         JObject data;
 
-        data = await Database.SelectRowAsync(shopNum, "shop", "data");
+        data = await Database.SelectRowAsync(index, "shop", "data");
 
         if (data is null)
         {
-            Clear(shopNum);
+            OnClear(index);
             return;
         }
 
         Core.Globals.Type.Shop shopData = JObject.FromObject(data).ToObject<Core.Globals.Type.Shop>();
-        Data.Shop[shopNum] = shopData;
+        Data.Shop[index] = shopData;
     }
 
-
-    public static void Save(int shopNum)
+    public static void OnSave(int index)
     {
-        string json = JsonConvert.SerializeObject(Data.Shop[shopNum]).ToString();
+        string json = JsonConvert.SerializeObject(Data.Shop[index]).ToString();
 
-        if (Database.RowExists(shopNum, "shop"))
+        if (Database.RowExists(index, "shop"))
         {
-            Database.UpdateRow(shopNum, json, "shop", "data");
+            Database.UpdateRow(index, json, "shop", "data");
         }
         else
         {
-            Database.InsertRow(shopNum, json, "shop");
+            Database.InsertRow(index, json, "shop");
         }
     }
 
-    public static void Load(int shopNum)
-    {
-        _ = OnLoadAsync(shopNum);
-    }
-
-    public static void LoadAll()
-    {
-        int i;
-
-        var loopTo = Core.Globals.Variables.MaxShops;
-        for (i = 0; i < loopTo; i++)
-            _ = OnLoadAsync(i);
-
-    }
-
-    public static void Clear(int index)
+    public static void OnClear(int index)
     {
         Data.Shop[index] = default;
         Data.Shop[index].Name = "";
@@ -75,4 +58,24 @@ public static class Shop
         }
     }
 
+    public static void OnReset()
+    {
+        for (int i = 0, loopTo = Core.Globals.Variables.MaxShops; i < loopTo; i++)
+            OnClear(i);
+    }
+
+    public static void OnDraw(int index)
+    {
+        throw new NotImplementedException();
+    }
+
+    public static void OnStream(int index)
+    {
+        throw new NotImplementedException();
+    }
+
+    public static void OnLoad(int index)
+    {
+        throw new NotImplementedException();
+    }
 }

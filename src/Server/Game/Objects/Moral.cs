@@ -10,38 +10,39 @@ using Server.Net;
 using static Core.Net.Packets;
 using static Core.Globals.Command;
 using Type = Core.Globals.Type;
+using Core.Interfaces;
 
 namespace Server;
 
-public static class Moral
+public class Moral : IData, IAsyncData
 {
-    private static void Clear(int moralNum)
+    public static void OnClear(int index)
     {
-        Data.Moral[moralNum].Name = "";
-        Data.Moral[moralNum].Color = 0;
-        Data.Moral[moralNum].CanCast = false;
-        Data.Moral[moralNum].CanDropItem = false;
-        Data.Moral[moralNum].CanPk = false;
-        Data.Moral[moralNum].CanPickupItem = false;
-        Data.Moral[moralNum].CanUseItem = false;
-        Data.Moral[moralNum].DropItems = false;
-        Data.Moral[moralNum].LoseExp = false;
-        Data.Moral[moralNum].NpcBlock = false;
-        Data.Moral[moralNum].PlayerBlock = false;
+        Data.Moral[index].Name = "";
+        Data.Moral[index].Color = 0;
+        Data.Moral[index].CanCast = false;
+        Data.Moral[index].CanDropItem = false;
+        Data.Moral[index].CanPk = false;
+        Data.Moral[index].CanPickupItem = false;
+        Data.Moral[index].CanUseItem = false;
+        Data.Moral[index].DropItems = false;
+        Data.Moral[index].LoseExp = false;
+        Data.Moral[index].NpcBlock = false;
+        Data.Moral[index].PlayerBlock = false;
     }
 
-    private static async ValueTask OnLoadAsync(int moralNum, CancellationToken cancellationToken)
+    public static async ValueTask OnLoadAsync(int index, CancellationToken cancellationToken)
     {
-        var data = await Database.SelectRowAsync(moralNum, "moral", "data");
+        var data = await Database.SelectRowAsync(index, "moral", "data");
         if (data is null)
         {
-            Clear(moralNum);
+            OnClear(index);
             return;
         }
 
         var moralData = JObject.FromObject(data).ToObject<Type.Moral>();
 
-        Data.Moral[moralNum] = moralData;
+        Data.Moral[index] = moralData;
     }
 
     public static async Task OnLoadAllAsync()
@@ -49,17 +50,37 @@ public static class Moral
         await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxMorals), OnLoadAsync);
     }
 
-    public static void Save(int moralNum)
+    public static void OnSave(int index)
     {
-        var json = JsonConvert.SerializeObject(Data.Moral[moralNum]);
+        var json = JsonConvert.SerializeObject(Data.Moral[index]);
 
-        if (Database.RowExists(moralNum, "moral"))
+        if (Database.RowExists(index, "moral"))
         {
-            Database.UpdateRow(moralNum, json, "moral", "data");
+            Database.UpdateRow(index, json, "moral", "data");
         }
         else
         {
-            Database.InsertRow(moralNum, json, "moral");
+            Database.InsertRow(index, json, "moral");
         }
+    }
+
+    public static void OnDraw(int index)
+    {
+        throw new NotImplementedException();
+    }
+
+    public static void OnStream(int index)
+    {
+        throw new NotImplementedException();
+    }
+
+    public static void OnReset()
+    {
+        throw new NotImplementedException();
+    }
+
+    public static void OnLoad(int index)
+    {
+        throw new NotImplementedException();
     }
 }

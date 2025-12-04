@@ -404,7 +404,7 @@ namespace Server
         {
             await System.Threading.Tasks.Task.WhenAll(
                 System.Threading.Tasks.Task.Run(MapItem.SpawnAll),
-                Npc.SpawnAllMapNpcs(),
+                MapNpc.OnSpawnAll(),
                 EventLogic.SpawnAllMapGlobalEvents()
             );
             Logger.LogInformation("Game objects spawned.");

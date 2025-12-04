@@ -10,22 +10,23 @@ using Server.Net;
 using static Core.Net.Packets;
 using static Core.Globals.Command;
 using Type = Core.Globals.Type;
+using Core.Interfaces;
 
 namespace Server;
 
-public static class Animation
+public class Animation : IData, IAsyncData
 {
-    public static void Save(int animationNum)
+    public static void OnSave(int index)
     {
-        var json = JsonConvert.SerializeObject(Data.Animation[animationNum]);
+        var json = JsonConvert.SerializeObject(Data.Animation[index]);
 
-        if (Database.RowExists(animationNum, "animation"))
+        if (Database.RowExists(index, "animation"))
         {
-            Database.UpdateRow(animationNum, json, "animation", "data");
+            Database.UpdateRow(index, json, "animation", "data");
         }
         else
         {
-            Database.InsertRow(animationNum, json, "animation");
+            Database.InsertRow(index, json, "animation");
         }
     }
 
@@ -34,27 +35,48 @@ public static class Animation
         return Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxAnimations), OnLoadAsync);
     }
 
-    private static async ValueTask OnLoadAsync(int animationNum, CancellationToken cancellationToken)
+    public static async ValueTask OnLoadAsync(int index, CancellationToken cancellationToken)
     {
-        var data = await Database.SelectRowAsync(animationNum, "animation", "data");
+        var data = await Database.SelectRowAsync(index, "animation", "data");
         if (data is null)
         {
-            Clear(animationNum);
+            OnClear(index);
             return;
         }
 
         var animationData = JObject.FromObject(data).ToObject<Type.Animation>();
 
-        Data.Animation[animationNum] = animationData;
+        Data.Animation[index] = animationData;
     }
 
-    private static void Clear(int animationNum)
+    public static void OnClear(int index)
     {
-        Data.Animation[animationNum].Name = "";
-        Data.Animation[animationNum].Sound = "";
-        Data.Animation[animationNum].Sprite = [0, 0];
-        Data.Animation[animationNum].Frames = [0, 0];
-        Data.Animation[animationNum].LoopCount = [0, 0];
-        Data.Animation[animationNum].LoopTime = [0, 0];
+        Data.Animation[index].Name = "";
+        Data.Animation[index].Sound = "";
+        Data.Animation[index].Sprite = [0, 0];
+        Data.Animation[index].Frames = [0, 0];
+        Data.Animation[index].LoopCount = [0, 0];
+        Data.Animation[index].LoopTime = [0, 0];
+    }
+
+    public static void OnDraw(int index)
+    {
+        throw new NotImplementedException();
+    }
+
+    public static void OnStream(int index)
+    {
+        throw new NotImplementedException();
+    }
+
+    public static void OnReset()
+    {
+        for (int i = 0; i < Data.Animation.Length; i++)
+            OnClear(i);
+    }
+
+    public static void OnLoad(int index)
+    {
+        throw new NotImplementedException();
     }
 }

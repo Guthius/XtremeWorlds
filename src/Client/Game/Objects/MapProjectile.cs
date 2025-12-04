@@ -1,12 +1,13 @@
 ﻿using Core.Configurations;
 using Core.Globals;
+using Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Client
 {
-    public class MapProjectile
+    public class MapProjectile : IData
     {
         public static void OnClear(int projectileNum)
         {
@@ -140,5 +141,25 @@ namespace Client
             GameClient.RenderTexture(ref argPath, x, y, (int)rec.Left, (int)rec.Top, 32, 32, 32, 32);
         }
 
+        public static void OnLoad(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnReset()
+        {
+            for (int i = 0; i < Data.MapProjectile.GetLength(1); i++)
+                OnClear(i);
+        }
+
+        public static void OnSave(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnStream(int index)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

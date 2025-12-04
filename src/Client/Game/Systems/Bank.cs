@@ -53,6 +53,11 @@ namespace Client
             throw new NotImplementedException();
         }
 
+        public static void OnSave(int index)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
     }
