@@ -310,13 +310,13 @@ namespace Client
 
             int baseWorldX = Data.MyMapNpc[mapNpcNum].X;
             int baseWorldY = Data.MyMapNpc[mapNpcNum].Y;
-
+            
             if (name == null) return;
 
             // X position: match player name centering over the tile
             var size = TextRenderer.Fonts[Font.Georgia].MeasureString(name);
-            int screenX = GameLogic.ConvertMapX(baseWorldX);
-            int drawX = (int)(screenX + (Constants.TileSize - size.X) / 2);
+            var padding = GameLogic.ConvertMapX((int)size.X / 6);
+            var drawX = (int)(baseWorldX + (Constants.TileSize - size.X) / 2 + padding);
 
             int spriteNum = Data.Npc[(int)npcNum].Sprite;
             if (spriteNum <= 0 || spriteNum > GameState.NumCharacters)
