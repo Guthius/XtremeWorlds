@@ -92,7 +92,7 @@ public static class WinBank
             var amount = GetBankValue(GameState.MyIndex, slot);
             var amountColor = TextRenderer.GetColorForAmount(amount);
 
-            TextRenderer.OnRender(GameLogic.ConvertCurrency(amount), left + 1, top + 20, amountColor, amountColor, winBank.Font);
+            TextRenderer.OnDraw(GameLogic.ConvertCurrency(amount), left + 1, top + 20, amountColor, amountColor, winBank.Font);
         }
     }
 

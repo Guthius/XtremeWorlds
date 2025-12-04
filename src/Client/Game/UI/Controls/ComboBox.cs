@@ -34,7 +34,7 @@ public sealed class ComboBox : Control
             int left = X + x + paddingL + Math.Max(0, (innerWidth - textWidth) / 2);
             int top = Y + y + 2; // vertical baseline consistent with other controls
 
-            TextRenderer.OnRender(text, left, top, Color, Color.Black, Font);
+            TextRenderer.OnDraw(text, left, top, Color, Color.Black, Font);
         }
 
         var path = Path.Combine(Texture[0], ArrowSprite.ToString());

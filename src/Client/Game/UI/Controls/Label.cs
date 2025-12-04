@@ -38,7 +38,7 @@ public sealed class Label : Control
     {
         if (TextRenderer.GetTextWidth(Text, Font) <= Width)
         {
-            TextRenderer.OnRender(Text, X + x + XOffset, Y + y + YOffset, Color, Color.Black, Font);
+            TextRenderer.OnDraw(Text, X + x + XOffset, Y + y + YOffset, Color, Color.Black, Font);
             return;
         }
 
@@ -52,7 +52,7 @@ public sealed class Label : Control
             var size = TextRenderer.Fonts[Font].MeasureString(line);
             var padding = (int) (size.X / 6);
 
-            TextRenderer.OnRender(line,
+            TextRenderer.OnDraw(line,
                 X + x + XOffset + padding,
                 Y + y + YOffset + lineOffset,
                 Color, Color.Black, Font);
@@ -67,7 +67,7 @@ public sealed class Label : Control
         {
             var size = TextRenderer.Fonts[Font].MeasureString(Text);
 
-            TextRenderer.OnRender(Text,
+            TextRenderer.OnDraw(Text,
                 X + Width - (int) size.X + x + XOffset,
                 Y + y + YOffset,
                 Color, Color.Black, Font);
@@ -85,7 +85,7 @@ public sealed class Label : Control
             var size = TextRenderer.Fonts[Font].MeasureString(line);
             var padding = (int) (size.X / 6);
 
-            TextRenderer.OnRender(line,
+            TextRenderer.OnDraw(line,
                 X + Width - (int) size.X + x + XOffset + padding,
                 Y + y + YOffset + lineOffset,
                 Color, Color.Black, Font);
@@ -101,7 +101,7 @@ public sealed class Label : Control
             var size = TextRenderer.Fonts[Font].MeasureString(Text);
             var padding = (int) (size.X / 8);
 
-            TextRenderer.OnRender(Text,
+            TextRenderer.OnDraw(Text,
                 X + (Width - (int) size.X) / 2 + x + XOffset + padding - 4,
                 Y + y + YOffset + (Height - (int) size.Y) / 2,
                 Color, Color.Black, Font);
@@ -119,7 +119,7 @@ public sealed class Label : Control
             var size = TextRenderer.Fonts[Font].MeasureString(line);
             var padding = (int) (size.X / 8);
 
-            TextRenderer.OnRender(line,
+            TextRenderer.OnDraw(line,
                 X + (Width - (int) size.X) / 2 + x + XOffset + padding - 4,
                 Y + y + YOffset + lineOffset + (Height - (int) size.Y) / 2,
                 Color, Color.Black, Font);

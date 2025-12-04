@@ -2794,7 +2794,7 @@ namespace Client
             if (GameState.Bfps)
             {
                 string fps = "FPS: " + GetFps();
-                TextRenderer.OnRender(fps, (int) Math.Round(GameState.Camera.Left - 24d),
+                TextRenderer.OnDraw(fps, (int) Math.Round(GameState.Camera.Left - 24d),
                     (int) Math.Round(GameState.Camera.Top + 60d), Color.Yellow, Color.Black);
             }
 
@@ -2806,16 +2806,16 @@ namespace Client
                 string map = " (Map #" + GetPlayerMap(GameState.MyIndex) + ")";
                 string curMouse = "Mouse X: " + (int)GameState.CurMouseXGame + " Y: " + (int)GameState.CurMouseYGame;
 
-                TextRenderer.OnRender(cur, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 15f),
+                TextRenderer.OnDraw(cur, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 15f),
                     Color.Yellow, Color.Black);
 
-                TextRenderer.OnRender(curMouse, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 30f),
+                TextRenderer.OnDraw(curMouse, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 30f),
                     Color.Yellow, Color.Black);
 
-                TextRenderer.OnRender(loc, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 45f),
+                TextRenderer.OnDraw(loc, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 45f),
                     Color.Yellow, Color.Black);
 
-                TextRenderer.OnRender(map, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 60f),
+                TextRenderer.OnDraw(map, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 60f),
                     Color.Yellow, Color.Black);
             }
             
