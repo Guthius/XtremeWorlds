@@ -6,42 +6,45 @@ using Microsoft.Xna.Framework;
 
 namespace Client
 {
-    public class Blood
+    public class Blood : IContent
     {
-        public static void OnDraw(int index)
+        public struct Data { get; set; } = Data.Blood;
+
+        public void OnDraw(int index)
         {
             Rectangle srcRec;
             Rectangle destRec;
             int x;
             int y;
 
-            {
-                ref var instance = ref Data.Blood[index];
-                if (instance.X < GameState.TileView.Left | instance.X > GameState.TileView.Right)
-                    return;
-                if (instance.Y < GameState.TileView.Top | instance.Y > GameState.TileView.Bottom)
-                    return;
+            ref var instance = ref Data[index];
+            
+            if (instance.X < GameState.TileView.Left | instance.X > GameState.TileView.Right)
+                return;
 
-                // check if we should be seeing it
-                if (instance.Timer + 30000 < General.GetTickCount())
-                    return;
+            if (instance.Y < GameState.TileView.Top | instance.Y > GameState.TileView.Bottom)
+                return;
 
-                x = GameLogic.ConvertMapX(Data.Blood[index].X);
-                y = GameLogic.ConvertMapY(Data.Blood[index].Y);
+            // check if we should be seeing it
+            if (instance.Timer + 30000 < General.GetTickCount())
+                return;
 
-                srcRec = new Rectangle((instance.Sprite - 1) * Constants.TileSize, 0, Constants.TileSize, Constants.TileSize);
-                destRec = new Rectangle(GameLogic.ConvertMapX(instance.X),
-                    GameLogic.ConvertMapY(instance.Y), Constants.TileSize, Constants.TileSize);
+            x = GameLogic.ConvertMapX(Data.Blood[index].X);
+            y = GameLogic.ConvertMapY(Data.Blood[index].Y);
 
-                string argPath = System.IO.Path.Combine(Core.Globals.DataPath.Misc, "Blood");
-                GameClient.RenderTexture(ref argPath, x, y, srcRec.X, srcRec.Y, srcRec.Width, srcRec.Height);
-            }
+            srcRec = new Rectangle((instance.Sprite - 1) * Constants.TileSize, 0, Constants.TileSize, Constants.TileSize);
+            destRec = new Rectangle(GameLogic.ConvertMapX(instance.X),
+                GameLogic.ConvertMapY(instance.Y), Constants.TileSize, Constants.TileSize);
+
+            string argPath = System.IO.Path.Combine(Core.Globals.DataPath.Misc, "Blood");
+            GameClient.RenderTexture(ref argPath, x, y, srcRec.X, srcRec.Y, srcRec.Width, srcRec.Height);
+        
         }
 
-        public static void OnClear()
+        public void OnClear()
         {
             for (int i = 0; i < byte.MaxValue; i++)
-                Data.Blood[i].Timer = 0;
+                Data[i].Timer = 0;
         }
 
     }

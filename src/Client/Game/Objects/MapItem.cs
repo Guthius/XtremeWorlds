@@ -7,9 +7,11 @@ using Core.Configurations;
 
 namespace Client
 {
-    public class MapItem
+    public class MapItem : IContent
     {
-        public static void OnDraw(int itemNum)
+        public struct Data { get; set; } = Data;
+
+        public void OnDraw(int itemNum)
         {
             Rectangle srcRec;
             Rectangle destRec;
@@ -17,17 +19,17 @@ namespace Client
             int x;
             int y;
 
-            if (Data.MyMapItem[itemNum].Num < 0 | Data.MyMapItem[itemNum].Num > Variables.MaxItems)
+            if (Data[itemNum].Num < 0 | Data[itemNum].Num > Variables.MaxItems)
                 return;
 
-            Item.OnStream(Data.MyMapItem[itemNum].Num);
+            Item.OnStream(Data[itemNum].Num);
 
-            picNum = Data.Item[Data.MyMapItem[itemNum].Num].Icon;
+            picNum = Data.Item[Data[itemNum].Num].Icon;
 
             if (picNum < 1 | picNum > GameState.NumItems)
                 return;
 
-            ref var instance = ref Data.MyMapItem[itemNum];
+            ref var instance = ref Data[itemNum];
 
             if (Math.Floor((double) instance.X / Constants.TileSize) < GameState.TileView.Left | Math.Floor((double) instance.X / Constants.TileSize) > GameState.TileView.Right)
                 return;
@@ -36,20 +38,20 @@ namespace Client
                 return;
 
             srcRec = new Rectangle(0, 0, Constants.TileSize, Constants.TileSize);
-            destRec = new Rectangle(GameLogic.ConvertMapX(Data.MyMapItem[itemNum].X),
-                GameLogic.ConvertMapY(Data.MyMapItem[itemNum].Y), Constants.TileSize, Constants.TileSize);
+            destRec = new Rectangle(GameLogic.ConvertMapX(Data[itemNum].X),
+                GameLogic.ConvertMapY(Data[itemNum].Y), Constants.TileSize, Constants.TileSize);
 
-            x = GameLogic.ConvertMapX(Data.MyMapItem[itemNum].X);
-            y = GameLogic.ConvertMapY(Data.MyMapItem[itemNum].Y);
+            x = GameLogic.ConvertMapX(Data[itemNum].X);
+            y = GameLogic.ConvertMapY(Data[itemNum].Y);
 
             string argPath = System.IO.Path.Combine(Core.Globals.DataPath.Items, picNum.ToString());
             GameClient.RenderTexture(ref argPath, x, y, srcRec.X, srcRec.Y, srcRec.Width, srcRec.Height, srcRec.Width,
                 srcRec.Height);
         }
 
-        public static void OnClear(int index)
+        public void OnClear(int index)
         {
-            ref var instance = ref Data.MyMapItem[index];
+            ref var instance = ref Data[index];
             instance.Num = -1;
             instance.Value = 0;
             instance.X = 0;
