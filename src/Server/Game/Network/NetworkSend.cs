@@ -1,5 +1,4 @@
 ﻿using Core;
-using Core.Configurations;
 using Core.Globals;
 using Core.Net;
 using Microsoft.Extensions.Logging;
@@ -154,7 +153,7 @@ public static class NetworkSend
         w.WriteByte(Variables.MaxPlayerSkills);
         w.WriteByte(Variables.MaxTrades);
         w.WriteByte(Variables.NameLength);
-        w.WriteByte(Variables.Minimum_NameLength);
+        w.WriteByte(Variables.MinimumNameLength);
         w.WriteByte(Variables.ChatLength);
         w.WriteByte(Variables.MaxHotbar);
         w.WriteByte(Variables.MaxMapX);

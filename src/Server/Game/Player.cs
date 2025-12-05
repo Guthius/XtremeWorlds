@@ -11,9 +11,4 @@ public sealed class Player(int id, INetworkChannel channel)
     {
         channel.Send(bytes);
     }
-
-    public void Disconnect()
-    {
-        channel.Close();
-    }
 }

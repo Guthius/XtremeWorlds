@@ -1,6 +1,5 @@
 ﻿using Core;
 using Core.Common;
-using Core.Configurations;
 using Core.Globals;
 using Core.Net;
 using Microsoft.Extensions.Logging;
@@ -11,6 +10,7 @@ using System;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using XtremeWorlds.Server.Configuration;
 using static Core.Globals.Command;
 using static Core.Globals.Type;
 using static Core.Net.Packets;
@@ -195,7 +195,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             return;
         }
 
-        if (username.Length > Core.Globals.Variables.NameLength | username.Length < Core.Globals.Variables.Minimum_NameLength)
+        if (username.Length > Core.Globals.Variables.NameLength | username.Length < Core.Globals.Variables.MinimumNameLength)
         {
             NetworkSend.AlertMsg(session, SystemMessage.NameLengthInvalid);
             return;

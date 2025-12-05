@@ -1,11 +1,8 @@
-﻿
-namespace Server
+﻿namespace Server;
+
+public class Constant
 {
-    public class Constant
-    {
-        // Path constants
-        public const string AdminLog = "admin.log";
-        public const string PlayerLog = "player.log";
-        public const string PacketLog = "packet.log";
-    }
+    public const string AdminLog = "admin.log";
+    public const string PlayerLog = "player.log";
+    public const string PacketLog = "packet.log";
 }

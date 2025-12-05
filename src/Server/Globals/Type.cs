@@ -768,19 +768,7 @@ public static class Type
         public SdLayer MapLayer;
     }
 
-    public struct Point
-    {
-        public int X;
-        public int Y;
-    }
-
-    public static Point[] AutoIn = new Point[5];
-    public static Point[] AutoNw = new Point[5];
-    public static Point[] AutoNe = new Point[5];
-    public static Point[] AutoSw = new Point[5];
-    public static Point[] AutoSe = new Point[5];
-
-    public struct Script
+    public sealed record Script
     {
         public string[] Code;
     }

@@ -32,21 +32,10 @@ public sealed class PlayerService : IPlayerService
             return false;
         }
 
-        _playerIds?.Remove(playerId);
-        _players?.Remove(player);
+        _playerIds.Remove(playerId);
+        _players.Remove(player);
 
         return true;
-    }
-
-    public void SendDataToAll(ReadOnlySpan<byte> data, int head)
-    {
-        var buffer = new byte[head + 4];
-
-        BitConverter.TryWriteBytes(buffer, head);
-
-        data.CopyTo(buffer.AsSpan(4));
-
-        SendDataToAll(buffer);
     }
 
     public void SendDataToAll(byte[] bytes)
@@ -55,23 +44,6 @@ public sealed class PlayerService : IPlayerService
         {
             player.Send(bytes);
         }
-    }
-
-    public void SendDataTo(int playerId, ReadOnlySpan<byte> data, int head)
-    {
-        var player = _players.FirstOrDefault(x => x.Id == playerId);
-        if (player is null)
-        {
-            return;
-        }
-
-        var buffer = new byte[head + 4];
-
-        BitConverter.TryWriteBytes(buffer, head);
-
-        data.CopyTo(buffer.AsSpan(4));
-
-        player.Send(buffer);
     }
 
     public void SendDataTo(int playerId, byte[] bytes)
@@ -84,11 +56,7 @@ public sealed class PlayerService : IPlayerService
     public string ClientIp(int playerId)
     {
         var player = _players.FirstOrDefault(x => x.Id == playerId);
-        if (player is not null)
-        {
-            return player.IpAddress;
-        }
 
-        return string.Empty;
+        return player is not null ? player.IpAddress : string.Empty;
     }
 }

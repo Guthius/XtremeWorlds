@@ -1,6 +1,4 @@
-﻿using Core;
-using Microsoft.Extensions.Hosting;
-using static Core.Globals.Command;
+﻿using Microsoft.Extensions.Hosting;
 
 namespace Server.Services;
 
@@ -12,19 +10,14 @@ public sealed class ConsoleInputService : BackgroundService
         {
             return;
         }
-
-        await ConsoleThreadAsync(stoppingToken);
-    }
-
-    public static async Task ConsoleThreadAsync(CancellationToken cancellationToken)
-    {
+        
         await using var stream = Console.OpenStandardInput();
 
         using var streamReader = new StreamReader(stream);
 
-        while (!cancellationToken.IsCancellationRequested)
+        while (!stoppingToken.IsCancellationRequested)
         {
-            var line = await streamReader.ReadLineAsync(cancellationToken);
+            var line = await streamReader.ReadLineAsync(stoppingToken);
             if (string.IsNullOrEmpty(line))
             {
                 continue;

@@ -23,12 +23,12 @@ using static Server.Resource;
 using static System.Net.Mime.MediaTypeNames;
 using System.Collections.Generic;
 using System.Net.Http.Headers;
-using Core.Configurations;
 using Server.Game;
 using Variables = Core.Globals.Variables;
 using EventCommand = Core.Globals.EventCommand;
 using Type = Core.Globals.Type;
 using Microsoft.Extensions.Logging;
+using XtremeWorlds.Server.Configuration;
 
 public class Script
 {
@@ -74,7 +74,7 @@ public class Script
     public static byte MaxTrades = Variables.MaxTrades;
     public static byte NameLength = Variables.NameLength;
     public static byte MaxNameLength = Variables.NameLength;
-    public static byte Minimum_NameLength = Variables.Minimum_NameLength;
+    public static byte Minimum_NameLength = Variables.MinimumNameLength;
     public static byte ChatLength = Variables.ChatLength;
     public static byte MaxHotbar = Variables.MaxHotbar;
     public static byte MaxMapx = Variables.MaxMapX;
@@ -101,57 +101,6 @@ public class Script
     public static string Welcome = Variables.Welcome;
     public static string Website = Variables.Website;
     
-    // Make functions for all max values to be mutable
-    public void UpdateMaxValues()
-    {
-        Variables.MaxAnimations = MaxAnimations;
-        Variables.MaxBank = MaxBank;
-        Variables.MaxJobs = MaxJobs;
-        Variables.MaxMorals = MaxMorals;
-        Variables.MaxInv = MaxInv;
-        Variables.MaxItems = MaxItems;
-        Variables.MaxMaps = MaxMaps;
-        Variables.MaxMapItems = MaxMapItems;
-        Variables.MaxMapNpcs = MaxMapNpcs;
-        Variables.MaxNpcs = MaxNpcs;
-        Variables.MaxNpcSkills = MaxNpcSkills;
-        Variables.MaxParty = MaxParty;
-        Variables.MaxPartyMembers = MaxPartyMembers;
-        Variables.MaxPlayers = MaxPlayers;
-        Variables.MaxPlayerSkills = MaxPlayerSkills;
-        Variables.MaxResources = MaxResources;
-        Variables.MaxShops = MaxShops;
-        Variables.MaxSkills = MaxSkills;
-        Variables.MaxTrades = MaxTrades;
-        Variables.NameLength = NameLength;
-        Variables.Minimum_NameLength = Minimum_NameLength;
-        Variables.ChatLength = ChatLength;
-        Variables.MaxHotbar = MaxHotbar;
-        Variables.MaxMapX = MaxMapx;
-        Variables.MaxMapY = MaxMapy;
-        Variables.MaxProjectiles = MaxProjectiles;
-        Variables.MaxDropItems = MaxDropItems;
-        Variables.MaxStartItems = MaxStartItems;
-        Variables.MaxStartSkills = MaxStartSkills;
-        Variables.MaxSwitches = MaxSwitches;
-        Variables.MaxVariables = MaxVariables;
-        Variables.MaxPoints = MaxPoints;
-        Variables.MaxChars = MaxChars;
-        Variables.ChatLines = ChatLines;
-        Variables.MaxStats = MaxStats;
-        Variables.MaxQuests = MaxQuests;
-        Variables.MaxEvents = MaxEvents;
-        Variables.MaxGuilds = MaxGuilds;
-        Variables.MaxEventChoices = MaxEventChoices;
-        Variables.TileSize = TileSize;
-        Variables.MaxWeatherParticles = MaxWeatherParticles;
-        Variables.MaxBackups = MaxBackups;
-        Variables.SaveInterval = SaveInterval;
-        Variables.ServerShutdown = ServerShutdown;
-        Variables.Welcome = Welcome;
-        Variables.Website = Website;
-    }
-
     public long ItemDespawnTimeMs()
     {
         return ItemDespawnTime;

@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace Core.Database;
+namespace XtremeWorlds.Server.Database;
 
 public sealed class CharacterNameList : IEnumerable<string>
 {

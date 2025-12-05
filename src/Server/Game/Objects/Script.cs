@@ -20,7 +20,7 @@ public static class Script
     public static async Task OnLoadAsync(int playerId)
     {
         General.Logger.LogInformation("Loading script...");
-        var path = System.IO.Path.Combine(DataPath.Database, "Script.cs");
+        var path = Path.Combine(DataPath.Database, "Script.cs");
         if (File.Exists(path))
         {
             Data.Script.Code = await File.ReadAllLinesAsync(path, Encoding.UTF8);
@@ -55,8 +55,7 @@ public static class Script
             if (instance is not null)
             {
                 Instance = instance;
-                General.Logger.LogInformation("Script loaded successfully!");
-                Script.Instance?.UpdateMaxValues();                
+                General.Logger.LogInformation("Script loaded successfully!");       
                 for (int i = 0; i < Variables.MaxPlayers; i++)
                 {
                     if (IsPlaying(i))

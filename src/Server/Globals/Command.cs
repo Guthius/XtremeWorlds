@@ -215,7 +215,7 @@ public static class Command
 
     public static bool IsPlaying(int index)
     {
-        return GetPlayerName(index)?.Length > 0;
+        return GetPlayerName(index).Length > 0;
     }
 
     public static int GetPlayerGatherSkillLevel(int index, int skillSlot)
@@ -346,7 +346,7 @@ public static class Command
         Data.Player[index].Skill[skillSlot].Cd = value;
     }
 
-    public static bool HasSkill(int index, double skillNum)
+    public static bool HasSkill(int index, int skillNum)
     {
         for (var slot = 0; slot < Variables.MaxPlayerSkills; slot++)
         {

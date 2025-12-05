@@ -1,5 +1,4 @@
 ﻿using Core;
-using Core.Configurations;
 using Core.Globals;
 using Core.Net;
 using Microsoft.CodeAnalysis.Scripting;
@@ -7,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Server.Game;
 using Server.Game.Net;
 using Server.Net;
+using XtremeWorlds.Server.Configuration;
 using static Core.Globals.Command;
 using static Core.Net.Packets;
 
