@@ -47,11 +47,7 @@
     <AssemblyName>XtremeWorlds.Server</AssemblyName>
     <AssemblyTitle>XtremeWorlds.Server</AssemblyTitle>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Core\Core.csproj" />
-  </ItemGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" />
     <PackageReference Include="Serilog" />
@@ -64,6 +60,7 @@
     <PackageReference Include="Serilog.Sinks.File" />
     <PackageReference Include="Npgsql" />
     <PackageReference Include="Newtonsoft.Json" />
+    <PackageReference Include="CS-Script.Core" />
   </ItemGroup>
 
   <ItemGroup>
