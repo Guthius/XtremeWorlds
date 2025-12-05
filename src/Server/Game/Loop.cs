@@ -208,6 +208,13 @@ public static class Loop
             }
         }
 
-        Script.Instance?.UpdateMapAi();
+        try
+        {
+            Script.Instance?.UpdateMapAi();
+        }
+        catch (Exception ex)
+        {
+            General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(Loop));
+        }
     }
 }
