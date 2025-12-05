@@ -825,9 +825,7 @@ public static class Database
 
             var statCount = Enum.GetValues(typeof(Stat)).Length;
             for (n = 0; n < statCount; n++)
-                if (Data.Job[jobNum].Stat != null) {
-                    Data.Player[index].Stat[n] = Data.Job[jobNum].Stat[n];
-                }
+                Data.Player[index].Stat[n] = Data.Job[jobNum].Stat[n];
 
             Data.Player[index].Dir = (byte)Direction.Down;
             Data.Player[index].Map = Data.Job[jobNum].StartMap;
@@ -849,26 +847,20 @@ public static class Database
             // set starter items
             for (n = 0; n < Variables.MaxStartItems; n++)
             {
-                if (Data.Job[jobNum].StartItem != null)
+                if (Data.Job[jobNum].StartItem[n] >= 0)
                 {
-                    if (Data.Job[jobNum].StartItem[n] >= 0)
-                    {
-                        Data.Player[index].Inv[n].Num = Data.Job[jobNum].StartItem[n];
-                        Data.Player[index].Inv[n].Value = Data.Job[jobNum].StartValue[n];
-                    }
-                }
+                    Data.Player[index].Inv[n].Num = Data.Job[jobNum].StartItem[n];
+                    Data.Player[index].Inv[n].Value = Data.Job[jobNum].StartValue[n];
+                }            
             }
 
             // set start skills
             for (n = 0; n < Variables.MaxStartSkills; n++)
             {
-                if (Data.Job[jobNum].StartSkill != null)
+                if (Data.Job[jobNum].StartSkill[n] >= 0)
                 {
-                    if (Data.Job[jobNum].StartSkill[n] >= 0)
-                    {
-                        Data.Player[index].Skill[n].Num = Data.Job[jobNum].StartSkill[n];
-                        Data.Player[index].Skill[n].Cd = 0;
-                    }
+                    Data.Player[index].Skill[n].Num = Data.Job[jobNum].StartSkill[n];
+                    Data.Player[index].Skill[n].Cd = 0;
                 }
             }
 
