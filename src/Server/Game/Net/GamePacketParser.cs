@@ -1954,7 +1954,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
             return;
 
-        MapItem.Spawn(tmpItem, tmpAmount, GetPlayerMap(session.Id), GetPlayerX(session.Id), GetPlayerY(session.Id));
+        MapItem.OnSpawn(tmpItem, tmpAmount, GetPlayerMap(session.Id), GetPlayerX(session.Id), GetPlayerY(session.Id));
     }
 
     public static void Packet_TrainStat(GameSession session, ReadOnlyMemory<byte> bytes)

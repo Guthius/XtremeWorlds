@@ -42,11 +42,11 @@ namespace Server
                         {
                             var value = Data.Map[mapNum].Tile[x, y].Data2 < 1 ? 1 : Data.Map[mapNum].Tile[x, y].Data2;
 
-                            Spawn(Data.Map[mapNum].Tile[x, y].Data1, value, mapNum, x, y);
+                            OnSpawn(Data.Map[mapNum].Tile[x, y].Data1, value, mapNum, x, y);
                         }
                         else
                         {
-                            Spawn(Data.Map[mapNum].Tile[x, y].Data1, Data.Map[mapNum].Tile[x, y].Data2, mapNum, x, y);
+                            OnSpawn(Data.Map[mapNum].Tile[x, y].Data1, Data.Map[mapNum].Tile[x, y].Data2, mapNum, x, y);
                         }
                     }
 
@@ -57,11 +57,11 @@ namespace Server
                         {
                             var value = Data.Map[mapNum].Tile[x, y].Data2_2 < 1 ? 1 : Data.Map[mapNum].Tile[x, y].Data2_2;
 
-                            Spawn(Data.Map[mapNum].Tile[x, y].Data1_2, value, mapNum, x, y);
+                            OnSpawn(Data.Map[mapNum].Tile[x, y].Data1_2, value, mapNum, x, y);
                         }
                         else
                         {
-                            Spawn(Data.Map[mapNum].Tile[x, y].Data1_2, Data.Map[mapNum].Tile[x, y].Data2_2, mapNum, x, y);
+                            OnSpawn(Data.Map[mapNum].Tile[x, y].Data1_2, Data.Map[mapNum].Tile[x, y].Data2_2, mapNum, x, y);
                         }
                     }
                 }
@@ -69,7 +69,7 @@ namespace Server
         }
 
 
-        public static void Spawn(int itemNum, int itemVal, int mapNum, int x, int y)
+        public static void OnSpawn(int itemNum, int itemVal, int mapNum, int x, int y)
         {
             if (itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems || mapNum < 0 || mapNum >= Core.Globals.Variables.MaxMaps)
             {
