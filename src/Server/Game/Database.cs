@@ -963,6 +963,7 @@ public static class Database
 
     public static void WriteJobDataToPacket(int jobNum, PacketWriter packetWriter)
     {
+        if (Data.Job[jobNum].Stat == null || Data.Job[jobNum].StartItem == null || Data.Job[jobNum].StartSkill == null) return;
         packetWriter.WriteString(Data.Job[jobNum].Name);
         packetWriter.WriteString(Data.Job[jobNum].Desc);
         packetWriter.WriteInt32(Data.Job[jobNum].MaleSprite);
