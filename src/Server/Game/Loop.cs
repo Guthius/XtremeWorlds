@@ -177,10 +177,13 @@ public static class Loop
         for (var mapNum = 0; mapNum < mapCount; mapNum++)
         {
             // Add Npcs
-            for (var i = 0; i < Variables.MaxMapNpcs; i++)
+            if (mapNum < 0 || mapNum >= Data.MapNpc.Length) continue;
+            var npcArr0 = Data.MapNpc[mapNum].Npc;
+            if (npcArr0 == null) continue;
+
+            for (var i = 0; i < npcArr0.Length; i++)
             {
-                if (Data.MapNpc[mapNum].Npc == null) break;
-                var npc = Entity.FromNpc(i, Data.MapNpc[mapNum].Npc[i]);
+                var npc = Entity.FromNpc(i, npcArr0[i]);
                 if (npc.Num < 0)
                 {
                     continue;
@@ -209,13 +212,496 @@ public static class Loop
             }
         }
 
-        try
+        long tickCount = General.GetTimeMs();
+
+        for (int x = 0; x < entities.Count; x++)
         {
-            Script.Instance?.UpdateMapAi();
+            var entity = entities[x];
+            if (entity == null) continue;
+            var vitals = entity.Vital; // capture early
+            var mapNum = entity.Map;
+
+            // Only process entities that are Npcs
+            if (entity.Num < 0) continue;
+
+            // Resolve completed skill buffers for both players and NPCs
+            long nowMsBuff = General.GetTimeMs();
+            if (entity.Type == Core.Globals.Entity.EntityType.Player)
+            {
+                int slot = (int)Data.TempPlayer[entity.Id].SkillBuffer;
+                if (slot >= 0)
+                {
+                    int skillId = -1;
+                    if (Data.Player[entity.Id].Skill != null && slot < Data.Player[entity.Id].Skill.Length)
+                        skillId = Data.Player[entity.Id].Skill[slot].Num;
+                    int castMs = (skillId >= 0 && skillId < Data.Skill.Length) ? Data.Skill[skillId].CastTime * 1000 : 0;
+                    if (nowMsBuff > Data.TempPlayer[entity.Id].SkillBufferTimer + castMs)
+                    {
+                        Script.Instance?.CastSkill(mapNum, entity, slot); // bufferedValue is slot for players
+                        // clear buffer
+                        Data.TempPlayer[entity.Id].SkillBuffer = -1;
+                        Data.TempPlayer[entity.Id].SkillBufferTimer = 0;
+                        NetworkSend.SendClearSkillBuffer(entity.Id);
+                    }
+                }
+            }
+            else if (entity.Type == Core.Globals.Entity.EntityType.Npc)
+            {
+                int skillId = entity.SkillBuffer; // NPC stores skillId directly
+                if (skillId >= 0)
+                {
+                    int castMs = (skillId < Data.Skill.Length) ? Data.Skill[skillId].CastTime * 1000 : 0;
+                    if (nowMsBuff > entity.SkillBufferTimer + castMs)
+                    {
+                        Script.Instance?.CastSkill(mapNum, entity, skillId); // bufferedValue is skillId for NPCs
+                        // clear snapshot & underlying map npc buffer
+                        entity.SkillBuffer = -1;
+                        entity.SkillBufferTimer = 0;
+                        if (mapNum >= 0 && mapNum < Data.MapNpc.Length)
+                        {
+                            var npcArr = Data.MapNpc[mapNum].Npc;
+                            if (npcArr != null && entity.Id >= 0 && entity.Id < npcArr.Length)
+                            {
+                                ref var baseNpc = ref npcArr[entity.Id];
+                                baseNpc.SkillBuffer = -1;
+                                baseNpc.SkillBufferTimer = 0;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // ATTACKING ON SIGHT (use tile-based distance; ensure property name consistency)
+                if (entity.Behavior == (byte)NpcBehavior.AttackOnSight || entity.Behavior == (byte)NpcBehavior.Guard)
+                {
+                    // make sure it's not stunned
+                    if (!(entity.StunDuration > 0))
+                    {
+                        foreach (var player in PlayerService.Instance.Players)
+                        {
+                            if (NetworkConfig.IsPlaying(player.Id))
+                            {
+                                if (GetPlayerMap(player.Id) == mapNum && entity.TargetType == 0 && GetPlayerAccess(player.Id) <= (byte)AccessLevel.Moderator)
+                                {
+                                    // Detection range
+                                    int n = entity.Range;
+                                    int ex = entity.X / Constants.TileSize;
+                                    int ey = entity.Y / Constants.TileSize;
+                                    int px = GetPlayerX(player.Id);
+                                    int py = GetPlayerY(player.Id);
+                                    int distanceX = Math.Abs(ex - px);
+                                    int distanceY = Math.Abs(ey - py);
+
+                                    if (distanceX <= n && distanceY <= n)
+                                    {
+                                        if (entity.Behavior == (byte)NpcBehavior.AttackOnSight || GetPlayerPk(player.Id))
+                                        {
+                                            if (!string.IsNullOrEmpty(entity.AttackSay))
+                                            {
+                                                NetworkSend.SendPlayerMessage(player.Id, GameLogic.CheckGrammar(entity.Name, 1) + " says, '" + entity.AttackSay + "' to you.", (int)ColorName.Yellow);
+                                            }
+                                            entity.TargetType = (byte)TargetType.Player;
+                                            entity.Target = player.Id;
+                                            // Persist target into base map data for movement logic
+                                            if (mapNum >= 0 && mapNum < Data.MapNpc.Length)
+                                            {
+                                                var npcArr = Data.MapNpc[mapNum].Npc;
+                                                if (npcArr != null && entity.Id >= 0 && entity.Id < npcArr.Length)
+                                                {
+                                                    ref var mapNpc = ref npcArr[entity.Id];
+                                                    mapNpc.TargetType = entity.TargetType;
+                                                    mapNpc.Target = entity.Target;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // Check if target was found for Npc targeting
+                        if (entity.TargetType == 0 && entity.Faction > 0)
+                        {
+                            for (int i = 0; i < entities.Count; i++)
+                            {
+                                var otherEntity = entities[i];
+                                if (otherEntity != null && otherEntity.Num >= 0)
+                                {
+                                    if (otherEntity.Map != mapNum) continue;
+                                    if (ReferenceEquals(otherEntity, entity)) continue;
+                                    if ((int)otherEntity.Faction > 0 && otherEntity.Faction != entity.Faction)
+                                    {
+                                        // Detection range between NPCs
+                                        int n = otherEntity.Range;
+                                        int ex = entity.X / Constants.TileSize;
+                                        int ey = entity.Y / Constants.TileSize;
+                                        int ox = otherEntity.X / Constants.TileSize;
+                                        int oy = otherEntity.Y / Constants.TileSize;
+                                        int distanceX = Math.Abs(ex - ox);
+                                        int distanceY = Math.Abs(ey - oy);
+
+                                        if (distanceX <= n && distanceY <= n && entity.Behavior == (byte)NpcBehavior.AttackOnSight)
+                                        {
+                                            entity.TargetType = (byte)TargetType.Npc;
+                                            entity.Target = i;
+                                            if (mapNum >= 0 && mapNum < Data.MapNpc.Length)
+                                            {
+                                                var npcArr = Data.MapNpc[mapNum].Npc;
+                                                if (npcArr != null && entity.Id >= 0 && entity.Id < npcArr.Length)
+                                                {
+                                                    ref var mapNpc = ref npcArr[entity.Id];
+                                                    mapNpc.TargetType = entity.TargetType;
+                                                    mapNpc.Target = entity.Target;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Attempt attack using new combat system when target acquired
+                if (entity != null && entity.Target >= 0)
+                {
+                    if (entity.TargetType == (byte)TargetType.Player)
+                    {
+                        var pid = entity.Target;
+                        if (NetworkConfig.IsPlaying(pid) && GetPlayerMap(pid) == mapNum)
+                        {
+                            // Clear target if out of chase range
+                            int ex = entity.X / Constants.TileSize;
+                            int ey = entity.Y / Constants.TileSize;
+                            int px = GetPlayerX(pid);
+                            int py = GetPlayerY(pid);
+                            int r = entity.Range;
+                            if (Math.Abs(ex - px) > r || Math.Abs(ey - py) > r)
+                            {
+                                entity.Target = -1;
+                                entity.TargetType = 0;
+                                // reflect to base map npc if this is an NPC snapshot
+                                if (entity.Type == Core.Globals.Entity.EntityType.Npc && mapNum >= 0 && mapNum < Data.MapNpc.Length)
+                                {
+                                    var npcArr = Data.MapNpc[mapNum].Npc;
+                                    if (npcArr != null && entity.Id >= 0 && entity.Id < npcArr.Length)
+                                    {
+                                        ref var baseNpcClr = ref npcArr[entity.Id];
+                                        baseNpcClr.TargetType = 0;
+                                        baseNpcClr.Target = -1;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                var targetEntity = Core.Globals.Entity.FromPlayer(pid, Data.Player[pid]);
+                                targetEntity.Map = mapNum;
+                                // NPC skills: select a valid skill and cast it directly; otherwise do a basic attack
+                                bool didCast = false;
+                                if (entity.Type == Core.Globals.Entity.EntityType.Npc && entity.Num >= 0 && entity.Num < Data.Npc.Length)
+                                {
+                                    var skills = Data.Npc[entity.Num].Skill;
+                                    if (skills != null)
+                                    {
+                                        long nowMs = General.GetTimeMs();
+                                        int dist = Math.Max(Math.Abs(ex - px), Math.Abs(ey - py));
+                                        for (int slot = 0; slot < Core.Globals.Variables.MaxNpcSkills && slot < skills.Length; slot++)
+                                        {
+                                            int sid = skills[slot];
+                                            if (sid <= 0 || sid >= Data.Skill.Length) continue;
+                                            ref var sk = ref Data.Skill[sid];
+                                            bool inRange = sk.Range == 0 ? (sk.IsAoE || dist <= 1) : dist <= sk.Range;
+                                            if (!inRange) continue;
+                                            if (mapNum < 0 || mapNum >= Data.MapNpc.Length) break;
+                                            var npcArr = Data.MapNpc[mapNum].Npc;
+                                            if (npcArr == null || entity.Id < 0 || entity.Id >= npcArr.Length) break;
+                                            ref var baseNpc = ref npcArr[entity.Id];
+                                            bool cdReady = baseNpc.SkillCd == null || slot >= baseNpc.SkillCd.Length || baseNpc.SkillCd[slot] <= nowMs;
+                                            if (!cdReady) continue;
+                                            if (entity.Vital == null || entity.Vital.Length <= (int)Vital.Mana || entity.Vital[(int)Vital.Mana] < sk.MpCost) continue;
+                                            Script.Instance?.CastSkill(mapNum, entity, sid);
+                                            didCast = true;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (!didCast)
+                                {
+                                    Script.Instance?.AttemptAttack(entity, targetEntity);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            entity.Target = -1;
+                            entity.TargetType = 0;
+                        }
+                    }
+                    else if (entity.TargetType == (byte)TargetType.Npc)
+                    {
+                        var idx = entity.Target;
+                        if (idx >= 0 && idx < entities.Count)
+                        {
+                            var targetEntity = entities[idx];
+                            if (targetEntity != null && targetEntity.Type == Core.Globals.Entity.EntityType.Npc && targetEntity.Map == mapNum && targetEntity.Num >= 0)
+                            {
+                                int ex = entity.X / Constants.TileSize;
+                                int ey = entity.Y / Constants.TileSize;
+                                int tx = targetEntity.X / Constants.TileSize;
+                                int ty = targetEntity.Y / Constants.TileSize;
+                                int r = entity.Range;
+                                if (Math.Abs(ex - tx) > r || Math.Abs(ey - ty) > r)
+                                {
+                                    entity.Target = -1;
+                                    entity.TargetType = 0;
+                                    if (entity.Type == Core.Globals.Entity.EntityType.Npc && mapNum >= 0 && mapNum < Data.MapNpc.Length)
+                                    {
+                                        var npcArr = Data.MapNpc[mapNum].Npc;
+                                        if (npcArr != null && entity.Id >= 0 && entity.Id < npcArr.Length)
+                                        {
+                                            ref var baseNpc = ref npcArr[entity.Id];
+                                            baseNpc.TargetType = 0;
+                                            baseNpc.Target = -1;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    bool didCast2 = false;
+                                    if (entity.Type == Core.Globals.Entity.EntityType.Npc && entity.Num >= 0 && entity.Num < Data.Npc.Length)
+                                    {
+                                        var skills2 = Data.Npc[entity.Num].Skill;
+                                        if (skills2 != null)
+                                        {
+                                            long nowMs2 = General.GetTimeMs();
+                                            int dist2 = Math.Max(Math.Abs(ex - tx), Math.Abs(ey - ty));
+                                            for (int slot2 = 0; slot2 < Core.Globals.Variables.MaxNpcSkills && slot2 < skills2.Length; slot2++)
+                                            {
+                                                int sid2 = skills2[slot2];
+                                                if (sid2 <= 0 || sid2 >= Data.Skill.Length) continue;
+                                                ref var sk2 = ref Data.Skill[sid2];
+                                                bool inRange2 = sk2.Range == 0 ? (sk2.IsAoE || dist2 <= 1) : dist2 <= sk2.Range;
+                                                if (!inRange2) continue;
+                                                if (mapNum < 0 || mapNum >= Data.MapNpc.Length) break;
+                                                var npcArr = Data.MapNpc[mapNum].Npc;
+                                                if (npcArr == null || entity.Id < 0 || entity.Id >= npcArr.Length) break;
+                                                ref var baseNpc2 = ref npcArr[entity.Id];
+                                                bool cdReady2 = baseNpc2.SkillCd == null || slot2 >= baseNpc2.SkillCd.Length || baseNpc2.SkillCd[slot2] <= nowMs2;
+                                                if (!cdReady2) continue;
+                                                if (entity.Vital == null || entity.Vital.Length <= (int)Vital.Mana || entity.Vital[(int)Vital.Mana] < sk2.MpCost) continue;
+                                                Script.Instance?.CastSkill(mapNum, entity, sid2);
+                                                didCast2 = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    if (!didCast2)
+                                    {
+                                        Script.Instance?.AttemptAttack(entity, targetEntity);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                entity.Target = -1;
+                                entity.TargetType = 0;
+                            }
+                        }
+                        else
+                        {
+                            entity.Target = -1;
+                            entity.TargetType = 0;
+                        }
+                    }
+                }
+
+                // Simplified death/spawn handling (entity is non-null here)
+#pragma warning disable CS8602
+                if (vitals != null && vitals[(byte)Vital.Health] < 0 && entity.SpawnWait > 0)
+                {
+                    entity.Num = 0;
+                    entity.SpawnWait = General.GetTimeMs();
+                    vitals[(byte)Vital.Health] = 0;
+                }
+#pragma warning restore CS8602
+
+#pragma warning disable CS8602
+                // Handle npc respawn logic (no special death window state)
+                if (entity.Type == Core.Globals.Entity.EntityType.Npc)
+                {
+                    if (entity.Num == -1 && entity.SpawnSecs > 0)
+                    {
+                        if (tickCount > entity.SpawnWait && mapNum >= 0 && mapNum < Data.Map.Length)
+                        {
+                            Server.MapNpc.OnSpawn(x, mapNum);
+                        }
+                    }
+                }
+#pragma warning restore CS8602
+            }
         }
-        catch (Exception ex)
+
+        // ----- NPC Movement (Chase + Wander) -----
+        var nowMove = General.GetTimeMs();
+        foreach (var e in entities)
         {
-            General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(Loop));
+            if (e == null) continue;
+            if (e.Type != Core.Globals.Entity.EntityType.Npc) continue;
+            if (e.Num < 0) continue;
+            var npcIndex = e.Id; // Index into Data.MapNpc[map].Npc
+            var map = e.Map;
+            if (map < 0 || map >= Data.MapNpc.Length) continue;
+            var npcArr = Data.MapNpc[map].Npc;
+            if (npcArr == null || npcIndex < 0 || npcIndex >= npcArr.Length) continue;
+
+            ref var baseNpc = ref npcArr[npcIndex];
+
+            // Skip if stunned
+            if (baseNpc.StunDuration > 0) continue;
+
+            // Sync any target assigned on snapshot back to base data if base has none.
+            if (baseNpc.TargetType == 0 && e.TargetType != 0)
+            {
+                baseNpc.TargetType = e.TargetType;
+                baseNpc.Target = e.Target;
+            }
+
+            bool moved = false;
+
+            // If target exists but is out of range, clear it before deciding movement
+            if (baseNpc.TargetType == (byte)TargetType.Player && baseNpc.Target >= 0 && NetworkConfig.IsPlaying(baseNpc.Target) && GetPlayerMap(baseNpc.Target) == map)
+            {
+                int sxR = baseNpc.X / Constants.TileSize;
+                int syR = baseNpc.Y / Constants.TileSize;
+                int txR = GetPlayerX(baseNpc.Target);
+                int tyR = GetPlayerY(baseNpc.Target);
+                int rR = Math.Max(0, (int)Data.Npc[baseNpc.Num].Range);
+                if (Math.Abs(sxR - txR) > rR || Math.Abs(syR - tyR) > rR)
+                {
+                    baseNpc.TargetType = 0;
+                    baseNpc.Target = -1;
+                }
+            }
+            else if (baseNpc.TargetType == (byte)TargetType.Npc && baseNpc.Target >= 0)
+            {
+                int targetSlot = baseNpc.Target;
+                if (targetSlot < npcArr.Length && npcArr[targetSlot].Num >= 0)
+                {
+                    int sxR = baseNpc.X / Constants.TileSize;
+                    int syR = baseNpc.Y / Constants.TileSize;
+                    int txR = npcArr[targetSlot].X / Constants.TileSize;
+                    int tyR = npcArr[targetSlot].Y / Constants.TileSize;
+                    int rR = Math.Max(0, (int)Data.Npc[baseNpc.Num].Range);
+                    if (Math.Abs(sxR - txR) > rR || Math.Abs(syR - tyR) > rR)
+                    {
+                        baseNpc.TargetType = 0;
+                        baseNpc.Target = -1;
+                    }
+                }
+                else
+                {
+                    baseNpc.TargetType = 0;
+                    baseNpc.Target = -1;
+                }
+            }
+
+            // Read target info from persistent npc record
+            if (baseNpc.TargetType == (byte)TargetType.Player && baseNpc.Target >= 0 && NetworkConfig.IsPlaying(baseNpc.Target) && GetPlayerMap(baseNpc.Target) == map)
+            {
+                int sx = baseNpc.X / Constants.TileSize;
+                int sy = baseNpc.Y / Constants.TileSize;
+                int tx = GetPlayerX(baseNpc.Target);
+                int ty = GetPlayerY(baseNpc.Target);
+                moved = Script.Instance?.TryChase(map, npcIndex, sx, sy, tx, ty);
+            }
+            else if (baseNpc.TargetType == (byte)TargetType.Npc && baseNpc.Target >= 0)
+            {
+                int targetSlot = baseNpc.Target;
+                if (targetSlot < npcArr.Length && npcArr[targetSlot].Num >= 0)
+                {
+                    int sx = baseNpc.X / Constants.TileSize;
+                    int sy = baseNpc.Y / Constants.TileSize;
+                    int tx = npcArr[targetSlot].X / Constants.TileSize;
+                    int ty = npcArr[targetSlot].Y / Constants.TileSize;
+                    moved = Script.Instance?.TryChase(map, npcIndex, sx, sy, tx, ty);
+                }
+                else
+                {
+                    baseNpc.TargetType = 0;
+                    baseNpc.Target = -1;
+                }
+            }
+
+            // Wander if not moved and no target. AttackOnSight/Guard now also wander albeit less frequently.
+            if (!moved && baseNpc.TargetType == 0)
+            {
+                bool aggressive = e.Behavior == (byte)NpcBehavior.AttackOnSight || e.Behavior == (byte)NpcBehavior.Guard;
+                double chance = aggressive ? 0.02 : 0.05; // aggressive wander less
+                if (Random.Shared.NextDouble() < chance)
+                {
+                    byte dir = (byte)(Random.Shared.Next(0, 4));
+                    if (Server.MapNpc.CanMove(map, npcIndex, dir))
+                    {
+                        Server.MapNpc.OnMove(map, npcIndex, dir, (int)MovementState.Walking);
+                    }
+                }
+            }
         }
+
+        var now = General.GetTimeMs();
+        var itemCount = Variables.MaxMapItems;
+
+        for (int mapNum = 0; mapNum < mapCount; mapNum++)
+        {
+            // Handle map items (public/despawn)
+            for (int i = 0; i < itemCount; i++)
+            {
+                var item = Data.MapItem[mapNum, i];
+                if (item.Num >= 0 && !string.IsNullOrEmpty(item.PlayerName))
+                {
+                    if (item.PlayerTimer < now)
+                    {
+                        item.PlayerName = "";
+                        item.PlayerTimer = 0;
+                        NetworkSend.SendMapItemToAll(mapNum, i);
+                    }
+
+                    if (item.CanDespawn && item.DespawnTimer < now)
+                    {
+                        Server.MapItem.OnClear(i, mapNum);
+                        NetworkSend.SendMapItemToAll(mapNum, i);
+                    }
+                }
+            }
+
+            // Respawn resources
+            var mapResource = Data.MapResource[mapNum];
+            if (mapResource.ResourceCount > 0)
+            {
+                for (int i = 0; i < mapResource.ResourceCount; i++)
+                {
+                    var resData = mapResource.ResourceData[i];
+                    int resourceindex = Data.Map[mapNum].Tile[resData.X, resData.Y].Data1;
+                    if (resourceindex > 0)
+                    {
+                        if (resData.State == 1 || resData.Health < 1)
+                        {
+                            if (resData.Timer + Data.Resource[resourceindex].RespawnTime * 1000 < now)
+                            {
+                                resData.Timer = now;
+                                resData.State = 0;
+                                resData.Health = (byte)Data.Resource[resourceindex].Health;
+                                NetworkSend.SendMapResourceToMap(mapNum);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Group vital regeneration executed after NPC AI loop (wrapped for script safety)
+        Script.Instance?.RegenVitals();
     }
 }
