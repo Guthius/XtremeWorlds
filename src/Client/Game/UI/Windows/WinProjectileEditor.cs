@@ -6,7 +6,7 @@ using System.IO;
 
 namespace Client.Game.UI.Windows;
 
-public static class WinProjectileEditor
+public class WinProjectileEditor
 {
     public static int SelectedIndex = 0;
     private static Core.Globals.Type.Projectile? _history;

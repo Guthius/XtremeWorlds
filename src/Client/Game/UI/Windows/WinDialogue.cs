@@ -2,7 +2,7 @@
 
 namespace Client.Game.UI.Windows;
 
-public static class WinDialogue
+public class WinDialogue
 {
     public static void OnOkay()
     {

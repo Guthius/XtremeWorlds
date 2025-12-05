@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Client.Game.UI.Windows;
 
-public static class WinItemEditor
+public class WinItemEditor
 {
     public static int SelectedIndex = 0;
     private static Core.Globals.Type.Item? _history;

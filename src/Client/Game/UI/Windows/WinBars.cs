@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Client.Game.UI.Windows;
 
-public static class WinBars
+public class WinBars
 {
     public static void OnDraw()
     {

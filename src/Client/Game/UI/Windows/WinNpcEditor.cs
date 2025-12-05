@@ -5,7 +5,7 @@ using System;
 
 namespace Client.Game.UI.Windows;
 
-public static class WinNpcEditor
+public class WinNpcEditor
 {
     public static int SelectedIndex = 0;
     public static bool IsLoading = false;

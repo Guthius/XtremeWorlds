@@ -1,6 +1,6 @@
 ﻿namespace Client.Game.UI.Windows;
 
-public static class WinMenu
+public class WinMenu
 {
     public static void OnCharacterClick()
     {

@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Client.Game.UI.Windows;
 
-public static class WinNewChar
+public class WinNewChar
 {
     public static void OnDrawSprite()
     {

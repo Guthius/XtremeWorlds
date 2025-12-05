@@ -2,7 +2,7 @@
 
 namespace Client.Game.UI.Windows;
 
-public static class WinComboMenu
+public class WinComboMenu
 {
     /// <summary>
     /// Returns true if the combo menu is currently open for the given window/control.

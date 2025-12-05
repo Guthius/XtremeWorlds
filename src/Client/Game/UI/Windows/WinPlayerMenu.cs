@@ -4,7 +4,7 @@ using static Core.Globals.Command;
 
 namespace Client.Game.UI.Windows;
 
-public static class WinPlayerMenu
+public class WinPlayerMenu
 {
     public static void OnClose()
     {

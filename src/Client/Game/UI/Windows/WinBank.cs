@@ -5,7 +5,7 @@ using static Core.Globals.Command;
 
 namespace Client.Game.UI.Windows;
 
-public static class WinBank
+public class WinBank
 {
     public static void OnDraw()
     {

@@ -5,7 +5,7 @@ using System;
 using System;
 
 namespace Client.Game.UI.Windows;
-public static class WinMoralEditor
+public class WinMoralEditor
 {
     public static int SelectedIndex = 0;
     public static Core.Globals.Type.Moral? _history = null;

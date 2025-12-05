@@ -5,7 +5,7 @@ using static Core.Globals.Command;
 
 namespace Client.Game.UI.Windows;
 
-public static class WinCharacter
+public class WinCharacter
 {
     private static readonly Equipment[] EquipmentTypes = Enum.GetValues<Equipment>();
 

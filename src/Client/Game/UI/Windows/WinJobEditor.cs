@@ -5,7 +5,7 @@ using System;
 
 namespace Client.Game.UI.Windows
 {
-    public static class WinJobEditor
+    public class WinJobEditor
     {
         public static int SelectedIndex = 0;
         private static Core.Globals.Type.Job? _history = null;

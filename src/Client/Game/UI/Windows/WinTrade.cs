@@ -5,7 +5,7 @@ using Client.Net;
 
 namespace Client.Game.UI.Windows;
 
-public static class WinTrade
+public class WinTrade
 {
     public static void OnDraw()
     {

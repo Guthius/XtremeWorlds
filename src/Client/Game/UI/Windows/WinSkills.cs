@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Client.Game.UI.Windows;
 
-public static class WinSkills
+public class WinSkills
 {
     public static void OnDraw()
     {

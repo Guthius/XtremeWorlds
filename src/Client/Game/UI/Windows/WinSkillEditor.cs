@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Client.Game.UI.Windows;
 
-public static class WinSkillEditor
+public class WinSkillEditor
 {
     public static int SelectedIndex = 0;
     private static Core.Globals.Type.Skill? _history;

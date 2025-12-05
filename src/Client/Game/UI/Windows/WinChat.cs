@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Client.Game.UI.Windows;
 
-public static class WinChat
+public class WinChat
 {
     public static void OnSayClick()
     {

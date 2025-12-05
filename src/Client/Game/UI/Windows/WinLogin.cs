@@ -4,7 +4,7 @@ using Core.Globals;
 
 namespace Client.Game.UI.Windows;
 
-public static class WinLogin
+public class WinLogin
 {
     public static void OnExit()
     {

@@ -8,7 +8,7 @@ using System.IO;
 using System.Text;
 
 namespace Client.Game.UI.Windows;
-public static class WinResourceEditor
+public class WinResourceEditor
 {
     public static int SelectedIndex = 0;
     public static bool IsLoading = false;

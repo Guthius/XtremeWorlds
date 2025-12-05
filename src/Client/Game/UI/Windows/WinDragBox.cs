@@ -7,8 +7,7 @@ using Type = Core.Globals.Type;
 
 namespace Client.Game.UI.Windows;
 
-[SuppressMessage("ReSharper", "PossibleLossOfFraction")]
-public static class WinDragBox
+public class WinDragBox
 {
     public static void OnDraw()
     {

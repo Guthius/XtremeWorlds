@@ -6,7 +6,7 @@ using System.IO;
 
 namespace Client.Game.UI.Windows;
 
-public static class WinShopEditor
+public class WinShopEditor
 {
     public static int SelectedIndex = 0;
 

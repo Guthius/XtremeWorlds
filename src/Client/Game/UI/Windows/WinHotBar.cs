@@ -6,7 +6,7 @@ using static Core.Globals.Command;
 
 namespace Client.Game.UI.Windows;
 
-public static class WinHotBar
+public class WinHotBar
 {
     public static void OnDraw()
     {

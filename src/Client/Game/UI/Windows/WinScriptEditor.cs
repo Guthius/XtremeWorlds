@@ -7,7 +7,7 @@ using Client;
 using System.IO;
 
 namespace Client.Game.UI.Windows;
-public static class WinScriptEditor
+public class WinScriptEditor
 {   
     public static void OnLoad()
     {

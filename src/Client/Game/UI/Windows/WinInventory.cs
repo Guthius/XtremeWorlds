@@ -5,7 +5,7 @@ using static Core.Globals.Command;
 
 namespace Client.Game.UI.Windows;
 
-public static class WinInventory
+public class WinInventory
 {
     public static void OnDraw()
     {

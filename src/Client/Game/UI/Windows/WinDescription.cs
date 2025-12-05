@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Client.Game.UI.Windows;
 
-public static class WinDescription
+public class WinDescription
 {
     public static void OnDraw()
     {

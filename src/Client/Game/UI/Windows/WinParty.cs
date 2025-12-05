@@ -3,7 +3,7 @@ using static Core.Globals.Command;
 
 namespace Client.Game.UI.Windows;
 
-public static class WinParty
+public class WinParty
 {
     public static void Update()
     {

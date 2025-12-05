@@ -4,7 +4,7 @@ using Core.Globals;
 
 namespace Client.Game.UI;
 
-public static class WindowLoader
+public class WindowLoader
 {
     private const Font DefaultWindowFont = Font.Georgia;
     private const Font DefaultControlFont = Font.Georgia;

@@ -3,7 +3,7 @@ using Core.Globals;
 
 namespace Client.Game.UI.Windows;
 
-public static class WinRegister
+public class WinRegister
 {
     public static void OnRegister()
     {

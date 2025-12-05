@@ -5,7 +5,7 @@ using static Core.Globals.Command;
 
 namespace Client.Game.UI.Windows;
 
-public static class WinShop
+public class WinShop
 {
     public static void OnDraw()
     {

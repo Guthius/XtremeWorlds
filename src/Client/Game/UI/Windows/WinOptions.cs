@@ -3,7 +3,7 @@ using Core.Globals;
 
 namespace Client.Game.UI.Windows;
 
-public static class WinOptions
+public class WinOptions
 {
     // Apply a 0-based resolution index immediately (update settings and graphics)
     public static void ApplyResolutionSelection(int selIndex)

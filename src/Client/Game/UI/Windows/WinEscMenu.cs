@@ -2,7 +2,7 @@
 
 namespace Client.Game.UI.Windows;
 
-public static class WinEscMenu
+public class WinEscMenu
 {
     public static void OnClose()
     {

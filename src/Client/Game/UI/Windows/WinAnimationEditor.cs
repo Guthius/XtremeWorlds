@@ -6,7 +6,7 @@ using System.IO;
 
 namespace Client.Game.UI.Windows
 {
-    public static class WinAnimationEditor
+    public class WinAnimationEditor
     {
         public static int SelectedIndex = 0;
 

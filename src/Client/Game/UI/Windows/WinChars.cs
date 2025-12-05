@@ -5,7 +5,7 @@ using System.IO;
 
 namespace Client.Game.UI.Windows;
 
-public static class WinChars
+public class WinChars
 {
     public static void OnSelectCharacter1Click()
     {

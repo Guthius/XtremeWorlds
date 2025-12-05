@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Client.Game.UI;
 
-public static class WindowRenderer
+public class WindowRenderer
 {
     public static void Render(Window window)
     {

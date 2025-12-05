@@ -5,7 +5,7 @@ using System.IO;
 
 namespace Client.Game.UI.Windows;
 
-public static class WinJobs
+public class WinJobs
 {
     public static void OnDrawSprite()
     {
