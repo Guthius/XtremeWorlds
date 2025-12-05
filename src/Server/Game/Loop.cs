@@ -8,7 +8,7 @@ namespace Server;
 
 public static class Loop
 {
-    public static async Task ServerAsync()
+    public static async System.Threading.Tasks.Task ServerAsync()
     {
         var tmr25 = 0;
         var tmr500 = 0;
@@ -179,6 +179,7 @@ public static class Loop
             // Add Npcs
             for (var i = 0; i < Variables.MaxMapNpcs; i++)
             {
+                if (Data.MapNpc[mapNum].Npc == null) break;
                 var npc = Entity.FromNpc(i, Data.MapNpc[mapNum].Npc[i]);
                 if (npc.Num < 0)
                 {

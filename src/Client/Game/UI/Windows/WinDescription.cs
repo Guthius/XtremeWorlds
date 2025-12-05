@@ -26,7 +26,7 @@ public class WinDescription
         {
             case 1: // Inventory Item
             {
-                var iconPath = Path.Combine(DataPath.Items, Data.Item[GameState.DescItem].Icon.ToString());
+                var iconPath = Path.Combine(DataPath.Items, Item.Instance[GameState.DescItem].Icon.ToString());
 
                 GameClient.RenderTexture(ref iconPath, x + 20, y + 34, 0, 0, 64, 64, 32, 32);
 
@@ -47,7 +47,7 @@ public class WinDescription
                         picBar.Value, 12);
                 }
                 
-                var iconPath = Path.Combine(DataPath.Skills, Data.Item[GameState.DescItem].Icon.ToString());
+                var iconPath = Path.Combine(DataPath.Skills, Item.Instance[GameState.DescItem].Icon.ToString());
 
                 GameClient.RenderTexture(ref iconPath, x + 20, y + 34, 0, 0, 64, 64, 32, 32);
 

@@ -108,7 +108,7 @@ public class Projectile : IData, IAsyncData
         }
     }
 
-    public static async Task OnLoadAllAsync()
+    public static async System.Threading.Tasks.Task OnLoadAllAsync()
     {
         await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxProjectiles), OnLoadAsync);
     }
@@ -150,12 +150,12 @@ public class Projectile : IData, IAsyncData
         }
         
         if (mapProjectileNum == -1) return;
-        int projectileNum = itemNum >= 0 ? Data.Item[itemNum].Projectile : -1;
+        int projectileNum = itemNum >= 0 ? Item.Instance[itemNum].Projectile : -1;
         if (projectileNum < 0) return;
         if (Data.TempPlayer[playerId].ProjectileTimer > General.GetTimeMs()) return;
 
         ref var mp = ref Data.MapProjectile[mapNum, mapProjectileNum];
-        Data.TempPlayer[playerId].ProjectileTimer = General.GetTimeMs() + Data.Item[itemNum].Speed;
+        Data.TempPlayer[playerId].ProjectileTimer = General.GetTimeMs() + Item.Instance[itemNum].Speed;
         mp.ProjectileNum = projectileNum;
         mp.Owner = playerId;
         mp.OwnerType = (byte)TargetType.Player;
@@ -189,12 +189,12 @@ public class Projectile : IData, IAsyncData
             { mapProjectileNum = i; break; }
         }
         if (mapProjectileNum == -1) return;
-        int projectileNum = itemNum >= 0 ? Data.Item[itemNum].Projectile : -1;
+        int projectileNum = itemNum >= 0 ? Item.Instance[itemNum].Projectile : -1;
         if (projectileNum < 0) return;
         if (Data.TempPlayer[playerId].ProjectileTimer > General.GetTimeMs()) return;
 
         ref var mp = ref Data.MapProjectile[mapNum, mapProjectileNum];
-        Data.TempPlayer[playerId].ProjectileTimer = General.GetTimeMs() + Data.Item[itemNum].Speed;
+        Data.TempPlayer[playerId].ProjectileTimer = General.GetTimeMs() + Item.Instance[itemNum].Speed;
         mp.ProjectileNum = projectileNum;
         mp.Owner = playerId;
         mp.OwnerType = (byte)TargetType.Player;
@@ -236,7 +236,7 @@ public class Projectile : IData, IAsyncData
             return;
         }
 
-        var projectileNum = itemNum >= 0 ? Data.Item[itemNum].Projectile : skillNum >= 0 ? Data.Skill[skillNum].Projectile : -1;
+        var projectileNum = itemNum >= 0 ? Item.Instance[itemNum].Projectile : skillNum >= 0 ? Data.Skill[skillNum].Projectile : -1;
         if (projectileNum == -1)
         {
             return;
@@ -427,10 +427,13 @@ public class Projectile : IData, IAsyncData
                         int anim = Data.Projectile[projId].Animation;
                         if (anim >= 0)
                         {
-                            int tx = Math.Clamp(prevTileX, 0, Data.Map[map].MaxX - 1);
-                            int ty = Math.Clamp(prevTileY, 0, Data.Map[map].MaxY - 1);
-                            NetworkSend.SendAnimation(map, anim, tx, ty);
-                            TryAttackAtTile(map, ref mp, tx, ty, projId);
+                            if (Data.Map[map].MaxX > 0 && Data.Map[map].MaxY > 0)
+                            {
+                                int tx = Math.Clamp(prevTileX, 0, Data.Map[map].MaxX - 1);
+                                int ty = Math.Clamp(prevTileY, 0, Data.Map[map].MaxY - 1);
+                                NetworkSend.SendAnimation(map, anim, tx, ty);
+                                TryAttackAtTile(map, ref mp, tx, ty, projId);
+                            }
                         }
                         MapProjectile.OnClear(map, i);
                         moved = false;

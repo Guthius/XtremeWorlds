@@ -56,7 +56,7 @@ public static class Network
 
     public static bool IsConnected => Client.Connected;
     
-    public static async Task Start()
+    public static async System.Threading.Tasks.Task Start()
     {
         await Client.StartAsync(
             SettingsManager.Instance.Ip,

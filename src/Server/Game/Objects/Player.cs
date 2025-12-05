@@ -26,7 +26,7 @@ public class Player
         }
     }
 
-    public static void HandleUseChar(GameSession session)
+    public static void OnAdd(GameSession session)
     {
         PlayerService.Instance.AddPlayer(session.Id, session.Channel);
 
@@ -43,17 +43,7 @@ public class Player
             SettingsManager.Instance.GameName);
     }
 
-    public static void SendLeaveMap(int playerId, int mapNum)
-    {
-        var packet = new PacketWriter(4);
-
-        packet.WriteEnum(ServerPackets.SLeftMap);
-        packet.WriteInt32(playerId);
-
-        NetworkConfig.SendDataToMapBut(playerId, mapNum, packet.GetBytes());
-    }
-
-    public static void Warp(int playerId, int mapNum, int x, int y, int dir, bool send = false)
+    public static void OnWarp(int playerId, int mapNum, int x, int y, int dir, bool send = false)
     {
         if (!NetworkConfig.IsPlaying(playerId) || mapNum <= 0 || mapNum >= Core.Globals.Variables.MaxMaps || Data.TempPlayer[playerId].GettingMap == true || mapNum < 0 || mapNum >= Core.Globals.Variables.MaxMaps)
         {
@@ -83,7 +73,7 @@ public class Player
                 General.Logger.LogError(ex, "[Script] Error in {MethodName}", "LeaveMap");
             }
 
-            SendLeaveMap(playerId, oldMapNum);   
+            NetworkSend.SendLeaveMap(playerId, oldMapNum);   
         }
 
         SetPlayerMap(playerId, mapNum);
@@ -207,7 +197,7 @@ public class Player
                     {
                         var newMapY = Data.Map[Data.Map[GetPlayerMap(playerId)].Up].MaxY;
                         
-                        Warp(playerId, Data.Map[GetPlayerMap(playerId)].Up, GetPlayerX(playerId), newMapY, (int) Direction.Up);
+                        OnWarp(playerId, Data.Map[GetPlayerMap(playerId)].Up, GetPlayerX(playerId), newMapY, (int) Direction.Up);
                         
                         didWarp = true;
                         moved = true;
@@ -233,7 +223,7 @@ public class Player
                 {
                     if (Data.Map[GetPlayerMap(playerId)].Down > 0)
                     {
-                        Warp(playerId, Data.Map[GetPlayerMap(playerId)].Down, GetPlayerX(playerId), 0, (int) Direction.Down);
+                        OnWarp(playerId, Data.Map[GetPlayerMap(playerId)].Down, GetPlayerX(playerId), 0, (int) Direction.Down);
                         
                         didWarp = true;
                         moved = true;
@@ -261,7 +251,7 @@ public class Player
                     {
                         var newMapX = Data.Map[Data.Map[GetPlayerMap(playerId)].Left].MaxX;
 
-                        Warp(playerId, Data.Map[GetPlayerMap(playerId)].Left, newMapX, GetPlayerY(playerId), (int) Direction.Left);
+                        OnWarp(playerId, Data.Map[GetPlayerMap(playerId)].Left, newMapX, GetPlayerY(playerId), (int) Direction.Left);
 
                         didWarp = true;
                         moved = true;
@@ -287,7 +277,7 @@ public class Player
                 {
                     if (Data.Map[GetPlayerMap(playerId)].Right > 0)
                     {
-                        Warp(playerId, Data.Map[GetPlayerMap(playerId)].Right, 0, GetPlayerY(playerId), (int) Direction.Right);
+                        OnWarp(playerId, Data.Map[GetPlayerMap(playerId)].Right, 0, GetPlayerY(playerId), (int) Direction.Right);
                         
                         didWarp = true;
                         moved = true;
@@ -398,7 +388,7 @@ public class Player
 
             if (mapNum >= 0 && mapNum < Core.Globals.Variables.MaxMaps)
             {
-                Warp(playerId, mapNum, x, y, (int) Direction.Down);
+                OnWarp(playerId, mapNum, x, y, (int) Direction.Down);
 
                 didWarp = true;
                 moved = true;
@@ -462,7 +452,7 @@ public class Player
                     };
                     NetworkSend.SendActionMsg(GetPlayerMap(playerId), "+" + healAmount, color, (byte)ActionMessageType.Scroll, GetPlayerX(playerId) * 32, GetPlayerY(playerId) * 32, 1);
                     SetPlayerVital(playerId, hv, Math.Min(GetPlayerVital(playerId, hv) + healAmount, GetPlayerMaxVital(playerId, hv)));
-                    NetworkSend.PlayerMsg(playerId, "You feel rejuvenating forces coursing through your body.", (int)ColorName.BrightGreen);
+                    NetworkSend.SendPlayerMessage(playerId, "You feel rejuvenating forces coursing through your body.", (int)ColorName.BrightGreen);
                     NetworkSend.SendVital(playerId, hv);
                 }
                 moved = true; // stepping onto a heal tile counts as a valid move
@@ -486,12 +476,12 @@ public class Player
                 if (tv == Vital.Health && GetPlayerVital(playerId, Vital.Health) - trapAmount <= 0)
                 {
                     KillPlayer(playerId);
-                    NetworkSend.PlayerMsg(playerId, "You've been killed by a trap.", (int)ColorName.BrightRed);
+                    NetworkSend.SendPlayerMessage(playerId, "You've been killed by a trap.", (int)ColorName.BrightRed);
                 }
                 else
                 {
                     SetPlayerVital(playerId, tv, Math.Max(0, GetPlayerVital(playerId, tv) - trapAmount));
-                    NetworkSend.PlayerMsg(playerId, "You've been injured by a trap.", (int)ColorName.BrightRed);
+                    NetworkSend.SendPlayerMessage(playerId, "You've been injured by a trap.", (int)ColorName.BrightRed);
                     NetworkSend.SendVital(playerId, tv);
                 }
                 moved = true;
@@ -501,7 +491,7 @@ public class Player
         // They tried to hack
         if (!moved || (expectingWarp && !didWarp))
         {
-            Warp(playerId, GetPlayerMap(playerId), GetPlayerX(playerId), GetPlayerY(playerId), (byte) Direction.Down);
+            OnWarp(playerId, GetPlayerMap(playerId), GetPlayerX(playerId), GetPlayerY(playerId), (byte) Direction.Down);
         }
         
         Data.Player[playerId].IsMoving = true;
@@ -632,7 +622,7 @@ public class Player
                 continue;
             }
 
-            if (Data.Item[itemNum].Type == (byte) ItemCategory.Currency || Data.Item[itemNum].Stackable == 1)
+            if (Item.Instance[itemNum].Type == (byte) ItemCategory.Currency || Item.Instance[itemNum].Stackable == 1)
             {
                 totalQuantity += GetPlayerInvValue(playerId, invSlot);
             }
@@ -674,7 +664,7 @@ public class Player
 
         if (!Data.Moral[Data.Map[mapNum].Moral].CanPickupItem)
         {
-            NetworkSend.PlayerMsg(playerId, "You can't pickup items here!", (int) ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(playerId, "You can't pickup items here!", (int) ColorName.BrightRed);
             return false;
         }
 
@@ -707,7 +697,7 @@ public class Player
                 var slot = Player.FindOpenInvSlot(playerId, Data.MapItem[mapNum, mapItemNum].Num);
                 if (slot == -1)
                 {
-                    NetworkSend.PlayerMsg(playerId, "Your inventory is full.", (int)ColorName.BrightRed);
+                    NetworkSend.SendPlayerMessage(playerId, "Your inventory is full.", (int)ColorName.BrightRed);
                     break;
                 }
 
@@ -737,8 +727,8 @@ public class Player
             return -1;
         }
 
-        if (Data.Item[itemNum].Type == (byte) ItemCategory.Currency ||
-            Data.Item[itemNum].Stackable == 1)
+        if (Item.Instance[itemNum].Type == (byte) ItemCategory.Currency ||
+            Item.Instance[itemNum].Stackable == 1)
         {
             for (var invSlot = 0; invSlot < Core.Globals.Variables.MaxInv; invSlot++)
             {
@@ -777,8 +767,8 @@ public class Player
                 continue;
             }
 
-            if (Data.Item[itemNum].Type == (byte) ItemCategory.Currency ||
-                Data.Item[itemNum].Stackable == 1)
+            if (Item.Instance[itemNum].Type == (byte) ItemCategory.Currency ||
+                Item.Instance[itemNum].Stackable == 1)
             {
                 // Is what we are trying to take away more then what they have?  If so just set it to zero
                 if (itemVal >= GetPlayerInvValue(playerId, invSlot))
@@ -823,7 +813,7 @@ public class Player
         var slot = FindOpenInvSlot(playerId, itemNum);
         if (slot == -1)
         {
-            NetworkSend.PlayerMsg(playerId, "Your inventory is full.", (int) ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(playerId, "Your inventory is full.", (int) ColorName.BrightRed);
             return false;
         }
 
@@ -858,13 +848,13 @@ public class Player
 
         if (!Data.Moral[Data.Map[GetPlayerMap(playerId)].Moral].CanDropItem)
         {
-            NetworkSend.PlayerMsg(playerId, "You can't drop items here!", (int) ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(playerId, "You can't drop items here!", (int) ColorName.BrightRed);
             return;
         }
 
         if (Data.Player[playerId].Inv[invNum].Bound > 0)
         {
-            NetworkSend.PlayerMsg(playerId, "You can't drop soulbound items!", (int) ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(playerId, "You can't drop soulbound items!", (int) ColorName.BrightRed);
             return;
         }
 
@@ -879,8 +869,8 @@ public class Player
         {
             var mapNum = GetPlayerMap(playerId);
 
-            ref var item = ref Data.Item[itemNum];
-            ref var mapItem = ref Data.MapItem[mapNum, slot];
+            var item = Item.Instance[itemNum];
+            var mapItem = Data.MapItem[mapNum, slot];
 
             mapItem.Num = itemNum;
             mapItem.X = GetPlayerX(playerId);
@@ -901,7 +891,7 @@ public class Player
         }
         else
         {
-            NetworkSend.PlayerMsg(playerId, "Too many items already on the ground.", (int) ColorName.Yellow);
+            NetworkSend.SendPlayerMessage(playerId, "Too many items already on the ground.", (int) ColorName.Yellow);
         }
     }
 
@@ -916,8 +906,8 @@ public class Player
 
         var itemNum = GetPlayerInv(playerId, invSlot);
 
-        if (Data.Item[itemNum].Type == (byte) ItemCategory.Currency ||
-            Data.Item[itemNum].Stackable == 1)
+        if (Item.Instance[itemNum].Type == (byte) ItemCategory.Currency ||
+            Item.Instance[itemNum].Stackable == 1)
         {
             // Is what we are trying to take away more then what they have?  If so just set it to zero
             if (itemVal >= GetPlayerInvValue(playerId, invSlot))
@@ -951,7 +941,7 @@ public class Player
         {
             if (!Data.Moral[Data.Map[GetPlayerMap(playerId)].Moral].CanUseItem)
             {
-                NetworkSend.PlayerMsg(playerId, "You can't use items here!", (int) ColorName.BrightRed);
+                NetworkSend.SendPlayerMessage(playerId, "You can't use items here!", (int) ColorName.BrightRed);
                 return false;
             }
         }
@@ -959,30 +949,30 @@ public class Player
         var stats = Enum.GetValues<Stat>();
         foreach (var stat in stats)
         {
-            if (GetPlayerStat(playerId, stat) >= Data.Item[itemNum].StatReq[(int) stat])
+            if (GetPlayerStat(playerId, stat) >= Item.Instance[itemNum].StatReq[(int) stat])
             {
                 continue;
             }
 
-            NetworkSend.PlayerMsg(playerId, "You do not meet the stat requirements to use this item.", (int) ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(playerId, "You do not meet the stat requirements to use this item.", (int) ColorName.BrightRed);
             return false;
         }
 
-        if (Data.Item[itemNum].LevelReq > GetPlayerLevel(playerId))
+        if (Item.Instance[itemNum].LevelReq > GetPlayerLevel(playerId))
         {
-            NetworkSend.PlayerMsg(playerId, "You do not meet the level requirements to use this item.", (int) ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(playerId, "You do not meet the level requirements to use this item.", (int) ColorName.BrightRed);
             return false;
         }
 
-        if (Data.Item[itemNum].JobReq != -1 && Data.Item[itemNum].JobReq != GetPlayerJob(playerId))
+        if (Item.Instance[itemNum].JobReq != -1 && Item.Instance[itemNum].JobReq != GetPlayerJob(playerId))
         {
-            NetworkSend.PlayerMsg(playerId, "You do not meet the job requirements to use this item.", (int) ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(playerId, "You do not meet the job requirements to use this item.", (int) ColorName.BrightRed);
             return false;
         }
 
-        if (GetPlayerAccess(playerId) < Data.Item[itemNum].AccessReq)
+        if (GetPlayerAccess(playerId) < Item.Instance[itemNum].AccessReq)
         {
-            NetworkSend.PlayerMsg(playerId, "You do not meet the access requirement to equip this item.", (int) ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(playerId, "You do not meet the access requirement to equip this item.", (int) ColorName.BrightRed);
             return false;
         }
 
@@ -991,7 +981,7 @@ public class Player
             return true;
         }
 
-        NetworkSend.PlayerMsg(playerId, "You can't use items while in a bank, shop, or trade!", (int) ColorName.BrightRed);
+        NetworkSend.SendPlayerMessage(playerId, "You can't use items while in a bank, shop, or trade!", (int) ColorName.BrightRed);
         return false;
     }
 
@@ -1039,7 +1029,7 @@ public class Player
 
         if (newNum >= 0)
         {
-            if (oldNum == newNum & Data.Item[newNum].Stackable == 1) // Same item, if we can stack it, lets do that :P
+            if (oldNum == newNum & Item.Instance[newNum].Stackable == 1) // Same item, if we can stack it, lets do that :P
             {
                 SetPlayerInv(playerId, newSlot, newNum);
                 SetPlayerInvValue(playerId, newSlot, oldValue + newValue);
@@ -1089,7 +1079,7 @@ public class Player
 
         if (newNum >= 0)
         {
-            if (oldNum == newNum & Data.Item[newNum].Stackable == 1) // Same item, if we can stack it, lets do that :P
+            if (oldNum == newNum & Item.Instance[newNum].Stackable == 1) // Same item, if we can stack it, lets do that :P
             {
                 SetPlayerSkill(playerId, newSlot, newNum);
                 SetPlayerSkillCd(playerId, newSlot, newValue);
@@ -1128,7 +1118,7 @@ public class Player
                 continue;
             }
 
-            if (Data.Item[itemNum].SubType != (byte) equipment)
+            if (Item.Instance[itemNum].SubType != (byte) equipment)
             {
                 SetPlayerEquipment(playerId, -1, equipment);
             }
@@ -1165,7 +1155,7 @@ public class Player
         }
         else
         {
-            NetworkSend.PlayerMsg(playerId, "Your inventory is full.", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(playerId, "Your inventory is full.", (int)ColorName.BrightRed);
         }
     }
 
@@ -1183,7 +1173,7 @@ public class Player
         }
     }
 
-    public static async Task LeftGame(int playerId)
+    public static async System.Threading.Tasks.Task LeftGame(int playerId)
     {
         General.Logger.LogInformation("{AccountName} | {PlayerName} has stopped playing {GameName}",
             GetAccountLogin(playerId), GetPlayerName(playerId),
@@ -1251,8 +1241,8 @@ public class Player
 
         Data.Bank[playerId].Item[bankSlot].Bound = bound;
 
-        if (Data.Item[GetPlayerInv(playerId, invSlot)].Type == (byte)ItemCategory.Currency ||
-            Data.Item[GetPlayerInv(playerId, invSlot)].Stackable == 1)
+        if (Item.Instance[GetPlayerInv(playerId, invSlot)].Type == (byte)ItemCategory.Currency ||
+            Item.Instance[GetPlayerInv(playerId, invSlot)].Stackable == 1)
         {
             if (GetPlayerBank(playerId, bankSlot) == GetPlayerInv(playerId, invSlot))
             {
@@ -1312,8 +1302,8 @@ public class Player
             return -1;
         }
 
-        if (Data.Item[itemNum].Type == (byte) ItemCategory.Currency ||
-            Data.Item[itemNum].Stackable == 1)
+        if (Item.Instance[itemNum].Type == (byte) ItemCategory.Currency ||
+            Item.Instance[itemNum].Stackable == 1)
         {
             for (var bankSlot = 0; bankSlot < Core.Globals.Variables.MaxBank; bankSlot++)
             {
@@ -1353,8 +1343,8 @@ public class Player
 
         if (invSlot >= 0)
         {
-            if (Data.Item[GetPlayerBank(playerId, bankSlot)].Type == (byte)ItemCategory.Currency ||
-                Data.Item[GetPlayerBank(playerId, bankSlot)].Stackable == 1)
+            if (Item.Instance[GetPlayerBank(playerId, bankSlot)].Type == (byte)ItemCategory.Currency ||
+                Item.Instance[GetPlayerBank(playerId, bankSlot)].Stackable == 1)
             {
                 GiveInv(playerId, GetPlayerBank(playerId, bankSlot), amount, bound);
                 SetPlayerBankValue(playerId, bankSlot, GetPlayerBankValue(playerId, bankSlot) - amount);

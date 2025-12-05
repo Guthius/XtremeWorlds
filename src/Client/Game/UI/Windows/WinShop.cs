@@ -262,21 +262,21 @@ public class WinShop
             GameState.ShopSelectedItem = Data.Shop[GameState.InShop].TradeItem[GameState.ShopSelectedSlot].Item;
             if (GameState.ShopSelectedItem >= 0)
             {
-                labelName.Text = Data.Item[GameState.ShopSelectedItem].Name;
+                labelName.Text = Item.Instance[GameState.ShopSelectedItem].Name;
                 if (Data.Shop[GameState.InShop].TradeItem[GameState.ShopSelectedSlot].CostItem == 0)
                 {
                     labelCost.Text = Data.Shop[GameState.InShop].TradeItem[GameState.ShopSelectedSlot].CostValue + "g";
                 }
                 else if (Data.Shop[GameState.InShop].TradeItem[GameState.ShopSelectedSlot].CostValue == 1)
                 {
-                    labelCost.Text = Data.Item[Data.Shop[GameState.InShop].TradeItem[GameState.ShopSelectedSlot].CostItem].Name;
+                    labelCost.Text = Item.Instance[Data.Shop[GameState.InShop].TradeItem[GameState.ShopSelectedSlot].CostItem].Name;
                 }
                 else
                 {
-                    labelCost.Text = Data.Shop[GameState.InShop].TradeItem[GameState.ShopSelectedSlot].CostValue + " " + Data.Item[Data.Shop[GameState.InShop].TradeItem[GameState.ShopSelectedSlot].CostItem].Name;
+                    labelCost.Text = Data.Shop[GameState.InShop].TradeItem[GameState.ShopSelectedSlot].CostValue + " " + Item.Instance[Data.Shop[GameState.InShop].TradeItem[GameState.ShopSelectedSlot].CostItem].Name;
                 }
 
-                picItem.Image = Data.Item[GameState.ShopSelectedItem].Icon;
+                picItem.Image = Item.Instance[GameState.ShopSelectedItem].Icon;
 
                 for (var i = 0; i < 5; i++)
                 {
@@ -302,12 +302,12 @@ public class WinShop
 
             if (GameState.ShopSelectedItem >= 0)
             {
-                var cost = (long) Math.Round(Data.Item[GameState.ShopSelectedItem].Price / 100d * Data.Shop[GameState.InShop].BuyRate);
+                var cost = (long) Math.Round(Item.Instance[GameState.ShopSelectedItem].Price / 100d * Data.Shop[GameState.InShop].BuyRate);
 
-                labelName.Text = Data.Item[GameState.ShopSelectedItem].Name;
+                labelName.Text = Item.Instance[GameState.ShopSelectedItem].Name;
                 labelCost.Text = cost + "g";
 
-                picItem.Image = Data.Item[GameState.ShopSelectedItem].Icon;
+                picItem.Image = Item.Instance[GameState.ShopSelectedItem].Icon;
                 for (var i = 0; i < 5; i++)
                 {
                     picItem.Texture[i] = DataPath.Items;
@@ -351,7 +351,7 @@ public class WinShop
 
             Item.OnStream(itemNum);
 
-            var itemIcon = Data.Item[itemNum].Icon;
+            var itemIcon = Item.Instance[itemNum].Icon;
             if (itemIcon <= 0 || itemIcon > GameState.NumItems)
             {
                 continue;
@@ -384,7 +384,7 @@ public class WinShop
 
             Item.OnStream(itemNum);
 
-            var itemIcon = Data.Item[itemNum].Icon;
+            var itemIcon = Item.Instance[itemNum].Icon;
             if (itemIcon <= 0 || itemIcon > GameState.NumItems)
             {
                 continue;

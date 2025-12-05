@@ -10,7 +10,7 @@ namespace Client.Game.UI.Windows;
 public class WinItemEditor
 {
     public static int SelectedIndex = 0;
-    private static Core.Globals.Type.Item? _history;
+    private static Item? _history;
 
     public static void Init()
     {
@@ -31,7 +31,7 @@ public class WinItemEditor
             sldIcon.CallBack[(int)ControlState.MouseMove] = () =>
             {
                 if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
-                Data.Item[SelectedIndex].Icon = (short)Math.Clamp(sldIcon.Value, sldIcon.Min, sldIcon.Max);
+                Item.Instance[SelectedIndex].Icon = (short)Math.Clamp(sldIcon.Value, sldIcon.Min, sldIcon.Max);
                 GameState.ItemChanged[SelectedIndex] = true;
             };
         }
@@ -40,10 +40,10 @@ public class WinItemEditor
             sldPd.CallBack[(int)ControlState.MouseMove] = () =>
             {
                 if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
-                Data.Item[SelectedIndex].Paperdoll = (short)Math.Clamp(sldPd.Value, sldPd.Min, sldPd.Max);
+                Item.Instance[SelectedIndex].Paperdoll = (short)Math.Clamp(sldPd.Value, sldPd.Min, sldPd.Max);
                 // keep textbox in sync if present
                 if (WindowManager.TryGetControl("winItemEditor", "txtItemPaperdoll", out var pdCtrl) && pdCtrl is TextBox txtPd)
-                    txtPd.Text = Data.Item[SelectedIndex].Paperdoll.ToString();
+                    txtPd.Text = Item.Instance[SelectedIndex].Paperdoll.ToString();
                 GameState.ItemChanged[SelectedIndex] = true;
             };
         }
@@ -54,7 +54,7 @@ public class WinItemEditor
             cmbType.CallBack[(int)ControlState.MouseMove] = () =>
             {
                 if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
-                Data.Item[SelectedIndex].Type = (byte)Math.Clamp(cmbType.Value, 0, byte.MaxValue);
+                Item.Instance[SelectedIndex].Type = (byte)Math.Clamp(cmbType.Value, 0, byte.MaxValue);
                 BuildSubtypeList();
                 ToggleTypeSections();
                 GameState.ItemChanged[SelectedIndex] = true;
@@ -71,7 +71,7 @@ public class WinItemEditor
                 if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
                 // Toggle value locally then push to Data
                 chkStack.Value = chkStack.Value == 0 ? 1 : 0;
-                Data.Item[SelectedIndex].Stackable = chkStack.Value != 0 ? (byte)1 : (byte)0;
+                Item.Instance[SelectedIndex].Stackable = chkStack.Value != 0 ? (byte)1 : (byte)0;
                 GameState.ItemChanged[SelectedIndex] = true;
             };
         }
@@ -83,7 +83,7 @@ public class WinItemEditor
             {
                 if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
                 chkKb.Value = chkKb.Value == 0 ? 1 : 0;
-                Data.Item[SelectedIndex].KnockBack = chkKb.Value != 0 ? (byte)1 : (byte)0;
+                Item.Instance[SelectedIndex].KnockBack = chkKb.Value != 0 ? (byte)1 : (byte)0;
                 GameState.ItemChanged[SelectedIndex] = true;
             };
         }
@@ -94,7 +94,7 @@ public class WinItemEditor
             cmbKbTiles.CallBack[(int)ControlState.MouseMove] = () =>
             {
                 if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
-                Data.Item[SelectedIndex].KnockBackTiles = (byte)Math.Clamp(cmbKbTiles.Value, 0, byte.MaxValue);
+                Item.Instance[SelectedIndex].KnockBackTiles = (byte)Math.Clamp(cmbKbTiles.Value, 0, byte.MaxValue);
                 GameState.ItemChanged[SelectedIndex] = true;
             };
         }
@@ -111,7 +111,7 @@ public class WinItemEditor
         list.Clear();
         for (int i = 0; i < Variables.MaxItems; i++)
         {
-            string name = Strings.Trim(Data.Item[i].Name);
+            string name = Strings.Trim(Item.Instance[i].Name);
             if (string.IsNullOrWhiteSpace(name)) name = "None";
             list.AddItem($"{i + 1}: {name}");
         }
@@ -240,7 +240,7 @@ public class WinItemEditor
             cmbAmmo.Items.Add("None");
             for (int i = 0; i < Variables.MaxItems; i++)
             {
-                var n = Data.Item[i].Name ?? string.Empty;
+                var n = Item.Instance[i].Name ?? string.Empty;
                 if (string.IsNullOrWhiteSpace(n)) n = "None";
                 cmbAmmo.Items.Add($"{i + 1}: {n.Trim()}");
             }
@@ -252,7 +252,7 @@ public class WinItemEditor
         if (!WindowManager.TryGetControl("winItemEditor", "cmbSubType", out var subCtrl) || subCtrl is not ComboBox cmbSub)
             return;
         cmbSub.Items.Clear();
-        var type = (ItemCategory)Math.Clamp(Data.Item[SelectedIndex].Type, 0, int.MaxValue);
+        var type = (ItemCategory)Math.Clamp(Item.Instance[SelectedIndex].Type, 0, int.MaxValue);
         switch (type)
         {
             case ItemCategory.Equipment:
@@ -279,14 +279,14 @@ public class WinItemEditor
         }
         if (cmbSub.Items.Count > 0)
         {
-            var sub = Math.Clamp(Data.Item[SelectedIndex].SubType, 0, cmbSub.Items.Count - 1);
+            var sub = Math.Clamp(Item.Instance[SelectedIndex].SubType, 0, cmbSub.Items.Count - 1);
             cmbSub.Value = sub;
         }
     }
 
     private static void ToggleTypeSections()
     {
-        var type = (ItemCategory)Math.Clamp(Data.Item[SelectedIndex].Type, 0, int.MaxValue);
+        var type = (ItemCategory)Math.Clamp(Item.Instance[SelectedIndex].Type, 0, int.MaxValue);
 
         static void SetVisible(string name, bool vis)
         {
@@ -349,7 +349,7 @@ public class WinItemEditor
         if (index < 0 || index >= Variables.MaxItems) return;
         SelectedIndex = index;
         GameState.EditorIndex = index;
-        var item = Data.Item[index];
+        var item = Item.Instance[index];
 
         // Basics
         if (WindowManager.TryGetControl("winItemEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
@@ -513,7 +513,7 @@ public class WinItemEditor
         if (win is null) return;
 
         if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
-        var item = Data.Item[SelectedIndex];
+        var item = Item.Instance[SelectedIndex];
 
         if (item.Icon < 1 || item.Icon > GameState.NumItems) return;
 
@@ -536,7 +536,7 @@ public class WinItemEditor
         var win = WindowManager.GetWindowByName("winItemEditor");
         if (win is null) return;
         if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
-        var item = Data.Item[SelectedIndex];
+        var item = Item.Instance[SelectedIndex];
         if (item.Paperdoll < 1 || item.Paperdoll > GameState.NumPaperdolls) return;
         if (!WindowManager.TryGetControl("winItemEditor", "picPaperdoll", out var ctrl) || ctrl is not PictureBox pic)
             return;
@@ -575,13 +575,13 @@ public class WinItemEditor
 
         if (_history is null)
         {
-            _history = Data.Item[SelectedIndex];
+            _history = (Item?)Item.Instance[SelectedIndex];
             if (WindowManager.TryGetControl("winItemEditor", "btnCopy", out var btn) && btn is Button b)
                 b.Text = "Paste";
             return;
         }
 
-        Data.Item[SelectedIndex] = _history.Value;
+        Item.Instance[SelectedIndex] = _history;
         GameState.ItemChanged[SelectedIndex] = true;
         OnLoad(SelectedIndex);
         RefreshList();

@@ -17,7 +17,7 @@ internal sealed class NetworkChannel<TSession>(ILogger<NetworkChannel<TSession>>
 
     public string IpAddress { get; } = (tcpClient.Client.RemoteEndPoint as IPEndPoint)?.Address.ToString() ?? "(none)";
 
-    public async Task StartAsync(INetworkChannelProxy channelProxy, TSession session, CancellationToken cancellationToken)
+    public async System.Threading.Tasks.Task StartAsync(INetworkChannelProxy channelProxy, TSession session, CancellationToken cancellationToken)
     {
         var started = Interlocked.Exchange(ref _started, true);
         if (started)
@@ -62,7 +62,7 @@ internal sealed class NetworkChannel<TSession>(ILogger<NetworkChannel<TSession>>
         }
     }
 
-    private async Task RunSend(CancellationToken cancellationToken)
+    private async System.Threading.Tasks.Task RunSend(CancellationToken cancellationToken)
     {
         await foreach (var bytes in _sendChannel.Reader.ReadAllAsync(cancellationToken))
         {
@@ -70,7 +70,7 @@ internal sealed class NetworkChannel<TSession>(ILogger<NetworkChannel<TSession>>
         }
     }
 
-    private async Task RunReceive(INetworkChannelProxy channelProxy, CancellationToken cancellationToken)
+    private async System.Threading.Tasks.Task RunReceive(INetworkChannelProxy channelProxy, CancellationToken cancellationToken)
     {
         try
         {

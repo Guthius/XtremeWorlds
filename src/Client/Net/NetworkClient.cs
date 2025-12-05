@@ -12,7 +12,7 @@ public sealed class NetworkClient
 
     public bool Connected => _isConnected;
 
-    public async Task StartAsync(string hostname, int port, INetworkEventHandler eventHandler, CancellationToken cancellationToken)
+    public async System.Threading.Tasks.Task StartAsync(string hostname, int port, INetworkEventHandler eventHandler, CancellationToken cancellationToken)
     {
         // Ensure only a single runner loop
         if (Interlocked.Exchange(ref _started, 1) == 1)
@@ -91,7 +91,7 @@ public sealed class NetworkClient
         }
     }
 
-    private static async Task RunAsync(TcpClient tcpClient, Channel<byte[]> sendChannel, INetworkEventHandler eventHandler, CancellationToken cancellationToken)
+    private static async System.Threading.Tasks.Task RunAsync(TcpClient tcpClient, Channel<byte[]> sendChannel, INetworkEventHandler eventHandler, CancellationToken cancellationToken)
     {
         await Task.WhenAll(
             RunReceive(tcpClient, eventHandler,
@@ -100,7 +100,7 @@ public sealed class NetworkClient
                 cancellationToken));
     }
 
-    private static async Task RunReceive(TcpClient tcpClient, INetworkEventHandler eventHandler, CancellationToken cancellationToken)
+    private static async System.Threading.Tasks.Task RunReceive(TcpClient tcpClient, INetworkEventHandler eventHandler, CancellationToken cancellationToken)
     {
         var buffer = ArrayPool<byte>.Shared.Rent(4096);
 
@@ -148,7 +148,7 @@ public sealed class NetworkClient
         }
     }
 
-    private static async Task RunSend(TcpClient tcpClient, Channel<byte[]> sendChannel, CancellationToken cancellationToken)
+    private static async System.Threading.Tasks.Task RunSend(TcpClient tcpClient, Channel<byte[]> sendChannel, CancellationToken cancellationToken)
     {
         try
         {

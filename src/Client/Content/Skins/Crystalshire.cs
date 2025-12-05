@@ -570,7 +570,7 @@ public class Crystalshire
                     {
                         for (int i = 0; i < Variables.MaxItems; i++)
                         {
-                            var name = (i < Data.Item.Length) ? (Data.Item[i].Name ?? string.Empty) : string.Empty;
+                            var name = (i < Item.Instance.Count) ? (Item.Instance[i].Name ?? string.Empty) : string.Empty;
                             cmb.Items.Add(string.IsNullOrWhiteSpace(name) ? $"{i + 1}" : $"{i + 1}: {name.Trim()}");
                         }
                         cmb.Value = 0;
@@ -1673,7 +1673,7 @@ public class Crystalshire
             {
                 int idx = WinItemEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxItems) return;
                 var newName = txtName.Text ?? string.Empty;
-                Data.Item[idx].Name = newName;
+                Item.Instance[idx].Name = newName;
                 GameState.ItemChanged[idx] = true;
 
                 // Update list item text without losing selection/scroll
@@ -1712,7 +1712,7 @@ public class Crystalshire
             {
                 if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
                 {
-                    Data.Item[WinItemEditor.SelectedIndex].Description = txtDesc.Text ?? string.Empty;
+                    Item.Instance[WinItemEditor.SelectedIndex].Description = txtDesc.Text ?? string.Empty;
                     GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
                 }
             };
@@ -1725,7 +1725,7 @@ public class Crystalshire
             {
                 if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
                 {
-                    Data.Item[WinItemEditor.SelectedIndex].Icon = (short)sldIcon.Value;
+                    Item.Instance[WinItemEditor.SelectedIndex].Icon = (short)sldIcon.Value;
                     GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
                 }
             };
@@ -1735,7 +1735,7 @@ public class Crystalshire
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
-                Data.Item[WinItemEditor.SelectedIndex].Paperdoll = (short)v;
+                Item.Instance[WinItemEditor.SelectedIndex].Paperdoll = (short)v;
                 GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
             }
         }, 0, GameState.NumPaperdolls);
@@ -1744,7 +1744,7 @@ public class Crystalshire
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
-                Data.Item[WinItemEditor.SelectedIndex].ItemLevel = (byte)Math.Clamp(v, 0, 255);
+                Item.Instance[WinItemEditor.SelectedIndex].ItemLevel = (byte)Math.Clamp(v, 0, 255);
                 GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
             }
         }, 0, 255);
@@ -1753,7 +1753,7 @@ public class Crystalshire
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
-                Data.Item[WinItemEditor.SelectedIndex].Price = v;
+                Item.Instance[WinItemEditor.SelectedIndex].Price = v;
                 GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
             }
         }, 0, int.MaxValue);
@@ -1762,7 +1762,7 @@ public class Crystalshire
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
-                Data.Item[WinItemEditor.SelectedIndex].Rarity = (byte)v;
+                Item.Instance[WinItemEditor.SelectedIndex].Rarity = (byte)v;
                 GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
             }
         }, 0, 5);
@@ -1773,7 +1773,7 @@ public class Crystalshire
             {
                 if (WinItemEditor.SelectedIndex >= 0)
                 {
-                    Data.Item[WinItemEditor.SelectedIndex].Stackable = chkStack.Value == 1 ? (byte)1 : (byte)0;
+                    Item.Instance[WinItemEditor.SelectedIndex].Stackable = chkStack.Value == 1 ? (byte)1 : (byte)0;
                     GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
                 }
             };
@@ -1786,7 +1786,7 @@ public class Crystalshire
             {
                 if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
                 {
-                    Data.Item[WinItemEditor.SelectedIndex].Data2 = sldDmg.Value;
+                    Item.Instance[WinItemEditor.SelectedIndex].Data2 = sldDmg.Value;
                     GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
                 }
             };
@@ -1798,7 +1798,7 @@ public class Crystalshire
             {
                 if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
                 {
-                    Data.Item[WinItemEditor.SelectedIndex].Speed = sldSpeed.Value;
+                    Item.Instance[WinItemEditor.SelectedIndex].Speed = sldSpeed.Value;
                     GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
                 }
             };
@@ -1810,7 +1810,7 @@ public class Crystalshire
             {
                 if (WinItemEditor.SelectedIndex >= 0)
                 {
-                    Data.Item[WinItemEditor.SelectedIndex].KnockBack = chkKb.Value == 1 ? (byte)1 : (byte)0;
+                    Item.Instance[WinItemEditor.SelectedIndex].KnockBack = chkKb.Value == 1 ? (byte)1 : (byte)0;
                     GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
                 }
             };
@@ -1831,18 +1831,18 @@ public class Crystalshire
                 };
             }
         }
-        BindStatSlider("sldStr", () => Data.Item[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Strength], v => Data.Item[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Strength] = v);
-        BindStatSlider("sldVit", () => Data.Item[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Vitality], v => Data.Item[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Vitality] = v);
-        BindStatSlider("sldLuck", () => Data.Item[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Luck], v => Data.Item[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Luck] = v);
-        BindStatSlider("sldInt", () => Data.Item[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Intelligence], v => Data.Item[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Intelligence] = v);
-        BindStatSlider("sldSpr", () => Data.Item[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Spirit], v => Data.Item[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Spirit] = v);
+        BindStatSlider("sldStr", () => Item.Instance[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Strength], v => Item.Instance[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Strength] = v);
+        BindStatSlider("sldVit", () => Item.Instance[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Vitality], v => Item.Instance[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Vitality] = v);
+        BindStatSlider("sldLuck", () => Item.Instance[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Luck], v => Item.Instance[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Luck] = v);
+        BindStatSlider("sldInt", () => Item.Instance[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Intelligence], v => Item.Instance[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Intelligence] = v);
+        BindStatSlider("sldSpr", () => Item.Instance[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Spirit], v => Item.Instance[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Spirit] = v);
 
         // Vital mod (Data1 for consumables)    
         BindIntText("txtVitalMod", v =>
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
-                Data.Item[WinItemEditor.SelectedIndex].Data1 = v;
+                Item.Instance[WinItemEditor.SelectedIndex].Data1 = v;
                 GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
             }
         }, -1000, 1000);
@@ -1852,7 +1852,7 @@ public class Crystalshire
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
-                Data.Item[WinItemEditor.SelectedIndex].Data1 = v;
+                Item.Instance[WinItemEditor.SelectedIndex].Data1 = v;
                 GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
             }
         }, 0, int.MaxValue);
@@ -1861,7 +1861,7 @@ public class Crystalshire
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
-                Data.Item[WinItemEditor.SelectedIndex].Data2 = v;
+                Item.Instance[WinItemEditor.SelectedIndex].Data2 = v;
                 GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
             }
         }, 0, int.MaxValue);
@@ -1888,17 +1888,17 @@ public class Crystalshire
             {
                 if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
                 {
-                    Data.Item[WinItemEditor.SelectedIndex].LevelReq = (byte)sldReqLevel.Value;
+                    Item.Instance[WinItemEditor.SelectedIndex].LevelReq = (byte)sldReqLevel.Value;
                     GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
                 }
             };
         }
 
-        BindReqStatSlider("sldReqStr", () => Data.Item[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Strength], v => Data.Item[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Strength] = v);
-        BindReqStatSlider("sldReqVit", () => Data.Item[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Vitality], v => Data.Item[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Vitality] = v);
-        BindReqStatSlider("sldReqLuck", () => Data.Item[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Luck], v => Data.Item[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Luck] = v);
-        BindReqStatSlider("sldReqInt", () => Data.Item[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Intelligence], v => Data.Item[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Intelligence] = v);
-        BindReqStatSlider("sldReqSpr", () => Data.Item[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Spirit], v => Data.Item[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Spirit] = v);
+        BindReqStatSlider("sldReqStr", () => Item.Instance[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Strength], v => Item.Instance[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Strength] = v);
+        BindReqStatSlider("sldReqVit", () => Item.Instance[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Vitality], v => Item.Instance[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Vitality] = v);
+        BindReqStatSlider("sldReqLuck", () => Item.Instance[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Luck], v => Item.Instance[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Luck] = v);
+        BindReqStatSlider("sldReqInt", () => Item.Instance[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Intelligence], v => Item.Instance[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Intelligence] = v);
+        BindReqStatSlider("sldReqSpr", () => Item.Instance[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Spirit], v => Item.Instance[WinItemEditor.SelectedIndex].StatReq[(int)Stat.Spirit] = v);
 
         // Combos: Type, SubType, Animation, Bind, Tool, Knockback tiles, Skill, Projectile, Ammo, JobReq, AccessReq
         void BindCombo(string name, Action<int> apply)
@@ -1918,7 +1918,7 @@ public class Crystalshire
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
-                Data.Item[WinItemEditor.SelectedIndex].Type = (byte)v;
+                Item.Instance[WinItemEditor.SelectedIndex].Type = (byte)v;
                 GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
             }
         });
@@ -1927,7 +1927,7 @@ public class Crystalshire
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
-                Data.Item[WinItemEditor.SelectedIndex].SubType = (byte)v;
+                Item.Instance[WinItemEditor.SelectedIndex].SubType = (byte)v;
                 GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
             }
         });
@@ -1936,7 +1936,7 @@ public class Crystalshire
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
-                Data.Item[WinItemEditor.SelectedIndex].Animation = (byte)v;
+                Item.Instance[WinItemEditor.SelectedIndex].Animation = (byte)v;
                 GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
             }
         });
@@ -1945,7 +1945,7 @@ public class Crystalshire
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
-                Data.Item[WinItemEditor.SelectedIndex].BindType = (byte)v;
+                Item.Instance[WinItemEditor.SelectedIndex].BindType = (byte)v;
                 GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
             }
         });
@@ -1954,7 +1954,7 @@ public class Crystalshire
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
-                Data.Item[WinItemEditor.SelectedIndex].Data3 = (byte)v;
+                Item.Instance[WinItemEditor.SelectedIndex].Data3 = (byte)v;
                 GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
             }
         });
@@ -1963,7 +1963,7 @@ public class Crystalshire
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
-                Data.Item[WinItemEditor.SelectedIndex].KnockBackTiles = (byte)v;
+                Item.Instance[WinItemEditor.SelectedIndex].KnockBackTiles = (byte)v;
                 GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
             }
         });
@@ -1972,7 +1972,7 @@ public class Crystalshire
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
-                Data.Item[WinItemEditor.SelectedIndex].Data1 = v;
+                Item.Instance[WinItemEditor.SelectedIndex].Data1 = v;
                 GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
             }
         });
@@ -1981,7 +1981,7 @@ public class Crystalshire
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
-                Data.Item[WinItemEditor.SelectedIndex].Projectile = (short)(v - 1);
+                Item.Instance[WinItemEditor.SelectedIndex].Projectile = (short)(v - 1);
                 GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
             }
         });
@@ -1990,7 +1990,7 @@ public class Crystalshire
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
-                Data.Item[WinItemEditor.SelectedIndex].Ammo = (short)(v - 1);
+                Item.Instance[WinItemEditor.SelectedIndex].Ammo = (short)(v - 1);
                 GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
             }
         });
@@ -1999,7 +1999,7 @@ public class Crystalshire
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
-                Data.Item[WinItemEditor.SelectedIndex].JobReq = (byte)v;
+                Item.Instance[WinItemEditor.SelectedIndex].JobReq = (byte)v;
                 GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
             }
         });
@@ -2008,7 +2008,7 @@ public class Crystalshire
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
-                Data.Item[WinItemEditor.SelectedIndex].AccessReq = (byte)v;
+                Item.Instance[WinItemEditor.SelectedIndex].AccessReq = (byte)v;
                 GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
             }
         });

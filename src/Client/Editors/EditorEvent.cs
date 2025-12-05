@@ -1438,7 +1438,7 @@ namespace Client
             cmbCondition_HasItem.Items.Clear();
 
             for (i = 0; i < Variables.MaxItems; i++)
-                cmbCondition_HasItem.Items.Add(i + 1 + ". " + Data.Item[i].Name);
+                cmbCondition_HasItem.Items.Add(i + 1 + ". " + Item.Instance[i].Name);
             cmbCondition_HasItem.SelectedIndex = 0;
             nudCondition_HasItem.Enabled = false;
             nudCondition_HasItem.Value = 1;
@@ -1504,7 +1504,7 @@ namespace Client
                 cmbVariable.SelectedIndex = 0;
                 cmbChangeItemIndex.Items.Clear();
                 for (i = 0; i < Variables.MaxItems; i++)
-                    cmbChangeItemIndex.Items.Add(Data.Item[i].Name);
+                    cmbChangeItemIndex.Items.Add(Item.Instance[i].Name);
                 cmbChangeItemIndex.SelectedIndex = 0;
                 nudChangeLevel.MinValue = 1;
                 nudChangeLevel.MaxValue = GameState.MaxLevel;
@@ -1620,7 +1620,7 @@ namespace Client
                 // items
                 cmbHasItem.Items.Clear();
                 for (i = 0; i < Variables.MaxItems; i++)
-                    cmbHasItem.Items.Add(i + 1 + ": " + Data.Item[i].Name);
+                    cmbHasItem.Items.Add(i + 1 + ": " + Item.Instance[i].Name);
 
                 // variables
                 cmbPlayerVar.Items.Clear();

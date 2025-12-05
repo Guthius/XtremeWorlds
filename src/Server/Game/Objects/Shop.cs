@@ -10,7 +10,7 @@ namespace Server;
 
 public class Shop : IData, IAsyncData
 {
-    public static async Task OnLoadAllAsync()
+    public static async System.Threading.Tasks.Task OnLoadAllAsync()
     {
         await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxShops), OnLoadAsync);
     }

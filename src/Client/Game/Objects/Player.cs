@@ -70,9 +70,9 @@ namespace Client
                 Data.Player[index].Skill[x].Cd = 0;
             }
 
-            Data.Player[index].Stat = new byte[Enum.GetValues(typeof(Stat)).Length];
+            Data.Player[index].Stat = new int[Enum.GetValues(typeof(Stat)).Length];
             foreach (Stat stat in Enum.GetValues(typeof(Stat)))
-                Data.Player[index].Stat[(int) stat] = 0;
+                Data.Player[index].Stat[(int)stat] = 0;
 
             Data.Player[index].Steps = 0;
 
@@ -102,9 +102,12 @@ namespace Client
             // Guard against invalid player or map state
             if (GameState.MyIndex < 0 || GameState.MyIndex >= Variables.MaxPlayers)
                 return;
+
             int mapIdx = GetPlayerMap(GameState.MyIndex);
+
             if (mapIdx < 0 || mapIdx >= Data.Map.Length)
                 return;
+
             if (Data.MyMap.MaxX <= 0 || Data.MyMap.MaxY <= 0)
                 return;
 
@@ -851,7 +854,7 @@ namespace Client
                 // speed from weapon
                 if (GetPlayerEquipment(GameState.MyIndex, Equipment.Weapon) >= 0)
                 {
-                    attackSpeed = Data.Item[GetPlayerEquipment(GameState.MyIndex, Equipment.Weapon)].Speed * 1000;
+                    attackSpeed = Item.Instance[GetPlayerEquipment(GameState.MyIndex, Equipment.Weapon)].Speed * 1000;
                 }
                 else
                 {
@@ -870,7 +873,7 @@ namespace Client
 
                         // If weapon has a projectile, send mouse-aimed attack with world pixel coords
                         int weapon = GetPlayerEquipment(GameState.MyIndex, Equipment.Weapon);
-                        if (mouse && weapon >= 0 && Data.Item[weapon].Projectile >= 0)
+                        if (mouse && weapon >= 0 && Item.Instance[weapon].Projectile >= 0)
                         {
                             // Compute world pixel coordinates of mouse relative to map origin
                             int worldX = (int)GameState.Camera.Left + GameState.CurMouseXGame;
@@ -1155,7 +1158,7 @@ namespace Client
             // Derive attack speed duration (ms). If stored as seconds, multiply here; if already ms, keep as-is.
             if (GetPlayerEquipment(index, Equipment.Weapon) >= 0)
             {
-                attackSpeed = Data.Item[GetPlayerEquipment(index, Equipment.Weapon)].Speed;
+                attackSpeed = Item.Instance[GetPlayerEquipment(index, Equipment.Weapon)].Speed;
                 if (attackSpeed < 50) attackSpeed *= 1000; // heuristic: treat tiny values as seconds, convert to ms
             }
             else
@@ -1341,7 +1344,7 @@ namespace Client
                 if (GetPlayerEquipment(index, eq) >= 0)
                 {
                     var itemIndex = GetPlayerEquipment(index, eq);
-                    var paperId = Data.Item[itemIndex].Paperdoll;
+                    var paperId = Item.Instance[itemIndex].Paperdoll;
                     if (paperId > 0)
                     {
                         // Pass segment context so equipment animates consistently with base sprite.

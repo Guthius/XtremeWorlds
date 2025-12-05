@@ -42,7 +42,7 @@ public static class NetworkConfig
         return false;
     }
 
-    public static async Task LoadAccount(GameSession session, string login, byte slot)
+    public static async System.Threading.Tasks.Task LoadAccount(GameSession session, string login, byte slot)
     {
         if (!string.IsNullOrEmpty(login))
         {
@@ -65,11 +65,11 @@ public static class NetworkConfig
         if (Data.Player[session.Id].Name.Length > 0)
         {
             // we have a char!
-            Player.HandleUseChar(session);
+            Player.OnAdd(session);
         }
         else
         {
-            NetworkSend.AlertMsg(session, SystemMessage.DatabaseError, Menu.CharacterSelect);
+            NetworkSend.SendAlert(session, SystemMessage.DatabaseError, Menu.CharacterSelect);
         }
     }
 

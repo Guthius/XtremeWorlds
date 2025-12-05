@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualBasic;
-
-namespace Core.Globals;
+﻿namespace Core.Globals;
 
 public static class Command
 {
@@ -94,14 +92,6 @@ public static class Command
     public static int GetPlayerStat(int index, Stat stat)
     {
         int statValue = Data.Player[index].Stat[(int)stat];
-
-        for (var i = 0; i < EquipmentCount; i++)
-        {
-            if (Data.Player[index].Equipment[i].Num >= 0 && Data.Item[Data.Player[index].Equipment[i].Num].AddStat[(int)stat] > 0)
-            {
-                statValue += Data.Item[Data.Player[index].Equipment[i].Num].AddStat[(int)stat];
-            }
-        }
 
         return statValue;
     }

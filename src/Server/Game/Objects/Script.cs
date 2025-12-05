@@ -17,7 +17,7 @@ public static class Script
 
     public static dynamic? Instance { get; private set; }
 
-    public static async Task OnLoadAsync(int playerId)
+    public static async System.Threading.Tasks.Task OnLoadAsync(int playerId)
     {
         General.Logger.LogInformation("Loading script...");
         var path = Path.Combine(DataPath.Database, "Script.cs");
@@ -36,8 +36,7 @@ public static class Script
 
         if (string.IsNullOrWhiteSpace(script))
         {
-            NetworkSend.PlayerMsg(playerId, "No script code found to compile.", (int) ColorName.BrightRed);
-
+            NetworkSend.SendPlayerMessage(playerId, "No script code found to compile.", (int) ColorName.BrightRed);
             General.Logger.LogWarning("No script code found to compile");
             return;
         }
@@ -60,7 +59,7 @@ public static class Script
                 {
                     if (IsPlaying(i))
                     {
-                        NetworkSend.AlertMsg(i, SystemMessage.ServerMaintenance, Menu.Login);    
+                        NetworkSend.SendAlert(i, SystemMessage.ServerMaintenance, Menu.Login);    
                     }
                 }
                 General.InitalizeCoreData();
@@ -72,7 +71,7 @@ public static class Script
         {
             if (playerId > 0)
             {
-                NetworkSend.PlayerMsg(playerId, ex.Message, (int) ColorName.BrightRed);
+                NetworkSend.SendPlayerMessage(playerId, ex.Message, (int) ColorName.BrightRed);
             }
 
             General.Logger.LogError(ex, "[Script] Failed to load script");

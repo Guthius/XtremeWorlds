@@ -183,12 +183,12 @@ public class WinHotBar
 
         Item.OnStream(itemNum);
 
-        if (Data.Item[itemNum].Name.Length <= 0 || Data.Item[itemNum].Icon <= 0)
+        if (Item.Instance[itemNum].Name.Length <= 0 || Item.Instance[itemNum].Icon <= 0)
         {
             return;
         }
 
-        var path = Path.Combine(DataPath.Items, Data.Item[itemNum].Icon.ToString());
+        var path = Path.Combine(DataPath.Items, Item.Instance[itemNum].Icon.ToString());
 
         GameClient.RenderTexture(ref path, x, y, 0, 0, 32, 32, 32, 32);
     }

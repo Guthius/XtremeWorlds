@@ -1572,13 +1572,13 @@ namespace Server
                                             switch (command.Data2)
                                             {
                                                 case 0: // Player
-                                                    NetworkSend.PlayerMsg(i, command.Text1, command.Data1);
+                                                    NetworkSend.SendPlayerMessage(i, command.Text1, command.Data1);
                                                     break;
                                                 case 1: // Map
                                                     NetworkSend.MapMsg(mapNum, command.Text1);
                                                     break;
                                                 case 2: // Global
-                                                    NetworkSend.GlobalMsg(command.Text1);
+                                                    NetworkSend.SendGlobalMessage(command.Text1);
                                                     break;
                                             }
 
@@ -1926,7 +1926,7 @@ namespace Server
                                         case (byte) EventCommand.WarpPlayer:
                                         {
                                             int dir = command.Data4 == 0 ? Data.Player[i].Dir : (byte) (command.Data4 - 1);
-                                            Player.Warp(i, command.Data1, command.Data2, command.Data3, dir);
+                                            Player.OnWarp(i, command.Data1, command.Data2, command.Data3, dir);
                                             break;
                                         }
 

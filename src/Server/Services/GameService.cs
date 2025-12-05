@@ -11,7 +11,7 @@ public sealed class GameService(
     IPlayerService playerService, 
     IHostApplicationLifetime lifetime) : BackgroundService
 {
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override async System.Threading.Tasks.Task ExecuteAsync(CancellationToken stoppingToken)
     {
         General.Logger = logger;
         

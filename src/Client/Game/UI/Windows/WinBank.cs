@@ -70,7 +70,7 @@ public class WinBank
                 continue;
             }
 
-            var itemIcon = Data.Item[itemNum].Icon;
+            var itemIcon = Item.Instance[itemNum].Icon;
             if (itemIcon <= 0 || itemIcon > GameState.NumItems)
             {
                 continue;

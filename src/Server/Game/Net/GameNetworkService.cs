@@ -14,7 +14,7 @@ public sealed class GameNetworkService : NetworkService<GameSession>
         return Task.CompletedTask;
     }
 
-    public override async Task OnDisconnectedAsync(GameSession session, CancellationToken cancellationToken)
+    public override async System.Threading.Tasks.Task OnDisconnectedAsync(GameSession session, CancellationToken cancellationToken)
     {
         await Server.Player.LeftGame(session.Id);
     }

@@ -159,7 +159,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         if (NetworkConfig.IsPlaying(session.Id))
         {
-            NetworkSend.AlertMsg(session, SystemMessage.Connection, Menu.Login);
+            NetworkSend.SendAlert(session, SystemMessage.Connection, Menu.Login);
             return;
         }
 
@@ -170,7 +170,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         if (General.GetShutDownTimer != null && General.GetShutDownTimer.IsRunning)
         {
-            NetworkSend.AlertMsg(session, SystemMessage.ServerMaintenance, Menu.Login);
+            NetworkSend.SendAlert(session, SystemMessage.ServerMaintenance, Menu.Login);
             return;
         }
 
@@ -191,43 +191,43 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         // Check versions
         if (clientVersion != serverVersion)
         {
-            NetworkSend.AlertMsg(session, SystemMessage.ClientOutdated, Menu.Login);
+            NetworkSend.SendAlert(session, SystemMessage.ClientOutdated, Menu.Login);
             return;
         }
 
         if (username.Length > Core.Globals.Variables.NameLength | username.Length < Core.Globals.Variables.MinimumNameLength)
         {
-            NetworkSend.AlertMsg(session, SystemMessage.NameLengthInvalid);
+            NetworkSend.SendAlert(session, SystemMessage.NameLengthInvalid);
             return;
         }
 
         if (NetworkConfig.IsMultiLogin(session.Id, username))
         {
-            NetworkSend.AlertMsg(session, SystemMessage.MultipleAccountsNotAllowed, Menu.Login);
+            NetworkSend.SendAlert(session, SystemMessage.MultipleAccountsNotAllowed, Menu.Login);
             return;
         }
 
         if (!Database.LoadAccount(session.Id, username))
         {
-            NetworkSend.AlertMsg(session, SystemMessage.Login, Menu.Login);
+            NetworkSend.SendAlert(session, SystemMessage.Login, Menu.Login);
             return;
         }
 
         if (GetPlayerPassword(session.Id) != password)
         {
-            NetworkSend.AlertMsg(session, SystemMessage.WrongPassword, Menu.Login);
+            NetworkSend.SendAlert(session, SystemMessage.WrongPassword, Menu.Login);
             return;
         }
 
         if (Database.IsBanned(session.Id, session.Channel.IpAddress))
         {
-            NetworkSend.AlertMsg(session, SystemMessage.Banned, Menu.Login);
+            NetworkSend.SendAlert(session, SystemMessage.Banned, Menu.Login);
             return;
         }
 
         if (GetAccountLogin(session.Id) == "")
         {
-            NetworkSend.AlertMsg(session, SystemMessage.DatabaseError, Menu.Login);
+            NetworkSend.SendAlert(session, SystemMessage.DatabaseError, Menu.Login);
             return;
         }
 
@@ -253,13 +253,13 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         // Cut off last portion of ip
         if (Database.IsBanned(session.Id, session.Channel.IpAddress))
         {
-            NetworkSend.AlertMsg(session, SystemMessage.Banned, Menu.Register);
+            NetworkSend.SendAlert(session, SystemMessage.Banned, Menu.Register);
             return;
         }
 
         if (General.GetShutDownTimer is { IsRunning: true })
         {
-            NetworkSend.AlertMsg(session, SystemMessage.ServerMaintenance, Menu.Register);
+            NetworkSend.SendAlert(session, SystemMessage.ServerMaintenance, Menu.Register);
             return;
         }
 
@@ -280,7 +280,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         // Check versions
         if (clientVersion != serverVersion)
         {
-            NetworkSend.AlertMsg(session, SystemMessage.ClientOutdated, Menu.Register);
+            NetworkSend.SendAlert(session, SystemMessage.ClientOutdated, Menu.Register);
             return;
         }
 
@@ -289,24 +289,24 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         switch (x) // Check if the username is valid
         {
             case -1:
-                NetworkSend.AlertMsg(session, SystemMessage.NameContainsIllegalChars, Menu.Register);
+                NetworkSend.SendAlert(session, SystemMessage.NameContainsIllegalChars, Menu.Register);
                 return;
 
             case 0:
-                NetworkSend.AlertMsg(session, SystemMessage.NameLengthInvalid, Menu.Register);
+                NetworkSend.SendAlert(session, SystemMessage.NameLengthInvalid, Menu.Register);
                 return;
         }
 
         if (NetworkConfig.IsMultiLogin(session.Id, username))
         {
-            NetworkSend.AlertMsg(session, SystemMessage.MultipleAccountsNotAllowed, Menu.Register);
+            NetworkSend.SendAlert(session, SystemMessage.MultipleAccountsNotAllowed, Menu.Register);
             return;
         }
 
         var userData = Database.SelectRowByColumn("id", Database.GetStringHash(username), "account", "data");
         if (userData is not null)
         {
-            NetworkSend.AlertMsg(session, SystemMessage.NameTaken, Menu.Register);
+            NetworkSend.SendAlert(session, SystemMessage.NameTaken, Menu.Register);
             return;
         }
 
@@ -335,7 +335,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
             if (slot < 1 | slot > Core.Globals.Variables.MaxChars)
             {
-                NetworkSend.AlertMsg(session, SystemMessage.MaxCharactersReached, Menu.CharacterSelect);
+                NetworkSend.SendAlert(session, SystemMessage.MaxCharactersReached, Menu.CharacterSelect);
                 return;
             }
 
@@ -350,19 +350,19 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             // Check if the username is valid
             if (x == -1)
             {
-                NetworkSend.AlertMsg(session, SystemMessage.NameContainsIllegalChars, Menu.Register);
+                NetworkSend.SendAlert(session, SystemMessage.NameContainsIllegalChars, Menu.Register);
                 return;
             }
             else if (x == 0)
             {
-                NetworkSend.AlertMsg(session, SystemMessage.NameLengthInvalid, Menu.Register);
+                NetworkSend.SendAlert(session, SystemMessage.NameLengthInvalid, Menu.Register);
                 return;
             }
 
             // Check if name is already in use
-            if (Data.Char?.Contains(name) == true)
+            if (Database.CharacterList?.Contains(name) == true)
             {
-                NetworkSend.AlertMsg(session, SystemMessage.NameTaken, Menu.NewCharacter);
+                NetworkSend.SendAlert(session, SystemMessage.NameTaken, Menu.NewCharacter);
                 return;
             }
 
@@ -387,14 +387,14 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             }
 
             // Everything went ok, add the character
-            Data.Char?.Add(name);
+            Database.CharacterList?.Add(name);
             Database.AddChar(session.Id, slot, name, (byte)sexNum, (byte)jobNum, sprite);
 
-            if (Data.Char?.Count == 1)
+            if (Database.CharacterList?.Count == 1)
                 SetPlayerAccess(session.Id, (int)AccessLevel.Owner);
 
             Log.Add("Character " + name + " added to " + GetAccountLogin(session.Id) + "'s account.", Constant.PlayerLog);
-            Server.Player.HandleUseChar(session);
+            Server.Player.OnAdd(session);
         }
     }
 
@@ -409,7 +409,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                 var slot = reader.ReadByte();
                 if (slot < 1 | slot > Core.Globals.Variables.MaxChars)
                 {
-                    NetworkSend.AlertMsg(session, SystemMessage.MaxCharactersReached, Menu.CharacterSelect);
+                    NetworkSend.SendAlert(session, SystemMessage.MaxCharactersReached, Menu.CharacterSelect);
                     return;
                 }
 
@@ -418,12 +418,12 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             }
             else
             {
-                NetworkSend.AlertMsg(session, SystemMessage.Connection, Menu.Login);
+                NetworkSend.SendAlert(session, SystemMessage.Connection, Menu.Login);
             }
         }
         else
         {
-            NetworkSend.AlertMsg(session, SystemMessage.Connection, Menu.Login);
+            NetworkSend.SendAlert(session, SystemMessage.Connection, Menu.Login);
         }
     }
 
@@ -436,12 +436,12 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             var slot = buffer.ReadByte();
             if (slot < 1 | slot > Core.Globals.Variables.MaxChars)
             {
-                NetworkSend.AlertMsg(session, SystemMessage.MaxCharactersReached, Menu.CharacterSelect);
+                NetworkSend.SendAlert(session, SystemMessage.MaxCharactersReached, Menu.CharacterSelect);
                 return;
             }
 
             Database.LoadCharacter(session.Id, slot);
-            Data.Char?.Remove(GetPlayerName(session.Id));
+            Database.CharacterList?.Remove(GetPlayerName(session.Id));
             Database.ClearCharacter(session.Id);
             Database.SaveCharacter(session.Id, slot);
 
@@ -450,7 +450,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         }
         else
         {
-            NetworkSend.AlertMsg(session, SystemMessage.Connection, Menu.Login);
+            NetworkSend.SendAlert(session, SystemMessage.Connection, Menu.Login);
         }
     }
 
@@ -505,17 +505,17 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             if (otherPlayerIndex >= 0)
             {
                 Log.Add(GetPlayerName(session.Id) + " tells " + GetPlayerName(session.Id) + ", '" + msg + "'", Constant.PlayerLog);
-                NetworkSend.PlayerMsg(otherPlayerIndex, GetPlayerName(session.Id) + " tells you, '" + msg + "'", (int)ColorName.Pink);
-                NetworkSend.PlayerMsg(session.Id, "You tell " + GetPlayerName(otherPlayerIndex) + ", '" + msg + "'", (int)ColorName.Pink);
+                NetworkSend.SendPlayerMessage(otherPlayerIndex, GetPlayerName(session.Id) + " tells you, '" + msg + "'", (int)ColorName.Pink);
+                NetworkSend.SendPlayerMessage(session.Id, "You tell " + GetPlayerName(otherPlayerIndex) + ", '" + msg + "'", (int)ColorName.Pink);
             }
             else
             {
-                NetworkSend.PlayerMsg(session.Id, "Player is not online.", (int)ColorName.BrightRed);
+                NetworkSend.SendPlayerMessage(session.Id, "Player is not online.", (int)ColorName.BrightRed);
             }
         }
         else
         {
-            NetworkSend.PlayerMsg(session.Id, "Cannot message your self!", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(session.Id, "Cannot message your self!", (int)ColorName.BrightRed);
         }
     }
 
@@ -640,19 +640,19 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         // Projectile check
         if (GetPlayerEquipment(session.Id, Equipment.Weapon) >= 0)
         {
-            if (Data.Item[GetPlayerEquipment(session.Id, Equipment.Weapon)].Projectile >= 0) // Item has a projectile
+            if (Item.Instance[GetPlayerEquipment(session.Id, Equipment.Weapon)].Projectile >= 0) // Item has a projectile
             {
-                if (Data.Item[GetPlayerEquipment(session.Id, Equipment.Weapon)].Ammo >= 0)
+                if (Item.Instance[GetPlayerEquipment(session.Id, Equipment.Weapon)].Ammo >= 0)
                 {
-                    if (Server.Player.HasItem(session.Id, Data.Item[GetPlayerEquipment(session.Id, Equipment.Weapon)].Ammo) > 0)
+                    if (Server.Player.HasItem(session.Id, Item.Instance[GetPlayerEquipment(session.Id, Equipment.Weapon)].Ammo) > 0)
                     {
-                        Server.Player.TakeInv(session.Id, Data.Item[GetPlayerEquipment(session.Id, Equipment.Weapon)].Ammo, 1);
+                        Server.Player.TakeInv(session.Id, Item.Instance[GetPlayerEquipment(session.Id, Equipment.Weapon)].Ammo, 1);
                         Projectile.PlayerFireProjectile(session.Id, -1, GetPlayerEquipment(session.Id, Equipment.Weapon));
                         return;
                     }
                     else
                     {
-                        NetworkSend.PlayerMsg(session.Id, "Out of " + Data.Item[Data.Item[GetPlayerEquipment(session.Id, Equipment.Weapon)].Ammo].Name + "!", (int)ColorName.BrightRed);
+                        NetworkSend.SendPlayerMessage(session.Id, "Out of " + Item.Instance[Item.Instance[GetPlayerEquipment(session.Id, Equipment.Weapon)].Ammo].Name + "!", (int)ColorName.BrightRed);
                         return;
                     }
                 }
@@ -815,7 +815,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         // Ensure player holds a weapon with projectile or skill casting projectile
         int itemNum = GetPlayerEquipment(session.Id, Equipment.Weapon);
-        if (itemNum < 0 || Data.Item[itemNum].Projectile < 0)
+        if (itemNum < 0 || Item.Instance[itemNum].Projectile < 0)
         {
             // fallback: trigger normal attack if no projectile
             Packet_Attack(session, ReadOnlyMemory<byte>.Empty);
@@ -823,10 +823,10 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         }
 
         // Check ammo availability first (do not deduct yet)
-        int ammoId = Data.Item[itemNum].Ammo;
+        int ammoId = Item.Instance[itemNum].Ammo;
         if (ammoId >= 0 && Server.Player.HasItem(session.Id, ammoId) <= 0)
         {
-            NetworkSend.PlayerMsg(session.Id, "Out of " + Data.Item[ammoId].Name + "!", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(session.Id, "Out of " + Item.Instance[ammoId].Name + "!", (int)ColorName.BrightRed);
             return;
         }
 
@@ -883,14 +883,14 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         if (i >= 0)
         {
-            NetworkSend.PlayerMsg(session.Id, "Account:  " + GetAccountLogin(i) + ", Name: " + GetPlayerName(i), (int)ColorName.Yellow);
+            NetworkSend.SendPlayerMessage(session.Id, "Account:  " + GetAccountLogin(i) + ", Name: " + GetPlayerName(i), (int)ColorName.Yellow);
 
             if (GetPlayerAccess(session.Id) > (byte)AccessLevel.Moderator)
             {
-                NetworkSend.PlayerMsg(session.Id, " Stats for " + GetPlayerName(i) + " ", (int)ColorName.Yellow);
-                NetworkSend.PlayerMsg(session.Id, "Level: " + GetPlayerLevel(i) + "  Exp: " + GetPlayerExp(i) + "/" + Script.Instance?.GetPlayerNextLevel(i), (int)ColorName.Yellow);
-                NetworkSend.PlayerMsg(session.Id, "HP: " + GetPlayerVital(i, Vital.Health) + "/" + Script.Instance?.GetPlayerMaxVital(i, Vital.Health) + "  MP: " + GetPlayerVital(i, Vital.Stamina) + "/" + Script.Instance?.GetPlayerMaxVital(i, Vital.Stamina) + "  SP: " + GetPlayerVital(i, Vital.Stamina) + "/" + Script.Instance?.GetPlayerMaxVital(i, Vital.Stamina), (int)ColorName.Yellow);
-                NetworkSend.PlayerMsg(session.Id, "Strength: " + GetPlayerStat(i, Stat.Strength) + "  Defense: " + GetPlayerStat(i, Stat.Luck) + "  Magic: " + GetPlayerStat(i, Stat.Intelligence) + "  Speed: " + GetPlayerStat(i, Stat.Spirit), (int)ColorName.Yellow);
+                NetworkSend.SendPlayerMessage(session.Id, " Stats for " + GetPlayerName(i) + " ", (int)ColorName.Yellow);
+                NetworkSend.SendPlayerMessage(session.Id, "Level: " + GetPlayerLevel(i) + "  Exp: " + GetPlayerExp(i) + "/" + Script.Instance?.GetPlayerNextLevel(i), (int)ColorName.Yellow);
+                NetworkSend.SendPlayerMessage(session.Id, "HP: " + GetPlayerVital(i, Vital.Health) + "/" + Script.Instance?.GetPlayerMaxVital(i, Vital.Health) + "  MP: " + GetPlayerVital(i, Vital.Stamina) + "/" + Script.Instance?.GetPlayerMaxVital(i, Vital.Stamina) + "  SP: " + GetPlayerVital(i, Vital.Stamina) + "/" + Script.Instance?.GetPlayerMaxVital(i, Vital.Stamina), (int)ColorName.Yellow);
+                NetworkSend.SendPlayerMessage(session.Id, "Strength: " + GetPlayerStat(i, Stat.Strength) + "  Defense: " + GetPlayerStat(i, Stat.Luck) + "  Magic: " + GetPlayerStat(i, Stat.Intelligence) + "  Speed: " + GetPlayerStat(i, Stat.Spirit), (int)ColorName.Yellow);
                 n = GetPlayerStat(i, Stat.Strength) / 2 + GetPlayerLevel(i) / 2;
                 i = GetPlayerStat(i, Stat.Luck) / 2 + GetPlayerLevel(i) / 2;
 
@@ -899,12 +899,12 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
                 if (i > 100)
                     i = 100;
-                NetworkSend.PlayerMsg(session.Id, "Critical Hit Chance: " + n + "%, Block Chance: " + i + "%", (int)ColorName.Yellow);
+                NetworkSend.SendPlayerMessage(session.Id, "Critical Hit Chance: " + n + "%, Block Chance: " + i + "%", (int)ColorName.Yellow);
             }
         }
         else
         {
-            NetworkSend.PlayerMsg(session.Id, "Player is not online.", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(session.Id, "Player is not online.", (int)ColorName.BrightRed);
         }
     }
 
@@ -923,19 +923,19 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         {
             if (n >= 0)
             {
-                Server.Player.Warp(session.Id, GetPlayerMap(n), GetPlayerX(n), GetPlayerY(n), (byte)Direction.Down);
-                NetworkSend.PlayerMsg(n, GetPlayerName(session.Id) + " has warped to you.", (int)ColorName.Yellow);
-                NetworkSend.PlayerMsg(session.Id, "You have been warped to " + GetPlayerName(n) + ".", (int)ColorName.Yellow);
+                Server.Player.OnWarp(session.Id, GetPlayerMap(n), GetPlayerX(n), GetPlayerY(n), (byte)Direction.Down);
+                NetworkSend.SendPlayerMessage(n, GetPlayerName(session.Id) + " has warped to you.", (int)ColorName.Yellow);
+                NetworkSend.SendPlayerMessage(session.Id, "You have been warped to " + GetPlayerName(n) + ".", (int)ColorName.Yellow);
                 Log.Add(GetPlayerName(session.Id) + " has warped to " + GetPlayerName(n) + ", map #" + GetPlayerMap(n) + ".", Constant.AdminLog);
             }
             else
             {
-                NetworkSend.PlayerMsg(session.Id, "Player is not online.", (int)ColorName.BrightRed);
+                NetworkSend.SendPlayerMessage(session.Id, "Player is not online.", (int)ColorName.BrightRed);
             }
         }
         else
         {
-            NetworkSend.PlayerMsg(session.Id, "You cannot warp to yourself, dumbass!", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(session.Id, "You cannot warp to yourself, dumbass!", (int)ColorName.BrightRed);
         }
     }
 
@@ -955,19 +955,19 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         {
             if (n >= 0)
             {
-                Server.Player.Warp(n, GetPlayerMap(session.Id), GetPlayerX(session.Id), GetPlayerY(session.Id), (byte)Direction.Down);
-                NetworkSend.PlayerMsg(n, "You have been summoned by " + GetPlayerName(session.Id) + ".", (int)ColorName.Yellow);
-                NetworkSend.PlayerMsg(session.Id, GetPlayerName(n) + " has been summoned.", (int)ColorName.Yellow);
+                Server.Player.OnWarp(n, GetPlayerMap(session.Id), GetPlayerX(session.Id), GetPlayerY(session.Id), (byte)Direction.Down);
+                NetworkSend.SendPlayerMessage(n, "You have been summoned by " + GetPlayerName(session.Id) + ".", (int)ColorName.Yellow);
+                NetworkSend.SendPlayerMessage(session.Id, GetPlayerName(n) + " has been summoned.", (int)ColorName.Yellow);
                 Log.Add(GetPlayerName(session.Id) + " has warped " + GetPlayerName(n) + " to self, map #" + GetPlayerMap(session.Id) + ".", Constant.AdminLog);
             }
             else
             {
-                NetworkSend.PlayerMsg(session.Id, "Player is not online.", (int)ColorName.BrightRed);
+                NetworkSend.SendPlayerMessage(session.Id, "Player is not online.", (int)ColorName.BrightRed);
             }
         }
         else
         {
-            NetworkSend.PlayerMsg(session.Id, "You cannot warp yourself to yourself, dumbass!", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(session.Id, "You cannot warp yourself to yourself, dumbass!", (int)ColorName.BrightRed);
         }
     }
 
@@ -986,8 +986,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         if (n < 0 | n > Core.Globals.Variables.MaxMaps)
             return;
 
-        Server.Player.Warp(session.Id, n, GetPlayerX(session.Id), GetPlayerY(session.Id), (byte)Direction.Down);
-        NetworkSend.PlayerMsg(session.Id, "You have been warped to map #" + n, (int)ColorName.Yellow);
+        Server.Player.OnWarp(session.Id, n, GetPlayerX(session.Id), GetPlayerY(session.Id), (byte)Direction.Down);
+        NetworkSend.SendPlayerMessage(session.Id, "You have been warped to map #" + n, (int)ColorName.Yellow);
         Log.Add(GetPlayerName(session.Id) + " warped to map #" + n + ".", Constant.AdminLog);
     }
 
@@ -1009,10 +1009,10 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
     public static void Packet_GetStats(GameSession session, ReadOnlyMemory<byte> bytes)
     {
-        NetworkSend.PlayerMsg(session.Id, "Stats: " + GetPlayerName(session.Id), (int)ColorName.Yellow);
-        NetworkSend.PlayerMsg(session.Id, "Level: " + GetPlayerLevel(session.Id) + "  Exp: " + GetPlayerExp(session.Id) + "/" + Script.Instance?.GetPlayerNextLevel(session.Id), (int)ColorName.Yellow);
-        NetworkSend.PlayerMsg(session.Id, "HP: " + GetPlayerVital(session.Id, Vital.Health) + "/" + Script.Instance?.GetPlayerMaxVital(session.Id, Vital.Health) + "  MP: " + GetPlayerVital(session.Id, Vital.Stamina) + "/" + Script.Instance?.GetPlayerMaxVital(session.Id, Vital.Stamina) + "  SP: " + GetPlayerVital(session.Id, Vital.Stamina) + "/" + Script.Instance?.GetPlayerMaxVital(session.Id, Vital.Stamina), (int)ColorName.Yellow);
-        NetworkSend.PlayerMsg(session.Id, "STR: " + GetPlayerStat(session.Id, Stat.Strength) + "  DEF: " + GetPlayerStat(session.Id, Stat.Luck) + "  MAGI: " + GetPlayerStat(session.Id, Stat.Intelligence) + "  Speed: " + GetPlayerStat(session.Id, Stat.Spirit), (int)ColorName.Yellow);
+        NetworkSend.SendPlayerMessage(session.Id, "Stats: " + GetPlayerName(session.Id), (int)ColorName.Yellow);
+        NetworkSend.SendPlayerMessage(session.Id, "Level: " + GetPlayerLevel(session.Id) + "  Exp: " + GetPlayerExp(session.Id) + "/" + Script.Instance?.GetPlayerNextLevel(session.Id), (int)ColorName.Yellow);
+        NetworkSend.SendPlayerMessage(session.Id, "HP: " + GetPlayerVital(session.Id, Vital.Health) + "/" + Script.Instance?.GetPlayerMaxVital(session.Id, Vital.Health) + "  MP: " + GetPlayerVital(session.Id, Vital.Stamina) + "/" + Script.Instance?.GetPlayerMaxVital(session.Id, Vital.Stamina) + "  SP: " + GetPlayerVital(session.Id, Vital.Stamina) + "/" + Script.Instance?.GetPlayerMaxVital(session.Id, Vital.Stamina), (int)ColorName.Yellow);
+        NetworkSend.SendPlayerMessage(session.Id, "STR: " + GetPlayerStat(session.Id, Stat.Strength) + "  DEF: " + GetPlayerStat(session.Id, Stat.Luck) + "  MAGI: " + GetPlayerStat(session.Id, Stat.Intelligence) + "  Speed: " + GetPlayerStat(session.Id, Stat.Spirit), (int)ColorName.Yellow);
         var n = GetPlayerStat(session.Id, Stat.Strength) / 2;
         var n2 = GetPlayerStat(session.Id, Stat.Intelligence) / 2;
         var i = GetPlayerStat(session.Id, Stat.Vitality) / 5;
@@ -1025,7 +1025,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         if (i > 100)
             i = 100;
-        NetworkSend.PlayerMsg(session.Id, "Critical Hit Chance: " + n + "% Critical Cast Chance: " + n2 + "%, Block Chance: " + i + "%", (int)ColorName.Yellow);
+        NetworkSend.SendPlayerMessage(session.Id, "Critical Hit Chance: " + n + "% Critical Cast Chance: " + n2 + "%, Block Chance: " + i + "%", (int)ColorName.Yellow);
     }
 
     public static void Packet_RequestNewMap(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -1309,7 +1309,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         {
             if (NetworkConfig.IsPlaying(i) & GetPlayerMap(i) == mapNum)
             {
-                Server.Player.Warp(i, mapNum, GetPlayerX(i), GetPlayerY(i), (byte)Direction.Down);
+                Server.Player.OnWarp(i, mapNum, GetPlayerX(i), GetPlayerY(i), (byte)Direction.Down);
                 NetworkSend.SendMapData(i, mapNum, true);
             }
         }
@@ -1373,7 +1373,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         EventLogic.SpawnMapEventsFor(session.Id, GetPlayerMap(session.Id));
 
         MapResource.Cache(GetPlayerMap(session.Id));
-        NetworkSend.PlayerMsg(session.Id, "Map respawned.", (int)ColorName.BrightGreen);
+        NetworkSend.SendPlayerMessage(session.Id, "Map respawned.", (int)ColorName.BrightGreen);
         Log.Add(GetPlayerName(session.Id) + " has respawned map #" + GetPlayerMap(session.Id), Constant.AdminLog);
     }
 
@@ -1405,23 +1405,23 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             {
                 if (GetPlayerAccess(n) < GetPlayerAccess(session.Id))
                 {
-                    NetworkSend.GlobalMsg(GetPlayerName(n) + " has been kicked from " + SettingsManager.Instance.GameName + " by " + GetPlayerName(session.Id) + "!");
+                    NetworkSend.SendGlobalMessage(GetPlayerName(n) + " has been kicked from " + SettingsManager.Instance.GameName + " by " + GetPlayerName(session.Id) + "!");
                     Log.Add(GetPlayerName(session.Id) + " has kicked " + GetPlayerName(n) + ".", Constant.AdminLog);
-                    NetworkSend.AlertMsg(session, SystemMessage.Kicked, Menu.Login);
+                    NetworkSend.SendAlert(session, SystemMessage.Kicked, Menu.Login);
                 }
                 else
                 {
-                    NetworkSend.PlayerMsg(session.Id, "That is a higher or same access admin then you!", (int)ColorName.BrightRed);
+                    NetworkSend.SendPlayerMessage(session.Id, "That is a higher or same access admin then you!", (int)ColorName.BrightRed);
                 }
             }
             else
             {
-                NetworkSend.PlayerMsg(session.Id, "Player is not online.", (int)ColorName.BrightRed);
+                NetworkSend.SendPlayerMessage(session.Id, "Player is not online.", (int)ColorName.BrightRed);
             }
         }
         else
         {
-            NetworkSend.PlayerMsg(session.Id, "You cannot kick yourself!", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(session.Id, "You cannot kick yourself!", (int)ColorName.BrightRed);
         }
     }
 
@@ -1433,7 +1433,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             return;
         }
 
-        NetworkSend.PlayerMsg(session.Id, "Command /banlist is not available.", (int)ColorName.Yellow);
+        NetworkSend.SendPlayerMessage(session.Id, "Command /banlist is not available.", (int)ColorName.Yellow);
     }
 
     public static void Packet_DestroyBans(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -1447,7 +1447,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         if (File.Exists(filename))
             File.Delete(filename);
 
-        NetworkSend.PlayerMsg(session.Id, "Ban list destroyed.", (int)ColorName.BrightGreen);
+        NetworkSend.SendPlayerMessage(session.Id, "Ban list destroyed.", (int)ColorName.BrightGreen);
     }
 
     public static void Packet_BanPlayer(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -1471,17 +1471,17 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                 }
                 else
                 {
-                    NetworkSend.PlayerMsg(session.Id, "That is a higher or same access admin then you!", (int)ColorName.BrightRed);
+                    NetworkSend.SendPlayerMessage(session.Id, "That is a higher or same access admin then you!", (int)ColorName.BrightRed);
                 }
             }
             else
             {
-                NetworkSend.PlayerMsg(session.Id, "Player is not online.", (int)ColorName.BrightRed);
+                NetworkSend.SendPlayerMessage(session.Id, "Player is not online.", (int)ColorName.BrightRed);
             }
         }
         else
         {
-            NetworkSend.PlayerMsg(session.Id, "You cannot ban yourself!", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(session.Id, "You cannot ban yourself!", (int)ColorName.BrightRed);
         }
     }
 
@@ -1495,7 +1495,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         if (!string.IsNullOrEmpty(user))
         {
-            NetworkSend.PlayerMsg(session.Id, "The game editor is locked and being used by " + user + ".", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(session.Id, "The game editor is locked and being used by " + user + ".", (int)ColorName.BrightRed);
             return;
         }
 
@@ -1526,7 +1526,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         if (!string.IsNullOrEmpty(user))
         {
-            NetworkSend.PlayerMsg(session.Id, "The game editor is locked and being used by " + user + ".", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(session.Id, "The game editor is locked and being used by " + user + ".", (int)ColorName.BrightRed);
             return;
         }
 
@@ -1584,7 +1584,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         if (!string.IsNullOrEmpty(user))
         {
-            NetworkSend.PlayerMsg(session.Id, "The game editor is locked and being used by " + user + ".", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(session.Id, "The game editor is locked and being used by " + user + ".", (int)ColorName.BrightRed);
             return;
         }
 
@@ -1681,14 +1681,14 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                     // check to see if same level access is trying to change another access of the very same level and boot them if they are.
                     if (GetPlayerAccess(n) == GetPlayerAccess(session.Id))
                     {
-                        NetworkSend.PlayerMsg(session.Id, "Invalid access level.", (int)ColorName.BrightRed);
+                        NetworkSend.SendPlayerMessage(session.Id, "Invalid access level.", (int)ColorName.BrightRed);
                         return;
                     }
                 }
 
                 if (GetPlayerAccess(n) == (int)AccessLevel.Player && i > (int)AccessLevel.Player)
                 {
-                    NetworkSend.GlobalMsg(GetPlayerName(n) + " has been blessed with administrative access.");
+                    NetworkSend.SendGlobalMessage(GetPlayerName(n) + " has been blessed with administrative access.");
                 }
 
                 SetPlayerAccess(n, (byte)i);
@@ -1697,12 +1697,12 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             }
             else
             {
-                NetworkSend.PlayerMsg(session.Id, "Player is not online.", (int)ColorName.BrightRed);
+                NetworkSend.SendPlayerMessage(session.Id, "Player is not online.", (int)ColorName.BrightRed);
             }
         }
         else
         {
-            NetworkSend.PlayerMsg(session.Id, "Invalid access level.", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(session.Id, "Invalid access level.", (int)ColorName.BrightRed);
         }
     }
 
@@ -1722,7 +1722,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Variables.Welcome = buffer.ReadString();
         SettingsManager.Save();
 
-        NetworkSend.GlobalMsg("Welcome changed to: " + Variables.Welcome);
+        NetworkSend.SendGlobalMessage("Welcome changed to: " + Variables.Welcome);
         Log.Add(GetPlayerName(session.Id) + " changed welcome to: " + Variables.Welcome, Constant.AdminLog);
     }
 
@@ -1752,27 +1752,27 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                         {
                             if (GetPlayerLevel(i) >= GetPlayerLevel(session.Id) + 5)
                             {
-                                NetworkSend.PlayerMsg(session.Id, "You wouldn't stand a chance.", (int)ColorName.BrightRed);
+                                NetworkSend.SendPlayerMessage(session.Id, "You wouldn't stand a chance.", (int)ColorName.BrightRed);
                             }
 
                             else if (GetPlayerLevel(i) > GetPlayerLevel(session.Id))
                             {
-                                NetworkSend.PlayerMsg(session.Id, "This one seems to have an advantage over you.", (int)ColorName.Yellow);
+                                NetworkSend.SendPlayerMessage(session.Id, "This one seems to have an advantage over you.", (int)ColorName.Yellow);
                             }
 
                             else if (GetPlayerLevel(i) == GetPlayerLevel(session.Id))
                             {
-                                NetworkSend.PlayerMsg(session.Id, "This would be an even fight.", (int)ColorName.White);
+                                NetworkSend.SendPlayerMessage(session.Id, "This would be an even fight.", (int)ColorName.White);
                             }
 
                             else if (GetPlayerLevel(session.Id) >= GetPlayerLevel(i) + 5)
                             {
-                                NetworkSend.PlayerMsg(session.Id, "You could slaughter that player.", (int)ColorName.BrightBlue);
+                                NetworkSend.SendPlayerMessage(session.Id, "You could slaughter that player.", (int)ColorName.BrightBlue);
                             }
 
                             else if (GetPlayerLevel(session.Id) > GetPlayerLevel(i))
                             {
-                                NetworkSend.PlayerMsg(session.Id, "You would have an advantage over that player.", (int)ColorName.BrightCyan);
+                                NetworkSend.SendPlayerMessage(session.Id, "You would have an advantage over that player.", (int)ColorName.BrightCyan);
                             }
                         }
 
@@ -1790,7 +1790,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
                         if (Data.TempPlayer[session.Id].Target >= 0)
                         {
-                            NetworkSend.PlayerMsg(session.Id, "Your target is now " + GetPlayerName(i) + ".", (int)ColorName.Yellow);
+                            NetworkSend.SendPlayerMessage(session.Id, "Your target is now " + GetPlayerName(i) + ".", (int)ColorName.Yellow);
                         }
 
                         NetworkSend.SendTarget(session.Id, Data.TempPlayer[session.Id].Target, Data.TempPlayer[session.Id].TargetType);
@@ -1808,13 +1808,13 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         {
             if (Data.MapItem[GetPlayerMap(session.Id), i].Num >= 0)
             {
-                if (!string.IsNullOrEmpty(Data.Item[(int)Data.MapItem[GetPlayerMap(session.Id), i].Num].Name))
+                if (!string.IsNullOrEmpty(Item.Instance[(int)Data.MapItem[GetPlayerMap(session.Id), i].Num].Name))
                 {
                     if (Math.Floor((double)Data.MapItem[GetPlayerMap(session.Id), i].X / Constants.TileSize) == x)
                     {
                         if (Math.Floor((double)Data.MapItem[GetPlayerMap(session.Id), i].Y / Constants.TileSize) == y)
                         {
-                            NetworkSend.PlayerMsg(session.Id, "You see " + Data.MapItem[GetPlayerMap(session.Id), i].Value + " " + Data.Item[(int)Data.MapItem[GetPlayerMap(session.Id), i].Num].Name + ".", (int)ColorName.BrightGreen);
+                            NetworkSend.SendPlayerMessage(session.Id, "You see " + Data.MapItem[GetPlayerMap(session.Id), i].Value + " " + Item.Instance[(int)Data.MapItem[GetPlayerMap(session.Id), i].Num].Name + ".", (int)ColorName.BrightGreen);
                             return;
                         }
                     }
@@ -1846,7 +1846,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
                         if (Data.TempPlayer[session.Id].Target >= 0)
                         {
-                            NetworkSend.PlayerMsg(session.Id, "Your target is now " + GameLogic.CheckGrammar(Data.Npc[(int)Data.MapNpc[GetPlayerMap(session.Id)].Npc[i].Num].Name) + ".", (int)ColorName.Yellow);
+                            NetworkSend.SendPlayerMessage(session.Id, "Your target is now " + GameLogic.CheckGrammar(Data.Npc[(int)Data.MapNpc[GetPlayerMap(session.Id)].Npc[i].Num].Name) + ".", (int)ColorName.Yellow);
                         }
 
                         NetworkSend.SendTarget(session.Id, Data.TempPlayer[session.Id].Target, Data.TempPlayer[session.Id].TargetType);
@@ -2025,14 +2025,14 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         // dont let them forget a skill which is in CD
         if (Data.TempPlayer[session.Id].SkillCd[skillSlot] > 0)
         {
-            NetworkSend.PlayerMsg(session.Id, "Cannot forget a skill which is cooling down!", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(session.Id, "Cannot forget a skill which is cooling down!", (int)ColorName.BrightRed);
             return;
         }
 
         // dont let them forget a skill which is buffered
         if (Data.TempPlayer[session.Id].SkillBuffer == skillSlot)
         {
-            NetworkSend.PlayerMsg(session.Id, "Cannot forget a skill which you are casting!", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(session.Id, "Cannot forget a skill which you are casting!", (int)ColorName.BrightRed);
             return;
         }
 
@@ -2067,7 +2067,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var itemAmount = Server.Player.HasItem(session.Id, instance.CostItem);
         if (itemAmount == 0 | itemAmount < instance.CostValue)
         {
-            NetworkSend.PlayerMsg(session.Id, "You do not have enough to buy this item.", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(session.Id, "You do not have enough to buy this item.", (int)ColorName.BrightRed);
             NetworkSend.ResetShopAction();
             return;
         }
@@ -2078,7 +2078,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Server.Player.GiveInv(session.Id, instance.Item, instance.ItemValue);
 
         // send confirmation message & reset their shop action
-        NetworkSend.PlayerMsg(session.Id, "Trade successful.", (int)ColorName.BrightGreen);
+        NetworkSend.SendPlayerMessage(session.Id, "Trade successful.", (int)ColorName.BrightGreen);
         NetworkSend.ResetShopAction();
     }
 
@@ -2107,12 +2107,12 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         // work out price
         var multiplier = Data.Shop[(int)shopNum].BuyRate / 100d;
-        var price = (int)Math.Round(Data.Item[(int)itemNum].Price * multiplier);
+        var price = (int)Math.Round(Item.Instance[(int)itemNum].Price * multiplier);
 
         // item has cost?
         if (price < 0)
         {
-            NetworkSend.PlayerMsg(session.Id, "The shop doesn't want that item.", (int)ColorName.Yellow);
+            NetworkSend.SendPlayerMessage(session.Id, "The shop doesn't want that item.", (int)ColorName.Yellow);
             NetworkSend.ResetShopAction();
             return;
         }
@@ -2122,7 +2122,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Server.Player.GiveInv(session.Id, 0, price);
 
         // send confirmation message & reset their shop action
-        NetworkSend.PlayerMsg(session.Id, "Sold the " + Data.Item[(int)itemNum].Name + " for " + price + " " + Data.Item[(int)itemNum].Name + "!", (int)ColorName.BrightGreen);
+        NetworkSend.SendPlayerMessage(session.Id, "Sold the " + Item.Instance[(int)itemNum].Name + " for " + price + " " + Item.Instance[(int)itemNum].Name + "!", (int)ColorName.BrightGreen);
         NetworkSend.ResetShopAction();
     }
 
@@ -2201,7 +2201,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         // can't trade with yourself..
         if (tradeTarget == session.Id)
         {
-            NetworkSend.PlayerMsg(session.Id, "You can't trade with yourself!", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(session.Id, "You can't trade with yourself!", (int)ColorName.BrightRed);
             return;
         }
 
@@ -2209,8 +2209,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Data.TempPlayer[session.Id].TradeRequest = tradeTarget;
         Data.TempPlayer[tradeTarget].TradeRequest = session.Id;
 
-        NetworkSend.PlayerMsg(tradeTarget, GetPlayerName(session.Id) + " has invited you to trade.", (int)ColorName.Yellow);
-        NetworkSend.PlayerMsg(session.Id, "You have invited " + GetPlayerName(tradeTarget) + " to trade.", (int)ColorName.BrightGreen);
+        NetworkSend.SendPlayerMessage(tradeTarget, GetPlayerName(session.Id) + " has invited you to trade.", (int)ColorName.Yellow);
+        NetworkSend.SendPlayerMessage(session.Id, "You have invited " + GetPlayerName(tradeTarget) + " to trade.", (int)ColorName.BrightGreen);
 
         NetworkSend.SendTradeInvite(tradeTarget, session.Id);
     }
@@ -2228,8 +2228,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         if (status == 0)
         {
-            NetworkSend.PlayerMsg(tradeTarget, GetPlayerName(session.Id) + " has declined your trade request.", (int)ColorName.BrightRed);
-            NetworkSend.PlayerMsg(session.Id, "You have declined the trade with " + GetPlayerName(tradeTarget) + ".", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(tradeTarget, GetPlayerName(session.Id) + " has declined your trade request.", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(session.Id, "You have declined the trade with " + GetPlayerName(tradeTarget) + ".", (int)ColorName.BrightRed);
             Data.TempPlayer[session.Id].TradeRequest = -1;
             return;
         }
@@ -2238,8 +2238,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         if (Data.TempPlayer[tradeTarget].TradeRequest == session.Id)
         {
             // let them know they're trading
-            NetworkSend.PlayerMsg(session.Id, "You have accepted " + GetPlayerName(tradeTarget) + "'s trade request.", (int)ColorName.Yellow);
-            NetworkSend.PlayerMsg(tradeTarget, GetPlayerName(session.Id) + " has accepted your trade request.", (int)ColorName.BrightGreen);
+            NetworkSend.SendPlayerMessage(session.Id, "You have accepted " + GetPlayerName(tradeTarget) + "'s trade request.", (int)ColorName.Yellow);
+            NetworkSend.SendPlayerMessage(tradeTarget, GetPlayerName(session.Id) + " has accepted your trade request.", (int)ColorName.BrightGreen);
 
             // clear the tradeRequest server-side
             Data.TempPlayer[session.Id].TradeRequest = -1;
@@ -2369,8 +2369,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Data.TempPlayer[session.Id].InTrade = -1;
         Data.TempPlayer[tradeTarget].InTrade = -1;
 
-        NetworkSend.PlayerMsg(session.Id, "Trade completed.", (int)ColorName.BrightGreen);
-        NetworkSend.PlayerMsg(tradeTarget, "Trade completed.", (int)ColorName.BrightGreen);
+        NetworkSend.SendPlayerMessage(session.Id, "Trade completed.", (int)ColorName.BrightGreen);
+        NetworkSend.SendPlayerMessage(tradeTarget, "Trade completed.", (int)ColorName.BrightGreen);
 
         NetworkSend.SendCloseTrade(session.Id);
         NetworkSend.SendCloseTrade(tradeTarget);
@@ -2391,8 +2391,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Data.TempPlayer[session.Id].InTrade = -1;
         Data.TempPlayer[tradeTarget].InTrade = -1;
 
-        NetworkSend.PlayerMsg(session.Id, "You declined the trade.", (int)ColorName.BrightRed);
-        NetworkSend.PlayerMsg(tradeTarget, GetPlayerName(session.Id) + " has declined the trade.", (int)ColorName.BrightRed);
+        NetworkSend.SendPlayerMessage(session.Id, "You declined the trade.", (int)ColorName.BrightRed);
+        NetworkSend.SendPlayerMessage(tradeTarget, GetPlayerName(session.Id) + " has declined the trade.", (int)ColorName.BrightRed);
 
         NetworkSend.SendCloseTrade(session.Id);
         NetworkSend.SendCloseTrade(tradeTarget);
@@ -2421,11 +2421,11 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         if (Data.Player[session.Id].Inv[invslot].Bound > 0)
         {
-            NetworkSend.PlayerMsg(session.Id, "You can't trade soulbound items.", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(session.Id, "You can't trade soulbound items.", (int)ColorName.BrightRed);
             return;
         }
 
-        if (Data.Item[itemnum].Type == (byte)ItemCategory.Currency | Data.Item[itemnum].Stackable == 1)
+        if (Item.Instance[itemnum].Type == (byte)ItemCategory.Currency | Item.Instance[itemnum].Stackable == 1)
         {
             // check if already offering same currency item
             var loopTo = Core.Globals.Variables.MaxInv;
@@ -2465,7 +2465,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             {
                 if (Data.TempPlayer[session.Id].TradeOffer[i].Num == invslot)
                 {
-                    NetworkSend.PlayerMsg(session.Id, "You've already offered this item.", (int)ColorName.BrightRed);
+                    NetworkSend.SendPlayerMessage(session.Id, "You've already offered this item.", (int)ColorName.BrightRed);
                     return;
                 }
             }
@@ -2530,7 +2530,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
     {
         if (index > 0 & NetworkConfig.IsPlaying(index))
         {
-            NetworkSend.GlobalMsg(GetAccountLogin(index) + "/" + GetPlayerName(index) + " has been booted for (" + reason + ")");
+            NetworkSend.SendGlobalMessage(GetAccountLogin(index) + "/" + GetPlayerName(index) + " has been booted for (" + reason + ")");
             var task = Server.Player.LeftGame(index);
             task.Wait();
         }
@@ -2677,7 +2677,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         if (!string.IsNullOrEmpty(user))
         {
-            NetworkSend.PlayerMsg(session.Id, "The game editor is locked and being used by " + user + ".", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(session.Id, "The game editor is locked and being used by " + user + ".", (int)ColorName.BrightRed);
             return;
         }
 
@@ -2765,7 +2765,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var user = IsEditorLocked(session.Id, EditorType.Moral);
         if (!string.IsNullOrEmpty(user))
         {
-            NetworkSend.PlayerMsg(session.Id, "The game editor is locked and being used by " + user + ".", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(session.Id, "The game editor is locked and being used by " + user + ".", (int)ColorName.BrightRed);
             return;
         }
 
@@ -2833,7 +2833,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var user = IsEditorLocked(session.Id, EditorType.Script);
         if (!string.IsNullOrEmpty(user))
         {
-            NetworkSend.PlayerMsg(session.Id, "The game editor is locked and being used by " + user + ".", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(session.Id, "The game editor is locked and being used by " + user + ".", (int)ColorName.BrightRed);
             return;
         }
 
@@ -2925,7 +2925,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var user = IsEditorLocked(session.Id, EditorType.Projectile);
         if (!string.IsNullOrEmpty(user))
         {
-            NetworkSend.PlayerMsg(session.Id, "The game editor is locked and being used by " + user + ".", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(session.Id, "The game editor is locked and being used by " + user + ".", (int)ColorName.BrightRed);
             return;
         }
 
@@ -2981,7 +2981,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var user = IsEditorLocked(session.Id, EditorType.Resource);
         if (!string.IsNullOrEmpty(user))
         {
-            NetworkSend.PlayerMsg(session.Id, "The game editor is locked and being used by " + user + ".", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(session.Id, "The game editor is locked and being used by " + user + ".", (int)ColorName.BrightRed);
             return;
         }
 
@@ -3073,7 +3073,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var user = IsEditorLocked(session.Id, EditorType.Item);
         if (!string.IsNullOrEmpty(user))
         {
-            NetworkSend.PlayerMsg(session.Id, "The game editor is locked and being used by " + user + ".", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(session.Id, "The game editor is locked and being used by " + user + ".", (int)ColorName.BrightRed);
             return;
         }
 
@@ -3106,43 +3106,43 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             return;
         }
 
-        Data.Item[itemNum].AccessReq = packetReader.ReadInt32();
+        Item.Instance[itemNum].AccessReq = packetReader.ReadInt32();
 
         var statCount = Enum.GetNames<Stat>().Length;
         for (var i = 0; i < statCount; i++)
         {
-            Data.Item[itemNum].AddStat[i] = (byte)packetReader.ReadInt32();
+            Item.Instance[itemNum].AddStat[i] = (byte)packetReader.ReadInt32();
         }
 
-        Data.Item[itemNum].Animation = packetReader.ReadInt32();
-        Data.Item[itemNum].BindType = packetReader.ReadByte();
-        Data.Item[itemNum].JobReq = packetReader.ReadInt32();
-        Data.Item[itemNum].Data1 = packetReader.ReadInt32();
-        Data.Item[itemNum].Data2 = packetReader.ReadInt32();
-        Data.Item[itemNum].Data3 = packetReader.ReadInt32();
-        Data.Item[itemNum].LevelReq = packetReader.ReadInt32();
-        Data.Item[itemNum].Mastery = (byte)packetReader.ReadInt32();
-        Data.Item[itemNum].Name = packetReader.ReadString();
-        Data.Item[itemNum].Paperdoll = packetReader.ReadInt32();
-        Data.Item[itemNum].Icon = packetReader.ReadInt32();
-        Data.Item[itemNum].Price = packetReader.ReadInt32();
-        Data.Item[itemNum].Rarity = (byte)packetReader.ReadInt32();
-        Data.Item[itemNum].Speed = packetReader.ReadInt32();
-        Data.Item[itemNum].Stackable = (byte)packetReader.ReadInt32();
-        Data.Item[itemNum].Description = packetReader.ReadString();
+        Item.Instance[itemNum].Animation = packetReader.ReadInt32();
+        Item.Instance[itemNum].BindType = packetReader.ReadByte();
+        Item.Instance[itemNum].JobReq = packetReader.ReadInt32();
+        Item.Instance[itemNum].Data1 = packetReader.ReadInt32();
+        Item.Instance[itemNum].Data2 = packetReader.ReadInt32();
+        Item.Instance[itemNum].Data3 = packetReader.ReadInt32();
+        Item.Instance[itemNum].LevelReq = packetReader.ReadInt32();
+        Item.Instance[itemNum].Mastery = (byte)packetReader.ReadInt32();
+        Item.Instance[itemNum].Name = packetReader.ReadString();
+        Item.Instance[itemNum].Paperdoll = packetReader.ReadInt32();
+        Item.Instance[itemNum].Icon = packetReader.ReadInt32();
+        Item.Instance[itemNum].Price = packetReader.ReadInt32();
+        Item.Instance[itemNum].Rarity = (byte)packetReader.ReadInt32();
+        Item.Instance[itemNum].Speed = packetReader.ReadInt32();
+        Item.Instance[itemNum].Stackable = (byte)packetReader.ReadInt32();
+        Item.Instance[itemNum].Description = packetReader.ReadString();
 
         for (var i = 0; i < statCount; i++)
         {
-            Data.Item[itemNum].StatReq[i] = (byte)packetReader.ReadInt32();
+            Item.Instance[itemNum].StatReq[i] = (byte)packetReader.ReadInt32();
         }
 
-        Data.Item[itemNum].Type = (byte)packetReader.ReadInt32();
-        Data.Item[itemNum].SubType = (byte)packetReader.ReadInt32();
-        Data.Item[itemNum].ItemLevel = (byte)packetReader.ReadInt32();
-        Data.Item[itemNum].KnockBack = (byte)packetReader.ReadInt32();
-        Data.Item[itemNum].KnockBackTiles = (byte)packetReader.ReadInt32();
-        Data.Item[itemNum].Projectile = packetReader.ReadInt32();
-        Data.Item[itemNum].Ammo = packetReader.ReadInt32();
+        Item.Instance[itemNum].Type = (byte)packetReader.ReadInt32();
+        Item.Instance[itemNum].SubType = (byte)packetReader.ReadInt32();
+        Item.Instance[itemNum].ItemLevel = (byte)packetReader.ReadInt32();
+        Item.Instance[itemNum].KnockBack = (byte)packetReader.ReadInt32();
+        Item.Instance[itemNum].KnockBackTiles = (byte)packetReader.ReadInt32();
+        Item.Instance[itemNum].Projectile = packetReader.ReadInt32();
+        Item.Instance[itemNum].Ammo = packetReader.ReadInt32();
 
         Item.OnSave(itemNum);
 
@@ -3179,8 +3179,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             return;
         }
 
-        if (Data.Item[GetPlayerInv(session.Id, invNum)].Type == (byte)ItemCategory.Currency ||
-            Data.Item[GetPlayerInv(session.Id, invNum)].Stackable == 1)
+        if (Item.Instance[GetPlayerInv(session.Id, invNum)].Type == (byte)ItemCategory.Currency ||
+            Item.Instance[GetPlayerInv(session.Id, invNum)].Stackable == 1)
         {
             if (amount < 0 | amount > GetPlayerInvValue(session.Id, invNum))
             {
@@ -3208,7 +3208,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var user = IsEditorLocked(session.Id, EditorType.Animation);
         if (!string.IsNullOrEmpty(user))
         {
-            NetworkSend.PlayerMsg(session.Id, "The game editor is locked and being used by " + user + ".", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(session.Id, "The game editor is locked and being used by " + user + ".", (int)ColorName.BrightRed);
             return;
         }
 
@@ -3353,7 +3353,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var user = IsEditorLocked(session.Id, EditorType.Npc);
         if (!string.IsNullOrEmpty(user))
         {
-            NetworkSend.PlayerMsg(session.Id, "The game editor is locked and being used by " + user + ".", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(session.Id, "The game editor is locked and being used by " + user + ".", (int)ColorName.BrightRed);
             return;
         }
 

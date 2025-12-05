@@ -23,7 +23,7 @@ namespace Client
 
             Item.OnStream(Data.MyMapItem[itemNum].Num);
 
-            picNum = Data.Item[Data.MyMapItem[itemNum].Num].Icon;
+            picNum = Item.Instance[Data.MyMapItem[itemNum].Num].Icon;
 
             if (picNum < 1 | picNum > GameState.NumItems)
                 return;

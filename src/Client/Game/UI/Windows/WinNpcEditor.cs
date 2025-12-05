@@ -135,7 +135,7 @@ public class WinNpcEditor
             cmbItem.Items.Clear();
             for (int i = 0; i < Variables.MaxItems; i++)
             {
-                var raw = Data.Item[i].Name ?? string.Empty;
+                var raw = Item.Instance[i].Name ?? string.Empty;
                 var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
                 cmbItem.Items.Add($"{i + 1}: {name}");
             }

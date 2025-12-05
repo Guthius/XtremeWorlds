@@ -59,7 +59,7 @@ namespace Server
                 return;
             }
 
-            NetworkSend.PlayerMsg(playerId, levels == 1
+            NetworkSend.SendPlayerMessage(playerId, levels == 1
                 ? $"Your {Command.GetResourceSkillName((ResourceSkill)skillSlot)} has gone up a level!"
                 : $"Your {Command.GetResourceSkillName((ResourceSkill)skillSlot)} has gone up by {levels} levels!", (int)ColorName.BrightGreen);
 
@@ -101,13 +101,13 @@ namespace Server
 
             if (Command.GetPlayerEquipment(playerId, Equipment.Weapon) < 0 && Data.Resource[resourceIndex].ToolRequired != 0)
             {
-                NetworkSend.PlayerMsg(playerId, "You need a tool to gather this resource.", (int)ColorName.Yellow);
+                NetworkSend.SendPlayerMessage(playerId, "You need a tool to gather this resource.", (int)ColorName.Yellow);
                 return;
             }
 
-            if (Data.Item[Command.GetPlayerEquipment(playerId, Equipment.Weapon)].Data3 != Data.Resource[resourceIndex].ToolRequired)
+            if (Item.Instance[Command.GetPlayerEquipment(playerId, Equipment.Weapon)].Data3 != Data.Resource[resourceIndex].ToolRequired)
             {
-                NetworkSend.PlayerMsg(playerId, "You have the wrong type of tool equiped.", (int)ColorName.Yellow);
+                NetworkSend.SendPlayerMessage(playerId, "You have the wrong type of tool equiped.", (int)ColorName.Yellow);
                 return;
             }
 
@@ -115,14 +115,14 @@ namespace Server
             {
                 if (Player.FindOpenInvSlot(playerId, Data.Resource[resourceIndex].ItemReward) == 0)
                 {
-                    NetworkSend.PlayerMsg(playerId, "You have no inventory space.", (int)ColorName.Yellow);
+                    NetworkSend.SendPlayerMessage(playerId, "You have no inventory space.", (int)ColorName.Yellow);
                     return;
                 }
             }
 
             if (Data.Resource[resourceIndex].LvlRequired > Command.GetPlayerGatherSkillLevel(playerId, resourceType))
             {
-                NetworkSend.PlayerMsg(playerId, "Your level is too low!", (int)ColorName.Yellow);
+                NetworkSend.SendPlayerMessage(playerId, "Your level is too low!", (int)ColorName.Yellow);
                 return;
             }
 
@@ -142,7 +142,7 @@ namespace Server
             }
             else
             {
-                damage = Data.Item[Command.GetPlayerEquipment(playerId, Equipment.Weapon)].Data2;
+                damage = Item.Instance[Command.GetPlayerEquipment(playerId, Equipment.Weapon)].Data2;
             }
 
             if (damage <= 0)
@@ -171,7 +171,7 @@ namespace Server
 
             Command.SetPlayerGatherSkillExp(playerId, resourceType, Command.GetPlayerGatherSkillExp(playerId, resourceType) + Data.Resource[resourceIndex].ExpReward);
 
-            NetworkSend.PlayerMsg(playerId, $"Your {Command.GetResourceSkillName((ResourceSkill)resourceType)} has earned {Data.Resource[resourceIndex].ExpReward} experience. ({Command.GetPlayerGatherSkillExp(playerId, resourceType)}/{Command.GetPlayerGatherSkillMaxExp(playerId, resourceType)})", (int)ColorName.BrightGreen);
+            NetworkSend.SendPlayerMessage(playerId, $"Your {Command.GetResourceSkillName((ResourceSkill)resourceType)} has earned {Data.Resource[resourceIndex].ExpReward} experience. ({Command.GetPlayerGatherSkillExp(playerId, resourceType)}/{Command.GetPlayerGatherSkillMaxExp(playerId, resourceType)})", (int)ColorName.BrightGreen);
             NetworkSend.SendPlayerData(playerId);
 
             MapResource.CheckLevelUp(playerId, resourceType);

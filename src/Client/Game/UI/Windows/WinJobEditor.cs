@@ -80,7 +80,7 @@ namespace Client.Game.UI.Windows
                 cmbItem.Items.Add("None");
                 for (int i = 0; i < Variables.MaxItems; i++)
                 {
-                    var raw = Data.Item[i].Name ?? string.Empty;
+                    var raw = Item.Instance[i].Name ?? string.Empty;
                     var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
                     cmbItem.Items.Add($"{i + 1}: {name}");
                 }
@@ -185,7 +185,7 @@ namespace Client.Game.UI.Windows
                 {
                     int id = job.StartItem[i];
                     int amt = job.StartValue[i];
-                    string name = id >= 0 && id < Variables.MaxItems ? Data.Item[id].Name : "(None)";
+                    string name = id >= 0 && id < Variables.MaxItems ? Item.Instance[id].Name : "(None)";
                     lstItems.AddItem($"{i + 1}: {name} x {amt}");
                 }
                 lstItems.SelectedIndex = 0;

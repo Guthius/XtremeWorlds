@@ -40,7 +40,7 @@ internal sealed class NetworkServiceHost<TSession>(
         }
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override async System.Threading.Tasks.Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var port = configuration.GetValue("Networking:Port", 7234);
 

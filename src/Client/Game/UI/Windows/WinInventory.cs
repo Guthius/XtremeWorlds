@@ -73,7 +73,7 @@ public class WinInventory
                 continue;
             }
 
-            var itemIcon = Data.Item[itemNum].Icon;
+            var itemIcon = Item.Instance[itemNum].Icon;
 
             if (itemIcon <= 0 || itemIcon > GameState.NumItems)
             {
@@ -98,7 +98,7 @@ public class WinInventory
 
                     var tempItemNum = GetPlayerInv(GameState.MyIndex, Data.TradeYourOffer[tradeSlot].Num);
 
-                    if (Data.Item[tempItemNum].Type != (byte) ItemCategory.Currency ||
+                    if (Item.Instance[tempItemNum].Type != (byte) ItemCategory.Currency ||
                         Data.TradeYourOffer[tradeSlot].Value == GetPlayerInvValue(GameState.MyIndex, slot))
                     {
                         skipItem = true;
@@ -208,7 +208,7 @@ public class WinInventory
                         continue;
                     }
 
-                    if (Data.Item[GetPlayerInv(GameState.MyIndex, Data.TradeYourOffer[i].Num)].Type != (byte)ItemCategory.Currency)
+                    if (Item.Instance[GetPlayerInv(GameState.MyIndex, Data.TradeYourOffer[i].Num)].Type != (byte)ItemCategory.Currency)
                     {
                         return;
                     }
@@ -219,7 +219,7 @@ public class WinInventory
                     }
                 }
 
-                if (Data.Item[GetPlayerInv(GameState.MyIndex, slot)].Type == (byte)ItemCategory.Currency)
+                if (Item.Instance[GetPlayerInv(GameState.MyIndex, slot)].Type == (byte)ItemCategory.Currency)
                 {
                     GameLogic.Dialogue(
                         "Select Amount",
@@ -277,7 +277,7 @@ public class WinInventory
                     continue;
                 }
 
-                if (Data.Item[GetPlayerInv(GameState.MyIndex, Data.TradeYourOffer[i].Num)].Type != (byte) ItemCategory.Currency)
+                if (Item.Instance[GetPlayerInv(GameState.MyIndex, Data.TradeYourOffer[i].Num)].Type != (byte) ItemCategory.Currency)
                 {
                     return;
                 }

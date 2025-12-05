@@ -37,8 +37,8 @@ namespace Server
                 {
                     if (Data.Map[mapNum].Tile[x, y].Type == TileType.Item)
                     {
-                        if (Data.Item[Data.Map[mapNum].Tile[x, y].Data1].Type == (byte)ItemCategory.Currency ||
-                            Data.Item[Data.Map[mapNum].Tile[x, y].Data1].Stackable == 1)
+                        if (Item.Instance[Data.Map[mapNum].Tile[x, y].Data1].Type == (byte)ItemCategory.Currency ||
+                            Item.Instance[Data.Map[mapNum].Tile[x, y].Data1].Stackable == 1)
                         {
                             var value = Data.Map[mapNum].Tile[x, y].Data2 < 1 ? 1 : Data.Map[mapNum].Tile[x, y].Data2;
 
@@ -52,8 +52,8 @@ namespace Server
 
                     if (Data.Map[mapNum].Tile[x, y].Type2 == TileType.Item)
                     {
-                        if (Data.Item[Data.Map[mapNum].Tile[x, y].Data1_2].Type == (byte)ItemCategory.Currency ||
-                            Data.Item[Data.Map[mapNum].Tile[x, y].Data1_2].Stackable == 1)
+                        if (Item.Instance[Data.Map[mapNum].Tile[x, y].Data1_2].Type == (byte)ItemCategory.Currency ||
+                            Item.Instance[Data.Map[mapNum].Tile[x, y].Data1_2].Stackable == 1)
                         {
                             var value = Data.Map[mapNum].Tile[x, y].Data2_2 < 1 ? 1 : Data.Map[mapNum].Tile[x, y].Data2_2;
 
@@ -82,7 +82,7 @@ namespace Server
                 return;
             }
 
-            if (Data.Item[itemNum].Type != (byte)ItemCategory.Currency && Data.Item[itemNum].Stackable != 1)
+            if (Item.Instance[itemNum].Type != (byte)ItemCategory.Currency && Item.Instance[itemNum].Stackable != 1)
             {
                 for (var i = 0; i < itemVal; i++)
                 {

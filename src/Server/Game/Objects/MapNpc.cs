@@ -28,14 +28,14 @@ namespace Server
         }
 
 
-        public static async Task OnSpawnAll()
+        public static async System.Threading.Tasks.Task OnSpawnAll()
         {
             await Task.WhenAll(Enumerable
                 .Range(0, Core.Globals.Variables.MaxMapNpcs)
                 .Select(OnSpawn));
         }
 
-        public static async Task OnSpawn(int mapNum)
+        public static async System.Threading.Tasks.Task OnSpawn(int mapNum)
         {
             await Task.WhenAll(Enumerable
                 .Range(0, Core.Globals.Variables.MaxMapNpcs)
@@ -325,6 +325,7 @@ namespace Server
             {
                 for (int i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
                 {
+                    if (Data.MapNpc[map].Npc == null) break;
                     ref var npc = ref Data.MapNpc[map].Npc[i];
                     if (npc.Num < 0) continue;
                     if (npc.Moving != (byte)MovementState.Walking) continue;

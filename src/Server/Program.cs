@@ -19,23 +19,22 @@ var builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings
 });
 
 // Configure services and logging
+builder.Services.AddHostedService<GameService>();
+builder.Services.AddSingleton<IPlayerService, PlayerService>();
+builder.Services.AddNetworkService<GameSession, GameSessionManager, GameNetworkService>();
+builder.Services.AddHostedService<ConsoleInputService>();
 builder.Services.AddSerilog((services, loggerConfiguration) =>
 {
     loggerConfiguration
         .ReadFrom.Configuration(builder.Configuration)
         .ReadFrom.Services(services)
         .WriteTo.File(
-            path: Path.Combine(DataPath.Logs, "errors.log"),
+            path: DataPath.Logs,
             restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Error,
             rollingInterval: RollingInterval.Day,
             retainedFileCountLimit: 7,
             shared: true
         );
 });
-builder.Services.AddHostedService<GameService>();
-builder.Services.AddSingleton<IPlayerService, PlayerService>();
-builder.Services.AddNetworkService<GameSession, GameSessionManager, GameNetworkService>();
-builder.Services.AddHostedService<ConsoleInputService>();
-
 var app = builder.Build();
 await app.RunAsync();

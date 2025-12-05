@@ -245,10 +245,7 @@ public static class Packets
         STime = 105,
         SClock = 106,
         SScriptEditor = 107,
-        // Death notifications
         SPlayerDead = 108,
-
-        // Server variables for client-side sizing/config
         SVariables = 109,
 
         // Make sure COUNT is below everything else

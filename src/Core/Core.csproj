@@ -21,4 +21,8 @@
         <PackageReference Include="CS-Script" />
         <PackageReference Include="CS-Script.Core" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Database\" />
+    </ItemGroup>
 </Project>

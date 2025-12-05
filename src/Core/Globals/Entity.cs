@@ -49,8 +49,8 @@ public class Entity
     public byte Job { get; set; }
     public byte Level { get; set; }
     public int[]? Vital { get; set; }
-    public byte[] Stat { get; set; } = Array.Empty<byte>();
-    public byte Points { get; set; }
+    public int[] Stat { get; set; } = Array.Empty<int>();
+    public int Points { get; set; }
     public PlayerEq[] Equipment { get; set; } = Array.Empty<PlayerEq>();
     public object[] Inv { get; set; } = Array.Empty<object>();
     public object[] PlayerSkill { get; set; } = Array.Empty<object>();

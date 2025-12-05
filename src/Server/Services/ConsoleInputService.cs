@@ -4,7 +4,7 @@ namespace Server.Services;
 
 public sealed class ConsoleInputService : BackgroundService
 {
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override async System.Threading.Tasks.Task ExecuteAsync(CancellationToken stoppingToken)
     {
         if (Console.IsInputRedirected)
         {

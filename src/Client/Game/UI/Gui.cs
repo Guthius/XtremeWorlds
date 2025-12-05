@@ -1480,7 +1480,7 @@ public class WindowManager
                 if (itemNum >= 0 & itemNum < Variables.MaxItems)
                 {
                     Item.OnStream((int)itemNum);
-                    long itemPic = Data.Item[(int)itemNum].Icon;
+                    long itemPic = Item.Instance[(int)itemNum].Icon;
 
                     if (itemPic > 0 & itemPic <= GameState.NumItems)
                     {
@@ -1546,7 +1546,7 @@ public class WindowManager
             if (itemNum >= 0 & itemNum < Variables.MaxItems)
             {
                 Item.OnStream((int)itemNum);
-                long itemPic = Data.Item[(int)itemNum].Icon;
+                long itemPic = Item.Instance[(int)itemNum].Icon;
 
                 if (itemPic > 0 & itemPic <= GameState.NumItems)
                 {

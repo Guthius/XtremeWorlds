@@ -65,7 +65,7 @@ public static class General
         return Regex.IsMatch(username, @"^[a-zA-Z0-9_ ]+$") ? 1 : -1;
     }
 
-    public static async Task InitServerAsync(IConfiguration configuration)
+    public static async System.Threading.Tasks.Task InitServerAsync(IConfiguration configuration)
     {
         if (!Debugger.IsAttached)
         {
@@ -85,7 +85,7 @@ public static class General
         }
     }
 
-    private static async Task ServerStartAsync(IConfiguration configuration)
+    private static async System.Threading.Tasks.Task ServerStartAsync(IConfiguration configuration)
     {
         MyStopwatch.Start();
         var startTime = GetTimeMs();
@@ -95,9 +95,9 @@ public static class General
         await StartGameLoopAsync(startTime);
     }
 
-    private static async Task InitializeCoreComponentsAsync(IConfiguration configuration)
+    private static async System.Threading.Tasks.Task InitializeCoreComponentsAsync(IConfiguration configuration)
     {
-        await Task.WhenAll(LoadConfigurationAsync(), InitializeNetworkAsync(), InitializeChatSystemAsync());
+        await System.Threading.Tasks.Task.WhenAll(LoadConfigurationAsync(), InitializeNetworkAsync(), InitializeChatSystemAsync());
         await InitializeDatabaseWithRetryAsync(configuration);
     }
 
@@ -112,13 +112,6 @@ public static class General
                 Data.MapNpc[i].Npc[x].SkillCd = new int[Variables.MaxNpcSkills];
                 Data.MapNpc[i].Npc[x].Num = -1;
                 Data.MapNpc[i].Npc[x].SkillBuffer = -1;
-            }
-
-            var statCount = Enum.GetNames(typeof(Stat)).Length;
-            for (var x = 0; x < Variables.MaxItems; x++)
-            {
-                Data.Item[x].AddStat = new byte[statCount];
-                Data.Item[x].StatReq = new byte[statCount];
             }
 
             for (var x = 0; x < Variables.MaxMapItems; x++)
@@ -140,14 +133,14 @@ public static class General
         Event.TempEventMap = new GlobalEvents[Variables.MaxMaps];
     }
 
-    private static async Task LoadGameDataAsync()
+    private static async System.Threading.Tasks.Task LoadGameDataAsync()
     {
         var stopwatch = Stopwatch.StartNew();
         await Script.OnLoadAsync(0);           
         Logger.LogInformation($"Game data loaded in {stopwatch.ElapsedMilliseconds}ms");
     }
 
-    private static async Task StartGameLoopAsync(int startTime)
+    private static async System.Threading.Tasks.Task StartGameLoopAsync(int startTime)
     {
         InitializeSaveTimer();
         DisplayServerBanner(startTime);
@@ -172,7 +165,7 @@ public static class General
 
     }
 
-    private static async Task DestroyServerAsync()
+    private static async System.Threading.Tasks.Task DestroyServerAsync()
     {
         if (_serverDestroyed) return;
         _serverDestroyed = true;
@@ -200,9 +193,9 @@ public static class General
         Environment.Exit(0);
     }
 
-    private static async Task LoadConfigurationAsync()
+    private static async System.Threading.Tasks.Task LoadConfigurationAsync()
     {
-        await Task.Run(() =>
+        await System.Threading.Tasks.Task.Run(() =>
         {
             ValidateConfiguration();
             Clock.Instance.GameSpeed = SettingsManager.Instance.TimeSpeed;
@@ -220,12 +213,12 @@ public static class General
             throw new InvalidOperationException("Invalid Port number in configuration");
     }
 
-    private static Task InitializeNetworkAsync()
+    private static System.Threading.Tasks.Task InitializeNetworkAsync()
     {
-        return Task.CompletedTask;
+        return System.Threading.Tasks.Task.CompletedTask;
     }
 
-    private static async Task InitializeDatabaseWithRetryAsync(IConfiguration configuration)
+    private static async System.Threading.Tasks.Task InitializeDatabaseWithRetryAsync(IConfiguration configuration)
     {
         var maxRetries = configuration.GetValue("Database:MaxRetries", 3);
         var retryDelayMs = configuration.GetValue("Database:RetryDelayMs", 1000);
@@ -253,15 +246,15 @@ public static class General
                     throw;
                 }
                 Logger.LogWarning(ex, $"Database initialization failed, attempt {attempt} of {maxRetries}");
-                await Task.Delay(retryDelayMs * attempt, Cts.Token);
+                await System.Threading.Tasks.Task.Delay(retryDelayMs * attempt, Cts.Token);
             }
         }
     }
 
-    private static async Task LoadCharacterListAsync()
+    private static async System.Threading.Tasks.Task LoadCharacterListAsync()
     {
         var ids = await Database.GetDataAsync("account");
-        Data.Char = new CharacterNameList();
+        Database.CharacterList = new CharacterNameList();
         const int maxConcurrency = 4;
         using var semaphore = new SemaphoreSlim(maxConcurrency);
 
@@ -278,7 +271,7 @@ public static class General
                         var name = (string?)data["Name"];
                         if (!string.IsNullOrWhiteSpace(name))
                         {
-                            Data.Char.Add(name);
+                            Database.CharacterList.Add(name);
                         }
                     }
                 }
@@ -289,11 +282,11 @@ public static class General
             }
         });
 
-        await Task.WhenAll(tasks);
-        Logger.LogInformation($"Loaded {Data.Char.Count} character(s).");
+        await System.Threading.Tasks.Task.WhenAll(tasks);
+        Logger.LogInformation($"Loaded {Database.CharacterList.Count} character(s).");
     }
 
-    public static async Task LoadGameContentAsync()
+    public static async System.Threading.Tasks.Task LoadGameContentAsync()
     {
         const int maxConcurrency = 4;
         using var semaphore = new SemaphoreSlim(maxConcurrency);
@@ -314,11 +307,11 @@ public static class General
             LoadWithSemaphoreAsync(semaphore, async () => { Logger.LogInformation("Loading projectiles..."); await Projectile.OnLoadAllAsync(); Logger.LogInformation("Projectiles loaded."); }),
         };
 
-        await Task.WhenAll(tasks);
+        await System.Threading.Tasks.Task.WhenAll(tasks);
         Logger.LogInformation("Game content loaded successfully.");
     }
 
-    private static async Task LoadWithSemaphoreAsync(SemaphoreSlim semaphore, Func<Task> loadFunc)
+    private static async System.Threading.Tasks.Task LoadWithSemaphoreAsync(SemaphoreSlim semaphore, Func<System.Threading.Tasks.Task> loadFunc)
     {
         await semaphore.WaitAsync(Cts.Token);
         try
@@ -331,10 +324,10 @@ public static class General
         }
     }
 
-    public static async Task SpawnGameObjectsAsync()
+    public static async System.Threading.Tasks.Task SpawnGameObjectsAsync()
     {
-        await Task.WhenAll(
-            Task.Run(MapItem.SpawnAll),
+        await System.Threading.Tasks.Task.WhenAll(
+            System.Threading.Tasks.Task.Run(MapItem.SpawnAll),
             MapNpc.OnSpawnAll(),
             EventLogic.SpawnAllMapGlobalEvents()
         );
@@ -405,7 +398,7 @@ public static class General
             TimeSpan.FromMinutes(intervalMinutes));
     }
 
-    private static async Task SavePlayersPeriodicallyAsync()
+    private static async System.Threading.Tasks.Task SavePlayersPeriodicallyAsync()
     {
         try
         {
@@ -418,25 +411,25 @@ public static class General
         }
     }
 
-    private static async Task SendServerAnnouncementAsync(string message)
+    private static async System.Threading.Tasks.Task SendServerAnnouncementAsync(string message)
     {
         await Parallel.ForEachAsync(Enumerable.Range(0, Variables.MaxPlayers), Cts.Token, (i, _) =>
         {
             if (NetworkConfig.IsPlaying(i))
-                NetworkSend.PlayerMsg(i, message, (int)ColorName.Yellow);
+                NetworkSend.SendPlayerMessage(i, message, (int)ColorName.Yellow);
             return new ValueTask();
         });
         Logger.LogInformation("Server announcement sent.");
     }
 
-    private static Task InitializeChatSystemAsync()
+    private static System.Threading.Tasks.Task InitializeChatSystemAsync()
     {
         Logger.LogInformation("Chat system initialized.");
         // Additional initialization logic can be added here if needed
-        return Task.CompletedTask;
+        return System.Threading.Tasks.Task.CompletedTask;
     }
 
-    public static async Task HandlePlayerCommandAsync(string[] command)
+    public static async System.Threading.Tasks.Task HandlePlayerCommandAsync(string[] command)
     {
         // Defensive: command[1] may not exist for some commands
         var playerIndex = -1;
@@ -482,7 +475,7 @@ public static class General
                 {
                     GetShutDownTimer.Stop();
                     Console.WriteLine("Server shutdown has been cancelled!");
-                    NetworkSend.GlobalMsg("Server shutdown has been cancelled!");
+                    NetworkSend.SendGlobalMessage("Server shutdown has been cancelled!");
                 }
                 else
                 {
@@ -496,7 +489,7 @@ public static class General
                     }
 
                     Console.WriteLine("Server shutdown in " + Variables.ServerShutdown + " seconds!");
-                    NetworkSend.GlobalMsg("Server shutdown in " + Variables.ServerShutdown + " seconds!");
+                    NetworkSend.SendGlobalMessage("Server shutdown in " + Variables.ServerShutdown + " seconds!");
                 }
                 break;
             }
@@ -526,31 +519,31 @@ public static class General
                     case (byte)AccessLevel.Player:
                         SetPlayerAccess(playerIndex, access);
                         NetworkSend.SendPlayerData(playerIndex);
-                        NetworkSend.PlayerMsg(playerIndex, "Your access has been set to Player!", (int)ColorName.Yellow);
+                        NetworkSend.SendPlayerMessage(playerIndex, "Your access has been set to Player!", (int)ColorName.Yellow);
                         Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(playerIndex));
                         break;
                     case (byte)AccessLevel.Moderator:
                         SetPlayerAccess(playerIndex, access);
                         NetworkSend.SendPlayerData(playerIndex);
-                        NetworkSend.PlayerMsg(playerIndex, "Your access has been set to Moderator!", (int)ColorName.Yellow);
+                        NetworkSend.SendPlayerMessage(playerIndex, "Your access has been set to Moderator!", (int)ColorName.Yellow);
                         Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(playerIndex));
                         break;
                     case (byte)AccessLevel.Mapper:
                         SetPlayerAccess(playerIndex, access);
                         NetworkSend.SendPlayerData(playerIndex);
-                        NetworkSend.PlayerMsg(playerIndex, "Your access has been set to Mapper!", (int)ColorName.Yellow);
+                        NetworkSend.SendPlayerMessage(playerIndex, "Your access has been set to Mapper!", (int)ColorName.Yellow);
                         Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(playerIndex));
                         break;
                     case (byte)AccessLevel.Developer:
                         SetPlayerAccess(playerIndex, access);
                         NetworkSend.SendPlayerData(playerIndex);
-                        NetworkSend.PlayerMsg(playerIndex, "Your access has been set to Developer!", (int)ColorName.Yellow);
+                        NetworkSend.SendPlayerMessage(playerIndex, "Your access has been set to Developer!", (int)ColorName.Yellow);
                         Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(playerIndex));
                         break;
                     case (byte)AccessLevel.Owner:
                         SetPlayerAccess(playerIndex, access);
                         NetworkSend.SendPlayerData(playerIndex);
-                        NetworkSend.PlayerMsg(playerIndex, "Your access has been set to Owner!", (int)ColorName.Yellow);
+                        NetworkSend.SendPlayerMessage(playerIndex, "Your access has been set to Owner!", (int)ColorName.Yellow);
                         Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(playerIndex));
                         break;
                     default:
@@ -591,7 +584,7 @@ public static class General
         }
     }
 
-    private static Task TeleportPlayerAsync(int playerIndex, int x, int y)
+    private static System.Threading.Tasks.Task TeleportPlayerAsync(int playerIndex, int x, int y)
     {
         try
         {               
@@ -599,8 +592,8 @@ public static class General
 
             if (x < 0 || x >= Data.Map[player.Map].MaxX || y < 0 || y >= Data.Map[player.Map].MaxY)
             {
-                NetworkSend.PlayerMsg(playerIndex, "Invalid coordinates for teleportation.", (int)ColorName.BrightRed);
-                return Task.CompletedTask;
+                NetworkSend.SendPlayerMessage(playerIndex, "Invalid coordinates for teleportation.", (int)ColorName.BrightRed);
+                return System.Threading.Tasks.Task.CompletedTask;
             }
 
             player.X = x;
@@ -611,12 +604,12 @@ public static class General
         catch (Exception ex)
         {
             Logger.LogError(ex, $"Failed to teleport player {playerIndex}");
-            NetworkSend.PlayerMsg(playerIndex, "Teleport failed.", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(playerIndex, "Teleport failed.", (int)ColorName.BrightRed);
         }
-        return Task.CompletedTask;
+        return System.Threading.Tasks.Task.CompletedTask;
     }
 
-    private static async Task KickPlayerAsync(int playerIndex)
+    private static async System.Threading.Tasks.Task KickPlayerAsync(int playerIndex)
     {
         try
         {
@@ -625,27 +618,27 @@ public static class General
                 NetworkSend.SendLeftGame(playerIndex);
                 await Player.LeftGame(playerIndex);
                 Logger.LogInformation($"Player {playerIndex} kicked by server!");
-                NetworkSend.PlayerMsg(playerIndex, $"Player {playerIndex} has been kicked.", (int)ColorName.BrightGreen);
+                NetworkSend.SendPlayerMessage(playerIndex, $"Player {playerIndex} has been kicked.", (int)ColorName.BrightGreen);
             }
             else
             {
-                NetworkSend.PlayerMsg(playerIndex, "Target player is not online.", (int)ColorName.BrightRed);
+                NetworkSend.SendPlayerMessage(playerIndex, "Target player is not online.", (int)ColorName.BrightRed);
             }
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, $"Failed to kick player {playerIndex}");
-            NetworkSend.PlayerMsg(playerIndex, "Kick operation failed.", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(playerIndex, "Kick operation failed.", (int)ColorName.BrightRed);
         }
     }
 
-    private static async Task BroadcastMessageAsync(int playerIndex, string message)
+    private static async System.Threading.Tasks.Task BroadcastMessageAsync(int playerIndex, string message)
     {
         try
         {
             if (!await IsAdminAsync(playerIndex))
             {
-                NetworkSend.PlayerMsg(playerIndex, "You are not authorized to broadcast.", (int)ColorName.BrightRed);
+                NetworkSend.SendPlayerMessage(playerIndex, "You are not authorized to broadcast.", (int)ColorName.BrightRed);
                 return;
             }
 
@@ -655,28 +648,28 @@ public static class General
         catch (Exception ex)
         {
             Logger.LogError(ex, "Broadcast failed");
-            NetworkSend.PlayerMsg(playerIndex, "Broadcast failed.", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(playerIndex, "Broadcast failed.", (int)ColorName.BrightRed);
         }
     }
 
-    private static Task SendServerStatusAsync(int playerIndex)
+    private static System.Threading.Tasks.Task SendServerStatusAsync(int playerIndex)
     {
         try
         {
             var status = $"Players Online: {CountPlayersOnline()}\n" +
                          $"Uptime: {MyStopwatch.Elapsed}\n" +
                          $"Errors: {Global.ErrorCount}";
-            NetworkSend.PlayerMsg(playerIndex, status, (int)ColorName.BrightGreen);
+            NetworkSend.SendPlayerMessage(playerIndex, status, (int)ColorName.BrightGreen);
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to send server status");
-            NetworkSend.PlayerMsg(playerIndex, "Unable to retrieve server status.", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(playerIndex, "Unable to retrieve server status.", (int)ColorName.BrightRed);
         }
-        return Task.CompletedTask;
+        return System.Threading.Tasks.Task.CompletedTask;
     }
 
-    private static Task SendHelpMessageAsync()
+    private static System.Threading.Tasks.Task SendHelpMessageAsync()
     {
         var help = "Available Commands:\n" +
                    "/teleport <x> <y> - Teleport to coordinates\n" +
@@ -692,17 +685,17 @@ public static class General
                    "/save - Manually save player data\n" +
                    "/help - Show this message";
         Console.WriteLine(help);
-        return Task.CompletedTask;
+        return System.Threading.Tasks.Task.CompletedTask;
     }
 
-    private static async Task SendWhisperAsync(int senderIndex, string targetName, string message)
+    private static async System.Threading.Tasks.Task SendWhisperAsync(int senderIndex, string targetName, string message)
     {
         try
         {
             var targetIndex = await FindPlayerByNameAsync(targetName);
             if (targetIndex == -1)
             {
-                NetworkSend.PlayerMsg(senderIndex, $"Player '{targetName}' not found.", (int)ColorName.BrightRed);
+                NetworkSend.SendPlayerMessage(senderIndex, $"Player '{targetName}' not found.", (int)ColorName.BrightRed);
                 return;
             }
 
@@ -712,22 +705,22 @@ public static class General
         catch (Exception ex)
         {
             Logger.LogError(ex, $"Failed to send whisper from {senderIndex} to {targetName}");
-            NetworkSend.PlayerMsg(senderIndex, "Failed to send whisper.", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(senderIndex, "Failed to send whisper.", (int)ColorName.BrightRed);
         }
     }
 
-    private static async Task SavePlayerDataAsync(int playerIndex)
+    private static async System.Threading.Tasks.Task SavePlayerDataAsync(int playerIndex)
     {
         try
         {
             await Database.SaveAccountAsync(playerIndex); // Assuming this method exists
-            NetworkSend.PlayerMsg(playerIndex, "Your data has been saved.", (int)ColorName.BrightGreen);
+            NetworkSend.SendPlayerMessage(playerIndex, "Your data has been saved.", (int)ColorName.BrightGreen);
             Logger.LogInformation($"Player {playerIndex} data saved manually.");
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, $"Failed to save data for player {playerIndex}");
-            NetworkSend.PlayerMsg(playerIndex, "Failed to save data.", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(playerIndex, "Failed to save data.", (int)ColorName.BrightRed);
         }
     }
 
@@ -737,34 +730,34 @@ public static class General
         {
             if (NetworkConfig.IsPlaying(i) && Data.Player[i].Name.Equals(name, StringComparison.OrdinalIgnoreCase))
             {
-                return Task.FromResult(i);
+                return System.Threading.Tasks.Task.FromResult(i);
             }
         }
-        return Task.FromResult(-1);
+        return System.Threading.Tasks.Task.FromResult(-1);
     }
 
-    private static async Task SendChatMessageAsync(int senderIndex, string channel, string message, ColorName color)
+    private static async System.Threading.Tasks.Task SendChatMessageAsync(int senderIndex, string channel, string message, ColorName color)
     {
         try
         {
             if (string.IsNullOrWhiteSpace(message) || message.Length > 200) // Basic filtering
             {
-                NetworkSend.PlayerMsg(senderIndex, "Invalid message.", (int)ColorName.BrightRed);
+                NetworkSend.SendPlayerMessage(senderIndex, "Invalid message.", (int)ColorName.BrightRed);
                 return;
             }
 
             if (channel.StartsWith("private:"))
             {
                 var targetIndex = int.Parse(channel.Split(':')[1]);
-                NetworkSend.PlayerMsg(targetIndex, $"[From {Data.Player[senderIndex].Name}] {message}", (int)color);
-                NetworkSend.PlayerMsg(senderIndex, $"[To {Data.Player[targetIndex].Name}] {message}", (int)color);
+                NetworkSend.SendPlayerMessage(targetIndex, $"[From {Data.Player[senderIndex].Name}] {message}", (int)color);
+                NetworkSend.SendPlayerMessage(senderIndex, $"[To {Data.Player[targetIndex].Name}] {message}", (int)color);
             }
             else if (channel == "party" && Data.TempPlayer[senderIndex].InParty != 0)
             {
                 await Parallel.ForEachAsync(Enumerable.Range(0, Variables.MaxPlayers), Cts.Token, (i, _) =>
                 {
                     if (NetworkConfig.IsPlaying(i) && Data.TempPlayer[i].InParty == Data.TempPlayer[senderIndex].InParty)
-                        NetworkSend.PlayerMsg(i, $"[Party] {Data.Player[senderIndex].Name}: {message}", (int)color);
+                        NetworkSend.SendPlayerMessage(i, $"[Party] {Data.Player[senderIndex].Name}: {message}", (int)color);
                     return new ValueTask();
                 });
             }
@@ -773,7 +766,7 @@ public static class General
                 await Parallel.ForEachAsync(Enumerable.Range(0, Variables.MaxPlayers), Cts.Token, (i, _) =>
                 {
                     if (NetworkConfig.IsPlaying(i))
-                        NetworkSend.PlayerMsg(i, message, (int)color);
+                        NetworkSend.SendPlayerMessage(i, message, (int)color);
                     return new ValueTask();
                 });
             }
@@ -781,14 +774,14 @@ public static class General
         catch (Exception ex)
         {
             Logger.LogError(ex, $"Failed to send chat message from {senderIndex} to {channel}");
-            NetworkSend.PlayerMsg(senderIndex, "Failed to send message.", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(senderIndex, "Failed to send message.", (int)ColorName.BrightRed);
         }
     }
 
     private static Task<bool> IsAdminAsync(int playerIndex) =>
-        Task.FromResult(playerIndex == 0);
+        System.Threading.Tasks.Task.FromResult(playerIndex == 0);
 
-    private static async Task BackupDatabaseAsync()
+    private static async System.Threading.Tasks.Task BackupDatabaseAsync()
     {
         try
         {
@@ -804,7 +797,7 @@ public static class General
                 .ToList();
             foreach (var oldBackup in backups)
             {
-                await Task.Run(() => File.Delete(oldBackup), Cts.Token);
+                await System.Threading.Tasks.Task.Run(() => File.Delete(oldBackup), Cts.Token);
                 Logger.LogInformation($"Deleted old backup: {oldBackup}");
             }
         }
@@ -814,7 +807,7 @@ public static class General
         }
     }
         
-    private static async Task HandleCriticalErrorAsync(Exception ex)
+    private static async System.Threading.Tasks.Task HandleCriticalErrorAsync(Exception ex)
     {
         await BackupDatabaseAsync();
         Logger.LogCritical(ex, "Critical error occurred. Initiating emergency shutdown");
@@ -822,7 +815,7 @@ public static class General
         await DestroyServerAsync();
     }
 
-    public static async Task CheckShutDownCountDownAsync()
+    public static async System.Threading.Tasks.Task CheckShutDownCountDownAsync()
     {
         if (GetShutDownTimer.ElapsedTicks <= 0) return;
 
@@ -831,7 +824,7 @@ public static class General
         {
             if (Variables.ServerShutdown - time <= 10)
             {
-                NetworkSend.GlobalMsg($"Server shutdown in {Variables.ServerShutdown - time} seconds!");
+                NetworkSend.SendGlobalMessage($"Server shutdown in {Variables.ServerShutdown - time} seconds!");
                 Console.WriteLine($"Server shutdown in {Variables.ServerShutdown - time} seconds!");
                 if (Variables.ServerShutdown - time <= 1)
                 {

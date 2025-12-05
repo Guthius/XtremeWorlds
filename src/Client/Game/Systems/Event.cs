@@ -515,7 +515,7 @@ namespace Client
                                         }
                                         case 2:
                                         {
-                                            EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Conditional Branch: Player Has Item [" + Data.Item[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].ConditionalBranch.Data1].Name + "] x" + Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].ConditionalBranch.Data2);
+                                            EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Conditional Branch: Player Has Item [" + Item.Instance[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].ConditionalBranch.Data1].Name + "] x" + Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].ConditionalBranch.Data2);
                                             break;
                                         }
                                         case 3:
@@ -1015,15 +1015,15 @@ namespace Client
                                 {
                                     if (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data2 == 0)
                                     {
-                                        EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Set Item Amount of [" + Data.Item[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1].Name + "] to " + Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data3);
+                                        EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Set Item Amount of [" + Item.Instance[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1].Name + "] to " + Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data3);
                                     }
                                     else if (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data2 == 1)
                                     {
-                                        EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Give Player " + Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data3 + " " + Data.Item[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1].Name + "(s)");
+                                        EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Give Player " + Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data3 + " " + Item.Instance[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1].Name + "(s)");
                                     }
                                     else if (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data2 == 2)
                                     {
-                                        EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Take " + Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data3 + " " + Data.Item[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1].Name + "(s) from Player.");
+                                        EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Take " + Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data3 + " " + Item.Instance[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1].Name + "(s) from Player.");
                                     }
 
                                     break;

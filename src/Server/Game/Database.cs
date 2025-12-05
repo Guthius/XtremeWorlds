@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-using Core.Common;
+﻿using Core.Common;
 using Core.Globals;
 using Core.Net;
 using Newtonsoft.Json;
@@ -8,7 +6,10 @@ using Newtonsoft.Json.Linq;
 using Npgsql;
 using NpgsqlTypes;
 using Server.Game;
+using System.Security.Cryptography;
+using System.Text;
 using XtremeWorlds.Server.Configuration;
+using XtremeWorlds.Server.Database;
 using static Core.Globals.Command;
 using static Core.Globals.Type;
 using Path = System.IO.Path;
@@ -18,13 +19,15 @@ namespace Server;
 
 public static class Database
 {
+    public static CharacterNameList? CharacterList;
+
     private static readonly int StatCount = Enum.GetValues<Stat>().Length;
 
     private static readonly SemaphoreSlim ConnectionSemaphore = new(Variables.MaxSqlClients, Variables.MaxSqlClients);
 
     public static string ConnectionString { get; set; } = string.Empty;
 
-    public static async Task CreateDatabaseAsync(string databaseName)
+    public static async System.Threading.Tasks.Task CreateDatabaseAsync(string databaseName)
     {
         await ConnectionSemaphore.WaitAsync();
         try
@@ -61,7 +64,7 @@ public static class Database
         }
     }
 
-    private static async Task UpdateRowByColumnAsync(string columnName, long value, string targetColumn, string newValue, string tableName)
+    private static async System.Threading.Tasks.Task UpdateRowByColumnAsync(string columnName, long value, string targetColumn, string newValue, string tableName)
     {
         await ConnectionSemaphore.WaitAsync();
         try
@@ -89,7 +92,7 @@ public static class Database
         }
     }
 
-    public static async Task CreateTablesAsync()
+    public static async System.Threading.Tasks.Task CreateTablesAsync()
     {
         await ConnectionSemaphore.WaitAsync();
         try
@@ -103,7 +106,7 @@ public static class Database
             var tableNames = new[] { "job", "item", "map", "npc", "shop", "skill", "resource", "animation", "projectile", "moral" };
 
             var tasks = tableNames.Select(tableName => CreateTableAsync(tableName, dataTable));
-            await Task.WhenAll(tasks);
+            await System.Threading.Tasks.Task.WhenAll(tasks);
 
             await CreateTableAsync("account", playerTable);
         }
@@ -113,7 +116,7 @@ public static class Database
         }
     }
 
-    private static async Task CreateTableAsync(string tableName, string layout)
+    private static async System.Threading.Tasks.Task CreateTableAsync(string tableName, string layout)
     {
         await ConnectionSemaphore.WaitAsync();
         try
@@ -134,7 +137,7 @@ public static class Database
         }
     }
 
-    public static async Task<List<long>> GetDataAsync(string tableName)
+    public static async System.Threading.Tasks.Task<List<long>> GetDataAsync(string tableName)
     {
         var ids = new List<long>();
 
@@ -168,7 +171,7 @@ public static class Database
         return ids;
     }
 
-    private static async Task<bool> RowExistsAsync(long id, string table)
+    private static async System.Threading.Tasks.Task<bool> RowExistsAsync(long id, string table)
     {
         await ConnectionSemaphore.WaitAsync();
         try
@@ -203,7 +206,7 @@ public static class Database
         }
     }
 
-    private static async Task InsertRowByColumnAsync(long id, string data, string tableName, string dataColumn, string idColumn)
+    private static async System.Threading.Tasks.Task InsertRowByColumnAsync(long id, string data, string tableName, string dataColumn, string idColumn)
     {
         await ConnectionSemaphore.WaitAsync();
         try
@@ -236,7 +239,7 @@ public static class Database
         }
     }
 
-    public static async Task<JObject?> SelectRowAsync(long id, string tableName, string columnName)
+    public static async System.Threading.Tasks.Task<JObject?> SelectRowAsync(long id, string tableName, string columnName)
     {
         await ConnectionSemaphore.WaitAsync();
         try
@@ -273,7 +276,7 @@ public static class Database
         }
     }
 
-    public static async Task<JObject?> SelectRowByColumnAsync(string columnName, long value, string tableName, string dataColumn)
+    public static async System.Threading.Tasks.Task<JObject?> SelectRowByColumnAsync(string columnName, long value, string tableName, string dataColumn)
     {
         await ConnectionSemaphore.WaitAsync();
         try
@@ -552,7 +555,7 @@ public static class Database
         return string.Empty; // Key not found
     }
 
-    public static async Task SaveAllPlayersOnlineAsync()
+    public static async System.Threading.Tasks.Task SaveAllPlayersOnlineAsync()
     {
         foreach (var i in PlayerService.Instance.PlayerIds)
         {
@@ -564,17 +567,17 @@ public static class Database
         }
     }
 
-    public static async Task SaveCharacterAsync(int index, int slot)
+    public static async System.Threading.Tasks.Task SaveCharacterAsync(int index, int slot)
     {
-        await Task.Run(() => SaveCharacter(index, slot));
+        await System.Threading.Tasks.Task.Run(() => SaveCharacter(index, slot));
     }
 
-    public static async Task SaveBankAsync(int index)
+    public static async System.Threading.Tasks.Task SaveBankAsync(int index)
     {
-        await Task.Run(() => SaveBank(index));
+        await System.Threading.Tasks.Task.Run(() => SaveBank(index));
     }
 
-    public static async Task SaveAccountAsync(int index)
+    public static async System.Threading.Tasks.Task SaveAccountAsync(int index)
     {
         var json = JsonConvert.SerializeObject(Data.Account[index]).ToString();
         var username = GetAccountLogin(index);
@@ -699,7 +702,7 @@ public static class Database
             Data.Player[index].Equipment[i].Num = -1;
         }
 
-        Data.Player[index].Inv = new PlayerInv[global::Script.MaxInv];
+        Data.Player[index].Inv = new PlayerInv[Core.Globals.Variables.MaxInv];
         for (int i = 0, loopTo1 = global::Script.MaxInv; i < loopTo1; i++)
         {
             Data.Player[index].Inv[i].Num = -1;
@@ -714,7 +717,7 @@ public static class Database
         Data.Player[index].Points = 0;
         Data.Player[index].Sex = 0;
 
-        Data.Player[index].Skill = new PlayerSkill[global::Script.MaxPlayerSkills];
+        Data.Player[index].Skill = new PlayerSkill[Core.Globals.Variables.MaxPlayerSkills];
         for (int i = 0, loopTo2 = global::Script.MaxPlayerSkills; i < loopTo2; i++)
         {
             Data.Player[index].Skill[i].Num = -1;
@@ -723,7 +726,7 @@ public static class Database
 
         Data.Player[index].Sprite = 0;
 
-        Data.Player[index].Stat = new byte[Enum.GetValues(typeof(Stat)).Length];
+        Data.Player[index].Stat = new int[Enum.GetValues(typeof(Stat)).Length];
         for (int i = 0, loopTo3 = Enum.GetValues(typeof(Stat)).Length; i < loopTo3; i++)
             Data.Player[index].Stat[i] = 0;
 
@@ -738,18 +741,18 @@ public static class Database
         Data.Player[index].X = 0;
         Data.Player[index].Y = 0;
 
-        Data.Player[index].Hotbar = new Hotbar[global::Script.MaxHotbar];
+        Data.Player[index].Hotbar = new Hotbar[Core.Globals.Variables.MaxHotbar];
         for (int i = 0, loopTo5 = global::Script.MaxHotbar; i < loopTo5; i++)
         {
             Data.Player[index].Hotbar[i].Slot = -1;
             Data.Player[index].Hotbar[i].SlotType = 0;
         }
 
-        Data.Player[index].Switches = new byte[global::Script.MaxSwitches];
+        Data.Player[index].Switches = new byte[Core.Globals.Variables.MaxSwitches];
         for (int i = 0, loopTo6 = global::Script.MaxSwitches; i < loopTo6; i++)
             Data.Player[index].Switches[i] = 0;
 
-        Data.Player[index].Variables = new int[global::Script.MaxVariables];
+        Data.Player[index].Variables = new int[Core.Globals.Variables.MaxVariables];
         for (int i = 0, loopTo7 = global::Script.MaxVariables; i < loopTo7; i++)
             Data.Player[index].Variables[i] = 0;
 
@@ -773,6 +776,7 @@ public static class Database
 
         if (data is null)
         {
+            ClearCharacter(index);
             return false;
         }
 
@@ -821,7 +825,9 @@ public static class Database
 
             var statCount = Enum.GetValues(typeof(Stat)).Length;
             for (n = 0; n < statCount; n++)
-                Data.Player[index].Stat[n] = (byte)Data.Job[jobNum].Stat[n];
+                if (Data.Job[jobNum].Stat != null) {
+                    Data.Player[index].Stat[n] = Data.Job[jobNum].Stat[n];
+                }
 
             Data.Player[index].Dir = (byte)Direction.Down;
             Data.Player[index].Map = Data.Job[jobNum].StartMap;
@@ -843,20 +849,26 @@ public static class Database
             // set starter items
             for (n = 0; n < Variables.MaxStartItems; n++)
             {
-                if (Data.Job[jobNum].StartItem[n] >= 0)
+                if (Data.Job[jobNum].StartItem != null)
                 {
-                    Data.Player[index].Inv[n].Num = Data.Job[jobNum].StartItem[n];
-                    Data.Player[index].Inv[n].Value = Data.Job[jobNum].StartValue[n];
+                    if (Data.Job[jobNum].StartItem[n] >= 0)
+                    {
+                        Data.Player[index].Inv[n].Num = Data.Job[jobNum].StartItem[n];
+                        Data.Player[index].Inv[n].Value = Data.Job[jobNum].StartValue[n];
+                    }
                 }
             }
 
             // set start skills
             for (n = 0; n < Variables.MaxStartSkills; n++)
             {
-                if (Data.Job[jobNum].StartSkill[n] >= 0)
+                if (Data.Job[jobNum].StartSkill != null)
                 {
-                    Data.Player[index].Skill[n].Num = Data.Job[jobNum].StartSkill[n];
-                    Data.Player[index].Skill[n].Cd = 0;
+                    if (Data.Job[jobNum].StartSkill[n] >= 0)
+                    {
+                        Data.Player[index].Skill[n].Num = Data.Job[jobNum].StartSkill[n];
+                        Data.Player[index].Skill[n].Cd = 0;
+                    }
                 }
             }
 
@@ -951,7 +963,7 @@ public static class Database
 
         ip = ip.Substring(0, i);
         Log.Add(ip, "banlist.txt");
-        NetworkSend.GlobalMsg(GetPlayerName(banPlayerIndex) + " has been banned from " + SettingsManager.Instance.GameName + " by " + GetPlayerName(bannedByIndex) + "!");
+        NetworkSend.SendGlobalMessage(GetPlayerName(banPlayerIndex) + " has been banned from " + SettingsManager.Instance.GameName + " by " + GetPlayerName(bannedByIndex) + "!");
         Log.Add(GetPlayerName(bannedByIndex) + " has banned " + GetPlayerName(banPlayerIndex) + ".", Constant.AdminLog);
         var task = Player.LeftGame(banPlayerIndex);
         task.Wait();
@@ -966,8 +978,6 @@ public static class Database
 
         for (var i = 0; i < StatCount; i++)
         {
-            if (Data.Job[jobNum].Stat == null)
-                return;
             packetWriter.WriteInt32(Data.Job[jobNum].Stat[i]);
         }
 

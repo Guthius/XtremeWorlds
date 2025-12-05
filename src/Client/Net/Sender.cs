@@ -439,8 +439,8 @@ public static class Sender
             return;
         }
 
-        if (Data.Item[GetPlayerInv(GameState.MyIndex, invNum)].Type == (byte) ItemCategory.Currency ||
-            Data.Item[GetPlayerInv(GameState.MyIndex, invNum)].Stackable == 1)
+        if (Item.Instance[GetPlayerInv(GameState.MyIndex, invNum)].Type == (byte) ItemCategory.Currency ||
+            Item.Instance[GetPlayerInv(GameState.MyIndex, invNum)].Stackable == 1)
         {
             if (amount < 0 || amount > Data.Player[GameState.MyIndex].Inv[invNum].Value)
             {
@@ -817,46 +817,46 @@ public static class Sender
 
         packetWriter.WriteEnum(Packets.ClientPackets.CSaveItem);
         packetWriter.WriteInt32(itemNum);
-        packetWriter.WriteInt32(Data.Item[itemNum].AccessReq);
+        packetWriter.WriteInt32(Item.Instance[itemNum].AccessReq);
 
         for (var i = 0; i < StatCount; i++)
         {
-            packetWriter.WriteInt32(Data.Item[itemNum].AddStat[i]);
+            packetWriter.WriteInt32(Item.Instance[itemNum].AddStat[i]);
         }
 
-        packetWriter.WriteInt32(Data.Item[itemNum].Animation);
-        packetWriter.WriteByte(Data.Item[itemNum].BindType);
-        packetWriter.WriteInt32(Data.Item[itemNum].JobReq);
-        packetWriter.WriteInt32(Data.Item[itemNum].Data1);
-        packetWriter.WriteInt32(Data.Item[itemNum].Data2);
-        packetWriter.WriteInt32(Data.Item[itemNum].Data3);
-        packetWriter.WriteInt32(Data.Item[itemNum].LevelReq);
-        packetWriter.WriteInt32(Data.Item[itemNum].Mastery);
-        packetWriter.WriteString(Data.Item[itemNum].Name);
-        packetWriter.WriteInt32(Data.Item[itemNum].Paperdoll);
-        packetWriter.WriteInt32(Data.Item[itemNum].Icon);
-        packetWriter.WriteInt32(Data.Item[itemNum].Price);
-        packetWriter.WriteInt32(Data.Item[itemNum].Rarity);
-        packetWriter.WriteInt32(Data.Item[itemNum].Speed);
+        packetWriter.WriteInt32(Item.Instance[itemNum].Animation);
+        packetWriter.WriteByte(Item.Instance[itemNum].BindType);
+        packetWriter.WriteInt32(Item.Instance[itemNum].JobReq);
+        packetWriter.WriteInt32(Item.Instance[itemNum].Data1);
+        packetWriter.WriteInt32(Item.Instance[itemNum].Data2);
+        packetWriter.WriteInt32(Item.Instance[itemNum].Data3);
+        packetWriter.WriteInt32(Item.Instance[itemNum].LevelReq);
+        packetWriter.WriteInt32(Item.Instance[itemNum].Mastery);
+        packetWriter.WriteString(Item.Instance[itemNum].Name);
+        packetWriter.WriteInt32(Item.Instance[itemNum].Paperdoll);
+        packetWriter.WriteInt32(Item.Instance[itemNum].Icon);
+        packetWriter.WriteInt32(Item.Instance[itemNum].Price);
+        packetWriter.WriteInt32(Item.Instance[itemNum].Rarity);
+        packetWriter.WriteInt32(Item.Instance[itemNum].Speed);
 
-        packetWriter.WriteInt32(Data.Item[itemNum].Stackable);
-        packetWriter.WriteString(Data.Item[itemNum].Description);
+        packetWriter.WriteInt32(Item.Instance[itemNum].Stackable);
+        packetWriter.WriteString(Item.Instance[itemNum].Description);
 
         for (var i = 0; i < StatCount; i++)
         {
-            packetWriter.WriteInt32(Data.Item[itemNum].StatReq[i]);
+            packetWriter.WriteInt32(Item.Instance[itemNum].StatReq[i]);
         }
 
-        packetWriter.WriteInt32(Data.Item[itemNum].Type);
-        packetWriter.WriteInt32(Data.Item[itemNum].SubType);
+        packetWriter.WriteInt32(Item.Instance[itemNum].Type);
+        packetWriter.WriteInt32(Item.Instance[itemNum].SubType);
 
-        packetWriter.WriteInt32(Data.Item[itemNum].ItemLevel);
+        packetWriter.WriteInt32(Item.Instance[itemNum].ItemLevel);
 
-        packetWriter.WriteInt32(Data.Item[itemNum].KnockBack);
-        packetWriter.WriteInt32(Data.Item[itemNum].KnockBackTiles);
+        packetWriter.WriteInt32(Item.Instance[itemNum].KnockBack);
+        packetWriter.WriteInt32(Item.Instance[itemNum].KnockBackTiles);
 
-        packetWriter.WriteInt32(Data.Item[itemNum].Projectile);
-        packetWriter.WriteInt32(Data.Item[itemNum].Ammo);
+        packetWriter.WriteInt32(Item.Instance[itemNum].Projectile);
+        packetWriter.WriteInt32(Item.Instance[itemNum].Ammo);
 
         Network.Send(packetWriter);
     }

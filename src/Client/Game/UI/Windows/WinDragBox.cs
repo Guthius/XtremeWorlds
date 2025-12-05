@@ -31,7 +31,7 @@ public class WinDragBox
             case DraggablePartType.Item:
                 if (dragBox.Value >= 0)
                 {
-                    var icon = Data.Item[dragBox.Value].Icon;
+                    var icon = Item.Instance[dragBox.Value].Icon;
                     if (icon <= 0 || icon > GameState.NumItems)
                     {
                         return;
@@ -174,7 +174,7 @@ public class WinDragBox
             case PartOrigin.Inventory:
                 if (WindowManager.DragBox.Type == DraggablePartType.Item)
                 {
-                    if (Data.Item[GetPlayerInv(GameState.MyIndex, WindowManager.DragBox.Slot)].Type != (byte) ItemCategory.Currency)
+                    if (Item.Instance[GetPlayerInv(GameState.MyIndex, WindowManager.DragBox.Slot)].Type != (byte) ItemCategory.Currency)
                     {
                         Sender.SendDepositItem(WindowManager.DragBox.Slot, 1);
                     }
@@ -226,7 +226,7 @@ public class WinDragBox
             case PartOrigin.Bank:
                 if (WindowManager.DragBox.Type == DraggablePartType.Item)
                 {
-                    if (Data.Item[GetBank(GameState.MyIndex, (byte) WindowManager.DragBox.Slot)].Type != (byte) ItemCategory.Currency)
+                    if (Item.Instance[GetBank(GameState.MyIndex, (byte) WindowManager.DragBox.Slot)].Type != (byte) ItemCategory.Currency)
                     {
                         Sender.SendWithdrawItem((byte) WindowManager.DragBox.Slot, 0);
                     }
@@ -326,7 +326,7 @@ public class WinDragBox
         switch (WindowManager.DragBox.Origin)
         {
             case PartOrigin.Inventory:
-                if (Data.Item[GetPlayerInv(GameState.MyIndex, WindowManager.DragBox.Slot)].Type != (byte) ItemCategory.Currency)
+                if (Item.Instance[GetPlayerInv(GameState.MyIndex, WindowManager.DragBox.Slot)].Type != (byte) ItemCategory.Currency)
                 {
                     Sender.SendDropItem(WindowManager.DragBox.Slot, GetPlayerInv(GameState.MyIndex, WindowManager.DragBox.Slot));
                 }

@@ -19,7 +19,7 @@ public static class Party
         {
             if (Data.Party[partyNum].Member[i] >= 0)
             {
-                NetworkSend.PlayerMsg(Data.Party[partyNum].Member[i], msg, (int)ColorName.BrightBlue);
+                NetworkSend.SendPlayerMessage(Data.Party[partyNum].Member[i], msg, (int)ColorName.BrightBlue);
             }
         }
     }
@@ -111,7 +111,7 @@ public static class Party
         if (Data.TempPlayer[target].PartyInvite >= 0 | Data.TempPlayer[target].TradeRequest >= 0)
         {
             // they've already got a request for trade/party
-            NetworkSend.PlayerMsg(index, "This player is busy.", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(index, "This player is busy.", (int)ColorName.BrightRed);
             return;
         }
 
@@ -119,7 +119,7 @@ public static class Party
         if (Data.TempPlayer[target].InParty >= 0)
         {
             // they're already in a party
-            NetworkSend.PlayerMsg(index, "This player is already in a party.", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(index, "This player is already in a party.", (int)ColorName.BrightRed);
             return;
         }
 
@@ -143,18 +143,18 @@ public static class Party
                         Data.TempPlayer[target].PartyInvite = index;
 
                         // let them know
-                        NetworkSend.PlayerMsg(index, "Party invitation sent.", (int)ColorName.Pink);
+                        NetworkSend.SendPlayerMessage(index, "Party invitation sent.", (int)ColorName.Pink);
                         return;
                     }
                 }
 
                 // no room
-                NetworkSend.PlayerMsg(index, "Party is full.", (int)ColorName.BrightRed);
+                NetworkSend.SendPlayerMessage(index, "Party is full.", (int)ColorName.BrightRed);
                 return;
             }
 
             // not the leader
-            NetworkSend.PlayerMsg(index, "You are not the party leader.", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(index, "You are not the party leader.", (int)ColorName.BrightRed);
             return;
         }
 
@@ -165,7 +165,7 @@ public static class Party
         Data.TempPlayer[target].PartyInvite = index;
 
         // let them know
-        NetworkSend.PlayerMsg(index, "Party invitation sent.", (int)ColorName.Pink);
+        NetworkSend.SendPlayerMessage(index, "Party invitation sent.", (int)ColorName.Pink);
     }
 
     public static void OnAccept(int index, int target)
@@ -203,8 +203,8 @@ public static class Party
             }
 
             // no empty slots - let them know
-            NetworkSend.PlayerMsg(index, "Party is full.", (int)ColorName.BrightRed);
-            NetworkSend.PlayerMsg(target, "Party is full.", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(index, "Party is full.", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(target, "Party is full.", (int)ColorName.BrightRed);
             return;
         }
 
@@ -243,9 +243,9 @@ public static class Party
 
     public static void OnDecline(int index, int target)
     {
-        NetworkSend.PlayerMsg(index, string.Format("{0} has declined to join your party.", GetPlayerName(target)),
+        NetworkSend.SendPlayerMessage(index, string.Format("{0} has declined to join your party.", GetPlayerName(target)),
             (int)ColorName.BrightRed);
-        NetworkSend.PlayerMsg(target, "You declined to join the party.", (int)ColorName.Yellow);
+        NetworkSend.SendPlayerMessage(target, "You declined to join the party.", (int)ColorName.Yellow);
 
         // clear the invitation
         Data.TempPlayer[target].PartyInvite = -1;
@@ -390,7 +390,7 @@ public static class Party
             {
                 var loopTo = Data.Party[Data.TempPlayer[index].InParty].MemberCount;
                 for (var i = 0; i < loopTo; i++)
-                    Player.Warp(Data.Party[Data.TempPlayer[index].InParty].Member[i], mapNum, x, y,
+                    Player.OnWarp(Data.Party[Data.TempPlayer[index].InParty].Member[i], mapNum, x, y,
                         (byte)Direction.Down);
             }
         }

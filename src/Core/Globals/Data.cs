@@ -1,5 +1,4 @@
-﻿using Core.Database;
-using static Core.Globals.Type;
+﻿using static Core.Globals.Type;
 
 namespace Core.Globals;
 
@@ -32,7 +31,6 @@ public static class Data
     public static Party[] Party = new Party[Variables.MaxParty];
     public static Party MyParty;
     public static Resource[] Resource = new Resource[Variables.MaxResources];
-    public static CharacterNameList? Char;
     public static ChatBubble[] ChatBubble = new ChatBubble[byte.MaxValue];
     public static Script Script = new();
 

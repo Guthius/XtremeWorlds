@@ -247,8 +247,8 @@ public static class Type
         public bool Pk;
         public int[] Vital;
         public int[] MaxVital;
-        public byte[] Stat;
-        public byte Points;
+        public int[] Stat;
+        public int Points;
         public PlayerEq[] Equipment;
         public PlayerInv[] Inv;
         public PlayerSkill[] Skill;

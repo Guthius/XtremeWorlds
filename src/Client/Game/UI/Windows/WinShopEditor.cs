@@ -115,14 +115,14 @@ public class WinShopEditor
         {
             cmbItem.Items.Clear();
             for (int i = 0; i < Variables.MaxItems; i++)
-                cmbItem.Items.Add($"{i + 1}: {Data.Item[i].Name}");
+                cmbItem.Items.Add($"{i + 1}: {Item.Instance[i].Name}");
             cmbItem.Value = 0;
         }
         if (WindowManager.TryGetControl("winShopEditor", "cmbCostItem", out var costCtrl) && costCtrl is ComboBox cmbCost)
         {
             cmbCost.Items.Clear();
             for (int i = 0; i < Variables.MaxItems; i++)
-                cmbCost.Items.Add($"{i + 1}: {Data.Item[i].Name}");
+                cmbCost.Items.Add($"{i + 1}: {Item.Instance[i].Name}");
             cmbCost.Value = 0;
         }
     }
@@ -145,8 +145,8 @@ public class WinShopEditor
             for (int i = 0; i < Variables.MaxTrades; i++)
             {
                 ref var t = ref shop.TradeItem[i];
-                string itemName = t.Item >= 0 ? Data.Item[t.Item].Name : "None";
-                string costName = t.CostItem >= 0 ? Data.Item[t.CostItem].Name : "None";
+                string itemName = t.Item >= 0 ? Item.Instance[t.Item].Name : "None";
+                string costName = t.CostItem >= 0 ? Item.Instance[t.CostItem].Name : "None";
                 tradeList.AddItem($"{i + 1}: {itemName} x{t.ItemValue} for {costName} x{t.CostValue}");
             }
         }

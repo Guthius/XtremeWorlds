@@ -11,14 +11,15 @@ using Server.Net;
 using static Core.Globals.Command;
 using static Core.Net.Packets;
 using Type = Core.Globals.Type;
+using Core.Objects;
 
 namespace Server;
 
-public class Item : IData, IAsyncData
+public class Item : ItemBase, IData, IAsyncData
 {
     public static void OnSave(int index)
     {
-        var json = JsonConvert.SerializeObject(Data.Item[index]);
+        var json = JsonConvert.SerializeObject(Item.Instance[index]);
 
         if (Database.RowExists(index, "item"))
         {
@@ -44,17 +45,25 @@ public class Item : IData, IAsyncData
             return;
         }
 
-        var itemData = JObject.FromObject(data).ToObject<Type.Item>();
+        var itemData = JObject.FromObject(data).ToObject<Item>();
 
-        Data.Item[index] = itemData;
+        Item.Instance[index] = itemData;
     }
 
     public static void OnClear(int index)
     {
-        Data.Item[index].Name = "";
-        Data.Item[index].Description = "";
-        Data.Item[index].Ammo = -1;
-        Data.Item[index].Stackable = 1;
+        // Guard against out-of-range indexes (matches client-side behavior)
+        if (index < 0)
+            return;
+
+        EnsureSize(index + 1);
+        if (index >= ItemBase.Instance.Count)
+            return;
+
+        Item.Instance[index].Name = "";
+        Item.Instance[index].Description = "";
+        Item.Instance[index].Ammo = -1;
+        Item.Instance[index].Stackable = 1;
     }
 
     public static void OnDraw(int index)

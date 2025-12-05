@@ -177,7 +177,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Variables.MaxPlayerSkills = r.ReadByte();
         Variables.MaxTrades = r.ReadByte();
         Variables.NameLength = r.ReadByte();
-        Variables.Minimum_NameLength = r.ReadByte();
+        Variables.MinimumNameLength = r.ReadByte();
         Variables.ChatLength = r.ReadByte();
         Variables.MaxHotbar = r.ReadByte();
         Variables.MaxMapX = r.ReadByte();
@@ -185,48 +185,14 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Variables.MaxDropItems = r.ReadByte();
         Variables.MaxStartItems = r.ReadByte();
         Variables.MaxStartSkills = r.ReadByte();
-        Variables.MaxPoints = r.ReadByte();
+        Variables.MaxPoints = r.ReadInt32();
         Variables.MaxChars = r.ReadByte();
         Variables.MaxStats = r.ReadByte();
         Variables.MaxQuests = r.ReadByte();
         Variables.MaxGuilds = r.ReadByte();
         Variables.MaxEventChoices = r.ReadByte();
-        General.ClearGameData();
-        
-        ApplyClientSizing();
-    }
 
-    private static void ApplyClientSizing()
-    {
-        // Character select arrays
-        if (GameState.CharName.Length != Variables.MaxChars)
-        {
-            Array.Resize(ref GameState.CharName, Variables.MaxChars);
-            Array.Resize(ref GameState.CharSprite, Variables.MaxChars);
-            Array.Resize(ref GameState.CharAccess, Variables.MaxChars);
-            Array.Resize(ref GameState.CharJob, Variables.MaxChars);
-            GameState.CharEq = new long[Variables.MaxChars, EquipmentCount];
-        }
-
-        // Bars and map names
-        if (GameState.BarWidthNpcHP.Length != Variables.MaxMapNpcs)
-        {
-            GameState.BarWidthNpcHP = new int[Variables.MaxMapNpcs];
-            GameState.BarWidthNpcHPMax = new int[Variables.MaxMapNpcs];
-        }
-        
-        if (GameState.BarWidthPlayerHP.Length != Variables.MaxPlayers)
-        {
-            GameState.BarWidthPlayerHP = new int[Variables.MaxPlayers];
-            GameState.BarWidthPlayerHPMax = new int[Variables.MaxPlayers];
-            GameState.BarWidthPlayerMP = new int[Variables.MaxPlayers];
-            GameState.BarWidthPlayerMPMax = new int[Variables.MaxPlayers];
-        }
-
-        if (GameState.MapNames.Length != Variables.MaxMaps)
-        {
-            Array.Resize(ref GameState.MapNames, Variables.MaxMaps);
-        }
+        General.ClearGameData();  
     }
 
     private static void Packet_AlertMsg(ReadOnlyMemory<byte> data)
@@ -1055,42 +1021,42 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         n = buffer.ReadInt32();
 
         // Update the item
-        Data.Item[n].AccessReq = buffer.ReadInt32();
+        Item.Instance[n].AccessReq = buffer.ReadInt32();
 
         int statCount = System.Enum.GetValues(typeof(Stat)).Length;
         for (i = 0; i < statCount; i++)
-            Data.Item[n].AddStat[i] = (byte)buffer.ReadInt32();
+            Item.Instance[n].AddStat[i] = (byte)buffer.ReadInt32();
 
-        Data.Item[n].Animation = buffer.ReadInt32();
-        Data.Item[n].BindType = buffer.ReadByte();
-        Data.Item[n].JobReq = buffer.ReadInt32();
-        Data.Item[n].Data1 = buffer.ReadInt32();
-        Data.Item[n].Data2 = buffer.ReadInt32();
-        Data.Item[n].Data3 = buffer.ReadInt32();
-        Data.Item[n].LevelReq = buffer.ReadInt32();
-        Data.Item[n].Mastery = (byte)buffer.ReadInt32();
-        Data.Item[n].Name = buffer.ReadString();
-        Data.Item[n].Paperdoll = buffer.ReadInt32();
-        Data.Item[n].Icon = buffer.ReadInt32();
-        Data.Item[n].Price = buffer.ReadInt32();
-        Data.Item[n].Rarity = (byte)buffer.ReadInt32();
-        Data.Item[n].Speed = buffer.ReadInt32();
+        Item.Instance[n].Animation = buffer.ReadInt32();
+        Item.Instance[n].BindType = buffer.ReadByte();
+        Item.Instance[n].JobReq = buffer.ReadInt32();
+        Item.Instance[n].Data1 = buffer.ReadInt32();
+        Item.Instance[n].Data2 = buffer.ReadInt32();
+        Item.Instance[n].Data3 = buffer.ReadInt32();
+        Item.Instance[n].LevelReq = buffer.ReadInt32();
+        Item.Instance[n].Mastery = (byte)buffer.ReadInt32();
+        Item.Instance[n].Name = buffer.ReadString();
+        Item.Instance[n].Paperdoll = buffer.ReadInt32();
+        Item.Instance[n].Icon = buffer.ReadInt32();
+        Item.Instance[n].Price = buffer.ReadInt32();
+        Item.Instance[n].Rarity = (byte)buffer.ReadInt32();
+        Item.Instance[n].Speed = buffer.ReadInt32();
 
-        Data.Item[n].Stackable = (byte)buffer.ReadInt32();
-        Data.Item[n].Description = buffer.ReadString();
+        Item.Instance[n].Stackable = (byte)buffer.ReadInt32();
+        Item.Instance[n].Description = buffer.ReadString();
 
         for (i = 0; i < statCount; i++)
-            Data.Item[n].StatReq[i] = (byte)buffer.ReadInt32();
+            Item.Instance[n].StatReq[i] = (byte)buffer.ReadInt32();
 
-        Data.Item[n].Type = (byte)buffer.ReadInt32();
-        Data.Item[n].SubType = (byte)buffer.ReadInt32();
-        Data.Item[n].ItemLevel = (byte)buffer.ReadInt32();
+        Item.Instance[n].Type = (byte)buffer.ReadInt32();
+        Item.Instance[n].SubType = (byte)buffer.ReadInt32();
+        Item.Instance[n].ItemLevel = (byte)buffer.ReadInt32();
 
-        Data.Item[n].KnockBack = (byte)buffer.ReadInt32();
-        Data.Item[n].KnockBackTiles = (byte)buffer.ReadInt32();
+        Item.Instance[n].KnockBack = (byte)buffer.ReadInt32();
+        Item.Instance[n].KnockBackTiles = (byte)buffer.ReadInt32();
 
-        Data.Item[n].Projectile = buffer.ReadInt32();
-        Data.Item[n].Ammo = buffer.ReadInt32();
+        Item.Instance[n].Projectile = buffer.ReadInt32();
+        Item.Instance[n].Ammo = buffer.ReadInt32();
 
         if (n == GameState.DescLastItem)
         {

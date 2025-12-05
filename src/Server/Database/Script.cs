@@ -29,6 +29,7 @@ using EventCommand = Core.Globals.EventCommand;
 using Type = Core.Globals.Type;
 using Microsoft.Extensions.Logging;
 using XtremeWorlds.Server.Configuration;
+using Item = Server.Item;
 
 public class Script
 {
@@ -85,7 +86,7 @@ public class Script
     public static byte MaxStartSkills = Variables.MaxStartSkills;
     public static int MaxSwitches = Variables.MaxSwitches;
     public static int MaxVariables = Variables.MaxVariables;
-    public static byte MaxPoints = Variables.MaxPoints;
+    public static int MaxPoints = Variables.MaxPoints;
     public static byte MaxChars = Variables.MaxChars;
     public static int ChatLines = Variables.ChatLines;
     public static byte MaxStats = Variables.MaxStats;
@@ -135,10 +136,10 @@ public class Script
     public void JoinGame(int index)
     {
         // Warp the player to his saved location
-        Warp(index, GetPlayerMap(index), GetPlayerX(index), GetPlayerY(index), (byte)Direction.Down, true);
+        OnWarp(index, GetPlayerMap(index), GetPlayerX(index), GetPlayerY(index), (byte)Direction.Down, true);
 
         // Notify everyone that a player has joined the game.
-        NetworkSend.GlobalMsg(string.Format("{0} has joined {1}!", GetPlayerName(index), SettingsManager.Instance.GameName));
+        NetworkSend.SendGlobalMessage(string.Format("{0} has joined {1}!", GetPlayerName(index), SettingsManager.Instance.GameName));
 
         // Send all the required game data to the user.
         CheckEquippedItems(index);
@@ -207,7 +208,7 @@ public class Script
         SetPlayerInv(index, invSlot, itemNum);
 
         string msg;
-        var item = Data.Item[itemNum];
+        var item = Item.Instance[itemNum];
         int mapValue = Data.MapItem[mapNum, mapSlot].Value;
 
         if (item.BindType == 1)
@@ -252,7 +253,7 @@ public class Script
             Data.Player[index].Inv[invSlot].Bound = Data.Player[index].Equipment[eqSlot].Bound;
             SetPlayerInvValue(index, invSlot, 1);
 
-            NetworkSend.PlayerMsg(index, "You unequip " + GameLogic.CheckGrammar(Data.Item[GetPlayerEquipment(index, (Equipment)eqSlot)].Name), (int)ColorName.Yellow);
+            NetworkSend.SendPlayerMessage(index, "You unequip " + GameLogic.CheckGrammar(Item.Instance[GetPlayerEquipment(index, (Equipment)eqSlot)].Name), (int)ColorName.Yellow);
 
             // remove equipment
             SetPlayerEquipment(index, -1, (Equipment)eqSlot);
@@ -284,7 +285,7 @@ public class Script
             var tempstr = new string[3];
 
             // Find out what kind of item it is
-            switch (Data.Item[itemNum].Type)
+            switch (Item.Instance[itemNum].Type)
             {
                 case (byte)ItemCategory.Equipment:
                     {
@@ -294,13 +295,13 @@ public class Script
 
                 case (byte)ItemCategory.Consumable:
                     {
-                        switch (Data.Item[itemNum].SubType)
+                        switch (Item.Instance[itemNum].SubType)
                         {
                             case (byte)ConsumableEffect.RestoresHealth:
                                 {
-                                    NetworkSend.SendActionMsg(GetPlayerMap(index), "+" + Data.Item[itemNum].Data1, (int)ColorName.BrightGreen, (byte)ActionMessageType.Scroll, GetPlayerX(index) * 32, GetPlayerY(index) * 32);
-                                    NetworkSend.SendAnimation(GetPlayerMap(index), Data.Item[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
-                                    SetPlayerVital(index, Vital.Health, GetPlayerVital(index, Vital.Health) + Data.Item[itemNum].Data1);
+                                    NetworkSend.SendActionMsg(GetPlayerMap(index), "+" + Item.Instance[itemNum].Data1, (int)ColorName.BrightGreen, (byte)ActionMessageType.Scroll, GetPlayerX(index) * 32, GetPlayerY(index) * 32);
+                                    NetworkSend.SendAnimation(GetPlayerMap(index), Item.Instance[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
+                                    SetPlayerVital(index, Vital.Health, GetPlayerVital(index, Vital.Health) + Item.Instance[itemNum].Data1);
                                     TakeInv(index, itemNum, 1);
                                     NetworkSend.SendVital(index, Vital.Health);
                                     break;
@@ -308,9 +309,9 @@ public class Script
 
                             case (byte)ConsumableEffect.RestoresMana:
                                 {
-                                    NetworkSend.SendActionMsg(GetPlayerMap(index), "+" + Data.Item[itemNum].Data1, (int)ColorName.BrightBlue, (byte)ActionMessageType.Scroll, GetPlayerX(index) * 32, GetPlayerY(index) * 32);
-                                    NetworkSend.SendAnimation(GetPlayerMap(index), Data.Item[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
-                                    SetPlayerVital(index, Vital.Stamina, GetPlayerVital(index, Vital.Stamina) + Data.Item[itemNum].Data1);
+                                    NetworkSend.SendActionMsg(GetPlayerMap(index), "+" + Item.Instance[itemNum].Data1, (int)ColorName.BrightBlue, (byte)ActionMessageType.Scroll, GetPlayerX(index) * 32, GetPlayerY(index) * 32);
+                                    NetworkSend.SendAnimation(GetPlayerMap(index), Item.Instance[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
+                                    SetPlayerVital(index, Vital.Stamina, GetPlayerVital(index, Vital.Stamina) + Item.Instance[itemNum].Data1);
                                     TakeInv(index, itemNum, 1);
                                     NetworkSend.SendVital(index, Vital.Stamina);
                                     break;
@@ -318,8 +319,8 @@ public class Script
 
                             case (byte)ConsumableEffect.RestoresStamina:
                                 {
-                                    NetworkSend.SendAnimation(GetPlayerMap(index), Data.Item[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
-                                    SetPlayerVital(index, Vital.Stamina, GetPlayerVital(index, Vital.Stamina) + Data.Item[itemNum].Data1);
+                                    NetworkSend.SendAnimation(GetPlayerMap(index), Item.Instance[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
+                                    SetPlayerVital(index, Vital.Stamina, GetPlayerVital(index, Vital.Stamina) + Item.Instance[itemNum].Data1);
                                     TakeInv(index, itemNum, 1);
                                     NetworkSend.SendVital(index, Vital.Stamina);
                                     break;
@@ -327,8 +328,8 @@ public class Script
 
                             case (byte)ConsumableEffect.GrantsExperience:
                                 {
-                                    NetworkSend.SendAnimation(GetPlayerMap(index), Data.Item[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
-                                    SetPlayerExp(index, GetPlayerExp(index) + Data.Item[itemNum].Data1);
+                                    NetworkSend.SendAnimation(GetPlayerMap(index), Item.Instance[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
+                                    SetPlayerExp(index, GetPlayerExp(index) + Item.Instance[itemNum].Data1);
                                     TakeInv(index, itemNum, 1);
                                     NetworkSend.SendExp(index);
                                     break;
@@ -341,16 +342,16 @@ public class Script
 
                 case (byte)ItemCategory.Projectile:
                     {
-                        if (Data.Item[itemNum].Ammo >= 0)
+                        if (Item.Instance[itemNum].Ammo >= 0)
                         {
-                            if (HasItem(index, Data.Item[itemNum].Ammo) > 0)
+                            if (HasItem(index, Item.Instance[itemNum].Ammo) > 0)
                             {
-                                TakeInv(index, Data.Item[itemNum].Ammo, 1);
+                                TakeInv(index, Item.Instance[itemNum].Ammo, 1);
                                 Server.Projectile.PlayerFireProjectile(index, -1, itemNum);
                             }
                             else
                             {
-                                NetworkSend.PlayerMsg(index, "Out of " + Data.Item[Data.Item[GetPlayerEquipment(index, Equipment.Weapon)].Ammo].Name + "!", (int)ColorName.BrightRed);
+                                NetworkSend.SendPlayerMessage(index, "Out of " + Item.Instance[Item.Instance[GetPlayerEquipment(index, Equipment.Weapon)].Ammo].Name + "!", (int)ColorName.BrightRed);
                                 return;
                             }
                         }
@@ -397,9 +398,9 @@ public class Script
         else
         {
             // Item-driven common events directly use the enum as SubType
-            idxType = Data.Item[itemNum].SubType;
-            n = Data.Item[itemNum].Data1;
-            n2 = Data.Item[itemNum].Data2;
+            idxType = Item.Instance[itemNum].SubType;
+            n = Item.Instance[itemNum].Data1;
+            n2 = Item.Instance[itemNum].Data2;
         }
 
         switch (idxType)
@@ -416,9 +417,9 @@ public class Script
             case (byte)CommonEventTrigger.Script:
                 // Minimal sample custom scripts
                 if (n == 0)
-                    NetworkSend.PlayerMsg(index, "You feel a strange sensation...", (int)ColorName.BrightCyan);
+                    NetworkSend.SendPlayerMessage(index, "You feel a strange sensation...", (int)ColorName.BrightCyan);
                 else
-                    NetworkSend.PlayerMsg(index, "Nothing happens.", (int)ColorName.Yellow);
+                    NetworkSend.SendPlayerMessage(index, "Nothing happens.", (int)ColorName.Yellow);
                 break;
             default:
                 break;
@@ -435,8 +436,8 @@ public class Script
         {
             int tempItem = -1;
             int m;
-            Equipment eqType = (Equipment)Data.Item[itemNum].SubType;
-            if (Data.Item[itemNum].BindType == 2)
+            Equipment eqType = (Equipment)Item.Instance[itemNum].SubType;
+            if (Item.Instance[itemNum].BindType == 2)
             {
                 Data.Player[index].Inv[invNum].Bound = 2;
             }
@@ -447,7 +448,7 @@ public class Script
             }
             SetPlayerEquipment(index, itemNum, eqType);
             Data.Player[index].Equipment[(byte)eqType].Bound = Data.Player[index].Inv[invNum].Bound;
-            NetworkSend.PlayerMsg(index, "You equip " + GameLogic.CheckGrammar(Data.Item[itemNum].Name), (int)ColorName.BrightGreen);
+            NetworkSend.SendPlayerMessage(index, "You equip " + GameLogic.CheckGrammar(Item.Instance[itemNum].Name), (int)ColorName.BrightGreen);
             TakeInv(index, itemNum, 1);
             if (tempItem >= 0)
             {
@@ -478,7 +479,7 @@ public class Script
         }
         else
         {
-            n = Data.Item[itemNum].Data1;
+            n = Item.Instance[itemNum].Data1;
         }
 
         if (n < 0 | n >= Variables.MaxSkills)
@@ -503,31 +504,31 @@ public class Script
                         SetPlayerSkill(index, i, n);
                         if (itemNum >= 0)
                         {
-                            NetworkSend.SendAnimation(GetPlayerMap(index), Data.Item[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
+                            NetworkSend.SendAnimation(GetPlayerMap(index), Item.Instance[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
                             TakeInv(index, itemNum, 1);
                         }
-                        NetworkSend.PlayerMsg(index, "You study the skill carefully.", (int)ColorName.Yellow);
-                        NetworkSend.PlayerMsg(index, "You have learned a new skill!", (int)ColorName.BrightGreen);
+                        NetworkSend.SendPlayerMessage(index, "You study the skill carefully.", (int)ColorName.Yellow);
+                        NetworkSend.SendPlayerMessage(index, "You have learned a new skill!", (int)ColorName.BrightGreen);
                         NetworkSend.SendPlayerSkills(index);
                     }
                     else
                     {
-                        NetworkSend.PlayerMsg(index, "You have already learned this skill!", (int)ColorName.BrightRed);
+                        NetworkSend.SendPlayerMessage(index, "You have already learned this skill!", (int)ColorName.BrightRed);
                     }
                 }
                 else
                 {
-                    NetworkSend.PlayerMsg(index, "You have learned all that you can learn!", (int)ColorName.BrightRed);
+                    NetworkSend.SendPlayerMessage(index, "You have learned all that you can learn!", (int)ColorName.BrightRed);
                 }
             }
             else
             {
-                NetworkSend.PlayerMsg(index, "You must be level " + i + " to learn this skill.", (int)ColorName.Yellow);
+                NetworkSend.SendPlayerMessage(index, "You must be level " + i + " to learn this skill.", (int)ColorName.Yellow);
             }
         }
         else
         {
-            NetworkSend.PlayerMsg(index, string.Format("Only {0} can use this skill.", GameLogic.CheckGrammar(Data.Job[Data.Skill[n].JobReq].Name, 1)), (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(index, string.Format("Only {0} can use this skill.", GameLogic.CheckGrammar(Data.Job[Data.Skill[n].JobReq].Name, 1)), (int)ColorName.BrightRed);
         }
     }
 
@@ -627,11 +628,11 @@ public class Script
         // to the bootmap if it is set
         if (instance.BootMap > 0)
         {
-            Warp(index, instance.BootMap, instance.BootX, instance.BootY, (int)Direction.Down);
+            OnWarp(index, instance.BootMap, instance.BootX, instance.BootY, (int)Direction.Down);
         }
         else
         {
-            Warp(index, Data.Job[GetPlayerJob(index)].StartMap, Data.Job[GetPlayerJob(index)].StartX, Data.Job[GetPlayerJob(index)].StartY, (int)Direction.Down);
+            OnWarp(index, Data.Job[GetPlayerJob(index)].StartMap, Data.Job[GetPlayerJob(index)].StartX, Data.Job[GetPlayerJob(index)].StartY, (int)Direction.Down);
         }
     }
 
@@ -661,7 +662,7 @@ public class Script
             var cdExpiry = Data.TempPlayer[playerIndex].SkillCd[skillSlot];
             if (cdExpiry > now)
             {
-                NetworkSend.PlayerMsg(playerIndex, "That skill is still cooling down.", (int)ColorName.BrightRed);
+                NetworkSend.SendPlayerMessage(playerIndex, "That skill is still cooling down.", (int)ColorName.BrightRed);
                 return;
             }
         }
@@ -669,7 +670,7 @@ public class Script
         // Mana check (only deduct on finalize) - ensure sufficient now
         if (GetPlayerVital(playerIndex, Vital.Mana) < skill.MpCost)
         {
-            NetworkSend.PlayerMsg(playerIndex, "Not enough mana.", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(playerIndex, "Not enough mana.", (int)ColorName.BrightRed);
             return;
         }
 
@@ -680,7 +681,7 @@ public class Script
         var moralId = Data.Map[mapNum].Moral;
         if (moralId >= 0 && !Data.Moral[moralId].CanCast)
         {
-            NetworkSend.PlayerMsg(playerIndex, "You cannot cast here.", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(playerIndex, "You cannot cast here.", (int)ColorName.BrightRed);
             return;
         }
 
@@ -703,12 +704,12 @@ public class Script
 
         if (exp == 0)
         {
-            NetworkSend.PlayerMsg(index, "You've lost no experience.", (int)ColorName.BrightGreen);
+            NetworkSend.SendPlayerMessage(index, "You've lost no experience.", (int)ColorName.BrightGreen);
         }
         else
         {
             NetworkSend.SendExp(index);
-            NetworkSend.PlayerMsg(index, string.Format("You've lost {0} experience.", exp), (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(index, string.Format("You've lost {0} experience.", exp), (int)ColorName.BrightRed);
         }
 
         return exp;
@@ -719,7 +720,7 @@ public class Script
         // make sure their stats are not maxed
         if (GetPlayerRawStat(index, (Stat)tmpStat) >= Variables.MaxStats)
         {
-            NetworkSend.PlayerMsg(index, "You cannot spend any more points on that stat.", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(index, "You cannot spend any more points on that stat.", (int)ColorName.BrightRed);
             return;
         }
 
@@ -824,7 +825,7 @@ public class Script
                                         {
                                             if (!string.IsNullOrEmpty(entity.AttackSay))
                                             {
-                                                NetworkSend.PlayerMsg(player.Id, GameLogic.CheckGrammar(entity.Name, 1) + " says, '" + entity.AttackSay + "' to you.", (int)ColorName.Yellow);
+                                                NetworkSend.SendPlayerMessage(player.Id, GameLogic.CheckGrammar(entity.Name, 1) + " says, '" + entity.AttackSay + "' to you.", (int)ColorName.Yellow);
                                             }
                                             entity.TargetType = (byte)TargetType.Player;
                                             entity.Target = player.Id;
@@ -1254,12 +1255,12 @@ public class Script
             if (level_count == 1)
             {
                 // singular
-                NetworkSend.GlobalMsg(GetPlayerName(index) + " has gained " + level_count + " level!");
+                NetworkSend.SendGlobalMessage(GetPlayerName(index) + " has gained " + level_count + " level!");
             }
             else
             {
                 // plural
-                NetworkSend.GlobalMsg(GetPlayerName(index) + " has gained " + level_count + " levels!");
+                NetworkSend.SendGlobalMessage(GetPlayerName(index) + " has gained " + level_count + " levels!");
             }
             NetworkSend.SendActionMsg(GetPlayerMap(index), "Level Up", (int)ColorName.Yellow, 1, GetPlayerX(index) * 32, GetPlayerY(index) * 32);
             NetworkSend.SendExp(index);
@@ -1378,7 +1379,7 @@ public class Script
                     if (GetPlayerEquipment(target.Id, (Equipment)i) >= 0)
                     {
                         Server.MapItem.OnSpawn(GetPlayerEquipment(target.Id, (Equipment)i), 1, GetPlayerMap(target.Id), GetPlayerX(target.Id), GetPlayerY(target.Id));
-                        NetworkSend.PlayerMsg(target.Id, "You have dropped your " + Data.Item[GetPlayerEquipment(target.Id, (Equipment)i)].Name + " upon death.", (int)ColorName.BrightRed);
+                        NetworkSend.SendPlayerMessage(target.Id, "You have dropped your " + Item.Instance[GetPlayerEquipment(target.Id, (Equipment)i)].Name + " upon death.", (int)ColorName.BrightRed);
                         SetPlayerEquipment(target.Id, -1, (Equipment)i);
                     }
                 }
@@ -1406,11 +1407,11 @@ public class Script
                         SetPlayerExp(attacker.Id, GetPlayerExp(attacker.Id) + gain);
                         NetworkSend.SendExp(attacker.Id);
                     }
-                    NetworkSend.PlayerMsg(attacker.Id, $"You gained {gain} experience for defeating {GetPlayerName(target.Id)}.", (int)ColorName.BrightGreen);
+                    NetworkSend.SendPlayerMessage(attacker.Id, $"You gained {gain} experience for defeating {GetPlayerName(target.Id)}.", (int)ColorName.BrightGreen);
                 }
             }
 
-            NetworkSend.GlobalMsg(GetPlayerName(target.Id) + " was slain by " + GetEntityName(attacker) + ".");
+            NetworkSend.SendGlobalMessage(GetPlayerName(target.Id) + " was slain by " + GetEntityName(attacker) + ".");
 
             // Hide the player on their client immediately (do not broadcast to map)
             var deathPacket = new Core.Net.PacketWriter();
@@ -1508,7 +1509,7 @@ public class Script
                             SetPlayerExp(attacker.Id, GetPlayerExp(attacker.Id) + baseExp);
                             NetworkSend.SendExp(attacker.Id);
                         }
-                        NetworkSend.PlayerMsg(attacker.Id, $"You gained {baseExp} experience.", (int)ColorName.BrightGreen);
+                        NetworkSend.SendPlayerMessage(attacker.Id, $"You gained {baseExp} experience.", (int)ColorName.BrightGreen);
                     }
                 }
             }
@@ -1563,18 +1564,18 @@ public class Script
         {
             if (attacker.Type == Entity.EntityType.Player)
             {
-                NetworkSend.PlayerMsg(target.Id, $"You were hit by {GetPlayerName(attacker.Id)} for {dmg.Final} damage.", (int)ColorName.BrightRed);
+                NetworkSend.SendPlayerMessage(target.Id, $"You were hit by {GetPlayerName(attacker.Id)} for {dmg.Final} damage.", (int)ColorName.BrightRed);
             }
             else if (attacker.Type == Entity.EntityType.Npc)
             {
-                NetworkSend.PlayerMsg(target.Id, $"You were hit by {GetEntityName(attacker)} for {dmg.Final} damage.", (int)ColorName.BrightRed);
+                NetworkSend.SendPlayerMessage(target.Id, $"You were hit by {GetEntityName(attacker)} for {dmg.Final} damage.", (int)ColorName.BrightRed);
             }
         }
         else if (target.Type == Entity.EntityType.Npc)
         {
             if (attacker.Type == Entity.EntityType.Player)
             {
-                NetworkSend.PlayerMsg(attacker.Id, $"You hit {GetEntityName(target)} for {dmg.Final} damage.", (int)ColorName.BrightGreen);
+                NetworkSend.SendPlayerMessage(attacker.Id, $"You hit {GetEntityName(target)} for {dmg.Final} damage.", (int)ColorName.BrightGreen);
             }
         }
 
@@ -1802,7 +1803,7 @@ public class Script
             var weaponId = GetEquippedItemId(attacker, Equipment.Weapon);
             if (weaponId >= 0)
             {
-                return Data.Item[weaponId].Speed > 0 ? Data.Item[weaponId].Speed : BaseAttackSpeedMs;
+                return Item.Instance[weaponId].Speed > 0 ? Item.Instance[weaponId].Speed : BaseAttackSpeedMs;
             }
         }
         return BaseAttackSpeedMs;
@@ -1918,7 +1919,7 @@ public class Script
             power = GetPlayerStat(playerId, Stat.Strength) / 2;
 
         int weaponId = GetPlayerEquipment(playerId, Equipment.Weapon);
-        int weaponPower = (weaponId >= 0 && weaponId < Data.Item.Length) ? Data.Item[weaponId].Data2 : 0;
+        int weaponPower = (weaponId >= 0 && weaponId < Item.Instance.Count) ? Item.Instance[weaponId].Data2 : 0;
         // Keep formula aligned with prior CalculateDamage logic (without RNG)
         int baseDamage = power + weaponPower;
         return Math.Max(0, baseDamage);
@@ -2196,8 +2197,8 @@ public class Script
                         {
                             // Accept any of the 8 directions from the editor; default to Down if out of range
                             byte dir = (skill.Dir <= (byte)Direction.UpLeft) ? skill.Dir : (byte)Direction.Down;
-                            Warp(caster.Id, destMap, destX, destY, dir);
-                            NetworkSend.PlayerMsg(caster.Id, "You feel space bend around you...", (int)ColorName.Cyan);
+                            OnWarp(caster.Id, destMap, destX, destY, dir);
+                            NetworkSend.SendPlayerMessage(caster.Id, "You feel space bend around you...", (int)ColorName.Cyan);
                         }
                     }
                 }
@@ -2447,9 +2448,9 @@ public class Script
         for (int i = 0; i < entity.Equipment.Length; i++)
         {
             var itemNum = entity.Equipment[i].Num;
-            if (itemNum >= 0 && itemNum < Data.Item.Length)
+            if (itemNum >= 0 && itemNum < Item.Instance.Count)
             {
-                total += Data.Item[itemNum].Data2;
+                total += Item.Instance[itemNum].Data2;
             }
         }
         return total + GetPlayerDefense(entity.Id);
@@ -2500,7 +2501,7 @@ public class Script
         var final = dmg.Final;
         if (final <= 0)
         {
-            NetworkSend.PlayerMsg(attacker.Id, "Your attack does nothing.", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(attacker.Id, "Your attack does nothing.", (int)ColorName.BrightRed);
             return;
         }
 
@@ -2665,7 +2666,7 @@ public class Script
         {
             var itemId = Data.Npc[npcNum].DropItem[slot];
             var itemVal = Data.Npc[npcNum].DropItemValue[slot];
-            if (itemId >= 0 && itemId < Data.Item.Length)
+            if (itemId >= 0 && itemId < Item.Instance.Count)
             {
                 Server.MapItem.OnSpawn(itemId, itemVal, mapNum, mapNpc.X / Constants.TileSize, mapNpc.Y / Constants.TileSize);
             }
