@@ -745,7 +745,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                 }
         }
 
-        MapResource.Check(session.Id, x, y);
+        MapResource.OnUpdate(session.Id, x, y);
 
         // New combat system integration: attempt a melee attack on the entity (player or npc)
         // occupying the targeted tile (x,y). Legacy code only triggered animation + resource checks.                                  

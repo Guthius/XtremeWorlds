@@ -66,7 +66,7 @@ namespace Server
             NetworkSend.SendPlayerData(playerId);
         }
 
-        public static void Check(int playerId, int x, int y)
+        public static void OnUpdate(int playerId, int x, int y)
         {
             var mapNum = Command.GetPlayerMap(playerId);
 
