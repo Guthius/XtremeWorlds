@@ -44,6 +44,8 @@ namespace Core.Objects
         public static List<ItemBase> Instance { get; private set; } = new List<ItemBase>();
         public int Index { get; set; } = -1;
 
+        private static readonly object _sizeLock = new();
+
         // Ensure the Instance list is exactly 'count' long and initialize new slots
         public static void EnsureSize(int count)
         {
@@ -52,33 +54,36 @@ namespace Core.Objects
                 count = 0;
             }
 
-            if (Instance.Count == count)
+            lock (_sizeLock)
             {
-                return;
-            }
-
-            var old = Instance;
-            var fresh = new ItemBase[count];
-
-            int copy = Math.Min(old.Count, count);
-            for (int i = 0; i < copy; i++)
-            {
-                fresh[i] = old[i];
-            }
-
-            for (int i = copy; i < count; i++)
-            {
-                fresh[i] = new ItemBase();
-            }
-
-            Instance = new List<ItemBase>(fresh);
-
-            // Initialize newly added or defaulted entries
-            for (int i = 0; i < Instance.Count; i++)
-            {
-                if (Instance[i] == null)
+                if (Instance.Count == count)
                 {
-                    Instance[i] = new ItemBase();
+                    return;
+                }
+
+                var old = Instance;
+                var fresh = new ItemBase[count];
+
+                int copy = Math.Min(old.Count, count);
+                for (int i = 0; i < copy; i++)
+                {
+                    fresh[i] = old[i];
+                }
+
+                for (int i = copy; i < count; i++)
+                {
+                    fresh[i] = new ItemBase();
+                }
+
+                Instance = new List<ItemBase>(fresh);
+
+                // Initialize newly added or defaulted entries
+                for (int i = 0; i < Instance.Count; i++)
+                {
+                    if (Instance[i] == null)
+                    {
+                        Instance[i] = new ItemBase();
+                    }
                 }
             }
         }
@@ -87,9 +92,12 @@ namespace Core.Objects
         public static ItemBase GetOrCreate(int index)
         {
             if (index < 0) throw new ArgumentOutOfRangeException(nameof(index));
-            EnsureSize(Math.Max(Instance.Count, index + 1));
-
-            return Instance[index];
+            // Use the lock to avoid races with EnsureSize
+            lock (_sizeLock)
+            {
+                EnsureSize(Math.Max(Instance.Count, index + 1));
+                return Instance[index];
+            }
         }
     }
 }

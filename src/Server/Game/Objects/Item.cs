@@ -52,18 +52,18 @@ public class Item : ItemBase, IData, IAsyncData
 
     public static void OnClear(int index)
     {
-        // Guard against out-of-range indexes (matches client-side behavior)
+        // Guard against negative indexes
         if (index < 0)
             return;
 
-        EnsureSize(index + 1);
-        if (index >= ItemBase.Instance.Count)
-            return;
+        // Ensure slot exists and is initialized
+        var it = ItemBase.GetOrCreate(index);
 
-        Item.Instance[index].Name = "";
-        Item.Instance[index].Description = "";
-        Item.Instance[index].Ammo = -1;
-        Item.Instance[index].Stackable = 1;
+        // Reset minimal fields (server-side defaults)
+        it.Name = "";
+        it.Description = "";
+        it.Ammo = -1;
+        it.Stackable = 1;
     }
 
     public static void OnDraw(int index)
