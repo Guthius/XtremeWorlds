@@ -79,4 +79,9 @@ public class Animation : IData, IAsyncData
     {
         throw new NotImplementedException();
     }
+
+    public static void OnUpdate(int index)
+    {
+        throw new NotImplementedException();
+    }
 }

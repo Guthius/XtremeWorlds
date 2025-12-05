@@ -89,5 +89,10 @@ namespace Server
             var jobData = JObject.FromObject(data).ToObject<Core.Globals.Type.Job>();
             Data.Job[index] = jobData;
         }
+
+        public static void OnUpdate(int index)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

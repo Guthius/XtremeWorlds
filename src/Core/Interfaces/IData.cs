@@ -8,5 +8,6 @@ namespace Core.Interfaces
         static abstract void OnReset();
         static abstract void OnLoad(int index);
         static abstract void OnSave(int index);
+        static abstract void OnUpdate(int index);
     }
 }
