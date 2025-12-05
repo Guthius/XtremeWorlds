@@ -14,8 +14,8 @@ public class SettingsManager
 
     public static SettingsManager Instance { get; } = Load();
 
-    public int Port { get; init; } = 7001;
-    public string GameName { get; init; } = "XtremeWorlds";
+    public int Port { get; set; } = 7001;
+    public string GameName { get; set; } = "XtremeWorlds";
     public double TimeSpeed { get; set; }
 
     private static SettingsManager Load()
