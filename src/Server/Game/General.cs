@@ -103,8 +103,10 @@ public static class General
 
     public static void InitalizeCoreData()
     {
+        Data.MapResource = new Type.MapResource[Variables.MaxMaps];
         for (var i = 0; i < Variables.MaxMaps; i++)
         {
+            Data.MapResource[i] = new Type.MapResource();
             Data.MapNpc[i].Npc = new Type.MapNpc[Variables.MaxMapNpcs];
             for (var x = 0; x < Variables.MaxMapNpcs; x++)
             {
