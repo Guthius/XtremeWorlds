@@ -2587,7 +2587,6 @@ public class Script
     {
         if (entity.Type == Entity.EntityType.Player)
         {
-            Data.TempPlayer[entity.Id].AttackTimer = newTime;
         }
         else if (entity.Type == Entity.EntityType.Npc)
         {

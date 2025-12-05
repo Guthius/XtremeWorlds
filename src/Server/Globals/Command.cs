@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualBasic;
-
-namespace Core.Globals;
+﻿namespace Core.Globals;
 
 public static class Command
 {
@@ -151,12 +149,6 @@ public static class Command
         return Data.Player[index].MaxVital[(int)vital];
     }
 
-    public static int SetPlayerMaxVital(int index, Vital vital, int value)
-    {
-        Data.Player[index].MaxVital[(int)vital] = value;
-        return Data.Player[index].MaxVital[(int)vital];
-    }
-
     public static bool IsDirBlocked(byte blockvar, Direction dir)
     {
         return dir switch
@@ -249,16 +241,6 @@ public static class Command
     public static int GetPlayerInv(int index, int invslot)
     {
         return Data.Player[index].Inv[invslot].Num;
-    }
-
-    public static void SetPlayerName(int index, string name)
-    {
-        Data.Player[index].Name = name;
-    }
-
-    public static void SetPlayerJob(int index, int jobNum)
-    {
-        Data.Player[index].Job = (byte)jobNum;
     }
 
     public static void SetPlayerPoints(int index, int points)
@@ -380,25 +362,5 @@ public static class Command
     public static void SetPlayerSkill(int index, int skillslot, int skillNum)
     {
         Data.Player[index].Skill[skillslot].Num = skillNum;
-    }
-
-    public static int GetBank(int index, int bankslot)
-    {
-        return Data.Bank[index].Item[bankslot].Num;
-    }
-
-    public static void SetBank(int index, byte bankSlot, int itemNum)
-    {
-        Data.Bank[index].Item[bankSlot].Num = itemNum;
-    }
-
-    public static int GetBankValue(int index, int bankSlot)
-    {
-        return Data.Bank[index].Item[bankSlot].Value;
-    }
-
-    public static void SetBankValue(int index, byte bankSlot, int itemValue)
-    {
-        Data.Bank[index].Item[bankSlot].Value = itemValue;
     }
 }

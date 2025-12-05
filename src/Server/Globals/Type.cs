@@ -18,14 +18,6 @@ public static class Type
         public int[] LoopCount;
         public int[] LoopTime;
     }
-    
-    public struct Rect
-    {
-        public double Top;
-        public double Left;
-        public double Right;
-        public double Bottom;
-    }
 
     public struct Resource
     {
@@ -134,11 +126,6 @@ public static class Type
         public byte DirBlock;
     }
 
-    public struct TileHistory
-    {
-        public Tile[,] Tile;
-    }
-
     public struct Item
     {
         public string Name;
@@ -167,19 +154,6 @@ public static class Type
         public byte KnockBackTiles;
         public int Projectile;
         public int Ammo;
-    }
-
-    public struct MapAnimation
-    {
-        public int Animation;
-        public int X;
-        public int Y;
-        public int LockIndex;
-        public byte LockType;
-        public int[] Timer;
-        public bool[] Used;
-        public int[] LoopIndex;
-        public int[] FrameIndex;
     }
 
     public struct Npc
@@ -268,30 +242,21 @@ public static class Type
         public int Emote;
         public int EmoteTimer;
         public int EventTimer;
-        public PlayerQuest[] Quests;
-        public int GuildId;
         public bool Dead;
-        public int DeathTimer;
     }
 
     public struct TempPlayer
     {
         public bool InGame;
-        public int AttackTimer;
-        public int DataTimer;
-        public int DataBytes;
-        public int DataPackets;
         public int PartyInvite;
         public int InParty;
         public byte TargetType;
         public int Target;
-        public byte PartyStarter;
         public bool GettingMap;
         public double SkillBuffer;
         public int SkillBufferTimer;
         public int[] SkillCd;
         public double InShop;
-        public int StunTimer;
         public int StunDuration;
         public bool InBank;
         public int TradeRequest;
@@ -301,13 +266,6 @@ public static class Type
         public EventMap EventMap;
         public int EventProcessingCount;
         public EventProcessing[] EventProcessing;
-        public int StopRegenTimer;
-        public byte StopRegen;
-        public int TmpMap;
-        public int TmpX;
-        public int TmpY;
-        public int GoToX;
-        public int GoToY;
         public EditorType Editor;
         public byte Slot;
         public int ProjectileTimer;
@@ -379,12 +337,8 @@ public static class Type
         public int SkillBuffer;
         public int SkillBufferTimer;
         public int[] SkillCd;
-        public byte StopRegen;
-        public int StopRegenTimer;
         public byte Moving;
         public byte Attacking;
-        public int Steps;
-        public int DeathTimer;
     }
 
     public struct MapData
@@ -396,29 +350,6 @@ public static class Type
     {
         public int Slot;
         public byte SlotType;
-    }
-
-    public struct SkillBuffer
-    {
-        public int Skill;
-        public int Timer;
-        public int Target;
-        public byte TargetType;
-    }
-
-    public struct DoT
-    {
-        public bool Used;
-        public int Skill;
-        public int Timer;
-        public int Caster;
-        public int StartTime;
-        public int AttackerType;
-    }
-
-    public struct InstancedMap
-    {
-        public int OriginalMap;
     }
 
     public struct MoveRoute
@@ -540,8 +471,6 @@ public static class Type
         public int CommandListCount;
         public CommandList[] CommandList;
         public byte Position;
-        public int X;
-        public int Y;
     }
 
     public struct Event
@@ -555,18 +484,8 @@ public static class Type
         public int[] SelfSwitches;
     }
 
-    public struct GlobalMapEvents
-    {
-        public int EventId;
-        public int PageId;
-        public int X;
-        public int Y;
-    }
-
     public struct MapEvent
     {
-        public string Name;
-        public int Steps;
         public int Dir;
         public int X;
         public int Y;
@@ -596,10 +515,6 @@ public static class Type
         public int MoveTimer;
         public int[] SelfSwitches;
         public int MoveRouteComplete;
-        public int Moving;
-        public int ShowDir;
-        public int IdleAnim;
-        public int DirFix;
     }
 
     public struct EventMap
@@ -627,20 +542,6 @@ public static class Type
         public int Status; // 0=not started, 1=started, 2=completed, 3=repeatable
         public int ActualTask;
         public int CurrentCount;
-    }
-
-    public struct Task
-    {
-        public int Order;
-        public int Npc;
-        public int Item;
-        public int Map;
-        public int Resource;
-        public int Amount;
-        public string Speech;
-        public string TaskLog;
-        public byte QuestEnd;
-        public int TaskType;
     }
 
     public struct Projectile
@@ -678,12 +579,6 @@ public static class Type
         public int Timer;
     }
 
-    public struct EventList
-    {
-        public int CommandList;
-        public int CommandNum;
-    }
-
     public struct Party
     {
         public int Leader;
@@ -704,23 +599,6 @@ public static class Type
         public byte State;
         public int Timer;
         public byte Health;
-    }
-
-    public struct Picture
-    {
-        public byte Index;
-        public byte SpriteType;
-        public byte XOffset;
-        public byte YOffset;
-        public int EventId;
-    }
-
-    public struct ControlPart
-    {
-        public DraggablePartType Type;
-        public PartOrigin Origin;
-        public int Value;
-        public int Slot;
     }
 
     public struct CsMap
@@ -890,59 +768,10 @@ public static class Type
         public SdLayer MapLayer;
     }
 
-    public struct Quest
-    {
-        public string Name;
-        public string Description;
-        public int RewardExp;
-        public int RewardItem;
-        public int RewardItemValue;
-        public Task[] Tasks;
-        public int TaskCount;
-    }
-
-    public struct Guild
-    {
-        public string Name;
-        public int Leader;
-        public List<int> Members;
-        public int MaxMembers;
-        public int Level;
-        public int Exp;
-    }
-
-    public struct Weather
-    {
-        public int Type; // 0: None, 1: Rain, 2: Snow, etc.
-        public int Intensity;
-        public int Duration;
-    }
-
-    public struct Rectangle
-    {
-        public int Top;
-        public int Right;
-        public int Bottom;
-        public int Left;
-    }
-
     public struct Point
     {
         public int X;
         public int Y;
-    }
-
-    public struct QuarterTile
-    {
-        public Point[] Tile;
-        public byte RenderState;
-        public int[] SrcX;
-        public int[] SrcY;
-    }
-
-    public struct Autotile
-    {
-        public QuarterTile[] Layer;
     }
 
     public static Point[] AutoIn = new Point[5];
@@ -950,67 +779,6 @@ public static class Type
     public static Point[] AutoNe = new Point[5];
     public static Point[] AutoSw = new Point[5];
     public static Point[] AutoSe = new Point[5];
-
-    public struct Chat
-    {
-        public string Text;
-        public int Color;
-        public byte Channel;
-        public bool Visible;
-        public long Timer;
-    }
-
-    public struct SkillAnim
-    {
-        public int SkillNum;
-        public int Timer;
-        public int FramePointer;
-    }
-
-    public struct ChatBubble
-    {
-        public string Msg;
-        public int Color;
-        public int Target;
-        public byte TargetType;
-        public int Timer;
-        public bool Active;
-    }
-
-    public struct ActionMsg
-    {
-        public string Message;
-        public int Created;
-        public int Type;
-        public int Color;
-        public int Scroll;
-        public int X;
-        public int Y;
-        public int Timer;
-    }
-
-    public struct Blood
-    {
-        public int Sprite;
-        public int Timer;
-        public int X;
-        public int Y;
-    }
-
-    public struct Text
-    {
-        public string Caption;
-        public System.Drawing.Color Color;
-    }
-
-    public struct WeatherParticle
-    {
-        public int Type;
-        public int X;
-        public int Y;
-        public int Velocity;
-        public int InUse;
-    }
 
     public struct Script
     {

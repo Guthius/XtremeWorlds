@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace Core.Globals;
 
-namespace Core.Globals
+public static class Constants
 {
-    public class Constants
-    {
-        public const int TileSize = 32;
-    }
+    public const int TileSize = 32;
 }

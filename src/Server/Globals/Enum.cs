@@ -169,18 +169,6 @@ public enum NpcBehavior : byte
 }
 
 /// <summary>
-/// Defines the primary effect of a skill.
-/// </summary>
-public enum SkillEffect : byte
-{
-    DamageHealth,
-    DamageMana,
-    HealHealth,
-    HealMana,
-    Warp
-}
-
-/// <summary>
 /// Specifies the valid targets for an action or skill.
 /// </summary>
 public enum TargetType : byte
@@ -258,91 +246,6 @@ public enum ResourceSkill : byte
     Woodcutting,
     Mining,
     Fishing
-}
-
-public enum ToolType : byte
-{
-    None,
-    Axe,
-    Pickaxe,
-    Rod
-}
-
-/// <summary>
-/// Defines the rarity levels of items or loot.
-/// </summary>
-public enum Rarity
-{
-    Broken,
-    Common,
-    Uncommon,
-    Rare,
-    Epic,
-    Legendary // Added for more granularity
-}
-
-/// <summary>
-/// Defines weather conditions.
-/// </summary>
-public enum WeatherType
-{
-    None,
-    Rain,
-    Snow,
-    Hail,
-    Sandstorm,
-    Storm,
-    Fog
-}
-
-/// <summary>
-/// Defines commands for an entity's movement route.
-/// </summary>
-public enum MoveRouteCommand
-{
-    MoveUp,
-    MoveDown,
-    MoveLeft,
-    MoveRight,
-    MoveRandom,
-    MoveTowardsPlayer,
-    MoveAwayFromPlayer,
-    StepForward,
-    StepBack,
-    Wait100Ms,
-    Wait500Ms,
-    Wait1000Ms,
-    TurnUp,
-    TurnDown,
-    TurnLeft,
-    TurnRight,
-    Turn90DegreesRight,
-    Turn90DegreesLeft,
-    Turn180Degrees,
-    TurnRandom,
-    TurnTowardPlayer,
-    TurnAwayFromPlayer,
-    SetSpeed8XSlower,
-    SetSpeed4XSlower,
-    SetSpeed2XSlower,
-    SetSpeedNormal,
-    SetSpeed2XFaster,
-    SetSpeed4XFaster,
-    SetFrequencyLowest,
-    SetFrequencyLower,
-    SetFrequencyNormal,
-    SetFrequencyHigher,
-    SetFrequencyHighest,
-    WalkingAnimationOn,
-    WalkingAnimationOff,
-    DirectionFixOn,
-    DirectionFixOff,
-    WalkThroughOn,
-    WalkThroughOff,
-    SetZPositionBelowPlayer,
-    SetZPositionWithPlayer,
-    SetZPositionAbovePlayer,
-    ChangeGraphic
 }
 
 /// <summary>
@@ -450,38 +353,6 @@ public enum EditorType
 }
 
 /// <summary>
-/// Specifies the anchor point for a picture on the screen.
-/// </summary>
-public enum PictureOrigin
-{
-    TopLeft,
-    CenterScreen,
-    CenterOnEvent,
-    CenterOnPlayer
-}
-
-/// <summary>
-/// Represents a 2D quadrant.
-/// </summary>
-public enum Quadrant
-{
-    Northeast,
-    Southeast,
-    Southwest,
-    Northwest
-}
-
-/// <summary>
-/// Defines text alignment.
-/// </summary>
-public enum Alignment
-{
-    Left,
-    Right,
-    Center
-}
-
-/// <summary>
 /// Defines the data type of a draggable UI part.
 /// </summary>
 public enum DraggablePartType
@@ -501,37 +372,6 @@ public enum PartOrigin
     SkillTree,
     Hotbar,
     Bank
-}
-
-/// <summary>
-/// Defines available fonts.
-/// </summary>
-public enum Font
-{
-    None,
-    Georgia,
-    Arial,
-    Verdana,
-    PixelGeorgia,
-    PixelGeorgiaBold
-}
-
-/// <summary>
-/// Defines available bitmap fonts.
-/// </summary>
-public enum BitmapFont
-{
-    None,
-    Default,
-    Georgia,
-    Georgia_16,
-    GeorgiaBold_16,
-    GeorgiaDec_16,
-    Rockwell_15,
-    RockwellDec_10,
-    RockwellDec_15,
-    Verdana_12,
-    VerdanaBold_12
 }
 
 /// <summary>
@@ -571,87 +411,4 @@ public enum SystemMessage
     Login,
     Crashed,
     Disconnected
-}
-
-/// <summary>
-/// Specifies the purpose of a confirmation dialogue.
-/// </summary>
-public enum DialogueType
-{
-    Trade,
-    ForgetSkill,
-    PartyInvite,
-    LootConfirmation,
-    Alert,
-    DeleteCharacter,
-    DropItem,
-    DepositItem,
-    WithdrawItem,
-    TradeAmount,
-    UntradeAmount,
-    ClearLayer,
-    FillLayer,
-    ClearAttributes,
-    FillAttributes,
-    ClearDirBlocks,
-    DeleteMap,
-    Information,
-    CopyMap,
-    PasteMap
-}
-
-/// <summary>
-/// Defines the button layout for a dialogue box.
-/// </summary>
-public enum DialogueStyle
-{
-    Okay,
-    YesNo,
-    Input
-}
-
-/// <summary>
-/// Defines chat channels.
-/// </summary>
-public enum ChatChannel
-{
-    Game,
-    Map,
-    Broadcast,
-    Party,
-    Guild,
-    Private, // Renamed from Player
-}
-
-/// <summary>
-/// Defines mouse buttons.
-/// </summary>
-public enum MouseButton
-{
-    Left,
-    Right,
-    Middle
-}
-
-/// <summary>
-/// Specifies the type of asset to be rendered.
-/// </summary>
-public enum RenderType
-{
-    Texture,
-    Font
-}
-
-/// <summary>
-/// Defines the tabs in the map editor.
-/// </summary>
-public enum MapEditorTab
-{
-    Tiles,
-    Attributes,
-    Npcs,
-    Settings,
-    Directions,
-    Events,
-    Effects
 }

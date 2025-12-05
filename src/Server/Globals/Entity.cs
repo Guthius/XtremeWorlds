@@ -2,10 +2,6 @@ using static Core.Globals.Type;
 
 namespace Core.Globals;
 
-/// <summary>
-/// Represents a dynamic entity that can be a Player, or Npc.
-/// Allows unified access to common fields for logic processing.
-/// </summary>
 public class Entity
 {
     public static List<Entity> Instances = [];
@@ -72,8 +68,6 @@ public class Entity
     public int Emote { get; set; }
     public int EmoteTimer { get; set; }
     public int EventTimer { get; set; }
-    public object[] Quests { get; set; } = Array.Empty<object>();
-    public int GuildId { get; set; }
     public int[] DropChance { get; set; } = Array.Empty<int>();
     public int[] DropItem { get; set; } = Array.Empty<int>();
     public int[] DropItemValue { get; set; } = Array.Empty<int>();
@@ -137,9 +131,7 @@ public class Entity
             Steps = player.Steps,
             Emote = player.Emote,
             EmoteTimer = player.EmoteTimer,
-            EventTimer = player.EventTimer,
-            Quests = player.Quests != null ? Array.ConvertAll(player.Quests, x => (object) x) : new object[Core.Globals.Variables.MaxQuests],
-            GuildId = player.GuildId,
+            EventTimer = player.EventTimer, 
             GatherSkills = player.GatherSkills
         };
     }

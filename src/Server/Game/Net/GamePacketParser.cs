@@ -151,7 +151,6 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
     private static void Packet_Ping(GameSession session, ReadOnlyMemory<byte> bytes)
     {
-        Data.TempPlayer[session.Id].DataPackets += 1;
     }
 
     private static void Packet_Login(GameSession session, ReadOnlyMemory<byte> bytes)
