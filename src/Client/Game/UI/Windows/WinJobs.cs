@@ -151,7 +151,7 @@ public class WinJobs
 
         foreach (var line in lines)
         {
-            if (line == "") continue;
+            if (line == "" || line == null) continue;
             
             var x = winJobs.X + 118 + 200 / 2 - TextRenderer.GetTextWidth(line, winJobs.Font) / 2;
 
