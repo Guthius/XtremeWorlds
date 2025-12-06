@@ -24,7 +24,7 @@ namespace Client
 
             ref var instance = ref MapAnimation.Instance[index];
             int anim = instance.Animation;
-            if (anim < 0 || anim >= Variables.MaxAnimations)
+            if (anim < 0 || anim >= Animation.Instance.Count)
                 return;
 
             // Validate layer and arrays
