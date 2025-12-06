@@ -16,23 +16,12 @@ namespace Core.Objects
         public AnimationBase()
         {
             for (int x = 0; x < Count; x++)
-               Sprite = new int[x + 1];
-
-            for (int x = 0; x < Count; x++)
-                Frames = new int[x + 1];
-
-            for (int x = 0; x < Count; x++)
-                Frames[x] = 5;
-
-            for (int x = 0; x < Count; x++)
-                LoopCount = new int[x + 1];
-
-            for (int x = 0; x < Count; x++)
-                LoopTime = new int[x + 1];
-
-            Name = "";
-            for (int x = 0; x < Count; x++)
             {
+                Sprite = new int[x + 1];
+                Frames = new int[x + 1];
+                Frames[x] = 5;
+                LoopCount = new int[x + 1];
+                LoopTime = new int[x + 1];
                 LoopCount[x] = 1;
                 LoopTime[x] = 1;
             }

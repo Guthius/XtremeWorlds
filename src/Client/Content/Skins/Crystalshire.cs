@@ -2649,9 +2649,9 @@ public class Crystalshire
                         amt = Math.Max(1, parsed);
                     if (WinJobEditor.SelectedIndex >= 0)
                     {
-                        Data.Job[WinJobEditor.SelectedIndex].StartItem[slot] = item;
-                        Data.Job[WinJobEditor.SelectedIndex].StartValue[slot] = amt;
-                        GameState.JobChanged[WinJobEditor.SelectedIndex] = true;
+                        Job.Instance[WinJobEditor.SelectedIndex].StartItem[slot] = item;
+                        Job.Instance[WinJobEditor.SelectedIndex].StartValue[slot] = amt;
+                        Job.IsChanged[WinJobEditor.SelectedIndex] = true;
                         WinJobEditor.OnLoad(WinJobEditor.SelectedIndex);
                     }
                 };
@@ -2674,8 +2674,8 @@ public class Crystalshire
                         skill = cs.Value <= 0 ? -1 : Math.Clamp(cs.Value - 1, 0, Variables.MaxSkills - 1);
                     if (WinJobEditor.SelectedIndex >= 0)
                     {
-                        Data.Job[WinJobEditor.SelectedIndex].StartSkill[slot] = skill;
-                        GameState.JobChanged[WinJobEditor.SelectedIndex] = true;
+                        Job.Instance[WinJobEditor.SelectedIndex].StartSkill[slot] = skill;
+                        Job.IsChanged[WinJobEditor.SelectedIndex] = true;
                         WinJobEditor.OnLoad(WinJobEditor.SelectedIndex);
                     }
                 };
@@ -2694,24 +2694,26 @@ public class Crystalshire
         // Text boxes
         if (WindowManager.TryGetControl("winJobEditor", "txtName", out var txtNameCtrl) && txtNameCtrl is TextBox txtName)
         {
+            int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return;
             txtName.Enabled = true;
             txtName.CallBack[(int)ControlState.KeyUp] = () =>
             {
-                if (WinJobEditor.SelectedIndex < 0 || WinJobEditor.SelectedIndex >= Variables.MaxJobs) return;
-                Data.Job[WinJobEditor.SelectedIndex].Name = txtName.Text ?? string.Empty;
-                GameState.JobChanged[WinJobEditor.SelectedIndex] = true;
+                if (id < 0 || id >= Job.Instance.Count) return;
+                Job.Instance[id].Name = txtName.Text ?? string.Empty;
+                Job.IsChanged[id] = true;
                 WinJobEditor.RefreshList();
             };
         }
 
         if (WindowManager.TryGetControl("winJobEditor", "txtDesc", out var txtDescCtrl) && txtDescCtrl is TextBox txtDesc)
         {
+            int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return;
             txtDesc.Enabled = true;
             txtDesc.CallBack[(int)ControlState.KeyUp] = () =>
             {
-                if (WinJobEditor.SelectedIndex < 0 || WinJobEditor.SelectedIndex >= Variables.MaxJobs) return;
-                Data.Job[WinJobEditor.SelectedIndex].Desc = txtDesc.Text ?? string.Empty;
-                GameState.JobChanged[WinJobEditor.SelectedIndex] = true;
+                if (id < 0 || id >= Job.Instance.Count) return;
+                Job.Instance[id].Desc = txtDesc.Text ?? string.Empty;
+                Job.IsChanged[id] = true;
             };
         }
 
@@ -2730,9 +2732,9 @@ public class Crystalshire
                 };
             }
         }
-        BindIntText("txtStartMap", v => { if (WinJobEditor.SelectedIndex >= 0) { Data.Job[WinJobEditor.SelectedIndex].StartMap = v; GameState.JobChanged[WinJobEditor.SelectedIndex] = true; } }, 0, int.MaxValue);
-        BindIntText("txtStartX", v => { if (WinJobEditor.SelectedIndex >= 0) { Data.Job[WinJobEditor.SelectedIndex].StartX = (byte)Math.Clamp(v, 0, 255); GameState.JobChanged[WinJobEditor.SelectedIndex] = true; } }, 0, 255);
-        BindIntText("txtStartY", v => { if (WinJobEditor.SelectedIndex >= 0) { Data.Job[WinJobEditor.SelectedIndex].StartY = (byte)Math.Clamp(v, 0, 255); GameState.JobChanged[WinJobEditor.SelectedIndex] = true; } }, 0, 255);
+        BindIntText("txtStartMap", v => { if (WinJobEditor.SelectedIndex >= 0) { Job.Instance[WinJobEditor.SelectedIndex].StartMap = v; } }, 0, int.MaxValue);
+        BindIntText("txtStartX", v => { if (WinJobEditor.SelectedIndex >= 0) { Job.Instance[WinJobEditor.SelectedIndex].StartX = (byte)Math.Clamp(v, 0, 255); } }, 0, 255);
+        BindIntText("txtStartY", v => { if (WinJobEditor.SelectedIndex >= 0) { Job.Instance[WinJobEditor.SelectedIndex].StartY = (byte)Math.Clamp(v, 0, 255); } }, 0, 255);
 
         // Sprite bars
         void BindSpriteBar(string name, Func<int> get, Action<int> apply)
@@ -2746,14 +2748,14 @@ public class Crystalshire
                 {
                     int v = Math.Clamp(sb.Value, sb.Min, sb.Max);
                     apply(v);
-                    if (WinJobEditor.SelectedIndex >= 0) GameState.JobChanged[WinJobEditor.SelectedIndex] = true;
+                    if (WinJobEditor.SelectedIndex >= 0) Job.IsChanged[WinJobEditor.SelectedIndex] = true;
                 };
             }
         }
-        BindSpriteBar("sldMaleSprite", () => WinJobEditor.SelectedIndex >= 0 ? Data.Job[WinJobEditor.SelectedIndex].MaleSprite : 0,
-            v => { if (WinJobEditor.SelectedIndex >= 0) Data.Job[WinJobEditor.SelectedIndex].MaleSprite = v; });
-        BindSpriteBar("sldFemaleSprite", () => WinJobEditor.SelectedIndex >= 0 ? Data.Job[WinJobEditor.SelectedIndex].FemaleSprite : 0,
-            v => { if (WinJobEditor.SelectedIndex >= 0) Data.Job[WinJobEditor.SelectedIndex].FemaleSprite = v; });
+        BindSpriteBar("sldMaleSprite", () => WinJobEditor.SelectedIndex >= 0 ? Job.Instance[WinJobEditor.SelectedIndex].MaleSprite : 0,
+            v => { if (WinJobEditor.SelectedIndex >= 0) Job.Instance[WinJobEditor.SelectedIndex].MaleSprite = v; });
+        BindSpriteBar("sldFemaleSprite", () => WinJobEditor.SelectedIndex >= 0 ? Job.Instance[WinJobEditor.SelectedIndex].FemaleSprite : 0,
+            v => { if (WinJobEditor.SelectedIndex >= 0) Job.Instance[WinJobEditor.SelectedIndex].FemaleSprite = v; });
 
         // Remaining buttons
         if (WindowManager.TryGetControl("winJobEditor", "btnSave", out var btnSave))

@@ -825,16 +825,16 @@ public static class Database
 
             var statCount = Enum.GetValues(typeof(Stat)).Length;
             for (n = 0; n < statCount; n++)
-                Data.Player[index].Stat[n] = Data.Job[jobNum].Stat[n];
+                Data.Player[index].Stat[n] = Job.Instance[jobNum].Stat[n];
 
             Data.Player[index].Dir = (byte)Direction.Down;
-            Data.Player[index].Map = Data.Job[jobNum].StartMap;
+            Data.Player[index].Map = Job.Instance[jobNum].StartMap;
 
             if (Data.Player[index].Map == 0)
                 Data.Player[index].Map = 1;
 
-            Data.Player[index].X = Data.Job[jobNum].StartX;
-            Data.Player[index].Y = Data.Job[jobNum].StartY;
+            Data.Player[index].X = Job.Instance[jobNum].StartX;
+            Data.Player[index].Y = Job.Instance[jobNum].StartY;
             Data.Player[index].Dir = (byte)Direction.Down;
 
             var vitalCount = Enum.GetValues(typeof(Vital)).Length;
@@ -847,19 +847,19 @@ public static class Database
             // set starter items
             for (n = 0; n < Variables.MaxStartItems; n++)
             {
-                if (Data.Job[jobNum].StartItem[n] >= 0)
+                if (Job.Instance[jobNum].StartItem[n] >= 0)
                 {
-                    Data.Player[index].Inv[n].Num = Data.Job[jobNum].StartItem[n];
-                    Data.Player[index].Inv[n].Value = Data.Job[jobNum].StartValue[n];
+                    Data.Player[index].Inv[n].Num = Job.Instance[jobNum].StartItem[n];
+                    Data.Player[index].Inv[n].Value = Job.Instance[jobNum].StartValue[n];
                 }            
             }
 
             // set start skills
             for (n = 0; n < Variables.MaxStartSkills; n++)
             {
-                if (Data.Job[jobNum].StartSkill[n] >= 0)
+                if (Job.Instance[jobNum].StartSkill[n] >= 0)
                 {
-                    Data.Player[index].Skill[n].Num = Data.Job[jobNum].StartSkill[n];
+                    Data.Player[index].Skill[n].Num = Job.Instance[jobNum].StartSkill[n];
                     Data.Player[index].Skill[n].Cd = 0;
                 }
             }
@@ -959,35 +959,5 @@ public static class Database
         Log.Add(GetPlayerName(bannedByIndex) + " has banned " + GetPlayerName(banPlayerIndex) + ".", Constant.AdminLog);
         var task = Player.LeftGame(banPlayerIndex);
         task.Wait();
-    }
-
-    public static void WriteJobDataToPacket(int jobNum, PacketWriter packetWriter)
-    {
-        if (Data.Job[jobNum].Stat == null || Data.Job[jobNum].StartItem == null || Data.Job[jobNum].StartSkill == null) return;
-        packetWriter.WriteString(Data.Job[jobNum].Name);
-        packetWriter.WriteString(Data.Job[jobNum].Desc);
-        packetWriter.WriteInt32(Data.Job[jobNum].MaleSprite);
-        packetWriter.WriteInt32(Data.Job[jobNum].FemaleSprite);
-
-        for (var i = 0; i < StatCount; i++)
-        {
-            packetWriter.WriteInt32(Data.Job[jobNum].Stat[i]);
-        }
-
-        for (var q = 0; q < Variables.MaxStartItems; q++)
-        {
-            packetWriter.WriteInt32(Data.Job[jobNum].StartItem[q]);
-            packetWriter.WriteInt32(Data.Job[jobNum].StartValue[q]);
-        }
-
-        for (var q = 0; q < Variables.MaxStartSkills; q++)
-        {
-            packetWriter.WriteInt32(Data.Job[jobNum].StartSkill[q]);
-        }
-
-        packetWriter.WriteInt32(Data.Job[jobNum].StartMap);
-        packetWriter.WriteByte(Data.Job[jobNum].StartX);
-        packetWriter.WriteByte(Data.Job[jobNum].StartY);
-        packetWriter.WriteInt32(Data.Job[jobNum].BaseExp);
     }
 }

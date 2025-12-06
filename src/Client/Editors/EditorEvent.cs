@@ -1446,7 +1446,7 @@ namespace Client
             cmbCondition_JobIs.Items.Clear();
 
             for (i = 0; i < Variables.MaxJobs; i++)
-                cmbCondition_JobIs.Items.Add(i + 1 + ". " + Data.Job[i].Name);
+                cmbCondition_JobIs.Items.Add(i + 1 + ". " + Job.Instance[i].Name);
             cmbCondition_JobIs.SelectedIndex = 0;
             cmbCondition_LearntSkill.Enabled = false;
             cmbCondition_LearntSkill.Items.Clear();
@@ -1517,7 +1517,7 @@ namespace Client
                 cmbChangeJob.Items.Clear();
 
                 for (i = 0; i < Variables.MaxJobs; i++)
-                    cmbChangeJob.Items.Add(Strings.Trim(Data.Job[i].Name));
+                    cmbChangeJob.Items.Add(Strings.Trim(Job.Instance[i].Name));
                 cmbChangeJob.SelectedIndex = 0;
                 nudChangeSprite.MaxValue = GameState.NumCharacters;
                 cmbPlayAnim.Items.Clear();
@@ -2020,7 +2020,7 @@ namespace Client
                                 cmbChangeJob.Items.Clear();
 
                                 for (int i = 0; i < Variables.MaxJobs; i++)
-                                    cmbChangeJob.Items.Add(Strings.Trim(Data.Job[i].Name));
+                                    cmbChangeJob.Items.Add(Strings.Trim(Job.Instance[i].Name));
                                 cmbChangeJob.SelectedIndex = 0;
                             }
                         }

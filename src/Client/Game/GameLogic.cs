@@ -13,6 +13,7 @@ using Core.Net;
 using static Core.Globals.Command;
 using static Core.Globals.Type;
 using Type = Core.Globals.Type;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Client
 {
@@ -1359,7 +1360,7 @@ namespace Client
             GameState.NewCharJob = 0;
             GameState.NewCharSprite = 1;
             GameState.NewCnarGender = Sex.Male;
-            if (WindowManager.TryGetControl("winJobs", "lblJobName", out var jobNameLbl)) jobNameLbl!.Text = Data.Job[(int)GameState.NewCharJob].Name;
+            if (WindowManager.TryGetControl("winJobs", "lblJobName", out var jobNameLbl)) jobNameLbl!.Text = Job.Instance[(int)GameState.NewCharJob].Name;
             WindowManager.ShowWindow("winJobs");
         }
 
@@ -1541,7 +1542,7 @@ namespace Client
                 // class req
                 if (Item.Instance[(int)itemNum].JobReq > 0)
                 {
-                    jobName = Data.Job[Item.Instance[(int)itemNum].JobReq].Name;
+                    jobName = Job.Instance[Item.Instance[(int)itemNum].JobReq].Name;
                     // do we match it?
                     if (GetPlayerJob(GameState.MyIndex) == Item.Instance[(int)itemNum].JobReq)
                     {

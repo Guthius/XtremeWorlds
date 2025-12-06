@@ -10,6 +10,7 @@ namespace Core.Objects
     public class ItemBase : IData
     {
         public static bool[] IsChanged { get; set; } = new bool[Variables.MaxItems];
+        
         public ItemBase()
         {
             AddStat = new int[Enum.GetNames(typeof(Stat)).Length];

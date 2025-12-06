@@ -528,7 +528,7 @@ public class Script
         }
         else
         {
-            NetworkSend.SendPlayerMessage(index, string.Format("Only {0} can use this skill.", GameLogic.CheckGrammar(Data.Job[Data.Skill[n].JobReq].Name, 1)), (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(index, string.Format("Only {0} can use this skill.", GameLogic.CheckGrammar(Job.Instance[Data.Skill[n].JobReq].Name, 1)), (int)ColorName.BrightRed);
         }
     }
 
@@ -650,7 +650,7 @@ public class Script
         }
         else
         {
-            OnWarp(index, Data.Job[GetPlayerJob(index)].StartMap, Data.Job[GetPlayerJob(index)].StartX, Data.Job[GetPlayerJob(index)].StartY, (int)Direction.Down);
+            OnWarp(index, Job.Instance[GetPlayerJob(index)].StartMap, Job.Instance[GetPlayerJob(index)].StartX, Job.Instance[GetPlayerJob(index)].StartY, (int)Direction.Down);
         }
     }
 
@@ -2206,8 +2206,8 @@ public class Script
         int job = GetPlayerJob(index);
 
         int baseJobStr = 0;
-        if (job >= 0 && job < Data.Job.Length)
-            baseJobStr = Data.Job[job].Stat[(int)Stat.Strength];
+        if (job >= 0 && job < Job.Instance.Count)
+            baseJobStr = Job.Instance[job].Stat[(int)Stat.Strength];
 
         long val = (long)(1 + (str / 2) + baseJobStr) * 2L;
         return (int)Math.Max(1, Math.Min(int.MaxValue, val));
@@ -2221,8 +2221,8 @@ public class Script
         int job = GetPlayerJob(index);
 
         int basejobInt = 0;
-        if (job >= 0 && job < Data.Job.Length)
-            basejobInt = Data.Job[job].Stat[(int)Stat.Intelligence];
+        if (job >= 0 && job < Job.Instance.Count)
+            basejobInt = Job.Instance[job].Stat[(int)Stat.Intelligence];
 
         long val = (long)(1 + (magi / 2) + basejobInt) * 2L;
         return (int)Math.Max(1, Math.Min(int.MaxValue, val));
@@ -2236,8 +2236,8 @@ public class Script
         int job = GetPlayerJob(index);
 
         int baseJobSpirit = 0;
-        if (job >= 0 && job < Data.Job.Length)
-            baseJobSpirit = Data.Job[job].Stat[(int)Stat.Spirit]; // base “Speed” on Stat.Spirit
+        if (job >= 0 && job < Job.Instance.Count)
+            baseJobSpirit = Job.Instance[job].Stat[(int)Stat.Spirit]; // base “Speed” on Stat.Spirit
 
         long val = (long)(1 + (speed / 2) + baseJobSpirit) * 2L;
         return (int)Math.Max(1, Math.Min(int.MaxValue, val));

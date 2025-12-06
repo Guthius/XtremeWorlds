@@ -520,15 +520,6 @@ namespace Client
                 GameState.InitEventEditor = false;
             }
 
-            if (GameState.InitJobEditor)
-            {
-                GameState.MyEditorType = EditorType.Job;
-                GameState.EditorIndex = 0;
-                WindowManager.ShowWindow("winJobEditor");
-                Client.Game.UI.Windows.WinJobEditor.Init();
-                GameState.InitJobEditor = false;
-            }
-
             if (GameState.InitMoralEditor)
             {
                 GameState.MyEditorType = EditorType.Moral;

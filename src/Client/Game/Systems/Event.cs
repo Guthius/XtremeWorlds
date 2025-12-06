@@ -520,7 +520,7 @@ namespace Client
                                         }
                                         case 3:
                                         {
-                                            EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Conditional Branch: Player's Job Is [" + Strings.Trim(Data.Job[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].ConditionalBranch.Data1].Name) + "]");
+                                            EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Conditional Branch: Player's Job Is [" + Strings.Trim(Job.Instance[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].ConditionalBranch.Data1].Name) + "]");
                                             break;
                                         }
                                         case 4:
@@ -1068,7 +1068,7 @@ namespace Client
                                 }
                                 case (byte) EventCommand.ChangeJob:
                                 {
-                                    EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Set Player Job to " + Strings.Trim(Data.Job[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1].Name));
+                                    EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Set Player Job to " + Strings.Trim(Job.Instance[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1].Name));
                                     break;
                                 }
                                 case (byte) EventCommand.ChangeSprite:

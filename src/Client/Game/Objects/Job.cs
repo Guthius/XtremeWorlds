@@ -1,65 +1,24 @@
-﻿using Core.Globals;
+﻿using Client.Net;
+using Core.Globals;
 using Core.Interfaces;
+using Core.Objects;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Client
 {
-    public class Job : IData
+    public class Job : JobBase, IData
     {
-        public static void OnReset()
-        {
-            for (int i = 0; i < Variables.MaxJobs; i++)
-                OnClear(i);
-        }
-
-        public static void OnClear(int index)
-        {
-            var statCount = System.Enum.GetValues(typeof(Stat)).Length;
-            Data.Job[index] = default;
-            Data.Job[index].Stat = new int[statCount];
-            Data.Job[index].Name = "";
-            Data.Job[index].Desc = "";
-            Data.Job[index].StartItem = new int[Variables.MaxStartItems];
-            Data.Job[index].StartValue = new int[Variables.MaxStartItems];
-            Data.Job[index].StartSkill = new int[Variables.MaxStartSkills];
-            Data.Job[index].MaleSprite = 1;
-            Data.Job[index].FemaleSprite = 1;
-            for (int i = 0; i < Variables.MaxStartItems; i++)
-            {
-                Data.Job[index].StartItem[i] = -1;
-                Data.Job[index].StartValue[i] = 0;
-            }
-            for (int i = 0; i < Variables.MaxStartSkills; i++)
-            {
-                Data.Job[index].StartSkill[i] = -1;
-            }
-        }
-
-        public static void OnDraw(int index)
-        {
-            throw new NotImplementedException();
-        }
-
+        #region Database
         public static void OnStream(int index)
         {
-            throw new NotImplementedException();
+            if (index < 0 || index >= Variables.MaxJobs) return;
+            if (JobBase.Instance.Count <= index)
+            {
+                //Sender.SendRequestJob(index);
+            }
         }
-
-        public static void OnLoad(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnSave(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnUpdate(int index)
-        {
-            throw new NotImplementedException();
-        }
+        #endregion
     }
 }

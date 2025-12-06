@@ -8,7 +8,7 @@ namespace Client.Game.UI.Windows
     public class WinJobEditor
     {
         public static int SelectedIndex = 0;
-        private static Core.Globals.Type.Job? _history = null;
+        private static Job? _history = null;
 
         public static void Init()
         {
@@ -22,8 +22,8 @@ namespace Client.Game.UI.Windows
         }
 
         // Picture previews
-        public static void OnDrawMaleSprite() => DrawSpritePreview("picMale", SelectedIndex >= 0 && SelectedIndex < Variables.MaxJobs ? Data.Job[SelectedIndex].MaleSprite : 0);
-        public static void OnDrawFemaleSprite() => DrawSpritePreview("picFemale", SelectedIndex >= 0 && SelectedIndex < Variables.MaxJobs ? Data.Job[SelectedIndex].FemaleSprite : 0);
+        public static void OnDrawMaleSprite() => DrawSpritePreview("picMale", SelectedIndex >= 0 && SelectedIndex < Variables.MaxJobs ? Job.Instance[SelectedIndex].MaleSprite : 0);
+        public static void OnDrawFemaleSprite() => DrawSpritePreview("picFemale", SelectedIndex >= 0 && SelectedIndex < Variables.MaxJobs ? Job.Instance[SelectedIndex].FemaleSprite : 0);
 
         private static void DrawSpritePreview(string picName, int spriteIndex)
         {
@@ -128,7 +128,7 @@ namespace Client.Game.UI.Windows
             list.Clear();
             for (int i = 0; i < Variables.MaxJobs; i++)
             {
-                string name = Strings.Trim(Data.Job[i].Name);
+                string name = Strings.Trim(Job.Instance[i].Name);
                 if (string.IsNullOrWhiteSpace(name)) name = "None";
                 list.AddItem($"{i + 1}: {name}");
             }
@@ -154,7 +154,7 @@ namespace Client.Game.UI.Windows
             if (index < 0 || index >= Variables.MaxJobs) return;
             SelectedIndex = index;
             GameState.EditorIndex = index;
-            var job = Data.Job[index];
+            var job = Job.Instance[index];
 
             if (WindowManager.TryGetControl("winJobEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
                 txtName.Text = job.Name ?? string.Empty;
@@ -222,20 +222,19 @@ namespace Client.Game.UI.Windows
             if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxJobs) return;
             if (_history is null)
             {
-                var s = Data.Job[SelectedIndex];
-                var n = s; // struct copy
-                if (s.Stat != null) n.Stat = (int[])s.Stat.Clone();
-                if (s.StartItem != null) n.StartItem = (int[])s.StartItem.Clone();
-                if (s.StartValue != null) n.StartValue = (int[])s.StartValue.Clone();
-                if (s.StartSkill != null) n.StartSkill = (int[])s.StartSkill.Clone();
-                _history = n;
+                var s = Job.Instance[SelectedIndex];
+                if (s.Stat != null) s.Stat = (int[])s.Stat.Clone();
+                if (s.StartItem != null) s.StartItem = (int[])s.StartItem.Clone();
+                if (s.StartValue != null) s.StartValue = (int[])s.StartValue.Clone();
+                if (s.StartSkill != null) s.StartSkill = (int[])s.StartSkill.Clone();
+                _history = (Job)s;
                 if (WindowManager.TryGetControl("winJobEditor", "btnCopy", out var btn)) btn.Text = "Paste";
                 return;
             }
 
-            var pasted = _history.Value;
-            Data.Job[SelectedIndex] = pasted;
-            GameState.JobChanged[SelectedIndex] = true;
+            var pasted = _history;
+            Job.Instance[SelectedIndex] = pasted;
+            Job.IsChanged[SelectedIndex] = true;
             OnLoad(SelectedIndex);
             RefreshList();
         }
@@ -255,7 +254,7 @@ namespace Client.Game.UI.Windows
         public static void OnDelete()
         {
             Job.OnClear(SelectedIndex);
-            GameState.JobChanged[SelectedIndex] = true;
+            Job.IsChanged[SelectedIndex] = true;
             OnLoad(SelectedIndex);
             RefreshList();
         }

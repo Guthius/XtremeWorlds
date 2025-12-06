@@ -740,7 +740,7 @@ public class WindowManager
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"UI script error in {name}: {ex.Message}");
+                    Console.WriteLine($"UI script error in {name}: {ex}");
                 }
             }
 

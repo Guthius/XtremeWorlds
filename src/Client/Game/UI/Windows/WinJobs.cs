@@ -17,7 +17,7 @@ public class WinJobs
 
         int spriteIndex;
 
-        if (Data.Job[GameState.NewCharJob].Name == "")
+        if (Job.Instance[GameState.NewCharJob].Name == "")
         {
             spriteIndex = GameState.NewCharJob switch
             {
@@ -41,8 +41,8 @@ public class WinJobs
             }
 
             spriteIndex = maleFlag == 1
-                ? Data.Job[GameState.NewCharJob].MaleSprite
-                : Data.Job[GameState.NewCharJob].FemaleSprite;
+                ? Job.Instance[GameState.NewCharJob].MaleSprite
+                : Job.Instance[GameState.NewCharJob].FemaleSprite;
         }
 
 
@@ -119,7 +119,7 @@ public class WinJobs
         var text = "";
 
         // Get job description or use default
-        if (Data.Job[GameState.NewCharJob].Desc == "")
+        if (Job.Instance[GameState.NewCharJob].Desc == "")
         {
             switch (GameState.NewCharJob)
             {
@@ -142,7 +142,7 @@ public class WinJobs
         }
         else
         {
-            text = Data.Job[GameState.NewCharJob].Desc;
+            text = Job.Instance[GameState.NewCharJob].Desc;
         }
 
         TextRenderer.WordWrap(text, winJobs.Font, 330, ref lines);
@@ -180,7 +180,7 @@ public class WinJobs
             GameState.NewCharJob = 0;
         }
 
-        winJobs.GetChild("lblJobName").Text = Data.Job[GameState.NewCharJob].Name;
+        winJobs.GetChild("lblJobName").Text = Job.Instance[GameState.NewCharJob].Name;
     }
 
     public static void OnRightClick()
@@ -191,14 +191,14 @@ public class WinJobs
             return;
         }
 
-        if (GameState.NewCharJob >= Variables.MaxJobs - 1 || string.IsNullOrEmpty(Data.Job[GameState.NewCharJob].Desc) & GameState.NewCharJob >= Variables.MaxJobs)
+        if (GameState.NewCharJob >= Variables.MaxJobs - 1 || string.IsNullOrEmpty(Job.Instance[GameState.NewCharJob].Desc) & GameState.NewCharJob >= Variables.MaxJobs)
         {
             return;
         }
 
         GameState.NewCharJob += 1;
 
-        winJobs.GetChild("lblJobName").Text = Data.Job[GameState.NewCharJob].Name;
+        winJobs.GetChild("lblJobName").Text = Job.Instance[GameState.NewCharJob].Name;
     }
 
     public static void OnAccept()

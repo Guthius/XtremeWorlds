@@ -324,48 +324,14 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    public static void Packet_UpdateJob(ReadOnlyMemory<byte> data)
+     public static void Packet_JobData(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
+        Job.Instance.Clear();
 
-        var jobNum = packetReader.ReadInt32();
-
-        ref var job = ref Data.Job[jobNum];
-
-        job.Name = packetReader.ReadString();
-        job.Desc = packetReader.ReadString();
-        job.MaleSprite = packetReader.ReadInt32();
-        job.FemaleSprite = packetReader.ReadInt32();
-
-        for (var i = 0; i < StatCount; i++)
+        for (var n = 0; n < Variables.MaxJobs; n++)
         {
-            job.Stat[i] = packetReader.ReadInt32();
-        }
-
-        for (var i = 0; i < Variables.MaxStartItems; i++)
-        {
-            job.StartItem[i] = packetReader.ReadInt32();
-            job.StartValue[i] = packetReader.ReadInt32();
-        }
-
-        for (var i = 0; i < Variables.MaxStartSkills; i++)
-        {
-            job.StartSkill[i] = packetReader.ReadInt32();
-        }
-
-        job.StartMap = packetReader.ReadInt32();
-        job.StartX = packetReader.ReadByte();
-        job.StartY = packetReader.ReadByte();
-        job.BaseExp = packetReader.ReadInt32();
-    }
-
-    public static void Packet_JobData(ReadOnlyMemory<byte> data)
-    {
-        var packetReader = new PacketReader(data);
-
-        for (var jobNum = 0; jobNum < Variables.MaxJobs; jobNum++)
-        {
-            ref var job = ref Data.Job[jobNum];
+            var job = new Job();
 
             job.Name = packetReader.ReadString();
             job.Desc = packetReader.ReadString();
@@ -392,6 +358,73 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             job.StartX = packetReader.ReadByte();
             job.StartY = packetReader.ReadByte();
             job.BaseExp = packetReader.ReadInt32();
+
+            Job.Instance.Add(job);
+
+            if ((n + 1) == Variables.MaxJobs)
+            {
+                if (GameState.InitJobEditor)
+                {
+                    GameState.MyEditorType = EditorType.Job;
+                    GameState.EditorIndex = 0;
+                    WindowManager.ShowWindow("winJobEditor");
+                    GameState.InitJobEditor = false;
+                    Client.Game.UI.Windows.WinJobEditor.Init();
+                }
+            }
+        }
+    }
+
+    public static void Packet_UpdateJob(ReadOnlyMemory<byte> data)
+    {
+        var packetReader = new PacketReader(data);
+
+        var n = packetReader.ReadInt32();
+        
+        if (n == 0)
+            Job.Instance.Clear();
+
+        var job = new Job();
+
+        job.Name = packetReader.ReadString();
+        job.Desc = packetReader.ReadString();
+        job.MaleSprite = packetReader.ReadInt32();
+        job.FemaleSprite = packetReader.ReadInt32();
+
+        for (var i = 0; i < StatCount; i++)
+        {
+            job.Stat[i] = packetReader.ReadInt32();
+        }
+
+        for (var i = 0; i < Variables.MaxStartItems; i++)
+        {
+            job.StartItem[i] = packetReader.ReadInt32();
+            job.StartValue[i] = packetReader.ReadInt32();
+        }
+
+        for (var i = 0; i < Variables.MaxStartSkills; i++)
+        {
+            job.StartSkill[i] = packetReader.ReadInt32();
+        }
+
+        job.StartMap = packetReader.ReadInt32();
+        job.StartX = packetReader.ReadByte();
+        job.StartY = packetReader.ReadByte();
+        job.BaseExp = packetReader.ReadInt32();
+
+        // Update the job
+        Job.Instance.Add(job);
+
+        if ((n + 1) == Variables.MaxJobs)
+        {
+            if (GameState.InitJobEditor)
+            {
+                GameState.MyEditorType = EditorType.Job;
+                GameState.EditorIndex = 0;
+                WindowManager.ShowWindow("winJobEditor");
+                GameState.InitJobEditor = false;
+                Client.Game.UI.Windows.WinJobEditor.Init();
+            }
         }
     }
 
@@ -1447,7 +1480,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
                 instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblLevel")].Text = "Level";
                 instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblGuild")].Text = "Guild";
                 instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblName2")].Text = GetPlayerName(GameState.MyIndex);
-                instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblJob2")].Text = Data.Job[GetPlayerJob(GameState.MyIndex)].Name;
+                instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblJob2")].Text = Job.Instance[GetPlayerJob(GameState.MyIndex)].Name;
                 instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblLevel2")].Text = GetPlayerLevel(GameState.MyIndex).ToString();
                 instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblGuild2")].Text = "None";
                 WinCharacter.Update();

@@ -14,7 +14,7 @@ public class WinNewChar
             return;
         }
 
-        var spriteIndex = GameState.NewCnarGender == Sex.Male ? Data.Job[GameState.NewCharJob].MaleSprite : Data.Job[GameState.NewCharJob].FemaleSprite;
+        var spriteIndex = GameState.NewCnarGender == Sex.Male ? Job.Instance[GameState.NewCharJob].MaleSprite : Job.Instance[GameState.NewCharJob].FemaleSprite;
 
         if (spriteIndex < 1 || spriteIndex > GameState.NumCharacters)
             spriteIndex = 1;
@@ -40,7 +40,7 @@ public class WinNewChar
 
     public static void OnLeftClick()
     {
-        var spriteIndex = GameState.NewCnarGender == Sex.Male ? Data.Job[GameState.NewCharJob].MaleSprite : Data.Job[GameState.NewCharJob].FemaleSprite;
+        var spriteIndex = GameState.NewCnarGender == Sex.Male ? Job.Instance[GameState.NewCharJob].MaleSprite : Job.Instance[GameState.NewCharJob].FemaleSprite;
         if (GameState.NewCharSprite < 0)
         {
             GameState.NewCharSprite = spriteIndex;
@@ -54,8 +54,8 @@ public class WinNewChar
     public static void OnRightClick()
     {
         var spriteIndex = GameState.NewCnarGender == Sex.Male
-            ? Data.Job[GameState.NewCharJob].MaleSprite
-            : Data.Job[GameState.NewCharJob].FemaleSprite;
+            ? Job.Instance[GameState.NewCharJob].MaleSprite
+            : Job.Instance[GameState.NewCharJob].FemaleSprite;
 
         if (GameState.NewCharSprite >= spriteIndex)
         {

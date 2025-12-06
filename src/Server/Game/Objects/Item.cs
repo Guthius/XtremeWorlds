@@ -15,7 +15,7 @@ using Core.Objects;
 
 namespace Server;
 
-public class Item : ItemBase, IData, IAsyncData
+public class Item : ItemBase, IAsyncData
 {
     public static void OnSave(int index)
     {

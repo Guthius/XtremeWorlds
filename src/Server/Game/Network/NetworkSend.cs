@@ -248,7 +248,7 @@ public static class NetworkSend
 
         for (var i = 0; i < Core.Globals.Variables.MaxJobs; i++)
         {
-            Database.WriteJobDataToPacket(i, packetWriter);
+            WriteJobDataToPacket(i, packetWriter);
         }
 
         session.Channel.Send(packetWriter.GetBytes());
@@ -260,9 +260,21 @@ public static class NetworkSend
 
         packetWriter.WriteEnum(ServerPackets.SJobData);
 
-        Database.WriteJobDataToPacket(jobNum, packetWriter);
+        WriteJobDataToPacket(jobNum, packetWriter);
 
         PlayerService.Instance.SendDataToAll(packetWriter.GetBytes());
+    }
+
+    public static void SendJobs(int playerId)
+    {
+        var packetWriter = new PacketWriter();
+
+        packetWriter.WriteEnum(ServerPackets.SJobData);
+
+        for (var i = 0; i < Core.Globals.Variables.MaxJobs; i++)
+        {
+            WriteJobDataToPacket(i, packetWriter);
+        }
     }
 
     public static void SendInventory(int playerId)
@@ -1477,9 +1489,9 @@ public static class NetworkSend
 
     public static void SendItems(int playerId)
     {
-        for (var index = 0; index < Variables.MaxItems; index++)
+        for (var i = 0; i < Variables.MaxItems; i++)
         {
-            SendUpdateItemTo(playerId, index);         
+            SendUpdateItemTo(playerId, i);         
         }
     }
 
@@ -1551,6 +1563,41 @@ public static class NetworkSend
         packet.WriteInt32(item.KnockBackTiles);
         packet.WriteInt32(item.Projectile);
         packet.WriteInt32(item.Ammo);
+    }
+
+     public static void WriteJobDataToPacket(int index, PacketWriter packetWriter)
+    { 
+        packetWriter.WriteInt32(index);
+        
+        var job = new Job();
+        if (Job.Instance.Count > index)
+            job = (Job)Job.Instance[index];
+
+        packetWriter.WriteString(job.Name);
+        packetWriter.WriteString(job.Desc);
+        packetWriter.WriteInt32(job.MaleSprite);
+        packetWriter.WriteInt32(job.FemaleSprite);
+
+        for (var i = 0; i < StatCount; i++)
+        {
+            packetWriter.WriteInt32(job.Stat[i]);
+        }
+
+        for (var q = 0; q < Variables.MaxStartItems; q++)
+        {
+            packetWriter.WriteInt32(job.StartItem[q]);
+            packetWriter.WriteInt32(job.StartValue[q]);
+        }
+
+        for (var q = 0; q < Variables.MaxStartSkills; q++)
+        {
+            packetWriter.WriteInt32(job.StartSkill[q]);
+        }
+
+        packetWriter.WriteInt32(job.StartMap);
+        packetWriter.WriteByte(job.StartX);
+        packetWriter.WriteByte(job.StartY);
+        packetWriter.WriteInt32(job.BaseExp);
     }
 
     public static void SendAnimation(int mapNum, int anim, int x, int y, byte lockType = 0, int lockindex = 0)

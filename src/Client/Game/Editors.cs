@@ -1217,7 +1217,7 @@ namespace Client
         {
             for (int i = 0; i < Variables.MaxJobs; i++)
             {
-                if (GameState.JobChanged[i])
+                if (Job.IsChanged[i])
                 {
                     Sender.SendSaveJob(i);
                 }
@@ -1229,15 +1229,9 @@ namespace Client
         public static void JobEditorCancel()
         {
             GameState.MyEditorType = EditorType.None;
-            ClearChanged_Job();
+            Job.ClearChanged();
             Job.OnReset();
             Sender.SendCloseEditor();
-        }
-
-        public static void ClearChanged_Job()
-        {
-            for (int i = 0; i < Variables.MaxJobs; i++)
-                GameState.JobChanged[i] = false;
         }
 
         public static void ItemEditorCancel()

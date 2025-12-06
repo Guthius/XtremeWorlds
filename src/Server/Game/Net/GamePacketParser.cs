@@ -236,7 +236,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         NetworkSend.SendVariables(session);
         NetworkSend.SendPlayerChars(session);
-        NetworkSend.SendJobs(session);
+        NetworkSend.SendJobs(session.Id);
     }
 
     private static void Packet_Register(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -314,7 +314,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         // send them to the character portal
         NetworkSend.SendPlayerChars(session);
-        NetworkSend.SendJobs(session);
+        NetworkSend.SendJobs(session.Id);
     }
 
     private static void Packet_AddChar(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -374,11 +374,11 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
             if (sexNum == (byte)Sex.Male)
             {
-                sprite = Data.Job[jobNum].MaleSprite;
+                sprite = Job.Instance[jobNum].MaleSprite;
             }
             else
             {
-                sprite = Data.Job[jobNum].FemaleSprite;
+                sprite = Job.Instance[jobNum].FemaleSprite;
             }
 
             if (sprite == 0)
@@ -1588,7 +1588,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         Data.TempPlayer[session.Id].Editor = EditorType.Skill;
 
-        NetworkSend.SendJobs(session);
+        NetworkSend.SendJobs(session.Id);
         NetworkSend.SendProjectiles(session.Id);
         NetworkSend.SendAnimations(session.Id);
         NetworkSend.SendSkills(session.Id);
@@ -2679,12 +2679,12 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             return;
         }
 
-        NetworkSend.SendItems(session.Id);
-        NetworkSend.SendJobs(session);
-
-        Data.TempPlayer[session.Id].Editor = EditorType.Job;
-
         NetworkSend.SendJobEditor(session.Id);
+
+        NetworkSend.SendItems(session.Id);
+        NetworkSend.SendJobs(session.Id);
+
+        Data.TempPlayer[session.Id].Editor = EditorType.Job;        
     }
 
     public static void Packet_SaveJob(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -2696,38 +2696,37 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
             return;
 
-        var jobNum = buffer.ReadInt32();
+        var index = buffer.ReadInt32();
+    
+        var instance = Job.Instance[index];
+        instance.Name = buffer.ReadString();
+        instance.Desc = buffer.ReadString();
 
+        instance.MaleSprite = buffer.ReadInt32();
+        instance.FemaleSprite = buffer.ReadInt32();
+
+        var loopTo = Enum.GetNames(typeof(Stat)).Length;
+        for (x = 0; x < loopTo; x++)
+            instance.Stat[x] = buffer.ReadInt32();
+
+        for (var q = 0; q < Core.Globals.Variables.MaxStartItems; q++)
         {
-            ref var instance = ref Data.Job[jobNum];
-            instance.Name = buffer.ReadString();
-            instance.Desc = buffer.ReadString();
-
-            instance.MaleSprite = buffer.ReadInt32();
-            instance.FemaleSprite = buffer.ReadInt32();
-
-            var loopTo = Enum.GetNames(typeof(Stat)).Length;
-            for (x = 0; x < loopTo; x++)
-                instance.Stat[x] = buffer.ReadInt32();
-
-            for (var q = 0; q < Core.Globals.Variables.MaxStartItems; q++)
-            {
-                instance.StartItem[q] = buffer.ReadInt32();
-                instance.StartValue[q] = buffer.ReadInt32();
-            }
-
-            for (var q = 0; q < Core.Globals.Variables.MaxStartSkills; q++)
-            {
-                instance.StartSkill[q] = buffer.ReadInt32();
-            }
-
-            instance.StartMap = buffer.ReadInt32();
-            instance.StartX = buffer.ReadByte();
-            instance.StartY = buffer.ReadByte();
-            instance.BaseExp = buffer.ReadInt32();
+            instance.StartItem[q] = buffer.ReadInt32();
+            instance.StartValue[q] = buffer.ReadInt32();
         }
 
-        Job.OnSave(jobNum);
+        for (var q = 0; q < Core.Globals.Variables.MaxStartSkills; q++)
+        {
+            instance.StartSkill[q] = buffer.ReadInt32();
+        }
+
+        instance.StartMap = buffer.ReadInt32();
+        instance.StartX = buffer.ReadByte();
+        instance.StartY = buffer.ReadByte();
+        instance.BaseExp = buffer.ReadInt32();
+    
+
+        Job.OnSave(index);
         NetworkSend.SendJobToAll(session.Id);
     }
 
@@ -3085,7 +3084,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         NetworkSend.SendAnimations(session.Id);
         NetworkSend.SendProjectiles(session.Id);
-        NetworkSend.SendJobs(session);
+        NetworkSend.SendJobs(session.Id);
         NetworkSend.SendItems(session.Id);
     }
 

@@ -2254,7 +2254,7 @@ namespace Server
             sb.Replace("/name", Data.Player[index].Name);
             sb.Replace("/p", Data.Player[index].Name);
             sb.Replace("$playername$", Data.Player[index].Name);
-            sb.Replace("$playerclass$", Data.Job[Data.Player[index].Job].Name);
+            sb.Replace("$playerclass$", Job.Instance[Data.Player[index].Job].Name);
 
             // Process variables (/v[variableIndex]).
             int start = sb.ToString().IndexOf("/v"); // Find the first occurrence.

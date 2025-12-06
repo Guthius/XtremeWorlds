@@ -184,7 +184,7 @@ public class WinItemEditor
         {
             cmbJob.Items.Clear();
             for (int i = 0; i < Variables.MaxJobs; i++)
-                cmbJob.Items.Add(Data.Job[i].Name);
+                cmbJob.Items.Add(Job.Instance[i].Name);
         }
 
         // Access requirements (use AccessLevel enum with spaced names)

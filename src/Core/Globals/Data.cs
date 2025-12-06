@@ -4,7 +4,6 @@ namespace Core.Globals;
 
 public static class Data
 {
-    public static Job[] Job = new Job[Variables.MaxJobs];
     public static Moral[] Moral = new Moral[Variables.MaxMorals];
     public static Npc[] Npc = new Npc[Variables.MaxNpcs];
     public static Shop[] Shop = new Shop[Variables.MaxShops];

@@ -172,22 +172,6 @@ public static class Type
         public int CostValue;
     }
 
-    public struct Job
-    {
-        public string Name;
-        public string Desc;
-        public int[] Stat;
-        public int MaleSprite;
-        public int FemaleSprite;
-        public int[] StartItem;
-        public int[] StartValue;
-        public int[] StartSkill;
-        public int StartMap;
-        public byte StartX;
-        public byte StartY;
-        public int BaseExp;
-    }
-
     public struct Account
     {
         public string Login;

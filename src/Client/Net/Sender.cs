@@ -778,30 +778,30 @@ public static class Sender
 
         packetWriter.WriteEnum(Packets.ClientPackets.CSaveJob);
         packetWriter.WriteInt32(index);
-        packetWriter.WriteString(Data.Job[index].Name);
-        packetWriter.WriteString(Data.Job[index].Desc);
-        packetWriter.WriteInt32(Data.Job[index].MaleSprite);
-        packetWriter.WriteInt32(Data.Job[index].FemaleSprite);
+        packetWriter.WriteString(Job.Instance[index].Name);
+        packetWriter.WriteString(Job.Instance[index].Desc);
+        packetWriter.WriteInt32(Job.Instance[index].MaleSprite);
+        packetWriter.WriteInt32(Job.Instance[index].FemaleSprite);
         for (var i = 0; i < StatCount; i++)
         {
-            packetWriter.WriteInt32(Data.Job[index].Stat[i]);
+            packetWriter.WriteInt32(Job.Instance[index].Stat[i]);
         }
 
         for (var i = 0; i < Variables.MaxStartItems; i++)
         {
-            packetWriter.WriteInt32(Data.Job[index].StartItem[i]);
-            packetWriter.WriteInt32(Data.Job[index].StartValue[i]);
+            packetWriter.WriteInt32(Job.Instance[index].StartItem[i]);
+            packetWriter.WriteInt32(Job.Instance[index].StartValue[i]);
         }
 
         for (var i = 0; i < Variables.MaxStartSkills; i++)
         {
-            packetWriter.WriteInt32(Data.Job[index].StartSkill[i]);
+            packetWriter.WriteInt32(Job.Instance[index].StartSkill[i]);
         }
 
-        packetWriter.WriteInt32(Data.Job[index].StartMap);
-        packetWriter.WriteByte(Data.Job[index].StartX);
-        packetWriter.WriteByte(Data.Job[index].StartY);
-        packetWriter.WriteInt32(Data.Job[index].BaseExp);
+        packetWriter.WriteInt32(Job.Instance[index].StartMap);
+        packetWriter.WriteByte(Job.Instance[index].StartX);
+        packetWriter.WriteByte(Job.Instance[index].StartY);
+        packetWriter.WriteInt32(Job.Instance[index].BaseExp);
 
         Network.Send(packetWriter);
     }
