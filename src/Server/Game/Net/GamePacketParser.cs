@@ -3100,56 +3100,62 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             return;
         }
 
-        var itemNum = packetReader.ReadInt32();
-        if (itemNum < 0 || itemNum > Variables.MaxItems)
+        var index = packetReader.ReadInt32();
+        if (index < 0 || index > Variables.MaxItems)
         {
             return;
         }
 
-        Item.Instance[itemNum].AccessReq = packetReader.ReadInt32();
+        for (var i = 0; i <= index; i++)
+        {
+            if (Item.Instance.Count <= i)
+            {
+                Item.Instance.Add(new Item());
+            }
+        }
+
+        Item.Instance[index].AccessReq = packetReader.ReadInt32();
 
         var statCount = Enum.GetNames<Stat>().Length;
         for (var i = 0; i < statCount; i++)
         {
-            Item.Instance[itemNum].AddStat[i] = (byte)packetReader.ReadInt32();
+            Item.Instance[index].AddStat[i] = (byte)packetReader.ReadInt32();
         }
 
-        Item.Instance[itemNum].Animation = packetReader.ReadInt32();
-        Item.Instance[itemNum].BindType = packetReader.ReadByte();
-        Item.Instance[itemNum].JobReq = packetReader.ReadInt32();
-        Item.Instance[itemNum].Data1 = packetReader.ReadInt32();
-        Item.Instance[itemNum].Data2 = packetReader.ReadInt32();
-        Item.Instance[itemNum].Data3 = packetReader.ReadInt32();
-        Item.Instance[itemNum].LevelReq = packetReader.ReadInt32();
-        Item.Instance[itemNum].Mastery = (byte)packetReader.ReadInt32();
-        Item.Instance[itemNum].Name = packetReader.ReadString();
-        Item.Instance[itemNum].Paperdoll = packetReader.ReadInt32();
-        Item.Instance[itemNum].Icon = packetReader.ReadInt32();
-        Item.Instance[itemNum].Price = packetReader.ReadInt32();
-        Item.Instance[itemNum].Rarity = (byte)packetReader.ReadInt32();
-        Item.Instance[itemNum].Speed = packetReader.ReadInt32();
-        Item.Instance[itemNum].Stackable = (byte)packetReader.ReadInt32();
-        Item.Instance[itemNum].Description = packetReader.ReadString();
+        Item.Instance[index].Animation = packetReader.ReadInt32();
+        Item.Instance[index].BindType = packetReader.ReadByte();
+        Item.Instance[index].JobReq = packetReader.ReadInt32();
+        Item.Instance[index].Data1 = packetReader.ReadInt32();
+        Item.Instance[index].Data2 = packetReader.ReadInt32();
+        Item.Instance[index].Data3 = packetReader.ReadInt32();
+        Item.Instance[index].LevelReq = packetReader.ReadInt32();
+        Item.Instance[index].Mastery = (byte)packetReader.ReadInt32();
+        Item.Instance[index].Name = packetReader.ReadString();
+        Item.Instance[index].Paperdoll = packetReader.ReadInt32();
+        Item.Instance[index].Icon = packetReader.ReadInt32();
+        Item.Instance[index].Price = packetReader.ReadInt32();
+        Item.Instance[index].Rarity = (byte)packetReader.ReadInt32();
+        Item.Instance[index].Speed = packetReader.ReadInt32();
+        Item.Instance[index].Stackable = (byte)packetReader.ReadInt32();
+        Item.Instance[index].Description = packetReader.ReadString();
 
         for (var i = 0; i < statCount; i++)
         {
-            Item.Instance[itemNum].StatReq[i] = (byte)packetReader.ReadInt32();
+            Item.Instance[index].StatReq[i] = (byte)packetReader.ReadInt32();
         }
 
-        Item.Instance[itemNum].Type = (byte)packetReader.ReadInt32();
-        Item.Instance[itemNum].SubType = (byte)packetReader.ReadInt32();
-        Item.Instance[itemNum].ItemLevel = (byte)packetReader.ReadInt32();
-        Item.Instance[itemNum].KnockBack = (byte)packetReader.ReadInt32();
-        Item.Instance[itemNum].KnockBackTiles = (byte)packetReader.ReadInt32();
-        Item.Instance[itemNum].Projectile = packetReader.ReadInt32();
-        Item.Instance[itemNum].Ammo = packetReader.ReadInt32();
-
-        Item.OnSave(itemNum);
+        Item.Instance[index].Type = (byte)packetReader.ReadInt32();
+        Item.Instance[index].SubType = (byte)packetReader.ReadInt32();
+        Item.Instance[index].ItemLevel = (byte)packetReader.ReadInt32();
+        Item.Instance[index].KnockBack = (byte)packetReader.ReadInt32();
+        Item.Instance[index].KnockBackTiles = (byte)packetReader.ReadInt32();
+        Item.Instance[index].Projectile = packetReader.ReadInt32();
+        Item.Instance[index].Ammo = packetReader.ReadInt32();
+        Item.OnSave(index);
 
         General.Logger.LogInformation("{AccountName} saved item #{ItemNum}",
-            GetAccountLogin(session.Id), itemNum);
-
-        NetworkSend.SendUpdateItemToAll(itemNum);
+            GetAccountLogin(session.Id), index);
+        NetworkSend.SendUpdateItemToAll(index);
     }
 
     public static void Packet_GetItem(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -3226,38 +3232,44 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
     public static void Packet_SaveAnimation(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var packetReader = new PacketReader(bytes);
+        var index = packetReader.ReadInt32();
 
-        var animationNum = packetReader.ReadInt32();
-
-        for (var i = 0; i < Animation.Instance[animationNum].Frames.Length; i++)
+        for (var i = 0; i <= index; i++)
         {
-            Animation.Instance[animationNum].Frames[i] = packetReader.ReadInt32();
+            if (Animation.Instance.Count <= i)
+            {
+                Animation.Instance.Add(new Animation());
+            }
         }
 
-        for (var i = 0; i < Animation.Instance[animationNum].LoopCount.Length; i++)
+        for (var i = 0; i < Animation.Instance[index].Frames.Length; i++)
         {
-            Animation.Instance[animationNum].LoopCount[i] = packetReader.ReadInt32();
+            Animation.Instance[index].Frames[i] = packetReader.ReadInt32();
         }
 
-        for (var i = 0; i < Animation.Instance[animationNum].LoopTime.Length; i++)
+        for (var i = 0; i < Animation.Instance[index].LoopCount.Length; i++)
         {
-            Animation.Instance[animationNum].LoopTime[i] = packetReader.ReadInt32();
+            Animation.Instance[index].LoopCount[i] = packetReader.ReadInt32();
         }
 
-        Animation.Instance[animationNum].Name = packetReader.ReadString();
-        Animation.Instance[animationNum].Sound = packetReader.ReadString();
-
-        for (var i = 0; i < Animation.Instance[animationNum].Sprite.Length; i++)
+        for (var i = 0; i < Animation.Instance[index].LoopTime.Length; i++)
         {
-            Animation.Instance[animationNum].Sprite[i] = packetReader.ReadInt32();
+            Animation.Instance[index].LoopTime[i] = packetReader.ReadInt32();
         }
 
-        Animation.OnSave(animationNum);
+        Animation.Instance[index].Name = packetReader.ReadString();
+        Animation.Instance[index].Sound = packetReader.ReadString();
+        for (var i = 0; i < Animation.Instance[index].Sprite.Length; i++)
+        {
+            Animation.Instance[index].Sprite[i] = packetReader.ReadInt32();
+        }
+
+        Animation.OnSave(index);
 
         General.Logger.LogInformation("{AccountName} saved animation #{AnimationNum}",
-            GetAccountLogin(session.Id), animationNum);
+            GetAccountLogin(session.Id), index);
 
-        NetworkSend.SendUpdateAnimationToAll(animationNum);
+        NetworkSend.SendUpdateAnimationToAll(index);
     }
 
     public static void Packet_RequestAnimation(GameSession session, ReadOnlyMemory<byte> bytes)

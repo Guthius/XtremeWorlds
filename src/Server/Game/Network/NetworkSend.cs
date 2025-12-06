@@ -1477,45 +1477,43 @@ public static class NetworkSend
 
     public static void SendItems(int playerId)
     {
-        for (var itemNum = 0; itemNum < Variables.MaxItems; itemNum++)
+        for (var index = 0; index < Variables.MaxItems; index++)
         {
-            SendUpdateItemTo(playerId, itemNum);         
+            SendUpdateItemTo(playerId, index);         
         }
     }
 
-    public static void SendUpdateItemTo(int playerId, int itemNum)
+    public static void SendUpdateItemTo(int playerId, int index)
     {
         var packet = new PacketWriter();
 
         packet.WriteEnum(ServerPackets.SUpdateItem);
 
-        WriteItemDataToPacket(itemNum, packet);
+        WriteItemDataToPacket(index, packet);
 
         PlayerService.Instance.SendDataTo(playerId, packet.GetBytes());
     }
 
-    public static void SendUpdateItemToAll(int itemNum)
+    public static void SendUpdateItemToAll(int index)
     {
         var packet = new PacketWriter();
 
         packet.WriteEnum(ServerPackets.SUpdateItem);
 
-        WriteItemDataToPacket(itemNum, packet);
+        WriteItemDataToPacket(index, packet);
 
         PlayerService.Instance.SendDataToAll(packet.GetBytes());
     }
 
-    private static void WriteItemDataToPacket(int itemNum, PacketWriter packet)
+    private static void WriteItemDataToPacket(int index, PacketWriter packet)
     {
         var statCount = Enum.GetNames<Stat>().Length;
 
-        packet.WriteInt32(itemNum);
+        packet.WriteInt32(index);
 
         var item = new Item();
-        if (Item.Instance.Count > itemNum)
-            item = (Item)Item.Instance[itemNum];
-        else
-            item = new Item();
+        if (Item.Instance.Count > index)
+            item = (Item)Item.Instance[index];
 
         packet.WriteInt32(item.AccessReq);
 
@@ -1571,22 +1569,19 @@ public static class NetworkSend
 
     public static void SendAnimations(int playerId)
     {
-        for (var animationNum = 0; animationNum < Animation.Instance.Count; animationNum++)
+        for (var index = 0; index < Animation.Instance.Count; index++)
         {
-            if (Animation.Instance[animationNum].Name.Length > 0)
-            {
-                SendUpdateAnimationTo(playerId, animationNum);
-            }
+            SendUpdateAnimationTo(playerId, index);
         }
     }
 
-    public static void SendUpdateAnimationTo(int playerId, int animationNum)
+    public static void SendUpdateAnimationTo(int playerId, int index)
     {
         var packet = new PacketWriter();
 
         packet.WriteEnum(ServerPackets.SUpdateAnimation);
 
-        WriteAnimationDataToPacket(animationNum, packet);
+        WriteAnimationDataToPacket(index, packet);
 
         PlayerService.Instance.SendDataTo(playerId, packet.GetBytes());
     }
@@ -1602,29 +1597,33 @@ public static class NetworkSend
         PlayerService.Instance.SendDataToAll(packet.GetBytes());
     }
 
-    private static void WriteAnimationDataToPacket(int animationNum, PacketWriter packet)
+    private static void WriteAnimationDataToPacket(int index, PacketWriter packet)
     {
-        packet.WriteInt32(animationNum);
+        packet.WriteInt32(index);
 
-        foreach (var frame in Animation.Instance[animationNum].Frames)
+        var animation = new Animation();
+        if (Animation.Instance.Count > index)
+            animation = (Animation)Animation.Instance[index];
+
+        foreach (var frame in animation.Frames)
         {
             packet.WriteInt32(frame);
         }
 
-        foreach (var loopCount in Animation.Instance[animationNum].LoopCount)
+        foreach (var loopCount in animation.LoopCount)
         {
             packet.WriteInt32(loopCount);
         }
 
-        foreach (var loopTime in Animation.Instance[animationNum].LoopTime)
+        foreach (var loopTime in animation.LoopTime)
         {
             packet.WriteInt32(loopTime);
         }
 
-        packet.WriteString(Animation.Instance[animationNum].Name);
-        packet.WriteString(Animation.Instance[animationNum].Sound);
+        packet.WriteString(animation.Name);
+        packet.WriteString(animation.Sound);
 
-        foreach (var sprite in Animation.Instance[animationNum].Sprite)
+        foreach (var sprite in animation.Sprite)
         {
             packet.WriteInt32(sprite);
         }
