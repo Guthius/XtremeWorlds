@@ -572,7 +572,7 @@ public class Script
                 if (Data.Map[mapNum].Tile[x, y].Type == TileType.Animation)
                 {
                     NetworkSend.SendUpdateAnimationTo(index, Data.Map[mapNum].Tile[x, y].Data1);
-                    NetworkSend.SendAnimationTo(index, Data.Map[mapNum].Tile[x, y].Data1, x, y, 0, -1);                  
+                    NetworkSend.SendAnimationTo(index, Data.Map[mapNum].Tile[x, y].Data1, x, y, 0, -1);
                 }
                 else if (Data.Map[mapNum].Tile[x, y].Type2 == TileType.Animation)
                 {
