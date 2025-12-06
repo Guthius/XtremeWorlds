@@ -2688,10 +2688,10 @@ namespace Client
                 for (i = 0; i < MapAnimation.Instance?.Length; i++)
                 {
                     if (MapAnimation.Instance[i].Used?[1] == true)
-                        {
-                            MapAnimation.OnDraw(i, 1);
-                        }
-                    }       
+                    {
+                        MapAnimation.OnDraw(i, 1);
+                    }
+                }       
             }
 
             if (GameState.NumProjectiles > 0)

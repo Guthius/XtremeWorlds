@@ -22,26 +22,26 @@ namespace Client
             if (GameState.MyEditorType == EditorType.Map && GameState.MapEditorTab != (byte)MapEditorTab.Tiles)
                 return;
 
-            ref var inst = ref MapAnimation.Instance[index];
-            int animIdx = inst.Animation;
-            if (animIdx < 0 || animIdx >= Animation.Instance.Count)
+            ref var instance = ref MapAnimation.Instance[index];
+            int anim = instance.Animation;
+            if (anim < 0 || anim >= Animation.Instance.Count)
                 return;
 
             // Validate layer and arrays
             if (layer < 0)
                 return;
 
-            var anim = Animation.Instance[animIdx];
-            if (anim.Sprite == null || anim.Frames == null || inst.Used == null || inst.FrameIndex == null)
+            var animation = Animation.Instance?[anim];
+            if (animation?.Sprite == null || animation.Frames == null || instance.Used == null || instance.FrameIndex == null)
                 return;
 
-            if (anim.Sprite.Length <= layer || anim.Frames.Length <= layer || inst.Used.Length <= layer || inst.FrameIndex.Length <= layer)
+            if (animation.Sprite.Length <= layer || animation.Frames.Length <= layer || instance.Used.Length <= layer || instance.FrameIndex.Length <= layer)
                 return;
 
-            if (!inst.Used[layer])
+            if (!instance.Used[layer])
                 return;
 
-            int sprite = anim.Sprite[layer];
+            int sprite = animation.Sprite[layer];
             if (sprite < 1 || sprite > GameState.NumAnimations)
                 return;
 
@@ -52,7 +52,7 @@ namespace Client
             // Texture and frame layout (5 columns typical; dynamic height supported)
             int totalWidth = gfxInfo.Width;
             int totalHeight = gfxInfo.Height;
-            int columns = anim.Frames[layer];
+            int columns = animation.Frames[layer];
             if (columns <= 0)
                 return;
 
@@ -68,7 +68,7 @@ namespace Client
             int frameCount = Math.Max(1, rows * columns);
 
             // Frame index (1-based in state, convert to 0-based for drawing)
-            int id1 = inst.FrameIndex[layer];
+            int id1 = instance.FrameIndex[layer];
             if (id1 <= 0) id1 = 1;
             if (id1 > frameCount) id1 = frameCount;
             int zeroIndex = id1 - 1;
@@ -81,17 +81,17 @@ namespace Client
             // Determine draw position
             int x;
             int y;
-            if (inst.LockType > 0)
+            if (instance.LockType > 0)
             {
-                int lockindex = inst.LockIndex;
+                int lockindex = instance.LockIndex;
                 var point = GetLockedPosition(index, lockindex, frameWidth, frameHeight);
                 x = point.X;
                 y = point.Y;
             }
             else
             {
-                x = (int)Math.Round(inst.X * 32 + 16 - frameWidth / 2d);
-                y = (int)Math.Round(inst.Y * 32 + 16 - frameHeight / 2d);
+                x = (int)Math.Round(instance.X * 32 + 16 - frameWidth / 2d);
+                y = (int)Math.Round(instance.Y * 32 + 16 - frameHeight / 2d);
             }
 
             x = GameLogic.ConvertMapX(x);

@@ -78,12 +78,14 @@ namespace Client
                                 if (GameLogic.IsValidMapPoint(x, y))
                                 {
                                     if (Data.MyMap.Tile[x, y].Type == TileType.Animation)
-                                    {                                      
+                                    {      
+                                        if (Animation.Instance.Count <= Data.MyMap.Tile[x, y].Data1) continue; // No animations loaded                           
                                         _animationTmr[layer] = _tick + MapAnimation.OnPlay(Animation.Instance[Data.MyMap.Tile[x, y].Data1].Sprite[layer], layer, Data.MyMap.Tile[x, y].Data1, x, y);
                                     }
 
                                     if (Data.MyMap.Tile[x, y].Type2 == TileType.Animation)
                                     {
+                                        if (Animation.Instance.Count <= Data.MyMap.Tile[x, y].Data1_2) continue; // No animations loaded                           
                                         _animationTmr[layer] = _tick + MapAnimation.OnPlay(Animation.Instance[Data.MyMap.Tile[x, y].Data1_2].Sprite[layer], layer, Data.MyMap.Tile[x, y].Data1_2, x, y);
                                     }
                                 }
