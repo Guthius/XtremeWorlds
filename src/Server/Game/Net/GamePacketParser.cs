@@ -3230,7 +3230,17 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
     public static void Packet_SaveAnimation(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var packetReader = new PacketReader(bytes);
+
+        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        {
+            return;
+        }
+
         var index = packetReader.ReadInt32();
+        if (index < 0 || index > Variables.MaxAnimations)
+        {
+            return;
+        }
 
         for (var i = 0; i <= index; i++)
         {
