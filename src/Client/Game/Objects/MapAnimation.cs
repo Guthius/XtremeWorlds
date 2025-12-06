@@ -24,15 +24,16 @@ namespace Client
 
             ref var instance = ref MapAnimation.Instance[index];
             int anim = instance.Animation;
-            if (anim < 0 || anim >= Animation.Instance.Count)
+            if (anim < 0 || anim >= Variables.MaxAnimations)
                 return;
+
+            Animation.OnStream(anim);
 
             // Validate layer and arrays
             if (layer < 0)
                 return;
 
             var animation = Animation.Instance?[anim];
-            Animation.OnStream(anim);
             if (animation?.Sprite == null || animation.Frames == null || instance.Used == null || instance.FrameIndex == null)
                 return;
 
