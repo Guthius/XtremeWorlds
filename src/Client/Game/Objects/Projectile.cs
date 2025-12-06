@@ -35,9 +35,8 @@ namespace Client
 
         public static void OnStream(int projectileNum)
         {
-            if (projectileNum >= 0 & string.IsNullOrEmpty(Data.Projectile[projectileNum].Name) && GameState.ProjectileLoaded[projectileNum] == 0)
+            if (projectileNum >= 0 & string.IsNullOrEmpty(Data.Projectile[projectileNum].Name))
             {
-                GameState.ProjectileLoaded[projectileNum] = 1;
                 Sender.SendRequestProjectile(projectileNum);
             }
         }

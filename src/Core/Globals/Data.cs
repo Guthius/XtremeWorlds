@@ -6,13 +6,11 @@ public static class Data
 {
     public static Job[] Job = new Job[Variables.MaxJobs];
     public static Moral[] Moral = new Moral[Variables.MaxMorals];
-    public static Item[] Item = new Item[Variables.MaxItems];
     public static Npc[] Npc = new Npc[Variables.MaxNpcs];
     public static Shop[] Shop = new Shop[Variables.MaxShops];
     public static Skill[] Skill = new Skill[Variables.MaxSkills];
     public static MapResource[] MapResource = new MapResource[Variables.MaxResources];
     public static MapResourceCache[] MyMapResource = new MapResourceCache[Variables.MaxResources];
-    public static Animation[] Animation = new Animation[Variables.MaxAnimations];
     public static Map[] Map = new Map[Variables.MaxMaps];
     public static Map MyMap;
     public static Tile[,]? TempTile;

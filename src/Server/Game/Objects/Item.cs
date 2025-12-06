@@ -47,23 +47,15 @@ public class Item : ItemBase, IData, IAsyncData
 
         var itemData = JObject.FromObject(data).ToObject<Item>();
 
-        Item.Instance[index] = itemData;
+        Item.Instance.Add(itemData ?? new Item());
     }
 
     public static void OnClear(int index)
     {
-        // Guard against negative indexes
-        if (index < 0)
-            return;
-
-        // Ensure slot exists and is initialized
-        var it = ItemBase.GetOrCreate(index);
-
-        // Reset minimal fields (server-side defaults)
-        it.Name = "";
-        it.Description = "";
-        it.Ammo = -1;
-        it.Stackable = 1;
+        if (Item.Instance.Count <= index)
+            Item.Instance.Add(new Item());
+        else
+            Item.Instance[index] = new Item();
     }
 
     public static void OnDraw(int index)

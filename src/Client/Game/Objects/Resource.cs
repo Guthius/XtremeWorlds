@@ -18,7 +18,6 @@ namespace Client
         {
             Data.Resource[index] = default;
             Data.Resource[index].Name = "";
-            GameState.ResourceLoaded[index] = 0;
         }
 
         public static void OnReset()
@@ -32,9 +31,8 @@ namespace Client
 
         public static void OnStream(int resourceNum)
         {
-            if (resourceNum >= 0 && string.IsNullOrEmpty(Data.Resource[resourceNum].Name) && GameState.ResourceLoaded[resourceNum] == 0)
+            if (resourceNum >= 0 && string.IsNullOrEmpty(Data.Resource[resourceNum].Name))
             {
-                GameState.ResourceLoaded[resourceNum] = 1;
                 Sender.SendRequestResource(resourceNum);
             }
         }

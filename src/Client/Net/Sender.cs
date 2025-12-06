@@ -732,25 +732,25 @@ public static class Sender
         packetWriter.WriteEnum(Packets.ClientPackets.CSaveAnimation);
         packetWriter.WriteInt32(animationNum);
 
-        foreach (var frame in Data.Animation[animationNum].Frames)
+        foreach (var frame in Animation.Instance[animationNum].Frames)
         {
             packetWriter.WriteInt32(frame);
         }
 
-        foreach (var loopCount in Data.Animation[animationNum].LoopCount)
+        foreach (var loopCount in Animation.Instance[animationNum].LoopCount)
         {
             packetWriter.WriteInt32(loopCount);
         }
 
-        foreach (var loopTime in Data.Animation[animationNum].LoopTime)
+        foreach (var loopTime in Animation.Instance[animationNum].LoopTime)
         {
             packetWriter.WriteInt32(loopTime);
         }
 
-        packetWriter.WriteString(Data.Animation[animationNum].Name);
-        packetWriter.WriteString(Data.Animation[animationNum].Sound);
+        packetWriter.WriteString(Animation.Instance[animationNum].Name);
+        packetWriter.WriteString(Animation.Instance[animationNum].Sound);
 
-        foreach (var sprite in Data.Animation[animationNum].Sprite)
+        foreach (var sprite in Animation.Instance[animationNum].Sprite)
         {
             packetWriter.WriteInt32(sprite);
         }

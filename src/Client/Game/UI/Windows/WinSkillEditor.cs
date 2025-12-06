@@ -74,7 +74,7 @@ public class WinSkillEditor
             cmbAnim.Items.Clear();
             for (int i = 0; i < Variables.MaxAnimations; i++)
             {
-                var raw = Data.Animation[i].Name ?? string.Empty;
+                var raw = Animation.Instance[i].Name ?? string.Empty;
                 var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
                 cmbAnim.Items.Add($"{i + 1}: {name}");
             }

@@ -1477,7 +1477,7 @@ public static class NetworkSend
 
     public static void SendItems(int playerId)
     {
-        for (var itemNum = 0; itemNum < Core.Globals.Variables.MaxItems; itemNum++)
+        for (var itemNum = 0; itemNum < Item.Instance.Count; itemNum++)
         {
             if (Item.Instance[itemNum].Name.Length > 0)
             {
@@ -1568,9 +1568,9 @@ public static class NetworkSend
 
     public static void SendAnimations(int playerId)
     {
-        for (var animationNum = 0; animationNum < Core.Globals.Variables.MaxAnimations; animationNum++)
+        for (var animationNum = 0; animationNum < Animation.Instance.Count; animationNum++)
         {
-            if (Data.Animation[animationNum].Name.Length > 0)
+            if (Animation.Instance[animationNum].Name.Length > 0)
             {
                 SendUpdateAnimationTo(playerId, animationNum);
             }
@@ -1603,25 +1603,25 @@ public static class NetworkSend
     {
         packet.WriteInt32(animationNum);
 
-        foreach (var frame in Data.Animation[animationNum].Frames)
+        foreach (var frame in Animation.Instance[animationNum].Frames)
         {
             packet.WriteInt32(frame);
         }
 
-        foreach (var loopCount in Data.Animation[animationNum].LoopCount)
+        foreach (var loopCount in Animation.Instance[animationNum].LoopCount)
         {
             packet.WriteInt32(loopCount);
         }
 
-        foreach (var loopTime in Data.Animation[animationNum].LoopTime)
+        foreach (var loopTime in Animation.Instance[animationNum].LoopTime)
         {
             packet.WriteInt32(loopTime);
         }
 
-        packet.WriteString(Data.Animation[animationNum].Name);
-        packet.WriteString(Data.Animation[animationNum].Sound);
+        packet.WriteString(Animation.Instance[animationNum].Name);
+        packet.WriteString(Animation.Instance[animationNum].Sound);
 
-        foreach (var sprite in Data.Animation[animationNum].Sprite)
+        foreach (var sprite in Animation.Instance[animationNum].Sprite)
         {
             packet.WriteInt32(sprite);
         }

@@ -1073,20 +1073,20 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         n = buffer.ReadInt32();
 
-        for (i = 0; i < Data.Animation[n].Frames.Length; i++)
-            Data.Animation[n].Frames[i] = buffer.ReadInt32();
+        for (i = 0; i < Animation.Instance[n].Frames.Length; i++)
+            Animation.Instance[n].Frames[i] = buffer.ReadInt32();
 
-        for (i = 0; i < Data.Animation[n].LoopCount.Length; i++)
-            Data.Animation[n].LoopCount[i] = buffer.ReadInt32();
+        for (i = 0; i < Animation.Instance[n].LoopCount.Length; i++)
+            Animation.Instance[n].LoopCount[i] = buffer.ReadInt32();
 
-        for (i = 0; i < Data.Animation[n].LoopTime.Length; i++)
-            Data.Animation[n].LoopTime[i] = buffer.ReadInt32();
+        for (i = 0; i < Animation.Instance[n].LoopTime.Length; i++)
+            Animation.Instance[n].LoopTime[i] = buffer.ReadInt32();
 
-        Data.Animation[n].Name = buffer.ReadString();
-        Data.Animation[n].Sound = buffer.ReadString();
+        Animation.Instance[n].Name = buffer.ReadString();
+        Animation.Instance[n].Sound = buffer.ReadString();
 
-        for (i = 0; i < Data.Animation[n].Sprite.Length; i++)
-            Data.Animation[n].Sprite[i] = buffer.ReadInt32();
+        for (i = 0; i < Animation.Instance[n].Sprite.Length; i++)
+            Animation.Instance[n].Sprite[i] = buffer.ReadInt32();
     }
 
     public static void Packet_Animation(ReadOnlyMemory<byte> data)

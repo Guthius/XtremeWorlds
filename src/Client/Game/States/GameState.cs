@@ -231,16 +231,6 @@ namespace Client
         public static bool ShowAnimLayers;
         public static int ShowAnimTimer;
 
-        // Stream Content
-        public static int[] ItemLoaded = new int[Variables.MaxItems];
-        public static int[] NpcLoaded = new int[Variables.MaxNpcs];
-        public static int[] ResourceLoaded = new int[Variables.MaxResources];
-        public static int[] AnimationLoaded = new int[Variables.MaxResources];
-        public static int[] SkillLoaded = new int[Variables.MaxSkills];
-        public static int[] ShopLoaded = new int[Variables.MaxShops];
-        public static int[] MoralLoaded = new int[(Variables.MaxMorals)];
-        public static int[] ProjectileLoaded = new int[(Variables.MaxProjectiles)];
-
         public static int[] AnimEditorFrame = new int[2];
         public static int[] AnimEditorTimer = new int[2];
 
@@ -442,10 +432,8 @@ namespace Client
         public static bool InitScriptEditor;
 
         // Editor edited items array
-        public static bool[] ItemChanged = new bool[Variables.MaxItems];
         public static bool[] NpcChanged = new bool[Variables.MaxNpcs];
         public static bool[] ResourceChanged = new bool[Variables.MaxResources];
-        public static bool[] AnimationChanged = new bool[Variables.MaxAnimations];
         public static bool[] SkillChanged = new bool[Variables.MaxSkills];
         public static bool[] ShopChanged = new bool[Variables.MaxShops];
         public static bool[] JobChanged = new bool[(Variables.MaxJobs)];

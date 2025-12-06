@@ -32,7 +32,7 @@ public class WinItemEditor
             {
                 if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
                 Item.Instance[SelectedIndex].Icon = (short)Math.Clamp(sldIcon.Value, sldIcon.Min, sldIcon.Max);
-                GameState.ItemChanged[SelectedIndex] = true;
+                Item.IsChanged[SelectedIndex] = true;
             };
         }
         if (WindowManager.TryGetControl("winItemEditor", "sldPaperdoll", out var pdScrollCtrl) && pdScrollCtrl is ScrollBar sldPd)
@@ -44,7 +44,7 @@ public class WinItemEditor
                 // keep textbox in sync if present
                 if (WindowManager.TryGetControl("winItemEditor", "txtItemPaperdoll", out var pdCtrl) && pdCtrl is TextBox txtPd)
                     txtPd.Text = Item.Instance[SelectedIndex].Paperdoll.ToString();
-                GameState.ItemChanged[SelectedIndex] = true;
+                Item.IsChanged[SelectedIndex] = true;
             };
         }
 
@@ -57,7 +57,7 @@ public class WinItemEditor
                 Item.Instance[SelectedIndex].Type = (byte)Math.Clamp(cmbType.Value, 0, byte.MaxValue);
                 BuildSubtypeList();
                 ToggleTypeSections();
-                GameState.ItemChanged[SelectedIndex] = true;
+                Item.IsChanged[SelectedIndex] = true;
             };
             // Apply initial visibility state
             ToggleTypeSections();
@@ -72,7 +72,7 @@ public class WinItemEditor
                 // Toggle value locally then push to Data
                 chkStack.Value = chkStack.Value == 0 ? 1 : 0;
                 Item.Instance[SelectedIndex].Stackable = chkStack.Value != 0 ? (byte)1 : (byte)0;
-                GameState.ItemChanged[SelectedIndex] = true;
+                Item.IsChanged[SelectedIndex] = true;
             };
         }
 
@@ -84,7 +84,7 @@ public class WinItemEditor
                 if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
                 chkKb.Value = chkKb.Value == 0 ? 1 : 0;
                 Item.Instance[SelectedIndex].KnockBack = chkKb.Value != 0 ? (byte)1 : (byte)0;
-                GameState.ItemChanged[SelectedIndex] = true;
+                Item.IsChanged[SelectedIndex] = true;
             };
         }
 
@@ -95,7 +95,7 @@ public class WinItemEditor
             {
                 if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
                 Item.Instance[SelectedIndex].KnockBackTiles = (byte)Math.Clamp(cmbKbTiles.Value, 0, byte.MaxValue);
-                GameState.ItemChanged[SelectedIndex] = true;
+                Item.IsChanged[SelectedIndex] = true;
             };
         }
     }
@@ -165,7 +165,7 @@ public class WinItemEditor
             cmbAnim.Items.Clear();
             for (int i = 0; i < Variables.MaxAnimations; i++)
             {
-                var raw = Data.Animation[i].Name ?? string.Empty;
+                var raw = Animation.Instance[i].Name ?? string.Empty;
                 var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
                 cmbAnim.Items.Add($"{i + 1}: {name}");
             }
@@ -582,7 +582,7 @@ public class WinItemEditor
         }
 
         Item.Instance[SelectedIndex] = _history;
-        GameState.ItemChanged[SelectedIndex] = true;
+        Item.IsChanged[SelectedIndex] = true;
         OnLoad(SelectedIndex);
         RefreshList();
     }
@@ -603,8 +603,8 @@ public class WinItemEditor
     public static void OnDelete()
     {
         Item.OnClear(GameState.EditorIndex);
-        if (SelectedIndex >= 0 && SelectedIndex < GameState.ItemChanged.Length)
-            GameState.ItemChanged[SelectedIndex] = true;
+        if (SelectedIndex >= 0 && SelectedIndex < Item.IsChanged.Length)
+            Item.IsChanged[SelectedIndex] = true;
         OnLoad(GameState.EditorIndex);
         RefreshList();
     }

@@ -31,7 +31,7 @@ namespace Client.Game.UI.Windows
             list.Clear();
             for (int i = 0; i < Variables.MaxAnimations; i++)
             {
-                string name = Strings.Trim(Data.Animation[i].Name);
+                string name = Strings.Trim(Animation.Instance[i].Name);
                 if (string.IsNullOrWhiteSpace(name)) name = "None";
                 list.AddItem($"{i + 1}: {name}");
             }
@@ -72,9 +72,7 @@ namespace Client.Game.UI.Windows
             if (index < 0 || index >= Variables.MaxAnimations) return;
             SelectedIndex = index;
             GameState.EditorIndex = index;
-            ref var a = ref Data.Animation[index];
-
-            EnsureAnimArrays(ref a);
+            var a = Animation.Instance[index];
 
             // Name
             if (WindowManager.TryGetControl("winAnimationEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
@@ -171,7 +169,7 @@ namespace Client.Game.UI.Windows
         public static void OnDelete()
         {
             Animation.OnClear(GameState.EditorIndex);
-            GameState.AnimationChanged[SelectedIndex] = true;
+            Animation.IsChanged[SelectedIndex] = true;
             OnLoad(GameState.EditorIndex);
             RefreshList();
         }
@@ -182,7 +180,7 @@ namespace Client.Game.UI.Windows
             int src = GameState.EditorIndex;
             if (src < 0 || src >= Variables.MaxAnimations) return;
 
-            var a = Data.Animation[src];
+            var a = Animation.Instance[src];
             var n = a;
             if (a.Sprite != null) n.Sprite = (int[])a.Sprite.Clone();
             if (a.Frames != null) n.Frames = (int[])a.Frames.Clone();
@@ -194,28 +192,11 @@ namespace Client.Game.UI.Windows
             if (oneBased == null) return;
             int dst = oneBased.Value - 1;
 
-            EnsureAnimArrays(ref n);
-            Data.Animation[dst] = n;
-            GameState.AnimationChanged[dst] = true;
+            Animation.Instance[dst] = n;
+            Animation.IsChanged[dst] = true;
 
             RefreshList();
             OnLoad(dst);
-        }
-
-        private static void EnsureAnimArrays(ref Core.Globals.Type.Animation a)
-        {
-            a.Sprite ??= new int[2];
-            a.Frames ??= new int[2];
-            a.LoopCount ??= new int[2];
-            a.LoopTime ??= new int[2];
-            if (a.Sprite.Length < 2) Array.Resize(ref a.Sprite, 2);
-            if (a.Frames.Length < 2) Array.Resize(ref a.Frames, 2);
-            if (a.LoopCount.Length < 2) Array.Resize(ref a.LoopCount, 2);
-            if (a.LoopTime.Length < 2) Array.Resize(ref a.LoopTime, 2);
-            if (a.LoopCount[0] == 0) a.LoopCount[0] = 1;
-            if (a.LoopCount[1] == 0) a.LoopCount[1] = 1;
-            if (a.LoopTime[0] == 0) a.LoopTime[0] = 1;
-            if (a.LoopTime[1] == 0) a.LoopTime[1] = 1;
         }
     }
 }

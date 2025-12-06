@@ -1154,15 +1154,15 @@ namespace Client
                                 {
                                     if (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data2 == 0)
                                     {
-                                        EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Play Animation " + (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1 + 1) + " [" + Data.Animation[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1].Name + "]" + " On Player");
+                                        EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Play Animation " + (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1 + 1) + " [" + Animation.Instance[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1].Name + "]" + " On Player");
                                     }
                                     else if (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data2 == 1)
                                     {
-                                        EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Play Animation " + (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1 + 1) + " [" + Data.Animation[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1].Name + "]" + " On Event " + Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data3 + " [" + Strings.Trim(Data.MyMap.Event[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data3].Name) + "]");
+                                        EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Play Animation " + (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1 + 1) + " [" + Animation.Instance[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1].Name + "]" + " On Event " + Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data3 + " [" + Strings.Trim(Data.MyMap.Event[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data3].Name) + "]");
                                     }
                                     else if (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data2 == 2)
                                     {
-                                        EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Play Animation " + (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1 + 1) + " [" + Data.Animation[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1].Name + "]" + " On Tile (" + Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data3 + "," + Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data4 + ")");
+                                        EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Play Animation " + (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1 + 1) + " [" + Animation.Instance[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1].Name + "]" + " On Tile (" + Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data3 + "," + Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data4 + ")");
                                     }
 
                                     break;

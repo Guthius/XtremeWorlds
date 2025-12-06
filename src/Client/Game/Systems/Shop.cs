@@ -34,7 +34,6 @@ namespace Client
                 Data.Shop[index].TradeItem[x].Item = -1;
                 Data.Shop[index].TradeItem[x].CostItem = - 1;
             }
-            GameState.ShopLoaded[index] = 0;
         }
 
         public static void OnReset()
@@ -50,9 +49,8 @@ namespace Client
 
         public static void OnStream(int shopNum)
         {
-            if (shopNum >= 0 && string.IsNullOrEmpty(Data.Shop[shopNum].Name) && GameState.ShopLoaded[shopNum] == 0)
+            if (shopNum >= 0 && string.IsNullOrEmpty(Data.Shop[shopNum].Name))
             {
-                GameState.ShopLoaded[shopNum] = 1;
                 Sender.SendRequestShop(shopNum);
             }
         }

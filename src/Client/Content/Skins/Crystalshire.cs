@@ -809,7 +809,7 @@ public class Crystalshire
                     {
                         for (int i = 0; i < Variables.MaxAnimations; i++)
                         {
-                            var raw = (i < Data.Animation.Length) ? (Data.Animation[i].Name ?? string.Empty) : string.Empty;
+                            var raw = (i < Animation.Instance.Count) ? (Animation.Instance[i].Name ?? string.Empty) : string.Empty;
                             var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
                             cmb.Items.Add($"{i + 1}: {name}");
                         }
@@ -1674,7 +1674,7 @@ public class Crystalshire
                 int idx = WinItemEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxItems) return;
                 var newName = txtName.Text ?? string.Empty;
                 Item.Instance[idx].Name = newName;
-                GameState.ItemChanged[idx] = true;
+                Item.IsChanged[idx] = true;
 
                 // Update list item text without losing selection/scroll
                 if (WindowManager.TryGetControl("winItemEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox lb)
@@ -1713,7 +1713,7 @@ public class Crystalshire
                 if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
                 {
                     Item.Instance[WinItemEditor.SelectedIndex].Description = txtDesc.Text ?? string.Empty;
-                    GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                    Item.IsChanged[WinItemEditor.SelectedIndex] = true;
                 }
             };
         }
@@ -1726,7 +1726,7 @@ public class Crystalshire
                 if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
                 {
                     Item.Instance[WinItemEditor.SelectedIndex].Icon = (short)sldIcon.Value;
-                    GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                    Item.IsChanged[WinItemEditor.SelectedIndex] = true;
                 }
             };
         }
@@ -1736,7 +1736,7 @@ public class Crystalshire
             if (WinItemEditor.SelectedIndex >= 0)
             {
                 Item.Instance[WinItemEditor.SelectedIndex].Paperdoll = (short)v;
-                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                Item.IsChanged[WinItemEditor.SelectedIndex] = true;
             }
         }, 0, GameState.NumPaperdolls);
 
@@ -1745,7 +1745,7 @@ public class Crystalshire
             if (WinItemEditor.SelectedIndex >= 0)
             {
                 Item.Instance[WinItemEditor.SelectedIndex].ItemLevel = (byte)Math.Clamp(v, 0, 255);
-                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                Item.IsChanged[WinItemEditor.SelectedIndex] = true;
             }
         }, 0, 255);
 
@@ -1754,7 +1754,7 @@ public class Crystalshire
             if (WinItemEditor.SelectedIndex >= 0)
             {
                 Item.Instance[WinItemEditor.SelectedIndex].Price = v;
-                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                Item.IsChanged[WinItemEditor.SelectedIndex] = true;
             }
         }, 0, int.MaxValue);
 
@@ -1763,7 +1763,7 @@ public class Crystalshire
             if (WinItemEditor.SelectedIndex >= 0)
             {
                 Item.Instance[WinItemEditor.SelectedIndex].Rarity = (byte)v;
-                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                Item.IsChanged[WinItemEditor.SelectedIndex] = true;
             }
         }, 0, 5);
 
@@ -1774,7 +1774,7 @@ public class Crystalshire
                 if (WinItemEditor.SelectedIndex >= 0)
                 {
                     Item.Instance[WinItemEditor.SelectedIndex].Stackable = chkStack.Value == 1 ? (byte)1 : (byte)0;
-                    GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                    Item.IsChanged[WinItemEditor.SelectedIndex] = true;
                 }
             };
         }
@@ -1787,7 +1787,7 @@ public class Crystalshire
                 if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
                 {
                     Item.Instance[WinItemEditor.SelectedIndex].Data2 = sldDmg.Value;
-                    GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                    Item.IsChanged[WinItemEditor.SelectedIndex] = true;
                 }
             };
         }
@@ -1799,7 +1799,7 @@ public class Crystalshire
                 if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
                 {
                     Item.Instance[WinItemEditor.SelectedIndex].Speed = sldSpeed.Value;
-                    GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                    Item.IsChanged[WinItemEditor.SelectedIndex] = true;
                 }
             };
         }
@@ -1811,13 +1811,13 @@ public class Crystalshire
                 if (WinItemEditor.SelectedIndex >= 0)
                 {
                     Item.Instance[WinItemEditor.SelectedIndex].KnockBack = chkKb.Value == 1 ? (byte)1 : (byte)0;
-                    GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                    Item.IsChanged[WinItemEditor.SelectedIndex] = true;
                 }
             };
         }
 
         // Stat bonuses via sliders
-        void BindStatSlider(string name, Func<byte> get, Action<byte> apply)
+        void BindStatSlider(string name, Func<int> get, Action<int> apply)
         {
             if (WindowManager.TryGetControl("winItemEditor", name, out var ctrl) && ctrl is Client.Game.UI.Controls.ScrollBar sld)
             {
@@ -1826,7 +1826,7 @@ public class Crystalshire
                     if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
                     {
                         apply((byte)sld.Value);
-                        GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                        Item.IsChanged[WinItemEditor.SelectedIndex] = true;
                     }
                 };
             }
@@ -1843,7 +1843,7 @@ public class Crystalshire
             if (WinItemEditor.SelectedIndex >= 0)
             {
                 Item.Instance[WinItemEditor.SelectedIndex].Data1 = v;
-                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                Item.IsChanged[WinItemEditor.SelectedIndex] = true;
             }
         }, -1000, 1000);
 
@@ -1853,7 +1853,7 @@ public class Crystalshire
             if (WinItemEditor.SelectedIndex >= 0)
             {
                 Item.Instance[WinItemEditor.SelectedIndex].Data1 = v;
-                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                Item.IsChanged[WinItemEditor.SelectedIndex] = true;
             }
         }, 0, int.MaxValue);
 
@@ -1862,12 +1862,12 @@ public class Crystalshire
             if (WinItemEditor.SelectedIndex >= 0)
             {
                 Item.Instance[WinItemEditor.SelectedIndex].Data2 = v;
-                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                Item.IsChanged[WinItemEditor.SelectedIndex] = true;
             }
         }, 0, int.MaxValue);
 
         // Requirements via sliders
-        void BindReqStatSlider(string name, Func<byte> get, Action<byte> apply)
+        void BindReqStatSlider(string name, Func<int> get, Action<int> apply)
         {
             if (WindowManager.TryGetControl("winItemEditor", name, out var ctrl) && ctrl is Client.Game.UI.Controls.ScrollBar sld)
             {
@@ -1876,7 +1876,7 @@ public class Crystalshire
                     if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
                     {
                         apply((byte)sld.Value);
-                        GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                        Item.IsChanged[WinItemEditor.SelectedIndex] = true;
                     }
                 };
             }
@@ -1889,7 +1889,7 @@ public class Crystalshire
                 if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
                 {
                     Item.Instance[WinItemEditor.SelectedIndex].LevelReq = (byte)sldReqLevel.Value;
-                    GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                    Item.IsChanged[WinItemEditor.SelectedIndex] = true;
                 }
             };
         }
@@ -1919,7 +1919,7 @@ public class Crystalshire
             if (WinItemEditor.SelectedIndex >= 0)
             {
                 Item.Instance[WinItemEditor.SelectedIndex].Type = (byte)v;
-                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                Item.IsChanged[WinItemEditor.SelectedIndex] = true;
             }
         });
 
@@ -1928,7 +1928,7 @@ public class Crystalshire
             if (WinItemEditor.SelectedIndex >= 0)
             {
                 Item.Instance[WinItemEditor.SelectedIndex].SubType = (byte)v;
-                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                Item.IsChanged[WinItemEditor.SelectedIndex] = true;
             }
         });
 
@@ -1937,7 +1937,7 @@ public class Crystalshire
             if (WinItemEditor.SelectedIndex >= 0)
             {
                 Item.Instance[WinItemEditor.SelectedIndex].Animation = (byte)v;
-                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                Item.IsChanged[WinItemEditor.SelectedIndex] = true;
             }
         });
 
@@ -1946,7 +1946,7 @@ public class Crystalshire
             if (WinItemEditor.SelectedIndex >= 0)
             {
                 Item.Instance[WinItemEditor.SelectedIndex].BindType = (byte)v;
-                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                Item.IsChanged[WinItemEditor.SelectedIndex] = true;
             }
         });
 
@@ -1955,7 +1955,7 @@ public class Crystalshire
             if (WinItemEditor.SelectedIndex >= 0)
             {
                 Item.Instance[WinItemEditor.SelectedIndex].Data3 = (byte)v;
-                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                Item.IsChanged[WinItemEditor.SelectedIndex] = true;
             }
         });
 
@@ -1964,7 +1964,7 @@ public class Crystalshire
             if (WinItemEditor.SelectedIndex >= 0)
             {
                 Item.Instance[WinItemEditor.SelectedIndex].KnockBackTiles = (byte)v;
-                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                Item.IsChanged[WinItemEditor.SelectedIndex] = true;
             }
         });
 
@@ -1973,7 +1973,7 @@ public class Crystalshire
             if (WinItemEditor.SelectedIndex >= 0)
             {
                 Item.Instance[WinItemEditor.SelectedIndex].Data1 = v;
-                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                Item.IsChanged[WinItemEditor.SelectedIndex] = true;
             }
         });
 
@@ -1982,7 +1982,7 @@ public class Crystalshire
             if (WinItemEditor.SelectedIndex >= 0)
             {
                 Item.Instance[WinItemEditor.SelectedIndex].Projectile = (short)(v - 1);
-                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                Item.IsChanged[WinItemEditor.SelectedIndex] = true;
             }
         });
 
@@ -1991,7 +1991,7 @@ public class Crystalshire
             if (WinItemEditor.SelectedIndex >= 0)
             {
                 Item.Instance[WinItemEditor.SelectedIndex].Ammo = (short)(v - 1);
-                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                Item.IsChanged[WinItemEditor.SelectedIndex] = true;
             }
         });
 
@@ -2000,7 +2000,7 @@ public class Crystalshire
             if (WinItemEditor.SelectedIndex >= 0)
             {
                 Item.Instance[WinItemEditor.SelectedIndex].JobReq = (byte)v;
-                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                Item.IsChanged[WinItemEditor.SelectedIndex] = true;
             }
         });
 
@@ -2009,7 +2009,7 @@ public class Crystalshire
             if (WinItemEditor.SelectedIndex >= 0)
             {
                 Item.Instance[WinItemEditor.SelectedIndex].AccessReq = (byte)v;
-                GameState.ItemChanged[WinItemEditor.SelectedIndex] = true;
+                Item.IsChanged[WinItemEditor.SelectedIndex] = true;
             }
         });
 
@@ -3113,7 +3113,7 @@ public class Crystalshire
                 cmbAnim.Items.Add("None");
                 for (int i = 0; i < Variables.MaxAnimations; i++)
                 {
-                    var raw = Data.Animation[i].Name ?? string.Empty;
+                    var raw = Animation.Instance[i].Name ?? string.Empty;
                     var nm = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
                     cmbAnim.Items.Add($"{i + 1}: {nm}");
                 }
@@ -3170,7 +3170,7 @@ public class Crystalshire
             {
                 int idx = WinAnimationEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxAnimations) return;
                 var newName = txtName.Text?.Trim() ?? string.Empty;
-                Data.Animation[idx].Name = newName;
+                Animation.Instance[idx].Name = newName;
 
                 // Update list item text and keep selection/scroll
                 if (WindowManager.TryGetControl("winAnimationEditor", "lstIndex", out var lc) && lc is ListBox lb)
@@ -3203,29 +3203,12 @@ public class Crystalshire
             {
                 int idx = WinAnimationEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxAnimations) return;
                 string text = cmbSound.Value >= 0 && cmbSound.Value < cmbSound.Items.Count ? cmbSound.Items[cmbSound.Value] : string.Empty;
-                Data.Animation[idx].Sound = text ?? string.Empty;
+                Animation.Instance[idx].Sound = text ?? string.Empty;
             };
         }
 
-        // Ensure arrays exist (struct copy-safe)
-        static void EnsureAnimArrays(Core.Globals.Type.Animation a)
-        {
-            a.Sprite ??= new int[2];
-            a.Frames ??= new int[2];
-            a.LoopCount ??= new int[2];
-            a.LoopTime ??= new int[2];
-            if (a.Sprite.Length < 2) Array.Resize(ref a.Sprite, 2);
-            if (a.Frames.Length < 2) Array.Resize(ref a.Frames, 2);
-            if (a.LoopCount.Length < 2) Array.Resize(ref a.LoopCount, 2);
-            if (a.LoopTime.Length < 2) Array.Resize(ref a.LoopTime, 2);
-            if (a.LoopCount[0] == 0) a.LoopCount[0] = 1;
-            if (a.LoopCount[1] == 0) a.LoopCount[1] = 1;
-            if (a.LoopTime[0] == 0) a.LoopTime[0] = 1;
-            if (a.LoopTime[1] == 0) a.LoopTime[1] = 1;
-        }
-
         // Bind sliders to animation fields (copy-update, assign back)
-        void BindAnimIntBar(string barName, Action<Core.Globals.Type.Animation, int> set, int min, int max)
+        void BindAnimIntBar(string barName, Action<Animation, int> set, int min, int max)
         {
             if (WindowManager.TryGetControl("winAnimationEditor", barName, out var bCtrl) && bCtrl is ScrollBar sb)
             {
@@ -3233,11 +3216,10 @@ public class Crystalshire
                 sb.CallBack[(int)ControlState.MouseMove] = () =>
                 {
                     int i = WinAnimationEditor.SelectedIndex; if (i < 0 || i >= Variables.MaxAnimations) return;
-                    var a = Data.Animation[i];
-                    EnsureAnimArrays(a);
+                    var a = (Animation)Animation.Instance[i];
                     int v = Math.Clamp(sb.Value, sb.Min, sb.Max);
                     set(a, v);
-                    Data.Animation[i] = a;
+                    Animation.Instance[i] = a;
                 };
             }
         }
@@ -3277,8 +3259,7 @@ public class Crystalshire
                 {
                     var win = WindowManager.GetWindowByName("winAnimationEditor"); if (win is null) return;
                     int idx = WinAnimationEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxAnimations) return;
-                    var a = Data.Animation[idx];
-                    EnsureAnimArrays(a);
+                    var a = Animation.Instance[idx];
 
                     int spriteNum = 0;
                     if (WindowManager.TryGetControl("winAnimationEditor", barSpriteName, out var sc) && sc is ScrollBar sbSprite)

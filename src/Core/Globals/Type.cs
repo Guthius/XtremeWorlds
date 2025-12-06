@@ -8,16 +8,6 @@ public static class Type
         public int SkillCurExp;
         public int SkillNextLevelExp;
     }
-
-    public struct Animation
-    {
-        public string Name;
-        public string Sound;
-        public int[] Sprite;
-        public int[] Frames;
-        public int[] LoopCount;
-        public int[] LoopTime;
-    }
     
     public struct Rect
     {
@@ -137,36 +127,6 @@ public static class Type
     public struct TileHistory
     {
         public Tile[,] Tile;
-    }
-
-    public struct Item
-    {
-        public string Name;
-        public int Icon;
-        public string Description;
-        public byte Type;
-        public byte SubType;
-        public int Data1;
-        public int Data2;
-        public int Data3;
-        public int JobReq;
-        public int AccessReq;
-        public int LevelReq;
-        public byte Mastery;
-        public int Price;
-        public byte[] AddStat;
-        public byte Rarity;
-        public int Speed;
-        public byte BindType;
-        public byte[] StatReq;
-        public int Animation;
-        public int Paperdoll;
-        public byte Stackable;
-        public byte ItemLevel;
-        public byte KnockBack;
-        public byte KnockBackTiles;
-        public int Projectile;
-        public int Ammo;
     }
 
     public struct MapAnimation

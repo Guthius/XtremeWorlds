@@ -24,14 +24,14 @@ namespace Client
 
             ref var inst = ref MapAnimation.Instance[index];
             int animIdx = inst.Animation;
-            if (animIdx < 0 || animIdx >= Data.Animation.Length)
+            if (animIdx < 0 || animIdx >= Animation.Instance.Count)
                 return;
 
             // Validate layer and arrays
             if (layer < 0)
                 return;
 
-            var anim = Data.Animation[animIdx];
+            var anim = Animation.Instance[animIdx];
             if (anim.Sprite == null || anim.Frames == null || inst.Used == null || inst.FrameIndex == null)
                 return;
 
@@ -143,7 +143,7 @@ namespace Client
             return new Point(x, y);
         }
 
-        public static void OnCheck(int index)
+        public static void OnUpdate(int index)
         {
             // Validate instance and animation index
             if (Instance == null || index < 0 || index >= Instance.Length)
@@ -151,10 +151,10 @@ namespace Client
 
             ref var inst = ref Instance[index];
             int animIdx = inst.Animation;
-            if (animIdx < 0 || animIdx >= Data.Animation.Length)
+            if (animIdx < 0 || animIdx >= Animation.Instance.Count)
                 return;
 
-            var anim = Data.Animation[animIdx];
+            var anim = Animation.Instance[animIdx];
             Animation.OnStream(animIdx);
 
             // Advance each layer independently with strict bounds checks
@@ -253,14 +253,14 @@ namespace Client
             // Get dimensions and column count from controls and graphic info
             int totalWidth = gfxInfo.Width;
             int totalHeight = gfxInfo.Height;
-            int columns = Data.Animation[data].Frames[layer];
+            int columns = Animation.Instance[data].Frames[layer];
             int frameWidth = columns > 0 ? (int)Math.Round(totalWidth / (double)columns) : 0;
             int rows = frameWidth > 0 ? Math.Max(1, (int)Math.Round(totalHeight / (double)frameWidth)) : 1;
             int frameHeight = rows > 0 ? (int)Math.Round(totalHeight / (double)rows) : 0;
             int frameCount = rows * Math.Max(1, columns);
 
             OnCreate(data, x, y);
-            return Data.Animation[data].LoopTime[layer] * frameCount * Data.Animation[data].LoopCount[layer];
+            return Animation.Instance[data].LoopTime[layer] * frameCount * Animation.Instance[data].LoopCount[layer];
         }
 
         public static void OnCreate(int animationNum, byte x, byte y)
@@ -292,7 +292,7 @@ namespace Client
                 instance.Used[0] = true;
                 instance.Used[1] = true;
 
-                sound = Data.Animation[instance.Animation].Sound;
+                sound = Animation.Instance[instance.Animation].Sound;
                 if (!string.IsNullOrEmpty(sound))
                     Audio.PlaySound(sound, instance.X, instance.Y);
             }
@@ -370,11 +370,6 @@ namespace Client
         }
 
         public static void OnSave(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnUpdate(int index)
         {
             throw new NotImplementedException();
         }

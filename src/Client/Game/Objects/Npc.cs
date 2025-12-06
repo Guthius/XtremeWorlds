@@ -273,14 +273,12 @@ namespace Client
             Data.Npc[index].DropItem = new int[Core.Globals.Variables.MaxDropItems];
             Data.Npc[index].DropItemValue = new int[Core.Globals.Variables.MaxDropItems];
             Data.Npc[index].Skill = new byte[Core.Globals.Variables.MaxNpcSkills];
-            GameState.NpcLoaded[index] = 0;
         }
 
         public static void OnStream(int npcNum)
         {
-            if (npcNum >= 0 && string.IsNullOrEmpty(Data.Npc[npcNum].Name) && GameState.NpcLoaded[npcNum] == 0)
+            if (npcNum >= 0 && string.IsNullOrEmpty(Data.Npc[npcNum].Name))
             {
-                GameState.NpcLoaded[(int)npcNum] = 1;
                 Sender.SendRequestNpc(npcNum);
             }
         }

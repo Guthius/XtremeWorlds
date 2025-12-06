@@ -26,14 +26,12 @@ namespace Client
             Data.Skill[index].Name = "";
             Data.Skill[index].JobReq = -1;
             Data.Skill[index].SkillAnim = -1;
-            GameState.SkillLoaded[index] = 0;
         }
 
         public static void OnStream(int skillNum)
         {
-            if (skillNum >= 0 && string.IsNullOrEmpty(Data.Skill[skillNum].Name) && GameState.SkillLoaded[skillNum] == 0)
+            if (skillNum >= 0 && string.IsNullOrEmpty(Data.Skill[skillNum].Name))
             {
-                GameState.SkillLoaded[skillNum] = 1;
                 Sender.SendRequestSkill(skillNum);
             }
         }

@@ -1,4 +1,5 @@
 ﻿using Core.Globals;
+using Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -6,12 +7,18 @@ using System.Text;
 
 namespace Core.Objects
 {
-    public class ItemBase
+    public class ItemBase : Stream, IData
     {
+        public static bool[] IsChanged { get; set; } = new bool[Variables.MaxItems];
         public ItemBase()
         {
-            AddStat = new byte[Enum.GetNames(typeof(Stat)).Length];
-            StatReq = new byte[Enum.GetNames(typeof(Stat)).Length];
+            AddStat = new int[Enum.GetNames(typeof(Stat)).Length];
+            StatReq = new int[Enum.GetNames(typeof(Stat)).Length];
+
+            Name = "";
+            Description = "";
+            Ammo = -1;
+            Stackable = 1;
         }
 
         public string Name;
@@ -27,11 +34,11 @@ namespace Core.Objects
         public int LevelReq;
         public byte Mastery;
         public int Price;
-        public byte[] AddStat;
+        public int[] AddStat;
         public byte Rarity;
         public int Speed;
         public byte BindType;
-        public byte[] StatReq;
+        public int[] StatReq;
         public int Animation;
         public int Paperdoll;
         public byte Stackable;
@@ -40,64 +47,46 @@ namespace Core.Objects
         public byte KnockBackTiles;
         public int Projectile;
         public int Ammo;
-
         public static List<ItemBase> Instance { get; private set; } = new List<ItemBase>();
         public int Index { get; set; } = -1;
 
-        private static readonly object _sizeLock = new();
-
-        // Ensure the Instance list is exactly 'count' long and initialize new slots
-        public static void EnsureSize(int count)
+        public static void OnClear(int index)
         {
-            if (count < 0)
-            {
-                count = 0;
-            }
-
-            lock (_sizeLock)
-            {
-                if (Instance.Count == count)
-                {
-                    return;
-                }
-
-                var old = Instance;
-                var fresh = new ItemBase[count];
-
-                int copy = Math.Min(old.Count, count);
-                for (int i = 0; i < copy; i++)
-                {
-                    fresh[i] = old[i];
-                }
-
-                for (int i = copy; i < count; i++)
-                {
-                    fresh[i] = new ItemBase();
-                }
-
-                Instance = new List<ItemBase>(fresh);
-
-                // Initialize newly added or defaulted entries
-                for (int i = 0; i < Instance.Count; i++)
-                {
-                    if (Instance[i] == null)
-                    {
-                        Instance[i] = new ItemBase();
-                    }
-                }
-            }
+            if (Instance.Count <= index)
+                Instance.Add(new ItemBase());
+            else
+                Instance[index] = new ItemBase();
         }
 
-        // Safe accessor that ensures the slot exists and is initialized
-        public static ItemBase GetOrCreate(int index)
+        public static void OnClearChanged()
         {
-            if (index < 0) throw new ArgumentOutOfRangeException(nameof(index));
-            // Use the lock to avoid races with EnsureSize
-            lock (_sizeLock)
-            {
-                EnsureSize(Math.Max(Instance.Count, index + 1));
-                return Instance[index];
-            }
+            IsChanged = new bool[Variables.MaxItems];
+        }
+
+        public static void OnReset()
+        {
+            for (int i = 0; i < Variables.MaxItems; i++)
+                OnClear(i);
+        }
+
+        public static void OnDraw(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnLoad(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnSave(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void OnUpdate(int index)
+        {
+            throw new NotImplementedException();
         }
     }
 }

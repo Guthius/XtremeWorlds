@@ -16,7 +16,6 @@ namespace Client
             Data.Moral[index] = default;
 
             Data.Moral[index].Name = "";
-            GameState.MoralLoaded[index] = 0;
         }
 
         public static void OnReset()
@@ -31,9 +30,8 @@ namespace Client
 
         public static void OnStream(int moralNum)
         {
-            if (moralNum >= 0 & string.IsNullOrEmpty(Data.Moral[moralNum].Name) && GameState.MoralLoaded[moralNum] == 0)
+            if (moralNum >= 0 & string.IsNullOrEmpty(Data.Moral[moralNum].Name))
             {
-                GameState.MoralLoaded[moralNum] = 1;
                 Sender.SendRequestMoral(moralNum);
             }
         }

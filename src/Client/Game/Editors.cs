@@ -1054,7 +1054,7 @@ namespace Client
 
             for (i = 0; i < Variables.MaxAnimations; i++)
             {
-                if (GameState.AnimationChanged[i])
+                if (Animation.IsChanged[i])
                 {
                     Sender.SendSaveAnimation(i);
                 }
@@ -1076,7 +1076,7 @@ namespace Client
         public static void ClearChanged_Animation()
         {
             for (int i = 0; i < Variables.MaxAnimations; i++)
-                GameState.AnimationChanged[i] = false;
+                Animation.IsChanged[i] = false;
         }
 
         #endregion
@@ -1254,7 +1254,7 @@ namespace Client
 
             for (i = 0; i < Variables.MaxItems; i++)
             {
-                if (GameState.ItemChanged[i])
+                if (Item.IsChanged[i])
                 {
                     Sender.SendSaveItem(i);
                 }

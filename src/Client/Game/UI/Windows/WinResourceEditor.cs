@@ -90,7 +90,7 @@ public class WinResourceEditor
             {
                 for (int i = 0; i < Variables.MaxAnimations; i++)
                 {
-                    var nm = Data.Animation[i].Name ?? string.Empty;
+                    var nm = Animation.Instance[i].Name ?? string.Empty;
                     cmbAnim.Items.Add($"{i + 1}: {nm}");
                 }
             }

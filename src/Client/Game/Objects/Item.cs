@@ -8,64 +8,17 @@ using Core.Objects;
 
 namespace Client
 {
-    public class Item : ItemBase, IData
+    public class Item : ItemBase, IStreamable
     {
         #region Database
-        public static void OnClear(int index)
+        public static void OnStream(int index)
         {
-            if (index < 0 || index >= ItemBase.Instance.Count) return;
-
-            ItemBase.Instance[index].Name = "";
-            ItemBase.Instance[index].Description = "";
-            ItemBase.Instance[index].Ammo = -1;
-            ItemBase.Instance[index].Stackable = 1;
-
-            GameState.ItemLoaded[index] = 0;
-        }
-
-        public static void OnReset()
-        {
-            // Size instance storage first, then clear all
-            ItemBase.EnsureSize(Variables.MaxItems);
-
-            for (int i = 0; i < Variables.MaxItems; i++)
-                OnClear(i);
-        }
-
-        public static void OnClearChanged()
-        {
-            GameState.ItemChanged = new bool[Variables.MaxItems];
-        }
-
-        public static void OnDraw(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnLoad(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnStream(int itemNum)
-        {
-            if (itemNum < 0 || itemNum >= Variables.MaxItems) return;
-            var it = ItemBase.Instance[itemNum];
-            if (string.IsNullOrEmpty(it.Name) && GameState.ItemLoaded[itemNum] == 0)
+            if (index < 0 || index >= Variables.MaxItems) return;
+            if (string.IsNullOrEmpty(Item.Instance[index].Name) && Item.Instance[index].IsLoaded == false)
             {
-                GameState.ItemLoaded[itemNum] = 1;
-                Sender.SendRequestItem(itemNum);
+                Sender.SendRequestItem(index);
+                Item.Instance[index].IsLoaded = true;
             }
-        }
-
-        public static void OnSave(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnUpdate(int index)
-        {
-            throw new NotImplementedException();
         }
         #endregion
     }

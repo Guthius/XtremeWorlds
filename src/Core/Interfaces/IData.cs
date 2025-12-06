@@ -4,7 +4,6 @@ namespace Core.Interfaces
     {
         static abstract void OnDraw(int index);
         static abstract void OnClear(int index);
-        static abstract void OnStream(int index);
         static abstract void OnReset();
         static abstract void OnLoad(int index);
         static abstract void OnSave(int index);

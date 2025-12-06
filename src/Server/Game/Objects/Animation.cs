@@ -11,14 +11,15 @@ using static Core.Net.Packets;
 using static Core.Globals.Command;
 using Type = Core.Globals.Type;
 using Core.Interfaces;
+using Core.Objects;
 
 namespace Server;
 
-public class Animation : IData, IAsyncData
+public class Animation : AnimationBase, IAsyncData
 {
     public static void OnSave(int index)
     {
-        var json = JsonConvert.SerializeObject(Data.Animation[index]);
+        var json = JsonConvert.SerializeObject(Animation.Instance[index]);
 
         if (Database.RowExists(index, "animation"))
         {
@@ -44,44 +45,8 @@ public class Animation : IData, IAsyncData
             return;
         }
 
-        var animationData = JObject.FromObject(data).ToObject<Type.Animation>();
+        var animationData = JObject.FromObject(data).ToObject<Animation>();
 
-        Data.Animation[index] = animationData;
-    }
-
-    public static void OnClear(int index)
-    {
-        Data.Animation[index].Name = "";
-        Data.Animation[index].Sound = "";
-        Data.Animation[index].Sprite = [0, 0];
-        Data.Animation[index].Frames = [0, 0];
-        Data.Animation[index].LoopCount = [0, 0];
-        Data.Animation[index].LoopTime = [0, 0];
-    }
-
-    public static void OnDraw(int index)
-    {
-        throw new NotImplementedException();
-    }
-
-    public static void OnStream(int index)
-    {
-        throw new NotImplementedException();
-    }
-
-    public static void OnReset()
-    {
-        for (int i = 0; i < Data.Animation.Length; i++)
-            OnClear(i);
-    }
-
-    public static void OnLoad(int index)
-    {
-        throw new NotImplementedException();
-    }
-
-    public static void OnUpdate(int index)
-    {
-        throw new NotImplementedException();
+        Animation.Instance.Add(animationData ?? new Animation());
     }
 }

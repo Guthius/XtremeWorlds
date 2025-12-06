@@ -1523,7 +1523,7 @@ namespace Client
                 cmbPlayAnim.Items.Clear();
 
                 for (i = 0; i < Variables.MaxAnimations; i++)
-                    cmbPlayAnim.Items.Add(i + 1 + ". " + Data.Animation[i].Name);
+                    cmbPlayAnim.Items.Add(i + 1 + ". " + Animation.Instance[i].Name);
                 cmbPlayAnim.SelectedIndex = 0;
 
                 cmbPlayBGM.Items.Clear();

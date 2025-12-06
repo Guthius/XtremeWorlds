@@ -3229,27 +3229,27 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         var animationNum = packetReader.ReadInt32();
 
-        for (var i = 0; i < Data.Animation[animationNum].Frames.Length; i++)
+        for (var i = 0; i < Animation.Instance[animationNum].Frames.Length; i++)
         {
-            Data.Animation[animationNum].Frames[i] = packetReader.ReadInt32();
+            Animation.Instance[animationNum].Frames[i] = packetReader.ReadInt32();
         }
 
-        for (var i = 0; i < Data.Animation[animationNum].LoopCount.Length; i++)
+        for (var i = 0; i < Animation.Instance[animationNum].LoopCount.Length; i++)
         {
-            Data.Animation[animationNum].LoopCount[i] = packetReader.ReadInt32();
+            Animation.Instance[animationNum].LoopCount[i] = packetReader.ReadInt32();
         }
 
-        for (var i = 0; i < Data.Animation[animationNum].LoopTime.Length; i++)
+        for (var i = 0; i < Animation.Instance[animationNum].LoopTime.Length; i++)
         {
-            Data.Animation[animationNum].LoopTime[i] = packetReader.ReadInt32();
+            Animation.Instance[animationNum].LoopTime[i] = packetReader.ReadInt32();
         }
 
-        Data.Animation[animationNum].Name = packetReader.ReadString();
-        Data.Animation[animationNum].Sound = packetReader.ReadString();
+        Animation.Instance[animationNum].Name = packetReader.ReadString();
+        Animation.Instance[animationNum].Sound = packetReader.ReadString();
 
-        for (var i = 0; i < Data.Animation[animationNum].Sprite.Length; i++)
+        for (var i = 0; i < Animation.Instance[animationNum].Sprite.Length; i++)
         {
-            Data.Animation[animationNum].Sprite[i] = packetReader.ReadInt32();
+            Animation.Instance[animationNum].Sprite[i] = packetReader.ReadInt32();
         }
 
         Animation.OnSave(animationNum);

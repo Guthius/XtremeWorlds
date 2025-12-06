@@ -160,7 +160,7 @@ public class Script
         NetworkSend.SendPlaySound(index, "Bell.ogg", GetPlayerX(index), GetPlayerY(index));
     }
 
-    public void MapDropItem(int index, int mapSlot, int invSlot, int amount, int mapNum, Type.Item item, int itemNum)
+    public void MapDropItem(int index, int mapSlot, int invSlot, int amount, int mapNum, Item item, int itemNum)
     {
         // Determine if the item is currency or stackable
         if (item.Type == (byte)ItemCategory.Currency || item.Stackable == 1)
