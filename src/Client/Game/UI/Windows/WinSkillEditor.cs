@@ -18,7 +18,7 @@ public class WinSkillEditor
             return;
 
         PopulateCombos();
-        SelectedIndex = Math.Clamp(GameState.EditorIndex, 0, Variables.MaxSkills - 1);
+        SelectedIndex = 0;
         RefreshList();
         OnLoad(SelectedIndex);
     }
