@@ -184,7 +184,7 @@ public class WinBank
         var slot = General.IsBank(winBank.X, winBank.Y);
         if (slot >= 0)
         {
-            Sender.SendWithdrawItem(slot, GetBankValue(GameState.MyIndex, slot));
+            Sender.SendWithdrawItem((byte)slot, GetBankValue(GameState.MyIndex, slot));
 
             return;
         }

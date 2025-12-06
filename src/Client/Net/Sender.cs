@@ -14,15 +14,15 @@ public static class Sender
 {
     private static readonly int StatCount = Enum.GetValues<Stat>().Length;
 
-    public static void SendAddChar(string characterName, int sexNum, int jobNum)
+    public static void SendAddChar(string name, int sex, int job)
     {
         var packetWriter = new PacketWriter();
 
         packetWriter.WriteEnum(Packets.ClientPackets.CAddChar);
         packetWriter.WriteByte(GameState.CharNum);
-        packetWriter.WriteString(characterName);
-        packetWriter.WriteInt32(sexNum);
-        packetWriter.WriteInt32(jobNum);
+        packetWriter.WriteString(name);
+        packetWriter.WriteInt32(sex);
+        packetWriter.WriteInt32(job);
 
         Network.Send(packetWriter);
     }
@@ -202,12 +202,12 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void WarpTo(int mapNum)
+    public static void WarpTo(int index)
     {
         var packetWriter = new PacketWriter(8);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CWarpTo);
-        packetWriter.WriteInt32(mapNum);
+        packetWriter.WriteInt32(index);
 
         Network.Send(packetWriter);
     }
@@ -221,23 +221,23 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendSpawnItem(int tmpItem, int tmpAmount)
+    public static void SendSpawnItem(int index, int amount)
     {
         var packetWriter = new PacketWriter(12);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CSpawnItem);
-        packetWriter.WriteInt32(tmpItem);
-        packetWriter.WriteInt32(tmpAmount);
+        packetWriter.WriteInt32(index);
+        packetWriter.WriteInt32(amount);
 
         Network.Send(packetWriter);
     }
 
-    public static void SendSetSprite(int spriteNum)
+    public static void SendSetSprite(int index)
     {
         var packetWriter = new PacketWriter(8);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CSetSprite);
-        packetWriter.WriteInt32(spriteNum);
+        packetWriter.WriteInt32(index);
 
         Network.Send(packetWriter);
     }
@@ -281,12 +281,12 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendRequestNpc(int npcNum)
+    public static void SendRequestNpc(int index)
     {
         var packetWriter = new PacketWriter();
 
         packetWriter.WriteEnum(Packets.ClientPackets.CRequestNpc);
-        packetWriter.WriteInt32(npcNum);
+        packetWriter.WriteInt32(index);
 
         Network.Send(packetWriter);
     }
@@ -361,12 +361,12 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendMotdChange(string welcome)
+    public static void SendMotdChange(string message)
     {
         var packetWriter = new PacketWriter();
 
         packetWriter.WriteEnum(Packets.ClientPackets.CSetMotd);
-        packetWriter.WriteString(welcome);
+        packetWriter.WriteString(message);
 
         Network.Send(packetWriter);
     }
@@ -411,12 +411,12 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendUseItem(int invNum)
+    public static void SendUseItem(int index)
     {
         var packetWriter = new PacketWriter(8);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CUseItem);
-        packetWriter.WriteInt32(invNum);
+        packetWriter.WriteInt32(index);
 
         Network.Send(packetWriter);
     }
@@ -485,39 +485,38 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendUnequip(int eqNum)
+    public static void SendUnequip(int index)
     {
         var packetWriter = new PacketWriter(8);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CUnequip);
-        packetWriter.WriteInt32(eqNum);
-
+        packetWriter.WriteInt32(index);
         Network.Send(packetWriter);
     }
 
-    public static void SendForgetSkill(int skillSlot)
+    public static void SendForgetSkill(int index)
     {
         // Check for subscript out of range
-        if (skillSlot < 0 || skillSlot > Variables.MaxPlayerSkills)
+        if (index < 0 || index > Variables.MaxPlayerSkills)
         {
             return;
         }
 
         // Dont let them forget a skill which is in CD
-        if (Data.Player[GameState.MyIndex].Skill[skillSlot].Cd > 0)
+        if (Data.Player[GameState.MyIndex].Skill[index].Cd > 0)
         {
             TextRenderer.AddText("Cannot forget a skill which is cooling down!", (int) ColorName.Red);
             return;
         }
 
         // Dont let them forget a skill which is buffered
-        if (GameState.SkillBuffer == skillSlot)
+        if (GameState.SkillBuffer == index)
         {
             TextRenderer.AddText("Cannot forget a skill which you are casting!", (int) ColorName.Red);
             return;
         }
 
-        if (Data.Player[GameState.MyIndex].Skill[skillSlot].Num < 0)
+        if (Data.Player[GameState.MyIndex].Skill[index].Num < 0)
         {
             TextRenderer.AddText("No skill found.", (int) ColorName.Red);
             return;
@@ -526,7 +525,7 @@ public static class Sender
         var packetWriter = new PacketWriter(8);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CForgetSkill);
-        packetWriter.WriteInt32(skillSlot);
+        packetWriter.WriteInt32(index);
 
         Network.Send(packetWriter);
     }
@@ -549,12 +548,12 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendUseEmote(int emote)
+    public static void SendUseEmote(int index)
     {
         var packetWriter = new PacketWriter(8);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CEmote);
-        packetWriter.WriteInt32(emote);
+        packetWriter.WriteInt32(index);
 
         Network.Send(packetWriter);
     }
@@ -568,27 +567,26 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendSaveResource(int resourceNum)
+    public static void SendSaveResource(int index)
     {
         var packetWriter = new PacketWriter();
 
         packetWriter.WriteEnum(Packets.ClientPackets.CSaveResource);
-        packetWriter.WriteInt32(resourceNum);
-        packetWriter.WriteInt32(Data.Resource[resourceNum].Animation);
-        packetWriter.WriteString(Data.Resource[resourceNum].EmptyMessage);
-        packetWriter.WriteInt32(Data.Resource[resourceNum].ExhaustedImage);
-        packetWriter.WriteInt32(Data.Resource[resourceNum].Health);
-        packetWriter.WriteInt32(Data.Resource[resourceNum].ExpReward);
-        packetWriter.WriteInt32(Data.Resource[resourceNum].ItemReward);
-        packetWriter.WriteString(Data.Resource[resourceNum].Name);
-        packetWriter.WriteInt32(Data.Resource[resourceNum].ResourceImage);
-        packetWriter.WriteInt32(Data.Resource[resourceNum].ResourceType);
-        packetWriter.WriteInt32(Data.Resource[resourceNum].RespawnTime);
-        packetWriter.WriteString(Data.Resource[resourceNum].SuccessMessage);
-        packetWriter.WriteInt32(Data.Resource[resourceNum].LvlRequired);
-        packetWriter.WriteInt32(Data.Resource[resourceNum].ToolRequired);
-        packetWriter.WriteBoolean(Data.Resource[resourceNum].Walkthrough);
-
+        packetWriter.WriteInt32(index);
+        packetWriter.WriteInt32(Data.Resource[index].Animation);
+        packetWriter.WriteString(Data.Resource[index].EmptyMessage);
+        packetWriter.WriteInt32(Data.Resource[index].ExhaustedImage);
+        packetWriter.WriteInt32(Data.Resource[index].Health);
+        packetWriter.WriteInt32(Data.Resource[index].ExpReward);
+        packetWriter.WriteInt32(Data.Resource[index].ItemReward);
+        packetWriter.WriteString(Data.Resource[index].Name);
+        packetWriter.WriteInt32(Data.Resource[index].ResourceImage);
+        packetWriter.WriteInt32(Data.Resource[index].ResourceType);
+        packetWriter.WriteInt32(Data.Resource[index].RespawnTime);
+        packetWriter.WriteString(Data.Resource[index].SuccessMessage);
+        packetWriter.WriteInt32(Data.Resource[index].LvlRequired);
+        packetWriter.WriteInt32(Data.Resource[index].ToolRequired);
+        packetWriter.WriteBoolean(Data.Resource[index].Walkthrough);
         Network.Send(packetWriter);
     }
 
@@ -601,45 +599,44 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendSaveNpc(int npcNum)
+    public static void SendSaveNpc(int index)
     {
         var packetWriter = new PacketWriter();
 
         packetWriter.WriteEnum(Packets.ClientPackets.CSaveNpc);
-        packetWriter.WriteInt32(npcNum);
-        packetWriter.WriteInt32(Data.Npc[npcNum].Animation);
-        packetWriter.WriteString(Data.Npc[npcNum].AttackSay);
-        packetWriter.WriteByte(Data.Npc[npcNum].Behavior);
+        packetWriter.WriteInt32(index);
+        packetWriter.WriteInt32(Data.Npc[index].Animation);
+        packetWriter.WriteString(Data.Npc[index].AttackSay);
+        packetWriter.WriteByte(Data.Npc[index].Behavior);
 
         for (var i = 0; i < Variables.MaxDropItems; i++)
         {
-            packetWriter.WriteInt32(Data.Npc[npcNum].DropChance[i]);
-            packetWriter.WriteInt32(Data.Npc[npcNum].DropItem[i]);
-            packetWriter.WriteInt32(Data.Npc[npcNum].DropItemValue[i]);
+            packetWriter.WriteInt32(Data.Npc[index].DropChance[i]);
+            packetWriter.WriteInt32(Data.Npc[index].DropItem[i]);
+            packetWriter.WriteInt32(Data.Npc[index].DropItemValue[i]);
         }
 
-        packetWriter.WriteInt32(Data.Npc[npcNum].Exp);
-        packetWriter.WriteByte(Data.Npc[npcNum].Faction);
-        packetWriter.WriteInt32(Data.Npc[npcNum].Hp);
-        packetWriter.WriteString(Data.Npc[npcNum].Name);
-        packetWriter.WriteByte(Data.Npc[npcNum].Range);
-        packetWriter.WriteByte(Data.Npc[npcNum].SpawnTime);
-        packetWriter.WriteInt32(Data.Npc[npcNum].SpawnSecs);
-        packetWriter.WriteInt32(Data.Npc[npcNum].Sprite);
+        packetWriter.WriteInt32(Data.Npc[index].Exp);
+        packetWriter.WriteByte(Data.Npc[index].Faction);
+        packetWriter.WriteInt32(Data.Npc[index].Hp);
+        packetWriter.WriteString(Data.Npc[index].Name);
+        packetWriter.WriteByte(Data.Npc[index].Range);
+        packetWriter.WriteByte(Data.Npc[index].SpawnTime);
+        packetWriter.WriteInt32(Data.Npc[index].SpawnSecs);
+        packetWriter.WriteInt32(Data.Npc[index].Sprite);
 
         for (var i = 0; i < StatCount; i++)
         {
-            packetWriter.WriteByte(Data.Npc[npcNum].Stat[i]);
+            packetWriter.WriteByte(Data.Npc[index].Stat[i]);
         }
 
         for (var i = 0; i < Variables.MaxNpcSkills; i++)
         {
-            packetWriter.WriteByte(Data.Npc[npcNum].Skill[i]);
+            packetWriter.WriteByte(Data.Npc[index].Skill[i]);
         }
 
-        packetWriter.WriteInt32(Data.Npc[npcNum].Level);
-        packetWriter.WriteInt32(Data.Npc[npcNum].Damage);
-
+        packetWriter.WriteInt32(Data.Npc[index].Level);
+        packetWriter.WriteInt32(Data.Npc[index].Damage);
         Network.Send(packetWriter);
     }
 
@@ -652,65 +649,64 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendSaveSkill(int skillNum)
+    public static void SendSaveSkill(int index)
     {
         var packetWriter = new PacketWriter(4);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CSaveSkill);
-        packetWriter.WriteInt32(skillNum);
+        packetWriter.WriteInt32(index);
 
-        packetWriter.WriteInt32(Data.Skill[skillNum].AccessReq);
-        packetWriter.WriteInt32(Data.Skill[skillNum].AoE);
-        packetWriter.WriteInt32(Data.Skill[skillNum].CastAnim);
-        packetWriter.WriteInt32(Data.Skill[skillNum].CastTime);
-        packetWriter.WriteInt32(Data.Skill[skillNum].CdTime);
-        packetWriter.WriteInt32(Data.Skill[skillNum].JobReq);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Dir);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Duration);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Icon);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Interval);
-        packetWriter.WriteInt32(Data.Skill[skillNum].IsAoE ? 1 : 0);
-        packetWriter.WriteInt32(Data.Skill[skillNum].LevelReq);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Map);
-        packetWriter.WriteInt32(Data.Skill[skillNum].MpCost);
-        packetWriter.WriteString(Data.Skill[skillNum].Name);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Range);
-        packetWriter.WriteInt32(Data.Skill[skillNum].SkillAnim);
-        packetWriter.WriteInt32(Data.Skill[skillNum].StunDuration);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Type);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Vital);
-        packetWriter.WriteInt32(Data.Skill[skillNum].X);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Y);
+        packetWriter.WriteInt32(Data.Skill[index].AccessReq);
+        packetWriter.WriteInt32(Data.Skill[index].AoE);
+        packetWriter.WriteInt32(Data.Skill[index].CastAnim);
+        packetWriter.WriteInt32(Data.Skill[index].CastTime);
+        packetWriter.WriteInt32(Data.Skill[index].CdTime);
+        packetWriter.WriteInt32(Data.Skill[index].JobReq);
+        packetWriter.WriteInt32(Data.Skill[index].Dir);
+        packetWriter.WriteInt32(Data.Skill[index].Duration);
+        packetWriter.WriteInt32(Data.Skill[index].Icon);
+        packetWriter.WriteInt32(Data.Skill[index].Interval);
+        packetWriter.WriteInt32(Data.Skill[index].IsAoE ? 1 : 0);
+        packetWriter.WriteInt32(Data.Skill[index].LevelReq);
+        packetWriter.WriteInt32(Data.Skill[index].Map);
+        packetWriter.WriteInt32(Data.Skill[index].MpCost);
+        packetWriter.WriteString(Data.Skill[index].Name);
+        packetWriter.WriteInt32(Data.Skill[index].Range);
+        packetWriter.WriteInt32(Data.Skill[index].SkillAnim);
+        packetWriter.WriteInt32(Data.Skill[index].StunDuration);
+        packetWriter.WriteInt32(Data.Skill[index].Type);
+        packetWriter.WriteInt32(Data.Skill[index].Vital);
+        packetWriter.WriteInt32(Data.Skill[index].X);
+        packetWriter.WriteInt32(Data.Skill[index].Y);
 
-        packetWriter.WriteInt32(Data.Skill[skillNum].IsProjectile);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Projectile);
+        packetWriter.WriteInt32(Data.Skill[index].IsProjectile);
+        packetWriter.WriteInt32(Data.Skill[index].Projectile);
 
-        packetWriter.WriteInt32(Data.Skill[skillNum].KnockBack);
-        packetWriter.WriteInt32(Data.Skill[skillNum].KnockBackTiles);
-        packetWriter.WriteInt32(Data.Skill[skillNum].MultiDirMask);
-        packetWriter.WriteInt32(Data.Skill[skillNum].ChainOnHitSkillId);
-        packetWriter.WriteInt32(Data.Skill[skillNum].CommonEventType);
-        packetWriter.WriteInt32(Data.Skill[skillNum].CommonEventData1);
-        packetWriter.WriteInt32(Data.Skill[skillNum].CommonEventData2);
-
+        packetWriter.WriteInt32(Data.Skill[index].KnockBack);
+        packetWriter.WriteInt32(Data.Skill[index].KnockBackTiles);
+        packetWriter.WriteInt32(Data.Skill[index].MultiDirMask);
+        packetWriter.WriteInt32(Data.Skill[index].ChainOnHitSkillId);
+        packetWriter.WriteInt32(Data.Skill[index].CommonEventType);
+        packetWriter.WriteInt32(Data.Skill[index].CommonEventData1);
+        packetWriter.WriteInt32(Data.Skill[index].CommonEventData2);
         Network.Send(packetWriter);
     }
 
-    public static void SendSaveShop(int shopNum)
+    public static void SendSaveShop(int index)
     {
         var packetWriter = new PacketWriter();
 
         packetWriter.WriteEnum(Packets.ClientPackets.CSaveShop);
-        packetWriter.WriteInt32(shopNum);
-        packetWriter.WriteInt32(Data.Shop[shopNum].BuyRate);
-        packetWriter.WriteString(Data.Shop[shopNum].Name);
+        packetWriter.WriteInt32(index);
+        packetWriter.WriteInt32(Data.Shop[index].BuyRate);
+        packetWriter.WriteString(Data.Shop[index].Name);
 
         for (var i = 0; i < Variables.MaxTrades; i++)
         {
-            packetWriter.WriteInt32(Data.Shop[shopNum].TradeItem[i].CostItem);
-            packetWriter.WriteInt32(Data.Shop[shopNum].TradeItem[i].CostValue);
-            packetWriter.WriteInt32(Data.Shop[shopNum].TradeItem[i].Item);
-            packetWriter.WriteInt32(Data.Shop[shopNum].TradeItem[i].ItemValue);
+            packetWriter.WriteInt32(Data.Shop[index].TradeItem[i].CostItem);
+            packetWriter.WriteInt32(Data.Shop[index].TradeItem[i].CostValue);
+            packetWriter.WriteInt32(Data.Shop[index].TradeItem[i].Item);
+            packetWriter.WriteInt32(Data.Shop[index].TradeItem[i].ItemValue);
         }
 
         Network.Send(packetWriter);
@@ -725,32 +721,32 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendSaveAnimation(int animationNum)
+    public static void SendSaveAnimation(int index)
     {
         var packetWriter = new PacketWriter();
 
         packetWriter.WriteEnum(Packets.ClientPackets.CSaveAnimation);
-        packetWriter.WriteInt32(animationNum);
+        packetWriter.WriteInt32(index);
 
-        foreach (var frame in Animation.Instance[animationNum].Frames)
+        foreach (var frame in Animation.Instance[index].Frames)
         {
             packetWriter.WriteInt32(frame);
         }
 
-        foreach (var loopCount in Animation.Instance[animationNum].LoopCount)
+        foreach (var loopCount in Animation.Instance[index].LoopCount)
         {
             packetWriter.WriteInt32(loopCount);
         }
 
-        foreach (var loopTime in Animation.Instance[animationNum].LoopTime)
+        foreach (var loopTime in Animation.Instance[index].LoopTime)
         {
             packetWriter.WriteInt32(loopTime);
         }
 
-        packetWriter.WriteString(Animation.Instance[animationNum].Name);
-        packetWriter.WriteString(Animation.Instance[animationNum].Sound);
+        packetWriter.WriteString(Animation.Instance[index].Name);
+        packetWriter.WriteString(Animation.Instance[index].Sound);
 
-        foreach (var sprite in Animation.Instance[animationNum].Sprite)
+        foreach (var sprite in Animation.Instance[index].Sprite)
         {
             packetWriter.WriteInt32(sprite);
         }
@@ -776,87 +772,83 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendSaveJob(int jobNum)
+    public static void SendSaveJob(int index)
     {
         var packetWriter = new PacketWriter();
 
         packetWriter.WriteEnum(Packets.ClientPackets.CSaveJob);
-        packetWriter.WriteInt32(jobNum);
-        packetWriter.WriteString(Data.Job[jobNum].Name);
-        packetWriter.WriteString(Data.Job[jobNum].Desc);
-        packetWriter.WriteInt32(Data.Job[jobNum].MaleSprite);
-        packetWriter.WriteInt32(Data.Job[jobNum].FemaleSprite);
-
+        packetWriter.WriteInt32(index);
+        packetWriter.WriteString(Data.Job[index].Name);
+        packetWriter.WriteString(Data.Job[index].Desc);
+        packetWriter.WriteInt32(Data.Job[index].MaleSprite);
+        packetWriter.WriteInt32(Data.Job[index].FemaleSprite);
         for (var i = 0; i < StatCount; i++)
         {
-            packetWriter.WriteInt32(Data.Job[jobNum].Stat[i]);
+            packetWriter.WriteInt32(Data.Job[index].Stat[i]);
         }
 
         for (var i = 0; i < Variables.MaxStartItems; i++)
         {
-            packetWriter.WriteInt32(Data.Job[jobNum].StartItem[i]);
-            packetWriter.WriteInt32(Data.Job[jobNum].StartValue[i]);
+            packetWriter.WriteInt32(Data.Job[index].StartItem[i]);
+            packetWriter.WriteInt32(Data.Job[index].StartValue[i]);
         }
 
         for (var i = 0; i < Variables.MaxStartSkills; i++)
         {
-            packetWriter.WriteInt32(Data.Job[jobNum].StartSkill[i]);
+            packetWriter.WriteInt32(Data.Job[index].StartSkill[i]);
         }
 
-        packetWriter.WriteInt32(Data.Job[jobNum].StartMap);
-        packetWriter.WriteByte(Data.Job[jobNum].StartX);
-        packetWriter.WriteByte(Data.Job[jobNum].StartY);
-        packetWriter.WriteInt32(Data.Job[jobNum].BaseExp);
+        packetWriter.WriteInt32(Data.Job[index].StartMap);
+        packetWriter.WriteByte(Data.Job[index].StartX);
+        packetWriter.WriteByte(Data.Job[index].StartY);
+        packetWriter.WriteInt32(Data.Job[index].BaseExp);
 
         Network.Send(packetWriter);
     }
 
-    public static void SendSaveItem(int itemNum)
+    public static void SendSaveItem(int index)
     {
         var packetWriter = new PacketWriter();
 
         packetWriter.WriteEnum(Packets.ClientPackets.CSaveItem);
-        packetWriter.WriteInt32(itemNum);
-        packetWriter.WriteInt32(Item.Instance[itemNum].AccessReq);
+        packetWriter.WriteInt32(index);
+        packetWriter.WriteInt32(Item.Instance[index].AccessReq);
 
         for (var i = 0; i < StatCount; i++)
         {
-            packetWriter.WriteInt32(Item.Instance[itemNum].AddStat[i]);
+            packetWriter.WriteInt32(Item.Instance[index].AddStat[i]);
         }
 
-        packetWriter.WriteInt32(Item.Instance[itemNum].Animation);
-        packetWriter.WriteByte(Item.Instance[itemNum].BindType);
-        packetWriter.WriteInt32(Item.Instance[itemNum].JobReq);
-        packetWriter.WriteInt32(Item.Instance[itemNum].Data1);
-        packetWriter.WriteInt32(Item.Instance[itemNum].Data2);
-        packetWriter.WriteInt32(Item.Instance[itemNum].Data3);
-        packetWriter.WriteInt32(Item.Instance[itemNum].LevelReq);
-        packetWriter.WriteInt32(Item.Instance[itemNum].Mastery);
-        packetWriter.WriteString(Item.Instance[itemNum].Name);
-        packetWriter.WriteInt32(Item.Instance[itemNum].Paperdoll);
-        packetWriter.WriteInt32(Item.Instance[itemNum].Icon);
-        packetWriter.WriteInt32(Item.Instance[itemNum].Price);
-        packetWriter.WriteInt32(Item.Instance[itemNum].Rarity);
-        packetWriter.WriteInt32(Item.Instance[itemNum].Speed);
+        packetWriter.WriteInt32(Item.Instance[index].Animation);
+        packetWriter.WriteByte(Item.Instance[index].BindType);
+        packetWriter.WriteInt32(Item.Instance[index ].JobReq);
+        packetWriter.WriteInt32(Item.Instance[index].Data1);
+        packetWriter.WriteInt32(Item.Instance[index].Data2);
+        packetWriter.WriteInt32(Item.Instance[index].Data3);
+        packetWriter.WriteInt32(Item.Instance[index].LevelReq);
+        packetWriter.WriteInt32(Item.Instance[index].Mastery);
+        packetWriter.WriteString(Item.Instance[index].Name);
+        packetWriter.WriteInt32(Item.Instance[index].Paperdoll);
+        packetWriter.WriteInt32(Item.Instance[index].Icon);
+        packetWriter.WriteInt32(Item.Instance[index].Price);
+        packetWriter.WriteInt32(Item.Instance[index].Rarity);
+        packetWriter.WriteInt32(Item.Instance[index].Speed);
 
-        packetWriter.WriteInt32(Item.Instance[itemNum].Stackable);
-        packetWriter.WriteString(Item.Instance[itemNum].Description);
-
+        packetWriter.WriteInt32(Item.Instance[index].Stackable);
+        packetWriter.WriteString(Item.Instance[index].Description);
         for (var i = 0; i < StatCount; i++)
         {
-            packetWriter.WriteInt32(Item.Instance[itemNum].StatReq[i]);
+            packetWriter.WriteInt32(Item.Instance[index].StatReq[i]);
         }
 
-        packetWriter.WriteInt32(Item.Instance[itemNum].Type);
-        packetWriter.WriteInt32(Item.Instance[itemNum].SubType);
+        packetWriter.WriteInt32(Item.Instance[index].Type);
+        packetWriter.WriteInt32(Item.Instance[index].SubType);
+        packetWriter.WriteInt32(Item.Instance[index].ItemLevel);
 
-        packetWriter.WriteInt32(Item.Instance[itemNum].ItemLevel);
-
-        packetWriter.WriteInt32(Item.Instance[itemNum].KnockBack);
-        packetWriter.WriteInt32(Item.Instance[itemNum].KnockBackTiles);
-
-        packetWriter.WriteInt32(Item.Instance[itemNum].Projectile);
-        packetWriter.WriteInt32(Item.Instance[itemNum].Ammo);
+        packetWriter.WriteInt32(Item.Instance[index].KnockBack);
+        packetWriter.WriteInt32(Item.Instance[index].KnockBackTiles);
+        packetWriter.WriteInt32(Item.Instance[index].Projectile);
+        packetWriter.WriteInt32(Item.Instance[index].Ammo);
 
         Network.Send(packetWriter);
     }
@@ -879,7 +871,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendSetHotbarSlot(int type, int newSlot, int oldSlot, int num)
+    public static void SendSetHotbarSlot(int type, int newSlot, int oldSlot, int index)
     {
         var packetWriter = new PacketWriter(20);
 
@@ -887,57 +879,56 @@ public static class Sender
         packetWriter.WriteInt32(type);
         packetWriter.WriteInt32(newSlot);
         packetWriter.WriteInt32(oldSlot);
-        packetWriter.WriteInt32(num);
-
+        packetWriter.WriteInt32(index);
         Network.Send(packetWriter);
     }
 
-    public static void SendDeleteHotbar(int slot)
+    public static void SendDeleteHotbar(int index)
     {
         var packetWriter = new PacketWriter(8);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CDeleteHotbarSlot);
-        packetWriter.WriteInt32(slot);
+        packetWriter.WriteInt32(index);
 
         Network.Send(packetWriter);
     }
 
-    public static void SendUseHotbarSlot(int slot)
+    public static void SendUseHotbarSlot(int index)
     {
         var packetWriter = new PacketWriter(8);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CUseHotbarSlot);
-        packetWriter.WriteInt32(slot);
+        packetWriter.WriteInt32(index);
 
         Network.Send(packetWriter);
     }
 
-    public static void SendLearnSkill(int tmpSkill)
+    public static void SendLearnSkill(int index)
     {
         var packetWriter = new PacketWriter(8);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CSkillLearn);
-        packetWriter.WriteInt32(tmpSkill);
+        packetWriter.WriteInt32(index);
 
         Network.Send(packetWriter);
     }
 
-    public static void SendCast(int skillSlot)
+    public static void SendCast(int index)
     {
         var packetWriter = new PacketWriter(8);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CCast);
-        packetWriter.WriteInt32(skillSlot);
+        packetWriter.WriteInt32(index);
 
         Network.Send(packetWriter);
     }
 
-    public static void SendRequestMoral(int moralNum)
+    public static void SendRequestMoral(int index)
     {
         var packetWriter = new PacketWriter(8);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CRequestMoral);
-        packetWriter.WriteInt32(moralNum);
+        packetWriter.WriteInt32(index);
 
         Network.Send(packetWriter);
     }
@@ -951,14 +942,14 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendSaveMoral(int moralNum)
+    public static void SendSaveMoral(int index)
     {
-        ref var moral = ref Data.Moral[moralNum];
+        ref var moral = ref Data.Moral[index];
 
         var packetWriter = new PacketWriter();
 
         packetWriter.WriteEnum(Packets.ClientPackets.CSaveMoral);
-        packetWriter.WriteInt32(moralNum);
+        packetWriter.WriteInt32(index);
         packetWriter.WriteString(moral.Name);
         packetWriter.WriteByte(moral.Color);
         packetWriter.WriteBoolean(moral.CanCast);
@@ -983,12 +974,12 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendRequestEditScript(int lineNumber = 0)
+    public static void SendRequestEditScript(int index)
     {
         var packetWriter = new PacketWriter(8);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CRequestEditScript);
-        packetWriter.WriteInt32(lineNumber);
+        packetWriter.WriteInt32(index);
 
         Network.Send(packetWriter);
     }
@@ -1003,52 +994,52 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendRequestItem(int itemNum)
+    public static void SendRequestItem(int index)
     {
         var packetWriter = new PacketWriter(8);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CRequestItem);
-        packetWriter.WriteInt32(itemNum);
+        packetWriter.WriteInt32(index);
 
         Network.Send(packetWriter);
     }
 
-    public static void SendRequestShop(int shopNum)
+    public static void SendRequestShop(int index)
     {
         var packetWriter = new PacketWriter(8);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CRequestShop);
-        packetWriter.WriteInt32(shopNum);
+        packetWriter.WriteInt32(index);
 
         Network.Send(packetWriter);
     }
 
-    public static void SendBuyItem(int shopSlot)
+    public static void SendBuyItem(int index)
     {
         var packetWriter = new PacketWriter(8);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CBuyItem);
-        packetWriter.WriteInt32(shopSlot);
+        packetWriter.WriteInt32(index);
 
         Network.Send(packetWriter);
     }
 
-    public static void SendSellItem(int invslot)
+    public static void SendSellItem(int index)
     {
         var packetWriter = new PacketWriter(8);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CSellItem);
-        packetWriter.WriteInt32(invslot);
+        packetWriter.WriteInt32(index);
 
         Network.Send(packetWriter);
     }
 
-    public static void SendRequestAnimation(int animationNum)
+    public static void SendRequestAnimation(int index)
     {
         var packetWriter = new PacketWriter(8);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CRequestAnimation);
-        packetWriter.WriteInt32(animationNum);
+        packetWriter.WriteInt32(index);
 
         Network.Send(packetWriter);
     }
@@ -1093,33 +1084,33 @@ public static class Sender
 
     }
 
-    public static void SendHandleTradeInvite(byte answer)
+    public static void SendHandleTradeInvite(int index)
     {
         var packetWriter = new PacketWriter(8);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CHandleTradeInvite);
-        packetWriter.WriteInt32(answer);
+        packetWriter.WriteInt32(index);
 
         Network.Send(packetWriter);
     }
 
-    public static void SendTradeItem(int invslot, int amount)
+    public static void SendTradeItem(int index, int amount)
     {
         var packetWriter = new PacketWriter(12);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CTradeItem);
-        packetWriter.WriteInt32(invslot);
+        packetWriter.WriteInt32(index);
         packetWriter.WriteInt32(amount);
 
         Network.Send(packetWriter);
     }
 
-    public static void SendUntradeItem(int invslot)
+    public static void SendUntradeItem(int index)
     {
         var packetWriter = new PacketWriter(8);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CUntradeItem);
-        packetWriter.WriteInt32(invslot);
+        packetWriter.WriteInt32(index);
 
         Network.Send(packetWriter);
     }
@@ -1439,23 +1430,23 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendDepositItem(int invslot, int amount)
+    public static void SendDepositItem(int index, int amount)
     {
         var packetWriter = new PacketWriter(12);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CDepositItem);
-        packetWriter.WriteInt32(invslot);
+        packetWriter.WriteInt32(index);
         packetWriter.WriteInt32(amount);
 
         Network.Send(packetWriter);
     }
 
-    public static void SendWithdrawItem(int bankSlot, int amount)
+    public static void SendWithdrawItem(byte index, int amount)
     {
         var packetWriter = new PacketWriter(9);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CWithdrawItem);
-        packetWriter.WriteByte((byte)bankSlot);
+        packetWriter.WriteByte(index);
         packetWriter.WriteInt32(amount);
 
         Network.Send(packetWriter);
@@ -1498,38 +1489,38 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendSaveProjectile(int projectileNum)
+    public static void SendSaveProjectile(int index)
     {
         var packetWriter = new PacketWriter();
 
         packetWriter.WriteEnum(Packets.ClientPackets.CSaveProjectile);
-        packetWriter.WriteInt32(projectileNum);
-        packetWriter.WriteString(Data.Projectile[projectileNum].Name);
-        packetWriter.WriteInt32(Data.Projectile[projectileNum].Sprite);
-        packetWriter.WriteInt32(Data.Projectile[projectileNum].Range);
-        packetWriter.WriteInt32(Data.Projectile[projectileNum].Speed);
-        packetWriter.WriteInt32(Data.Projectile[projectileNum].Damage);
-        packetWriter.WriteInt32(Data.Projectile[projectileNum].Animation);
+        packetWriter.WriteInt32(index);
+        packetWriter.WriteString(Data.Projectile[index].Name);
+        packetWriter.WriteInt32(Data.Projectile[index].Sprite);
+        packetWriter.WriteInt32(Data.Projectile[index].Range);
+        packetWriter.WriteInt32(Data.Projectile[index].Speed);
+        packetWriter.WriteInt32(Data.Projectile[index].Damage);
+        packetWriter.WriteInt32(Data.Projectile[index].Animation);
 
         Network.Send(packetWriter);
     }
 
-    public static void SendRequestProjectile(int projectileNum)
+    public static void SendRequestProjectile(int index)
     {
         var packetWriter = new PacketWriter(8);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CRequestProjectile);
-        packetWriter.WriteInt32(projectileNum);
+        packetWriter.WriteInt32(index);
 
         Network.Send(packetWriter);
     }
 
-    public static void SendClearProjectile(int projectileNum, int collisionindex, byte collisionType, int collisionZone)
+    public static void SendClearProjectile(int index, int collisionindex, byte collisionType, int collisionZone)
     {
         var packetWriter = new PacketWriter(20);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CClearProjectile);
-        packetWriter.WriteInt32(projectileNum);
+        packetWriter.WriteInt32(index);
         packetWriter.WriteInt32(collisionindex);
         packetWriter.WriteInt32(collisionType);
         packetWriter.WriteInt32(collisionZone);
