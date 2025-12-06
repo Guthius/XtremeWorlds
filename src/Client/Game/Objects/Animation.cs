@@ -17,7 +17,7 @@ namespace Client
 
         public static void OnStream(int animationNum)
         {
-            if (animationNum >= 0 && string.IsNullOrEmpty(Animation.Instance[animationNum].Name))
+            if (animationNum >= 0 && string.IsNullOrEmpty(Animation.Instance[animationNum].Name) && Animation.Instance[animationNum].IsLoaded)
             {
                 Sender.SendRequestAnimation(animationNum);
             }

@@ -29,7 +29,7 @@ namespace Client.Game.UI.Windows
             int prevScroll = list.ScrollOffset;
 
             list.Clear();
-            for (int i = 0; i < Variables.MaxAnimations; i++)
+            for (int i = 0; i < Animation.Instance.Count; i++)
             {
                 string name = Strings.Trim(Animation.Instance[i].Name);
                 if (string.IsNullOrWhiteSpace(name)) name = "None";
@@ -69,7 +69,7 @@ namespace Client.Game.UI.Windows
 
         public static void OnLoad(int index)
         {
-            if (index < 0 || index >= Variables.MaxAnimations) return;
+            if (index < 0 || index >= Animation.Instance.Count) return;
             SelectedIndex = index;
             GameState.EditorIndex = index;
             var a = Animation.Instance[index];
