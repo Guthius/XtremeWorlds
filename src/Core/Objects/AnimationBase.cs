@@ -9,27 +9,29 @@ namespace Core.Objects
 {
     public class AnimationBase : Stream, IData
     {
+        public byte Count = 2;
+
         public static bool[] IsChanged { get; set; } = new bool[Variables.MaxAnimations];
 
         public AnimationBase()
         {
-            for (int x = 0; x <= 1; x++)
+            for (int x = 0; x < Count; x++)
                Sprite = new int[x + 1];
 
-            for (int x = 0; x <= 1; x++)
+            for (int x = 0; x < Count; x++)
                 Frames = new int[x + 1];
 
-            for (int x = 0; x <= 1; x++)
+            for (int x = 0; x < Count; x++)
                 Frames[x] = 5;
 
-            for (int x = 0; x <= 1; x++)
+            for (int x = 0; x < Count; x++)
                 LoopCount = new int[x + 1];
 
-            for (int x = 0; x <= 1; x++)
+            for (int x = 0; x < Count; x++)
                 LoopTime = new int[x + 1];
 
             Name = "";
-            for (int x = 0; x <= 1; x++)
+            for (int x = 0; x < Count; x++)
             {
                 LoopCount[x] = 1;
                 LoopTime[x] = 1;
