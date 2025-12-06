@@ -16,7 +16,7 @@ public class WinProjectileEditor
         if (!WindowManager.TryGetControl("winProjectileEditor", "lstIndex", out _))
             return;
 
-        SelectedIndex = Math.Clamp(SelectedIndex, 0, Variables.MaxProjectiles - 1);
+        SelectedIndex = 0;
         RefreshList();
         PopulateCombos();
         OnLoad(SelectedIndex);

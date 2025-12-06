@@ -17,7 +17,7 @@ public class WinShopEditor
         if (!WindowManager.TryGetControl("winShopEditor", "lstIndex", out _))
             return; // window not present yet
 
-        SelectedIndex = Math.Clamp(SelectedIndex, 0, Variables.MaxShops - 1);
+        SelectedIndex = 0;
         RefreshList();
         PopulateCombos();
         OnLoad(SelectedIndex);

@@ -33,7 +33,7 @@ public class Animation : AnimationBase, IAsyncData
 
     public static Task OnLoadAllAsync()
     {
-        return Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxAnimations), OnLoadAsync);
+        return Parallel.ForEachAsync(Enumerable.Range(0, Variables.MaxAnimations), OnLoadAsync);
     }
 
     public static async ValueTask OnLoadAsync(int index, CancellationToken cancellationToken)

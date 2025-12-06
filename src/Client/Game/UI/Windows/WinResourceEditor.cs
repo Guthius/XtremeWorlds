@@ -19,7 +19,7 @@ public class WinResourceEditor
     {
         if (!WindowManager.TryGetControl("winResourceEditor", "lstIndex", out _))
             return; // window not present yet
-        SelectedIndex = Math.Clamp(SelectedIndex, 0, Variables.MaxResources - 1);
+        SelectedIndex = 0;
         RefreshList();
         OnLoad(SelectedIndex);
     }

@@ -15,7 +15,7 @@ namespace Client.Game.UI.Windows
             if (!WindowManager.TryGetControl("winAnimationEditor", "lstIndex", out _))
                 return;
 
-            SelectedIndex = Math.Clamp(SelectedIndex, 0, Variables.MaxAnimations - 1);
+            SelectedIndex = 0;
             RefreshList();
             OnLoad(SelectedIndex);
         }

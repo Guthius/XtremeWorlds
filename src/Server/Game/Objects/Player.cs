@@ -609,7 +609,7 @@ public class Player
 
     public static int HasItem(int playerId, int itemNum)
     {
-        if (itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems)
+        if (itemNum < 0 || itemNum > Variables.MaxItems)
         {
             return 0;
         }
@@ -637,7 +637,7 @@ public class Player
 
     public static int FindItemSlot(int playerId, int itemNum)
     {
-        if (itemNum < 0 || itemNum >= Core.Globals.Variables.MaxItems)
+        if (itemNum < 0 || itemNum >= Variables.MaxItems)
         {
             return -1;
         }
@@ -684,7 +684,7 @@ public class Player
             for (var mapItemNum = 0; mapItemNum < Core.Globals.Variables.MaxMapItems; mapItemNum++)
             {
                 if (Data.MapItem[mapNum, mapItemNum].Num < 0 ||
-                    Data.MapItem[mapNum, mapItemNum].Num >= Core.Globals.Variables.MaxItems)
+                    Data.MapItem[mapNum, mapItemNum].Num >= Variables.MaxItems)
                 {
                     continue;
                 }
@@ -722,7 +722,7 @@ public class Player
 
     public static int FindOpenInvSlot(int playerId, int itemNum)
     {
-        if (!NetworkConfig.IsPlaying(playerId) || itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems)
+        if (!NetworkConfig.IsPlaying(playerId) || itemNum < 0 || itemNum > Variables.MaxItems)
         {
             return -1;
         }
@@ -752,7 +752,7 @@ public class Player
 
     public static bool TakeInv(int playerId, int itemNum, int itemVal)
     {
-        if (!NetworkConfig.IsPlaying(playerId) || itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems)
+        if (!NetworkConfig.IsPlaying(playerId) || itemNum < 0 || itemNum > Variables.MaxItems)
         {
             return false;
         }
@@ -805,7 +805,7 @@ public class Player
 
     public static bool GiveInv(int playerId, int itemNum, int itemVal, byte bound = 0, bool sendUpdate = true)
     {
-        if (!NetworkConfig.IsPlaying(playerId) || itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems)
+        if (!NetworkConfig.IsPlaying(playerId) || itemNum < 0 || itemNum > Variables.MaxItems)
         {
             return false;
         }
@@ -859,7 +859,7 @@ public class Player
         }
 
         var itemNum = GetPlayerInv(playerId, invNum);
-        if (itemNum < 0 || itemNum >= Core.Globals.Variables.MaxItems)
+        if (itemNum < 0 || itemNum >= Variables.MaxItems)
         {
             return;
         }
@@ -993,7 +993,7 @@ public class Player
         }
 
         var itemNum = GetPlayerInv(playerId, invNum);
-        if (itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems)
+        if (itemNum < 0 || itemNum > Variables.MaxItems)
         {
             return;
         }
@@ -1134,12 +1134,12 @@ public class Player
         }
 
         var itemNum = GetPlayerEquipment(playerId, (Equipment) eqSlot);
-        if (itemNum < 0 || itemNum >= Core.Globals.Variables.MaxItems)
+        if (itemNum < 0 || itemNum >= Variables.MaxItems)
         {
             return;
         }
 
-        if (GetPlayerEquipment(playerId, (Equipment)eqSlot) < 0 || GetPlayerEquipment(playerId, (Equipment)eqSlot) > Core.Globals.Variables.MaxItems)
+        if (GetPlayerEquipment(playerId, (Equipment)eqSlot) < 0 || GetPlayerEquipment(playerId, (Equipment)eqSlot) > Variables.MaxItems)
             return;
 
         if (FindOpenInvSlot(playerId, itemNum) >= 0)
@@ -1297,7 +1297,7 @@ public class Player
 
     public static int FindOpenbankSlot(int playerId, int itemNum)
     {
-        if (!NetworkConfig.IsPlaying(playerId) || itemNum < 0 || itemNum >= Core.Globals.Variables.MaxItems)
+        if (!NetworkConfig.IsPlaying(playerId) || itemNum < 0 || itemNum >= Variables.MaxItems)
         {
             return -1;
         }

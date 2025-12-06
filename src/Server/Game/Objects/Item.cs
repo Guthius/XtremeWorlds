@@ -33,7 +33,7 @@ public class Item : ItemBase, IData, IAsyncData
 
     public static Task OnLoadAllAsync()
     {
-        return Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxItems), OnLoadAsync);
+        return Parallel.ForEachAsync(Enumerable.Range(0, Variables.MaxItems), OnLoadAsync);
     }
 
     public static async ValueTask OnLoadAsync(int index, CancellationToken cancellationToken)
@@ -48,38 +48,5 @@ public class Item : ItemBase, IData, IAsyncData
         var itemData = JObject.FromObject(data).ToObject<Item>();
 
         Item.Instance.Add(itemData ?? new Item());
-    }
-
-    public static void OnClear(int index)
-    {
-        if (Item.Instance.Count <= index)
-            Item.Instance.Add(new Item());
-        else
-            Item.Instance[index] = new Item();
-    }
-
-    public static void OnDraw(int index)
-    {
-        throw new NotImplementedException();
-    }
-
-    public static void OnStream(int index)
-    {
-        throw new NotImplementedException();
-    }
-
-    public static void OnReset()
-    {
-        throw new NotImplementedException();
-    }
-
-    public static void OnLoad(int index)
-    {
-        throw new NotImplementedException();
-    }
-
-    public static void OnUpdate(int index)
-    {
-        throw new NotImplementedException();
     }
 }

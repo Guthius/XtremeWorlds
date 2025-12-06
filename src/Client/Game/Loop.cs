@@ -528,15 +528,6 @@ namespace Client
                 GameState.InitAnimationEditor = false;
             }
 
-            if (GameState.InitItemEditor)
-            {
-                GameState.MyEditorType = EditorType.Item;
-                GameState.EditorIndex = 0;
-                WindowManager.ShowWindow("winItemEditor");
-                Client.Game.UI.Windows.WinItemEditor.Init();
-                GameState.InitItemEditor = false;
-            }
-
             if (GameState.InitJobEditor)
             {
                 GameState.MyEditorType = EditorType.Job;

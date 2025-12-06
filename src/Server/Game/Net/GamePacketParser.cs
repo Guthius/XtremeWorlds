@@ -2089,11 +2089,11 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var invSlot = buffer.ReadInt32();
 
         // if invalid, exit out
-        if (invSlot < 0 | invSlot > Core.Globals.Variables.MaxInv)
+        if (invSlot < 0 || invSlot > Core.Globals.Variables.MaxInv)
             return;
 
         // has item?
-        if (GetPlayerInv(session.Id, invSlot) < 0 | GetPlayerInv(session.Id, invSlot) > Core.Globals.Variables.MaxItems)
+        if (GetPlayerInv(session.Id, invSlot) < 0 || GetPlayerInv(session.Id, invSlot) > Core.Globals.Variables.MaxItems)
             return;
 
         // seems to be valid
@@ -2404,42 +2404,42 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         int i;
         var buffer = new PacketReader(bytes);
 
-        var invslot = buffer.ReadInt32();
+        var invSlot = buffer.ReadInt32();
         var amount = buffer.ReadInt32();
 
-        if (invslot < 0 | invslot > Core.Globals.Variables.MaxInv)
+        if (invSlot < 0 | invSlot > Core.Globals.Variables.MaxInv)
             return;
 
-        var itemnum = GetPlayerInv(session.Id, invslot);
+        var itemNum = GetPlayerInv(session.Id, invSlot);
 
-        if (itemnum < 0 | itemnum > Core.Globals.Variables.MaxItems)
+        if (itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems)
             return;
 
         // make sure they have the amount they offer
-        if (amount < 0 | amount > GetPlayerInvValue(session.Id, invslot))
+        if (amount < 0 || amount > GetPlayerInvValue(session.Id, invSlot))
             return;
 
-        if (Data.Player[session.Id].Inv[invslot].Bound > 0)
+        if (Data.Player[session.Id].Inv[invSlot].Bound > 0)
         {
             NetworkSend.SendPlayerMessage(session.Id, "You can't trade soulbound items.", (int)ColorName.BrightRed);
             return;
         }
 
-        if (Item.Instance[itemnum].Type == (byte)ItemCategory.Currency | Item.Instance[itemnum].Stackable == 1)
+        if (Item.Instance[itemNum].Type == (byte)ItemCategory.Currency | Item.Instance[itemNum].Stackable == 1)
         {
             // check if already offering same currency item
             var loopTo = Core.Globals.Variables.MaxInv;
             for (i = 0; i < loopTo; i++)
             {
-                if (Data.TempPlayer[session.Id].TradeOffer[i].Num == invslot)
+                if (Data.TempPlayer[session.Id].TradeOffer[i].Num == invSlot)
                 {
                     // add amount
                     Data.TempPlayer[session.Id].TradeOffer[i].Value = Data.TempPlayer[session.Id].TradeOffer[i].Value + amount;
 
                     // clamp to limits
-                    if (Data.TempPlayer[session.Id].TradeOffer[i].Value > GetPlayerInvValue(session.Id, invslot))
+                    if (Data.TempPlayer[session.Id].TradeOffer[i].Value > GetPlayerInvValue(session.Id, invSlot))
                     {
-                        Data.TempPlayer[session.Id].TradeOffer[i].Value = GetPlayerInvValue(session.Id, invslot);
+                        Data.TempPlayer[session.Id].TradeOffer[i].Value = GetPlayerInvValue(session.Id, invSlot);
                     }
 
                     // cancel any trade agreement
@@ -2463,7 +2463,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             var loopTo1 = Core.Globals.Variables.MaxInv;
             for (i = 0; i < loopTo1; i++)
             {
-                if (Data.TempPlayer[session.Id].TradeOffer[i].Num == invslot)
+                if (Data.TempPlayer[session.Id].TradeOffer[i].Num == invSlot)
                 {
                     NetworkSend.SendPlayerMessage(session.Id, "You've already offered this item.", (int)ColorName.BrightRed);
                     return;
@@ -2482,7 +2482,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             }
         }
 
-        Data.TempPlayer[session.Id].TradeOffer[emptyslot].Num = invslot;
+        Data.TempPlayer[session.Id].TradeOffer[emptyslot].Num = invSlot;
         Data.TempPlayer[session.Id].TradeOffer[emptyslot].Value = amount;
 
         // cancel any trade agreement and send new data
@@ -3055,7 +3055,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var packetReader = new PacketReader(bytes);
 
         var itemNum = packetReader.ReadInt32();
-        if (itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems)
+        if (itemNum < 0 || itemNum > Variables.MaxItems)
         {
             return;
         }
@@ -3101,7 +3101,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         }
 
         var itemNum = packetReader.ReadInt32();
-        if (itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems)
+        if (itemNum < 0 || itemNum > Variables.MaxItems)
         {
             return;
         }
@@ -3174,7 +3174,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             return;
         }
 
-        if (GetPlayerInv(session.Id, invNum) < 0 || GetPlayerInv(session.Id, invNum) > Core.Globals.Variables.MaxItems)
+        if (GetPlayerInv(session.Id, invNum) < 0 || GetPlayerInv(session.Id, invNum) > Variables.MaxItems)
         {
             return;
         }
@@ -3265,7 +3265,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var packetReader = new PacketReader(bytes);
 
         var animationNum = packetReader.ReadInt32();
-        if (animationNum < 0 || animationNum >= Core.Globals.Variables.MaxAnimations)
+        if (animationNum < 0 || animationNum >= Variables.MaxAnimations)
         {
             return;
         }

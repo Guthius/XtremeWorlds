@@ -52,9 +52,7 @@ namespace Core.Objects
 
         public static void OnClear(int index)
         {
-            if (Instance.Count <= index)
-                Instance.Add(new ItemBase());
-            else
+            if (Instance.Count > index)
                 Instance[index] = new ItemBase();
         }
 
@@ -65,7 +63,7 @@ namespace Core.Objects
 
         public static void OnReset()
         {
-            for (int i = 0; i < Variables.MaxItems; i++)
+            for (int i = 0; i < Instance.Count; i++)
                 OnClear(i);
         }
 

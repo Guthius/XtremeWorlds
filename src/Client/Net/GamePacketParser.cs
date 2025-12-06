@@ -1020,48 +1020,66 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         n = buffer.ReadInt32();
 
-        // Update the item
-        Item.Instance[n].AccessReq = buffer.ReadInt32();
+        if (n == 0)
+            Item.Instance.Clear();
+
+        var item = new Item();
+        item.AccessReq = buffer.ReadInt32();
 
         int statCount = System.Enum.GetValues(typeof(Stat)).Length;
         for (i = 0; i < statCount; i++)
-            Item.Instance[n].AddStat[i] = (byte)buffer.ReadInt32();
+            item.AddStat[i] = (byte)buffer.ReadInt32();
 
-        Item.Instance[n].Animation = buffer.ReadInt32();
-        Item.Instance[n].BindType = buffer.ReadByte();
-        Item.Instance[n].JobReq = buffer.ReadInt32();
-        Item.Instance[n].Data1 = buffer.ReadInt32();
-        Item.Instance[n].Data2 = buffer.ReadInt32();
-        Item.Instance[n].Data3 = buffer.ReadInt32();
-        Item.Instance[n].LevelReq = buffer.ReadInt32();
-        Item.Instance[n].Mastery = (byte)buffer.ReadInt32();
-        Item.Instance[n].Name = buffer.ReadString();
-        Item.Instance[n].Paperdoll = buffer.ReadInt32();
-        Item.Instance[n].Icon = buffer.ReadInt32();
-        Item.Instance[n].Price = buffer.ReadInt32();
-        Item.Instance[n].Rarity = (byte)buffer.ReadInt32();
-        Item.Instance[n].Speed = buffer.ReadInt32();
+        item.Animation = buffer.ReadInt32();
+        item.BindType = buffer.ReadByte();
+        item.JobReq = buffer.ReadInt32();
+        item.Data1 = buffer.ReadInt32();
+        item.Data2 = buffer.ReadInt32();
+        item.Data3 = buffer.ReadInt32();
+        item.LevelReq = buffer.ReadInt32();
+        item.Mastery = (byte)buffer.ReadInt32();
+        item.Name = buffer.ReadString();
+        item.Paperdoll = buffer.ReadInt32();
+        item.Icon = buffer.ReadInt32();
+        item.Price = buffer.ReadInt32();
+        item.Rarity = (byte)buffer.ReadInt32();
+        item.Speed = buffer.ReadInt32();
 
-        Item.Instance[n].Stackable = (byte)buffer.ReadInt32();
-        Item.Instance[n].Description = buffer.ReadString();
+        item.Stackable = (byte)buffer.ReadInt32();
+        item.Description = buffer.ReadString();
 
         for (i = 0; i < statCount; i++)
-            Item.Instance[n].StatReq[i] = (byte)buffer.ReadInt32();
+            item.StatReq[i] = (byte)buffer.ReadInt32();
 
-        Item.Instance[n].Type = (byte)buffer.ReadInt32();
-        Item.Instance[n].SubType = (byte)buffer.ReadInt32();
-        Item.Instance[n].ItemLevel = (byte)buffer.ReadInt32();
+        item.Type = (byte)buffer.ReadInt32();
+        item.SubType = (byte)buffer.ReadInt32();
+        item.ItemLevel = (byte)buffer.ReadInt32();
 
-        Item.Instance[n].KnockBack = (byte)buffer.ReadInt32();
-        Item.Instance[n].KnockBackTiles = (byte)buffer.ReadInt32();
+        item.KnockBack = (byte)buffer.ReadInt32();
+        item.KnockBackTiles = (byte)buffer.ReadInt32();
 
-        Item.Instance[n].Projectile = buffer.ReadInt32();
-        Item.Instance[n].Ammo = buffer.ReadInt32();
+        item.Projectile = buffer.ReadInt32();
+        item.Ammo = buffer.ReadInt32();
 
         if (n == GameState.DescLastItem)
         {
             GameState.DescLastType = 0;
             GameState.DescLastItem = 0L;
+        }
+
+        // Update the item
+        Item.Instance.Add(item);
+
+        if ((n + 1) == Variables.MaxItems)
+        {
+            if (GameState.InitItemEditor)
+            {
+                GameState.MyEditorType = EditorType.Item;
+                GameState.EditorIndex = 0;
+                WindowManager.ShowWindow("winItemEditor");
+                GameState.InitItemEditor = false;
+                Client.Game.UI.Windows.WinItemEditor.Init();
+            }
         }
     }
 

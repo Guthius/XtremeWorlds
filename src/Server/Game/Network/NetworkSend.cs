@@ -1477,12 +1477,9 @@ public static class NetworkSend
 
     public static void SendItems(int playerId)
     {
-        for (var itemNum = 0; itemNum < Item.Instance.Count; itemNum++)
+        for (var itemNum = 0; itemNum < Variables.MaxItems; itemNum++)
         {
-            if (Item.Instance[itemNum].Name.Length > 0)
-            {
-                SendUpdateItemTo(playerId, itemNum);
-            }
+            SendUpdateItemTo(playerId, itemNum);         
         }
     }
 
@@ -1513,44 +1510,50 @@ public static class NetworkSend
         var statCount = Enum.GetNames<Stat>().Length;
 
         packet.WriteInt32(itemNum);
-        packet.WriteInt32(Item.Instance[itemNum].AccessReq);
+
+        var item = new Item();
+        if (Item.Instance.Count > itemNum)
+            item = (Item)Item.Instance[itemNum];
+        else
+            item = new Item();
+
+        packet.WriteInt32(item.AccessReq);
 
         for (var i = 0; i < statCount; i++)
         {
-            packet.WriteInt32(Item.Instance[itemNum].AddStat[i]);
+            packet.WriteInt32(item.AddStat[i]);
         }
 
-        packet.WriteInt32(Item.Instance[itemNum].Animation);
-        packet.WriteByte(Item.Instance[itemNum].BindType);
-        packet.WriteInt32(Item.Instance[itemNum].JobReq);
-        packet.WriteInt32(Item.Instance[itemNum].Data1);
-        packet.WriteInt32(Item.Instance[itemNum].Data2);
-        packet.WriteInt32(Item.Instance[itemNum].Data3);
-        packet.WriteInt32(Item.Instance[itemNum].LevelReq);
-        packet.WriteInt32(Item.Instance[itemNum].Mastery);
-        packet.WriteString(Item.Instance[itemNum].Name);
-        packet.WriteInt32(Item.Instance[itemNum].Paperdoll);
-        packet.WriteInt32(Item.Instance[itemNum].Icon);
-        packet.WriteInt32(Item.Instance[itemNum].Price);
-        packet.WriteInt32(Item.Instance[itemNum].Rarity);
-        packet.WriteInt32(Item.Instance[itemNum].Speed);
-        packet.WriteInt32(Item.Instance[itemNum].Stackable);
-        packet.WriteString(Item.Instance[itemNum].Description);
+        packet.WriteInt32(item.Animation);
+        packet.WriteByte(item.BindType);
+        packet.WriteInt32(item.JobReq);
+        packet.WriteInt32(item.Data1);
+        packet.WriteInt32(item.Data2);
+        packet.WriteInt32(item.Data3);
+        packet.WriteInt32(item.LevelReq);
+        packet.WriteInt32(item.Mastery);
+        packet.WriteString(item.Name);
+        packet.WriteInt32(item.Paperdoll);
+        packet.WriteInt32(item.Icon);
+        packet.WriteInt32(item.Price);
+        packet.WriteInt32(item.Rarity);
+        packet.WriteInt32(item.Speed);
+        packet.WriteInt32(item.Stackable);
+        packet.WriteString(item.Description);
 
         for (var i = 0; i < statCount; i++)
         {
-            packet.WriteInt32(Item.Instance[itemNum].StatReq[i]);
+            packet.WriteInt32(item.StatReq[i]);
         }
 
-        packet.WriteInt32(Item.Instance[itemNum].Type);
-        packet.WriteInt32(Item.Instance[itemNum].SubType);
-        packet.WriteInt32(Item.Instance[itemNum].ItemLevel);
-        packet.WriteInt32(Item.Instance[itemNum].KnockBack);
-        packet.WriteInt32(Item.Instance[itemNum].KnockBackTiles);
-        packet.WriteInt32(Item.Instance[itemNum].Projectile);
-        packet.WriteInt32(Item.Instance[itemNum].Ammo);
+        packet.WriteInt32(item.Type);
+        packet.WriteInt32(item.SubType);
+        packet.WriteInt32(item.ItemLevel);
+        packet.WriteInt32(item.KnockBack);
+        packet.WriteInt32(item.KnockBackTiles);
+        packet.WriteInt32(item.Projectile);
+        packet.WriteInt32(item.Ammo);
     }
-
 
     public static void SendAnimation(int mapNum, int anim, int x, int y, byte lockType = 0, int lockindex = 0)
     {

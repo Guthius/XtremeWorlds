@@ -670,7 +670,7 @@ public static class Loop
 
                     if (item.CanDespawn && item.DespawnTimer < now)
                     {
-                        Server.MapItem.OnClear(i, mapNum);
+                        MapItem.OnClear(i, mapNum);
                         NetworkSend.SendMapItemToAll(mapNum, i);
                     }
                 }

@@ -590,7 +590,7 @@ public class Crystalshire
                     btn.CallBack[(int)ControlState.MouseDown] = () =>
                     {
                         if (WindowManager.TryGetControl("winMapEditor", "cmbMapItem", out var c) && c is ComboBox cb)
-                            GameState.ItemEditorNum = Math.Clamp(cb.Value, 0, Variables.MaxItems - 1);
+                            GameState.ItemEditorNum = Math.Clamp(cb.Value, 0, Item.Instance.Count - 1);
                         if (WindowManager.TryGetControl("winMapEditor", "sldMapItemValue", out var s))
                             GameState.ItemEditorValue = Math.Clamp(s.Value, 1, 1024);
                     };
@@ -807,7 +807,7 @@ public class Crystalshire
                 {
                     if (cmb.Items.Count == 0)
                     {
-                        for (int i = 0; i < Variables.MaxAnimations; i++)
+                        for (int i = 0; i < Animation.Instance.Count; i++)
                         {
                             var raw = (i < Animation.Instance.Count) ? (Animation.Instance[i].Name ?? string.Empty) : string.Empty;
                             var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
@@ -821,7 +821,7 @@ public class Crystalshire
                     btn.CallBack[(int)ControlState.MouseDown] = () =>
                     {
                         if (WindowManager.TryGetControl("winMapEditor", "cmbAnimation", out var c) && c is ComboBox cb)
-                            GameState.EditorAnimation = Math.Clamp(cb.Value, 0, Variables.MaxAnimations - 1);
+                            GameState.EditorAnimation = Math.Clamp(cb.Value, 0, Animation.Instance.Count - 1);
                     };
                 }
             }
@@ -1462,7 +1462,7 @@ public class Crystalshire
                     Data.Npc[WinNpcEditor.SelectedIndex].DropItem != null &&
                     slot < Data.Npc[WinNpcEditor.SelectedIndex].DropItem.Length)
                 {
-                    Data.Npc[WinNpcEditor.SelectedIndex].DropItem[slot] = Math.Clamp(cmbItem.Value, 0, Variables.MaxItems - 1);
+                    Data.Npc[WinNpcEditor.SelectedIndex].DropItem[slot] = Math.Clamp(cmbItem.Value, 0, Item.Instance.Count - 1);
                     GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
                 }
             };
@@ -1671,7 +1671,7 @@ public class Crystalshire
         {
             txtName.CallBack[(int)ControlState.KeyUp] = () =>
             {
-                int idx = WinItemEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxItems) return;
+                int idx = WinItemEditor.SelectedIndex; if (idx < 0 || idx >= Item.Instance.Count) return;
                 var newName = txtName.Text ?? string.Empty;
                 Item.Instance[idx].Name = newName;
                 Item.IsChanged[idx] = true;
@@ -1710,7 +1710,7 @@ public class Crystalshire
         {
             txtDesc.CallBack[(int)ControlState.KeyUp] = () =>
             {
-                if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
+                if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Item.Instance.Count)
                 {
                     Item.Instance[WinItemEditor.SelectedIndex].Description = txtDesc.Text ?? string.Empty;
                     Item.IsChanged[WinItemEditor.SelectedIndex] = true;
@@ -1723,7 +1723,7 @@ public class Crystalshire
         {
             sldIcon.CallBack[(int)ControlState.MouseMove] = () =>
             {
-                if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
+                if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Item.Instance.Count)
                 {
                     Item.Instance[WinItemEditor.SelectedIndex].Icon = (short)sldIcon.Value;
                     Item.IsChanged[WinItemEditor.SelectedIndex] = true;
@@ -1784,7 +1784,7 @@ public class Crystalshire
         {
             sldDmg.CallBack[(int)ControlState.MouseMove] = () =>
             {
-                if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
+                if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Item.Instance.Count)
                 {
                     Item.Instance[WinItemEditor.SelectedIndex].Data2 = sldDmg.Value;
                     Item.IsChanged[WinItemEditor.SelectedIndex] = true;
@@ -1796,7 +1796,7 @@ public class Crystalshire
         {
             sldSpeed.CallBack[(int)ControlState.MouseMove] = () =>
             {
-                if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
+                if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Item.Instance.Count)
                 {
                     Item.Instance[WinItemEditor.SelectedIndex].Speed = sldSpeed.Value;
                     Item.IsChanged[WinItemEditor.SelectedIndex] = true;
@@ -1823,7 +1823,7 @@ public class Crystalshire
             {
                 sld.CallBack[(int)ControlState.MouseMove] = () =>
                 {
-                    if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
+                    if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Item.Instance.Count)
                     {
                         apply((byte)sld.Value);
                         Item.IsChanged[WinItemEditor.SelectedIndex] = true;
@@ -1873,7 +1873,7 @@ public class Crystalshire
             {
                 sld.CallBack[(int)ControlState.MouseMove] = () =>
                 {
-                    if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
+                    if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Item.Instance.Count)
                     {
                         apply((byte)sld.Value);
                         Item.IsChanged[WinItemEditor.SelectedIndex] = true;
@@ -1886,7 +1886,7 @@ public class Crystalshire
         {
             sldReqLevel.CallBack[(int)ControlState.MouseMove] = () =>
             {
-                if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Variables.MaxItems)
+                if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Item.Instance.Count)
                 {
                     Item.Instance[WinItemEditor.SelectedIndex].LevelReq = (byte)sldReqLevel.Value;
                     Item.IsChanged[WinItemEditor.SelectedIndex] = true;
@@ -2570,9 +2570,9 @@ public class Crystalshire
                 if (idx < 0 || idx >= Variables.MaxTrades) return;
                 ref var trade = ref Data.Shop[WinShopEditor.SelectedIndex].TradeItem[idx];
                 if (WindowManager.TryGetControl("winShopEditor", "cmbItem", out var ic) && ic is ComboBox ci)
-                    trade.Item = Math.Clamp(ci.Value, -1, Variables.MaxItems - 1);
+                    trade.Item = Math.Clamp(ci.Value, -1, Item.Instance.Count - 1);
                 if (WindowManager.TryGetControl("winShopEditor", "cmbCostItem", out var cCtrl) && cCtrl is ComboBox cc)
-                    trade.CostItem = Math.Clamp(cc.Value, -1, Variables.MaxItems - 1);
+                    trade.CostItem = Math.Clamp(cc.Value, -1, Item.Instance.Count - 1);
                 if (WindowManager.TryGetControl("winShopEditor", "txtItemValue", out var iqCtrl) && iqCtrl is TextBox txtIQ && int.TryParse(txtIQ.Text, out var itemQty))
                     trade.ItemValue = Math.Max(0, itemQty);
                 if (WindowManager.TryGetControl("winShopEditor", "txtCostValue", out var cqCtrl) && cqCtrl is TextBox txtCQ && int.TryParse(txtCQ.Text, out var costQty))
@@ -2644,7 +2644,7 @@ public class Crystalshire
                     if (slot < 0 || slot >= Variables.MaxStartItems) return;
                     int item = -1, amt = 1;
                     if (WindowManager.TryGetControl("winJobEditor", "cmbItem", out var ic) && ic is ComboBox cmb)
-                        item = cmb.Value <= 0 ? -1 : Math.Clamp(cmb.Value - 1, 0, Variables.MaxItems - 1);
+                        item = cmb.Value <= 0 ? -1 : Math.Clamp(cmb.Value - 1, 0, Item.Instance.Count - 1);
                     if (WindowManager.TryGetControl("winJobEditor", "txtItemValue", out var ac) && ac is TextBox t && int.TryParse(t.Text, out var parsed))
                         amt = Math.Max(1, parsed);
                     if (WinJobEditor.SelectedIndex >= 0)
@@ -3111,7 +3111,7 @@ public class Crystalshire
             if (cmbAnim.Items.Count == 0)
             {
                 cmbAnim.Items.Add("None");
-                for (int i = 0; i < Variables.MaxAnimations; i++)
+                for (int i = 0; i < Animation.Instance.Count; i++)
                 {
                     var raw = Animation.Instance[i].Name ?? string.Empty;
                     var nm = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
@@ -3168,7 +3168,7 @@ public class Crystalshire
         {
             txtName.CallBack[(int)ControlState.KeyUp] = () =>
             {
-                int idx = WinAnimationEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxAnimations) return;
+                int idx = WinAnimationEditor.SelectedIndex; if (idx < 0 || idx >= Animation.Instance.Count) return;
                 var newName = txtName.Text?.Trim() ?? string.Empty;
                 Animation.Instance[idx].Name = newName;
 
@@ -3201,7 +3201,7 @@ public class Crystalshire
             }
             cmbSound.CallBack[(int)ControlState.MouseMove] = () =>
             {
-                int idx = WinAnimationEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxAnimations) return;
+                int idx = WinAnimationEditor.SelectedIndex; if (idx < 0 || idx >= Animation.Instance.Count) return;
                 string text = cmbSound.Value >= 0 && cmbSound.Value < cmbSound.Items.Count ? cmbSound.Items[cmbSound.Value] : string.Empty;
                 Animation.Instance[idx].Sound = text ?? string.Empty;
             };
@@ -3215,7 +3215,7 @@ public class Crystalshire
                 sb.Min = min; sb.Max = max;
                 sb.CallBack[(int)ControlState.MouseMove] = () =>
                 {
-                    int i = WinAnimationEditor.SelectedIndex; if (i < 0 || i >= Variables.MaxAnimations) return;
+                    int i = WinAnimationEditor.SelectedIndex; if (i < 0 || i >= Animation.Instance.Count) return;
                     var a = (Animation)Animation.Instance[i];
                     int v = Math.Clamp(sb.Value, sb.Min, sb.Max);
                     set(a, v);
@@ -3258,7 +3258,7 @@ public class Crystalshire
                 pic.OnDraw = () =>
                 {
                     var win = WindowManager.GetWindowByName("winAnimationEditor"); if (win is null) return;
-                    int idx = WinAnimationEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxAnimations) return;
+                    int idx = WinAnimationEditor.SelectedIndex; if (idx < 0 || idx >= Animation.Instance.Count) return;
                     var a = Animation.Instance[idx];
 
                     int spriteNum = 0;
@@ -3411,7 +3411,7 @@ public class Crystalshire
         BindCombo("cmbAnimation", v =>
         {
             int i = WinSkillEditor.SelectedIndex; if (i < 0 || i >= Variables.MaxSkills) return;
-            Data.Skill[i].SkillAnim = Math.Clamp(v, 0, Variables.MaxAnimations - 1);
+            Data.Skill[i].SkillAnim = Math.Clamp(v, 0, Animation.Instance.Count - 1);
             GameState.SkillChanged[i] = true;
         });
 

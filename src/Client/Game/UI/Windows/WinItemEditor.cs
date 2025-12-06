@@ -18,7 +18,7 @@ public class WinItemEditor
             return;
 
         PopulateCombos();
-        SelectedIndex = Math.Clamp(GameState.EditorIndex, 0, Variables.MaxItems - 1);
+        SelectedIndex = 0;
         RefreshList();
         OnLoad(SelectedIndex);
 
@@ -109,7 +109,7 @@ public class WinItemEditor
         int prevScroll = list.ScrollOffset;
 
         list.Clear();
-        for (int i = 0; i < Variables.MaxItems; i++)
+        for (int i = 0; i < Item.Instance.Count; i++)
         {
             string name = Strings.Trim(Item.Instance[i].Name);
             if (string.IsNullOrWhiteSpace(name)) name = "None";
@@ -163,7 +163,7 @@ public class WinItemEditor
         if (WindowManager.TryGetControl("winItemEditor", "cmbAnimation", out var animCtrl) && animCtrl is ComboBox cmbAnim)
         {
             cmbAnim.Items.Clear();
-            for (int i = 0; i < Variables.MaxAnimations; i++)
+            for (int i = 0; i < Animation.Instance.Count; i++)
             {
                 var raw = Animation.Instance[i].Name ?? string.Empty;
                 var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
@@ -238,7 +238,7 @@ public class WinItemEditor
         {
             cmbAmmo.Items.Clear();
             cmbAmmo.Items.Add("None");
-            for (int i = 0; i < Variables.MaxItems; i++)
+            for (int i = 0; i < Item.Instance.Count; i++)
             {
                 var n = Item.Instance[i].Name ?? string.Empty;
                 if (string.IsNullOrWhiteSpace(n)) n = "None";
@@ -252,7 +252,7 @@ public class WinItemEditor
         if (!WindowManager.TryGetControl("winItemEditor", "cmbSubType", out var subCtrl) || subCtrl is not ComboBox cmbSub)
             return;
         cmbSub.Items.Clear();
-        var type = (ItemCategory)Math.Clamp(Item.Instance[SelectedIndex].Type, 0, int.MaxValue);
+        var type = ItemCategory.Equipment;
         switch (type)
         {
             case ItemCategory.Equipment:
@@ -279,14 +279,14 @@ public class WinItemEditor
         }
         if (cmbSub.Items.Count > 0)
         {
-            var sub = Math.Clamp(Item.Instance[SelectedIndex].SubType, 0, cmbSub.Items.Count - 1);
+            var sub = 0;
             cmbSub.Value = sub;
         }
     }
 
     private static void ToggleTypeSections()
     {
-        var type = (ItemCategory)Math.Clamp(Item.Instance[SelectedIndex].Type, 0, int.MaxValue);
+        var type = ItemCategory.Equipment;
 
         static void SetVisible(string name, bool vis)
         {
@@ -346,7 +346,7 @@ public class WinItemEditor
 
     public static void OnLoad(int index)
     {
-        if (index < 0 || index >= Variables.MaxItems) return;
+        if (index < 0 || index >= Item.Instance.Count) return;
         SelectedIndex = index;
         GameState.EditorIndex = index;
         var item = Item.Instance[index];
@@ -512,7 +512,7 @@ public class WinItemEditor
         var win = WindowManager.GetWindowByName("winItemEditor");
         if (win is null) return;
 
-        if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
+        if (SelectedIndex < 0 || SelectedIndex >= Item.Instance.Count) return;
         var item = Item.Instance[SelectedIndex];
 
         if (item.Icon < 1 || item.Icon > GameState.NumItems) return;

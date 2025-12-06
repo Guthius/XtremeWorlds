@@ -17,7 +17,7 @@ public class WinNpcEditor
             return; // window not present yet
 
         PopulateCombos();
-        SelectedIndex = Math.Clamp(SelectedIndex, 0, Variables.MaxNpcs - 1);
+        SelectedIndex = 0;
         RefreshList();
         OnLoad(SelectedIndex);
     }

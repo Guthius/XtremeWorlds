@@ -15,7 +15,7 @@ public class WinMoralEditor
     {
         if (!WindowManager.TryGetControl("winMoralEditor", "lstIndex", out _))
             return; // window not present yet
-        SelectedIndex = Math.Clamp(SelectedIndex, 0, Variables.MaxMorals - 1);
+        SelectedIndex = 0;
         RefreshList();
         OnLoad(SelectedIndex);
     }

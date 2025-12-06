@@ -60,7 +60,7 @@ namespace Core.Objects
 
         public static void OnReset()
         {
-            for (int i = 0; i < Variables.MaxAnimations; i++)
+            for (int i = 0; i < Instance.Count; i++)
                 OnClear(i);
         }
 
@@ -71,9 +71,7 @@ namespace Core.Objects
 
         public static void OnClear(int index)
         {
-            if (Instance.Count <= index)
-                Instance.Add(new AnimationBase());
-            else
+            if (Instance.Count > index)
                 Instance[index] = new AnimationBase();
         }
 

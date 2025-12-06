@@ -15,7 +15,7 @@ namespace Client.Game.UI.Windows
             if (!WindowManager.TryGetControl("winJobEditor", "lstIndex", out _))
                 return; // window not present yet
 
-            SelectedIndex = Math.Clamp(SelectedIndex, 0, Variables.MaxJobs - 1);
+            SelectedIndex = 0;
             RefreshList();
             PopulateStaticCombos();
             OnLoad(SelectedIndex);
