@@ -1569,7 +1569,7 @@ public static class NetworkSend
 
     public static void SendAnimations(int playerId)
     {
-        for (var index = 0; index < Animation.Instance.Count; index++)
+        for (var index = 0; index < Variables.MaxAnimations; index++)
         {
             SendUpdateAnimationTo(playerId, index);
         }

@@ -1091,20 +1091,38 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         n = buffer.ReadInt32();
 
-        for (i = 0; i < Animation.Instance[n].Frames.Length; i++)
-            Animation.Instance[n].Frames[i] = buffer.ReadInt32();
+        if (n == 0)
+            Animation.Instance.Clear();
+        
+        var animation = new Animation();
 
-        for (i = 0; i < Animation.Instance[n].LoopCount.Length; i++)
-            Animation.Instance[n].LoopCount[i] = buffer.ReadInt32();
+        for (i = 0; i < animation.Frames.Length; i++)
+            animation.Frames[i] = buffer.ReadInt32();
 
-        for (i = 0; i < Animation.Instance[n].LoopTime.Length; i++)
-            Animation.Instance[n].LoopTime[i] = buffer.ReadInt32();
+        for (i = 0; i < animation.LoopCount.Length; i++)
+            animation.LoopCount[i] = buffer.ReadInt32();
+        for (i = 0; i < animation.LoopTime.Length; i++)
+            animation.LoopTime[i] = buffer.ReadInt32();
 
-        Animation.Instance[n].Name = buffer.ReadString();
-        Animation.Instance[n].Sound = buffer.ReadString();
+        animation.Name = buffer.ReadString();
+        animation.Sound = buffer.ReadString();
 
-        for (i = 0; i < Animation.Instance[n].Sprite.Length; i++)
-            Animation.Instance[n].Sprite[i] = buffer.ReadInt32();
+        for (i = 0; i < animation.Sprite.Length; i++)
+            animation.Sprite[i] = buffer.ReadInt32();
+
+        Animation.Instance.Add(animation);
+
+        if ((n + 1) == Variables.MaxAnimations)
+        {
+            if (GameState.InitAnimationEditor)
+            {
+                GameState.MyEditorType = EditorType.Animation;
+                GameState.EditorIndex = 0;
+                WindowManager.ShowWindow("winAnimationEditor");
+                GameState.InitAnimationEditor = false;
+                Client.Game.UI.Windows.WinAnimationEditor.Init();
+            }
+        }
     }
 
     public static void Packet_Animation(ReadOnlyMemory<byte> data)
