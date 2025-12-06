@@ -575,7 +575,7 @@ public class Script
 
     }
 
-    public void OnPlayerDeath(int index)
+    public void OnDeath(int index)
     {
         // Set HP to nothing
         SetPlayerVital(index, Vital.Health, 0);
@@ -734,7 +734,7 @@ public class Script
         NetworkSend.SendPlayerData(index);
     }
 
-    public void PlayerMove(int index)
+    public void OnMove(int index)
     {
 
     }
@@ -933,7 +933,7 @@ public class Script
                 await System.Threading.Tasks.Task.Delay(DeathSpawnTimeMs);
                 if (IsPlaying(target.Id) && Data.Player[target.Id].Dead)
                 {
-                    OnPlayerDeath(target.Id);
+                    OnDeath(target.Id);
                 }
             });
 

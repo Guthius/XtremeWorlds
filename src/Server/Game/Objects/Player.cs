@@ -133,7 +133,7 @@ public class Player
         }
     }
 
-    public static void PlayerMove(int playerId, int dir, int movement, bool expectingWarp)
+    public static void OnMove(int playerId, int dir, int movement, bool expectingWarp)
     {
         int x;
         int y;
@@ -499,11 +499,11 @@ public class Player
 
         try
         {
-            Script.Instance?.PlayerMove(playerId);
+            Script.Instance?.OnMove(playerId);
         }
         catch (Exception ex)
         {
-            General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(PlayerMove));
+            General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(OnMove));
         }
 
         x = GetPlayerX(playerId);

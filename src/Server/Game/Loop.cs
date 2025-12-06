@@ -41,7 +41,7 @@ public static class Loop
                 {
                     if (Data.Player[player.Id].Moving > 0)
                     {
-                        Player.PlayerMove(player.Id, Data.Player[player.Id].Dir, Data.Player[player.Id].Moving, false);
+                        Player.OnMove(player.Id, Data.Player[player.Id].Dir, Data.Player[player.Id].Moving, false);
                     }
                 }
 

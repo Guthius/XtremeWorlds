@@ -1031,11 +1031,9 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
     public static void Packet_RequestNewMap(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
-
         var dir = buffer.ReadInt32();
 
-
-        Server.Player.PlayerMove(session.Id, dir, 1, true);
+        Server.Player.OnMove(session.Id, dir, 1, true);
     }
 
     public static void Packet_MapData(GameSession session, ReadOnlyMemory<byte> bytes)
