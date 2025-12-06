@@ -321,8 +321,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
     {
         string name;
         byte slot;
-        int sexNum;
-        int jobNum;
+        int sex;
+        int job;
         int sprite;
         var buffer = new PacketReader(bytes);
 
@@ -330,8 +330,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         {
             slot = buffer.ReadByte();
             name = buffer.ReadString();
-            sexNum = buffer.ReadInt32();
-            jobNum = buffer.ReadInt32();
+            sex = buffer.ReadInt32();
+            job = buffer.ReadInt32();
 
             if (slot < 1 | slot > Core.Globals.Variables.MaxChars)
             {
@@ -366,19 +366,28 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                 return;
             }
 
-            if (sexNum < (byte)Sex.Male | sexNum > (byte)Sex.Female)
+            if (sex < (byte)Sex.Male | sex > (byte)Sex.Female)
                 return;
 
-            if (jobNum < 0 | jobNum > Core.Globals.Variables.MaxJobs)
+            if (job < 0 | job > Core.Globals.Variables.MaxJobs)
                 return;
 
-            if (sexNum == (byte)Sex.Male)
+            if (Job.Instance.Count <= job)
             {
-                sprite = Job.Instance[jobNum].MaleSprite;
+                for (int i = Job.Instance.Count; i <= job; i++)
+                {
+                    var instance = new Job();
+                    Job.Instance.Add(instance);
+                }
+            }
+
+            if (sex == (byte)Sex.Male)
+            {
+                sprite = Job.Instance[job].MaleSprite;
             }
             else
             {
-                sprite = Job.Instance[jobNum].FemaleSprite;
+                sprite = Job.Instance[job].FemaleSprite;
             }
 
             if (sprite == 0)
@@ -388,7 +397,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
             // Everything went ok, add the character
             Database.CharacterList?.Add(name);
-            Database.AddChar(session.Id, slot, name, (byte)sexNum, (byte)jobNum, sprite);
+            Database.AddChar(session.Id, slot, name, (byte)sex, (byte)job, sprite);
 
             if (Database.CharacterList?.Count == 1)
                 SetPlayerAccess(session.Id, (int)AccessLevel.Owner);
