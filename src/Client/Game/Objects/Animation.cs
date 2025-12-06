@@ -1,4 +1,5 @@
-﻿using Client.Net;
+﻿using System.ComponentModel;
+using Client.Net;
 using Core;
 using Core.Globals;
 using Core.Interfaces;
@@ -18,7 +19,7 @@ namespace Client
         public static void OnStream(int index)
         {
             if (index < 0 || index >= Variables.MaxAnimations) return;
-            if (string.IsNullOrEmpty(Animation.Instance[index].Name) && Animation.Instance[index].IsLoaded)
+            if (Animation.Instance.Count <= index)
             {
                 Sender.SendRequestAnimation(index);
             }

@@ -14,10 +14,9 @@ namespace Client
         public static void OnStream(int index)
         {
             if (index < 0 || index >= Variables.MaxItems) return;
-            if (string.IsNullOrEmpty(Item.Instance[index].Name) && Item.Instance[index].IsLoaded == false)
+            if (Item.Instance.Count <= index)
             {
                 Sender.SendRequestItem(index);
-                Item.Instance[index].IsLoaded = true;
             }
         }
         #endregion

@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Core.Objects
 {
-    public class AnimationBase : Stream, IData
+    public class AnimationBase : IData
     {
         public byte Count = 2;
 

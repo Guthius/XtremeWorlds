@@ -27,8 +27,6 @@ namespace Client
             if (anim < 0 || anim >= Variables.MaxAnimations)
                 return;
 
-            Animation.OnStream(anim);
-
             // Validate layer and arrays
             if (layer < 0)
                 return;
@@ -151,26 +149,25 @@ namespace Client
             if (Instance == null || index < 0 || index >= Instance.Length)
                 return;
 
-            ref var inst = ref Instance[index];
-            int animIdx = inst.Animation;
-            if (animIdx < 0 || animIdx >= Animation.Instance.Count)
+            ref var mapInstance = ref Instance[index];
+            int anim = mapInstance.Animation;
+            if (anim < 0 || anim >= Animation.Instance.Count)
                 return;
 
-            var anim = Animation.Instance[animIdx];
-            Animation.OnStream(animIdx);
+            var instance = Animation.Instance[anim];
 
             // Advance each layer independently with strict bounds checks
             for (int layer = 0; layer <= 1; layer++)
             {
                 // Ensure all arrays we index are present and sized
-                var spriteArr = anim.Sprite;
-                var framesArr = anim.Frames;
-                var loopTimeArr = anim.LoopTime;
-                var loopCountArr = anim.LoopCount;
-                var usedArr = inst.Used;
-                var frameIndexArr = inst.FrameIndex;
-                var loopIndexArr = inst.LoopIndex;
-                var timerArr = inst.Timer;
+                var spriteArr = instance.Sprite;
+                var framesArr = instance.Frames;
+                var loopTimeArr = instance.LoopTime;
+                var loopCountArr = instance.LoopCount;
+                var usedArr = mapInstance.Used;
+                var frameIndexArr = mapInstance.FrameIndex;
+                var loopIndexArr = mapInstance.LoopIndex;
+                var timerArr = mapInstance.Timer;
 
                 if (spriteArr == null || framesArr == null || loopTimeArr == null || loopCountArr == null ||
                     usedArr == null || frameIndexArr == null || loopIndexArr == null || timerArr == null)
@@ -222,9 +219,9 @@ namespace Client
                         else
                         {
                             frameIndexArr[layer] = 1;
-                            var sound = anim.Sound;
+                            var sound = instance.Sound;
                             if (!string.IsNullOrEmpty(sound))
-                                Audio.PlaySound(sound, inst.X, inst.Y);
+                                Audio.PlaySound(sound, mapInstance.X, mapInstance.Y);
                         }
                     }
                     else
@@ -236,14 +233,12 @@ namespace Client
             }
 
             // If neither layer is used, clear the instance
-            if (inst.Used != null && inst.Used.Length > 1 && !inst.Used[0] && !inst.Used[1])
+            if (mapInstance.Used != null && mapInstance.Used.Length > 1 && !mapInstance.Used[0] && !mapInstance.Used[1])
                 MapAnimation.OnClear(index);
         }
 
         public static int OnPlay(int sprite, int layer, int data, byte x, byte y)
         {
-            Animation.OnStream(data);
-
             if (sprite == 0)
                 return 0;
 
@@ -329,31 +324,31 @@ namespace Client
             if (Instance == null || index < 0 || index >= Instance.Length)
                 return;
 
-            ref var inst = ref Instance[index];
-            inst.Animation = -1;
-            inst.X = 0;
-            inst.Y = 0;
+            ref var instance = ref Instance[index];
+            instance.Animation = -1;
+            instance.X = 0;
+            instance.Y = 0;
 
-            if (inst.Used != null)
+            if (instance.Used != null)
             {
-                for (int i = 0; i < inst.Used.Length; i++)
-                    inst.Used[i] = false;
+                for (int i = 0; i < instance.Used.Length; i++)
+                    instance.Used[i] = false;
             }
 
-            if (inst.Timer != null)
+            if (instance.Timer != null)
             {
-                for (int i = 0; i < inst.Timer.Length; i++)
-                    inst.Timer[i] = 0;
+                for (int i = 0; i < instance.Timer.Length; i++)
+                    instance.Timer[i] = 0;
             }
 
-            if (inst.FrameIndex != null)
+            if (instance.FrameIndex != null)
             {
-                for (int i = 0; i < inst.FrameIndex.Length; i++)
-                    inst.FrameIndex[i] = 0;
+                for (int i = 0; i < instance.FrameIndex.Length; i++)
+                    instance.FrameIndex[i] = 0;
             }
 
-            inst.LockType = 0;
-            inst.LockIndex = 0;
+            instance.LockType = 0;
+            instance.LockIndex = 0;
         }
 
         public static void OnDraw(int index)

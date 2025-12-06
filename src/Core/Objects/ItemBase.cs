@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Core.Objects
 {
-    public class ItemBase : Stream, IData
+    public class ItemBase : IData
     {
         public static bool[] IsChanged { get; set; } = new bool[Variables.MaxItems];
         public ItemBase()
