@@ -236,7 +236,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         NetworkSend.SendVariables(session);
         NetworkSend.SendPlayerChars(session);
-        NetworkSend.SendJobs(session.Id);
+        NetworkSend.SendJobs(session);
     }
 
     private static void Packet_Register(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -314,7 +314,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         // send them to the character portal
         NetworkSend.SendPlayerChars(session);
-        NetworkSend.SendJobs(session.Id);
+        NetworkSend.SendJobs(session);
     }
 
     private static void Packet_AddChar(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -1588,7 +1588,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         Data.TempPlayer[session.Id].Editor = EditorType.Skill;
 
-        NetworkSend.SendJobs(session.Id);
+        NetworkSend.SendJobs(session);
         NetworkSend.SendProjectiles(session.Id);
         NetworkSend.SendAnimations(session.Id);
         NetworkSend.SendSkills(session.Id);
@@ -2682,7 +2682,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         NetworkSend.SendJobEditor(session.Id);
 
         NetworkSend.SendItems(session.Id);
-        NetworkSend.SendJobs(session.Id);
+        NetworkSend.SendJobs(session);
 
         Data.TempPlayer[session.Id].Editor = EditorType.Job;        
     }
@@ -2725,7 +2725,6 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         instance.StartY = buffer.ReadByte();
         instance.BaseExp = buffer.ReadInt32();
     
-
         Job.OnSave(index);
         NetworkSend.SendJobToAll(session.Id);
     }
@@ -3084,7 +3083,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         NetworkSend.SendAnimations(session.Id);
         NetworkSend.SendProjectiles(session.Id);
-        NetworkSend.SendJobs(session.Id);
+        NetworkSend.SendJobs(session);
         NetworkSend.SendItems(session.Id);
     }
 

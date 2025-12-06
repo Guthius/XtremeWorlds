@@ -324,7 +324,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-     public static void Packet_JobData(ReadOnlyMemory<byte> data)
+    public static void Packet_JobData(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
         Job.Instance.Clear();

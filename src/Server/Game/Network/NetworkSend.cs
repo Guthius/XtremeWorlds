@@ -265,18 +265,6 @@ public static class NetworkSend
         PlayerService.Instance.SendDataToAll(packetWriter.GetBytes());
     }
 
-    public static void SendJobs(int playerId)
-    {
-        var packetWriter = new PacketWriter();
-
-        packetWriter.WriteEnum(ServerPackets.SJobData);
-
-        for (var i = 0; i < Core.Globals.Variables.MaxJobs; i++)
-        {
-            WriteJobDataToPacket(i, packetWriter);
-        }
-    }
-
     public static void SendInventory(int playerId)
     {
         var packetWriter = new PacketWriter();
@@ -1566,9 +1554,7 @@ public static class NetworkSend
     }
 
      public static void WriteJobDataToPacket(int index, PacketWriter packetWriter)
-    { 
-        packetWriter.WriteInt32(index);
-        
+    {
         var job = new Job();
         if (Job.Instance.Count > index)
             job = (Job)Job.Instance[index];
