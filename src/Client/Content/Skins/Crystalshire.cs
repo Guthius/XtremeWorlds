@@ -3171,6 +3171,7 @@ public class Crystalshire
                 int id = WinAnimationEditor.SelectedIndex; if (id < 0 || id >= Animation.Instance.Count) return;
                 var newName = txtName.Text?.Trim() ?? string.Empty;
                 Animation.Instance[id].Name = newName;
+                Animation.IsChanged[id] = true;
 
                 // Update list item text and keep selection/scroll
                 if (WindowManager.TryGetControl("winAnimationEditor", "lstIndex", out var lc) && lc is ListBox lb)
@@ -3220,6 +3221,7 @@ public class Crystalshire
                     int v = Math.Clamp(sb.Value, sb.Min, sb.Max);
                     set(a, v);
                     Animation.Instance[i] = a;
+                    Animation.IsChanged[i] = true;
                 };
             }
         }

@@ -128,7 +128,7 @@ namespace Server
 
             if (Data.MapResource[mapNum].ResourceData[resourceNum].State != 0)
             {
-                NetworkSend.SendActionMsg(mapNum, Data.Resource[resourceIndex].EmptyMessage, (int)ColorName.BrightRed, 1, Command.GetPlayerX(playerId) * 32, Command.GetPlayerY(playerId) * 32);
+                NetworkSend.SendActionMessage(mapNum, Data.Resource[resourceIndex].EmptyMessage, (int)ColorName.BrightRed, 1, Command.GetPlayerX(playerId) * 32, Command.GetPlayerY(playerId) * 32);
                 return;
             }
 
@@ -147,14 +147,14 @@ namespace Server
 
             if (damage <= 0)
             {
-                NetworkSend.SendActionMsg(mapNum, "Miss!", (int)ColorName.BrightRed, 1, resourceX * 32, resourceY * 32);
+                NetworkSend.SendActionMessage(mapNum, "Miss!", (int)ColorName.BrightRed, 1, resourceX * 32, resourceY * 32);
                 return;
             }
 
             if (Data.MapResource[mapNum].ResourceData[resourceNum].Health - damage >= 0)
             {
                 Data.MapResource[mapNum].ResourceData[resourceNum].Health = (byte)(Data.MapResource[mapNum].ResourceData[resourceNum].Health - damage);
-                NetworkSend.SendActionMsg(mapNum, "-" + damage, (int)ColorName.BrightRed, 1, resourceX * 32, resourceY * 32);
+                NetworkSend.SendActionMessage(mapNum, "-" + damage, (int)ColorName.BrightRed, 1, resourceX * 32, resourceY * 32);
                 NetworkSend.SendAnimation(mapNum, Data.Resource[resourceIndex].Animation, resourceX, resourceY);
 
                 return;
@@ -165,7 +165,7 @@ namespace Server
 
             NetworkSend.SendMapResourceToMap(mapNum);
 
-            NetworkSend.SendActionMsg(mapNum, Data.Resource[resourceIndex].SuccessMessage, (int)ColorName.BrightGreen, 1, Command.GetPlayerX(playerId) * 32, Command.GetPlayerY(playerId) * 32);
+            NetworkSend.SendActionMessage(mapNum, Data.Resource[resourceIndex].SuccessMessage, (int)ColorName.BrightGreen, 1, Command.GetPlayerX(playerId) * 32, Command.GetPlayerY(playerId) * 32);
             Player.GiveInv(playerId, Data.Resource[resourceIndex].ItemReward, 1);
             NetworkSend.SendAnimation(mapNum, Data.Resource[resourceIndex].Animation, resourceX, resourceY);
 

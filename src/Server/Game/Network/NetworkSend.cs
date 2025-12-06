@@ -889,21 +889,21 @@ public static class NetworkSend
         NetworkConfig.SendDataToMap(GetPlayerMap(playerId), packetWriter.GetBytes());
     }
 
-    public static void MapMsg(int mapNum, string message)
+    public static void SendMapMessage(int mapNum, string message)
     {
         var packetWriter = new PacketWriter();
 
-        packetWriter.WriteEnum(ServerPackets.SMapMsg);
+        packetWriter.WriteEnum(ServerPackets.SSendMapMessage);
         packetWriter.WriteString(message);
 
         NetworkConfig.SendDataToMap(mapNum, packetWriter.GetBytes());
     }
 
-    public static void AdminMsg(string message)
+    public static void SendAdminMessage(string message)
     {
         var packetWriter = new PacketWriter();
 
-        packetWriter.WriteEnum(ServerPackets.SAdminMsg);
+        packetWriter.WriteEnum(ServerPackets.SSendAdminMessage);
         packetWriter.WriteString(message);
 
         foreach (var playerId in PlayerService.Instance.PlayerIds)
@@ -915,7 +915,7 @@ public static class NetworkSend
         }
     }
 
-    public static void SendActionMsg(int mapNum, string message, int color, int msgType, int x, int y, int playerOnlyNum = -1)
+    public static void SendActionMessage(int mapNum, string message, int color, int msgType, int x, int y, int playerOnlyNum = -1)
     {
         var packetWriter = new PacketWriter();
 

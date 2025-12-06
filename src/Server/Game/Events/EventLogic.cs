@@ -1575,7 +1575,7 @@ namespace Server
                                                     NetworkSend.SendPlayerMessage(i, command.Text1, command.Data1);
                                                     break;
                                                 case 1: // Map
-                                                    NetworkSend.MapMsg(mapNum, command.Text1);
+                                                    NetworkSend.SendMapMessage(mapNum, command.Text1);
                                                     break;
                                                 case 2: // Global
                                                     NetworkSend.SendGlobalMessage(command.Text1);

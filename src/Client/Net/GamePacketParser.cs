@@ -48,9 +48,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Bind(Packets.ServerPackets.SMapNpcData, Packet_MapNpcData);
         Bind(Packets.ServerPackets.SMapNpcUpdate, Packet_MapNpcUpdate);
         Bind(Packets.ServerPackets.SGlobalMsg, Packet_GlobalMsg);
-        Bind(Packets.ServerPackets.SAdminMsg, Packet_AdminMsg);
+        Bind(Packets.ServerPackets.SSendAdminMessage, Packet_SendAdminMessage);
         Bind(Packets.ServerPackets.SPlayerMsg, Packet_PlayerMsg);
-        Bind(Packets.ServerPackets.SMapMsg, Packet_MapMsg);
+        Bind(Packets.ServerPackets.SSendMapMessage, Packet_SendMapMessage);
         Bind(Packets.ServerPackets.SSpawnItem, Packet_SpawnItem);
         Bind(Packets.ServerPackets.SUpdateItem, Packet_UpdateItem);
         Bind(Packets.ServerPackets.SSpawnNpc, Packet_SpawnNpc);
@@ -524,7 +524,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         TextRenderer.AddText(message, (int) ColorName.Yellow, channel: (byte) ChatChannel.Broadcast);
     }
 
-    private static void Packet_MapMsg(ReadOnlyMemory<byte> data)
+    private static void Packet_SendMapMessage(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 
@@ -533,7 +533,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         TextRenderer.AddText(message, (int) ColorName.White, channel: (byte) ChatChannel.Map);
     }
 
-    private static void Packet_AdminMsg(ReadOnlyMemory<byte> data)
+    private static void Packet_SendAdminMessage(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 

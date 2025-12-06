@@ -177,7 +177,7 @@ public class Script
             {
                 SetPlayerInvValue(index, invSlot, playerInvValue - amount);
             }
-            NetworkSend.MapMsg(mapNum, string.Format("{0} has dropped {1} ({2}x).", GetPlayerName(index), GameLogic.CheckGrammar(item.Name), amount));
+            NetworkSend.SendMapMessage(mapNum, string.Format("{0} has dropped {1} ({2}x).", GetPlayerName(index), GameLogic.CheckGrammar(item.Name), amount));
         }
         else
         {
@@ -185,7 +185,7 @@ public class Script
             SetPlayerInv(index, invSlot, -1);
             SetPlayerInvValue(index, invSlot, 0);
 
-            NetworkSend.MapMsg(mapNum, string.Format("{0} has dropped {1}.", GetPlayerName(index), GameLogic.CheckGrammar(item.Name)));
+            NetworkSend.SendMapMessage(mapNum, string.Format("{0} has dropped {1}.", GetPlayerName(index), GameLogic.CheckGrammar(item.Name)));
         }
 
         // Send inventory update
@@ -234,7 +234,7 @@ public class Script
         Data.MapItem[mapNum, mapSlot].Value = 0;
         NetworkSend.SendMapItemToAll(mapNum, mapSlot);
         NetworkSend.SendInventoryUpdate(index, invSlot);
-        NetworkSend.SendActionMsg(GetPlayerMap(index), msg, (int)ColorName.White, (byte)ActionMessageType.Static, GetPlayerX(index) * 32, GetPlayerY(index) * 32);
+        NetworkSend.SendActionMessage(GetPlayerMap(index), msg, (int)ColorName.White, (byte)ActionMessageType.Static, GetPlayerX(index) * 32, GetPlayerY(index) * 32);
 
         // Unlock pickup for this player
         _isPickingUp[index] = false;
@@ -299,7 +299,7 @@ public class Script
                         {
                             case (byte)ConsumableEffect.RestoresHealth:
                                 {
-                                    NetworkSend.SendActionMsg(GetPlayerMap(index), "+" + Item.Instance[itemNum].Data1, (int)ColorName.BrightGreen, (byte)ActionMessageType.Scroll, GetPlayerX(index) * 32, GetPlayerY(index) * 32);
+                                    NetworkSend.SendActionMessage(GetPlayerMap(index), "+" + Item.Instance[itemNum].Data1, (int)ColorName.BrightGreen, (byte)ActionMessageType.Scroll, GetPlayerX(index) * 32, GetPlayerY(index) * 32);
                                     NetworkSend.SendAnimation(GetPlayerMap(index), Item.Instance[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
                                     SetPlayerVital(index, Vital.Health, GetPlayerVital(index, Vital.Health) + Item.Instance[itemNum].Data1);
                                     TakeInv(index, itemNum, 1);
@@ -309,7 +309,7 @@ public class Script
 
                             case (byte)ConsumableEffect.RestoresMana:
                                 {
-                                    NetworkSend.SendActionMsg(GetPlayerMap(index), "+" + Item.Instance[itemNum].Data1, (int)ColorName.BrightBlue, (byte)ActionMessageType.Scroll, GetPlayerX(index) * 32, GetPlayerY(index) * 32);
+                                    NetworkSend.SendActionMessage(GetPlayerMap(index), "+" + Item.Instance[itemNum].Data1, (int)ColorName.BrightBlue, (byte)ActionMessageType.Scroll, GetPlayerX(index) * 32, GetPlayerY(index) * 32);
                                     NetworkSend.SendAnimation(GetPlayerMap(index), Item.Instance[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
                                     SetPlayerVital(index, Vital.Stamina, GetPlayerVital(index, Vital.Stamina) + Item.Instance[itemNum].Data1);
                                     TakeInv(index, itemNum, 1);
@@ -563,6 +563,22 @@ public class Script
         SendPlayerXYToMap(index);
         NetworkSend.SendMapEquipment(index);
         NetworkSend.SendVitals(index);
+        
+        // Send map animations
+        for (int x = 0; x < Data.Map[mapNum].MaxX; x++)
+        {
+            for (int y = 0; y < Data.Map[mapNum].MaxY; y++)
+            {
+                if (Data.Map[mapNum].Tile[x, y].Type == TileType.Animation)
+                {
+                    NetworkSend.SendAnimation(mapNum, Data.Map[mapNum].Tile[x, y].Data1, x, y, 0, -1);
+                }
+                else if (Data.Map[mapNum].Tile[x, y].Type2 == TileType.Animation)
+                {
+                    NetworkSend.SendAnimation(mapNum, Data.Map[mapNum].Tile[x, y].Data1_2, x, y, 0, -1);
+                }
+            }
+        }
     }
 
     public void LeaveMap(int index, int mapNum)
@@ -768,7 +784,7 @@ public class Script
                 // plural
                 NetworkSend.SendGlobalMessage(GetPlayerName(index) + " has gained " + level_count + " levels!");
             }
-            NetworkSend.SendActionMsg(GetPlayerMap(index), "Level Up", (int)ColorName.Yellow, 1, GetPlayerX(index) * 32, GetPlayerY(index) * 32);
+            NetworkSend.SendActionMessage(GetPlayerMap(index), "Level Up", (int)ColorName.Yellow, 1, GetPlayerX(index) * 32, GetPlayerY(index) * 32);
             NetworkSend.SendExp(index);
             NetworkSend.SendPlayerData(index);
         }
@@ -1522,7 +1538,7 @@ public class Script
             if (vital == Vital.Health && !isHeal)
             {
                 // show damage amount like existing ApplyDamage does (keep consistent color if possible)
-                NetworkSend.SendActionMsg(target.Map, (isHeal ? "+" : "-") + amount, (int)(isHeal ? ColorName.BrightGreen : ColorName.BrightRed), 1, target.X, target.Y);
+                NetworkSend.SendActionMessage(target.Map, (isHeal ? "+" : "-") + amount, (int)(isHeal ? ColorName.BrightGreen : ColorName.BrightRed), 1, target.X, target.Y);
             }
             NetworkSend.SendMapNpcVitals(target.Map, (byte)target.Id);
             if (!isHeal && vital == Vital.Health && newVal <= 0)
@@ -1986,23 +2002,23 @@ public class Script
 
         if (dmg.Dodge)
         {
-            NetworkSend.SendActionMsg(map, "Dodge!", (int)ColorName.Pink, 1, tx, ty);
+            NetworkSend.SendActionMessage(map, "Dodge!", (int)ColorName.Pink, 1, tx, ty);
             return;
         }
         if (dmg.Parry)
         {
-            NetworkSend.SendActionMsg(map, "Parry!", (int)ColorName.Pink, 1, tx, ty);
+            NetworkSend.SendActionMessage(map, "Parry!", (int)ColorName.Pink, 1, tx, ty);
             return;
         }
         if (dmg.Block)
         {
-            NetworkSend.SendActionMsg(map, "Block!", (int)ColorName.BrightCyan, 1, tx, ty);
+            NetworkSend.SendActionMessage(map, "Block!", (int)ColorName.BrightCyan, 1, tx, ty);
             return;
         }
 
         if (dmg.Crit)
         {
-            NetworkSend.SendActionMsg(map, "Critical!", (int)ColorName.BrightCyan, 1, attacker.X, attacker.Y);
+            NetworkSend.SendActionMessage(map, "Critical!", (int)ColorName.BrightCyan, 1, attacker.X, attacker.Y);
         }
 
         var final = dmg.Final;
@@ -2019,7 +2035,7 @@ public class Script
             var newHp = Math.Max(0, current - final);
             SetPlayerVital(target.Id, Vital.Health, newHp);
             NetworkSend.SendVital(target.Id, Vital.Health);
-            NetworkSend.SendActionMsg(map, "-" + final, (int)ColorName.BrightRed, 1, tx, ty);
+            NetworkSend.SendActionMessage(map, "-" + final, (int)ColorName.BrightRed, 1, tx, ty);
         }
         else if (target.Type == Entity.EntityType.Npc)
         {
@@ -2030,7 +2046,7 @@ public class Script
                 var current = Data.MapNpc[map].Npc[mapNpcNum].Vital[hpIndex];
                 var newHp = Math.Max(0, current - final);
                 Data.MapNpc[map].Npc[mapNpcNum].Vital[hpIndex] = newHp;
-                NetworkSend.SendActionMsg(map, "-" + final, (int)ColorName.BrightRed, 1, tx, ty);
+                NetworkSend.SendActionMessage(map, "-" + final, (int)ColorName.BrightRed, 1, tx, ty);
                 if (newHp > 0)
                 {
                     // still alive

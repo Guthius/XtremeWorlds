@@ -32,6 +32,7 @@ namespace Client
                 return;
 
             var animation = Animation.Instance?[anim];
+            Animation.OnStream(anim);
             if (animation?.Sprite == null || animation.Frames == null || instance.Used == null || instance.FrameIndex == null)
                 return;
 

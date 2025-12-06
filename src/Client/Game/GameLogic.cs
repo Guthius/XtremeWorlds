@@ -164,7 +164,7 @@ namespace Client
 
                 if (Strings.Len(chatText) > 0)
                 {
-                    Sender.AdminMsg(chatText);
+                    Sender.SendAdminMessage(chatText);
                 }
 
                 if (WindowManager.TryGetControl("winChat", "txtChat", out var chatCtrl3)) chatCtrl3!.Text = "";

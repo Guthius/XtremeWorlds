@@ -2557,7 +2557,7 @@ namespace Client
                     if (MapAnimation.Instance[i].Used?[0] == true)
                     {
                         MapAnimation.OnDraw(i, 0);
-                    }         
+                    }
                 }
             }
 

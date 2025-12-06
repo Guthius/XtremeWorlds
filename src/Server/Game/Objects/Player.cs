@@ -450,7 +450,7 @@ public class Player
                         Vital.Mana => (int)ColorName.BrightBlue,
                         _ => (int)ColorName.Yellow
                     };
-                    NetworkSend.SendActionMsg(GetPlayerMap(playerId), "+" + healAmount, color, (byte)ActionMessageType.Scroll, GetPlayerX(playerId) * 32, GetPlayerY(playerId) * 32, 1);
+                    NetworkSend.SendActionMessage(GetPlayerMap(playerId), "+" + healAmount, color, (byte)ActionMessageType.Scroll, GetPlayerX(playerId) * 32, GetPlayerY(playerId) * 32, 1);
                     SetPlayerVital(playerId, hv, Math.Min(GetPlayerVital(playerId, hv) + healAmount, GetPlayerMaxVital(playerId, hv)));
                     NetworkSend.SendPlayerMessage(playerId, "You feel rejuvenating forces coursing through your body.", (int)ColorName.BrightGreen);
                     NetworkSend.SendVital(playerId, hv);
@@ -472,7 +472,7 @@ public class Player
             if (trapAmount > 0)
             {
                 var tv = (Vital)trapVital;
-                NetworkSend.SendActionMsg(GetPlayerMap(playerId), "-" + trapAmount, (int)ColorName.BrightRed, (byte)ActionMessageType.Scroll, GetPlayerX(playerId) * 32, GetPlayerY(playerId) * 32, 1);
+                NetworkSend.SendActionMessage(GetPlayerMap(playerId), "-" + trapAmount, (int)ColorName.BrightRed, (byte)ActionMessageType.Scroll, GetPlayerX(playerId) * 32, GetPlayerY(playerId) * 32, 1);
                 if (tv == Vital.Health && GetPlayerVital(playerId, Vital.Health) - trapAmount <= 0)
                 {
                     KillPlayer(playerId);

@@ -29,10 +29,10 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Bind(GamePacketId.FromClient.CUseChar, Packet_UseChar);
         Bind(GamePacketId.FromClient.CDelChar, Packet_DelChar);
         Bind(GamePacketId.FromClient.CLogout, Packet_Logout);
-        Bind(GamePacketId.FromClient.CSayMsg, Packet_SayMessage);
-        Bind(GamePacketId.FromClient.CBroadcastMsg, Packet_BroadCastMsg);
-        Bind(GamePacketId.FromClient.CPlayerMsg, Packet_PlayerMsg);
-        Bind(GamePacketId.FromClient.CAdminMsg, Packet_AdminMsg);
+        Bind(GamePacketId.FromClient.CSayMessage, Packet_SayMessage);
+        Bind(GamePacketId.FromClient.CBroadcastMessage, Packet_BroadCastMsg);
+        Bind(GamePacketId.FromClient.CPlayerMessage, Packet_PlayerMsg);
+        Bind(GamePacketId.FromClient.CAdminMessage, Packet_SendAdminMessage);
         Bind(GamePacketId.FromClient.CPlayerMove, Packet_PlayerMove);
         Bind(GamePacketId.FromClient.CStopPlayerMove, Packet_StopPlayerMove);
         Bind(GamePacketId.FromClient.CPlayerDir, Packet_PlayerDirection);
@@ -519,14 +519,14 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         }
     }
 
-    private static void Packet_AdminMsg(GameSession session, ReadOnlyMemory<byte> bytes)
+    private static void Packet_SendAdminMessage(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var s = default(string);
         var buffer = new PacketReader(bytes);
 
         var msg = buffer.ReadString();
 
-        NetworkSend.AdminMsg(msg);
+        NetworkSend.SendAdminMessage(msg);
         Log.Add(s ?? string.Empty, Constant.PlayerLog);
         Console.WriteLine(s);
     }

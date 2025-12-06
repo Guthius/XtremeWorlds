@@ -332,11 +332,11 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void AdminMsg(string text)
+    public static void SendAdminMessage(string text)
     {
         var packetWriter = new PacketWriter();
 
-        packetWriter.WriteEnum(Packets.ClientPackets.CAdminMsg);
+        packetWriter.WriteEnum(Packets.ClientPackets.CAdminMessage);
         packetWriter.WriteString(text);
 
         Network.Send(packetWriter);
