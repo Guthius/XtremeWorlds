@@ -1567,6 +1567,20 @@ public static class NetworkSend
         NetworkConfig.SendDataToMap(mapNum, packet.GetBytes());
     }
 
+     public static void SendAnimationTo(int index, int anim, int x, int y, byte lockType = 0, int lockindex = 0)
+    {
+        var packet = new PacketWriter(4);
+
+        packet.WriteEnum(ServerPackets.SAnimation);
+        packet.WriteInt32(anim);
+        packet.WriteInt32(x);
+        packet.WriteInt32(y);
+        packet.WriteInt32(lockType);
+        packet.WriteInt32(lockindex);
+
+        PlayerService.Instance.SendDataTo(index, packet.GetBytes());
+    }
+    
     public static void SendAnimations(int playerId)
     {
         for (var index = 0; index < Variables.MaxAnimations; index++)
