@@ -68,10 +68,10 @@ namespace Client
             int frameCount = Math.Max(1, rows * columns);
 
             // Frame index (1-based in state, convert to 0-based for drawing)
-            int idx1 = inst.FrameIndex[layer];
-            if (idx1 <= 0) idx1 = 1;
-            if (idx1 > frameCount) idx1 = frameCount;
-            int zeroIndex = idx1 - 1;
+            int id1 = inst.FrameIndex[layer];
+            if (id1 <= 0) id1 = 1;
+            if (id1 > frameCount) id1 = frameCount;
+            int zeroIndex = id1 - 1;
 
             int column = columns > 0 ? zeroIndex % columns : 0;
             int row = columns > 0 ? zeroIndex / columns : 0;

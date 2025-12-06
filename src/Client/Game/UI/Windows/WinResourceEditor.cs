@@ -40,12 +40,12 @@ public class WinResourceEditor
         OnLoad(index);
     }
 
-    public static void OnLoad(int idx)
+    public static void OnLoad(int id)
     {
-        if (idx < 0 || idx >= Variables.MaxResources) return;
-        SelectedIndex = idx;
-        GameState.EditorIndex = idx;
-        ref var r = ref Data.Resource[idx];
+        if (id < 0 || id >= Variables.MaxResources) return;
+        SelectedIndex = id;
+        GameState.EditorIndex = id;
+        ref var r = ref Data.Resource[id];
 
         // Text boxes
         if (WindowManager.TryGetControl("winResourceEditor", "txtName", out var txtName) && txtName is TextBox tbName)

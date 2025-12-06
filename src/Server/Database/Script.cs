@@ -386,24 +386,24 @@ public class Script
 
     private void CommonEvent(int index, int itemNum, int skillNum = -1)
     {
-        int idxType;
+        int idType;
         int n, n2;
 
         if (skillNum >= 0)
         {
-            idxType = Data.Skill[skillNum].CommonEventType - 1;
+            idType = Data.Skill[skillNum].CommonEventType - 1;
             n = Data.Skill[skillNum].CommonEventData1;
             n2 = Data.Skill[skillNum].CommonEventData2;
         }
         else
         {
             // Item-driven common events directly use the enum as SubType
-            idxType = Item.Instance[itemNum].SubType;
+            idType = Item.Instance[itemNum].SubType;
             n = Item.Instance[itemNum].Data1;
             n2 = Item.Instance[itemNum].Data2;
         }
 
-        switch (idxType)
+        switch (idType)
         {
             case (byte)CommonEventTrigger.Switch:
                 Data.Player[index].Switches[Math.Max(0, n)] = (byte)Math.Max(0, n2); break;
@@ -1453,9 +1453,9 @@ public class Script
     private int SafeStat(Entity e, Stat stat)
     {
         if (e.Stat == null) return 0;
-        var idx = (int)stat;
-        if (idx < 0 || idx >= e.Stat.Length) return 0;
-        return e.Stat[idx];
+        var id = (int)stat;
+        if (id < 0 || id >= e.Stat.Length) return 0;
+        return e.Stat[id];
     }
 
     // Adjust vital on an entity (player or npc). If isHeal=false we subtract (damage). If true we add (heal).
@@ -1503,9 +1503,9 @@ public class Script
             if (target.Id < 0 || target.Id >= Data.MapNpc.Length) return;
             ref var mapNpc = ref Data.MapNpc[target.Map].Npc[target.Id];
             if (mapNpc.Num < 0) return;
-            int idx = (int)vital;
-            if (mapNpc.Vital == null || idx < 0 || idx >= mapNpc.Vital.Length) return;
-            int cur = mapNpc.Vital[idx];
+            int id = (int)vital;
+            if (mapNpc.Vital == null || id < 0 || id >= mapNpc.Vital.Length) return;
+            int cur = mapNpc.Vital[id];
             int max = GameLogic.GetNpcMaxVital(mapNpc.Num, vital);
             int newVal;
             if (isHeal)
@@ -1518,7 +1518,7 @@ public class Script
                 if (cur <= 0) return;
                 newVal = Math.Max(0, cur - amount);
             }
-            mapNpc.Vital[idx] = newVal;
+            mapNpc.Vital[id] = newVal;
             if (vital == Vital.Health && !isHeal)
             {
                 // show damage amount like existing ApplyDamage does (keep consistent color if possible)

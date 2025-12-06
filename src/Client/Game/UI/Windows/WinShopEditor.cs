@@ -54,9 +54,9 @@ public class WinShopEditor
     public static void LoadTradeFieldsForSelected()
     {
         if (!WindowManager.TryGetControl("winShopEditor", "lstTradeItem", out var ctrl) || ctrl is not ListBox lst) return;
-        int idx = lst.SelectedIndex;
-        if (idx < 0 || SelectedIndex < 0 || SelectedIndex >= Variables.MaxShops) return;
-        ref var trade = ref Data.Shop[SelectedIndex].TradeItem[idx];
+        int id = lst.SelectedIndex;
+        if (id < 0 || SelectedIndex < 0 || SelectedIndex >= Variables.MaxShops) return;
+        ref var trade = ref Data.Shop[SelectedIndex].TradeItem[id];
         if (WindowManager.TryGetControl("winShopEditor", "cmbItem", out var itCtrl) && itCtrl is ComboBox ci)
             ci.Value = Math.Clamp(trade.Item, 0, Math.Max(0, ci.Items.Count - 1));
         if (WindowManager.TryGetControl("winShopEditor", "cmbCostItem", out var cCtrl) && cCtrl is ComboBox cc)
@@ -205,9 +205,9 @@ public class WinShopEditor
     {
         if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxShops) return;
         if (!WindowManager.TryGetControl("winShopEditor", "lstTradeItem", out var tradeListCtrl) || tradeListCtrl is not ListBox lst) return;
-        int idx = lst.SelectedIndex;
-        if (idx < 0 || idx >= Variables.MaxTrades) return;
-        ref var trade = ref Data.Shop[SelectedIndex].TradeItem[idx];
+        int id = lst.SelectedIndex;
+        if (id < 0 || id >= Variables.MaxTrades) return;
+        ref var trade = ref Data.Shop[SelectedIndex].TradeItem[id];
         trade.Item = -1; trade.ItemValue = 0; trade.CostItem = -1; trade.CostValue = 0;
         GameState.ShopChanged[SelectedIndex] = true;
         OnLoad(SelectedIndex);

@@ -149,7 +149,7 @@ public static class TextRenderer
         int maxLine = 0;
         int current = 0;
         int colorSkip = 0;
-        int idx = 0;
+        int id = 0;
         int len = text.Length;
 
         foreach (var ch in text)
@@ -174,8 +174,8 @@ public static class TextRenderer
             if (adv <= 0) adv = rect.Width;
 
             current += adv;
-            if (idx < len - 1) current += bf.Spacing;
-            idx++;
+            if (id < len - 1) current += bf.Spacing;
+            id++;
         }
 
         int w = Math.Max(maxLine, current);
@@ -256,7 +256,7 @@ public static class TextRenderer
         int lineX = originX;
         int lineY = originY;
         int colorSkip = 0;
-        int idx = 0;
+        int id = 0;
         int len = text.Length;
 
         int lineAdvance = (int)Math.Round(bf.CharHeight * textSize);
@@ -271,7 +271,7 @@ public static class TextRenderer
             {
                 lineY += lineAdvance + gapAdvance;
                 lineX = originX;
-                idx = 0;
+                id = 0;
                 continue;
             }
 
@@ -297,8 +297,8 @@ public static class TextRenderer
             // Glyph
             GameClient.SpriteBatch.Draw(bf.Atlas, new Rectangle(lineX, lineY, drawW, drawH), rect, frontColor);
 
-            lineX += drawW + (idx < len - 1 ? bf.Spacing : 0);
-            idx++;
+            lineX += drawW + (id < len - 1 ? bf.Spacing : 0);
+            id++;
         }
     }
 

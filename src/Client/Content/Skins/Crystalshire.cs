@@ -231,8 +231,8 @@ public class Crystalshire
                     Data.MyMap.Name = txtNameCtrl.Text?.Trim() ?? string.Empty;
                 if (WindowManager.TryGetControl("winMapEditor", "cmbMusic", out var musicCtrl) && musicCtrl is ComboBox cmbMusic)
                 {
-                    var idx = Math.Clamp(cmbMusic.Value, 0, cmbMusic.Items.Count - 1);
-                    Data.MyMap.Music = idx <= 0 ? string.Empty : cmbMusic.Items[idx];
+                    var id = Math.Clamp(cmbMusic.Value, 0, cmbMusic.Items.Count - 1);
+                    Data.MyMap.Music = id <= 0 ? string.Empty : cmbMusic.Items[id];
                 }
                 if (WindowManager.TryGetControl("winMapEditor", "lstShop", out var shopCtrl) && shopCtrl is ComboBox lstShop)
                     Data.MyMap.Shop = lstShop.Value <= 0 ? -1 : lstShop.Value - 1;
@@ -477,10 +477,10 @@ public class Crystalshire
             GameState.OptInfo = false; // Info handled via dedicated button
         }
 
-        void UpdateAttrVisibility(int idx)
+        void UpdateAttrVisibility(int id)
         {
             // Show only relevant attribute configuration controls per selection (mirror Eto behavior)
-            bool showWarp = idx == 1; // Warp
+            bool showWarp = id == 1; // Warp
             string[] warpCtrls = new[] { "lblWarp", "lblWarpMap", "sldMapWarp", "lblWarpX", "sldMapWarpX", "lblWarpY", "sldMapWarpY", "btnMapWarp" }; ;
             foreach (var n in warpCtrls)
             {
@@ -555,7 +555,7 @@ public class Crystalshire
             }
 
             // Item
-            bool showItem = idx == 2;
+            bool showItem = id == 2;
             string[] itemCtrls = new[] { "lblItem", "cmbMapItem", "lblItemValue", "sldMapItemValue", "btnMapItem" };
             foreach (var n in itemCtrls)
             {
@@ -598,7 +598,7 @@ public class Crystalshire
             }
 
             // Resource
-            bool showResource = idx == 4;
+            bool showResource = id == 4;
             string[] resCtrls = new[] { "lblResource", "cmbResource", "btnResourceOk" };
             foreach (var n in resCtrls)
             {
@@ -631,7 +631,7 @@ public class Crystalshire
             }
 
             // NPC Spawn
-            bool showSpawn = idx == 5;
+            bool showSpawn = id == 5;
             string[] spawnCtrls = new[] { "lblNpcSpawn", "lblNpcSpawnSlot", "cmbNpcSpawnSlot", "lblNpcDir", "sldNpcDir", "btnNpcSpawn" };
             foreach (var n in spawnCtrls)
             {
@@ -683,7 +683,7 @@ public class Crystalshire
             }
 
             // Shop
-            bool showShop = idx == 6;
+            bool showShop = id == 6;
             string[] shopCtrls = new[] { "lblShopAttr", "cmbShopAttr", "btnShop" };
             foreach (var n in shopCtrls)
             {
@@ -715,7 +715,7 @@ public class Crystalshire
             }
 
             // Heal
-            bool showHeal = idx == 8;
+            bool showHeal = id == 8;
             string[] healCtrls = new[] { "lblHeal", "cmbHeal", "lblHealAmount", "sldHeal", "btnHeal" };
             foreach (var n in healCtrls)
             {
@@ -755,7 +755,7 @@ public class Crystalshire
             }
 
             // Trap
-            bool showTrap = idx == 9;
+            bool showTrap = id == 9;
             string[] trapCtrls = new[] { "lblTrap", "lblTrapVital", "cmbTrapVital", "lblTrapAmount", "sldTrap", "btnTrap" };
             foreach (var n in trapCtrls)
             {
@@ -795,7 +795,7 @@ public class Crystalshire
             }
 
             // Animation
-            bool showAnimation = idx == 10;
+            bool showAnimation = id == 10;
             string[] animCtrls = new[] { "lblAnimation", "cmbAnimation", "btnAnimation" };
             foreach (var n in animCtrls)
             {
@@ -837,9 +837,9 @@ public class Crystalshire
             // Immediate apply on selection change
             cmbAttr.CallBack[(int)ControlState.MouseMove] = () =>
             {
-                var idx = Math.Clamp(cmbAttr.Value, 0, attrModes.Length - 1);
-                SetAttrFlags(idx);
-                UpdateAttrVisibility(idx);
+                var id = Math.Clamp(cmbAttr.Value, 0, attrModes.Length - 1);
+                SetAttrFlags(id);
+                UpdateAttrVisibility(id);
             };
         }
 
@@ -945,8 +945,8 @@ public class Crystalshire
                     // Ensure attribute group visibility matches current mode when tab opens
                     if (WindowManager.TryGetControl("winMapEditor", "cmbAttrMode", out var attrModeCtrl) && attrModeCtrl is ComboBox attrCmb)
                     {
-                        var idx = Math.Clamp(attrCmb.Value, 0, 12);
-                        UpdateAttrVisibility(idx);
+                        var id = Math.Clamp(attrCmb.Value, 0, 12);
+                        UpdateAttrVisibility(id);
                     }
                     break;
                 case "Npcs":
@@ -1053,14 +1053,14 @@ public class Crystalshire
                 cmbMusic.Value = Math.Clamp(found, 0, cmbMusic.Items.Count - 1);
                 cmbMusic.CallBack[(int)ControlState.MouseMove] = () =>
                 {
-                    var idx = Math.Clamp(cmbMusic.Value, 0, cmbMusic.Items.Count - 1);
-                    if (idx <= 0)
+                    var id = Math.Clamp(cmbMusic.Value, 0, cmbMusic.Items.Count - 1);
+                    if (id <= 0)
                     {
                         Data.MyMap.Music = string.Empty;
                     }
                     else
                     {
-                        var display = cmbMusic.Items[idx];
+                        var display = cmbMusic.Items[id];
                         var sep = display.IndexOf(": ", StringComparison.Ordinal);
                         Data.MyMap.Music = sep >= 0 ? display.Substring(sep + 2) : display;
                     }
@@ -1070,11 +1070,11 @@ public class Crystalshire
                 {
                     btnMusicPreview.CallBack[(int)ControlState.MouseDown] = () =>
                     {
-                        var idx = Math.Clamp(cmbMusic.Value, 0, cmbMusic.Items.Count - 1);
+                        var id = Math.Clamp(cmbMusic.Value, 0, cmbMusic.Items.Count - 1);
                         string file = string.Empty;
-                        if (idx > 0)
+                        if (id > 0)
                         {
-                            var display = cmbMusic.Items[idx];
+                            var display = cmbMusic.Items[id];
                             var sep = display.IndexOf(": ", StringComparison.Ordinal);
                             file = sep >= 0 ? display.Substring(sep + 2) : display;
                         }
@@ -1343,10 +1343,10 @@ public class Crystalshire
         {
             txtName.CallBack[(int)ControlState.KeyUp] = () =>
             {
-                int idx = WinNpcEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxNpcs) return;
+                int id = WinNpcEditor.SelectedIndex; if (id < 0 || id >= Variables.MaxNpcs) return;
                 var newName = txtName.Text ?? string.Empty;
-                Data.Npc[idx].Name = newName;
-                GameState.NpcChanged[idx] = true;
+                Data.Npc[id].Name = newName;
+                GameState.NpcChanged[id] = true;
             };
         }
 
@@ -1392,15 +1392,15 @@ public class Crystalshire
         BindCombo("cmbAnimation", v => { if (WinNpcEditor.SelectedIndex >= 0) { Data.Npc[WinNpcEditor.SelectedIndex].Animation = (byte)v; GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true; } });
 
         // Skills 1..6
-        void BindSkill(string ctrlName, int idx)
+        void BindSkill(string ctrlName, int id)
         {
             BindCombo(ctrlName, v =>
             {
                 if (WinNpcEditor.SelectedIndex >= 0)
                 {
-                    if (Data.Npc[WinNpcEditor.SelectedIndex].Skill == null || Data.Npc[WinNpcEditor.SelectedIndex].Skill.Length <= idx)
+                    if (Data.Npc[WinNpcEditor.SelectedIndex].Skill == null || Data.Npc[WinNpcEditor.SelectedIndex].Skill.Length <= id)
                         return;
-                    Data.Npc[WinNpcEditor.SelectedIndex].Skill[idx] = (byte)Math.Clamp(v, 0, Variables.MaxSkills - 1);
+                    Data.Npc[WinNpcEditor.SelectedIndex].Skill[id] = (byte)Math.Clamp(v, 0, Variables.MaxSkills - 1);
                     GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
                 }
             });
@@ -1671,19 +1671,19 @@ public class Crystalshire
         {
             txtName.CallBack[(int)ControlState.KeyUp] = () =>
             {
-                int idx = WinItemEditor.SelectedIndex; if (idx < 0 || idx >= Item.Instance.Count) return;
+                int id = WinItemEditor.SelectedIndex; if (id < 0 || id >= Item.Instance.Count) return;
                 var newName = txtName.Text ?? string.Empty;
-                Item.Instance[idx].Name = newName;
-                Item.IsChanged[idx] = true;
+                Item.Instance[id].Name = newName;
+                Item.IsChanged[id] = true;
 
                 // Update list item text without losing selection/scroll
                 if (WindowManager.TryGetControl("winItemEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox lb)
                 {
-                    if (idx >= 0 && idx < lb.Items.Count)
+                    if (id >= 0 && id < lb.Items.Count)
                     {
-                        lb.Items[idx] = $"{idx + 1}: {newName}";
-                        lb.SelectedIndex = idx;
-                        lb.EnsureVisible(idx);
+                        lb.Items[id] = $"{id + 1}: {newName}";
+                        lb.SelectedIndex = id;
+                        lb.EnsureVisible(id);
                     }
                 }
             };
@@ -2352,9 +2352,9 @@ public class Crystalshire
             lstMaps.CallBack[(int)ControlState.DoubleClick] = () =>
             {
                 if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
-                int idx = lstMaps.SelectedIndex;
-                if (idx < 0 || idx >= lstMaps.Items.Count) return;
-                var line = lstMaps.Items[idx] ?? string.Empty;
+                int id = lstMaps.SelectedIndex;
+                if (id < 0 || id >= lstMaps.Items.Count) return;
+                var line = lstMaps.Items[id] ?? string.Empty;
                 var colon = line.IndexOf(':');
                 if (colon > 0 && int.TryParse(line.AsSpan(0, colon), out var mapNum))
                 {
@@ -2527,19 +2527,19 @@ public class Crystalshire
         {
             txtName.CallBack[(int)ControlState.KeyUp] = () =>
             {
-                int idx = WinShopEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxShops) return;
+                int id = WinShopEditor.SelectedIndex; if (id < 0 || id >= Variables.MaxShops) return;
                 var newName = txtName.Text ?? string.Empty;
-                Data.Shop[idx].Name = newName;
-                GameState.ShopChanged[idx] = true;
+                Data.Shop[id].Name = newName;
+                GameState.ShopChanged[id] = true;
 
                 // Update list item text without losing selection/scroll
                 if (WindowManager.TryGetControl("winShopEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox lb)
                 {
-                    if (idx >= 0 && idx < lb.Items.Count)
+                    if (id >= 0 && id < lb.Items.Count)
                     {
-                        lb.Items[idx] = $"{idx + 1}: {newName}";
-                        lb.SelectedIndex = idx;
-                        lb.EnsureVisible(idx);
+                        lb.Items[id] = $"{id + 1}: {newName}";
+                        lb.SelectedIndex = id;
+                        lb.EnsureVisible(id);
                     }
                 }
             };
@@ -2566,9 +2566,9 @@ public class Crystalshire
             {
                 if (WinShopEditor.SelectedIndex < 0 || WinShopEditor.SelectedIndex >= Variables.MaxShops) return;
                 if (!WindowManager.TryGetControl("winShopEditor", "lstTradeItem", out var tradeListCtrl) || tradeListCtrl is not ListBox lst) return;
-                int idx = lst.SelectedIndex;
-                if (idx < 0 || idx >= Variables.MaxTrades) return;
-                ref var trade = ref Data.Shop[WinShopEditor.SelectedIndex].TradeItem[idx];
+                int id = lst.SelectedIndex;
+                if (id < 0 || id >= Variables.MaxTrades) return;
+                ref var trade = ref Data.Shop[WinShopEditor.SelectedIndex].TradeItem[id];
                 if (WindowManager.TryGetControl("winShopEditor", "cmbItem", out var ic) && ic is ComboBox ci)
                     trade.Item = Math.Clamp(ci.Value, -1, Item.Instance.Count - 1);
                 if (WindowManager.TryGetControl("winShopEditor", "cmbCostItem", out var cCtrl) && cCtrl is ComboBox cc)
@@ -2781,12 +2781,12 @@ public class Crystalshire
             var win = WindowManager.GetWindowByName(windowName);
             if (win is null) return;
             int relY = GameClient.CurrentMouseState.Y - (win.Y + lb.Y);
-            int idx = lb.GetItemIndexAtPosition(relY);
+            int id = lb.GetItemIndexAtPosition(relY);
 
-            if (idx >= 0 && idx < lb.Items.Count)
+            if (id >= 0 && id < lb.Items.Count)
             {
-                lb.SelectedIndex = idx;
-                lb.EnsureVisible(idx);
+                lb.SelectedIndex = id;
+                lb.EnsureVisible(id);
 
                 // Keep scrollbar aligned after EnsureVisible
                 if (sb != null)
@@ -2871,19 +2871,19 @@ public class Crystalshire
         {
             txtName.CallBack[(int)ControlState.KeyUp] = () =>
             {
-                int idx = WinResourceEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxResources) return;
+                int id = WinResourceEditor.SelectedIndex; if (id < 0 || id >= Variables.MaxResources) return;
                 var newName = txtName.Text ?? string.Empty;
-                Data.Resource[idx].Name = newName;
-                GameState.ResourceChanged[idx] = true;
+                Data.Resource[id].Name = newName;
+                GameState.ResourceChanged[id] = true;
 
                 // Update list item text without losing selection/scroll
                 if (WindowManager.TryGetControl("winResourceEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox lb)
                 {
-                    if (idx >= 0 && idx < lb.Items.Count)
+                    if (id >= 0 && id < lb.Items.Count)
                     {
-                        lb.Items[idx] = $"{idx + 1}: {newName}";
-                        lb.SelectedIndex = idx;
-                        lb.EnsureVisible(idx);
+                        lb.Items[id] = $"{id + 1}: {newName}";
+                        lb.SelectedIndex = id;
+                        lb.EnsureVisible(id);
                     }
                 }
             };
@@ -2903,7 +2903,7 @@ public class Crystalshire
             {
                 combo.CallBack[(int)ControlState.MouseMove] = () =>
                 {
-                    int idx = GameState.EditorIndex; if (idx < 0 || idx >= Variables.MaxResources) return;
+                    int id = GameState.EditorIndex; if (id < 0 || id >= Variables.MaxResources) return;
                     apply(Math.Max(0, combo.Value));
                 };
             }
@@ -2967,19 +2967,19 @@ public class Crystalshire
         {
             txtName.CallBack[(int)ControlState.KeyUp] = () =>
             {
-                int idx = WinMoralEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxMorals) return;
+                int id = WinMoralEditor.SelectedIndex; if (id < 0 || id >= Variables.MaxMorals) return;
                 var newName = txtName.Text ?? string.Empty;
-                Data.Moral[idx].Name = newName;
-                GameState.MoralChanged[idx] = true;
+                Data.Moral[id].Name = newName;
+                GameState.MoralChanged[id] = true;
 
                 // Update list item text without losing selection/scroll
                 if (WindowManager.TryGetControl("winMoralEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox lb)
                 {
-                    if (idx >= 0 && idx < lb.Items.Count)
+                    if (id >= 0 && id < lb.Items.Count)
                     {
-                        lb.Items[idx] = $"{idx + 1}: {newName}";
-                        lb.SelectedIndex = idx;
-                        lb.EnsureVisible(idx);
+                        lb.Items[id] = $"{id + 1}: {newName}";
+                        lb.SelectedIndex = id;
+                        lb.EnsureVisible(id);
                     }
                 }
             };
@@ -2994,10 +2994,10 @@ public class Crystalshire
             }
             cmbColor.CallBack[(int)ControlState.MouseMove] = () =>
             {
-                int idx = WinMoralEditor.SelectedIndex;
-                if (idx < 0 || idx >= Variables.MaxMorals) return;
-                Data.Moral[idx].Color = (byte)Math.Clamp(cmbColor.Value, 0, Math.Max(0, cmbColor.Items.Count - 1));
-                GameState.MoralChanged[idx] = true;
+                int id = WinMoralEditor.SelectedIndex;
+                if (id < 0 || id >= Variables.MaxMorals) return;
+                Data.Moral[id].Color = (byte)Math.Clamp(cmbColor.Value, 0, Math.Max(0, cmbColor.Items.Count - 1));
+                GameState.MoralChanged[id] = true;
             };
         }
 
@@ -3010,8 +3010,8 @@ public class Crystalshire
                 {
                     cb.Value = cb.Value == 0 ? 1 : 0;
                     apply(cb.Value);
-                    int idx = WinMoralEditor.SelectedIndex;
-                    if (idx >= 0 && idx < Variables.MaxMorals) GameState.MoralChanged[idx] = true;
+                    int id = WinMoralEditor.SelectedIndex;
+                    if (id >= 0 && id < Variables.MaxMorals) GameState.MoralChanged[id] = true;
                 };
             }
         }
@@ -3056,19 +3056,19 @@ public class Crystalshire
         {
             txtName.CallBack[(int)ControlState.KeyUp] = () =>
             {
-                int idx = WinProjectileEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxProjectiles) return;
+                int id = WinProjectileEditor.SelectedIndex; if (id < 0 || id >= Variables.MaxProjectiles) return;
                 var newName = txtName.Text ?? string.Empty;
-                Data.Projectile[idx].Name = newName;
-                GameState.ProjectileChanged[idx] = true;
+                Data.Projectile[id].Name = newName;
+                GameState.ProjectileChanged[id] = true;
 
                 // Update list item text without losing selection/scroll
                 if (WindowManager.TryGetControl("winProjectileEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox lb)
                 {
-                    if (idx >= 0 && idx < lb.Items.Count)
+                    if (id >= 0 && id < lb.Items.Count)
                     {
-                        lb.Items[idx] = $"{idx + 1}: {newName}";
-                        lb.SelectedIndex = idx;
-                        lb.EnsureVisible(idx);
+                        lb.Items[id] = $"{id + 1}: {newName}";
+                        lb.SelectedIndex = id;
+                        lb.EnsureVisible(id);
                     }
                 }
             };
@@ -3079,9 +3079,9 @@ public class Crystalshire
         {
             sbSprite.CallBack[(int)ControlState.MouseMove] = () =>
             {
-                int idx = WinProjectileEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxProjectiles) return;
-                Data.Projectile[idx].Sprite = sbSprite.Value;
-                GameState.ProjectileChanged[idx] = true;
+                int id = WinProjectileEditor.SelectedIndex; if (id < 0 || id >= Variables.MaxProjectiles) return;
+                Data.Projectile[id].Sprite = sbSprite.Value;
+                GameState.ProjectileChanged[id] = true;
             };
         }
 
@@ -3093,10 +3093,10 @@ public class Crystalshire
                 sb.Min = min; sb.Max = max;
                 sb.CallBack[(int)ControlState.MouseMove] = () =>
                 {
-                    int idx = WinProjectileEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxProjectiles) return;
+                    int id = WinProjectileEditor.SelectedIndex; if (id < 0 || id >= Variables.MaxProjectiles) return;
                     int v = Math.Clamp(sb.Value, sb.Min, sb.Max);
                     apply(v);
-                    GameState.ProjectileChanged[idx] = true;
+                    GameState.ProjectileChanged[id] = true;
                     if (WindowManager.TryGetControl("winProjectileEditor", labelName, out var lCtrl) && lCtrl is Label lbl) lbl.Text = v.ToString();
                 };
             }
@@ -3120,10 +3120,10 @@ public class Crystalshire
             }
             cmbAnim.CallBack[(int)ControlState.MouseMove] = () =>
             {
-                int idx = WinProjectileEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxProjectiles) return;
+                int id = WinProjectileEditor.SelectedIndex; if (id < 0 || id >= Variables.MaxProjectiles) return;
                 int sel = Math.Clamp(cmbAnim.Value, 0, cmbAnim.Items.Count - 1);
-                Data.Projectile[idx].Animation = sel == 0 ? -1 : sel - 1;
-                GameState.ProjectileChanged[idx] = true;
+                Data.Projectile[id].Animation = sel == 0 ? -1 : sel - 1;
+                GameState.ProjectileChanged[id] = true;
             };
         }
 
@@ -3168,18 +3168,18 @@ public class Crystalshire
         {
             txtName.CallBack[(int)ControlState.KeyUp] = () =>
             {
-                int idx = WinAnimationEditor.SelectedIndex; if (idx < 0 || idx >= Animation.Instance.Count) return;
+                int id = WinAnimationEditor.SelectedIndex; if (id < 0 || id >= Animation.Instance.Count) return;
                 var newName = txtName.Text?.Trim() ?? string.Empty;
-                Animation.Instance[idx].Name = newName;
+                Animation.Instance[id].Name = newName;
 
                 // Update list item text and keep selection/scroll
                 if (WindowManager.TryGetControl("winAnimationEditor", "lstIndex", out var lc) && lc is ListBox lb)
                 {
-                    if (idx >= 0 && idx < lb.Items.Count)
+                    if (id >= 0 && id < lb.Items.Count)
                     {
-                        lb.Items[idx] = $"{idx + 1}: {newName}";
-                        lb.SelectedIndex = idx;
-                        lb.EnsureVisible(idx);
+                        lb.Items[id] = $"{id + 1}: {newName}";
+                        lb.SelectedIndex = id;
+                        lb.EnsureVisible(id);
                     }
                 }
             };
@@ -3201,9 +3201,9 @@ public class Crystalshire
             }
             cmbSound.CallBack[(int)ControlState.MouseMove] = () =>
             {
-                int idx = WinAnimationEditor.SelectedIndex; if (idx < 0 || idx >= Animation.Instance.Count) return;
+                int id = WinAnimationEditor.SelectedIndex; if (id < 0 || id >= Animation.Instance.Count) return;
                 string text = cmbSound.Value >= 0 && cmbSound.Value < cmbSound.Items.Count ? cmbSound.Items[cmbSound.Value] : string.Empty;
-                Animation.Instance[idx].Sound = text ?? string.Empty;
+                Animation.Instance[id].Sound = text ?? string.Empty;
             };
         }
 
@@ -3258,8 +3258,8 @@ public class Crystalshire
                 pic.OnDraw = () =>
                 {
                     var win = WindowManager.GetWindowByName("winAnimationEditor"); if (win is null) return;
-                    int idx = WinAnimationEditor.SelectedIndex; if (idx < 0 || idx >= Animation.Instance.Count) return;
-                    var a = Animation.Instance[idx];
+                    int id = WinAnimationEditor.SelectedIndex; if (id < 0 || id >= Animation.Instance.Count) return;
+                    var a = Animation.Instance[id];
 
                     int spriteNum = 0;
                     if (WindowManager.TryGetControl("winAnimationEditor", barSpriteName, out var sc) && sc is ScrollBar sbSprite)
@@ -3319,19 +3319,19 @@ public class Crystalshire
         {
             txtName.CallBack[(int)ControlState.KeyUp] = () =>
             {
-                int idx = WinSkillEditor.SelectedIndex; if (idx < 0 || idx >= Variables.MaxSkills) return;
+                int id = WinSkillEditor.SelectedIndex; if (id < 0 || id >= Variables.MaxSkills) return;
                 var newName = txtName.Text ?? string.Empty;
-                Data.Skill[idx].Name = newName;
-                GameState.SkillChanged[idx] = true;
+                Data.Skill[id].Name = newName;
+                GameState.SkillChanged[id] = true;
 
                 // Update list item text
                 if (WindowManager.TryGetControl("winSkillEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox lb)
                 {
-                    if (idx >= 0 && idx < lb.Items.Count)
+                    if (id >= 0 && id < lb.Items.Count)
                     {
-                        lb.Items[idx] = $"{idx + 1}: {newName}";
-                        lb.SelectedIndex = idx;
-                        lb.EnsureVisible(idx);
+                        lb.Items[id] = $"{id + 1}: {newName}";
+                        lb.SelectedIndex = id;
+                        lb.EnsureVisible(id);
                     }
                 }
             };

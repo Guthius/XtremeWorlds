@@ -59,8 +59,8 @@ public sealed class Window : Component
             int i2 = name.LastIndexOf('\\');
             int i3 = name.LastIndexOf(':');
             int i4 = name.LastIndexOf('.');
-            int idx = Math.Max(Math.Max(i1, i2), Math.Max(i3, i4));
-            return idx >= 0 && idx + 1 < name.Length ? name[(idx + 1)..] : name;
+            int id = Math.Max(Math.Max(i1, i2), Math.Max(i3, i4));
+            return id >= 0 && id + 1 < name.Length ? name[(id + 1)..] : name;
         }
 
         var wanted = LastSegment(controlName);

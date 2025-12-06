@@ -1051,10 +1051,10 @@ public class WindowManager
                                                   GameState.CurMouseY <= menuY + menuHeight;
                                     int relY = GameState.CurMouseY -
                                                (curWindow.Y + comboBox.Y + comboBox.Height + menuPadding);
-                                    int idx = relY / itemHeight;
-                                    if (inMenu && idx >= 0 && idx < comboBox.Items.Count)
+                                    int id = relY / itemHeight;
+                                    if (inMenu && id >= 0 && id < comboBox.Items.Count)
                                     {
-                                        comboBox.Value = idx;
+                                        comboBox.Value = id;
                                         // If this is the options resolution combobox, apply immediately
                                         if (string.Equals(curWindow.Name, "winOptions",
                                                 StringComparison.CurrentCultureIgnoreCase) &&
@@ -1063,7 +1063,7 @@ public class WindowManager
                                         {
                                             try
                                             {
-                                                WinOptions.ApplyResolutionSelection(idx);
+                                                WinOptions.ApplyResolutionSelection(id);
                                             }
                                             catch
                                             {
@@ -1355,10 +1355,10 @@ public class WindowManager
 
         int visibleRows = Math.Max(1, (window.Height - 2) / 16);
         int start = Math.Clamp(window.ScrollOffset, 0, Math.Max(0, window.List.Count - visibleRows));
-        int idx = start + relY / 16; // each item row is 16px tall
-        if (idx >= 0 && idx < window.List.Count)
+        int id = start + relY / 16; // each item row is 16px tall
+        if (id >= 0 && id < window.List.Count)
         {
-            window.Group = idx; // hovered index
+            window.Group = id; // hovered index
         }
         else
         {
@@ -1376,19 +1376,19 @@ public class WindowManager
         int relY = GameState.CurMouseY - (window.Y + 2);
         int visibleRows = Math.Max(1, (window.Height - 2) / 16);
         int start = Math.Clamp(window.ScrollOffset, 0, Math.Max(0, window.List.Count - visibleRows));
-        int idx = start + relY / 16;
-        if (idx >= 0 && idx < window.List.Count)
+        int id = start + relY / 16;
+        if (id >= 0 && id < window.List.Count)
         {
             if (window.ParentControl is not null)
             {
                 if (window.ParentControl is Client.Game.UI.Controls.ComboBox comboBox)
                 {
-                    comboBox.Value = idx;
+                    comboBox.Value = id;
                     comboBox.CallBack[(int)ControlState.MouseMove]?.Invoke();
                 }
                 else
                 {
-                    window.ParentControl.Value = idx;
+                    window.ParentControl.Value = id;
                 }
             }
         }
@@ -1407,13 +1407,13 @@ public class WindowManager
         // Helper to safely apply changes when a window exists
         static void TryApply(string name, Action<Window> apply)
         {
-            var idx = GetWindowIndex(name);
-            if (idx == 0)
+            var id = GetWindowIndex(name);
+            if (id == 0)
             {
                 return;
             }
 
-            if (Windows.TryGetValue(idx, out var w))
+            if (Windows.TryGetValue(id, out var w))
             {
                 apply(w);
             }

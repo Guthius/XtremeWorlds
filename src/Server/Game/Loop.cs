@@ -441,10 +441,10 @@ public static class Loop
                     }
                     else if (entity.TargetType == (byte)TargetType.Npc)
                     {
-                        var idx = entity.Target;
-                        if (idx >= 0 && idx < entities.Count)
+                        var id = entity.Target;
+                        if (id >= 0 && id < entities.Count)
                         {
-                            var targetEntity = entities[idx];
+                            var targetEntity = entities[id];
                             if (targetEntity != null && targetEntity.Type == Core.Globals.Entity.EntityType.Npc && targetEntity.Map == mapNum && targetEntity.Num >= 0)
                             {
                                 int ex = entity.X / Constants.TileSize;

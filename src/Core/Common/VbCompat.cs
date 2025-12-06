@@ -55,8 +55,8 @@ public static class Strings
 	public static int InStr(string? string1, string? string2)
 	{
 		if (string1 == null || string2 == null) return 0;
-		int idx = string1.IndexOf(string2, StringComparison.Ordinal);
-		return idx < 0 ? 0 : idx + 1;
+		int id = string1.IndexOf(string2, StringComparison.Ordinal);
+		return id < 0 ? 0 : id + 1;
 	}
 
 	public static int InStr(int start, string? string1, string? string2)
@@ -64,8 +64,8 @@ public static class Strings
 		if (string1 == null || string2 == null) return 0;
 		if (start <= 0) start = 1;
 		int zeroStart = Math.Min(Math.Max(start - 1, 0), string1.Length);
-		int idx = string1.IndexOf(string2, zeroStart, StringComparison.Ordinal);
-		return idx < 0 ? 0 : idx + 1;
+		int id = string1.IndexOf(string2, zeroStart, StringComparison.Ordinal);
+		return id < 0 ? 0 : id + 1;
 	}
 
 	public static string Replace(string? expression, string? find, string? replacement)

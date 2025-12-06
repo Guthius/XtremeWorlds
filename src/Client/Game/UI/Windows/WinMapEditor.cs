@@ -388,16 +388,16 @@ public class WinMapEditor
         if (WindowManager.TryGetControl("winMapEditor", "cmbMusic", out var musicCtrl) && musicCtrl is ComboBox cmbMusic)
         {
             // find the index of the current map music in the combo
-            int idx = 0;
+            int id = 0;
             for (int i = 0; i < cmbMusic.Items.Count; i++)
             {
                 if (string.Equals(cmbMusic.Items[i], map.Music, StringComparison.OrdinalIgnoreCase))
                 {
-                    idx = i;
+                    id = i;
                     break;
                 }
             }
-            cmbMusic.Value = idx;
+            cmbMusic.Value = id;
         }
 
         // Shop / Moral combos

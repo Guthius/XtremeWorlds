@@ -36,12 +36,12 @@ public class WinMoralEditor
         OnLoad(index);
     }
 
-    public static void OnLoad(int idx)
+    public static void OnLoad(int id)
     {
-        if (idx < 0 || idx >= Variables.MaxMorals) return;
-        SelectedIndex = idx;
-        GameState.EditorIndex = idx;
-        ref var m = ref Data.Moral[idx];
+        if (id < 0 || id >= Variables.MaxMorals) return;
+        SelectedIndex = id;
+        GameState.EditorIndex = id;
+        ref var m = ref Data.Moral[id];
 
         // Text box
         if (WindowManager.TryGetControl("winMoralEditor", "txtName", out var txtName) && txtName is TextBox tbName)

@@ -511,9 +511,9 @@ public static class General
                 }
 
                 // SetPlayerAccess implementation stub
-                void SetPlayerAccess(int idx, byte lvl)
+                void SetPlayerAccess(int id, byte lvl)
                 {
-                    Data.Player[idx].Access = lvl;
+                    Data.Player[id].Access = lvl;
                 }
 
                 switch (access)
