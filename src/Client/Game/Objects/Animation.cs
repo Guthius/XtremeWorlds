@@ -11,13 +11,14 @@ using Type = Core.Globals.Type;
 
 namespace Client
 {
-    public class Animation : AnimationBase, IData
+    public class Animation : AnimationBase, IStreamable
     {
         #region Database
 
         public static void OnStream(int index)
         {
-            if (index >= 0 && string.IsNullOrEmpty(Animation.Instance[index].Name) && Animation.Instance[index].IsLoaded)
+            if (index < 0 || index >= Variables.MaxAnimations) return;
+            if (string.IsNullOrEmpty(Animation.Instance[index].Name) && Animation.Instance[index].IsLoaded)
             {
                 Sender.SendRequestAnimation(index);
             }
