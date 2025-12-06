@@ -15,11 +15,11 @@ namespace Client
     {
         #region Database
 
-        public static void OnStream(int animationNum)
+        public static void OnStream(int index)
         {
-            if (animationNum >= 0 && string.IsNullOrEmpty(Animation.Instance[animationNum].Name) && Animation.Instance[animationNum].IsLoaded)
+            if (index >= 0 && string.IsNullOrEmpty(Animation.Instance[index].Name) && Animation.Instance[index].IsLoaded)
             {
-                Sender.SendRequestAnimation(animationNum);
+                Sender.SendRequestAnimation(index);
             }
         }
      
