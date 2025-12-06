@@ -402,3 +402,6 @@ FodyWeavers.xsd
 *.secret.json
 /.idea
 /config
+src/.DS_Store
+.DS_Store
+src/Client/.DS_Store
