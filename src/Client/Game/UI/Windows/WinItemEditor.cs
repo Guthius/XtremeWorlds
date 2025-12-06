@@ -252,7 +252,7 @@ public class WinItemEditor
         if (!WindowManager.TryGetControl("winItemEditor", "cmbSubType", out var subCtrl) || subCtrl is not ComboBox cmbSub)
             return;
         cmbSub.Items.Clear();
-        var type = ItemCategory.Equipment;
+        var type = (ItemCategory)Item.Instance[SelectedIndex].Type;
         switch (type)
         {
             case ItemCategory.Equipment:
@@ -286,7 +286,7 @@ public class WinItemEditor
 
     private static void ToggleTypeSections()
     {
-        var type = ItemCategory.Equipment;
+        var type = (ItemCategory)Item.Instance[SelectedIndex].Type;
 
         static void SetVisible(string name, bool vis)
         {
