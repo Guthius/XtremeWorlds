@@ -1,6 +1,4 @@
-﻿#nullable disable
-
-using System;
+﻿using System;
 using Client;
 using Client.Game.UI;
 using Client.Game.UI.Controls;
@@ -3254,14 +3252,13 @@ public class Crystalshire
         if (WindowManager.TryGetControl("winAnimationEditor", "btnCopy", out var btnCopy) && btnCopy is Button bcp)
             bcp.CallBack[(int)ControlState.MouseDown] = WinAnimationEditor.OnCopy;
 
-        // Previews draw (first frame only, centered)
+        // Previews draw (first frame only, centered and fully inside picture box)
         void DrawPreview(string barSpriteName, string barFramesName, string picName)
         {
             if (WindowManager.TryGetControl("winAnimationEditor", picName, out var pc) && pc is PictureBox pic)
             {
                 pic.OnDraw = () =>
                 {
-                    var win = WindowManager.GetWindowByName("winAnimationEditor"); if (win is null) return;
                     int id = WinAnimationEditor.SelectedIndex; if (id < 0 || id >= Animation.Instance.Count) return;
                     var a = Animation.Instance[id];
 
@@ -3273,20 +3270,29 @@ public class Crystalshire
 
                     var path = System.IO.Path.Combine(DataPath.Animations, spriteNum + GameState.GfxExt);
                     var tex = GameClient.GetGfxInfo(path);
-                    if (tex is null || tex.Width == 0 || tex.Height == 0) return;
+                    if (tex is null || tex.Width <= 0 || tex.Height <= 0) return;
 
                     int columns = 0;
                     if (WindowManager.TryGetControl("winAnimationEditor", barFramesName, out var fc) && fc is ScrollBar sbFrames)
                         columns = Math.Max(0, sbFrames.Value);
 
-                    int fw = columns > 0 ? Math.Max(1, tex.Width / columns) : tex.Width;
-                    int inferredRows = fw > 0 ? tex.Height / fw : 0;
-                    int fh = columns > 0 ? (inferredRows > 0 ? fw : tex.Height) : tex.Height;
+                    // Source frame: first frame in row 0
+                    int srcW = columns > 0 ? Math.Max(1, tex.Width / columns) : tex.Width;
+                    int srcH = tex.Height;
 
-                    int drawX = win.X + pic.X + (pic.Width - fw) / 2;
-                    int drawY = win.Y + pic.Y + (pic.Height - fh) / 2;
+                    // Compute uniform scale so the frame fits entirely inside the picture box
+                    float scaleX = (float)pic.Width / srcW;
+                    float scaleY = (float)pic.Height / srcH;
+                    float scale = Math.Min(1f, Math.Min(scaleX, scaleY));
 
-                    GameClient.RenderTexture(ref path, drawX, drawY, 0, 0, fw, fh, fw, fh);
+                    int dstW = (int)Math.Round(srcW * scale);
+                    int dstH = (int)Math.Round(srcH * scale);
+
+                    // Center inside picture box (coordinates are already relative to the window)
+                    int drawX = pic.X + (pic.Width - dstW) / 2;
+                    int drawY = pic.Y + (pic.Height - dstH) / 2;
+
+                    GameClient.RenderTexture(ref path, drawX, drawY, 0, 0, srcW, srcH, dstW, dstH);
                 };
             }
         }
