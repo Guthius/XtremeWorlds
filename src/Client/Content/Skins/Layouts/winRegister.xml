@@ -22,13 +22,13 @@
 
 		<!-- Action buttons placed near the bottom of the group -->
 		<Button Name="btnAccept" Text="Accept"
-				Position="62,136" Size="67,22"
+				Position="70,144" Size="67,22"
 				Design="Green"
 				DesignHover="GreenHover"
 				DesignMouseDown="GreenClick"/>
 
 		<Button Name="btnExit" Text="Back"
-			Position="136,136" Size="67,22"
+			Position="142,144" Size="67,22"
 			Design="Red"
 			DesignHover="RedHover"
 			DesignMouseDown="RedClick"/>
