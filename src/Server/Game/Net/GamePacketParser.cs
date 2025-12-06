@@ -3077,16 +3077,16 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         Data.TempPlayer[session.Id].Editor = EditorType.Item;
 
-        NetworkSend.SendAnimations(session.Id);
-        NetworkSend.SendProjectiles(session.Id);
-        NetworkSend.SendJobs(session);
-        NetworkSend.SendItems(session.Id);
-
         var packet = new PacketWriter(4);
 
         packet.WriteEnum(ServerPackets.SItemEditor);
 
         PlayerService.Instance.SendDataTo(session.Id, packet.GetBytes());
+
+        NetworkSend.SendAnimations(session.Id);
+        NetworkSend.SendProjectiles(session.Id);
+        NetworkSend.SendJobs(session);
+        NetworkSend.SendItems(session.Id);
     }
 
     public static void Packet_SaveItem(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -3218,13 +3218,13 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         Data.TempPlayer[session.Id].Editor = EditorType.Animation;
 
-        NetworkSend.SendAnimations(session.Id);
-
         var packet = new PacketWriter(4);
 
         packet.WriteEnum(ServerPackets.SAnimationEditor);
 
         PlayerService.Instance.SendDataTo(session.Id, packet.GetBytes());
+
+        NetworkSend.SendAnimations(session.Id);
     }
 
     public static void Packet_SaveAnimation(GameSession session, ReadOnlyMemory<byte> bytes)
