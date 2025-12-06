@@ -15,7 +15,7 @@ using Core.Objects;
 
 namespace Server;
 
-public class Animation : AnimationBase, IAsyncData
+public class Animation : AnimationBase, IData, IAsyncData
 {
     public static void OnSave(int index)
     {
