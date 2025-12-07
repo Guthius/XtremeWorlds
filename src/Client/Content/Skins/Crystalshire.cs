@@ -2690,29 +2690,41 @@ public class Crystalshire
             lstIndex.CallBack[(int)ControlState.MouseDown] = WinJobEditor.OnListMouseDown;
 
         // Text boxes
-        if (WindowManager.TryGetControl("winJobEditor", "txtName", out var txtNameCtrl) && txtNameCtrl is TextBox txtName)
+        if (WindowManager.TryGetControl("winJobEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
         {
-            int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return;
             txtName.Enabled = true;
             txtName.CallBack[(int)ControlState.KeyUp] = () =>
             {
-                if (id < 0 || id >= Job.Instance.Count) return;
-                Job.Instance[id].Name = txtName.Text ?? string.Empty;
+                int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return;
+                var newName = txtName.Text ?? string.Empty;
+                Job.Instance[id].Name = newName;
                 Job.IsChanged[id] = true;
-                WinJobEditor.RefreshList();
+
+                if (WindowManager.TryGetControl("winJobEditor", "lstIndex", out var lstCtrl2) && lstCtrl2 is ListBox lb)
+                {
+                    if (id >= 0 && id < lb.Items.Count)
+                    {
+                        lb.Items[id] = $"{id + 1}: {newName}";
+                        lb.SelectedIndex = id;
+                        lb.EnsureVisible(id);
+                    }
+                }
             };
         }
 
         if (WindowManager.TryGetControl("winJobEditor", "txtDesc", out var txtDescCtrl) && txtDescCtrl is TextBox txtDesc)
         {
-            int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return;
-            txtDesc.Enabled = true;
-            txtDesc.CallBack[(int)ControlState.KeyUp] = () =>
+            int id = WinJobEditor.SelectedIndex;
+            if (id >= 0 || id < Job.Instance.Count)
             {
-                if (id < 0 || id >= Job.Instance.Count) return;
-                Job.Instance[id].Desc = txtDesc.Text ?? string.Empty;
-                Job.IsChanged[id] = true;
-            };
+                txtDesc.Enabled = true;
+                txtDesc.CallBack[(int)ControlState.KeyUp] = () =>
+                {
+                    if (id < 0 || id >= Job.Instance.Count) return;
+                    Job.Instance[id].Desc = txtDesc.Text ?? string.Empty;
+                    Job.IsChanged[id] = true;
+                };
+            }
         }
 
         // Int binder
@@ -2730,9 +2742,15 @@ public class Crystalshire
                 };
             }
         }
-        BindIntText("txtStartMap", v => { if (WinJobEditor.SelectedIndex >= 0) { Job.Instance[WinJobEditor.SelectedIndex].StartMap = v; } }, 0, int.MaxValue);
-        BindIntText("txtStartX", v => { if (WinJobEditor.SelectedIndex >= 0) { Job.Instance[WinJobEditor.SelectedIndex].StartX = (byte)Math.Clamp(v, 0, 255); } }, 0, 255);
-        BindIntText("txtStartY", v => { if (WinJobEditor.SelectedIndex >= 0) { Job.Instance[WinJobEditor.SelectedIndex].StartY = (byte)Math.Clamp(v, 0, 255); } }, 0, 255);
+        BindIntText("txtStartMap", v => { 
+            int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return;
+            if (id >= 0) { Job.Instance[id].StartMap = v; } }, 0, int.MaxValue);
+        BindIntText("txtStartX", v => {
+            int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return;
+            if (id >= 0) { Job.Instance[id].StartX = (byte)Math.Clamp(v, 0, 255); } }, 0, 255);
+        BindIntText("txtStartY", v => {
+            int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return;
+            if (id >= 0) { Job.Instance[id].StartY = (byte)Math.Clamp(v, 0, 255); } }, 0, 255);
 
         // Sprite bars
         void BindSpriteBar(string name, Func<int> get, Action<int> apply)
@@ -2746,14 +2764,15 @@ public class Crystalshire
                 {
                     int v = Math.Clamp(sb.Value, sb.Min, sb.Max);
                     apply(v);
-                    if (WinJobEditor.SelectedIndex >= 0) Job.IsChanged[WinJobEditor.SelectedIndex] = true;
+                    int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return;
+                    if (id >= 0) Job.IsChanged[id] = true;
                 };
             }
         }
-        BindSpriteBar("sldMaleSprite", () => WinJobEditor.SelectedIndex >= 0 ? Job.Instance[WinJobEditor.SelectedIndex].MaleSprite : 0,
-            v => { if (WinJobEditor.SelectedIndex >= 0) Job.Instance[WinJobEditor.SelectedIndex].MaleSprite = v; });
-        BindSpriteBar("sldFemaleSprite", () => WinJobEditor.SelectedIndex >= 0 ? Job.Instance[WinJobEditor.SelectedIndex].FemaleSprite : 0,
-            v => { if (WinJobEditor.SelectedIndex >= 0) Job.Instance[WinJobEditor.SelectedIndex].FemaleSprite = v; });
+        BindSpriteBar("sldMaleSprite", () => { int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return 0; return Job.Instance[id].MaleSprite; },
+            v => { int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return; Job.Instance[id].MaleSprite = v; });
+        BindSpriteBar("sldFemaleSprite", () => { int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return 0; return Job.Instance[id].FemaleSprite; },
+            v => { int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return; Job.Instance[id].FemaleSprite = v; });
 
         // Remaining buttons
         if (WindowManager.TryGetControl("winJobEditor", "btnSave", out var btnSave))
@@ -2846,8 +2865,8 @@ public class Crystalshire
             btnOpen.CallBack[(int)ControlState.MouseDown] = () => { WinScriptEditor.OnLoad(); };
 
         // Save Script
-        if (WindowManager.TryGetControl("winScriptEditor", "btnSave", out var btnSaveScript))
-            btnSaveScript.CallBack[(int)ControlState.MouseDown] = () => { WinScriptEditor.OnSave(); };
+        if (WindowManager.TryGetControl("winScriptEditor", "btnSave", out var btnSave))
+            btnSave.CallBack[(int)ControlState.MouseDown] = () => { WinScriptEditor.OnSave(); };
 
         if (WindowManager.TryGetControl("winScriptEditor", "btnClose", out var btnClose))
             btnClose.CallBack[(int)ControlState.MouseDown] = () => { WinScriptEditor.OnClose(); };

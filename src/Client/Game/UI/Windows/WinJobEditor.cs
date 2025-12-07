@@ -22,8 +22,22 @@ namespace Client.Game.UI.Windows
         }
 
         // Picture previews
-        public static void OnDrawMaleSprite() => DrawSpritePreview("picMale", SelectedIndex >= 0 && SelectedIndex < Variables.MaxJobs ? Job.Instance[SelectedIndex].MaleSprite : 0);
-        public static void OnDrawFemaleSprite() => DrawSpritePreview("picFemale", SelectedIndex >= 0 && SelectedIndex < Variables.MaxJobs ? Job.Instance[SelectedIndex].FemaleSprite : 0);
+        public static void OnDrawMaleSprite()
+        {
+            int idx = SelectedIndex;
+            if (idx < 0 || idx >= Variables.MaxJobs) return;
+            var job = Job.Instance[idx];
+            int sprite = job?.MaleSprite ?? 0;
+            DrawSpritePreview("picMale", sprite);
+        }
+        public static void OnDrawFemaleSprite()
+        {
+            int idx = SelectedIndex;
+            if (idx < 0 || idx >= Variables.MaxJobs) return;
+            var job = Job.Instance[idx];
+            int sprite = job?.FemaleSprite ?? 0;
+            DrawSpritePreview("picFemale", sprite);
+        }
 
         private static void DrawSpritePreview(string picName, int spriteIndex)
         {
@@ -128,7 +142,8 @@ namespace Client.Game.UI.Windows
             list.Clear();
             for (int i = 0; i < Variables.MaxJobs; i++)
             {
-                string name = Strings.Trim(Job.Instance[i].Name);
+                var job = Job.Instance[i];
+                string name = job?.Name?.Trim() ?? string.Empty;
                 if (string.IsNullOrWhiteSpace(name)) name = "None";
                 list.AddItem($"{i + 1}: {name}");
             }
@@ -152,9 +167,11 @@ namespace Client.Game.UI.Windows
         public static void OnLoad(int index)
         {
             if (index < 0 || index >= Variables.MaxJobs) return;
+            var job = Job.Instance[index];
+            if (job is null) return;
+
             SelectedIndex = index;
             GameState.EditorIndex = index;
-            var job = Job.Instance[index];
 
             if (WindowManager.TryGetControl("winJobEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
                 txtName.Text = job.Name ?? string.Empty;
