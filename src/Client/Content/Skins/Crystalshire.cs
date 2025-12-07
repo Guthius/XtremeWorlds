@@ -3302,7 +3302,7 @@ public class Crystalshire
                     int inferredRows = fw > 0 ? tex.Height / fw : 0;
                     int fh = columns > 0 ? (inferredRows > 0 ? fw : tex.Height) : tex.Height;
 
-                    if (fw > pic.Width) fw = pic.Width;
+                    if (fw > pic.Width) fw = columns > 0 ? pic.Width / columns : 0;
                     if (fh > pic.Height) fh = pic.Height;
 
                     int drawX = win.X + pic.X + (pic.Width - fw) / 2;
