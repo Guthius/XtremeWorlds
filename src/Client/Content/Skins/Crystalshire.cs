@@ -3273,7 +3273,7 @@ public class Crystalshire
         if (WindowManager.TryGetControl("winAnimationEditor", "btnCopy", out var btnCopy) && btnCopy is Button bcp)
             bcp.CallBack[(int)ControlState.MouseDown] = WinAnimationEditor.OnCopy;
 
-        // Previews draw (first frame only, centered)
+        // Previews draw
         void DrawPreview(string barSpriteName, string barFramesName, string picName)
         {
             if (WindowManager.TryGetControl("winAnimationEditor", picName, out var pc) && pc is PictureBox pic)
@@ -3301,6 +3301,9 @@ public class Crystalshire
                     int fw = columns > 0 ? Math.Max(1, tex.Width / columns) : tex.Width;
                     int inferredRows = fw > 0 ? tex.Height / fw : 0;
                     int fh = columns > 0 ? (inferredRows > 0 ? fw : tex.Height) : tex.Height;
+
+                    if (fw > pic.Width) fw = pic.Width;
+                    if (fh > pic.Height) fh = pic.Height;
 
                     int drawX = win.X + pic.X + (pic.Width - fw) / 2;
                     int drawY = win.Y + pic.Y + (pic.Height - fh) / 2;
