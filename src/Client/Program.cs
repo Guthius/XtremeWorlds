@@ -2554,7 +2554,7 @@ namespace Client
             {
                 for (i = 0; i < MapAnimation.Instance?.Length; i++)
                 {
-                    if (MapAnimation.Instance[i].Used?[0] == true)
+                    if (MapAnimation.Instance?[i].Used?[0] == true)
                     {
                         MapAnimation.OnDraw(i, 0);
                     }
@@ -2687,7 +2687,7 @@ namespace Client
             {
                 for (i = 0; i < MapAnimation.Instance?.Length; i++)
                 {
-                    if (MapAnimation.Instance[i].Used?[1] == true)
+                    if (MapAnimation.Instance?[i].Used?[1] == true)
                     {
                         MapAnimation.OnDraw(i, 1);
                     }
