@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Client
 {
-    public class Job : JobBase, IData, IStreamable
+    public class Job : JobBase, IStreamable
     {
         #region Database
         public static void OnStream(int index)
