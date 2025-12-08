@@ -69,8 +69,6 @@ Log in to the game with the client. On the server, type the command /access name
    dotnet build
    ```
 
-- *Note: Copy ```Content``` and ```Config``` folders found inside the ```src``` folder to ```Build``` folder outside the git repository after building if the copy process fails*
-
 #### 4. Run the applications
 
 - Start the server application first
