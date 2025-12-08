@@ -54,7 +54,8 @@ namespace Core.Objects
 
         public static void OnReset()
         {
-            throw new NotImplementedException();
+            for (int i = 0; i < Instance.Count; i++)
+                OnClear(i);
         }
 
         public static void OnSave(int index)
