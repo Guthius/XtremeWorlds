@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using static Core.Globals.Command;
 using Type = Core.Globals.Type;
 using System.IO;
+using Core.Objects;
 
 namespace Client
 {
