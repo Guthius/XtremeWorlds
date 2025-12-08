@@ -1115,10 +1115,6 @@ namespace Client
         #endregion
 
         #region Resource Editor
-        public static void ClearChanged_Resource()
-        {
-            GameState.ResourceChanged = new bool[Variables.MaxResources];
-        }
 
         public static void ResourceEditorOK()
         {
@@ -1133,14 +1129,14 @@ namespace Client
             }
 
             GameState.MyEditorType = EditorType.None;
-            ClearChanged_Resource();
+            Resource.ClearChanged();
             Sender.SendCloseEditor();
         }
 
         public static void ResourceEditorCancel()
         {
             GameState.MyEditorType = EditorType.None;
-            ClearChanged_Resource();
+            Resource.ClearChanged();
             Resource.OnReset();
             Sender.SendCloseEditor();
         }

@@ -529,15 +529,6 @@ namespace Client
                 GameState.InitMoralEditor = false;
             }
 
-            if (GameState.InitResourceEditor)
-            {
-                GameState.MyEditorType = EditorType.Resource;
-                GameState.EditorIndex = 0;
-                WindowManager.ShowWindow("winResourceEditor");
-                Client.Game.UI.Windows.WinResourceEditor.Init();
-                GameState.InitResourceEditor = false;
-            }
-
             if (GameState.InitNpcEditor)
             {
                 GameState.MyEditorType = EditorType.Npc;

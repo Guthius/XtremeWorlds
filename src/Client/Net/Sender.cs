@@ -573,20 +573,20 @@ public static class Sender
 
         packetWriter.WriteEnum(Packets.ClientPackets.CSaveResource);
         packetWriter.WriteInt32(index);
-        packetWriter.WriteInt32(Data.Resource[index].Animation);
-        packetWriter.WriteString(Data.Resource[index].EmptyMessage);
-        packetWriter.WriteInt32(Data.Resource[index].ExhaustedImage);
-        packetWriter.WriteInt32(Data.Resource[index].Health);
-        packetWriter.WriteInt32(Data.Resource[index].ExpReward);
-        packetWriter.WriteInt32(Data.Resource[index].ItemReward);
-        packetWriter.WriteString(Data.Resource[index].Name);
-        packetWriter.WriteInt32(Data.Resource[index].ResourceImage);
-        packetWriter.WriteInt32(Data.Resource[index].ResourceType);
-        packetWriter.WriteInt32(Data.Resource[index].RespawnTime);
-        packetWriter.WriteString(Data.Resource[index].SuccessMessage);
-        packetWriter.WriteInt32(Data.Resource[index].LvlRequired);
-        packetWriter.WriteInt32(Data.Resource[index].ToolRequired);
-        packetWriter.WriteBoolean(Data.Resource[index].Walkthrough);
+        packetWriter.WriteInt32(Resource.Instance[index].Animation);
+        packetWriter.WriteString(Resource.Instance[index].EmptyMessage);
+        packetWriter.WriteInt32(Resource.Instance[index].ExhaustedImage);
+        packetWriter.WriteInt32(Resource.Instance[index].Health);
+        packetWriter.WriteInt32(Resource.Instance[index].ExpReward);
+        packetWriter.WriteInt32(Resource.Instance[index].ItemReward);
+        packetWriter.WriteString(Resource.Instance[index].Name);
+        packetWriter.WriteInt32(Resource.Instance[index].ResourceImage);
+        packetWriter.WriteInt32(Resource.Instance[index].ResourceType);
+        packetWriter.WriteInt32(Resource.Instance[index].RespawnTime);
+        packetWriter.WriteString(Resource.Instance[index].SuccessMessage);
+        packetWriter.WriteInt32(Resource.Instance[index].LvlRequired);
+        packetWriter.WriteInt32(Resource.Instance[index].ToolRequired);
+        packetWriter.WriteBoolean(Resource.Instance[index].Walkthrough);
         Network.Send(packetWriter);
     }
 

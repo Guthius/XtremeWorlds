@@ -13,7 +13,7 @@ public class WinResourceEditor
 {
     public static int SelectedIndex = 0;
     public static bool IsLoading = false;
-    public static Core.Globals.Type.Resource? _history = null;
+    public static Resource? _history = null;
 
     // Initialize window (called after layout is loaded)
     public static void Init()
@@ -46,7 +46,7 @@ public class WinResourceEditor
         if (id < 0 || id >= Variables.MaxResources) return;
         SelectedIndex = id;
         GameState.EditorIndex = id;
-        ref var r = ref Data.Resource[id];
+        var r = Resource.Instance[id];
 
         // Text boxes
         if (WindowManager.TryGetControl("winResourceEditor", "txtName", out var txtName) && txtName is TextBox tbName)
@@ -122,7 +122,7 @@ public class WinResourceEditor
             lst.Items.Clear();
             for (int i = 0; i < Variables.MaxResources; i++)
             {
-                var name = Data.Resource[i].Name ?? string.Empty;
+                var name = Resource.Instance[i].Name ?? string.Empty;
                 lst.Items.Add($"{i + 1}: {name}");
             }
             if (sel < 0 || sel >= lst.Items.Count) sel = 0;
@@ -137,16 +137,16 @@ public class WinResourceEditor
         if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxResources) return;
         if (_history is null)
         {
-            var s = Data.Resource[SelectedIndex];
+            var s = Resource.Instance[SelectedIndex];
             var n = s; // struct copy (clone arrays if any added later)
-            _history = n;
+            _history = (Resource)n;
             if (WindowManager.TryGetControl("winResourceEditor", "btnCopy", out var btn) && btn is Button b) b.Text = "Paste";
             return;
         }
 
         // Paste clipboard into current slot
-        var pasted = _history.Value;
-        Data.Resource[SelectedIndex] = pasted;
+        var pasted = _history;
+        Resource.Instance[SelectedIndex] = pasted;
         GameState.ResourceChanged[SelectedIndex] = true;
         _history = null;
         if (WindowManager.TryGetControl("winResourceEditor", "btnCopy", out var btn2) && btn2 is Button b2) b2.Text = "Copy";
@@ -185,7 +185,7 @@ public class WinResourceEditor
     {
         if (!WindowManager.TryGetWindow("winResourceEditor", out var win) || win is null) return;
         if (!WindowManager.TryGetControl("winResourceEditor", "picNormal", out var ctrl) || ctrl is not PictureBox pic) return;
-        int img = Math.Max(0, Data.Resource[SelectedIndex].ResourceImage);
+        int img = Math.Max(0, Resource.Instance[SelectedIndex].ResourceImage);
         if (img <= 0 || img > GameState.NumResources) return;
         var path = Path.Combine(DataPath.Resources, img + GameState.GfxExt);
         if (!File.Exists(path)) return;
@@ -196,7 +196,7 @@ public class WinResourceEditor
     {
         if (!WindowManager.TryGetWindow("winResourceEditor", out var win) || win is null) return;
         if (!WindowManager.TryGetControl("winResourceEditor", "picExhausted", out var ctrl) || ctrl is not PictureBox pic) return;
-        int img = Math.Max(0, Data.Resource[SelectedIndex].ExhaustedImage);
+        int img = Math.Max(0, Resource.Instance[SelectedIndex].ExhaustedImage);
         if (img <= 0 || img > GameState.NumResources) return;
         var path = Path.Combine(DataPath.Resources, img + GameState.GfxExt);
         if (!File.Exists(path)) return;

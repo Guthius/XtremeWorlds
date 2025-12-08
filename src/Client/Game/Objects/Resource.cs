@@ -14,11 +14,12 @@ namespace Client
     {
         #region Database
 
-        public static void OnStream(int resourceNum)
+        public static void OnStream(int index)
         {
-            if (resourceNum >= 0 && string.IsNullOrEmpty(Data.Resource[resourceNum].Name))
+            if (index < 0 || index >= Variables.MaxResources) return;
+            if (Resource.Instance.Count <= index)
             {
-                Sender.SendRequestResource(resourceNum);
+                Sender.SendRequestResource(index);
             }
         }
 

@@ -204,7 +204,7 @@ public class WinItemEditor
             cmbTool.Items.Clear();
             cmbTool.Items.Add("None");
             for (int i = 0; i < Variables.MaxResources; i++)
-                cmbTool.Items.Add(Data.Resource[i].Name);
+                cmbTool.Items.Add(Resource.Instance[i].Name);
         }
 
         // Knockback tiles choices

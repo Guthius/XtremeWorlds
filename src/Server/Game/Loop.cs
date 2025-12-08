@@ -688,11 +688,11 @@ public static class Loop
                     {
                         if (resData.State == 1 || resData.Health < 1)
                         {
-                            if (resData.Timer + Data.Resource[resourceindex].RespawnTime * 1000 < now)
+                            if (resData.Timer + Resource.Instance[resourceindex].RespawnTime * 1000 < now)
                             {
                                 resData.Timer = now;
                                 resData.State = 0;
-                                resData.Health = (byte)Data.Resource[resourceindex].Health;
+                                resData.Health = (byte)Resource.Instance[resourceindex].Health;
                                 NetworkSend.SendMapResourceToMap(mapNum);
                             }
                         }

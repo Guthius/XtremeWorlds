@@ -1214,24 +1214,44 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
     public static void Packet_UpdateResource(ReadOnlyMemory<byte> data)
     {
-        int resourceNum;
+        int n;
         var buffer = new PacketReader(data);
-        resourceNum = buffer.ReadInt32();
+        n = buffer.ReadInt32();
 
-        Data.Resource[resourceNum].Animation = buffer.ReadInt32();
-        Data.Resource[resourceNum].EmptyMessage = buffer.ReadString();
-        Data.Resource[resourceNum].ExhaustedImage = buffer.ReadInt32();
-        Data.Resource[resourceNum].Health = buffer.ReadInt32();
-        Data.Resource[resourceNum].ExpReward = buffer.ReadInt32();
-        Data.Resource[resourceNum].ItemReward = buffer.ReadInt32();
-        Data.Resource[resourceNum].Name = buffer.ReadString();
-        Data.Resource[resourceNum].ResourceImage = buffer.ReadInt32();
-        Data.Resource[resourceNum].ResourceType = buffer.ReadInt32();
-        Data.Resource[resourceNum].RespawnTime = buffer.ReadInt32();
-        Data.Resource[resourceNum].SuccessMessage = buffer.ReadString();
-        Data.Resource[resourceNum].LvlRequired = buffer.ReadInt32();
-        Data.Resource[resourceNum].ToolRequired = buffer.ReadInt32();
-        Data.Resource[resourceNum].Walkthrough = buffer.ReadBoolean();
+        if (n == 0)
+            Resource.Instance.Clear();
+
+        var resource = new Resource();
+
+        resource.Animation = buffer.ReadInt32();
+        resource.EmptyMessage = buffer.ReadString();
+        resource.ExhaustedImage = buffer.ReadInt32();
+        resource.Health = buffer.ReadInt32();
+        resource.ExpReward = buffer.ReadInt32();
+        resource.ItemReward = buffer.ReadInt32();
+        resource.Name = buffer.ReadString();
+        resource.ResourceImage = buffer.ReadInt32();
+        resource.ResourceType = buffer.ReadInt32();
+        resource.RespawnTime = buffer.ReadInt32();
+        resource.SuccessMessage = buffer.ReadString();
+        resource.LvlRequired = buffer.ReadInt32();
+        resource.ToolRequired = buffer.ReadInt32();
+        resource.Walkthrough = buffer.ReadBoolean();
+
+        // Update the resource
+        Resource.Instance.Add(resource);
+
+        if ((n + 1) == Variables.MaxResources)
+        {
+            if (GameState.InitResourceEditor)
+            {
+                GameState.MyEditorType = EditorType.Resource;
+                GameState.EditorIndex = 0;
+                WindowManager.ShowWindow("winResourceEditor");
+                GameState.InitResourceEditor = false;
+                Client.Game.UI.Windows.WinResourceEditor.Init();
+            }
+        }
     }
 
     public static void Packet_OpenShop(ReadOnlyMemory<byte> data)

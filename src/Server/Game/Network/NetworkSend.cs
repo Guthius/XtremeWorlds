@@ -1424,23 +1424,28 @@ public static class NetworkSend
         PlayerService.Instance.SendDataTo(playerId, packet.GetBytes());
     }
 
-    private static void WriteResourceDataToPacket(int resourceNum, PacketWriter packet)
+    private static void WriteResourceDataToPacket(int index, PacketWriter packet)
     {
-        packet.WriteInt32(resourceNum);
-        packet.WriteInt32(Data.Resource[resourceNum].Animation);
-        packet.WriteString(Data.Resource[resourceNum].EmptyMessage);
-        packet.WriteInt32(Data.Resource[resourceNum].ExhaustedImage);
-        packet.WriteInt32(Data.Resource[resourceNum].Health);
-        packet.WriteInt32(Data.Resource[resourceNum].ExpReward);
-        packet.WriteInt32(Data.Resource[resourceNum].ItemReward);
-        packet.WriteString(Data.Resource[resourceNum].Name);
-        packet.WriteInt32(Data.Resource[resourceNum].ResourceImage);
-        packet.WriteInt32(Data.Resource[resourceNum].ResourceType);
-        packet.WriteInt32(Data.Resource[resourceNum].RespawnTime);
-        packet.WriteString(Data.Resource[resourceNum].SuccessMessage);
-        packet.WriteInt32(Data.Resource[resourceNum].LvlRequired);
-        packet.WriteInt32(Data.Resource[resourceNum].ToolRequired);
-        packet.WriteBoolean(Data.Resource[resourceNum].Walkthrough);
+        packet.WriteInt32(index);
+
+        var resource = new Resource();
+        if (Resource.Instance.Count > index)
+            resource = (Resource)Resource.Instance[index];
+
+        packet.WriteInt32(resource.Animation);
+        packet.WriteString(resource.EmptyMessage);
+        packet.WriteInt32(resource.ExhaustedImage);
+        packet.WriteInt32(resource.Health);
+        packet.WriteInt32(resource.ExpReward);
+        packet.WriteInt32(resource.ItemReward);
+        packet.WriteString(resource.Name);
+        packet.WriteInt32(resource.ResourceImage);
+        packet.WriteInt32(resource.ResourceType);
+        packet.WriteInt32(resource.RespawnTime);
+        packet.WriteString(resource.SuccessMessage);
+        packet.WriteInt32(resource.LvlRequired);
+        packet.WriteInt32(resource.ToolRequired);
+        packet.WriteBoolean(resource.Walkthrough);
     }
 
     public static void SendMapResourceToMap(int mapNum)
@@ -1465,15 +1470,11 @@ public static class NetworkSend
 
     public static void SendResources(int playerId)
     {
-        for (var resourceNum = 0; resourceNum < Core.Globals.Variables.MaxResources; resourceNum++)
-        {
-            if (Data.Resource[resourceNum].Name.Length > 0)
-            {
-                NetworkSend.SendUpdateResourceTo(playerId, resourceNum);
-            }
+        for (var i = 0; i < Core.Globals.Variables.MaxResources; i++)
+        { 
+            NetworkSend.SendUpdateResourceTo(playerId, i);
         }
     }
-
 
     public static void SendItems(int playerId)
     {

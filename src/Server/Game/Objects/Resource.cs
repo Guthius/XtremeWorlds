@@ -1,6 +1,8 @@
 ﻿using Core;
 using Core.Globals;
+using Core.Interfaces;
 using Core.Net;
+using Core.Objects;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -13,19 +15,19 @@ using Type = Core.Globals.Type;
 
 namespace Server;
 
-public static class Resource
+public class Resource : ResourceBase, IAsyncData
 {
-    public static void Save(int resourceNum)
+    public static void OnSave(int index)
     {
-        var json = JsonConvert.SerializeObject(Data.Resource[resourceNum]);
+        var json = JsonConvert.SerializeObject(Resource.Instance[index]);
 
-        if (Database.RowExists(resourceNum, "resource"))
+        if (Database.RowExists(index, "resource"))
         {
-            Database.UpdateRow(resourceNum, json, "resource", "data");
+            Database.UpdateRow(index, json, "resource", "data");
         }
         else
         {
-            Database.InsertRow(resourceNum, json, "resource");
+            Database.InsertRow(index, json, "resource");
         }
     }
 
@@ -39,19 +41,12 @@ public static class Resource
         var data = await Database.SelectRowAsync(resourceNum, "resource", "data");
         if (data is null)
         {
-            Clear(resourceNum);
+            OnClear(resourceNum);
             return;
         }
 
-        var resourceData = JObject.FromObject(data).ToObject<Type.Resource>();
+        var resourceData = JObject.FromObject(data).ToObject<Resource>();
 
-        Data.Resource[resourceNum] = resourceData;
-    }
-
-    public static void Clear(int resourceNum)
-    {
-        Data.Resource[resourceNum].Name = "";
-        Data.Resource[resourceNum].EmptyMessage = "";
-        Data.Resource[resourceNum].SuccessMessage = "";
+        Resource.Instance.Add(resourceData ?? new Resource());
     }
 }

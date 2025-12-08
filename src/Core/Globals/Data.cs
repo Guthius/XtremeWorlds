@@ -27,7 +27,6 @@ public static class Data
     public static PlayerInv[] TradeTheirOffer = new PlayerInv[Variables.MaxInv];
     public static Party[] Party = new Party[Variables.MaxParty];
     public static Party MyParty;
-    public static Resource[] Resource = new Resource[Variables.MaxResources];
     public static ChatBubble[] ChatBubble = new ChatBubble[byte.MaxValue];
     public static Script Script = new();
 

@@ -3013,33 +3013,41 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             return;
         }
 
-        var resourcenum = packetReader.ReadInt32();
-        if (resourcenum < 0 || resourcenum >= Core.Globals.Variables.MaxResources)
+        var index = packetReader.ReadInt32();
+        if (index < 0 || index >= Core.Globals.Variables.MaxResources)
         {
             return;
         }
 
-        Data.Resource[resourcenum].Animation = packetReader.ReadInt32();
-        Data.Resource[resourcenum].EmptyMessage = packetReader.ReadString();
-        Data.Resource[resourcenum].ExhaustedImage = packetReader.ReadInt32();
-        Data.Resource[resourcenum].Health = packetReader.ReadInt32();
-        Data.Resource[resourcenum].ExpReward = packetReader.ReadInt32();
-        Data.Resource[resourcenum].ItemReward = packetReader.ReadInt32();
-        Data.Resource[resourcenum].Name = packetReader.ReadString();
-        Data.Resource[resourcenum].ResourceImage = packetReader.ReadInt32();
-        Data.Resource[resourcenum].ResourceType = packetReader.ReadInt32();
-        Data.Resource[resourcenum].RespawnTime = packetReader.ReadInt32();
-        Data.Resource[resourcenum].SuccessMessage = packetReader.ReadString();
-        Data.Resource[resourcenum].LvlRequired = packetReader.ReadInt32();
-        Data.Resource[resourcenum].ToolRequired = packetReader.ReadInt32();
-        Data.Resource[resourcenum].Walkthrough = packetReader.ReadBoolean();
+        for (var i = 0; i <= index; i++)
+        {
+            if (Resource.Instance.Count <= i)
+            {
+                Resource.Instance.Add(new Resource());
+            }
+        }
 
-        Resource.Save(resourcenum);
+        Resource.Instance[index].Animation = packetReader.ReadInt32();
+        Resource.Instance[index].EmptyMessage = packetReader.ReadString();
+        Resource.Instance[index].ExhaustedImage = packetReader.ReadInt32();
+        Resource.Instance[index].Health = packetReader.ReadInt32();
+        Resource.Instance[index].ExpReward = packetReader.ReadInt32();
+        Resource.Instance[index].ItemReward = packetReader.ReadInt32();
+        Resource.Instance[index].Name = packetReader.ReadString();
+        Resource.Instance[index].ResourceImage = packetReader.ReadInt32();
+        Resource.Instance[index].ResourceType = packetReader.ReadInt32();
+        Resource.Instance[index].RespawnTime = packetReader.ReadInt32();
+        Resource.Instance[index].SuccessMessage = packetReader.ReadString();
+        Resource.Instance[index].LvlRequired = packetReader.ReadInt32();
+        Resource.Instance[index].ToolRequired = packetReader.ReadInt32();
+        Resource.Instance[index].Walkthrough = packetReader.ReadBoolean();
 
-        General.Logger.LogInformation("{AccountName} saved Resource #{Resourcenum}",
-            GetAccountLogin(session.Id), resourcenum);
+        Resource.OnSave(index);
 
-        NetworkSend.SendUpdateResourceToAll(resourcenum);
+        General.Logger.LogInformation("{AccountName} saved Resource #{ResourceNum}",
+            GetAccountLogin(session.Id), index);
+
+        NetworkSend.SendUpdateResourceToAll(index);
     }
 
     public static void Packet_RequestResource(GameSession session, ReadOnlyMemory<byte> bytes)

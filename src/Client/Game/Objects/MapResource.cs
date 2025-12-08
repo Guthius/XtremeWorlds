@@ -59,7 +59,7 @@ namespace Core.Objects
 
             Resource.OnStream(mapResourceNum);
 
-            if (Data.Resource[mapResourceNum].ResourceImage == 0)
+            if (Resource.Instance[mapResourceNum].ResourceImage == 0)
                 return;
 
             // Get the Resource state
@@ -67,11 +67,11 @@ namespace Core.Objects
 
             if (resourceState == 0) // normal
             {
-                resourceSprite = Data.Resource[mapResourceNum].ResourceImage;
+                resourceSprite = Resource.Instance[mapResourceNum].ResourceImage;
             }
             else if (resourceState == 1) // used
             {
-                resourceSprite = Data.Resource[mapResourceNum].ExhaustedImage;
+                resourceSprite = Resource.Instance[mapResourceNum].ExhaustedImage;
             }
 
             var gfxInfo = GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Resources, resourceSprite.ToString()));

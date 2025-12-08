@@ -612,7 +612,7 @@ public class Crystalshire
                     {
                         for (int i = 0; i < Variables.MaxResources; i++)
                         {
-                            var raw = (i < Data.Resource.Length) ? (Data.Resource[i].Name ?? string.Empty) : string.Empty;
+                            var raw = (i < Resource.Instance.Count) ? (Resource.Instance[i].Name ?? string.Empty) : string.Empty;
                             var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
                             cmb.Items.Add($"{i + 1}: {name}");
                         }
@@ -2894,7 +2894,7 @@ public class Crystalshire
             {
                 int id = WinResourceEditor.SelectedIndex; if (id < 0 || id >= Variables.MaxResources) return;
                 var newName = txtName.Text ?? string.Empty;
-                Data.Resource[id].Name = newName;
+                Resource.Instance[id].Name = newName;
                 GameState.ResourceChanged[id] = true;
 
                 // Update list item text without losing selection/scroll
@@ -2911,11 +2911,11 @@ public class Crystalshire
         }
 
         if (WindowManager.TryGetControl("winResourceEditor", "txtMessage", out var msgCtrl) && msgCtrl is TextBox txtMsg)
-            txtMsg.CallBack[(int)ControlState.KeyUp] = () => { int i = GameState.EditorIndex; if (i >= 0 && i < Variables.MaxResources) Data.Resource[i].SuccessMessage = txtMsg.Text ?? string.Empty; };
+            txtMsg.CallBack[(int)ControlState.KeyUp] = () => { int i = GameState.EditorIndex; if (i >= 0 && i < Variables.MaxResources) Resource.Instance[i].SuccessMessage = txtMsg.Text ?? string.Empty; };
         if (WindowManager.TryGetControl("winResourceEditor", "txtMessage2", out var msg2Ctrl) && msg2Ctrl is TextBox txtMsg2)
-            txtMsg2.CallBack[(int)ControlState.KeyUp] = () => { int i = GameState.EditorIndex; if (i >= 0 && i < Variables.MaxResources) Data.Resource[i].EmptyMessage = txtMsg2.Text ?? string.Empty; };
+            txtMsg2.CallBack[(int)ControlState.KeyUp] = () => { int i = GameState.EditorIndex; if (i >= 0 && i < Variables.MaxResources) Resource.Instance[i].EmptyMessage = txtMsg2.Text ?? string.Empty; };
         if (WindowManager.TryGetControl("winResourceEditor", "txtRewardExp", out var expCtrl) && expCtrl is TextBox txtExp)
-            txtExp.CallBack[(int)ControlState.KeyUp] = () => { int i = GameState.EditorIndex; if (i >= 0 && i < Variables.MaxResources) Data.Resource[i].ExpReward = int.TryParse(txtExp.Text, out var exp) ? exp : 0; };
+            txtExp.CallBack[(int)ControlState.KeyUp] = () => { int i = GameState.EditorIndex; if (i >= 0 && i < Variables.MaxResources) Resource.Instance[i].ExpReward = int.TryParse(txtExp.Text, out var exp) ? exp : 0; };
 
         // Combo callbacks
         void BindCombo(string ctrlName, Action<int> apply)
@@ -2929,10 +2929,10 @@ public class Crystalshire
                 };
             }
         }
-        BindCombo("cmbType", v => Data.Resource[GameState.EditorIndex].ResourceType = v);
-        BindCombo("cmbRewardItem", v => Data.Resource[GameState.EditorIndex].ItemReward = v);
-        BindCombo("cmbTool", v => Data.Resource[GameState.EditorIndex].ToolRequired = v);
-        BindCombo("cmbAnimation", v => Data.Resource[GameState.EditorIndex].Animation = v);
+        BindCombo("cmbType", v => Resource.Instance[GameState.EditorIndex].ResourceType = v);
+        BindCombo("cmbRewardItem", v => Resource.Instance[GameState.EditorIndex].ItemReward = v);
+        BindCombo("cmbTool", v => Resource.Instance[GameState.EditorIndex].ToolRequired = v);
+        BindCombo("cmbAnimation", v => Resource.Instance[GameState.EditorIndex].Animation = v);
 
         // Scrollbar binding
         void BindBar(string barName, string labelName, Action<int> apply, int min, int max)
@@ -2949,9 +2949,9 @@ public class Crystalshire
             }
         }
 
-        BindBar("sldLvlReq", "lblLvlReqVal", v => Data.Resource[GameState.EditorIndex].LvlRequired = v, 0, GameState.MaxLevel);
-        BindBar("sldNormalPic", "lblNormalPicVal", v => Data.Resource[GameState.EditorIndex].ResourceImage = v, 0, GameState.NumResources);
-        BindBar("sldExhaustedPic", "lblExhaustedPicVal", v => Data.Resource[GameState.EditorIndex].ExhaustedImage = v, 0, GameState.NumResources);
+        BindBar("sldLvlReq", "lblLvlReqVal", v => Resource.Instance[GameState.EditorIndex].LvlRequired = v, 0, GameState.MaxLevel);
+        BindBar("sldNormalPic", "lblNormalPicVal", v => Resource.Instance[GameState.EditorIndex].ResourceImage = v, 0, GameState.NumResources);
+        BindBar("sldExhaustedPic", "lblExhaustedPicVal", v => Resource.Instance[GameState.EditorIndex].ExhaustedImage = v, 0, GameState.NumResources);
 
         // Buttons
         if (WindowManager.TryGetControl("winResourceEditor", "btnSave", out var btnSave))

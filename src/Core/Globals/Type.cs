@@ -17,24 +17,6 @@ public static class Type
         public double Bottom;
     }
 
-    public struct Resource
-    {
-        public string Name;
-        public string SuccessMessage;
-        public string EmptyMessage;
-        public int ResourceType;
-        public int ResourceImage;
-        public int ExhaustedImage;
-        public int ExpReward;
-        public int ItemReward;
-        public int LvlRequired;
-        public int ToolRequired;
-        public int Health;
-        public int RespawnTime;
-        public bool Walkthrough;
-        public int Animation;
-    }
-
     public struct Skill
     {
         public string Name;
