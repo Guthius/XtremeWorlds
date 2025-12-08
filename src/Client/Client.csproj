@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <Version>2.4.9</Version>
-    <!-- Use TargetFrameworks for clarity, the conditions below handle selection -->
     <TargetFrameworks>net10.0-windows;net10.0</TargetFrameworks>
     <RootNamespace>XtremeWorlds.Client</RootNamespace>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
@@ -15,9 +14,6 @@
     <Product>Game Client</Product>
   </PropertyGroup>
 
-  <!-- Define the target framework and runtime identifier based on the BUILD HOST OS -->
-  <!-- This simplifies the 'dotnet build' command -->
-  
   <!-- Windows Host -->
   <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
     <TargetFramework>net10.0-windows</TargetFramework>
@@ -30,10 +26,8 @@
   </PropertyGroup>
 
   <!-- macOS Host -->
-  <!-- We check if OS is Unix and then use IsOSPlatform function for Mac specifically -->
   <PropertyGroup Condition="'$(OS)' != 'Windows_NT' and $([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))">
     <TargetFramework>net10.0</TargetFramework>
-    <!-- Assumes an ARM64 Mac host for default build -->
     <RuntimeIdentifier>osx-arm64</RuntimeIdentifier> 
     <OutputType>Exe</OutputType>
   </PropertyGroup>
@@ -73,7 +67,7 @@
     </Content>
   </ItemGroup>
 
-  <!-- Windows: copy only .dll and content -->
+  <!-- Windows -->
   <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
     <Content Include="*.dll;*.sf2">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -84,7 +78,7 @@
     <Content Remove="*.so;*.so.*;*.dylib" />
   </ItemGroup>
 
-  <!-- macOS or Linux: copy content -->
+  <!-- macOS or Linux -->
   <ItemGroup Condition="'$(OS)' != 'Windows_NT'">
     <Content Include="*.sf2">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -95,7 +89,7 @@
     <Content Remove="*.dll" />
   </ItemGroup>
   
-  <!-- macOS Host (Specific native library inclusion) -->
+  <!-- macOS -->
   <ItemGroup Condition="'$(OS)' != 'Windows_NT' and $([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))">
     <Content Include="*.dylib">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
