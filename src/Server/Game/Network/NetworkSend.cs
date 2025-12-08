@@ -1293,12 +1293,9 @@ public static class NetworkSend
 
     public static void SendMorals(int playerId)
     {
-        for (var moralNum = 0; moralNum < Core.Globals.Variables.MaxMorals; moralNum++)
+        for (var i = 0; i < Core.Globals.Variables.MaxMorals; i++)
         {
-            if (Data.Moral[moralNum].Name.Length > 0)
-            {
-                SendUpdateMoralTo(playerId, moralNum);
-            }
+            SendUpdateMoralTo(playerId, i);
         }
     }
 
@@ -1324,19 +1321,24 @@ public static class NetworkSend
         PlayerService.Instance.SendDataToAll(packet.GetBytes());
     }
 
-    private static void WriteMoralDataToPacket(int moralNum, PacketWriter packet)
+    private static void WriteMoralDataToPacket(int index, PacketWriter packet)
     {
-        packet.WriteInt32(moralNum);
-        packet.WriteString(Data.Moral[moralNum].Name);
-        packet.WriteByte(Data.Moral[moralNum].Color);
-        packet.WriteBoolean(Data.Moral[moralNum].NpcBlock);
-        packet.WriteBoolean(Data.Moral[moralNum].PlayerBlock);
-        packet.WriteBoolean(Data.Moral[moralNum].CanCast);
-        packet.WriteBoolean(Data.Moral[moralNum].CanDropItem);
-        packet.WriteBoolean(Data.Moral[moralNum].CanPickupItem);
-        packet.WriteBoolean(Data.Moral[moralNum].CanPk);
-        packet.WriteBoolean(Data.Moral[moralNum].DropItems);
-        packet.WriteBoolean(Data.Moral[moralNum].LoseExp);
+        packet.WriteInt32(index);
+
+        var moral = new Moral();
+        if (Moral.Instance.Count > index)
+            moral = (Moral)Moral.Instance[index];
+
+        packet.WriteString(moral.Name);
+        packet.WriteByte(moral.Color);
+        packet.WriteBoolean(moral.NpcBlock);
+        packet.WriteBoolean(moral.PlayerBlock);
+        packet.WriteBoolean(moral.CanCast);
+        packet.WriteBoolean(moral.CanDropItem);
+        packet.WriteBoolean(moral.CanPickupItem);
+        packet.WriteBoolean(moral.CanPk);
+        packet.WriteBoolean(moral.DropItems);
+        packet.WriteBoolean(moral.LoseExp);
     }
 
     public static void SendProjectileToMap(int mapNum, int projectileNum)

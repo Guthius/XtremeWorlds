@@ -745,21 +745,6 @@ public static class Type
         public short Data3_2;
     }
 
-    public struct Moral
-    {
-        public string Name;
-        public byte Color;
-        public bool CanCast;
-        public bool CanPk;
-        public bool CanUseItem;
-        public bool DropItems;
-        public bool LoseExp;
-        public bool CanPickupItem;
-        public bool CanDropItem;
-        public bool PlayerBlock;
-        public bool NpcBlock;
-    }
-
     public struct SdLayer
     {
         public List<SdMapLayer> MapLayer;

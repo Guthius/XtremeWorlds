@@ -2794,13 +2794,21 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             return;
         }
 
-        var moralNum = packetReader.ReadInt32();
-        if (moralNum < 0 || moralNum >= Core.Globals.Variables.MaxMorals)
+        var index = packetReader.ReadInt32();
+        if (index < 0 || index >= Core.Globals.Variables.MaxMorals)
         {
             return;
         }
 
-        ref var moral = ref Data.Moral[moralNum];
+        for (var i = 0; i <= index; i++)
+        {
+            if (Moral.Instance.Count <= i)
+            {
+                Moral.Instance.Add(new Moral());
+            }
+        }
+
+        var moral = Moral.Instance[index];
 
         moral.Name = packetReader.ReadString();
         moral.Color = packetReader.ReadByte();
@@ -2814,12 +2822,12 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         moral.PlayerBlock = packetReader.ReadBoolean();
         moral.NpcBlock = packetReader.ReadBoolean();
 
-        Moral.OnSave(moralNum);
+        Moral.OnSave(index);
 
         General.Logger.LogInformation("{AccountName} saved moral #{MoralNum}",
-            GetAccountLogin(session.Id), moralNum);
+            GetAccountLogin(session.Id), index);
 
-        NetworkSend.SendUpdateMoralToAll(moralNum);
+        NetworkSend.SendUpdateMoralToAll(index);
         NetworkSend.SendMorals(session.Id);
     }
 

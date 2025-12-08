@@ -2,58 +2,22 @@
 using Core;
 using Core.Globals;
 using Core.Interfaces;
+using Core.Objects;
 using Type = Core.Globals.Type;
 
 namespace Client
 {
 
-    public class Moral : IData
+    public class Moral : MoralBase, IStreamable
     {
         #region Database
 
-        public static void OnClear(int index)
-        {
-            Data.Moral[index] = default;
-
-            Data.Moral[index].Name = "";
-        }
-
-        public static void OnReset()
-        {
-            int i;
-
-            Data.Moral = new Type.Moral[(Variables.MaxMorals)];
-
-            for (i = 0; i < Variables.MaxMorals; i++)
-                OnClear(i);
-        }
-
         public static void OnStream(int moralNum)
         {
-            if (moralNum >= 0 & string.IsNullOrEmpty(Data.Moral[moralNum].Name))
+            if (moralNum >= 0 & string.IsNullOrEmpty(Moral.Instance[moralNum].Name))
             {
                 Sender.SendRequestMoral(moralNum);
             }
-        }
-
-        public static void OnDraw(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnLoad(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnSave(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnUpdate(int index)
-        {
-            throw new NotImplementedException();
         }
 
         #endregion

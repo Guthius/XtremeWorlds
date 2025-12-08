@@ -1029,9 +1029,12 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     {
         var packetReader = new PacketReader(data);
 
-        var moralNum = packetReader.ReadInt32();
+        var n = packetReader.ReadInt32();
 
-        ref var moral = ref Data.Moral[moralNum];
+        if (n == 0)
+            Moral.Instance.Clear();
+
+        var moral = new Moral();
 
         moral.Name = packetReader.ReadString();
         moral.Color = packetReader.ReadByte();
@@ -1043,6 +1046,21 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         moral.CanPk = packetReader.ReadBoolean();
         moral.DropItems = packetReader.ReadBoolean();
         moral.LoseExp = packetReader.ReadBoolean();
+
+        // Update the moral
+        Moral.Instance.Add(moral);
+
+        if ((n + 1) == Variables.MaxMorals)
+        {
+            if (GameState.InitMoralEditor)
+            {
+                GameState.MyEditorType = EditorType.Moral;
+                GameState.EditorIndex = 0;
+                WindowManager.ShowWindow("winMoralEditor");
+                GameState.InitMoralEditor = false;
+                Client.Game.UI.Windows.WinMoralEditor.Init();
+            }
+        }
     }
 
     public static void Packet_UpdateItem(ReadOnlyMemory<byte> data)

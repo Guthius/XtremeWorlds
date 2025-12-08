@@ -566,7 +566,7 @@ public class Player
     {
         try
         {
-            if (Data.Moral[Data.Map[mapNum].Moral].PlayerBlock)
+            if (Moral.Instance[Data.Map[mapNum].Moral].PlayerBlock)
             {
                 foreach (var playerId in PlayerService.Instance.PlayerIds)
                 {
@@ -579,7 +579,7 @@ public class Player
                 }
             }
 
-            if (Data.Moral[Data.Map[mapNum].Moral].NpcBlock)
+            if (Moral.Instance[Data.Map[mapNum].Moral].NpcBlock)
             {
                 for (var mapNpcNum = 0; mapNpcNum < Core.Globals.Variables.MaxMapNpcs; mapNpcNum++)
                 {
@@ -662,7 +662,7 @@ public class Player
             return false;
         }
 
-        if (!Data.Moral[Data.Map[mapNum].Moral].CanPickupItem)
+        if (!Moral.Instance[Data.Map[mapNum].Moral].CanPickupItem)
         {
             NetworkSend.SendPlayerMessage(playerId, "You can't pickup items here!", (int) ColorName.BrightRed);
             return false;
@@ -846,7 +846,7 @@ public class Player
             return;
         }
 
-        if (!Data.Moral[Data.Map[GetPlayerMap(playerId)].Moral].CanDropItem)
+        if (!Moral.Instance[Data.Map[GetPlayerMap(playerId)].Moral].CanDropItem)
         {
             NetworkSend.SendPlayerMessage(playerId, "You can't drop items here!", (int) ColorName.BrightRed);
             return;
@@ -939,7 +939,7 @@ public class Player
     {
         if (Data.Map[GetPlayerMap(playerId)].Moral >= 0)
         {
-            if (!Data.Moral[Data.Map[GetPlayerMap(playerId)].Moral].CanUseItem)
+            if (!Moral.Instance[Data.Map[GetPlayerMap(playerId)].Moral].CanUseItem)
             {
                 NetworkSend.SendPlayerMessage(playerId, "You can't use items here!", (int) ColorName.BrightRed);
                 return false;

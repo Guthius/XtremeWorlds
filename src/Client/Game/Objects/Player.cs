@@ -697,7 +697,7 @@ namespace Client
             // Check to see if a player is already on that tile
             if (Data.MyMap.Moral > 0)
             {
-                if (Data.Moral[Data.MyMap.Moral].PlayerBlock)
+                if (Moral.Instance[Data.MyMap.Moral].PlayerBlock)
                 {
                     for (i = 0; i < Variables.MaxPlayers; i++)
                     {
@@ -713,7 +713,7 @@ namespace Client
                 }
 
                 // Check to see if a Npc is already on that tile
-                if (Data.Moral[Data.MyMap.Moral].NpcBlock)
+                if (Moral.Instance[Data.MyMap.Moral].NpcBlock)
                 {
                     for (i = 0; i < Variables.MaxMapNpcs; i++)
                     {
@@ -1010,7 +1010,7 @@ namespace Client
                     {
                         if (Data.MyMap.Moral >= 0)
                         {
-                            if (Data.Moral[Data.MyMap.Moral].CanCast)
+                            if (Moral.Instance[Data.MyMap.Moral].CanCast)
                             {
                                 Sender.SendCast(skillSlot);
                             }

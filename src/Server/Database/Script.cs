@@ -697,7 +697,7 @@ public class Script
         if (mapNum < 0 || mapNum >= Data.Map.Length) return;
 
         var moralId = Data.Map[mapNum].Moral;
-        if (moralId >= 0 && !Data.Moral[moralId].CanCast)
+        if (moralId >= 0 && !Moral.Instance[moralId].CanCast)
         {
             NetworkSend.SendPlayerMessage(playerIndex, "You cannot cast here.", (int)ColorName.BrightRed);
             return;
@@ -715,7 +715,7 @@ public class Script
 
     public int KillPlayer(int index)
     {
-        if (!Data.Moral[Data.Map[GetPlayerMap(index)].Moral].LoseExp)
+        if (!Moral.Instance[Data.Map[GetPlayerMap(index)].Moral].LoseExp)
             return 0;
 
         int exp = GetPlayerExp(index) / 3;
@@ -893,7 +893,7 @@ public class Script
     {
         if (target.Type == Entity.EntityType.Player)
         {
-            if (Data.Moral[Data.Map[GetPlayerMap(target.Id)].Moral].DropItems)
+            if (Moral.Instance[Data.Map[GetPlayerMap(target.Id)].Moral].DropItems)
             {
                 var equipCount = Enum.GetValues(typeof(Equipment)).Length;
                 
@@ -1068,7 +1068,7 @@ public class Script
         if (!IsAlive(attacker) || !IsAlive(target)) return false;
         if (!IsSkillRanged(skillId) && !IsInMeleeRange(attacker, target) && allowOutOfRange == false) return false;
 
-        if (!Data.Moral[Data.Map[GetPlayerMap(attacker.Id)].Moral].CanPk && attacker.Type == Entity.EntityType.Player && target.Type == Entity.EntityType.Player)
+        if (!Moral.Instance[Data.Map[GetPlayerMap(attacker.Id)].Moral].CanPk && attacker.Type == Entity.EntityType.Player && target.Type == Entity.EntityType.Player)
         {
             return false; // PvP not allowed on this map
         }

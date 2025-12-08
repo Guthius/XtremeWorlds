@@ -11,26 +11,12 @@ using static Core.Net.Packets;
 using static Core.Globals.Command;
 using Type = Core.Globals.Type;
 using Core.Interfaces;
+using Core.Objects;
 
 namespace Server;
 
-public class Moral : IData, IAsyncData
+public class Moral : MoralBase, IData, IAsyncData
 {
-    public static void OnClear(int index)
-    {
-        Data.Moral[index].Name = "";
-        Data.Moral[index].Color = 0;
-        Data.Moral[index].CanCast = false;
-        Data.Moral[index].CanDropItem = false;
-        Data.Moral[index].CanPk = false;
-        Data.Moral[index].CanPickupItem = false;
-        Data.Moral[index].CanUseItem = false;
-        Data.Moral[index].DropItems = false;
-        Data.Moral[index].LoseExp = false;
-        Data.Moral[index].NpcBlock = false;
-        Data.Moral[index].PlayerBlock = false;
-    }
-
     public static async ValueTask OnLoadAsync(int index, CancellationToken cancellationToken)
     {
         var data = await Database.SelectRowAsync(index, "moral", "data");
@@ -40,9 +26,9 @@ public class Moral : IData, IAsyncData
             return;
         }
 
-        var moralData = JObject.FromObject(data).ToObject<Type.Moral>();
+        var moralData = JObject.FromObject(data).ToObject<Moral>();
 
-        Data.Moral[index] = moralData;
+        Moral.Instance.Add(moralData ?? new Moral());
     }
 
     public static async System.Threading.Tasks.Task OnLoadAllAsync()
@@ -52,7 +38,7 @@ public class Moral : IData, IAsyncData
 
     public static void OnSave(int index)
     {
-        var json = JsonConvert.SerializeObject(Data.Moral[index]);
+        var json = JsonConvert.SerializeObject(Moral.Instance[index]);
 
         if (Database.RowExists(index, "moral"))
         {

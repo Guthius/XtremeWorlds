@@ -944,7 +944,7 @@ public static class Sender
 
     public static void SendSaveMoral(int index)
     {
-        ref var moral = ref Data.Moral[index];
+        var moral = Moral.Instance[index];
 
         var packetWriter = new PacketWriter();
 

@@ -1262,7 +1262,7 @@ namespace Client
         {
             for (int i = 0; i < Variables.MaxMorals; i++)
             {
-                if (GameState.MoralChanged[i])
+                if (Moral.IsChanged[i])
                 {
                     Sender.SendSaveMoral(i);
                 }
@@ -1282,7 +1282,7 @@ namespace Client
         public static void ClearChanged_Moral()
         {
             for (int i = 0; i < Variables.MaxMorals; i++)
-                GameState.MoralChanged[i] = false;
+                Moral.IsChanged[i] = false;
         }
         #endregion
 

@@ -994,7 +994,7 @@ public class Crystalshire
                 lstMoral.Items.Clear();
                 for (int i = 0; i < Variables.MaxMorals; i++)
                 {
-                    var raw = (i < Data.Moral.Length) ? (Data.Moral[i].Name ?? string.Empty) : string.Empty;
+                    var raw = (i < Moral.Instance.Count) ? (Moral.Instance[i].Name ?? string.Empty) : string.Empty;
                     var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
                     lstMoral.Items.Add($"{i + 1}: {name}");
                 }
@@ -2990,8 +2990,8 @@ public class Crystalshire
             {
                 int id = WinMoralEditor.SelectedIndex; if (id < 0 || id >= Variables.MaxMorals) return;
                 var newName = txtName.Text ?? string.Empty;
-                Data.Moral[id].Name = newName;
-                GameState.MoralChanged[id] = true;
+                Moral.Instance[id].Name = newName;
+                Moral.IsChanged[id] = true;
 
                 // Update list item text without losing selection/scroll
                 if (WindowManager.TryGetControl("winMoralEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox lb)
@@ -3017,8 +3017,8 @@ public class Crystalshire
             {
                 int id = WinMoralEditor.SelectedIndex;
                 if (id < 0 || id >= Variables.MaxMorals) return;
-                Data.Moral[id].Color = (byte)Math.Clamp(cmbColor.Value, 0, Math.Max(0, cmbColor.Items.Count - 1));
-                GameState.MoralChanged[id] = true;
+                Moral.Instance[id].Color = (byte)Math.Clamp(cmbColor.Value, 0, Math.Max(0, cmbColor.Items.Count - 1));
+                Moral.IsChanged[id] = true;
             };
         }
 
@@ -3032,20 +3032,20 @@ public class Crystalshire
                     cb.Value = cb.Value == 0 ? 1 : 0;
                     apply(cb.Value);
                     int id = WinMoralEditor.SelectedIndex;
-                    if (id >= 0 && id < Variables.MaxMorals) GameState.MoralChanged[id] = true;
+                    if (id >= 0 && id < Variables.MaxMorals) Moral.IsChanged[id] = true;
                 };
             }
         }
 
-        BindCheckbox("chkCanCast", v => { int i = WinMoralEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxMorals) Data.Moral[i].CanCast = v == 1; });
-        BindCheckbox("chkCanPK", v => { int i = WinMoralEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxMorals) Data.Moral[i].CanPk = v == 1; });
-        BindCheckbox("chkCanPickupItem", v => { int i = WinMoralEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxMorals) Data.Moral[i].CanPickupItem = v == 1; });
-        BindCheckbox("chkCanDropItem", v => { int i = WinMoralEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxMorals) Data.Moral[i].CanDropItem = v == 1; });
-        BindCheckbox("chkCanUseItem", v => { int i = WinMoralEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxMorals) Data.Moral[i].CanUseItem = v == 1; });
-        BindCheckbox("chkDropItems", v => { int i = WinMoralEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxMorals) Data.Moral[i].DropItems = v == 1; });
-        BindCheckbox("chkLoseExp", v => { int i = WinMoralEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxMorals) Data.Moral[i].LoseExp = v == 1; });
-        BindCheckbox("chkPlayerBlock", v => { int i = WinMoralEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxMorals) Data.Moral[i].PlayerBlock = v == 1; });
-        BindCheckbox("chkNpcBlock", v => { int i = WinMoralEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxMorals) Data.Moral[i].NpcBlock = v == 1; });
+        BindCheckbox("chkCanCast", v => { int i = WinMoralEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxMorals) Moral.Instance[i].CanCast = v == 1; });
+        BindCheckbox("chkCanPK", v => { int i = WinMoralEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxMorals) Moral.Instance[i].CanPk = v == 1; });
+        BindCheckbox("chkCanPickupItem", v => { int i = WinMoralEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxMorals) Moral.Instance[i].CanPickupItem = v == 1; });
+        BindCheckbox("chkCanDropItem", v => { int i = WinMoralEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxMorals) Moral.Instance[i].CanDropItem = v == 1; });
+        BindCheckbox("chkCanUseItem", v => { int i = WinMoralEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxMorals) Moral.Instance[i].CanUseItem = v == 1; });
+        BindCheckbox("chkDropItems", v => { int i = WinMoralEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxMorals) Moral.Instance[i].DropItems = v == 1; });
+        BindCheckbox("chkLoseExp", v => { int i = WinMoralEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxMorals) Moral.Instance[i].LoseExp = v == 1; });
+        BindCheckbox("chkPlayerBlock", v => { int i = WinMoralEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxMorals) Moral.Instance[i].PlayerBlock = v == 1; });
+        BindCheckbox("chkNpcBlock", v => { int i = WinMoralEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxMorals) Moral.Instance[i].NpcBlock = v == 1; });
 
         // Buttons
         if (WindowManager.TryGetControl("winMoralEditor", "btnSave", out var saveCtrl) && saveCtrl is Button btnSave)

@@ -836,9 +836,12 @@ namespace Client
 
         public static void UpdateDrawMapName()
         {
+            if (Moral.Instance.Count <= Data.MyMap.Moral)
+                return;
+
             if (Data.MyMap.Moral >= 0)
             {
-                GameState.DrawMapNameColor = GameClient.QbColorToXnaColor(Data.Moral[Data.MyMap.Moral].Color);
+                GameState.DrawMapNameColor = GameClient.QbColorToXnaColor(Moral.Instance[Data.MyMap.Moral].Color);
             }
         }
 

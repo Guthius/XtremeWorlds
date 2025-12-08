@@ -436,7 +436,6 @@ namespace Client
         public static bool[] ResourceChanged = new bool[Variables.MaxResources];
         public static bool[] SkillChanged = new bool[Variables.MaxSkills];
         public static bool[] ShopChanged = new bool[Variables.MaxShops];
-        public static bool[] MoralChanged = new bool[(Variables.MaxMorals)];
         public static bool[] ProjectileChanged = new bool[Variables.MaxProjectiles];
     }
 }

@@ -520,15 +520,6 @@ namespace Client
                 GameState.InitEventEditor = false;
             }
 
-            if (GameState.InitMoralEditor)
-            {
-                GameState.MyEditorType = EditorType.Moral;
-                GameState.EditorIndex = 0;
-                WindowManager.ShowWindow("winMoralEditor");
-                Client.Game.UI.Windows.WinMoralEditor.Init();
-                GameState.InitMoralEditor = false;
-            }
-
             if (GameState.InitNpcEditor)
             {
                 GameState.MyEditorType = EditorType.Npc;

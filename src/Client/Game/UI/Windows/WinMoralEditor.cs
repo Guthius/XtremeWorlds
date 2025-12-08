@@ -8,7 +8,7 @@ namespace Client.Game.UI.Windows;
 public class WinMoralEditor
 {
     public static int SelectedIndex = 0;
-    public static Core.Globals.Type.Moral? _history = null;
+    public static Moral? _history = null;
 
     // Initialize window (called after layout is loaded)
     public static void Init()
@@ -41,7 +41,7 @@ public class WinMoralEditor
         if (id < 0 || id >= Variables.MaxMorals) return;
         SelectedIndex = id;
         GameState.EditorIndex = id;
-        ref var m = ref Data.Moral[id];
+        var m = Moral.Instance[id];
 
         // Text box
         if (WindowManager.TryGetControl("winMoralEditor", "txtName", out var txtName) && txtName is TextBox tbName)
@@ -83,7 +83,7 @@ public class WinMoralEditor
             lst.Items.Clear();
             for (int i = 0; i < Variables.MaxMorals; i++)
             {
-                var name = Data.Moral[i].Name ?? string.Empty;
+                var name = Moral.Instance[i].Name ?? string.Empty;
                 lst.Items.Add($"{i + 1}: {name}");
             }
             if (sel < 0 || sel >= lst.Items.Count) sel = 0;
@@ -98,17 +98,17 @@ public class WinMoralEditor
         if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxMorals) return;
         if (_history is null)
         {
-            var s = Data.Moral[SelectedIndex];
+            var s = Moral.Instance[SelectedIndex];
             var n = s; // struct copy
-            _history = n;
+            _history = (Moral)n;
             if (WindowManager.TryGetControl("winMoralEditor", "btnCopy", out var btn) && btn is Button b) b.Text = "Paste";
             return;
         }
 
         // Paste clipboard into current slot
-        var pasted = _history.Value;
-        Data.Moral[SelectedIndex] = pasted;
-        GameState.MoralChanged[SelectedIndex] = true;
+        var pasted = _history;
+        Moral.Instance[SelectedIndex] = pasted;
+        Moral.IsChanged[SelectedIndex] = true;
         _history = null;
         if (WindowManager.TryGetControl("winMoralEditor", "btnCopy", out var btn2) && btn2 is Button b2) b2.Text = "Copy";
         OnLoad(SelectedIndex);
@@ -131,7 +131,7 @@ public class WinMoralEditor
     public static void OnDelete()
     {
         Moral.OnClear(GameState.EditorIndex);
-        GameState.MoralChanged[GameState.EditorIndex] = true;
+        Moral.IsChanged[GameState.EditorIndex] = true;
         OnLoad(GameState.EditorIndex);
         RefreshList();
     }
