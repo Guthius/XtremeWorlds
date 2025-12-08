@@ -1995,102 +1995,105 @@ namespace Client
 
             for (i = 0L; i < Variables.MaxPlayers; i++)
             {
-                if (GetPlayerMap((int) i) == GetPlayerMap((int) i))
+                if (IsPlaying((int) i))
                 {
-                    if (GetPlayerVital((int) i, Vital.Health) > 0 &
-                        GetPlayerVital((int) i, Vital.Health) < GetPlayerMaxVital((int) i, Vital.Health))
+                    if (GetPlayerMap((int) i) == GetPlayerMap((int) i))
                     {
-                        // lock to Player
-                        tmpX = (long) Math.Round(GetPlayerRawX((int) i) +
-                            16 - width / 2d);
-                        tmpY = GetPlayerRawY((int) i) + 35;
-
-                        // calculate the width to fill
-                        if (width > 0L)
-                            GameState.BarWidthPlayerHPMax[(int) i] = (int) Math.Round(
-                                GetPlayerVital((int) i, Vital.Health) / (double) width /
-                                (GetPlayerMaxVital((int) i, Vital.Health) / (double) width) * width);
-
-                        // draw bar background
-                        top = height * 3L; // HP bar background
-                        left = 0L;
-                        string argPath2 = Path.Combine(DataPath.Misc, "Bars");
-                        RenderTexture(ref argPath2, GameLogic.ConvertMapX((int) tmpX), GameLogic.ConvertMapY((int) tmpY),
-                            (int) left, (int) top, (int) width, (int) height, (int) width, (int) height);
-
-                        // draw the bar proper
-                        top = 0L; // HP bar
-                        left = 0L;
-                        string argPath3 = Path.Combine(DataPath.Misc, "Bars");
-                        RenderTexture(ref argPath3, GameLogic.ConvertMapX((int) tmpX), GameLogic.ConvertMapY((int) tmpY),
-                            (int) left, (int) top, (int) GameState.BarWidthPlayerHP[(int) i], (int) height,
-                            (int) GameState.BarWidthPlayerHP[(int) i], (int) height);
-                    }
-
-                    if (GetPlayerVital((int) i, Vital.Stamina) > 0 &
-                        GetPlayerVital((int) i, Vital.Stamina) < GetPlayerMaxVital((int) i, Vital.Stamina))
-                    {
-                        // lock to Player
-                        tmpX = (long)Math.Round(GetPlayerRawX((int)i) +
-                            16 - width / 2d);
-                        tmpY = GetPlayerRawY((int)i) + 35 + height;
-
-                        // calculate the width to fill
-                        if (width > 0)
-                            GameState.BarWidthPlayerMPMax[(int) i] = (int) Math.Round(
-                                GetPlayerVital((int) i, Vital.Mana) / (double) width /
-                                (GetPlayerMaxVital((int) i, Vital.Mana) / (double) width) * width);
-
-                        // draw bar background
-                        top = height * 3L; // SP bar background
-                        left = 0L;
-                        string argPath4 = Path.Combine(DataPath.Misc, "Bars");
-                        RenderTexture(ref argPath4, GameLogic.ConvertMapX((int) tmpX), GameLogic.ConvertMapY((int) tmpY),
-                            (int) left, (int) top, (int) width, (int) height, (int) width, (int) height);
-
-                        // draw the bar proper
-                        top = height * 1L; // MP bar
-                        left = 0L;
-                        string argPath5 = Path.Combine(DataPath.Misc, "Bars");
-                        RenderTexture(ref argPath5, GameLogic.ConvertMapX((int) tmpX), GameLogic.ConvertMapY((int) tmpY),
-                            (int) left, (int) top, (int) GameState.BarWidthPlayerMP[(int) i], (int) height,
-                            (int) GameState.BarWidthPlayerMP[(int) i], (int) height);
-                    }
-
-                    if (GameState.SkillBuffer >= 0)
-                    {
-                        if ((int) Data.Player[(int) i].Skill[GameState.SkillBuffer].Num >= 0)
+                        if (GetPlayerVital((int) i, Vital.Health) > 0 &
+                            GetPlayerVital((int) i, Vital.Health) < GetPlayerMaxVital((int) i, Vital.Health))
                         {
-                            if (Data.Skill[(int) Data.Player[(int) i].Skill[GameState.SkillBuffer].Num]
-                                    .CastTime > 0)
+                            // lock to Player
+                            tmpX = (long) Math.Round(GetPlayerRawX((int) i) +
+                                16 - width / 2d);
+                            tmpY = GetPlayerRawY((int) i) + 35;
+
+                            // calculate the width to fill
+                            if (width > 0L)
+                                GameState.BarWidthPlayerHPMax[(int) i] = (int) Math.Round(
+                                    GetPlayerVital((int) i, Vital.Health) / (double) width /
+                                    (GetPlayerMaxVital((int) i, Vital.Health) / (double) width) * width);
+
+                            // draw bar background
+                            top = height * 3L; // HP bar background
+                            left = 0L;
+                            string argPath2 = Path.Combine(DataPath.Misc, "Bars");
+                            RenderTexture(ref argPath2, GameLogic.ConvertMapX((int) tmpX), GameLogic.ConvertMapY((int) tmpY),
+                                (int) left, (int) top, (int) width, (int) height, (int) width, (int) height);
+
+                            // draw the bar proper
+                            top = 0L; // HP bar
+                            left = 0L;
+                            string argPath3 = Path.Combine(DataPath.Misc, "Bars");
+                            RenderTexture(ref argPath3, GameLogic.ConvertMapX((int) tmpX), GameLogic.ConvertMapY((int) tmpY),
+                                (int) left, (int) top, (int) GameState.BarWidthPlayerHP[(int) i], (int) height,
+                                (int) GameState.BarWidthPlayerHP[(int) i], (int) height);
+                        }
+
+                        if (GetPlayerVital((int) i, Vital.Stamina) > 0 &
+                            GetPlayerVital((int) i, Vital.Stamina) < GetPlayerMaxVital((int) i, Vital.Stamina))
+                        {
+                            // lock to Player
+                            tmpX = (long)Math.Round(GetPlayerRawX((int)i) +
+                                16 - width / 2d);
+                            tmpY = GetPlayerRawY((int)i) + 35 + height;
+
+                            // calculate the width to fill
+                            if (width > 0)
+                                GameState.BarWidthPlayerMPMax[(int) i] = (int) Math.Round(
+                                    GetPlayerVital((int) i, Vital.Mana) / (double) width /
+                                    (GetPlayerMaxVital((int) i, Vital.Mana) / (double) width) * width);
+
+                            // draw bar background
+                            top = height * 3L; // SP bar background
+                            left = 0L;
+                            string argPath4 = Path.Combine(DataPath.Misc, "Bars");
+                            RenderTexture(ref argPath4, GameLogic.ConvertMapX((int) tmpX), GameLogic.ConvertMapY((int) tmpY),
+                                (int) left, (int) top, (int) width, (int) height, (int) width, (int) height);
+
+                            // draw the bar proper
+                            top = height * 1L; // MP bar
+                            left = 0L;
+                            string argPath5 = Path.Combine(DataPath.Misc, "Bars");
+                            RenderTexture(ref argPath5, GameLogic.ConvertMapX((int) tmpX), GameLogic.ConvertMapY((int) tmpY),
+                                (int) left, (int) top, (int) GameState.BarWidthPlayerMP[(int) i], (int) height,
+                                (int) GameState.BarWidthPlayerMP[(int) i], (int) height);
+                        }
+
+                        if (GameState.SkillBuffer >= 0)
+                        {
+                            if ((int) Data.Player[(int) i].Skill[GameState.SkillBuffer].Num >= 0)
                             {
-                                // lock to player
-                                tmpX = (long)Math.Round(GetPlayerRawX((int)i) + 16 - width / 2d);
+                                if (Data.Skill[(int) Data.Player[(int) i].Skill[GameState.SkillBuffer].Num]
+                                        .CastTime > 0)
+                                {
+                                    // lock to player
+                                    tmpX = (long)Math.Round(GetPlayerRawX((int)i) + 16 - width / 2d);
 
-                                tmpY = GetPlayerRawY((int)i) + 35 + height;
+                                    tmpY = GetPlayerRawY((int)i) + 35 + height;
 
-                                // calculate the width to fill
-                                if (width > 0L)
-                                    barWidth = (long) Math.Round((General.GetTickCount() - GameState.SkillBufferTimer) /
-                                        (double) (Data
-                                            .Skill[(int) Data.Player[(int) i].Skill[GameState.SkillBuffer].Num]
-                                            .CastTime * 1000) * width);
+                                    // calculate the width to fill
+                                    if (width > 0L)
+                                        barWidth = (long) Math.Round((General.GetTickCount() - GameState.SkillBufferTimer) /
+                                            (double) (Data
+                                                .Skill[(int) Data.Player[(int) i].Skill[GameState.SkillBuffer].Num]
+                                                .CastTime * 1000) * width);
 
-                                // draw bar background
-                                top = height * 3L; // cooldown bar background
-                                left = 0L;
-                                string argPath6 = Path.Combine(DataPath.Misc, "Bars");
-                                RenderTexture(ref argPath6, GameLogic.ConvertMapX((int) tmpX),
-                                    GameLogic.ConvertMapY((int) tmpY), (int) left, (int) top, (int) width, (int) height,
-                                    (int) width, (int) height);
+                                    // draw bar background
+                                    top = height * 3L; // cooldown bar background
+                                    left = 0L;
+                                    string argPath6 = Path.Combine(DataPath.Misc, "Bars");
+                                    RenderTexture(ref argPath6, GameLogic.ConvertMapX((int) tmpX),
+                                        GameLogic.ConvertMapY((int) tmpY), (int) left, (int) top, (int) width, (int) height,
+                                        (int) width, (int) height);
 
-                                // draw the bar proper
-                                top = height * 2L; // cooldown bar
-                                left = 0L;
-                                string argPath7 = Path.Combine(DataPath.Misc, "Bars");
-                                RenderTexture(ref argPath7, GameLogic.ConvertMapX((int) tmpX),
-                                    GameLogic.ConvertMapY((int) tmpY), (int) left, (int) top, (int) barWidth, (int) height,
-                                    (int) barWidth, (int) height);
+                                    // draw the bar proper
+                                    top = height * 2L; // cooldown bar
+                                    left = 0L;
+                                    string argPath7 = Path.Combine(DataPath.Misc, "Bars");
+                                    RenderTexture(ref argPath7, GameLogic.ConvertMapX((int) tmpX),
+                                        GameLogic.ConvertMapY((int) tmpY), (int) left, (int) top, (int) barWidth, (int) height,
+                                        (int) barWidth, (int) height);
+                                }
                             }
                         }
                     }
