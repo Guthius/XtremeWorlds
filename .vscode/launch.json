@@ -2,38 +2,15 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Server (macOS)",
-      "type": "coreclr",
-      "request": "launch",
-      "preLaunchTask": "build Server",
-      "program": "${workspaceFolder}/Build/Server/XtremeWorlds.Server.dll",
-      "args": [],
-      "cwd": "${workspaceFolder}/Build/Server",
-      "stopAtEntry": false,
-      "console": "integratedTerminal",
-      "env": {
-        "DOTNET_ENVIRONMENT": "Development"
-      }
-    },
-    {
-      "name": "Client (macOS)",
+      "name": "Client",
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build Client",
-      "program": "${workspaceFolder}/Build/Client/XtremeWorlds.Client.dll",
+      "program": "${workspaceFolder}/Build/Client/osx-arm64/XtremeWorlds.Client.dll",
       "args": [],
       "cwd": "${workspaceFolder}/Build/Client",
       "stopAtEntry": false,
       "console": "integratedTerminal"
-    }
-  ],
-  "compounds": [
-    {
-      "name": "Client + Server (macOS)",
-      "configurations": [
-        "Server (macOS)",
-        "Client (macOS)"
-      ]
     }
   ]
 }
