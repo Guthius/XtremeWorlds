@@ -42,6 +42,7 @@ namespace Server
             }
 
             var jobData = JObject.FromObject(data).ToObject<Job>();
+            
             Job.Instance.Add(jobData ?? new Job());
         }
     }
