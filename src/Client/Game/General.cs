@@ -180,7 +180,7 @@ namespace Client
         {
             Map.OnClear();
             Npc.OnReset();
-            MapResource.OnReset();
+            Resource.OnReset();
             Item.OnReset();
             Shop.OnReset();
             Skill.OnReset();

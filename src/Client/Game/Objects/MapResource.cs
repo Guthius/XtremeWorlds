@@ -57,7 +57,7 @@ namespace Core.Objects
             if (mapResourceNum == 0)
                 mapResourceNum = Data.MyMap.Tile[Data.MyMapResource[index].X, Data.MyMapResource[index].Y].Data1_2;
 
-            MapResource.OnStream(mapResourceNum);
+            Resource.OnStream(mapResourceNum);
 
             if (Data.Resource[mapResourceNum].ResourceImage == 0)
                 return;

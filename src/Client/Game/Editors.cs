@@ -12,7 +12,7 @@ using Type = Core.Globals.Type;
 namespace Client
 {
 
-    public static class Editors
+    public class Editors
     {
         private static float tilesetOffsetX = 0;
         private static float tilesetOffsetY = 0;
@@ -1141,7 +1141,7 @@ namespace Client
         {
             GameState.MyEditorType = EditorType.None;
             ClearChanged_Resource();
-            MapResource.OnReset();
+            Resource.OnReset();
             Sender.SendCloseEditor();
         }
 

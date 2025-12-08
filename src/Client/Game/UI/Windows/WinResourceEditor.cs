@@ -2,6 +2,7 @@
 using Client.Game.UI;
 using Client.Game.UI.Controls;
 using Core.Globals;
+using Core.Objects;
 using System;
 using System.Collections.Generic;
 using System.IO;
