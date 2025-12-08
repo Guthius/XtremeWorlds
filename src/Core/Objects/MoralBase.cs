@@ -28,7 +28,7 @@ namespace Core.Objects
 
         public static void ClearChanged()
         {
-            IsChanged = new bool[Variables.MaxResources];
+            IsChanged = new bool[Variables.MaxMorals];
         }
 
         public static void OnClear(int index)

@@ -12,11 +12,11 @@ namespace Client
     {
         #region Database
 
-        public static void OnStream(int moralNum)
+        public static void OnStream(int index)
         {
-            if (moralNum >= 0 & string.IsNullOrEmpty(Moral.Instance[moralNum].Name))
+            if (index >= 0 & string.IsNullOrEmpty(Moral.Instance[index].Name))
             {
-                Sender.SendRequestMoral(moralNum);
+                Sender.SendRequestMoral(index);
             }
         }
 
