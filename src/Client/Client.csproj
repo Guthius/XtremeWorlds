@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <Version>2.4.9</Version>
+    <!-- Use TargetFrameworks for clarity, the conditions below handle selection -->
     <TargetFrameworks>net10.0-windows;net10.0</TargetFrameworks>
     <RootNamespace>XtremeWorlds.Client</RootNamespace>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
@@ -9,34 +11,43 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <UseSharedCompilation>false</UseSharedCompilation>
     <AssemblyName>XtremeWorlds.Client</AssemblyName>
-  </PropertyGroup>
-
-  <!-- Cross-platform TFM: non-Windows RIDs -->
-  <PropertyGroup Condition="'$(TargetFramework)'=='net10.0'">
-    <OutputType>Exe</OutputType>
-    <RuntimeIdentifiers>linux-x64;osx-arm64</RuntimeIdentifiers>
-  </PropertyGroup>
-
-  <!-- OutputType must be in PropertyGroup, not ItemGroup -->
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-windows'">
-    <OutputType>WinExe</OutputType>
-    <UseWPF>true</UseWPF>
-    <EnableWindowsTargeting>true</EnableWindowsTargeting>
-    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
-    <DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
-    <NoWarn>$(NoWarn);NU1701</NoWarn>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0'">
-    <OutputType>Exe</OutputType>
-  </PropertyGroup>
-
-  <PropertyGroup>
     <Title>XtremeWorlds Client</Title>
     <Product>Game Client</Product>
   </PropertyGroup>
 
-  <PropertyGroup>
+  <!-- Define the target framework and runtime identifier based on the BUILD HOST OS -->
+  <!-- This simplifies the 'dotnet build' command -->
+  
+  <!-- Windows Host -->
+  <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <OutputType>WinExe</OutputType>
+    <UseWPF>true</UseWPF>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
+  </PropertyGroup>
+
+  <!-- macOS Host -->
+  <!-- We check if OS is Unix and then use IsOSPlatform function for Mac specifically -->
+  <PropertyGroup Condition="'$(OS)' != 'Windows_NT' and $([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))">
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- Assumes an ARM64 Mac host for default build -->
+    <RuntimeIdentifier>osx-arm64</RuntimeIdentifier> 
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  
+  <!-- Linux Host -->
+  <PropertyGroup Condition="'$(OS)' != 'Windows_NT' and $([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))">
+    <TargetFramework>net10.0</TargetFramework>
+    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+
+  <!-- Manifest/Install properties (usually only applies to Windows builds/targets) -->
+  <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
     <ManifestCertificateThumbprint>181BBD77C201FB969E61DF100063FD42A08B2BE6</ManifestCertificateThumbprint>
     <TargetZone>LocalIntranet</TargetZone>
     <SignManifests>false</SignManifests>
@@ -54,50 +65,58 @@
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <AssemblyTitle>XtremeWorlds.Client</AssemblyTitle>
   </PropertyGroup>
+  
+  <!-- Content files inclusion based on host OS -->
+  <ItemGroup>
+    <Content Include="Content\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+  </ItemGroup>
 
-  <!-- Windows: copy only .dll and content; exclude Unix/Mac natives -->
-  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-windows'">
+  <!-- Windows: copy only .dll and content -->
+  <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
     <Content Include="*.dll;*.sf2">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>False</Visible>
     </Content>
-    <Content Include="Content\**\*.*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Content>
+    <!-- Explicitly remove files not used on Windows just in case -->
     <None Remove="*.so;*.so.*;*.dylib" />
     <Content Remove="*.so;*.so.*;*.dylib" />
   </ItemGroup>
 
-  <!-- macOS: copy only .dylib and content; exclude Windows and Linux .so -->
-  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0' and '$(RuntimeIdentifier)' == 'osx-arm64'">
-    <Content Include="*.dylib;*.sf2">
+  <!-- macOS or Linux: copy content -->
+  <ItemGroup Condition="'$(OS)' != 'Windows_NT'">
+    <Content Include="*.sf2">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>False</Visible>
     </Content>
-    <Content Include="Content\**\*.*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Content>
-    <None Remove="*.dll;*.so;*.so.*" />
-    <Content Remove="*.dll;*.so;*.so.*" />
+    <!-- Exclude Windows DLLs -->
+    <None Remove="*.dll" />
+    <Content Remove="*.dll" />
   </ItemGroup>
-
-  <!-- Linux: copy only .so and content; exclude Windows and macOS .dylib -->
-  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0' and '$(RuntimeIdentifier)' == 'linux-x64'">
-    <Content Include="*.so;*.so.*;*.sf2">
+  
+  <!-- macOS Host (Specific native library inclusion) -->
+  <ItemGroup Condition="'$(OS)' != 'Windows_NT' and $([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))">
+    <Content Include="*.dylib">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>False</Visible>
     </Content>
-    <Content Include="Content\**\*.*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Link>Content\%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Content>
-    <None Remove="*.dll;*.dylib" />
-    <Content Remove="*.dll;*.dylib" />
+    <None Remove="*.so;*.so.*" />
+    <Content Remove="*.so;*.so.*" />
   </ItemGroup>
 
-  <!-- Common resources -->
+  <!-- Linux Host (Specific native library inclusion) -->
+  <ItemGroup Condition="'$(OS)' != 'Windows_NT' and $([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))">
+    <Content Include="*.so;*.so.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+    <None Remove="*.dylib" />
+    <Content Remove="*.dylib" />
+  </ItemGroup>
+
+  <!-- Common resources (Keep as is) -->
   <ItemGroup>
     <Resource Include="Icon.bmp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -117,7 +136,7 @@
     <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
 
-  <!-- Always include Eto.Forms, but only include Gtk on Linux -->
+  <!-- Always include Eto.Forms, but only include platform-specific backends based on TFM resolution -->
   <ItemGroup>
     <PackageReference Include="Eto.Forms" />
   </ItemGroup>
@@ -133,11 +152,9 @@
   <!-- Non-Windows backends: Gtk for Linux always; Mac64 only when explicitly enabled -->
   <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
     <PackageReference Include="Eto.Platform.Gtk" />
+    <!-- You likely need Eto.Platform.Mac64 here too if building on Mac -->
+    <!-- <PackageReference Include="Eto.Platform.Mac64" /> -->
   </ItemGroup>
-
-  <PropertyGroup Condition="'$(BuildMac)' == 'true' and '$(TargetFramework)' == 'net10.0'">
-    <RuntimeIdentifiers>linux-x64;</RuntimeIdentifiers>
-  </PropertyGroup>
 
   <!-- Other platform-agnostic and always-needed packages -->
   <ItemGroup>
@@ -148,19 +165,21 @@
       <HintPath>FNA.dll</HintPath>
     </Reference>
   </ItemGroup>
-
+  
+  <!-- Targets customized for the host OS -->
   <Target Name="EnsureContentFolderExists" BeforeTargets="Build">
     <MakeDir Directories="$(OutputPath)Content" />
   </Target>
 
   <!-- macOS: adjust dylib dependency paths so libFNA3D loads local libSDL3.dylib -->
-  <Target Name="FixMacDylibRpaths" AfterTargets="Build" Condition="'$(TargetFramework)' == 'net10.0' and '$(OS)' != 'Windows_NT'">
+  <Target Name="FixMacDylibRpaths" AfterTargets="Build" Condition="'$(OS)' != 'Windows_NT' and $([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))">
     <Message Importance="high" Text="Fixing macOS dylib references in $(OutputPath)" />
+    <!-- Note: Paths like /opt/homebrew might need adjusting if your build machine is different -->
     <Exec Command="/usr/bin/install_name_tool -change /opt/homebrew/opt/sdl3/lib/libSDL3.0.dylib @loader_path/libSDL3.0.dylib &quot;$(OutputPath)libFNA3D.dylib&quot;" ContinueOnError="true" />
   </Target>
 
   <!-- Ensure only one SDL3 dylib in output: keep libSDL3.0.dylib and replace plain libSDL3.dylib with a symlink -->
-  <Target Name="NormalizeSDL3" AfterTargets="Build" Condition="'$(TargetFramework)' == 'net10.0' and '$(OS)' != 'Windows_NT'">
+  <Target Name="NormalizeSDL3" AfterTargets="Build" Condition="'$(OS)' != 'Windows_NT' and $([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))">
     <Message Importance="high" Text="Normalizing SDL3 dylib filenames in $(OutputPath)" />
     <Exec Command="/bin/rm -f &quot;$(OutputPath)libSDL3.dylib&quot;" ContinueOnError="true" />
     <Exec WorkingDirectory="$(OutputPath)" Command="/bin/ln -sf libSDL3.0.dylib libSDL3.dylib" ContinueOnError="true" />
