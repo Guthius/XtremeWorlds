@@ -1,7 +1,7 @@
 ﻿using Client.Net;
 using Core.Globals;
 using System.IO;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 
 namespace Client.Game.UI.Windows;
 
@@ -172,7 +172,7 @@ public class WinShop
         {
             if (GameState.ShopIsSelling)
             {
-                if (GetPlayerInv(GameState.MyIndex, slot) >= 0)
+                if (GetPlayerInventory(GameState.MyIndex, slot) >= 0)
                 {
                     GameState.ShopSelectedSlot = slot;
 
@@ -229,7 +229,7 @@ public class WinShop
 
         var itemNum = !GameState.ShopIsSelling
             ? Data.Shop[GameState.InShop].TradeItem[slot].Item
-            : GetPlayerInv(GameState.MyIndex, slot);
+            : GetPlayerInventory(GameState.MyIndex, slot);
 
         if (itemNum == -1)
         {
@@ -298,7 +298,7 @@ public class WinShop
         }
         else
         {
-            GameState.ShopSelectedItem = GetPlayerInv(GameState.MyIndex, GameState.ShopSelectedSlot);
+            GameState.ShopSelectedItem = GetPlayerInventory(GameState.MyIndex, GameState.ShopSelectedSlot);
 
             if (GameState.ShopSelectedItem >= 0)
             {
@@ -344,7 +344,7 @@ public class WinShop
             }
 
             var itemNum = Data.Shop[GameState.InShop].TradeItem[i].Item;
-            if (itemNum < 0 || itemNum >= Variables.MaxItems)
+            if (itemNum < 0 || itemNum >= Core.Globals.Variables.MaxItems)
             {
                 continue;
             }
@@ -376,8 +376,8 @@ public class WinShop
                 GameClient.RenderTexture(ref selectedSlotTexturePath, left, top, 0, 0, 32, 32, 32, 32);
             }
 
-            var itemNum = GetPlayerInv(GameState.MyIndex, i);
-            if (itemNum < 0 || itemNum >= Variables.MaxItems)
+            var itemNum = GetPlayerInventory(GameState.MyIndex, i);
+            if (itemNum < 0 || itemNum >= Core.Globals.Variables.MaxItems)
             {
                 continue;
             }
@@ -394,7 +394,7 @@ public class WinShop
 
             GameClient.RenderTexture(ref path, left, top, 0, 0, 32, 32, 32, 32);
 
-            if (GetPlayerInvValue(GameState.MyIndex, i) <= 1)
+            if (GetPlayerInventoryValue(GameState.MyIndex, i) <= 1)
             {
                 continue;
             }
@@ -402,7 +402,7 @@ public class WinShop
             var y = top + 20;
             var x = left + 1;
 
-            var amount = GetPlayerInvValue(GameState.MyIndex, i);
+            var amount = GetPlayerInventoryValue(GameState.MyIndex, i);
             var amountColor = TextRenderer.GetColorForAmount(amount);
 
             TextRenderer.OnDraw(GameLogic.ConvertCurrency(amount), x, y, amountColor, amountColor, winShop.Font);

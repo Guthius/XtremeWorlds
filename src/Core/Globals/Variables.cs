@@ -7,7 +7,7 @@ public static class Variables
     public static byte MaxBank = 90;
     public static byte MaxJobs = 50;
     public static byte MaxMorals = 50;
-    public static byte MaxInv = 35;
+    public static byte MaxInventory = 35;
     public static int MaxItems = 500;
     public static int MaxMaps = 1000;
     public static byte MaxMapItems = 255;
@@ -35,7 +35,7 @@ public static class Variables
     public static int MaxSwitches = 100;
     public static int MaxVariables = 100;
     public static int MaxPoints = 255;
-    public static byte MaxChars = 3;
+    public static byte MaxCharacters = 3;
     public static int ChatLines = 1000;
     public static byte MaxStats = 255;
     public static byte MaxQuests = 100;

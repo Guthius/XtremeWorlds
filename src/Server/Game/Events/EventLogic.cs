@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core;
 using static Core.Globals.Type;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 using static Core.Net.Packets;
 using System.Reflection.Metadata.Ecma335;
 using Core.Globals;
@@ -127,7 +127,7 @@ namespace Server
 
                                 if (mapEventPage.ChkVariable == 1)
                                 {
-                                    int playerVar = Data.Player[i].Variables[mapEventPage.VariableIndex];
+                                    int playerVar = Player.Instance[i].Variables[mapEventPage.VariableIndex];
                                     int condition = mapEventPage.VariableCondition;
                                     bool variableConditionMet = false;
 
@@ -150,7 +150,7 @@ namespace Server
                                 if (mapEventPage.ChkSwitch == 1)
                                 {
                                     //Simplified with XOR  
-                                    if ((mapEventPage.SwitchCompare == 1) ^ (Data.Player[i].Switches[mapEventPage.SwitchIndex] == 1)) //we are expecting true  
+                                    if ((mapEventPage.SwitchCompare == 1) ^ (Player.Instance[i].Switches[mapEventPage.SwitchIndex] == 1)) //we are expecting true  
                                     {
                                         playerEventPage.Visible = false;
                                     }
@@ -264,7 +264,7 @@ namespace Server
 
                             if (page.ChkVariable == 1)
                             {
-                                int playerVar = Data.Player[i].Variables[page.VariableIndex];
+                                int playerVar = Player.Instance[i].Variables[page.VariableIndex];
                                 bool conditionMet = false;
                                 switch (page.VariableCompare)
                                 {
@@ -284,7 +284,7 @@ namespace Server
                             if (page.ChkSwitch == 1)
                             {
                                 // Using XOR for concise switch check.
-                                if ((page.SwitchCompare == 0) ^ (Data.Player[i].Switches[page.SwitchIndex] == 0)) //we want false
+                                if ((page.SwitchCompare == 0) ^ (Player.Instance[i].Switches[page.SwitchIndex] == 0)) //we want false
                                 {
                                     spawnEvent = false; //and switch is true, don't spawn.
                                 }
@@ -1375,7 +1375,7 @@ namespace Server
             {
                 if (!NetworkConfig.IsPlaying(i) || Data.TempPlayer[i].GettingMap || Data.TempPlayer[i].EventMap.CurrentEvents <= 0) return;
 
-                int mapNum = Data.Player[i].Map; // Cache map number.
+                int mapNum = Player.Instance[i].Map; // Cache map number.
 
                 // Iterate through the player's events.
                 for (int x = 0; x < Data.TempPlayer[i].EventMap.CurrentEvents; x++)
@@ -1690,16 +1690,16 @@ namespace Server
                                             switch (command.Data2)
                                             {
                                                 case 0: // Set
-                                                    Data.Player[i].Variables[command.Data1] = command.Data3;
+                                                    Player.Instance[i].Variables[command.Data1] = command.Data3;
                                                     break;
                                                 case 1: // Add
-                                                    Data.Player[i].Variables[command.Data1] += command.Data3;
+                                                    Player.Instance[i].Variables[command.Data1] += command.Data3;
                                                     break;
                                                 case 2: // Subtract
-                                                    Data.Player[i].Variables[command.Data1] -= command.Data3;
+                                                    Player.Instance[i].Variables[command.Data1] -= command.Data3;
                                                     break;
                                                 case 3: // Random
-                                                    Data.Player[i].Variables[command.Data1] = (int) General.GetRandom.NextDouble(command.Data3, command.Data4);
+                                                    Player.Instance[i].Variables[command.Data1] = (int) General.GetRandom.NextDouble(command.Data3, command.Data4);
                                                     break;
                                             }
 
@@ -1709,7 +1709,7 @@ namespace Server
                                         }
                                         case (byte) EventCommand.ModifySwitch:
                                         {
-                                            Data.Player[i].Switches[command.Data1] = (byte) (command.Data2 == 0 ? 0 : 1);
+                                            Player.Instance[i].Switches[command.Data1] = (byte) (command.Data2 == 0 ? 0 : 1);
 
                                             // Check for new event pages
                                             SpawnMapEventsFor(i, mapNum);
@@ -1741,7 +1741,7 @@ namespace Server
                                             {
                                                 case 0: // Variable
                                                 {
-                                                    int playerVar = Data.Player[i].Variables[branch.Data1];
+                                                    int playerVar = Player.Instance[i].Variables[branch.Data1];
                                                     switch (branch.Data2)
                                                     {
                                                         case 0: conditionMet = playerVar == branch.Data3; break;
@@ -1756,7 +1756,7 @@ namespace Server
                                                 }
                                                 case 1: // Switch
                                                 {
-                                                    bool switchState = Data.Player[i].Switches[branch.Data1] == 1;
+                                                    bool switchState = Player.Instance[i].Switches[branch.Data1] == 1;
                                                     conditionMet = (branch.Data2 == 0 && switchState) || (branch.Data2 == 1 && !switchState);
                                                     break;
                                                 }
@@ -1764,7 +1764,7 @@ namespace Server
                                                     conditionMet = Player.HasItem(i, branch.Data1) >= branch.Data2;
                                                     break;
                                                 case 3: // Class
-                                                    conditionMet = Data.Player[i].Job == branch.Data1;
+                                                    conditionMet = Player.Instance[i].Job == branch.Data1;
                                                     break;
                                                 case 4: // Skill
                                                     conditionMet = HasSkill(i, branch.Data1);
@@ -1799,7 +1799,7 @@ namespace Server
                                                 case 7: //Timer - Not currently implemented
                                                     break;
                                                 case 8: // Gender
-                                                    conditionMet = Data.Player[i].Sex == branch.Data1;
+                                                    conditionMet = Player.Instance[i].Sex == branch.Data1;
                                                     break;
                                                 case 9: // Time of Day
                                                     conditionMet = Clock.Instance.TimeOfDay == (TimeOfDay) branch.Data1;
@@ -1827,7 +1827,7 @@ namespace Server
                                                 case 0: // Set
                                                     if (Player.HasItem(i, command.Data1) > 0)
                                                     {
-                                                        SetPlayerInvValue(i, Player.FindItemSlot(i, command.Data1), command.Data3);
+                                                        SetInventoryValue(i, Player.FindItemSlot(i, command.Data1), command.Data3);
                                                     }
 
                                                     break;
@@ -1851,31 +1851,31 @@ namespace Server
                                         }
 
                                         case (byte) EventCommand.RestoreHealth:
-                                            SetPlayerVital(i, Vital.Health, Script.Instance?.GetPlayerMaxVital(i, Vital.Health));
-                                            NetworkSend.SendVital(i, Vital.Health);
+                                            SetPlayerVital(i, Core.Globals.Vital.Health, Script.Instance?.GetPlayerMaxVital(i, Core.Globals.Vital.Health));
+                                            NetworkSend.SendVital(i, Core.Globals.Vital.Health);
                                             break;
 
                                         case (byte) EventCommand.RestoreMana:
-                                            SetPlayerVital(i, Vital.Mana, Script.Instance?.GetPlayerMaxVital(i, Vital.Mana));
-                                            NetworkSend.SendVital(i, Vital.Mana);
+                                            SetPlayerVital(i, Core.Globals.Vital.Mana, Script.Instance?.GetPlayerMaxVital(i, Core.Globals.Vital.Mana));
+                                            NetworkSend.SendVital(i, Core.Globals.Vital.Mana);
                                             break;
 
                                         case (byte) EventCommand.RestoreStamina:
-                                            SetPlayerVital(i, Vital.Stamina, Script.Instance?.GetPlayerMaxVital(i, Vital.Stamina));
-                                            NetworkSend.SendVital(i, Vital.Stamina);
+                                            SetPlayerVital(i, Core.Globals.Vital.Stamina, Script.Instance?.GetPlayerMaxVital(i, Core.Globals.Vital.Stamina));
+                                            NetworkSend.SendVital(i, Core.Globals.Vital.Stamina);
                                             break;
 
                                         case (byte) EventCommand.GiveExperience:
-                                            SetPlayerExp(i, Script.Instance?.GetPlayerNextLevel(i));
-                                            Player.CheckLevelUp(i);
-                                            NetworkSend.SendExp(i);
+                                            SetPlayerExperience(i, Script.Instance?.GetPlayerNextLevel(i));
+                                            Player.OnLevel(i);
+                                            NetworkSend.SendExperience(i);
                                             NetworkSend.SendPlayerData(i);
                                             break;
 
                                         case (byte) EventCommand.ChangeLevel:
                                             SetPlayerLevel(i, command.Data1);
-                                            SetPlayerExp(i, 0);
-                                            NetworkSend.SendExp(i);
+                                            SetPlayerExperience(i, 0);
+                                            NetworkSend.SendExperience(i);
                                             NetworkSend.SendPlayerData(i);
                                             break;
 
@@ -1892,7 +1892,7 @@ namespace Server
                                             {
                                                 for (int p = 0; p < Core.Globals.Variables.MaxPlayerSkills; p++)
                                                 {
-                                                    if (Data.Player[i].Skill[p].Num == command.Data1)
+                                                    if (Player.Instance[i].Skill[p].Num == command.Data1)
                                                     {
                                                         SetPlayerSkill(i, p, 0);
                                                     }
@@ -1904,7 +1904,7 @@ namespace Server
                                         }
 
                                         case (byte) EventCommand.ChangeJob:
-                                            Data.Player[i].Job = (byte) command.Data1;
+                                            Player.Instance[i].Job = (byte) command.Data1;
                                             NetworkSend.SendPlayerData(i);
                                             break;
 
@@ -1914,18 +1914,18 @@ namespace Server
                                             break;
 
                                         case (byte) EventCommand.ChangeSex:
-                                            Data.Player[i].Sex = (byte) (command.Data1 == 0 ? Sex.Male : Sex.Female);
+                                            Player.Instance[i].Sex = (byte) (command.Data1 == 0 ? Sex.Male : Sex.Female);
                                             NetworkSend.SendPlayerData(i);
                                             break;
 
                                         case (byte) EventCommand.SetPlayerKillable:
-                                            Data.Player[i].Pk = (command.Data1 == 0 ? false : true);
+                                            Player.Instance[i].Pk = (command.Data1 == 0 ? false : true);
                                             NetworkSend.SendPlayerData(i);
                                             break;
 
                                         case (byte) EventCommand.WarpPlayer:
                                         {
-                                            int dir = command.Data4 == 0 ? Data.Player[i].Dir : (byte) (command.Data4 - 1);
+                                            int dir = command.Data4 == 0 ? Player.Instance[i].Dir : (byte) (command.Data4 - 1);
                                             Player.OnWarp(i, command.Data1, command.Data2, command.Data3, dir);
                                             break;
                                         }
@@ -2251,10 +2251,10 @@ namespace Server
             // Use StringBuilder for efficient string manipulation.
             var sb = new System.Text.StringBuilder(txt);
 
-            sb.Replace("/name", Data.Player[index].Name);
-            sb.Replace("/p", Data.Player[index].Name);
-            sb.Replace("$playername$", Data.Player[index].Name);
-            sb.Replace("$playerclass$", Job.Instance[Data.Player[index].Job].Name);
+            sb.Replace("/name", Player.Instance[index].Name);
+            sb.Replace("/p", Player.Instance[index].Name);
+            sb.Replace("$playername$", Player.Instance[index].Name);
+            sb.Replace("$playerclass$", Job.Instance[Player.Instance[index].Job].Name);
 
             // Process variables (/v[variableIndex]).
             int start = sb.ToString().IndexOf("/v"); // Find the first occurrence.
@@ -2273,10 +2273,10 @@ namespace Server
                     if (int.TryParse(varIndexStr, out int varIndex))
                     {
                         // Make sure the variable index is within bounds
-                        if (varIndex >= 0 && varIndex < Data.Player[index].Variables.Length)
+                        if (varIndex >= 0 && varIndex < Player.Instance[index].Variables.Length)
                         {
                             sb.Remove(start, end - start);
-                            sb.Insert(start, Data.Player[index].Variables[varIndex].ToString());
+                            sb.Insert(start, Player.Instance[index].Variables[varIndex].ToString());
                         }
                         else
                         {
@@ -2693,7 +2693,7 @@ namespace Server
                     // Check conditions (Variable, Switch, Item, Self Switch).
                     if (page.ChkVariable == 1)
                     {
-                        int playerVar = Data.Player[index].Variables[page.VariableIndex];
+                        int playerVar = Player.Instance[index].Variables[page.VariableIndex];
                         switch (page.VariableCompare)
                         {
                             case 0: variableConditionMet = playerVar == page.VariableCondition; break;
@@ -2711,7 +2711,7 @@ namespace Server
                     if (page.ChkSwitch == 1)
                     {
                         // Using XOR for switch check, handles both expecting true and false efficiently
-                        if (!((page.SwitchCompare == 1) ^ (Data.Player[index].Switches[page.SwitchIndex] == 0))) //we want true
+                        if (!((page.SwitchCompare == 1) ^ (Player.Instance[index].Switches[page.SwitchIndex] == 0))) //we want true
                             spawnCurrentEvent = false;
                     }
 

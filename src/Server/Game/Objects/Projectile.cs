@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 using Server.Game;
 using Server.Game.Net;
 using Server.Net;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 using static Core.Net.Packets;
 using Type = Core.Globals.Type;
 using System.Linq;
@@ -22,7 +22,7 @@ public class Projectile : IData, IAsyncData
         Entity attackerEntity = null;
         if (mp.OwnerType == (byte)TargetType.Player)
         {
-            attackerEntity = Core.Globals.Entity.FromPlayer(mp.Owner, Data.Player[mp.Owner]);
+            attackerEntity = Core.Globals.Entity.FromPlayer(mp.Owner, Player.Instance[mp.Owner]);
             attackerEntity.Map = map;
         }
         else if (mp.OwnerType == (byte)TargetType.Npc)
@@ -41,7 +41,7 @@ public class Projectile : IData, IAsyncData
             {
                 if (!(mp.OwnerType == (byte)TargetType.Player && mp.Owner == p.Id))
                 {
-                    var targetEntity = Core.Globals.Entity.FromPlayer(p.Id, Data.Player[p.Id]);
+                    var targetEntity = Core.Globals.Entity.FromPlayer(p.Id, Player.Instance[p.Id]);
                     targetEntity.Map = map;
                     try
                     {
@@ -475,8 +475,8 @@ public class Projectile : IData, IAsyncData
                             if (!(mp.OwnerType == (byte)TargetType.Player && mp.Owner == p.Id))
                             {
                                 hit = true;
-                                attackerEntity = Core.Globals.Entity.FromPlayer(mp.Owner, Data.Player[mp.Owner]);
-                                targetEntity = Core.Globals.Entity.FromPlayer(p.Id, Data.Player[p.Id]);
+                                attackerEntity = Core.Globals.Entity.FromPlayer(mp.Owner, Player.Instance[mp.Owner]);
+                                targetEntity = Core.Globals.Entity.FromPlayer(p.Id, Player.Instance[p.Id]);
                             }
                             break;
                         }
@@ -523,7 +523,7 @@ public class Projectile : IData, IAsyncData
                             if (!(mp.OwnerType == (byte)TargetType.Npc && mp.Owner == n))
                             {
                                 hit = true;
-                                attackerEntity = Core.Globals.Entity.FromPlayer(mp.Owner, Data.Player[mp.Owner]);
+                                attackerEntity = Core.Globals.Entity.FromPlayer(mp.Owner, Player.Instance[mp.Owner]);
                                 targetEntity = Core.Globals.Entity.FromNpc(n, mn);
                             }
                             break;

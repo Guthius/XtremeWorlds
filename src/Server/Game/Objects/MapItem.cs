@@ -71,7 +71,7 @@ namespace Server
 
         public static void OnSpawn(int itemNum, int itemVal, int mapNum, int x, int y)
         {
-            if (itemNum < 0 || itemNum > Variables.MaxItems || mapNum < 0 || mapNum >= Core.Globals.Variables.MaxMaps)
+            if (itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems || mapNum < 0 || mapNum >= Core.Globals.Variables.MaxMaps)
             {
                 return;
             }
@@ -103,7 +103,7 @@ namespace Server
 
         public static void SpawnSlot(int mapItemSlot, int itemNum, int itemVal, int mapNum, int x, int y)
         {
-            if (mapItemSlot < 0 || mapItemSlot > Core.Globals.Variables.MaxMapItems || itemNum < 0 || itemNum > Variables.MaxItems || mapNum < 0 || mapNum >= Core.Globals.Variables.MaxMaps)
+            if (mapItemSlot < 0 || mapItemSlot > Core.Globals.Variables.MaxMapItems || itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems || mapNum < 0 || mapNum >= Core.Globals.Variables.MaxMaps)
             {
                 return;
             }

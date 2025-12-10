@@ -114,14 +114,14 @@ public class WinShopEditor
         if (WindowManager.TryGetControl("winShopEditor", "cmbItem", out var itemCtrl) && itemCtrl is ComboBox cmbItem)
         {
             cmbItem.Items.Clear();
-            for (int i = 0; i < Variables.MaxItems; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxItems; i++)
                 cmbItem.Items.Add($"{i + 1}: {Item.Instance[i].Name}");
             cmbItem.Value = 0;
         }
         if (WindowManager.TryGetControl("winShopEditor", "cmbCostItem", out var costCtrl) && costCtrl is ComboBox cmbCost)
         {
             cmbCost.Items.Clear();
-            for (int i = 0; i < Variables.MaxItems; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxItems; i++)
                 cmbCost.Items.Add($"{i + 1}: {Item.Instance[i].Name}");
             cmbCost.Value = 0;
         }

@@ -1,5 +1,5 @@
 ﻿using Core.Globals;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 
 namespace Client.Game.UI.Windows;
 

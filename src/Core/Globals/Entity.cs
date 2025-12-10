@@ -1,3 +1,4 @@
+using Core.Objects;
 using static Core.Globals.Type;
 
 namespace Core.Globals;
@@ -51,7 +52,7 @@ public class Entity
     public int[]? Vital { get; set; }
     public int[] Stat { get; set; } = Array.Empty<int>();
     public int Points { get; set; }
-    public PlayerEq[] Equipment { get; set; } = Array.Empty<PlayerEq>();
+    public Paperdoll[] Paperdoll { get; set; } = Array.Empty<Paperdoll>();
     public object[] Inv { get; set; } = Array.Empty<object>();
     public object[] PlayerSkill { get; set; } = Array.Empty<object>();
     public int Map { get; set; }
@@ -59,7 +60,7 @@ public class Entity
     public int Y { get; set; }
     public byte Dir { get; set; }
     public int Sprite { get; set; }
-    public int Exp { get; set; }
+    public int Experience { get; set; }
     public byte Access { get; set; }
     public object[] Hotbar { get; set; } = Array.Empty<object>();
     public byte[] Switches { get; set; } = Array.Empty<byte>();
@@ -72,7 +73,6 @@ public class Entity
     public int Emote { get; set; }
     public int EmoteTimer { get; set; }
     public int EventTimer { get; set; }
-    public object[] Quests { get; set; } = Array.Empty<object>();
     public int GuildId { get; set; }
     public int[] DropChance { get; set; } = Array.Empty<int>();
     public int[] DropItem { get; set; } = Array.Empty<int>();
@@ -106,7 +106,7 @@ public class Entity
         Raw = raw;
     }
 
-    public static Entity FromPlayer(int id, Player player)
+    public static Entity FromPlayer(int id, PlayerBase player)
     {
         return new Entity(EntityType.Player, id, player)
         {
@@ -116,13 +116,13 @@ public class Entity
             Job = player.Job,
             Sprite = player.Sprite,
             Level = player.Level,
-            Exp = player.Exp,
+            Experience = player.Experience,
             Access = player.Access,
             Vital = player.Vital,
             Stat = player.Stat,
             Points = player.Points,
-            Equipment = player.Equipment,
-            Inv = player.Inv != null ? Array.ConvertAll(player.Inv, x => (object) x) : new object[Core.Globals.Variables.MaxInv],
+            Paperdoll = player.Paperdoll,
+            Inv = player.Inventory != null ? Array.ConvertAll(player.Inventory, x => (object) x) : new object[Core.Globals.Variables.MaxInventory],
             PlayerSkill = player.Skill != null ? Array.ConvertAll(player.Skill, x => (object) x) : new object[Core.Globals.Variables.MaxSkills],
             Map = player.Map,
             X = player.X,
@@ -138,7 +138,6 @@ public class Entity
             Emote = player.Emote,
             EmoteTimer = player.EmoteTimer,
             EventTimer = player.EventTimer,
-            Quests = player.Quests != null ? Array.ConvertAll(player.Quests, x => (object) x) : new object[Core.Globals.Variables.MaxQuests],
             GuildId = player.GuildId,
             GatherSkills = player.GatherSkills
         };

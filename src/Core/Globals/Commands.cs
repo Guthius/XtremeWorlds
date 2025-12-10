@@ -1,150 +1,132 @@
-﻿namespace Core.Globals;
+﻿using Core.Objects;
 
-public static class Command
+namespace Core.Globals;
+
+public static class Commands
 {
     private static readonly int EquipmentCount = Enum.GetNames<Equipment>().Length;
 
-    public static string GetAccountLogin(int index)
+    public static int GetPlayerExperience(int index)
     {
-        return Data.Account[index].Login;
-    }
-
-    public static int GetPlayerExp(int index)
-    {
-        return Data.Player[index].Exp;
+        return PlayerBase.Instance[index].Experience;
     }
 
     public static int GetPlayerRawStat(int index, Stat stat)
     {
-        return Data.Player[index].Stat[(int)stat];
+        return PlayerBase.Instance[index].Stat[(int)stat];
     }
 
     public static string GetPlayerName(int index)
     {
-        return Data.Player[index].Name;
+        return PlayerBase.Instance[index].Name;
     }
 
-    public static int GetPlayerInvValue(int index, int invslot)
+    public static int GetPlayerInventoryValue(int index, int invslot)
     {
-        return Data.Player[index].Inv[invslot].Value;
+        return PlayerBase.Instance[index].Inventory[invslot].Value;
     }
 
     public static int GetPlayerPoints(int index)
     {
-        return Data.Player[index].Points;
+        return PlayerBase.Instance[index].Points;
     }
 
     public static int GetPlayerVital(int index, Vital vital)
     {
-        return Data.Player[index].Vital[(int)vital];
+        return PlayerBase.Instance[index].Vital[(int)vital];
     }
 
     public static int GetPlayerSprite(int index)
     {
-        return Data.Player[index].Sprite;
+        return PlayerBase.Instance[index].Sprite;
     }
 
     public static int GetPlayerJob(int index)
     {
-        return Data.Player[index].Job;
+        return PlayerBase.Instance[index].Job;
     }
 
     public static int GetPlayerMap(int index)
     {
-        return Data.Player[index].Map;
+        return PlayerBase.Instance[index].Map;
     }
 
     public static int GetPlayerLevel(int index)
     {
-        return Data.Player[index].Level;
+        return PlayerBase.Instance[index].Level;
     }
 
-    public static int GetPlayerEquipment(int index, Equipment equipmentSlot)
+    public static int GetPlayerPaperdoll(int index, Equipment equipmentSlot)
     {
-        return Data.Player[index].Equipment[(int)equipmentSlot].Num;
+        return PlayerBase.Instance[index].Paperdoll[(int)equipmentSlot].Num;
     }
 
     public static int GetPlayerSkill(int index, int skillSlot)
     {
-        return Data.Player[index].Skill[skillSlot].Num;
+        return PlayerBase.Instance[index].Skill[skillSlot].Num;
     }
 
     public static int GetPlayerSkillCd(int index, int skillSlot)
     {
-        return Data.Player[index].Skill[skillSlot].Cd;
-    }
-
-    public static void SetPlayerLogin(int index, string login)
-    {
-        Data.Account[index].Login = login;
-    }
-
-    public static string GetPlayerPassword(int index)
-    {
-        return Data.Account[index].Password;
-    }
-
-    public static void SetPlayerPassword(int index, string password)
-    {
-        Data.Account[index].Password = password;
+        return PlayerBase.Instance[index].Skill[skillSlot].Cd;
     }
 
     public static int GetPlayerStat(int index, Stat stat)
     {
-        int statValue = Data.Player[index].Stat[(int)stat];
+        int statValue = PlayerBase.Instance[index].Stat[(int)stat];
 
         return statValue;
     }
 
     public static byte GetPlayerAccess(int index)
     {
-        return Data.Player[index].Access;
+        return PlayerBase.Instance[index].Access;
     }
 
     public static int GetPlayerX(int index)
     {
-        return (int)Math.Floor((double)Data.Player[index].X / Constants.TileSize);
+        return (int)Math.Floor((double)PlayerBase.Instance[index].X / Constants.TileSize);
     }
 
     public static int GetPlayerY(int index)
     {
-        return (int)Math.Floor((double)Data.Player[index].Y / Constants.TileSize);
+        return (int)Math.Floor((double)PlayerBase.Instance[index].Y / Constants.TileSize);
     }
 
     public static int GetPlayerRawX(int index)
     {
-        return Data.Player[index].X;
+        return PlayerBase.Instance[index].X;
     }
 
     public static int GetPlayerRawY(int index)
     {
-        return Data.Player[index].Y;
+        return PlayerBase.Instance[index].Y;
     }
 
     public static byte GetPlayerDir(int index)
     {
-        return Data.Player[index].Dir;
+        return PlayerBase.Instance[index].Dir;
     }
 
     public static bool GetPlayerPk(int index)
     {
-        return Data.Player[index].Pk;
+        return PlayerBase.Instance[index].Pk;
     }
 
     public static void SetPlayerVital(int index, Vital vital, int value)
     {
-        Data.Player[index].Vital[(int)vital] = value;
+        PlayerBase.Instance[index].Vital[(int)vital] = value;
     }
 
     public static int GetPlayerMaxVital(int index, Vital vital)
     {
-        return Data.Player[index].MaxVital[(int)vital];
+        return PlayerBase.Instance[index].MaxVital[(int)vital];
     }
 
     public static int SetPlayerMaxVital(int index, Vital vital, int value)
     {
-        Data.Player[index].MaxVital[(int)vital] = value;
-        return Data.Player[index].MaxVital[(int)vital];
+        PlayerBase.Instance[index].MaxVital[(int)vital] = value;
+        return PlayerBase.Instance[index].MaxVital[(int)vital];
     }
 
     public static bool IsDirBlocked(byte blockvar, Direction dir)
@@ -173,17 +155,17 @@ public static class Command
 
     public static void SetPlayerGatherSkillLevel(int index, int skillSlot, int level)
     {
-        Data.Player[index].GatherSkills[skillSlot].SkillLevel = level;
+        PlayerBase.Instance[index].GatherSkills[skillSlot].SkillLevel = level;
     }
 
-    public static void SetPlayerGatherSkillExp(int index, int skillSlot, int exp)
+    public static void SetPlayerGatherSkillExperience(int index, int skillSlot, int exp)
     {
-        Data.Player[index].GatherSkills[skillSlot].SkillCurExp = exp;
+        PlayerBase.Instance[index].GatherSkills[skillSlot].SkillCurExp = exp;
     }
 
-    public static void SetPlayerGatherSkillMaxExp(int index, int skillSlot, int maxExp)
+    public static void SetPlayerGatherSkillMaxExperience(int index, int skillSlot, int maxExp)
     {
-        Data.Player[index].GatherSkills[skillSlot].SkillNextLevelExp = maxExp;
+        PlayerBase.Instance[index].GatherSkills[skillSlot].SkillNextLevelExp = maxExp;
     }
 
     public static string GetResourceSkillName(ResourceSkill skillNum)
@@ -218,102 +200,102 @@ public static class Command
 
     public static int GetPlayerGatherSkillLevel(int index, int skillSlot)
     {
-        return Data.Player[index].GatherSkills[skillSlot].SkillLevel;
+        return PlayerBase.Instance[index].GatherSkills[skillSlot].SkillLevel;
     }
 
-    public static int GetPlayerGatherSkillExp(int index, int skillSlot)
+    public static int GetPlayerGatherSkillExperience(int index, int skillSlot)
     {
-        return Data.Player[index].GatherSkills[skillSlot].SkillCurExp;
+        return PlayerBase.Instance[index].GatherSkills[skillSlot].SkillCurExp;
     }
 
-    public static int GetPlayerGatherSkillMaxExp(int index, int skillSlot)
+    public static int GetPlayerGatherSkillMaxExperience(int index, int skillSlot)
     {
-        return Data.Player[index].GatherSkills[skillSlot].SkillNextLevelExp;
+        return PlayerBase.Instance[index].GatherSkills[skillSlot].SkillNextLevelExp;
     }
 
     public static void SetPlayerMap(int index, int mapNum)
     {
-        Data.Player[index].Map = mapNum;
+        PlayerBase.Instance[index].Map = mapNum;
     }
 
-    public static int GetPlayerInv(int index, int invslot)
+    public static int GetPlayerInventory(int index, int invslot)
     {
-        return Data.Player[index].Inv[invslot].Num;
+        return PlayerBase.Instance[index].Inventory[invslot].Num;
     }
 
     public static void SetPlayerName(int index, string name)
     {
-        Data.Player[index].Name = name;
+        PlayerBase.Instance[index].Name = name;
     }
 
     public static void SetPlayerJob(int index, int jobNum)
     {
-        Data.Player[index].Job = (byte)jobNum;
+        PlayerBase.Instance[index].Job = (byte)jobNum;
     }
 
     public static void SetPlayerPoints(int index, int points)
     {
-        Data.Player[index].Points = (byte)points;
+        PlayerBase.Instance[index].Points = (byte)points;
     }
 
     public static void SetPlayerStat(int index, Stat stat, int value)
     {
-        Data.Player[index].Stat[(int)stat] = (byte)value;
+        PlayerBase.Instance[index].Stat[(int)stat] = (byte)value;
     }
 
-    public static void SetPlayerInv(int index, int invSlot, int itemNum)
+    public static void SetInventory(int index, int invSlot, int itemNum)
     {
-        Data.Player[index].Inv[invSlot].Num = itemNum;
+        PlayerBase.Instance[index].Inventory[invSlot].Num = itemNum;
     }
 
-    public static void SetPlayerInvValue(int index, int invslot, int itemValue)
+    public static void SetInventoryValue(int index, int invslot, int itemValue)
     {
-        Data.Player[index].Inv[invslot].Value = itemValue;
+        PlayerBase.Instance[index].Inventory[invslot].Value = itemValue;
     }
 
     public static void SetPlayerAccess(int index, byte access)
     {
-        Data.Player[index].Access = access;
+        PlayerBase.Instance[index].Access = access;
     }
 
     public static void SetPlayerPk(int index, bool pk)
     {
-        Data.Player[index].Pk = pk;
+        PlayerBase.Instance[index].Pk = pk;
     }
 
     public static void SetPlayerX(int index, int x)
     {
-        Data.Player[index].X = x;
+        PlayerBase.Instance[index].X = x;
     }
 
     public static void SetPlayerY(int index, int y)
     {
-        Data.Player[index].Y = y;
+        PlayerBase.Instance[index].Y = y;
     }
 
     public static void SetPlayerSprite(int index, int sprite)
     {
-        Data.Player[index].Sprite = sprite;
+        PlayerBase.Instance[index].Sprite = sprite;
     }
 
-    public static void SetPlayerExp(int index, int exp)
+    public static void SetPlayerExperience(int index, int experience)
     {
-        Data.Player[index].Exp = exp;
+        PlayerBase.Instance[index].Experience = experience;
     }
 
     public static void SetPlayerLevel(int index, int level)
     {
-        Data.Player[index].Level = (byte)level;
+        PlayerBase.Instance[index].Level = (byte)level;
     }
 
     public static void SetPlayerDir(int index, int dir)
     {
-        Data.Player[index].Dir = (byte)dir;
+        PlayerBase.Instance[index].Dir = (byte)dir;
     }
 
-    public static void SetPlayerEquipment(int index, int itemNum, Equipment equipmentSlot)
+    public static void SetPlayerPaperdoll(int index, int itemNum, Equipment equipmentSlot)
     {
-        Data.Player[index].Equipment[(int)equipmentSlot].Num = itemNum;
+        PlayerBase.Instance[index].Paperdoll[(int)equipmentSlot].Num = itemNum;
     }
 
     public static string IsEditorLocked(int index, EditorType id)
@@ -351,7 +333,7 @@ public static class Command
 
     public static void SetPlayerSkillCd(int index, int skillSlot, int value)
     {
-        Data.Player[index].Skill[skillSlot].Cd = value;
+        PlayerBase.Instance[index].Skill[skillSlot].Cd = value;
     }
 
     public static bool HasSkill(int index, double skillNum)
@@ -369,26 +351,26 @@ public static class Command
 
     public static void SetPlayerSkill(int index, int skillslot, int skillNum)
     {
-        Data.Player[index].Skill[skillslot].Num = skillNum;
+        PlayerBase.Instance[index].Skill[skillslot].Num = skillNum;
     }
 
     public static int GetBank(int index, int bankslot)
     {
-        return Data.Bank[index].Item[bankslot].Num;
+        return Bank.Instance[index].Item[bankslot].Num;
     }
 
     public static void SetBank(int index, byte bankSlot, int itemNum)
     {
-        Data.Bank[index].Item[bankSlot].Num = itemNum;
+        Bank.Instance[index].Item[bankSlot].Num = itemNum;
     }
 
     public static int GetBankValue(int index, int bankSlot)
     {
-        return Data.Bank[index].Item[bankSlot].Value;
+        return Bank.Instance[index].Item[bankSlot].Value;
     }
 
     public static void SetBankValue(int index, byte bankSlot, int itemValue)
     {
-        Data.Bank[index].Item[bankSlot].Value = itemValue;
+        Bank.Instance[index].Item[bankSlot].Value = itemValue;
     }
 }

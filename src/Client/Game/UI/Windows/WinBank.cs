@@ -1,7 +1,7 @@
 ﻿using Client.Net;
 using Core.Globals;
 using System.IO;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 
 namespace Client.Game.UI.Windows;
 
@@ -57,7 +57,7 @@ public class WinBank
         for (var slot = 0; slot < Variables.MaxBank; slot++)
         {
             var itemNum = GetBank(GameState.MyIndex, slot);
-            if (itemNum < 0 || itemNum >= Variables.MaxItems)
+            if (itemNum < 0 || itemNum >= Core.Globals.Variables.MaxItems)
             {
                 continue;
             }

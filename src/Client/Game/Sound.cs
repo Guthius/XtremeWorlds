@@ -3,7 +3,7 @@ using System.IO;
 using Core;
 using Core.Configurations;
 using Core.Globals;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 using ManagedBass;
 using ManagedBass.Midi;
 
@@ -309,8 +309,8 @@ namespace Client
                     x = 0;
                 if (y == -1)
                     y = 0;
-                x1 = Data.Player[GameState.MyIndex].X;
-                y1 = Data.Player[GameState.MyIndex].Y;
+                x1 = Player.Instance[GameState.MyIndex].X;
+                y1 = Player.Instance[GameState.MyIndex].Y;
                 x2 = x * 32;
                 y2 = y * 32;
 

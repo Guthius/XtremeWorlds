@@ -30,7 +30,7 @@ public class WinItemEditor
         {
             sldIcon.CallBack[(int)ControlState.MouseMove] = () =>
             {
-                if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
+                if (SelectedIndex < 0 || SelectedIndex >= Core.Globals.Variables.MaxItems) return;
                 Item.Instance[SelectedIndex].Icon = (short)Math.Clamp(sldIcon.Value, sldIcon.Min, sldIcon.Max);
                 Item.IsChanged[SelectedIndex] = true;
             };
@@ -39,7 +39,7 @@ public class WinItemEditor
         {
             sldPd.CallBack[(int)ControlState.MouseMove] = () =>
             {
-                if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
+                if (SelectedIndex < 0 || SelectedIndex >= Core.Globals.Variables.MaxItems) return;
                 Item.Instance[SelectedIndex].Paperdoll = (short)Math.Clamp(sldPd.Value, sldPd.Min, sldPd.Max);
                 // keep textbox in sync if present
                 if (WindowManager.TryGetControl("winItemEditor", "txtItemPaperdoll", out var pdCtrl) && pdCtrl is TextBox txtPd)
@@ -53,7 +53,7 @@ public class WinItemEditor
         {
             cmbType.CallBack[(int)ControlState.MouseMove] = () =>
             {
-                if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
+                if (SelectedIndex < 0 || SelectedIndex >= Core.Globals.Variables.MaxItems) return;
                 Item.Instance[SelectedIndex].Type = (byte)Math.Clamp(cmbType.Value, 0, byte.MaxValue);
                 BuildSubtypeList();
                 ToggleTypeSections();
@@ -68,7 +68,7 @@ public class WinItemEditor
         {
             chkStack.CallBack[(int)ControlState.MouseDown] = () =>
             {
-                if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
+                if (SelectedIndex < 0 || SelectedIndex >= Core.Globals.Variables.MaxItems) return;
                 // Toggle value locally then push to Data
                 chkStack.Value = chkStack.Value == 0 ? 1 : 0;
                 Item.Instance[SelectedIndex].Stackable = chkStack.Value != 0 ? (byte)1 : (byte)0;
@@ -81,7 +81,7 @@ public class WinItemEditor
         {
             chkKb.CallBack[(int)ControlState.MouseDown] = () =>
             {
-                if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
+                if (SelectedIndex < 0 || SelectedIndex >= Core.Globals.Variables.MaxItems) return;
                 chkKb.Value = chkKb.Value == 0 ? 1 : 0;
                 Item.Instance[SelectedIndex].KnockBack = chkKb.Value != 0 ? (byte)1 : (byte)0;
                 Item.IsChanged[SelectedIndex] = true;
@@ -93,7 +93,7 @@ public class WinItemEditor
         {
             cmbKbTiles.CallBack[(int)ControlState.MouseMove] = () =>
             {
-                if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
+                if (SelectedIndex < 0 || SelectedIndex >= Core.Globals.Variables.MaxItems) return;
                 Item.Instance[SelectedIndex].KnockBackTiles = (byte)Math.Clamp(cmbKbTiles.Value, 0, byte.MaxValue);
                 Item.IsChanged[SelectedIndex] = true;
             };
@@ -535,7 +535,7 @@ public class WinItemEditor
     {
         var win = WindowManager.GetWindowByName("winItemEditor");
         if (win is null) return;
-        if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
+        if (SelectedIndex < 0 || SelectedIndex >= Core.Globals.Variables.MaxItems) return;
         var item = Item.Instance[SelectedIndex];
         if (item.Paperdoll < 1 || item.Paperdoll > GameState.NumPaperdolls) return;
         if (!WindowManager.TryGetControl("winItemEditor", "picPaperdoll", out var ctrl) || ctrl is not PictureBox pic)
@@ -561,7 +561,7 @@ public class WinItemEditor
         if (win is null) return;
         int relY = GameState.CurMouseY - (win.Y + ctrl.Y);
         int index = list.GetItemIndexAtPosition(relY);
-        if (index < 0 || index >= Variables.MaxItems) return;
+        if (index < 0 || index >= Core.Globals.Variables.MaxItems) return;
         SelectedIndex = index;
         GameState.EditorIndex = index;
         list.SelectedIndex = index;
@@ -571,7 +571,7 @@ public class WinItemEditor
 
     public static void OnCopyOrPaste()
     {
-        if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxItems) return;
+        if (SelectedIndex < 0 || SelectedIndex >= Core.Globals.Variables.MaxItems) return;
 
         if (_history is null)
         {

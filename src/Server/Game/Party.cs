@@ -1,6 +1,6 @@
 ﻿using Core.Globals;
 using Server.Game;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 
 namespace Server;
 
@@ -318,8 +318,8 @@ public static class Party
         if (!(exp >= Data.Party[partyNum].MemberCount))
         {
             // no party - keep exp for self
-            SetPlayerExp(index, GetPlayerExp(index) + exp);
-            NetworkSend.SendExp(index);
+            SetPlayerExperience(index, GetPlayerExperience(index) + exp);
+            NetworkSend.SendExperience(index);
             return;
         }
 
@@ -366,7 +366,7 @@ public static class Party
                     if (GetPlayerMap(tmpindex) == mapNum)
                     {
                         // give them their share
-                        SetPlayerExp(tmpindex, GetPlayerExp(tmpindex) + expShare);
+                        SetPlayerExperience(tmpindex, GetPlayerExperience(tmpindex) + expShare);
                     }
                 }
             }
@@ -378,7 +378,7 @@ public static class Party
             tmpindex = Data.Party[partyNum]
                 .Member[(int)Math.Round(General.GetRandom.NextDouble(1d, Data.Party[partyNum].MemberCount))];
             // give the exp
-            SetPlayerExp(tmpindex, GetPlayerExp(tmpindex) + leftOver);
+            SetPlayerExperience(tmpindex, GetPlayerExperience(tmpindex) + leftOver);
         }
     }
 

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using static Core.Globals.Commands;
 
 namespace Server
 {
@@ -34,22 +35,22 @@ namespace Server
             Data.MapResource[mapNum].ResourceCount = resourceCount;
         }
 
-        public static void CheckLevelUp(int playerId, int skillSlot)
+        public static void OnLevel(int playerId, int skillSlot)
         {
             var levels = 0;
 
-            if (Command.GetPlayerGatherSkillLevel(playerId, skillSlot) == Script.Instance?.MaxLevel)
+            if (GetPlayerGatherSkillLevel(playerId, skillSlot) == Script.Instance?.MaxLevel)
             {
                 return;
             }
 
-            while (Command.GetPlayerGatherSkillExp(playerId, skillSlot) >= Command.GetPlayerGatherSkillMaxExp(playerId, skillSlot))
+            while (GetPlayerGatherSkillExperience(playerId, skillSlot) >= GetPlayerGatherSkillMaxExperience(playerId, skillSlot))
             {
-                var expRollover = Command.GetPlayerGatherSkillExp(playerId, skillSlot) - Command.GetPlayerGatherSkillMaxExp(playerId, skillSlot);
+                var expRollover = GetPlayerGatherSkillExperience(playerId, skillSlot) - GetPlayerGatherSkillMaxExperience(playerId, skillSlot);
 
-                Command.SetPlayerGatherSkillLevel(playerId, skillSlot, Command.GetPlayerGatherSkillLevel(playerId, skillSlot) + 1);
-                Command.SetPlayerGatherSkillExp(playerId, skillSlot, expRollover);
-                Command.SetPlayerGatherSkillMaxExp(playerId, skillSlot, (int)Command.GetSkillNextLevel(playerId, skillSlot));
+                SetPlayerGatherSkillLevel(playerId, skillSlot, GetPlayerGatherSkillLevel(playerId, skillSlot) + 1);
+                SetPlayerGatherSkillExperience(playerId, skillSlot, expRollover);
+                SetPlayerGatherSkillMaxExperience(playerId, skillSlot, (int)GetSkillNextLevel(playerId, skillSlot));
 
                 levels++;
             }
@@ -60,15 +61,15 @@ namespace Server
             }
 
             NetworkSend.SendPlayerMessage(playerId, levels == 1
-                ? $"Your {Command.GetResourceSkillName((ResourceSkill)skillSlot)} has gone up a level!"
-                : $"Your {Command.GetResourceSkillName((ResourceSkill)skillSlot)} has gone up by {levels} levels!", (int)ColorName.BrightGreen);
+                ? $"Your {GetResourceSkillName((ResourceSkill)skillSlot)} has gone up a level!"
+                : $"Your {GetResourceSkillName((ResourceSkill)skillSlot)} has gone up by {levels} levels!", (int)ColorName.BrightGreen);
 
             NetworkSend.SendPlayerData(playerId);
         }
 
         public static void OnUpdate(int playerId, int x, int y)
         {
-            var mapNum = Command.GetPlayerMap(playerId);
+            var mapNum = GetPlayerMap(playerId);
 
             if (x < 0 || y < 0 || x >= Data.Map[mapNum].MaxX || y >= Data.Map[mapNum].MaxY)
             {
@@ -99,13 +100,13 @@ namespace Server
                 return;
             }
 
-            if (Command.GetPlayerEquipment(playerId, Equipment.Weapon) < 0 && Resource.Instance[resourceIndex].ToolRequired != 0)
+            if (GetPlayerPaperdoll(playerId, Equipment.Weapon) < 0 && Resource.Instance[resourceIndex].ToolRequired != 0)
             {
                 NetworkSend.SendPlayerMessage(playerId, "You need a tool to gather this resource.", (int)ColorName.Yellow);
                 return;
             }
 
-            if (Item.Instance[Command.GetPlayerEquipment(playerId, Equipment.Weapon)].Data3 != Resource.Instance[resourceIndex].ToolRequired)
+            if (Item.Instance[GetPlayerPaperdoll(playerId, Equipment.Weapon)].Data3 != Resource.Instance[resourceIndex].ToolRequired)
             {
                 NetworkSend.SendPlayerMessage(playerId, "You have the wrong type of tool equiped.", (int)ColorName.Yellow);
                 return;
@@ -120,7 +121,7 @@ namespace Server
                 }
             }
 
-            if (Resource.Instance[resourceIndex].LvlRequired > Command.GetPlayerGatherSkillLevel(playerId, resourceType))
+            if (Resource.Instance[resourceIndex].LvlRequired > GetPlayerGatherSkillLevel(playerId, resourceType))
             {
                 NetworkSend.SendPlayerMessage(playerId, "Your level is too low!", (int)ColorName.Yellow);
                 return;
@@ -128,7 +129,7 @@ namespace Server
 
             if (Data.MapResource[mapNum].ResourceData[resourceNum].State != 0)
             {
-                NetworkSend.SendActionMessage(mapNum, Resource.Instance[resourceIndex].EmptyMessage, (int)ColorName.BrightRed, 1, Command.GetPlayerX(playerId) * 32, Command.GetPlayerY(playerId) * 32);
+                NetworkSend.SendActionMessage(mapNum, Resource.Instance[resourceIndex].EmptyMessage, (int)ColorName.BrightRed, 1, GetPlayerX(playerId) * 32, GetPlayerY(playerId) * 32);
                 return;
             }
 
@@ -138,11 +139,11 @@ namespace Server
             int damage;
             if (Resource.Instance[resourceIndex].ToolRequired == 0)
             {
-                damage = 1 * Command.GetPlayerGatherSkillLevel(playerId, resourceType);
+                damage = 1 * GetPlayerGatherSkillLevel(playerId, resourceType);
             }
             else
             {
-                damage = Item.Instance[Command.GetPlayerEquipment(playerId, Equipment.Weapon)].Data2;
+                damage = Item.Instance[GetPlayerPaperdoll(playerId, Equipment.Weapon)].Data2;
             }
 
             if (damage <= 0)
@@ -165,16 +166,16 @@ namespace Server
 
             NetworkSend.SendMapResourceToMap(mapNum);
 
-            NetworkSend.SendActionMessage(mapNum, Resource.Instance[resourceIndex].SuccessMessage, (int)ColorName.BrightGreen, 1, Command.GetPlayerX(playerId) * 32, Command.GetPlayerY(playerId) * 32);
+            NetworkSend.SendActionMessage(mapNum, Resource.Instance[resourceIndex].SuccessMessage, (int)ColorName.BrightGreen, 1, GetPlayerX(playerId) * 32, GetPlayerY(playerId) * 32);
             Player.GiveInv(playerId, Resource.Instance[resourceIndex].ItemReward, 1);
             NetworkSend.SendAnimation(mapNum, Resource.Instance[resourceIndex].Animation, resourceX, resourceY);
 
-            Command.SetPlayerGatherSkillExp(playerId, resourceType, Command.GetPlayerGatherSkillExp(playerId, resourceType) + Resource.Instance[resourceIndex].ExpReward);
+            SetPlayerGatherSkillExperience(playerId, resourceType, GetPlayerGatherSkillExperience(playerId, resourceType) + Resource.Instance[resourceIndex].ExperienceReward);
 
-            NetworkSend.SendPlayerMessage(playerId, $"Your {Command.GetResourceSkillName((ResourceSkill)resourceType)} has earned {Resource.Instance[resourceIndex].ExpReward} experience. ({Command.GetPlayerGatherSkillExp(playerId, resourceType)}/{Command.GetPlayerGatherSkillMaxExp(playerId, resourceType)})", (int)ColorName.BrightGreen);
+            NetworkSend.SendPlayerMessage(playerId, $"Your {GetResourceSkillName((ResourceSkill)resourceType)} has earned {Resource.Instance[resourceIndex].ExperienceReward} experience. ({GetPlayerGatherSkillExperience(playerId, resourceType)}/{GetPlayerGatherSkillMaxExperience(playerId, resourceType)})", (int)ColorName.BrightGreen);
             NetworkSend.SendPlayerData(playerId);
 
-            MapResource.CheckLevelUp(playerId, resourceType);
+            MapResource.OnLevel(playerId, resourceType);
         }
     }
 }

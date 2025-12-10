@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 using Server.Game;
 using Server.Game.Net;
 using Server.Net;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 using static Core.Net.Packets;
 using Type = Core.Globals.Type;
 
@@ -36,12 +36,12 @@ public class Resource : ResourceBase, IAsyncData
         await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxResources), Resource.OnLoadAsync);
     }
 
-    public static async ValueTask OnLoadAsync(int resourceNum, CancellationToken cancellationToken)
+    public static async ValueTask OnLoadAsync(int index, CancellationToken cancellationToken)
     {
-        var data = await Database.SelectRowAsync(resourceNum, "resource", "data");
+        var data = await Database.SelectRowAsync(index, "resource", "data");
         if (data is null)
         {
-            OnClear(resourceNum);
+            OnClear(index);
             return;
         }
 

@@ -7,7 +7,7 @@ using Core.Net;
 using Server.Game;
 using Server.Game.Net;
 using Server.Net;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 using static Core.Net.Packets;
 using static Core.Globals.Type;
 using EventCommand = Core.Globals.EventCommand;

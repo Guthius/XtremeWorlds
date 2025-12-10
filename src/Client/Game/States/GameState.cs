@@ -50,16 +50,16 @@ namespace Client
         public static Type.Text[]? Description;
 
         // New char
-        public static int NewCharSprite;
+        public static int NewCharactersprite;
         public static int NewCharJob;
         public static Sex NewCnarGender;
 
-        // chars
-        public static string?[] CharName = new string?[Variables.MaxChars];
-        public static long[] CharSprite = new long[(Variables.MaxChars)];
-        public static long[] CharAccess = new long[(Variables.MaxChars)];
-        public static long[] CharJob = new long[(Variables.MaxChars)];
-        public static long[,] CharEq = new long[Variables.MaxChars, Enum.GetValues<Equipment>().Length];
+        // Characters
+        public static string?[] CharName = new string?[Variables.MaxCharacters];
+        public static long[] Charactersprite = new long[(Variables.MaxCharacters)];
+        public static long[] CharAccess = new long[(Variables.MaxCharacters)];
+        public static long[] CharJob = new long[(Variables.MaxCharacters)];
+        public static long[,] CharEq = new long[Variables.MaxCharacters, Enum.GetValues<Equipment>().Length];
         public static byte CharNum;
 
         // elastic bars
@@ -218,7 +218,7 @@ namespace Client
         public static int Ping;
 
         // Indexing
-        public static byte ActionMsgIndex;
+        public static byte ActionMessageIndex;
         public static byte BloodIndex;
 
     public static byte[]? TempMapData;

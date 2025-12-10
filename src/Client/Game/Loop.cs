@@ -5,7 +5,7 @@ using Client.Game.UI.Controls;
 using Client.Net;
 using Core.Configurations;
 using Core.Globals;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 using Type = Core.Globals.Type;
 
 namespace Client
@@ -144,13 +144,13 @@ namespace Client
                 {
                     for (_i = 0; _i < Variables.MaxPlayerSkills; _i++)
                     {
-                        if (Data.Player[GameState.MyIndex].Skill[_i].Num >= 0)
+                        if (Player.Instance[GameState.MyIndex].Skill[_i].Num >= 0)
                         {
-                            if (Data.Player[GameState.MyIndex].Skill[_i].Cd > 0)
+                            if (Player.Instance[GameState.MyIndex].Skill[_i].Cd > 0)
                             {
-                                if (Data.Player[GameState.MyIndex].Skill[_i].Cd + Data.Skill[(int)Data.Player[GameState.MyIndex].Skill[_i].Num].CdTime * 1000 < _tick)
+                                if (Player.Instance[GameState.MyIndex].Skill[_i].Cd + Data.Skill[(int)Player.Instance[GameState.MyIndex].Skill[_i].Num].CdTime * 1000 < _tick)
                                 {
-                                    Data.Player[GameState.MyIndex].Skill[_i].Cd = 0;
+                                    Player.Instance[GameState.MyIndex].Skill[_i].Cd = 0;
                                 }
                             }
                         }
@@ -160,7 +160,7 @@ namespace Client
                 // check if we need to unlock the player's skill casting restriction
                 if (GameState.SkillBuffer >= 0)
                 {
-                    if (GameState.SkillBufferTimer + Data.Skill[(int)Data.Player[GameState.MyIndex].Skill[GameState.SkillBuffer].Num].CastTime * 1000 < _tick)
+                    if (GameState.SkillBufferTimer + Data.Skill[(int)Player.Instance[GameState.MyIndex].Skill[GameState.SkillBuffer].Num].CastTime * 1000 < _tick)
                     {
                         GameState.SkillBuffer = -1;
                         GameState.SkillBufferTimer = 0;
@@ -357,7 +357,7 @@ namespace Client
                         if (!IsPlaying(i)) continue;
                         if (GetPlayerMap(i) != GetPlayerMap(GameState.MyIndex)) continue;
                         // Always advance Steps (used modulo by idle/run frame counts in draw)
-                        unchecked { Data.Player[i].Steps++; } // byte wraps automatically
+                        unchecked { Player.Instance[i].Steps++; } // byte wraps automatically
                     }
 
                     for (int i = 0; i < Variables.MaxMapNpcs; i++)

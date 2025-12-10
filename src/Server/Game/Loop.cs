@@ -1,8 +1,9 @@
-﻿using Core;
+﻿using System.Threading.Tasks;
+using Core;
 using Core.Globals;
 using Microsoft.Extensions.Logging;
 using Server.Game;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 
 namespace Server;
 
@@ -39,9 +40,9 @@ public static class Loop
             {
                 foreach (var player in PlayerService.Instance.Players)
                 {
-                    if (Data.Player[player.Id].Moving > 0)
+                    if (Player.Instance[player.Id].Moving > 0)
                     {
-                        Player.OnMove(player.Id, Data.Player[player.Id].Dir, Data.Player[player.Id].Moving, false);
+                        Player.OnMove(player.Id, Player.Instance[player.Id].Dir, Player.Instance[player.Id].Moving, false);
                     }
                 }
 
@@ -130,7 +131,7 @@ public static class Loop
         }
     }
 
-    private static void UpdateSavePlayers()
+    private static async Task UpdateSavePlayers()
     {
         var players = PlayerService.Instance.Players.ToList();
         if (players.Count == 0)
@@ -142,8 +143,7 @@ public static class Loop
 
         foreach (var player in players)
         {
-            Database.SaveCharacter(player.Id, Data.TempPlayer[player.Id].Slot);
-            Database.SaveBank(player.Id);
+            await Account.OnSave(player.Id);
         }
     }
 
@@ -196,12 +196,12 @@ public static class Loop
             // Add Players
             foreach (var i in PlayerService.Instance.Players)
             {
-                if (Data.Player[i.Id].Map != mapNum)
+                if (Player.Instance[i.Id].Map != mapNum)
                 {
                     continue;
                 }
 
-                var player = Entity.FromPlayer(i.Id, Data.Player[i.Id]);
+                var player = Entity.FromPlayer(i.Id, Player.Instance[i.Id]);
                 if (!IsPlaying(i.Id))
                 {
                     continue;
@@ -232,8 +232,8 @@ public static class Loop
                 if (slot >= 0)
                 {
                     int skillId = -1;
-                    if (Data.Player[entity.Id].Skill != null && slot < Data.Player[entity.Id].Skill.Length)
-                        skillId = Data.Player[entity.Id].Skill[slot].Num;
+                    if (Player.Instance[entity.Id].Skill != null && slot < Player.Instance[entity.Id].Skill.Length)
+                        skillId = Player.Instance[entity.Id].Skill[slot].Num;
                     int castMs = (skillId >= 0 && skillId < Data.Skill.Length) ? Data.Skill[skillId].CastTime * 1000 : 0;
                     if (nowMsBuff > Data.TempPlayer[entity.Id].SkillBufferTimer + castMs)
                     {
@@ -395,7 +395,7 @@ public static class Loop
                             }
                             else
                             {
-                                var targetEntity = Core.Globals.Entity.FromPlayer(pid, Data.Player[pid]);
+                                var targetEntity = Core.Globals.Entity.FromPlayer(pid, Player.Instance[pid]);
                                 targetEntity.Map = mapNum;
                                 // NPC skills: select a valid skill and cast it directly; otherwise do a basic attack
                                 bool didCast = false;
@@ -419,7 +419,7 @@ public static class Loop
                                             ref var baseNpc = ref npcArr[entity.Id];
                                             bool cdReady = baseNpc.SkillCd == null || slot >= baseNpc.SkillCd.Length || baseNpc.SkillCd[slot] <= nowMs;
                                             if (!cdReady) continue;
-                                            if (entity.Vital == null || entity.Vital.Length <= (int)Vital.Mana || entity.Vital[(int)Vital.Mana] < sk.MpCost) continue;
+                                            if (entity.Vital == null || entity.Vital.Length <= (int)Core.Globals.Vital.Mana || entity.Vital[(int)Core.Globals.Vital.Mana] < sk.MpCost) continue;
                                             Script.Instance?.CastSkill(mapNum, entity, sid);
                                             didCast = true;
                                             break;
@@ -490,7 +490,7 @@ public static class Loop
                                                 ref var baseNpc2 = ref npcArr[entity.Id];
                                                 bool cdReady2 = baseNpc2.SkillCd == null || slot2 >= baseNpc2.SkillCd.Length || baseNpc2.SkillCd[slot2] <= nowMs2;
                                                 if (!cdReady2) continue;
-                                                if (entity.Vital == null || entity.Vital.Length <= (int)Vital.Mana || entity.Vital[(int)Vital.Mana] < sk2.MpCost) continue;
+                                                if (entity.Vital == null || entity.Vital.Length <= (int)Core.Globals.Vital.Mana || entity.Vital[(int)Core.Globals.Vital.Mana] < sk2.MpCost) continue;
                                                 Script.Instance?.CastSkill(mapNum, entity, sid2);
                                                 didCast2 = true;
                                                 break;
@@ -519,11 +519,11 @@ public static class Loop
 
                 // Simplified death/spawn handling (entity is non-null here)
 #pragma warning disable CS8602
-                if (vitals != null && vitals[(byte)Vital.Health] < 0 && entity.SpawnWait > 0)
+                if (vitals != null && vitals[(byte)Core.Globals.Vital.Health] < 0 && entity.SpawnWait > 0)
                 {
                     entity.Num = 0;
                     entity.SpawnWait = General.GetTimeMs();
-                    vitals[(byte)Vital.Health] = 0;
+                    vitals[(byte)Core.Globals.Vital.Health] = 0;
                 }
 #pragma warning restore CS8602
 
@@ -677,6 +677,7 @@ public static class Loop
             }
 
             // Respawn resources
+            if (Data.MapResource == null || mapNum < 0 || mapNum >= Data.MapResource.Length) continue;
             var mapResource = Data.MapResource[mapNum];
             if (mapResource.ResourceCount > 0)
             {

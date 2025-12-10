@@ -220,6 +220,6 @@ public class WinJobs
     public static void OnClose()
     {
         WindowManager.HideWindows();
-        WindowManager.ShowWindow("winChars");
+        WindowManager.ShowWindow("WinCharacters");
     }
 }

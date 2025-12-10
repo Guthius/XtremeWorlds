@@ -5,7 +5,7 @@ using Core.Globals;
 using Core.Interfaces;
 using Core.Net;
 using Core.Objects;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 using Point = Microsoft.Xna.Framework.Point;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using Type = Core.Globals.Type;

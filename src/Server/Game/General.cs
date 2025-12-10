@@ -13,7 +13,7 @@ using Server.Game;
 using XtremeWorlds.Server.Configuration;
 using XtremeWorlds.Server.Database;
 using static Core.Globals.Type;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 using Type = Core.Globals.Type;
 
 namespace Server;
@@ -54,15 +54,15 @@ public static class General
             ?.ToString() ?? "127.0.0.1";
     }
 
-    public static int IsValidUsername(string username)
+    public static int IsValidLogin(string login)
     {
-        if (string.IsNullOrWhiteSpace(username))
+        if (string.IsNullOrWhiteSpace(login))
             return -1;
 
-        if (username.Length < Variables.MinimumNameLength || username.Length > Variables.NameLength)
+        if (login.Length < Variables.MinimumNameLength || login.Length > Variables.NameLength)
             return 0;
 
-        return Regex.IsMatch(username, @"^[a-zA-Z0-9_ ]+$") ? 1 : -1;
+        return Regex.IsMatch(login, @"^[a-zA-Z0-9_ ]+$") ? 1 : -1;
     }
 
     public static async System.Threading.Tasks.Task InitServerAsync(IConfiguration configuration)
@@ -124,7 +124,7 @@ public static class General
         
         for (var i = 0; i < Variables.MaxPlayers; i++)
         {
-            Database.ClearPlayer(i);
+            Account.OnClear(i);
         }
 
         for (var i = 0; i < Variables.MaxPartyMembers; i++)
@@ -183,7 +183,7 @@ public static class General
             await Parallel.ForEachAsync(Enumerable.Range(0, Variables.MaxPlayers), Cts.Token, async (i, _) =>
             {
                 NetworkSend.SendLeftGame(i);
-                await Player.LeftGame(i);
+                await Player.OnExit(i);
             });
         }
         catch (TaskCanceledException)
@@ -265,7 +265,7 @@ public static class General
             await semaphore.WaitAsync(Cts.Token);
             try
             {
-                for (var i = 0; i < Variables.MaxChars; i++)
+                for (var i = 0; i < Variables.MaxCharacters; i++)
                 {
                     var data = await Database.SelectRowByColumnAsync("id", id, "account", $"character{i + 1}");
                     if (data != null)
@@ -513,7 +513,7 @@ public static class General
                 // SetPlayerAccess implementation stub
                 void SetPlayerAccess(int id, byte lvl)
                 {
-                    Data.Player[id].Access = lvl;
+                    Player.Instance[id].Access = lvl;
                 }
 
                 switch (access)
@@ -558,8 +558,8 @@ public static class General
 
             case "/ban":
             {
-                Data.Account[playerIndex].Banned = true;
-                var task = Player.LeftGame(playerIndex);
+                Account.Instance[playerIndex].Banned = true;
+                var task = Player.OnExit(playerIndex);
                 task.Wait();
                 Console.WriteLine($"Player {GetPlayerName(playerIndex)} has been banned by the server.");
                         
@@ -590,7 +590,7 @@ public static class General
     {
         try
         {               
-            ref var player = ref Data.Player[playerIndex];
+            var player = Player.Instance[playerIndex];
 
             if (x < 0 || x >= Data.Map[player.Map].MaxX || y < 0 || y >= Data.Map[player.Map].MaxY)
             {
@@ -618,7 +618,7 @@ public static class General
             if (NetworkConfig.IsPlaying(playerIndex))
             {
                 NetworkSend.SendLeftGame(playerIndex);
-                await Player.LeftGame(playerIndex);
+                await Player.OnExit(playerIndex);
                 Logger.LogInformation($"Player {playerIndex} kicked by server!");
                 NetworkSend.SendPlayerMessage(playerIndex, $"Player {playerIndex} has been kicked.", (int)ColorName.BrightGreen);
             }
@@ -715,7 +715,7 @@ public static class General
     {
         try
         {
-            await Database.SaveAccountAsync(playerIndex); // Assuming this method exists
+            await Account.OnSave(playerIndex); // Assuming this method exists
             NetworkSend.SendPlayerMessage(playerIndex, "Your data has been saved.", (int)ColorName.BrightGreen);
             Logger.LogInformation($"Player {playerIndex} data saved manually.");
         }
@@ -730,7 +730,7 @@ public static class General
     {
         for (var i = 0; i < Variables.MaxPlayers; i++)
         {
-            if (NetworkConfig.IsPlaying(i) && Data.Player[i].Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+            if (NetworkConfig.IsPlaying(i) && Player.Instance[i].Name.Equals(name, StringComparison.OrdinalIgnoreCase))
             {
                 return System.Threading.Tasks.Task.FromResult(i);
             }
@@ -751,15 +751,15 @@ public static class General
             if (channel.StartsWith("private:"))
             {
                 var targetIndex = int.Parse(channel.Split(':')[1]);
-                NetworkSend.SendPlayerMessage(targetIndex, $"[From {Data.Player[senderIndex].Name}] {message}", (int)color);
-                NetworkSend.SendPlayerMessage(senderIndex, $"[To {Data.Player[targetIndex].Name}] {message}", (int)color);
+                NetworkSend.SendPlayerMessage(targetIndex, $"[From {Player.Instance[senderIndex].Name}] {message}", (int)color);
+                NetworkSend.SendPlayerMessage(senderIndex, $"[To {Player.Instance[targetIndex].Name}] {message}", (int)color);
             }
             else if (channel == "party" && Data.TempPlayer[senderIndex].InParty != 0)
             {
                 await Parallel.ForEachAsync(Enumerable.Range(0, Variables.MaxPlayers), Cts.Token, (i, _) =>
                 {
                     if (NetworkConfig.IsPlaying(i) && Data.TempPlayer[i].InParty == Data.TempPlayer[senderIndex].InParty)
-                        NetworkSend.SendPlayerMessage(i, $"[Party] {Data.Player[senderIndex].Name}: {message}", (int)color);
+                        NetworkSend.SendPlayerMessage(i, $"[Party] {Player.Instance[senderIndex].Name}: {message}", (int)color);
                     return new ValueTask();
                 });
             }

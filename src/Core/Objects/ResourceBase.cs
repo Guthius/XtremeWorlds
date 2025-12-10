@@ -13,7 +13,7 @@ namespace Core.Objects
         public int ResourceType;
         public int ResourceImage;
         public int ExhaustedImage;
-        public int ExpReward;
+        public int ExperienceReward;
         public int ItemReward;
         public int LvlRequired;
         public int ToolRequired;
@@ -23,7 +23,6 @@ namespace Core.Objects
         public int Animation;
 
         public static List<ResourceBase> Instance { get; private set; } = new List<ResourceBase>();
-        public int Index { get; set; } = -1;
 
         public ResourceBase()
         {

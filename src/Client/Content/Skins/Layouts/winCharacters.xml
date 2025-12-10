@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Window Name="winChars" Caption="Characters"
+<Window Name="WinCharacters" Caption="Characters"
         Size="364,229"
         Icon="62" IconOffset="3,5"
         Design="WindowNormal"
         StartPosition="CenterScreen"
         Visible="False">
 
-	<GroupBox Name="grpChars" Position="6,26" Size="348,193">
+	<GroupBox Name="grpCharacters" Position="6,26" Size="348,193">
 		<PictureBox Name="picSlot_1" Position="16,17" Size="98,9" Design="BlackOval"/>
 		<Label Name="lblCharName_1" Text="Blank Slot" Position="20,17" Size="98,10" Align="Center"/>
 		<PictureBox Name="picScene_1" Position="17,32" Size="96,96" Image="11"/>

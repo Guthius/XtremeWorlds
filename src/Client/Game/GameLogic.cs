@@ -10,7 +10,7 @@ using Core.Configurations;
 using Core.Globals;
 using System.Threading;
 using Core.Net;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 using static Core.Globals.Type;
 using Type = Core.Globals.Type;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -46,14 +46,14 @@ namespace Client
             return gameStarted;
         }
 
-        public static void CreateActionMsg(string message, int color, byte msgType, int x, int y)
+        public static void CreateActionMessage(string message, int color, byte msgType, int x, int y)
         {
 
-            GameState.ActionMsgIndex = (byte)(GameState.ActionMsgIndex + 1);
-            if (GameState.ActionMsgIndex >= byte.MaxValue)
-                GameState.ActionMsgIndex = 1;
+            GameState.ActionMessageIndex = (byte)(GameState.ActionMessageIndex + 1);
+            if (GameState.ActionMessageIndex >= byte.MaxValue)
+                GameState.ActionMessageIndex = 1;
             
-            ref var instance = ref Data.ActionMsg[GameState.ActionMsgIndex];
+            ref var instance = ref Data.ActionMessage[GameState.ActionMessageIndex];
             instance.Message = message;
             instance.Color = color;
             instance.Type = msgType;
@@ -62,10 +62,10 @@ namespace Client
             instance.X = x;
             instance.Y = y;        
 
-            if (Data.ActionMsg[GameState.ActionMsgIndex].Type == (int)ActionMessageType.Scroll)
+            if (Data.ActionMessage[GameState.ActionMessageIndex].Type == (int)ActionMessageType.Scroll)
             {
-                Data.ActionMsg[GameState.ActionMsgIndex].Y = Data.ActionMsg[GameState.ActionMsgIndex].Y + Rand(-2, 6);
-                Data.ActionMsg[GameState.ActionMsgIndex].X = Data.ActionMsg[GameState.ActionMsgIndex].X + Rand(-8, 8);
+                Data.ActionMessage[GameState.ActionMessageIndex].Y = Data.ActionMessage[GameState.ActionMessageIndex].Y + Rand(-2, 6);
+                Data.ActionMessage[GameState.ActionMessageIndex].X = Data.ActionMessage[GameState.ActionMessageIndex].X + Rand(-8, 8);
             }
 
         }
@@ -823,15 +823,15 @@ namespace Client
             Network.Send(packetWriter);
         }
 
-        public static void ClearActionMsg(byte index)
+        public static void ClearActionMessage(byte index)
         {
-            Data.ActionMsg[index].Message = "";
-            Data.ActionMsg[index].Created = 0;
-            Data.ActionMsg[index].Type = 0;
-            Data.ActionMsg[index].Color = 0;
-            Data.ActionMsg[index].Scroll = 0;
-            Data.ActionMsg[index].X = 0;
-            Data.ActionMsg[index].Y = 0;
+            Data.ActionMessage[index].Message = "";
+            Data.ActionMessage[index].Created = 0;
+            Data.ActionMessage[index].Type = 0;
+            Data.ActionMessage[index].Color = 0;
+            Data.ActionMessage[index].Scroll = 0;
+            Data.ActionMessage[index].X = 0;
+            Data.ActionMessage[index].Y = 0;
         }
 
         public static void UpdateDrawMapName()
@@ -957,7 +957,7 @@ namespace Client
                         break;
                     }
 
-                case (byte)SystemMessage.NameContainsIllegalChars:
+                case (byte)SystemMessage.NameContainsIllegalCharacters:
                     {
                         header = "Invalid Name";
                         body = "This name contains illegal characters.";
@@ -1361,7 +1361,7 @@ namespace Client
         {
             WindowManager.HideWindows();
             GameState.NewCharJob = 0;
-            GameState.NewCharSprite = 1;
+            GameState.NewCharactersprite = 1;
             GameState.NewCnarGender = Sex.Male;
             if (WindowManager.TryGetControl("winJobs", "lblJobName", out var jobNameLbl)) jobNameLbl!.Text = Job.Instance[(int)GameState.NewCharJob].Name;
             WindowManager.ShowWindow("winJobs");
@@ -1418,7 +1418,7 @@ namespace Client
                 rec.Right = rec.Left + Constants.TileSize;
                 rec.Bottom = rec.Top + Constants.TileSize;
 
-                if (Data.Player[GameState.MyIndex].Hotbar[i].Slot < 0)
+                if (Player.Instance[GameState.MyIndex].Hotbar[i].Slot < 0)
                 {
                     continue;
                 }
@@ -1437,13 +1437,13 @@ namespace Client
         {
             // reserved for future use
 
-            if (invNum < 0L | invNum > Variables.MaxInv)
+            if (invNum < 0L | invNum > Core.Globals.Variables.MaxInventory)
                 return;
 
             // show
-            if (GetPlayerInv(GameState.MyIndex, invNum) >= 0)
+            if (GetPlayerInventory(GameState.MyIndex, invNum) >= 0)
             {
-                ShowItemDesc(x, y, GetPlayerInv(GameState.MyIndex, invNum), invNum);
+                ShowItemDesc(x, y, GetPlayerInventory(GameState.MyIndex, invNum), invNum);
             }
         }
 
@@ -1486,7 +1486,7 @@ namespace Client
                 var instance = WindowManager.GetWindowByName("winDescription");
                 if (invNum >= 0)
                 {
-                    if (Data.Player[GameState.MyIndex].Inv[invNum].Bound > 0)
+                    if (Player.Instance[GameState.MyIndex].Inventory[invNum].Bound > 0)
                         theName = "(SB) " + Item.Instance[(int)itemNum].Name;
                     else
                         theName = Item.Instance[(int)itemNum].Name;
@@ -1497,7 +1497,7 @@ namespace Client
 
                 if (eqNum >= 0)
                 {
-                    if (Data.Player[GameState.MyIndex].Equipment[eqNum].Bound > 0)
+                    if (Player.Instance[GameState.MyIndex].Paperdoll[eqNum].Bound > 0)
                         theName = "(SB) " + Item.Instance[(int)itemNum].Name;
                     else
                         theName = Item.Instance[(int)itemNum].Name;
@@ -1908,7 +1908,7 @@ namespace Client
 
         public static void ShowShopDesc(int x, int y, int itemNum)
         {
-            if (itemNum < 0L | itemNum > Variables.MaxItems)
+            if (itemNum < 0L | itemNum > Core.Globals.Variables.MaxItems)
                 return;
             // show
             ShowItemDesc(x, y, itemNum);
@@ -1916,17 +1916,16 @@ namespace Client
 
         public static void ShowEqDesc(int x, int y, long eqNum)
         {
-
             var equipmentCount = System.Enum.GetValues(typeof(Equipment)).Length;
 
             if (eqNum < 0L || eqNum >= equipmentCount)
                 return;
 
-            if (Data.Player[GameState.MyIndex].Equipment[(int)eqNum].Num < 0 || Data.Player[GameState.MyIndex].Equipment[(int)eqNum].Num > Variables.MaxItems)
+            if (Player.Instance[GameState.MyIndex].Paperdoll[(int)eqNum].Num < 0 || Player.Instance[GameState.MyIndex].Paperdoll[(int)eqNum].Num > Core.Globals.Variables.MaxItems)
                 return;
 
             // show
-            ShowItemDesc(x, y, Data.Player[GameState.MyIndex].Equipment[(int)eqNum].Num, -1, (byte)eqNum);
+            ShowItemDesc(x, y, Player.Instance[GameState.MyIndex].Paperdoll[(int)eqNum].Num, -1, (byte)eqNum);
             
         }
 
@@ -2044,9 +2043,9 @@ namespace Client
                             if (IsPlaying((int)pIndex))
                             {
                                 // get their health
-                                if (GetPlayerVital((int)pIndex, Vital.Health) > 0 & GetPlayerMaxVital((int)pIndex, Vital.Health) > 0)
+                                if (GetPlayerVital((int)pIndex, Core.Globals.Vital.Health) > 0 & GetPlayerMaxVital((int)pIndex, Core.Globals.Vital.Health) > 0)
                                 {
-                                    width = (int)Math.Round(GetPlayerVital((int)pIndex, Vital.Health) / (double)barWidth / (GetPlayerMaxVital((int)pIndex, Vital.Health) / (double)barWidth) * barWidth);
+                                    width = (int)Math.Round(GetPlayerVital((int)pIndex, Core.Globals.Vital.Health) / (double)barWidth / (GetPlayerMaxVital((int)pIndex, Core.Globals.Vital.Health) / (double)barWidth) * barWidth);
                                     instance.Controls[WindowManager.GetControlIndex("winParty", "picBar_HP" + i)].Width = width;
                                 }
                                 else
@@ -2054,9 +2053,9 @@ namespace Client
                                     instance.Controls[WindowManager.GetControlIndex("winParty", "picBar_HP" + i)].Width = 0;
                                 }
                                 // get their spirit
-                                if (GetPlayerVital((int)pIndex, Vital.Stamina) > 0 & GetPlayerMaxVital((int)pIndex, Vital.Stamina) > 0)
+                                if (GetPlayerVital((int)pIndex, Core.Globals.Vital.Stamina) > 0 & GetPlayerMaxVital((int)pIndex, Core.Globals.Vital.Stamina) > 0)
                                 {
-                                    width = (int)Math.Round(GetPlayerVital((int)pIndex, Vital.Stamina) / (double)barWidth / (GetPlayerMaxVital((int)pIndex, Vital.Stamina) / (double)barWidth) * barWidth);
+                                    width = (int)Math.Round(GetPlayerVital((int)pIndex, Core.Globals.Vital.Stamina) / (double)barWidth / (GetPlayerMaxVital((int)pIndex, Core.Globals.Vital.Stamina) / (double)barWidth) * barWidth);
                                     instance.Controls[WindowManager.GetControlIndex("winParty", "picBar_SP" + i)].Width = width;
                                 }
                                 else
@@ -2144,11 +2143,11 @@ namespace Client
             long i;
             var amount = default(long);
 
-            for (i = 0L; i < Variables.MaxInv; i++)
+            for (i = 0L; i < Variables.MaxInventory; i++)
             {
-                if (GetPlayerInv(GameState.MyIndex, (int)i) == 1)
+                if (GetPlayerInventory(GameState.MyIndex, (int)i) == 1)
                 {
-                    amount = GetPlayerInvValue(GameState.MyIndex, (int)i);
+                    amount = GetPlayerInventoryValue(GameState.MyIndex, (int)i);
                 }
             }
             WindowManager.Windows[WindowManager.GetWindowIndex("winShop")].Controls[WindowManager.GetControlIndex("winShop", "lblGold")].Text = Strings.Format(amount, "#,###,###,###") + "g";
@@ -2395,7 +2394,6 @@ namespace Client
         
         public static void UpdateCamera()
         {
-
             int nativeWidth = GameState.ResolutionWidth;
             int nativeHeight = GameState.ResolutionHeight;
 
@@ -2412,7 +2410,7 @@ namespace Client
                 if (GameState.MyTargetType == (int)TargetType.Player)
                 {
                     int t = GameState.MyTarget;
-                    if (IsPlaying(t) && Data.Player[t].Map == Data.Player[GameState.MyIndex].Map)
+                    if (IsPlaying(t) && Player.Instance[t].Map == Player.Instance[GameState.MyIndex].Map)
                     {
                         targetX = GetPlayerRawX(t);
                         targetY = GetPlayerRawY(t);

@@ -13,7 +13,7 @@ namespace Client
         #region Database
         public static void OnStream(int index)
         {
-            if (index < 0 || index >= Variables.MaxItems) return;
+            if (index < 0 || index >= Core.Globals.Variables.MaxItems) return;
             if (Item.Instance.Count <= index)
             {
                 Sender.SendRequestItem(index);

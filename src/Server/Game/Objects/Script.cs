@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Serilog.Core;
 using Server.Game.Net;
 using System.Text;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 using static Core.Net.Packets;
 
 namespace Server;

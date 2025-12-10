@@ -8,7 +8,7 @@ using Core.Net;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Drawing;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 using static Core.Globals.Type;
 using Type = Core.Globals.Type;
 
@@ -399,8 +399,8 @@ namespace Client
                     break;
 
                 case PictureOrigin.CenterOnPlayer:
-                    posX = (int) Math.Round(GameLogic.ConvertMapX(Data.Player[GameState.MyIndex].X) / 2d - Event.Picture.XOffset);
-                    posY = (int) Math.Round(GameLogic.ConvertMapY(Data.Player[GameState.MyIndex].Y) / 2d - Event.Picture.YOffset);
+                    posX = (int) Math.Round(GameLogic.ConvertMapX(Player.Instance[GameState.MyIndex].X) / 2d - Event.Picture.XOffset);
+                    posY = (int) Math.Round(GameLogic.ConvertMapY(Player.Instance[GameState.MyIndex].Y) / 2d - Event.Picture.YOffset);
                     break;
             }
 

@@ -11,16 +11,16 @@ namespace Client
     {
         public static void OnClear(int projectileNum)
         {
-            Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].ProjectileNum = -1;
-            Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Owner = 0;
-            Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].OwnerType = 0;
-            Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].X = 0;
-            Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Y = 0;
-            Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Dir = 0;
-            Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Vx = 0;
-            Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Vy = 0;
-            Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].FreeAim = 0;
-            Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Timer = 0;
+            Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, projectileNum].ProjectileNum = -1;
+            Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, projectileNum].Owner = 0;
+            Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, projectileNum].OwnerType = 0;
+            Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, projectileNum].X = 0;
+            Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, projectileNum].Y = 0;
+            Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, projectileNum].Dir = 0;
+            Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, projectileNum].Vx = 0;
+            Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, projectileNum].Vy = 0;
+            Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, projectileNum].FreeAim = 0;
+            Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, projectileNum].Timer = 0;
         }
 
 
@@ -43,7 +43,7 @@ namespace Client
                 return;
             }
 
-            int mapId = Data.Player[GameState.MyIndex].Map;
+            int mapId = Player.Instance[GameState.MyIndex].Map;
             if (mapId < 0 || mapId >= Data.MapProjectile.GetLength(0))
             {
                 return;
@@ -51,11 +51,11 @@ namespace Client
 
             Projectile.OnStream(projectileNum);
 
-            x = (int)Math.Floor((double)Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].X / Constants.TileSize);
-            y = (int)Math.Floor((double)Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Y / Constants.TileSize);
+            x = (int)Math.Floor((double)Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, projectileNum].X / Constants.TileSize);
+            y = (int)Math.Floor((double)Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, projectileNum].Y / Constants.TileSize);
 
             // Check if its been going for over 1 minute, if so clear.
-            if (Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Timer < General.GetTickCount())
+            if (Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, projectileNum].Timer < General.GetTickCount())
                 return;
 
             if (x > Data.MyMap.MaxX | x < 0)
@@ -64,7 +64,7 @@ namespace Client
             if (y > Data.MyMap.MaxY | y < 0)
                 return;
 
-            int projectile = Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].ProjectileNum;
+            int projectile = Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, projectileNum].ProjectileNum;
             if (projectile < 0 || projectile >= Data.Projectile.Length)
             {
                 return;
@@ -89,7 +89,7 @@ namespace Client
             // 0: Up, 1: Down, 2: Left, 3: Right, 4: UpRight, 5: UpLeft, 6: DownRight, 7: DownLeft
             // If the sheet has fewer than 8 columns, fall back to 4-direction mapping.
             int col = 0;
-            var mp = Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum];
+            var mp = Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, projectileNum];
             var dir = mp.Dir;
             int cols = Math.Max(1, gfxInfo.Width / Constants.TileSize);
             bool eightDirEnabled = SettingsManager.Instance.SpriteDirections >= 8;
@@ -133,8 +133,8 @@ namespace Client
             rec.Right = rec.Left + Constants.TileSize;
 
             // Convert coordinates
-            x = GameLogic.ConvertMapX(Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].X);
-            y = GameLogic.ConvertMapY(Data.MapProjectile[Data.Player[GameState.MyIndex].Map, projectileNum].Y);
+            x = GameLogic.ConvertMapX(Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, projectileNum].X);
+            y = GameLogic.ConvertMapY(Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, projectileNum].Y);
 
             // Render texture
             string argPath = System.IO.Path.Combine(DataPath.Projectiles, sprite.ToString());

@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 using Server.Game;
 using Server.Game.Net;
 using Server.Net;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 using static Core.Net.Packets;
 
 namespace Server;

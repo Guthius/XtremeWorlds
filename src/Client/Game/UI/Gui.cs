@@ -6,7 +6,7 @@ using Core.Configurations;
 using Core.Globals;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 using Type = Core.Globals.Type;
 using System.IO;
 
@@ -749,7 +749,7 @@ public class WindowManager
             Safe("UpdateWindow_Login", () => ui.UpdateWindow_Login());
             Safe("UpdateWindow_NewChar", () => ui.UpdateWindow_NewChar());
             Safe("UpdateWindow_Jobs", () => ui.UpdateWindow_Jobs());
-            Safe("UpdateWindow_Chars", () => ui.UpdateWindow_Chars());
+            Safe("UpdateWindow_Characters", () => ui.UpdateWindow_Characters());
             Safe("UpdateWindow_ChatSmall", () => ui.UpdateWindow_ChatSmall());
             Safe("UpdateWindow_Chat", () => ui.UpdateWindow_Chat());
             Safe("UpdateWindow_Menu", () => ui.UpdateWindow_Menu());
@@ -1472,12 +1472,12 @@ public class WindowManager
         var yo = winTrade!.Y + picYour!.Y;
 
         // your items
-        for (var i = 0; i < Variables.MaxInv; i++)
+        for (var i = 0; i < Variables.MaxInventory; i++)
         {
             if (Data.TradeYourOffer[i].Num >= 0)
             {
-                long itemNum = GetPlayerInv(GameState.MyIndex, Data.TradeYourOffer[i].Num);
-                if (itemNum >= 0 & itemNum < Variables.MaxItems)
+                long itemNum = GetPlayerInventory(GameState.MyIndex, Data.TradeYourOffer[i].Num);
+                if (itemNum >= 0 & itemNum < Core.Globals.Variables.MaxItems)
                 {
                     Item.OnStream((int)itemNum);
                     long itemPic = Item.Instance[(int)itemNum].Icon;
@@ -1540,10 +1540,10 @@ public class WindowManager
         var yo = winTrade!.Y + picTheir!.Y;
 
         // their items
-        for (var i = 0; i < Variables.MaxInv; i++)
+        for (var i = 0; i < Variables.MaxInventory; i++)
         {
             long itemNum = Data.TradeTheirOffer[i].Num;
-            if (itemNum >= 0 & itemNum < Variables.MaxItems)
+            if (itemNum >= 0 & itemNum < Core.Globals.Variables.MaxItems)
             {
                 Item.OnStream((int)itemNum);
                 long itemPic = Item.Instance[(int)itemNum].Icon;

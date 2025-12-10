@@ -1,6 +1,6 @@
 ﻿using Core.Globals;
 using Server.Game;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 
 namespace Server;
 
@@ -20,8 +20,8 @@ public static class GameLogic
 
         return vital switch
         {
-            Vital.Health => Data.Npc[(int)npcNum].Hp,
-            Vital.Stamina => Data.Npc[(int)npcNum].Stat[(byte)Stat.Intelligence] * 2,
+            Core.Globals.Vital.Health => Data.Npc[(int)npcNum].Hp,
+            Core.Globals.Vital.Stamina => Data.Npc[(int)npcNum].Stat[(byte)Stat.Intelligence] * 2,
             _ => 0
         };
     }

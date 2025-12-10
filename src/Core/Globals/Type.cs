@@ -60,20 +60,20 @@ public static class Type
         public TradeItem[] TradeItem;
     }
 
-    public struct PlayerInv
+    public struct Item
     {
         public int Num;
         public int Value;
         public byte Bound;
     }
 
-     public struct PlayerEq
+     public struct Paperdoll
     {
         public int Num;
         public byte Bound;
     }
 
-    public struct PlayerSkill
+    public struct SkillBook
     {
         public int Num;
         public int Cd;
@@ -81,7 +81,7 @@ public static class Type
 
     public struct Bank
     {
-        public PlayerInv[] Item;
+        public Item[] Item;
     }
 
     public struct Layer
@@ -139,7 +139,7 @@ public static class Type
         public byte[] Stat;
         public byte Faction;
         public int Hp;
-        public int Exp;
+        public int Experience;
         public int Animation;
         public byte[] Skill;
         public byte Level;
@@ -168,16 +168,16 @@ public static class Type
         public byte Job;
         public int Sprite;
         public byte Level;
-        public int Exp;
+        public int Experience;
         public byte Access;
         public bool Pk;
         public int[] Vital;
         public int[] MaxVital;
         public int[] Stat;
         public int Points;
-        public PlayerEq[] Equipment;
-        public PlayerInv[] Inv;
-        public PlayerSkill[] Skill;
+        public Paperdoll[] Paperdoll;
+        public Item[] Inventory;
+        public SkillBook[] Skill;
         public int Map;
         public int X;
         public int Y;
@@ -222,7 +222,7 @@ public static class Type
         public bool InBank;
         public int TradeRequest;
         public double InTrade;
-        public PlayerInv[] TradeOffer;
+        public Item[] TradeOffer;
         public bool AcceptTrade;
         public EventMap EventMap;
         public int EventProcessingCount;
@@ -888,7 +888,7 @@ public static class Type
         public bool Active;
     }
 
-    public struct ActionMsg
+    public struct ActionMessage
     {
         public string Message;
         public int Created;

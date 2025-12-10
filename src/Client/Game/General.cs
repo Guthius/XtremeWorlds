@@ -5,11 +5,12 @@ using Client.Net;
 using Core.Common;
 using Core.Configurations;
 using Core.Globals;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 using Type = Core.Globals.Type;
 using System.IO;
 using System;
 using System.Diagnostics;
+using Core.Objects;
 
 namespace Client
 {
@@ -297,7 +298,7 @@ namespace Client
 
             for (var i = 0; i < equipmentCount; i++)
             {
-                if (GetPlayerEquipment(GameState.MyIndex, (Equipment) i) < 0)
+                if (Player.Instance[GameState.MyIndex].Paperdoll[i].Num < 0)
                 {
                     continue;
                 }
@@ -321,9 +322,9 @@ namespace Client
 
         public static int IsInv(long startX, long startY)
         {
-            for (var i = 0; i < Variables.MaxInv; i++)
+            for (var i = 0; i < Variables.MaxInventory; i++)
             {
-                if (GetPlayerInv(GameState.MyIndex, i) < 0)
+                if (Player.Instance[GameState.MyIndex].Paperdoll[i].Num < 0)
                 {
                     continue;
                 }
@@ -353,7 +354,7 @@ namespace Client
 
             for (i = 0; i < Variables.MaxPlayerSkills; i++)
             {
-                if (Data.Player[GameState.MyIndex].Skill[(int) i].Num >= 0)
+                if (Player.Instance[GameState.MyIndex].Skill[(int) i].Num >= 0)
                 {
                     tempRec.Top = startY + GameState.SkillTop + (GameState.SkillOffsetY + Constants.TileSize) * (i / GameState.SkillColumns);
                     tempRec.Bottom = tempRec.Top + Constants.TileSize;
@@ -379,7 +380,7 @@ namespace Client
 
             for (int i = 0; i < Variables.MaxBank; i++)
             {
-                if (GetBank(GameState.MyIndex, i) >= 0)
+                if (Bank.Instance[GameState.MyIndex].Item[i].Num >= 0)
                 {
                     tempRec.Top = startY + GameState.BankTop + (GameState.BankOffsetY + Constants.TileSize) * (i / GameState.BankColumns);
                     tempRec.Bottom = tempRec.Top + Constants.TileSize;
@@ -428,7 +429,7 @@ namespace Client
             Type.Rect tempRec;
             int i;
 
-            for (i = 0; i < Variables.MaxInv; i++)
+            for (i = 0; i < Variables.MaxInventory; i++)
             {
                 tempRec.Top = startY + GameState.TradeTop + (GameState.TradeOffsetY + Constants.TileSize) * (i / GameState.TradeColumns);
                 tempRec.Bottom = tempRec.Top + Constants.TileSize;
@@ -446,6 +447,30 @@ namespace Client
             }
 
             return -1;
+        }
+
+        public static bool IsDirBlocked(byte blockvar, Direction dir)
+        {
+            return dir switch
+            {
+                Direction.UpRight =>
+                    (blockvar & (long)Math.Round(Math.Pow(2d, (double)Direction.Up))) != 0 ||
+                    (blockvar & (long)Math.Round(Math.Pow(2d, (double)Direction.Right))) != 0,
+
+                Direction.UpLeft =>
+                    (blockvar & (long)Math.Round(Math.Pow(2d, (double)Direction.Up))) != 0 ||
+                    (blockvar & (long)Math.Round(Math.Pow(2d, (double)Direction.Left))) != 0,
+
+                Direction.DownRight =>
+                    (blockvar & (long)Math.Round(Math.Pow(2d, (double)Direction.Down))) != 0 ||
+                    (blockvar & (long)Math.Round(Math.Pow(2d, (double)Direction.Right))) != 0,
+
+                Direction.DownLeft =>
+                    (blockvar & (long)Math.Round(Math.Pow(2d, (double)Direction.Down))) != 0 ||
+                    (blockvar & (long)Math.Round(Math.Pow(2d, (double)Direction.Left))) != 0,
+
+                _ => (blockvar & (long)Math.Round(Math.Pow(2d, (byte)dir))) != 0
+            };
         }
     }
 }

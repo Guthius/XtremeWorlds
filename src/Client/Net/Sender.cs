@@ -6,7 +6,7 @@ using Core;
 using Core.Globals;
 using Core.Net;
 using System.IO;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 
 namespace Client.Net;
 
@@ -128,9 +128,9 @@ public static class Sender
 
         packetWriter.WriteEnum(Packets.ClientPackets.CPlayerMove);
         packetWriter.WriteByte(GetPlayerDir(GameState.MyIndex));
-        packetWriter.WriteByte(Data.Player[GameState.MyIndex].Moving);
-        packetWriter.WriteInt32(Data.Player[GameState.MyIndex].X);
-        packetWriter.WriteInt32(Data.Player[GameState.MyIndex].Y);
+        packetWriter.WriteByte(Player.Instance[GameState.MyIndex].Moving);
+        packetWriter.WriteInt32(Player.Instance[GameState.MyIndex].X);
+        packetWriter.WriteInt32(Player.Instance[GameState.MyIndex].Y);
 
         Network.Send(packetWriter);
     }
@@ -428,21 +428,21 @@ public static class Sender
             return;
         }
 
-        if (invNum < 0 || invNum > Variables.MaxInv)
+        if (invNum < 0 || invNum > Variables.MaxInventory)
         {
             return;
         }
 
-        if (Data.Player[GameState.MyIndex].Inv[invNum].Num < 0 ||
-            Data.Player[GameState.MyIndex].Inv[invNum].Num > Variables.MaxItems)
+        if (Player.Instance[GameState.MyIndex].Inventory[invNum].Num < 0 ||
+            Player.Instance[GameState.MyIndex].Inventory[invNum].Num > Core.Globals.Variables.MaxItems)
         {
             return;
         }
 
-        if (Item.Instance[GetPlayerInv(GameState.MyIndex, invNum)].Type == (byte) ItemCategory.Currency ||
-            Item.Instance[GetPlayerInv(GameState.MyIndex, invNum)].Stackable == 1)
+        if (Item.Instance[GetPlayerInventory(GameState.MyIndex, invNum)].Type == (byte) ItemCategory.Currency ||
+            Item.Instance[GetPlayerInventory(GameState.MyIndex, invNum)].Stackable == 1)
         {
-            if (amount < 0 || amount > Data.Player[GameState.MyIndex].Inv[invNum].Value)
+            if (amount < 0 || amount > Player.Instance[GameState.MyIndex].Inventory[invNum].Value)
             {
                 return;
             }
@@ -503,7 +503,7 @@ public static class Sender
         }
 
         // Dont let them forget a skill which is in CD
-        if (Data.Player[GameState.MyIndex].Skill[index].Cd > 0)
+        if (Player.Instance[GameState.MyIndex].Skill[index].Cd > 0)
         {
             TextRenderer.AddText("Cannot forget a skill which is cooling down!", (int) ColorName.Red);
             return;
@@ -516,7 +516,7 @@ public static class Sender
             return;
         }
 
-        if (Data.Player[GameState.MyIndex].Skill[index].Num < 0)
+        if (Player.Instance[GameState.MyIndex].Skill[index].Num < 0)
         {
             TextRenderer.AddText("No skill found.", (int) ColorName.Red);
             return;
@@ -577,7 +577,7 @@ public static class Sender
         packetWriter.WriteString(Resource.Instance[index].EmptyMessage);
         packetWriter.WriteInt32(Resource.Instance[index].ExhaustedImage);
         packetWriter.WriteInt32(Resource.Instance[index].Health);
-        packetWriter.WriteInt32(Resource.Instance[index].ExpReward);
+        packetWriter.WriteInt32(Resource.Instance[index].ExperienceReward);
         packetWriter.WriteInt32(Resource.Instance[index].ItemReward);
         packetWriter.WriteString(Resource.Instance[index].Name);
         packetWriter.WriteInt32(Resource.Instance[index].ResourceImage);
@@ -616,7 +616,7 @@ public static class Sender
             packetWriter.WriteInt32(Data.Npc[index].DropItemValue[i]);
         }
 
-        packetWriter.WriteInt32(Data.Npc[index].Exp);
+        packetWriter.WriteInt32(Data.Npc[index].Experience);
         packetWriter.WriteByte(Data.Npc[index].Faction);
         packetWriter.WriteInt32(Data.Npc[index].Hp);
         packetWriter.WriteString(Data.Npc[index].Name);

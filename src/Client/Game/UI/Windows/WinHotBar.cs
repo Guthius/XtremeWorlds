@@ -2,7 +2,7 @@
 using Core.Globals;
 using Microsoft.Xna.Framework;
 using System.IO;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 
 namespace Client.Game.UI.Windows;
 
@@ -44,7 +44,7 @@ public class WinHotBar
 
             if (WindowManager.DragBox.Origin != PartOrigin.Hotbar || WindowManager.DragBox.Slot != slot)
             {
-                switch (Data.Player[GameState.MyIndex].Hotbar[slot].SlotType)
+                switch (Player.Instance[GameState.MyIndex].Hotbar[slot].SlotType)
                 {
                     case (byte) PartOrigin.Inventory:
                         DrawInventorySlot(slot, x, y);
@@ -81,14 +81,14 @@ public class WinHotBar
         {
             ref var dragBox = ref WindowManager.DragBox;
 
-            dragBox.Type = Data.Player[GameState.MyIndex].Hotbar[slot].SlotType switch
+            dragBox.Type = Player.Instance[GameState.MyIndex].Hotbar[slot].SlotType switch
             {
                 1 => (DraggablePartType) PartOrigin.Inventory,
                 2 => (DraggablePartType) PartOrigin.SkillTree,
                 _ => dragBox.Type
             };
 
-            dragBox.Value = Data.Player[GameState.MyIndex].Hotbar[slot].Slot;
+            dragBox.Value = Player.Instance[GameState.MyIndex].Hotbar[slot].Slot;
             dragBox.Origin = PartOrigin.Hotbar;
             dragBox.Slot = slot;
 
@@ -165,21 +165,21 @@ public class WinHotBar
 
         var y = winHotbar.Y - 6;
 
-        switch (Data.Player[GameState.MyIndex].Hotbar[slot].SlotType)
+        switch (Player.Instance[GameState.MyIndex].Hotbar[slot].SlotType)
         {
             case 1: // Inventory
-                GameLogic.ShowItemDesc(x, y, Data.Player[GameState.MyIndex].Hotbar[slot].Slot);
+                GameLogic.ShowItemDesc(x, y, Player.Instance[GameState.MyIndex].Hotbar[slot].Slot);
                 break;
 
             case 2: // Skill
-                GameLogic.ShowSkillDesc(x, y, Data.Player[GameState.MyIndex].Hotbar[slot].Slot, 0L);
+                GameLogic.ShowSkillDesc(x, y, Player.Instance[GameState.MyIndex].Hotbar[slot].Slot, 0L);
                 break;
         }
     }
 
     private static void DrawInventorySlot(int slot, int x, int y)
     {
-        var itemNum = Data.Player[GameState.MyIndex].Hotbar[slot].Slot;
+        var itemNum = Player.Instance[GameState.MyIndex].Hotbar[slot].Slot;
 
         Item.OnStream(itemNum);
 
@@ -195,7 +195,7 @@ public class WinHotBar
 
     private static void DrawSkillTreeSlot(int slot, int x, int y)
     {
-        var skillNum = Data.Player[GameState.MyIndex].Hotbar[slot].Slot;
+        var skillNum = Player.Instance[GameState.MyIndex].Hotbar[slot].Slot;
 
         Skill.OnStream(skillNum);
 

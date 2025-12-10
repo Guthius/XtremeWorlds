@@ -4,7 +4,7 @@ using Core.Configurations;
 using Core.Globals;
 using Core.Interfaces;
 using Microsoft.Xna.Framework;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 
 public class ChatBubble : IData
 {
@@ -49,8 +49,8 @@ public class ChatBubble : IData
                     return;
 
                 // Base anchor previously used for bubble (top of classic 32px frame)
-                x = GameLogic.ConvertMapX(Data.Player[instance.Target].X) + 16;
-                y = GameLogic.ConvertMapY(Data.Player[instance.Target].Y) - 8;
+                x = GameLogic.ConvertMapX(Player.Instance[instance.Target].X) + 16;
+                y = GameLogic.ConvertMapY(Player.Instance[instance.Target].Y) - 8;
 
                 // Adjust upward so bubble sits above nameplate.
                 // Recreate nameplate top Y (TextRenderer logic simplified):
@@ -69,7 +69,7 @@ public class ChatBubble : IData
                         else dirs = 1;
                         int frameHeight = gi.Height / dirs;
                         if (frameHeight <= 0) frameHeight = 32;
-                        int worldBaseY = Data.Player[instance.Target].Y;
+                        int worldBaseY = Player.Instance[instance.Target].Y;
                         if (frameHeight > 32)
                         {
                             // replicate upward shift used when drawing tall sprites

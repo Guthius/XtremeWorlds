@@ -49,7 +49,6 @@ namespace Core.Objects
         public int Projectile;
         public int Ammo;
         public static List<ItemBase> Instance { get; private set; } = new List<ItemBase>();
-        public int Index { get; set; } = -1;
 
         public static void OnClear(int index)
         {

@@ -1437,7 +1437,7 @@ namespace Client
             cmbCondition_HasItem.Enabled = false;
             cmbCondition_HasItem.Items.Clear();
 
-            for (i = 0; i < Variables.MaxItems; i++)
+            for (i = 0; i < Core.Globals.Variables.MaxItems; i++)
                 cmbCondition_HasItem.Items.Add(i + 1 + ". " + Item.Instance[i].Name);
             cmbCondition_HasItem.SelectedIndex = 0;
             nudCondition_HasItem.Enabled = false;
@@ -1503,7 +1503,7 @@ namespace Client
                     cmbVariable.Items.Add(i + 1 + ". " + Event.Variables[i]);
                 cmbVariable.SelectedIndex = 0;
                 cmbChangeItemIndex.Items.Clear();
-                for (i = 0; i < Variables.MaxItems; i++)
+                for (i = 0; i < Core.Globals.Variables.MaxItems; i++)
                     cmbChangeItemIndex.Items.Add(Item.Instance[i].Name);
                 cmbChangeItemIndex.SelectedIndex = 0;
                 nudChangeLevel.MinValue = 1;
@@ -1619,7 +1619,7 @@ namespace Client
 
                 // items
                 cmbHasItem.Items.Clear();
-                for (i = 0; i < Variables.MaxItems; i++)
+                for (i = 0; i < Core.Globals.Variables.MaxItems; i++)
                     cmbHasItem.Items.Add(i + 1 + ": " + Item.Instance[i].Name);
 
                 // variables

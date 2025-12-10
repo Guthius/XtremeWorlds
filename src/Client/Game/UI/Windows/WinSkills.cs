@@ -1,5 +1,5 @@
 ﻿using Core.Globals;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 using System.IO;
 
 namespace Client.Game.UI.Windows;
@@ -53,7 +53,7 @@ public class WinSkills
 
         for (var slot = 0; slot < Variables.MaxPlayerSkills; slot++)
         {
-            var skillNum = Data.Player[GameState.MyIndex].Skill[slot].Num;
+            var skillNum = Player.Instance[GameState.MyIndex].Skill[slot].Num;
             if (skillNum < 0 || skillNum >= Variables.MaxSkills)
             {
                 continue;
@@ -139,7 +139,7 @@ public class WinSkills
             ref var dragBox = ref WindowManager.DragBox;
 
             dragBox.Type = DraggablePartType.Skill;
-            dragBox.Value = Data.Player[GameState.MyIndex].Skill[slot].Num;
+            dragBox.Value = Player.Instance[GameState.MyIndex].Skill[slot].Num;
             dragBox.Origin = PartOrigin.SkillTree;
             dragBox.Slot = slot;
 

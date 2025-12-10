@@ -2,7 +2,7 @@
 using Core.Globals;
 using Server.Game;
 using Server.Game.Net;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 
 namespace Server;
 
@@ -10,7 +10,11 @@ public static class NetworkConfig
 {
     public static bool IsLoggedIn(int index)
     {
-        return Data.Account[index].Login?.Length > 0;
+        if (Account.Instance == null || Account.Instance.Count <= index)
+        {
+            return false;
+        }
+        return Account.Instance[index].Login?.Length > 0;
     }
 
     public static bool IsPlaying(int index)
@@ -32,7 +36,7 @@ public static class NetworkConfig
                 continue;
             }
 
-            if (!Data.Account[otherPlayerId].Login.Equals(login, StringComparison.CurrentCultureIgnoreCase) &&
+            if (!Account.Instance[otherPlayerId].Login.Equals(login, StringComparison.CurrentCultureIgnoreCase) &&
                 PlayerService.Instance.ClientIp(otherPlayerId) == PlayerService.Instance.ClientIp(playerId))
             {
                 return true;
@@ -40,37 +44,6 @@ public static class NetworkConfig
         }
 
         return false;
-    }
-
-    public static async System.Threading.Tasks.Task LoadAccount(GameSession session, string login, byte slot)
-    {
-        if (!string.IsNullOrEmpty(login))
-        {
-            foreach (var otherPlayerId in PlayerService.Instance.PlayerIds)
-            {
-                if (session.Id == otherPlayerId || !Data.Account[otherPlayerId].Login.Equals(login, StringComparison.CurrentCultureIgnoreCase))
-                {
-                    continue;
-                }
-
-                await Player.LeftGame(otherPlayerId);
-                break;
-            }
-        }
-
-        Database.LoadCharacter(session.Id, slot);
-        Database.LoadBank(session.Id);
-
-        // Check if character data has been created
-        if (Data.Player[session.Id].Name.Length > 0)
-        {
-            // we have a char!
-            Player.OnAdd(session);
-        }
-        else
-        {
-            NetworkSend.SendAlert(session, SystemMessage.DatabaseError, Menu.CharacterSelect);
-        }
     }
 
     public static void SendDataToMapBut(int excludePlayerId, int mapNum, byte[] bytes)

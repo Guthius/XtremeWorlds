@@ -89,9 +89,9 @@ public static class Strings
 	public static string StrReverse(string? s)
 	{
 		if (string.IsNullOrEmpty(s)) return string.Empty;
-		var chars = s!.ToCharArray();
-		Array.Reverse(chars);
-		return new string(chars);
+		var Characters = s!.ToCharArray();
+		Array.Reverse(Characters);
+		return new string(Characters);
 	}
 
 	public static string Format(object? expression, string? format)

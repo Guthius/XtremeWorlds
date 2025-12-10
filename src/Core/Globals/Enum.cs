@@ -560,7 +560,7 @@ public enum SystemMessage
     ServerMaintenance,
     NameTaken,
     NameLengthInvalid,
-    NameContainsIllegalChars,
+    NameContainsIllegalCharacters,
     DatabaseError,
     WrongPassword,
     AccountActivationRequired,

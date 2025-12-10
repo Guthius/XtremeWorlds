@@ -4,7 +4,7 @@ using Client.Net;
 using Core;
 using Core.Globals;
 using Core.Net;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 using Core.Configurations;
 using Type = Core.Globals.Type;
 using Core.Interfaces;

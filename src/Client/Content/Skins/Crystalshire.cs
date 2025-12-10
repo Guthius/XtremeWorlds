@@ -8,7 +8,7 @@ using Client.Game.UI.Windows;
 using Client.Net;
 using Core.Configurations;
 using Core.Globals;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 using Type = Core.Globals.Type;
 
 public class Crystalshire
@@ -119,21 +119,21 @@ public class Crystalshire
         WindowManager.SetActiveControl(window, "txtName");
     }
 
-    public void UpdateWindow_Chars()
+    public void UpdateWindow_Characters()
     {
-        var window = WindowLoader.FromLayout("winChars");
+        var window = WindowLoader.FromLayout("WinCharacters");
 
-        window.GetChild("btnClose").CallBack[(int)ControlState.MouseDown] = WinChars.OnClose;
-        window.GetChild("picScene_3").OnDraw = WinChars.OnDraw;
-        window.GetChild("btnSelectChar_1").CallBack[(int)ControlState.MouseDown] = WinChars.OnSelectCharacter1Click;
-        window.GetChild("btnCreateChar_1").CallBack[(int)ControlState.MouseDown] = WinChars.OnCreateCharacter1Click;
-        window.GetChild("btnDelChar_1").CallBack[(int)ControlState.MouseDown] = WinChars.OnDeleteCharacter1Click;
-        window.GetChild("btnSelectChar_2").CallBack[(int)ControlState.MouseDown] = WinChars.OnSelectCharacter2Click;
-        window.GetChild("btnCreateChar_2").CallBack[(int)ControlState.MouseDown] = WinChars.OnCreateCharacter2Click;
-        window.GetChild("btnDelChar_2").CallBack[(int)ControlState.MouseDown] = WinChars.OnDeleteCharacter2Click;
-        window.GetChild("btnSelectChar_3").CallBack[(int)ControlState.MouseDown] = WinChars.OnSelectCharacter3Click;
-        window.GetChild("btnCreateChar_3").CallBack[(int)ControlState.MouseDown] = WinChars.OnCreateCharacter3Click;
-        window.GetChild("btnDelChar_3").CallBack[(int)ControlState.MouseDown] = WinChars.OnDeleteCharacter3Click;
+        window.GetChild("btnClose").CallBack[(int)ControlState.MouseDown] = WinCharacters.OnClose;
+        window.GetChild("picScene_3").OnDraw = WinCharacters.OnDraw;
+        window.GetChild("btnSelectChar_1").CallBack[(int)ControlState.MouseDown] = WinCharacters.OnSelectCharacter1Click;
+        window.GetChild("btnCreateChar_1").CallBack[(int)ControlState.MouseDown] = WinCharacters.OnCreateCharacter1Click;
+        window.GetChild("btnDelChar_1").CallBack[(int)ControlState.MouseDown] = WinCharacters.OnDeleteCharacter1Click;
+        window.GetChild("btnSelectChar_2").CallBack[(int)ControlState.MouseDown] = WinCharacters.OnSelectCharacter2Click;
+        window.GetChild("btnCreateChar_2").CallBack[(int)ControlState.MouseDown] = WinCharacters.OnCreateCharacter2Click;
+        window.GetChild("btnDelChar_2").CallBack[(int)ControlState.MouseDown] = WinCharacters.OnDeleteCharacter2Click;
+        window.GetChild("btnSelectChar_3").CallBack[(int)ControlState.MouseDown] = WinCharacters.OnSelectCharacter3Click;
+        window.GetChild("btnCreateChar_3").CallBack[(int)ControlState.MouseDown] = WinCharacters.OnCreateCharacter3Click;
+        window.GetChild("btnDelChar_3").CallBack[(int)ControlState.MouseDown] = WinCharacters.OnDeleteCharacter3Click;
     }
 
     public void UpdateWindow_Jobs()
@@ -568,7 +568,7 @@ public class Crystalshire
                 {
                     if (cmb.Items.Count == 0)
                     {
-                        for (int i = 0; i < Variables.MaxItems; i++)
+                        for (int i = 0; i < Core.Globals.Variables.MaxItems; i++)
                         {
                             var name = (i < Item.Instance.Count) ? (Item.Instance[i].Name ?? string.Empty) : string.Empty;
                             cmb.Items.Add(string.IsNullOrWhiteSpace(name) ? $"{i + 1}" : $"{i + 1}: {name.Trim()}");
@@ -1570,7 +1570,7 @@ public class Crystalshire
         {
             if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Variables.MaxNpcs)
             {
-                Data.Npc[WinNpcEditor.SelectedIndex].Exp = v;
+                Data.Npc[WinNpcEditor.SelectedIndex].Experience = v;
                 GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
             }
         }, 0, 100000000);
@@ -2915,7 +2915,7 @@ public class Crystalshire
         if (WindowManager.TryGetControl("winResourceEditor", "txtMessage2", out var msg2Ctrl) && msg2Ctrl is TextBox txtMsg2)
             txtMsg2.CallBack[(int)ControlState.KeyUp] = () => { int i = GameState.EditorIndex; if (i >= 0 && i < Variables.MaxResources) Resource.Instance[i].EmptyMessage = txtMsg2.Text ?? string.Empty; };
         if (WindowManager.TryGetControl("winResourceEditor", "txtRewardExp", out var expCtrl) && expCtrl is TextBox txtExp)
-            txtExp.CallBack[(int)ControlState.KeyUp] = () => { int i = GameState.EditorIndex; if (i >= 0 && i < Variables.MaxResources) Resource.Instance[i].ExpReward = int.TryParse(txtExp.Text, out var exp) ? exp : 0; };
+            txtExp.CallBack[(int)ControlState.KeyUp] = () => { int i = GameState.EditorIndex; if (i >= 0 && i < Variables.MaxResources) Resource.Instance[i].ExperienceReward = int.TryParse(txtExp.Text, out var exp) ? exp : 0; };
 
         // Combo callbacks
         void BindCombo(string ctrlName, Action<int> apply)

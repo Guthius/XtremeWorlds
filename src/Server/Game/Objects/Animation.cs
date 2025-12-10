@@ -8,7 +8,7 @@ using Server.Game;
 using Server.Game.Net;
 using Server.Net;
 using static Core.Net.Packets;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 using Type = Core.Globals.Type;
 using Core.Interfaces;
 using Core.Objects;

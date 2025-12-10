@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 
 namespace Client
 {
@@ -129,8 +129,8 @@ namespace Client
                         {
                             var npc = Data.MyMapNpc[lockindex];
                             var vit = npc.Vital;
-                            bool hasVitals = vit != null && vit.Length > (int)Vital.Health;
-                            if (npc.Num >= 0 && hasVitals && vit![(int)Vital.Health] > 0)
+                            bool hasVitals = vit != null && vit.Length > (int)Core.Globals.Vital.Health;
+                            if (npc.Num >= 0 && hasVitals && vit![(int)Core.Globals.Vital.Health] > 0)
                             {
                                 x = (int)Math.Round(npc.X + 16 - width / 2d);
                                 y = (int)Math.Round(npc.Y + 16 - height / 2d);

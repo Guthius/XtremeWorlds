@@ -1,7 +1,7 @@
 ﻿using Client.Net;
 using Core.Globals;
 using System.IO;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 
 namespace Client.Game.UI.Windows;
 
@@ -22,9 +22,9 @@ public class WinCharacter
         winCharacter.GetChild("lblHealth").Text = "Health";
         winCharacter.GetChild("lblSpirit").Text = "Spirit";
         winCharacter.GetChild("lblExperience").Text = "Exp";
-        winCharacter.GetChild("lblHealth2").Text = GetPlayerVital(GameState.MyIndex, Vital.Health) + "/" + GetPlayerMaxVital(GameState.MyIndex, Vital.Health);
-        winCharacter.GetChild("lblSpirit2").Text = GetPlayerVital(GameState.MyIndex, Vital.Stamina) + "/" + GetPlayerMaxVital(GameState.MyIndex, Vital.Stamina);
-        winCharacter.GetChild("lblExperience2").Text = Data.Player[GameState.MyIndex].Exp + "/" + GameState.NextlevelExp;
+        winCharacter.GetChild("lblHealth2").Text = GetPlayerVital(GameState.MyIndex, Core.Globals.Vital.Health) + "/" + GetPlayerMaxVital(GameState.MyIndex, Core.Globals.Vital.Health);
+        winCharacter.GetChild("lblSpirit2").Text = GetPlayerVital(GameState.MyIndex, Core.Globals.Vital.Stamina) + "/" + GetPlayerMaxVital(GameState.MyIndex, Core.Globals.Vital.Stamina);
+        winCharacter.GetChild("lblExperience2").Text = Player.Instance[GameState.MyIndex].Experience + "/" + GameState.NextlevelExp;
     }
 
     private static void UpdateBars()
@@ -35,9 +35,9 @@ public class WinCharacter
             return;
         }
 
-        winBars.GetChild("lblHP").Text = GetPlayerVital(GameState.MyIndex, Vital.Health) + "/" + GetPlayerMaxVital(GameState.MyIndex, Vital.Health);
-        winBars.GetChild("lblMP").Text = GetPlayerVital(GameState.MyIndex, Vital.Mana) + "/" + GetPlayerMaxVital(GameState.MyIndex, Vital.Mana);
-        winBars.GetChild("lblEXP").Text = GetPlayerExp(GameState.MyIndex) + "/" + GameState.NextlevelExp;
+        winBars.GetChild("lblHP").Text = GetPlayerVital(GameState.MyIndex, Core.Globals.Vital.Health) + "/" + GetPlayerMaxVital(GameState.MyIndex, Core.Globals.Vital.Health);
+        winBars.GetChild("lblMP").Text = GetPlayerVital(GameState.MyIndex, Core.Globals.Vital.Mana) + "/" + GetPlayerMaxVital(GameState.MyIndex, Core.Globals.Vital.Mana);
+        winBars.GetChild("lblEXP").Text = GetPlayerExperience(GameState.MyIndex) + "/" + GameState.NextlevelExp;
     }
 
     public static void OnDrawCharacter()
@@ -69,7 +69,7 @@ public class WinCharacter
 
         for (var i = 0; i < EquipmentTypes.Length; i++)
         {
-            var itemNum = GetPlayerEquipment(GameState.MyIndex, EquipmentTypes[i]);
+            var itemNum = GetPlayerPaperdoll(GameState.MyIndex, EquipmentTypes[i]);
             if (itemNum < 0)
             {
                 continue;

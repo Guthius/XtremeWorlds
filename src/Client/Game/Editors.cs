@@ -1242,7 +1242,7 @@ namespace Client
         {
             int i;
 
-            for (i = 0; i < Variables.MaxItems; i++)
+            for (i = 0; i < Core.Globals.Variables.MaxItems; i++)
             {
                 if (Item.IsChanged[i])
                 {

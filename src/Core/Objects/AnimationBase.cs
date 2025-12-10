@@ -35,8 +35,6 @@ namespace Core.Objects
         public int[] LoopTime;
 
         public static List<AnimationBase> Instance { get; private set; } = new List<AnimationBase>();
-        public int Index { get; set; } = -1;
-
         public static void OnDraw(int index)
         {
             throw new NotImplementedException();

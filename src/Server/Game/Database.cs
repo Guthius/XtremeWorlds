@@ -1,6 +1,7 @@
 ﻿using Core.Common;
 using Core.Globals;
 using Core.Net;
+using Core.Objects;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Npgsql;
@@ -10,10 +11,13 @@ using System.Security.Cryptography;
 using System.Text;
 using XtremeWorlds.Server.Configuration;
 using XtremeWorlds.Server.Database;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 using static Core.Globals.Type;
+using Bank = Core.Globals.Type.Bank;
 using Path = System.IO.Path;
 using Type = Core.Globals.Type;
+using static Server.Globals.Commands;
+using System.Threading.Tasks;
 
 namespace Server;
 
@@ -64,7 +68,7 @@ public static class Database
         }
     }
 
-    private static async System.Threading.Tasks.Task UpdateRowByColumnAsync(string columnName, long value, string targetColumn, string newValue, string tableName)
+    public static async System.Threading.Tasks.Task UpdateRowByColumnAsync(string columnName, long value, string targetColumn, string newValue, string tableName)
     {
         await ConnectionSemaphore.WaitAsync();
         try
@@ -100,7 +104,7 @@ public static class Database
             var dataTable = "id SERIAL PRIMARY KEY, data jsonb";
             var playerTable = "id BIGINT PRIMARY KEY, data jsonb, bank jsonb";
 
-            for (int i = 1, loopTo = Variables.MaxChars; i <= loopTo; i++)
+            for (int i = 1, loopTo = Variables.MaxCharacters; i <= loopTo; i++)
                 playerTable += $", character{i} jsonb";
 
             var tableNames = new[] { "job", "item", "map", "npc", "shop", "skill", "resource", "animation", "projectile", "moral" };
@@ -171,7 +175,7 @@ public static class Database
         return ids;
     }
 
-    private static async System.Threading.Tasks.Task<bool> RowExistsAsync(long id, string table)
+    public static async System.Threading.Tasks.Task<bool> RowExistsAsync(long id, string table)
     {
         await ConnectionSemaphore.WaitAsync();
         try
@@ -206,7 +210,7 @@ public static class Database
         }
     }
 
-    private static async System.Threading.Tasks.Task InsertRowByColumnAsync(long id, string data, string tableName, string dataColumn, string idColumn)
+    public static async System.Threading.Tasks.Task InsertRowByColumnAsync(long id, string data, string tableName, string dataColumn, string idColumn)
     {
         await ConnectionSemaphore.WaitAsync();
         try
@@ -322,7 +326,7 @@ public static class Database
         }
     }
 
-    private static bool RowExistsByColumn(string columnName, long value, string tableName)
+    public static bool RowExistsByColumn(string columnName, long value, string tableName)
     {
         var sql = $"SELECT EXISTS (SELECT 1 FROM {tableName} WHERE {columnName} = @value);";
 
@@ -396,7 +400,7 @@ public static class Database
         }
     }
 
-    private static void UpdateRowByColumn(string columnName, long value, string targetColumn, string newValue, string tableName)
+    public static void UpdateRowByColumn(string columnName, long value, string targetColumn, string newValue, string tableName)
     {
         var sql = $"UPDATE {tableName} SET {targetColumn} = @newValue::jsonb WHERE {columnName} = @value;";
 
@@ -461,7 +465,7 @@ public static class Database
         }
     }
 
-    private static void InsertRowByColumn(long id, string data, string tableName, string dataColumn, string idColumn)
+    public static void InsertRowByColumn(long id, string data, string tableName, string dataColumn, string idColumn)
     {
         // Sanitize the data string
         data = data.Replace("\\u0000", "");
@@ -562,280 +566,36 @@ public static class Database
             if (!NetworkConfig.IsPlaying(i))
                 continue;
 
-            await SaveCharacterAsync(i, Data.TempPlayer[i].Slot);
-            await SaveBankAsync(i);
+            await Account.OnSave(i);
         }
     }
 
-    public static async System.Threading.Tasks.Task SaveCharacterAsync(int index, int slot)
-    {
-        await System.Threading.Tasks.Task.Run(() => SaveCharacter(index, slot));
-    }
-
-    public static async System.Threading.Tasks.Task SaveBankAsync(int index)
-    {
-        await System.Threading.Tasks.Task.Run(() => SaveBank(index));
-    }
-
-    public static async System.Threading.Tasks.Task SaveAccountAsync(int index)
-    {
-        var json = JsonConvert.SerializeObject(Data.Account[index]).ToString();
-        var username = GetAccountLogin(index);
-        var id = GetStringHash(username);
-
-        if (await RowExistsAsync(id, "account"))
-        {
-            await UpdateRowByColumnAsync("id", id, "data", json, "account");
-        }
-        else
-        {
-            await InsertRowByColumnAsync(id, json, "account", "data", "id");
-        }
-    }
-
-    public static void RegisterAccount(int index, string username, string password)
-    {
-        SetPlayerLogin(index, username);
-        SetPlayerPassword(index, password);
-
-        var json = JsonConvert.SerializeObject(Data.Account[index]).ToString();
-
-        var id = GetStringHash(username);
-
-        InsertRowByColumn(id, json, "account", "data", "id");
-    }
-
-    public static bool LoadAccount(int index, string username)
-    {
-        JObject data;
-        data = SelectRowByColumn("id", GetStringHash(username), "account", "data");
-
-        if (data is null)
-        {
-            return false;
-        }
-
-        var accountData = JObject.FromObject(data).ToObject<Account>();
-        Data.Account[index] = accountData;
-        return true;
-    }
-
-    private static void ClearAccount(int index)
-    {
-        SetPlayerLogin(index, "");
-        SetPlayerPassword(index, "");
-    }
-
-    public static void ClearPlayer(int index)
-    {
-        ClearAccount(index);
-        ClearBank(index);
-
-        Data.TempPlayer[index].SkillCd = new int[Variables.MaxPlayerSkills];
-        Data.TempPlayer[index].TradeOffer = new PlayerInv[Variables.MaxInv];
-
-        Data.TempPlayer[index].SkillCd = new int[Variables.MaxPlayerSkills];
-        Data.TempPlayer[index].Editor = EditorType.None;
-        Data.TempPlayer[index].SkillBuffer = -1;
-        Data.TempPlayer[index].InShop = -1;
-        Data.TempPlayer[index].InTrade = -1;
-        Data.TempPlayer[index].InParty = -1;
-
-        for (int i = 0, loopTo = Data.TempPlayer[index].EventProcessingCount; i < loopTo; i++)
-            Data.TempPlayer[index].EventProcessing[i].EventId = -1;
-
-        ClearCharacter(index);
-    }
-
-    public static void LoadBank(int index)
-    {
-        JObject data;
-        data = SelectRowByColumn("id", GetStringHash(GetAccountLogin(index)), "account", "bank");
-
-        if (data is null)
-        {
-            ClearBank(index);
-            return;
-        }
-
-        var bankData = JObject.FromObject(data).ToObject<Bank>();
-        Data.Bank[index] = bankData;
-    }
-
-    public static void SaveBank(int index)
-    {
-        var json = JsonConvert.SerializeObject(Data.Bank[index]);
-        var username = GetAccountLogin(index);
-        var id = GetStringHash(username);
-
-        if (RowExistsByColumn("id", id, "account"))
-        {
-            UpdateRowByColumn("id", id, "bank", json, "account");
-        }
-        else
-        {
-            InsertRowByColumn(id, json, "account", "bank", "id");
-        }
-    }
-
-    private static void ClearBank(int index)
-    {
-        Data.Bank[index].Item = new PlayerInv[global::Script.MaxBank + 1];
-        for (var i = 0; i < global::Script.MaxBank; i++)
-        {
-            Data.Bank[index].Item[i].Num = -1;
-            Data.Bank[index].Item[i].Value = 0;
-        }
-    }
-
-    public static void ClearCharacter(int index)
-    {
-        Data.Player[index].Name = "";
-        Data.Player[index].Job = 0;
-        Data.Player[index].Dir = 0;
-        Data.Player[index].Access = (byte)AccessLevel.Player;
-
-        Data.Player[index].Equipment = new PlayerEq[Enum.GetValues(typeof(Equipment)).Length];
-        for (int i = 0, loopTo = Enum.GetValues(typeof(Equipment)).Length; i < loopTo; i++)
-        {
-            Data.Player[index].Equipment[i] = new PlayerEq();
-            Data.Player[index].Equipment[i].Num = -1;
-        }
-
-        Data.Player[index].Inv = new PlayerInv[Core.Globals.Variables.MaxInv];
-        for (int i = 0, loopTo1 = global::Script.MaxInv; i < loopTo1; i++)
-        {
-            Data.Player[index].Inv[i].Num = -1;
-            Data.Player[index].Inv[i].Value = 0;
-        }
-
-        Data.Player[index].Exp = 0;
-        Data.Player[index].Level = 0;
-        Data.Player[index].Map = 0;
-        Data.Player[index].Name = "";
-        Data.Player[index].Pk = false;
-        Data.Player[index].Points = 0;
-        Data.Player[index].Sex = 0;
-
-        Data.Player[index].Skill = new PlayerSkill[Core.Globals.Variables.MaxPlayerSkills];
-        for (int i = 0, loopTo2 = global::Script.MaxPlayerSkills; i < loopTo2; i++)
-        {
-            Data.Player[index].Skill[i].Num = -1;
-            Data.Player[index].Skill[i].Cd = 0;
-        }
-
-        Data.Player[index].Sprite = 0;
-
-        Data.Player[index].Stat = new int[Enum.GetValues(typeof(Stat)).Length];
-        for (int i = 0, loopTo3 = Enum.GetValues(typeof(Stat)).Length; i < loopTo3; i++)
-            Data.Player[index].Stat[i] = 0;
-
-        var count = Enum.GetValues(typeof(Vital)).Length;
-        Data.Player[index].Vital = new int[count];
-        Data.Player[index].MaxVital = new int[count];
-        for (int i = 0, loopTo4 = count; i < loopTo4; i++)
-        {
-            Data.Player[index].Vital[i] = 0;
-            Data.Player[index].MaxVital[i] = 0;
-        }
-        Data.Player[index].X = 0;
-        Data.Player[index].Y = 0;
-
-        Data.Player[index].Hotbar = new Hotbar[Core.Globals.Variables.MaxHotbar];
-        for (int i = 0, loopTo5 = global::Script.MaxHotbar; i < loopTo5; i++)
-        {
-            Data.Player[index].Hotbar[i].Slot = -1;
-            Data.Player[index].Hotbar[i].SlotType = 0;
-        }
-
-        Data.Player[index].Switches = new byte[Core.Globals.Variables.MaxSwitches];
-        for (int i = 0, loopTo6 = global::Script.MaxSwitches; i < loopTo6; i++)
-            Data.Player[index].Switches[i] = 0;
-
-        Data.Player[index].Variables = new int[Core.Globals.Variables.MaxVariables];
-        for (int i = 0, loopTo7 = global::Script.MaxVariables; i < loopTo7; i++)
-            Data.Player[index].Variables[i] = 0;
-
-        var resoruceCount = Enum.GetValues(typeof(ResourceSkill)).Length;
-        Data.Player[index].GatherSkills = new ResourceType[resoruceCount];
-        for (int i = 0, loopTo8 = resoruceCount; i < loopTo8; i++)
-        {
-            Data.Player[index].GatherSkills[i].SkillLevel = 1;
-            Data.Player[index].GatherSkills[i].SkillCurExp = 0;
-            SetPlayerGatherSkillMaxExp(index, i, (int)GetSkillNextLevel(index, i));
-        }
-
-        for (int i = 0, loopTo9 = Enum.GetValues(typeof(Equipment)).Length; i < loopTo9; i++)
-            Data.Player[index].Equipment[i] = new PlayerEq();
-    }
-
-    public static bool LoadCharacter(int index, int charNum)
-    {
-        JObject data;
-        data = SelectRowByColumn("id", GetStringHash(GetAccountLogin(index)), "account", "character" + charNum.ToString());
-
-        if (data is null)
-        {
-            ClearCharacter(index);
-            return false;
-        }
-
-        var characterData = data.ToObject<Type.Player>();
-
-        if (characterData.Name == "")
-        {
-            return false;
-        }
-
-        Data.Player[index] = characterData;
-        Data.TempPlayer[index].Slot = (byte)charNum;
-        return true;
-    }
-
-    public static void SaveCharacter(int index, int slot)
-    {
-        var json = JsonConvert.SerializeObject(Data.Player[index]).ToString();
-        var id = GetStringHash(GetAccountLogin(index));
-
-        if (slot < 1 | slot > global::Script.MaxChars)
-            return;
-
-        if (RowExistsByColumn("id", id, "account"))
-        {
-            UpdateRowByColumn("id", id, "character" + slot.ToString(), json, "account");
-        }
-        else
-        {
-            InsertRowByColumn(id, json, "account", "character" + slot.ToString(), "id");
-        }
-    }
-
-    public static void AddChar(int index, int slot, string name, byte sex, byte jobNum, int sprite)
+    public static async System.Threading.Tasks.Task AddChar(int index, int slot, string name, byte sex, byte jobNum, int sprite)
     {
         int n;
         int i;
 
-        if (Data.Player[index].Name == "")
+        if (Account.Instance[index].Player[slot].Name == "")
         {
-            Data.Player[index].Name = name;
-            Data.Player[index].Sex = sex;
-            Data.Player[index].Job = jobNum;
-            Data.Player[index].Sprite = sprite;
-            Data.Player[index].Level = 1;
+            Account.Instance[index].Player[slot].Name = name;
+            Account.Instance[index].Player[slot].Sex = sex;
+            Account.Instance[index].Player[slot].Job = jobNum;
+            Account.Instance[index].Player[slot].Sprite = sprite;
+            Account.Instance[index].Player[slot].Level = 1;
 
             var statCount = Enum.GetValues(typeof(Stat)).Length;
             for (n = 0; n < statCount; n++)
-                Data.Player[index].Stat[n] = Job.Instance[jobNum].Stat[n];
+                Account.Instance[index].Player[slot].Stat[n] = Job.Instance[jobNum].Stat[n];
 
-            Data.Player[index].Dir = (byte)Direction.Down;
-            Data.Player[index].Map = Job.Instance[jobNum].StartMap;
+            Account.Instance[index].Player[slot].Dir = (byte)Direction.Down;
+            Account.Instance[index].Player[slot].Map = Job.Instance[jobNum].StartMap;
 
-            if (Data.Player[index].Map == 0)
-                Data.Player[index].Map = 1;
+            if (Account.Instance[index].Player[slot].Map == 0)
+                Account.Instance[index].Player[slot].Map = 1;
 
-            Data.Player[index].X = Job.Instance[jobNum].StartX;
-            Data.Player[index].Y = Job.Instance[jobNum].StartY;
-            Data.Player[index].Dir = (byte)Direction.Down;
+            Account.Instance[index].Player[slot].X = Job.Instance[jobNum].StartX;
+            Account.Instance[index].Player[slot].Y = Job.Instance[jobNum].StartY;
+            Account.Instance[index].Player[slot].Dir = (byte)Direction.Down;
 
             var vitalCount = Enum.GetValues(typeof(Vital)).Length;
             for (i = 0; i < vitalCount; i++)
@@ -849,8 +609,8 @@ public static class Database
             {
                 if (Job.Instance[jobNum].StartItem[n] >= 0)
                 {
-                    Data.Player[index].Inv[n].Num = Job.Instance[jobNum].StartItem[n];
-                    Data.Player[index].Inv[n].Value = Job.Instance[jobNum].StartValue[n];
+                    Account.Instance[index].Player[slot].Inventory[n].Num = Job.Instance[jobNum].StartItem[n];
+                    Account.Instance[index].Player[slot].Inventory[n].Value = Job.Instance[jobNum].StartValue[n];
                 }            
             }
 
@@ -859,26 +619,30 @@ public static class Database
             {
                 if (Job.Instance[jobNum].StartSkill[n] >= 0)
                 {
-                    Data.Player[index].Skill[n].Num = Job.Instance[jobNum].StartSkill[n];
-                    Data.Player[index].Skill[n].Cd = 0;
+                    Account.Instance[index].Player[slot].Skill[n].Num = Job.Instance[jobNum].StartSkill[n];
+                    Account.Instance[index].Player[slot].Skill[n].Cd = 0;
                 }
             }
 
             for (n = 0; n < Enum.GetValues(typeof(Equipment)).Length; n++)
             {
-                Data.Player[index].Equipment[n] = new PlayerEq();
-                Data.Player[index].Equipment[n].Num = -1;
+                Account.Instance[index].Player[slot].Paperdoll[n] = new Paperdoll();
+                Account.Instance[index].Player[slot].Paperdoll[n].Num = -1;
             }
 
             // set gathering skills defaults
             var resourceCount = Enum.GetValues(typeof(ResourceSkill)).Length;
             for (i = 0; i < resourceCount; i++)
             {
-                Data.Player[index].GatherSkills[i].SkillLevel = 1;
-                Data.Player[index].GatherSkills[i].SkillCurExp = 0;
-                SetPlayerGatherSkillMaxExp(index, i, (int)GetSkillNextLevel(index, i));
+                Account.Instance[index].Player[slot].GatherSkills[i].SkillLevel = 1;
+                Account.Instance[index].Player[slot].GatherSkills[i].SkillCurExp = 0;
+                SetPlayerGatherSkillMaxExperience(index, i, (int)GetSkillNextLevel(index, i));
             }
-            SaveCharacter(index, slot);
+
+            if (Database.CharacterList?.Count == 1)
+                SetPlayerAccess(index, (int)AccessLevel.Owner);
+
+            await Account.OnSave(index);
         }
 
     }
@@ -921,7 +685,7 @@ public static class Database
 
         sr.Close();
 
-        if (Data.Account[index].Banned)
+        if (Account.Instance[index].Banned)
         {
             isBanned = true;
         }
@@ -951,13 +715,13 @@ public static class Database
             }
         }
 
-        Data.Account[banPlayerIndex].Banned = true;
+        Account.Instance[banPlayerIndex].Banned = true;
 
         ip = ip.Substring(0, i);
         Log.Add(ip, "banlist.txt");
         NetworkSend.SendGlobalMessage(GetPlayerName(banPlayerIndex) + " has been banned from " + SettingsManager.Instance.GameName + " by " + GetPlayerName(bannedByIndex) + "!");
         Log.Add(GetPlayerName(bannedByIndex) + " has banned " + GetPlayerName(banPlayerIndex) + ".", Constant.AdminLog);
-        var task = Player.LeftGame(banPlayerIndex);
+        var task = Player.OnExit(banPlayerIndex);
         task.Wait();
     }
 }

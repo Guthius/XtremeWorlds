@@ -21,7 +21,7 @@ public sealed class GameService(
 
         foreach (var player in playerService.Players)
         {
-            await Player.LeftGame(player.Id);
+            await Player.OnExit(player.Id);
         }
 
         lifetime.StopApplication();

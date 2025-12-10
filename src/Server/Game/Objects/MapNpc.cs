@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using static Core.Net.Packets;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 using Server.Game;
 
 namespace Server

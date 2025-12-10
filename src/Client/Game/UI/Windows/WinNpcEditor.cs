@@ -133,7 +133,7 @@ public class WinNpcEditor
         if (WindowManager.TryGetControl("winNpcEditor", "cmbDropItem", out var itemCtrl) && itemCtrl is ComboBox cmbItem)
         {
             cmbItem.Items.Clear();
-            for (int i = 0; i < Variables.MaxItems; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxItems; i++)
             {
                 var raw = Item.Instance[i].Name ?? string.Empty;
                 var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
@@ -232,7 +232,7 @@ public class WinNpcEditor
         }
         if (WindowManager.TryGetControl("winNpcEditor", "txtExp", out var expCtrl) && expCtrl is TextBox txtExp)
         {
-            txtExp.Text = npc.Exp.ToString();
+            txtExp.Text = npc.Experience.ToString();
         }
         if (WindowManager.TryGetControl("winNpcEditor", "txtLevel", out var lvlCtrl) && lvlCtrl is TextBox txtLvl)
         {
@@ -275,7 +275,7 @@ public class WinNpcEditor
         {
             if (npc.DropItem != null && slot < npc.DropItem.Length)
             {
-                var storedIndex = Math.Clamp(npc.DropItem[slot], 0, Variables.MaxItems - 1);
+                var storedIndex = Math.Clamp(npc.DropItem[slot], 0, Core.Globals.Variables.MaxItems - 1);
                 cmbItem.Value = Math.Clamp(storedIndex, 0, Math.Max(0, cmbItem.Items.Count - 1));
             }
             else

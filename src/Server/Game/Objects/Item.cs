@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 using Server.Game;
 using Server.Game.Net;
 using Server.Net;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 using static Core.Net.Packets;
 using Type = Core.Globals.Type;
 using Core.Objects;
@@ -33,7 +33,7 @@ public class Item : ItemBase, IAsyncData
 
     public static Task OnLoadAllAsync()
     {
-        return Parallel.ForEachAsync(Enumerable.Range(0, Variables.MaxItems), OnLoadAsync);
+        return Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxItems), OnLoadAsync);
     }
 
     public static async ValueTask OnLoadAsync(int index, CancellationToken cancellationToken)

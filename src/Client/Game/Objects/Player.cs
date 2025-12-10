@@ -6,90 +6,31 @@ using Client.Game.UI.Windows;
 using Client.Net;
 using Core.Globals;
 using Core.Net;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 using Type = Core.Globals.Type;
 using Microsoft.Xna.Framework;
 using Core.Configurations;
 using Core.Interfaces;
+using Core.Objects;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Client
 {
-    public class Player : IData
+    public class Player : PlayerBase
     {
         #region Database
 
-        public static void OnReset()
-        {
-            Data.Account = new Type.Account[Variables.MaxPlayers];
-            Data.Player = new Type.Player[Variables.MaxPlayers];
-            Data.TempPlayer = new Type.TempPlayer[Variables.MaxPlayers];
-
-            for (int i = 0; i < Variables.MaxPlayers; i++)
-            {
-                OnClear(i);
-            }
-        }
-
         public static void OnClear(int index)
         {
-            Data.Account[index].Login = "";
-            Data.Account[index].Password = "";
+            Data.TradeTheirOffer = new Type.Item[Core.Globals.Variables.MaxInventory];
+            Data.TradeYourOffer = new Type.Item[Core.Globals.Variables.MaxInventory];
 
-            Data.Player[index].Name = "";
-            Data.Player[index].Attacking = 0;
-            Data.Player[index].AttackTimer = 0;
-            Data.Player[index].Job = 0;
-            Data.Player[index].Dir = 0;
-            Data.Player[index].Access = (byte) AccessLevel.Player;
-
-            Data.Player[index].Equipment = new Type.PlayerEq[Enum.GetValues(typeof(Equipment)).Length];
-            for (int y = 0; y < Data.Player[index].Equipment.Length; y++)
-                Data.Player[index].Equipment[y] = new Type.PlayerEq();
-
-            Data.Player[index].Exp = 0;
-            Data.Player[index].Level = 0;
-            Data.Player[index].Map = 0;
-            Data.Player[index].Moving = 0;
-            Data.Player[index].Pk = false;
-            Data.Player[index].Points = 0;
-            Data.Player[index].Sprite = 0;
-
-            Data.Player[index].Inv = new Type.PlayerInv[Variables.MaxInv];
-            for (int x = 0; x < Variables.MaxInv; x++)
+            for (int x = 0; x < Core.Globals.Variables.MaxInventory; x++)
             {
-                Data.Player[index].Inv[x].Num = -1;
-                Data.Player[index].Inv[x].Value = 0;
                 Data.TradeTheirOffer[x].Num = -1;
                 Data.TradeYourOffer[x].Num = -1;
             }
-
-            Data.Player[index].Skill = new Type.PlayerSkill[Variables.MaxPlayerSkills];
-            for (int x = 0; x < Variables.MaxPlayerSkills; x++)
-            {
-                Data.Player[index].Skill[x].Num = -1;
-                Data.Player[index].Skill[x].Cd = 0;
-            }
-
-            Data.Player[index].Stat = new int[Enum.GetValues(typeof(Stat)).Length];
-            foreach (Stat stat in Enum.GetValues(typeof(Stat)))
-                Data.Player[index].Stat[(int)stat] = 0;
-
-            Data.Player[index].Steps = 0;
-
-            int vitalCount = Enum.GetValues(typeof(Vital)).Length;
-            Data.Player[index].Vital = new int[vitalCount];
-            Data.Player[index].MaxVital = new int[vitalCount];
-            foreach (Vital vital in Enum.GetValues(typeof(Vital)))
-            {
-                Data.Player[index].Vital[(int)vital] = 0;
-                Data.Player[index].MaxVital[(int)vital] = 0;
-            }
-            Data.Player[index].X = 0;
-            Data.Player[index].Y = 0;
-
-            Data.Player[index].Hotbar = new Type.Hotbar[Variables.MaxHotbar];
-            Data.Player[index].GatherSkills = new Type.ResourceType[Enum.GetValues(typeof(ResourceSkill)).Length];
-
+  
             Trade.InTrade = -1;
         }
 
@@ -100,7 +41,7 @@ namespace Client
         public static void CheckMovement()
         {
             // Guard against invalid player or map state
-            if (GameState.MyIndex < 0 || GameState.MyIndex >= Variables.MaxPlayers)
+            if (GameState.MyIndex < 0 || GameState.MyIndex >= Core.Globals.Variables.MaxPlayers)
                 return;
 
             int mapIdx = GetPlayerMap(GameState.MyIndex);
@@ -119,10 +60,10 @@ namespace Client
                 bool started = CanMove();
                 if (started)
                 {
-                    Data.Player[GameState.MyIndex].Moving = (byte)(GameState.VbKeyShift ? MovementState.Walking : MovementState.Running);
+                    Player.Instance[GameState.MyIndex].Moving = (byte)(GameState.VbKeyShift ? MovementState.Walking : MovementState.Running);
                     Sender.SendPlayerMove();
                 }
-                else if (Data.Player[GameState.MyIndex].IsMoving)
+                else if (Player.Instance[GameState.MyIndex].IsMoving)
                 {
                     // Keep sending movement while mid‑tile to keep server in sync (optional; can throttle later)
                     Sender.SendPlayerMove();
@@ -171,9 +112,9 @@ namespace Client
             if (newDir >= 0)
             {
                 // Always update local facing immediately
-                if (Data.Player[GameState.MyIndex].Dir != newDir)
+                if (Player.Instance[GameState.MyIndex].Dir != newDir)
                 {
-                    Data.Player[GameState.MyIndex].Dir = (byte)newDir;
+                    Player.Instance[GameState.MyIndex].Dir = (byte)newDir;
                 }
                 // Send dir every frame while keys are held to eliminate visual lag between transitions
                 Sender.SendPlayerDir();
@@ -190,13 +131,13 @@ namespace Client
             }
             else
             {
-                if (Data.Player[GameState.MyIndex].IsMoving)
+                if (Player.Instance[GameState.MyIndex].IsMoving)
                 {
                     Sender.SendStopPlayerMove();
-                    Data.Player[GameState.MyIndex].IsMoving = false;
+                    Player.Instance[GameState.MyIndex].IsMoving = false;
                 }
                 // Always ensure numeric Moving flag (animation driver) is cleared whenever no movement keys are down
-                Data.Player[GameState.MyIndex].Moving = 0; // 0 = idle
+                Player.Instance[GameState.MyIndex].Moving = 0; // 0 = idle
             }
 
             return isTryingToMove;
@@ -217,7 +158,7 @@ namespace Client
                 return canMove;
             }
 
-            var remaining = (int) (Data.Player[GameState.MyIndex].DeathTimer - General.GetTickCount()) / 1000;
+            var remaining = (int) (Player.Instance[GameState.MyIndex].DeathTimer - General.GetTickCount()) / 1000;
             if (remaining < 0) remaining = 0;
 
             if (remaining > 0)
@@ -699,11 +640,11 @@ namespace Client
             {
                 if (Moral.Instance[Data.MyMap.Moral].PlayerBlock)
                 {
-                    for (i = 0; i < Variables.MaxPlayers; i++)
+                    for (i = 0; i < Core.Globals.Variables.MaxPlayers; i++)
                     {
                         if (IsPlaying(i))
                         {
-                            if (Data.Player[i].X == x & Data.Player[i].Y == y)
+                            if (Player.Instance[i].X == x & Player.Instance[i].Y == y)
                             {
                                 OnCheckDir = true;
                                 return OnCheckDir;
@@ -715,7 +656,7 @@ namespace Client
                 // Check to see if a Npc is already on that tile
                 if (Moral.Instance[Data.MyMap.Moral].NpcBlock)
                 {
-                    for (i = 0; i < Variables.MaxMapNpcs; i++)
+                    for (i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
                     {
                         if (Data.MyMapNpc[i].Num >= 0 & Data.MyMapNpc[i].X == x & Data.MyMapNpc[i].Y == y)
                         {
@@ -751,7 +692,7 @@ namespace Client
         /// </summary>
         public static void UpdateFacingFromMouse(int mouseScreenX, int mouseScreenY)
         {
-            if (GameState.MyIndex < 0 | GameState.MyIndex > Variables.MaxPlayers) return;
+            if (GameState.MyIndex < 0 | GameState.MyIndex > Core.Globals.Variables.MaxPlayers) return;
             int playerScreenX = GameLogic.ConvertMapX(GetPlayerRawX(GameState.MyIndex)) + Constants.TileSize / 2;
             int playerScreenY = GameLogic.ConvertMapY(GetPlayerRawY(GameState.MyIndex)) + Constants.TileSize / 2;
             int dx = mouseScreenX - playerScreenX;
@@ -767,9 +708,9 @@ namespace Client
             else if (angle > -157.5 && angle <= -112.5) dir = Direction.UpLeft;
             else if (angle > -112.5 && angle <= -67.5) dir = Direction.Up;
             else dir = Direction.UpRight;
-            if (Data.Player[GameState.MyIndex].Dir != (byte)dir)
+            if (Player.Instance[GameState.MyIndex].Dir != (byte)dir)
             {
-                Data.Player[GameState.MyIndex].Dir = (byte)dir;
+                Player.Instance[GameState.MyIndex].Dir = (byte)dir;
                 Sender.SendPlayerDir();
             }
         }
@@ -780,39 +721,39 @@ namespace Client
             // causing remote players to slide only while you moved (and freeze otherwise), producing
             // desynced positions and camera jitter when targeting them. Now use each player's own flag.
             if (!IsPlaying(index)) return;
-            if (!Data.Player[index].IsMoving) return;
+            if (!Player.Instance[index].IsMoving) return;
 
             // Update per‑pixel offsets based on direction.
             // NOTE: This assumes 1px per tick step. If variable speed is desired later, introduce a per-player speed.
             switch (GetPlayerDir(index))
             {
                 case (int)Direction.Up:
-                    Data.Player[index].Y -= 1;
+                    Player.Instance[index].Y -= 1;
                     break;
                 case (int)Direction.Down:
-                    Data.Player[index].Y += 1;
+                    Player.Instance[index].Y += 1;
                     break;
                 case (int)Direction.Left:
-                    Data.Player[index].X -= 1;
+                    Player.Instance[index].X -= 1;
                     break;
                 case (int)Direction.Right:
-                    Data.Player[index].X += 1;
+                    Player.Instance[index].X += 1;
                     break;
                 case (int)Direction.UpRight:
-                    Data.Player[index].X += 1;
-                    Data.Player[index].Y -= 1;
+                    Player.Instance[index].X += 1;
+                    Player.Instance[index].Y -= 1;
                     break;
                 case (int)Direction.UpLeft:
-                    Data.Player[index].X -= 1;
-                    Data.Player[index].Y -= 1;
+                    Player.Instance[index].X -= 1;
+                    Player.Instance[index].Y -= 1;
                     break;
                 case (int)Direction.DownRight:
-                    Data.Player[index].X += 1;
-                    Data.Player[index].Y += 1;
+                    Player.Instance[index].X += 1;
+                    Player.Instance[index].Y += 1;
                     break;
                 case (int)Direction.DownLeft:
-                    Data.Player[index].X -= 1;
-                    Data.Player[index].Y += 1;
+                    Player.Instance[index].X -= 1;
+                    Player.Instance[index].Y += 1;
                     break;
             }
         }
@@ -825,7 +766,7 @@ namespace Client
 
             if (GameState.VbKeyControl || mouse)
             {
-                if (GameState.MyIndex < 0 | GameState.MyIndex > Variables.MaxPlayers)
+                if (GameState.MyIndex < 0 | GameState.MyIndex > Core.Globals.Variables.MaxPlayers)
                     return;
 
                 if (Event.InEvent)
@@ -837,7 +778,7 @@ namespace Client
                     return;
                 }
 
-                var remaining = (int) (Data.Player[GameState.MyIndex].DeathTimer - General.GetTickCount()) / 1000;
+                var remaining = (int) (Player.Instance[GameState.MyIndex].DeathTimer - General.GetTickCount()) / 1000;
                 if (remaining < 0) remaining = 0;
 
                 if (remaining > 0)
@@ -852,27 +793,27 @@ namespace Client
                     return; // stunned, can't attack
 
                 // speed from weapon
-                if (GetPlayerEquipment(GameState.MyIndex, Equipment.Weapon) >= 0)
+                if (GetPlayerPaperdoll(GameState.MyIndex, Equipment.Weapon) >= 0)
                 {
-                    attackSpeed = Item.Instance[GetPlayerEquipment(GameState.MyIndex, Equipment.Weapon)].Speed * 1000;
+                    attackSpeed = Item.Instance[GetPlayerPaperdoll(GameState.MyIndex, Equipment.Weapon)].Speed * 1000;
                 }
                 else
                 {
                     attackSpeed = 1000;
                 }
 
-                if (Data.Player[GameState.MyIndex].AttackTimer + attackSpeed < General.GetTickCount())
+                if (Player.Instance[GameState.MyIndex].AttackTimer + attackSpeed < General.GetTickCount())
                 {
-                    if (Data.Player[GameState.MyIndex].Attacking == 0)
+                    if (Player.Instance[GameState.MyIndex].Attacking == 0)
                     {
                         {
-                            ref var instance = ref Data.Player[GameState.MyIndex];
+                            var instance = Player.Instance[GameState.MyIndex];
                             instance.Attacking = 1;
                             instance.AttackTimer = General.GetTickCount();
                         }
 
                         // If weapon has a projectile, send mouse-aimed attack with world pixel coords
-                        int weapon = GetPlayerEquipment(GameState.MyIndex, Equipment.Weapon);
+                        int weapon = GetPlayerPaperdoll(GameState.MyIndex, Equipment.Weapon);
                         if (mouse && weapon >= 0 && Item.Instance[weapon].Projectile >= 0)
                         {
                             // Compute world pixel coordinates of mouse relative to map origin
@@ -887,7 +828,7 @@ namespace Client
                     }
                 }
 
-                switch (Data.Player[GameState.MyIndex].Dir)
+                switch (Player.Instance[GameState.MyIndex].Dir)
                 {
                     case (byte) Direction.Up:
                     {
@@ -945,7 +886,7 @@ namespace Client
                     }
                 }
 
-                if (General.GetTickCount() > Data.Player[GameState.MyIndex].EventTimer)
+                if (General.GetTickCount() > Player.Instance[GameState.MyIndex].EventTimer)
                 {
                     for (int i = 0, loopTo = GameState.CurrentEvents; i < loopTo; i++)
                     {
@@ -972,7 +913,7 @@ namespace Client
 
                                 Network.Send(packetWriter);
 
-                                Data.Player[GameState.MyIndex].EventTimer = General.GetTickCount() + 200;
+                                Player.Instance[GameState.MyIndex].EventTimer = General.GetTickCount() + 200;
                             }
                         }
                     }
@@ -983,30 +924,30 @@ namespace Client
         public static void CastSkill(int skillSlot)
         {
             // Check for subscript out of range
-            if (skillSlot < 0 | skillSlot > Variables.MaxPlayerSkills)
+            if (skillSlot < 0 | skillSlot > Core.Globals.Variables.MaxPlayerSkills)
                 return;
 
-            if (Data.Player[GameState.MyIndex].Skill[skillSlot].Cd > 0)
+            if (Player.Instance[GameState.MyIndex].Skill[skillSlot].Cd > 0)
             {
                 TextRenderer.AddText("Skill has not cooled down yet!", (int) ColorName.BrightRed);
                 return;
             }
 
-            if (Data.Player[GameState.MyIndex].Skill[skillSlot].Num < 0)
+            if (Player.Instance[GameState.MyIndex].Skill[skillSlot].Num < 0)
                 return;
 
             // Check if player has enough MP
-            if (GetPlayerVital(GameState.MyIndex, Vital.Mana) < Data.Skill[Data.Player[GameState.MyIndex].Skill[skillSlot].Num].MpCost)
+            if (GetPlayerVital(GameState.MyIndex,Core.Globals.Vital.Mana) < Data.Skill[Player.Instance[GameState.MyIndex].Skill[skillSlot].Num].MpCost)
             {
-                TextRenderer.AddText("Not enough mana to cast " + Data.Skill[Data.Player[GameState.MyIndex].Skill[skillSlot].Num].Name + ".", (int) ColorName.BrightRed);
+                TextRenderer.AddText("Not enough mana to cast " + Data.Skill[Player.Instance[GameState.MyIndex].Skill[skillSlot].Num].Name + ".", (int) ColorName.BrightRed);
                 return;
             }
 
-            if (Data.Player[GameState.MyIndex].Skill[skillSlot].Num >= 0)
+            if (Player.Instance[GameState.MyIndex].Skill[skillSlot].Num >= 0)
             {
-                if (General.GetTickCount() > Data.Player[GameState.MyIndex].AttackTimer + 1000)
+                if (General.GetTickCount() > Player.Instance[GameState.MyIndex].AttackTimer + 1000)
                 {
-                    if (Data.Player[GameState.MyIndex].Moving == 0)
+                    if (Player.Instance[GameState.MyIndex].Moving == 0)
                     {
                         if (Data.MyMap.Moral >= 0)
                         {
@@ -1040,12 +981,12 @@ namespace Client
             findSkill = 0;
 
             // Check for subscript out of range
-            if (skillNum < 0 | skillNum > Variables.MaxSkills)
+            if (skillNum < 0 | skillNum > Core.Globals.Variables.MaxSkills)
             {
                 return findSkill;
             }
 
-            for (i = 0; i < Variables.MaxPlayerSkills; i++)
+            for (i = 0; i < Core.Globals.Variables.MaxPlayerSkills; i++)
             {
                 // Check to see if the player has the skill
                 if (GetPlayerSkill(GameState.MyIndex, i) == skillNum)
@@ -1079,9 +1020,9 @@ namespace Client
                 color = Color.Red;
             }
 
-            var remaining = (Data.Player[index].DeathTimer - General.GetTickCount()) / 1000;
+            var remaining = (Player.Instance[index].DeathTimer - General.GetTickCount()) / 1000;
             if (remaining < 0) remaining = 0;
-            var name = remaining > 0 ? $"{remaining}..." : Data.Player[index].Name;
+            var name = remaining > 0 ? $"{remaining}..." : Player.Instance[index].Name;
 
             // X position: keep current label-style centering over the tile
             var playerWorldX = GetPlayerRawX(index);
@@ -1094,7 +1035,7 @@ namespace Client
 
             // Y position: mirror NPC/event logic using sprite graphics when available
             int textY;
-            int spriteNum = Data.Player[index].Sprite;
+            int spriteNum = Player.Instance[index].Sprite;
 
             if (spriteNum <= 0 || spriteNum > GameState.NumCharacters)
             {
@@ -1149,16 +1090,16 @@ namespace Client
 
             spriteNum = GetPlayerSprite(index);
 
-            if (index < 0 | index > Variables.MaxPlayers)
+            if (index < 0 | index > Core.Globals.Variables.MaxPlayers)
                 return;
 
             if (spriteNum <= 0 | spriteNum > GameState.NumCharacters)
                 return;
 
             // Derive attack speed duration (ms). If stored as seconds, multiply here; if already ms, keep as-is.
-            if (GetPlayerEquipment(index, Equipment.Weapon) >= 0)
+            if (GetPlayerPaperdoll(index, Equipment.Weapon) >= 0)
             {
-                attackSpeed = Item.Instance[GetPlayerEquipment(index, Equipment.Weapon)].Speed;
+                attackSpeed = Item.Instance[GetPlayerPaperdoll(index, Equipment.Weapon)].Speed;
                 if (attackSpeed < 50) attackSpeed *= 1000; // heuristic: treat tiny values as seconds, convert to ms
             }
             else
@@ -1167,13 +1108,13 @@ namespace Client
             }
 
             long tick = General.GetTickCount();
-            bool isAttacking = Data.Player[index].Attacking == 1; // full attack state
-            bool provisionalMoving = Data.Player[index].IsMoving; // raw flag from network
+            bool isAttacking = Player.Instance[index].Attacking == 1; // full attack state
+            bool provisionalMoving = Player.Instance[index].IsMoving; // raw flag from network
             anim = 0; // will be set after texture info (need framesPerSegment)
 
             // Check to see if we want to stop making him attack
             {
-                ref var instance = ref Data.Player[index];
+                var instance = Player.Instance[index];
                 if (instance.AttackTimer + attackSpeed < General.GetTickCount())
                 {
                     instance.Attacking = 0;
@@ -1254,7 +1195,7 @@ namespace Client
                 if (isAttacking)
                 {
                     // Time-based mapping: elapsed over attackSpeed spans exactly one full attack frame cycle
-                    long elapsed = tick - Data.Player[index].AttackTimer;
+                    long elapsed = tick - Player.Instance[index].AttackTimer;
                     if (elapsed < 0) elapsed = 0;
                     long duration = attackSpeed;
                     if (duration <= 0) duration = 1;
@@ -1268,22 +1209,22 @@ namespace Client
                 {
                     // Run anim: tied to movement steps only
                     int len = segmentLengths[1];
-                    anim = (byte)(Data.Player[index].Steps % len);
+                    anim = (byte)(Player.Instance[index].Steps % len);
                 }
                 else
                 {
                     // Idle: animate through idle frames using Steps
                     int len = segmentLengths[0];
-                    anim = (byte)(Data.Player[index].Steps % len);
+                    anim = (byte)(Player.Instance[index].Steps % len);
                 }
             }
             else
             {
                 // Legacy: single segment; Steps only advance while moving so idle shows frame 0
-                anim = (byte)(Data.Player[index].Steps % frameColumnsForWidth); // legacy: cycles while idle too
+                anim = (byte)(Player.Instance[index].Steps % frameColumnsForWidth); // legacy: cycles while idle too
             }
             // Calculate the X
-            x = (int)Math.Round(Data.Player[index].X - (gfxInfo.Width / (double)frameColumnsForWidth - 32d) / 2d);
+            x = (int)Math.Round(Player.Instance[index].X - (gfxInfo.Width / (double)frameColumnsForWidth - 32d) / 2d);
 
             // Is the player's height more than 32..?
             if ((gfxInfo.Height / directionRows) > 32)
@@ -1341,9 +1282,9 @@ namespace Client
 
             foreach (var eq in eqOrder)
             {
-                if (GetPlayerEquipment(index, eq) >= 0)
+                if (GetPlayerPaperdoll(index, eq) >= 0)
                 {
-                    var itemIndex = GetPlayerEquipment(index, eq);
+                    var itemIndex = GetPlayerPaperdoll(index, eq);
                     var paperId = Item.Instance[itemIndex].Paperdoll;
                     if (paperId > 0)
                     {
@@ -1360,18 +1301,18 @@ namespace Client
 
             // Check to see if we want to stop showing emote
             {
-                ref var instance1 = ref Data.Player[index];
-                if (instance1.EmoteTimer < General.GetTickCount())
+                var instance = Player.Instance[index];
+                if (instance.EmoteTimer < General.GetTickCount())
                 {
-                    instance1.Emote = 0;
-                    instance1.EmoteTimer = 0;
+                    instance.Emote = 0;
+                    instance.EmoteTimer = 0;
                 }
             }
 
             // check for emotes
-            if (Data.Player[GameState.MyIndex].Emote > 0)
+            if (Player.Instance[GameState.MyIndex].Emote > 0)
             {
-                GameClient.DrawEmote(x, y, Data.Player[GameState.MyIndex].Emote);
+                GameClient.DrawEmote(x, y, Player.Instance[GameState.MyIndex].Emote);
             }
         }
 

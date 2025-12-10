@@ -5,7 +5,7 @@ using System.IO;
 
 namespace Client.Game.UI.Windows;
 
-public class WinChars
+public class WinCharacters
 {
     public static void OnSelectCharacter1Click()
     {
@@ -77,33 +77,33 @@ public class WinChars
     
     public static void OnDraw()
     {
-        var winChars = WindowManager.GetWindowByName("winChars");
-        if (winChars is null)
+        var WinCharacters = WindowManager.GetWindowByName("WinCharacters");
+        if (WinCharacters is null)
         {
             return;
         }
 
-        for (var i = 0; i < Variables.MaxChars; i++)
+        for (var i = 0; i < Variables.MaxCharacters; i++)
         {
             if (string.IsNullOrEmpty(GameState.CharName[i]))
             {
                 continue;
             }
 
-            if (GameState.CharSprite[i] <= 0)
+            if (GameState.Charactersprite[i] <= 0)
             {
                 continue;
             }
 
-            var spritePath = Path.Combine(DataPath.Characters, GameState.CharSprite[i].ToString());
+            var spritePath = Path.Combine(DataPath.Characters, GameState.Charactersprite[i].ToString());
             var sprite = GameClient.GetGfxInfo(spritePath);
             if (sprite is null)
             {
                 continue;
             }
 
-            var x = winChars.X + 24 + (i * 110);
-            var y = winChars.Y + 80;
+            var x = WinCharacters.X + 24 + (i * 110);
+            var y = WinCharacters.Y + 80;
 
             var frameCount = SettingsManager.Instance.RunFrames + SettingsManager.Instance.IdleFrames + SettingsManager.Instance.AttackFrames;
             var w = sprite.Width / frameCount;
@@ -111,7 +111,7 @@ public class WinChars
             if (sprite.Height % dirs != 0) dirs = 4; // fallback legacy
             var h = sprite.Height / (dirs == 0 ? 1 : dirs);
 
-            if (GameState.CharSprite[i] <= GameState.NumCharacters)
+            if (GameState.Charactersprite[i] <= GameState.NumCharacters)
             {
                 GameClient.RenderTexture(ref spritePath, x, y, 0, 0, w, h, w, h);
             }

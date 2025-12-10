@@ -69,7 +69,7 @@ public class WinResourceEditor
         {
             if (cmbReward.Items.Count == 0)
             {
-                for (int i = 0; i < Variables.MaxItems; i++)
+                for (int i = 0; i < Core.Globals.Variables.MaxItems; i++)
                 {
                     var nm = Item.Instance[i].Name ?? string.Empty;
                     cmbReward.Items.Add($"{i + 1}: {nm}");

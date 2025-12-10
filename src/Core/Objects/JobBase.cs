@@ -46,7 +46,6 @@ namespace Core.Objects
         public int BaseExp;
 
         public static List<JobBase> Instance { get; private set; } = new List<JobBase>();
-        public int Index { get; set; } = -1;
 
         public static void OnClear(int index)
         {

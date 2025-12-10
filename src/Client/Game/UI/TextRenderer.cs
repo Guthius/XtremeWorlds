@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.IO;
 using System.Text;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 
 namespace Client.Game.UI;
 
@@ -438,41 +438,41 @@ public static class TextRenderer
         }
     }
 
-    public static void DrawActionMsg(int index)
+    public static void DrawActionMessage(int index)
     {
         var x = 0;
         var y = 0;
         var time = 0;
 
-        switch (Data.ActionMsg[index].Type)
+        switch (Data.ActionMessage[index].Type)
         {
             case (int)ActionMessageType.Static:
                 time = 1500;
-                if (Data.ActionMsg[index].Y > 0)
+                if (Data.ActionMessage[index].Y > 0)
                 {
-                    x = Data.ActionMsg[index].X + Conversion.Int(Constants.TileSize / 2) - Strings.Len(Data.ActionMsg[index].Message) / 2 * 8;
-                    y = Data.ActionMsg[index].Y - Conversion.Int(Constants.TileSize / 2) - 2;
+                    x = Data.ActionMessage[index].X + Conversion.Int(Constants.TileSize / 2) - Strings.Len(Data.ActionMessage[index].Message) / 2 * 8;
+                    y = Data.ActionMessage[index].Y - Conversion.Int(Constants.TileSize / 2) - 2;
                 }
                 else
                 {
-                    x = Data.ActionMsg[index].X + Conversion.Int(Constants.TileSize / 2) - Strings.Len(Data.ActionMsg[index].Message) / 2 * 8;
-                    y = Data.ActionMsg[index].Y - Conversion.Int(Constants.TileSize / 2) + 18;
+                    x = Data.ActionMessage[index].X + Conversion.Int(Constants.TileSize / 2) - Strings.Len(Data.ActionMessage[index].Message) / 2 * 8;
+                    y = Data.ActionMessage[index].Y - Conversion.Int(Constants.TileSize / 2) + 18;
                 }
                 break;
 
             case (int)ActionMessageType.Scroll:
                 time = 1500;
-                if (Data.ActionMsg[index].Y > 0)
+                if (Data.ActionMessage[index].Y > 0)
                 {
-                    x = Data.ActionMsg[index].X + Conversion.Int(Constants.TileSize / 2) - Strings.Len(Data.ActionMsg[index].Message) / 2 * 8;
-                    y = (int)Math.Round(Data.ActionMsg[index].Y - Conversion.Int(Constants.TileSize / 2) - 2 - Data.ActionMsg[index].Scroll * 0.6d);
-                    Data.ActionMsg[index].Scroll++;
+                    x = Data.ActionMessage[index].X + Conversion.Int(Constants.TileSize / 2) - Strings.Len(Data.ActionMessage[index].Message) / 2 * 8;
+                    y = (int)Math.Round(Data.ActionMessage[index].Y - Conversion.Int(Constants.TileSize / 2) - 2 - Data.ActionMessage[index].Scroll * 0.6d);
+                    Data.ActionMessage[index].Scroll++;
                 }
                 else
                 {
-                    x = Data.ActionMsg[index].X + Conversion.Int(Constants.TileSize / 2) - Strings.Len(Data.ActionMsg[index].Message) / 2 * 8;
-                    y = (int)Math.Round(Data.ActionMsg[index].Y - Conversion.Int(Constants.TileSize / 2) + 18 + Data.ActionMsg[index].Scroll * 0.6d);
-                    Data.ActionMsg[index].Scroll++;
+                    x = Data.ActionMessage[index].X + Conversion.Int(Constants.TileSize / 2) - Strings.Len(Data.ActionMessage[index].Message) / 2 * 8;
+                    y = (int)Math.Round(Data.ActionMessage[index].Y - Conversion.Int(Constants.TileSize / 2) + 18 + Data.ActionMessage[index].Scroll * 0.6d);
+                    Data.ActionMessage[index].Scroll++;
                 }
                 break;
 
@@ -480,13 +480,13 @@ public static class TextRenderer
                 time = 3000;
                 for (int i = byte.MaxValue; i >= 0; i--)
                 {
-                    if (Data.ActionMsg[i].Type == (int)ActionMessageType.Screen && i != index)
+                    if (Data.ActionMessage[i].Type == (int)ActionMessageType.Screen && i != index)
                     {
-                        GameLogic.ClearActionMsg((byte)index);
+                        GameLogic.ClearActionMessage((byte)index);
                         index = i;
                     }
                 }
-                x = GameState.ResolutionWidth / 2 - Strings.Len(Data.ActionMsg[index].Message) / 2 * 8;
+                x = GameState.ResolutionWidth / 2 - Strings.Len(Data.ActionMessage[index].Message) / 2 * 8;
                 y = 425;
                 break;
         }
@@ -494,13 +494,13 @@ public static class TextRenderer
         x = GameLogic.ConvertMapX(x);
         y = GameLogic.ConvertMapY(y);
 
-        if (General.GetTickCount() < Data.ActionMsg[index].Created + time)
+        if (General.GetTickCount() < Data.ActionMessage[index].Created + time)
         {
-            OnDraw(Data.ActionMsg[index].Message, x, y, GameClient.QbColorToXnaColor(Data.ActionMsg[index].Color), Color.Black);
+            OnDraw(Data.ActionMessage[index].Message, x, y, GameClient.QbColorToXnaColor(Data.ActionMessage[index].Color), Color.Black);
         }
         else
         {
-            GameLogic.ClearActionMsg((byte)index);
+            GameLogic.ClearActionMessage((byte)index);
         }
     }
 

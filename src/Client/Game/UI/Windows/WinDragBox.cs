@@ -2,7 +2,7 @@
 using System.IO;
 using Client.Net;
 using Core.Globals;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 using Type = Core.Globals.Type;
 
 namespace Client.Game.UI.Windows;
@@ -174,7 +174,7 @@ public class WinDragBox
             case PartOrigin.Inventory:
                 if (WindowManager.DragBox.Type == DraggablePartType.Item)
                 {
-                    if (Item.Instance[GetPlayerInv(GameState.MyIndex, WindowManager.DragBox.Slot)].Type != (byte) ItemCategory.Currency)
+                    if (Item.Instance[GetPlayerInventory(GameState.MyIndex, WindowManager.DragBox.Slot)].Type != (byte) ItemCategory.Currency)
                     {
                         Sender.SendDepositItem(WindowManager.DragBox.Slot, 1);
                     }
@@ -195,7 +195,7 @@ public class WinDragBox
             case PartOrigin.Inventory:
                 if (WindowManager.DragBox.Type == DraggablePartType.Item)
                 {
-                    for (var slot = 0; slot < Variables.MaxInv; slot++)
+                    for (var slot = 0; slot < Variables.MaxInventory; slot++)
                     {
                         Type.Rect rect;
 
@@ -326,9 +326,9 @@ public class WinDragBox
         switch (WindowManager.DragBox.Origin)
         {
             case PartOrigin.Inventory:
-                if (Item.Instance[GetPlayerInv(GameState.MyIndex, WindowManager.DragBox.Slot)].Type != (byte) ItemCategory.Currency)
+                if (Item.Instance[GetPlayerInventory(GameState.MyIndex, WindowManager.DragBox.Slot)].Type != (byte) ItemCategory.Currency)
                 {
-                    Sender.SendDropItem(WindowManager.DragBox.Slot, GetPlayerInv(GameState.MyIndex, WindowManager.DragBox.Slot));
+                    Sender.SendDropItem(WindowManager.DragBox.Slot, GetPlayerInventory(GameState.MyIndex, WindowManager.DragBox.Slot));
                 }
                 else
                 {

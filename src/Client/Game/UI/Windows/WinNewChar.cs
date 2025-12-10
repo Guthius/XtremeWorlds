@@ -41,13 +41,13 @@ public class WinNewChar
     public static void OnLeftClick()
     {
         var spriteIndex = GameState.NewCnarGender == Sex.Male ? Job.Instance[GameState.NewCharJob].MaleSprite : Job.Instance[GameState.NewCharJob].FemaleSprite;
-        if (GameState.NewCharSprite < 0)
+        if (GameState.NewCharactersprite < 0)
         {
-            GameState.NewCharSprite = spriteIndex;
+            GameState.NewCharactersprite = spriteIndex;
         }
         else
         {
-            GameState.NewCharSprite -= 1;
+            GameState.NewCharactersprite -= 1;
         }
     }
 
@@ -57,19 +57,19 @@ public class WinNewChar
             ? Job.Instance[GameState.NewCharJob].MaleSprite
             : Job.Instance[GameState.NewCharJob].FemaleSprite;
 
-        if (GameState.NewCharSprite >= spriteIndex)
+        if (GameState.NewCharactersprite >= spriteIndex)
         {
-            GameState.NewCharSprite = 1;
+            GameState.NewCharactersprite = 1;
         }
         else
         {
-            GameState.NewCharSprite += 1;
+            GameState.NewCharactersprite += 1;
         }
     }
 
     public static void OnMaleChecked()
     {
-        GameState.NewCharSprite = 1;
+        GameState.NewCharactersprite = 1;
         GameState.NewCnarGender = Sex.Male;
 
         var winNewChar = WindowManager.GetWindowByName("winNewChar");
@@ -89,7 +89,7 @@ public class WinNewChar
 
     public static void OnFemaleChecked()
     {
-        GameState.NewCharSprite = 1;
+        GameState.NewCharactersprite = 1;
         GameState.NewCnarGender = Sex.Female;
 
         var winNewChar = WindowManager.GetWindowByName("winNewChar");
@@ -119,7 +119,7 @@ public class WinNewChar
         winNewChar.GetChild("chkMale").Value = 0;
         winNewChar.GetChild("chkFemale").Value = 0;
 
-        GameState.NewCharSprite = 1;
+        GameState.NewCharactersprite = 1;
         GameState.NewCnarGender = Sex.Male;
 
         WindowManager.HideWindows();
@@ -138,6 +138,6 @@ public class WinNewChar
 
         WindowManager.HideWindows();
 
-        GameLogic.AddChar(name, (int) GameState.NewCnarGender, GameState.NewCharJob, GameState.NewCharSprite);
+        GameLogic.AddChar(name, (int) GameState.NewCnarGender, GameState.NewCharJob, GameState.NewCharactersprite);
     }
 }

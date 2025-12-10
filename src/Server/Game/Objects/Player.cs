@@ -1,28 +1,31 @@
 ﻿using Core;
 using Core.Globals;
+using Core.Interfaces;
 using Core.Net;
+using Core.Objects;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.Extensions.Logging;
 using Server.Game;
 using Server.Game.Net;
 using Server.Net;
 using XtremeWorlds.Server.Configuration;
-using static Core.Globals.Command;
+using static Core.Globals.Commands;
 using static Core.Net.Packets;
+using static Server.Globals.Commands;
 
 namespace Server;
 
-public class Player
+public class Player : PlayerBase
 {
-    public static void CheckLevelUp(int playerId)
+    public static void OnLevel(int playerId)
     {
         try
         {
-            Script.Instance?.CheckLevelUp(playerId);
+            Script.Instance?.OnLevel(playerId);
         }
         catch (Exception ex)
         {
-            General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(CheckLevelUp));
+            General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(OnLevel));
         }
     }
 
@@ -36,7 +39,7 @@ public class Player
         // Send an ok to client to start receiving in game data
         NetworkSend.SendLoginOk(session.Id);
 
-        JoinGame(session.Id);
+        OnJoin(session.Id);
 
         General.Logger.LogInformation("{AccountName} | {PlayerName} has began playing {GameName}",
             GetAccountLogin(session.Id), GetPlayerName(session.Id),
@@ -66,11 +69,11 @@ public class Player
         {
             try
             {
-                Script.Instance?.LeaveMap(playerId, oldMapNum);
+                Script.Instance?.OnLeave(playerId, oldMapNum);
             }
             catch (Exception ex)
             {
-                General.Logger.LogError(ex, "[Script] Error in {MethodName}", "LeaveMap");
+                General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(OnWarp));
             }
 
             NetworkSend.SendLeaveMap(playerId, oldMapNum);   
@@ -140,9 +143,9 @@ public class Player
         var didWarp = false;
 
         // Heal / Trap tile effect working variables
-        int healVital = -1;      // -1 means no heal tile encountered; 0=HP,1=MP,2=SP
+        int healVital = -1; // -1 means no heal tile encountered; 0=HP,1=MP,2=SP
         int healAmount = 0;
-        int trapVital = (int)Vital.Health; // default trap vital is Health
+        int trapVital = (int)Core.Globals.Vital.Health; // default trap vital is Health
         int trapAmount = 0;
 
         // Check for subscript out of range
@@ -446,8 +449,8 @@ public class Player
                 {
                     int color = hv switch
                     {
-                        Vital.Health => (int)ColorName.BrightGreen,
-                        Vital.Mana => (int)ColorName.BrightBlue,
+                        Core.Globals.Vital.Health => (int)ColorName.BrightGreen,
+                        Core.Globals.Vital.Mana => (int)ColorName.BrightBlue,
                         _ => (int)ColorName.Yellow
                     };
                     NetworkSend.SendActionMessage(GetPlayerMap(playerId), "+" + healAmount, color, (byte)ActionMessageType.Scroll, GetPlayerX(playerId) * 32, GetPlayerY(playerId) * 32, 1);
@@ -473,7 +476,7 @@ public class Player
             {
                 var tv = (Vital)trapVital;
                 NetworkSend.SendActionMessage(GetPlayerMap(playerId), "-" + trapAmount, (int)ColorName.BrightRed, (byte)ActionMessageType.Scroll, GetPlayerX(playerId) * 32, GetPlayerY(playerId) * 32, 1);
-                if (tv == Vital.Health && GetPlayerVital(playerId, Vital.Health) - trapAmount <= 0)
+                if (tv == Core.Globals.Vital.Health && GetPlayerVital(playerId, Core.Globals.Vital.Health) - trapAmount <= 0)
                 {
                     KillPlayer(playerId);
                     NetworkSend.SendPlayerMessage(playerId, "You've been killed by a trap.", (int)ColorName.BrightRed);
@@ -494,7 +497,7 @@ public class Player
             OnWarp(playerId, GetPlayerMap(playerId), GetPlayerX(playerId), GetPlayerY(playerId), (byte) Direction.Down);
         }
         
-        Data.Player[playerId].IsMoving = true;
+        Player.Instance[playerId].IsMoving = true;
         NetworkSend.SendPlayerXYToMap(playerId);
 
         try
@@ -609,22 +612,22 @@ public class Player
 
     public static int HasItem(int playerId, int itemNum)
     {
-        if (itemNum < 0 || itemNum > Variables.MaxItems)
+        if (itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems)
         {
             return 0;
         }
 
         var totalQuantity = 0;
-        for (var invSlot = 0; invSlot < Core.Globals.Variables.MaxInv; invSlot++)
+        for (var invSlot = 0; invSlot < Core.Globals.Variables.MaxInventory; invSlot++)
         {
-            if (GetPlayerInv(playerId, invSlot) != itemNum)
+            if (GetPlayerInventory(playerId, invSlot) != itemNum)
             {
                 continue;
             }
 
             if (Item.Instance[itemNum].Type == (byte) ItemCategory.Currency || Item.Instance[itemNum].Stackable == 1)
             {
-                totalQuantity += GetPlayerInvValue(playerId, invSlot);
+                totalQuantity += GetPlayerInventoryValue(playerId, invSlot);
             }
             else
             {
@@ -637,14 +640,14 @@ public class Player
 
     public static int FindItemSlot(int playerId, int itemNum)
     {
-        if (itemNum < 0 || itemNum >= Variables.MaxItems)
+        if (itemNum < 0 || itemNum >= Core.Globals.Variables.MaxItems)
         {
             return -1;
         }
 
-        for (var invSlot = 0; invSlot < Core.Globals.Variables.MaxInv; invSlot++)
+        for (var invSlot = 0; invSlot < Core.Globals.Variables.MaxInventory; invSlot++)
         {
-            if (GetPlayerInv(playerId, invSlot) == itemNum)
+            if (GetPlayerInventory(playerId, invSlot) == itemNum)
             {
                 return invSlot;
             }
@@ -679,17 +682,17 @@ public class Player
 
     public static void OnGetItem(int playerId)
         {
-            var mapNum = Command.GetPlayerMap(playerId);
+            var mapNum = GetPlayerMap(playerId);
 
             for (var mapItemNum = 0; mapItemNum < Core.Globals.Variables.MaxMapItems; mapItemNum++)
             {
                 if (Data.MapItem[mapNum, mapItemNum].Num < 0 ||
-                    Data.MapItem[mapNum, mapItemNum].Num >= Variables.MaxItems)
+                    Data.MapItem[mapNum, mapItemNum].Num >= Core.Globals.Variables.MaxItems)
                 {
                     continue;
                 }
 
-                if (Math.Floor((double)Data.MapItem[mapNum, mapItemNum].X / Constants.TileSize) != Command.GetPlayerX(playerId) || Math.Floor((double)Data.MapItem[mapNum, mapItemNum].Y / Constants.TileSize) != Command.GetPlayerY(playerId))
+                if (Math.Floor((double)Data.MapItem[mapNum, mapItemNum].X / Constants.TileSize) != GetPlayerX(playerId) || Math.Floor((double)Data.MapItem[mapNum, mapItemNum].Y / Constants.TileSize) != GetPlayerY(playerId))
                 {
                     continue;
                 }
@@ -722,7 +725,7 @@ public class Player
 
     public static int FindOpenInvSlot(int playerId, int itemNum)
     {
-        if (!NetworkConfig.IsPlaying(playerId) || itemNum < 0 || itemNum > Variables.MaxItems)
+        if (!NetworkConfig.IsPlaying(playerId) || itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems)
         {
             return -1;
         }
@@ -730,18 +733,18 @@ public class Player
         if (Item.Instance[itemNum].Type == (byte) ItemCategory.Currency ||
             Item.Instance[itemNum].Stackable == 1)
         {
-            for (var invSlot = 0; invSlot < Core.Globals.Variables.MaxInv; invSlot++)
+            for (var invSlot = 0; invSlot < Core.Globals.Variables.MaxInventory; invSlot++)
             {
-                if (GetPlayerInv(playerId, invSlot) == itemNum)
+                if (GetPlayerInventory(playerId, invSlot) == itemNum)
                 {
                     return invSlot;
                 }
             }
         }
 
-        for (var invSlot = 0; invSlot < Core.Globals.Variables.MaxInv; invSlot++)
+        for (var invSlot = 0; invSlot < Core.Globals.Variables.MaxInventory; invSlot++)
         {
-            if (GetPlayerInv(playerId, invSlot) == -1)
+            if (GetPlayerInventory(playerId, invSlot) == -1)
             {
                 return invSlot;
             }
@@ -752,17 +755,17 @@ public class Player
 
     public static bool TakeInv(int playerId, int itemNum, int itemVal)
     {
-        if (!NetworkConfig.IsPlaying(playerId) || itemNum < 0 || itemNum > Variables.MaxItems)
+        if (!NetworkConfig.IsPlaying(playerId) || itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems)
         {
             return false;
         }
 
         var clearInvSlot = false;
 
-        for (var invSlot = 0; invSlot < Core.Globals.Variables.MaxInv; invSlot++)
+        for (var invSlot = 0; invSlot < Core.Globals.Variables.MaxInventory; invSlot++)
         {
             // Check to see if the player has the item
-            if (GetPlayerInv(playerId, invSlot) != itemNum)
+            if (GetPlayerInventory(playerId, invSlot) != itemNum)
             {
                 continue;
             }
@@ -771,13 +774,13 @@ public class Player
                 Item.Instance[itemNum].Stackable == 1)
             {
                 // Is what we are trying to take away more then what they have?  If so just set it to zero
-                if (itemVal >= GetPlayerInvValue(playerId, invSlot))
+                if (itemVal >= GetPlayerInventoryValue(playerId, invSlot))
                 {
                     clearInvSlot = true;
                 }
                 else
                 {
-                    SetPlayerInvValue(playerId, invSlot, GetPlayerInvValue(playerId, invSlot) - itemVal);
+                    SetInventoryValue(playerId, invSlot, GetPlayerInventoryValue(playerId, invSlot) - itemVal);
 
                     NetworkSend.SendInventoryUpdate(playerId, invSlot);
                 }
@@ -792,8 +795,8 @@ public class Player
                 continue;
             }
 
-            SetPlayerInv(playerId, invSlot, -1);
-            SetPlayerInvValue(playerId, invSlot, 0);
+            SetInventory(playerId, invSlot, -1);
+            SetInventoryValue(playerId, invSlot, 0);
 
             NetworkSend.SendInventoryUpdate(playerId, invSlot);
 
@@ -805,7 +808,7 @@ public class Player
 
     public static bool GiveInv(int playerId, int itemNum, int itemVal, byte bound = 0, bool sendUpdate = true)
     {
-        if (!NetworkConfig.IsPlaying(playerId) || itemNum < 0 || itemNum > Variables.MaxItems)
+        if (!NetworkConfig.IsPlaying(playerId) || itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems)
         {
             return false;
         }
@@ -819,9 +822,9 @@ public class Player
 
         itemVal = Math.Max(itemVal, 1);
 
-        SetPlayerInv(playerId, slot, itemNum);
-        SetPlayerInvValue(playerId, slot, GetPlayerInvValue(playerId, slot) + itemVal);
-        Data.Player[playerId].Inv[slot].Bound = bound;
+        SetInventory(playerId, slot, itemNum);
+        SetInventoryValue(playerId, slot, GetPlayerInventoryValue(playerId, slot) + itemVal);
+        Player.Instance[playerId].Inventory[slot].Bound = bound;
 
         if (sendUpdate)
         {
@@ -833,7 +836,7 @@ public class Player
 
     public static void MapDropItem(int playerId, int invNum, int amount)
     {
-        if (!NetworkConfig.IsPlaying(playerId) || invNum < 0 || invNum > Core.Globals.Variables.MaxInv)
+        if (!NetworkConfig.IsPlaying(playerId) || invNum < 0 || invNum > Core.Globals.Variables.MaxInventory)
         {
             return;
         }
@@ -852,14 +855,14 @@ public class Player
             return;
         }
 
-        if (Data.Player[playerId].Inv[invNum].Bound > 0)
+        if (Player.Instance[playerId].Inventory[invNum].Bound > 0)
         {
             NetworkSend.SendPlayerMessage(playerId, "You can't drop soulbound items!", (int) ColorName.BrightRed);
             return;
         }
 
-        var itemNum = GetPlayerInv(playerId, invNum);
-        if (itemNum < 0 || itemNum >= Variables.MaxItems)
+        var itemNum = GetPlayerInventory(playerId, invNum);
+        if (itemNum < 0 || itemNum >= Core.Globals.Variables.MaxItems)
         {
             return;
         }
@@ -899,24 +902,24 @@ public class Player
     {
         var takeInvSlot = false;
 
-        if (!NetworkConfig.IsPlaying(playerId) || invSlot < 0 || invSlot > Core.Globals.Variables.MaxInv)
+        if (!NetworkConfig.IsPlaying(playerId) || invSlot < 0 || invSlot > Core.Globals.Variables.MaxInventory)
         {
             return false;
         }
 
-        var itemNum = GetPlayerInv(playerId, invSlot);
+        var itemNum = GetPlayerInventory(playerId, invSlot);
 
         if (Item.Instance[itemNum].Type == (byte) ItemCategory.Currency ||
             Item.Instance[itemNum].Stackable == 1)
         {
             // Is what we are trying to take away more then what they have?  If so just set it to zero
-            if (itemVal >= GetPlayerInvValue(playerId, invSlot))
+            if (itemVal >= GetPlayerInventoryValue(playerId, invSlot))
             {
                 takeInvSlot = true;
             }
             else
             {
-                SetPlayerInvValue(playerId, invSlot, GetPlayerInvValue(playerId, invSlot) - itemVal);
+                SetInventoryValue(playerId, invSlot, GetPlayerInventoryValue(playerId, invSlot) - itemVal);
             }
         }
         else
@@ -929,13 +932,13 @@ public class Player
             return false;
         }
 
-        SetPlayerInv(playerId, invSlot, -1);
-        SetPlayerInvValue(playerId, invSlot, 0);
+        SetInventory(playerId, invSlot, -1);
+        SetInventoryValue(playerId, invSlot, 0);
 
         return true;
     }
 
-    public static bool CanPlayerUseItem(int playerId, int itemNum)
+    public static bool CanUseItem(int playerId, int itemNum)
     {
         if (Data.Map[GetPlayerMap(playerId)].Moral >= 0)
         {
@@ -987,18 +990,18 @@ public class Player
 
     public static void UseItem(int playerId, int invNum)
     {
-        if (invNum < 0 || invNum > Core.Globals.Variables.MaxInv)
+        if (invNum < 0 || invNum > Core.Globals.Variables.MaxInventory)
         {
             return;
         }
 
-        var itemNum = GetPlayerInv(playerId, invNum);
-        if (itemNum < 0 || itemNum > Variables.MaxItems)
+        var itemNum = GetPlayerInventory(playerId, invNum);
+        if (itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems)
         {
             return;
         }
 
-        if (!CanPlayerUseItem(playerId, itemNum))
+        if (!CanUseItem(playerId, itemNum))
         {
             return;
         }
@@ -1020,46 +1023,46 @@ public class Player
             return;
         }
 
-        var oldNum = GetPlayerInv(playerId, oldSlot);
-        var oldValue = GetPlayerInvValue(playerId, oldSlot);
-        var newNum = GetPlayerInv(playerId, newSlot);
-        var newValue = GetPlayerInvValue(playerId, newSlot);
-        var oldBound = Data.Player[playerId].Inv[oldSlot].Bound;
-        var newBound = Data.Player[playerId].Inv[newSlot].Bound;
+        var oldNum = GetPlayerInventory(playerId, oldSlot);
+        var oldValue = GetPlayerInventoryValue(playerId, oldSlot);
+        var newNum = GetPlayerInventory(playerId, newSlot);
+        var newValue = GetPlayerInventoryValue(playerId, newSlot);
+        var oldBound = Player.Instance[playerId].Inventory[oldSlot].Bound;
+        var newBound = Player.Instance[playerId].Inventory[newSlot].Bound;
 
         if (newNum >= 0)
         {
             if (oldNum == newNum & Item.Instance[newNum].Stackable == 1) // Same item, if we can stack it, lets do that :P
             {
-                SetPlayerInv(playerId, newSlot, newNum);
-                SetPlayerInvValue(playerId, newSlot, oldValue + newValue);
-                SetPlayerInv(playerId, oldSlot, 0);
-                SetPlayerInvValue(playerId, oldSlot, 0);
-                Data.Player[playerId].Inv[oldSlot].Bound = 0;
+                SetInventory(playerId, newSlot, newNum);
+                SetInventoryValue(playerId, newSlot, oldValue + newValue);
+                SetInventory(playerId, oldSlot, 0);
+                SetInventoryValue(playerId, oldSlot, 0);
+                Player.Instance[playerId].Inventory[oldSlot].Bound = 0;
 
                 if (oldBound > newBound)
                 {
-                    Data.Player[playerId].Inv[newSlot].Bound = oldBound;
+                    Player.Instance[playerId].Inventory[newSlot].Bound = oldBound;
                 }
             }
             else
             {
-                SetPlayerInv(playerId, newSlot, oldNum);
-                SetPlayerInvValue(playerId, newSlot, oldValue);
-                SetPlayerInv(playerId, oldSlot, newNum);
-                SetPlayerInvValue(playerId, oldSlot, newValue);
-                Data.Player[playerId].Inv[oldSlot].Bound = newBound;
-                Data.Player[playerId].Inv[newSlot].Bound = oldBound;
+                SetInventory(playerId, newSlot, oldNum);
+                SetInventoryValue(playerId, newSlot, oldValue);
+                SetInventory(playerId, oldSlot, newNum);
+                SetInventoryValue(playerId, oldSlot, newValue);
+                Player.Instance[playerId].Inventory[oldSlot].Bound = newBound;
+                Player.Instance[playerId].Inventory[newSlot].Bound = oldBound;
             }
         }
         else
         {
-            SetPlayerInv(playerId, newSlot, oldNum);
-            SetPlayerInvValue(playerId, newSlot, oldValue);
-            SetPlayerInv(playerId, oldSlot, newNum);
-            SetPlayerInvValue(playerId, oldSlot, newValue);
-            Data.Player[playerId].Inv[oldSlot].Bound = newBound;
-            Data.Player[playerId].Inv[newSlot].Bound = oldBound;
+            SetInventory(playerId, newSlot, oldNum);
+            SetInventoryValue(playerId, newSlot, oldValue);
+            SetInventory(playerId, oldSlot, newNum);
+            SetInventoryValue(playerId, oldSlot, newValue);
+            Player.Instance[playerId].Inventory[oldSlot].Bound = newBound;
+            Player.Instance[playerId].Inventory[newSlot].Bound = oldBound;
         }
 
         NetworkSend.SendInventory(playerId);
@@ -1111,16 +1114,16 @@ public class Player
 
         foreach (var equipment in equipments)
         {
-            var itemNum = GetPlayerEquipment(playerId, equipment);
+            var itemNum = GetPlayerPaperdoll(playerId, equipment);
             if (itemNum < 0)
             {
-                SetPlayerEquipment(playerId, -1, equipment);
+                SetPlayerPaperdoll(playerId, -1, equipment);
                 continue;
             }
 
             if (Item.Instance[itemNum].SubType != (byte) equipment)
             {
-                SetPlayerEquipment(playerId, -1, equipment);
+                SetPlayerPaperdoll(playerId, -1, equipment);
             }
         }
     }
@@ -1133,13 +1136,13 @@ public class Player
             return;
         }
 
-        var itemNum = GetPlayerEquipment(playerId, (Equipment) eqSlot);
-        if (itemNum < 0 || itemNum >= Variables.MaxItems)
+        var itemNum = GetPlayerPaperdoll(playerId, (Equipment) eqSlot);
+        if (itemNum < 0 || itemNum >= Core.Globals.Variables.MaxItems)
         {
             return;
         }
 
-        if (GetPlayerEquipment(playerId, (Equipment)eqSlot) < 0 || GetPlayerEquipment(playerId, (Equipment)eqSlot) > Variables.MaxItems)
+        if (GetPlayerPaperdoll(playerId, (Equipment)eqSlot) < 0 || GetPlayerPaperdoll(playerId, (Equipment)eqSlot) > Core.Globals.Variables.MaxItems)
             return;
 
         if (FindOpenInvSlot(playerId, itemNum) >= 0)
@@ -1159,21 +1162,20 @@ public class Player
         }
     }
 
-    public static void JoinGame(int playerId)
+    public static void OnJoin(int playerId)
     {
         try
         {
-            Script.Instance?.JoinGame(playerId);
-
+            Script.Instance?.OnJoin(playerId);
             General.UpdateCaption();
         }
         catch (Exception ex)
         {
-            General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(JoinGame));
+            General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(OnJoin));
         }
     }
 
-    public static async System.Threading.Tasks.Task LeftGame(int playerId)
+    public static async System.Threading.Tasks.Task OnExit(int playerId)
     {
         General.Logger.LogInformation("{AccountName} | {PlayerName} has stopped playing {GameName}",
             GetAccountLogin(playerId), GetPlayerName(playerId),
@@ -1181,20 +1183,19 @@ public class Player
         
         try
         {
-            Script.Instance?.LeftGame(playerId);
+            Script.Instance?.OnLeft(playerId);
         }
         catch (Exception ex)
         {
-            General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(LeftGame));
+            General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(OnExit));
         }
 
         if (Data.TempPlayer[playerId].InGame)
         {
-            await Database.SaveCharacterAsync(playerId, Data.TempPlayer[playerId].Slot);
-            await Database.SaveBankAsync(playerId);
+            await Account.OnSave(playerId);
         }
         
-        Database.ClearPlayer(playerId);
+        Account.OnClear(playerId);
 
         PlayerService.Instance.RemovePlayer(playerId);
         
@@ -1219,57 +1220,57 @@ public class Player
 
     public static void GiveBank(int playerId, int invSlot, int amount)
     {
-        if (invSlot < 0 || invSlot >= Variables.MaxInv)
+        if (invSlot < 0 || invSlot >= Core.Globals.Variables.MaxInventory)
         {
             return;
         }
 
         amount = Math.Max(amount, 0);
-        if (GetPlayerInvValue(playerId, invSlot) < amount && GetPlayerInv(playerId, invSlot) == 0)
+        if (GetPlayerInventoryValue(playerId, invSlot) < amount && GetPlayerInventory(playerId, invSlot) == 0)
         {
             return;
         }
 
-        var bankSlot = FindOpenbankSlot(playerId, GetPlayerInv(playerId, invSlot));
+        var bankSlot = FindOpenbankSlot(playerId, GetPlayerInventory(playerId, invSlot));
         if (bankSlot == -1)
         {
             return;
         }
 
-        var itemNum = GetPlayerInv(playerId, invSlot);
-        var bound = Data.Player[playerId].Inv[invSlot].Bound;
+        var itemNum = GetPlayerInventory(playerId, invSlot);
+        var bound = Player.Instance[playerId].Inventory[invSlot].Bound;
 
-        Data.Bank[playerId].Item[bankSlot].Bound = bound;
+        Bank.Instance[playerId].Item[bankSlot].Bound = bound;
 
-        if (Item.Instance[GetPlayerInv(playerId, invSlot)].Type == (byte)ItemCategory.Currency ||
-            Item.Instance[GetPlayerInv(playerId, invSlot)].Stackable == 1)
+        if (Item.Instance[GetPlayerInventory(playerId, invSlot)].Type == (byte)ItemCategory.Currency ||
+            Item.Instance[GetPlayerInventory(playerId, invSlot)].Stackable == 1)
         {
-            if (GetPlayerBank(playerId, bankSlot) == GetPlayerInv(playerId, invSlot))
+            if (GetPlayerBank(playerId, bankSlot) == GetPlayerInventory(playerId, invSlot))
             {
                 SetPlayerBankValue(playerId, bankSlot, GetPlayerBankValue(playerId, bankSlot) + amount);
 
-                TakeInv(playerId, GetPlayerInv(playerId, invSlot), amount);
+                TakeInv(playerId, GetPlayerInventory(playerId, invSlot), amount);
             }
             else
             {
-                SetPlayerBank(playerId, bankSlot, GetPlayerInv(playerId, invSlot));
+                SetPlayerBank(playerId, bankSlot, GetPlayerInventory(playerId, invSlot));
                 SetPlayerBankValue(playerId, bankSlot, amount);
 
-                TakeInv(playerId, GetPlayerInv(playerId, invSlot), amount);
+                TakeInv(playerId, GetPlayerInventory(playerId, invSlot), amount);
             }
         }
-        else if (GetPlayerBank(playerId, bankSlot) == GetPlayerInv(playerId, invSlot))
+        else if (GetPlayerBank(playerId, bankSlot) == GetPlayerInventory(playerId, invSlot))
         {
             SetPlayerBankValue(playerId, bankSlot, GetPlayerBankValue(playerId, bankSlot) + 1);
 
-            TakeInv(playerId, GetPlayerInv(playerId, invSlot), 0);
+            TakeInv(playerId, GetPlayerInventory(playerId, invSlot), 0);
         }
         else
         {
             SetPlayerBank(playerId, bankSlot, itemNum);
             SetPlayerBankValue(playerId, bankSlot, 1);
 
-            TakeInv(playerId, GetPlayerInv(playerId, invSlot), 0);
+            TakeInv(playerId, GetPlayerInventory(playerId, invSlot), 0);
         }
 
         NetworkSend.SendBank(playerId);
@@ -1277,27 +1278,27 @@ public class Player
 
     public static int GetPlayerBank(int playerId, int bankSlot)
     {
-        return Data.Bank[playerId].Item[bankSlot].Num;
+        return Bank.Instance[playerId].Item[bankSlot].Num;
     }
 
     public static void SetPlayerBank(int playerId, int bankSlot, int itemNum)
     {
-        Data.Bank[playerId].Item[bankSlot].Num = itemNum;
+        Bank.Instance[playerId].Item[bankSlot].Num = itemNum;
     }
 
     public static int GetPlayerBankValue(int playerId, int bankSlot)
     {
-        return Data.Bank[playerId].Item[bankSlot].Value;
+        return Bank.Instance[playerId].Item[bankSlot].Value;
     }
 
     public static void SetPlayerBankValue(int playerId, int bankSlot, int value)
     {
-        Data.Bank[playerId].Item[bankSlot].Value = value;
+        Bank.Instance[playerId].Item[bankSlot].Value = value;
     }
 
     public static int FindOpenbankSlot(int playerId, int itemNum)
     {
-        if (!NetworkConfig.IsPlaying(playerId) || itemNum < 0 || itemNum >= Variables.MaxItems)
+        if (!NetworkConfig.IsPlaying(playerId) || itemNum < 0 || itemNum >= Core.Globals.Variables.MaxItems)
         {
             return -1;
         }
@@ -1339,7 +1340,7 @@ public class Player
         }
 
         var invSlot = FindOpenInvSlot(playerId, GetPlayerBank(playerId, bankSlot));
-        var bound =  Data.Bank[playerId].Item[bankSlot].Bound;
+        var bound =  Bank.Instance[playerId].Item[bankSlot].Bound;
 
         if (invSlot >= 0)
         {
@@ -1353,10 +1354,10 @@ public class Player
                 {
                     SetPlayerBank(playerId, bankSlot, 0);
                     SetPlayerBankValue(playerId, bankSlot, 0);
-                    Data.Bank[playerId].Item[bankSlot].Bound = 0;
+                    Bank.Instance[playerId].Item[bankSlot].Bound = 0;
                 }
             }
-            else if (GetPlayerBank(playerId, bankSlot) == GetPlayerInv(playerId, invSlot))
+            else if (GetPlayerBank(playerId, bankSlot) == GetPlayerInventory(playerId, invSlot))
             {
                 if (GetPlayerBankValue(playerId, bankSlot) > 1)
                 {
@@ -1386,16 +1387,16 @@ public class Player
         var oldValue = GetPlayerBankValue(playerId, oldSlot);
         var newNum = GetPlayerBank(playerId, newSlot);
         var newValue = GetPlayerBankValue(playerId, newSlot);
-        var oldBound = Data.Bank[playerId].Item[oldSlot].Bound;
-        var newBound = Data.Bank[playerId].Item[newSlot].Bound;
+        var oldBound = Bank.Instance[playerId].Item[oldSlot].Bound;
+        var newBound = Bank.Instance[playerId].Item[newSlot].Bound;
 
         SetPlayerBank(playerId, newSlot, oldNum);
         SetPlayerBankValue(playerId, newSlot, oldValue);
-        Data.Bank[playerId].Item[newSlot].Bound = oldBound;
+        Bank.Instance[playerId].Item[newSlot].Bound = oldBound;
 
         SetPlayerBank(playerId, oldSlot, newNum);
         SetPlayerBankValue(playerId, oldSlot, newValue);
-        Data.Bank[playerId].Item[oldSlot].Bound = newBound;
+        Bank.Instance[playerId].Item[oldSlot].Bound = newBound;
 
         NetworkSend.SendBank(playerId);
     }

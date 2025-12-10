@@ -19,7 +19,6 @@ namespace Core.Objects
         public bool PlayerBlock;
         public bool NpcBlock;
         public static List<MoralBase> Instance { get; private set; } = new List<MoralBase>();
-        public int Index { get; set; } = -1;
 
         public MoralBase()
         {

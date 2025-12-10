@@ -16,7 +16,7 @@ public sealed class GameNetworkService : NetworkService<GameSession>
 
     public override async System.Threading.Tasks.Task OnDisconnectedAsync(GameSession session, CancellationToken cancellationToken)
     {
-        await Server.Player.LeftGame(session.Id);
+        await Server.Player.OnExit(session.Id);
     }
 
     public override Task OnBytesReceivedAsync(GameSession session, ReadOnlySpan<byte> bytes, CancellationToken cancellationToken)

@@ -18,7 +18,7 @@ namespace Client
             int x;
             int y;
 
-            if (Data.MyMapItem[itemNum].Num < 0 | Data.MyMapItem[itemNum].Num > Variables.MaxItems)
+            if (Data.MyMapItem[itemNum].Num < 0 | Data.MyMapItem[itemNum].Num > Core.Globals.Variables.MaxItems)
                 return;
 
             Item.OnStream(Data.MyMapItem[itemNum].Num);
