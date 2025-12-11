@@ -31,8 +31,6 @@ public class Player : PlayerBase
 
     public static void OnAdd(GameSession session)
     {
-        PlayerService.Instance.AddPlayer(session.Id, session.Channel);
-
         // Set the flag so we know the person is in the game
         Data.TempPlayer[session.Id].InGame = true;
 
@@ -834,7 +832,7 @@ public class Player : PlayerBase
         return true;
     }
 
-    public static void MapDropItem(int playerId, int invNum, int amount)
+    public static void OnDrop(int playerId, int invNum, int amount)
     {
         if (!NetworkConfig.IsPlaying(playerId) || invNum < 0 || invNum > Core.Globals.Variables.MaxInventory)
         {
@@ -885,11 +883,11 @@ public class Player : PlayerBase
 
             try
             {
-                Script.Instance?.MapDropItem(playerId, slot, invNum, amount, mapNum, item, itemNum);
+                Script.Instance?.OnDrop(playerId, slot, invNum, amount, mapNum, item, itemNum);
             }
             catch (Exception ex)
             {
-                General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(MapDropItem));
+                General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(OnDrop));
             }
         }
         else
@@ -1208,7 +1206,7 @@ public class Player : PlayerBase
     {
         try
         {
-            return Script.Instance?.KillPlayer(playerId);
+            return Script.Instance?.OnKill(playerId);
         }
         catch (Exception ex)
         {

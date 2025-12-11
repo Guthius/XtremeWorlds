@@ -252,6 +252,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         General.Logger.LogInformation("{AccountName} has logged in from {IpAddress}",
             GetAccountLogin(session.Id), session.Channel.IpAddress);
 
+        PlayerService.Instance.AddPlayer(session.Id, session.Channel);
         NetworkSend.SendVariables(session);
         NetworkSend.SendPlayerCharacters(session);
         NetworkSend.SendJobs(session);
@@ -360,7 +361,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             sex = buffer.ReadInt32();
             job = buffer.ReadInt32();
 
-            if (slot < 1 | slot > Core.Globals.Variables.MaxCharacters)
+            if (slot < 0 || slot >= Core.Globals.Variables.MaxCharacters)
             {
                 NetworkSend.SendAlert(session, SystemMessage.MaxCharactersReached, Menu.CharacterSelect);
                 return;
@@ -436,7 +437,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             if (NetworkConfig.IsLoggedIn(session.Id))
             {
                 var slot = reader.ReadByte();
-                if (slot < 1 | slot > Core.Globals.Variables.MaxCharacters)
+                if (slot < 0 || slot >= Core.Globals.Variables.MaxCharacters)
                 {
                     NetworkSend.SendAlert(session, SystemMessage.MaxCharactersReached, Menu.CharacterSelect);
                     return;
@@ -462,7 +463,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         if (!NetworkConfig.IsPlaying(session.Id))
         {
             var slot = buffer.ReadByte();
-            if (slot < 1 | slot > Core.Globals.Variables.MaxCharacters)
+            if (slot < 0 || slot >= Core.Globals.Variables.MaxCharacters)
             {
                 NetworkSend.SendAlert(session, SystemMessage.MaxCharactersReached, Menu.CharacterSelect);
                 return;
@@ -1995,7 +1996,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         try
         {
-            Script.Instance?.TrainStat(session.Id, tmpStat);
+            Script.Instance?.OnTrain(session.Id, tmpStat);
         }
         catch (Exception ex)
         {
