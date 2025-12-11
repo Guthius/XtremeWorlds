@@ -1526,29 +1526,32 @@ namespace Client
                 // Right-click interactions
                 if (IsMouseButtonDown(MouseButton.Right))
                 {
-                    int slotNum = -1;
-                    if (WindowManager.TryGetWindow("winHotbar", out var winHotbar))
+                    if (GameState.PlayerData)
                     {
-                        slotNum = (int) GameLogic.IsHotbar(winHotbar!.X, winHotbar!.Y);
-                    }
-
-                    if (slotNum >= 0L)
-                    {
-                        Sender.SendDeleteHotbar(slotNum);
-                    }
-
-                    if (GameState.VbKeyShift == true)
-                    {
-                        // Admin warp if Shift is held and the player has moderator access
-                        if (GetPlayerAccess(GameState.MyIndex) >= (int) AccessLevel.Moderator)
+                        int slotNum = -1;
+                        if (WindowManager.TryGetWindow("winHotbar", out var winHotbar))
                         {
-                            Sender.SendAdminWarp(GameState.CurXGame, GameState.CurYGame);
+                            slotNum = (int) GameLogic.IsHotbar(winHotbar!.X, winHotbar!.Y);
                         }
-                    }
-                    else
-                    {
-                        // Handle right-click menu
-                        HandleRightClickMenu();
+
+                        if (slotNum >= 0L)
+                        {
+                            Sender.SendDeleteHotbar(slotNum);
+                        }
+
+                        if (GameState.VbKeyShift == true)
+                        {
+                            // Admin warp if Shift is held and the player has moderator access
+                            if (GetPlayerAccess(GameState.MyIndex) >= (int) AccessLevel.Moderator)
+                            {
+                                Sender.SendAdminWarp(GameState.CurXGame, GameState.CurYGame);
+                            }
+                        }
+                        else
+                        {
+                            // Handle right-click menu
+                            HandleRightClickMenu();
+                        }
                     }
                 }
             }
@@ -2495,10 +2498,11 @@ namespace Client
             int y;
             int i;
 
-            if (GameState.GettingMap || !GameState.InGame)
+            if (GameState.GettingMap || !GameState.InGame || !GameState.PlayerData)
                 return;
 
             GameLogic.UpdateCamera();
+
             // Auto-cancel target if player is off the current camera viewport (native world rect)
             CancelTargetIfOffCamera();
 
@@ -2586,7 +2590,7 @@ namespace Client
                     }
 
                     // Players
-                    for (i = 0; i < Variables.MaxPlayers; i++)
+                    for (i = 0; i < PlayerBase.Instance.Count; i++)
                     {
                         if (IsPlaying(i) & GetPlayerMap(i) == GetPlayerMap(GameState.MyIndex))
                         {

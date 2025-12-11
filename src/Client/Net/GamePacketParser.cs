@@ -248,7 +248,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     {
         var packetReader = new PacketReader(data);
 
-        GameState.MyIndex = packetReader.ReadInt32();
+        GameState.MyIndex = packetReader.ReadInt32() - 1;
     }
 
     public static void Packet_PlayerCharacters(ReadOnlyMemory<byte> data)
@@ -1482,8 +1482,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         for (int n = 0; n <= i; n++)
         {
-            if (n == 0) continue;
-            Player.Instance.Add(new Player());
+            if (Player.Instance.Count <= n)
+                Player.Instance.Add(new Player());
         }
         SetPlayerName(i, buffer.ReadString());
         SetPlayerJob(i, buffer.ReadInt32());

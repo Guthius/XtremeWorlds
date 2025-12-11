@@ -21,6 +21,11 @@ public class WinHotBar
             return;
         }
 
+        if (GameState.PlayerData == false)
+        {
+            return;
+        }
+
         var argPath = Path.Combine(DataPath.Gui, "31");
 
         GameClient.RenderTexture(ref argPath, winHotbar.X - 1, winHotbar.Y + 3, 0, 0, 11, 26, 11, 26);

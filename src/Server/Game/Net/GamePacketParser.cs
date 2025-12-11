@@ -219,12 +219,6 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         await Account.OnLoadAsync(session.Id, new CancellationToken());
 
-        for (int i = 0; i < Variables.MaxCharacters; i++)
-        {
-            if (PlayerBase.Instance.Count <= i)
-                PlayerBase.Instance.Add(new PlayerBase());
-        }
-
         if (Account.Instance[session.Id].Login != login)
         {
             NetworkSend.SendAlert(session, SystemMessage.Login, Menu.Login);
@@ -443,6 +437,14 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                     return;
                 }
 
+                for (int n = 0; n <= session.Id; n++)
+                {
+                    if (PlayerBase.Instance?.Count <= n)
+                    {
+                        PlayerBase.Instance?.Add(new PlayerBase());
+                    }
+                }
+                PlayerBase.Instance?.Add(Account.Instance[session.Id].Player[slot]);
                 Server.Player.OnAdd(session);
             }
             else

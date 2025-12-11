@@ -811,7 +811,7 @@ public static class NetworkSend
     {
         try
         {
-            Script.Instance?.JoinMap(playerId);
+            Script.Instance?.OnMap(playerId);
         }
         catch (Exception ex)
         {

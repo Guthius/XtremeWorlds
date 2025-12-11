@@ -9,17 +9,17 @@ public class WinCharacters
 {
     public static void OnSelectCharacter1Click()
     {
-        Sender.SendUseChar(1);
+        Sender.SendUseChar(0);
     }
 
     public static void OnSelectCharacter2Click()
     {
-        Sender.SendUseChar(2);
+        Sender.SendUseChar(1);
     }
 
     public static void OnSelectCharacter3Click()
     {
-        Sender.SendUseChar(3);
+        Sender.SendUseChar(2);
     }
 
     private static void TryDeleteCharacter(int slot)
@@ -56,17 +56,17 @@ public class WinCharacters
 
     public static void OnCreateCharacter1Click()
     {
-        TryCreateCharacter(1);
+        TryCreateCharacter(0);
     }
 
     public static void OnCreateCharacter2Click()
     {
-        TryCreateCharacter(2);
+        TryCreateCharacter(1);
     }
 
     public static void OnCreateCharacter3Click()
     {
-        TryCreateCharacter(3);
+        TryCreateCharacter(2);
     }
 
     public static void OnClose()

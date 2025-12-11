@@ -142,6 +142,7 @@ public class Script
         NetworkSend.SendHotbar(index);
         NetworkSend.SendPlayerSkills(index);
         NetworkSend.SendStats(index);
+        NetworkSend.SendPlayerData(index);
 
         // Send the flag so they know they can start doing stuff
         NetworkSend.SendInGame(index);
@@ -153,7 +154,7 @@ public class Script
         NetworkSend.SendPlaySound(index, "Bell.ogg", GetPlayerX(index), GetPlayerY(index));
     }
 
-    public void MapDropItem(int index, int mapSlot, int invSlot, int amount, int mapNum, Item item, int itemNum)
+    public void OnDrop(int index, int mapSlot, int invSlot, int amount, int mapNum, Item item, int itemNum)
     {
         // Determine if the item is currency or stackable
         if (item.Type == (byte)ItemCategory.Currency || item.Stackable == 1)
@@ -525,7 +526,7 @@ public class Script
         }
     }
 
-    public void JoinMap(int index)
+    public void OnMap(int index)
     {
         byte[] data;
         int mapNum = GetPlayerMap(index);
@@ -706,7 +707,7 @@ public class Script
         NetworkSend.SendStartSkillBuffer(PlayerIndex, skillSlot, effectiveCastTime);
     }
 
-    public int KillPlayer(int index)
+    public int OnKill(int index)
     {
         if (!Moral.Instance[Data.Map[GetPlayerMap(index)].Moral].LoseExp)
             return 0;
@@ -726,7 +727,7 @@ public class Script
         return exp;
     }
 
-    public void TrainStat(int index, int tmpStat)
+    public void OnTrain(int index, int tmpStat)
     {
         // make sure their stats are not maxed
         if (GetPlayerRawStat(index, (Stat)tmpStat) >= Variables.MaxStats)

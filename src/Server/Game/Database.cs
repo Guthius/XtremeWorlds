@@ -18,6 +18,7 @@ using Path = System.IO.Path;
 using Type = Core.Globals.Type;
 using static Server.Globals.Commands;
 using System.Threading.Tasks;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Server;
 
@@ -577,6 +578,14 @@ public static class Database
 
         if (Account.Instance[index].Player[slot].Name == "")
         {
+            for (n = 0; n <= index; n++)
+            {
+                if (PlayerBase.Instance?.Count <= n)
+                {
+                    PlayerBase.Instance?.Add(new Player());
+                }
+            }
+            PlayerBase.Instance?.Add(Account.Instance[index].Player[slot]);
             Account.Instance[index].Player[slot].Name = name;
             Account.Instance[index].Player[slot].Sex = sex;
             Account.Instance[index].Player[slot].Job = jobNum;
