@@ -1,4 +1,5 @@
 ﻿using Core.Objects;
+using static Core.Globals.Type;
 
 namespace Core.Globals;
 
@@ -228,9 +229,9 @@ public static class Commands
         PlayerBase.Instance[index].Name = name;
     }
 
-    public static void SetPlayerJob(int index, int jobNum)
+    public static void SetPlayerJob(int index, int job)
     {
-        PlayerBase.Instance[index].Job = (byte)jobNum;
+        PlayerBase.Instance[index].Job = (byte)job;
     }
 
     public static void SetPlayerPoints(int index, int points)
@@ -300,7 +301,7 @@ public static class Commands
 
     public static string IsEditorLocked(int index, EditorType id)
     {
-        for (int i = 0; i < Variables.MaxPlayers; i++)
+        for (int i = 0; i < PlayerBase.Instance.Count; i++)
         {
             if (IsPlaying(i))
             {
@@ -356,21 +357,21 @@ public static class Commands
 
     public static int GetBank(int index, int bankslot)
     {
-        return Bank.Instance[index].Item[bankslot].Num;
+        return Objects.Bank.Instance[index].Item[bankslot].Num;
     }
 
     public static void SetBank(int index, byte bankSlot, int itemNum)
     {
-        Bank.Instance[index].Item[bankSlot].Num = itemNum;
+        Objects.Bank.Instance[index].Item[bankSlot].Num = itemNum;
     }
 
     public static int GetBankValue(int index, int bankSlot)
     {
-        return Bank.Instance[index].Item[bankSlot].Value;
+        return Objects.Bank.Instance[index].Item[bankSlot].Value;
     }
 
     public static void SetBankValue(int index, byte bankSlot, int itemValue)
     {
-        Bank.Instance[index].Item[bankSlot].Value = itemValue;
+        Objects.Bank.Instance[index].Item[bankSlot].Value = itemValue;
     }
 }

@@ -352,7 +352,7 @@ namespace Client
                 // Change map animation
                 if (_tmr250 < _tick)
                 {
-                    for (int i = 0; i < Variables.MaxPlayers; i++)
+                    for (int i = 0; i < Player.Instance.Count; i++)
                     {
                         if (!IsPlaying(i)) continue;
                         if (GetPlayerMap(i) != GetPlayerMap(GameState.MyIndex)) continue;

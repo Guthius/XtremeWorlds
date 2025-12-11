@@ -249,13 +249,13 @@ public static class NetworkSend
         session.Channel.Send(packetWriter.GetBytes());
     }
 
-    public static void SendJobToAll(int jobNum)
+    public static void SendJobToAll(int job)
     {
         var packetWriter = new PacketWriter();
 
         packetWriter.WriteEnum(ServerPackets.SJobData);
 
-        WriteJobDataToPacket(jobNum, packetWriter);
+        WriteJobDataToPacket(job, packetWriter);
 
         PlayerService.Instance.SendDataToAll(packetWriter.GetBytes());
     }

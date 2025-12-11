@@ -193,7 +193,7 @@ namespace Client
             Bank.OnReset();
             Party.OnClear();
 
-            for (int i = 0; i < Variables.MaxPlayers; i++)
+            for (int i = 0; i < Player.Instance.Count; i++)
                 Player.OnClear(i);
 
             Animation.OnReset();

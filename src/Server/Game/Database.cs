@@ -571,7 +571,7 @@ public static class Database
         }
     }
 
-    public static async System.Threading.Tasks.Task AddChar(int index, int slot, string name, byte sex, byte jobNum, int sprite)
+    public static async System.Threading.Tasks.Task AddChar(int index, int slot, string name, byte sex, byte job, int sprite)
     {
         int n;
         int i;
@@ -588,22 +588,22 @@ public static class Database
             PlayerBase.Instance?.Add(Account.Instance[index].Player[slot]);
             Account.Instance[index].Player[slot].Name = name;
             Account.Instance[index].Player[slot].Sex = sex;
-            Account.Instance[index].Player[slot].Job = jobNum;
+            Account.Instance[index].Player[slot].Job = job;
             Account.Instance[index].Player[slot].Sprite = sprite;
             Account.Instance[index].Player[slot].Level = 1;
 
             var statCount = Enum.GetValues(typeof(Stat)).Length;
             for (n = 0; n < statCount; n++)
-                Account.Instance[index].Player[slot].Stat[n] = Job.Instance[jobNum].Stat[n];
+                Account.Instance[index].Player[slot].Stat[n] = Job.Instance[job].Stat[n];
 
             Account.Instance[index].Player[slot].Dir = (byte)Direction.Down;
-            Account.Instance[index].Player[slot].Map = Job.Instance[jobNum].StartMap;
+            Account.Instance[index].Player[slot].Map = Job.Instance[job].StartMap;
 
             if (Account.Instance[index].Player[slot].Map == 0)
                 Account.Instance[index].Player[slot].Map = 1;
 
-            Account.Instance[index].Player[slot].X = Job.Instance[jobNum].StartX;
-            Account.Instance[index].Player[slot].Y = Job.Instance[jobNum].StartY;
+            Account.Instance[index].Player[slot].X = Job.Instance[job].StartX;
+            Account.Instance[index].Player[slot].Y = Job.Instance[job].StartY;
             Account.Instance[index].Player[slot].Dir = (byte)Direction.Down;
 
             var vitalCount = Enum.GetValues(typeof(Vital)).Length;
@@ -616,19 +616,19 @@ public static class Database
             // set starter items
             for (n = 0; n < Variables.MaxStartItems; n++)
             {
-                if (Job.Instance[jobNum].StartItem[n] >= 0)
+                if (Job.Instance[job].StartItem[n] >= 0)
                 {
-                    Account.Instance[index].Player[slot].Inventory[n].Num = Job.Instance[jobNum].StartItem[n];
-                    Account.Instance[index].Player[slot].Inventory[n].Value = Job.Instance[jobNum].StartValue[n];
+                    Account.Instance[index].Player[slot].Inventory[n].Num = Job.Instance[job].StartItem[n];
+                    Account.Instance[index].Player[slot].Inventory[n].Value = Job.Instance[job].StartValue[n];
                 }            
             }
 
             // set start skills
             for (n = 0; n < Variables.MaxStartSkills; n++)
             {
-                if (Job.Instance[jobNum].StartSkill[n] >= 0)
+                if (Job.Instance[job].StartSkill[n] >= 0)
                 {
-                    Account.Instance[index].Player[slot].Skill[n].Num = Job.Instance[jobNum].StartSkill[n];
+                    Account.Instance[index].Player[slot].Skill[n].Num = Job.Instance[job].StartSkill[n];
                     Account.Instance[index].Player[slot].Skill[n].Cd = 0;
                 }
             }

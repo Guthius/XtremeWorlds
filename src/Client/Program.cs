@@ -1569,7 +1569,7 @@ namespace Client
             int mouseXGui = mousePosGui.Item1;
             int mouseYGui = mousePosGui.Item2;
 
-            for (int i = 0; i < Variables.MaxPlayers; i++)
+            for (int i = 0; i < Player.Instance.Count; i++)
             {
                 if (IsPlaying(i) && GetPlayerMap(i) == GetPlayerMap(GameState.MyIndex))
                 {
@@ -2001,7 +2001,7 @@ namespace Client
                 }
             }
 
-            for (i = 0L; i < Variables.MaxPlayers; i++)
+            for (i = 0L; i < PlayerBase.Instance.Count; i++)
             {
                 if (IsPlaying((int) i))
                 {
@@ -2650,7 +2650,7 @@ namespace Client
                         }
                     }
 
-                    for (i = 0; i < Variables.MaxPlayers; i++)
+                    for (i = 0; i < Player.Instance.Count; i++)
                     {
                         if (IsPlaying(i))
                         {
@@ -2664,7 +2664,6 @@ namespace Client
                                     if (GameState.MyTargetType == (int) TargetType.Player & GameState.MyTarget == i)
                                     {
                                     }
-
                                     else
                                     {
                                         DrawHover(Player.Instance[i].X * 32 - 16,
@@ -2755,7 +2754,7 @@ namespace Client
                 DrawGrid();
             }
 
-            for (i = 0; i < Variables.MaxPlayers; i++)
+            for (i = 0; i < Player.Instance.Count; i++)
             {
                 if (IsPlaying(i) & GetPlayerMap(i) == GetPlayerMap(GameState.MyIndex))
                 {

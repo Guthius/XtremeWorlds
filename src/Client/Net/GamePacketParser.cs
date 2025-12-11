@@ -248,7 +248,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     {
         var packetReader = new PacketReader(data);
 
-        GameState.MyIndex = packetReader.ReadInt32() - 1;
+        GameState.MyIndex = packetReader.ReadInt32();
     }
 
     public static void Packet_PlayerCharacters(ReadOnlyMemory<byte> data)
@@ -1657,7 +1657,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         GameState.GettingMap = true;
 
         // Erase all players except self
-        for (i = 0; i < Variables.MaxPlayers; i++)
+        for (i = 0; i < Player.Instance.Count; i++)
         {
             if (i != GameState.MyIndex)
             {

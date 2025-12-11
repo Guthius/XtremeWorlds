@@ -122,7 +122,7 @@ public static class General
             }
         }
         
-        for (var i = 0; i < Variables.MaxPlayers; i++)
+        for (var i = 0; i < Player.Instance.Count; i++)
         {
             Account.OnClear(i);
         }
@@ -728,7 +728,7 @@ public static class General
 
     private static Task<int> FindPlayerByNameAsync(string name)
     {
-        for (var i = 0; i < Variables.MaxPlayers; i++)
+        for (var i = 0; i < Player.Instance.Count; i++)
         {
             if (NetworkConfig.IsPlaying(i) && Player.Instance[i].Name.Equals(name, StringComparison.OrdinalIgnoreCase))
             {

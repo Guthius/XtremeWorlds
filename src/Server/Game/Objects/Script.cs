@@ -55,7 +55,7 @@ public static class Script
             {
                 Instance = instance;
                 General.Logger.LogInformation("Script loaded successfully!");       
-                for (int i = 0; i < Variables.MaxPlayers; i++)
+                for (int i = 0; i < Player.Instance.Count; i++)
                 {
                     if (IsPlaying(i))
                     {
