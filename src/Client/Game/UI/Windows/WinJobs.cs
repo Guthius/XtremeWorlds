@@ -145,7 +145,7 @@ public class WinJobs
             text = Job.Instance[GameState.NewCharJob].Desc;
         }
 
-        TextRenderer.WordWrap(text, winJobs.Font, 330, ref lines);
+        TextRenderer.WordWrap(text, winJobs.Font, 250, ref lines);
 
         var y = winJobs.Y + 60;
 
