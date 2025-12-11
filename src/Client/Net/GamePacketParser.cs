@@ -2696,9 +2696,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Bank.OnReset();
         for (i = 0; i < GameState.MyIndex; i++)
         {
-            Core.Objects.Bank.Instance.Add(new Core.Objects.Bank());
+            Bank.Instance.Add(new Bank());
         }
-        Core.Objects.Bank.Instance.Add(new Core.Objects.Bank());
+        Bank.Instance.Add(new Bank());
         for (i = 0; i < Variables.MaxBank; i++)
         {
             SetBank(GameState.MyIndex, (byte)i, buffer.ReadInt32());
