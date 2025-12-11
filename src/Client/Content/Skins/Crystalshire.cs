@@ -2260,7 +2260,7 @@ public class Crystalshire
         }
 
         // Defaults
-        var playerName = GetPlayerName(GameState.MyIndex);
+        var playerName = "";
         var txtName = window.GetChild("txtName");
         txtName.Text = playerName;
 
