@@ -35,17 +35,17 @@ public class WinCharacters
 
     public static void OnDeleteCharacter1Click()
     {
-        TryDeleteCharacter(1);
+        TryDeleteCharacter(0);
     }
 
     public static void OnDeleteCharacter2Click()
     {
-        TryDeleteCharacter(2);
+        TryDeleteCharacter(1);
     }
 
     public static void OnDeleteCharacter3Click()
     {
-        TryDeleteCharacter(3);
+        TryDeleteCharacter(2);
     }
 
     private static void TryCreateCharacter(int slot)

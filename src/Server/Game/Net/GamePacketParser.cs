@@ -471,8 +471,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                 return;
             }
 
-            Database.CharacterList?.Remove(GetPlayerName(session.Id));
-            Account.Instance[session.Id] = new Account();
+            Database.CharacterList?.Remove(Account.Instance[session.Id].Player[slot].Name);
+            Account.Instance[session.Id].Player[slot] = new Server.Player();
             await Account.OnSave(session.Id);
 
             // send them to the character portal
