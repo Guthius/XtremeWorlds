@@ -457,9 +457,12 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         {
             var itemNum = packetReader.ReadInt32();
             var amount = packetReader.ReadInt32();
-
-            SetInventory(GameState.MyIndex, i, itemNum);
-            SetInventoryValue(GameState.MyIndex, i, amount);
+            // Guard against invalid indices
+            if (i >= 0 && i < Variables.MaxInventory && GameState.MyIndex >= 0)
+            {
+                SetInventory(GameState.MyIndex, i, itemNum);
+                SetInventoryValue(GameState.MyIndex, i, amount);
+            }
         }
 
         GameLogic.SetGoldLabel();
@@ -470,9 +473,14 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         var packetReader = new PacketReader(data);
 
         var invSlot = packetReader.ReadInt32();
+        var itemNum = packetReader.ReadInt32();
+        var amount = packetReader.ReadInt32();
 
-        SetInventory(GameState.MyIndex, invSlot, packetReader.ReadInt32());
-        SetInventoryValue(GameState.MyIndex, invSlot, packetReader.ReadInt32());
+        if (invSlot >= 0 && invSlot < Variables.MaxInventory && GameState.MyIndex >= 0)
+        {
+            SetInventory(GameState.MyIndex, invSlot, itemNum);
+            SetInventoryValue(GameState.MyIndex, invSlot, amount);
+        }
 
         GameLogic.SetGoldLabel();
     }
@@ -724,7 +732,11 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         for (var i = 0; i < Variables.MaxPlayerSkills; i++)
         {
-            Player.Instance[GameState.MyIndex].Skill[i].Num = packetReader.ReadInt32();
+            var skillNum = packetReader.ReadInt32();
+            if (GameState.MyIndex >= 0 && i >= 0 && i < Variables.MaxPlayerSkills)
+            {
+                SetPlayerSkill(GameState.MyIndex, i, skillNum);
+            }
         }
     }
 
@@ -794,8 +806,10 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         var packetReader = new PacketReader(data);
 
         var slot = packetReader.ReadInt32();
-
-        Player.Instance[GameState.MyIndex].Skill[slot].Cd = General.GetTickCount();
+        if (slot >= 0 && slot < Variables.MaxPlayerSkills && GameState.MyIndex >= 0)
+        {
+            SetPlayerSkillCd(GameState.MyIndex, slot, General.GetTickCount());
+        }
     }
 
     private static void Packet_ClearSkillBuffer(ReadOnlyMemory<byte> data)
@@ -1012,6 +1026,18 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     public static void Packet_Hotbar(ReadOnlyMemory<byte> data)
     {
         var buffer = new PacketReader(data);
+
+        // Guard against invalid player index or hotbar size
+        if (GameState.MyIndex < 0 || GameState.MyIndex >= Player.Instance.Count)
+        {
+            // Consume payload to keep stream aligned even if we skip applying
+            for (var i = 0; i < Variables.MaxHotbar; i++)
+            {
+                _ = buffer.ReadInt32();
+                _ = buffer.ReadByte();
+            }
+            return;
+        }
 
         for (var i = 0; i < Variables.MaxHotbar; i++)
         {
@@ -1619,8 +1645,11 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             GameState.BarWidthGuiExpMax = 209;
         }
 
-        // Update GUI
-        WinCharacter.Update();
+        // Update GUI if local player index is valid
+        if (GameState.MyIndex >= 0 && GameState.MyIndex < Player.Instance.Count)
+        {
+            WinCharacter.Update();
+        }
     }
 
     public static void Packet_PlayerXY(ReadOnlyMemory<byte> data)
@@ -1638,11 +1667,20 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         dir = buffer.ReadByte();
         moving = buffer.ReadByte();
 
-        SetPlayerX(index, x);
-        SetPlayerY(index, y);
-        SetPlayerDir(index, dir);
-        Player.Instance[index].Moving = moving;
-        Player.Instance[index].IsMoving = buffer.ReadBoolean();
+        // Ensure player array has the target index before applying
+        if (index >= 0 && index < Player.Instance.Count)
+        {
+            SetPlayerX(index, x);
+            SetPlayerY(index, y);
+            SetPlayerDir(index, dir);
+            Player.Instance[index].Moving = moving;
+            Player.Instance[index].IsMoving = buffer.ReadBoolean();
+        }
+        else
+        {
+            // Consume boolean to keep reader aligned
+            _ = buffer.ReadBoolean();
+        }
     }
 
 

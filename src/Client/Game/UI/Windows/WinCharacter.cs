@@ -11,6 +11,10 @@ public class WinCharacter
 
     public static void Update()
     {
+        if (GameState.MyIndex < 0 || GameState.MyIndex >= Player.Instance.Count)
+        {
+            return;
+        }
         UpdateBars();
 
         var winCharacter = WindowManager.GetWindowByName("winCharacter");
@@ -29,6 +33,10 @@ public class WinCharacter
 
     private static void UpdateBars()
     {
+        if (GameState.MyIndex < 0 || GameState.MyIndex >= Player.Instance.Count)
+        {
+            return;
+        }
         var winBars = WindowManager.GetWindowByName("winBars");
         if (winBars is null)
         {

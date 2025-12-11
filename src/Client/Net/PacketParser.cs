@@ -83,7 +83,7 @@ public abstract class PacketParser<TPacketId> where TPacketId : Enum
         catch (Exception ex)
         {
             // Never let handler exceptions bubble out to the network layer
-            Console.WriteLine($"Packet handler error (id={packetId}): {ex.Message}");
+            Console.WriteLine($"Packet handler error (id={packetId}): {ex}");
         }
     }
 
