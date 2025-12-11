@@ -1243,30 +1243,30 @@ public class Player : PlayerBase
         if (Item.Instance[GetPlayerInventory(playerId, invSlot)].Type == (byte)ItemCategory.Currency ||
             Item.Instance[GetPlayerInventory(playerId, invSlot)].Stackable == 1)
         {
-            if (GetPlayerBank(playerId, bankSlot) == GetPlayerInventory(playerId, invSlot))
+            if (GetBank(playerId, bankSlot) == GetPlayerInventory(playerId, invSlot))
             {
-                SetPlayerBankValue(playerId, bankSlot, GetPlayerBankValue(playerId, bankSlot) + amount);
+                SetBankValue(playerId, bankSlot, GetBankValue(playerId, bankSlot) + amount);
 
                 TakeInv(playerId, GetPlayerInventory(playerId, invSlot), amount);
             }
             else
             {
-                SetPlayerBank(playerId, bankSlot, GetPlayerInventory(playerId, invSlot));
-                SetPlayerBankValue(playerId, bankSlot, amount);
+                SetBank(playerId, bankSlot, GetPlayerInventory(playerId, invSlot));
+                SetBankValue(playerId, bankSlot, amount);
 
                 TakeInv(playerId, GetPlayerInventory(playerId, invSlot), amount);
             }
         }
-        else if (GetPlayerBank(playerId, bankSlot) == GetPlayerInventory(playerId, invSlot))
+        else if (GetBank(playerId, bankSlot) == GetPlayerInventory(playerId, invSlot))
         {
-            SetPlayerBankValue(playerId, bankSlot, GetPlayerBankValue(playerId, bankSlot) + 1);
+            SetBankValue(playerId, bankSlot, GetBankValue(playerId, bankSlot) + 1);
 
             TakeInv(playerId, GetPlayerInventory(playerId, invSlot), 0);
         }
         else
         {
-            SetPlayerBank(playerId, bankSlot, itemNum);
-            SetPlayerBankValue(playerId, bankSlot, 1);
+            SetBank(playerId, bankSlot, itemNum);
+            SetBankValue(playerId, bankSlot, 1);
 
             TakeInv(playerId, GetPlayerInventory(playerId, invSlot), 0);
         }
@@ -1274,24 +1274,27 @@ public class Player : PlayerBase
         NetworkSend.SendBank(playerId);
     }
 
-    public static int GetPlayerBank(int playerId, int bankSlot)
+    public static int GetBank(int playerId, int bankSlot)
     {
         return Bank.Instance[playerId].Item[bankSlot].Num;
     }
 
-    public static void SetPlayerBank(int playerId, int bankSlot, int itemNum)
+    public static void SetBank(int playerId, int bankSlot, int itemNum)
     {
-        Bank.Instance[playerId].Item[bankSlot].Num = itemNum;
+        byte slot = Data.TempPlayer[playerId].Slot;
+        Account.Instance[playerId].Bank[slot].Item[bankSlot].Num = itemNum;
     }
 
-    public static int GetPlayerBankValue(int playerId, int bankSlot)
+    public static int GetBankValue(int playerId, int bankSlot)
     {
-        return Bank.Instance[playerId].Item[bankSlot].Value;
+        byte slot = Data.TempPlayer[playerId].Slot;
+        return Account.Instance[playerId].Bank[slot].Item[bankSlot].Value;
     }
 
-    public static void SetPlayerBankValue(int playerId, int bankSlot, int value)
+    public static void SetBankValue(int playerId, int bankSlot, int value)
     {
-        Bank.Instance[playerId].Item[bankSlot].Value = value;
+        byte slot = Data.TempPlayer[playerId].Slot;
+        Account.Instance[playerId].Bank[slot].Item[bankSlot].Value = value;
     }
 
     public static int FindOpenbankSlot(int playerId, int itemNum)
@@ -1306,7 +1309,7 @@ public class Player : PlayerBase
         {
             for (var bankSlot = 0; bankSlot < Core.Globals.Variables.MaxBank; bankSlot++)
             {
-                if (GetPlayerBank(playerId, bankSlot) == itemNum)
+                if (GetBank(playerId, bankSlot) == itemNum)
                 {
                     return bankSlot;
                 }
@@ -1315,7 +1318,7 @@ public class Player : PlayerBase
 
         for (var bankSlot = 0; bankSlot < Core.Globals.Variables.MaxBank; bankSlot++)
         {
-            if (GetPlayerBank(playerId, bankSlot) == -1)
+            if (GetBank(playerId, bankSlot) == -1)
             {
                 return bankSlot;
             }
@@ -1332,42 +1335,42 @@ public class Player : PlayerBase
         }
 
         amount = Math.Max(amount, 0);
-        if (GetPlayerBankValue(playerId, bankSlot) < amount)
+        if (GetBankValue(playerId, bankSlot) < amount)
         {
             return;
         }
 
-        var invSlot = FindOpenInvSlot(playerId, GetPlayerBank(playerId, bankSlot));
+        var invSlot = FindOpenInvSlot(playerId, GetBank(playerId, bankSlot));
         var bound =  Bank.Instance[playerId].Item[bankSlot].Bound;
 
         if (invSlot >= 0)
         {
-            if (Item.Instance[GetPlayerBank(playerId, bankSlot)].Type == (byte)ItemCategory.Currency ||
-                Item.Instance[GetPlayerBank(playerId, bankSlot)].Stackable == 1)
+            if (Item.Instance[GetBank(playerId, bankSlot)].Type == (byte)ItemCategory.Currency ||
+                Item.Instance[GetBank(playerId, bankSlot)].Stackable == 1)
             {
-                GiveInv(playerId, GetPlayerBank(playerId, bankSlot), amount, bound);
-                SetPlayerBankValue(playerId, bankSlot, GetPlayerBankValue(playerId, bankSlot) - amount);
+                GiveInv(playerId, GetBank(playerId, bankSlot), amount, bound);
+                SetBankValue(playerId, bankSlot, GetBankValue(playerId, bankSlot) - amount);
 
-                if (GetPlayerBankValue(playerId, bankSlot) < 0)
+                if (GetBankValue(playerId, bankSlot) < 0)
                 {
-                    SetPlayerBank(playerId, bankSlot, 0);
-                    SetPlayerBankValue(playerId, bankSlot, 0);
+                    SetBank(playerId, bankSlot, 0);
+                    SetBankValue(playerId, bankSlot, 0);
                     Bank.Instance[playerId].Item[bankSlot].Bound = 0;
                 }
             }
-            else if (GetPlayerBank(playerId, bankSlot) == GetPlayerInventory(playerId, invSlot))
+            else if (GetBank(playerId, bankSlot) == GetPlayerInventory(playerId, invSlot))
             {
-                if (GetPlayerBankValue(playerId, bankSlot) > 1)
+                if (GetBankValue(playerId, bankSlot) > 1)
                 {
-                    GiveInv(playerId, GetPlayerBank(playerId, bankSlot), bound);
-                    SetPlayerBankValue(playerId, bankSlot, GetPlayerBankValue(playerId, bankSlot) - 1);
+                    GiveInv(playerId, GetBank(playerId, bankSlot), bound);
+                    SetBankValue(playerId, bankSlot, GetBankValue(playerId, bankSlot) - 1);
                 }
             }
             else
             {
-                GiveInv(playerId, GetPlayerBank(playerId, bankSlot), bound);
-                SetPlayerBank(playerId, bankSlot, -1);
-                SetPlayerBankValue(playerId, bankSlot, 0);
+                GiveInv(playerId, GetBank(playerId, bankSlot), bound);
+                SetBank(playerId, bankSlot, -1);
+                SetBankValue(playerId, bankSlot, 0);
             }
         }
 
@@ -1381,19 +1384,19 @@ public class Player : PlayerBase
             return;
         }
 
-        var oldNum = GetPlayerBank(playerId, oldSlot);
-        var oldValue = GetPlayerBankValue(playerId, oldSlot);
-        var newNum = GetPlayerBank(playerId, newSlot);
-        var newValue = GetPlayerBankValue(playerId, newSlot);
+        var oldNum = GetBank(playerId, oldSlot);
+        var oldValue = GetBankValue(playerId, oldSlot);
+        var newNum = GetBank(playerId, newSlot);
+        var newValue = GetBankValue(playerId, newSlot);
         var oldBound = Bank.Instance[playerId].Item[oldSlot].Bound;
         var newBound = Bank.Instance[playerId].Item[newSlot].Bound;
 
-        SetPlayerBank(playerId, newSlot, oldNum);
-        SetPlayerBankValue(playerId, newSlot, oldValue);
+        SetBank(playerId, newSlot, oldNum);
+        SetBankValue(playerId, newSlot, oldValue);
         Bank.Instance[playerId].Item[newSlot].Bound = oldBound;
 
-        SetPlayerBank(playerId, oldSlot, newNum);
-        SetPlayerBankValue(playerId, oldSlot, newValue);
+        SetBank(playerId, oldSlot, newNum);
+        SetBankValue(playerId, oldSlot, newValue);
         Bank.Instance[playerId].Item[oldSlot].Bound = newBound;
 
         NetworkSend.SendBank(playerId);

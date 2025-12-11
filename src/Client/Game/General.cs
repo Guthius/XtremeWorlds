@@ -378,7 +378,7 @@ namespace Client
             int isBank = default;
             Type.Rect tempRec;
 
-            for (int i = 0; i < Variables.MaxBank; i++)
+            for (int i = 0; i < Bank.Instance.Count; i++)
             {
                 if (Bank.Instance[GameState.MyIndex].Item[i].Num >= 0)
                 {

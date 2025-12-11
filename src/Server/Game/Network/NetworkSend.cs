@@ -1003,10 +1003,11 @@ public static class NetworkSend
 
         packetWriter.WriteEnum(ServerPackets.SBank);
 
-        for (var i = 0; i < Core.Globals.Variables.MaxBank; i++)
+        for (var i = 0; i < Variables.MaxBank; i++)
         {
-            packetWriter.WriteInt32(Bank.Instance[playerId].Item[i].Num);
-            packetWriter.WriteInt32(Bank.Instance[playerId].Item[i].Value);
+            byte slot = (byte)Data.TempPlayer[playerId].Slot;
+            packetWriter.WriteInt32(Account.Instance[playerId].Bank[slot].Item[i].Num);
+            packetWriter.WriteInt32(Account.Instance[playerId].Bank[slot].Item[i].Value);
         }
 
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());

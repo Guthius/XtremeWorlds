@@ -1,5 +1,6 @@
 ﻿using Core.Objects;
 using static Core.Globals.Type;
+using Bank = Core.Objects.Bank;
 
 namespace Core.Globals;
 
@@ -464,32 +465,32 @@ public static class Commands
 
     public static int GetBank(int index, int bankslot)
     {
-        if (Objects.Bank.Instance == null || index < 0 || index >= Objects.Bank.Instance.Count) return -1;
-        var b = Objects.Bank.Instance[index];
+        if (Bank.Instance == null || index < 0 || index >= Bank.Instance.Count) return -1;
+        var b = Bank.Instance[index];
         if (b.Item == null || bankslot < 0 || bankslot >= b.Item.Length) return -1;
         return b.Item[bankslot].Num;
     }
 
     public static void SetBank(int index, byte bankSlot, int itemNum)
     {
-        if (Objects.Bank.Instance == null || index < 0 || index >= Objects.Bank.Instance.Count) return;
-        var b = Objects.Bank.Instance[index];
+        if (Bank.Instance == null || index < 0 || index >= Bank.Instance.Count) return;
+        var b = Bank.Instance[index];
         if (b.Item == null || bankSlot < 0 || bankSlot >= b.Item.Length) return;
         b.Item[bankSlot].Num = itemNum;
     }
 
     public static int GetBankValue(int index, int bankSlot)
     {
-        if (Objects.Bank.Instance == null || index < 0 || index >= Objects.Bank.Instance.Count) return 0;
-        var b = Objects.Bank.Instance[index];
+        if (Bank.Instance == null || index < 0 || index >= Bank.Instance.Count) return 0;
+        var b = Bank.Instance[index];
         if (b.Item == null || bankSlot < 0 || bankSlot >= b.Item.Length) return 0;
         return b.Item[bankSlot].Value;
     }
 
     public static void SetBankValue(int index, byte bankSlot, int itemValue)
     {
-        if (Objects.Bank.Instance == null || index < 0 || index >= Objects.Bank.Instance.Count) return;
-        var b = Objects.Bank.Instance[index];
+        if (Bank.Instance == null || index < 0 || index >= Bank.Instance.Count) return;
+        var b = Bank.Instance[index];
         if (b.Item == null || bankSlot < 0 || bankSlot >= b.Item.Length) return;
         b.Item[bankSlot].Value = itemValue;
     }

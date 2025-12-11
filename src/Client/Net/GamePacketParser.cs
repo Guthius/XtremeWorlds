@@ -5,8 +5,10 @@ using Core.Configurations;
 using Core.Globals;
 using Core.Net;
 using System;
+using System.Security.AccessControl;
 using static Core.Globals.Commands;
 using static Core.Globals.Type;
+using Bank = Core.Objects.Bank;
 
 namespace Client.Net;
 
@@ -2691,6 +2693,12 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         int i;
         var buffer = new PacketReader(data);
 
+        Bank.OnReset();
+        for (i = 0; i < GameState.MyIndex; i++)
+        {
+            Core.Objects.Bank.Instance.Add(new Core.Objects.Bank());
+        }
+        Core.Objects.Bank.Instance.Add(new Core.Objects.Bank());
         for (i = 0; i < Variables.MaxBank; i++)
         {
             SetBank(GameState.MyIndex, (byte)i, buffer.ReadInt32());
@@ -2704,7 +2712,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             WindowManager.ShowWindow("winBank", resetPosition: false);
         }
     }
-
 
     public static void Packet_EditScript(ReadOnlyMemory<byte> data)
     {
