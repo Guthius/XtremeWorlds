@@ -2694,11 +2694,11 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         var buffer = new PacketReader(data);
 
         Bank.OnReset();
-        for (i = 0; i < GameState.MyIndex; i++)
+        for (i = 0; i <= GameState.MyIndex; i++)
         {
             Bank.Instance.Add(new Bank());
         }
-        Bank.Instance.Add(new Bank());
+        
         for (i = 0; i < Variables.MaxBank; i++)
         {
             SetBank(GameState.MyIndex, (byte)i, buffer.ReadInt32());
