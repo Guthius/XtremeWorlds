@@ -644,7 +644,7 @@ public static class Database
             for (i = 0; i < resourceCount; i++)
             {
                 Account.Instance[index].Player[slot].GatherSkills[i].SkillLevel = 1;
-                Account.Instance[index].Player[slot].GatherSkills[i].SkillCurExp = 0;
+                Account.Instance[index].Player[slot].GatherSkills[i].SkillCurExperience = 0;
                 SetPlayerGatherSkillMaxExperience(index, i, (int)GetSkillNextLevel(index, i));
             }
 

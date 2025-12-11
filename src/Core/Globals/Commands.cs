@@ -7,127 +7,181 @@ public static class Commands
 {
     private static readonly int EquipmentCount = Enum.GetNames<Equipment>().Length;
 
+    private static bool ValidPlayerIndex(int index)
+    {
+        return PlayerBase.Instance != null && index >= 0 && index < PlayerBase.Instance.Count;
+    }
+
     public static int GetPlayerExperience(int index)
     {
+        if (!ValidPlayerIndex(index)) return 0;
         return PlayerBase.Instance[index].Experience;
     }
 
     public static int GetPlayerRawStat(int index, Stat stat)
     {
-        return PlayerBase.Instance[index].Stat[(int)stat];
+        if (!ValidPlayerIndex(index)) return 0;
+        var p = PlayerBase.Instance[index];
+        var si = (int)stat;
+        if (p.Stat == null || si < 0 || si >= p.Stat.Length) return 0;
+        return p.Stat[si];
     }
 
     public static string GetPlayerName(int index)
     {
-        return PlayerBase.Instance[index].Name;
+        if (!ValidPlayerIndex(index)) return string.Empty;
+        return PlayerBase.Instance[index].Name ?? string.Empty;
     }
 
     public static int GetPlayerInventoryValue(int index, int invslot)
     {
-        return PlayerBase.Instance[index].Inventory[invslot].Value;
+        if (!ValidPlayerIndex(index)) return 0;
+        var p = PlayerBase.Instance[index];
+        if (p.Inventory == null || invslot < 0 || invslot >= p.Inventory.Length) return 0;
+        return p.Inventory[invslot].Value;
     }
 
     public static int GetPlayerPoints(int index)
     {
+        if (!ValidPlayerIndex(index)) return 0;
         return PlayerBase.Instance[index].Points;
     }
 
     public static int GetPlayerVital(int index, Vital vital)
     {
-        return PlayerBase.Instance[index].Vital[(int)vital];
+        if (!ValidPlayerIndex(index)) return 0;
+        var p = PlayerBase.Instance[index];
+        var vi = (int)vital;
+        if (p.Vital == null || vi < 0 || vi >= p.Vital.Length) return 0;
+        return p.Vital[vi];
     }
 
     public static int GetPlayerSprite(int index)
     {
+        if (!ValidPlayerIndex(index)) return 0;
         return PlayerBase.Instance[index].Sprite;
     }
 
     public static int GetPlayerJob(int index)
     {
+        if (!ValidPlayerIndex(index)) return 0;
         return PlayerBase.Instance[index].Job;
     }
 
     public static int GetPlayerMap(int index)
     {
+        if (!ValidPlayerIndex(index)) return 0;
         return PlayerBase.Instance[index].Map;
     }
 
     public static int GetPlayerLevel(int index)
     {
+        if (!ValidPlayerIndex(index)) return 0;
         return PlayerBase.Instance[index].Level;
     }
 
     public static int GetPlayerPaperdoll(int index, Equipment equipmentSlot)
     {
-        return PlayerBase.Instance[index].Paperdoll[(int)equipmentSlot].Num;
+        if (!ValidPlayerIndex(index)) return -1;
+        var p = PlayerBase.Instance[index];
+        var es = (int)equipmentSlot;
+        if (p.Paperdoll == null || es < 0 || es >= p.Paperdoll.Length) return -1;
+        return p.Paperdoll[es].Num;
     }
 
     public static int GetPlayerSkill(int index, int skillSlot)
     {
-        return PlayerBase.Instance[index].Skill[skillSlot].Num;
+        if (!ValidPlayerIndex(index)) return -1;
+        var p = PlayerBase.Instance[index];
+        if (p.Skill == null || skillSlot < 0 || skillSlot >= p.Skill.Length) return -1;
+        return p.Skill[skillSlot].Num;
     }
 
     public static int GetPlayerSkillCd(int index, int skillSlot)
     {
-        return PlayerBase.Instance[index].Skill[skillSlot].Cd;
+        if (!ValidPlayerIndex(index)) return 0;
+        var p = PlayerBase.Instance[index];
+        if (p.Skill == null || skillSlot < 0 || skillSlot >= p.Skill.Length) return 0;
+        return p.Skill[skillSlot].Cd;
     }
 
     public static int GetPlayerStat(int index, Stat stat)
     {
-        int statValue = PlayerBase.Instance[index].Stat[(int)stat];
-
-        return statValue;
+        if (!ValidPlayerIndex(index)) return 0;
+        var p = PlayerBase.Instance[index];
+        var si = (int)stat;
+        if (p.Stat == null || si < 0 || si >= p.Stat.Length) return 0;
+        return p.Stat[si];
     }
 
     public static byte GetPlayerAccess(int index)
     {
+        if (!ValidPlayerIndex(index)) return 0;
         return PlayerBase.Instance[index].Access;
     }
 
     public static int GetPlayerX(int index)
     {
+        if (!ValidPlayerIndex(index)) return 0;
         return (int)Math.Floor((double)PlayerBase.Instance[index].X / Constants.TileSize);
     }
 
     public static int GetPlayerY(int index)
     {
+        if (!ValidPlayerIndex(index)) return 0;
         return (int)Math.Floor((double)PlayerBase.Instance[index].Y / Constants.TileSize);
     }
 
     public static int GetPlayerRawX(int index)
     {
+        if (!ValidPlayerIndex(index)) return 0;
         return PlayerBase.Instance[index].X;
     }
 
     public static int GetPlayerRawY(int index)
     {
+        if (!ValidPlayerIndex(index)) return 0;
         return PlayerBase.Instance[index].Y;
     }
 
     public static byte GetPlayerDir(int index)
     {
+        if (!ValidPlayerIndex(index)) return 0;
         return PlayerBase.Instance[index].Dir;
     }
 
     public static bool GetPlayerPk(int index)
     {
+        if (!ValidPlayerIndex(index)) return false;
         return PlayerBase.Instance[index].Pk;
     }
 
     public static void SetPlayerVital(int index, Vital vital, int value)
     {
-        PlayerBase.Instance[index].Vital[(int)vital] = value;
+        if (!ValidPlayerIndex(index)) return;
+        var p = PlayerBase.Instance[index];
+        var vi = (int)vital;
+        if (p.Vital == null || vi < 0 || vi >= p.Vital.Length) return;
+        p.Vital[vi] = value;
     }
 
     public static int GetPlayerMaxVital(int index, Vital vital)
     {
-        return PlayerBase.Instance[index].MaxVital[(int)vital];
+        if (!ValidPlayerIndex(index)) return 0;
+        var p = PlayerBase.Instance[index];
+        var vi = (int)vital;
+        if (p.MaxVital == null || vi < 0 || vi >= p.MaxVital.Length) return 0;
+        return p.MaxVital[vi];
     }
 
     public static int SetPlayerMaxVital(int index, Vital vital, int value)
     {
-        PlayerBase.Instance[index].MaxVital[(int)vital] = value;
-        return PlayerBase.Instance[index].MaxVital[(int)vital];
+        if (!ValidPlayerIndex(index)) return 0;
+        var p = PlayerBase.Instance[index];
+        var vi = (int)vital;
+        if (p.MaxVital == null || vi < 0 || vi >= p.MaxVital.Length) return 0;
+        p.MaxVital[vi] = value;
+        return p.MaxVital[vi];
     }
 
     public static bool IsDirBlocked(byte blockvar, Direction dir)
@@ -156,17 +210,26 @@ public static class Commands
 
     public static void SetPlayerGatherSkillLevel(int index, int skillSlot, int level)
     {
-        PlayerBase.Instance[index].GatherSkills[skillSlot].SkillLevel = level;
+        if (!ValidPlayerIndex(index)) return;
+        var p = PlayerBase.Instance[index];
+        if (p.GatherSkills == null || skillSlot < 0 || skillSlot >= p.GatherSkills.Length) return;
+        p.GatherSkills[skillSlot].SkillLevel = level;
     }
 
     public static void SetPlayerGatherSkillExperience(int index, int skillSlot, int exp)
     {
-        PlayerBase.Instance[index].GatherSkills[skillSlot].SkillCurExp = exp;
+        if (!ValidPlayerIndex(index)) return;
+        var p = PlayerBase.Instance[index];
+        if (p.GatherSkills == null || skillSlot < 0 || skillSlot >= p.GatherSkills.Length) return;
+        p.GatherSkills[skillSlot].SkillCurExperience = exp;
     }
 
     public static void SetPlayerGatherSkillMaxExperience(int index, int skillSlot, int maxExp)
     {
-        PlayerBase.Instance[index].GatherSkills[skillSlot].SkillNextLevelExp = maxExp;
+        if (!ValidPlayerIndex(index)) return;
+        var p = PlayerBase.Instance[index];
+        if (p.GatherSkills == null || skillSlot < 0 || skillSlot >= p.GatherSkills.Length) return;
+        p.GatherSkills[skillSlot].SkillNextLevelExperience = maxExp;
     }
 
     public static string GetResourceSkillName(ResourceSkill skillNum)
@@ -201,102 +264,140 @@ public static class Commands
 
     public static int GetPlayerGatherSkillLevel(int index, int skillSlot)
     {
-        return PlayerBase.Instance[index].GatherSkills[skillSlot].SkillLevel;
+        if (!ValidPlayerIndex(index)) return 0;
+        var p = PlayerBase.Instance[index];
+        if (p.GatherSkills == null || skillSlot < 0 || skillSlot >= p.GatherSkills.Length) return 0;
+        return p.GatherSkills[skillSlot].SkillLevel;
     }
 
     public static int GetPlayerGatherSkillExperience(int index, int skillSlot)
     {
-        return PlayerBase.Instance[index].GatherSkills[skillSlot].SkillCurExp;
+        if (!ValidPlayerIndex(index)) return 0;
+        var p = PlayerBase.Instance[index];
+        if (p.GatherSkills == null || skillSlot < 0 || skillSlot >= p.GatherSkills.Length) return 0;
+        return p.GatherSkills[skillSlot].SkillCurExperience;
     }
 
     public static int GetPlayerGatherSkillMaxExperience(int index, int skillSlot)
     {
-        return PlayerBase.Instance[index].GatherSkills[skillSlot].SkillNextLevelExp;
+        if (!ValidPlayerIndex(index)) return 0;
+        var p = PlayerBase.Instance[index];
+        if (p.GatherSkills == null || skillSlot < 0 || skillSlot >= p.GatherSkills.Length) return 0;
+        return p.GatherSkills[skillSlot].SkillNextLevelExperience;
     }
 
     public static void SetPlayerMap(int index, int mapNum)
     {
+        if (!ValidPlayerIndex(index)) return;
         PlayerBase.Instance[index].Map = mapNum;
     }
 
     public static int GetPlayerInventory(int index, int invslot)
     {
-        return PlayerBase.Instance[index].Inventory[invslot].Num;
+        if (!ValidPlayerIndex(index)) return -1;
+        var p = PlayerBase.Instance[index];
+        if (p.Inventory == null || invslot < 0 || invslot >= p.Inventory.Length) return -1;
+        return p.Inventory[invslot].Num;
     }
 
     public static void SetPlayerName(int index, string name)
     {
+        if (!ValidPlayerIndex(index)) return;
         PlayerBase.Instance[index].Name = name;
     }
 
     public static void SetPlayerJob(int index, int job)
     {
+        if (!ValidPlayerIndex(index)) return;
         PlayerBase.Instance[index].Job = (byte)job;
     }
 
     public static void SetPlayerPoints(int index, int points)
     {
+        if (!ValidPlayerIndex(index)) return;
         PlayerBase.Instance[index].Points = (byte)points;
     }
 
     public static void SetPlayerStat(int index, Stat stat, int value)
     {
-        PlayerBase.Instance[index].Stat[(int)stat] = (byte)value;
+        if (!ValidPlayerIndex(index)) return;
+        var p = PlayerBase.Instance[index];
+        var si = (int)stat;
+        if (p.Stat == null || si < 0 || si >= p.Stat.Length) return;
+        p.Stat[si] = (byte)value;
     }
 
     public static void SetInventory(int index, int invSlot, int itemNum)
     {
-        PlayerBase.Instance[index].Inventory[invSlot].Num = itemNum;
+        if (!ValidPlayerIndex(index)) return;
+        var p = PlayerBase.Instance[index];
+        if (p.Inventory == null || invSlot < 0 || invSlot >= p.Inventory.Length) return;
+        p.Inventory[invSlot].Num = itemNum;
     }
 
     public static void SetInventoryValue(int index, int invslot, int itemValue)
     {
-        PlayerBase.Instance[index].Inventory[invslot].Value = itemValue;
+        if (!ValidPlayerIndex(index)) return;
+        var p = PlayerBase.Instance[index];
+        if (p.Inventory == null || invslot < 0 || invslot >= p.Inventory.Length) return;
+        p.Inventory[invslot].Value = itemValue;
     }
 
     public static void SetPlayerAccess(int index, byte access)
     {
+        if (!ValidPlayerIndex(index)) return;
         PlayerBase.Instance[index].Access = access;
     }
 
     public static void SetPlayerPk(int index, bool pk)
     {
+        if (!ValidPlayerIndex(index)) return;
         PlayerBase.Instance[index].Pk = pk;
     }
 
     public static void SetPlayerX(int index, int x)
     {
+        if (!ValidPlayerIndex(index)) return;
         PlayerBase.Instance[index].X = x;
     }
 
     public static void SetPlayerY(int index, int y)
     {
+        if (!ValidPlayerIndex(index)) return;
         PlayerBase.Instance[index].Y = y;
     }
 
     public static void SetPlayerSprite(int index, int sprite)
     {
+        if (!ValidPlayerIndex(index)) return;
         PlayerBase.Instance[index].Sprite = sprite;
     }
 
     public static void SetPlayerExperience(int index, int experience)
     {
+        if (!ValidPlayerIndex(index)) return;
         PlayerBase.Instance[index].Experience = experience;
     }
 
     public static void SetPlayerLevel(int index, int level)
     {
+        if (!ValidPlayerIndex(index)) return;
         PlayerBase.Instance[index].Level = (byte)level;
     }
 
     public static void SetPlayerDir(int index, int dir)
     {
+        if (!ValidPlayerIndex(index)) return;
         PlayerBase.Instance[index].Dir = (byte)dir;
     }
 
     public static void SetPlayerPaperdoll(int index, int itemNum, Equipment equipmentSlot)
     {
-        PlayerBase.Instance[index].Paperdoll[(int)equipmentSlot].Num = itemNum;
+        if (!ValidPlayerIndex(index)) return;
+        var p = PlayerBase.Instance[index];
+        var es = (int)equipmentSlot;
+        if (p.Paperdoll == null || es < 0 || es >= p.Paperdoll.Length) return;
+        p.Paperdoll[es].Num = itemNum;
     }
 
     public static string IsEditorLocked(int index, EditorType id)
@@ -334,7 +435,10 @@ public static class Commands
 
     public static void SetPlayerSkillCd(int index, int skillSlot, int value)
     {
-        PlayerBase.Instance[index].Skill[skillSlot].Cd = value;
+        if (!ValidPlayerIndex(index)) return;
+        var p = PlayerBase.Instance[index];
+        if (p.Skill == null || skillSlot < 0 || skillSlot >= p.Skill.Length) return;
+        p.Skill[skillSlot].Cd = value;
     }
 
     public static bool HasSkill(int index, double skillNum)
@@ -352,26 +456,41 @@ public static class Commands
 
     public static void SetPlayerSkill(int index, int skillslot, int skillNum)
     {
-        PlayerBase.Instance[index].Skill[skillslot].Num = skillNum;
+        if (!ValidPlayerIndex(index)) return;
+        var p = PlayerBase.Instance[index];
+        if (p.Skill == null || skillslot < 0 || skillslot >= p.Skill.Length) return;
+        p.Skill[skillslot].Num = skillNum;
     }
 
     public static int GetBank(int index, int bankslot)
     {
-        return Objects.Bank.Instance[index].Item[bankslot].Num;
+        if (Objects.Bank.Instance == null || index < 0 || index >= Objects.Bank.Instance.Count) return -1;
+        var b = Objects.Bank.Instance[index];
+        if (b.Item == null || bankslot < 0 || bankslot >= b.Item.Length) return -1;
+        return b.Item[bankslot].Num;
     }
 
     public static void SetBank(int index, byte bankSlot, int itemNum)
     {
-        Objects.Bank.Instance[index].Item[bankSlot].Num = itemNum;
+        if (Objects.Bank.Instance == null || index < 0 || index >= Objects.Bank.Instance.Count) return;
+        var b = Objects.Bank.Instance[index];
+        if (b.Item == null || bankSlot < 0 || bankSlot >= b.Item.Length) return;
+        b.Item[bankSlot].Num = itemNum;
     }
 
     public static int GetBankValue(int index, int bankSlot)
     {
-        return Objects.Bank.Instance[index].Item[bankSlot].Value;
+        if (Objects.Bank.Instance == null || index < 0 || index >= Objects.Bank.Instance.Count) return 0;
+        var b = Objects.Bank.Instance[index];
+        if (b.Item == null || bankSlot < 0 || bankSlot >= b.Item.Length) return 0;
+        return b.Item[bankSlot].Value;
     }
 
     public static void SetBankValue(int index, byte bankSlot, int itemValue)
     {
-        Objects.Bank.Instance[index].Item[bankSlot].Value = itemValue;
+        if (Objects.Bank.Instance == null || index < 0 || index >= Objects.Bank.Instance.Count) return;
+        var b = Objects.Bank.Instance[index];
+        if (b.Item == null || bankSlot < 0 || bankSlot >= b.Item.Length) return;
+        b.Item[bankSlot].Value = itemValue;
     }
 }

@@ -1503,8 +1503,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         for (x = 0; x < resourceSkillCount; x++)
         {
             Player.Instance[i].GatherSkills[x].SkillLevel = buffer.ReadInt32();
-            Player.Instance[i].GatherSkills[x].SkillCurExp = buffer.ReadInt32();
-            Player.Instance[i].GatherSkills[x].SkillNextLevelExp = buffer.ReadInt32();
+            Player.Instance[i].GatherSkills[x].SkillCurExperience = buffer.ReadInt32();
+            Player.Instance[i].GatherSkills[x].SkillNextLevelExperience = buffer.ReadInt32();
         }
 
         // Check if the player is the client player

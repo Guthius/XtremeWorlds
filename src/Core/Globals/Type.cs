@@ -5,8 +5,8 @@ public static class Type
     public struct ResourceType
     {
         public int SkillLevel;
-        public int SkillCurExp;
-        public int SkillNextLevelExp;
+        public int SkillCurExperience;
+        public int SkillNextLevelExperience;
     }
     
     public struct Rect
