@@ -40,9 +40,21 @@ public static class Loop
             {
                 foreach (var player in PlayerService.Instance.Players)
                 {
-                    if (Player.Instance[player.Id].Moving > 0)
+                    var id = player.Id;
+                    if (id < 0 || id >= Player.Instance.Count)
                     {
-                        Player.OnMove(player.Id, Player.Instance[player.Id].Dir, Player.Instance[player.Id].Moving, false);
+                        continue;
+                    }
+
+                    var basePlayer = Player.Instance[id];
+                    if (basePlayer is null)
+                    {
+                        continue;
+                    }
+
+                    if (basePlayer.Moving > 0)
+                    {
+                        Player.OnMove(id, basePlayer.Dir, basePlayer.Moving, false);
                     }
                 }
 
@@ -196,12 +208,24 @@ public static class Loop
             // Add Players
             foreach (var i in PlayerService.Instance.Players)
             {
-                if (Player.Instance[i.Id].Map != mapNum)
+                var id = i.Id;
+                if (id < 0 || id >= Player.Instance.Count)
                 {
                     continue;
                 }
 
-                var player = Entity.FromPlayer(i.Id, Player.Instance[i.Id]);
+                var basePlayer = Player.Instance[id];
+                if (basePlayer is null)
+                {
+                    continue;
+                }
+
+                if (basePlayer.Map != mapNum)
+                {
+                    continue;
+                }
+
+                var player = Entity.FromPlayer(id, basePlayer);
                 if (!IsPlaying(i.Id))
                 {
                     continue;

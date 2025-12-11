@@ -2407,23 +2407,30 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
     public static void Packet_DeclineTrade(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var tradeTarget = (int)Data.TempPlayer[session.Id].InTrade;
+        var hasValidTarget = tradeTarget >= 0 && tradeTarget < Core.Globals.Variables.MaxPlayers;
 
         for (int i = 0, loopTo = Core.Globals.Variables.MaxInventory; i < loopTo; i++)
         {
             Data.TempPlayer[session.Id].TradeOffer[i].Num = -1;
             Data.TempPlayer[session.Id].TradeOffer[i].Value = 0;
-            Data.TempPlayer[tradeTarget].TradeOffer[i].Num = -1;
-            Data.TempPlayer[tradeTarget].TradeOffer[i].Value = 0;
+
+            if (hasValidTarget)
+            {
+                Data.TempPlayer[tradeTarget].TradeOffer[i].Num = -1;
+                Data.TempPlayer[tradeTarget].TradeOffer[i].Value = 0;
+            }
         }
 
         Data.TempPlayer[session.Id].InTrade = -1;
-        Data.TempPlayer[tradeTarget].InTrade = -1;
-
         NetworkSend.SendPlayerMessage(session.Id, "You declined the trade.", (int)ColorName.BrightRed);
-        NetworkSend.SendPlayerMessage(tradeTarget, GetPlayerName(session.Id) + " has declined the trade.", (int)ColorName.BrightRed);
-
         NetworkSend.SendCloseTrade(session.Id);
-        NetworkSend.SendCloseTrade(tradeTarget);
+
+        if (hasValidTarget)
+        {
+            Data.TempPlayer[tradeTarget].InTrade = -1;
+            NetworkSend.SendPlayerMessage(tradeTarget, GetPlayerName(session.Id) + " has declined the trade.", (int)ColorName.BrightRed);
+            NetworkSend.SendCloseTrade(tradeTarget);
+        }
     }
 
     public static void Packet_TradeItem(GameSession session, ReadOnlyMemory<byte> bytes)
