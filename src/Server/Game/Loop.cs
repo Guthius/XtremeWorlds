@@ -114,7 +114,7 @@ public static class Loop
             // Checks to save players every 5 minutes
             if (tick > lastUpdateSavePlayers)
             {
-                UpdateSavePlayers();
+                await UpdateSavePlayers();
                 lastUpdateSavePlayers = General.GetTimeMs() + 300000;
             }
 
