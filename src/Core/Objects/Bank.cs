@@ -5,7 +5,7 @@ namespace Core.Objects
 {
     public class Bank : IData, IAsyncData
     {
-        public static List<Bank> Instance { get; private set; } = new List<Bank>();
+        public static List<Bank> Instance { get; set; } = new List<Bank>();
         public Core.Globals.Type.Item[] Item;
 
         public Bank()

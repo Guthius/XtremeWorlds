@@ -7,6 +7,7 @@ using static Server.Globals.Commands;
 using static Server.Database;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
+using System.Security.AccessControl;
 
 namespace Server
 {
@@ -18,7 +19,7 @@ namespace Server
         public Player[] Player;
         public Bank[] Bank;
 
-        public static List<Account> Instance { get; private set; } = new List<Account>();
+        public static List<Account> Instance { get; set; } = new List<Account>();
 
         public Account()
         {
@@ -104,6 +105,7 @@ namespace Server
 
             var accountData = JObject.FromObject(data).ToObject<Account>();
             Account.Instance[index] = accountData;
+            Core.Objects.Bank.Instance = Account.Instance[index].Bank.ToList();
         }
 
         public static Task OnLoadAllAsync()
