@@ -67,7 +67,7 @@ public class Player : PlayerBase
         {
             try
             {
-                Script.Instance?.OnLeave(playerId, oldMapNum);
+                Script.Instance?.LeaveMap(playerId, oldMapNum);
             }
             catch (Exception ex)
             {
@@ -1181,7 +1181,7 @@ public class Player : PlayerBase
         
         try
         {
-            Script.Instance?.OnLeft(playerId);
+            Script.Instance?.OnLeave(playerId);
         }
         catch (Exception ex)
         {

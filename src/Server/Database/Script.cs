@@ -582,7 +582,7 @@ public class Script
 
     }
 
-    public void LeftGame(int index)
+    public void OnLeave(int index)
     {
 
     }
