@@ -48,6 +48,26 @@ public static class Network
             _bufferOffset = bytesLeft;
             return Task.CompletedTask;
         }
+
+        public Task OnDisconnectedAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                Console.WriteLine("Network disconnected");
+                // Ensure game returns to menu/login state
+                GameState.InMenu = true;
+                Game.UI.WindowManager.HideWindows();
+                Game.UI.WindowManager.ShowWindow("winLogin");
+                GameLogic.Dialogue("Disconnect", "You lost connection to game server.", "Try to log back in again.", Core.Globals.DialogueType.Disconnect, Core.Globals.DialogueStyle.Okay);
+                // Hide any open windows and show login window
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"OnDisconnected UI handling failed: {ex.Message}");
+            }
+
+            return Task.CompletedTask;
+        }
     }
 
     private static readonly NetworkClient Client = new();

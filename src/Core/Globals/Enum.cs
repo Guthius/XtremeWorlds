@@ -597,7 +597,8 @@ public enum DialogueType
     DeleteMap,
     Information,
     CopyMap,
-    PasteMap
+    PasteMap,
+    Disconnect
 }
 
 /// <summary>

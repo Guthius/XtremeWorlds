@@ -123,11 +123,14 @@ public sealed class NetworkClient
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Receive error: {ex.Message}");
+                    // Notify handler about disconnection/error so UI can react
+                    try { await eventHandler.OnDisconnectedAsync(cancellationToken); } catch { }
                     break;
                 }
                 if (bytesReceived == 0)
                 {
                     Console.WriteLine("Connection with the server has been lost");
+                    try { await eventHandler.OnDisconnectedAsync(cancellationToken); } catch { }
                     break;
                 }
 
