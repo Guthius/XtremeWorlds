@@ -206,7 +206,7 @@ namespace Client
                         }
                     }
                     // Process player movements
-                    for (_i = 0; _i < Variables.MaxPlayers; _i++)
+                    for (_i = 0; _i < Player.Instance.Count; _i++)
                     {
                         if (IsPlaying(_i))
                         {
@@ -336,7 +336,7 @@ namespace Client
                         }
                     }
 
-                    for (_i = 0; _i < Variables.MaxPlayers; _i++)
+                    for (_i = 0; _i < Player.Instance.Count; _i++)
                     {
                         if (IsPlaying(_i) & GetPlayerMap(_i) == GetPlayerMap(GameState.MyIndex))
                         {

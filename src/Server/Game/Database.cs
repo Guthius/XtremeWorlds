@@ -578,7 +578,7 @@ public static class Database
 
         if (Account.Instance[index].Player[slot].Name == "")
         {
-            for (n = 0; n <= index; n++)
+            for (n = 0; n < index; n++)
             {
                 if (PlayerBase.Instance?.Count <= n)
                 {

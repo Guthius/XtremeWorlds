@@ -437,7 +437,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                     return;
                 }
 
-                for (int n = 0; n <= session.Id; n++)
+                for (int n = 0; n < session.Id; n++)
                 {
                     if (PlayerBase.Instance?.Count <= n)
                     {
