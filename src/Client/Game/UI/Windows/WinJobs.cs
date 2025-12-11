@@ -153,7 +153,7 @@ public class WinJobs
         {
             if (line == "" || line == null) continue;
             
-            var x = winJobs.X + 118 + 200 / 2 - TextRenderer.GetTextWidth(line, winJobs.Font) / 2;
+            var x = winJobs.X + 108 + 200 / 2 - TextRenderer.GetTextWidth(line, winJobs.Font) / 2;
 
             var textClean = new string(line.Where(c => TextRenderer.Fonts[winJobs.Font].Characters.Contains(c)).ToArray());
             var textSize = TextRenderer.Fonts[winJobs.Font].MeasureString(textClean);
