@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 using System.Xml;
 using Core.Globals;
 
@@ -13,6 +14,36 @@ public class WindowLoader
     {
         // Resolve layout path relative to the packaged Content root
         var path = Path.Combine(DataPath.Skins, "Layouts", layoutName + ".xml");
+        
+        // If file doesn't exist, try case-insensitive lookup
+        if (!File.Exists(path))
+        {
+            var layoutDir = Path.Combine(DataPath.Skins, "Layouts");
+            var fileName = layoutName + ".xml";
+            
+            // Try to find a file with matching name (case-insensitive)
+            if (Directory.Exists(layoutDir))
+            {
+                var files = Directory.GetFiles(layoutDir, fileName, System.IO.SearchOption.TopDirectoryOnly);
+                if (files.Length == 0)
+                {
+                    // Try case-insensitive search by listing and comparing
+                    var allFiles = Directory.GetFiles(layoutDir, "*.xml");
+                    var matchFile = allFiles.FirstOrDefault(f =>
+                        string.Equals(Path.GetFileName(f), fileName, StringComparison.OrdinalIgnoreCase));
+                    
+                    if (matchFile != null)
+                    {
+                        path = matchFile;
+                    }
+                }
+                else
+                {
+                    path = files[0];
+                }
+            }
+        }
+        
         if (!File.Exists(path))
         {
             throw new UIException(
