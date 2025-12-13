@@ -2936,23 +2936,23 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
     {
         var packetReader = new PacketReader(bytes);
 
-        var projectileNum = packetReader.ReadInt32();
+        var projectile = packetReader.ReadInt32();
 
-        NetworkSend.SendUpdateProjectileTo(session.Id, projectileNum);
+        NetworkSend.SendUpdateProjectileTo(session.Id, projectile);
     }
 
     public static void Packet_ClearProjectile(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var packetReader = new PacketReader(bytes);
 
-        var projectileNum = packetReader.ReadInt32();
+        var projectile = packetReader.ReadInt32();
         _ = packetReader.ReadInt32(); // Target Index
         _ = (TargetType)packetReader.ReadInt32(); // Target TYpe
         _ = packetReader.ReadInt32(); // Target Zone
 
         var mapNum = GetPlayerMap(session.Id);
 
-        MapProjectile.OnClear(mapNum, projectileNum);
+        MapProjectile.OnClear(mapNum, projectile);
     }
 
     public static void Packet_RequestEditProjectile(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -2990,25 +2990,25 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             return;
         }
 
-        var projectileNum = packetReader.ReadInt32();
-        if (projectileNum < 0 || projectileNum > Core.Globals.Variables.MaxProjectiles)
+        var projectile = packetReader.ReadInt32();
+        if (projectile < 0 || projectile > Core.Globals.Variables.MaxProjectiles)
         {
             return;
         }
 
-        Projectile.Instance[projectileNum].Name = packetReader.ReadString();
-        Projectile.Instance[projectileNum].Sprite = packetReader.ReadInt32();
-        Projectile.Instance[projectileNum].Range = (byte)packetReader.ReadInt32();
-        Projectile.Instance[projectileNum].Speed = packetReader.ReadInt32();
-        Projectile.Instance[projectileNum].Damage = packetReader.ReadInt32();
-        Projectile.Instance[projectileNum].Animation = packetReader.ReadInt32();
+        Projectile.Instance[projectile].Name = packetReader.ReadString();
+        Projectile.Instance[projectile].Sprite = packetReader.ReadInt32();
+        Projectile.Instance[projectile].Range = (byte)packetReader.ReadInt32();
+        Projectile.Instance[projectile].Speed = packetReader.ReadInt32();
+        Projectile.Instance[projectile].Damage = packetReader.ReadInt32();
+        Projectile.Instance[projectile].Animation = packetReader.ReadInt32();
 
-        Projectile.OnSave(projectileNum);
+        Projectile.OnSave(projectile);
 
         General.Logger.LogInformation("{AccountName} saved projectile #{ProjectileNum}",
-            GetAccountLogin(session.Id), projectileNum);
+            GetAccountLogin(session.Id), projectile);
 
-        NetworkSend.SendUpdateProjectileToAll(projectileNum);
+        NetworkSend.SendUpdateProjectileToAll(projectile);
     }
 
     public static void Packet_RequestEditResource(GameSession session, ReadOnlyMemory<byte> bytes)

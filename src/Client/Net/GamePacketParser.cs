@@ -2589,24 +2589,31 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     public static void Packet_UpdateProjectile(ReadOnlyMemory<byte> data)
     {
         var buffer = new PacketReader(data);
-        var projectileNum = buffer.ReadInt32();
+        var projectile = buffer.ReadInt32();
 
-        if (projectileNum == 0)
+        if (projectile == 0)
         {
             Projectile.Instance.Clear();
         }
 
-        var projectile = new Projectile();
-        projectile.Name = buffer.ReadString();
-        projectile.Sprite = buffer.ReadInt32();
-        projectile.Range = (byte)buffer.ReadInt32();
-        projectile.Speed = buffer.ReadInt32();
-        projectile.Damage = buffer.ReadInt32();
-        projectile.Animation = buffer.ReadInt32();
+        var instance = new Projectile
+        {
+            Name = buffer.ReadString(),
+            Sprite = buffer.ReadInt32(),
+            Range = (byte)buffer.ReadInt32(),
+            Speed = buffer.ReadInt32(),
+            Damage = buffer.ReadInt32(),
+            Animation = buffer.ReadInt32()
+        };
 
-        Projectile.Instance.Add(projectile);
+        for (var proj = Projectile.Instance.Count; proj <= proj; proj++)
+        {
+            Projectile.Instance.Add(new Projectile());
+        }
 
-        if (GameState.InitProjectileEditor && (projectileNum + 1) == Variables.MaxProjectiles)
+        Projectile.Instance[projectile] = projectile;
+
+        if (GameState.InitProjectileEditor && (projectile + 1) == Variables.MaxProjectiles)
         {
             GameState.MyEditorType = EditorType.Projectile;
             GameState.EditorIndex = 0;

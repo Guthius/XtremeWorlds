@@ -1379,9 +1379,9 @@ public static class NetworkSend
 
     public static void SendProjectiles(int playerId)
     {
-        for (var projectileNum = 0; projectileNum < Core.Globals.Variables.MaxProjectiles; projectileNum++)
+        for (var projectile = 0; projectile < Core.Globals.Variables.MaxProjectiles; projectile++)
         {
-            SendUpdateProjectileTo(playerId, projectileNum);
+            SendUpdateProjectileTo(playerId, projectile);
         }
     }
 

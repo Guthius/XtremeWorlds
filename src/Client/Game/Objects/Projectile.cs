@@ -16,7 +16,6 @@ namespace Client
     {
         #region Database
 
-
         public static void OnStream(int index)
 {           if (index < 0 || index >= Core.Globals.Variables.MaxProjectiles) return;
             if (Projectile.Instance.Count <= index)

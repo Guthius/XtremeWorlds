@@ -227,8 +227,8 @@ public class Projectile : ProjectileBase, IData, IAsyncData
             return;
         }
 
-        var projectileNum = itemNum >= 0 ? Item.Instance[itemNum].Projectile : skillNum >= 0 ? Data.Skill[skillNum].Projectile : -1;
-        if (projectileNum == -1)
+        var projectile = itemNum >= 0 ? Item.Instance[itemNum].Projectile : skillNum >= 0 ? Data.Skill[skillNum].Projectile : -1;
+        if (projectile == -1)
         {
             return;
         }
@@ -244,10 +244,10 @@ public class Projectile : ProjectileBase, IData, IAsyncData
         // Only set cooldown if not suppressed here; caller may set once per batch
         if (!suppressCooldown)
         {
-            int cooldownMs = Projectile.Instance[projectileNum].Speed;
+            int cooldownMs = Projectile.Instance[projectile].Speed;
             Data.TempPlayer[playerId].ProjectileTimer = General.GetTimeMs() + cooldownMs;
         }
-        mapProjectile.ProjectileNum = projectileNum;
+        mapProjectile.ProjectileNum = projectile;
         mapProjectile.Owner = playerId;
         mapProjectile.OwnerType = (byte)TargetType.Player;
         mapProjectile.Dir = dir >= 0 ? (byte) dir : GetPlayerDir(playerId);
@@ -255,7 +255,7 @@ public class Projectile : ProjectileBase, IData, IAsyncData
         mapProjectile.Y = GetPlayerRawY(playerId);
         mapProjectile.SkillId = skillNum;
         mapProjectile.Range = 0;
-        mapProjectile.TravelTime = General.GetTimeMs() + Math.Max(1, Projectile.Instance[projectileNum].Speed);
+        mapProjectile.TravelTime = General.GetTimeMs() + Math.Max(1, Projectile.Instance[projectile].Speed);
         mapProjectile.Timer = General.GetTimeMs() + 60000;
 
         NetworkSend.SendProjectileToMap(mapNum, mapProjectileNum);
@@ -280,8 +280,8 @@ public class Projectile : ProjectileBase, IData, IAsyncData
         }
 
         // Skill-defined projectile
-        var projectileNum = skillNum >= 0 ? Data.Skill[skillNum].Projectile : -1;
-        if (projectileNum == -1)
+        var projectile = skillNum >= 0 ? Data.Skill[skillNum].Projectile : -1;
+        if (projectile == -1)
         {
             return;
         }
@@ -293,7 +293,7 @@ public class Projectile : ProjectileBase, IData, IAsyncData
 
         ref var mapProjectile = ref Data.MapProjectile[mapNum, mapProjectileNum];
 
-        mapProjectile.ProjectileNum = projectileNum;
+        mapProjectile.ProjectileNum = projectile;
         mapProjectile.Owner = mapNpcNum;
         mapProjectile.OwnerType = (byte) TargetType.Npc;
         mapProjectile.Dir = dir >= 0 ? (byte) dir : Data.MapNpc[mapNum].Npc[mapNpcNum].Dir;
@@ -301,7 +301,7 @@ public class Projectile : ProjectileBase, IData, IAsyncData
         mapProjectile.Y = Data.MapNpc[mapNum].Npc[mapNpcNum].Y;
         mapProjectile.SkillId = skillNum;
         mapProjectile.Range = 0;
-        mapProjectile.TravelTime = General.GetTimeMs() + Math.Max(1, Projectile.Instance[projectileNum].Speed);
+        mapProjectile.TravelTime = General.GetTimeMs() + Math.Max(1, Projectile.Instance[projectile].Speed);
         mapProjectile.Timer = General.GetTimeMs() + 60000;
 
         NetworkSend.SendProjectileToMap(mapNum, mapProjectileNum);
