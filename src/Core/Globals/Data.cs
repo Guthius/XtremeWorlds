@@ -17,7 +17,6 @@ public static class Data
     public static MapData[] MapNpc = new MapData[Variables.MaxMaps];
     public static MapNpc[] MyMapNpc = new MapNpc[Variables.MaxMapNpcs];
     public static TempPlayer[] TempPlayer = new TempPlayer[Variables.MaxPlayers];
-    public static Projectile[] Projectile = new Projectile[Variables.MaxProjectiles];
     public static MapProjectile[,] MapProjectile = new MapProjectile[Variables.MaxMaps, Variables.MaxProjectiles];
     public static Item[] TradeYourOffer = new Item[Variables.MaxInventory];
     public static Item[] TradeTheirOffer = new Item[Variables.MaxInventory];

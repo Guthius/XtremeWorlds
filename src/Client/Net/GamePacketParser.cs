@@ -2588,16 +2588,32 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
     public static void Packet_UpdateProjectile(ReadOnlyMemory<byte> data)
     {
-        int projectileNum;
         var buffer = new PacketReader(data);
-        projectileNum = buffer.ReadInt32();
+        var projectileNum = buffer.ReadInt32();
 
-        Data.Projectile[projectileNum].Name = buffer.ReadString();
-        Data.Projectile[projectileNum].Sprite = buffer.ReadInt32();
-        Data.Projectile[projectileNum].Range = (byte)buffer.ReadInt32();
-        Data.Projectile[projectileNum].Speed = buffer.ReadInt32();
-        Data.Projectile[projectileNum].Damage = buffer.ReadInt32();
-        Data.Projectile[projectileNum].Animation = buffer.ReadInt32();
+        if (projectileNum == 0)
+        {
+            Projectile.Instance.Clear();
+        }
+
+        var projectile = new Projectile();
+        projectile.Name = buffer.ReadString();
+        projectile.Sprite = buffer.ReadInt32();
+        projectile.Range = (byte)buffer.ReadInt32();
+        projectile.Speed = buffer.ReadInt32();
+        projectile.Damage = buffer.ReadInt32();
+        projectile.Animation = buffer.ReadInt32();
+
+        Projectile.Instance.Add(projectile);
+
+        if (GameState.InitProjectileEditor && (projectileNum + 1) == Variables.MaxProjectiles)
+        {
+            GameState.MyEditorType = EditorType.Projectile;
+            GameState.EditorIndex = 0;
+            WindowManager.ShowWindow("winProjectileEditor");
+            GameState.InitProjectileEditor = false;
+            Client.Game.UI.Windows.WinProjectileEditor.Init();
+        }
     }
 
     public static void Packet_MapProjectile(ReadOnlyMemory<byte> data)

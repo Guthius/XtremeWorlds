@@ -230,7 +230,7 @@ public class WinItemEditor
             cmbProj.Items.Clear();
             cmbProj.Items.Add("None");
             for (int i = 0; i < Variables.MaxProjectiles; i++)
-                cmbProj.Items.Add($"{i + 1}: {Data.Projectile[i].Name}");
+                cmbProj.Items.Add($"{i + 1}: {Projectile.Instance[i].Name}");
         }
 
         // Ammo list (0 = None, then items)

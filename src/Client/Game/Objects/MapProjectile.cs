@@ -65,12 +65,12 @@ namespace Client
                 return;
 
             int projectile = Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, projectileNum].ProjectileNum;
-            if (projectile < 0 || projectile >= Data.Projectile.Length)
+            if (projectile < 0 || projectile >= Projectile.Instance.Count)
             {
                 return;
             }
 
-            sprite = Data.Projectile[projectile].Sprite;
+            sprite = Projectile.Instance[projectile].Sprite;
             if (sprite < 1 || sprite > GameState.NumProjectiles)
             {
                 return;

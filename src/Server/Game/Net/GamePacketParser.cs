@@ -677,7 +677,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                     if (Server.Player.HasItem(session.Id, Item.Instance[GetPlayerPaperdoll(session.Id, Equipment.Weapon)].Ammo) > 0)
                     {
                         Server.Player.TakeInv(session.Id, Item.Instance[GetPlayerPaperdoll(session.Id, Equipment.Weapon)].Ammo, 1);
-                        Projectile.PlayerFireProjectile(session.Id, -1, GetPlayerPaperdoll(session.Id, Equipment.Weapon));
+                        Projectile.onShoot(session.Id, -1, GetPlayerPaperdoll(session.Id, Equipment.Weapon));
                         return;
                     }
                     else
@@ -688,7 +688,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                 }
                 else
                 {
-                    Projectile.PlayerFireProjectile(session.Id, -1, GetPlayerPaperdoll(session.Id, Equipment.Weapon));
+                    Projectile.onShoot(session.Id, -1, GetPlayerPaperdoll(session.Id, Equipment.Weapon));
                     return;
                 }
             }
@@ -889,7 +889,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         if (dx == 0 && dy == 0)
         {
             // if zero vector, default to current facing
-            Projectile.PlayerFireProjectile(session.Id, -1, itemNum);
+            Projectile.onShoot(session.Id, -1, itemNum);
             return;
         }
 
@@ -899,7 +899,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         short vy = (short)Math.Clamp((int)Math.Round(dy / length * 1000.0), short.MinValue, short.MaxValue);
 
         // Fire with free-aim using helper and stop at target
-        Server.Projectile.PlayerFireProjectileFreeAim(session.Id, vx, vy, itemNum, targetX, targetY);
+        Server.Projectile.OnFreeAim(session.Id, vx, vy, itemNum, targetX, targetY);
         NetworkSend.SendPlayerAttack(session.Id);
     }
 
@@ -2969,9 +2969,6 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             return;
         }
 
-        NetworkSend.SendProjectiles(session.Id);
-        NetworkSend.SendAnimations(session.Id);
-
         Data.TempPlayer[session.Id].Editor = EditorType.Projectile;
 
         var buffer = new PacketWriter(4);
@@ -2979,6 +2976,9 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         buffer.WriteEnum(ServerPackets.SProjectileEditor);
 
         PlayerService.Instance.SendDataTo(session.Id, buffer.GetBytes());
+
+        NetworkSend.SendProjectiles(session.Id);
+        NetworkSend.SendAnimations(session.Id);
     }
 
     public static void Packet_SaveProjectile(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -2996,12 +2996,12 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             return;
         }
 
-        Data.Projectile[projectileNum].Name = packetReader.ReadString();
-        Data.Projectile[projectileNum].Sprite = packetReader.ReadInt32();
-        Data.Projectile[projectileNum].Range = (byte)packetReader.ReadInt32();
-        Data.Projectile[projectileNum].Speed = packetReader.ReadInt32();
-        Data.Projectile[projectileNum].Damage = packetReader.ReadInt32();
-        Data.Projectile[projectileNum].Animation = packetReader.ReadInt32();
+        Projectile.Instance[projectileNum].Name = packetReader.ReadString();
+        Projectile.Instance[projectileNum].Sprite = packetReader.ReadInt32();
+        Projectile.Instance[projectileNum].Range = (byte)packetReader.ReadInt32();
+        Projectile.Instance[projectileNum].Speed = packetReader.ReadInt32();
+        Projectile.Instance[projectileNum].Damage = packetReader.ReadInt32();
+        Projectile.Instance[projectileNum].Animation = packetReader.ReadInt32();
 
         Projectile.OnSave(projectileNum);
 

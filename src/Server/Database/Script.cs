@@ -341,7 +341,7 @@ public class Script
                             if (HasItem(index, Item.Instance[itemNum].Ammo) > 0)
                             {
                                 TakeInv(index, Item.Instance[itemNum].Ammo, 1);
-                                Server.Projectile.PlayerFireProjectile(index, -1, itemNum);
+                                Server.Projectile.onShoot(index, -1, itemNum);
                             }
                             else
                             {
@@ -351,7 +351,7 @@ public class Script
                         }
                         else
                         {
-                            Server.Projectile.PlayerFireProjectile(index, -1, itemNum);
+                            Server.Projectile.onShoot(index, -1, itemNum);
                             return;
                         }
 
@@ -1653,9 +1653,9 @@ public class Script
         if (mask == 0)
         {
             if (caster.Type == Core.Globals.Entity.EntityType.Player)
-                Server.Projectile.PlayerFireProjectile(caster.Id, -1, skillId);
+                Server.Projectile.onShoot(caster.Id, -1, skillId);
             else if (caster.Type == Core.Globals.Entity.EntityType.Npc)
-                Server.Projectile.NpcFireProjectile(mapNum, caster.Id, skillId);
+                Server.Projectile.OnNpcProjectile(mapNum, caster.Id, skillId);
             return;
         }
 
@@ -1669,9 +1669,9 @@ public class Script
             if ((mask & (1 << i)) == 0) continue;
             caster.Dir = dirs[i];
             if (caster.Type == Core.Globals.Entity.EntityType.Player)
-                Server.Projectile.PlayerFireProjectile(caster.Id, -1, skillId, caster.Dir, suppressCooldown: true);
+                Server.Projectile.onShoot(caster.Id, -1, skillId, caster.Dir, suppressCooldown: true);
             else if (caster.Type == Core.Globals.Entity.EntityType.Npc)
-                Server.Projectile.NpcFireProjectile(mapNum, caster.Id, skillId, caster.Dir);
+                Server.Projectile.OnNpcProjectile(mapNum, caster.Id, skillId, caster.Dir);
         }
         caster.Dir = originalDir;
 
@@ -1681,7 +1681,7 @@ public class Script
             var projNum = Data.Skill[skillId].Projectile;
             if (projNum >= 0)
             {
-                Data.TempPlayer[caster.Id].ProjectileTimer = General.GetTimeMs() + Math.Max(0, Data.Projectile[projNum].Speed);
+                Data.TempPlayer[caster.Id].ProjectileTimer = General.GetTimeMs() + Math.Max(0, Projectile.Instance[projNum].Speed);
             }
         }
     }

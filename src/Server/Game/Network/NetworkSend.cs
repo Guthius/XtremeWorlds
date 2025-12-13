@@ -1362,13 +1362,7 @@ public static class NetworkSend
         var packet = new PacketWriter();
 
         packet.WriteEnum(ServerPackets.SUpdateProjectile);
-        packet.WriteInt32(projectileNum);
-        packet.WriteString(Data.Projectile[projectileNum].Name);
-        packet.WriteInt32(Data.Projectile[projectileNum].Sprite);
-        packet.WriteInt32(Data.Projectile[projectileNum].Range);
-        packet.WriteInt32(Data.Projectile[projectileNum].Speed);
-        packet.WriteInt32(Data.Projectile[projectileNum].Damage);
-        packet.WriteInt32(Data.Projectile[projectileNum].Animation);
+        WriteProjectileDataToPacket(projectileNum, packet);
 
         PlayerService.Instance.SendDataToAll(packet.GetBytes());
     }
@@ -1378,13 +1372,7 @@ public static class NetworkSend
         var packet = new PacketWriter();
 
         packet.WriteEnum(ServerPackets.SUpdateProjectile);
-        packet.WriteInt32(projectileNum);
-        packet.WriteString(Data.Projectile[projectileNum].Name);
-        packet.WriteInt32(Data.Projectile[projectileNum].Sprite);
-        packet.WriteInt32(Data.Projectile[projectileNum].Range);
-        packet.WriteInt32(Data.Projectile[projectileNum].Speed);
-        packet.WriteInt32(Data.Projectile[projectileNum].Damage);
-        packet.WriteInt32(Data.Projectile[projectileNum].Animation);
+        WriteProjectileDataToPacket(projectileNum, packet);
 
         PlayerService.Instance.SendDataTo(playerId, packet.GetBytes());
     }
@@ -1393,11 +1381,24 @@ public static class NetworkSend
     {
         for (var projectileNum = 0; projectileNum < Core.Globals.Variables.MaxProjectiles; projectileNum++)
         {
-            if (Data.Projectile[projectileNum].Name.Length > 0)
-            {
-                SendUpdateProjectileTo(playerId, projectileNum);
-            }
+            SendUpdateProjectileTo(playerId, projectileNum);
         }
+    }
+
+    private static void WriteProjectileDataToPacket(int index, PacketWriter packet)
+    {
+        packet.WriteInt32(index);
+
+        var projectile = new ProjectileBase();
+        if (Projectile.Instance.Count > index)
+            projectile = Projectile.Instance[index];
+
+        packet.WriteString(projectile.Name);
+        packet.WriteInt32(projectile.Sprite);
+        packet.WriteInt32(projectile.Range);
+        packet.WriteInt32(projectile.Speed);
+        packet.WriteInt32(projectile.Damage);
+        packet.WriteInt32(projectile.Animation);
     }
 
     public static void SendUpdateResourceToAll(int resourceNum)

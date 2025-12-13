@@ -1,6 +1,7 @@
 using Client.Game.UI;
 using Client.Game.UI.Controls;
 using Core.Globals;
+using Core.Objects;
 using System;
 using System.IO;
 
@@ -9,7 +10,7 @@ namespace Client.Game.UI.Windows;
 public class WinProjectileEditor
 {
     public static int SelectedIndex = 0;
-    private static Core.Globals.Type.Projectile? _history;
+    private static ProjectileBase? _history;
 
     public static void Init()
     {
@@ -33,7 +34,7 @@ public class WinProjectileEditor
         list.Clear();
         for (int i = 0; i < Variables.MaxProjectiles; i++)
         {
-            string name = Strings.Trim(Data.Projectile[i].Name);
+            string name = Strings.Trim(Projectile.Instance[i].Name);
             if (string.IsNullOrWhiteSpace(name)) name = "None";
             list.AddItem($"{i + 1}: {name}");
         }
@@ -90,7 +91,7 @@ public class WinProjectileEditor
         if (index < 0 || index >= Variables.MaxProjectiles) return;
         SelectedIndex = index;
         GameState.EditorIndex = index;
-        ref var p = ref Data.Projectile[index];
+        var p = Projectile.Instance[index];
 
         if (WindowManager.TryGetControl("winProjectileEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
             txtName.Text = p.Name ?? string.Empty;
@@ -129,11 +130,11 @@ public class WinProjectileEditor
         if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxProjectiles) return;
         if (_history is null)
         {
-            _history = Data.Projectile[SelectedIndex];
+            _history = (Projectile)Projectile.Instance[SelectedIndex];
             if (WindowManager.TryGetControl("winProjectileEditor", "btnCopy", out var btn) && btn is Button b) b.Text = "Paste";
             return;
         }
-        Data.Projectile[SelectedIndex] = _history.Value;
+        Projectile.Instance[SelectedIndex] = _history;
         GameState.ProjectileChanged[SelectedIndex] = true;
         _history = null;
         if (WindowManager.TryGetControl("winProjectileEditor", "btnCopy", out var btn2) && btn2 is Button b2) b2.Text = "Copy";
@@ -169,7 +170,7 @@ public class WinProjectileEditor
         if (win is null) return;
         if (!WindowManager.TryGetControl("winProjectileEditor", "picSprite", out var ctrl) || ctrl is not PictureBox pic) return;
         if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxProjectiles) return;
-        var pr = Data.Projectile[SelectedIndex];
+        var pr = Projectile.Instance[SelectedIndex];
         int spriteIndex = pr.Sprite;
         if (spriteIndex < 1 || spriteIndex > GameState.NumProjectiles) return;
         var path = Path.Combine(DataPath.Projectiles, spriteIndex + GameState.GfxExt);

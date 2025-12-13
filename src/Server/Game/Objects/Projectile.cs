@@ -11,12 +11,13 @@ using static Core.Net.Packets;
 using Type = Core.Globals.Type;
 using System.Linq;
 using Core.Interfaces;
+using Core.Objects;
 
 namespace Server;
 
-public class Projectile : IData, IAsyncData
+public class Projectile : ProjectileBase, IData, IAsyncData
 {
-    private static void TryAttackAtTile(int map, ref Type.MapProjectile mp, int tileX, int tileY, int projId)
+    private static void OnAttack(int map, ref Type.MapProjectile mp, int tileX, int tileY, int projId)
     {
         // Build attacker entity snapshot (owner is player for now)
         Entity attackerEntity = null;
@@ -51,7 +52,7 @@ public class Projectile : IData, IAsyncData
                         }
                         else
                         {
-                            Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, Data.Projectile[projId].Damage, true);
+                            Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, Projectile.Instance[projId].Damage, true);
                         }
                     }
                     catch (Exception ex)
@@ -82,7 +83,7 @@ public class Projectile : IData, IAsyncData
                         }
                         else
                         {
-                            Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, Data.Projectile[projId].Damage, true);
+                            Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, Projectile.Instance[projId].Damage, true);
                         }
                     }
                     catch (Exception ex)
@@ -96,7 +97,7 @@ public class Projectile : IData, IAsyncData
     }
     public static void OnSave(int index)
     {
-        var json = JsonConvert.SerializeObject(Data.Projectile[index]);
+        var json = JsonConvert.SerializeObject(Projectile.Instance[index]);
 
         if (Database.RowExists(index, "projectile"))
         {
@@ -122,22 +123,12 @@ public class Projectile : IData, IAsyncData
             return;
         }
 
-        var projectileData = data.ToObject<Type.Projectile>();
+        var projectileData = data.ToObject<Projectile>();
 
-        Data.Projectile[index] = projectileData;
+        Projectile.Instance[index] = projectileData;
     }
 
-    public static void OnClear(int index)
-    {
-        Data.Projectile[index].Name = "";
-        Data.Projectile[index].Sprite = 0;
-        Data.Projectile[index].Range = 0;
-        Data.Projectile[index].Speed = 0;
-        Data.Projectile[index].Damage = 0;
-        Data.Projectile[index].Animation = -1;
-    }
-    
-    public static void PlayerFireProjectileFreeAim(int playerId, short vx, short vy, int itemNum)
+    public static void OnFireFreeAim(int playerId, short vx, short vy, int itemNum)
     {
         var mapNum = GetPlayerMap(playerId);
         var mapProjectileNum = -1;
@@ -174,12 +165,12 @@ public class Projectile : IData, IAsyncData
         mp.Y = GetPlayerRawY(playerId);
         mp.Vx = vx; mp.Vy = vy; mp.FreeAim = 1;
         mp.AccX = 0; mp.AccY = 0; mp.Range = 0;
-        mp.TravelTime = General.GetTimeMs() + Math.Max(1, Data.Projectile[projectileNum].Speed);
+        mp.TravelTime = General.GetTimeMs() + Math.Max(1, Projectile.Instance[projectileNum].Speed);
         mp.Timer = General.GetTimeMs() + 60000;
         NetworkSend.SendProjectileToMap(mapNum, mapProjectileNum);
     }
 
-    public static void PlayerFireProjectileFreeAim(int playerId, short vx, short vy, int itemNum, int destX, int destY)
+    public static void OnFreeAim(int playerId, short vx, short vy, int itemNum, int destX, int destY)
     {
         var mapNum = GetPlayerMap(playerId);
         var mapProjectileNum = -1;
@@ -213,12 +204,12 @@ public class Projectile : IData, IAsyncData
         mp.Vx = vx; mp.Vy = vy; mp.FreeAim = 1; mp.SkillId = -1;
         mp.AccX = 0; mp.AccY = 0; mp.Range = 0;
         mp.DestX = destX; mp.DestY = destY;
-        mp.TravelTime = General.GetTimeMs() + Math.Max(1, Data.Projectile[projectileNum].Speed);
+        mp.TravelTime = General.GetTimeMs() + Math.Max(1, Projectile.Instance[projectileNum].Speed);
         mp.Timer = General.GetTimeMs() + 60000;
         NetworkSend.SendProjectileToMap(mapNum, mapProjectileNum);
     }
 
-    public static void PlayerFireProjectile(int playerId, int itemNum, int skillNum = -1, int dir = -1, bool suppressCooldown = false)
+    public static void onShoot(int playerId, int itemNum, int skillNum = -1, int dir = -1, bool suppressCooldown = false)
     {
         var mapNum = GetPlayerMap(playerId);
         var mapProjectileNum = -1;
@@ -253,7 +244,7 @@ public class Projectile : IData, IAsyncData
         // Only set cooldown if not suppressed here; caller may set once per batch
         if (!suppressCooldown)
         {
-            int cooldownMs = Data.Projectile[projectileNum].Speed;
+            int cooldownMs = Projectile.Instance[projectileNum].Speed;
             Data.TempPlayer[playerId].ProjectileTimer = General.GetTimeMs() + cooldownMs;
         }
         mapProjectile.ProjectileNum = projectileNum;
@@ -264,13 +255,13 @@ public class Projectile : IData, IAsyncData
         mapProjectile.Y = GetPlayerRawY(playerId);
         mapProjectile.SkillId = skillNum;
         mapProjectile.Range = 0;
-        mapProjectile.TravelTime = General.GetTimeMs() + Math.Max(1, Data.Projectile[projectileNum].Speed);
+        mapProjectile.TravelTime = General.GetTimeMs() + Math.Max(1, Projectile.Instance[projectileNum].Speed);
         mapProjectile.Timer = General.GetTimeMs() + 60000;
 
         NetworkSend.SendProjectileToMap(mapNum, mapProjectileNum);
     }
 
-    public static void NpcFireProjectile(int mapNum, int mapNpcNum, int skillNum, int dir = -1)
+    public static void OnNpcProjectile(int mapNum, int mapNpcNum, int skillNum, int dir = -1)
     {
         // Find free map projectile slot
         var mapProjectileNum = -1;
@@ -310,13 +301,13 @@ public class Projectile : IData, IAsyncData
         mapProjectile.Y = Data.MapNpc[mapNum].Npc[mapNpcNum].Y;
         mapProjectile.SkillId = skillNum;
         mapProjectile.Range = 0;
-        mapProjectile.TravelTime = General.GetTimeMs() + Math.Max(1, Data.Projectile[projectileNum].Speed);
+        mapProjectile.TravelTime = General.GetTimeMs() + Math.Max(1, Projectile.Instance[projectileNum].Speed);
         mapProjectile.Timer = General.GetTimeMs() + 60000;
 
         NetworkSend.SendProjectileToMap(mapNum, mapProjectileNum);
     }
 
-    public static void UpdateProjectiles()
+    public static void OnUpdate()
     {
         int now = General.GetTimeMs();
         for (int map = 0; map < Core.Globals.Variables.MaxMaps; map++)
@@ -335,13 +326,13 @@ public class Projectile : IData, IAsyncData
                 }
 
                 var projId = mp.ProjectileNum;
-                if (projId < 0 || projId >= Data.Projectile.Length)
+                if (projId < 0 || projId >= Projectile.Instance.Count)
                 {
                     MapProjectile.OnClear(map, i);
                     continue;
                 }
 
-                int stepMs = Math.Max(1, Data.Projectile[projId].Speed);
+                int stepMs = Math.Max(1, Projectile.Instance[projId].Speed);
                 bool moved = false;
                 int prevTileX = mp.X / Constants.TileSize;
                 int prevTileY = mp.Y / Constants.TileSize;
@@ -387,14 +378,14 @@ public class Projectile : IData, IAsyncData
                         {
                             // Snap to destination tile center rim if desired; for now, snap to Dest
                             mp.X = mp.DestX; mp.Y = mp.DestY;
-                            int anim = Data.Projectile[projId].Animation;
+                            int anim = Projectile.Instance[projId].Animation;
                             if (anim >= 0)
                             {
                                 int tx = Math.Clamp(mp.X / Constants.TileSize, 0, Data.Map[map].MaxX - 1);
                                 int ty = Math.Clamp(mp.Y / Constants.TileSize, 0, Data.Map[map].MaxY - 1);
                                 NetworkSend.SendAnimation(map, anim, tx, ty);
                                 // Try to apply attack on expire at destination
-                                TryAttackAtTile(map, ref mp, tx, ty, projId);
+                                OnAttack(map, ref mp, tx, ty, projId);
                             }
                             MapProjectile.OnClear(map, i);
                             moved = false;
@@ -403,16 +394,16 @@ public class Projectile : IData, IAsyncData
                     }
 
                     // Range check (Range in tiles in DB, convert to pixels)
-                    if (mp.Range >= (Data.Projectile[projId].Range + 1) * 32)
+                    if (mp.Range >= (Projectile.Instance[projId].Range + 1) * 32)
                     {
                         // Play hit/expire animation at the last tile location if configured
-                        int anim = Data.Projectile[projId].Animation;
+                        int anim = Projectile.Instance[projId].Animation;
                         if (anim >= 0)
                         {
                             int tx = Math.Clamp(prevTileX, 0, Data.Map[map].MaxX - 1);
                             int ty = Math.Clamp(prevTileY, 0, Data.Map[map].MaxY - 1);
                             NetworkSend.SendAnimation(map, anim, tx, ty);
-                            TryAttackAtTile(map, ref mp, tx, ty, projId);
+                            OnAttack(map, ref mp, tx, ty, projId);
                         }
                         MapProjectile.OnClear(map, i);
                         moved = false;
@@ -424,7 +415,7 @@ public class Projectile : IData, IAsyncData
                     int tileY = Math.Clamp(mp.Y / Constants.TileSize, 0, Core.Globals.Variables.MaxMapY - 1);
                     if (tileX < 0 || tileY < 0 || tileX >= Data.Map[map].MaxX || tileY >= Data.Map[map].MaxY)
                     {
-                        int anim = Data.Projectile[projId].Animation;
+                        int anim = Projectile.Instance[projId].Animation;
                         if (anim >= 0)
                         {
                             if (Data.Map[map].MaxX > 0 && Data.Map[map].MaxY > 0)
@@ -432,7 +423,7 @@ public class Projectile : IData, IAsyncData
                                 int tx = Math.Clamp(prevTileX, 0, Data.Map[map].MaxX - 1);
                                 int ty = Math.Clamp(prevTileY, 0, Data.Map[map].MaxY - 1);
                                 NetworkSend.SendAnimation(map, anim, tx, ty);
-                                TryAttackAtTile(map, ref mp, tx, ty, projId);
+                                OnAttack(map, ref mp, tx, ty, projId);
                             }
                         }
                         MapProjectile.OnClear(map, i);
@@ -443,11 +434,11 @@ public class Projectile : IData, IAsyncData
                     // Tile collision
                     if (Data.Map[map].Tile[tileX, tileY].Type == TileType.Blocked || Data.Map[map].Tile[tileX, tileY].Type2 == TileType.Blocked)
                     {
-                        int anim = Data.Projectile[projId].Animation;
+                        int anim = Projectile.Instance[projId].Animation;
                         if (anim >= 0)
                         {
                             NetworkSend.SendAnimation(map, anim, tileX, tileY);
-                            TryAttackAtTile(map, ref mp, tileX, tileY, projId);
+                            OnAttack(map, ref mp, tileX, tileY, projId);
                         }
                         
                         MapProjectile.OnClear(map, i);
@@ -484,7 +475,7 @@ public class Projectile : IData, IAsyncData
 
                     if (hit)
                     {
-                        int anim = Data.Projectile[projId].Animation;
+                        int anim = Projectile.Instance[projId].Animation;
                         if (anim >= 0)
                         {
                             NetworkSend.SendAnimation(map, anim, tileX, tileY);
@@ -500,7 +491,7 @@ public class Projectile : IData, IAsyncData
                             else
                             {
                                 // item/weapon projectile: basic damage
-                                Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, Data.Projectile[projId].Damage, true);
+                                Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, Projectile.Instance[projId].Damage, true);
                             }
                         }
                         catch (Exception ex)
@@ -532,7 +523,7 @@ public class Projectile : IData, IAsyncData
                     
                     if (hit)
                     {
-                        int anim = Data.Projectile[projId].Animation;
+                        int anim = Projectile.Instance[projId].Animation;
                         if (anim >= 0)
                         {
                             NetworkSend.SendAnimation(map, anim, tileX, tileY);
@@ -546,7 +537,7 @@ public class Projectile : IData, IAsyncData
                             }
                             else
                             {
-                                Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, Data.Projectile[projId].Damage, true);
+                                Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, Projectile.Instance[projId].Damage, true);
                             }
                         }
                         catch (Exception ex)
@@ -566,27 +557,7 @@ public class Projectile : IData, IAsyncData
         }
     }
 
-    public static void OnDraw(int index)
-    {
-        throw new NotImplementedException();
-    }
-
     public static void OnStream(int index)
-    {
-        throw new NotImplementedException();
-    }
-
-    public static void OnReset()
-    {
-        throw new NotImplementedException();
-    }
-
-    public static void OnLoad(int index)
-    {
-        throw new NotImplementedException();
-    }
-
-    public static void OnUpdate(int index)
     {
         throw new NotImplementedException();
     }

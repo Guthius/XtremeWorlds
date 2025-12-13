@@ -569,16 +569,6 @@ public static class Type
         public int TaskType;
     }
 
-    public struct Projectile
-    {
-        public string Name;
-        public int Sprite;
-        public byte Range;
-        public int Speed;
-        public int Damage;
-        public int Animation;
-    }
-
     public struct MapProjectile
     {
         public int ProjectileNum;

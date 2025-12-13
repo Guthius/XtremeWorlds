@@ -1495,12 +1495,12 @@ public static class Sender
 
         packetWriter.WriteEnum(Packets.ClientPackets.CSaveProjectile);
         packetWriter.WriteInt32(index);
-        packetWriter.WriteString(Data.Projectile[index].Name);
-        packetWriter.WriteInt32(Data.Projectile[index].Sprite);
-        packetWriter.WriteInt32(Data.Projectile[index].Range);
-        packetWriter.WriteInt32(Data.Projectile[index].Speed);
-        packetWriter.WriteInt32(Data.Projectile[index].Damage);
-        packetWriter.WriteInt32(Data.Projectile[index].Animation);
+        packetWriter.WriteString(Projectile.Instance[index].Name);
+        packetWriter.WriteInt32(Projectile.Instance[index].Sprite);
+        packetWriter.WriteInt32(Projectile.Instance[index].Range);
+        packetWriter.WriteInt32(Projectile.Instance[index].Speed);
+        packetWriter.WriteInt32(Projectile.Instance[index].Damage);
+        packetWriter.WriteInt32(Projectile.Instance[index].Animation);
 
         Network.Send(packetWriter);
     }

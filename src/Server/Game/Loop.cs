@@ -73,7 +73,7 @@ public static class Loop
             if (tick > tmrProj)
             {
                 // Server-side projectile pixel movement and sparse map broadcasts
-                Projectile.UpdateProjectiles();
+                Projectile.OnUpdate();
                 tmrProj = General.GetTimeMs() + 5;
             }
 

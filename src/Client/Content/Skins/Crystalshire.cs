@@ -3079,7 +3079,7 @@ public class Crystalshire
             {
                 int id = WinProjectileEditor.SelectedIndex; if (id < 0 || id >= Variables.MaxProjectiles) return;
                 var newName = txtName.Text ?? string.Empty;
-                Data.Projectile[id].Name = newName;
+                Projectile.Instance[id].Name = newName;
                 GameState.ProjectileChanged[id] = true;
 
                 // Update list item text without losing selection/scroll
@@ -3101,7 +3101,7 @@ public class Crystalshire
             sbSprite.CallBack[(int)ControlState.MouseMove] = () =>
             {
                 int id = WinProjectileEditor.SelectedIndex; if (id < 0 || id >= Variables.MaxProjectiles) return;
-                Data.Projectile[id].Sprite = sbSprite.Value;
+                Projectile.Instance[id].Sprite = sbSprite.Value;
                 GameState.ProjectileChanged[id] = true;
             };
         }
@@ -3122,9 +3122,9 @@ public class Crystalshire
                 };
             }
         }
-        BindBar("sldRange", "lblRangeVal", v => Data.Projectile[WinProjectileEditor.SelectedIndex].Range = (byte)v, 0, 255);
-        BindBar("sldSpeed", "lblSpeedVal", v => Data.Projectile[WinProjectileEditor.SelectedIndex].Speed = v, 0, 1000);
-        BindBar("sldDamage", "lblDamageVal", v => Data.Projectile[WinProjectileEditor.SelectedIndex].Damage = v, 0, 100000);
+        BindBar("sldRange", "lblRangeVal", v => Projectile.Instance[WinProjectileEditor.SelectedIndex].Range = (byte)v, 0, 255);
+        BindBar("sldSpeed", "lblSpeedVal", v => Projectile.Instance[WinProjectileEditor.SelectedIndex].Speed = v, 0, 1000);
+        BindBar("sldDamage", "lblDamageVal", v => Projectile.Instance[WinProjectileEditor.SelectedIndex].Damage = v, 0, 100000);
 
         // Animation combo (0=None then +1 offset)
         if (WindowManager.TryGetControl("winProjectileEditor", "cmbAnimation", out var animCtrl) && animCtrl is ComboBox cmbAnim)
@@ -3143,7 +3143,7 @@ public class Crystalshire
             {
                 int id = WinProjectileEditor.SelectedIndex; if (id < 0 || id >= Variables.MaxProjectiles) return;
                 int sel = Math.Clamp(cmbAnim.Value, 0, cmbAnim.Items.Count - 1);
-                Data.Projectile[id].Animation = sel == 0 ? -1 : sel - 1;
+                Projectile.Instance[id].Animation = sel == 0 ? -1 : sel - 1;
                 GameState.ProjectileChanged[id] = true;
             };
         }

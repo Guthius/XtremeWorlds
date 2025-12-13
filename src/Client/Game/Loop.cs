@@ -547,15 +547,6 @@ namespace Client
                 GameState.InitShopEditor = false;
             }
 
-            if (GameState.InitProjectileEditor)
-            {
-                GameState.MyEditorType = EditorType.Projectile;
-                GameState.EditorIndex = 0;
-                WindowManager.ShowWindow("winProjectileEditor");
-                Client.Game.UI.Windows.WinProjectileEditor.Init();
-                GameState.InitProjectileEditor = false;
-            }
-
             if (GameState.InitScriptEditor)
             {
                 GameState.MyEditorType = EditorType.Script;

@@ -86,7 +86,7 @@ public class WinSkillEditor
             cmbProj.Items.Clear();
             cmbProj.Items.Add("None");
             for (int i = 0; i < Variables.MaxProjectiles; i++)
-                cmbProj.Items.Add($"{i + 1}: {Data.Projectile[i].Name}");
+                cmbProj.Items.Add($"{i + 1}: {Projectile.Instance[i].Name}");
         }
 
         // Optional sound list (not persisted by Type.Skill; populated for parity)
