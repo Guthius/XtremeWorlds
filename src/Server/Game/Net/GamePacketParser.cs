@@ -677,7 +677,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                     if (Server.Player.HasItem(session.Id, Item.Instance[GetPlayerPaperdoll(session.Id, Equipment.Weapon)].Ammo) > 0)
                     {
                         Server.Player.TakeInv(session.Id, Item.Instance[GetPlayerPaperdoll(session.Id, Equipment.Weapon)].Ammo, 1);
-                        Projectile.onShoot(session.Id, -1, GetPlayerPaperdoll(session.Id, Equipment.Weapon));
+                        Projectile.OnShoot(session.Id, -1, GetPlayerPaperdoll(session.Id, Equipment.Weapon));
                         return;
                     }
                     else
@@ -688,7 +688,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                 }
                 else
                 {
-                    Projectile.onShoot(session.Id, -1, GetPlayerPaperdoll(session.Id, Equipment.Weapon));
+                    Projectile.OnShoot(session.Id, -1, GetPlayerPaperdoll(session.Id, Equipment.Weapon));
                     return;
                 }
             }
@@ -889,7 +889,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         if (dx == 0 && dy == 0)
         {
             // if zero vector, default to current facing
-            Projectile.onShoot(session.Id, -1, itemNum);
+            Projectile.OnShoot(session.Id, -1, itemNum);
             return;
         }
 

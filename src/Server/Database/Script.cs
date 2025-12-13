@@ -341,7 +341,7 @@ public class Script
                             if (HasItem(index, Item.Instance[itemNum].Ammo) > 0)
                             {
                                 TakeInv(index, Item.Instance[itemNum].Ammo, 1);
-                                Server.Projectile.onShoot(index, -1, itemNum);
+                                Server.Projectile.OnShoot(index, -1, itemNum);
                             }
                             else
                             {
@@ -351,7 +351,7 @@ public class Script
                         }
                         else
                         {
-                            Server.Projectile.onShoot(index, -1, itemNum);
+                            Server.Projectile.OnShoot(index, -1, itemNum);
                             return;
                         }
 
@@ -1653,7 +1653,7 @@ public class Script
         if (mask == 0)
         {
             if (caster.Type == Core.Globals.Entity.EntityType.Player)
-                Server.Projectile.onShoot(caster.Id, -1, skillId);
+                Server.Projectile.OnShoot(caster.Id, -1, skillId);
             else if (caster.Type == Core.Globals.Entity.EntityType.Npc)
                 Server.Projectile.OnNpcProjectile(mapNum, caster.Id, skillId);
             return;
@@ -1669,7 +1669,7 @@ public class Script
             if ((mask & (1 << i)) == 0) continue;
             caster.Dir = dirs[i];
             if (caster.Type == Core.Globals.Entity.EntityType.Player)
-                Server.Projectile.onShoot(caster.Id, -1, skillId, caster.Dir, suppressCooldown: true);
+                Server.Projectile.OnShoot(caster.Id, -1, skillId, caster.Dir, suppressCooldown: true);
             else if (caster.Type == Core.Globals.Entity.EntityType.Npc)
                 Server.Projectile.OnNpcProjectile(mapNum, caster.Id, skillId, caster.Dir);
         }

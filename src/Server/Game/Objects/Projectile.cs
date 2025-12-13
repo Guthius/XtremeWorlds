@@ -209,7 +209,7 @@ public class Projectile : ProjectileBase, IData, IAsyncData
         NetworkSend.SendProjectileToMap(mapNum, mapProjectileNum);
     }
 
-    public static void onShoot(int playerId, int itemNum, int skillNum = -1, int dir = -1, bool suppressCooldown = false)
+    public static void OnShoot(int playerId, int itemNum, int skillNum = -1, int dir = -1, bool suppressCooldown = false)
     {
         var mapNum = GetPlayerMap(playerId);
         var mapProjectileNum = -1;
