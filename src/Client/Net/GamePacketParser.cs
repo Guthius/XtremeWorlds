@@ -2589,9 +2589,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     public static void Packet_UpdateProjectile(ReadOnlyMemory<byte> data)
     {
         var buffer = new PacketReader(data);
-        var projectile = buffer.ReadInt32();
+        var n = buffer.ReadInt32();
 
-        if (projectile == 0)
+        if (n == 0)
         {
             Projectile.Instance.Clear();
         }
@@ -2611,15 +2611,18 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             Projectile.Instance.Add(new Projectile());
         }
 
-        Projectile.Instance[projectile] = projectile;
+        Projectile.Instance[n] = instance;
 
-        if (GameState.InitProjectileEditor && (projectile + 1) == Variables.MaxProjectiles)
+        if ((n + 1) == Variables.MaxProjectiles)
         {
-            GameState.MyEditorType = EditorType.Projectile;
-            GameState.EditorIndex = 0;
-            WindowManager.ShowWindow("winProjectileEditor");
-            GameState.InitProjectileEditor = false;
-            Client.Game.UI.Windows.WinProjectileEditor.Init();
+            if (GameState.InitProjectileEditor)
+            {
+                GameState.MyEditorType = EditorType.Projectile;
+                GameState.EditorIndex = 0;
+                WindowManager.ShowWindow("winProjectileEditor");
+                GameState.InitProjectileEditor = false;
+                Client.Game.UI.Windows.WinProjectileEditor.Init();
+            }
         }
     }
 
