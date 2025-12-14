@@ -322,22 +322,12 @@ public static class NetworkSend
         }
     }
 
-    public static void SendUpdateShopTo(int playerId, int shopNum)
+    public static void SendUpdateShopTo(int playerId, int index)
     {
         var packetWriter = new PacketWriter();
 
         packetWriter.WriteEnum(ServerPackets.SUpdateShop);
-        packetWriter.WriteInt32(shopNum);
-        packetWriter.WriteInt32(Shop.Instance[shopNum].BuyRate);
-        packetWriter.WriteString(Shop.Instance[shopNum].Name);
-
-        for (var i = 0; i < Core.Globals.Variables.MaxTrades; i++)
-        {
-            packetWriter.WriteInt32(Shop.Instance[shopNum].TradeItem[i].CostItem);
-            packetWriter.WriteInt32(Shop.Instance[shopNum].TradeItem[i].CostValue);
-            packetWriter.WriteInt32(Shop.Instance[shopNum].TradeItem[i].Item);
-            packetWriter.WriteInt32(Shop.Instance[shopNum].TradeItem[i].ItemValue);
-        }
+        WriteShopDataToPacket(index, packetWriter);
 
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
     }
@@ -347,19 +337,42 @@ public static class NetworkSend
         var packetWriter = new PacketWriter();
 
         packetWriter.WriteEnum(ServerPackets.SUpdateShop);
-        packetWriter.WriteInt32(shopNum);
-        packetWriter.WriteInt32(Shop.Instance[shopNum].BuyRate);
-        packetWriter.WriteString(Shop.Instance[shopNum].Name);
-
-        for (var i = 0; i < Core.Globals.Variables.MaxTrades; i++)
-        {
-            packetWriter.WriteInt32(Shop.Instance[shopNum].TradeItem[i].CostItem);
-            packetWriter.WriteInt32(Shop.Instance[shopNum].TradeItem[i].CostValue);
-            packetWriter.WriteInt32(Shop.Instance[shopNum].TradeItem[i].Item);
-            packetWriter.WriteInt32(Shop.Instance[shopNum].TradeItem[i].ItemValue);
-        }
+        WriteShopDataToPacket(shopNum, packetWriter);
 
         PlayerService.Instance.SendDataToAll(packetWriter.GetBytes());
+    }
+
+    private static void WriteShopDataToPacket(int shopNum, PacketWriter packetWriter)
+    {
+        packetWriter.WriteInt32(shopNum);
+
+        var shop = new Shop();
+        if (shopNum >= 0 && shopNum < Shop.Instance.Count)
+        {
+            shop = (Shop)Shop.Instance[shopNum];
+        }
+
+        packetWriter.WriteInt32(shop.BuyRate);
+        packetWriter.WriteString(shop.Name ?? string.Empty);
+
+        var tradeItems = shop.TradeItem;
+        for (var i = 0; i < Core.Globals.Variables.MaxTrades; i++)
+        {
+            if (tradeItems is not null && i < tradeItems.Length)
+            {
+                packetWriter.WriteInt32(tradeItems[i].CostItem);
+                packetWriter.WriteInt32(tradeItems[i].CostValue);
+                packetWriter.WriteInt32(tradeItems[i].Item);
+                packetWriter.WriteInt32(tradeItems[i].ItemValue);
+            }
+            else
+            {
+                packetWriter.WriteInt32(0);
+                packetWriter.WriteInt32(0);
+                packetWriter.WriteInt32(0);
+                packetWriter.WriteInt32(0);
+            }
+        }
     }
 
     public static void SendSkills(int playerId)
