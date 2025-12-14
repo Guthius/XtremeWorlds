@@ -135,7 +135,7 @@ public class Script
         NetworkSend.SendGlobalMessage(string.Format("{0} has joined {1}!", GetPlayerName(index), SettingsManager.Instance.GameName));
 
         // Send all the required game data to the user.
-        CheckEquippedItems(index);
+        OnCheckEquipment(index);
         NetworkSend.SendInventory(index);
         NetworkSend.SendWornEquipment(index);
         NetworkSend.SendExperience(index);
@@ -904,7 +904,7 @@ public class Script
             }
 
             // Apply death penalty & get exp lost
-            int lost = Server.Player.KillPlayer(target.Id);
+            int lost = Server.Player.OnKill(target.Id);
 
             // Basic attacker reward (if attacker is Player) with party sharing
             if (attacker.Type == Entity.EntityType.Player && attacker.Id != target.Id)

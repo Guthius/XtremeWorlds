@@ -1960,7 +1960,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var buffer = new PacketReader(bytes);
         int eqSlot = buffer.ReadInt32();
         int m = Server.Player.FindOpenInvSlot(session.Id, (int)PlayerBase.Instance[session.Id].Paperdoll[eqSlot].Num);
-        Server.Player.UnEquipItem(session.Id, eqSlot, m);
+        Server.Player.RemoveEquipment(session.Id, eqSlot, m);
     }
 
     public static void Packet_RequestPlayerData(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -2667,7 +2667,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
                 if (eqSlot >= 0 && m >= 0)
                 {
-                    Server.Player.UnEquipItem(session.Id, eqSlot, m);
+                    Server.Player.RemoveEquipment(session.Id, eqSlot, m);
                 }
                 else
                 {

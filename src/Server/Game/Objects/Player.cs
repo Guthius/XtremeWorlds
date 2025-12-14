@@ -476,7 +476,7 @@ public class Player : PlayerBase
                 NetworkSend.SendActionMessage(GetPlayerMap(playerId), "-" + trapAmount, (int)ColorName.BrightRed, (byte)ActionMessageType.Scroll, GetPlayerX(playerId) * 32, GetPlayerY(playerId) * 32, 1);
                 if (tv == Core.Globals.Vital.Health && GetPlayerVital(playerId, Core.Globals.Vital.Health) - trapAmount <= 0)
                 {
-                    KillPlayer(playerId);
+                    OnKill(playerId);
                     NetworkSend.SendPlayerMessage(playerId, "You've been killed by a trap.", (int)ColorName.BrightRed);
                 }
                 else
@@ -1106,7 +1106,7 @@ public class Player : PlayerBase
         NetworkSend.SendPlayerSkills(playerId);
     }
 
-    public static void CheckEquippedItems(int playerId)
+    public static void OnCheckEquipment(int playerId)
     {
         var equipments = Enum.GetValues<Equipment>();
 
@@ -1126,7 +1126,7 @@ public class Player : PlayerBase
         }
     }
 
-    public static void UnEquipItem(int playerId, int eqSlot, int invSlot)
+    public static void RemoveEquipment(int playerId, int eqSlot, int invSlot)
     {
         var eqCount = Enum.GetNames<Equipment>().Length;
         if (eqSlot < 0 || eqSlot > eqCount)
@@ -1151,7 +1151,7 @@ public class Player : PlayerBase
             }
             catch (Exception ex)
             {
-                General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(UnEquipItem));
+                General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(RemoveEquipment));
             }
         }
         else
@@ -1202,7 +1202,7 @@ public class Player : PlayerBase
         General.UpdateCaption();
     }
 
-    public static int KillPlayer(int playerId)
+    public static int OnKill(int playerId)
     {
         try
         {
@@ -1210,7 +1210,7 @@ public class Player : PlayerBase
         }
         catch (Exception ex)
         {
-            General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(KillPlayer));
+            General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(OnKill));
         }
 
         return 0;
