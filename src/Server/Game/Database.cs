@@ -13,7 +13,6 @@ using XtremeWorlds.Server.Configuration;
 using XtremeWorlds.Server.Database;
 using static Core.Globals.Commands;
 using static Core.Globals.Type;
-using Bank = Core.Globals.Type.Bank;
 using Path = System.IO.Path;
 using Type = Core.Globals.Type;
 using static Server.Globals.Commands;
