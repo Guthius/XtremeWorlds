@@ -698,15 +698,23 @@ public static class Sender
 
         packetWriter.WriteEnum(Packets.ClientPackets.CSaveShop);
         packetWriter.WriteInt32(index);
-        packetWriter.WriteInt32(Data.Shop[index].BuyRate);
-        packetWriter.WriteString(Data.Shop[index].Name);
+        for (var i = 0; i <= index; i++)
+        {
+            if (Shop.Instance.Count <= i)
+            {
+                Shop.Instance.Add(new Shop());
+            }
+        }
+
+        packetWriter.WriteInt32(Shop.Instance[index].BuyRate);
+        packetWriter.WriteString(Shop.Instance[index].Name);
 
         for (var i = 0; i < Variables.MaxTrades; i++)
         {
-            packetWriter.WriteInt32(Data.Shop[index].TradeItem[i].CostItem);
-            packetWriter.WriteInt32(Data.Shop[index].TradeItem[i].CostValue);
-            packetWriter.WriteInt32(Data.Shop[index].TradeItem[i].Item);
-            packetWriter.WriteInt32(Data.Shop[index].TradeItem[i].ItemValue);
+            packetWriter.WriteInt32(Shop.Instance[index].TradeItem[i].CostItem);
+            packetWriter.WriteInt32(Shop.Instance[index].TradeItem[i].CostValue);
+            packetWriter.WriteInt32(Shop.Instance[index].TradeItem[i].Item);
+            packetWriter.WriteInt32(Shop.Instance[index].TradeItem[i].ItemValue);
         }
 
         Network.Send(packetWriter);

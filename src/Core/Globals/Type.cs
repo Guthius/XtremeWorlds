@@ -53,13 +53,6 @@ public static class Type
         public int CommonEventData2; // e.g., value for switch/variable, optional
     }
 
-    public struct Shop
-    {
-        public string Name;
-        public int BuyRate;
-        public TradeItem[] TradeItem;
-    }
-
     public struct Item
     {
         public int Num;

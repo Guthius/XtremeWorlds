@@ -1,16 +1,14 @@
 ﻿using Core.Globals;
 using Core.Interfaces;
+using Core.Objects;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Server;
 
-public class Shop : IData, IAsyncData
+public class Shop : ShopBase, IAsyncData
 {
-    public static async System.Threading.Tasks.Task OnLoadAllAsync()
+    public static async Task OnLoadAllAsync()
     {
         await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxShops), OnLoadAsync);
     }
@@ -27,13 +25,14 @@ public class Shop : IData, IAsyncData
             return;
         }
 
-        Core.Globals.Type.Shop shopData = JObject.FromObject(data).ToObject<Core.Globals.Type.Shop>();
-        Data.Shop[index] = shopData;
+        var shopData = JObject.FromObject(data).ToObject<Shop>();
+
+        Shop.Instance.Add(shopData ?? new Shop());
     }
 
     public static void OnSave(int index)
     {
-        string json = JsonConvert.SerializeObject(Data.Shop[index]).ToString();
+        string json = JsonConvert.SerializeObject(Shop.Instance[index]);
 
         if (Database.RowExists(index, "shop"))
         {
@@ -43,44 +42,5 @@ public class Shop : IData, IAsyncData
         {
             Database.InsertRow(index, json, "shop");
         }
-    }
-
-    public static void OnClear(int index)
-    {
-        Data.Shop[index] = default;
-        Data.Shop[index].Name = "";
-
-        Data.Shop[index].TradeItem = new Core.Globals.Type.TradeItem[Core.Globals.Variables.MaxTrades];
-        for (int i = 0, loopTo = Core.Globals.Variables.MaxTrades; i < loopTo; i++)
-        {
-            Data.Shop[index].TradeItem[i].Item = -1;
-            Data.Shop[index].TradeItem[i].CostItem = -1;
-        }
-    }
-
-    public static void OnReset()
-    {
-        for (int i = 0, loopTo = Core.Globals.Variables.MaxShops; i < loopTo; i++)
-            OnClear(i);
-    }
-
-    public static void OnDraw(int index)
-    {
-        throw new NotImplementedException();
-    }
-
-    public static void OnStream(int index)
-    {
-        throw new NotImplementedException();
-    }
-
-    public static void OnLoad(int index)
-    {
-        throw new NotImplementedException();
-    }
-
-    public static void OnUpdate(int index)
-    {
-        throw new NotImplementedException();
     }
 }

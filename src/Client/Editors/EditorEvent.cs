@@ -1542,8 +1542,8 @@ namespace Client
                 cmbPlaySound.SelectedIndex = 0;
                 cmbOpenShop.Items.Clear();
 
-                for (i = 0; i < Variables.MaxVariables; i++)
-                    cmbOpenShop.Items.Add(i + 1 + ". " + Data.Shop[i].Name);
+                for (i = 0; i < Variables.MaxShops; i++)
+                    cmbOpenShop.Items.Add(i + 1 + ". " + Shop.Instance[i].Name);
                 cmbOpenShop.SelectedIndex = 0;
                 cmbSpawnNpc.Items.Clear();
 

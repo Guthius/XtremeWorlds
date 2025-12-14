@@ -1194,7 +1194,9 @@ namespace Client
                                 }
                                 case (byte) EventCommand.OpenShop:
                                 {
-                                    EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Open Shop [" + Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1.ToString() + ". " + Data.Shop[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1].Name + "]");
+                                    var shopIndex = Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1;
+                                    var shopName = (shopIndex >= 0 && shopIndex < Shop.Instance.Count) ? Shop.Instance[shopIndex].Name : string.Empty;
+                                    EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Open Shop [" + shopIndex.ToString() + ". " + shopName + "]");
                                     break;
                                 }
                                 case (byte) EventCommand.SetAccessLevel:

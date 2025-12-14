@@ -181,7 +181,7 @@ public class WinShop
             }
             else
             {
-                if (Data.Shop[GameState.InShop].TradeItem[slot].Item >= 0)
+                if (Shop.Instance[GameState.InShop].TradeItem[slot].Item >= 0)
                 {
                     GameState.ShopSelectedSlot = slot;
 
@@ -228,7 +228,7 @@ public class WinShop
         var y = winShop.Y - 6;
 
         var itemNum = !GameState.ShopIsSelling
-            ? Data.Shop[GameState.InShop].TradeItem[slot].Item
+            ? Shop.Instance[GameState.InShop].TradeItem[slot].Item
             : GetPlayerInventory(GameState.MyIndex, slot);
 
         if (itemNum == -1)
@@ -259,21 +259,21 @@ public class WinShop
 
         if (!GameState.ShopIsSelling)
         {
-            GameState.ShopSelectedItem = Data.Shop[GameState.InShop].TradeItem[GameState.ShopSelectedSlot].Item;
+            GameState.ShopSelectedItem = Shop.Instance[GameState.InShop].TradeItem[GameState.ShopSelectedSlot].Item;
             if (GameState.ShopSelectedItem >= 0)
             {
                 labelName.Text = Item.Instance[GameState.ShopSelectedItem].Name;
-                if (Data.Shop[GameState.InShop].TradeItem[GameState.ShopSelectedSlot].CostItem == 0)
+                if (Shop.Instance[GameState.InShop].TradeItem[GameState.ShopSelectedSlot].CostItem == 0)
                 {
-                    labelCost.Text = Data.Shop[GameState.InShop].TradeItem[GameState.ShopSelectedSlot].CostValue + "g";
+                    labelCost.Text = Shop.Instance[GameState.InShop].TradeItem[GameState.ShopSelectedSlot].CostValue + "g";
                 }
-                else if (Data.Shop[GameState.InShop].TradeItem[GameState.ShopSelectedSlot].CostValue == 1)
+                else if (Shop.Instance[GameState.InShop].TradeItem[GameState.ShopSelectedSlot].CostValue == 1)
                 {
-                    labelCost.Text = Item.Instance[Data.Shop[GameState.InShop].TradeItem[GameState.ShopSelectedSlot].CostItem].Name;
+                    labelCost.Text = Item.Instance[Shop.Instance[GameState.InShop].TradeItem[GameState.ShopSelectedSlot].CostItem].Name;
                 }
                 else
                 {
-                    labelCost.Text = Data.Shop[GameState.InShop].TradeItem[GameState.ShopSelectedSlot].CostValue + " " + Item.Instance[Data.Shop[GameState.InShop].TradeItem[GameState.ShopSelectedSlot].CostItem].Name;
+                    labelCost.Text = Shop.Instance[GameState.InShop].TradeItem[GameState.ShopSelectedSlot].CostValue + " " + Item.Instance[Shop.Instance[GameState.InShop].TradeItem[GameState.ShopSelectedSlot].CostItem].Name;
                 }
 
                 picItem.Image = Item.Instance[GameState.ShopSelectedItem].Icon;
@@ -302,7 +302,7 @@ public class WinShop
 
             if (GameState.ShopSelectedItem >= 0)
             {
-                var cost = (long) Math.Round(Item.Instance[GameState.ShopSelectedItem].Price / 100d * Data.Shop[GameState.InShop].BuyRate);
+                var cost = (long) Math.Round(Item.Instance[GameState.ShopSelectedItem].Price / 100d * Shop.Instance[GameState.InShop].BuyRate);
 
                 labelName.Text = Item.Instance[GameState.ShopSelectedItem].Name;
                 labelCost.Text = cost + "g";
@@ -343,7 +343,7 @@ public class WinShop
                 GameClient.RenderTexture(ref selectedSlotTexturePath, left, top, 0, 0, 32, 32, 32, 32);
             }
 
-            var itemNum = Data.Shop[GameState.InShop].TradeItem[i].Item;
+            var itemNum = Shop.Instance[GameState.InShop].TradeItem[i].Item;
             if (itemNum < 0 || itemNum >= Core.Globals.Variables.MaxItems)
             {
                 continue;

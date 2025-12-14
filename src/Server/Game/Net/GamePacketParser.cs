@@ -1362,9 +1362,10 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         if (Data.Map[GetPlayerMap(session.Id)].Shop >= 0 && Data.Map[GetPlayerMap(session.Id)].Shop < Core.Globals.Variables.MaxShops)
         {
-            if (!string.IsNullOrEmpty(Data.Shop[Data.Map[GetPlayerMap(session.Id)].Shop].Name))
+            var shop = Data.Map[GetPlayerMap(session.Id)].Shop;
+            if (shop >= 0 && shop < Shop.Instance.Count && !string.IsNullOrEmpty(Shop.Instance[shop].Name))
             {
-                Data.TempPlayer[session.Id].InShop = Data.Map[GetPlayerMap(session.Id)].Shop;
+                Data.TempPlayer[session.Id].InShop = shop;
                 NetworkSend.SendOpenShop(session.Id, (int)Data.TempPlayer[session.Id].InShop);
             }
         }
@@ -1584,15 +1585,23 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         if (shopNum < 0 | shopNum > Core.Globals.Variables.MaxShops)
             return;
 
-        Data.Shop[shopNum].BuyRate = buffer.ReadInt32();
-        Data.Shop[shopNum].Name = buffer.ReadString();
+        for (var i = 0; i <= shopNum; i++)
+        {
+            if (Shop.Instance.Count <= i)
+            {
+                Shop.Instance.Add(new Shop());
+            }
+        }
+
+        Shop.Instance[shopNum].BuyRate = buffer.ReadInt32();
+        Shop.Instance[shopNum].Name = buffer.ReadString();
 
         for (int i = 0, loopTo = Core.Globals.Variables.MaxTrades; i < loopTo; i++)
         {
-            Data.Shop[shopNum].TradeItem[i].CostItem = buffer.ReadInt32();
-            Data.Shop[shopNum].TradeItem[i].CostValue = buffer.ReadInt32();
-            Data.Shop[shopNum].TradeItem[i].Item = buffer.ReadInt32();
-            Data.Shop[shopNum].TradeItem[i].ItemValue = buffer.ReadInt32();
+            Shop.Instance[shopNum].TradeItem[i].CostItem = buffer.ReadInt32();
+            Shop.Instance[shopNum].TradeItem[i].CostValue = buffer.ReadInt32();
+            Shop.Instance[shopNum].TradeItem[i].Item = buffer.ReadInt32();
+            Shop.Instance[shopNum].TradeItem[i].ItemValue = buffer.ReadInt32();
         }
 
 
@@ -2085,7 +2094,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         if (shopMum < 0 | shopMum > Core.Globals.Variables.MaxShops)
             return;
 
-        ref var instance = ref Data.Shop[(int)shopMum].TradeItem[shopSlot];
+        ref var instance = ref Shop.Instance[(int)shopMum].TradeItem[shopSlot];
 
         // check trade exists
         if (instance.Item < 0)
@@ -2134,7 +2143,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         }
 
         // work out price
-        var multiplier = Data.Shop[(int)shopNum].BuyRate / 100d;
+        var multiplier = Shop.Instance[(int)shopNum].BuyRate / 100d;
         var price = (int)Math.Round(Item.Instance[(int)itemNum].Price * multiplier);
 
         // item has cost?

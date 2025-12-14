@@ -176,14 +176,14 @@ public class Player : PlayerBase
 
         SetPlayerDir(playerId, dir);
         var moved = false;
-        var mapNum = GetPlayerMap(playerId);
+        var map = GetPlayerMap(playerId);
 
         switch ((Direction) dir)
         {
             case Direction.Up:
                 if (GetPlayerY(playerId) > 0)
                 {
-                    if (IsTileBlocked(mapNum, GetPlayerX(playerId), GetPlayerY(playerId) - 1, Direction.Up))
+                    if (IsTileBlocked(map, GetPlayerX(playerId), GetPlayerY(playerId) - 1, Direction.Up))
                     {
                         NetworkSend.SendPlayerXY(playerId);
                         return;
@@ -192,7 +192,7 @@ public class Player : PlayerBase
                     SetPlayerY(playerId, GetPlayerRawY(playerId) - 1);
                     moved = true;
                 }
-                else if (Data.Map[mapNum].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type != TileType.NoCrossing && Data.Map[mapNum].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type2 != TileType.NoCrossing)
+                else if (Data.Map[map].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type != TileType.NoCrossing && Data.Map[map].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type2 != TileType.NoCrossing)
                 {
                     if (Data.Map[GetPlayerMap(playerId)].Up > 0)
                     {
@@ -208,9 +208,9 @@ public class Player : PlayerBase
                 break;
 
             case Direction.Down:
-                if (GetPlayerY(playerId) < Data.Map[mapNum].MaxY - 1)
+                if (GetPlayerY(playerId) < Data.Map[map].MaxY - 1)
                 {
-                    if (IsTileBlocked(mapNum, GetPlayerX(playerId), GetPlayerY(playerId) + 1, Direction.Down))
+                    if (IsTileBlocked(map, GetPlayerX(playerId), GetPlayerY(playerId) + 1, Direction.Down))
                     {
                         NetworkSend.SendPlayerXY(playerId);
                         return;
@@ -236,7 +236,7 @@ public class Player : PlayerBase
             case Direction.Left:
                 if (GetPlayerX(playerId) > 0)
                 {
-                    if (IsTileBlocked(mapNum, GetPlayerX(playerId) - 1, GetPlayerY(playerId), Direction.Left))
+                    if (IsTileBlocked(map, GetPlayerX(playerId) - 1, GetPlayerY(playerId), Direction.Left))
                     {
                         NetworkSend.SendPlayerXY(playerId);
                         return;
@@ -262,9 +262,9 @@ public class Player : PlayerBase
                 break;
 
             case Direction.Right:
-                if (GetPlayerX(playerId) < Data.Map[mapNum].MaxX - 1)
+                if (GetPlayerX(playerId) < Data.Map[map].MaxX - 1)
                 {
-                    if (IsTileBlocked(mapNum, GetPlayerX(playerId) + 1, GetPlayerY(playerId), Direction.Right))
+                    if (IsTileBlocked(map, GetPlayerX(playerId) + 1, GetPlayerY(playerId), Direction.Right))
                     {
                         NetworkSend.SendPlayerXY(playerId);
                         return;
@@ -288,9 +288,9 @@ public class Player : PlayerBase
                 break;
 
             case Direction.UpRight:
-                if (GetPlayerY(playerId) > 0 && GetPlayerX(playerId) < Data.Map[mapNum].MaxX - 1)
+                if (GetPlayerY(playerId) > 0 && GetPlayerX(playerId) < Data.Map[map].MaxX - 1)
                 {
-                    if (IsTileBlocked(mapNum, GetPlayerX(playerId) + 1, GetPlayerY(playerId) - 1, Direction.UpRight))
+                    if (IsTileBlocked(map, GetPlayerX(playerId) + 1, GetPlayerY(playerId) - 1, Direction.UpRight))
                     {
                         NetworkSend.SendPlayerXY(playerId);
                         return;
@@ -307,7 +307,7 @@ public class Player : PlayerBase
             case Direction.UpLeft:
                 if (GetPlayerY(playerId) > 0 && GetPlayerX(playerId) > 0)
                 {
-                    if (IsTileBlocked(mapNum, GetPlayerX(playerId) - 1, GetPlayerY(playerId) - 1, Direction.UpLeft))
+                    if (IsTileBlocked(map, GetPlayerX(playerId) - 1, GetPlayerY(playerId) - 1, Direction.UpLeft))
                     {
                         NetworkSend.SendPlayerXY(playerId);
                         return;
@@ -322,9 +322,9 @@ public class Player : PlayerBase
                 break;
 
             case Direction.DownRight:
-                if (GetPlayerY(playerId) < Data.Map[mapNum].MaxY - 1 && GetPlayerX(playerId) < Data.Map[mapNum].MaxX - 1)
+                if (GetPlayerY(playerId) < Data.Map[map].MaxY - 1 && GetPlayerX(playerId) < Data.Map[map].MaxX - 1)
                 {
-                    if (IsTileBlocked(mapNum, GetPlayerX(playerId) + 1, GetPlayerY(playerId) + 1, Direction.DownRight))
+                    if (IsTileBlocked(map, GetPlayerX(playerId) + 1, GetPlayerY(playerId) + 1, Direction.DownRight))
                     {
                         NetworkSend.SendPlayerXY(playerId);
                         return;
@@ -339,9 +339,9 @@ public class Player : PlayerBase
                 break;
 
             case Direction.DownLeft:
-                if (GetPlayerY(playerId) < Data.Map[mapNum].MaxY - 1 && GetPlayerX(playerId) > 0)
+                if (GetPlayerY(playerId) < Data.Map[map].MaxY - 1 && GetPlayerX(playerId) > 0)
                 {
-                    if (IsTileBlocked(mapNum, GetPlayerX(playerId) - 1, GetPlayerY(playerId) + 1, Direction.DownLeft))
+                    if (IsTileBlocked(map, GetPlayerX(playerId) - 1, GetPlayerY(playerId) + 1, Direction.DownLeft))
                     {
                         NetworkSend.SendPlayerXY(playerId);
                         return;
@@ -368,28 +368,28 @@ public class Player : PlayerBase
 
             ref var tile = ref Data.Map[GetPlayerMap(playerId)].Tile[GetPlayerX(playerId), GetPlayerY(playerId)];
 
-            mapNum = -1;
+            map = -1;
             x = 0;
             y = 0;
 
             // Check to see if the tile is a warp tile, and if so warp them
             if (tile.Type == TileType.Warp)
             {
-                mapNum = tile.Data1;
+                map = tile.Data1;
                 x = tile.Data2 * 32;
                 y = tile.Data3 * 32;
             }
 
             if (tile.Type2 == TileType.Warp)
             {
-                mapNum = tile.Data1_2;
+                map = tile.Data1_2;
                 x = tile.Data2_2;
                 y = tile.Data3_2;
             }
 
-            if (mapNum >= 0 && mapNum < Core.Globals.Variables.MaxMaps)
+            if (map >= 0 && map < Core.Globals.Variables.MaxMaps)
             {
-                OnWarp(playerId, mapNum, x, y, (int) Direction.Down);
+                OnWarp(playerId, map, x, y, (int) Direction.Down);
 
                 didWarp = true;
                 moved = true;
@@ -408,7 +408,7 @@ public class Player : PlayerBase
 
             if (x >= 0) // shop exists?
             {
-                if (Data.Shop[x].Name.Length > 0)
+                if (x < Shop.Instance.Count && Shop.Instance[x].Name.Length > 0)
                 {
                     NetworkSend.SendOpenShop(playerId, x);
                     

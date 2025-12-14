@@ -5,7 +5,6 @@ namespace Core.Globals;
 public static class Data
 {
     public static Npc[] Npc = new Npc[Variables.MaxNpcs];
-    public static Shop[] Shop = new Shop[Variables.MaxShops];
     public static Skill[] Skill = new Skill[Variables.MaxSkills];
     public static MapResource[] MapResource = new MapResource[Variables.MaxResources];
     public static MapResourceCache[] MyMapResource = new MapResourceCache[Variables.MaxResources];

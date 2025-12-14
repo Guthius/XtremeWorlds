@@ -1317,23 +1317,40 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
     public static void Packet_UpdateShop(ReadOnlyMemory<byte> data)
     {
-        int shopNum;
         var buffer = new PacketReader(data);
-        shopNum = buffer.ReadInt32();
 
-        Data.Shop[shopNum].BuyRate = buffer.ReadInt32();
-        Data.Shop[shopNum].Name = buffer.ReadString();
+        var n = buffer.ReadInt32();
+
+        if (n == 0)
+            Shop.Instance.Clear();
+
+        var shop = new Shop
+        {
+            BuyRate = buffer.ReadInt32(),
+            Name = buffer.ReadString() ?? string.Empty,
+        };
 
         for (int i = 0; i < Variables.MaxTrades; i++)
         {
-            Data.Shop[shopNum].TradeItem[i].CostItem = buffer.ReadInt32();
-            Data.Shop[shopNum].TradeItem[i].CostValue = buffer.ReadInt32();
-            Data.Shop[shopNum].TradeItem[i].Item = buffer.ReadInt32();
-            Data.Shop[shopNum].TradeItem[i].ItemValue = buffer.ReadInt32();
+            shop.TradeItem[i].CostItem = buffer.ReadInt32();
+            shop.TradeItem[i].CostValue = buffer.ReadInt32();
+            shop.TradeItem[i].Item = buffer.ReadInt32();
+            shop.TradeItem[i].ItemValue = buffer.ReadInt32();
         }
 
-        if (Data.Shop[shopNum].Name is null)
-            Data.Shop[shopNum].Name = "";
+        Shop.Instance.Add(shop);
+
+        if ((n + 1) == Variables.MaxShops)
+        {
+            if (GameState.InitShopEditor)
+            {
+                GameState.MyEditorType = EditorType.Shop;
+                GameState.EditorIndex = 0;
+                WindowManager.ShowWindow("winShopEditor");
+                GameState.InitShopEditor = false;
+                Client.Game.UI.Windows.WinShopEditor.Init();
+            }
+        }
     }
 
     public static void Packet_TradeInvite(ReadOnlyMemory<byte> data)

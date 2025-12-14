@@ -2065,7 +2065,7 @@ namespace Server
                                         case (byte) EventCommand.OpenShop:
                                         {
                                             // Check if the shop exists and has a valid name.
-                                            if (command.Data1 > 0 && command.Data1 < Data.Shop.Length && !string.IsNullOrEmpty(Data.Shop[command.Data1].Name))
+                                            if (command.Data1 > 0 && command.Data1 < Core.Globals.Variables.MaxShops && command.Data1 < Shop.Instance.Count && !string.IsNullOrEmpty(Shop.Instance[command.Data1].Name))
                                             {
                                                 NetworkSend.SendOpenShop(i, command.Data1);
                                                 Data.TempPlayer[i].InShop = command.Data1;

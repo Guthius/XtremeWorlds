@@ -538,15 +538,6 @@ namespace Client
                 GameState.InitSkillEditor = false;
             }
 
-            if (GameState.InitShopEditor)
-            {
-                GameState.MyEditorType = EditorType.Shop;
-                GameState.EditorIndex = 0;
-                WindowManager.ShowWindow("winShopEditor");
-                Client.Game.UI.Windows.WinShopEditor.Init();
-                GameState.InitShopEditor = false;
-            }
-
             if (GameState.InitScriptEditor)
             {
                 GameState.MyEditorType = EditorType.Script;

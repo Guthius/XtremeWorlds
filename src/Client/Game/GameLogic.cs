@@ -1998,7 +1998,7 @@ namespace Client
             // set globals
             GameState.InShop = (int)shopNum;
             GameState.ShopSelectedSlot = 0;
-            GameState.ShopSelectedItem = Data.Shop[GameState.InShop].TradeItem[1].Item;
+            GameState.ShopSelectedItem = Shop.Instance[GameState.InShop].TradeItem[1].Item;
             WindowManager.Windows[WindowManager.GetWindowIndex("winShop")].Controls[WindowManager.GetControlIndex("winShop", "CheckboxSelling")].Value = 0;
             WindowManager.Windows[WindowManager.GetWindowIndex("winShop")].Controls[WindowManager.GetControlIndex("winShop", "CheckboxBuying")].Value = 0;
             WindowManager.Windows[WindowManager.GetWindowIndex("winShop")].Controls[WindowManager.GetControlIndex("winShop", "btnSell")].Visible = false;

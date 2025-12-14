@@ -697,7 +697,7 @@ public class Crystalshire
                     {
                         for (int i = 0; i < Variables.MaxShops; i++)
                         {
-                            var raw = (i < Data.Shop.Length) ? (Data.Shop[i].Name ?? string.Empty) : string.Empty;
+                            var raw = (i < Shop.Instance.Count) ? (Shop.Instance[i].Name ?? string.Empty) : string.Empty;
                             var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
                             cmb.Items.Add($"{i + 1}: {name}");
                         }
@@ -1012,7 +1012,7 @@ public class Crystalshire
                 lstShop.Items.Add("None");
                 for (int i = 0; i < Variables.MaxShops; i++)
                 {
-                    var raw = (i < Data.Shop.Length) ? (Data.Shop[i].Name ?? string.Empty) : string.Empty;
+                    var raw = (i < Shop.Instance.Count) ? (Shop.Instance[i].Name ?? string.Empty) : string.Empty;
                     var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
                     lstShop.Items.Add($"{i + 1}: {name}");
                 }
@@ -2529,7 +2529,7 @@ public class Crystalshire
             {
                 int id = WinShopEditor.SelectedIndex; if (id < 0 || id >= Variables.MaxShops) return;
                 var newName = txtName.Text ?? string.Empty;
-                Data.Shop[id].Name = newName;
+                Shop.Instance[id].Name = newName;
                 GameState.ShopChanged[id] = true;
 
                 // Update list item text without losing selection/scroll
@@ -2553,7 +2553,7 @@ public class Crystalshire
                 if (WinShopEditor.SelectedIndex < 0 || WinShopEditor.SelectedIndex >= Variables.MaxShops) return;
                 if (int.TryParse(txtBuy.Text, out var rate))
                 {
-                    Data.Shop[WinShopEditor.SelectedIndex].BuyRate = rate;
+                    Shop.Instance[WinShopEditor.SelectedIndex].BuyRate = rate;
                     GameState.ShopChanged[WinShopEditor.SelectedIndex] = true;
                 }
             };
@@ -2568,7 +2568,7 @@ public class Crystalshire
                 if (!WindowManager.TryGetControl("winShopEditor", "lstTradeItem", out var tradeListCtrl) || tradeListCtrl is not ListBox lst) return;
                 int id = lst.SelectedIndex;
                 if (id < 0 || id >= Variables.MaxTrades) return;
-                ref var trade = ref Data.Shop[WinShopEditor.SelectedIndex].TradeItem[id];
+                ref var trade = ref Shop.Instance[WinShopEditor.SelectedIndex].TradeItem[id];
                 if (WindowManager.TryGetControl("winShopEditor", "cmbItem", out var ic) && ic is ComboBox ci)
                     trade.Item = Math.Clamp(ci.Value, -1, Item.Instance.Count - 1);
                 if (WindowManager.TryGetControl("winShopEditor", "cmbCostItem", out var cCtrl) && cCtrl is ComboBox cc)

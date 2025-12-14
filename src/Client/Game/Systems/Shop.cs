@@ -4,12 +4,13 @@ using Core;
 using Core.Globals;
 using Core.Interfaces;
 using Core.Net;
+using Core.Objects;
 using Type = Core.Globals.Type;
 
 namespace Client
 {
 
-    public class Shop : IData
+    public class Shop : ShopBase, IStreamable
     {
         public static void OnClose()
         {
@@ -24,55 +25,14 @@ namespace Client
 
         #region Database
 
-        public static void OnClear(int index)
+        public static void OnStream(int Index)
         {
-            Data.Shop[index] = default;
-            Data.Shop[index].Name = "";
-            Data.Shop[index].TradeItem = new Type.TradeItem[Variables.MaxTrades];
-            for (int x = 0; x < Variables.MaxTrades; x++)
-            {            
-                Data.Shop[index].TradeItem[x].Item = -1;
-                Data.Shop[index].TradeItem[x].CostItem = - 1;
-            }
-        }
-
-        public static void OnReset()
-        {
-            int i;
-
-            Data.Shop = new Type.Shop[Variables.MaxShops];
-
-            for (i = 0; i < Variables.MaxShops; i++)
-                OnClear(i);
-
-        }
-
-        public static void OnStream(int shopNum)
-        {
-            if (shopNum >= 0 && string.IsNullOrEmpty(Data.Shop[shopNum].Name))
+            if (Index < 0 || Index >= Core.Globals.Variables.MaxShops) return;
+            if (Shop.Instance.Count <= Index)
             {
-                Sender.SendRequestShop(shopNum);
+                Sender.SendRequestShop(Index);
             }
-        }
-
-        public static void OnDraw(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnLoad(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnSave(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnUpdate(int index)
-        {
-            throw new NotImplementedException();
+            
         }
 
         #endregion

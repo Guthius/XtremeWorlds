@@ -49,29 +49,4 @@ public class Moral : MoralBase, IData, IAsyncData
             Database.InsertRow(index, json, "moral");
         }
     }
-
-    public static void OnDraw(int index)
-    {
-        throw new NotImplementedException();
-    }
-
-    public static void OnStream(int index)
-    {
-        throw new NotImplementedException();
-    }
-
-    public static void OnReset()
-    {
-        throw new NotImplementedException();
-    }
-
-    public static void OnLoad(int index)
-    {
-        throw new NotImplementedException();
-    }
-
-    public static void OnUpdate(int index)
-    {
-        throw new NotImplementedException();
-    }
 }
