@@ -5,10 +5,9 @@ using Core.Configurations;
 using Core.Globals;
 using Core.Net;
 using System;
-using System.Security.AccessControl;
 using static Core.Globals.Commands;
 using static Core.Globals.Type;
-using Bank = Core.Objects.Bank;
+using Core.Objects;
 
 namespace Client.Net;
 
@@ -1317,18 +1316,17 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
     public static void Packet_UpdateShop(ReadOnlyMemory<byte> data)
     {
+        int n;
         var buffer = new PacketReader(data);
-
-        var n = buffer.ReadInt32();
+        n = buffer.ReadInt32();
 
         if (n == 0)
             Shop.Instance.Clear();
 
-        var shop = new Shop
-        {
-            BuyRate = buffer.ReadInt32(),
-            Name = buffer.ReadString() ?? string.Empty,
-        };
+        var shop = new Shop();
+
+        shop.BuyRate = buffer.ReadInt32();
+        shop.Name = buffer.ReadString();
 
         for (int i = 0; i < Variables.MaxTrades; i++)
         {
@@ -2605,32 +2603,30 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
     public static void Packet_UpdateProjectile(ReadOnlyMemory<byte> data)
     {
+        int n;
         var buffer = new PacketReader(data);
-        var n = buffer.ReadInt32();
+        n = buffer.ReadInt32();
 
         if (n == 0)
         {
             Projectile.Instance.Clear();
         }
 
-        var instance = new Projectile
-        {
-            Name = buffer.ReadString(),
-            Sprite = buffer.ReadInt32(),
-            Range = (byte)buffer.ReadInt32(),
-            Speed = buffer.ReadInt32(),
-            Damage = buffer.ReadInt32(),
-            Animation = buffer.ReadInt32()
-        };
+        var projectile = new Projectile();
 
-        for (var proj = Projectile.Instance.Count; proj <= proj; proj++)
-        {
-            Projectile.Instance.Add(new Projectile());
-        }
 
-        Projectile.Instance[n] = instance;
 
-        if ((n + 1) == Variables.MaxProjectiles)
+        projectile.Name = buffer.ReadString();
+        projectile.Sprite = buffer.ReadInt32();
+        projectile.Range = (byte)buffer.ReadInt32();
+        projectile.Speed = buffer.ReadInt32();
+        projectile.Damage = buffer.ReadInt32();
+        projectile.Animation = buffer.ReadInt32();
+
+        // Update the projectile
+        Projectile.Instance.Add(projectile);
+
+        if ((n + 1) == Core.Globals.Variables.MaxProjectiles)
         {
             if (GameState.InitProjectileEditor)
             {
@@ -2741,7 +2737,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         {
             Bank.Instance.Add(new Bank());
         }
-        
+
         for (i = 0; i < Variables.MaxBank; i++)
         {
             SetBank(GameState.MyIndex, (byte)i, buffer.ReadInt32());
@@ -2755,6 +2751,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             WindowManager.ShowWindow("winBank", resetPosition: false);
         }
     }
+
 
     public static void Packet_EditScript(ReadOnlyMemory<byte> data)
     {

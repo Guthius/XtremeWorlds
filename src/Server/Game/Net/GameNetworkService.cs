@@ -9,6 +9,7 @@ public sealed class GameNetworkService : NetworkService<GameSession>
     public override Task OnConnectedAsync(GameSession session, CancellationToken cancellationToken)
     {
         session.Aes = Aes.Create();
+        Console.WriteLine($"Client connected (id={session.Id}); sending SAes");
         session.Channel.Send(new AesPacket(session.Aes.Key, session.Aes.IV));
 
         return Task.CompletedTask;

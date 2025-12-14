@@ -72,10 +72,6 @@ public static class Type
         public int Cd;
     }
 
-    public struct Bank
-    {
-        public Item[] Item;
-    }
 
     public struct Layer
     {

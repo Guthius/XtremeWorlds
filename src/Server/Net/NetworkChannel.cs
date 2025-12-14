@@ -15,6 +15,10 @@ internal sealed class NetworkChannel<TSession>(ILogger<NetworkChannel<TSession>>
     private readonly Channel<byte[]> _sendChannel = Channel.CreateUnbounded<byte[]>();
     private bool _started;
 
+    private long _packetsEnqueued;
+    private long _packetsSent;
+    private long _bytesSent;
+
     public string IpAddress { get; } = (tcpClient.Client.RemoteEndPoint as IPEndPoint)?.Address.ToString() ?? "(none)";
 
     public async System.Threading.Tasks.Task StartAsync(INetworkChannelProxy channelProxy, TSession session, CancellationToken cancellationToken)
@@ -64,9 +68,30 @@ internal sealed class NetworkChannel<TSession>(ILogger<NetworkChannel<TSession>>
 
     private async System.Threading.Tasks.Task RunSend(CancellationToken cancellationToken)
     {
-        await foreach (var bytes in _sendChannel.Reader.ReadAllAsync(cancellationToken))
+        try
         {
-            await _networkStream.WriteAsync(bytes, cancellationToken);
+            await foreach (var bytes in _sendChannel.Reader.ReadAllAsync(cancellationToken))
+            {
+                await _networkStream.WriteAsync(bytes, cancellationToken);
+
+                Interlocked.Increment(ref _packetsSent);
+                Interlocked.Add(ref _bytesSent, bytes.Length);
+
+                // Log the first send and then every 200 packets to avoid spamming.
+                var sent = Interlocked.Read(ref _packetsSent);
+                if (sent == 1 || sent % 200 == 0)
+                {
+                    logger.LogInformation("Sent {PacketsSent} packets ({BytesSent} bytes) to {Ip}", sent, Interlocked.Read(ref _bytesSent), IpAddress);
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // normal shutdown
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Send loop terminated for {Ip}", IpAddress);
         }
     }
 
@@ -95,7 +120,23 @@ internal sealed class NetworkChannel<TSession>(ILogger<NetworkChannel<TSession>>
 
     public void Send(byte[] bytes)
     {
-        _sendChannel.Writer.TryWrite(bytes);
+        if (bytes is null || bytes.Length == 0)
+        {
+            return;
+        }
+
+        var enqueued = Interlocked.Increment(ref _packetsEnqueued);
+        if (!_sendChannel.Writer.TryWrite(bytes))
+        {
+            logger.LogWarning("Send dropped (channel closed) to {Ip} (attempted packet size={Size})", IpAddress, bytes.Length);
+            return;
+        }
+
+        // Log the first enqueue so we can confirm the server attempted to send anything.
+        if (enqueued == 1)
+        {
+            logger.LogInformation("Enqueued first packet (size={Size}) to {Ip}", bytes.Length, IpAddress);
+        }
     }
 
     public void Send<TPacket>(TPacket packet) where TPacket : IPacket
