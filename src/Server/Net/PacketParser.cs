@@ -76,7 +76,16 @@ public abstract class PacketParser<TPacketId, TSession> where TPacketId : Enum
             return;
         }
 
-        handler(session, packetData);
+        try
+        {
+            handler(session, packetData);
+        }
+        catch (Exception ex)
+        {
+            // Never let handler exceptions tear down the TCP session.
+            // Log to stderr; higher-level logging can be added later.
+            Console.WriteLine($"Packet handler error (id={packetId}): {ex}");
+        }
     }
 
     private static void HandleCompressed(TSession session, ReadOnlyMemory<byte> bytes, Action<TSession, ReadOnlyMemory<byte>> handler)

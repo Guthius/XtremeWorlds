@@ -20,11 +20,8 @@ public sealed class NetworkClient
             return;
         }
 
-        _sendChannel = Channel.CreateUnbounded<byte[]>(new UnboundedChannelOptions
-        {
-            SingleReader = true,
-            SingleWriter = false
-        });
+        // Channel is created per successful connection.
+        _sendChannel = null;
 
         try
         {
@@ -33,6 +30,7 @@ public sealed class NetworkClient
             while (!cancellationToken.IsCancellationRequested)
             {
                 _isConnected = false; // assume disconnected until we actually connect
+                _sendChannel = null;
                 TcpClient tcpClient = null;
                 try
                 {
@@ -54,7 +52,15 @@ public sealed class NetworkClient
                     Console.WriteLine("Connected to server successfully!");
                     _isConnected = true;
 
-                    await RunAsync(tcpClient, _sendChannel, eventHandler, cancellationToken);
+                    // Fresh channel per connection attempt (old one may have been completed).
+                    var sendChannel = Channel.CreateUnbounded<byte[]>(new UnboundedChannelOptions
+                    {
+                        SingleReader = true,
+                        SingleWriter = false
+                    });
+                    _sendChannel = sendChannel;
+
+                    await RunAsync(tcpClient, sendChannel, eventHandler, cancellationToken);
 
                     Console.WriteLine("Reconnecting...");
                 }
@@ -78,6 +84,7 @@ public sealed class NetworkClient
                 {
                 try { tcpClient?.Close(); } catch { }
                 _isConnected = false; // mark disconnected on any exit
+                _sendChannel = null;
                 }
             }
         }
@@ -94,13 +101,13 @@ public sealed class NetworkClient
     private static async System.Threading.Tasks.Task RunAsync(TcpClient tcpClient, Channel<byte[]> sendChannel, INetworkEventHandler eventHandler, CancellationToken cancellationToken)
     {
         await Task.WhenAll(
-            RunReceive(tcpClient, eventHandler,
+            RunReceive(tcpClient, sendChannel, eventHandler,
                 cancellationToken),
             RunSend(tcpClient, sendChannel,
                 cancellationToken));
     }
 
-    private static async System.Threading.Tasks.Task RunReceive(TcpClient tcpClient, INetworkEventHandler eventHandler, CancellationToken cancellationToken)
+    private static async System.Threading.Tasks.Task RunReceive(TcpClient tcpClient, Channel<byte[]> sendChannel, INetworkEventHandler eventHandler, CancellationToken cancellationToken)
     {
         var buffer = ArrayPool<byte>.Shared.Rent(4096);
 
@@ -148,6 +155,8 @@ public sealed class NetworkClient
         finally
         {
             ArrayPool<byte>.Shared.Return(buffer);
+            // Unblock sender loop for this connection.
+            try { sendChannel.Writer.TryComplete(); } catch { }
         }
     }
 
@@ -162,6 +171,14 @@ public sealed class NetworkClient
                 await networkStream.WriteAsync(bytes, cancellationToken);
             }
         }
+        catch (OperationCanceledException)
+        {
+            // normal during shutdown
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Send error: {ex.Message}");
+        }
         finally
         {
             sendChannel.Writer.TryComplete();
@@ -170,6 +187,22 @@ public sealed class NetworkClient
 
     public void Send(byte[] bytes)
     {
-        var result = _sendChannel.Writer.TryWrite(bytes);
+        var channel = _sendChannel;
+        if (channel == null)
+        {
+            Console.WriteLine("Send dropped: no active connection channel");
+            return;
+        }
+
+        if (!_isConnected)
+        {
+            Console.WriteLine("Send dropped: not connected");
+            return;
+        }
+
+        if (!channel.Writer.TryWrite(bytes))
+        {
+            Console.WriteLine("Send queue full or closed; packet dropped");
+        }
     }
 }
