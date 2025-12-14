@@ -2999,25 +2999,33 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             return;
         }
 
-        var projectile = packetReader.ReadInt32();
-        if (projectile < 0 || projectile > Core.Globals.Variables.MaxProjectiles)
+        var index = packetReader.ReadInt32();
+        if (index < 0 || index > Core.Globals.Variables.MaxProjectiles)
         {
             return;
         }
 
-        Projectile.Instance[projectile].Name = packetReader.ReadString();
-        Projectile.Instance[projectile].Sprite = packetReader.ReadInt32();
-        Projectile.Instance[projectile].Range = (byte)packetReader.ReadInt32();
-        Projectile.Instance[projectile].Speed = packetReader.ReadInt32();
-        Projectile.Instance[projectile].Damage = packetReader.ReadInt32();
-        Projectile.Instance[projectile].Animation = packetReader.ReadInt32();
+        for (var i = 0; i <= index; i++)
+        {
+            if (Projectile.Instance.Count <= i)
+            {
+                Projectile.Instance.Add(new Projectile());
+            }
+        }
 
-        Projectile.OnSave(projectile);
+        Projectile.Instance[index].Name = packetReader.ReadString();
+        Projectile.Instance[index].Sprite = packetReader.ReadInt32();
+        Projectile.Instance[index].Range = (byte)packetReader.ReadInt32();
+        Projectile.Instance[index].Speed = packetReader.ReadInt32();
+        Projectile.Instance[index].Damage = packetReader.ReadInt32();
+        Projectile.Instance[index].Animation = packetReader.ReadInt32();
+
+        Projectile.OnSave(index);
 
         General.Logger.LogInformation("{AccountName} saved projectile #{ProjectileNum}",
-            GetAccountLogin(session.Id), projectile);
+            GetAccountLogin(session.Id), index);
 
-        NetworkSend.SendUpdateProjectileToAll(projectile);
+        NetworkSend.SendUpdateProjectileToAll(index);
     }
 
     public static void Packet_RequestEditResource(GameSession session, ReadOnlyMemory<byte> bytes)

@@ -1399,11 +1399,11 @@ public static class NetworkSend
     {
         packet.WriteInt32(index);
 
-        var projectile = new ProjectileBase();
+        var projectile = new Projectile();
         if (Projectile.Instance.Count > index)
-            projectile = Projectile.Instance[index];
-
-        packet.WriteString(projectile.Name);
+            projectile = (Projectile)Projectile.Instance[index];
+            
+        packet.WriteString(projectile.Name ?? string.Empty);
         packet.WriteInt32(projectile.Sprite);
         packet.WriteInt32(projectile.Range);
         packet.WriteInt32(projectile.Speed);
