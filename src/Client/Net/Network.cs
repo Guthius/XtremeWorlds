@@ -1,11 +1,19 @@
 ﻿using Core;
 using Core.Configurations;
 using Core.Net;
+using System.Buffers.Binary;
+using System.Collections.Concurrent;
 
 namespace Client.Net;
 
 public static class Network
 {
+    private static bool DebugPackets => SettingsManager.Instance.NetworkDebug;
+
+    private static readonly ConcurrentDictionary<int, long> SentCounts = new();
+    private static long _sentBytes;
+    private static int _lastSentReportTick;
+
     private sealed class NetworkEventHandler : INetworkEventHandler
     {
         private const int BufferSize = 0xFFFF;
@@ -92,6 +100,53 @@ public static class Network
 
     public static void Send(byte[] data)
     {
+        if (DebugPackets)
+        {
+            if (data.Length >= 8)
+            {
+                // PacketWriter.GetBytes() prefix: [len:int32][packetId:int32]...
+                int id = BinaryPrimitives.ReadInt32LittleEndian(data.AsSpan(4, 4));
+                SentCounts.AddOrUpdate(id, 1, static (_, v) => v + 1);
+            }
+
+            Interlocked.Add(ref _sentBytes, data.Length);
+
+            // Report at most once per second.
+            int now = General.GetTickCount();
+            if (now > _lastSentReportTick + 1000 && Interlocked.Exchange(ref _lastSentReportTick, now) < now)
+            {
+                try
+                {
+                    long bytes = Interlocked.Exchange(ref _sentBytes, 0);
+                    var snapshot = SentCounts.ToArray();
+                    SentCounts.Clear();
+
+                    Array.Sort(snapshot, static (a, b) => b.Value.CompareTo(a.Value));
+                    int take = Math.Min(6, snapshot.Length);
+                    if (take > 0)
+                    {
+                        var parts = new List<string>(take);
+                        for (int i = 0; i < take; i++)
+                        {
+                            int id = snapshot[i].Key;
+                            string name = Enum.GetName(typeof(Packets.ClientPackets), id) ?? id.ToString();
+                            parts.Add($"{name}({id}):{snapshot[i].Value}");
+                        }
+
+                        Console.WriteLine($"[SEND] bytes={bytes} header={{ {string.Join(", ", parts)} }}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[SEND] bytes={bytes} header={{ }}");
+                    }
+                }
+                catch
+                {
+                    // ignore debug stats failures
+                }
+            }
+        }
+
         Client.Send(data);
     }
     

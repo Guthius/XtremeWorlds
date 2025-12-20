@@ -42,6 +42,8 @@ internal sealed class NetworkServiceHost<TSession>(
 
     protected override async System.Threading.Tasks.Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        PacketSendStats.Configure(configuration);
+
         var port = configuration.GetValue("Networking:Port", 7234);
 
         var tcpListener = new TcpListener(IPAddress.Any, port);

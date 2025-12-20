@@ -19,6 +19,10 @@ internal sealed class NetworkChannel<TSession>(ILogger<NetworkChannel<TSession>>
     private long _packetsSent;
     private long _bytesSent;
 
+    private long _secondStartTick;
+    private long _packetsSentThisSecond;
+    private long _bytesSentThisSecond;
+
     public string IpAddress { get; } = (tcpClient.Client.RemoteEndPoint as IPEndPoint)?.Address.ToString() ?? "(none)";
 
     public async System.Threading.Tasks.Task StartAsync(INetworkChannelProxy channelProxy, TSession session, CancellationToken cancellationToken)
@@ -70,18 +74,59 @@ internal sealed class NetworkChannel<TSession>(ILogger<NetworkChannel<TSession>>
     {
         try
         {
-            await foreach (var bytes in _sendChannel.Reader.ReadAllAsync(cancellationToken))
+            while (await _sendChannel.Reader.WaitToReadAsync(cancellationToken))
             {
-                await _networkStream.WriteAsync(bytes, cancellationToken);
-
-                Interlocked.Increment(ref _packetsSent);
-                Interlocked.Add(ref _bytesSent, bytes.Length);
-
-                // Log the first send and then every 200 packets to avoid spamming.
-                var sent = Interlocked.Read(ref _packetsSent);
-                if (sent == 1 || sent % 200 == 0)
+                while (_sendChannel.Reader.TryRead(out var bytes))
                 {
-                    logger.LogInformation("Sent {PacketsSent} packets ({BytesSent} bytes) to {Ip}", sent, Interlocked.Read(ref _bytesSent), IpAddress);
+                    await _networkStream.WriteAsync(bytes, cancellationToken);
+
+                    Interlocked.Increment(ref _packetsSent);
+                    Interlocked.Add(ref _bytesSent, bytes.Length);
+
+                    // Per-connection per-second counter (only when global packet stats are disabled).
+                    if (!PacketSendStats.Enabled)
+                    {
+                        var now = Environment.TickCount64;
+                        if (_secondStartTick == 0)
+                        {
+                            _secondStartTick = now;
+                        }
+
+                        _packetsSentThisSecond++;
+                        _bytesSentThisSecond += bytes.Length;
+
+                        if (now - _secondStartTick >= 1000 && _packetsSentThisSecond >= 1000)
+                        {
+                            logger.LogInformation(
+                                "Sent {PacketsSent} packets ({BytesSent} bytes) to {Ip} in last second",
+                                _packetsSentThisSecond,
+                                _bytesSentThisSecond,
+                                IpAddress);
+
+                            _packetsSentThisSecond = 0;
+                            _bytesSentThisSecond = 0;
+                            _secondStartTick = now;
+                        }
+                    }
+
+                    PacketSendStats.RecordSent(bytes, logger);
+                }
+
+                // We drained the current burst; force a flush/reset so stats don't carry across idle gaps.
+                PacketSendStats.FlushIfPending(logger);
+
+                // If we're idle, flush any partial per-second window so it doesn't carry into the next burst.
+                if (!PacketSendStats.Enabled && _packetsSentThisSecond > 0)
+                {
+                    logger.LogInformation(
+                        "Sent {PacketsSent} packets ({BytesSent} bytes) to {Ip} in last second",
+                        _packetsSentThisSecond,
+                        _bytesSentThisSecond,
+                        IpAddress);
+
+                    _packetsSentThisSecond = 0;
+                    _bytesSentThisSecond = 0;
+                    _secondStartTick = 0;
                 }
             }
         }

@@ -2063,7 +2063,7 @@ public class Crystalshire
         var window = WindowLoader.FromLayout("winChat");
 
         // Buttons
-        window.GetChild("btnChat").CallBack[(int)ControlState.Normal] = WinChat.OnSayClick;
+        window.GetChild("btnChat").CallBack[(int)ControlState.MouseDown] = WinChat.OnSayClick;
         window.GetChild("btnUp").CallBack[(int)ControlState.MouseDown] = WinChat.OnUpButtonMouseDown;
         window.GetChild("btnDown").CallBack[(int)ControlState.MouseDown] = WinChat.OnDownButtonMouseDown;
         window.GetChild("btnUp").CallBack[(int)ControlState.MouseUp] = WinChat.OnUpButtonMouseUp;

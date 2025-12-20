@@ -44,6 +44,9 @@ public class SettingsManager
     public int AttackFrames { get; set; } = 5;
     public int SpriteDirections { get; set; } = 4;
     public bool BitmapFont { get; set; } = false;
+
+    // When enabled, prints periodic packet send stats to console.
+    public bool NetworkDebug { get; set; } = true;
     
     private static SettingsManager Load()
     {

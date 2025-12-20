@@ -38,6 +38,9 @@ namespace Client
 
         #region Movement
 
+        private static int _lastMovePacketTime;
+        private static int _lastCancelCastPacketTime;
+
         public static void CheckMovement()
         {
             // Guard against invalid player or map state
@@ -52,7 +55,8 @@ namespace Client
             if (Data.MyMap.MaxX <= 0 || Data.MyMap.MaxY <= 0)
                 return;
 
-            // Always refresh facing immediately based on current key state (diagonals prioritized)
+            // Refresh facing based on current key state (diagonals prioritized)
+            // Only send direction when it actually changes to avoid network spam.
             RefreshFacingFromKeys(sendIfChanged: true);
 
             if (IsTryingToMove())
@@ -61,12 +65,13 @@ namespace Client
                 if (started)
                 {
                     Player.Instance[GameState.MyIndex].Moving = (byte)(GameState.VbKeyShift ? MovementState.Walking : MovementState.Running);
-                    Sender.SendPlayerMove();
-                }
-                else if (Player.Instance[GameState.MyIndex].IsMoving)
-                {
-                    // Keep sending movement while mid‑tile to keep server in sync (optional; can throttle later)
-                    Sender.SendPlayerMove();
+                    // Only send a move packet when we actually start a step.
+                    // (Server uses this to set Moving + validate XY; spamming each tick is unnecessary.)
+                    if (General.GetTickCount() > _lastMovePacketTime + 50)
+                    {
+                        Sender.SendPlayerMove();
+                        _lastMovePacketTime = General.GetTickCount();
+                    }
                 }
 
                 // Warp detection with bounds checks to avoid out-of-range
@@ -111,13 +116,19 @@ namespace Client
 
             if (newDir >= 0)
             {
-                // Always update local facing immediately
+                // Update local facing; optionally notify server.
                 if (Player.Instance[GameState.MyIndex].Dir != newDir)
                 {
                     Player.Instance[GameState.MyIndex].Dir = (byte)newDir;
+                    if (sendIfChanged)
+                    {
+                        Sender.SendPlayerDir();
+                    }
                 }
-                // Send dir every frame while keys are held to eliminate visual lag between transitions
-                Sender.SendPlayerDir();
+                else if (!sendIfChanged)
+                {
+                    Sender.SendPlayerDir();
+                }
             }
         }
 
@@ -171,10 +182,19 @@ namespace Client
                 return canMove;
             }
 
-            // Make sure they haven't just casted a skill
+            // If a skill cast is buffered, cancel it once (locally + notify server).
+            // IMPORTANT: previously this spammed CCancelCast every tick while keys were held.
             if (GameState.SkillBuffer >= 0)
             {
-                Sender.SendCancelCast();
+                GameState.SkillBuffer = -1;
+                GameState.SkillBufferTimer = 0;
+
+                var now = General.GetTickCount();
+                if (now > _lastCancelCastPacketTime + 250)
+                {
+                    Sender.SendCancelCast();
+                    _lastCancelCastPacketTime = now;
+                }
             }
 
             // make sure they're not stunned

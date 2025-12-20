@@ -1010,6 +1010,8 @@ namespace Client
                 // If we're casting/buffering a skill, cancel it first
                 if (GameState.SkillBuffer >= 0)
                 {
+                    GameState.SkillBuffer = -1;
+                    GameState.SkillBufferTimer = 0;
                     Sender.SendCancelCast();
                     return; // consume this press
                 }
@@ -1163,8 +1165,8 @@ namespace Client
                 HandleWindowToggle(Keys.C, "winCharacter", WinMenu.OnCharacterClick);
                 HandleWindowToggle(Keys.K, "winSkills", WinMenu.OnSkillsClick);
 
-                // Handle chat input
-                if (CurrentKeyboardState.IsKeyDown(Keys.Enter))
+                // Handle chat input (only once per key press)
+                if (IsKeyPressedOnce(Keys.Enter))
                 {
                     if (IsWindowVisible("winChatSmall"))
                     {
