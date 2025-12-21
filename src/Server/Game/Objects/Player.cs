@@ -44,15 +44,15 @@ public class Player : PlayerBase
             SettingsManager.Instance.GameName);
     }
 
-    public static void OnWarp(int playerId, int mapNum, int x, int y, int dir, bool send = false)
+    public static void OnWarp(int playerId, int map, int x, int y, int dir, bool send = false)
     {
-        if (!NetworkConfig.IsPlaying(playerId) || mapNum <= 0 || mapNum >= Core.Globals.Variables.MaxMaps || Data.TempPlayer[playerId].GettingMap == true || mapNum < 0 || mapNum >= Core.Globals.Variables.MaxMaps)
+        if (!NetworkConfig.IsPlaying(playerId) || map <= 0 || map >= Core.Globals.Variables.MaxMaps || Data.TempPlayer[playerId].GettingMap == true || map < 0 || map >= Core.Globals.Variables.MaxMaps)
         {
             return;
         }
 
-        x = Math.Clamp(x, 0, Server.Map.Instance[mapNum].MaxX) * 32;
-        y = Math.Clamp(y, 0, Server.Map.Instance[mapNum].MaxY) * 32;
+        x = Math.Clamp(x, 0, Server.Map.Instance[map].MaxX) * 32;
+        y = Math.Clamp(y, 0, Server.Map.Instance[map].MaxY) * 32;
 
         Data.TempPlayer[playerId].EventProcessingCount = 0;
         Data.TempPlayer[playerId].EventMap.CurrentEvents = 0; // Clear events
@@ -63,7 +63,7 @@ public class Player : PlayerBase
 
         // Save old map to send erase player data to
         var oldMapNum = GetPlayerMap(playerId);
-        if (oldMapNum != mapNum)
+        if (oldMapNum != map)
         {
             try
             {
@@ -77,7 +77,7 @@ public class Player : PlayerBase
             NetworkSend.SendLeaveMap(playerId, oldMapNum);   
         }
 
-        SetPlayerMap(playerId, mapNum);
+        SetPlayerMap(playerId, map);
         SetPlayerX(playerId, x);
         SetPlayerY(playerId, y);
         SetPlayerDir(playerId, dir);
@@ -85,11 +85,11 @@ public class Player : PlayerBase
         NetworkSend.SendPlayerXY(playerId);
 
         // Send equipment of all people on new map
-        if (GameLogic.GetTotalMapPlayers(mapNum) > 0)
+        if (GameLogic.GetTotalMapPlayers(map) > 0)
         {
             foreach (var otherPlayerId in PlayerService.Instance.PlayerIds)
             {
-                if (GetPlayerMap(otherPlayerId) == mapNum)
+                if (GetPlayerMap(otherPlayerId) == map)
                 {
                     NetworkSend.SendMapEquipmentTo(otherPlayerId, playerId);
                 }
@@ -113,22 +113,22 @@ public class Player : PlayerBase
             }
         }
 
-        if (oldMapNum != mapNum || send)
+        if (oldMapNum != map || send)
         {
-            if (Server.Map.Instance[mapNum].Moral < 0 || Server.Map.Instance[mapNum].Moral >= Core.Globals.Variables.MaxMorals)
+            if (Server.Map.Instance[map].Moral < 0 || Server.Map.Instance[map].Moral >= Core.Globals.Variables.MaxMorals)
             {
-                Server.Map.Instance[mapNum].Moral = 0;
+                Server.Map.Instance[map].Moral = 0;
             }
 
             Data.TempPlayer[playerId].GettingMap = true;
 
-            NetworkSend.SendUpdateMoralTo(playerId, Server.Map.Instance[mapNum].Moral);
+            NetworkSend.SendUpdateMoralTo(playerId, Server.Map.Instance[map].Moral);
 
             var packet = new PacketWriter(12);
 
             packet.WriteEnum(ServerPackets.SCheckForMap);
-            packet.WriteInt32(mapNum);
-            packet.WriteInt32(Server.Map.Instance[mapNum].Revision);
+            packet.WriteInt32(map);
+            packet.WriteInt32(Server.Map.Instance[map].Revision);
 
             PlayerService.Instance.SendDataTo(playerId, packet.GetBytes());
         }
@@ -563,15 +563,15 @@ public class Player : PlayerBase
         }
     }
 
-    public static bool IsTileBlocked(int mapNum, int x, int y, Direction dir)
+    public static bool IsTileBlocked(int map, int x, int y, Direction dir)
     {
         try
         {
-            if (Moral.Instance[Server.Map.Instance[mapNum].Moral].PlayerBlock)
+            if (Moral.Instance[Server.Map.Instance[map].Moral].PlayerBlock)
             {
                 foreach (var playerId in PlayerService.Instance.PlayerIds)
                 {
-                    if (GetPlayerMap(playerId) == mapNum &&
+                    if (GetPlayerMap(playerId) == map &&
                         GetPlayerX(playerId) == x &&
                         GetPlayerY(playerId) == y)
                     {
@@ -580,13 +580,13 @@ public class Player : PlayerBase
                 }
             }
 
-            if (Moral.Instance[Server.Map.Instance[mapNum].Moral].NpcBlock)
+            if (Moral.Instance[Server.Map.Instance[map].Moral].NpcBlock)
             {
                 for (var mapNpcNum = 0; mapNpcNum < Core.Globals.Variables.MaxMapNpcs; mapNpcNum++)
                 {
-                    if (MapNpc.Instance[mapNum, mapNpcNum].Num >= 0 &&
-                        MapNpc.Instance[mapNum, mapNpcNum].X == x &&
-                        MapNpc.Instance[mapNum, mapNpcNum].Y == y)
+                    if (MapNpc.Instance[map, mapNpcNum].Num >= 0 &&
+                        MapNpc.Instance[map, mapNpcNum].X == x &&
+                        MapNpc.Instance[map, mapNpcNum].Y == y)
                     {
                         return true;
                     }
@@ -594,13 +594,13 @@ public class Player : PlayerBase
             }
 
             // Check to make sure that the tile is walkable
-            if (IsDirBlocked(Server.Map.Instance[mapNum].Tile[x, y].DirBlock, dir))
+            if (IsDirBlocked(Server.Map.Instance[map].Tile[x, y].DirBlock, dir))
             {
                 return true;
             }
 
-            return Server.Map.Instance[mapNum].Tile[x, y].Type == TileType.Blocked ||
-                   Server.Map.Instance[mapNum].Tile[x, y].Type2 == TileType.Blocked;
+            return Server.Map.Instance[map].Tile[x, y].Type == TileType.Blocked ||
+                   Server.Map.Instance[map].Tile[x, y].Type2 == TileType.Blocked;
         }
         catch (Exception)
         {
@@ -656,21 +656,21 @@ public class Player : PlayerBase
 
     public static bool CanPickup(int playerId, int mapitemNum)
     {
-        var mapNum = GetPlayerMap(playerId);
+        var map = GetPlayerMap(playerId);
 
-        if (Server.Map.Instance[mapNum].Moral < 0)
+        if (Server.Map.Instance[map].Moral < 0)
         {
             return false;
         }
 
-        if (!Moral.Instance[Server.Map.Instance[mapNum].Moral].CanPickupItem)
+        if (!Moral.Instance[Server.Map.Instance[map].Moral].CanPickupItem)
         {
             NetworkSend.SendPlayerMessage(playerId, "You can't pickup items here!", (int) ColorName.BrightRed);
             return false;
         }
 
-        if (string.IsNullOrEmpty(MapItem.Instance[mapNum, mapitemNum].PlayerName) ||
-            MapItem.Instance[mapNum, mapitemNum].PlayerName == GetPlayerName(playerId))
+        if (string.IsNullOrEmpty(MapItem.Instance[map, mapitemNum].PlayerName) ||
+            MapItem.Instance[map, mapitemNum].PlayerName == GetPlayerName(playerId))
         {
             return true;
         }
@@ -680,22 +680,22 @@ public class Player : PlayerBase
 
     public static void OnGetItem(int playerId)
         {
-            var mapNum = GetPlayerMap(playerId);
+            var map = GetPlayerMap(playerId);
 
             for (var mapItemNum = 0; mapItemNum < Core.Globals.Variables.MaxMapItems; mapItemNum++)
             {
-                if (MapItem.Instance[mapNum, mapItemNum].Num < 0 ||
-                    MapItem.Instance[mapNum, mapItemNum].Num >= Core.Globals.Variables.MaxItems)
+                if (MapItem.Instance[map, mapItemNum].Num < 0 ||
+                    MapItem.Instance[map, mapItemNum].Num >= Core.Globals.Variables.MaxItems)
                 {
                     continue;
                 }
 
-                if (Math.Floor((double)MapItem.Instance[mapNum, mapItemNum].X / Constants.TileSize) != GetPlayerX(playerId) || Math.Floor((double)MapItem.Instance[mapNum, mapItemNum].Y / Constants.TileSize) != GetPlayerY(playerId))
+                if (Math.Floor((double)MapItem.Instance[map, mapItemNum].X / Constants.TileSize) != GetPlayerX(playerId) || Math.Floor((double)MapItem.Instance[map, mapItemNum].Y / Constants.TileSize) != GetPlayerY(playerId))
                 {
                     continue;
                 }
 
-                var slot = Player.FindOpenInvSlot(playerId, MapItem.Instance[mapNum, mapItemNum].Num);
+                var slot = Player.FindOpenInvSlot(playerId, MapItem.Instance[map, mapItemNum].Num);
                 if (slot == -1)
                 {
                     NetworkSend.SendPlayerMessage(playerId, "Your inventory is full.", (int)ColorName.BrightRed);
@@ -709,7 +709,7 @@ public class Player : PlayerBase
 
                 try
                 {
-                    Script.Instance?.MapGetItem(playerId, mapNum, mapItemNum, slot);
+                    Script.Instance?.MapGetItem(playerId, map, mapItemNum, slot);
                 }
                 catch (Exception ex)
                 {
@@ -868,10 +868,10 @@ public class Player : PlayerBase
         var slot = MapItem.FindOpenSlot(GetPlayerMap(playerId));
         if (slot != -1)
         {
-            var mapNum = GetPlayerMap(playerId);
+            var map = GetPlayerMap(playerId);
 
             var item = Item.Instance[itemNum];
-            ref var mapItem = ref MapItem.Instance[mapNum, slot];
+            ref var mapItem = ref MapItem.Instance[map, slot];
 
             mapItem.Num = itemNum;
             mapItem.X = GetPlayerX(playerId);
@@ -883,7 +883,7 @@ public class Player : PlayerBase
 
             try
             {
-                Script.Instance?.OnDrop(playerId, slot, invNum, amount, mapNum, item, itemNum);
+                Script.Instance?.OnDrop(playerId, slot, invNum, amount, map, item, itemNum);
             }
             catch (Exception ex)
             {

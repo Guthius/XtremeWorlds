@@ -306,7 +306,7 @@ public static class Party
         OnCount(partyNum);
     }
 
-    public static void ShareExp(int partyNum, int exp, int index, int mapNum)
+    public static void ShareExp(int partyNum, int exp, int index, int map)
     {
         int expShare;
         int leftOver;
@@ -332,7 +332,7 @@ public static class Party
             {
                 if (PlayerService.Instance.IsConnected(tmpindex) & NetworkConfig.IsPlaying(tmpindex))
                 {
-                    if (GetPlayerMap(tmpindex) != mapNum)
+                    if (GetPlayerMap(tmpindex) != map)
                     {
                         loseMemberCount = +1;
                     }
@@ -363,7 +363,7 @@ public static class Party
                 // playing?
                 if (PlayerService.Instance.IsConnected(tmpindex) & NetworkConfig.IsPlaying(tmpindex))
                 {
-                    if (GetPlayerMap(tmpindex) == mapNum)
+                    if (GetPlayerMap(tmpindex) == map)
                     {
                         // give them their share
                         SetPlayerExperience(tmpindex, GetPlayerExperience(tmpindex) + expShare);
@@ -382,7 +382,7 @@ public static class Party
         }
     }
 
-    public static void PartyWarp(int index, int mapNum, int x, int y)
+    public static void PartyWarp(int index, int map, int x, int y)
     {
         if (Data.TempPlayer[index].InParty >= 0)
         {
@@ -390,7 +390,7 @@ public static class Party
             {
                 var loopTo = Data.Party[Data.TempPlayer[index].InParty].MemberCount;
                 for (var i = 0; i < loopTo; i++)
-                    Player.OnWarp(Data.Party[Data.TempPlayer[index].InParty].Member[i], mapNum, x, y,
+                    Player.OnWarp(Data.Party[Data.TempPlayer[index].InParty].Member[i], map, x, y,
                         (byte)Direction.Down);
             }
         }

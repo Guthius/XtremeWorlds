@@ -16,7 +16,7 @@
 		<Button Name="btnSetAccess" Text="Set" Position="330,64" Size="100,22"
 				Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 
-		<Label Name="lblMapNumber" Text="Map Number:" Position="12,92" Size="110,14"/>
+		<Label Name="lblMap" Text="Map Number:" Position="12,92" Size="110,14"/>
 		<TextBox Name="txtAdminMap" Position="125,90" Size="100,18"/>
 		<Button Name="btnWarpTo" Text="Warp" Position="230,90" Size="100,22"
 				Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>

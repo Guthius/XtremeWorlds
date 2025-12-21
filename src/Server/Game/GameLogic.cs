@@ -6,9 +6,9 @@ namespace Server;
 
 public static class GameLogic
 {
-    public static int GetTotalMapPlayers(int mapNum)
+    public static int GetTotalMapPlayers(int map)
     {
-        return PlayerService.Instance.PlayerIds.Count(i => GetPlayerMap(i) == mapNum);
+        return PlayerService.Instance.PlayerIds.Count(i => GetPlayerMap(i) == map);
     }
 
     public static int GetNpcMaxVital(double npcNum, Vital vital)

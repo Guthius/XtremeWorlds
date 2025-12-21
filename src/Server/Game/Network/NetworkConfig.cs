@@ -46,7 +46,7 @@ public static class NetworkConfig
         return false;
     }
 
-    public static void SendDataToMapBut(int excludePlayerId, int mapNum, byte[] bytes)
+    public static void SendDataToMapBut(int excludePlayerId, int map, byte[] bytes)
     {
         foreach (var playerId in PlayerService.Instance.PlayerIds)
         {
@@ -55,18 +55,18 @@ public static class NetworkConfig
                 continue;
             }
 
-            if (GetPlayerMap(playerId) == mapNum)
+            if (GetPlayerMap(playerId) == map)
             {
                 PlayerService.Instance.SendDataTo(playerId, bytes);
             }
         }
     }
 
-    public static void SendDataToMap(int mapNum, byte[] bytes)
+    public static void SendDataToMap(int map, byte[] bytes)
     {
         foreach (var playerId in PlayerService.Instance.PlayerIds)
         {
-            if (!IsPlaying(playerId) || GetPlayerMap(playerId) != mapNum)
+            if (!IsPlaying(playerId) || GetPlayerMap(playerId) != map)
             {
                 continue;
             }

@@ -779,25 +779,25 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         // New combat system integration: attempt a melee attack on the entity (player or npc)
         // occupying the targeted tile (x,y). Legacy code only triggered animation + resource checks.                                  
-        var mapNum = GetPlayerMap(session.Id);
+        var map = GetPlayerMap(session.Id);
 
         // Build attacker entity snapshot
         var attackerEntity = Core.Globals.Entity.FromPlayer(session.Id, PlayerBase.Instance[session.Id]);
-        attackerEntity.Map = mapNum;
+        attackerEntity.Map = map;
 
         Core.Globals.Entity? targetEntity = null;
 
         // 1. Prefer npc target at tile (x,y)
         for (int i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
         {
-            var npc = MapNpc.Instance[mapNum, i];
+            var npc = MapNpc.Instance[map, i];
             if (npc.Num < 0) continue;
             int npcTileX = npc.X / Constants.TileSize;
             int npcTileY = npc.Y / Constants.TileSize;
             if (npcTileX == x && npcTileY == y)
             {
                 targetEntity = Core.Globals.Entity.FromNpc(i, npc);
-                targetEntity.Map = mapNum;
+                targetEntity.Map = map;
                 break;
             }
         }
@@ -809,11 +809,11 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             {
                 if (p.Id == session.Id) continue;
                 if (!NetworkConfig.IsPlaying(p.Id)) continue;
-                if (GetPlayerMap(p.Id) != mapNum) continue;
+                if (GetPlayerMap(p.Id) != map) continue;
                 if (GetPlayerX(p.Id) == x && GetPlayerY(p.Id) == y)
                 {
                     targetEntity = Core.Globals.Entity.FromPlayer(p.Id, PlayerBase.Instance[p.Id]);
-                    targetEntity.Map = mapNum;
+                    targetEntity.Map = map;
                     break;
                 }
             }
@@ -1077,53 +1077,53 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         }
 
 
-        var mapNum = GetPlayerMap(session.Id);
+        var map = GetPlayerMap(session.Id);
 
-        var ii = Server.Map.Instance[mapNum].Revision + 1;
-        Map.OnClear(mapNum);
+        var ii = Server.Map.Instance[map].Revision + 1;
+        Map.OnClear(map);
 
         var packetReader = new PacketReader(bytes);
 
-        Server.Map.Instance[mapNum].Name = packetReader.ReadString();
-        Server.Map.Instance[mapNum].Music = packetReader.ReadString();
-        Server.Map.Instance[mapNum].Revision = ii;
-        Server.Map.Instance[mapNum].Moral = (byte)packetReader.ReadInt32();
-        Server.Map.Instance[mapNum].Tileset = packetReader.ReadInt32();
-        Server.Map.Instance[mapNum].Up = packetReader.ReadInt32();
-        Server.Map.Instance[mapNum].Down = packetReader.ReadInt32();
-        Server.Map.Instance[mapNum].Left = packetReader.ReadInt32();
-        Server.Map.Instance[mapNum].Right = packetReader.ReadInt32();
-        Server.Map.Instance[mapNum].BootMap = packetReader.ReadInt32();
-        Server.Map.Instance[mapNum].BootX = (byte)packetReader.ReadInt32();
-        Server.Map.Instance[mapNum].BootY = (byte)packetReader.ReadInt32();
-        Server.Map.Instance[mapNum].MaxX = (byte)packetReader.ReadInt32();
-        Server.Map.Instance[mapNum].MaxY = (byte)packetReader.ReadInt32();
-        Server.Map.Instance[mapNum].Weather = (byte)packetReader.ReadInt32();
-        Server.Map.Instance[mapNum].Fog = packetReader.ReadInt32();
-        Server.Map.Instance[mapNum].WeatherIntensity = packetReader.ReadInt32();
-        Server.Map.Instance[mapNum].FogOpacity = (byte)packetReader.ReadInt32();
-        Server.Map.Instance[mapNum].FogSpeed = (byte)packetReader.ReadInt32();
-        Server.Map.Instance[mapNum].MapTint = packetReader.ReadBoolean();
-        Server.Map.Instance[mapNum].MapTintR = (byte)packetReader.ReadInt32();
-        Server.Map.Instance[mapNum].MapTintG = (byte)packetReader.ReadInt32();
-        Server.Map.Instance[mapNum].MapTintB = (byte)packetReader.ReadInt32();
-        Server.Map.Instance[mapNum].MapTintA = (byte)packetReader.ReadInt32();
-        Server.Map.Instance[mapNum].Panorama = packetReader.ReadByte();
-        Server.Map.Instance[mapNum].Parallax = packetReader.ReadByte();
-        Server.Map.Instance[mapNum].Brightness = packetReader.ReadByte();
-        Server.Map.Instance[mapNum].NoRespawn = packetReader.ReadBoolean();
-        Server.Map.Instance[mapNum].Indoors = packetReader.ReadBoolean();
-        Server.Map.Instance[mapNum].Shop = packetReader.ReadInt32();
+        Server.Map.Instance[map].Name = packetReader.ReadString();
+        Server.Map.Instance[map].Music = packetReader.ReadString();
+        Server.Map.Instance[map].Revision = ii;
+        Server.Map.Instance[map].Moral = (byte)packetReader.ReadInt32();
+        Server.Map.Instance[map].Tileset = packetReader.ReadInt32();
+        Server.Map.Instance[map].Up = packetReader.ReadInt32();
+        Server.Map.Instance[map].Down = packetReader.ReadInt32();
+        Server.Map.Instance[map].Left = packetReader.ReadInt32();
+        Server.Map.Instance[map].Right = packetReader.ReadInt32();
+        Server.Map.Instance[map].BootMap = packetReader.ReadInt32();
+        Server.Map.Instance[map].BootX = (byte)packetReader.ReadInt32();
+        Server.Map.Instance[map].BootY = (byte)packetReader.ReadInt32();
+        Server.Map.Instance[map].MaxX = (byte)packetReader.ReadInt32();
+        Server.Map.Instance[map].MaxY = (byte)packetReader.ReadInt32();
+        Server.Map.Instance[map].Weather = (byte)packetReader.ReadInt32();
+        Server.Map.Instance[map].Fog = packetReader.ReadInt32();
+        Server.Map.Instance[map].WeatherIntensity = packetReader.ReadInt32();
+        Server.Map.Instance[map].FogOpacity = (byte)packetReader.ReadInt32();
+        Server.Map.Instance[map].FogSpeed = (byte)packetReader.ReadInt32();
+        Server.Map.Instance[map].MapTint = packetReader.ReadBoolean();
+        Server.Map.Instance[map].MapTintR = (byte)packetReader.ReadInt32();
+        Server.Map.Instance[map].MapTintG = (byte)packetReader.ReadInt32();
+        Server.Map.Instance[map].MapTintB = (byte)packetReader.ReadInt32();
+        Server.Map.Instance[map].MapTintA = (byte)packetReader.ReadInt32();
+        Server.Map.Instance[map].Panorama = packetReader.ReadByte();
+        Server.Map.Instance[map].Parallax = packetReader.ReadByte();
+        Server.Map.Instance[map].Brightness = packetReader.ReadByte();
+        Server.Map.Instance[map].NoRespawn = packetReader.ReadBoolean();
+        Server.Map.Instance[map].Indoors = packetReader.ReadBoolean();
+        Server.Map.Instance[map].Shop = packetReader.ReadInt32();
 
-        Server.Map.Instance[mapNum].Tile = new Type.Tile[Server.Map.Instance[mapNum].MaxX, Server.Map.Instance[mapNum].MaxY];
+        Server.Map.Instance[map].Tile = new Type.Tile[Server.Map.Instance[map].MaxX, Server.Map.Instance[map].MaxY];
 
         for (x = 0; x < Core.Globals.Variables.MaxMapNpcs; x++)
         {
-            MapNpc.Clear(x, mapNum);
-            Server.Map.Instance[mapNum].Npc[x] = packetReader.ReadInt32();
+            MapNpc.Clear(x, map);
+            Server.Map.Instance[map].Npc[x] = packetReader.ReadInt32();
         }
 
-        var instance = Server.Map.Instance[mapNum];
+        var instance = Server.Map.Instance[map];
         var loopTo1 = (int)instance.MaxX;
         for (x = 0; x < loopTo1; x++)
         {
@@ -1152,16 +1152,16 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             }
         }
 
-        Server.Map.Instance[mapNum].EventCount = packetReader.ReadInt32();
+        Server.Map.Instance[map].EventCount = packetReader.ReadInt32();
 
-        if (Server.Map.Instance[mapNum].EventCount > 0)
+        if (Server.Map.Instance[map].EventCount > 0)
         {
-            Server.Map.Instance[mapNum].Event = new Type.Event[Server.Map.Instance[mapNum].EventCount];
-            var loopTo4 = Server.Map.Instance[mapNum].EventCount;
+            Server.Map.Instance[map].Event = new Type.Event[Server.Map.Instance[map].EventCount];
+            var loopTo4 = Server.Map.Instance[map].EventCount;
             for (var i = 0; i < loopTo4; i++)
             {
                 {
-                    ref var instance1 = ref Server.Map.Instance[mapNum].Event[i];
+                    ref var instance1 = ref Server.Map.Instance[map].Event[i];
                     instance1.Name = packetReader.ReadString();
                     instance1.Globals = packetReader.ReadByte();
                     instance1.X = packetReader.ReadInt32();
@@ -1169,16 +1169,16 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                     instance1.PageCount = packetReader.ReadInt32();
                 }
 
-                if (Server.Map.Instance[mapNum].Event[i].PageCount > 0)
+                if (Server.Map.Instance[map].Event[i].PageCount > 0)
                 {
-                    Server.Map.Instance[mapNum].Event[i].Pages = new Type.EventPage[Server.Map.Instance[mapNum].Event[i].PageCount];
-                    Array.Resize(ref Data.TempPlayer[i].EventMap.EventPages, Server.Map.Instance[mapNum].Event[i].PageCount);
+                    Server.Map.Instance[map].Event[i].Pages = new Type.EventPage[Server.Map.Instance[map].Event[i].PageCount];
+                    Array.Resize(ref Data.TempPlayer[i].EventMap.EventPages, Server.Map.Instance[map].Event[i].PageCount);
 
-                    var loopTo5 = Server.Map.Instance[mapNum].Event[i].PageCount;
+                    var loopTo5 = Server.Map.Instance[map].Event[i].PageCount;
                     for (x = 0; x < (int)loopTo5; x++)
                     {
                         {
-                            ref var instance2 = ref Server.Map.Instance[mapNum].Event[i].Pages[x];
+                            ref var instance2 = ref Server.Map.Instance[map].Event[i].Pages[x];
                             instance2.ChkVariable = packetReader.ReadInt32();
                             instance2.VariableIndex = packetReader.ReadInt32();
                             instance2.VariableCondition = packetReader.ReadInt32();
@@ -1212,7 +1212,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
                             if (instance2.MoveRouteCount > 0)
                             {
-                                Server.Map.Instance[mapNum].Event[i].Pages[x].MoveRoute = new Type.MoveRoute[instance2.MoveRouteCount];
+                                Server.Map.Instance[map].Event[i].Pages[x].MoveRoute = new Type.MoveRoute[instance2.MoveRouteCount];
                                 var loopTo6 = instance2.MoveRouteCount;
                                 for (y = 0; y < (int)loopTo6; y++)
                                 {
@@ -1235,21 +1235,21 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                             instance2.Position = packetReader.ReadByte();
                         }
 
-                        if (Server.Map.Instance[mapNum].Event[i].Pages[x].CommandListCount > 0)
+                        if (Server.Map.Instance[map].Event[i].Pages[x].CommandListCount > 0)
                         {
-                            Server.Map.Instance[mapNum].Event[i].Pages[x].CommandList = new Type.CommandList[Server.Map.Instance[mapNum].Event[i].Pages[x].CommandListCount];
-                            var loopTo7 = Server.Map.Instance[mapNum].Event[i].Pages[x].CommandListCount;
+                            Server.Map.Instance[map].Event[i].Pages[x].CommandList = new Type.CommandList[Server.Map.Instance[map].Event[i].Pages[x].CommandListCount];
+                            var loopTo7 = Server.Map.Instance[map].Event[i].Pages[x].CommandListCount;
                             for (y = 0; y < (int)loopTo7; y++)
                             {
-                                Server.Map.Instance[mapNum].Event[i].Pages[x].CommandList[y].CommandCount = packetReader.ReadInt32();
-                                Server.Map.Instance[mapNum].Event[i].Pages[x].CommandList[y].ParentList = packetReader.ReadInt32();
-                                if (Server.Map.Instance[mapNum].Event[i].Pages[x].CommandList[y].CommandCount > 0)
+                                Server.Map.Instance[map].Event[i].Pages[x].CommandList[y].CommandCount = packetReader.ReadInt32();
+                                Server.Map.Instance[map].Event[i].Pages[x].CommandList[y].ParentList = packetReader.ReadInt32();
+                                if (Server.Map.Instance[map].Event[i].Pages[x].CommandList[y].CommandCount > 0)
                                 {
-                                    Server.Map.Instance[mapNum].Event[i].Pages[x].CommandList[y].Commands = new Type.EventCommand[Server.Map.Instance[mapNum].Event[i].Pages[x].CommandList[y].CommandCount];
-                                    for (int z = 0, loopTo8 = Server.Map.Instance[mapNum].Event[i].Pages[x].CommandList[y].CommandCount; z < (int)loopTo8; z++)
+                                    Server.Map.Instance[map].Event[i].Pages[x].CommandList[y].Commands = new Type.EventCommand[Server.Map.Instance[map].Event[i].Pages[x].CommandList[y].CommandCount];
+                                    for (int z = 0, loopTo8 = Server.Map.Instance[map].Event[i].Pages[x].CommandList[y].CommandCount; z < (int)loopTo8; z++)
                                     {
                                         {
-                                            ref var instance3 = ref Server.Map.Instance[mapNum].Event[i].Pages[x].CommandList[y].Commands[z];
+                                            ref var instance3 = ref Server.Map.Instance[map].Event[i].Pages[x].CommandList[y].Commands[z];
                                             instance3.Index = packetReader.ReadInt32();
                                             instance3.Text1 = packetReader.ReadString();
                                             instance3.Text2 = packetReader.ReadString();
@@ -1294,29 +1294,29 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             }
         }
 
-        var loopTo13 = Server.Map.Instance[mapNum].EventCount;
+        var loopTo13 = Server.Map.Instance[map].EventCount;
         for (var i = 0; i < loopTo13; i++)
         {
-            if (Server.Map.Instance[mapNum].Event[i].PageCount == 0)
+            if (Server.Map.Instance[map].Event[i].PageCount == 0)
             {
-                Server.Map.Instance[mapNum].Event[i] = Server.Map.Instance[mapNum].Event[i + 1];
-                Server.Map.Instance[mapNum].Event[i + 1] = default;
-                Server.Map.Instance[mapNum].EventCount = Server.Map.Instance[mapNum].EventCount - 1;
+                Server.Map.Instance[map].Event[i] = Server.Map.Instance[map].Event[i + 1];
+                Server.Map.Instance[map].Event[i + 1] = default;
+                Server.Map.Instance[map].EventCount = Server.Map.Instance[map].EventCount - 1;
             }
         }
 
         // Save the map
-        Map.OnSave(mapNum);
-        MapNpc.OnSpawn(mapNum).GetAwaiter().GetResult();
-        EventLogic.SpawnGlobalEvents(mapNum).GetAwaiter().GetResult();
+        Map.OnSave(map);
+        MapNpc.OnSpawn(map).GetAwaiter().GetResult();
+        EventLogic.SpawnGlobalEvents(map).GetAwaiter().GetResult();
 
         foreach (var i in PlayerService.Instance.PlayerIds)
         {
             if (NetworkConfig.IsPlaying(i))
             {
-                if (PlayerBase.Instance[i].Map == mapNum)
+                if (PlayerBase.Instance[i].Map == map)
                 {
-                    EventLogic.SpawnMapEventsFor(i, mapNum);
+                    EventLogic.SpawnMapEventsFor(i, map);
                 }
             }
         }
@@ -1330,15 +1330,15 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         // Respawn
         MapItem.Spawn(GetPlayerMap(session.Id));
-        MapResource.OnUpdate(mapNum);
+        MapResource.OnUpdate(map);
 
         // Refresh map for everyone online
         foreach (var i in PlayerService.Instance.PlayerIds)
         {
-            if (NetworkConfig.IsPlaying(i) & GetPlayerMap(i) == mapNum)
+            if (NetworkConfig.IsPlaying(i) & GetPlayerMap(i) == map)
             {
-                Server.Player.OnWarp(i, mapNum, GetPlayerX(i), GetPlayerY(i), (byte)Direction.Down);
-                NetworkSend.SendMapData(i, mapNum, true);
+                Server.Player.OnWarp(i, map, GetPlayerX(i), GetPlayerY(i), (byte)Direction.Down);
+                NetworkSend.SendMapData(i, map, true);
             }
         }
     }
@@ -2959,9 +2959,9 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         _ = (TargetType)packetReader.ReadInt32(); // Target TYpe
         _ = packetReader.ReadInt32(); // Target Zone
 
-        var mapNum = GetPlayerMap(session.Id);
+        var map = GetPlayerMap(session.Id);
 
-        MapProjectile.OnClear(mapNum, projectile);
+        MapProjectile.OnClear(map, projectile);
     }
 
     public static void Packet_RequestEditProjectile(GameSession session, ReadOnlyMemory<byte> bytes)

@@ -130,11 +130,11 @@ public class Projectile : ProjectileBase, IData, IAsyncData
 
     public static void OnFireFreeAim(int playerId, short vx, short vy, int itemNum)
     {
-        var mapNum = GetPlayerMap(playerId);
+        var map = GetPlayerMap(playerId);
         var mapProjectileNum = -1;
         for (var i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
         {
-            if (Data.MapProjectile[mapNum, i].ProjectileNum < 0)
+            if (Data.MapProjectile[map, i].ProjectileNum < 0)
             {
                 mapProjectileNum = i; break;
             }
@@ -145,7 +145,7 @@ public class Projectile : ProjectileBase, IData, IAsyncData
         if (projectileNum < 0) return;
         if (Data.TempPlayer[playerId].ProjectileTimer > General.GetTimeMs()) return;
 
-        ref var mp = ref Data.MapProjectile[mapNum, mapProjectileNum];
+        ref var mp = ref Data.MapProjectile[map, mapProjectileNum];
         Data.TempPlayer[playerId].ProjectileTimer = General.GetTimeMs() + Item.Instance[itemNum].Speed;
         mp.ProjectileNum = projectileNum;
         mp.Owner = playerId;
@@ -167,16 +167,16 @@ public class Projectile : ProjectileBase, IData, IAsyncData
         mp.AccX = 0; mp.AccY = 0; mp.Range = 0;
         mp.TravelTime = General.GetTimeMs() + Math.Max(1, Projectile.Instance[projectileNum].Speed);
         mp.Timer = General.GetTimeMs() + 60000;
-        NetworkSend.SendProjectileToMap(mapNum, mapProjectileNum);
+        NetworkSend.SendProjectileToMap(map, mapProjectileNum);
     }
 
     public static void OnFreeAim(int playerId, short vx, short vy, int itemNum, int destX, int destY)
     {
-        var mapNum = GetPlayerMap(playerId);
+        var map = GetPlayerMap(playerId);
         var mapProjectileNum = -1;
         for (var i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
         {
-            if (Data.MapProjectile[mapNum, i].ProjectileNum < 0)
+            if (Data.MapProjectile[map, i].ProjectileNum < 0)
             { mapProjectileNum = i; break; }
         }
         if (mapProjectileNum == -1) return;
@@ -184,7 +184,7 @@ public class Projectile : ProjectileBase, IData, IAsyncData
         if (projectileNum < 0) return;
         if (Data.TempPlayer[playerId].ProjectileTimer > General.GetTimeMs()) return;
 
-        ref var mp = ref Data.MapProjectile[mapNum, mapProjectileNum];
+        ref var mp = ref Data.MapProjectile[map, mapProjectileNum];
         Data.TempPlayer[playerId].ProjectileTimer = General.GetTimeMs() + Item.Instance[itemNum].Speed;
         mp.ProjectileNum = projectileNum;
         mp.Owner = playerId;
@@ -206,16 +206,16 @@ public class Projectile : ProjectileBase, IData, IAsyncData
         mp.DestX = destX; mp.DestY = destY;
         mp.TravelTime = General.GetTimeMs() + Math.Max(1, Projectile.Instance[projectileNum].Speed);
         mp.Timer = General.GetTimeMs() + 60000;
-        NetworkSend.SendProjectileToMap(mapNum, mapProjectileNum);
+        NetworkSend.SendProjectileToMap(map, mapProjectileNum);
     }
 
     public static void OnShoot(int playerId, int itemNum, int skillNum = -1, int dir = -1, bool suppressCooldown = false)
     {
-        var mapNum = GetPlayerMap(playerId);
+        var map = GetPlayerMap(playerId);
         var mapProjectileNum = -1;
         for (var i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
         {
-            if (Data.MapProjectile[mapNum, i].ProjectileNum < 0)
+            if (Data.MapProjectile[map, i].ProjectileNum < 0)
             {
                 mapProjectileNum = i;
                 break;
@@ -239,7 +239,7 @@ public class Projectile : ProjectileBase, IData, IAsyncData
             return;
         }
 
-        ref var mapProjectile = ref Data.MapProjectile[mapNum, mapProjectileNum];
+        ref var mapProjectile = ref Data.MapProjectile[map, mapProjectileNum];
 
         // Only set cooldown if not suppressed here; caller may set once per batch
         if (!suppressCooldown)
@@ -258,16 +258,16 @@ public class Projectile : ProjectileBase, IData, IAsyncData
         mapProjectile.TravelTime = General.GetTimeMs() + Math.Max(1, Projectile.Instance[projectile].Speed);
         mapProjectile.Timer = General.GetTimeMs() + 60000;
 
-        NetworkSend.SendProjectileToMap(mapNum, mapProjectileNum);
+        NetworkSend.SendProjectileToMap(map, mapProjectileNum);
     }
 
-    public static void OnNpcProjectile(int mapNum, int mapNpcNum, int skillNum, int dir = -1)
+    public static void OnNpcProjectile(int map, int mapNpcNum, int skillNum, int dir = -1)
     {
         // Find free map projectile slot
         var mapProjectileNum = -1;
         for (var i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
         {
-            if (Data.MapProjectile[mapNum, i].ProjectileNum < 0)
+            if (Data.MapProjectile[map, i].ProjectileNum < 0)
             {
                 mapProjectileNum = i;
                 break;
@@ -287,24 +287,24 @@ public class Projectile : ProjectileBase, IData, IAsyncData
         }
 
         // Validate npc is present on map
-        if (mapNum < 0 || mapNum >= Core.Globals.Variables.MaxMaps) return;
+        if (map < 0 || map >= Core.Globals.Variables.MaxMaps) return;
         if (mapNpcNum < 0 || mapNpcNum >= Core.Globals.Variables.MaxMapNpcs) return;
-        if (MapNpc.Instance[mapNum, mapNpcNum].Num < 0) return;
+        if (MapNpc.Instance[map, mapNpcNum].Num < 0) return;
 
-        ref var mapProjectile = ref Data.MapProjectile[mapNum, mapProjectileNum];
+        ref var mapProjectile = ref Data.MapProjectile[map, mapProjectileNum];
 
         mapProjectile.ProjectileNum = projectile;
         mapProjectile.Owner = mapNpcNum;
         mapProjectile.OwnerType = (byte) TargetType.Npc;
-        mapProjectile.Dir = dir >= 0 ? (byte) dir : MapNpc.Instance[mapNum, mapNpcNum].Dir;
-        mapProjectile.X = MapNpc.Instance[mapNum, mapNpcNum].X;
-        mapProjectile.Y = MapNpc.Instance[mapNum, mapNpcNum].Y;
+        mapProjectile.Dir = dir >= 0 ? (byte) dir : MapNpc.Instance[map, mapNpcNum].Dir;
+        mapProjectile.X = MapNpc.Instance[map, mapNpcNum].X;
+        mapProjectile.Y = MapNpc.Instance[map, mapNpcNum].Y;
         mapProjectile.SkillId = skillNum;
         mapProjectile.Range = 0;
         mapProjectile.TravelTime = General.GetTimeMs() + Math.Max(1, Projectile.Instance[projectile].Speed);
         mapProjectile.Timer = General.GetTimeMs() + 60000;
 
-        NetworkSend.SendProjectileToMap(mapNum, mapProjectileNum);
+        NetworkSend.SendProjectileToMap(map, mapProjectileNum);
     }
 
     public static void OnUpdate()

@@ -157,7 +157,7 @@ public class Script
         NetworkSend.SendPlaySound(index, "Bell.ogg", GetPlayerX(index), GetPlayerY(index));
     }
 
-    public void OnDrop(int index, int mapSlot, int invSlot, int amount, int mapNum, Item item, int itemNum)
+    public void OnDrop(int index, int mapSlot, int invSlot, int amount, int map, Item item, int itemNum)
     {
         // Determine if the item is currency or stackable
         if (item.Type == (byte)ItemCategory.Currency || item.Stackable == 1)
@@ -174,7 +174,7 @@ public class Script
             {
                 SetInventoryValue(index, invSlot, InventoryValue - amount);
             }
-            NetworkSend.SendMapMessage(mapNum, string.Format("{0} has dropped {1} ({2}x).", GetPlayerName(index), GameLogic.CheckGrammar(item.Name), amount));
+            NetworkSend.SendMapMessage(map, string.Format("{0} has dropped {1} ({2}x).", GetPlayerName(index), GameLogic.CheckGrammar(item.Name), amount));
         }
         else
         {
@@ -182,17 +182,17 @@ public class Script
             SetInventory(index, invSlot, -1);
             SetInventoryValue(index, invSlot, 0);
 
-            NetworkSend.SendMapMessage(mapNum, string.Format("{0} has dropped {1}.", GetPlayerName(index), GameLogic.CheckGrammar(item.Name)));
+            NetworkSend.SendMapMessage(map, string.Format("{0} has dropped {1}.", GetPlayerName(index), GameLogic.CheckGrammar(item.Name)));
         }
 
         // Send inventory update
         NetworkSend.SendInventoryUpdate(index, invSlot);
 
         // Spawn the item on the map
-        Server.MapItem.OnSpawn(itemNum, amount, mapNum, GetPlayerX(index), GetPlayerY(index));
+        Server.MapItem.OnSpawn(itemNum, amount, map, GetPlayerX(index), GetPlayerY(index));
     }
 
-    public void MapGetItem(int index, int mapNum, int mapSlot, int invSlot)
+    public void MapGetItem(int index, int map, int mapSlot, int invSlot)
     {
         // Prevent double pickup: if already picking up, ignore
         if (_isPickingUp[index])
@@ -201,12 +201,12 @@ public class Script
         _isPickingUp[index] = true;
 
         // Set item in Player's inventory
-        int itemNum = MapItem.Instance[mapNum, mapSlot].Num;
+        int itemNum = MapItem.Instance[map, mapSlot].Num;
         SetInventory(index, invSlot, itemNum);
 
         string msg;
         var item = Item.Instance[itemNum];
-        int mapValue = MapItem.Instance[mapNum, mapSlot].Value;
+        int mapValue = MapItem.Instance[map, mapSlot].Value;
 
         if (item.BindType == 1)
         {
@@ -227,9 +227,9 @@ public class Script
         }
 
         // Erase item from the map
-        MapItem.Instance[mapNum, mapSlot].Num = -1;
-        MapItem.Instance[mapNum, mapSlot].Value = 0;
-        NetworkSend.SendMapItemToAll(mapNum, mapSlot);
+        MapItem.Instance[map, mapSlot].Num = -1;
+        MapItem.Instance[map, mapSlot].Value = 0;
+        NetworkSend.SendMapItemToAll(map, mapSlot);
         NetworkSend.SendInventoryUpdate(index, invSlot);
         NetworkSend.SendActionMessage(GetPlayerMap(index), msg, (int)ColorName.White, (byte)ActionMessageType.Static, GetPlayerX(index) * 32, GetPlayerY(index) * 32);
 
@@ -532,7 +532,7 @@ public class Script
     public void OnMap(int index)
     {
         byte[] data;
-        int mapNum = GetPlayerMap(index);
+        int map = GetPlayerMap(index);
 
         // Send all Players on current map to index
         foreach (var Player in PlayerService.Instance.Players)
@@ -541,7 +541,7 @@ public class Script
             {
                 if (Player.Id != index)
                 {
-                    if (GetPlayerMap(Player.Id) == mapNum)
+                    if (GetPlayerMap(Player.Id) == map)
                     {
                         data = GetPlayerDataPacket(Player.Id);
                         PlayerService.Instance.SendDataTo(index, data);
@@ -556,31 +556,31 @@ public class Script
 
         // Send index's Player data to everyone on the map including himself
         data = GetPlayerDataPacket(index);
-        NetworkConfig.SendDataToMap(mapNum, data);
+        NetworkConfig.SendDataToMap(map, data);
         SendPlayerXYToMap(index);
         NetworkSend.SendMapEquipment(index);
         NetworkSend.SendVitals(index);
         
         // Send map animations
-        for (int x = 0; x < Server.Map.Instance[mapNum].MaxX; x++)
+        for (int x = 0; x < Server.Map.Instance[map].MaxX; x++)
         {
-            for (int y = 0; y < Server.Map.Instance[mapNum].MaxY; y++)
+            for (int y = 0; y < Server.Map.Instance[map].MaxY; y++)
             {
-                if (Server.Map.Instance[mapNum].Tile[x, y].Type == TileType.Animation)
+                if (Server.Map.Instance[map].Tile[x, y].Type == TileType.Animation)
                 {
-                    NetworkSend.SendUpdateAnimationTo(index, Server.Map.Instance[mapNum].Tile[x, y].Data1);
-                    NetworkSend.SendAnimationTo(index, Server.Map.Instance[mapNum].Tile[x, y].Data1, x, y, 0, -1);
+                    NetworkSend.SendUpdateAnimationTo(index, Server.Map.Instance[map].Tile[x, y].Data1);
+                    NetworkSend.SendAnimationTo(index, Server.Map.Instance[map].Tile[x, y].Data1, x, y, 0, -1);
                 }
-                else if (Server.Map.Instance[mapNum].Tile[x, y].Type2 == TileType.Animation)
+                else if (Server.Map.Instance[map].Tile[x, y].Type2 == TileType.Animation)
                 {
-                    NetworkSend.SendUpdateAnimationTo(index, Server.Map.Instance[mapNum].Tile[x, y].Data1_2);
-                    NetworkSend.SendAnimationTo(index, Server.Map.Instance[mapNum].Tile[x, y].Data1_2, x, y, 0, -1);
+                    NetworkSend.SendUpdateAnimationTo(index, Server.Map.Instance[map].Tile[x, y].Data1_2);
+                    NetworkSend.SendAnimationTo(index, Server.Map.Instance[map].Tile[x, y].Data1_2, x, y, 0, -1);
                 }
             }
         }
     }
 
-    public void LeaveMap(int index, int mapNum)
+    public void LeaveMap(int index, int map)
     {
 
     }
@@ -690,10 +690,10 @@ public class Script
         }
 
         // Moral / map rule check
-        var mapNum = GetPlayerMap(PlayerIndex);
-        if (mapNum < 0 || mapNum >= Server.Map.Instance.Count) return;
+        var map = GetPlayerMap(PlayerIndex);
+        if (map < 0 || map >= Server.Map.Instance.Count) return;
 
-        var moralId = Server.Map.Instance[mapNum].Moral;
+        var moralId = Server.Map.Instance[map].Moral;
         if (moralId >= 0 && !Moral.Instance[moralId].CanCast)
         {
             NetworkSend.SendPlayerMessage(PlayerIndex, "You cannot cast here.", (int)ColorName.BrightRed);
@@ -916,11 +916,11 @@ public class Script
                 {
                     int gain = Math.Max(1, lost);
                     int partyId = Data.TempPlayer[attacker.Id].InParty;
-                    int mapNum = GetPlayerMap(attacker.Id);
+                    int map = GetPlayerMap(attacker.Id);
                     if (partyId >= 0)
                     {
                         // Share EXP among party members on the same map
-                        ShareExp(partyId, gain, attacker.Id, mapNum);
+                        ShareExp(partyId, gain, attacker.Id, map);
                     }
                     else
                     {
@@ -1185,18 +1185,18 @@ public class Script
         return dx <= 1 && dy <= 1; // any adjacent (including diagonals)
     }
 
-    private bool TryChase(int mapNum, int npcIndex, int sx, int sy, int tx, int ty)
+    private bool TryChase(int map, int npcIndex, int sx, int sy, int tx, int ty)
     {
         int dx = tx - sx;
         int dy = ty - sy;
         if (dx == 0 && dy == 0) return false; // already on target tile
 
         // Try to compute a short path and enqueue it so animation continues between tiles.
-        var route = ComputePathAStar(mapNum, sx, sy, tx, ty, maxSteps: 12);
+        var route = ComputePathAStar(map, sx, sy, tx, ty, maxSteps: 12);
         if (route != null && route.Count > 0)
         {
-            Server.MapNpc.SetRoute(mapNum, npcIndex, route);
-            Server.MapNpc.TryStartNextStepNow(mapNum, npcIndex);
+            Server.MapNpc.SetRoute(map, npcIndex, route);
+            Server.MapNpc.TryStartNextStepNow(map, npcIndex);
             return true;
         }
 
@@ -1216,19 +1216,19 @@ public class Script
         for (int i = 0; i < count; i++)
         {
             var d = dirs[i];
-            if (Server.MapNpc.CanMove(mapNum, npcIndex, d))
+            if (Server.MapNpc.CanMove(map, npcIndex, d))
             {
-                Server.MapNpc.OnMove(mapNum, npcIndex, d, (int)MovementState.Walking);
+                Server.MapNpc.OnMove(map, npcIndex, d, (int)MovementState.Walking);
                 return true;
             }
         }
         return false;
     }
 
-    private static System.Collections.Generic.List<byte>? ComputePathAStar(int mapNum, int sx, int sy, int tx, int ty, int maxSteps)
+    private static System.Collections.Generic.List<byte>? ComputePathAStar(int map, int sx, int sy, int tx, int ty, int maxSteps)
     {
-        int maxX = Server.Map.Instance[mapNum].MaxX;
-        int maxY = Server.Map.Instance[mapNum].MaxY;
+        int maxX = Server.Map.Instance[map].MaxX;
+        int maxY = Server.Map.Instance[map].MaxY;
         if (sx < 0 || sy < 0 || tx < 0 || ty < 0 || sx >= maxX || sy >= maxY || tx >= maxX || ty >= maxY) return null;
 
         var open = new System.Collections.Generic.SortedSet<(int f,int g,int x,int y)>(System.Collections.Generic.Comparer<(int,int,int,int)>.Create((a,b)=> a.Item1!=b.Item1? a.Item1-b.Item1 : (a.Item2!=b.Item2? a.Item2-b.Item2 : (a.Item3!=b.Item3? a.Item3-b.Item3 : a.Item4-b.Item4))));
@@ -1247,7 +1247,7 @@ public class Script
             int cx = current.Item3, cy = current.Item4, cg = current.Item2;
             if (cx == tx && cy == ty) break;
 
-            foreach (var (nx, ny, dir) in Neighbors(mapNum, cx, cy, maxX, maxY))
+            foreach (var (nx, ny, dir) in Neighbors(map, cx, cy, maxX, maxY))
             {
                 int tentative = cg + 1;
                 var key = (nx, ny);
@@ -1297,19 +1297,19 @@ public class Script
 
     private static int Heuristic(int x1, int y1, int x2, int y2) => System.Math.Abs(x1 - x2) + System.Math.Abs(y1 - y2);
 
-    private static System.Collections.Generic.IEnumerable<(int x,int y,byte dir)> Neighbors(int mapNum, int x, int y, int maxX, int maxY)
+    private static System.Collections.Generic.IEnumerable<(int x,int y,byte dir)> Neighbors(int map, int x, int y, int maxX, int maxY)
     {
         // Cardinal moves
-        if (x+1 < maxX && IsTileWalkable(mapNum, x+1, y)) yield return (x+1, y, (byte)Direction.Right);
-        if (x-1 >= 0  && IsTileWalkable(mapNum, x-1, y)) yield return (x-1, y, (byte)Direction.Left);
-        if (y+1 < maxY && IsTileWalkable(mapNum, x, y+1)) yield return (x, y+1, (byte)Direction.Down);
-        if (y-1 >= 0  && IsTileWalkable(mapNum, x, y-1)) yield return (x, y-1, (byte)Direction.Up);
+        if (x+1 < maxX && IsTileWalkable(map, x+1, y)) yield return (x+1, y, (byte)Direction.Right);
+        if (x-1 >= 0  && IsTileWalkable(map, x-1, y)) yield return (x-1, y, (byte)Direction.Left);
+        if (y+1 < maxY && IsTileWalkable(map, x, y+1)) yield return (x, y+1, (byte)Direction.Down);
+        if (y-1 >= 0  && IsTileWalkable(map, x, y-1)) yield return (x, y-1, (byte)Direction.Up);
     }
 
-    private static bool IsTileWalkable(int mapNum, int x, int y)
+    private static bool IsTileWalkable(int map, int x, int y)
     {
         // Mirror CanNpcMove constraints loosely using tile types only; dynamic collisions are validated at step time.
-        var t = Server.Map.Instance[mapNum].Tile[x, y];
+        var t = Server.Map.Instance[map].Tile[x, y];
         int n = (int)t.Type; int n2 = (int)t.Type2;
         bool ok = (n == (byte)TileType.None || n == (byte)TileType.Item || n == (byte)TileType.NpcSpawn) ||
                   (n2 == (byte)TileType.None || n2 == (byte)TileType.Item || n2 == (byte)TileType.NpcSpawn);
@@ -1476,7 +1476,7 @@ public class Script
     // Adjust vital on an entity (Player or npc). If isHeal=false we subtract (damage). If true we add (heal).
     // amountParam is base amount from skill; for now no scaling besides simple clamp.
     // caster may be used later for threat/aggro or scaling.
-    private void AdjustVital(Entity target, Vital vital, int amountParam, bool isHeal, int skillId, int mapNum, Entity caster)
+    private void AdjustVital(Entity target, Vital vital, int amountParam, bool isHeal, int skillId, int map, Entity caster)
     {
         if (target == null) return;
         if (vital != Core.Globals.Vital.Health && vital != Core.Globals.Vital.Mana && vital != Core.Globals.Vital.Stamina) return; // only support these
@@ -1547,10 +1547,10 @@ public class Script
         }
     }
 
-    private void CastSkill(int mapNum, Entity entity, int bufferedValue)
+    private void CastSkill(int map, Entity entity, int bufferedValue)
     {
         if (entity == null) return;
-        if (entity.Map != mapNum) return;
+        if (entity.Map != map) return;
 
         int skillId = -1;
         int PlayerSkillSlot = -1;
@@ -1591,7 +1591,7 @@ public class Script
         Entity resolvedTarget = null;
         if (skill.Range > 0)
         {
-            resolvedTarget = ResolveTargetEntity(mapNum, entity);
+            resolvedTarget = ResolveTargetEntity(map, entity);
         }
 
         // Optional cast (wind-up) animation already played when buffering; only play execution anim here.
@@ -1601,37 +1601,37 @@ public class Script
 
         if (isProjectile)
         {
-            HandleProjectileSkill(mapNum, entity, skillId, resolvedTarget);
+            HandleProjectileSkill(map, entity, skillId, resolvedTarget);
         }
         else if (range == 0 && !isAoE)
         {
-            HandleSelfCastSkill(mapNum, entity, skillId);
+            HandleSelfCastSkill(map, entity, skillId);
         }
         else if (range == 0 && isAoE)
         {
-            HandleSelfCastAoESkill(mapNum, entity, skillId);
+            HandleSelfCastAoESkill(map, entity, skillId);
         }
         else if (range > 0 && isAoE)
         {
-            HandleTargetedAoESkill(mapNum, entity, skillId, resolvedTarget);
+            HandleTargetedAoESkill(map, entity, skillId, resolvedTarget);
         }
         else if (range > 0)
         {
-            HandleTargetedSkill(mapNum, entity, skillId, resolvedTarget);
+            HandleTargetedSkill(map, entity, skillId, resolvedTarget);
         }
 
-        FinalizeCast(mapNum, entity, skillId, PlayerSkillSlot);
+        FinalizeCast(map, entity, skillId, PlayerSkillSlot);
     }
 
-    private Entity? ResolveTargetEntity(int mapNum, Entity entity)
+    private Entity? ResolveTargetEntity(int map, Entity entity)
     {
         if (entity.TargetType == (byte)TargetType.Player)
         {
             var pid = entity.Target;
-            if (NetworkConfig.IsPlaying(pid) && GetPlayerMap(pid) == mapNum)
+            if (NetworkConfig.IsPlaying(pid) && GetPlayerMap(pid) == map)
             {
                 var e = Core.Globals.Entity.FromPlayer(pid, Server.Player.Instance[pid]);
-                e.Map = mapNum;
+                e.Map = map;
                 return e;
             }
         }
@@ -1641,14 +1641,14 @@ public class Script
             if (tid >= 0 && tid < Core.Globals.Entity.Instances.Count)
             {
                 var tEnt = Core.Globals.Entity.Instances[tid];
-                if (tEnt != null && tEnt.Type == Core.Globals.Entity.EntityType.Npc && tEnt.Map == mapNum && tEnt.Num >= 0)
+                if (tEnt != null && tEnt.Type == Core.Globals.Entity.EntityType.Npc && tEnt.Map == map && tEnt.Num >= 0)
                     return tEnt;
             }
         }
         return null;
     }
 
-    private void HandleProjectileSkill(int mapNum, Entity caster, int skillId, Entity? target)
+    private void HandleProjectileSkill(int map, Entity caster, int skillId, Entity? target)
     {
         // Spawn one or more projectiles depending on MultiDirMask. If mask==0, fire in caster's facing or skill.Dir
         ref var skill = ref Data.Skill[skillId];
@@ -1658,7 +1658,7 @@ public class Script
             if (caster.Type == Core.Globals.Entity.EntityType.Player)
                 Server.Projectile.OnShoot(caster.Id, -1, skillId);
             else if (caster.Type == Core.Globals.Entity.EntityType.Npc)
-                Server.Projectile.OnNpcProjectile(mapNum, caster.Id, skillId);
+                Server.Projectile.OnNpcProjectile(map, caster.Id, skillId);
             return;
         }
 
@@ -1674,7 +1674,7 @@ public class Script
             if (caster.Type == Core.Globals.Entity.EntityType.Player)
                 Server.Projectile.OnShoot(caster.Id, -1, skillId, caster.Dir, suppressCooldown: true);
             else if (caster.Type == Core.Globals.Entity.EntityType.Npc)
-                Server.Projectile.OnNpcProjectile(mapNum, caster.Id, skillId, caster.Dir);
+                Server.Projectile.OnNpcProjectile(map, caster.Id, skillId, caster.Dir);
         }
         caster.Dir = originalDir;
 
@@ -1689,22 +1689,22 @@ public class Script
         }
     }
 
-    private void HandleSelfCastSkill(int mapNum, Entity caster, int skillId)
+    private void HandleSelfCastSkill(int map, Entity caster, int skillId)
     {
         ref var skill = ref Data.Skill[skillId];
         switch (skill.Type)
         {
             case 0: // Damage HP self
-                AdjustVital(caster, Core.Globals.Vital.Health, skill.Vital, false, skillId, mapNum, caster);
+                AdjustVital(caster, Core.Globals.Vital.Health, skill.Vital, false, skillId, map, caster);
                 break;
             case 1: // Damage MP self
-                AdjustVital(caster, Core.Globals.Vital.Mana, skill.Vital, false, skillId, mapNum, caster);
+                AdjustVital(caster, Core.Globals.Vital.Mana, skill.Vital, false, skillId, map, caster);
                 break;
             case 2: // Heal HP self
-                AdjustVital(caster, Core.Globals.Vital.Health, skill.Vital, true, skillId, mapNum, caster);
+                AdjustVital(caster, Core.Globals.Vital.Health, skill.Vital, true, skillId, map, caster);
                 break;
             case 3: // Heal MP self
-                AdjustVital(caster, Core.Globals.Vital.Mana, skill.Vital, true, skillId, mapNum, caster);
+                AdjustVital(caster, Core.Globals.Vital.Mana, skill.Vital, true, skillId, map, caster);
                 break;
             case 4: // Warp
                 if (skill.Map >= 0 && skill.Map < Server.Map.Instance.Count)
@@ -1725,15 +1725,15 @@ public class Script
                 }
                 break;
         }
-        PlaySkillAnimation(mapNum, caster, skillId, caster);
+        PlaySkillAnimation(map, caster, skillId, caster);
     }
 
-    private void HandleSelfCastAoESkill(int mapNum, Entity caster, int skillId)
+    private void HandleSelfCastAoESkill(int map, Entity caster, int skillId)
     {
-        ApplyAoE(mapNum, caster, skillId, caster.X / Constants.TileSize, caster.Y / Constants.TileSize);
+        ApplyAoE(map, caster, skillId, caster.X / Constants.TileSize, caster.Y / Constants.TileSize);
     }
 
-    private void HandleTargetedSkill(int mapNum, Entity caster, int skillId, Entity? target)
+    private void HandleTargetedSkill(int map, Entity caster, int skillId, Entity? target)
     {
         if (target == null) return;
         ref var s = ref Data.Skill[skillId];
@@ -1754,7 +1754,7 @@ public class Script
                 int tx = caster.X/32 + deltas[i].dx;
                 int ty = caster.Y/32 + deltas[i].dy;
                 // Try find another entity on this tile and attack
-                var extraTarget = FindEntityAt(mapNum, tx, ty, preferOpponentsOf: caster);
+                var extraTarget = FindEntityAt(map, tx, ty, preferOpponentsOf: caster);
                 if (extraTarget != null && (extraTarget.Id != target.Id || extraTarget.Type != target.Type))
                 {
                     AttemptAttack(caster, extraTarget, skillId);
@@ -1765,19 +1765,19 @@ public class Script
         if (skill.Type == 2 || skill.Type == 3)
         {
             var vital = skill.Type == 2 ? Core.Globals.Vital.Health : Core.Globals.Vital.Mana;
-            AdjustVital(target, vital, skill.Vital, true, skillId, mapNum, caster);
+            AdjustVital(target, vital, skill.Vital, true, skillId, map, caster);
         }
-        PlaySkillAnimation(mapNum, caster, skillId, target);
+        PlaySkillAnimation(map, caster, skillId, target);
     }
 
-    private void HandleTargetedAoESkill(int mapNum, Entity caster, int skillId, Entity? target)
+    private void HandleTargetedAoESkill(int map, Entity caster, int skillId, Entity? target)
     {
         int baseX = (target != null ? target.X : caster.X) / Constants.TileSize;
         int baseY = (target != null ? target.Y : caster.Y) / Constants.TileSize;
         ref var s = ref Data.Skill[skillId];
         if (s.MultiDirMask == 0)
         {
-            ApplyAoE(mapNum, caster, skillId, baseX, baseY);
+            ApplyAoE(map, caster, skillId, baseX, baseY);
         }
         else
         {
@@ -1786,34 +1786,34 @@ public class Script
             for (int i = 0; i < dirCount; i++)
             {
                 if ((s.MultiDirMask & (1 << i)) == 0) continue;
-                ApplyAoE(mapNum, caster, skillId, baseX + deltas[i].dx, baseY + deltas[i].dy);
+                ApplyAoE(map, caster, skillId, baseX + deltas[i].dx, baseY + deltas[i].dy);
             }
         }
     }
 
-    public Entity? FindEntityAt(int mapNum, int tx, int ty, Entity preferOpponentsOf)
+    public Entity? FindEntityAt(int map, int tx, int ty, Entity preferOpponentsOf)
     {
         // Players first
         foreach (var p in PlayerService.Instance.Players)
         {
             if (!NetworkConfig.IsPlaying(p.Id)) continue;
-            if (GetPlayerMap(p.Id) != mapNum) continue;
+            if (GetPlayerMap(p.Id) != map) continue;
             if (GetPlayerX(p.Id) == tx && GetPlayerY(p.Id) == ty)
             {
-                var e = Core.Globals.Entity.FromPlayer(p.Id, Server.Player.Instance[p.Id]); e.Map = mapNum; return e;
+                var e = Core.Globals.Entity.FromPlayer(p.Id, Server.Player.Instance[p.Id]); e.Map = map; return e;
             }
         }
         // NPCs
-        if (mapNum >= 0 && mapNum < Core.Globals.Variables.MaxMaps)
+        if (map >= 0 && map < Core.Globals.Variables.MaxMaps)
         {
             for (int i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
             {
-                ref var mn = ref MapNpc.Instance[mapNum, i];
+                ref var mn = ref MapNpc.Instance[map, i];
                 if (mn.Num < 0) continue;
                 if (mn.X == tx && mn.Y == ty)
                 {
-                    var e = Core.Globals.Entity.FromNpc(i, MapNpc.Instance[mapNum, i]);
-                    e.Map = mapNum;
+                    var e = Core.Globals.Entity.FromNpc(i, MapNpc.Instance[map, i]);
+                    e.Map = map;
                     return e;
                 }
             }
@@ -1821,7 +1821,7 @@ public class Script
         return null;
     }
 
-    public void ApplyAoE(int mapNum, Entity caster, int skillId, int centerX, int centerY)
+    public void ApplyAoE(int map, Entity caster, int skillId, int centerX, int centerY)
     {
         ref var skill = ref Data.Skill[skillId];
         int radius = skill.AoE;
@@ -1833,48 +1833,48 @@ public class Script
         foreach (var Player in PlayerService.Instance.Players)
         {
             if (!NetworkConfig.IsPlaying(Player.Id)) continue;
-            if (GetPlayerMap(Player.Id) != mapNum) continue;
+            if (GetPlayerMap(Player.Id) != map) continue;
             int px = GetPlayerX(Player.Id);
             int py = GetPlayerY(Player.Id);
             if (Math.Abs(px - centerX) <= radius && Math.Abs(py - centerY) <= radius)
             {
                 var targetEntity = Core.Globals.Entity.FromPlayer(Player.Id, Server.Player.Instance[Player.Id]);
-                targetEntity.Map = mapNum;
+                targetEntity.Map = map;
                 if (isDamage) AttemptAttack(caster, targetEntity, skillId);
-                if (isHeal) AdjustVital(targetEntity, vital, skill.Vital, true, skillId, mapNum, caster);
-                PlaySkillAnimation(mapNum, caster, skillId, targetEntity);
+                if (isHeal) AdjustVital(targetEntity, vital, skill.Vital, true, skillId, map, caster);
+                PlaySkillAnimation(map, caster, skillId, targetEntity);
             }
         }
 
         // NPCs via map data (avoid LINQ)
-        if (mapNum >= 0 && mapNum < Core.Globals.Variables.MaxMaps)
+        if (map >= 0 && map < Core.Globals.Variables.MaxMaps)
         {
             for (int i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
             {
-                if (MapNpc.Instance[mapNum, i].Num < 0) continue;
-                int nx = MapNpc.Instance[mapNum, i].X / Constants.TileSize;
-                int ny = MapNpc.Instance[mapNum, i].Y / Constants.TileSize;
+                if (MapNpc.Instance[map, i].Num < 0) continue;
+                int nx = MapNpc.Instance[map, i].X / Constants.TileSize;
+                int ny = MapNpc.Instance[map, i].Y / Constants.TileSize;
                 if (Math.Abs(nx - centerX) <= radius && Math.Abs(ny - centerY) <= radius)
                 {
-                    var npcEntity = Core.Globals.Entity.FromNpc(i, MapNpc.Instance[mapNum, i]);
-                    npcEntity.Map = mapNum;
+                    var npcEntity = Core.Globals.Entity.FromNpc(i, MapNpc.Instance[map, i]);
+                    npcEntity.Map = map;
                     if (isDamage) AttemptAttack(caster, npcEntity, skillId);
-                    if (isHeal) AdjustVital(npcEntity, vital, skill.Vital, true, skillId, mapNum, caster);
-                    PlaySkillAnimation(mapNum, caster, skillId, npcEntity);
+                    if (isHeal) AdjustVital(npcEntity, vital, skill.Vital, true, skillId, map, caster);
+                    PlaySkillAnimation(map, caster, skillId, npcEntity);
                 }
             }
         }
     }
 
-    private void PlaySkillAnimation(int mapNum, Entity caster, int skillId, Entity target)
+    private void PlaySkillAnimation(int map, Entity caster, int skillId, Entity target)
     {
         int anim = Data.Skill[skillId].SkillAnim;
         if (anim < 0) return;
         byte tType = (byte)(target.Type == Core.Globals.Entity.EntityType.Player ? TargetType.Player : TargetType.Npc);
-        NetworkSend.SendAnimation(mapNum, anim, 0, 0, tType, target.Id);
+        NetworkSend.SendAnimation(map, anim, 0, 0, tType, target.Id);
     }
 
-    private void TryChainOnHit(int mapNum, Entity caster, int baseSkillId, Entity target)
+    private void TryChainOnHit(int map, Entity caster, int baseSkillId, Entity target)
     {
         if (baseSkillId < 0 || baseSkillId >= Data.Skill.Length) return;
         int chainId = Data.Skill[baseSkillId].ChainOnHitSkillId;
@@ -1885,28 +1885,28 @@ public class Script
         if (chain.IsProjectile == 1)
         {
             // Fire projectile(s) from caster using chain skill
-            HandleProjectileSkill(mapNum, caster, chainId, target);
+            HandleProjectileSkill(map, caster, chainId, target);
         }
         else if (chain.Range == 0 && !chain.IsAoE)
         {
-            HandleSelfCastSkill(mapNum, caster, chainId);
+            HandleSelfCastSkill(map, caster, chainId);
         }
         else if (chain.Range == 0 && chain.IsAoE)
         {
-            HandleSelfCastAoESkill(mapNum, caster, chainId);
+            HandleSelfCastAoESkill(map, caster, chainId);
         }
         else if (chain.Range > 0 && chain.IsAoE)
         {
-            HandleTargetedAoESkill(mapNum, caster, chainId, target);
+            HandleTargetedAoESkill(map, caster, chainId, target);
         }
         else if (chain.Range > 0)
         {
-            HandleTargetedSkill(mapNum, caster, chainId, target);
+            HandleTargetedSkill(map, caster, chainId, target);
         }
         // No cooldown or mana additional cost for automated chain to keep it responsive; adjust if needed.
     }
 
-    private void FinalizeCast(int mapNum, Entity caster, int skillId, int PlayerSkillSlot)
+    private void FinalizeCast(int map, Entity caster, int skillId, int PlayerSkillSlot)
     {
         ref var skill = ref Data.Skill[skillId];
         if (skill.MpCost > 0)
@@ -2172,10 +2172,10 @@ public class Script
         }
     }
 
-    private void DropNpcLoot(int mapNum, int mapNpcNum)
+    private void DropNpcLoot(int map, int mapNpcNum)
     {
-        if (mapNum < 0 || mapNum >= Core.Globals.Variables.MaxMaps) return;
-        ref var mapNpc = ref MapNpc.Instance[mapNum, mapNpcNum];
+        if (map < 0 || map >= Core.Globals.Variables.MaxMaps) return;
+        ref var mapNpc = ref MapNpc.Instance[map, mapNpcNum];
         var npcNum = mapNpc.Num;
         if (npcNum < 0 || npcNum >= Data.Npc.Length) return;
         // Simple single-roll logic similar to legacy: choose one drop slot 0-4
@@ -2190,7 +2190,7 @@ public class Script
             var itemVal = Data.Npc[npcNum].DropItemValue[slot];
             if (itemId >= 0 && itemId < Item.Instance.Count)
             {
-                Server.MapItem.OnSpawn(itemId, itemVal, mapNum, mapNpc.X / Constants.TileSize, mapNpc.Y / Constants.TileSize);
+                Server.MapItem.OnSpawn(itemId, itemVal, map, mapNpc.X / Constants.TileSize, mapNpc.Y / Constants.TileSize);
             }
         }
     }

@@ -287,10 +287,10 @@ public static class Commands
         return p.GatherSkills[skillSlot].SkillNextLevelExperience;
     }
 
-    public static void SetPlayerMap(int index, int mapNum)
+    public static void SetPlayerMap(int index, int map)
     {
         if (!ValidPlayerIndex(index)) return;
-        PlayerBase.Instance[index].Map = mapNum;
+        PlayerBase.Instance[index].Map = map;
     }
 
     public static int GetPlayerInventory(int index, int invslot)

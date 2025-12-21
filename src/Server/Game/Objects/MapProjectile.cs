@@ -8,9 +8,9 @@ namespace Server
 {
     public class MapProjectile : IData
     {
-        public static void OnClear(int mapNum, int mapProjectileNum)
+        public static void OnClear(int map, int mapProjectileNum)
         {
-            ref var mp = ref Data.MapProjectile[mapNum, mapProjectileNum];
+            ref var mp = ref Data.MapProjectile[map, mapProjectileNum];
             mp.ProjectileNum = -1;
             mp.Owner = 0;
             mp.OwnerType = 0;
@@ -29,7 +29,7 @@ namespace Server
             mp.TravelTime = 0;
             mp.Timer = 0;
 
-            NetworkSend.SendProjectileToMap(mapNum, mapProjectileNum);
+            NetworkSend.SendProjectileToMap(map, mapProjectileNum);
         }
 
         public static void OnClear(int index)
@@ -49,11 +49,11 @@ namespace Server
 
         public static void OnReset()
         {
-            for (int mapNum = 0; mapNum < Core.Globals.Variables.MaxMaps; mapNum++)
+            for (int map = 0; map < Core.Globals.Variables.MaxMaps; map++)
             {
                 for (int mapProjectileNum = 0; mapProjectileNum < Data.MapProjectile.GetLength(1); mapProjectileNum++)
                 {
-                    OnClear(mapNum, mapProjectileNum);
+                    OnClear(map, mapProjectileNum);
                 }
             }
         }

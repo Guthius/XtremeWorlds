@@ -1753,14 +1753,14 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         int y;
         int i;
         int j;
-        int mapNum;
+        int map;
         var buffer = new PacketReader(data);
 
         GameState.MapData = false;
 
         if (buffer.ReadInt32() == 1)
         {
-            mapNum = buffer.ReadInt32();
+            map = buffer.ReadInt32();
             Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Name = buffer.ReadString();
             Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Music = buffer.ReadString();
             Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Revision = buffer.ReadInt32();

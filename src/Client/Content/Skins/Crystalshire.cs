@@ -544,9 +544,9 @@ public class Crystalshire
                             var line = lines[start];
                             if (string.IsNullOrWhiteSpace(line)) return;
                             var colon = line.IndexOf(':');
-                            if (colon > 0 && int.TryParse(line.AsSpan(0, colon), out var mapNum))
+                            if (colon > 0 && int.TryParse(line.AsSpan(0, colon), out var map))
                             {
-                                var target = Math.Max(0, mapNum - 1); // convert 1-based display to 0-based map id
+                                var target = Math.Max(0, map - 1); // convert 1-based display to 0-based map id
                                 Sender.WarpTo(target);
                             }
                         }
@@ -2281,8 +2281,8 @@ public class Crystalshire
         window.GetChild("btnWarpTo").CallBack[(int)ControlState.MouseDown] = () =>
         {
             if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
-            var mapNum = ReadInt(window.GetChild("txtAdminMap")) + 1;
-            Sender.WarpTo(mapNum);
+            var map = ReadInt(window.GetChild("txtAdminMap")) + 1;
+            Sender.WarpTo(map);
         };
 
         window.GetChild("btnBan").CallBack[(int)ControlState.MouseDown] = () =>
@@ -2356,9 +2356,9 @@ public class Crystalshire
                 if (id < 0 || id >= lstMaps.Items.Count) return;
                 var line = lstMaps.Items[id] ?? string.Empty;
                 var colon = line.IndexOf(':');
-                if (colon > 0 && int.TryParse(line.AsSpan(0, colon), out var mapNum))
+                if (colon > 0 && int.TryParse(line.AsSpan(0, colon), out var map))
                 {
-                    var target = Math.Max(0, mapNum - 1); // display is 1-based; engine expects 0-based
+                    var target = Math.Max(0, map - 1); // display is 1-based; engine expects 0-based
                     Sender.WarpTo(target);
                 }
             };
@@ -2386,9 +2386,9 @@ public class Crystalshire
                     }
                     if (string.IsNullOrWhiteSpace(line)) return;
                     var colon = line.IndexOf(':');
-                    if (colon > 0 && int.TryParse(line.AsSpan(0, colon), out var mapNum))
+                    if (colon > 0 && int.TryParse(line.AsSpan(0, colon), out var map))
                     {
-                        var target = Math.Max(0, mapNum - 1); // convert 1-based display to 0-based map id
+                        var target = Math.Max(0, map - 1); // convert 1-based display to 0-based map id
                         Sender.WarpTo(target);
                     }
                 }

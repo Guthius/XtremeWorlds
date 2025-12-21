@@ -16,55 +16,55 @@ namespace Server
 
         public static void SpawnAll()
         {
-            for (var mapNum = 0; mapNum < Core.Globals.Variables.MaxMaps; mapNum++)
+            for (var map = 0; map < Core.Globals.Variables.MaxMaps; map++)
             {
-                Spawn(mapNum);
+                Spawn(map);
             }
         }
 
-        public static void Spawn(int mapNum)
+        public static void Spawn(int map)
         {
-            if (mapNum < 0 || mapNum >= Core.Globals.Variables.MaxMaps)
+            if (map < 0 || map >= Core.Globals.Variables.MaxMaps)
             {
                 return;
             }
 
-            if (Server.Map.Instance[mapNum].NoRespawn)
+            if (Server.Map.Instance[map].NoRespawn)
             {
                 return;
             }
 
-            for (var x = 0; x < Server.Map.Instance[mapNum].MaxX; x++)
+            for (var x = 0; x < Server.Map.Instance[map].MaxX; x++)
             {
-                for (var y = 0; y < Server.Map.Instance[mapNum].MaxY; y++)
+                for (var y = 0; y < Server.Map.Instance[map].MaxY; y++)
                 {
-                    if (Server.Map.Instance[mapNum].Tile[x, y].Type == TileType.Item)
+                    if (Server.Map.Instance[map].Tile[x, y].Type == TileType.Item)
                     {
-                        if (Item.Instance[Server.Map.Instance[mapNum].Tile[x, y].Data1].Type == (byte)ItemCategory.Currency ||
-                            Item.Instance[Server.Map.Instance[mapNum].Tile[x, y].Data1].Stackable == 1)
+                        if (Item.Instance[Server.Map.Instance[map].Tile[x, y].Data1].Type == (byte)ItemCategory.Currency ||
+                            Item.Instance[Server.Map.Instance[map].Tile[x, y].Data1].Stackable == 1)
                         {
-                            var value = Server.Map.Instance[mapNum].Tile[x, y].Data2 < 1 ? 1 : Server.Map.Instance[mapNum].Tile[x, y].Data2;
+                            var value = Server.Map.Instance[map].Tile[x, y].Data2 < 1 ? 1 : Server.Map.Instance[map].Tile[x, y].Data2;
 
-                            OnSpawn(Server.Map.Instance[mapNum].Tile[x, y].Data1, value, mapNum, x, y);
+                            OnSpawn(Server.Map.Instance[map].Tile[x, y].Data1, value, map, x, y);
                         }
                         else
                         {
-                            OnSpawn(Server.Map.Instance[mapNum].Tile[x, y].Data1, Server.Map.Instance[mapNum].Tile[x, y].Data2, mapNum, x, y);
+                            OnSpawn(Server.Map.Instance[map].Tile[x, y].Data1, Server.Map.Instance[map].Tile[x, y].Data2, map, x, y);
                         }
                     }
 
-                    if (Server.Map.Instance[mapNum].Tile[x, y].Type2 == TileType.Item)
+                    if (Server.Map.Instance[map].Tile[x, y].Type2 == TileType.Item)
                     {
-                        if (Item.Instance[Server.Map.Instance[mapNum].Tile[x, y].Data1_2].Type == (byte)ItemCategory.Currency ||
-                            Item.Instance[Server.Map.Instance[mapNum].Tile[x, y].Data1_2].Stackable == 1)
+                        if (Item.Instance[Server.Map.Instance[map].Tile[x, y].Data1_2].Type == (byte)ItemCategory.Currency ||
+                            Item.Instance[Server.Map.Instance[map].Tile[x, y].Data1_2].Stackable == 1)
                         {
-                            var value = Server.Map.Instance[mapNum].Tile[x, y].Data2_2 < 1 ? 1 : Server.Map.Instance[mapNum].Tile[x, y].Data2_2;
+                            var value = Server.Map.Instance[map].Tile[x, y].Data2_2 < 1 ? 1 : Server.Map.Instance[map].Tile[x, y].Data2_2;
 
-                            OnSpawn(Server.Map.Instance[mapNum].Tile[x, y].Data1_2, value, mapNum, x, y);
+                            OnSpawn(Server.Map.Instance[map].Tile[x, y].Data1_2, value, map, x, y);
                         }
                         else
                         {
-                            OnSpawn(Server.Map.Instance[mapNum].Tile[x, y].Data1_2, Server.Map.Instance[mapNum].Tile[x, y].Data2_2, mapNum, x, y);
+                            OnSpawn(Server.Map.Instance[map].Tile[x, y].Data1_2, Server.Map.Instance[map].Tile[x, y].Data2_2, map, x, y);
                         }
                     }
                 }
@@ -72,14 +72,14 @@ namespace Server
         }
 
 
-        public static void OnSpawn(int itemNum, int itemVal, int mapNum, int x, int y)
+        public static void OnSpawn(int itemNum, int itemVal, int map, int x, int y)
         {
-            if (itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems || mapNum < 0 || mapNum >= Core.Globals.Variables.MaxMaps)
+            if (itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems || map < 0 || map >= Core.Globals.Variables.MaxMaps)
             {
                 return;
             }
 
-            var slot = FindOpenSlot(mapNum);
+            var slot = FindOpenSlot(map);
             if (slot == -1)
             {
                 return;
@@ -89,24 +89,24 @@ namespace Server
             {
                 for (var i = 0; i < itemVal; i++)
                 {
-                    slot = FindOpenSlot(mapNum);
+                    slot = FindOpenSlot(map);
                     if (slot == -1)
                     {
                         return;
                     }
 
-                    SpawnSlot(slot, itemNum, 1, mapNum, x, y);
+                    SpawnSlot(slot, itemNum, 1, map, x, y);
                 }
             }
             else
             {
-                SpawnSlot(slot, itemNum, itemVal, mapNum, x, y);
+                SpawnSlot(slot, itemNum, itemVal, map, x, y);
             }
         }
 
-        public static void SpawnSlot(int mapItemSlot, int itemNum, int itemVal, int mapNum, int x, int y)
+        public static void SpawnSlot(int mapItemSlot, int itemNum, int itemVal, int map, int x, int y)
         {
-            if (mapItemSlot < 0 || mapItemSlot > Core.Globals.Variables.MaxMapItems || itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems || mapNum < 0 || mapNum >= Core.Globals.Variables.MaxMaps)
+            if (mapItemSlot < 0 || mapItemSlot > Core.Globals.Variables.MaxMapItems || itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems || map < 0 || map >= Core.Globals.Variables.MaxMaps)
             {
                 return;
             }
@@ -114,10 +114,10 @@ namespace Server
             x *= 32;
             y *= 32;
 
-            Instance[mapNum, mapItemSlot].Num = itemNum;
-            Instance[mapNum, mapItemSlot].Value = itemVal;
-            Instance[mapNum, mapItemSlot].X = x;
-            Instance[mapNum, mapItemSlot].Y = y;
+            Instance[map, mapItemSlot].Num = itemNum;
+            Instance[map, mapItemSlot].Value = itemVal;
+            Instance[map, mapItemSlot].X = x;
+            Instance[map, mapItemSlot].Y = y;
 
             var packet = new PacketWriter();
 
@@ -128,19 +128,19 @@ namespace Server
             packet.WriteInt32(x);
             packet.WriteInt32(y);
 
-            NetworkConfig.SendDataToMap(mapNum, packet.GetBytes());
+            NetworkConfig.SendDataToMap(map, packet.GetBytes());
         }
 
-        public static int FindOpenSlot(int mapNum)
+        public static int FindOpenSlot(int map)
         {
-            if (mapNum < 0 || mapNum >= Core.Globals.Variables.MaxMaps)
+            if (map < 0 || map >= Core.Globals.Variables.MaxMaps)
             {
                 return -1;
             }
 
             for (var mapItemNum = 0; mapItemNum < Core.Globals.Variables.MaxMapItems; mapItemNum++)
             {
-                if (Instance[mapNum, mapItemNum].Num == -1)
+                if (Instance[map, mapItemNum].Num == -1)
                 {
                     return mapItemNum;
                 }
@@ -149,10 +149,10 @@ namespace Server
             return -1;
         }
 
-        public static void OnClear(int index, int mapNum)
+        public static void OnClear(int index, int map)
         {
-            Instance[mapNum, index].PlayerName = "";
-            Instance[mapNum, index].Num = -1;
+            Instance[map, index].PlayerName = "";
+            Instance[map, index].Num = -1;
         }
 
         public static void OnDraw(int index)
@@ -167,11 +167,11 @@ namespace Server
 
         public static void OnReset()
         {
-            for (int mapNum = 0; mapNum < Core.Globals.Variables.MaxMaps; mapNum++)
+            for (int map = 0; map < Core.Globals.Variables.MaxMaps; map++)
             {
                 for (int i = 0; i < Core.Globals.Variables.MaxMapItems; i++)
                 {
-                    OnClear(i, mapNum);
+                    OnClear(i, map);
                 }
             }
         }
