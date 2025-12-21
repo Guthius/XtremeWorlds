@@ -179,6 +179,7 @@ namespace Client
 
         public static void ClearGameData()
         {
+            Map.Instance.Add(new Map());
             Map.OnClear();
             Npc.OnReset();
             Resource.OnReset();

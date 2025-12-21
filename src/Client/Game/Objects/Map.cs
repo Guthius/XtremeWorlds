@@ -412,7 +412,6 @@ namespace Client
         public static void OnClear()
         {
             MapBase.OnClear(GetPlayerMap(GameState.MyIndex));
-            Map.Instance.Add(new Map());
             Data.TileHistory = new Type.TileHistory[GameState.MaxTileHistory]; // Fixed type name
 
             // Reset tile history indices
