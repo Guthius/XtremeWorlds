@@ -2158,6 +2158,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         {
             GameState.MyEditorType = EditorType.Map;
             GameState.EditorIndex = 0;
+            WindowManager.HideWindows();
             WindowManager.ShowWindow("winMapEditor");
             Client.Game.UI.Windows.WinMapEditor.OnLoad();
             GameState.CameraZoom = 1.0f;
