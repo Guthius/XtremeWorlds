@@ -6,11 +6,7 @@ public static class Data
 {
     public static Npc[] Npc = new Npc[Variables.MaxNpcs];
     public static Skill[] Skill = new Skill[Variables.MaxSkills];
-    public static MapResource[] MapResource = new MapResource[Variables.MaxResources];
-    public static MapResourceCache[] MyMapResource = new MapResourceCache[Variables.MaxResources];
     public static Tile[,]? TempTile;
-    public static MapItem[,] MapItem = new MapItem[Variables.MaxMaps, Variables.MaxMapItems];
-    public static MapData[] MapNpc = new MapData[Variables.MaxMaps];
     public static TempPlayer[] TempPlayer = new TempPlayer[Variables.MaxPlayers];
     public static MapProjectile[,] MapProjectile = new MapProjectile[Variables.MaxMaps, Variables.MaxProjectiles];
     public static Item[] TradeYourOffer = new Item[Variables.MaxInventory];

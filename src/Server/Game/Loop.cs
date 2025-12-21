@@ -189,13 +189,9 @@ public static class Loop
         for (var mapNum = 0; mapNum < mapCount; mapNum++)
         {
             // Add Npcs
-            if (mapNum < 0 || mapNum >= Data.MapNpc.Length) continue;
-            var npcArr0 = Data.MapNpc[mapNum].Npc;
-            if (npcArr0 == null) continue;
-
-            for (var i = 0; i < npcArr0.Length; i++)
+            for (var i = 0; i < Variables.MaxMapNpcs; i++)
             {
-                var npc = Entity.FromNpc(i, npcArr0[i]);
+                var npc = Entity.FromNpc(i, MapNpc.Instance[mapNum, i]);
                 if (npc.Num < 0)
                 {
                     continue;
@@ -281,12 +277,11 @@ public static class Loop
                         // clear snapshot & underlying map npc buffer
                         entity.SkillBuffer = -1;
                         entity.SkillBufferTimer = 0;
-                        if (mapNum >= 0 && mapNum < Data.MapNpc.Length)
+                        if (mapNum >= 0 && mapNum < Variables.MaxMaps)
                         {
-                            var npcArr = Data.MapNpc[mapNum].Npc;
-                            if (npcArr != null && entity.Id >= 0 && entity.Id < npcArr.Length)
+                            if (entity.Id >= 0 && entity.Id < Variables.MaxMapNpcs)
                             {
-                                ref var baseNpc = ref npcArr[entity.Id];
+                                ref var baseNpc = ref MapNpc.Instance[mapNum, entity.Id];
                                 baseNpc.SkillBuffer = -1;
                                 baseNpc.SkillBufferTimer = 0;
                             }
@@ -328,12 +323,11 @@ public static class Loop
                                             entity.TargetType = (byte)TargetType.Player;
                                             entity.Target = player.Id;
                                             // Persist target into base map data for movement logic
-                                            if (mapNum >= 0 && mapNum < Data.MapNpc.Length)
+                                            if (mapNum >= 0 && mapNum < Variables.MaxMaps)
                                             {
-                                                var npcArr = Data.MapNpc[mapNum].Npc;
-                                                if (npcArr != null && entity.Id >= 0 && entity.Id < npcArr.Length)
+                                                if (entity.Id >= 0 && entity.Id < Variables.MaxMapNpcs)
                                                 {
-                                                    ref var mapNpc = ref npcArr[entity.Id];
+                                                    ref var mapNpc = ref MapNpc.Instance[mapNum, entity.Id];
                                                     mapNpc.TargetType = entity.TargetType;
                                                     mapNpc.Target = entity.Target;
                                                 }
@@ -369,12 +363,11 @@ public static class Loop
                                         {
                                             entity.TargetType = (byte)TargetType.Npc;
                                             entity.Target = i;
-                                            if (mapNum >= 0 && mapNum < Data.MapNpc.Length)
+                                            if (mapNum >= 0 && mapNum < Variables.MaxMaps)
                                             {
-                                                var npcArr = Data.MapNpc[mapNum].Npc;
-                                                if (npcArr != null && entity.Id >= 0 && entity.Id < npcArr.Length)
+                                                if (entity.Id >= 0 && entity.Id < Variables.MaxMapNpcs)
                                                 {
-                                                    ref var mapNpc = ref npcArr[entity.Id];
+                                                    ref var mapNpc = ref MapNpc.Instance[mapNum, entity.Id];
                                                     mapNpc.TargetType = entity.TargetType;
                                                     mapNpc.Target = entity.Target;
                                                 }
@@ -406,12 +399,11 @@ public static class Loop
                                 entity.Target = -1;
                                 entity.TargetType = 0;
                                 // reflect to base map npc if this is an NPC snapshot
-                                if (entity.Type == Core.Globals.Entity.EntityType.Npc && mapNum >= 0 && mapNum < Data.MapNpc.Length)
+                                if (entity.Type == Core.Globals.Entity.EntityType.Npc && mapNum >= 0 && mapNum < Variables.MaxMaps)
                                 {
-                                    var npcArr = Data.MapNpc[mapNum].Npc;
-                                    if (npcArr != null && entity.Id >= 0 && entity.Id < npcArr.Length)
+                                    if (entity.Id >= 0 && entity.Id < Variables.MaxMapNpcs)
                                     {
-                                        ref var baseNpcClr = ref npcArr[entity.Id];
+                                        ref var baseNpcClr = ref MapNpc.Instance[mapNum, entity.Id];
                                         baseNpcClr.TargetType = 0;
                                         baseNpcClr.Target = -1;
                                     }
@@ -437,10 +429,9 @@ public static class Loop
                                             ref var sk = ref Data.Skill[sid];
                                             bool inRange = sk.Range == 0 ? (sk.IsAoE || dist <= 1) : dist <= sk.Range;
                                             if (!inRange) continue;
-                                            if (mapNum < 0 || mapNum >= Data.MapNpc.Length) break;
-                                            var npcArr = Data.MapNpc[mapNum].Npc;
-                                            if (npcArr == null || entity.Id < 0 || entity.Id >= npcArr.Length) break;
-                                            ref var baseNpc = ref npcArr[entity.Id];
+                                            if (mapNum < 0 || mapNum >= Variables.MaxMaps) break;
+                                            if (entity.Id < 0 || entity.Id >= Variables.MaxMapNpcs) break;
+                                            ref var baseNpc = ref MapNpc.Instance[mapNum, entity.Id];
                                             bool cdReady = baseNpc.SkillCd == null || slot >= baseNpc.SkillCd.Length || baseNpc.SkillCd[slot] <= nowMs;
                                             if (!cdReady) continue;
                                             if (entity.Vital == null || entity.Vital.Length <= (int)Core.Globals.Vital.Mana || entity.Vital[(int)Core.Globals.Vital.Mana] < sk.MpCost) continue;
@@ -480,12 +471,11 @@ public static class Loop
                                 {
                                     entity.Target = -1;
                                     entity.TargetType = 0;
-                                    if (entity.Type == Core.Globals.Entity.EntityType.Npc && mapNum >= 0 && mapNum < Data.MapNpc.Length)
+                                    if (entity.Type == Core.Globals.Entity.EntityType.Npc && mapNum >= 0 && mapNum < Variables.MaxMaps)
                                     {
-                                        var npcArr = Data.MapNpc[mapNum].Npc;
-                                        if (npcArr != null && entity.Id >= 0 && entity.Id < npcArr.Length)
+                                        if (entity.Id >= 0 && entity.Id < Variables.MaxMapNpcs)
                                         {
-                                            ref var baseNpc = ref npcArr[entity.Id];
+                                            ref var baseNpc = ref MapNpc.Instance[mapNum, entity.Id];
                                             baseNpc.TargetType = 0;
                                             baseNpc.Target = -1;
                                         }
@@ -508,10 +498,9 @@ public static class Loop
                                                 ref var sk2 = ref Data.Skill[sid2];
                                                 bool inRange2 = sk2.Range == 0 ? (sk2.IsAoE || dist2 <= 1) : dist2 <= sk2.Range;
                                                 if (!inRange2) continue;
-                                                if (mapNum < 0 || mapNum >= Data.MapNpc.Length) break;
-                                                var npcArr = Data.MapNpc[mapNum].Npc;
-                                                if (npcArr == null || entity.Id < 0 || entity.Id >= npcArr.Length) break;
-                                                ref var baseNpc2 = ref npcArr[entity.Id];
+                                                if (mapNum < 0 || mapNum >= Variables.MaxMaps) break;
+                                                if (entity.Id < 0 || entity.Id >= Variables.MaxMapNpcs) break;
+                                                ref var baseNpc2 = ref MapNpc.Instance[mapNum, entity.Id];
                                                 bool cdReady2 = baseNpc2.SkillCd == null || slot2 >= baseNpc2.SkillCd.Length || baseNpc2.SkillCd[slot2] <= nowMs2;
                                                 if (!cdReady2) continue;
                                                 if (entity.Vital == null || entity.Vital.Length <= (int)Core.Globals.Vital.Mana || entity.Vital[(int)Core.Globals.Vital.Mana] < sk2.MpCost) continue;
@@ -574,13 +563,12 @@ public static class Loop
             if (e == null) continue;
             if (e.Type != Core.Globals.Entity.EntityType.Npc) continue;
             if (e.Num < 0) continue;
-            var npcIndex = e.Id; // Index into Data.MapNpc[map].Npc
+            var npcIndex = e.Id; // Index into MapNpc.Instance[map, slot]
             var map = e.Map;
-            if (map < 0 || map >= Data.MapNpc.Length) continue;
-            var npcArr = Data.MapNpc[map].Npc;
-            if (npcArr == null || npcIndex < 0 || npcIndex >= npcArr.Length) continue;
+            if (map < 0 || map >= Variables.MaxMaps) continue;
+            if (npcIndex < 0 || npcIndex >= Variables.MaxMapNpcs) continue;
 
-            ref var baseNpc = ref npcArr[npcIndex];
+            ref var baseNpc = ref MapNpc.Instance[map, npcIndex];
 
             // Skip if stunned
             if (baseNpc.StunDuration > 0) continue;
@@ -611,12 +599,12 @@ public static class Loop
             else if (baseNpc.TargetType == (byte)TargetType.Npc && baseNpc.Target >= 0)
             {
                 int targetSlot = baseNpc.Target;
-                if (targetSlot < npcArr.Length && npcArr[targetSlot].Num >= 0)
+                if (targetSlot >= 0 && targetSlot < Variables.MaxMapNpcs && MapNpc.Instance[map, targetSlot].Num >= 0)
                 {
                     int sxR = baseNpc.X / Constants.TileSize;
                     int syR = baseNpc.Y / Constants.TileSize;
-                    int txR = npcArr[targetSlot].X / Constants.TileSize;
-                    int tyR = npcArr[targetSlot].Y / Constants.TileSize;
+                    int txR = MapNpc.Instance[map, targetSlot].X / Constants.TileSize;
+                    int tyR = MapNpc.Instance[map, targetSlot].Y / Constants.TileSize;
                     int rR = Math.Max(0, (int)Data.Npc[baseNpc.Num].Range);
                     if (Math.Abs(sxR - txR) > rR || Math.Abs(syR - tyR) > rR)
                     {
@@ -643,12 +631,12 @@ public static class Loop
             else if (baseNpc.TargetType == (byte)TargetType.Npc && baseNpc.Target >= 0)
             {
                 int targetSlot = baseNpc.Target;
-                if (targetSlot < npcArr.Length && npcArr[targetSlot].Num >= 0)
+                if (targetSlot >= 0 && targetSlot < Variables.MaxMapNpcs && MapNpc.Instance[map, targetSlot].Num >= 0)
                 {
                     int sx = baseNpc.X / Constants.TileSize;
                     int sy = baseNpc.Y / Constants.TileSize;
-                    int tx = npcArr[targetSlot].X / Constants.TileSize;
-                    int ty = npcArr[targetSlot].Y / Constants.TileSize;
+                    int tx = MapNpc.Instance[map, targetSlot].X / Constants.TileSize;
+                    int ty = MapNpc.Instance[map, targetSlot].Y / Constants.TileSize;
                     moved = Script.Instance?.TryChase(map, npcIndex, sx, sy, tx, ty);
                 }
                 else
@@ -682,7 +670,7 @@ public static class Loop
             // Handle map items (public/despawn)
             for (int i = 0; i < itemCount; i++)
             {
-                var item = Data.MapItem[mapNum, i];
+                ref var item = ref MapItem.Instance[mapNum, i];
                 if (item.Num >= 0 && !string.IsNullOrEmpty(item.PlayerName))
                 {
                     if (item.PlayerTimer < now)
@@ -701,8 +689,7 @@ public static class Loop
             }
 
             // Respawn resources
-            if (Data.MapResource == null || mapNum < 0 || mapNum >= Data.MapResource.Length) continue;
-            var mapResource = Data.MapResource[mapNum];
+            var mapResource = MapResource.Instance[mapNum];
             if (mapResource.ResourceCount > 0)
             {
                 for (int i = 0; i < mapResource.ResourceCount; i++)

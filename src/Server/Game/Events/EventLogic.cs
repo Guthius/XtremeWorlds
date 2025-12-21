@@ -2464,11 +2464,11 @@ namespace Server
         public static int FindNpcPath(int mapNum, double mapNpcNum, int targetx, int targety)
         {
             // Validate map and NPC
-            if (mapNum < 0 || mapNum >= Server.Map.Instance.Count || mapNpcNum < 0 || mapNpcNum >= Data.MapNpc[mapNum].Npc.Length)
+            if (mapNum < 0 || mapNum >= Server.Map.Instance.Count || mapNpcNum < 0 || mapNpcNum >= Core.Globals.Variables.MaxMapNpcs)
                 return 4;
 
-            int startX = Data.MapNpc[mapNum].Npc[(int) mapNpcNum].X;
-            int startY = Data.MapNpc[mapNum].Npc[(int) mapNpcNum].Y;
+            int startX = MapNpc.Instance[mapNum, (int)mapNpcNum].X;
+            int startY = MapNpc.Instance[mapNum, (int)mapNpcNum].Y;
             int goalX = targetx < 0 ? 0 : targetx;
             int goalY = targety < 0 ? 0 : targety;
 

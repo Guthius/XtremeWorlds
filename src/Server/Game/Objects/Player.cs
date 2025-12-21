@@ -105,9 +105,9 @@ public class Player : PlayerBase
                 var vitalCount = (int)System.Enum.GetValues(typeof(Vital)).Length;
                 for (var i = 0; i < vitalCount; i++)
                 {
-                    if (Data.MapNpc[oldMapNum].Npc[mapNpcNum].Num >= 0)
+                    if (MapNpc.Instance[oldMapNum, mapNpcNum].Num >= 0)
                     {
-                        Data.MapNpc[oldMapNum].Npc[mapNpcNum].Vital[i] = GameLogic.GetNpcMaxVital(Data.MapNpc[oldMapNum].Npc[mapNpcNum].Num, (Vital)i);
+                        MapNpc.Instance[oldMapNum, mapNpcNum].Vital[i] = GameLogic.GetNpcMaxVital(MapNpc.Instance[oldMapNum, mapNpcNum].Num, (Vital)i);
                     }
                 }
             }
@@ -584,9 +584,9 @@ public class Player : PlayerBase
             {
                 for (var mapNpcNum = 0; mapNpcNum < Core.Globals.Variables.MaxMapNpcs; mapNpcNum++)
                 {
-                    if (Data.MapNpc[mapNum].Npc[mapNpcNum].Num >= 0 &&
-                        Data.MapNpc[mapNum].Npc[mapNpcNum].X == x &&
-                        Data.MapNpc[mapNum].Npc[mapNpcNum].Y == y)
+                    if (MapNpc.Instance[mapNum, mapNpcNum].Num >= 0 &&
+                        MapNpc.Instance[mapNum, mapNpcNum].X == x &&
+                        MapNpc.Instance[mapNum, mapNpcNum].Y == y)
                     {
                         return true;
                     }
@@ -669,8 +669,8 @@ public class Player : PlayerBase
             return false;
         }
 
-        if (string.IsNullOrEmpty(Data.MapItem[mapNum, mapitemNum].PlayerName) ||
-            Data.MapItem[mapNum, mapitemNum].PlayerName == GetPlayerName(playerId))
+        if (string.IsNullOrEmpty(MapItem.Instance[mapNum, mapitemNum].PlayerName) ||
+            MapItem.Instance[mapNum, mapitemNum].PlayerName == GetPlayerName(playerId))
         {
             return true;
         }
@@ -684,18 +684,18 @@ public class Player : PlayerBase
 
             for (var mapItemNum = 0; mapItemNum < Core.Globals.Variables.MaxMapItems; mapItemNum++)
             {
-                if (Data.MapItem[mapNum, mapItemNum].Num < 0 ||
-                    Data.MapItem[mapNum, mapItemNum].Num >= Core.Globals.Variables.MaxItems)
+                if (MapItem.Instance[mapNum, mapItemNum].Num < 0 ||
+                    MapItem.Instance[mapNum, mapItemNum].Num >= Core.Globals.Variables.MaxItems)
                 {
                     continue;
                 }
 
-                if (Math.Floor((double)Data.MapItem[mapNum, mapItemNum].X / Constants.TileSize) != GetPlayerX(playerId) || Math.Floor((double)Data.MapItem[mapNum, mapItemNum].Y / Constants.TileSize) != GetPlayerY(playerId))
+                if (Math.Floor((double)MapItem.Instance[mapNum, mapItemNum].X / Constants.TileSize) != GetPlayerX(playerId) || Math.Floor((double)MapItem.Instance[mapNum, mapItemNum].Y / Constants.TileSize) != GetPlayerY(playerId))
                 {
                     continue;
                 }
 
-                var slot = Player.FindOpenInvSlot(playerId, Data.MapItem[mapNum, mapItemNum].Num);
+                var slot = Player.FindOpenInvSlot(playerId, MapItem.Instance[mapNum, mapItemNum].Num);
                 if (slot == -1)
                 {
                     NetworkSend.SendPlayerMessage(playerId, "Your inventory is full.", (int)ColorName.BrightRed);
@@ -871,7 +871,7 @@ public class Player : PlayerBase
             var mapNum = GetPlayerMap(playerId);
 
             var item = Item.Instance[itemNum];
-            var mapItem = Data.MapItem[mapNum, slot];
+            ref var mapItem = ref MapItem.Instance[mapNum, slot];
 
             mapItem.Num = itemNum;
             mapItem.X = GetPlayerX(playerId);

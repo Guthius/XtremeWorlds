@@ -6,11 +6,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using static Core.Net.Packets;
+using MapItemData = Core.Globals.Type.MapItem;
 
 namespace Server
 {
     public class MapItem : IData
     {
+        public static MapItemData[,] Instance { get; } = new MapItemData[Core.Globals.Variables.MaxMaps, Core.Globals.Variables.MaxMapItems];
+
         public static void SpawnAll()
         {
             for (var mapNum = 0; mapNum < Core.Globals.Variables.MaxMaps; mapNum++)
@@ -111,10 +114,10 @@ namespace Server
             x *= 32;
             y *= 32;
 
-            Data.MapItem[mapNum, mapItemSlot].Num = itemNum;
-            Data.MapItem[mapNum, mapItemSlot].Value = itemVal;
-            Data.MapItem[mapNum, mapItemSlot].X = x;
-            Data.MapItem[mapNum, mapItemSlot].Y = y;
+            Instance[mapNum, mapItemSlot].Num = itemNum;
+            Instance[mapNum, mapItemSlot].Value = itemVal;
+            Instance[mapNum, mapItemSlot].X = x;
+            Instance[mapNum, mapItemSlot].Y = y;
 
             var packet = new PacketWriter();
 
@@ -137,7 +140,7 @@ namespace Server
 
             for (var mapItemNum = 0; mapItemNum < Core.Globals.Variables.MaxMapItems; mapItemNum++)
             {
-                if (Data.MapItem[mapNum, mapItemNum].Num == -1)
+                if (Instance[mapNum, mapItemNum].Num == -1)
                 {
                     return mapItemNum;
                 }
@@ -148,8 +151,8 @@ namespace Server
 
         public static void OnClear(int index, int mapNum)
         {
-            Data.MapItem[mapNum, index].PlayerName = "";
-            Data.MapItem[mapNum, index].Num = -1;
+            Instance[mapNum, index].PlayerName = "";
+            Instance[mapNum, index].Num = -1;
         }
 
         public static void OnDraw(int index)

@@ -790,7 +790,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         // 1. Prefer npc target at tile (x,y)
         for (int i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
         {
-            var npc = Data.MapNpc[mapNum].Npc[i];
+            var npc = MapNpc.Instance[mapNum, i];
             if (npc.Num < 0) continue;
             int npcTileX = npc.X / Constants.TileSize;
             int npcTileY = npc.Y / Constants.TileSize;
@@ -1843,15 +1843,15 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var loopTo1 = Core.Globals.Variables.MaxMapItems;
         for (var i = 0; i < loopTo1; i++)
         {
-            if (Data.MapItem[GetPlayerMap(session.Id), i].Num >= 0)
+            if (MapItem.Instance[GetPlayerMap(session.Id), i].Num >= 0)
             {
-                if (!string.IsNullOrEmpty(Item.Instance[(int)Data.MapItem[GetPlayerMap(session.Id), i].Num].Name))
+                if (!string.IsNullOrEmpty(Item.Instance[(int)MapItem.Instance[GetPlayerMap(session.Id), i].Num].Name))
                 {
-                    if (Math.Floor((double)Data.MapItem[GetPlayerMap(session.Id), i].X / Constants.TileSize) == x)
+                    if (Math.Floor((double)MapItem.Instance[GetPlayerMap(session.Id), i].X / Constants.TileSize) == x)
                     {
-                        if (Math.Floor((double)Data.MapItem[GetPlayerMap(session.Id), i].Y / Constants.TileSize) == y)
+                        if (Math.Floor((double)MapItem.Instance[GetPlayerMap(session.Id), i].Y / Constants.TileSize) == y)
                         {
-                            NetworkSend.SendPlayerMessage(session.Id, "You see " + Data.MapItem[GetPlayerMap(session.Id), i].Value + " " + Item.Instance[(int)Data.MapItem[GetPlayerMap(session.Id), i].Num].Name + ".", (int)ColorName.BrightGreen);
+                            NetworkSend.SendPlayerMessage(session.Id, "You see " + MapItem.Instance[GetPlayerMap(session.Id), i].Value + " " + Item.Instance[(int)MapItem.Instance[GetPlayerMap(session.Id), i].Num].Name + ".", (int)ColorName.BrightGreen);
                             return;
                         }
                     }
@@ -1863,11 +1863,11 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var loopTo2 = Core.Globals.Variables.MaxMapNpcs;
         for (var i = 0; i < loopTo2; i++)
         {
-            if (Data.MapNpc[GetPlayerMap(session.Id)].Npc[i].Num >= 0)
+            if (MapNpc.Instance[GetPlayerMap(session.Id), i].Num >= 0)
             {
-                if (Math.Floor((double)Data.MapNpc[GetPlayerMap(session.Id)].Npc[i].X / Constants.TileSize) == x)
+                if (Math.Floor((double)MapNpc.Instance[GetPlayerMap(session.Id), i].X / Constants.TileSize) == x)
                 {
-                    if (Math.Floor((double)Data.MapNpc[GetPlayerMap(session.Id)].Npc[i].Y / Constants.TileSize) == y)
+                    if (Math.Floor((double)MapNpc.Instance[GetPlayerMap(session.Id), i].Y / Constants.TileSize) == y)
                     {
                         // Change target
                         if (Data.TempPlayer[session.Id].TargetType == 0)
@@ -1883,7 +1883,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
                         if (Data.TempPlayer[session.Id].Target >= 0)
                         {
-                            NetworkSend.SendPlayerMessage(session.Id, "Your target is now " + GameLogic.CheckGrammar(Data.Npc[(int)Data.MapNpc[GetPlayerMap(session.Id)].Npc[i].Num].Name) + ".", (int)ColorName.Yellow);
+                            NetworkSend.SendPlayerMessage(session.Id, "Your target is now " + GameLogic.CheckGrammar(Data.Npc[(int)MapNpc.Instance[GetPlayerMap(session.Id), i].Num].Name) + ".", (int)ColorName.Yellow);
                         }
 
                         NetworkSend.SendTarget(session.Id, Data.TempPlayer[session.Id].Target, Data.TempPlayer[session.Id].TargetType);

@@ -103,22 +103,19 @@ public static class General
 
     public static void InitalizeCoreData()
     {
-        Data.MapResource = new Type.MapResource[Variables.MaxMaps];
         for (var i = 0; i < Variables.MaxMaps; i++)
         {
-            Data.MapResource[i] = new Type.MapResource();
-            Data.MapNpc[i].Npc = new Type.MapNpc[Variables.MaxMapNpcs];
             for (var x = 0; x < Variables.MaxMapNpcs; x++)
             {
-                Data.MapNpc[i].Npc[x].Vital = new int[Enum.GetValues(typeof(Vital)).Length];
-                Data.MapNpc[i].Npc[x].SkillCd = new int[Variables.MaxNpcSkills];
-                Data.MapNpc[i].Npc[x].Num = -1;
-                Data.MapNpc[i].Npc[x].SkillBuffer = -1;
+                MapNpc.Instance[i, x].Vital = new int[Enum.GetValues(typeof(Vital)).Length];
+                MapNpc.Instance[i, x].SkillCd = new int[Variables.MaxNpcSkills];
+                MapNpc.Instance[i, x].Num = -1;
+                MapNpc.Instance[i, x].SkillBuffer = -1;
             }
 
             for (var x = 0; x < Variables.MaxMapItems; x++)
             {
-                Data.MapItem[i, x].Num = -1;
+                MapItem.Instance[i, x].Num = -1;
             }
         }
         

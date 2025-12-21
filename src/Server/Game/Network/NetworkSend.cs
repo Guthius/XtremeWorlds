@@ -778,35 +778,35 @@ public static class NetworkSend
 
         for (var i = 0; i < Core.Globals.Variables.MaxMapItems; i++)
         {
-            packetWriter.WriteInt32(Data.MapItem[mapNum, i].Num);
-            packetWriter.WriteInt32(Data.MapItem[mapNum, i].Value);
-            packetWriter.WriteInt32(Data.MapItem[mapNum, i].X);
-            packetWriter.WriteInt32(Data.MapItem[mapNum, i].Y);
+            packetWriter.WriteInt32(MapItem.Instance[mapNum, i].Num);
+            packetWriter.WriteInt32(MapItem.Instance[mapNum, i].Value);
+            packetWriter.WriteInt32(MapItem.Instance[mapNum, i].X);
+            packetWriter.WriteInt32(MapItem.Instance[mapNum, i].Y);
         }
 
         for (var i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
         {
-            packetWriter.WriteInt32(Data.MapNpc[mapNum].Npc[i].Num);
-            packetWriter.WriteInt32(Data.MapNpc[mapNum].Npc[i].X);
-            packetWriter.WriteInt32(Data.MapNpc[mapNum].Npc[i].Y);
-            packetWriter.WriteByte(Data.MapNpc[mapNum].Npc[i].Dir);
+            packetWriter.WriteInt32(MapNpc.Instance[mapNum, i].Num);
+            packetWriter.WriteInt32(MapNpc.Instance[mapNum, i].X);
+            packetWriter.WriteInt32(MapNpc.Instance[mapNum, i].Y);
+            packetWriter.WriteByte(MapNpc.Instance[mapNum, i].Dir);
 
             for (var x = 0; x < VitalCount; x++)
             {
-                packetWriter.WriteInt32(Data.MapNpc[mapNum].Npc[i].Vital[x]);
+                packetWriter.WriteInt32(MapNpc.Instance[mapNum, i].Vital[x]);
             }
         }
 
-        if (Data.MapResource[GetPlayerMap(playerId)].ResourceCount > 0)
+        if (MapResource.Instance[GetPlayerMap(playerId)].ResourceCount > 0)
         {
             packetWriter.WriteInt32(1);
-            packetWriter.WriteInt32(Data.MapResource[GetPlayerMap(playerId)].ResourceCount);
+            packetWriter.WriteInt32(MapResource.Instance[GetPlayerMap(playerId)].ResourceCount);
 
-            for (var i = 0; i < Data.MapResource[GetPlayerMap(playerId)].ResourceCount; i++)
+            for (var i = 0; i < MapResource.Instance[GetPlayerMap(playerId)].ResourceCount; i++)
             {
-                packetWriter.WriteByte(Data.MapResource[GetPlayerMap(playerId)].ResourceData[i].State);
-                packetWriter.WriteInt32(Data.MapResource[GetPlayerMap(playerId)].ResourceData[i].X);
-                packetWriter.WriteInt32(Data.MapResource[GetPlayerMap(playerId)].ResourceData[i].Y);
+                packetWriter.WriteByte(MapResource.Instance[GetPlayerMap(playerId)].ResourceData[i].State);
+                packetWriter.WriteInt32(MapResource.Instance[GetPlayerMap(playerId)].ResourceData[i].X);
+                packetWriter.WriteInt32(MapResource.Instance[GetPlayerMap(playerId)].ResourceData[i].Y);
             }
         }
         else
@@ -1272,10 +1272,10 @@ public static class NetworkSend
 
         packet.WriteEnum(ServerPackets.SMapItemData);
         packet.WriteByte((byte)mapSlot);
-        packet.WriteInt32(Data.MapItem[mapNum, mapSlot].Num);
-        packet.WriteInt32(Data.MapItem[mapNum, mapSlot].Value);
-        packet.WriteInt32(Data.MapItem[mapNum, mapSlot].X);
-        packet.WriteInt32(Data.MapItem[mapNum, mapSlot].Y);
+        packet.WriteInt32(MapItem.Instance[mapNum, mapSlot].Num);
+        packet.WriteInt32(MapItem.Instance[mapNum, mapSlot].Value);
+        packet.WriteInt32(MapItem.Instance[mapNum, mapSlot].X);
+        packet.WriteInt32(MapItem.Instance[mapNum, mapSlot].Y);
 
         NetworkConfig.SendDataToMap(mapNum, packet.GetBytes());
     }
@@ -1288,10 +1288,10 @@ public static class NetworkSend
 
         for (var i = 0; i < Core.Globals.Variables.MaxMapItems; i++)
         {
-            packet.WriteInt32(Data.MapItem[mapNum, i].Num);
-            packet.WriteInt32(Data.MapItem[mapNum, i].Value);
-            packet.WriteInt32(Data.MapItem[mapNum, i].X);
-            packet.WriteInt32(Data.MapItem[mapNum, i].Y);
+            packet.WriteInt32(MapItem.Instance[mapNum, i].Num);
+            packet.WriteInt32(MapItem.Instance[mapNum, i].Value);
+            packet.WriteInt32(MapItem.Instance[mapNum, i].X);
+            packet.WriteInt32(MapItem.Instance[mapNum, i].Y);
         }
 
         NetworkConfig.SendDataToMap(mapNum, packet.GetBytes());
@@ -1462,15 +1462,15 @@ public static class NetworkSend
         var packet = new PacketWriter();
 
         packet.WriteEnum(ServerPackets.SMapResource);
-        packet.WriteInt32(Data.MapResource[mapNum].ResourceCount);
+        packet.WriteInt32(MapResource.Instance[mapNum].ResourceCount);
 
-        if (Data.MapResource[mapNum].ResourceCount > 0)
+        if (MapResource.Instance[mapNum].ResourceCount > 0)
         {
-            for (var i = 0; i < Data.MapResource[mapNum].ResourceCount; i++)
+            for (var i = 0; i < MapResource.Instance[mapNum].ResourceCount; i++)
             {
-                packet.WriteByte(Data.MapResource[mapNum].ResourceData[i].State);
-                packet.WriteInt32(Data.MapResource[mapNum].ResourceData[i].X);
-                packet.WriteInt32(Data.MapResource[mapNum].ResourceData[i].Y);
+                packet.WriteByte(MapResource.Instance[mapNum].ResourceData[i].State);
+                packet.WriteInt32(MapResource.Instance[mapNum].ResourceData[i].X);
+                packet.WriteInt32(MapResource.Instance[mapNum].ResourceData[i].Y);
             }
         }
 
@@ -1853,10 +1853,10 @@ public static class NetworkSend
 
         for (var mapNpcNum = 0; mapNpcNum < Core.Globals.Variables.MaxMapNpcs; mapNpcNum++)
         {
-            packet.WriteInt32(Data.MapNpc[mapNum].Npc[mapNpcNum].Num);
-            packet.WriteInt32(Data.MapNpc[mapNum].Npc[mapNpcNum].X);
-            packet.WriteInt32(Data.MapNpc[mapNum].Npc[mapNpcNum].Y);
-            packet.WriteByte(Data.MapNpc[mapNum].Npc[mapNpcNum].Dir);
+            packet.WriteInt32(MapNpc.Instance[mapNum, mapNpcNum].Num);
+            packet.WriteInt32(MapNpc.Instance[mapNum, mapNpcNum].X);
+            packet.WriteInt32(MapNpc.Instance[mapNum, mapNpcNum].Y);
+            packet.WriteByte(MapNpc.Instance[mapNum, mapNpcNum].Dir);
         }
 
         NetworkConfig.SendDataToMap(mapNum, packet.GetBytes());
@@ -1970,7 +1970,7 @@ public static class NetworkSend
         var vitalCount = Enum.GetValues<Vital>().Length;
         for (var i = 0; i < vitalCount; i++)
         {
-            packet.WriteInt32(Data.MapNpc[mapNum].Npc[mapNpcNum].Vital[i]);
+            packet.WriteInt32(MapNpc.Instance[mapNum, mapNpcNum].Vital[i]);
         }
 
         NetworkConfig.SendDataToMap(mapNum, packet.GetBytes());

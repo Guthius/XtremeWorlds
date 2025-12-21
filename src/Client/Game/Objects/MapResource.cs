@@ -2,11 +2,14 @@ using Client;
 using Core.Globals;
 using Core.Interfaces;
 using static Core.Globals.Commands;
+using MapResourceCacheData = Core.Globals.Type.MapResourceCache;
 
 namespace Core.Objects
 {
     public class MapResource : IData
     {
+        public static MapResourceCacheData[] Instance { get; private set; } = new MapResourceCacheData[Variables.MaxResources];
+
         public static void OnClear(int index)
         {
             throw new NotImplementedException();
@@ -50,13 +53,13 @@ namespace Core.Objects
             if (!GameState.MapData)
                 return;
 
-            if (Data.MyMapResource[index].X > Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX | Data.MyMapResource[index].Y > Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)
+            if (MapResource.Instance[index].X > Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX | MapResource.Instance[index].Y > Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)
                 return;
 
-            mapResourceNum = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[Data.MyMapResource[index].X, Data.MyMapResource[index].Y].Data1;
+            mapResourceNum = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[MapResource.Instance[index].X, MapResource.Instance[index].Y].Data1;
 
             if (mapResourceNum == 0)
-                mapResourceNum = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[Data.MyMapResource[index].X, Data.MyMapResource[index].Y].Data1_2;
+                mapResourceNum = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[MapResource.Instance[index].X, MapResource.Instance[index].Y].Data1_2;
 
             Resource.OnStream(mapResourceNum);
 
@@ -64,7 +67,7 @@ namespace Core.Objects
                 return;
 
             // Get the Resource state
-            resourceState = Data.MyMapResource[index].State;
+            resourceState = MapResource.Instance[index].State;
 
             if (resourceState == 0) // normal
             {
@@ -86,8 +89,8 @@ namespace Core.Objects
             rec.Width = gfxInfo.Width;
 
             // Set base x + y, then the offset due to size
-            x = (int)Math.Round(Data.MyMapResource[index].X * Constants.TileSize - gfxInfo.Width / 2d + 16d);
-            y = Data.MyMapResource[index].Y * Constants.TileSize - gfxInfo.Height + 32;
+            x = (int)Math.Round(MapResource.Instance[index].X * Constants.TileSize - gfxInfo.Width / 2d + 16d);
+            y = MapResource.Instance[index].Y * Constants.TileSize - gfxInfo.Height + 32;
 
             if (resourceSprite < 1 | resourceSprite > GameState.NumResources)
                 return;

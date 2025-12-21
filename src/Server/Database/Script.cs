@@ -21,6 +21,8 @@ using Variables = Core.Globals.Variables;
 using Microsoft.Extensions.Logging;
 using XtremeWorlds.Server.Configuration;
 using Item = Server.Item;
+using MapItem = Server.MapItem;
+using MapNpc = Server.MapNpc;
 using Map = Server.Map;
 using Core.Globals;
 using Server.Game;
@@ -199,12 +201,12 @@ public class Script
         _isPickingUp[index] = true;
 
         // Set item in Player's inventory
-        int itemNum = Data.MapItem[mapNum, mapSlot].Num;
+        int itemNum = MapItem.Instance[mapNum, mapSlot].Num;
         SetInventory(index, invSlot, itemNum);
 
         string msg;
         var item = Item.Instance[itemNum];
-        int mapValue = Data.MapItem[mapNum, mapSlot].Value;
+        int mapValue = MapItem.Instance[mapNum, mapSlot].Value;
 
         if (item.BindType == 1)
         {
@@ -225,8 +227,8 @@ public class Script
         }
 
         // Erase item from the map
-        Data.MapItem[mapNum, mapSlot].Num = -1;
-        Data.MapItem[mapNum, mapSlot].Value = 0;
+        MapItem.Instance[mapNum, mapSlot].Num = -1;
+        MapItem.Instance[mapNum, mapSlot].Value = 0;
         NetworkSend.SendMapItemToAll(mapNum, mapSlot);
         NetworkSend.SendInventoryUpdate(index, invSlot);
         NetworkSend.SendActionMessage(GetPlayerMap(index), msg, (int)ColorName.White, (byte)ActionMessageType.Static, GetPlayerX(index) * 32, GetPlayerY(index) * 32);
@@ -629,12 +631,12 @@ public class Script
             }
         }
 
-        for (int i = 0; i < Data.MapNpc.Length; i++)
+        for (int i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
         {
-            if (Data.MapNpc[GetPlayerMap(index)].Npc[i].TargetType == (byte)TargetType.Player & Data.MapNpc[GetPlayerMap(index)].Npc[i].Target == index)
+            if (MapNpc.Instance[GetPlayerMap(index), i].TargetType == (byte)TargetType.Player & MapNpc.Instance[GetPlayerMap(index), i].Target == index)
             {
-                Data.MapNpc[GetPlayerMap(index)].Npc[i].TargetType = 0;
-                Data.MapNpc[GetPlayerMap(index)].Npc[i].Target = -1;
+                MapNpc.Instance[GetPlayerMap(index), i].TargetType = 0;
+                MapNpc.Instance[GetPlayerMap(index), i].Target = -1;
             }
         }
 
@@ -955,13 +957,13 @@ public class Script
         {
             var map = target.Map;
             var mapNpcNum = target.Id;
-            if (map >= 0 && map < Data.MapNpc.Length && mapNpcNum >= 0 && mapNpcNum < Data.MapNpc.Length)
+            if (map >= 0 && map < Core.Globals.Variables.MaxMaps && mapNpcNum >= 0 && mapNpcNum < Core.Globals.Variables.MaxMapNpcs)
             {
                 // Loot
                 DropNpcLoot(map, mapNpcNum);
 
                 // Mark dead & schedule respawn with a 60-second countdown via action messages
-                ref var mapNpc = ref Data.MapNpc[map].Npc[mapNpcNum];
+                ref var mapNpc = ref MapNpc.Instance[map, mapNpcNum];
                 var deathTimerMs = DeathSpawnTimeMs;
                 var currentTime = (int)General.GetTimeMs();
                 
@@ -982,12 +984,12 @@ public class Script
                 mapNpc.Target = -1;
                 mapNpc.TargetType = 0;
 
-                for (int i = 0; i < Data.MapNpc.Length; i++)
+                for (int i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
                 {
-                    if (Data.MapNpc[map].Npc[i].TargetType == (byte)TargetType.Npc && Data.MapNpc[map].Npc[i].Target == mapNpcNum)
+                    if (MapNpc.Instance[map, i].TargetType == (byte)TargetType.Npc && MapNpc.Instance[map, i].Target == mapNpcNum)
                     {
-                        Data.MapNpc[map].Npc[i].TargetType = 0;
-                        Data.MapNpc[map].Npc[i].Target = -1;
+                        MapNpc.Instance[map, i].TargetType = 0;
+                        MapNpc.Instance[map, i].Target = -1;
                     }
                 }
 
@@ -1104,9 +1106,9 @@ public class Script
             // Acquire underlying map npc to set target persistent
             var map = target.Map;
             var mapNpcIndex = target.Id;
-            if (map >= 0 && map < Data.MapNpc.Length && mapNpcIndex >= 0 && mapNpcIndex < Data.MapNpc.Length)
+            if (map >= 0 && map < Core.Globals.Variables.MaxMaps && mapNpcIndex >= 0 && mapNpcIndex < Core.Globals.Variables.MaxMapNpcs)
             {
-                ref var baseNpc = ref Data.MapNpc[map].Npc[mapNpcIndex];
+                ref var baseNpc = ref MapNpc.Instance[map, mapNpcIndex];
                 // Always switch target to the attacker on hit for snappy aggro behavior
                 if (attacker.Type == Entity.EntityType.Player)
                 {
@@ -1131,9 +1133,9 @@ public class Script
         {
             var map = attacker.Map;
             var mapNpcIndex = attacker.Id;
-            if (map >= 0 && map < Data.MapNpc.Length && mapNpcIndex >= 0 && mapNpcIndex < Data.MapNpc.Length)
+            if (map >= 0 && map < Core.Globals.Variables.MaxMaps && mapNpcIndex >= 0 && mapNpcIndex < Core.Globals.Variables.MaxMapNpcs)
             {
-                ref var baseNpc = ref Data.MapNpc[map].Npc[mapNpcIndex];
+                ref var baseNpc = ref MapNpc.Instance[map, mapNpcIndex];
                 if (baseNpc.TargetType == 0)
                 {
                     if (target.Type == Entity.EntityType.Player)
@@ -1512,9 +1514,9 @@ public class Script
         }
         else if (target.Type == Core.Globals.Entity.EntityType.Npc)
         {
-            if (target.Map < 0 || target.Map >= Data.MapNpc.Length) return;
-            if (target.Id < 0 || target.Id >= Data.MapNpc.Length) return;
-            ref var mapNpc = ref Data.MapNpc[target.Map].Npc[target.Id];
+            if (target.Map < 0 || target.Map >= Core.Globals.Variables.MaxMaps) return;
+            if (target.Id < 0 || target.Id >= Core.Globals.Variables.MaxMapNpcs) return;
+            ref var mapNpc = ref MapNpc.Instance[target.Map, target.Id];
             if (mapNpc.Num < 0) return;
             int id = (int)vital;
             if (mapNpc.Vital == null || id < 0 || id >= mapNpc.Vital.Length) return;
@@ -1802,15 +1804,15 @@ public class Script
             }
         }
         // NPCs
-        if (mapNum >= 0 && mapNum < Data.MapNpc.Length)
+        if (mapNum >= 0 && mapNum < Core.Globals.Variables.MaxMaps)
         {
-            for (int i = 0; i < Data.MapNpc.Length; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
             {
-                ref var mn = ref Data.MapNpc[mapNum].Npc[i];
+                ref var mn = ref MapNpc.Instance[mapNum, i];
                 if (mn.Num < 0) continue;
                 if (mn.X == tx && mn.Y == ty)
                 {
-                    var e = Core.Globals.Entity.FromNpc(i, Data.MapNpc[mapNum].Npc[i]);
+                    var e = Core.Globals.Entity.FromNpc(i, MapNpc.Instance[mapNum, i]);
                     e.Map = mapNum;
                     return e;
                 }
@@ -1845,16 +1847,16 @@ public class Script
         }
 
         // NPCs via map data (avoid LINQ)
-        if (mapNum >= 0 && mapNum < Data.MapNpc.Length)
+        if (mapNum >= 0 && mapNum < Core.Globals.Variables.MaxMaps)
         {
-            for (int i = 0; i < Data.MapNpc.Length; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
             {
-                if (Data.MapNpc[mapNum].Npc[i].Num < 0) continue;
-                int nx = Data.MapNpc[mapNum].Npc[i].X / Constants.TileSize;
-                int ny = Data.MapNpc[mapNum].Npc[i].Y / Constants.TileSize;
+                if (MapNpc.Instance[mapNum, i].Num < 0) continue;
+                int nx = MapNpc.Instance[mapNum, i].X / Constants.TileSize;
+                int ny = MapNpc.Instance[mapNum, i].Y / Constants.TileSize;
                 if (Math.Abs(nx - centerX) <= radius && Math.Abs(ny - centerY) <= radius)
                 {
-                    var npcEntity = Core.Globals.Entity.FromNpc(i, Data.MapNpc[mapNum].Npc[i]);
+                    var npcEntity = Core.Globals.Entity.FromNpc(i, MapNpc.Instance[mapNum, i]);
                     npcEntity.Map = mapNum;
                     if (isDamage) AttemptAttack(caster, npcEntity, skillId);
                     if (isHeal) AdjustVital(npcEntity, vital, skill.Vital, true, skillId, mapNum, caster);
@@ -1933,9 +1935,9 @@ public class Script
         else if (caster.Type == Core.Globals.Entity.EntityType.Npc)
         {
             // Set NPC cooldown on the slot that matches this skillId
-            if (caster.Map >= 0 && caster.Map < Data.MapNpc.Length && caster.Id >= 0 && caster.Id < Data.MapNpc.Length)
+            if (caster.Map >= 0 && caster.Map < Core.Globals.Variables.MaxMaps && caster.Id >= 0 && caster.Id < Core.Globals.Variables.MaxMapNpcs)
             {
-                ref var baseNpc = ref Data.MapNpc[caster.Map].Npc[caster.Id];
+                ref var baseNpc = ref MapNpc.Instance[caster.Map, caster.Id];
                 var npcTemplate = caster.Num >= 0 && caster.Num < Data.Npc.Length ? Data.Npc[caster.Num] : default;
                 if (npcTemplate.Skill != null && baseNpc.SkillCd != null)
                 {
@@ -2040,9 +2042,9 @@ public class Script
             {
                 var mapNpcNum = target.Id; // id is map npc index
                 var hpIndex = (int)Core.Globals.Vital.Health;
-                var current = Data.MapNpc[map].Npc[mapNpcNum].Vital[hpIndex];
+                var current = MapNpc.Instance[map, mapNpcNum].Vital[hpIndex];
                 var newHp = Math.Max(0, current - final);
-                Data.MapNpc[map].Npc[mapNpcNum].Vital[hpIndex] = newHp;
+                MapNpc.Instance[map, mapNpcNum].Vital[hpIndex] = newHp;
                 NetworkSend.SendActionMessage(map, "-" + final, (int)ColorName.BrightRed, 1, tx, ty);
                 if (newHp > 0)
                 {
@@ -2060,9 +2062,9 @@ public class Script
         }
         else if (entity.Type == Entity.EntityType.Npc)
         {
-            if (entity.Map >= 0 && entity.Map < Data.MapNpc.Length && entity.Id >= 0 && entity.Id < Data.MapNpc.Length)
+            if (entity.Map >= 0 && entity.Map < Core.Globals.Variables.MaxMaps && entity.Id >= 0 && entity.Id < Core.Globals.Variables.MaxMapNpcs)
             {
-                Data.MapNpc[entity.Map].Npc[entity.Id].AttackTimer = newTime;
+                MapNpc.Instance[entity.Map, entity.Id].AttackTimer = newTime;
             }
         }
     }
@@ -2085,9 +2087,9 @@ public class Script
         var before = target.Vital != null ? target.Vital[(int)Core.Globals.Vital.Health] : 0;
         ApplyDamage(attacker, target, dmg, skillId);
         var after = target.Type == Entity.EntityType.Player ? GetPlayerVital(target.Id, Core.Globals.Vital.Health) : (target.Vital != null ? target.Vital[(int)Core.Globals.Vital.Health] : 0);
-        if (target.Type == Entity.EntityType.Npc && target.Map >= 0 && target.Map < Data.MapNpc.Length && target.Id >= 0 && target.Id < Data.MapNpc.Length)
+        if (target.Type == Entity.EntityType.Npc && target.Map >= 0 && target.Map < Core.Globals.Variables.MaxMaps && target.Id >= 0 && target.Id < Core.Globals.Variables.MaxMapNpcs)
         {
-            after = Data.MapNpc[target.Map].Npc[target.Id].Vital[(int)Core.Globals.Vital.Health];
+            after = MapNpc.Instance[target.Map, target.Id].Vital[(int)Core.Globals.Vital.Health];
         }
         return before > 0 && after <= 0; // HandleDeath already executed if true
     }
@@ -2149,20 +2151,20 @@ public class Script
             else if (target.Type == Entity.EntityType.Npc)
             {
                 // Ensure no other NPC occupying
-                for (int mi = 0; mi < Data.MapNpc.Length; mi++)
+                for (int mi = 0; mi < Core.Globals.Variables.MaxMapNpcs; mi++)
                 {
                     if (mi == target.Id) continue;
-                    if (Data.MapNpc[map].Npc[mi].Num >= 0 && Data.MapNpc[map].Npc[mi].X/32 == nx && Data.MapNpc[map].Npc[mi].Y/32 == ny) { occ = true; break; }
+                    if (MapNpc.Instance[map, mi].Num >= 0 && MapNpc.Instance[map, mi].X/32 == nx && MapNpc.Instance[map, mi].Y/32 == ny) { occ = true; break; }
                 }
                 if (!occ)
                 {
-                    Data.MapNpc[map].Npc[target.Id].X = nx * 32;
-                    Data.MapNpc[map].Npc[target.Id].Y = ny * 32;
+                    MapNpc.Instance[map, target.Id].X = nx * 32;
+                    MapNpc.Instance[map, target.Id].Y = ny * 32;
                     // Notify clients by sending SNpcDir (keeps anim simple) and vitals/position via SMapNpcData on next sync
                     var stopPacket = new Core.Net.PacketWriter(9);
                     stopPacket.WriteEnum(ServerPackets.SNpcDir);
                     stopPacket.WriteInt32(target.Id);
-                    stopPacket.WriteByte(Data.MapNpc[map].Npc[target.Id].Dir);
+                    stopPacket.WriteByte(MapNpc.Instance[map, target.Id].Dir);
                     NetworkConfig.SendDataToMap(map, stopPacket.GetBytes());
                 }
                 else break;
@@ -2172,8 +2174,8 @@ public class Script
 
     private void DropNpcLoot(int mapNum, int mapNpcNum)
     {
-        if (mapNum < 0 || mapNum >= Data.MapNpc.Length) return;
-        ref var mapNpc = ref Data.MapNpc[mapNum].Npc[mapNpcNum];
+        if (mapNum < 0 || mapNum >= Core.Globals.Variables.MaxMaps) return;
+        ref var mapNpc = ref MapNpc.Instance[mapNum, mapNpcNum];
         var npcNum = mapNpc.Num;
         if (npcNum < 0 || npcNum >= Data.Npc.Length) return;
         // Simple single-roll logic similar to legacy: choose one drop slot 0-4

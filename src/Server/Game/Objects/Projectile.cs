@@ -28,7 +28,7 @@ public class Projectile : ProjectileBase, IData, IAsyncData
         }
         else if (mp.OwnerType == (byte)TargetType.Npc)
         {
-            attackerEntity = Core.Globals.Entity.FromNpc(mp.Owner, Data.MapNpc[map].Npc[mp.Owner]);
+            attackerEntity = Core.Globals.Entity.FromNpc(mp.Owner, MapNpc.Instance[map, mp.Owner]);
             attackerEntity.Map = map;
         }
 
@@ -67,7 +67,7 @@ public class Projectile : ProjectileBase, IData, IAsyncData
         // Then NPC target at tile excluding owner NPC
         for (int n = 0; n < Core.Globals.Variables.MaxMapNpcs; n++)
         {
-            ref var mn = ref Data.MapNpc[map].Npc[n];
+            ref var mn = ref MapNpc.Instance[map, n];
             if (mn.Num < 0) continue;
             if (mn.X == tileX && mn.Y == tileY)
             {
@@ -287,18 +287,18 @@ public class Projectile : ProjectileBase, IData, IAsyncData
         }
 
         // Validate npc is present on map
-        if (mapNum < 0 || mapNum >= Data.MapNpc.Length) return;
+        if (mapNum < 0 || mapNum >= Core.Globals.Variables.MaxMaps) return;
         if (mapNpcNum < 0 || mapNpcNum >= Core.Globals.Variables.MaxMapNpcs) return;
-        if (Data.MapNpc[mapNum].Npc[mapNpcNum].Num < 0) return;
+        if (MapNpc.Instance[mapNum, mapNpcNum].Num < 0) return;
 
         ref var mapProjectile = ref Data.MapProjectile[mapNum, mapProjectileNum];
 
         mapProjectile.ProjectileNum = projectile;
         mapProjectile.Owner = mapNpcNum;
         mapProjectile.OwnerType = (byte) TargetType.Npc;
-        mapProjectile.Dir = dir >= 0 ? (byte) dir : Data.MapNpc[mapNum].Npc[mapNpcNum].Dir;
-        mapProjectile.X = Data.MapNpc[mapNum].Npc[mapNpcNum].X;
-        mapProjectile.Y = Data.MapNpc[mapNum].Npc[mapNpcNum].Y;
+        mapProjectile.Dir = dir >= 0 ? (byte) dir : MapNpc.Instance[mapNum, mapNpcNum].Dir;
+        mapProjectile.X = MapNpc.Instance[mapNum, mapNpcNum].X;
+        mapProjectile.Y = MapNpc.Instance[mapNum, mapNpcNum].Y;
         mapProjectile.SkillId = skillNum;
         mapProjectile.Range = 0;
         mapProjectile.TravelTime = General.GetTimeMs() + Math.Max(1, Projectile.Instance[projectile].Speed);
@@ -506,7 +506,7 @@ public class Projectile : ProjectileBase, IData, IAsyncData
                     // Npcs
                     for (int n = 0; n < Core.Globals.Variables.MaxMapNpcs; n++)
                     {
-                        ref var mn = ref Data.MapNpc[map].Npc[n];
+                        ref var mn = ref MapNpc.Instance[map, n];
                         if (mn.Num < 0) continue;
                         if (mn.X == tileX && mn.Y == tileY)
                         {

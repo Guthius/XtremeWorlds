@@ -1242,15 +1242,13 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         if (GameState.ResourceIndex > 0)
         {
-            Array.Resize(ref Data.MapResource, GameState.ResourceIndex);
-            Array.Resize(ref Data.MyMapResource, GameState.ResourceIndex);
 
             var loopTo = GameState.ResourceIndex;
             for (i = 0; i < loopTo; i++)
             {
-                Data.MyMapResource[i].State = buffer.ReadByte();
-                Data.MyMapResource[i].X = buffer.ReadInt32();
-                Data.MyMapResource[i].Y = buffer.ReadInt32();
+                Core.Objects.MapResource.Instance[i].State = buffer.ReadByte();
+                Core.Objects.MapResource.Instance[i].X = buffer.ReadInt32();
+                Core.Objects.MapResource.Instance[i].Y = buffer.ReadInt32();
             }
 
             GameState.ResourcesInit = true;
@@ -2052,17 +2050,15 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         {
             GameState.ResourceIndex = buffer.ReadInt32();
             GameState.ResourcesInit = false;
-            Data.MapResource = new Core.Globals.Type.MapResource[GameState.ResourceIndex];
-            Data.MyMapResource = new Core.Globals.Type.MapResourceCache[Variables.MaxResources];
 
             if (GameState.ResourceIndex > 0)
             {
                 var loopTo8 = GameState.ResourceIndex;
                 for (i = 0; i < loopTo8; i++)
                 {
-                    Data.MyMapResource[i].State = buffer.ReadByte();
-                    Data.MyMapResource[i].X = buffer.ReadInt32();
-                    Data.MyMapResource[i].Y = buffer.ReadInt32();
+                    Core.Objects.MapResource.Instance[i].State = buffer.ReadByte();
+                    Core.Objects.MapResource.Instance[i].X = buffer.ReadInt32();
+                    Core.Objects.MapResource.Instance[i].Y = buffer.ReadInt32();
                 }
 
                 GameState.ResourcesInit = true;

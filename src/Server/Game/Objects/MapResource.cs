@@ -3,11 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using static Core.Globals.Commands;
+using MapResourceCacheData = Core.Globals.Type.MapResource;
 
 namespace Server
 {
     public static class MapResource
     {
+        public static MapResourceCacheData[] Instance { get; private set; } = new MapResourceCacheData[Variables.MaxResources];
         public static void OnUpdate(int mapNum)
         {
             var resourceCount = 0;
@@ -24,15 +26,15 @@ namespace Server
 
                     resourceCount++;
 
-                    Array.Resize(ref Data.MapResource[mapNum].ResourceData, resourceCount);
+                    Array.Resize(ref MapResource.Instance[mapNum].ResourceData, resourceCount);
 
-                    Data.MapResource[mapNum].ResourceData[resourceCount - 1].X = x;
-                    Data.MapResource[mapNum].ResourceData[resourceCount - 1].Y = y;
-                    Data.MapResource[mapNum].ResourceData[resourceCount - 1].Health = (byte)Resource.Instance[Server.Map.Instance[mapNum].Tile[x, y].Data1].Health;
+                    MapResource.Instance[mapNum].ResourceData[resourceCount - 1].X = x;
+                    MapResource.Instance[mapNum].ResourceData[resourceCount - 1].Y = y;
+                    MapResource.Instance[mapNum].ResourceData[resourceCount - 1].Health = (byte)Resource.Instance[Server.Map.Instance[mapNum].Tile[x, y].Data1].Health;
                 }
             }
 
-            Data.MapResource[mapNum].ResourceCount = resourceCount;
+            MapResource.Instance[mapNum].ResourceCount = resourceCount;
         }
 
         public static void OnLevel(int playerId, int skillSlot)
@@ -86,10 +88,10 @@ namespace Server
             var resourceIndex = Server.Map.Instance[mapNum].Tile[x, y].Data1;
             var resourceType = (byte)Resource.Instance[resourceIndex].ResourceType;
 
-            for (var i = 0; i < Data.MapResource[mapNum].ResourceCount; i++)
+            for (var i = 0; i < MapResource.Instance[mapNum].ResourceCount; i++)
             {
-                if (Data.MapResource[mapNum].ResourceData[i].X == x &&
-                    Data.MapResource[mapNum].ResourceData[i].Y == y)
+                if (MapResource.Instance[mapNum].ResourceData[i].X == x &&
+                    MapResource.Instance[mapNum].ResourceData[i].Y == y)
                 {
                     resourceNum = i;
                 }
@@ -127,14 +129,14 @@ namespace Server
                 return;
             }
 
-            if (Data.MapResource[mapNum].ResourceData[resourceNum].State != 0)
+            if (MapResource.Instance[mapNum].ResourceData[resourceNum].State != 0)
             {
                 NetworkSend.SendActionMessage(mapNum, Resource.Instance[resourceIndex].EmptyMessage, (int)ColorName.BrightRed, 1, GetPlayerX(playerId) * 32, GetPlayerY(playerId) * 32);
                 return;
             }
 
-            var resourceX = Data.MapResource[mapNum].ResourceData[resourceNum].X;
-            var resourceY = Data.MapResource[mapNum].ResourceData[resourceNum].Y;
+            var resourceX = MapResource.Instance[mapNum].ResourceData[resourceNum].X;
+            var resourceY = MapResource.Instance[mapNum].ResourceData[resourceNum].Y;
 
             int damage;
             if (Resource.Instance[resourceIndex].ToolRequired == 0)
@@ -152,17 +154,17 @@ namespace Server
                 return;
             }
 
-            if (Data.MapResource[mapNum].ResourceData[resourceNum].Health - damage >= 0)
+            if (MapResource.Instance[mapNum].ResourceData[resourceNum].Health - damage >= 0)
             {
-                Data.MapResource[mapNum].ResourceData[resourceNum].Health = (byte)(Data.MapResource[mapNum].ResourceData[resourceNum].Health - damage);
+                MapResource.Instance[mapNum].ResourceData[resourceNum].Health = (byte)(MapResource.Instance[mapNum].ResourceData[resourceNum].Health - damage);
                 NetworkSend.SendActionMessage(mapNum, "-" + damage, (int)ColorName.BrightRed, 1, resourceX * 32, resourceY * 32);
                 NetworkSend.SendAnimation(mapNum, Resource.Instance[resourceIndex].Animation, resourceX, resourceY);
 
                 return;
             }
 
-            Data.MapResource[mapNum].ResourceData[resourceNum].State = 0; // Cut
-            Data.MapResource[mapNum].ResourceData[resourceNum].Timer = General.GetTimeMs();
+            MapResource.Instance[mapNum].ResourceData[resourceNum].State = 0; // Cut
+            MapResource.Instance[mapNum].ResourceData[resourceNum].Timer = General.GetTimeMs();
 
             NetworkSend.SendMapResourceToMap(mapNum);
 

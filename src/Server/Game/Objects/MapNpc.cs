@@ -7,11 +7,14 @@ using System.Text;
 using static Core.Net.Packets;
 using static Core.Globals.Commands;
 using Server.Game;
+using MapNpcData = Core.Globals.Type.MapNpc;
 
 namespace Server
 {
     public class MapNpc
     {
+        public static MapNpcData[,] Instance { get; } = new MapNpcData[Core.Globals.Variables.MaxMaps, Core.Globals.Variables.MaxMapNpcs];
+
         // Tracks remaining pixels to finish the current tile step for each npc on each map.
         private static readonly int[,] _stepRemaining = new int[Core.Globals.Variables.MaxMaps, Core.Globals.Variables.MaxMapNpcs];
 
@@ -21,10 +24,10 @@ namespace Server
         public static void Clear(int index, int mapNum)
         {
             var count = Enum.GetValues(typeof(Vital)).Length;
-            Data.MapNpc[mapNum].Npc[index].Vital = new int[count];
-            Data.MapNpc[mapNum].Npc[index].SkillCd = new int[Core.Globals.Variables.MaxNpcSkills];
-            Data.MapNpc[mapNum].Npc[index].Num = -1;
-            Data.MapNpc[mapNum].Npc[index].SkillBuffer = -1;
+            Instance[mapNum, index].Vital = new int[count];
+            Instance[mapNum, index].SkillCd = new int[Core.Globals.Variables.MaxNpcSkills];
+            Instance[mapNum, index].Num = -1;
+            Instance[mapNum, index].SkillBuffer = -1;
         }
 
 
@@ -75,17 +78,17 @@ namespace Server
                 return;
             }
 
-            Data.MapNpc[mapNum].Npc[mapNpcNum].Num = npcNum;
-            Data.MapNpc[mapNum].Npc[mapNpcNum].Target = 0;
-            Data.MapNpc[mapNum].Npc[mapNpcNum].TargetType = 0; // Clear
+            Instance[mapNum, mapNpcNum].Num = npcNum;
+            Instance[mapNum, mapNpcNum].Target = 0;
+            Instance[mapNum, mapNpcNum].TargetType = 0; // Clear
 
             var vitals = Enum.GetValues<Vital>();
             foreach (var vital in vitals)
             {
-                Data.MapNpc[mapNum].Npc[mapNpcNum].Vital[(int) vital] = GameLogic.GetNpcMaxVital(npcNum, vital);
+                Instance[mapNum, mapNpcNum].Vital[(int) vital] = GameLogic.GetNpcMaxVital(npcNum, vital);
             }
             
-            Data.MapNpc[mapNum].Npc[mapNpcNum].Dir = (byte) (Random.Shared.NextDouble() * 4f);
+            Instance[mapNum, mapNpcNum].Dir = (byte) (Random.Shared.NextDouble() * 4f);
 
             for (var x = 0; x < Server.Map.Instance[mapNum].MaxX; x++)
             {
@@ -97,9 +100,9 @@ namespace Server
                     if (!isPrimaryMatch && !isSecondaryMatch)
                         continue;
 
-                    Data.MapNpc[mapNum].Npc[mapNpcNum].X = x * 32;
-                    Data.MapNpc[mapNum].Npc[mapNpcNum].Y = y * 32;
-                    Data.MapNpc[mapNum].Npc[mapNpcNum].Dir = (byte)(isPrimaryMatch ? tile.Data2 : tile.Data2_2);
+                    Instance[mapNum, mapNpcNum].X = x * 32;
+                    Instance[mapNum, mapNpcNum].Y = y * 32;
+                    Instance[mapNum, mapNpcNum].Dir = (byte)(isPrimaryMatch ? tile.Data2 : tile.Data2_2);
 
                     spawned = true;
                     break;
@@ -120,8 +123,8 @@ namespace Server
 
                     if (TileIsOpen(mapNum, x, y))
                     {
-                        Data.MapNpc[mapNum].Npc[mapNpcNum].X = x * 32;
-                        Data.MapNpc[mapNum].Npc[mapNpcNum].Y = y * 32;
+                        Instance[mapNum, mapNpcNum].X = x * 32;
+                        Instance[mapNum, mapNpcNum].Y = y * 32;
 
                         spawned = true;
                         break;
@@ -143,8 +146,8 @@ namespace Server
                             continue;
                         }
 
-                        Data.MapNpc[mapNum].Npc[mapNpcNum].X = x * 32;
-                        Data.MapNpc[mapNum].Npc[mapNpcNum].Y = y * 32;
+                        Instance[mapNum, mapNpcNum].X = x * 32;
+                        Instance[mapNum, mapNpcNum].Y = y * 32;
 
                         spawned = true;
                     }
@@ -158,15 +161,15 @@ namespace Server
 
                 packet.WriteInt32((int) ServerPackets.SSpawnNpc);
                 packet.WriteInt32(mapNpcNum);
-                packet.WriteInt32(Data.MapNpc[mapNum].Npc[mapNpcNum].Num);
-                packet.WriteInt32(Data.MapNpc[mapNum].Npc[mapNpcNum].X);
-                packet.WriteInt32(Data.MapNpc[mapNum].Npc[mapNpcNum].Y);
-                packet.WriteByte(Data.MapNpc[mapNum].Npc[mapNpcNum].Dir);
+                packet.WriteInt32(Instance[mapNum, mapNpcNum].Num);
+                packet.WriteInt32(Instance[mapNum, mapNpcNum].X);
+                packet.WriteInt32(Instance[mapNum, mapNpcNum].Y);
+                packet.WriteByte(Instance[mapNum, mapNpcNum].Dir);
 
                 var vitalCount = Enum.GetValues<Vital>().Length;
                 for (var i = 0; i < vitalCount; i++)
                 {
-                    packet.WriteInt32(Data.MapNpc[mapNum].Npc[mapNpcNum].Vital[i]);
+                    packet.WriteInt32(Instance[mapNum, mapNpcNum].Vital[i]);
                 }
 
                 NetworkConfig.SendDataToMap(mapNum, packet.GetBytes());
@@ -189,9 +192,9 @@ namespace Server
 
             for (var mapNpcNum = 0; mapNpcNum < Core.Globals.Variables.MaxMapNpcs; mapNpcNum++)
             {
-                if (Data.MapNpc[mapNum].Npc[mapNpcNum].Num >= 0 &&
-                    Data.MapNpc[mapNum].Npc[mapNpcNum].X == x &&
-                    Data.MapNpc[mapNum].Npc[mapNpcNum].Y == y)
+                if (Instance[mapNum, mapNpcNum].Num >= 0 &&
+                    Instance[mapNum, mapNpcNum].X == x &&
+                    Instance[mapNum, mapNpcNum].Y == y)
                 {
                     return false;
                 }
@@ -218,10 +221,10 @@ namespace Server
                 return false;
             }
 
-            var x = Data.MapNpc[mapNum].Npc[mapNpcNum].X;
-            var y = Data.MapNpc[mapNum].Npc[mapNpcNum].Y;
+            var x = Instance[mapNum, mapNpcNum].X;
+            var y = Instance[mapNum, mapNpcNum].Y;
             // If already in mid-move, don't allow a new tile move.
-            if (Data.MapNpc[mapNum].Npc[mapNpcNum].Moving == (byte)MovementState.Walking && _stepRemaining[mapNum, mapNpcNum] > 0)
+            if (Instance[mapNum, mapNpcNum].Moving == (byte)MovementState.Walking && _stepRemaining[mapNum, mapNpcNum] > 0)
                 return false;
 
             int tileX = x / Constants.TileSize;
@@ -268,9 +271,9 @@ namespace Server
             for (var i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
             {
                 if (i == mapNpcNum) continue;
-                if (Data.MapNpc[mapNum].Npc[i].Num < 0) continue;
-                int npcTileX = (int)Math.Floor((double)Data.MapNpc[mapNum].Npc[i].X / Constants.TileSize);
-                int npcTileY = (int)Math.Floor((double)Data.MapNpc[mapNum].Npc[i].Y / Constants.TileSize);
+                if (Instance[mapNum, i].Num < 0) continue;
+                int npcTileX = (int)Math.Floor((double)Instance[mapNum, i].X / Constants.TileSize);
+                int npcTileY = (int)Math.Floor((double)Instance[mapNum, i].Y / Constants.TileSize);
                 if (npcTileX == nextTileX && npcTileY == nextTileY)
                 {
                     return false;
@@ -278,7 +281,7 @@ namespace Server
             }
 
             // Prevent movement if skill buffer is active
-            if (Data.MapNpc[mapNum].Npc[mapNpcNum].SkillBuffer >= 0)
+            if (Instance[mapNum, mapNpcNum].SkillBuffer >= 0)
             {
                 return false;
             }
@@ -295,21 +298,21 @@ namespace Server
                 return;
             }
             // If already walking mid-step, ignore duplicate start.
-            if (Data.MapNpc[mapNum].Npc[mapNpcNum].Moving == (byte)MovementState.Walking && _stepRemaining[mapNum, mapNpcNum] > 0)
+            if (Instance[mapNum, mapNpcNum].Moving == (byte)MovementState.Walking && _stepRemaining[mapNum, mapNpcNum] > 0)
                 return;
 
             // Begin a new tile movement: set dir, movement state, step counter (32px)
-            Data.MapNpc[mapNum].Npc[mapNpcNum].Dir = dir;
-            Data.MapNpc[mapNum].Npc[mapNpcNum].Moving = (byte)MovementState.Walking;
+            Instance[mapNum, mapNpcNum].Dir = dir;
+            Instance[mapNum, mapNpcNum].Moving = (byte)MovementState.Walking;
             _stepRemaining[mapNum, mapNpcNum] = 32; // pixels to travel
 
             // Send start-of-move packet (position unchanged); client will animate pixel stepping locally.
             var buffer = new PacketWriter(4);
             buffer.WriteEnum(ServerPackets.SNpcMove);
             buffer.WriteInt32(mapNpcNum);
-            buffer.WriteInt32(Data.MapNpc[mapNum].Npc[mapNpcNum].X);
-            buffer.WriteInt32(Data.MapNpc[mapNum].Npc[mapNpcNum].Y);
-            buffer.WriteByte(Data.MapNpc[mapNum].Npc[mapNpcNum].Dir);
+            buffer.WriteInt32(Instance[mapNum, mapNpcNum].X);
+            buffer.WriteInt32(Instance[mapNum, mapNpcNum].Y);
+            buffer.WriteByte(Instance[mapNum, mapNpcNum].Dir);
             buffer.WriteInt32((int)MovementState.Walking);
             NetworkConfig.SendDataToMap(mapNum, buffer.GetBytes());
         }
@@ -325,8 +328,7 @@ namespace Server
             {
                 for (int i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
                 {
-                    if (Data.MapNpc[map].Npc == null) break;
-                    ref var npc = ref Data.MapNpc[map].Npc[i];
+                    ref var npc = ref Instance[map, i];
                     if (npc.Num < 0) continue;
                     if (npc.Moving != (byte)MovementState.Walking) continue;
                     if (_stepRemaining[map, i] <= 0) continue;
@@ -375,7 +377,7 @@ namespace Server
                 return;
             }
 
-            Data.MapNpc[mapNum].Npc[mapNpcNum].Dir = dir;
+            Instance[mapNum, mapNpcNum].Dir = dir;
 
             var packet = new PacketWriter(9);
 
@@ -412,7 +414,7 @@ namespace Server
         public static bool TryStartNextStepNow(int mapNum, int mapNpcNum)
         {
             if (mapNum < 0 || mapNum >= Core.Globals.Variables.MaxMaps || mapNpcNum < 0 || mapNpcNum >= Core.Globals.Variables.MaxMapNpcs) return false;
-            ref var npc = ref Data.MapNpc[mapNum].Npc[mapNpcNum];
+            ref var npc = ref Instance[mapNum, mapNpcNum];
             if (npc.Moving == (byte)MovementState.Walking && _stepRemaining[mapNum, mapNpcNum] > 0) return false;
             return TryDequeueNextStep(mapNum, mapNpcNum);
         }
