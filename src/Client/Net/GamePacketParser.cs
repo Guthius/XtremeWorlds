@@ -2090,13 +2090,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         GameState.GettingMap = false;
         GameState.CanMoveNow = true;
-
-        GameState.MyEditorType = EditorType.Map;
-        GameState.EditorIndex = 0;
-        WindowManager.ShowWindow("winMapEditor");
-        Client.Game.UI.Windows.WinMapEditor.OnLoad();
-        GameState.CameraZoom = 1.0f;
-
     }
 
     public static void Packet_MapItemData(ReadOnlyMemory<byte> data)
@@ -2160,7 +2153,16 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     public static void Packet_EditMap(ReadOnlyMemory<byte> data)
     {
         var buffer = new PacketReader(data);
-        WindowManager.HideWindows();
+        GameState.InitMapEditor = true;
+        if (GameState.InitMapEditor)
+        {
+            GameState.MyEditorType = EditorType.Map;
+            GameState.EditorIndex = 0;
+            WindowManager.ShowWindow("winMapEditor");
+            Client.Game.UI.Windows.WinMapEditor.OnLoad();
+            GameState.CameraZoom = 1.0f;
+            GameState.InitMapEditor = false;
+        }
     }
 
     public static void Packet_SpawnEvent(ReadOnlyMemory<byte> data)

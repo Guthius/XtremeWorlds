@@ -377,8 +377,9 @@ public class WinMapEditor
 
     public static void OnLoad()
     {
-        var map = Data.MyMap;
+        var map = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)];
 
+        GameState.CurTileset = 1;
         map.Tileset = 1;
 
         // Name

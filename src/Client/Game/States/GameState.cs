@@ -415,6 +415,7 @@ namespace Client
         public static bool OptNoCrossing;   // No Crossing attribute
 
         // Editors
+        public static bool InitMapEditor;
         public static bool InitEditor;
         public static bool InitItemEditor;
         public static bool InitResourceEditor;

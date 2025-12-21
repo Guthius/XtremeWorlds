@@ -411,31 +411,8 @@ namespace Client
 
         public static void OnClear()
         {
-            // Reset basic map properties
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Name = string.Empty;
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tileset = 1;
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX = Variables.MaxMapX;
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY = Variables.MaxMapY;
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].BootMap = 0;
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].BootX = 0;
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].BootY = 0;
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Down = 0;
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Left = 0;
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Moral = 0;
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Music = string.Empty;
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Revision = 0;
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Right = 0;
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Up = 0;
-
-            // Initialize Npc and Tile arrays
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc = new int[Variables.MaxMapNpcs];
-
-            for (int i = 0; i < Variables.MaxMapNpcs; i++)
-            {
-                Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[i] = -1;
-            }
-
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile = new Type.Tile[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY];
+            MapBase.OnClear(GetPlayerMap(GameState.MyIndex));
+            Map.Instance.Add(new Map());
             Data.TileHistory = new Type.TileHistory[GameState.MaxTileHistory]; // Fixed type name
 
             // Reset tile history indices

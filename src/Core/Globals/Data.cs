@@ -8,7 +8,6 @@ public static class Data
     public static Skill[] Skill = new Skill[Variables.MaxSkills];
     public static MapResource[] MapResource = new MapResource[Variables.MaxResources];
     public static MapResourceCache[] MyMapResource = new MapResourceCache[Variables.MaxResources];
-    public static Map MyMap;
     public static Tile[,]? TempTile;
     public static MapItem[,] MapItem = new MapItem[Variables.MaxMaps, Variables.MaxMapItems];
     public static MapItem[] MyMapItem = new MapItem[Variables.MaxMapItems];
