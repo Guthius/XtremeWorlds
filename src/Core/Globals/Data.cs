@@ -10,9 +10,7 @@ public static class Data
     public static MapResourceCache[] MyMapResource = new MapResourceCache[Variables.MaxResources];
     public static Tile[,]? TempTile;
     public static MapItem[,] MapItem = new MapItem[Variables.MaxMaps, Variables.MaxMapItems];
-    public static MapItem[] MyMapItem = new MapItem[Variables.MaxMapItems];
     public static MapData[] MapNpc = new MapData[Variables.MaxMaps];
-    public static MapNpc[] MyMapNpc = new MapNpc[Variables.MaxMapNpcs];
     public static TempPlayer[] TempPlayer = new TempPlayer[Variables.MaxPlayers];
     public static MapProjectile[,] MapProjectile = new MapProjectile[Variables.MaxMaps, Variables.MaxProjectiles];
     public static Item[] TradeYourOffer = new Item[Variables.MaxInventory];

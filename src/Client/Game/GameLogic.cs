@@ -2424,10 +2424,10 @@ namespace Client
                 else if (GameState.MyTargetType == (int)TargetType.Npc)
                 {
                     int npcIndex = GameState.MyTarget;
-                    if (npcIndex >= 0 && npcIndex < Data.MyMapNpc.Length && Data.MyMapNpc[npcIndex].Num >= 0)
+                    if (npcIndex >= 0 && npcIndex < MapNpc.Instance.Length && MapNpc.Instance[npcIndex].Num >= 0)
                     {
-                        targetX = Data.MyMapNpc[npcIndex].X;
-                        targetY = Data.MyMapNpc[npcIndex].Y;
+                        targetX = MapNpc.Instance[npcIndex].X;
+                        targetY = MapNpc.Instance[npcIndex].Y;
                     }
                     else
                     {

@@ -870,10 +870,10 @@ namespace Client
                 else if (GameState.MyTargetType == (int)TargetType.Npc)
                 {
                     int n = GameState.MyTarget;
-                    if (n >= 0 && n < Data.MyMapNpc.Length && Data.MyMapNpc[n].Num >= 0)
+                    if (n >= 0 && n < MapNpc.Instance.Length && MapNpc.Instance[n].Num >= 0)
                     {
-                        worldX = Data.MyMapNpc[n].X + Constants.TileSize / 2;
-                        worldY = Data.MyMapNpc[n].Y + Constants.TileSize / 2;
+                        worldX = MapNpc.Instance[n].X + Constants.TileSize / 2;
+                        worldY = MapNpc.Instance[n].Y + Constants.TileSize / 2;
                     }
                 }
             }
@@ -1033,10 +1033,10 @@ namespace Client
                     }
                     else if (prevTargetType == (int)TargetType.Npc)
                     {
-                        if (prevTarget >= 0 && prevTarget < Data.MyMapNpc.Length && Data.MyMapNpc[prevTarget].Num >= 0)
+                        if (prevTarget >= 0 && prevTarget < MapNpc.Instance.Length && MapNpc.Instance[prevTarget].Num >= 0)
                         {
-                            clearTileX = (int)Math.Floor(Data.MyMapNpc[prevTarget].X / (double)Constants.TileSize);
-                            clearTileY = (int)Math.Floor(Data.MyMapNpc[prevTarget].Y / (double)Constants.TileSize);
+                            clearTileX = (int)Math.Floor(MapNpc.Instance[prevTarget].X / (double)Constants.TileSize);
+                            clearTileY = (int)Math.Floor(MapNpc.Instance[prevTarget].Y / (double)Constants.TileSize);
                         }
                     }
 
@@ -1961,28 +1961,28 @@ namespace Client
             width = barsInfo.Width;
             height = (long) Math.Round(barsInfo.Height / 4d);
 
-            if (Data.MyMapNpc == null)
+            if (MapNpc.Instance == null)
                 return;
 
             // render Npc health bars
             for (i = 0L; i < Variables.MaxMapNpcs; i++)
             {
-                npcNum = (long) Data.MyMapNpc[(int) i].Num;
+                npcNum = (long) MapNpc.Instance[(int) i].Num;
                 // exists?
                 if (npcNum >= 0L && npcNum < Variables.MaxNpcs)
                 {
                     // alive?
-                    if (Data.MyMapNpc[(int) i].Vital[(int) Core.Globals.Vital.Health] > 0 &
-                        Data.MyMapNpc[(int) i].Vital[(int) Core.Globals.Vital.Health] < Data.Npc[(int) npcNum].Hp)
+                    if (MapNpc.Instance[(int) i].Vital[(int) Core.Globals.Vital.Health] > 0 &
+                        MapNpc.Instance[(int) i].Vital[(int) Core.Globals.Vital.Health] < Data.Npc[(int) npcNum].Hp)
                     {
                         // lock to Npc
-                        tmpX = (long) Math.Round(Data.MyMapNpc[(int) i].X + 16 - width / 2d);
-                        tmpY = Data.MyMapNpc[(int) i].Y + 35;
+                        tmpX = (long) Math.Round(MapNpc.Instance[(int) i].X + 16 - width / 2d);
+                        tmpY = MapNpc.Instance[(int) i].Y + 35;
 
                         // calculate the width to fill
                         if (width > 0)
                             GameState.BarWidthNpcHPMax[(int) i] = (int) Math.Round(
-                                Data.MyMapNpc[(int) i].Vital[(int) Core.Globals.Vital.Health] / (double) width /
+                                MapNpc.Instance[(int) i].Vital[(int) Core.Globals.Vital.Health] / (double) width /
                                 (Data.Npc[(int) npcNum].Hp / (double) width) * width);
 
                         // draw bar background
@@ -2585,7 +2585,7 @@ namespace Client
                     // Npcs
                     for (i = 0; i < Variables.MaxMapNpcs; i++)
                     {
-                        if (Math.Floor((decimal) Data.MyMapNpc[i].Y / Constants.TileSize) == y)
+                        if (Math.Floor((decimal) MapNpc.Instance[i].Y / Constants.TileSize) == y)
                         {
                             MapNpc.OnDraw(i);
                         }
@@ -2646,8 +2646,8 @@ namespace Client
 
                             case (int) TargetType.Npc:
                                 DrawTarget(
-                                    Data.MyMapNpc[GameState.MyTarget].X - 16,
-                                    Data.MyMapNpc[GameState.MyTarget].Y);
+                                    MapNpc.Instance[GameState.MyTarget].X - 16,
+                                    MapNpc.Instance[GameState.MyTarget].Y);
                                 break;
                         }
                     }
@@ -2910,7 +2910,7 @@ namespace Client
             else if (GameState.MyTargetType == (int)TargetType.Npc)
             {
                 int n = t;
-                if (n < 0 || n >= Data.MyMapNpc.Length || Data.MyMapNpc[n].Num < 0)
+                if (n < 0 || n >= MapNpc.Instance.Length || MapNpc.Instance[n].Num < 0)
                 {
                     shouldClear = true;
                 }
@@ -2918,13 +2918,13 @@ namespace Client
                 {
                     int px = GetPlayerRawX(GameState.MyIndex) + Constants.TileSize / 2;
                     int py = GetPlayerRawY(GameState.MyIndex) + Constants.TileSize / 2;
-                    int tx = Data.MyMapNpc[n].X + Constants.TileSize / 2;
-                    int ty = Data.MyMapNpc[n].Y + Constants.TileSize / 2;
+                    int tx = MapNpc.Instance[n].X + Constants.TileSize / 2;
+                    int ty = MapNpc.Instance[n].Y + Constants.TileSize / 2;
                     if (Math.Abs(tx - px) >= maxDx || Math.Abs(ty - py) >= maxDy)
                     {
                         shouldClear = true;
-                        tileX = (int)Math.Floor(Data.MyMapNpc[n].X / (double)Constants.TileSize);
-                        tileY = (int)Math.Floor(Data.MyMapNpc[n].Y / (double)Constants.TileSize);
+                        tileX = (int)Math.Floor(MapNpc.Instance[n].X / (double)Constants.TileSize);
+                        tileY = (int)Math.Floor(MapNpc.Instance[n].Y / (double)Constants.TileSize);
                     }
                 }
             }

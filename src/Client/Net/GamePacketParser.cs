@@ -509,7 +509,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         var dir = packetReader.ReadByte();
         var movement = packetReader.ReadInt32();
 
-        ref var mapNpc = ref Data.MyMapNpc[mapNpcNum];
+        ref var mapNpc = ref MapNpc.Instance[mapNpcNum];
 
         // Server signals start of a 1-tile move. Keep the authoritative starting position,
         // initialize client-side step bookkeeping, and set moving state/dir.
@@ -527,7 +527,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         var mapNpcNum = packetReader.ReadInt32();
         var dir = packetReader.ReadByte();
 
-        ref var mapNpc = ref Data.MyMapNpc[mapNpcNum];
+        ref var mapNpc = ref MapNpc.Instance[mapNpcNum];
 
         mapNpc.Dir = dir;
         // Ensure we finish at the exact destination for the last step
@@ -553,8 +553,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         var mapNpcNum = packetReader.ReadInt32();
 
-        Data.MyMapNpc[mapNpcNum].Attacking = 1;
-        Data.MyMapNpc[mapNpcNum].AttackTimer = General.GetTickCount();
+        MapNpc.Instance[mapNpcNum].Attacking = 1;
+        MapNpc.Instance[mapNpcNum].AttackTimer = General.GetTickCount();
     }
 
     private static void Packet_GlobalMsg(ReadOnlyMemory<byte> data)
@@ -600,7 +600,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         var mapItemNum = packetReader.ReadInt32();
 
-        ref var mapItem = ref Data.MyMapItem[mapItemNum];
+        ref var mapItem = ref MapItem.Instance[mapItemNum];
 
         mapItem.Num = packetReader.ReadInt32();
         mapItem.Value = packetReader.ReadInt32();
@@ -614,7 +614,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         var mapNpcNum = packetReader.ReadInt32();
 
-        ref var mapNpc = ref Data.MyMapNpc[mapNpcNum];
+        ref var mapNpc = ref MapNpc.Instance[mapNpcNum];
 
         mapNpc.Num = packetReader.ReadInt32();
         mapNpc.X = packetReader.ReadInt32();
@@ -636,7 +636,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         var timer = packetReader.ReadInt32(); // milliseconds until respawn
         var mapNpcNum = packetReader.ReadInt32();
 
-        Data.MyMapNpc[mapNpcNum].DeathTimer = Client.General.GetTickCount() + timer;
+        MapNpc.Instance[mapNpcNum].DeathTimer = Client.General.GetTickCount() + timer;
         MapNpc.OnClear(mapNpcNum);
     }
 
@@ -798,7 +798,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         var mapNpcNum = packetReader.ReadInt32();
         for (var i = 0; i < VitalCount; i++)
         {
-            Data.MyMapNpc[mapNpcNum].Vital[i] = packetReader.ReadInt32();
+            MapNpc.Instance[mapNpcNum].Vital[i] = packetReader.ReadInt32();
         }
     }
 
@@ -2030,22 +2030,22 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         for (i = 0; i < Variables.MaxMapItems; i++)
         {
-            Data.MyMapItem[i].Num = buffer.ReadInt32();
-            Data.MyMapItem[i].Value = buffer.ReadInt32();
-            Data.MyMapItem[i].X = buffer.ReadInt32();
-            Data.MyMapItem[i].Y = buffer.ReadInt32();
+            MapItem.Instance[i].Num = buffer.ReadInt32();
+            MapItem.Instance[i].Value = buffer.ReadInt32();
+            MapItem.Instance[i].X = buffer.ReadInt32();
+            MapItem.Instance[i].Y = buffer.ReadInt32();
         }
 
         int vitalCount = Enum.GetValues(typeof(Vital)).Length;
 
         for (i = 0; i < Variables.MaxMapNpcs; i++)
         {
-            Data.MyMapNpc[i].Num = buffer.ReadInt32();
-            Data.MyMapNpc[i].X = buffer.ReadInt32();
-            Data.MyMapNpc[i].Y = buffer.ReadInt32();
-            Data.MyMapNpc[i].Dir = buffer.ReadByte();
+            MapNpc.Instance[i].Num = buffer.ReadInt32();
+            MapNpc.Instance[i].X = buffer.ReadInt32();
+            MapNpc.Instance[i].Y = buffer.ReadInt32();
+            MapNpc.Instance[i].Dir = buffer.ReadByte();
             for (int n = 0; n < vitalCount; n++)
-                Data.MyMapNpc[i].Vital[n] = buffer.ReadInt32();
+                MapNpc.Instance[i].Vital[n] = buffer.ReadInt32();
         }
 
         if (buffer.ReadInt32() == 1)
@@ -2098,7 +2098,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         var buffer = new PacketReader(data);
 
         i = buffer.ReadByte();
-        ref var instance = ref Data.MyMapItem[i];
+        ref var instance = ref MapItem.Instance[i];
         instance.Num = buffer.ReadInt32();
         instance.Value = buffer.ReadInt32();
         instance.X = buffer.ReadInt32();
@@ -2112,7 +2112,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         for (int i = 0; i < Variables.MaxMapItems; i++)
         {
-            ref var instance = ref Data.MyMapItem[i];
+            ref var instance = ref MapItem.Instance[i];
             instance.Num = buffer.ReadInt32();
             instance.Value = buffer.ReadInt32();
             instance.X = buffer.ReadInt32();
@@ -2128,7 +2128,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         for (i = 0; i < Variables.MaxMapNpcs; i++)
         {
-            ref var instance = ref Data.MyMapNpc[i];
+            ref var instance = ref MapNpc.Instance[i];
             instance.Num = buffer.ReadInt32();
             instance.X = buffer.ReadInt32();
             instance.Y = buffer.ReadInt32();
@@ -2143,7 +2143,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         npcNum = buffer.ReadInt32();
 
-        ref var instance = ref Data.MyMapNpc[npcNum];
+        ref var instance = ref MapNpc.Instance[npcNum];
         instance.Num = buffer.ReadInt32();
         instance.X = buffer.ReadInt32();
         instance.Y = buffer.ReadInt32();

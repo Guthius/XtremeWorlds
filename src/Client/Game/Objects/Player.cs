@@ -672,7 +672,7 @@ namespace Client
                 {
                     for (i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
                     {
-                        if (Data.MyMapNpc[i].Num >= 0 & Data.MyMapNpc[i].X == x & Data.MyMapNpc[i].Y == y)
+                        if (MapNpc.Instance[i].Num >= 0 & MapNpc.Instance[i].X == x & MapNpc.Instance[i].Y == y)
                         {
                             OnCheckDir = true;
                             return OnCheckDir;

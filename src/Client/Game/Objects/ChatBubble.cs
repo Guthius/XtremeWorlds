@@ -96,8 +96,8 @@ public class ChatBubble : IData
 
             case (byte) TargetType.Npc:
             {
-                x = GameLogic.ConvertMapX(Data.MyMapNpc[instance.Target].X) + 16;
-                y = GameLogic.ConvertMapY(Data.MyMapNpc[instance.Target].Y) - 32;
+                x = GameLogic.ConvertMapX(MapNpc.Instance[instance.Target].X) + 16;
+                y = GameLogic.ConvertMapY(MapNpc.Instance[instance.Target].Y) - 32;
                 break;
             }
 

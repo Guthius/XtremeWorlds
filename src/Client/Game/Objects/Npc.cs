@@ -75,8 +75,8 @@ namespace Client
         public static void SnapToDest(int index)
         {
             if (index < 0 || index >= Variables.MaxMapNpcs) return;
-            if (Data.MyMapNpc == null) return;
-            ref var npc = ref Data.MyMapNpc[index];
+            if (MapNpc.Instance == null) return;
+            ref var npc = ref MapNpc.Instance[index];
             if (RemainingPixels[index] > 0)
             {
                 npc.X = DestX[index];
@@ -97,7 +97,7 @@ namespace Client
         {
             if (index < 0 || index >= Variables.MaxMapNpcs) return false;
             if (runFrames <= 1) return false; // nothing to finish
-            if (Data.MyMapNpc[index].Moving != 0) return false; // currently moving, not finishing
+            if (MapNpc.Instance[index].Moving != 0) return false; // currently moving, not finishing
 
             // If we haven't observed a stop, nothing to finish
             long stoppedAt = StopTick[index];
@@ -147,9 +147,9 @@ namespace Client
         public static void OnMove(int index, int pixelsPerTick)
         {
             if (index < 0 || index >= Variables.MaxMapNpcs) return;
-            if (Data.MyMapNpc == null) return;
+            if (MapNpc.Instance == null) return;
 
-            ref var npc = ref Data.MyMapNpc[index];
+            ref var npc = ref MapNpc.Instance[index];
 
             // Only process active walking state
             if (npc.Moving != (byte)MovementState.Walking)

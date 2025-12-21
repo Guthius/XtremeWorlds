@@ -125,9 +125,9 @@ namespace Client
                     }
                 case (byte)TargetType.Npc:
                     {
-                        if (Data.MyMapNpc != null && lockindex >= 0 && lockindex < Data.MyMapNpc.Length)
+                        if (MapNpc.Instance != null && lockindex >= 0 && lockindex < MapNpc.Instance.Length)
                         {
-                            var npc = Data.MyMapNpc[lockindex];
+                            var npc = MapNpc.Instance[lockindex];
                             var vit = npc.Vital;
                             bool hasVitals = vit != null && vit.Length > (int)Core.Globals.Vital.Health;
                             if (npc.Num >= 0 && hasVitals && vit![(int)Core.Globals.Vital.Health] > 0)

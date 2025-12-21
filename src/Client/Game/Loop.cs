@@ -330,7 +330,7 @@ namespace Client
                     GameLogic.SetBarWidth(ref GameState.BarWidthGuiExpMax, ref GameState.BarWidthGuiExp);
                     for (_i = 0; _i < Variables.MaxMapNpcs; _i++)
                     {
-                        if (Data.MyMapNpc[_i].Num >= 0)
+                        if (MapNpc.Instance[_i].Num >= 0)
                         {
                             GameLogic.SetBarWidth(ref GameState.BarWidthPlayerHPMax[_i], ref GameState.BarWidthPlayerHP[_i]);
                         }
@@ -362,9 +362,9 @@ namespace Client
 
                     for (int i = 0; i < Variables.MaxMapNpcs; i++)
                     {
-                        if (Data.MyMapNpc[i].Num >= 0)
+                        if (MapNpc.Instance[i].Num >= 0)
                         {
-                            unchecked { Data.MyMapNpc[i].Steps++; }
+                            unchecked { MapNpc.Instance[i].Steps++; }
                         }
                     }
 
