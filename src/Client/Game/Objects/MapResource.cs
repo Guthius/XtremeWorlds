@@ -1,6 +1,7 @@
 using Client;
 using Core.Globals;
 using Core.Interfaces;
+using static Core.Globals.Commands;
 
 namespace Core.Objects
 {
@@ -49,13 +50,13 @@ namespace Core.Objects
             if (!GameState.MapData)
                 return;
 
-            if (Data.MyMapResource[index].X > Data.MyMap.MaxX | Data.MyMapResource[index].Y > Data.MyMap.MaxY)
+            if (Data.MyMapResource[index].X > Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX | Data.MyMapResource[index].Y > Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)
                 return;
 
-            mapResourceNum = Data.MyMap.Tile[Data.MyMapResource[index].X, Data.MyMapResource[index].Y].Data1;
+            mapResourceNum = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[Data.MyMapResource[index].X, Data.MyMapResource[index].Y].Data1;
 
             if (mapResourceNum == 0)
-                mapResourceNum = Data.MyMap.Tile[Data.MyMapResource[index].X, Data.MyMapResource[index].Y].Data1_2;
+                mapResourceNum = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[Data.MyMapResource[index].X, Data.MyMapResource[index].Y].Data1_2;
 
             Resource.OnStream(mapResourceNum);
 

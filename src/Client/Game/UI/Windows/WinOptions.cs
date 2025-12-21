@@ -1,5 +1,6 @@
 ﻿using Core.Configurations;
 using Core.Globals;
+using static Core.Globals.Commands;
 
 namespace Client.Game.UI.Windows;
 
@@ -68,7 +69,7 @@ public class WinOptions
             {
                 TextRenderer.AddText("Music tured on.", (int) ColorName.BrightGreen);
 
-                var music = GameState.InGame ? Data.MyMap.Music : SettingsManager.Instance.Music.ToString();
+                var music = GameState.InGame ? Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Music : SettingsManager.Instance.Music.ToString();
                 if (music != "None.")
                 {
                     Audio.PlayMusic(music);

@@ -21,6 +21,7 @@ using Variables = Core.Globals.Variables;
 using Microsoft.Extensions.Logging;
 using XtremeWorlds.Server.Configuration;
 using Item = Server.Item;
+using Map = Server.Map;
 using Core.Globals;
 using Server.Game;
 
@@ -559,19 +560,19 @@ public class Script
         NetworkSend.SendVitals(index);
         
         // Send map animations
-        for (int x = 0; x < Data.Map[mapNum].MaxX; x++)
+        for (int x = 0; x < Server.Map.Instance[mapNum].MaxX; x++)
         {
-            for (int y = 0; y < Data.Map[mapNum].MaxY; y++)
+            for (int y = 0; y < Server.Map.Instance[mapNum].MaxY; y++)
             {
-                if (Data.Map[mapNum].Tile[x, y].Type == TileType.Animation)
+                if (Server.Map.Instance[mapNum].Tile[x, y].Type == TileType.Animation)
                 {
-                    NetworkSend.SendUpdateAnimationTo(index, Data.Map[mapNum].Tile[x, y].Data1);
-                    NetworkSend.SendAnimationTo(index, Data.Map[mapNum].Tile[x, y].Data1, x, y, 0, -1);
+                    NetworkSend.SendUpdateAnimationTo(index, Server.Map.Instance[mapNum].Tile[x, y].Data1);
+                    NetworkSend.SendAnimationTo(index, Server.Map.Instance[mapNum].Tile[x, y].Data1, x, y, 0, -1);
                 }
-                else if (Data.Map[mapNum].Tile[x, y].Type2 == TileType.Animation)
+                else if (Server.Map.Instance[mapNum].Tile[x, y].Type2 == TileType.Animation)
                 {
-                    NetworkSend.SendUpdateAnimationTo(index, Data.Map[mapNum].Tile[x, y].Data1_2);
-                    NetworkSend.SendAnimationTo(index, Data.Map[mapNum].Tile[x, y].Data1_2, x, y, 0, -1);
+                    NetworkSend.SendUpdateAnimationTo(index, Server.Map.Instance[mapNum].Tile[x, y].Data1_2);
+                    NetworkSend.SendAnimationTo(index, Server.Map.Instance[mapNum].Tile[x, y].Data1_2, x, y, 0, -1);
                 }
             }
         }
@@ -603,7 +604,7 @@ public class Script
             SetPlayerPk(index, false);
         }
 
-        ref var instance = ref Data.Map[GetPlayerMap(index)];
+        var instance = Server.Map.Instance[GetPlayerMap(index)];
 
         // Warp Player away
         SetPlayerDir(index, (byte)Direction.Down);
@@ -688,9 +689,9 @@ public class Script
 
         // Moral / map rule check
         var mapNum = GetPlayerMap(PlayerIndex);
-        if (mapNum < 0 || mapNum >= Data.Map.Length) return;
+        if (mapNum < 0 || mapNum >= Server.Map.Instance.Count) return;
 
-        var moralId = Data.Map[mapNum].Moral;
+        var moralId = Server.Map.Instance[mapNum].Moral;
         if (moralId >= 0 && !Moral.Instance[moralId].CanCast)
         {
             NetworkSend.SendPlayerMessage(PlayerIndex, "You cannot cast here.", (int)ColorName.BrightRed);
@@ -709,7 +710,7 @@ public class Script
 
     public int OnKill(int index)
     {
-        if (!Moral.Instance[Data.Map[GetPlayerMap(index)].Moral].LoseExp)
+        if (!Moral.Instance[Server.Map.Instance[GetPlayerMap(index)].Moral].LoseExp)
             return 0;
 
         int exp = GetPlayerExperience(index) / 3;
@@ -887,7 +888,7 @@ public class Script
     {
         if (target.Type == Entity.EntityType.Player)
         {
-            if (Moral.Instance[Data.Map[GetPlayerMap(target.Id)].Moral].DropItems)
+            if (Moral.Instance[Server.Map.Instance[GetPlayerMap(target.Id)].Moral].DropItems)
             {
                 var equipCount = Enum.GetValues(typeof(Equipment)).Length;
                 
@@ -1062,7 +1063,7 @@ public class Script
         if (!IsAlive(attacker) || !IsAlive(target)) return false;
         if (!IsSkillRanged(skillId) && !IsInMeleeRange(attacker, target) && allowOutOfRange == false) return false;
 
-        if (!Moral.Instance[Data.Map[GetPlayerMap(attacker.Id)].Moral].CanPk && attacker.Type == Entity.EntityType.Player && target.Type == Entity.EntityType.Player)
+        if (!Moral.Instance[Server.Map.Instance[GetPlayerMap(attacker.Id)].Moral].CanPk && attacker.Type == Entity.EntityType.Player && target.Type == Entity.EntityType.Player)
         {
             return false; // PvP not allowed on this map
         }
@@ -1224,8 +1225,8 @@ public class Script
 
     private static System.Collections.Generic.List<byte>? ComputePathAStar(int mapNum, int sx, int sy, int tx, int ty, int maxSteps)
     {
-        int maxX = Data.Map[mapNum].MaxX;
-        int maxY = Data.Map[mapNum].MaxY;
+        int maxX = Server.Map.Instance[mapNum].MaxX;
+        int maxY = Server.Map.Instance[mapNum].MaxY;
         if (sx < 0 || sy < 0 || tx < 0 || ty < 0 || sx >= maxX || sy >= maxY || tx >= maxX || ty >= maxY) return null;
 
         var open = new System.Collections.Generic.SortedSet<(int f,int g,int x,int y)>(System.Collections.Generic.Comparer<(int,int,int,int)>.Create((a,b)=> a.Item1!=b.Item1? a.Item1-b.Item1 : (a.Item2!=b.Item2? a.Item2-b.Item2 : (a.Item3!=b.Item3? a.Item3-b.Item3 : a.Item4-b.Item4))));
@@ -1306,7 +1307,7 @@ public class Script
     private static bool IsTileWalkable(int mapNum, int x, int y)
     {
         // Mirror CanNpcMove constraints loosely using tile types only; dynamic collisions are validated at step time.
-        var t = Data.Map[mapNum].Tile[x, y];
+        var t = Server.Map.Instance[mapNum].Tile[x, y];
         int n = (int)t.Type; int n2 = (int)t.Type2;
         bool ok = (n == (byte)TileType.None || n == (byte)TileType.Item || n == (byte)TileType.NpcSpawn) ||
                   (n2 == (byte)TileType.None || n2 == (byte)TileType.Item || n2 == (byte)TileType.NpcSpawn);
@@ -1704,12 +1705,12 @@ public class Script
                 AdjustVital(caster, Core.Globals.Vital.Mana, skill.Vital, true, skillId, mapNum, caster);
                 break;
             case 4: // Warp
-                if (skill.Map >= 0 && skill.Map < Data.Map.Length)
+                if (skill.Map >= 0 && skill.Map < Server.Map.Instance.Count)
                 {
                     int destMap = skill.Map;
                     int destX = skill.X;
                     int destY = skill.Y;
-                    if (destMap >= 0 && destMap < Data.Map.Length && destX >= 0 && destX < Core.Globals.Variables.MaxMapX && destY >= 0 && destY < Core.Globals.Variables.MaxMapY)
+                    if (destMap >= 0 && destMap < Server.Map.Instance.Count && destX >= 0 && destX < Core.Globals.Variables.MaxMapX && destY >= 0 && destY < Core.Globals.Variables.MaxMapY)
                     {
                         if (caster.Type == Core.Globals.Entity.EntityType.Player)
                         {
@@ -2124,9 +2125,9 @@ public class Script
             int nx = (target.X / Constants.TileSize) + dx;
             int ny = (target.Y / Constants.TileSize) + dy;
             // Bounds
-            if (nx < 0 || ny < 0 || nx >= Data.Map[map].MaxX || ny >= Data.Map[map].MaxY) break;
+            if (nx < 0 || ny < 0 || nx >= Server.Map.Instance[map].MaxX || ny >= Server.Map.Instance[map].MaxY) break;
             // Blocked tiles
-            bool blocked = Data.Map[map].Tile[nx, ny].Type == TileType.Blocked || Data.Map[map].Tile[nx, ny].Type2 == TileType.Blocked;
+            bool blocked = Server.Map.Instance[map].Tile[nx, ny].Type == TileType.Blocked || Server.Map.Instance[map].Tile[nx, ny].Type2 == TileType.Blocked;
             if (blocked) break;
             // Prevent collisions with other entities
             bool occ = false;

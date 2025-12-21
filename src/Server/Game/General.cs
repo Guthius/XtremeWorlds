@@ -592,7 +592,7 @@ public static class General
         {               
             var player = Player.Instance[playerIndex];
 
-            if (x < 0 || x >= Data.Map[player.Map].MaxX || y < 0 || y >= Data.Map[player.Map].MaxY)
+            if (x < 0 || x >= Server.Map.Instance[player.Map].MaxX || y < 0 || y >= Server.Map.Instance[player.Map].MaxY)
             {
                 NetworkSend.SendPlayerMessage(playerIndex, "Invalid coordinates for teleportation.", (int)ColorName.BrightRed);
                 return System.Threading.Tasks.Task.CompletedTask;

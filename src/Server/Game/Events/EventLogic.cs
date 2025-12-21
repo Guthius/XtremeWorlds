@@ -64,7 +64,7 @@ namespace Server
         // Helper methods for better readability:
         private static bool IsEventVisible(ref MapEvent eventPage) => eventPage.Visible;
         private static int GetEventId(ref MapEvent eventPage) => eventPage.EventId;
-        private static EventPage GetEventPage(int mapNum, int eventId, int pageId) => Data.Map[mapNum].Event[eventId].Pages[pageId];
+        private static EventPage GetEventPage(int mapNum, int eventId, int pageId) => Server.Map.Instance[mapNum].Event[eventId].Pages[pageId];
 
         public static void RemoveDeadEvents()
         {
@@ -79,7 +79,7 @@ namespace Server
                     var relevantPages = Data.TempPlayer[i].EventMap.EventPages
                         .Where((page, x) => x < Data.TempPlayer[i].EventMap.EventPages.Length)
                         .Where(page => page.EventId < Data.TempPlayer[i].EventMap.CurrentEvents) //Boundary check  
-                        .Where(page => mapNum >= 0 && mapNum < Data.Map.Length && page.EventId < Data.Map[mapNum].Event.Length) // Boundary check.  
+                        .Where(page => mapNum >= 0 && mapNum < Server.Map.Instance.Count && page.EventId < Server.Map.Instance[mapNum].Event.Length) // Boundary check.  
                         .ToList(); // Materialize the query to avoid issues with modifying the collection.  
 
                     foreach (var eventPage in relevantPages)
@@ -88,10 +88,10 @@ namespace Server
                         int page = eventPage.PageId;
 
                         // Check if the event and page still exist  
-                        if (id >= 0 && mapNum >= 0 && mapNum < Data.Map.Length &&
-                            id < Data.Map[mapNum].Event.Length &&
-                            Data.Map[mapNum].Event[id].Pages != null &&
-                            page >= 0 && page < Data.Map[mapNum].Event[id].Pages.Length)
+                        if (id >= 0 && mapNum >= 0 && mapNum < Server.Map.Instance.Count &&
+                            id < Server.Map.Instance[mapNum].Event.Length &&
+                            Server.Map.Instance[mapNum].Event[id].Pages != null &&
+                            page >= 0 && page < Server.Map.Instance[mapNum].Event[id].Pages.Length)
                         {
                             ref var playerEventPage = ref Data.TempPlayer[i].EventMap.EventPages[Array.IndexOf(Data.TempPlayer[i].EventMap.EventPages, eventPage)]; //find actual index of eventpage  
 
@@ -110,9 +110,9 @@ namespace Server
                                     int compare = mapEventPage.SelfSwitchCompare == 0 ? 0 : 1;
                                     bool selfSwitchConditionMet;
 
-                                    if (Data.Map[mapNum].Event[id].Globals == 1)
+                                    if (Server.Map.Instance[mapNum].Event[id].Globals == 1)
                                     {
-                                        selfSwitchConditionMet = Data.Map[mapNum].Event[id].SelfSwitches[mapEventPage.SelfSwitchIndex] == compare;
+                                        selfSwitchConditionMet = Server.Map.Instance[mapNum].Event[id].SelfSwitches[mapEventPage.SelfSwitchIndex] == compare;
                                     }
                                     else
                                     {
@@ -156,14 +156,14 @@ namespace Server
                                     }
                                 }
 
-                                if (Data.Map[mapNum].Event[id].Globals == 1 && !IsEventVisible(ref playerEventPage))
+                                if (Server.Map.Instance[mapNum].Event[id].Globals == 1 && !IsEventVisible(ref playerEventPage))
                                 {
                                     Event.TempEventMap[mapNum].Event[id].Active = 0;
                                 }
 
                                 if (!IsEventVisible(ref playerEventPage) && id >= 0)
                                 {
-                                    int pageNum = Array.IndexOf(Data.Map[mapNum].Event[id].Pages, mapEventPage);
+                                    int pageNum = Array.IndexOf(Server.Map.Instance[mapNum].Event[id].Pages, mapEventPage);
                                     if (pageNum < 0 || pageNum >= Data.TempPlayer[i].EventMap.EventPages.Length)
                                         return;
 
@@ -173,7 +173,7 @@ namespace Server
                                     packetWriter.WriteInt32(Data.TempPlayer[i].EventMap.CurrentEvents);
                                     packetWriter.WriteInt32(id);
                                     ref var instance = ref Data.TempPlayer[i].EventMap.EventPages[pageNum]; //find actual index of eventpage  
-                                    packetWriter.WriteString(Data.Map[GetPlayerMap(i)].Event[instance.EventId].Name);
+                                    packetWriter.WriteString(Server.Map.Instance[GetPlayerMap(i)].Event[instance.EventId].Name);
                                     packetWriter.WriteInt32(instance.Dir);
                                     packetWriter.WriteByte(instance.GraphicType);
                                     packetWriter.WriteInt32(instance.Graphic);
@@ -186,10 +186,10 @@ namespace Server
                                     packetWriter.WriteInt32(instance.Y);
                                     packetWriter.WriteByte(instance.Position);
                                     packetWriter.WriteBoolean(instance.Visible);
-                                    packetWriter.WriteInt32(Data.Map[mapNum].Event[id].Pages[page].IdleAnim);
-                                    packetWriter.WriteInt32(Data.Map[mapNum].Event[id].Pages[page].DirFix);
-                                    packetWriter.WriteInt32(Data.Map[mapNum].Event[id].Pages[page].WalkThrough);
-                                    packetWriter.WriteInt32(Data.Map[mapNum].Event[id].Pages[page].ShowName);
+                                    packetWriter.WriteInt32(Server.Map.Instance[mapNum].Event[id].Pages[page].IdleAnim);
+                                    packetWriter.WriteInt32(Server.Map.Instance[mapNum].Event[id].Pages[page].DirFix);
+                                    packetWriter.WriteInt32(Server.Map.Instance[mapNum].Event[id].Pages[page].WalkThrough);
+                                    packetWriter.WriteInt32(Server.Map.Instance[mapNum].Event[id].Pages[page].ShowName);
 
                                     PlayerService.Instance.SendDataTo(i, packetWriter.GetBytes());
                                 }
@@ -226,20 +226,20 @@ namespace Server
                             pageId = 0;
 
                         // Another bounds check.
-                        if (Data.Map[mapNum].Event == null)
+                        if (Server.Map.Instance[mapNum].Event == null)
                         {
                             break;
                         }
 
-                        if (id >= Data.Map[mapNum].Event.Length) continue;
+                        if (id >= Server.Map.Instance[mapNum].Event.Length) continue;
 
                         // Iterate through event pages to find the highest-priority page that meets conditions
-                        for (int z = 0; z < Data.Map[mapNum].Event[id].PageCount; z++)
+                        for (int z = 0; z < Server.Map.Instance[mapNum].Event[id].PageCount; z++)
                         {
                             bool spawnEvent = true;
-                            if (Data.Map[mapNum].Event[id].Pages == null)
+                            if (Server.Map.Instance[mapNum].Event[id].Pages == null)
                                 break;
-                            EventPage page = Data.Map[mapNum].Event[id].Pages[z];
+                            EventPage page = Server.Map.Instance[mapNum].Event[id].Pages[z];
 
                             // Check conditions (Item, Self Switch, Variable, Switch).
                             if (page.ChkHasItem == 1 && Player.HasItem(i, page.HasItemIndex) == 0)
@@ -252,8 +252,8 @@ namespace Server
                                 int compare = page.SelfSwitchCompare; // 0 or 1
                                 bool selfSwitchStatus;
 
-                                if (Data.Map[mapNum].Event[id].Globals == 1)
-                                    selfSwitchStatus = Data.Map[mapNum].Event[id].SelfSwitches[page.SelfSwitchIndex] == compare;
+                                if (Server.Map.Instance[mapNum].Event[id].Globals == 1)
+                                    selfSwitchStatus = Server.Map.Instance[mapNum].Event[id].SelfSwitches[page.SelfSwitchIndex] == compare;
                                 else
                                     selfSwitchStatus = Data.TempPlayer[i].EventMap.EventPages[id].SelfSwitches[page.SelfSwitchIndex] == compare;
 
@@ -315,7 +315,7 @@ namespace Server
 
                             // Set up the event page data.
                             ref var instance = ref Data.TempPlayer[i].EventMap.EventPages[x]; // Use x, as this is the correct index into *this player's* event list
-                            EventPage newPage = Data.Map[mapNum].Event[id].Pages[z];
+                            EventPage newPage = Server.Map.Instance[mapNum].Event[id].Pages[z];
 
                             instance.Dir = newPage.GraphicType == 1
                                 ? (newPage.GraphicY % 4) switch
@@ -381,7 +381,7 @@ namespace Server
                             instance.WalkingAnim = newPage.IdleAnim;
                             instance.FixedDir = newPage.DirFix;
 
-                            if (Data.Map[mapNum].Event[id].Globals == 1)
+                            if (Server.Map.Instance[mapNum].Event[id].Globals == 1)
                             {
                                 Event.TempEventMap[mapNum].Event[id].Active = z;
                                 Event.TempEventMap[mapNum].Event[id].Position = newPage.Position;
@@ -397,7 +397,7 @@ namespace Server
                             buffer.WriteInt32(id); // Event ID
 
                             ref var instance1 = ref Data.TempPlayer[i].EventMap.EventPages[x];
-                            buffer.WriteString(Data.Map[mapNum].Event[instance1.EventId].Name);
+                            buffer.WriteString(Server.Map.Instance[mapNum].Event[instance1.EventId].Name);
                             buffer.WriteInt32(instance1.Dir);
                             buffer.WriteByte(instance1.GraphicType);
                             buffer.WriteInt32(instance1.Graphic);
@@ -410,10 +410,10 @@ namespace Server
                             buffer.WriteInt32(instance1.Y);
                             buffer.WriteByte(instance1.Position);
                             buffer.WriteBoolean(instance1.Visible);
-                            buffer.WriteInt32(Data.Map[mapNum].Event[id].Pages[z].IdleAnim);
-                            buffer.WriteInt32(Data.Map[mapNum].Event[id].Pages[z].DirFix);
-                            buffer.WriteInt32(Data.Map[mapNum].Event[id].Pages[z].WalkThrough);
-                            buffer.WriteInt32(Data.Map[mapNum].Event[id].Pages[z].ShowName);
+                            buffer.WriteInt32(Server.Map.Instance[mapNum].Event[id].Pages[z].IdleAnim);
+                            buffer.WriteInt32(Server.Map.Instance[mapNum].Event[id].Pages[z].DirFix);
+                            buffer.WriteInt32(Server.Map.Instance[mapNum].Event[id].Pages[z].WalkThrough);
+                            buffer.WriteInt32(Server.Map.Instance[mapNum].Event[id].Pages[z].ShowName);
 
                             PlayerService.Instance.SendDataTo(i, buffer.GetBytes());
                         }
@@ -843,7 +843,7 @@ namespace Server
                                             buffer.WriteInt32(eventId); // Event ID.
 
                                             ref var instance1 = ref Event.TempEventMap[i].Event[x];
-                                            buffer.WriteString(Data.Map[i].Event[x].Name); // Global event, use map index
+                                            buffer.WriteString(Server.Map.Instance[i].Event[x].Name); // Global event, use map index
                                             buffer.WriteInt32(instance1.Dir);
                                             buffer.WriteByte(instance1.GraphicType);
                                             buffer.WriteInt32(instance1.Graphic);
@@ -903,14 +903,14 @@ namespace Server
                         break;
 
                     // Bounds check.
-                    if (Data.TempPlayer[i].EventMap.EventPages[x].EventId >= Data.Map[mapNum].Event.Length) continue;
+                    if (Data.TempPlayer[i].EventMap.EventPages[x].EventId >= Server.Map.Instance[mapNum].Event.Length) continue;
 
 
                     ref var localEvent = ref Data.TempPlayer[i].EventMap.EventPages[x];
 
 
                     // Only process visible, non-global events.
-                    if (Data.Map[mapNum].Event[localEvent.EventId].Globals != 0 || !localEvent.Visible) continue;
+                    if (Server.Map.Instance[mapNum].Event[localEvent.EventId].Globals != 0 || !localEvent.Visible) continue;
 
 
                     // Check move timer.
@@ -1070,9 +1070,9 @@ namespace Server
                                                     Event.Dir(i, mapNum, eventId, Event.GetDirToPlayer(i, mapNum, eventId), false);
 
                                                     // Activate event if triggered by player action.
-                                                    if (Data.Map[mapNum].Event[eventId].Pages[Data.TempPlayer[i].EventMap.EventPages[eventId].PageId].Trigger == 1)
+                                                    if (Server.Map.Instance[mapNum].Event[eventId].Pages[Data.TempPlayer[i].EventMap.EventPages[eventId].PageId].Trigger == 1)
                                                     {
-                                                        if (Data.Map[mapNum].Event[eventId].Pages[Data.TempPlayer[i].EventMap.EventPages[eventId].PageId].CommandListCount > 0)
+                                                        if (Server.Map.Instance[mapNum].Event[eventId].Pages[Data.TempPlayer[i].EventMap.EventPages[eventId].PageId].CommandListCount > 0)
                                                         {
                                                             // Start event processing.
                                                             ref var eventProcessing = ref Data.TempPlayer[i].EventProcessing[eventId]; // Use EventId (local index)
@@ -1325,7 +1325,7 @@ namespace Server
                                         buffer.WriteInt32(Data.TempPlayer[i].EventMap.EventPages[eventId].EventId); // Use map event ID
 
                                         ref var instance1 = ref Data.TempPlayer[i].EventMap.EventPages[eventId];
-                                        buffer.WriteString(Data.Map[mapNum].Event[instance1.EventId].Name); //use map event Id
+                                        buffer.WriteString(Server.Map.Instance[mapNum].Event[instance1.EventId].Name); //use map event Id
                                         buffer.WriteInt32(instance1.Dir);
                                         buffer.WriteByte(instance1.GraphicType);
                                         buffer.WriteInt32(instance1.Graphic);
@@ -1390,15 +1390,15 @@ namespace Server
                     if (!eventPage.Visible) continue;
 
                     // Check event and page validity.
-                    if (eventPage.EventId >= Data.Map[mapNum].Event.Length || Data.Map[mapNum].Event == null || Data.Map[mapNum].Event[eventPage.EventId].Pages == null || eventPage.PageId >= Data.Map[mapNum].Event[eventPage.EventId].Pages.Length) continue;
+                    if (eventPage.EventId >= Server.Map.Instance[mapNum].Event.Length || Server.Map.Instance[mapNum].Event == null || Server.Map.Instance[mapNum].Event[eventPage.EventId].Pages == null || eventPage.PageId >= Server.Map.Instance[mapNum].Event[eventPage.EventId].Pages.Length) continue;
 
                     // Handle parallel process events (Trigger == 2).
-                    if (Data.Map[mapNum].Event[eventPage.EventId].Pages[eventPage.PageId].Trigger == 2)
+                    if (Server.Map.Instance[mapNum].Event[eventPage.EventId].Pages[eventPage.PageId].Trigger == 2)
                     {
                         // If not already active, start the event processing.
                         if (Data.TempPlayer[i].EventProcessing[eventPage.EventId].Active == 0) // Use map event ID for indexing.
                         {
-                            if (Data.Map[mapNum].Event[eventPage.EventId].Pages[eventPage.PageId].CommandListCount > 0)
+                            if (Server.Map.Instance[mapNum].Event[eventPage.EventId].Pages[eventPage.PageId].CommandListCount > 0)
                             {
                                 ref var eventProcessing = ref Data.TempPlayer[i].EventProcessing[eventPage.EventId]; // And here.
                                 eventProcessing.Active = 1;
@@ -1410,7 +1410,7 @@ namespace Server
                                 eventProcessing.WaitingForResponse = 0;
 
                                 // Allocate ListLeftOff array.
-                                eventProcessing.ListLeftOff = new int[Data.Map[mapNum].Event[eventPage.EventId].Pages[eventPage.PageId].CommandListCount];
+                                eventProcessing.ListLeftOff = new int[Server.Map.Instance[mapNum].Event[eventPage.EventId].Pages[eventPage.PageId].CommandListCount];
                             }
                         }
                     }
@@ -1434,7 +1434,7 @@ namespace Server
                         ref var instance1 = ref Data.TempPlayer[i].EventProcessing[x];
 
                         // Basic validity checks
-                        if (instance1.EventId < 0 || instance1.EventId >= Data.Map[mapNum].Event.Length) continue;
+                        if (instance1.EventId < 0 || instance1.EventId >= Server.Map.Instance[mapNum].Event.Length) continue;
 
                         bool removeEventProcess = false;
 
@@ -1500,7 +1500,7 @@ namespace Server
                                 // Check for null or out-of-bounds conditions.
                                 if (instance1.ListLeftOff == null) continue; // Should not happen, but handle it.
 
-                                var commandList = Data.Map[mapNum].Event[instance1.EventId].Pages[instance1.PageId].CommandList;
+                                var commandList = Server.Map.Instance[mapNum].Event[instance1.EventId].Pages[instance1.PageId].CommandList;
 
                                 // More boundary checks
                                 if (instance1.CurList >= commandList.Length)
@@ -1719,9 +1719,9 @@ namespace Server
                                         case (byte) EventCommand.ModifySelfSwitch:
                                         {
                                             // Determine whether it's a global or local self switch.
-                                            if (Data.Map[mapNum].Event[instance1.EventId].Globals == 1)
+                                            if (Server.Map.Instance[mapNum].Event[instance1.EventId].Globals == 1)
                                             {
-                                                Data.Map[mapNum].Event[instance1.EventId].SelfSwitches[command.Data1 + 1] = (byte) (command.Data2 == 0 ? 0 : 1);
+                                                Server.Map.Instance[mapNum].Event[instance1.EventId].SelfSwitches[command.Data1 + 1] = (byte) (command.Data2 == 0 ? 0 : 1);
                                             }
                                             else
                                             {
@@ -1787,8 +1787,8 @@ namespace Server
                                                 case 6: // Self Switch
                                                 {
                                                     bool selfSwitchState;
-                                                    if (Data.Map[mapNum].Event[instance1.EventId].Globals == 1)
-                                                        selfSwitchState = Data.Map[mapNum].Event[instance1.EventId].SelfSwitches[branch.Data1 + 1] == 1;
+                                                    if (Server.Map.Instance[mapNum].Event[instance1.EventId].Globals == 1)
+                                                        selfSwitchState = Server.Map.Instance[mapNum].Event[instance1.EventId].SelfSwitches[branch.Data1 + 1] == 1;
                                                     else
                                                         selfSwitchState = Data.TempPlayer[i].EventMap.EventPages[instance1.EventId].SelfSwitches[branch.Data1 + 1] == 1;
 
@@ -1933,9 +1933,9 @@ namespace Server
                                         case (byte) EventCommand.SetMoveRoute:
                                         {
                                             // Check if the event exists.
-                                            if (command.Data1 < Data.Map[mapNum].Event.Length)
+                                            if (command.Data1 < Server.Map.Instance[mapNum].Event.Length)
                                             {
-                                                if (Data.Map[mapNum].Event[command.Data1].Globals == 1) // Global event
+                                                if (Server.Map.Instance[mapNum].Event[command.Data1].Globals == 1) // Global event
                                                 {
                                                     // Directly modify the global event.
                                                     ref var globalEvent = ref Event.TempEventMap[mapNum].Event[command.Data1];
@@ -1984,15 +1984,15 @@ namespace Server
                                                 case 1: // On Event
                                                 {
                                                     //check for valid event
-                                                    if (command.Data3 < 0 || command.Data3 >= Data.Map[mapNum].Event.Length)
+                                                    if (command.Data3 < 0 || command.Data3 >= Server.Map.Instance[mapNum].Event.Length)
                                                         break;
 
-                                                    if (Data.Map[mapNum].Event[command.Data3].Globals == 1)
+                                                    if (Server.Map.Instance[mapNum].Event[command.Data3].Globals == 1)
                                                     {
                                                         // Play on global event.
                                                         NetworkSend.SendAnimation(mapNum, command.Data1,
-                                                            Data.Map[mapNum].Event[command.Data3].X,
-                                                            Data.Map[mapNum].Event[command.Data3].Y);
+                                                            Server.Map.Instance[mapNum].Event[command.Data3].X,
+                                                            Server.Map.Instance[mapNum].Event[command.Data3].Y);
                                                     }
                                                     else
                                                     {
@@ -2042,8 +2042,8 @@ namespace Server
                                             {
                                                 buffer.WriteEnum(ServerPackets.SPlaySound);
                                                 buffer.WriteString(command.Text1);
-                                                buffer.WriteInt32(Data.Map[mapNum].Event[instance1.EventId].X);
-                                                buffer.WriteInt32(Data.Map[mapNum].Event[instance1.EventId].Y);
+                                                buffer.WriteInt32(Server.Map.Instance[mapNum].Event[instance1.EventId].X);
+                                                buffer.WriteInt32(Server.Map.Instance[mapNum].Event[instance1.EventId].Y);
                                                 PlayerService.Instance.SendDataTo(i, buffer.GetBytes());
                                             }
 
@@ -2109,7 +2109,7 @@ namespace Server
                                             break;
 
                                         case (byte) EventCommand.SpawnNpc:
-                                            if (command.Data1 > 0 && command.Data1 < Data.Map[mapNum].Npc.Length) // Check if Npc exists
+                                            if (command.Data1 > 0 && command.Data1 < Server.Map.Instance[mapNum].Npc.Length) // Check if Npc exists
                                             {
                                                 MapNpc.OnSpawn(command.Data1, mapNum);
                                             }
@@ -2173,9 +2173,9 @@ namespace Server
                                         case (byte) EventCommand.WaitMovementCompletion:
                                         {
                                             // Ensure the event exists.
-                                            if (command.Data1 < Data.Map[mapNum].Event.Length)
+                                            if (command.Data1 < Server.Map.Instance[mapNum].Event.Length)
                                             {
-                                                if (Data.Map[mapNum].Event[command.Data1].Globals == 1)
+                                                if (Server.Map.Instance[mapNum].Event[command.Data1].Globals == 1)
                                                 {
                                                     instance1.WaitingForResponse = 4;
                                                     instance1.EventMovingId = command.Data1; // Global event ID.
@@ -2301,8 +2301,8 @@ namespace Server
         public static void FindEventLabel(string label, int mapNum, int eventId, int pageId, ref int curSlot, ref int curList, ref int[] listLeftOff)
         {
             // Check for valid map, event, and page.
-            if (mapNum < 0 || mapNum >= Data.Map.Length || eventId < 0 || eventId >= Data.Map[mapNum].Event.Length ||
-                pageId < 0 || pageId >= Data.Map[mapNum].Event[eventId].Pages.Length)
+            if (mapNum < 0 || mapNum >= Server.Map.Instance.Count || eventId < 0 || eventId >= Server.Map.Instance[mapNum].Event.Length ||
+                pageId < 0 || pageId >= Server.Map.Instance[mapNum].Event[eventId].Pages.Length)
             {
                 //invalid event, don't do anything.
                 return;
@@ -2313,7 +2313,7 @@ namespace Server
             int[] tmpListLeftOff = listLeftOff;
 
             // Initialize data structures.
-            var commandList = Data.Map[mapNum].Event[eventId].Pages[pageId].CommandList;
+            var commandList = Server.Map.Instance[mapNum].Event[eventId].Pages[pageId].CommandList;
 
             // Check if commandList is null
             if (commandList == null)
@@ -2464,7 +2464,7 @@ namespace Server
         public static int FindNpcPath(int mapNum, double mapNpcNum, int targetx, int targety)
         {
             // Validate map and NPC
-            if (mapNum < 0 || mapNum >= Data.Map.Length || mapNpcNum < 0 || mapNpcNum >= Data.MapNpc[mapNum].Npc.Length)
+            if (mapNum < 0 || mapNum >= Server.Map.Instance.Count || mapNpcNum < 0 || mapNpcNum >= Data.MapNpc[mapNum].Npc.Length)
                 return 4;
 
             int startX = Data.MapNpc[mapNum].Npc[(int) mapNpcNum].X;
@@ -2472,8 +2472,8 @@ namespace Server
             int goalX = targetx < 0 ? 0 : targetx;
             int goalY = targety < 0 ? 0 : targety;
 
-            int maxX = Data.Map[mapNum].MaxX;
-            int maxY = Data.Map[mapNum].MaxY;
+            int maxX = Server.Map.Instance[mapNum].MaxX;
+            int maxY = Server.Map.Instance[mapNum].MaxY;
 
             // Early out if already at target
             if (startX == goalX && startY == goalY)
@@ -2579,7 +2579,7 @@ namespace Server
             await System.Threading.Tasks.Task.Run(() =>
             {
                 // Check if the map exists and has events.
-                if (mapNum < 0 || mapNum >= Data.Map.Length || Data.Map[mapNum].EventCount <= 0)
+                if (mapNum < 0 || mapNum >= Server.Map.Instance.Count || Server.Map.Instance[mapNum].EventCount <= 0)
                 {
                     return;
                 }
@@ -2588,10 +2588,10 @@ namespace Server
                 Event.TempEventMap[mapNum].EventCount = 0;
                 Array.Resize(ref Event.TempEventMap[mapNum].Event, 1); // Start with size 1, resize as needed.
 
-                for (int i = 0; i < Data.Map[mapNum].EventCount; i++)
+                for (int i = 0; i < Server.Map.Instance[mapNum].EventCount; i++)
                 {
                     // Check for valid global events.
-                    if (Data.Map[mapNum].Event[i].PageCount > 0 && Data.Map[mapNum].Event[i].Globals == 1)
+                    if (Server.Map.Instance[mapNum].Event[i].PageCount > 0 && Server.Map.Instance[mapNum].Event[i].Globals == 1)
                     {
                         // Add a new event to the temporary map.
                         Event.TempEventMap[mapNum].EventCount++;
@@ -2599,10 +2599,10 @@ namespace Server
                         ref var tempEvent = ref Event.TempEventMap[mapNum].Event[Event.TempEventMap[mapNum].EventCount];
 
                         // Set initial event properties.
-                        tempEvent.X = Data.Map[mapNum].Event[i].X;
-                        tempEvent.Y = Data.Map[mapNum].Event[i].Y;
-                        tempEvent.Dir = Data.Map[mapNum].Event[i].Pages[0].GraphicType == 1
-                            ? (Data.Map[mapNum].Event[i].Pages[0].GraphicY % 4) switch
+                        tempEvent.X = Server.Map.Instance[mapNum].Event[i].X;
+                        tempEvent.Y = Server.Map.Instance[mapNum].Event[i].Y;
+                        tempEvent.Dir = Server.Map.Instance[mapNum].Event[i].Pages[0].GraphicType == 1
+                            ? (Server.Map.Instance[mapNum].Event[i].Pages[0].GraphicY % 4) switch
                             {
                                 0 => (int) Direction.Down,
                                 1 => (int) Direction.Left,
@@ -2611,18 +2611,18 @@ namespace Server
                             }
                             : (int) Direction.Down;
                         tempEvent.Active = 0;
-                        tempEvent.MoveType = Data.Map[mapNum].Event[i].Pages[0].MoveType;
+                        tempEvent.MoveType = Server.Map.Instance[mapNum].Event[i].Pages[0].MoveType;
 
                         if (tempEvent.MoveType == 2) // Custom Move Route
                         {
-                            int moveRouteCount = Data.Map[mapNum].Event[i].Pages[0].MoveRouteCount;
+                            int moveRouteCount = Server.Map.Instance[mapNum].Event[i].Pages[0].MoveRouteCount;
                             tempEvent.MoveRouteCount = moveRouteCount;
 
                             if (moveRouteCount > 0)
                             {
                                 // Copy the move route.
                                 tempEvent.MoveRoute = new MoveRoute[moveRouteCount];
-                                Array.Copy(Data.Map[mapNum].Event[i].Pages[0].MoveRoute, tempEvent.MoveRoute, moveRouteCount);
+                                Array.Copy(Server.Map.Instance[mapNum].Event[i].Pages[0].MoveRoute, tempEvent.MoveRoute, moveRouteCount);
                                 tempEvent.MoveRouteComplete = 0; // Reset completion status.
                             }
                             else
@@ -2635,14 +2635,14 @@ namespace Server
                             tempEvent.MoveRouteComplete = 1; // Not a move route, so considered complete.
                         }
 
-                        tempEvent.RepeatMoveRoute = Data.Map[mapNum].Event[i].Pages[0].RepeatMoveRoute;
-                        tempEvent.IgnoreIfCannotMove = Data.Map[mapNum].Event[i].Pages[0].IgnoreMoveRoute;
-                        tempEvent.MoveFreq = Data.Map[mapNum].Event[i].Pages[0].MoveFreq;
-                        tempEvent.MoveSpeed = Data.Map[mapNum].Event[i].Pages[0].MoveSpeed;
-                        tempEvent.WalkThrough = Data.Map[mapNum].Event[i].Pages[0].WalkThrough;
-                        tempEvent.FixedDir = Data.Map[mapNum].Event[i].Pages[0].DirFix;
-                        tempEvent.WalkingAnim = Data.Map[mapNum].Event[i].Pages[0].IdleAnim;
-                        tempEvent.ShowName = Data.Map[mapNum].Event[i].Pages[0].ShowName;
+                        tempEvent.RepeatMoveRoute = Server.Map.Instance[mapNum].Event[i].Pages[0].RepeatMoveRoute;
+                        tempEvent.IgnoreIfCannotMove = Server.Map.Instance[mapNum].Event[i].Pages[0].IgnoreMoveRoute;
+                        tempEvent.MoveFreq = Server.Map.Instance[mapNum].Event[i].Pages[0].MoveFreq;
+                        tempEvent.MoveSpeed = Server.Map.Instance[mapNum].Event[i].Pages[0].MoveSpeed;
+                        tempEvent.WalkThrough = Server.Map.Instance[mapNum].Event[i].Pages[0].WalkThrough;
+                        tempEvent.FixedDir = Server.Map.Instance[mapNum].Event[i].Pages[0].DirFix;
+                        tempEvent.WalkingAnim = Server.Map.Instance[mapNum].Event[i].Pages[0].IdleAnim;
+                        tempEvent.ShowName = Server.Map.Instance[mapNum].Event[i].Pages[0].ShowName;
                     }
                 }
             });
@@ -2651,7 +2651,7 @@ namespace Server
         public static void SpawnMapEventsFor(int index, int mapNum)
         {
             // Check for valid map.
-            if (mapNum < 0 || mapNum >= Data.Map.Length)
+            if (mapNum < 0 || mapNum >= Server.Map.Instance.Count)
             {
                 return;
             }
@@ -2661,10 +2661,10 @@ namespace Server
             Array.Resize(ref Data.TempPlayer[index].EventMap.EventPages, 1);
 
             // Initialize event processing array.
-            if (Data.Map[mapNum].EventCount > 0)
+            if (Server.Map.Instance[mapNum].EventCount > 0)
             {
-                Array.Resize(ref Data.TempPlayer[index].EventProcessing, Data.Map[mapNum].EventCount + 1); //+1 for easier indexing
-                Data.TempPlayer[index].EventProcessingCount = Data.Map[mapNum].EventCount;
+                Array.Resize(ref Data.TempPlayer[index].EventProcessing, Server.Map.Instance[mapNum].EventCount + 1); //+1 for easier indexing
+                Data.TempPlayer[index].EventProcessingCount = Server.Map.Instance[mapNum].EventCount;
             }
             else
             {
@@ -2672,22 +2672,22 @@ namespace Server
                 Data.TempPlayer[index].EventProcessingCount = 0;
             }
 
-            if (Data.Map[mapNum].EventCount <= 0) return;
+            if (Server.Map.Instance[mapNum].EventCount <= 0) return;
 
             // Iterate through map events.
-            for (int i = 0; i < Data.Map[mapNum].EventCount; i++)
+            for (int i = 0; i < Server.Map.Instance[mapNum].EventCount; i++)
             {
                 int p = -1;
 
                 // Check if event and its pages exist
-                if (Data.Map[mapNum].Event[i].Pages == null) continue;
-                if (Data.Map[mapNum].Event[i].PageCount <= 0) continue;
+                if (Server.Map.Instance[mapNum].Event[i].Pages == null) continue;
+                if (Server.Map.Instance[mapNum].Event[i].PageCount <= 0) continue;
 
                 // Find the highest-priority page that meets conditions.
-                for (int z = 0; z < Data.Map[mapNum].Event[i].PageCount; z++)
+                for (int z = 0; z < Server.Map.Instance[mapNum].Event[i].PageCount; z++)
                 {
                     bool spawnCurrentEvent = true;
-                    ref var page = ref Data.Map[mapNum].Event[i].Pages[z]; // Use ref for direct modification.
+                    ref var page = ref Server.Map.Instance[mapNum].Event[i].Pages[z]; // Use ref for direct modification.
                     bool variableConditionMet = false;
 
                     // Check conditions (Variable, Switch, Item, Self Switch).
@@ -2725,8 +2725,8 @@ namespace Server
                         int compare = page.SelfSwitchCompare; // 0 or 1, no need to check both values explicitly.
                         bool selfSwitchState;
 
-                        if (Data.Map[mapNum].Event[i].Globals == 1)
-                            selfSwitchState = Data.Map[mapNum].Event[i].SelfSwitches[page.SelfSwitchIndex] == compare;
+                        if (Server.Map.Instance[mapNum].Event[i].Globals == 1)
+                            selfSwitchState = Server.Map.Instance[mapNum].Event[i].SelfSwitches[page.SelfSwitchIndex] == compare;
                         else
                             selfSwitchState = false; // Local self switches are not checked when spawning.
 
@@ -2751,7 +2751,7 @@ namespace Server
                     Array.Resize(ref Data.TempPlayer[index].EventMap.EventPages, Data.TempPlayer[index].EventMap.CurrentEvents + 1);
                     ref var instance1 = ref Data.TempPlayer[index].EventMap.EventPages[Data.TempPlayer[index].EventMap.CurrentEvents];
 
-                    ref var eventPage = ref Data.Map[mapNum].Event[i].Pages[z];
+                    ref var eventPage = ref Server.Map.Instance[mapNum].Event[i].Pages[z];
 
                     // Set up the event page data.
                     instance1.Dir = eventPage.GraphicType == 1
@@ -2781,7 +2781,7 @@ namespace Server
                         _ => DefaultMovementSpeed
                     };
 
-                    if (Data.Map[mapNum].Event[i].Globals == 1)
+                    if (Server.Map.Instance[mapNum].Event[i].Globals == 1)
                     {
                         // Use global event's position and direction.
                         instance1.X = Event.TempEventMap[mapNum].Event[i].X * 32;
@@ -2792,8 +2792,8 @@ namespace Server
                     else
                     {
 
-                        instance1.X = Data.Map[mapNum].Event[i].X * 32;
-                        instance1.Y = Data.Map[mapNum].Event[i].Y * 32;
+                        instance1.X = Server.Map.Instance[mapNum].Event[i].X * 32;
+                        instance1.Y = Server.Map.Instance[mapNum].Event[i].Y * 32;
 
                         instance1.MoveRouteStep = 0;
                     }
@@ -2847,7 +2847,7 @@ namespace Server
                 // Write a sequential id for client-side array indexing.
                 buffer.WriteInt32(slot - 1);
 
-                buffer.WriteString(Data.Map[mapNum].Event[eventPage.EventId].Name);
+                buffer.WriteString(Server.Map.Instance[mapNum].Event[eventPage.EventId].Name);
                 buffer.WriteInt32(eventPage.Dir);
                 buffer.WriteByte(eventPage.GraphicType);
                 buffer.WriteInt32(eventPage.Graphic);
@@ -2860,10 +2860,10 @@ namespace Server
                 buffer.WriteInt32(eventPage.Y);
                 buffer.WriteByte(eventPage.Position);
                 buffer.WriteBoolean(eventPage.Visible);
-                buffer.WriteInt32(Data.Map[mapNum].Event[eventPage.EventId].Pages[eventPage.PageId].IdleAnim);
-                buffer.WriteInt32(Data.Map[mapNum].Event[eventPage.EventId].Pages[eventPage.PageId].DirFix);
-                buffer.WriteInt32(Data.Map[mapNum].Event[eventPage.EventId].Pages[eventPage.PageId].WalkThrough);
-                buffer.WriteInt32(Data.Map[mapNum].Event[eventPage.EventId].Pages[eventPage.PageId].ShowName);
+                buffer.WriteInt32(Server.Map.Instance[mapNum].Event[eventPage.EventId].Pages[eventPage.PageId].IdleAnim);
+                buffer.WriteInt32(Server.Map.Instance[mapNum].Event[eventPage.EventId].Pages[eventPage.PageId].DirFix);
+                buffer.WriteInt32(Server.Map.Instance[mapNum].Event[eventPage.EventId].Pages[eventPage.PageId].WalkThrough);
+                buffer.WriteInt32(Server.Map.Instance[mapNum].Event[eventPage.EventId].Pages[eventPage.PageId].ShowName);
             }
 
             PlayerService.Instance.SendDataTo(index, buffer.GetBytes());
@@ -2876,7 +2876,7 @@ namespace Server
                 return false;
 
             int mapNum = GetPlayerMap(playerIndex);
-            if (mapNum < 0 || mapNum >= Data.Map.Length)
+            if (mapNum < 0 || mapNum >= Server.Map.Instance.Count)
                 return false;
 
             // 2. Find the relevant event for the player
@@ -2895,7 +2895,7 @@ namespace Server
                 return false; // Event not found
 
             ref var eventPage = ref eventMap.EventPages[localEventIndex];
-            var mapEvent = Data.Map[mapNum].Event[eventPage.EventId];
+            var mapEvent = Server.Map.Instance[mapNum].Event[eventPage.EventId];
             var page = mapEvent.Pages[eventPage.PageId];
 
             // 3. Check trigger type
@@ -2905,7 +2905,7 @@ namespace Server
             // 4. Calculate intended tile based on player direction (if not walk-through)
             if (page.WalkThrough == 0)
             {
-                (int x, int y)? offset = GetOffsetByDirection(GetPlayerDir(playerIndex), GetPlayerX(playerIndex), GetPlayerY(playerIndex), Data.Map[mapNum]);
+                (int x, int y)? offset = GetOffsetByDirection(GetPlayerDir(playerIndex), GetPlayerX(playerIndex), GetPlayerY(playerIndex), Server.Map.Instance[mapNum]);
                 if (offset == null)
                     return false;
                 (targetX, targetY) = offset.Value;
@@ -2938,7 +2938,7 @@ namespace Server
         }
 
         // Helper to calculate tile offsets based on player direction and map bounds
-        private static (int, int)? GetOffsetByDirection(byte direction, int x, int y, Core.Globals.Type.Map map)
+        private static (int, int)? GetOffsetByDirection(byte direction, int x, int y, Core.Objects.MapBase map)
         {
             int newX = x, newY = y;
             switch ((Direction) direction)

@@ -1813,7 +1813,7 @@ namespace Client
                 bool LocalIsDirBlocked()
                 {
                     byte argdir = (byte) i;
-                    var n = GameLogic.IsDirBlocked(ref Data.MyMap.Tile[x, y].DirBlock, ref argdir);
+                    var n = GameLogic.IsDirBlocked(ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].DirBlock, ref argdir);
                     return n;
                 }
 
@@ -2508,14 +2508,14 @@ namespace Client
             // Auto-cancel target if player is off the current camera viewport (native world rect)
             CancelTargetIfOffCamera();
 
-            if (GameState.NumPanoramas > 0 & Data.MyMap.Panorama > 0)
+            if (GameState.NumPanoramas > 0 & Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Panorama > 0)
             {
-                Map.DrawPanorama(Data.MyMap.Panorama);
+                Map.DrawPanorama(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Panorama);
             }
 
-            if (GameState.NumParallax > 0 & Data.MyMap.Parallax > 0)
+            if (GameState.NumParallax > 0 & Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Parallax > 0)
             {
-                Map.DrawParallax(Data.MyMap.Parallax);
+                Map.DrawParallax(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Parallax);
             }
 
             // Draw lower tiles
@@ -2538,7 +2538,7 @@ namespace Client
             // events
             if (GameState.MyEditorType != EditorType.Map)
             {
-                if (GameState.CurrentEvents > 0 & GameState.CurrentEvents <= Data.MyMap.EventCount)
+                if (GameState.CurrentEvents > 0 & GameState.CurrentEvents <= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount)
                 {
                     var loopTo2 = Information.UBound(Data.MapEvents);
                     for (i = 0; i <= loopTo2; i++)
@@ -2577,7 +2577,7 @@ namespace Client
             }
 
             // Y-based render. Renders Players, Npcs and Resources based on Y-axis.
-            var loopTo3 = (int) Data.MyMap.MaxY;
+            var loopTo3 = (int) Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
             for (y = 0; y < loopTo3; y++)
             {
                 if (GameState.NumCharacters > 0)
@@ -2605,7 +2605,7 @@ namespace Client
 
                     if (GameState.MyEditorType != EditorType.Map)
                     {
-                        if (GameState.CurrentEvents > 0 & GameState.CurrentEvents <= Data.MyMap.EventCount)
+                        if (GameState.CurrentEvents > 0 & GameState.CurrentEvents <= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount)
                         {
                             var loopTo4 = Information.UBound(Data.MapEvents);
                             for (i = 0; i <= loopTo4; i++)
@@ -2719,7 +2719,7 @@ namespace Client
                 }
             }
 
-            if (Data.MapEvents != null && GameState.CurrentEvents > 0 & GameState.CurrentEvents <= Data.MyMap.EventCount)
+            if (Data.MapEvents != null && GameState.CurrentEvents > 0 & GameState.CurrentEvents <= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount)
             {
                 var loopTo6 = GameState.CurrentEvents;
                 for (i = 0; i < loopTo6; i++)
@@ -2766,7 +2766,7 @@ namespace Client
 
             if (GameState.MyEditorType != EditorType.Map)
             {
-                if (GameState.CurrentEvents > 0 && Data.MyMap.EventCount >= GameState.CurrentEvents)
+                if (GameState.CurrentEvents > 0 && Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount >= GameState.CurrentEvents)
                 {
                     var loopTo9 = GameState.CurrentEvents;
                     for (i = 0; i < loopTo9; i++)

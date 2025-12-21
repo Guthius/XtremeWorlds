@@ -381,8 +381,8 @@ public class Projectile : ProjectileBase, IData, IAsyncData
                             int anim = Projectile.Instance[projId].Animation;
                             if (anim >= 0)
                             {
-                                int tx = Math.Clamp(mp.X / Constants.TileSize, 0, Data.Map[map].MaxX - 1);
-                                int ty = Math.Clamp(mp.Y / Constants.TileSize, 0, Data.Map[map].MaxY - 1);
+                                int tx = Math.Clamp(mp.X / Constants.TileSize, 0, Server.Map.Instance[map].MaxX - 1);
+                                int ty = Math.Clamp(mp.Y / Constants.TileSize, 0, Server.Map.Instance[map].MaxY - 1);
                                 NetworkSend.SendAnimation(map, anim, tx, ty);
                                 // Try to apply attack on expire at destination
                                 OnAttack(map, ref mp, tx, ty, projId);
@@ -400,8 +400,8 @@ public class Projectile : ProjectileBase, IData, IAsyncData
                         int anim = Projectile.Instance[projId].Animation;
                         if (anim >= 0)
                         {
-                            int tx = Math.Clamp(prevTileX, 0, Data.Map[map].MaxX - 1);
-                            int ty = Math.Clamp(prevTileY, 0, Data.Map[map].MaxY - 1);
+                            int tx = Math.Clamp(prevTileX, 0, Server.Map.Instance[map].MaxX - 1);
+                            int ty = Math.Clamp(prevTileY, 0, Server.Map.Instance[map].MaxY - 1);
                             NetworkSend.SendAnimation(map, anim, tx, ty);
                             OnAttack(map, ref mp, tx, ty, projId);
                         }
@@ -413,15 +413,15 @@ public class Projectile : ProjectileBase, IData, IAsyncData
                     // Bounds check
                     int tileX = Math.Clamp(mp.X / Constants.TileSize, 0, Core.Globals.Variables.MaxMapX - 1);
                     int tileY = Math.Clamp(mp.Y / Constants.TileSize, 0, Core.Globals.Variables.MaxMapY - 1);
-                    if (tileX < 0 || tileY < 0 || tileX >= Data.Map[map].MaxX || tileY >= Data.Map[map].MaxY)
+                    if (tileX < 0 || tileY < 0 || tileX >= Server.Map.Instance[map].MaxX || tileY >= Server.Map.Instance[map].MaxY)
                     {
                         int anim = Projectile.Instance[projId].Animation;
                         if (anim >= 0)
                         {
-                            if (Data.Map[map].MaxX > 0 && Data.Map[map].MaxY > 0)
+                            if (Server.Map.Instance[map].MaxX > 0 && Server.Map.Instance[map].MaxY > 0)
                             {
-                                int tx = Math.Clamp(prevTileX, 0, Data.Map[map].MaxX - 1);
-                                int ty = Math.Clamp(prevTileY, 0, Data.Map[map].MaxY - 1);
+                                int tx = Math.Clamp(prevTileX, 0, Server.Map.Instance[map].MaxX - 1);
+                                int ty = Math.Clamp(prevTileY, 0, Server.Map.Instance[map].MaxY - 1);
                                 NetworkSend.SendAnimation(map, anim, tx, ty);
                                 OnAttack(map, ref mp, tx, ty, projId);
                             }
@@ -432,7 +432,7 @@ public class Projectile : ProjectileBase, IData, IAsyncData
                     }
 
                     // Tile collision
-                    if (Data.Map[map].Tile[tileX, tileY].Type == TileType.Blocked || Data.Map[map].Tile[tileX, tileY].Type2 == TileType.Blocked)
+                    if (Server.Map.Instance[map].Tile[tileX, tileY].Type == TileType.Blocked || Server.Map.Instance[map].Tile[tileX, tileY].Type2 == TileType.Blocked)
                     {
                         int anim = Projectile.Instance[projId].Animation;
                         if (anim >= 0)

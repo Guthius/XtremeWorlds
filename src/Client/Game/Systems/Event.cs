@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework;
 using static Core.Globals.Type;
 using EventCommand = Core.Globals.EventCommand;
 using Type = Core.Globals.Type;
+using static Core.Globals.Commands;
 
 namespace Client
 {
@@ -80,16 +81,16 @@ namespace Client
             int count;
             int i;
 
-            count = Data.MyMap.EventCount;
+            count = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount;
             if (count == 0)
                 return;
 
             var loopTo = count;
             for (i = 0; i < loopTo; i++)
             {
-                if (Data.MyMap.Event[i].X == X & Data.MyMap.Event[i].Y == Y)
+                if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].X == X & Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Y == Y)
                 {
-                    CopyEvent = Data.MyMap.Event[i];
+                    CopyEvent = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i];
                     return;
                 }
             }
@@ -101,14 +102,14 @@ namespace Client
             int i;
             int EventNum = -1;
 
-            count = Data.MyMap.EventCount;
+            count = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount;
 
             if (count > 0)
             {
                 var loopTo = count;
                 for (i = 0; i < loopTo; i++)
                 {
-                    if (Data.MyMap.Event[i].X == x & Data.MyMap.Event[i].Y == y)
+                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].X == x & Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Y == y)
                     {
                         EventNum = i;
                     }
@@ -120,15 +121,15 @@ namespace Client
             {
                 AddEvent(x, y, true);
                 // Index of the newly added event is the last valid slot (0-based)
-                EventNum = Data.MyMap.EventCount - 1;
+                EventNum = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount - 1;
             }
 
             // copy it
-            Data.MyMap.Event[EventNum] = CopyEvent;
+            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[EventNum] = CopyEvent;
 
             // set position
-            Data.MyMap.Event[EventNum].X = x;
-            Data.MyMap.Event[EventNum].Y = y;
+            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[EventNum].X = x;
+            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[EventNum].Y = y;
         }
 
         public static void DeleteEvent(int X, int Y)
@@ -140,13 +141,13 @@ namespace Client
                 return;
 
             // First pass: find all events to delete and shift others down
-            var loopTo = Data.MyMap.EventCount;
+            var loopTo = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount;
             for (i = 0; i < loopTo; i++)
             {
-                if (Data.MyMap.Event.Length <= i)
+                if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event.Length <= i)
                     break;
 
-                if (Data.MyMap.Event[i].X == X & Data.MyMap.Event[i].Y == Y)
+                if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].X == X & Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Y == Y)
                 {
                     // Clear the event
                     ClearEvent(i);
@@ -157,15 +158,15 @@ namespace Client
 
             if (lowIndex != -1)
             {
-                for (i = lowIndex; i < Data.MyMap.EventCount; i++)
+                for (i = lowIndex; i < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount; i++)
                 {
-                    if (Information.UBound(Data.MyMap.Event) > i)
+                    if (Information.UBound(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event) > i)
                     {
-                        Data.MyMap.Event[i] = Data.MyMap.Event[i + 1];
+                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i] = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i + 1];
                     }
                 }
 
-                for (i = lowIndex; i < Data.MyMap.EventCount; i++)
+                for (i = lowIndex; i < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount; i++)
                 {
                     if (Information.UBound(Data.MapEvents) > i)
                     {
@@ -188,7 +189,7 @@ namespace Client
             if (Event.InEvent)
                 return;
 
-            count = Data.MyMap.EventCount;
+            count = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount;
 
             // make sure there's not already an event
             if (count > 0)
@@ -196,7 +197,7 @@ namespace Client
                 var loopTo = count;
                 for (i = 0; i < loopTo; i++)
                 {
-                    if (Data.MyMap.Event[i].X == X & Data.MyMap.Event[i].Y == Y)
+                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].X == X & Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Y == Y)
                     {
                         // already an event - edit it
                         if (!cancelLoad)
@@ -220,14 +221,14 @@ namespace Client
                 count++;
             }
 
-            Data.MyMap.EventCount = count;
-            Array.Resize(ref Data.MyMap.Event, count + 1);
+            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount = count;
+            Array.Resize(ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event, count + 1);
             Array.Resize(ref Data.MapEvents, count + 1);
             // Initialize the newly added event slot (0-based index is count - 1)
             ClearEvent(count - 1);
             // set the new event
-            Data.MyMap.Event[count - 1].X = X;
-            Data.MyMap.Event[count - 1].Y = Y;
+            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[count - 1].X = X;
+            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[count - 1].Y = Y;
             // ClearEvent already initialized a single page (PageCount=1),
             // so do NOT add another page here. New events should start with exactly 1 page.
             // load the editor
@@ -241,7 +242,7 @@ namespace Client
 
         public static void ClearEvent(int eventNum)
         {
-            ref var instance = ref Data.MyMap.Event[eventNum];
+            ref var instance = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[eventNum];
             instance.Name = "";
             instance.PageCount = 1;
             instance.Pages = new Type.EventPage[1];
@@ -259,14 +260,14 @@ namespace Client
             EditorId = EventNum;
             
             // Check if Event array is null or EventNum is out of bounds
-            if (Data.MyMap.Event == null || EventNum < 0 || EventNum >= Data.MyMap.Event.Length)
+            if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event == null || EventNum < 0 || EventNum >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event.Length)
             {
                 // Initialize with a default empty event
                 Instance = new Type.Event();
                 return;
             }
             
-            Instance = Data.MyMap.Event[EventNum];
+            Instance = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[EventNum];
         }
 
         public static void EventEditorLoadPage(int pageNum)
@@ -388,7 +389,7 @@ namespace Client
         public static void EventEditorOK()
         {
             // copy the event data from the temp event
-            Data.MyMap.Event[EditorId] = Instance;
+            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[EditorId] = Instance;
         }
 
         public static void EventListCommands()
@@ -1139,9 +1140,9 @@ namespace Client
                                 }
                                 case (byte) EventCommand.SetMoveRoute:
                                 {
-                                    if (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1 <= Data.MyMap.EventCount)
+                                    if (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1 <= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount)
                                     {
-                                        EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Set Move Route for Event #" + Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1 + " [" + Data.MyMap.Event[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1].Name + "]");
+                                        EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Set Move Route for Event #" + Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1 + " [" + Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1].Name + "]");
                                     }
                                     else
                                     {
@@ -1158,7 +1159,7 @@ namespace Client
                                     }
                                     else if (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data2 == 1)
                                     {
-                                        EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Play Animation " + (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1 + 1) + " [" + Animation.Instance[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1].Name + "]" + " On Event " + Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data3 + " [" + Strings.Trim(Data.MyMap.Event[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data3].Name) + "]");
+                                        EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Play Animation " + (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1 + 1) + " [" + Animation.Instance[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1].Name + "]" + " On Event " + Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data3 + " [" + Strings.Trim(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data3].Name) + "]");
                                     }
                                     else if (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data2 == 2)
                                     {
@@ -1220,20 +1221,20 @@ namespace Client
                                         }
                                         case (int) TargetType.Npc:
                                         {
-                                            if (Data.MyMap.Npc[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data2] <= 0)
+                                            if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data2] <= 0)
                                             {
                                                 EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Show Chat Bubble - " + Strings.Mid(Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Text1, 1, 20) + "... - On Npc [" + (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data2 + 1).ToString() + ". ]");
                                             }
                                             else
                                             {
-                                                EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Show Chat Bubble - " + Strings.Mid(Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Text1, 1, 20) + "... - On Npc [" + (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data2 + 1).ToString() + ". " + Data.Npc[Data.MyMap.Npc[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data2]].Name + "]");
+                                                EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Show Chat Bubble - " + Strings.Mid(Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Text1, 1, 20) + "... - On Npc [" + (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data2 + 1).ToString() + ". " + Data.Npc[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data2]].Name + "]");
                                             }
 
                                             break;
                                         }
                                         case (int) TargetType.Event:
                                         {
-                                            EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Show Chat Bubble - " + Strings.Mid(Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Text1, 1, 20) + "... - On Event [" + (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data2 + 1).ToString() + ". " + Data.MyMap.Event[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data2].Name + "]");
+                                            EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Show Chat Bubble - " + Strings.Mid(Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Text1, 1, 20) + "... - On Event [" + (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data2 + 1).ToString() + ". " + Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data2].Name + "]");
                                             break;
                                         }
                                     }
@@ -1252,13 +1253,13 @@ namespace Client
                                 }
                                 case (byte) EventCommand.SpawnNpc:
                                 {
-                                    if (Data.MyMap.Npc[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1] <= 0)
+                                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1] <= 0)
                                     {
                                         EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Spawn Npc: [" + Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1.ToString() + ". " + "]");
                                     }
                                     else
                                     {
-                                        EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Spawn Npc: [" + Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1.ToString() + ". " + Data.Npc[Data.MyMap.Npc[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1]].Name + "]");
+                                        EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Spawn Npc: [" + Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1.ToString() + ". " + Data.Npc[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1]].Name + "]");
                                     }
 
                                     break;
@@ -1361,9 +1362,9 @@ namespace Client
                                 }
                                 case (byte) EventCommand.WaitMovementCompletion:
                                 {
-                                    if (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1 <= Data.MyMap.EventCount)
+                                    if (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1 <= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount)
                                     {
-                                        EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Wait for Event #" + Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1 + " [" + Strings.Trim(Data.MyMap.Event[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1].Name) + "] to complete move route.");
+                                        EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Wait for Event #" + Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1 + " [" + Strings.Trim(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1].Name) + "] to complete move route.");
                                     }
                                     else
                                     {
@@ -2438,14 +2439,14 @@ namespace Client
                     IsEdit = true;
                     EditorEvent.Instance.fraMoveRoute.Visible = true;
                     EditorEvent.Instance.lstMoveRoute.Items.Clear();
-                    ListOfEvents = new int[Data.MyMap.EventCount];
+                    ListOfEvents = new int[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount];
                     ListOfEvents[0] = EditorId;
-                    var loopTo = Data.MyMap.EventCount;
+                    var loopTo = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount;
                     for (i = 0; i < loopTo; i++)
                     {
                         if (i != EditorId)
                         {
-                            EditorEvent.Instance.cmbEvent.Items.Add(Strings.Trim(Data.MyMap.Event[i].Name));
+                            EditorEvent.Instance.cmbEvent.Items.Add(Strings.Trim(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Name));
                             X = X + 1;
                             ListOfEvents[X] = i;
                             if (i == Instance.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1)
@@ -2696,9 +2697,9 @@ namespace Client
                     EditorEvent.Instance.cmbPlayAnimEvent.Visible = false;
                     EditorEvent.Instance.cmbPlayAnim.SelectedIndex = Instance.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1;
                     EditorEvent.Instance.cmbPlayAnimEvent.Items.Clear();
-                    var loopTo2 = Data.MyMap.EventCount;
+                    var loopTo2 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount;
                     for (i = 0; i < loopTo2; i++)
-                        EditorEvent.Instance.cmbPlayAnimEvent.Items.Add(i + 1 + ". " + Data.MyMap.Event[i].Name);
+                        EditorEvent.Instance.cmbPlayAnimEvent.Items.Add(i + 1 + ". " + Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Name);
                     EditorEvent.Instance.cmbPlayAnimEvent.SelectedIndex = 0;
                     if (Instance.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data2 == 0)
                     {
@@ -2712,8 +2713,8 @@ namespace Client
                     else if (Instance.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data2 == 2)
                     {
                         EditorEvent.Instance.cmbAnimTargetType.SelectedIndex = 2;
-                        EditorEvent.Instance.nudPlayAnimTileX.MaxValue = Data.MyMap.MaxX;
-                        EditorEvent.Instance.nudPlayAnimTileY.MaxValue = Data.MyMap.MaxY;
+                        EditorEvent.Instance.nudPlayAnimTileX.MaxValue = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
+                        EditorEvent.Instance.nudPlayAnimTileY.MaxValue = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
                         EditorEvent.Instance.nudPlayAnimTileX.Value = Instance.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data3;
                         EditorEvent.Instance.nudPlayAnimTileY.Value = Instance.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data4;
                     }
@@ -2889,16 +2890,16 @@ namespace Client
                     EditorEvent.Instance.fraMoveRouteWait.Visible = true;
                     EditorEvent.Instance.fraCommands.Visible = false;
                     EditorEvent.Instance.cmbMoveWait.Items.Clear();
-                    ListOfEvents = new int[Data.MyMap.EventCount];
+                    ListOfEvents = new int[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount];
                     ListOfEvents[0] = EditorId;
                     EditorEvent.Instance.cmbMoveWait.Items.Add("This Event");
                     EditorEvent.Instance.cmbMoveWait.SelectedIndex = 0;
-                    var loopTo5 = Data.MyMap.EventCount;
+                    var loopTo5 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount;
                     for (i = 0; i < loopTo5; i++)
                     {
                         if (i != EditorId)
                         {
-                            EditorEvent.Instance.cmbMoveWait.Items.Add(Strings.Trim(Data.MyMap.Event[i].Name));
+                            EditorEvent.Instance.cmbMoveWait.Items.Add(Strings.Trim(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Name));
                             X = X + 1;
                             ListOfEvents[X] = i;
                             if (i == Instance.Pages[CurPageNum].CommandList[curlist].Commands[curslot].Data1)
@@ -3370,7 +3371,7 @@ namespace Client
             if (id < 0) return;
 
             if (Data.MapEvents == null) return;
-            if (id >= Data.MyMap.EventCount) return;
+            if (id >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount) return;
             if (id >= Data.MapEvents.Length) return;
 
             // Some events may be uninitialized structs (default). We can skip if MovementSpeed == 0 and name null/empty and not moving.
@@ -3606,22 +3607,22 @@ namespace Client
 
         public static void OnDraw()
         {
-            if (Data.MyMap.Event == null)
+            if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event == null)
                 return;
 
             // Iterate only actual events to avoid drawing the trailing empty slot
-            int count = Math.Max(0, Data.MyMap.EventCount);
+            int count = Math.Max(0, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount);
             for (int i = 0; i < count; i++)
             {
-                if (i >= Data.MyMap.Event.Length)
+                if (i >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event.Length)
                     break;
                     
                 // Treat MyMap.Event.X/Y as tile coordinates; compute world pixel coordinates
-                int worldX = Data.MyMap.Event[i].X * Constants.TileSize;
-                int worldY = Data.MyMap.Event[i].Y * Constants.TileSize;
+                int worldX = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].X * Constants.TileSize;
+                int worldY = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Y * Constants.TileSize;
 
                 // Skip event if there are no pages
-                if (Data.MyMap.Event[i].PageCount <= 0)
+                if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].PageCount <= 0)
                 {
                     GameClient.DrawOutlineRectangle(GameLogic.ConvertMapX(worldX), GameLogic.ConvertMapY(worldY), Constants.TileSize, Constants.TileSize, Color.Blue, 0.6f);
                     continue;
@@ -3632,7 +3633,7 @@ namespace Client
                 int screenY = GameLogic.ConvertMapY(worldY);
 
                 // Render event based on its graphic type
-                switch (Data.MyMap.Event[i].Pages[0].GraphicType)
+                switch (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[0].GraphicType)
                 {
                     case 0: // Text Event (draw simple 'E' at the tile origin like other 32x32 textures)
                     {
@@ -3642,13 +3643,13 @@ namespace Client
 
                     case 1: // Character Graphic
                     {
-                        GameClient.RenderCharacterGraphic(Data.MyMap.Event[i], screenX, screenY);
+                        GameClient.RenderCharacterGraphic(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i], screenX, screenY);
                         break;
                     }
 
                     case 2: // Tileset Graphic
                     {
-                        GameClient.RenderTilesetGraphic(Data.MyMap.Event[i], screenX, screenY);
+                        GameClient.RenderTilesetGraphic(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i], screenX, screenY);
                         break;
                     }
 

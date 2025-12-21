@@ -51,8 +51,8 @@ public class Player : PlayerBase
             return;
         }
 
-        x = Math.Clamp(x, 0, Data.Map[mapNum].MaxX) * 32;
-        y = Math.Clamp(y, 0, Data.Map[mapNum].MaxY) * 32;
+        x = Math.Clamp(x, 0, Server.Map.Instance[mapNum].MaxX) * 32;
+        y = Math.Clamp(y, 0, Server.Map.Instance[mapNum].MaxY) * 32;
 
         Data.TempPlayer[playerId].EventProcessingCount = 0;
         Data.TempPlayer[playerId].EventMap.CurrentEvents = 0; // Clear events
@@ -115,20 +115,20 @@ public class Player : PlayerBase
 
         if (oldMapNum != mapNum || send)
         {
-            if (Data.Map[mapNum].Moral < 0 || Data.Map[mapNum].Moral >= Core.Globals.Variables.MaxMorals)
+            if (Server.Map.Instance[mapNum].Moral < 0 || Server.Map.Instance[mapNum].Moral >= Core.Globals.Variables.MaxMorals)
             {
-                Data.Map[mapNum].Moral = 0;
+                Server.Map.Instance[mapNum].Moral = 0;
             }
 
             Data.TempPlayer[playerId].GettingMap = true;
 
-            NetworkSend.SendUpdateMoralTo(playerId, Data.Map[mapNum].Moral);
+            NetworkSend.SendUpdateMoralTo(playerId, Server.Map.Instance[mapNum].Moral);
 
             var packet = new PacketWriter(12);
 
             packet.WriteEnum(ServerPackets.SCheckForMap);
             packet.WriteInt32(mapNum);
-            packet.WriteInt32(Data.Map[mapNum].Revision);
+            packet.WriteInt32(Server.Map.Instance[mapNum].Revision);
 
             PlayerService.Instance.SendDataTo(playerId, packet.GetBytes());
         }
@@ -192,13 +192,13 @@ public class Player : PlayerBase
                     SetPlayerY(playerId, GetPlayerRawY(playerId) - 1);
                     moved = true;
                 }
-                else if (Data.Map[map].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type != TileType.NoCrossing && Data.Map[map].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type2 != TileType.NoCrossing)
+                else if (Server.Map.Instance[map].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type != TileType.NoCrossing && Server.Map.Instance[map].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type2 != TileType.NoCrossing)
                 {
-                    if (Data.Map[GetPlayerMap(playerId)].Up > 0)
+                    if (Server.Map.Instance[GetPlayerMap(playerId)].Up > 0)
                     {
-                        var newMapY = Data.Map[Data.Map[GetPlayerMap(playerId)].Up].MaxY;
+                        var newMapY = Server.Map.Instance[Server.Map.Instance[GetPlayerMap(playerId)].Up].MaxY;
                         
-                        OnWarp(playerId, Data.Map[GetPlayerMap(playerId)].Up, GetPlayerX(playerId), newMapY, (int) Direction.Up);
+                        OnWarp(playerId, Server.Map.Instance[GetPlayerMap(playerId)].Up, GetPlayerX(playerId), newMapY, (int) Direction.Up);
                         
                         didWarp = true;
                         moved = true;
@@ -208,7 +208,7 @@ public class Player : PlayerBase
                 break;
 
             case Direction.Down:
-                if (GetPlayerY(playerId) < Data.Map[map].MaxY - 1)
+                if (GetPlayerY(playerId) < Server.Map.Instance[map].MaxY - 1)
                 {
                     if (IsTileBlocked(map, GetPlayerX(playerId), GetPlayerY(playerId) + 1, Direction.Down))
                     {
@@ -220,11 +220,11 @@ public class Player : PlayerBase
                     
                     moved = true;
                 }
-                else if (Data.Map[GetPlayerMap(playerId)].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type != TileType.NoCrossing && Data.Map[GetPlayerMap(playerId)].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type2 != TileType.NoCrossing)
+                else if (Server.Map.Instance[GetPlayerMap(playerId)].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type != TileType.NoCrossing && Server.Map.Instance[GetPlayerMap(playerId)].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type2 != TileType.NoCrossing)
                 {
-                    if (Data.Map[GetPlayerMap(playerId)].Down > 0)
+                    if (Server.Map.Instance[GetPlayerMap(playerId)].Down > 0)
                     {
-                        OnWarp(playerId, Data.Map[GetPlayerMap(playerId)].Down, GetPlayerX(playerId), 0, (int) Direction.Down);
+                        OnWarp(playerId, Server.Map.Instance[GetPlayerMap(playerId)].Down, GetPlayerX(playerId), 0, (int) Direction.Down);
                         
                         didWarp = true;
                         moved = true;
@@ -246,13 +246,13 @@ public class Player : PlayerBase
                     
                     moved = true;
                 }
-                else if (Data.Map[GetPlayerMap(playerId)].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type != TileType.NoCrossing && Data.Map[GetPlayerMap(playerId)].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type2 != TileType.NoCrossing)
+                else if (Server.Map.Instance[GetPlayerMap(playerId)].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type != TileType.NoCrossing && Server.Map.Instance[GetPlayerMap(playerId)].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type2 != TileType.NoCrossing)
                 {
-                    if (Data.Map[GetPlayerMap(playerId)].Left > 0)
+                    if (Server.Map.Instance[GetPlayerMap(playerId)].Left > 0)
                     {
-                        var newMapX = Data.Map[Data.Map[GetPlayerMap(playerId)].Left].MaxX;
+                        var newMapX = Server.Map.Instance[Server.Map.Instance[GetPlayerMap(playerId)].Left].MaxX;
 
-                        OnWarp(playerId, Data.Map[GetPlayerMap(playerId)].Left, newMapX, GetPlayerY(playerId), (int) Direction.Left);
+                        OnWarp(playerId, Server.Map.Instance[GetPlayerMap(playerId)].Left, newMapX, GetPlayerY(playerId), (int) Direction.Left);
 
                         didWarp = true;
                         moved = true;
@@ -262,7 +262,7 @@ public class Player : PlayerBase
                 break;
 
             case Direction.Right:
-                if (GetPlayerX(playerId) < Data.Map[map].MaxX - 1)
+                if (GetPlayerX(playerId) < Server.Map.Instance[map].MaxX - 1)
                 {
                     if (IsTileBlocked(map, GetPlayerX(playerId) + 1, GetPlayerY(playerId), Direction.Right))
                     {
@@ -274,11 +274,11 @@ public class Player : PlayerBase
                     
                     moved = true;
                 }
-                else if (Data.Map[GetPlayerMap(playerId)].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type != TileType.NoCrossing && Data.Map[GetPlayerMap(playerId)].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type2 != TileType.NoCrossing)
+                else if (Server.Map.Instance[GetPlayerMap(playerId)].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type != TileType.NoCrossing && Server.Map.Instance[GetPlayerMap(playerId)].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type2 != TileType.NoCrossing)
                 {
-                    if (Data.Map[GetPlayerMap(playerId)].Right > 0)
+                    if (Server.Map.Instance[GetPlayerMap(playerId)].Right > 0)
                     {
-                        OnWarp(playerId, Data.Map[GetPlayerMap(playerId)].Right, 0, GetPlayerY(playerId), (int) Direction.Right);
+                        OnWarp(playerId, Server.Map.Instance[GetPlayerMap(playerId)].Right, 0, GetPlayerY(playerId), (int) Direction.Right);
                         
                         didWarp = true;
                         moved = true;
@@ -288,7 +288,7 @@ public class Player : PlayerBase
                 break;
 
             case Direction.UpRight:
-                if (GetPlayerY(playerId) > 0 && GetPlayerX(playerId) < Data.Map[map].MaxX - 1)
+                if (GetPlayerY(playerId) > 0 && GetPlayerX(playerId) < Server.Map.Instance[map].MaxX - 1)
                 {
                     if (IsTileBlocked(map, GetPlayerX(playerId) + 1, GetPlayerY(playerId) - 1, Direction.UpRight))
                     {
@@ -322,7 +322,7 @@ public class Player : PlayerBase
                 break;
 
             case Direction.DownRight:
-                if (GetPlayerY(playerId) < Data.Map[map].MaxY - 1 && GetPlayerX(playerId) < Data.Map[map].MaxX - 1)
+                if (GetPlayerY(playerId) < Server.Map.Instance[map].MaxY - 1 && GetPlayerX(playerId) < Server.Map.Instance[map].MaxX - 1)
                 {
                     if (IsTileBlocked(map, GetPlayerX(playerId) + 1, GetPlayerY(playerId) + 1, Direction.DownRight))
                     {
@@ -339,7 +339,7 @@ public class Player : PlayerBase
                 break;
 
             case Direction.DownLeft:
-                if (GetPlayerY(playerId) < Data.Map[map].MaxY - 1 && GetPlayerX(playerId) > 0)
+                if (GetPlayerY(playerId) < Server.Map.Instance[map].MaxY - 1 && GetPlayerX(playerId) > 0)
                 {
                     if (IsTileBlocked(map, GetPlayerX(playerId) - 1, GetPlayerY(playerId) + 1, Direction.DownLeft))
                     {
@@ -358,15 +358,15 @@ public class Player : PlayerBase
 
         if (GetPlayerX(playerId) >= 0 &&
             GetPlayerY(playerId) >= 0 &&
-            GetPlayerX(playerId) < Data.Map[GetPlayerMap(playerId)].MaxX &&
-            GetPlayerY(playerId) < Data.Map[GetPlayerMap(playerId)].MaxY)
+            GetPlayerX(playerId) < Server.Map.Instance[GetPlayerMap(playerId)].MaxX &&
+            GetPlayerY(playerId) < Server.Map.Instance[GetPlayerMap(playerId)].MaxY)
         {
             for (var i = 0; i < Data.TempPlayer[playerId].EventMap.CurrentEvents; i++)
             {
                 EventLogic.TriggerEvent(playerId, i, 1, GetPlayerX(playerId), GetPlayerY(playerId));
             }
 
-            ref var tile = ref Data.Map[GetPlayerMap(playerId)].Tile[GetPlayerX(playerId), GetPlayerY(playerId)];
+            ref var tile = ref Server.Map.Instance[GetPlayerMap(playerId)].Tile[GetPlayerX(playerId), GetPlayerY(playerId)];
 
             map = -1;
             x = 0;
@@ -524,14 +524,14 @@ public class Player : PlayerBase
                 continue;
             }
                 
-            if (Data.Map[GetPlayerMap(playerId)].Event[Data.TempPlayer[playerId].EventMap.EventPages[i].EventId].Globals == 1)
+            if (Server.Map.Instance[GetPlayerMap(playerId)].Event[Data.TempPlayer[playerId].EventMap.EventPages[i].EventId].Globals == 1)
             {
-                if (Data.Map[GetPlayerMap(playerId)].Event[Data.TempPlayer[playerId].EventMap.EventPages[i].EventId].X == x & Data.Map[GetPlayerMap(playerId)].Event[Data.TempPlayer[playerId].EventMap.EventPages[i].EventId].Y == y & Data.Map[GetPlayerMap(playerId)].Event[Data.TempPlayer[playerId].EventMap.EventPages[i].EventId].Pages[Data.TempPlayer[playerId].EventMap.EventPages[i].PageId].Trigger == 1 & Data.TempPlayer[playerId].EventMap.EventPages[i].Visible)
+                if (Server.Map.Instance[GetPlayerMap(playerId)].Event[Data.TempPlayer[playerId].EventMap.EventPages[i].EventId].X == x & Server.Map.Instance[GetPlayerMap(playerId)].Event[Data.TempPlayer[playerId].EventMap.EventPages[i].EventId].Y == y & Server.Map.Instance[GetPlayerMap(playerId)].Event[Data.TempPlayer[playerId].EventMap.EventPages[i].EventId].Pages[Data.TempPlayer[playerId].EventMap.EventPages[i].PageId].Trigger == 1 & Data.TempPlayer[playerId].EventMap.EventPages[i].Visible)
                 {
                     beginEvent = true;
                 }
             }
-            else if (Data.TempPlayer[playerId].EventMap.EventPages[i].X == x & Data.TempPlayer[playerId].EventMap.EventPages[i].Y == y & Data.Map[GetPlayerMap(playerId)].Event[Data.TempPlayer[playerId].EventMap.EventPages[i].EventId].Pages[Data.TempPlayer[playerId].EventMap.EventPages[i].PageId].Trigger == 1 & Data.TempPlayer[playerId].EventMap.EventPages[i].Visible)
+            else if (Data.TempPlayer[playerId].EventMap.EventPages[i].X == x & Data.TempPlayer[playerId].EventMap.EventPages[i].Y == y & Server.Map.Instance[GetPlayerMap(playerId)].Event[Data.TempPlayer[playerId].EventMap.EventPages[i].EventId].Pages[Data.TempPlayer[playerId].EventMap.EventPages[i].PageId].Trigger == 1 & Data.TempPlayer[playerId].EventMap.EventPages[i].Visible)
             {
                 beginEvent = true;
             }
@@ -542,7 +542,7 @@ public class Player : PlayerBase
             }
             
             // Process this event, it is on-touch and everything checks out.
-            if (Data.Map[GetPlayerMap(playerId)].Event[Data.TempPlayer[playerId].EventMap.EventPages[i].EventId].Pages[Data.TempPlayer[playerId].EventMap.EventPages[i].PageId].CommandListCount > 0)
+            if (Server.Map.Instance[GetPlayerMap(playerId)].Event[Data.TempPlayer[playerId].EventMap.EventPages[i].EventId].Pages[Data.TempPlayer[playerId].EventMap.EventPages[i].PageId].CommandListCount > 0)
             {
                 Data.TempPlayer[playerId].EventProcessing[Data.TempPlayer[playerId].EventMap.EventPages[i].EventId].Active = 0;
                 Data.TempPlayer[playerId].EventProcessing[Data.TempPlayer[playerId].EventMap.EventPages[i].EventId].ActionTimer = General.GetTimeMs();
@@ -554,7 +554,7 @@ public class Player : PlayerBase
 
                 var eventId = Data.TempPlayer[playerId].EventMap.EventPages[i].EventId;
                 var pageId = Data.TempPlayer[playerId].EventMap.EventPages[i].PageId;
-                var commandListCount = Data.Map[GetPlayerMap(playerId)].Event[eventId].Pages[pageId].CommandListCount;
+                var commandListCount = Server.Map.Instance[GetPlayerMap(playerId)].Event[eventId].Pages[pageId].CommandListCount;
 
                 Array.Resize(ref Data.TempPlayer[playerId].EventProcessing[eventId].ListLeftOff, commandListCount);
             }
@@ -567,7 +567,7 @@ public class Player : PlayerBase
     {
         try
         {
-            if (Moral.Instance[Data.Map[mapNum].Moral].PlayerBlock)
+            if (Moral.Instance[Server.Map.Instance[mapNum].Moral].PlayerBlock)
             {
                 foreach (var playerId in PlayerService.Instance.PlayerIds)
                 {
@@ -580,7 +580,7 @@ public class Player : PlayerBase
                 }
             }
 
-            if (Moral.Instance[Data.Map[mapNum].Moral].NpcBlock)
+            if (Moral.Instance[Server.Map.Instance[mapNum].Moral].NpcBlock)
             {
                 for (var mapNpcNum = 0; mapNpcNum < Core.Globals.Variables.MaxMapNpcs; mapNpcNum++)
                 {
@@ -594,13 +594,13 @@ public class Player : PlayerBase
             }
 
             // Check to make sure that the tile is walkable
-            if (IsDirBlocked(Data.Map[mapNum].Tile[x, y].DirBlock, dir))
+            if (IsDirBlocked(Server.Map.Instance[mapNum].Tile[x, y].DirBlock, dir))
             {
                 return true;
             }
 
-            return Data.Map[mapNum].Tile[x, y].Type == TileType.Blocked ||
-                   Data.Map[mapNum].Tile[x, y].Type2 == TileType.Blocked;
+            return Server.Map.Instance[mapNum].Tile[x, y].Type == TileType.Blocked ||
+                   Server.Map.Instance[mapNum].Tile[x, y].Type2 == TileType.Blocked;
         }
         catch (Exception)
         {
@@ -658,12 +658,12 @@ public class Player : PlayerBase
     {
         var mapNum = GetPlayerMap(playerId);
 
-        if (Data.Map[mapNum].Moral < 0)
+        if (Server.Map.Instance[mapNum].Moral < 0)
         {
             return false;
         }
 
-        if (!Moral.Instance[Data.Map[mapNum].Moral].CanPickupItem)
+        if (!Moral.Instance[Server.Map.Instance[mapNum].Moral].CanPickupItem)
         {
             NetworkSend.SendPlayerMessage(playerId, "You can't pickup items here!", (int) ColorName.BrightRed);
             return false;
@@ -847,7 +847,7 @@ public class Player : PlayerBase
             return;
         }
 
-        if (!Moral.Instance[Data.Map[GetPlayerMap(playerId)].Moral].CanDropItem)
+        if (!Moral.Instance[Server.Map.Instance[GetPlayerMap(playerId)].Moral].CanDropItem)
         {
             NetworkSend.SendPlayerMessage(playerId, "You can't drop items here!", (int) ColorName.BrightRed);
             return;
@@ -938,9 +938,9 @@ public class Player : PlayerBase
 
     public static bool CanUseItem(int playerId, int itemNum)
     {
-        if (Data.Map[GetPlayerMap(playerId)].Moral >= 0)
+        if (Server.Map.Instance[GetPlayerMap(playerId)].Moral >= 0)
         {
-            if (!Moral.Instance[Data.Map[GetPlayerMap(playerId)].Moral].CanUseItem)
+            if (!Moral.Instance[Server.Map.Instance[GetPlayerMap(playerId)].Moral].CanUseItem)
             {
                 NetworkSend.SendPlayerMessage(playerId, "You can't use items here!", (int) ColorName.BrightRed);
                 return false;

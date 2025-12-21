@@ -12,12 +12,12 @@ namespace Server
         {
             var resourceCount = 0;
 
-            for (var x = 0; x < Data.Map[mapNum].MaxX; x++)
+            for (var x = 0; x < Server.Map.Instance[mapNum].MaxX; x++)
             {
-                for (var y = 0; y < Data.Map[mapNum].MaxY; y++)
+                for (var y = 0; y < Server.Map.Instance[mapNum].MaxY; y++)
                 {
-                    if (Data.Map[mapNum].Tile[x, y].Type != TileType.Resource &&
-                        Data.Map[mapNum].Tile[x, y].Type2 != TileType.Resource)
+                    if (Server.Map.Instance[mapNum].Tile[x, y].Type != TileType.Resource &&
+                        Server.Map.Instance[mapNum].Tile[x, y].Type2 != TileType.Resource)
                     {
                         continue;
                     }
@@ -28,7 +28,7 @@ namespace Server
 
                     Data.MapResource[mapNum].ResourceData[resourceCount - 1].X = x;
                     Data.MapResource[mapNum].ResourceData[resourceCount - 1].Y = y;
-                    Data.MapResource[mapNum].ResourceData[resourceCount - 1].Health = (byte)Resource.Instance[Data.Map[mapNum].Tile[x, y].Data1].Health;
+                    Data.MapResource[mapNum].ResourceData[resourceCount - 1].Health = (byte)Resource.Instance[Server.Map.Instance[mapNum].Tile[x, y].Data1].Health;
                 }
             }
 
@@ -71,19 +71,19 @@ namespace Server
         {
             var mapNum = GetPlayerMap(playerId);
 
-            if (x < 0 || y < 0 || x >= Data.Map[mapNum].MaxX || y >= Data.Map[mapNum].MaxY)
+            if (x < 0 || y < 0 || x >= Server.Map.Instance[mapNum].MaxX || y >= Server.Map.Instance[mapNum].MaxY)
             {
                 return;
             }
 
-            if (Data.Map[mapNum].Tile[x, y].Type != TileType.Resource &&
-                Data.Map[mapNum].Tile[x, y].Type2 != TileType.Resource)
+            if (Server.Map.Instance[mapNum].Tile[x, y].Type != TileType.Resource &&
+                Server.Map.Instance[mapNum].Tile[x, y].Type2 != TileType.Resource)
             {
                 return;
             }
 
             var resourceNum = 0;
-            var resourceIndex = Data.Map[mapNum].Tile[x, y].Data1;
+            var resourceIndex = Server.Map.Instance[mapNum].Tile[x, y].Data1;
             var resourceType = (byte)Resource.Instance[resourceIndex].ResourceType;
 
             for (var i = 0; i < Data.MapResource[mapNum].ResourceCount; i++)

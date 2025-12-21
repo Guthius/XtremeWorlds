@@ -9,6 +9,7 @@ using static Core.Globals.Type;
 using EventCommand = Core.Globals.EventCommand;
 using Type = Core.Globals.Type;
 using Client.Net;
+using static Core.Globals.Commands;
 
 namespace Client
 {
@@ -1549,9 +1550,9 @@ namespace Client
 
                 for (i = 0; i < Variables.MaxMapNpcs; i++)
                 {
-                    if (Data.MyMap.Npc[i] > 0)
+                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[i] > 0)
                     {
-                        cmbSpawnNpc.Items.Add(i + 1 + ". " + Data.Npc[Data.MyMap.Npc[i]].Name);
+                        cmbSpawnNpc.Items.Add(i + 1 + ". " + Data.Npc[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[i]].Name);
                     }
                     else
                     {
@@ -2072,13 +2073,13 @@ namespace Client
                     {
                         fraMoveRoute.Visible = true;
                         lstMoveRoute.Items.Clear();
-                        Event.ListOfEvents = new int[Data.MyMap.EventCount];
+                        Event.ListOfEvents = new int[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount];
                         Event.ListOfEvents[0] = Event.EditorId;
-                        for (int i = 0, loopTo = Data.MyMap.EventCount; i < loopTo; i++)
+                        for (int i = 0, loopTo = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount; i < loopTo; i++)
                         {
                             if (i != Event.EditorId)
                             {
-                                cmbEvent.Items.Add(Data.MyMap.Event[i].Name);
+                                cmbEvent.Items.Add(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Name);
                                 x = x + 1;
                                 Event.ListOfEvents[x] = i;
                             }
@@ -2095,16 +2096,16 @@ namespace Client
                 case "Wait for Route Completion":
                     {
                         cmbMoveWait.Items.Clear();
-                        Event.ListOfEvents = new int[Data.MyMap.EventCount];
+                        Event.ListOfEvents = new int[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount];
                         Event.ListOfEvents[0] = Event.EditorId;
                         cmbMoveWait.Items.Add("This Event");
                         cmbMoveWait.SelectedIndex = 0;
                         cmbMoveWait.Enabled = true;
-                        for (int i = 0, loopTo1 = Data.MyMap.EventCount; i < loopTo1; i++)
+                        for (int i = 0, loopTo1 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount; i < loopTo1; i++)
                         {
                             if (i != Event.EditorId)
                             {
-                                cmbMoveWait.Items.Add(Data.MyMap.Event[i].Name);
+                                cmbMoveWait.Items.Add(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Name);
                                 x = x + 1;
                                 Event.ListOfEvents[x] = i;
                             }
@@ -2142,15 +2143,15 @@ namespace Client
                     {
                         cmbPlayAnimEvent.Items.Clear();
 
-                        for (int i = 0, loopTo2 = Data.MyMap.EventCount; i < loopTo2; i++)
-                            cmbPlayAnimEvent.Items.Add(i + 1 + ". " + Data.MyMap.Event[i].Name);
+                        for (int i = 0, loopTo2 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount; i < loopTo2; i++)
+                            cmbPlayAnimEvent.Items.Add(i + 1 + ". " + Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Name);
                         cmbPlayAnimEvent.SelectedIndex = 0;
                         cmbAnimTargetType.SelectedIndex = 0;
                         cmbPlayAnim.SelectedIndex = 0;
                         nudPlayAnimTileX.Value = 0;
                         nudPlayAnimTileY.Value = 0;
-                        nudPlayAnimTileX.MaxValue = Data.MyMap.MaxX;
-                        nudPlayAnimTileY.MaxValue = Data.MyMap.MaxY;
+                        nudPlayAnimTileX.MaxValue = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
+                        nudPlayAnimTileY.MaxValue = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
                         ShowFrame(fraPlayAnimation, true);
                         lblPlayAnimX.Visible = false;
                         lblPlayAnimY.Visible = false;
@@ -3991,13 +3992,13 @@ namespace Client
 
                 for (int i = 0; i < Variables.MaxNpcs; i++)
                 {
-                    if (Data.MyMap.Npc[i] < 0)
+                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[i] < 0)
                     {
                         cmbChatBubbleTarget.Items.Add(i + ". ");
                     }
                     else
                     {
-                        cmbChatBubbleTarget.Items.Add(i + 1 + ". " + Data.Npc[Data.MyMap.Npc[i]].Name);
+                        cmbChatBubbleTarget.Items.Add(i + 1 + ". " + Data.Npc[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[i]].Name);
                     }
                 }
                 cmbChatBubbleTarget.SelectedIndex = 0;
@@ -4007,8 +4008,8 @@ namespace Client
                 cmbChatBubbleTarget.Visible = true;
                 cmbChatBubbleTarget.Items.Clear();
 
-                for (int i = 0, loopTo = Data.MyMap.EventCount; i < loopTo; i++)
-                    cmbChatBubbleTarget.Items.Add(i + 1 + ". " + Data.MyMap.Event[i].Name);
+                for (int i = 0, loopTo = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount; i < loopTo; i++)
+                    cmbChatBubbleTarget.Items.Add(i + 1 + ". " + Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Name);
                 cmbChatBubbleTarget.SelectedIndex = 0;
             }
 

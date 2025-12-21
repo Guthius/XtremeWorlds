@@ -144,8 +144,8 @@ namespace Server
 
         private static bool IsTileWalkable(int mapNum, int x, int y)
         {
-            if (x < 0 || x > Data.Map[mapNum].MaxX || y < 0 || y > Data.Map[mapNum].MaxY) return false;
-            var tile = Data.Map[mapNum].Tile[x, y];
+            if (x < 0 || x > Server.Map.Instance[mapNum].MaxX || y < 0 || y > Server.Map.Instance[mapNum].MaxY) return false;
+            var tile = Server.Map.Instance[mapNum].Tile[x, y];
 
             // Any non-blocked tile is walkable. Special tiles (warp, item, npc spawn, etc.) remain walkable.
             if (tile.Type == TileType.Blocked || tile.Type2 == TileType.Blocked) return false;
@@ -159,7 +159,7 @@ namespace Server
             {
                 if (NetworkConfig.IsPlaying(i) && GetPlayerMap(i) == mapNum && GetPlayerX(i) == x && GetPlayerY(i) == y)
                 {
-                    if (Data.Map[mapNum].Event[eventId].Pages[Data.TempPlayer[index].EventMap.EventPages[eventId].PageId].Trigger == 1)
+                    if (Server.Map.Instance[mapNum].Event[eventId].Pages[Data.TempPlayer[index].EventMap.EventPages[eventId].PageId].Trigger == 1)
                     {
                         StartEventProcessing(index, eventId, mapNum);
                     }
@@ -174,7 +174,7 @@ namespace Server
         private static void StartEventProcessing(int index, int eventId, int mapNum)
         {
             var pageId = Data.TempPlayer[index].EventMap.EventPages[eventId].PageId;
-            if (Data.Map[mapNum].Event[eventId].Pages[pageId].CommandListCount <= 0) return;
+            if (Server.Map.Instance[mapNum].Event[eventId].Pages[pageId].CommandListCount <= 0) return;
 
             var processing = Data.TempPlayer[index].EventProcessing[eventId];
             processing.Active = 0;
@@ -184,7 +184,7 @@ namespace Server
             processing.EventId = eventId;
             processing.PageId = pageId;
             processing.WaitingForResponse = 0;
-            processing.ListLeftOff = new int[Data.Map[mapNum].Event[eventId].Pages[pageId].CommandListCount];
+            processing.ListLeftOff = new int[Server.Map.Instance[mapNum].Event[eventId].Pages[pageId].CommandListCount];
         }
 
         private static bool IsNpcBlocking(int mapNum, int x, int y)
@@ -199,7 +199,7 @@ namespace Server
         }
 
         private static bool IsDirectionBlocked(int mapNum, int x, int y, byte dir) =>
-            IsDirBlocked(Data.Map[mapNum].Tile[x, y].DirBlock, (Direction)dir);
+            IsDirBlocked(Server.Map.Instance[mapNum].Tile[x, y].DirBlock, (Direction)dir);
 
         public static bool CanMove(int index, int mapNum, int x, int y, int eventId, int walkThrough, byte dir, bool globalEvent = false)
         {
@@ -219,7 +219,7 @@ namespace Server
             int realX = targetX;
             int realY = targetY;
 
-            if (realX < 0 || realX > Data.Map[mapNum].MaxX || realY < 0 || realY > Data.Map[mapNum].MaxY) return false;
+            if (realX < 0 || realX > Server.Map.Instance[mapNum].MaxX || realY < 0 || realY > Server.Map.Instance[mapNum].MaxY) return false;
             if (walkThrough == 1) return true;
 
             bool walkable = IsTileWalkable(mapNum, realX, realY);
@@ -247,10 +247,10 @@ namespace Server
             {
                 if (globalEvent)
                 {
-                    if (Data.Map[mapNum].Event[eventId].Pages[0].DirFix == 0)
+                    if (Server.Map.Instance[mapNum].Event[eventId].Pages[0].DirFix == 0)
                         TempEventMap[mapNum].Event[eventId].Dir = dir;
                 }
-                else if (Data.Map[mapNum].Event[eventId].Pages[Data.TempPlayer[playerIndex].EventMap.EventPages[eventIndex].PageId].DirFix == 0)
+                else if (Server.Map.Instance[mapNum].Event[eventId].Pages[Data.TempPlayer[playerIndex].EventMap.EventPages[eventIndex].PageId].DirFix == 0)
                     Data.TempPlayer[playerIndex].EventMap.EventPages[eventIndex].Dir = dir;
             }
 
@@ -294,7 +294,7 @@ namespace Server
                 if (globalEvent)
                 {
                     var eventData = TempEventMap[mapNum].Event[eventIndex];
-                    if (Data.Map[mapNum].Event[eventId].Pages[0].DirFix == 0)
+                    if (Server.Map.Instance[mapNum].Event[eventId].Pages[0].DirFix == 0)
                         eventData.Dir = dir;
 
                     switch (dir)
@@ -310,7 +310,7 @@ namespace Server
                 else
                 {
                     var eventData = Data.TempPlayer[index].EventMap.EventPages[eventIndex];
-                    if (Data.Map[mapNum].Event[eventId].Pages[Data.TempPlayer[index].EventMap.EventPages[eventIndex].PageId].DirFix == 0)
+                    if (Server.Map.Instance[mapNum].Event[eventId].Pages[Data.TempPlayer[index].EventMap.EventPages[eventIndex].PageId].DirFix == 0)
                         eventData.Dir = dir;
 
                     switch (dir)
@@ -394,7 +394,7 @@ namespace Server
             int px = GetPlayerX(playerId), py = GetPlayerY(playerId);
             var eventPage = Data.TempPlayer[playerId].EventMap.EventPages[eventId];
             return (px, py, eventPage.X, eventPage.Y,
-                Data.Map[mapNum].Event[eventPage.EventId].Pages[eventPage.PageId].WalkThrough);
+                Server.Map.Instance[mapNum].Event[eventPage.EventId].Pages[eventPage.PageId].WalkThrough);
         }
 
         private static int RandomMoveTowardsPlayer(int playerId, int mapNum, int eventId, int ex, int ey, int px, int py, int walkThrough)
@@ -460,7 +460,7 @@ namespace Server
         }
 
         private static bool IsValidMove(int playerId, int mapNum, int eventId, int x, int y, int walkThrough, HashSet<(int, int)> visited) =>
-            x >= 0 && x <= Data.Map[mapNum].MaxX && y >= 0 && y <= Data.Map[mapNum].MaxY &&
+            x >= 0 && x <= Server.Map.Instance[mapNum].MaxX && y >= 0 && y <= Server.Map.Instance[mapNum].MaxY &&
             !visited.Contains((x, y)) && CanMove(playerId, mapNum, x, y, eventId, walkThrough, 0, false);
 
         private static int GetDirectionFromStep(int ex, int ey, int nx, int ny) =>
@@ -506,7 +506,7 @@ namespace Server
         }
 
         private static bool IsWithinMapBounds(int mapNum, int x, int y) =>
-            x >= 0 && x <= Data.Map[mapNum].MaxX && y >= 0 && y <= Data.Map[mapNum].MaxY;
+            x >= 0 && x <= Server.Map.Instance[mapNum].MaxX && y >= 0 && y <= Server.Map.Instance[mapNum].MaxY;
 
         private static int Heuristic(int x1, int y1, int x2, int y2) => Math.Abs(x1 - x2) + Math.Abs(y1 - y2);
 
@@ -591,7 +591,7 @@ namespace Server
                 var proc = Data.TempPlayer[index].EventProcessing[i];
                 if (proc.EventId != eventId || proc.PageId != pageId || proc.WaitingForResponse != 1) continue;
 
-                var cmd = Data.Map[GetPlayerMap(index)].Event[eventId].Pages[pageId].CommandList[proc.CurList].Commands[proc.CurSlot - 1];
+                var cmd = Server.Map.Instance[GetPlayerMap(index)].Event[eventId].Pages[pageId].CommandList[proc.CurList].Commands[proc.CurSlot - 1];
                 if (reply == 0 && cmd.Index == (byte) EventCommand.ShowText)
                     proc.WaitingForResponse = 0;
                 else if (reply > 0 && cmd.Index == (byte) EventCommand.ShowChoices)
@@ -616,9 +616,9 @@ namespace Server
         }
         public static void SerializeMapEvents(PacketWriter buffer, int mapNum)
         {
-            for (var i = 0; i < Data.Map[mapNum].EventCount; i++)
+            for (var i = 0; i < Server.Map.Instance[mapNum].EventCount; i++)
             {
-                var ev = Data.Map[mapNum].Event[i];
+                var ev = Server.Map.Instance[mapNum].Event[i];
 
                 buffer.WriteString(ev.Name);
                 buffer.WriteByte(ev.Globals);
@@ -635,7 +635,7 @@ namespace Server
         {
             for (var x = 0; x < pageCount; x++)
             {
-                var page = Data.Map[mapNum].Event[eventIndex].Pages[x];
+                var page = Server.Map.Instance[mapNum].Event[eventIndex].Pages[x];
                 SerializePageConditions(buffer, page);
                 SerializePageGraphics(buffer, page);
                 SerializePageMovement(buffer, page);
@@ -709,7 +709,7 @@ namespace Server
             if (page.CommandListCount <= 0) return;
             for (var y = 0; y < page.CommandListCount; y++)
             {
-                var cmdList = Data.Map[mapNum].Event[eventIndex].Pages[pageIndex].CommandList[y];
+                var cmdList = Server.Map.Instance[mapNum].Event[eventIndex].Pages[pageIndex].CommandList[y];
                 buffer.WriteInt32(cmdList.CommandCount);
                 buffer.WriteInt32(cmdList.ParentList);
                 if (cmdList.CommandCount > 0)
@@ -805,9 +805,9 @@ namespace Server
         public static void TriggerOnPlayerAction(int index, string actionType, int value)
         {
             var mapNum = GetPlayerMap(index);
-            for (var i = 0; i < Data.Map[mapNum].EventCount; i++)
+            for (var i = 0; i < Server.Map.Instance[mapNum].EventCount; i++)
             {
-                var page = Data.Map[mapNum].Event[i].Pages[Data.TempPlayer[index].EventMap.EventPages[i].PageId];
+                var page = Server.Map.Instance[mapNum].Event[i].Pages[Data.TempPlayer[index].EventMap.EventPages[i].PageId];
                 if (page.ChkVariable == 1 && page.VariableIndex == GetActionVariableIndex(actionType) && page.VariableCompare == value)
                     EventLogic.TriggerEvent(index, i, 0, GetPlayerX(index), GetPlayerY(index));
             }

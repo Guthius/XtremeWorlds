@@ -24,7 +24,7 @@ namespace Core.Objects
         public Core.Globals.Type.Tile[,] Tile;
         public int[] Npc;
         public int EventCount;
-        public Core.Globals.Type.Event[] Events;
+        public Core.Globals.Type.Event[] Event;
         public byte Weather;
         public int Fog;
         public int WeatherIntensity;
@@ -69,7 +69,7 @@ namespace Core.Objects
             }
 
             EventCount = 0;
-            Events = Array.Empty<Core.Globals.Type.Event>();
+            Event = Array.Empty<Core.Globals.Type.Event>();
         }
 
         public static void OnClear(int index)

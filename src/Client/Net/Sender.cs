@@ -1161,75 +1161,75 @@ public static class Sender
         var packetWriter = new PacketWriter();
 
         packetWriter.WriteEnum(Packets.ClientPackets.CSaveMap);
-        packetWriter.WriteString(Data.MyMap.Name);
-        packetWriter.WriteString(Data.MyMap.Music);
-        packetWriter.WriteInt32(Data.MyMap.Moral);
-        packetWriter.WriteInt32(Data.MyMap.Tileset);
-        packetWriter.WriteInt32(Data.MyMap.Up);
-        packetWriter.WriteInt32(Data.MyMap.Down);
-        packetWriter.WriteInt32(Data.MyMap.Left);
-        packetWriter.WriteInt32(Data.MyMap.Right);
-        packetWriter.WriteInt32(Data.MyMap.BootMap);
-        packetWriter.WriteInt32(Data.MyMap.BootX);
-        packetWriter.WriteInt32(Data.MyMap.BootY);
-        packetWriter.WriteInt32(Data.MyMap.MaxX);
-        packetWriter.WriteInt32(Data.MyMap.MaxY);
-        packetWriter.WriteInt32(Data.MyMap.Weather);
-        packetWriter.WriteInt32(Data.MyMap.Fog);
-        packetWriter.WriteInt32(Data.MyMap.WeatherIntensity);
-        packetWriter.WriteInt32(Data.MyMap.FogOpacity);
-        packetWriter.WriteInt32(Data.MyMap.FogSpeed);
-        packetWriter.WriteBoolean(Data.MyMap.MapTint);
-        packetWriter.WriteInt32(Data.MyMap.MapTintR);
-        packetWriter.WriteInt32(Data.MyMap.MapTintG);
-        packetWriter.WriteInt32(Data.MyMap.MapTintB);
-        packetWriter.WriteInt32(Data.MyMap.MapTintA);
-        packetWriter.WriteByte(Data.MyMap.Panorama);
-        packetWriter.WriteByte(Data.MyMap.Parallax);
-        packetWriter.WriteByte(Data.MyMap.Brightness);
-        packetWriter.WriteBoolean(Data.MyMap.NoRespawn);
-        packetWriter.WriteBoolean(Data.MyMap.Indoors);
-        packetWriter.WriteInt32(Data.MyMap.Shop);
+        packetWriter.WriteString(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Name);
+        packetWriter.WriteString(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Music);
+        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Moral);
+        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tileset);
+        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Up);
+        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Down);
+        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Left);
+        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Right);
+        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].BootMap);
+        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].BootX);
+        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].BootY);
+        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX);
+        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY);
+        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Weather);
+        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Fog);
+        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].WeatherIntensity);
+        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].FogOpacity);
+        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].FogSpeed);
+        packetWriter.WriteBoolean(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTint);
+        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintR);
+        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintG);
+        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintB);
+        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintA);
+        packetWriter.WriteByte(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Panorama);
+        packetWriter.WriteByte(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Parallax);
+        packetWriter.WriteByte(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Brightness);
+        packetWriter.WriteBoolean(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].NoRespawn);
+        packetWriter.WriteBoolean(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Indoors);
+        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Shop);
 
         for (i = 0; i < Variables.MaxMapNpcs; i++)
         {
-            packetWriter.WriteInt32(Data.MyMap.Npc[i]);
+            packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[i]);
         }
 
-        for (x = 0; x < Data.MyMap.MaxX; x++)
+        for (x = 0; x < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX; x++)
         {
-            for (y = 0; y < Data.MyMap.MaxY; y++)
+            for (y = 0; y < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY; y++)
             {
-                packetWriter.WriteInt32(Data.MyMap.Tile[x, y].Data1);
-                packetWriter.WriteInt32(Data.MyMap.Tile[x, y].Data2);
-                packetWriter.WriteInt32(Data.MyMap.Tile[x, y].Data3);
-                packetWriter.WriteInt32(Data.MyMap.Tile[x, y].Data1_2);
-                packetWriter.WriteInt32(Data.MyMap.Tile[x, y].Data2_2);
-                packetWriter.WriteInt32(Data.MyMap.Tile[x, y].Data3_2);
-                packetWriter.WriteInt32(Data.MyMap.Tile[x, y].DirBlock);
+                packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data1);
+                packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data2);
+                packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data3);
+                packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data1_2);
+                packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data2_2);
+                packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data3_2);
+                packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].DirBlock);
 
                 int layerCount = Enum.GetValues<MapLayer>().Length;
                 for (i = 0; i < layerCount; i++)
                 {
-                    packetWriter.WriteInt32(Data.MyMap.Tile[x, y].Layer[i].Tileset);
-                    packetWriter.WriteInt32(Data.MyMap.Tile[x, y].Layer[i].X);
-                    packetWriter.WriteInt32(Data.MyMap.Tile[x, y].Layer[i].Y);
-                    packetWriter.WriteInt32(Data.MyMap.Tile[x, y].Layer[i].AutoTile);
+                    packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[i].Tileset);
+                    packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[i].X);
+                    packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[i].Y);
+                    packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[i].AutoTile);
                 }
 
-                packetWriter.WriteInt32((int)Data.MyMap.Tile[x, y].Type);
-                packetWriter.WriteInt32((int)Data.MyMap.Tile[x, y].Type2);
+                packetWriter.WriteInt32((int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Type);
+                packetWriter.WriteInt32((int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Type2);
             }
         }
 
-        packetWriter.WriteInt32(Data.MyMap.EventCount);
+        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount);
 
-        if (Data.MyMap.EventCount > 0)
+        if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount > 0)
         {
-            for (i = 0; i < Data.MyMap.EventCount; i++)
+            for (i = 0; i < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount; i++)
             {
                 {
-                    ref var instance = ref Data.MyMap.Event[i];
+                    ref var instance = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i];
                     packetWriter.WriteString(instance.Name);
                     packetWriter.WriteByte(instance.Globals);
                     packetWriter.WriteInt32(instance.X);
@@ -1237,13 +1237,13 @@ public static class Sender
                     packetWriter.WriteInt32(instance.PageCount);
                 }
 
-                if (Data.MyMap.Event[i].PageCount > 0)
+                if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].PageCount > 0)
                 {
-                    var loopTo3 = Data.MyMap.Event[i].PageCount;
+                    var loopTo3 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].PageCount;
                     for (x = 0; x < loopTo3; x++)
                     {
                         {
-                            ref var instance1 = ref Data.MyMap.Event[i].Pages[x];
+                            ref var instance1 = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x];
                             packetWriter.WriteInt32(instance1.ChkVariable);
                             packetWriter.WriteInt32(instance1.VariableIndex);
                             packetWriter.WriteInt32(instance1.VariableCondition);
@@ -1266,7 +1266,7 @@ public static class Sender
                             packetWriter.WriteByte(instance1.MoveType);
                             packetWriter.WriteByte(instance1.MoveSpeed);
                             packetWriter.WriteByte(instance1.MoveFreq);
-                            packetWriter.WriteInt32(Data.MyMap.Event[i].Pages[x].MoveRouteCount);
+                            packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].MoveRouteCount);
                             packetWriter.WriteInt32(instance1.IgnoreMoveRoute);
                             packetWriter.WriteInt32(instance1.RepeatMoveRoute);
 
@@ -1294,19 +1294,19 @@ public static class Sender
                             packetWriter.WriteByte(instance1.Position);
                         }
 
-                        if (Data.MyMap.Event[i].Pages[x].CommandListCount > 0)
+                        if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandListCount > 0)
                         {
-                            var loopTo5 = Data.MyMap.Event[i].Pages[x].CommandListCount;
+                            var loopTo5 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandListCount;
                             for (y = 0; y < loopTo5; y++)
                             {
-                                packetWriter.WriteInt32(Data.MyMap.Event[i].Pages[x].CommandList[y].CommandCount);
-                                packetWriter.WriteInt32(Data.MyMap.Event[i].Pages[x].CommandList[y].ParentList);
-                                if (Data.MyMap.Event[i].Pages[x].CommandList[y].CommandCount > 0)
+                                packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount);
+                                packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].ParentList);
+                                if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount > 0)
                                 {
-                                    for (int z = 0, loopTo6 = Data.MyMap.Event[i].Pages[x].CommandList[y].CommandCount; z < loopTo6; z++)
+                                    for (int z = 0, loopTo6 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount; z < loopTo6; z++)
                                     {
                                         {
-                                            ref var instance2 = ref Data.MyMap.Event[i].Pages[x].CommandList[y].Commands[z];
+                                            ref var instance2 = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].Commands[z];
                                             packetWriter.WriteInt32(instance2.Index);
                                             packetWriter.WriteString(instance2.Text1);
                                             packetWriter.WriteString(instance2.Text2);

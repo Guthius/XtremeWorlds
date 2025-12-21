@@ -26,42 +26,42 @@ namespace Server
                 return;
             }
 
-            if (Data.Map[mapNum].NoRespawn)
+            if (Server.Map.Instance[mapNum].NoRespawn)
             {
                 return;
             }
 
-            for (var x = 0; x < Data.Map[mapNum].MaxX; x++)
+            for (var x = 0; x < Server.Map.Instance[mapNum].MaxX; x++)
             {
-                for (var y = 0; y < Data.Map[mapNum].MaxY; y++)
+                for (var y = 0; y < Server.Map.Instance[mapNum].MaxY; y++)
                 {
-                    if (Data.Map[mapNum].Tile[x, y].Type == TileType.Item)
+                    if (Server.Map.Instance[mapNum].Tile[x, y].Type == TileType.Item)
                     {
-                        if (Item.Instance[Data.Map[mapNum].Tile[x, y].Data1].Type == (byte)ItemCategory.Currency ||
-                            Item.Instance[Data.Map[mapNum].Tile[x, y].Data1].Stackable == 1)
+                        if (Item.Instance[Server.Map.Instance[mapNum].Tile[x, y].Data1].Type == (byte)ItemCategory.Currency ||
+                            Item.Instance[Server.Map.Instance[mapNum].Tile[x, y].Data1].Stackable == 1)
                         {
-                            var value = Data.Map[mapNum].Tile[x, y].Data2 < 1 ? 1 : Data.Map[mapNum].Tile[x, y].Data2;
+                            var value = Server.Map.Instance[mapNum].Tile[x, y].Data2 < 1 ? 1 : Server.Map.Instance[mapNum].Tile[x, y].Data2;
 
-                            OnSpawn(Data.Map[mapNum].Tile[x, y].Data1, value, mapNum, x, y);
+                            OnSpawn(Server.Map.Instance[mapNum].Tile[x, y].Data1, value, mapNum, x, y);
                         }
                         else
                         {
-                            OnSpawn(Data.Map[mapNum].Tile[x, y].Data1, Data.Map[mapNum].Tile[x, y].Data2, mapNum, x, y);
+                            OnSpawn(Server.Map.Instance[mapNum].Tile[x, y].Data1, Server.Map.Instance[mapNum].Tile[x, y].Data2, mapNum, x, y);
                         }
                     }
 
-                    if (Data.Map[mapNum].Tile[x, y].Type2 == TileType.Item)
+                    if (Server.Map.Instance[mapNum].Tile[x, y].Type2 == TileType.Item)
                     {
-                        if (Item.Instance[Data.Map[mapNum].Tile[x, y].Data1_2].Type == (byte)ItemCategory.Currency ||
-                            Item.Instance[Data.Map[mapNum].Tile[x, y].Data1_2].Stackable == 1)
+                        if (Item.Instance[Server.Map.Instance[mapNum].Tile[x, y].Data1_2].Type == (byte)ItemCategory.Currency ||
+                            Item.Instance[Server.Map.Instance[mapNum].Tile[x, y].Data1_2].Stackable == 1)
                         {
-                            var value = Data.Map[mapNum].Tile[x, y].Data2_2 < 1 ? 1 : Data.Map[mapNum].Tile[x, y].Data2_2;
+                            var value = Server.Map.Instance[mapNum].Tile[x, y].Data2_2 < 1 ? 1 : Server.Map.Instance[mapNum].Tile[x, y].Data2_2;
 
-                            OnSpawn(Data.Map[mapNum].Tile[x, y].Data1_2, value, mapNum, x, y);
+                            OnSpawn(Server.Map.Instance[mapNum].Tile[x, y].Data1_2, value, mapNum, x, y);
                         }
                         else
                         {
-                            OnSpawn(Data.Map[mapNum].Tile[x, y].Data1_2, Data.Map[mapNum].Tile[x, y].Data2_2, mapNum, x, y);
+                            OnSpawn(Server.Map.Instance[mapNum].Tile[x, y].Data1_2, Server.Map.Instance[mapNum].Tile[x, y].Data2_2, mapNum, x, y);
                         }
                     }
                 }

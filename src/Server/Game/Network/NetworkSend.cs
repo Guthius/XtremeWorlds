@@ -579,74 +579,74 @@ public static class NetworkSend
         {
             packetWriter.WriteInt32(1);
             packetWriter.WriteInt32(mapNum);
-            packetWriter.WriteString(Data.Map[mapNum].Name);
-            packetWriter.WriteString(Data.Map[mapNum].Music);
-            packetWriter.WriteInt32(Data.Map[mapNum].Revision);
-            packetWriter.WriteByte(Data.Map[mapNum].Moral);
-            packetWriter.WriteInt32(Data.Map[mapNum].Tileset);
-            packetWriter.WriteInt32(Data.Map[mapNum].Up);
-            packetWriter.WriteInt32(Data.Map[mapNum].Down);
-            packetWriter.WriteInt32(Data.Map[mapNum].Left);
-            packetWriter.WriteInt32(Data.Map[mapNum].Right);
-            packetWriter.WriteInt32(Data.Map[mapNum].BootMap);
-            packetWriter.WriteByte(Data.Map[mapNum].BootX);
-            packetWriter.WriteByte(Data.Map[mapNum].BootY);
-            packetWriter.WriteByte(Data.Map[mapNum].MaxX);
-            packetWriter.WriteByte(Data.Map[mapNum].MaxY);
-            packetWriter.WriteByte(Data.Map[mapNum].Weather);
-            packetWriter.WriteInt32(Data.Map[mapNum].Fog);
-            packetWriter.WriteInt32(Data.Map[mapNum].WeatherIntensity);
-            packetWriter.WriteByte(Data.Map[mapNum].FogOpacity);
-            packetWriter.WriteByte(Data.Map[mapNum].FogSpeed);
-            packetWriter.WriteBoolean(Data.Map[mapNum].MapTint);
-            packetWriter.WriteByte(Data.Map[mapNum].MapTintR);
-            packetWriter.WriteByte(Data.Map[mapNum].MapTintG);
-            packetWriter.WriteByte(Data.Map[mapNum].MapTintB);
-            packetWriter.WriteByte(Data.Map[mapNum].MapTintA);
-            packetWriter.WriteByte(Data.Map[mapNum].Panorama);
-            packetWriter.WriteByte(Data.Map[mapNum].Parallax);
-            packetWriter.WriteByte(Data.Map[mapNum].Brightness);
-            packetWriter.WriteBoolean(Data.Map[mapNum].NoRespawn);
-            packetWriter.WriteBoolean(Data.Map[mapNum].Indoors);
-            packetWriter.WriteInt32(Data.Map[mapNum].Shop);
+            packetWriter.WriteString(Server.Map.Instance[mapNum].Name);
+            packetWriter.WriteString(Server.Map.Instance[mapNum].Music);
+            packetWriter.WriteInt32(Server.Map.Instance[mapNum].Revision);
+            packetWriter.WriteByte(Server.Map.Instance[mapNum].Moral);
+            packetWriter.WriteInt32(Server.Map.Instance[mapNum].Tileset);
+            packetWriter.WriteInt32(Server.Map.Instance[mapNum].Up);
+            packetWriter.WriteInt32(Server.Map.Instance[mapNum].Down);
+            packetWriter.WriteInt32(Server.Map.Instance[mapNum].Left);
+            packetWriter.WriteInt32(Server.Map.Instance[mapNum].Right);
+            packetWriter.WriteInt32(Server.Map.Instance[mapNum].BootMap);
+            packetWriter.WriteByte(Server.Map.Instance[mapNum].BootX);
+            packetWriter.WriteByte(Server.Map.Instance[mapNum].BootY);
+            packetWriter.WriteByte(Server.Map.Instance[mapNum].MaxX);
+            packetWriter.WriteByte(Server.Map.Instance[mapNum].MaxY);
+            packetWriter.WriteByte(Server.Map.Instance[mapNum].Weather);
+            packetWriter.WriteInt32(Server.Map.Instance[mapNum].Fog);
+            packetWriter.WriteInt32(Server.Map.Instance[mapNum].WeatherIntensity);
+            packetWriter.WriteByte(Server.Map.Instance[mapNum].FogOpacity);
+            packetWriter.WriteByte(Server.Map.Instance[mapNum].FogSpeed);
+            packetWriter.WriteBoolean(Server.Map.Instance[mapNum].MapTint);
+            packetWriter.WriteByte(Server.Map.Instance[mapNum].MapTintR);
+            packetWriter.WriteByte(Server.Map.Instance[mapNum].MapTintG);
+            packetWriter.WriteByte(Server.Map.Instance[mapNum].MapTintB);
+            packetWriter.WriteByte(Server.Map.Instance[mapNum].MapTintA);
+            packetWriter.WriteByte(Server.Map.Instance[mapNum].Panorama);
+            packetWriter.WriteByte(Server.Map.Instance[mapNum].Parallax);
+            packetWriter.WriteByte(Server.Map.Instance[mapNum].Brightness);
+            packetWriter.WriteBoolean(Server.Map.Instance[mapNum].NoRespawn);
+            packetWriter.WriteBoolean(Server.Map.Instance[mapNum].Indoors);
+            packetWriter.WriteInt32(Server.Map.Instance[mapNum].Shop);
 
             for (var i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
             {
-                packetWriter.WriteInt32(Data.Map[mapNum].Npc[i]);
+                packetWriter.WriteInt32(Server.Map.Instance[mapNum].Npc[i]);
             }
 
-            for (var x = 0; x < Data.Map[mapNum].MaxX; x++)
+            for (var x = 0; x < Server.Map.Instance[mapNum].MaxX; x++)
             {
-                for (var y = 0; y < Data.Map[mapNum].MaxY; y++)
+                for (var y = 0; y < Server.Map.Instance[mapNum].MaxY; y++)
                 {
-                    packetWriter.WriteInt32(Data.Map[mapNum].Tile[x, y].Data1);
-                    packetWriter.WriteInt32(Data.Map[mapNum].Tile[x, y].Data2);
-                    packetWriter.WriteInt32(Data.Map[mapNum].Tile[x, y].Data3);
-                    packetWriter.WriteInt32(Data.Map[mapNum].Tile[x, y].Data1_2);
-                    packetWriter.WriteInt32(Data.Map[mapNum].Tile[x, y].Data2_2);
-                    packetWriter.WriteInt32(Data.Map[mapNum].Tile[x, y].Data3_2);
-                    packetWriter.WriteByte(Data.Map[mapNum].Tile[x, y].DirBlock);
+                    packetWriter.WriteInt32(Server.Map.Instance[mapNum].Tile[x, y].Data1);
+                    packetWriter.WriteInt32(Server.Map.Instance[mapNum].Tile[x, y].Data2);
+                    packetWriter.WriteInt32(Server.Map.Instance[mapNum].Tile[x, y].Data3);
+                    packetWriter.WriteInt32(Server.Map.Instance[mapNum].Tile[x, y].Data1_2);
+                    packetWriter.WriteInt32(Server.Map.Instance[mapNum].Tile[x, y].Data2_2);
+                    packetWriter.WriteInt32(Server.Map.Instance[mapNum].Tile[x, y].Data3_2);
+                    packetWriter.WriteByte(Server.Map.Instance[mapNum].Tile[x, y].DirBlock);
 
                     for (var i = 0; i < MapLayerCount; i++)
                     {
-                        packetWriter.WriteInt32(Data.Map[mapNum].Tile[x, y].Layer[i].Tileset);
-                        packetWriter.WriteInt32(Data.Map[mapNum].Tile[x, y].Layer[i].X);
-                        packetWriter.WriteInt32(Data.Map[mapNum].Tile[x, y].Layer[i].Y);
-                        packetWriter.WriteByte(Data.Map[mapNum].Tile[x, y].Layer[i].AutoTile);
+                        packetWriter.WriteInt32(Server.Map.Instance[mapNum].Tile[x, y].Layer[i].Tileset);
+                        packetWriter.WriteInt32(Server.Map.Instance[mapNum].Tile[x, y].Layer[i].X);
+                        packetWriter.WriteInt32(Server.Map.Instance[mapNum].Tile[x, y].Layer[i].Y);
+                        packetWriter.WriteByte(Server.Map.Instance[mapNum].Tile[x, y].Layer[i].AutoTile);
                     }
 
-                    packetWriter.WriteInt32((int)Data.Map[mapNum].Tile[x, y].Type);
-                    packetWriter.WriteInt32((int)Data.Map[mapNum].Tile[x, y].Type2);
+                    packetWriter.WriteInt32((int)Server.Map.Instance[mapNum].Tile[x, y].Type);
+                    packetWriter.WriteInt32((int)Server.Map.Instance[mapNum].Tile[x, y].Type2);
                 }
             }
 
-            packetWriter.WriteInt32(Data.Map[mapNum].EventCount);
+            packetWriter.WriteInt32(Server.Map.Instance[mapNum].EventCount);
 
-            if (Data.Map[mapNum].EventCount > 0)
+            if (Server.Map.Instance[mapNum].EventCount > 0)
             {
-                for (var i = 0; i < Data.Map[mapNum].EventCount; i++)
+                for (var i = 0; i < Server.Map.Instance[mapNum].EventCount; i++)
                 {
-                    ref var @event = ref Data.Map[mapNum].Event[i];
+                    ref var @event = ref Server.Map.Instance[mapNum].Event[i];
 
                     packetWriter.WriteString(@event.Name);
                     packetWriter.WriteByte(@event.Globals);
@@ -654,14 +654,14 @@ public static class NetworkSend
                     packetWriter.WriteInt32(@event.Y);
                     packetWriter.WriteInt32(@event.PageCount);
 
-                    if (Data.Map[mapNum].Event[i].PageCount == 0)
+                    if (Server.Map.Instance[mapNum].Event[i].PageCount == 0)
                     {
                         continue;
                     }
 
-                    for (var x = 0; x < Data.Map[mapNum].Event[i].PageCount; x++)
+                    for (var x = 0; x < Server.Map.Instance[mapNum].Event[i].PageCount; x++)
                     {
-                        ref var eventPage = ref Data.Map[mapNum].Event[i].Pages[x];
+                        ref var eventPage = ref Server.Map.Instance[mapNum].Event[i].Pages[x];
 
                         packetWriter.WriteInt32(eventPage.ChkVariable);
                         packetWriter.WriteInt32(eventPage.VariableIndex);
@@ -711,24 +711,24 @@ public static class NetworkSend
                         packetWriter.WriteInt32(eventPage.CommandListCount);
                         packetWriter.WriteByte(eventPage.Position);
 
-                        if (Data.Map[mapNum].Event[i].Pages[x].CommandListCount == 0)
+                        if (Server.Map.Instance[mapNum].Event[i].Pages[x].CommandListCount == 0)
                         {
                             continue;
                         }
 
-                        for (var y = 0; y < Data.Map[mapNum].Event[i].Pages[x].CommandListCount; y++)
+                        for (var y = 0; y < Server.Map.Instance[mapNum].Event[i].Pages[x].CommandListCount; y++)
                         {
-                            packetWriter.WriteInt32(Data.Map[mapNum].Event[i].Pages[x].CommandList[y].CommandCount);
-                            packetWriter.WriteInt32(Data.Map[mapNum].Event[i].Pages[x].CommandList[y].ParentList);
+                            packetWriter.WriteInt32(Server.Map.Instance[mapNum].Event[i].Pages[x].CommandList[y].CommandCount);
+                            packetWriter.WriteInt32(Server.Map.Instance[mapNum].Event[i].Pages[x].CommandList[y].ParentList);
 
-                            if (Data.Map[mapNum].Event[i].Pages[x].CommandList[y].CommandCount == 0)
+                            if (Server.Map.Instance[mapNum].Event[i].Pages[x].CommandList[y].CommandCount == 0)
                             {
                                 continue;
                             }
 
-                            for (var z = 0; z < Data.Map[mapNum].Event[i].Pages[x].CommandList[y].CommandCount; z++)
+                            for (var z = 0; z < Server.Map.Instance[mapNum].Event[i].Pages[x].CommandList[y].CommandCount; z++)
                             {
-                                ref var eventCommand = ref Data.Map[mapNum].Event[i].Pages[x].CommandList[y].Commands[z];
+                                ref var eventCommand = ref Server.Map.Instance[mapNum].Event[i].Pages[x].CommandList[y].Commands[z];
 
                                 packetWriter.WriteInt32(eventCommand.Index);
                                 packetWriter.WriteString(eventCommand.Text1);
@@ -1173,7 +1173,7 @@ public static class NetworkSend
 
         for (var i = 0; i < Core.Globals.Variables.MaxMaps; i++)
         {
-            packetWriter.WriteString(Data.Map[i].Name);
+            packetWriter.WriteString(Server.Map.Instance[i].Name);
         }
 
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
@@ -1751,9 +1751,9 @@ public static class NetworkSend
         var mapNum = GetPlayerMap(index);
 
         buffer.WriteEnum(ServerPackets.SMapEventData);
-        buffer.WriteInt32(Data.Map[mapNum].EventCount);
+        buffer.WriteInt32(Server.Map.Instance[mapNum].EventCount);
 
-        if (Data.Map[mapNum].EventCount > 0)
+        if (Server.Map.Instance[mapNum].EventCount > 0)
         {
             Event.SerializeMapEvents(buffer, mapNum);
         }

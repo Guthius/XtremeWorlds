@@ -557,7 +557,7 @@ public static class Loop
                 {
                     if (entity.Num == -1 && entity.SpawnSecs > 0)
                     {
-                        if (tickCount > entity.SpawnWait && mapNum >= 0 && mapNum < Data.Map.Length)
+                        if (tickCount > entity.SpawnWait && mapNum >= 0 && mapNum < Server.Map.Instance.Count)
                         {
                             Server.MapNpc.OnSpawn(x, mapNum);
                         }
@@ -708,7 +708,7 @@ public static class Loop
                 for (int i = 0; i < mapResource.ResourceCount; i++)
                 {
                     var resData = mapResource.ResourceData[i];
-                    int resourceindex = Data.Map[mapNum].Tile[resData.X, resData.Y].Data1;
+                    int resourceindex = Server.Map.Instance[mapNum].Tile[resData.X, resData.Y].Data1;
                     if (resourceindex > 0)
                     {
                         if (resData.State == 1 || resData.Health < 1)

@@ -6,6 +6,7 @@ using Core.Globals;
 using Core.Interfaces;
 using Microsoft.Xna.Framework;
 using System;
+using static Core.Globals.Commands;
 
 namespace Client
 {
@@ -178,8 +179,8 @@ namespace Client
             int newY = y + dy;
 
             // Keep within 0 .. (Max-1) * TileSize inclusive to match the original coordinate convention.
-            int maxXpx = Math.Max(0, (Data.MyMap.MaxX - 1) * Constants.TileSize);
-            int maxYpx = Math.Max(0, (Data.MyMap.MaxY - 1) * Constants.TileSize);
+            int maxXpx = Math.Max(0, (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX - 1) * Constants.TileSize);
+            int maxYpx = Math.Max(0, (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY - 1) * Constants.TileSize);
 
             newX = Math.Clamp(newX, 0, maxXpx);
             newY = Math.Clamp(newY, 0, maxYpx);

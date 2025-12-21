@@ -89,8 +89,8 @@ public class ChatBubble : IData
             case (byte) TargetType.Event:
             {
                 // Event X/Y are stored as tile coordinates
-                x = GameLogic.ConvertMapX(Data.MyMap.Event[instance.Target].X * Constants.TileSize) + 16;
-                y = GameLogic.ConvertMapY(Data.MyMap.Event[instance.Target].Y * Constants.TileSize) - 16;
+                x = GameLogic.ConvertMapX(Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[instance.Target].X * Constants.TileSize) + 16;
+                y = GameLogic.ConvertMapY(Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[instance.Target].Y * Constants.TileSize) - 16;
                 break;
             }
 

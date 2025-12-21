@@ -3,6 +3,7 @@ using Client.Game.UI;
 using Client.Game.UI.Controls;
 using Core.Globals;
 using Microsoft.Xna.Framework;
+using static Core.Globals.Commands;
 
 namespace Client.Game.UI.Windows;
 
@@ -38,10 +39,10 @@ public class WinMapEditor
             cmbNpc.CallBack[(int)ControlState.MouseMove] = () =>
             {
                 int slotIndex = NpcSelectedSlot;
-                if (Data.MyMap.Npc != null && slotIndex >= 0 && slotIndex < Data.MyMap.Npc.Length)
+                if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc != null && slotIndex >= 0 && slotIndex < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc.Length)
                 {
                     int npcIndex = cmbNpc.Value - 1; // 0 = None
-                    Data.MyMap.Npc[slotIndex] = npcIndex;
+                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[slotIndex] = npcIndex;
 
                     if (WindowManager.TryGetControl("winMapEditor", "lstIndex", out var lstIndex) && lstIndex is ListBox lst)
                     {
@@ -77,7 +78,7 @@ public class WinMapEditor
             string name = "None";
             try
             {
-                int npcIndex = (Data.MyMap.Npc != null && slot < Data.MyMap.Npc.Length) ? Data.MyMap.Npc[slot] : -1;
+                int npcIndex = (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc != null && slot < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc.Length) ? Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[slot] : -1;
                 if (npcIndex >= 0 && npcIndex < Core.Globals.Variables.MaxNpcs && npcIndex < (Data.Npc?.Length ?? 0))
                 {
                     var raw = Data.Npc[npcIndex].Name ?? string.Empty;
@@ -96,7 +97,7 @@ public class WinMapEditor
         byte autotile = (byte)GameState.CurAutotileType;
         byte tileX = (byte)GameState.EditorTileX;
         byte tileY = (byte)GameState.EditorTileY;
-        int tileset = GameState.CurTileset > 0 ? GameState.CurTileset : Data.MyMap.Tileset;
+        int tileset = GameState.CurTileset > 0 ? GameState.CurTileset : Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tileset;
         GameLogic.Dialogue("Map Editor", $"Fill Layer: {layer}", "Are you sure you wish to fill this layer?", DialogueType.FillLayer, DialogueStyle.YesNo, GameState.CurLayer, autotile, tileX, tileY, tileset);
     }
 
@@ -108,7 +109,7 @@ public class WinMapEditor
         if (!WindowManager.TryGetControl("winMapEditor", "picTileset", out var ctrl)) return;
 
         int tilesetIndex = GameState.CurTileset;
-        if (tilesetIndex <= 0) tilesetIndex = Data.MyMap.Tileset;
+        if (tilesetIndex <= 0) tilesetIndex = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tileset;
         if (tilesetIndex <= 0) return;
 
         // Build tileset path (extension added by GetGfxInfo / RenderTexture)
@@ -193,7 +194,7 @@ public class WinMapEditor
 
         // Compute current tileset source rect and horizontal centering offset
         int tilesetIndex = GameState.CurTileset;
-        if (tilesetIndex <= 0) tilesetIndex = Data.MyMap.Tileset;
+        if (tilesetIndex <= 0) tilesetIndex = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tileset;
         if (tilesetIndex <= 0) tilesetIndex = 1;
         var path = System.IO.Path.Combine(DataPath.Tilesets, tilesetIndex.ToString());
         var info = GameClient.GetGfxInfo(path);
@@ -270,7 +271,7 @@ public class WinMapEditor
         if (relX < 0 || relY < 0 || relX >= ctrl.Width || relY >= ctrl.Height) return;
 
         int tilesetIndex = GameState.CurTileset;
-        if (tilesetIndex <= 0) tilesetIndex = Data.MyMap.Tileset;
+        if (tilesetIndex <= 0) tilesetIndex = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tileset;
         if (tilesetIndex <= 0) tilesetIndex = 1;
         var path = System.IO.Path.Combine(DataPath.Tilesets, tilesetIndex.ToString());
         var info = GameClient.GetGfxInfo(path);
@@ -331,7 +332,7 @@ public class WinMapEditor
         if (win is null) return;
 
         int tilesetIndex = GameState.CurTileset;
-        if (tilesetIndex <= 0) tilesetIndex = Data.MyMap.Tileset;
+        if (tilesetIndex <= 0) tilesetIndex = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tileset;
         if (tilesetIndex <= 0) return;
 
         var path = System.IO.Path.Combine(DataPath.Tilesets, tilesetIndex.ToString());
@@ -459,8 +460,8 @@ public class WinMapEditor
         if (WindowManager.TryGetControl("winMapEditor", "cmbNpcList", out var npcCtrl) && npcCtrl is ComboBox cmbNpc)
         {
             int assigned = -1;
-            if (Data.MyMap.Npc != null && index < Data.MyMap.Npc.Length)
-                assigned = Data.MyMap.Npc[index];
+            if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc != null && index < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc.Length)
+                assigned = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[index];
             int desired = (assigned >= 0) ? assigned + 1 : 0;
             desired = Math.Clamp(desired, 0, cmbNpc.Items.Count - 1);
             cmbNpc.Value = desired;

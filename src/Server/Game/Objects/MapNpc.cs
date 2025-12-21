@@ -53,12 +53,12 @@ namespace Server
                 return;
             }
 
-            if (Data.Map[mapNum].NoRespawn)
+            if (Server.Map.Instance[mapNum].NoRespawn)
             {
                 return;
             }
 
-            var npcNum = Data.Map[mapNum].Npc[mapNpcNum];
+            var npcNum = Server.Map.Instance[mapNum].Npc[mapNpcNum];
             
             // Validate slot and npc index; allow slot 0
             if (mapNpcNum < 0 || mapNpcNum >= Core.Globals.Variables.MaxMapNpcs || npcNum < 0 || npcNum >= Core.Globals.Variables.MaxNpcs)
@@ -87,11 +87,11 @@ namespace Server
             
             Data.MapNpc[mapNum].Npc[mapNpcNum].Dir = (byte) (Random.Shared.NextDouble() * 4f);
 
-            for (var x = 0; x < Data.Map[mapNum].MaxX; x++)
+            for (var x = 0; x < Server.Map.Instance[mapNum].MaxX; x++)
             {
-                for (var y = 0; y < Data.Map[mapNum].MaxY; y++)
+                for (var y = 0; y < Server.Map.Instance[mapNum].MaxY; y++)
                 {
-                    var tile = Data.Map[mapNum].Tile[x, y];
+                    var tile = Server.Map.Instance[mapNum].Tile[x, y];
                     bool isPrimaryMatch = tile.Type == TileType.NpcSpawn && tile.Data1 == mapNpcNum;
                     bool isSecondaryMatch = tile.Type2 == TileType.NpcSpawn && tile.Data1_2 == mapNpcNum;
                     if (!isPrimaryMatch && !isSecondaryMatch)
@@ -112,11 +112,11 @@ namespace Server
                 var i = 0;
                 while (i < 1000)
                 {
-                    var x = (int) Math.Round(General.GetRandom.NextDouble(0d, Data.Map[mapNum].MaxX - 1));
-                    var y = (int) Math.Round(General.GetRandom.NextDouble(0d, Data.Map[mapNum].MaxY - 1));
+                    var x = (int) Math.Round(General.GetRandom.NextDouble(0d, Server.Map.Instance[mapNum].MaxX - 1));
+                    var y = (int) Math.Round(General.GetRandom.NextDouble(0d, Server.Map.Instance[mapNum].MaxY - 1));
 
-                    if (x > Data.Map[mapNum].MaxX) x = Data.Map[mapNum].MaxX - 1;
-                    if (y > Data.Map[mapNum].MaxY) y = Data.Map[mapNum].MaxY - 1;
+                    if (x > Server.Map.Instance[mapNum].MaxX) x = Server.Map.Instance[mapNum].MaxX - 1;
+                    if (y > Server.Map.Instance[mapNum].MaxY) y = Server.Map.Instance[mapNum].MaxY - 1;
 
                     if (TileIsOpen(mapNum, x, y))
                     {
@@ -134,9 +134,9 @@ namespace Server
             // Didn't spawn, so now we'll just try to find a free tile
             if (!spawned)
             {
-                for (var x = 0; x < Data.Map[mapNum].MaxX; x++)
+                for (var x = 0; x < Server.Map.Instance[mapNum].MaxX; x++)
                 {
-                    for (var y = 0; y < Data.Map[mapNum].MaxY; y++)
+                    for (var y = 0; y < Server.Map.Instance[mapNum].MaxY; y++)
                     {
                         if (TileIsOpen(mapNum, x, y))
                         {
@@ -197,12 +197,12 @@ namespace Server
                 }
             }
 
-            if (Data.Map[mapNum].Tile[x, y].Type != TileType.NpcSpawn &&
-                Data.Map[mapNum].Tile[x, y].Type != TileType.Item &&
-                Data.Map[mapNum].Tile[x, y].Type != TileType.None &&
-                Data.Map[mapNum].Tile[x, y].Type2 != TileType.NpcSpawn &&
-                Data.Map[mapNum].Tile[x, y].Type2 != TileType.Item &&
-                Data.Map[mapNum].Tile[x, y].Type2 != TileType.None)
+            if (Server.Map.Instance[mapNum].Tile[x, y].Type != TileType.NpcSpawn &&
+                Server.Map.Instance[mapNum].Tile[x, y].Type != TileType.Item &&
+                Server.Map.Instance[mapNum].Tile[x, y].Type != TileType.None &&
+                Server.Map.Instance[mapNum].Tile[x, y].Type2 != TileType.NpcSpawn &&
+                Server.Map.Instance[mapNum].Tile[x, y].Type2 != TileType.Item &&
+                Server.Map.Instance[mapNum].Tile[x, y].Type2 != TileType.None)
             {
                 return false;
             }
@@ -237,12 +237,12 @@ namespace Server
             }
 
             // Check map bounds
-            if (nextTileX < 0 || nextTileY < 0 || nextTileX >= Data.Map[mapNum].MaxX || nextTileY >= Data.Map[mapNum].MaxY)
+            if (nextTileX < 0 || nextTileY < 0 || nextTileX >= Server.Map.Instance[mapNum].MaxX || nextTileY >= Server.Map.Instance[mapNum].MaxY)
                 return false;
 
             // Check tile walkability
-            int n = (int)Data.Map[mapNum].Tile[nextTileX, nextTileY].Type;
-            int n2 = (int)Data.Map[mapNum].Tile[nextTileX, nextTileY].Type2;
+            int n = (int)Server.Map.Instance[mapNum].Tile[nextTileX, nextTileY].Type;
+            int n2 = (int)Server.Map.Instance[mapNum].Tile[nextTileX, nextTileY].Type2;
             if (n != (byte)TileType.None &&
                 n != (byte)TileType.Item &&
                 n != (byte)TileType.NpcSpawn &&
@@ -344,8 +344,8 @@ namespace Server
                     if (_stepRemaining[map, i] <= 0)
                     {
                         // Clamp to tile grid alignment just in case
-                        npc.X = Math.Max(0, Math.Min(npc.X, (Data.Map[map].MaxX - 1) * TileSize));
-                        npc.Y = Math.Max(0, Math.Min(npc.Y, (Data.Map[map].MaxY - 1) * TileSize));
+                        npc.X = Math.Max(0, Math.Min(npc.X, (Server.Map.Instance[map].MaxX - 1) * TileSize));
+                        npc.Y = Math.Max(0, Math.Min(npc.Y, (Server.Map.Instance[map].MaxY - 1) * TileSize));
                         npc.Moving = 0;
                         _stepRemaining[map, i] = 0;
 

@@ -14,9 +14,81 @@ namespace Server
 {
     public class Map : MapBase, IAsyncData
     {
+        private static Map FromTypeMap(Core.Globals.Type.Map mapData)
+        {
+            var map = new Map
+            {
+                Name = mapData.Name ?? string.Empty,
+                Music = mapData.Music ?? string.Empty,
+                Revision = mapData.Revision,
+                Moral = mapData.Moral,
+                Tileset = mapData.Tileset,
+                Up = mapData.Up,
+                Down = mapData.Down,
+                Left = mapData.Left,
+                Right = mapData.Right,
+                BootMap = mapData.BootMap,
+                BootX = mapData.BootX,
+                BootY = mapData.BootY,
+                MaxX = mapData.MaxX == 0 ? Variables.MaxMapX : mapData.MaxX,
+                MaxY = mapData.MaxY == 0 ? Variables.MaxMapY : mapData.MaxY,
+                Weather = mapData.Weather,
+                Fog = mapData.Fog,
+                WeatherIntensity = mapData.WeatherIntensity,
+                FogOpacity = mapData.FogOpacity,
+                FogSpeed = mapData.FogSpeed,
+                MapTint = mapData.MapTint,
+                MapTintR = mapData.MapTintR,
+                MapTintG = mapData.MapTintG,
+                MapTintB = mapData.MapTintB,
+                MapTintA = mapData.MapTintA,
+                Panorama = mapData.Panorama,
+                Parallax = mapData.Parallax,
+                Brightness = mapData.Brightness,
+                Shop = mapData.Shop,
+                NoRespawn = mapData.NoRespawn,
+                Indoors = mapData.Indoors,
+                EventCount = mapData.EventCount,
+                Event = mapData.Event ?? Array.Empty<Core.Globals.Type.Event>(),
+            };
+
+            map.Npc = mapData.Npc ?? new int[Core.Globals.Variables.MaxMapNpcs];
+            if (mapData.Npc == null)
+            {
+                for (var i = 0; i < map.Npc.Length; i++)
+                {
+                    map.Npc[i] = -1;
+                }
+            }
+
+            map.Tile = mapData.Tile ?? CreateTile(map.MaxX, map.MaxY);
+            EnsureTileLayers(map.Tile);
+
+            return map;
+        }
+
+        private static Core.Globals.Type.Tile[,] CreateTile(byte maxX, byte maxY)
+        {
+            var tile = new Core.Globals.Type.Tile[maxX, maxY];
+            EnsureTileLayers(tile);
+            return tile;
+        }
+
+        private static void EnsureTileLayers(Core.Globals.Type.Tile[,] tile)
+        {
+            var layerCount = Enum.GetValues(typeof(MapLayer)).Length;
+            for (var x = 0; x < tile.GetLength(0); x++)
+            {
+                for (var y = 0; y < tile.GetLength(1); y++)
+                {
+                    tile[x, y].Layer ??= new Core.Globals.Type.Layer[layerCount];
+                }
+            }
+        }
+
         public static void OnSave(int index)
         {
-            string json = JsonConvert.SerializeObject(Data.Map[index]).ToString();
+            string json = JsonConvert.SerializeObject(Server.Map.Instance[index]).ToString();
 
             if (Database.RowExists(index, "map"))
             {
@@ -67,14 +139,14 @@ namespace Server
             if (System.IO.File.Exists(xwMapsDir + @"\map" + index + ".dat"))
             {
                 var xwMap = LoadXwMap(mapsDir + @"\map" + index + ".dat");
-                Data.Map[index] = MapFromXwMap(xwMap);
+                Server.Map.Instance[index] = MapFromXwMap(xwMap);
                 return;
             }
 
             if (File.Exists(csMapsDir + @"\map" + index + ".ini"))
             {
                 var csMap = LoadCsMap(csMapsDir + @"\map" + index + ".ini");
-                Data.Map[index] = MapFromCsMap(csMap);
+                Server.Map.Instance[index] = MapFromCsMap(csMap);
                 return;
             }
 
@@ -82,7 +154,7 @@ namespace Server
             if (File.Exists(mapPath))
             {
                 SdMap sdMap = LoadSdMap(mapPath);
-                Data.Map[index] = MapFromSdMap(sdMap);
+                Server.Map.Instance[index] = MapFromSdMap(sdMap);
                 return;
             }
 
@@ -97,7 +169,7 @@ namespace Server
             }
 
             var mapData = JObject.FromObject(data).ToObject<Core.Globals.Type.Map>();
-            Data.Map[index] = mapData;
+            Server.Map.Instance[index] = FromTypeMap(mapData);
 
             MapResource.OnUpdate(index);
         }
@@ -362,7 +434,7 @@ namespace Server
             };
         }
 
-        public static Core.Globals.Type.Map MapFromXwMap(XwMap xwMap)
+        public static Map MapFromXwMap(XwMap xwMap)
         {
             var map = new Core.Globals.Type.Map();
 
@@ -407,7 +479,7 @@ namespace Server
             map.MaxX = 15;
             map.MaxY = 11;
 
-            return map;
+            return FromTypeMap(map);
         }
 
         public static SdMap LoadSdMap(string fileName)
@@ -580,7 +652,7 @@ namespace Server
             return sdMap;
         }
 
-        public static Core.Globals.Type.Map MapFromCsMap(CsMap csMap)
+        public static Map MapFromCsMap(CsMap csMap)
         {
             var mwMap = new Core.Globals.Type.Map
             {
@@ -636,10 +708,10 @@ namespace Server
                 mwMap.Npc[i] = csMap.MapData.Npc[i];
             }
 
-            return mwMap;
+            return FromTypeMap(mwMap);
         }
 
-        private static Core.Globals.Type.Map MapFromSdMap(SdMap sdMap)
+        private static Map MapFromSdMap(SdMap sdMap)
         {
             var mwMap = new Core.Globals.Type.Map();
 
@@ -712,7 +784,7 @@ namespace Server
             {
                 mwMap.Npc[i] = -1;
             }
-            return mwMap;
+            return FromTypeMap(mwMap);
         }
 
     }

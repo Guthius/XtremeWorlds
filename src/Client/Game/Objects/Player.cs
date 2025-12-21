@@ -1,8 +1,4 @@
-﻿using System.Data;
-using Core;
-using System.Net.Security;
-using Client.Game.UI;
-using Client.Game.UI.Windows;
+﻿using Client.Game.UI;
 using Client.Net;
 using Core.Globals;
 using Core.Net;
@@ -10,9 +6,7 @@ using static Core.Globals.Commands;
 using Type = Core.Globals.Type;
 using Microsoft.Xna.Framework;
 using Core.Configurations;
-using Core.Interfaces;
 using Core.Objects;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Client
 {
@@ -49,10 +43,10 @@ namespace Client
 
             int mapIdx = GetPlayerMap(GameState.MyIndex);
 
-            if (mapIdx < 0 || mapIdx >= Data.Map.Length)
+            if (mapIdx < 0 || mapIdx >= Client.Map.Instance.Count)
                 return;
 
-            if (Data.MyMap.MaxX <= 0 || Data.MyMap.MaxY <= 0)
+            if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX <= 0 || Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY <= 0)
                 return;
 
             // Refresh facing based on current key state (diagonals prioritized)
@@ -77,9 +71,9 @@ namespace Client
                 // Warp detection with bounds checks to avoid out-of-range
                 int tx = GetPlayerX(GameState.MyIndex);
                 int ty = GetPlayerY(GameState.MyIndex);
-                if (tx >= 0 && ty >= 0 && tx < Data.MyMap.MaxX && ty < Data.MyMap.MaxY)
+                if (tx >= 0 && ty >= 0 && tx < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX && ty < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)
                 {
-                    var tile = Data.MyMap.Tile[tx, ty];
+                    var tile = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[tx, ty];
                     if (tile.Type == TileType.Warp || tile.Type2 == TileType.Warp)
                         GameState.GettingMap = true;
                 }
@@ -159,7 +153,7 @@ namespace Client
             bool canMove = false;
             int d;
 
-            if (GetPlayerX(GameState.MyIndex) < 0 || GetPlayerX(GameState.MyIndex) >= Data.MyMap.MaxX || GetPlayerY(GameState.MyIndex) < 0 || GetPlayerY(GameState.MyIndex) >= Data.MyMap.MaxY)
+            if (GetPlayerX(GameState.MyIndex) < 0 || GetPlayerX(GameState.MyIndex) >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX || GetPlayerY(GameState.MyIndex) < 0 || GetPlayerY(GameState.MyIndex) >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)
             {
                 return canMove;
             }
@@ -234,7 +228,7 @@ namespace Client
             {
                 case (int) Direction.Up:
                 {
-                    if (Data.Map[GetPlayerMap(GameState.MyIndex)].Up == 0 && GetPlayerY(GameState.MyIndex) <= 0)
+                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Up == 0 && GetPlayerY(GameState.MyIndex) <= 0)
                     {
                         GameState.DirUp = false;
                         SetPlayerDir(GameState.MyIndex, (int) Direction.Down);
@@ -246,7 +240,7 @@ namespace Client
 
                 case (int) Direction.Down:
                 {
-                    if (Data.Map[GetPlayerMap(GameState.MyIndex)].Down == 0 && GetPlayerY(GameState.MyIndex) >= Data.MyMap.MaxY)
+                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Down == 0 && GetPlayerY(GameState.MyIndex) >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)
                     {
                         GameState.DirDown = false;
                         SetPlayerDir(GameState.MyIndex, (int) Direction.Up);
@@ -258,7 +252,7 @@ namespace Client
 
                 case (int) Direction.Left:
                 {
-                    if (Data.Map[GetPlayerMap(GameState.MyIndex)].Left == 0 && GetPlayerX(GameState.MyIndex) <= 0)
+                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Left == 0 && GetPlayerX(GameState.MyIndex) <= 0)
                     {
                         GameState.DirLeft = false;
                         SetPlayerDir(GameState.MyIndex, (int) Direction.Right);
@@ -270,7 +264,7 @@ namespace Client
 
                 case (int) Direction.Right:
                 {
-                    if (Data.Map[GetPlayerMap(GameState.MyIndex)].Right == 0 && GetPlayerX(GameState.MyIndex) >= Data.MyMap.MaxX)
+                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Right == 0 && GetPlayerX(GameState.MyIndex) >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX)
                     {
                         GameState.DirRight = false;
                         SetPlayerDir(GameState.MyIndex, (int) Direction.Left);
@@ -282,7 +276,7 @@ namespace Client
 
                 case (int) Direction.UpLeft:
                 {
-                    if (Data.Map[GetPlayerMap(GameState.MyIndex)].Up == 0 && Data.Map[GetPlayerMap(GameState.MyIndex)].Left == 0 && GetPlayerY(GameState.MyIndex) <= 0 & GetPlayerX(GameState.MyIndex) <= 0)
+                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Up == 0 && Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Left == 0 && GetPlayerY(GameState.MyIndex) <= 0 & GetPlayerX(GameState.MyIndex) <= 0)
                     {
                         GameState.DirUp = false;
                         GameState.DirDown = true;
@@ -293,14 +287,14 @@ namespace Client
                         return canMove;
                     }
 
-                    if (Data.Map[GetPlayerMap(GameState.MyIndex)].Down == 0 && GetPlayerY(GameState.MyIndex) <= 0)
+                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Down == 0 && GetPlayerY(GameState.MyIndex) <= 0)
                     {
                         GameState.DirUp = false;
                         SetPlayerDir(GameState.MyIndex, (int) Direction.Down);
                         return canMove;
                     }
 
-                    if (Data.Map[GetPlayerMap(GameState.MyIndex)].Right == 0 && GetPlayerX(GameState.MyIndex) <= 0)
+                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Right == 0 && GetPlayerX(GameState.MyIndex) <= 0)
                     {
                         GameState.DirLeft = false;
                         SetPlayerDir(GameState.MyIndex, (int) Direction.Right);
@@ -312,7 +306,7 @@ namespace Client
 
                 case (int) Direction.UpRight:
                 {
-                    if (Data.Map[GetPlayerMap(GameState.MyIndex)].Up == 0 && Data.Map[GetPlayerMap(GameState.MyIndex)].Right == 0 && GetPlayerY(GameState.MyIndex) >= Data.MyMap.MaxY & GetPlayerX(GameState.MyIndex) >= Data.MyMap.MaxX)
+                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Up == 0 && Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Right == 0 && GetPlayerY(GameState.MyIndex) >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY & GetPlayerX(GameState.MyIndex) >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX)
                     {
                         GameState.DirUp = false;
                         GameState.DirDown = true;
@@ -323,14 +317,14 @@ namespace Client
                         return canMove;
                     }
 
-                    if (Data.Map[GetPlayerMap(GameState.MyIndex)].Up == 0 && GetPlayerY(GameState.MyIndex) <= 0)
+                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Up == 0 && GetPlayerY(GameState.MyIndex) <= 0)
                     {
                         GameState.DirUp = false;
                         SetPlayerDir(GameState.MyIndex, (int) Direction.Down);
                         return canMove;
                     }
 
-                    if (Data.Map[GetPlayerMap(GameState.MyIndex)].Right == 0 && GetPlayerX(GameState.MyIndex) <= 0)
+                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Right == 0 && GetPlayerX(GameState.MyIndex) <= 0)
                     {
                         GameState.DirLeft = false;
                         SetPlayerDir(GameState.MyIndex, (int) Direction.Right);
@@ -342,7 +336,7 @@ namespace Client
 
                 case (int) Direction.DownLeft:
                 {
-                    if (Data.Map[GetPlayerMap(GameState.MyIndex)].Up == 0 && Data.Map[GetPlayerMap(GameState.MyIndex)].Right == 0 && GetPlayerY(GameState.MyIndex) >= Data.MyMap.MaxY & GetPlayerX(GameState.MyIndex) < 0)
+                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Up == 0 && Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Right == 0 && GetPlayerY(GameState.MyIndex) >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY & GetPlayerX(GameState.MyIndex) < 0)
                     {
                         GameState.DirDown = false;
                         GameState.DirUp = true;
@@ -353,14 +347,14 @@ namespace Client
                         return canMove;
                     }
 
-                    if (Data.Map[GetPlayerMap(GameState.MyIndex)].Up == 0 && GetPlayerY(GameState.MyIndex) <= 0)
+                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Up == 0 && GetPlayerY(GameState.MyIndex) <= 0)
                     {
                         GameState.DirDown = false;
                         SetPlayerDir(GameState.MyIndex, (int) Direction.Up);
                         return canMove;
                     }
 
-                    if (Data.Map[GetPlayerMap(GameState.MyIndex)].Right == 0 && GetPlayerX(GameState.MyIndex) <= 0)
+                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Right == 0 && GetPlayerX(GameState.MyIndex) <= 0)
                     {
                         GameState.DirLeft = false;
                         SetPlayerDir(GameState.MyIndex, (int) Direction.Right);
@@ -372,7 +366,7 @@ namespace Client
 
                 case (int) Direction.DownRight:
                 {
-                    if (Data.Map[GetPlayerMap(GameState.MyIndex)].Down == 0 && Data.Map[GetPlayerMap(GameState.MyIndex)].Right == 0 && GetPlayerY(GameState.MyIndex) >= Data.MyMap.MaxY & GetPlayerX(GameState.MyIndex) >= Data.MyMap.MaxX)
+                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Down == 0 && Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Right == 0 && GetPlayerY(GameState.MyIndex) >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY & GetPlayerX(GameState.MyIndex) >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX)
                     {
                         GameState.DirDown = false;
                         GameState.DirUp = true;
@@ -383,14 +377,14 @@ namespace Client
                         return canMove;
                     }
 
-                    if (Data.Map[GetPlayerMap(GameState.MyIndex)].Down == 0 && GetPlayerY(GameState.MyIndex) >= Data.MyMap.MaxY)
+                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Down == 0 && GetPlayerY(GameState.MyIndex) >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)
                     {
                         GameState.DirDown = false;
                         SetPlayerDir(GameState.MyIndex, (int) Direction.Up);
                         return canMove;
                     }
 
-                    if (Data.Map[GetPlayerMap(GameState.MyIndex)].Right == 0 && GetPlayerX(GameState.MyIndex) >= Data.MyMap.MaxX)
+                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Right == 0 && GetPlayerX(GameState.MyIndex) >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX)
                     {
                         GameState.DirRight = false;
                         SetPlayerDir(GameState.MyIndex, (int) Direction.Left);
@@ -414,7 +408,7 @@ namespace Client
                         }
                     }
                 }
-                else if (Data.MyMap.Up > 0)
+                else if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Up > 0)
                 {
                     Sender.SendPlayerRequestNewMap();
                     return canMove;
@@ -424,7 +418,7 @@ namespace Client
             if (GameState.DirDown && !GameState.DirUp && !GameState.DirLeft && !GameState.DirRight)
             {
                 SetPlayerDir(GameState.MyIndex, (int) Direction.Down);
-                if (GetPlayerY(GameState.MyIndex) < Data.MyMap.MaxY - 1)
+                if (GetPlayerY(GameState.MyIndex) < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY - 1)
                 {
                     if (OnCheckDir((byte) Direction.Down))
                     {
@@ -434,7 +428,7 @@ namespace Client
                         }
                     }
                 }
-                else if (Data.MyMap.Down > 0)
+                else if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Down > 0)
                 {
                     Sender.SendPlayerRequestNewMap();
                     return canMove;
@@ -454,7 +448,7 @@ namespace Client
                         }
                     }
                 }
-                else if (Data.MyMap.Left > 0)
+                else if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Left > 0)
                 {
                     Sender.SendPlayerRequestNewMap();
                     return canMove;
@@ -464,7 +458,7 @@ namespace Client
             if (GameState.DirRight && !GameState.DirUp && !GameState.DirDown && !GameState.DirLeft)
             {
                 SetPlayerDir(GameState.MyIndex, (int) Direction.Right);
-                if (GetPlayerX(GameState.MyIndex) < Data.MyMap.MaxX)
+                if (GetPlayerX(GameState.MyIndex) < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX)
                 {
                     if (OnCheckDir((byte) Direction.Right))
                     {
@@ -474,7 +468,7 @@ namespace Client
                         }
                     }
                 }
-                else if (Data.MyMap.Right > 0)
+                else if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Right > 0)
                 {
                     Sender.SendPlayerRequestNewMap();
                     return canMove;
@@ -484,7 +478,7 @@ namespace Client
             // Check for diagonal movements first
             if (GameState.DirUp && GameState.DirRight && !GameState.DirLeft && !GameState.DirDown)
             {
-                if (GetPlayerY(GameState.MyIndex) > 0 & GetPlayerX(GameState.MyIndex) < Data.MyMap.MaxX)
+                if (GetPlayerY(GameState.MyIndex) > 0 & GetPlayerX(GameState.MyIndex) < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX)
                 {
                     SetPlayerDir(GameState.MyIndex, (int) Direction.UpRight);
                     if (OnCheckDir((byte)Direction.UpRight))
@@ -495,7 +489,7 @@ namespace Client
                         }
                     }
                 }
-                else if (Data.MyMap.Up > 0 & Data.MyMap.Right > 0)
+                else if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Up > 0 & Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Right > 0)
                 {
                     Sender.SendPlayerRequestNewMap();
                     return canMove;
@@ -514,7 +508,7 @@ namespace Client
                         }
                     }
                 }
-                else if (Data.MyMap.Up > 0 & Data.MyMap.Left > 0)
+                else if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Up > 0 & Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Left > 0)
                 {
                     Sender.SendPlayerRequestNewMap();
                     return canMove;
@@ -523,7 +517,7 @@ namespace Client
             else if (GameState.DirDown && GameState.DirRight && !GameState.DirLeft && !GameState.DirUp)
             {
                 SetPlayerDir(GameState.MyIndex, (int) Direction.DownRight);
-                if (GetPlayerY(GameState.MyIndex) < Data.MyMap.MaxY & GetPlayerX(GameState.MyIndex) < Data.MyMap.MaxX)
+                if (GetPlayerY(GameState.MyIndex) < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY & GetPlayerX(GameState.MyIndex) < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX)
                 {
                     if (OnCheckDir((byte) Direction.DownRight))
                     {
@@ -533,7 +527,7 @@ namespace Client
                         }
                     }
                 }
-                else if (Data.MyMap.Down > 0 & Data.MyMap.Right > 0)
+                else if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Down > 0 & Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Right > 0)
                 {
                     Sender.SendPlayerRequestNewMap();
                     return canMove;
@@ -542,7 +536,7 @@ namespace Client
             else if (GameState.DirDown && GameState.DirLeft && !GameState.DirRight && !GameState.DirUp)
             {
                 SetPlayerDir(GameState.MyIndex, (int) Direction.DownLeft);
-                if (GetPlayerY(GameState.MyIndex) < Data.MyMap.MaxY & GetPlayerX(GameState.MyIndex) > 0)
+                if (GetPlayerY(GameState.MyIndex) < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY & GetPlayerX(GameState.MyIndex) > 0)
                 {
                     if (OnCheckDir((byte) Direction.DownLeft))
                     {
@@ -552,7 +546,7 @@ namespace Client
                         }
                     }
                 }
-                else if (Data.MyMap.Down > 0 & Data.MyMap.Left > 0)
+                else if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Down > 0 & Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Left > 0)
                 {
                     Sender.SendPlayerRequestNewMap();
                     return canMove;
@@ -570,14 +564,14 @@ namespace Client
             var y = default(int);
             int i;
 
-            if (GetPlayerX(GameState.MyIndex) >= Data.Map[GetPlayerMap(GameState.MyIndex)].MaxX || GetPlayerY(GameState.MyIndex) >= Data.Map[GetPlayerMap(GameState.MyIndex)].MaxY)
+            if (GetPlayerX(GameState.MyIndex) >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX || GetPlayerY(GameState.MyIndex) >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)
             {
                 OnCheckDir = true;
                 return OnCheckDir;
             }
 
             // check directional blocking
-            if (GameLogic.IsDirBlocked(ref Data.MyMap.Tile[GetPlayerX(GameState.MyIndex), GetPlayerY(GameState.MyIndex)].DirBlock, ref direction))
+            if (GameLogic.IsDirBlocked(ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[GetPlayerX(GameState.MyIndex), GetPlayerY(GameState.MyIndex)].DirBlock, ref direction))
             {
                 OnCheckDir = true;
                 return OnCheckDir;
@@ -635,30 +629,30 @@ namespace Client
                 }
             }
 
-            if (x < 0 || y < 0 || x >= Data.MyMap.MaxX || y >= Data.MyMap.MaxY)
+            if (x < 0 || y < 0 || x >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX || y >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)
             {
                 OnCheckDir = true;
                 return OnCheckDir;
             }
 
             // Check to see if the map tile is blocked or not
-            if (Data.MyMap.Tile[x, y].Type == TileType.Blocked | Data.MyMap.Tile[x, y].Type2 == TileType.Blocked)
+            if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Type == TileType.Blocked | Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Type2 == TileType.Blocked)
             {
                 OnCheckDir = true;
                 return OnCheckDir;
             }
 
             // Check to see if the map tile is tree or not
-            if (Data.MyMap.Tile[x, y].Type == TileType.Resource | Data.MyMap.Tile[x, y].Type2 == TileType.Resource)
+            if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Type == TileType.Resource | Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Type2 == TileType.Resource)
             {
                 OnCheckDir = true;
                 return OnCheckDir;
             }
 
             // Check to see if a player is already on that tile
-            if (Data.MyMap.Moral > 0)
+            if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Moral > 0)
             {
-                if (Moral.Instance[Data.MyMap.Moral].PlayerBlock)
+                if (Moral.Instance[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Moral].PlayerBlock)
                 {
                     for (i = 0; i < Core.Globals.Variables.MaxPlayers; i++)
                     {
@@ -674,7 +668,7 @@ namespace Client
                 }
 
                 // Check to see if a Npc is already on that tile
-                if (Moral.Instance[Data.MyMap.Moral].NpcBlock)
+                if (Moral.Instance[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Moral].NpcBlock)
                 {
                     for (i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
                     {
@@ -969,9 +963,9 @@ namespace Client
                 {
                     if (Player.Instance[GameState.MyIndex].Moving == 0)
                     {
-                        if (Data.MyMap.Moral >= 0)
+                        if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Moral >= 0)
                         {
-                            if (Moral.Instance[Data.MyMap.Moral].CanCast)
+                            if (Moral.Instance[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Moral].CanCast)
                             {
                                 Sender.SendCast(skillSlot);
                             }

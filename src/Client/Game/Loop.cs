@@ -54,7 +54,7 @@ namespace Client
 
                 if (_tmr25 < _tick)
                 {
-                    Audio.PlayMusic(Data.MyMap.Music);
+                    Audio.PlayMusic(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Music);
                     UpdateEditors();
                     _tmr25 = _tick + 25;
                 }
@@ -69,24 +69,24 @@ namespace Client
                 {
                     if (_animationTmr[layer] < _tick)
                     {
-                        byte mapMaxX = Data.MyMap.MaxX;
+                        byte mapMaxX = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
                         for (byte x = 0; x < mapMaxX; x++)
                         {
-                            byte mapMaxY = Data.MyMap.MaxY;
+                            byte mapMaxY = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
                             for (byte y = 0; y < mapMaxY; y++)
                             {
                                 if (GameLogic.IsValidMapPoint(x, y))
                                 {
-                                    if (Data.MyMap.Tile[x, y].Type == TileType.Animation)
+                                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Type == TileType.Animation)
                                     {      
-                                        if (Animation.Instance.Count <= Data.MyMap.Tile[x, y].Data1) continue; // No animations loaded                           
-                                        _animationTmr[layer] = _tick + MapAnimation.OnPlay(Animation.Instance[Data.MyMap.Tile[x, y].Data1].Sprite[layer], layer, Data.MyMap.Tile[x, y].Data1, x, y);
+                                        if (Animation.Instance.Count <= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data1) continue; // No animations loaded                           
+                                        _animationTmr[layer] = _tick + MapAnimation.OnPlay(Animation.Instance[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data1].Sprite[layer], layer, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data1, x, y);
                                     }
 
-                                    if (Data.MyMap.Tile[x, y].Type2 == TileType.Animation)
+                                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Type2 == TileType.Animation)
                                     {
-                                        if (Animation.Instance.Count <= Data.MyMap.Tile[x, y].Data1_2) continue; // No animations loaded                           
-                                        _animationTmr[layer] = _tick + MapAnimation.OnPlay(Animation.Instance[Data.MyMap.Tile[x, y].Data1_2].Sprite[layer], layer, Data.MyMap.Tile[x, y].Data1_2, x, y);
+                                        if (Animation.Instance.Count <= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data1_2) continue; // No animations loaded                           
+                                        _animationTmr[layer] = _tick + MapAnimation.OnPlay(Animation.Instance[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data1_2].Sprite[layer], layer, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data1_2, x, y);
                                     }
                                 }
                             }

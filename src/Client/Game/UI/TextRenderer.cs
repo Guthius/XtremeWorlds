@@ -415,7 +415,7 @@ public static class TextRenderer
             for (var y = (int)GameState.TileView.Top; y < loopTo1; y++)
             {
                 if (!GameLogic.IsValidMapPoint(x, y)) continue;
-                ref var instance = ref Data.MyMap.Tile[x, y];
+                ref var instance = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y];
                 var tX = (int)Math.Round(GameLogic.ConvertMapX(x * Constants.TileSize) - 4 + Constants.TileSize * 0.5d);
                 var tY = (int)Math.Round(GameLogic.ConvertMapY(y * Constants.TileSize) - 7 + Constants.TileSize * 0.5d);
                 tA = GameState.EditorAttribute == 1 ? (int)instance.Type : (int)instance.Type2;
@@ -563,6 +563,6 @@ public static class TextRenderer
 
     public static void DrawMapName()
     {
-        OnDraw(Data.MyMap.Name, (int)Math.Round(GameState.ResolutionWidth / 2d - GetTextWidth(Data.MyMap.Name)), 10, GameState.DrawMapNameColor, Color.Black);
+        OnDraw(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Name, (int)Math.Round(GameState.ResolutionWidth / 2d - GetTextWidth(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Name)), 10, GameState.DrawMapNameColor, Color.Black);
     }
 }
