@@ -8,42 +8,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml.Linq;
 using static Core.Globals.Type;
+using Core.Objects;
 
 namespace Server
 {
-    public class Map : IData, IAsyncData
+    public class Map : MapBase, IAsyncData
     {
-        public static void OnClear(int index)
-        {
-            int x;
-            int y;
-            Data.Map[index].Name = "";
-            Data.Map[index].MaxX = (byte)Core.Globals.Variables.MaxMapX;
-            Data.Map[index].MaxY = (byte)Core.Globals.Variables.MaxMapY;
-            Data.Map[index].Npc = new int[Core.Globals.Variables.MaxMapNpcs];
-            Data.Map[index].Tile = new Tile[(Data.Map[index].MaxX), (Data.Map[index].MaxY)];
-
-            var loopTo = Data.Map[index].MaxX;
-            for (x = 0; x < loopTo; x++)
-            {
-                var loopTo1 = Data.Map[index].MaxY;
-                for (y = 0; y < loopTo1; y++)
-                    Data.Map[index].Tile[x, y].Layer = new Core.Globals.Type.Layer[Enum.GetValues(typeof(MapLayer)).Length];
-            }
-
-            var loopTo2 = Core.Globals.Variables.MaxMapNpcs;
-            for (x = 0; x < loopTo2; x++)
-            {
-                Data.Map[index].Npc[x] = -1;
-            }
-
-            Data.Map[index].EventCount = 0;
-            Data.Map[index].Event = new Core.Globals.Type.Event[1];
-            // Reset the values for if a player is on the map or not
-            Data.Map[index].Name = "";
-            Data.Map[index].Music = "";
-        }
-
         public static void OnSave(int index)
         {
             string json = JsonConvert.SerializeObject(Data.Map[index]).ToString();
@@ -129,7 +99,7 @@ namespace Server
             var mapData = JObject.FromObject(data).ToObject<Core.Globals.Type.Map>();
             Data.Map[index] = mapData;
 
-            MapResource.Cache(index);
+            MapResource.OnUpdate(index);
         }
 
         public static CsMap LoadCsMap(string fileName)
@@ -211,7 +181,6 @@ namespace Server
 
             return csMap;
         }
-
 
         public static XwMap LoadXwMap(string fileName)
         {
@@ -746,29 +715,5 @@ namespace Server
             return mwMap;
         }
 
-        public static void OnDraw(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnStream(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnReset()
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnLoad(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnUpdate(int index)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

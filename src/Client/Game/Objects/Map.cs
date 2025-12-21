@@ -5,6 +5,7 @@ using Core.Configurations;
 using Core.Globals;
 using Core.Interfaces;
 using Core.Net;
+using Core.Objects;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Drawing;
@@ -14,7 +15,7 @@ using Type = Core.Globals.Type;
 
 namespace Client
 {
-    public class Map : IData
+    public class Map : MapBase
     {
         #region Drawing
 
@@ -466,40 +467,6 @@ namespace Client
             }
         }
 
-        public static void OnDraw(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnClear(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnStream(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnReset()
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnLoad(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnSave(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnUpdate(int index)
-        {
-            throw new NotImplementedException();
-        }
     }
 
     #endregion
