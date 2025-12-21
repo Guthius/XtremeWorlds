@@ -8,7 +8,7 @@ namespace Server
 {
     public static class MapResource
     {
-        public static void Cache(int mapNum)
+        public static void OnUpdate(int mapNum)
         {
             var resourceCount = 0;
 
