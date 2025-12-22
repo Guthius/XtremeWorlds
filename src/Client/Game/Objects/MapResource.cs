@@ -2,13 +2,13 @@ using Client;
 using Core.Globals;
 using Core.Interfaces;
 using static Core.Globals.Commands;
-using MapResourceCache = Core.Globals.Type.MapResourceCache;
+using MapResourceCacheData = Core.Globals.Type.MapResourceCache;
 
 namespace Core.Objects
 {
     public class MapResource : IData
     {
-        public static MapResourceCache[] Instance { get; private set; } = new MapResourceCache[Variables.MaxResources];
+        public static MapResourceCacheData[] Instance { get; private set; } = new MapResourceCacheData[Variables.MaxResources];
 
         public static void OnClear(int index)
         {
