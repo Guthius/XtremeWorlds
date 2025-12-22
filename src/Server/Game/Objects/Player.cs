@@ -46,13 +46,49 @@ public class Player : PlayerBase
 
     public static void OnWarp(int playerId, int map, int x, int y, int dir, bool send = false)
     {
-        if (!NetworkConfig.IsPlaying(playerId) || map <= 0 || map >= Core.Globals.Variables.MaxMaps || Data.TempPlayer[playerId].GettingMap == true || map < 0 || map >= Core.Globals.Variables.MaxMaps)
+        if (!NetworkConfig.IsPlaying(playerId))
         {
             return;
         }
 
-        x = Math.Clamp(x, 0, Server.Map.Instance[map].MaxX) * 32;
-        y = Math.Clamp(y, 0, Server.Map.Instance[map].MaxY) * 32;
+        if (playerId < 0 || playerId >= Data.TempPlayer.Length)
+        {
+            return;
+        }
+
+        if (map <= 0 || map >= Core.Globals.Variables.MaxMaps)
+        {
+            return;
+        }
+
+        if (Data.TempPlayer[playerId].GettingMap)
+        {
+            return;
+        }
+
+        // Map data is stored in a list; MaxMaps is not a guarantee that the list is populated.
+        // Note: List indices are 0..Count-1, and map ids here are expected to be > 0.
+        var mapCount = Server.Map.Instance.Count;
+        if (map <= 0 || map >= mapCount)
+        {
+            General.Logger.LogWarning("OnWarp rejected: invalid map index {Map} (Map.Instance.Count={Count}) for player {PlayerId}", map, mapCount, playerId);
+            return;
+        }
+
+        var mapData = Server.Map.Instance[map];
+        if (mapData.Tile == null)
+        {
+            General.Logger.LogWarning("OnWarp rejected: map {Map} has no tile data for player {PlayerId}", map, playerId);
+            return;
+        }
+        if (mapData.MaxX <= 0 || mapData.MaxY <= 0)
+        {
+            General.Logger.LogWarning("OnWarp rejected: map {Map} has invalid bounds MaxX={MaxX} MaxY={MaxY}", map, mapData.MaxX, mapData.MaxY);
+            return;
+        }
+
+        x = Math.Clamp(x, 0, Math.Max(0, mapData.MaxX - 1)) * 32;
+        y = Math.Clamp(y, 0, Math.Max(0, mapData.MaxY - 1)) * 32;
 
         Data.TempPlayer[playerId].EventProcessingCount = 0;
         Data.TempPlayer[playerId].EventMap.CurrentEvents = 0; // Clear events
@@ -97,7 +133,7 @@ public class Player : PlayerBase
         }
 
         // Now we check if there were any players left on the map the player just left, and if not stop processing npcs
-        if (GameLogic.GetTotalMapPlayers(oldMapNum) == 0)
+        if (oldMapNum >= 0 && oldMapNum < Core.Globals.Variables.MaxMaps && GameLogic.GetTotalMapPlayers(oldMapNum) == 0)
         {
             // Regenerate all Npcs' health
             for (var mapNpcNum = 0; mapNpcNum < Core.Globals.Variables.MaxMapNpcs; mapNpcNum++)

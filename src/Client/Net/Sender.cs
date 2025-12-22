@@ -603,40 +603,47 @@ public static class Sender
     {
         var packetWriter = new PacketWriter();
 
+        if (index < 0 || index >= Core.Objects.NpcBase.Instance.Count)
+        {
+            return;
+        }
+
+        var npc = Core.Objects.NpcBase.Instance[index];
+
         packetWriter.WriteEnum(Packets.ClientPackets.CSaveNpc);
         packetWriter.WriteInt32(index);
-        packetWriter.WriteInt32(Data.Npc[index].Animation);
-        packetWriter.WriteString(Data.Npc[index].AttackSay);
-        packetWriter.WriteByte(Data.Npc[index].Behavior);
+        packetWriter.WriteInt32(npc.Animation);
+        packetWriter.WriteString(npc.AttackSay ?? string.Empty);
+        packetWriter.WriteByte(npc.Behavior);
 
         for (var i = 0; i < Variables.MaxDropItems; i++)
         {
-            packetWriter.WriteInt32(Data.Npc[index].DropChance[i]);
-            packetWriter.WriteInt32(Data.Npc[index].DropItem[i]);
-            packetWriter.WriteInt32(Data.Npc[index].DropItemValue[i]);
+            packetWriter.WriteInt32(npc.DropChance[i]);
+            packetWriter.WriteInt32(npc.DropItem[i]);
+            packetWriter.WriteInt32(npc.DropItemValue[i]);
         }
 
-        packetWriter.WriteInt32(Data.Npc[index].Experience);
-        packetWriter.WriteByte(Data.Npc[index].Faction);
-        packetWriter.WriteInt32(Data.Npc[index].Hp);
-        packetWriter.WriteString(Data.Npc[index].Name);
-        packetWriter.WriteByte(Data.Npc[index].Range);
-        packetWriter.WriteByte(Data.Npc[index].SpawnTime);
-        packetWriter.WriteInt32(Data.Npc[index].SpawnSecs);
-        packetWriter.WriteInt32(Data.Npc[index].Sprite);
+        packetWriter.WriteInt32(npc.Experience);
+        packetWriter.WriteByte(npc.Faction);
+        packetWriter.WriteInt32(npc.Hp);
+        packetWriter.WriteString(npc.Name ?? string.Empty);
+        packetWriter.WriteByte(npc.Range);
+        packetWriter.WriteByte(npc.SpawnTime);
+        packetWriter.WriteInt32(npc.SpawnSecs);
+        packetWriter.WriteInt32(npc.Sprite);
 
         for (var i = 0; i < StatCount; i++)
         {
-            packetWriter.WriteByte(Data.Npc[index].Stat[i]);
+            packetWriter.WriteByte(npc.Stat[i]);
         }
 
         for (var i = 0; i < Variables.MaxNpcSkills; i++)
         {
-            packetWriter.WriteByte(Data.Npc[index].Skill[i]);
+            packetWriter.WriteByte(npc.Skill[i]);
         }
 
-        packetWriter.WriteInt32(Data.Npc[index].Level);
-        packetWriter.WriteInt32(Data.Npc[index].Damage);
+        packetWriter.WriteByte(npc.Level);
+        packetWriter.WriteInt32(npc.Damage);
         Network.Send(packetWriter);
     }
 

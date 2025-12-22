@@ -689,23 +689,32 @@ public static class Loop
             }
 
             // Respawn resources
-            var mapResource = MapResource.Instance[map];
-            if (mapResource.ResourceCount > 0)
+            if (map >= 0 && map < MapResource.Instance.Length)
             {
-                for (int i = 0; i < mapResource.ResourceCount; i++)
+                var mapResource = MapResource.Instance[map];
+                if (mapResource.ResourceCount > 0 && mapResource.ResourceData != null)
                 {
-                    var resData = mapResource.ResourceData[i];
-                    int resourceindex = Server.Map.Instance[map].Tile[resData.X, resData.Y].Data1;
-                    if (resourceindex > 0)
+                    int loopTo = Math.Min(mapResource.ResourceCount, mapResource.ResourceData.Length);
+                    for (int i = 0; i < loopTo; i++)
                     {
-                        if (resData.State == 1 || resData.Health < 1)
+                        var resData = mapResource.ResourceData[i];
+                        if (resData.X < 0 || resData.Y < 0 || resData.X >= Server.Map.Instance[map].MaxX || resData.Y >= Server.Map.Instance[map].MaxY)
                         {
-                            if (resData.Timer + Resource.Instance[resourceindex].RespawnTime * 1000 < now)
+                            continue;
+                        }
+
+                        int resourceindex = Server.Map.Instance[map].Tile[resData.X, resData.Y].Data1;
+                        if (resourceindex > 0 && resourceindex < Resource.Instance.Count)
+                        {
+                            if (resData.State == 1 || resData.Health < 1)
                             {
-                                resData.Timer = now;
-                                resData.State = 0;
-                                resData.Health = (byte)Resource.Instance[resourceindex].Health;
-                                NetworkSend.SendMapResourceToMap(map);
+                                if (resData.Timer + Resource.Instance[resourceindex].RespawnTime * 1000 < now)
+                                {
+                                    resData.Timer = now;
+                                    resData.State = 0;
+                                    resData.Health = (byte)Resource.Instance[resourceindex].Health;
+                                    NetworkSend.SendMapResourceToMap(map);
+                                }
                             }
                         }
                     }

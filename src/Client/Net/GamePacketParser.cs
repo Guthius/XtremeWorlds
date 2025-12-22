@@ -654,38 +654,60 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         var npcNum = packetReader.ReadInt32();
 
-        Data.Npc[npcNum].Animation = packetReader.ReadInt32();
-        Data.Npc[npcNum].AttackSay = packetReader.ReadString();
-        Data.Npc[npcNum].Behavior = packetReader.ReadByte();
+        if (npcNum == 0)
+        {
+            Core.Objects.NpcBase.Instance.Clear();
+        }
+
+        var npc = new Core.Objects.NpcBase
+        {
+            Animation = packetReader.ReadInt32(),
+            AttackSay = packetReader.ReadString() ?? string.Empty,
+            Behavior = packetReader.ReadByte(),
+        };
 
         for (var i = 0; i < Variables.MaxDropItems; i++)
         {
-            Data.Npc[npcNum].DropChance[i] = packetReader.ReadInt32();
-            Data.Npc[npcNum].DropItem[i] = packetReader.ReadInt32();
-            Data.Npc[npcNum].DropItemValue[i] = packetReader.ReadInt32();
+            npc.DropChance[i] = packetReader.ReadInt32();
+            npc.DropItem[i] = packetReader.ReadInt32();
+            npc.DropItemValue[i] = packetReader.ReadInt32();
         }
 
-        Data.Npc[npcNum].Experience = packetReader.ReadInt32();
-        Data.Npc[npcNum].Faction = packetReader.ReadByte();
-        Data.Npc[npcNum].Hp = packetReader.ReadInt32();
-        Data.Npc[npcNum].Name = packetReader.ReadString();
-        Data.Npc[npcNum].Range = packetReader.ReadByte();
-        Data.Npc[npcNum].SpawnTime = packetReader.ReadByte();
-        Data.Npc[npcNum].SpawnSecs = packetReader.ReadInt32();
-        Data.Npc[npcNum].Sprite = packetReader.ReadInt32();
+        npc.Experience = packetReader.ReadInt32();
+        npc.Faction = packetReader.ReadByte();
+        npc.Hp = packetReader.ReadInt32();
+        npc.Name = packetReader.ReadString() ?? string.Empty;
+        npc.Range = packetReader.ReadByte();
+        npc.SpawnTime = packetReader.ReadByte();
+        npc.SpawnSecs = packetReader.ReadInt32();
+        npc.Sprite = packetReader.ReadInt32();
 
         for (var i = 0; i < StatCount; i++)
         {
-            Data.Npc[npcNum].Stat[i] = packetReader.ReadByte();
+            npc.Stat[i] = packetReader.ReadByte();
         }
 
         for (var i = 0; i < Variables.MaxNpcSkills; i++)
         {
-            Data.Npc[npcNum].Skill[i] = packetReader.ReadByte();
+            npc.Skill[i] = packetReader.ReadByte();
         }
 
-        Data.Npc[npcNum].Level = packetReader.ReadByte();
-        Data.Npc[npcNum].Damage = packetReader.ReadInt32();
+        npc.Level = packetReader.ReadByte();
+        npc.Damage = packetReader.ReadInt32();
+
+        Core.Objects.NpcBase.Instance.Add(npc);
+
+        if ((npcNum + 1) == Variables.MaxNpcs)
+        {
+            if (GameState.InitNpcEditor)
+            {
+                GameState.MyEditorType = EditorType.Npc;
+                GameState.EditorIndex = 0;
+                WindowManager.ShowWindow("winNpcEditor");
+                GameState.InitNpcEditor = false;
+                Client.Game.UI.Windows.WinNpcEditor.Init();
+            }
+        }
     }
 
     private static void Packet_UpdateSkill(ReadOnlyMemory<byte> data)

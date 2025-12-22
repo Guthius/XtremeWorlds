@@ -9,8 +9,7 @@ public class WinNpcEditor
 {
     public static int SelectedIndex = 0;
     public static bool IsLoading = false;
-    private static Core.Globals.Type.Npc? _history = null;
-
+    private static Core.Objects.NpcBase? _history = null;
     public static void Init()
     {
         if (!WindowManager.TryGetControl("winNpcEditor", "lstIndex", out _))
@@ -33,7 +32,7 @@ public class WinNpcEditor
         lst.Clear();
         for (int i = 0; i < Variables.MaxNpcs; i++)
         {
-            string name = Strings.Trim(Data.Npc[i].Name);
+            string name = (i < Core.Objects.NpcBase.Instance.Count ? Strings.Trim(Core.Objects.NpcBase.Instance[i].Name) : string.Empty);
             if (string.IsNullOrWhiteSpace(name)) name = "None";
             lst.AddItem($"{i + 1}: {name}");
         }
@@ -63,7 +62,8 @@ public class WinNpcEditor
         if (win is null) return;
 
         if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxNpcs) return;
-        var npc = Data.Npc[SelectedIndex];
+        if (SelectedIndex < 0 || SelectedIndex >= Core.Objects.NpcBase.Instance.Count) return;
+        var npc = Core.Objects.NpcBase.Instance[SelectedIndex];
 
         int spriteIndex = npc.Sprite;
 
@@ -183,9 +183,10 @@ public class WinNpcEditor
     public static void OnLoad(int index)
     {
         if (index < 0 || index >= Variables.MaxNpcs) return;
+        if (index < 0 || index >= Core.Objects.NpcBase.Instance.Count) return;
         IsLoading = true;
         SelectedIndex = index;
-        var npc = Data.Npc[index];
+        var npc = Core.Objects.NpcBase.Instance[index];
 
         // Name
         if (WindowManager.TryGetControl("winNpcEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
@@ -330,21 +331,17 @@ public class WinNpcEditor
         if (_history is null)
         {
             // Copy current NPC (deep copy for arrays)
-            var s = Data.Npc[SelectedIndex];
-            var n = s; // struct copy
-            if (s.Stat != null) { n.Stat = new byte[s.Stat.Length]; Array.Copy(s.Stat, n.Stat, s.Stat.Length); }
-            if (s.Skill != null) { n.Skill = new byte[s.Skill.Length]; Array.Copy(s.Skill, n.Skill, s.Skill.Length); }
-            if (s.DropItem != null) { n.DropItem = new int[s.DropItem.Length]; Array.Copy(s.DropItem, n.DropItem, s.DropItem.Length); }
-            if (s.DropItemValue != null) { n.DropItemValue = new int[s.DropItemValue.Length]; Array.Copy(s.DropItemValue, n.DropItemValue, s.DropItemValue.Length); }
-            if (s.DropChance != null) { n.DropChance = new int[s.DropChance.Length]; Array.Copy(s.DropChance, n.DropChance, s.DropChance.Length); }
-            _history = n;
+            if (SelectedIndex >= Core.Objects.NpcBase.Instance.Count) return;
+            var source = Core.Objects.NpcBase.Instance[SelectedIndex];
+            _history = source;
             if (WindowManager.TryGetControl("winNpcEditor", "btnCopy", out var btn)) btn.Text = "Paste";
             return;
         }
 
         // Paste clipboard into current slot
-        var pasted = _history.Value;
-        Data.Npc[SelectedIndex] = pasted;
+        if (SelectedIndex >= Core.Objects.NpcBase.Instance.Count) return;
+        var pasted = _history;
+        Core.Objects.NpcBase.Instance[SelectedIndex] = pasted;
         GameState.NpcChanged[SelectedIndex] = true;
         // Refresh UI to reflect pasted data
         OnLoad(SelectedIndex);
@@ -366,9 +363,9 @@ public class WinNpcEditor
 
     public static void OnDelete()
     {
-        Npc.OnClear(GameState.EditorIndex);
+        Core.Objects.NpcBase.OnClear(SelectedIndex);
         GameState.NpcChanged[SelectedIndex] = true;
-        OnLoad(GameState.EditorIndex);
+        OnLoad(SelectedIndex);
         RefreshList();
     }
 

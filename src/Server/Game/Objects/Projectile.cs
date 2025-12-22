@@ -125,7 +125,13 @@ public class Projectile : ProjectileBase, IData, IAsyncData
 
         var projectileData = data.ToObject<Projectile>();
 
-        Projectile.Instance[index] = projectileData;
+        if (projectileData is null)
+        {
+            OnClear(index);
+            return;
+        }
+
+        Projectile.Instance.Add(projectileData ?? new Projectile());
     }
 
     public static void OnFireFreeAim(int playerId, short vx, short vy, int itemNum)

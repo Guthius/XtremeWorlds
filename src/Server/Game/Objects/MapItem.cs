@@ -29,6 +29,13 @@ namespace Server
                 return;
             }
 
+            var items = Item.Instance;
+
+            if (Server.Map.Instance.Count <= map)
+            {
+                return;
+            }
+
             if (Server.Map.Instance[map].NoRespawn)
             {
                 return;
@@ -40,31 +47,63 @@ namespace Server
                 {
                     if (Server.Map.Instance[map].Tile[x, y].Type == TileType.Item)
                     {
-                        if (Item.Instance[Server.Map.Instance[map].Tile[x, y].Data1].Type == (byte)ItemCategory.Currency ||
-                            Item.Instance[Server.Map.Instance[map].Tile[x, y].Data1].Stackable == 1)
+                        var itemNum = Server.Map.Instance[map].Tile[x, y].Data1;
+                        if (itemNum < 0 || itemNum >= items.Count)
+                        {
+                            continue;
+                        }
+
+                        Core.Objects.ItemBase item;
+                        try
+                        {
+                            item = items[itemNum];
+                        }
+                        catch (ArgumentOutOfRangeException)
+                        {
+                            continue;
+                        }
+
+                        if (item.Type == (byte)ItemCategory.Currency ||
+                            item.Stackable == 1)
                         {
                             var value = Server.Map.Instance[map].Tile[x, y].Data2 < 1 ? 1 : Server.Map.Instance[map].Tile[x, y].Data2;
 
-                            OnSpawn(Server.Map.Instance[map].Tile[x, y].Data1, value, map, x, y);
+                            OnSpawn(itemNum, value, map, x, y);
                         }
                         else
                         {
-                            OnSpawn(Server.Map.Instance[map].Tile[x, y].Data1, Server.Map.Instance[map].Tile[x, y].Data2, map, x, y);
+                            OnSpawn(itemNum, Server.Map.Instance[map].Tile[x, y].Data2, map, x, y);
                         }
                     }
 
                     if (Server.Map.Instance[map].Tile[x, y].Type2 == TileType.Item)
                     {
-                        if (Item.Instance[Server.Map.Instance[map].Tile[x, y].Data1_2].Type == (byte)ItemCategory.Currency ||
-                            Item.Instance[Server.Map.Instance[map].Tile[x, y].Data1_2].Stackable == 1)
+                        var itemNum = Server.Map.Instance[map].Tile[x, y].Data1_2;
+                        if (itemNum < 0 || itemNum >= items.Count)
+                        {
+                            continue;
+                        }
+
+                        Core.Objects.ItemBase item;
+                        try
+                        {
+                            item = items[itemNum];
+                        }
+                        catch (ArgumentOutOfRangeException)
+                        {
+                            continue;
+                        }
+
+                        if (item.Type == (byte)ItemCategory.Currency ||
+                            item.Stackable == 1)
                         {
                             var value = Server.Map.Instance[map].Tile[x, y].Data2_2 < 1 ? 1 : Server.Map.Instance[map].Tile[x, y].Data2_2;
 
-                            OnSpawn(Server.Map.Instance[map].Tile[x, y].Data1_2, value, map, x, y);
+                            OnSpawn(itemNum, value, map, x, y);
                         }
                         else
                         {
-                            OnSpawn(Server.Map.Instance[map].Tile[x, y].Data1_2, Server.Map.Instance[map].Tile[x, y].Data2_2, map, x, y);
+                            OnSpawn(itemNum, Server.Map.Instance[map].Tile[x, y].Data2_2, map, x, y);
                         }
                     }
                 }
@@ -74,7 +113,22 @@ namespace Server
 
         public static void OnSpawn(int itemNum, int itemVal, int map, int x, int y)
         {
-            if (itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems || map < 0 || map >= Core.Globals.Variables.MaxMaps)
+            if (itemNum < 0 || itemNum >= Core.Globals.Variables.MaxItems || map < 0 || map >= Core.Globals.Variables.MaxMaps)
+            {
+                return;
+            }
+
+            if (itemNum >= Item.Instance.Count)
+            {
+                return;
+            }
+
+            Core.Objects.ItemBase item;
+            try
+            {
+                item = Item.Instance[itemNum];
+            }
+            catch (ArgumentOutOfRangeException)
             {
                 return;
             }
@@ -85,7 +139,7 @@ namespace Server
                 return;
             }
 
-            if (Item.Instance[itemNum].Type != (byte)ItemCategory.Currency && Item.Instance[itemNum].Stackable != 1)
+            if (item.Type != (byte)ItemCategory.Currency && item.Stackable != 1)
             {
                 for (var i = 0; i < itemVal; i++)
                 {

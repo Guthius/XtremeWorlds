@@ -4,6 +4,7 @@ using Core;
 using Core.Configurations;
 using Core.Globals;
 using Core.Interfaces;
+using Core.Objects;
 using Microsoft.Xna.Framework;
 using System;
 using static Core.Globals.Commands;
@@ -19,7 +20,7 @@ namespace Client
     /// - Helper utilities for bulk updates and tile alignment callbacks.
     /// - Clear, centralized constants (TileSize).
     /// </summary>
-    public class Npc : IData
+    public class Npc : NpcBase, IStreamable
     {
         // Client-side prediction helpers: track remaining pixels and destination for current tile step.
         private static readonly int[] RemainingPixels = new int[Variables.MaxMapNpcs];
@@ -263,45 +264,12 @@ namespace Client
 
         }
 
-        public static void OnClear(int index)
-        {
-            int statCount = Enum.GetValues(typeof(Stat)).Length;
-            Data.Npc[index].AttackSay = "";
-            Data.Npc[index].Name = "";
-            Data.Npc[index] = default;
-            Data.Npc[index].Stat = new byte[statCount];
-            Data.Npc[index].DropChance = new int[Core.Globals.Variables.MaxDropItems];
-            Data.Npc[index].DropItem = new int[Core.Globals.Variables.MaxDropItems];
-            Data.Npc[index].DropItemValue = new int[Core.Globals.Variables.MaxDropItems];
-            Data.Npc[index].Skill = new byte[Core.Globals.Variables.MaxNpcSkills];
-        }
-
         public static void OnStream(int npcNum)
         {
             if (npcNum >= 0 && string.IsNullOrEmpty(Data.Npc[npcNum].Name))
             {
                 Sender.SendRequestNpc(npcNum);
             }
-        }
-
-        public static void OnDraw(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnLoad(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnSave(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnUpdate(int index)
-        {
-            throw new NotImplementedException();
         }
     }
 }

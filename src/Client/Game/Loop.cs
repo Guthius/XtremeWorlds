@@ -510,15 +510,6 @@ namespace Client
                 GameState.InitEventEditor = false;
             }
 
-            if (GameState.InitNpcEditor)
-            {
-                GameState.MyEditorType = EditorType.Npc;
-                GameState.EditorIndex = 0;
-                WindowManager.ShowWindow("winNpcEditor");
-                Client.Game.UI.Windows.WinNpcEditor.Init();
-                GameState.InitNpcEditor = false;
-            }
-
             if (GameState.InitSkillEditor)
             {
                 GameState.MyEditorType = EditorType.Skill;

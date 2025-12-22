@@ -12,7 +12,7 @@ namespace Client
     public class MapItem : IData
     {
         public static MapItemData[] Instance { get; } = new MapItemData[Variables.MaxMapItems];
-        
+
         public static void OnDraw(int itemNum)
         {
             Rectangle srcRec;

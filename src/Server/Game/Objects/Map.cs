@@ -14,59 +14,6 @@ namespace Server
 {
     public class Map : MapBase, IAsyncData
     {
-        private static Map FromTypeMap(Core.Globals.Type.Map mapData)
-        {
-            var map = new Map
-            {
-                Name = mapData.Name ?? string.Empty,
-                Music = mapData.Music ?? string.Empty,
-                Revision = mapData.Revision,
-                Moral = mapData.Moral,
-                Tileset = mapData.Tileset,
-                Up = mapData.Up,
-                Down = mapData.Down,
-                Left = mapData.Left,
-                Right = mapData.Right,
-                BootMap = mapData.BootMap,
-                BootX = mapData.BootX,
-                BootY = mapData.BootY,
-                MaxX = mapData.MaxX == 0 ? Variables.MaxMapX : mapData.MaxX,
-                MaxY = mapData.MaxY == 0 ? Variables.MaxMapY : mapData.MaxY,
-                Weather = mapData.Weather,
-                Fog = mapData.Fog,
-                WeatherIntensity = mapData.WeatherIntensity,
-                FogOpacity = mapData.FogOpacity,
-                FogSpeed = mapData.FogSpeed,
-                MapTint = mapData.MapTint,
-                MapTintR = mapData.MapTintR,
-                MapTintG = mapData.MapTintG,
-                MapTintB = mapData.MapTintB,
-                MapTintA = mapData.MapTintA,
-                Panorama = mapData.Panorama,
-                Parallax = mapData.Parallax,
-                Brightness = mapData.Brightness,
-                Shop = mapData.Shop,
-                NoRespawn = mapData.NoRespawn,
-                Indoors = mapData.Indoors,
-                EventCount = mapData.EventCount,
-                Event = mapData.Event ?? Array.Empty<Core.Globals.Type.Event>(),
-            };
-
-            map.Npc = mapData.Npc ?? new int[Core.Globals.Variables.MaxMapNpcs];
-            if (mapData.Npc == null)
-            {
-                for (var i = 0; i < map.Npc.Length; i++)
-                {
-                    map.Npc[i] = -1;
-                }
-            }
-
-            map.Tile = mapData.Tile ?? CreateTile(map.MaxX, map.MaxY);
-            EnsureTileLayers(map.Tile);
-
-            return map;
-        }
-
         private static Core.Globals.Type.Tile[,] CreateTile(byte maxX, byte maxY)
         {
             var tile = new Core.Globals.Type.Tile[maxX, maxY];
@@ -164,12 +111,16 @@ namespace Server
 
             if (data is null)
             {
+                if (Server.Map.Instance.Count <= index)
+                {
+                    Server.Map.Instance.Add(new Map());
+                }
                 OnClear(index);
                 return;
             }
 
-            var mapData = JObject.FromObject(data).ToObject<Core.Globals.Type.Map>();
-            Server.Map.Instance[index] = FromTypeMap(mapData);
+            var mapData = JObject.FromObject(data).ToObject<Map>();
+            Server.Map.Instance.Add(mapData ?? new Map());
 
             MapResource.OnUpdate(index);
         }
@@ -436,7 +387,7 @@ namespace Server
 
         public static Map MapFromXwMap(XwMap xwMap)
         {
-            var map = new Core.Globals.Type.Map();
+            var map = new Map();
 
             map.Tile = new Tile[16, 12];
             map.Npc = new int[Core.Globals.Variables.MaxMapNpcs];
@@ -479,7 +430,7 @@ namespace Server
             map.MaxX = 15;
             map.MaxY = 11;
 
-            return FromTypeMap(map);
+            return map;
         }
 
         public static SdMap LoadSdMap(string fileName)
@@ -654,7 +605,7 @@ namespace Server
 
         public static Map MapFromCsMap(CsMap csMap)
         {
-            var mwMap = new Core.Globals.Type.Map
+            var mwMap = new Map
             {
                 Name = csMap.MapData.Name,
                 MaxX = csMap.MapData.MaxX,
@@ -708,12 +659,12 @@ namespace Server
                 mwMap.Npc[i] = csMap.MapData.Npc[i];
             }
 
-            return FromTypeMap(mwMap);
+            return mwMap;
         }
 
         private static Map MapFromSdMap(SdMap sdMap)
         {
-            var mwMap = new Core.Globals.Type.Map();
+            var mwMap = new Map();
 
             mwMap.Name = sdMap.Name;
             mwMap.Music = sdMap.Music;
@@ -784,7 +735,7 @@ namespace Server
             {
                 mwMap.Npc[i] = -1;
             }
-            return FromTypeMap(mwMap);
+            return mwMap;
         }
 
     }

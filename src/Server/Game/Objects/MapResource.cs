@@ -9,7 +9,7 @@ namespace Server
 {
     public static class MapResource
     {
-        public static MapResourceCacheData[] Instance { get; private set; } = new MapResourceCacheData[Variables.MaxResources];
+        public static MapResourceCacheData[] Instance { get; private set; } = new MapResourceCacheData[Variables.MaxMaps];
         public static void OnUpdate(int map)
         {
             var resourceCount = 0;
