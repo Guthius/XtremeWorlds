@@ -20,10 +20,10 @@ public class WinMapEditor
             int prev = cmbNpc.Value;
             cmbNpc.Items.Clear();
             cmbNpc.Items.Add("None");
-            var npcArr = Data.Npc;
+            var npcArr = Npc.Instance;
             if (npcArr != null)
             {
-                for (int i = 0; i < npcArr.Length; i++)
+                for (int i = 0; i < npcArr.Count; i++)
                 {
                     var raw = npcArr[i].Name ?? string.Empty;
                     var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
@@ -47,9 +47,9 @@ public class WinMapEditor
                     if (WindowManager.TryGetControl("winMapEditor", "lstIndex", out var lstIndex) && lstIndex is ListBox lst)
                     {
                         string name = "None";
-                        if (npcIndex >= 0 && npcIndex < (Data.Npc?.Length ?? 0))
+                        if (npcIndex >= 0 && npcIndex < (Npc.Instance?.Count ?? 0))
                         {
-                            var rawName = Data.Npc?[npcIndex].Name ?? string.Empty;
+                            var rawName = Npc.Instance?[npcIndex].Name ?? string.Empty;
                             if (!string.IsNullOrWhiteSpace(rawName)) name = rawName.Trim();
                         }
                         if (slotIndex >= 0 && slotIndex < lst.Items.Count)
@@ -79,9 +79,9 @@ public class WinMapEditor
             try
             {
                 int npcIndex = (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc != null && slot < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc.Length) ? Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[slot] : -1;
-                if (npcIndex >= 0 && npcIndex < Core.Globals.Variables.MaxNpcs && npcIndex < (Data.Npc?.Length ?? 0))
+                if (npcIndex >= 0 && npcIndex < Core.Globals.Variables.MaxNpcs && npcIndex < (Npc.Instance?.Count ?? 0))
                 {
-                    var raw = Data.Npc[npcIndex].Name ?? string.Empty;
+                    var raw = Npc.Instance[npcIndex].Name ?? string.Empty;
                     if (!string.IsNullOrWhiteSpace(raw)) name = raw.Trim();
                 }
             }

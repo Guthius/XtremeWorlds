@@ -331,6 +331,14 @@ public class WinNpcEditor
         if (_history is null)
         {
             // Copy current NPC (deep copy for arrays)
+            var s = Npc.Instance[SelectedIndex];
+            var n = s; // struct copy
+            if (s.Stat != null) { n.Stat = new byte[s.Stat.Length]; Array.Copy(s.Stat, n.Stat, s.Stat.Length); }
+            if (s.Skill != null) { n.Skill = new byte[s.Skill.Length]; Array.Copy(s.Skill, n.Skill, s.Skill.Length); }
+            if (s.DropItem != null) { n.DropItem = new int[s.DropItem.Length]; Array.Copy(s.DropItem, n.DropItem, s.DropItem.Length); }
+            if (s.DropItemValue != null) { n.DropItemValue = new int[s.DropItemValue.Length]; Array.Copy(s.DropItemValue, n.DropItemValue, s.DropItemValue.Length); }
+            if (s.DropChance != null) { n.DropChance = new int[s.DropChance.Length]; Array.Copy(s.DropChance, n.DropChance, s.DropChance.Length); }
+            _history = n;
             if (SelectedIndex >= Core.Objects.NpcBase.Instance.Count) return;
             var source = Core.Objects.NpcBase.Instance[SelectedIndex];
             _history = source;

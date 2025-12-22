@@ -14,7 +14,7 @@ using static Core.Net.Packets;
 
 namespace Server;
 
-public class Npc : NpcBase, IData, IAsyncData
+public class Npc : NpcBase, IAsyncData
 {
     public static Task OnLoadAllAsync()
     {
@@ -23,7 +23,7 @@ public class Npc : NpcBase, IData, IAsyncData
 
     public static void OnSave(int npcNum)
     {
-        string json = JsonConvert.SerializeObject(Data.Npc[(int)npcNum]).ToString();
+        string json = JsonConvert.SerializeObject(Npc.Instance[(int)npcNum]).ToString();
 
         if (Database.RowExists(npcNum, "npc"))
         {
@@ -40,13 +40,15 @@ public class Npc : NpcBase, IData, IAsyncData
         JObject data;
 
         data = await Database.SelectRowAsync(index, "npc", "data");
+
         if (data is null)
         {
             OnClear(index);
             return;
         }
 
-        var npcData = JObject.FromObject(data).ToObject<Core.Globals.Type.Npc>();
-        Data.Npc[index] = npcData;
+        var npcData = JObject.FromObject(data).ToObject<Npc>();
+
+        Npc.Instance.Add(npcData ?? new Npc());
     }
 }

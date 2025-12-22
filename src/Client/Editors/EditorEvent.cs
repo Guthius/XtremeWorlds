@@ -1552,7 +1552,7 @@ namespace Client
                 {
                     if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[i] > 0)
                     {
-                        cmbSpawnNpc.Items.Add(i + 1 + ". " + Data.Npc[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[i]].Name);
+                        cmbSpawnNpc.Items.Add(i + 1 + ". " + Npc.Instance[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[i]].Name);
                     }
                     else
                     {
@@ -2119,7 +2119,7 @@ namespace Client
                         // lets populate the combobox
                         cmbSpawnNpc.Items.Clear();
                         for (int i = 0; i < Variables.MaxVariables; i++)
-                            cmbSpawnNpc.Items.Add(Strings.Trim(Data.Npc[i].Name));
+                            cmbSpawnNpc.Items.Add(Strings.Trim(Npc.Instance[i].Name));
                         cmbSpawnNpc.SelectedIndex = 0;
                         ShowFrame(fraSpawnNpc, true);
                         break;
@@ -3998,7 +3998,7 @@ namespace Client
                     }
                     else
                     {
-                        cmbChatBubbleTarget.Items.Add(i + 1 + ". " + Data.Npc[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[i]].Name);
+                        cmbChatBubbleTarget.Items.Add(i + 1 + ". " + Npc.Instance[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[i]].Name);
                     }
                 }
                 cmbChatBubbleTarget.SelectedIndex = 0;

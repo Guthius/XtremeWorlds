@@ -69,7 +69,7 @@ namespace Server
                 return;
             }
 
-            if (Data.Npc[npcNum].SpawnTime != (byte) Clock.Instance.TimeOfDay && Data.Npc[npcNum].SpawnTime != 0)
+            if (Npc.Instance[npcNum].SpawnTime != (byte) Clock.Instance.TimeOfDay && Npc.Instance[npcNum].SpawnTime != 0)
             {
                 MapNpc.Clear(mapNpcNum, map);
 

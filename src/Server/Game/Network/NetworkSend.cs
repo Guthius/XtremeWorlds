@@ -1877,39 +1877,39 @@ public static class NetworkSend
 
         buffer.WriteEnum(ServerPackets.SUpdateNpc);
         buffer.WriteInt32(npcNum);
-        buffer.WriteInt32(Data.Npc[npcNum].Animation);
-        buffer.WriteString(Data.Npc[npcNum].AttackSay ?? string.Empty);
-        buffer.WriteByte(Data.Npc[npcNum].Behavior);
+        buffer.WriteInt32(Npc.Instance[npcNum].Animation);
+        buffer.WriteString(Npc.Instance[npcNum].AttackSay ?? string.Empty);
+        buffer.WriteByte(Npc.Instance[npcNum].Behavior);
 
         for (var i = 0; i < Core.Globals.Variables.MaxDropItems; i++)
         {
-            buffer.WriteInt32(Data.Npc[npcNum].DropChance != null ? Data.Npc[npcNum].DropChance[i] : 0);
-            buffer.WriteInt32(Data.Npc[npcNum].DropItem != null ? Data.Npc[npcNum].DropItem[i] : 0);
-            buffer.WriteInt32(Data.Npc[npcNum].DropItemValue != null ? Data.Npc[npcNum].DropItemValue[i] : 0);
+            buffer.WriteInt32(Npc.Instance[npcNum].DropChance != null ? Npc.Instance[npcNum].DropChance[i] : 0);
+            buffer.WriteInt32(Npc.Instance[npcNum].DropItem != null ? Npc.Instance[npcNum].DropItem[i] : 0);
+            buffer.WriteInt32(Npc.Instance[npcNum].DropItemValue != null ? Npc.Instance[npcNum].DropItemValue[i] : 0);
         }
 
-        buffer.WriteInt32(Data.Npc[npcNum].Experience);
-        buffer.WriteByte(Data.Npc[npcNum].Faction);
-        buffer.WriteInt32(Data.Npc[npcNum].Hp);
-        buffer.WriteString(Data.Npc[npcNum].Name ?? string.Empty);
-        buffer.WriteByte(Data.Npc[npcNum].Range);
-        buffer.WriteByte(Data.Npc[npcNum].SpawnTime);
-        buffer.WriteInt32(Data.Npc[npcNum].SpawnSecs);
-        buffer.WriteInt32(Data.Npc[npcNum].Sprite);
+        buffer.WriteInt32(Npc.Instance[npcNum].Experience);
+        buffer.WriteByte(Npc.Instance[npcNum].Faction);
+        buffer.WriteInt32(Npc.Instance[npcNum].Hp);
+        buffer.WriteString(Npc.Instance[npcNum].Name ?? string.Empty);
+        buffer.WriteByte(Npc.Instance[npcNum].Range);
+        buffer.WriteByte(Npc.Instance[npcNum].SpawnTime);
+        buffer.WriteInt32(Npc.Instance[npcNum].SpawnSecs);
+        buffer.WriteInt32(Npc.Instance[npcNum].Sprite);
 
         var statCount = Enum.GetValues<Stat>().Length;
         for (var i = 0; i < statCount; i++)
         {
-            buffer.WriteByte(Data.Npc[npcNum].Stat != null ? Data.Npc[npcNum].Stat[i] : (byte)0);
+            buffer.WriteByte(Npc.Instance[npcNum].Stat != null ? Npc.Instance[npcNum].Stat[i] : (byte)0);
         }
 
         for (var i = 0; i < Core.Globals.Variables.MaxNpcSkills; i++)
         {
-            buffer.WriteByte(Data.Npc[npcNum].Skill != null ? Data.Npc[npcNum].Skill[i] : (byte)0);
+            buffer.WriteByte(Npc.Instance[npcNum].Skill != null ? Npc.Instance[npcNum].Skill[i] : (byte)0);
         }
 
-        buffer.WriteByte(Data.Npc[npcNum].Level);
-        buffer.WriteInt32(Data.Npc[npcNum].Damage);
+        buffer.WriteByte(Npc.Instance[npcNum].Level);
+        buffer.WriteInt32(Npc.Instance[npcNum].Damage);
 
         PlayerService.Instance.SendDataTo(playerId, buffer.GetBytes());
     }
@@ -1920,39 +1920,39 @@ public static class NetworkSend
 
         packet.WriteEnum(ServerPackets.SUpdateNpc);
         packet.WriteInt32(npcNum);
-        packet.WriteInt32(Data.Npc[npcNum].Animation);
-        packet.WriteString(Data.Npc[npcNum].AttackSay ?? string.Empty);
-        packet.WriteByte(Data.Npc[npcNum].Behavior);
+        packet.WriteInt32(Npc.Instance[npcNum].Animation);
+        packet.WriteString(Npc.Instance[npcNum].AttackSay ?? string.Empty);
+        packet.WriteByte(Npc.Instance[npcNum].Behavior);
 
         for (var i = 0; i < Core.Globals.Variables.MaxDropItems; i++)
         {
-            packet.WriteInt32(Data.Npc[npcNum].DropChance != null ? Data.Npc[npcNum].DropChance[i] : 0);
-            packet.WriteInt32(Data.Npc[npcNum].DropItem != null ? Data.Npc[npcNum].DropItem[i] : 0);
-            packet.WriteInt32(Data.Npc[npcNum].DropItemValue != null ? Data.Npc[npcNum].DropItemValue[i] : 0);
+            packet.WriteInt32(Npc.Instance[npcNum].DropChance != null ? Npc.Instance[npcNum].DropChance[i] : 0);
+            packet.WriteInt32(Npc.Instance[npcNum].DropItem != null ? Npc.Instance[npcNum].DropItem[i] : 0);
+            packet.WriteInt32(Npc.Instance[npcNum].DropItemValue != null ? Npc.Instance[npcNum].DropItemValue[i] : 0);
         }
 
-        packet.WriteInt32(Data.Npc[npcNum].Experience);
-        packet.WriteByte(Data.Npc[npcNum].Faction);
-        packet.WriteInt32(Data.Npc[npcNum].Hp);
-        packet.WriteString(Data.Npc[npcNum].Name ?? string.Empty);
-        packet.WriteByte(Data.Npc[npcNum].Range);
-        packet.WriteByte(Data.Npc[npcNum].SpawnTime);
-        packet.WriteInt32(Data.Npc[npcNum].SpawnSecs);
-        packet.WriteInt32(Data.Npc[npcNum].Sprite);
+        packet.WriteInt32(Npc.Instance[npcNum].Experience);
+        packet.WriteByte(Npc.Instance[npcNum].Faction);
+        packet.WriteInt32(Npc.Instance[npcNum].Hp);
+        packet.WriteString(Npc.Instance[npcNum].Name ?? string.Empty);
+        packet.WriteByte(Npc.Instance[npcNum].Range);
+        packet.WriteByte(Npc.Instance[npcNum].SpawnTime);
+        packet.WriteInt32(Npc.Instance[npcNum].SpawnSecs);
+        packet.WriteInt32(Npc.Instance[npcNum].Sprite);
 
         var statCount = Enum.GetValues<Stat>().Length;
         for (var i = 0; i < statCount; i++)
         {
-            packet.WriteByte(Data.Npc[npcNum].Stat != null ? Data.Npc[npcNum].Stat[i] : (byte)0);
+            packet.WriteByte(Npc.Instance[npcNum].Stat != null ? Npc.Instance[npcNum].Stat[i] : (byte)0);
         }
 
         for (var i = 0; i < Core.Globals.Variables.MaxNpcSkills; i++)
         {
-            packet.WriteByte(Data.Npc[npcNum].Skill != null ? Data.Npc[npcNum].Skill[i] : (byte)0);
+            packet.WriteByte(Npc.Instance[npcNum].Skill != null ? Npc.Instance[npcNum].Skill[i] : (byte)0);
         }
 
-        packet.WriteByte(Data.Npc[npcNum].Level);
-        packet.WriteInt32(Data.Npc[npcNum].Damage);
+        packet.WriteByte(Npc.Instance[npcNum].Level);
+        packet.WriteInt32(Npc.Instance[npcNum].Damage);
 
         PlayerService.Instance.SendDataToAll(packet.GetBytes());
     }

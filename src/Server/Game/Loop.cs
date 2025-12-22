@@ -415,9 +415,9 @@ public static class Loop
                                 targetEntity.Map = map;
                                 // NPC skills: select a valid skill and cast it directly; otherwise do a basic attack
                                 bool didCast = false;
-                                if (entity.Type == Core.Globals.Entity.EntityType.Npc && entity.Num >= 0 && entity.Num < Data.Npc.Length)
+                                if (entity.Type == Core.Globals.Entity.EntityType.Npc && entity.Num >= 0 && entity.Num < Npc.Instance.Count)
                                 {
-                                    var skills = Data.Npc[entity.Num].Skill;
+                                    var skills = Npc.Instance[entity.Num].Skill;
                                     if (skills != null)
                                     {
                                         long nowMs = General.GetTimeMs();
@@ -484,9 +484,9 @@ public static class Loop
                                 else
                                 {
                                     bool didCast2 = false;
-                                    if (entity.Type == Core.Globals.Entity.EntityType.Npc && entity.Num >= 0 && entity.Num < Data.Npc.Length)
+                                    if (entity.Type == Core.Globals.Entity.EntityType.Npc && entity.Num >= 0 && entity.Num < Npc.Instance.Count)
                                     {
-                                        var skills2 = Data.Npc[entity.Num].Skill;
+                                        var skills2 = Npc.Instance[entity.Num].Skill;
                                         if (skills2 != null)
                                         {
                                             long nowMs2 = General.GetTimeMs();
@@ -589,7 +589,7 @@ public static class Loop
                 int syR = baseNpc.Y / Constants.TileSize;
                 int txR = GetPlayerX(baseNpc.Target);
                 int tyR = GetPlayerY(baseNpc.Target);
-                int rR = Math.Max(0, (int)Data.Npc[baseNpc.Num].Range);
+                int rR = Math.Max(0, (int)Npc.Instance[baseNpc.Num].Range);
                 if (Math.Abs(sxR - txR) > rR || Math.Abs(syR - tyR) > rR)
                 {
                     baseNpc.TargetType = 0;
@@ -605,7 +605,7 @@ public static class Loop
                     int syR = baseNpc.Y / Constants.TileSize;
                     int txR = MapNpc.Instance[map, targetSlot].X / Constants.TileSize;
                     int tyR = MapNpc.Instance[map, targetSlot].Y / Constants.TileSize;
-                    int rR = Math.Max(0, (int)Data.Npc[baseNpc.Num].Range);
+                    int rR = Math.Max(0, (int)Npc.Instance[baseNpc.Num].Range);
                     if (Math.Abs(sxR - txR) > rR || Math.Abs(syR - tyR) > rR)
                     {
                         baseNpc.TargetType = 0;

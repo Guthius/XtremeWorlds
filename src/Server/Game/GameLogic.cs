@@ -20,8 +20,8 @@ public static class GameLogic
 
         return vital switch
         {
-            Core.Globals.Vital.Health => Data.Npc[(int)npcNum].Hp,
-            Core.Globals.Vital.Stamina => Data.Npc[(int)npcNum].Stat[(byte)Stat.Intelligence] * 2,
+            Core.Globals.Vital.Health => Npc.Instance[(int)npcNum].Hp,
+            Core.Globals.Vital.Stamina => Npc.Instance[(int)npcNum].Stat[(byte)Stat.Intelligence] * 2,
             _ => 0
         };
     }

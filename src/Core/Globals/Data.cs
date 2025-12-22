@@ -4,7 +4,6 @@ namespace Core.Globals;
 
 public static class Data
 {
-    public static Npc[] Npc = new Npc[Variables.MaxNpcs];
     public static Skill[] Skill = new Skill[Variables.MaxSkills];
     public static Tile[,]? TempTile;
     public static TempPlayer[] TempPlayer = new TempPlayer[Variables.MaxPlayers];

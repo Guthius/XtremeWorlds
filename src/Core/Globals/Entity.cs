@@ -164,13 +164,13 @@ public class Entity
             Attacking = npc.Attacking,
         };
 
-        // Pull behavior-related data from NPC template for AI logic
-        if (npc.Num >= 0 && npc.Num < Data.Npc.Length)
+        // Pull behavior-related data from npc template for AI logic
+        if (npc.Num >= 0 && npc.Num < NpcBase.Instance.Count)
         {
-            entity.Behavior = Data.Npc[npc.Num].Behavior;
-            entity.Range = Data.Npc[npc.Num].Range;
-            entity.AttackSay = Data.Npc[npc.Num].AttackSay;
-            entity.Name = Data.Npc[npc.Num].Name;
+            entity.Behavior = NpcBase.Instance[npc.Num].Behavior;
+            entity.Range = NpcBase.Instance[npc.Num].Range;
+            entity.AttackSay = NpcBase.Instance[npc.Num].AttackSay;
+            entity.Name = NpcBase.Instance[npc.Num].Name;
         }
         return entity;
     }

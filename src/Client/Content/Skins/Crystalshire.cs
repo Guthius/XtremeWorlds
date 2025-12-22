@@ -645,13 +645,13 @@ public class Crystalshire
                 {
                     cmb.Items.Clear();
                     cmb.Items.Add("None");
-                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc != null && Data.Npc != null)
+                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc != null && Npc.Instance != null)
                     {
                         int max = Math.Min(Variables.MaxMapNpcs, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc.Length);
                         for (int slot = 1; slot < max; slot++)
                         {
                             int npcIndex = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[slot];
-                            string name = (npcIndex >= 0 && npcIndex < Variables.MaxNpcs && npcIndex < Data.Npc.Length) ? (Data.Npc[npcIndex].Name ?? string.Empty).Trim() : "None";
+                            string name = (npcIndex >= 0 && npcIndex < Variables.MaxNpcs && npcIndex < Npc.Instance.Count) ? (Npc.Instance[npcIndex].Name ?? string.Empty).Trim() : "None";
                             cmb.Items.Add($"{slot}: {name}");
                         }
                     }

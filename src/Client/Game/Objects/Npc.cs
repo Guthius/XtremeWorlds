@@ -255,18 +255,9 @@ namespace Client
             }
         }
 
-        public static void OnReset()
-        {
-            Data.Npc = new Core.Globals.Type.Npc[Variables.MaxNpcs];
-
-            for (int i = 0; i < Variables.MaxNpcs; i++)
-                OnClear(i);
-
-        }
-
         public static void OnStream(int npcNum)
         {
-            if (npcNum >= 0 && string.IsNullOrEmpty(Data.Npc[npcNum].Name))
+            if (npcNum >= 0 && string.IsNullOrEmpty(Npc.Instance[npcNum].Name))
             {
                 Sender.SendRequestNpc(npcNum);
             }

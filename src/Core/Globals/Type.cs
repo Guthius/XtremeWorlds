@@ -113,28 +113,6 @@ public static class Type
         public int[] FrameIndex;
     }
 
-    public struct Npc
-    {
-        public string Name;
-        public string AttackSay;
-        public int Sprite;
-        public byte SpawnTime;
-        public int SpawnSecs;
-        public byte Behavior;
-        public byte Range;
-        public int[] DropChance;
-        public int[] DropItem;
-        public int[] DropItemValue;
-        public byte[] Stat;
-        public byte Faction;
-        public int Hp;
-        public int Experience;
-        public int Animation;
-        public byte[] Skill;
-        public byte Level;
-        public int Damage;
-    }
-
     public struct TradeItem
     {
         public int Item;

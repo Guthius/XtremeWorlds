@@ -1227,7 +1227,7 @@ namespace Client
                                             }
                                             else
                                             {
-                                                EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Show Chat Bubble - " + Strings.Mid(Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Text1, 1, 20) + "... - On Npc [" + (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data2 + 1).ToString() + ". " + Data.Npc[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data2]].Name + "]");
+                                                EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Show Chat Bubble - " + Strings.Mid(Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Text1, 1, 20) + "... - On Npc [" + (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data2 + 1).ToString() + ". " + Npc.Instance[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data2]].Name + "]");
                                             }
 
                                             break;
@@ -1259,7 +1259,7 @@ namespace Client
                                     }
                                     else
                                     {
-                                        EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Spawn Npc: [" + Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1.ToString() + ". " + Data.Npc[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1]].Name + "]");
+                                        EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Spawn Npc: [" + Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1.ToString() + ". " + Npc.Instance[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1]].Name + "]");
                                     }
 
                                     break;

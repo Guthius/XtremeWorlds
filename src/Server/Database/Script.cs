@@ -811,7 +811,7 @@ public class Script
                 int curHp = e.Vital[(byte)Core.Globals.Vital.Health];
                 if (curHp > 0 && curHp < maxHp)
                 {
-                    int amount = Math.Max(1, Data.Npc[e.Num].Stat[(byte)Stat.Vitality] / 2);
+                    int amount = Math.Max(1, Npc.Instance[e.Num].Stat[(byte)Stat.Vitality] / 2);
                     e.Vital[(byte)Core.Globals.Vital.Health] = Math.Min(maxHp, curHp + amount);
                     NetworkSend.SendMapNpcVitals(e.Map, (byte)Core.Globals.Entity.Index(e));
                 }
@@ -821,7 +821,7 @@ public class Script
                     int curMana = e.Vital[(byte)Core.Globals.Vital.Mana];
                     if (curMana < maxMana)
                     {
-                        int amount = Math.Max(1, Data.Npc[e.Num].Stat[(byte)Stat.Intelligence] / 2);
+                        int amount = Math.Max(1, Npc.Instance[e.Num].Stat[(byte)Stat.Intelligence] / 2);
                         e.Vital[(byte)Core.Globals.Vital.Mana] = Math.Min(maxMana, curMana + amount);
                         NetworkSend.SendMapNpcVitals(e.Map, (byte)Core.Globals.Entity.Index(e));
                     }
@@ -833,7 +833,7 @@ public class Script
                     int curStam = e.Vital[(byte)Core.Globals.Vital.Stamina];
                     if (curStam < maxStam)
                     {
-                        int amount = Math.Max(1, Data.Npc[e.Num].Stat[(byte)Stat.Spirit] / 2);
+                        int amount = Math.Max(1, Npc.Instance[e.Num].Stat[(byte)Stat.Spirit] / 2);
                         e.Vital[(byte)Core.Globals.Vital.Stamina] = (int)Math.Min(maxStam, curStam + amount);
                         NetworkSend.SendMapNpcVitals(e.Map, (byte)Core.Globals.Entity.Index(e));
                     }
@@ -1012,9 +1012,9 @@ public class Script
                 if (attacker.Type == Entity.EntityType.Player && mapNpc.Num == -1)
                 {
                     int baseExp = 0;
-                    if (originalNpcNum >= 0 && originalNpcNum < Data.Npc.Length)
+                    if (originalNpcNum >= 0 && originalNpcNum < Npc.Instance.Count)
                     {
-                        baseExp = Data.Npc[originalNpcNum].Experience; // NPC base EXP
+                        baseExp = Npc.Instance[originalNpcNum].Experience; // NPC base EXP
                     }
                     if (baseExp > 0)
                     {
@@ -1045,7 +1045,7 @@ public class Script
         }
         if (e.Type == Entity.EntityType.Npc)
         {
-            return (e.Num >= 0 && e.Num < Data.Npc.Length) ? Data.Npc[e.Num].Name : "NPC";
+            return (e.Num >= 0 && e.Num < Npc.Instance.Count) ? Npc.Instance[e.Num].Name : "NPC";
         }
         return "Entity";
     }
@@ -1366,9 +1366,9 @@ public class Script
         }
         else // npc
         {
-            if (attacker.Num >= 0 && attacker.Num < Data.Npc.Length)
+            if (attacker.Num >= 0 && attacker.Num < Npc.Instance.Count)
             {
-                raw = Math.Max(1, Data.Npc[attacker.Num].Damage);
+                raw = Math.Max(1, Npc.Instance[attacker.Num].Damage);
             }
         }
 
@@ -1382,9 +1382,9 @@ public class Script
         }
         else if (target.Type == Entity.EntityType.Npc)
         {
-            if (target.Num >= 0 && target.Num < Data.Npc.Length)
+            if (target.Num >= 0 && target.Num < Npc.Instance.Count)
             {
-                mitigation += (int)Data.Npc[target.Num].Stat[(int)Stat.Vitality / 5];
+                mitigation += (int)Npc.Instance[target.Num].Stat[(int)Stat.Vitality / 5];
             }
         }
 
@@ -1566,7 +1566,7 @@ public class Script
             {
                 if (i == bufferedValue)
                 {
-                    skillId = Data.Npc[entity.Num].Skill[i];
+                    skillId = Npc.Instance[entity.Num].Skill[i];
                     break;
                 }
             }
@@ -1938,7 +1938,7 @@ public class Script
             if (caster.Map >= 0 && caster.Map < Core.Globals.Variables.MaxMaps && caster.Id >= 0 && caster.Id < Core.Globals.Variables.MaxMapNpcs)
             {
                 ref var baseNpc = ref MapNpc.Instance[caster.Map, caster.Id];
-                var npcTemplate = caster.Num >= 0 && caster.Num < Data.Npc.Length ? Data.Npc[caster.Num] : default;
+                var npcTemplate = caster.Num >= 0 && caster.Num < Npc.Instance.Count ? Npc.Instance[caster.Num] : default;
                 if (npcTemplate.Skill != null && baseNpc.SkillCd != null)
                 {
                     for (int slot = 0; slot < Script.MaxNpcSkills && slot < npcTemplate.Skill.Length && slot < baseNpc.SkillCd.Length; slot++)
@@ -2038,7 +2038,7 @@ public class Script
         }
         else if (target.Type == Entity.EntityType.Npc)
         {
-            if (target.Num >= 0 && target.Num < Data.Npc.Length)
+            if (target.Num >= 0 && target.Num < Npc.Instance.Count)
             {
                 var mapNpcNum = target.Id; // id is map npc index
                 var hpIndex = (int)Core.Globals.Vital.Health;
@@ -2177,17 +2177,17 @@ public class Script
         if (map < 0 || map >= Core.Globals.Variables.MaxMaps) return;
         ref var mapNpc = ref MapNpc.Instance[map, mapNpcNum];
         var npcNum = mapNpc.Num;
-        if (npcNum < 0 || npcNum >= Data.Npc.Length) return;
+        if (npcNum < 0 || npcNum >= Npc.Instance.Count) return;
         // Simple single-roll logic similar to legacy: choose one drop slot 0-4
-        var slot = General.GetRandom.NextInt(0, Math.Min(5, Data.Npc[npcNum].DropChance.Length));
+        var slot = General.GetRandom.NextInt(0, Math.Min(5, Npc.Instance[npcNum].DropChance.Length));
         if (slot < 0) return;
-        var chance = Data.Npc[npcNum].DropChance[slot];
+        var chance = Npc.Instance[npcNum].DropChance[slot];
         if (chance <= 0) return;
         var roll = General.GetRandom.NextInt(1, chance + 1);
         if (roll == 1)
         {
-            var itemId = Data.Npc[npcNum].DropItem[slot];
-            var itemVal = Data.Npc[npcNum].DropItemValue[slot];
+            var itemId = Npc.Instance[npcNum].DropItem[slot];
+            var itemVal = Npc.Instance[npcNum].DropItemValue[slot];
             if (itemId >= 0 && itemId < Item.Instance.Count)
             {
                 Server.MapItem.OnSpawn(itemId, itemVal, map, mapNpc.X / Constants.TileSize, mapNpc.Y / Constants.TileSize);

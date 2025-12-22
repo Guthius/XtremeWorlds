@@ -1973,7 +1973,7 @@ namespace Client
                 {
                     // alive?
                     if (MapNpc.Instance[(int) i].Vital[(int) Core.Globals.Vital.Health] > 0 &
-                        MapNpc.Instance[(int) i].Vital[(int) Core.Globals.Vital.Health] < Data.Npc[(int) npcNum].Hp)
+                        MapNpc.Instance[(int) i].Vital[(int) Core.Globals.Vital.Health] < Npc.Instance[(int) npcNum].Hp)
                     {
                         // lock to Npc
                         tmpX = (long) Math.Round(MapNpc.Instance[(int) i].X + 16 - width / 2d);
@@ -1983,7 +1983,7 @@ namespace Client
                         if (width > 0)
                             GameState.BarWidthNpcHPMax[(int) i] = (int) Math.Round(
                                 MapNpc.Instance[(int) i].Vital[(int) Core.Globals.Vital.Health] / (double) width /
-                                (Data.Npc[(int) npcNum].Hp / (double) width) * width);
+                                (Npc.Instance[(int) npcNum].Hp / (double) width) * width);
 
                         // draw bar background
                         top = height * 3L; // HP bar background
