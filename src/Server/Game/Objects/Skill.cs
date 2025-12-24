@@ -1,5 +1,6 @@
 ﻿using Core.Globals;
 using Core.Interfaces;
+using Core.Objects;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -8,16 +9,25 @@ using System.Text;
 
 namespace Server
 {
-    public class Skill : IData, IAsyncData
+    public class Skill : SkillBase, IAsyncData
     {
         public static Task OnLoadAllAsync()
         {
+            EnsureSize(Core.Globals.Variables.MaxSkills);
             return Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxSkills), OnLoadAsync);
         }
 
-        public static void OnSave(int index)
+        public new static void OnSave(int index)
         {
-            string json = JsonConvert.SerializeObject(Data.Skill[index]).ToString();
+            if (index < 0 || index >= Core.Globals.Variables.MaxSkills)
+            {
+                return;
+            }
+
+            EnsureSize(index + 1);
+            SyncToData(index);
+
+            string json = JsonConvert.SerializeObject(Skill.Instance[index]).ToString();
 
             if (Database.RowExists(index, "skill"))
             {
@@ -31,48 +41,24 @@ namespace Server
 
         public static async ValueTask OnLoadAsync(int index, System.Threading.CancellationToken cancellationToken)
         {
-            JObject data;
-
-            data = await Database.SelectRowAsync(index, "skill", "data");
+            var data = await Database.SelectRowAsync(index, "skill", "data");
             if (data is null)
             {
                 OnClear(index);
                 return;
             }
 
-            var skillData = JObject.FromObject(data).ToObject<Core.Globals.Type.Skill>();
-            Data.Skill[index] = skillData;
-        }
+            EnsureSize(index + 1);
 
-        public static void OnClear(int index)
-        {
-            Data.Skill[index].Name = "";
-            Data.Skill[index].LevelReq = 0;
-        }
+            var skillData = JObject.FromObject(data).ToObject<Skill>();
+            Skill.Instance[index] = skillData ?? new Skill();
 
-        public static void OnDraw(int index)
-        {
-            throw new NotImplementedException();
-        }
+            if (Skill.Instance[index].Name is null)
+            {
+                Skill.Instance[index].Name = string.Empty;
+            }
 
-        public static void OnStream(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnReset()
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnLoad(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnUpdate(int index)
-        {
-            throw new NotImplementedException();
+            SyncToData(index);
         }
     }
 }

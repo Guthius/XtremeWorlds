@@ -12,7 +12,7 @@ using Core.Objects;
 
 namespace Client
 {
-    public class Projectile : ProjectileBase, IData
+    public class Projectile : ProjectileBase, IStreamable
     {
         #region Database
 
