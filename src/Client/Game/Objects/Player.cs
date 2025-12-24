@@ -25,7 +25,7 @@ namespace Client
                 Data.TradeYourOffer[x].Num = -1;
             }
   
-            Trade.InTrade = -1;
+            Trade.InTrade = 0;
         }
 
         #endregion

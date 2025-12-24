@@ -12,7 +12,7 @@ namespace Client
     {
         public static void OnClose()
         {
-            InTrade = -1;
+            InTrade = 0;
             WindowManager.HideWindow(WindowManager.GetWindowIndex("winTrade"));
         }
 

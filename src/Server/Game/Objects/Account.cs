@@ -45,7 +45,7 @@ namespace Server
             Data.TempPlayer[index].Editor = EditorType.None;
             Data.TempPlayer[index].SkillBuffer = -1;
             Data.TempPlayer[index].InShop = -1;
-            Data.TempPlayer[index].InTrade = -1;
+            Data.TempPlayer[index].InTrade = 0;
             Data.TempPlayer[index].InParty = -1;
         }
 

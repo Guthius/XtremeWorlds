@@ -2410,8 +2410,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             Data.TempPlayer[tradeTarget].TradeOffer[i].Value = 0;
         }
 
-        Data.TempPlayer[session.Id].InTrade = -1;
-        Data.TempPlayer[tradeTarget].InTrade = -1;
+        Data.TempPlayer[session.Id].InTrade = 0;
+        Data.TempPlayer[tradeTarget].InTrade = 0;
 
         NetworkSend.SendPlayerMessage(session.Id, "Trade completed.", (int)ColorName.BrightGreen);
         NetworkSend.SendPlayerMessage(tradeTarget, "Trade completed.", (int)ColorName.BrightGreen);
@@ -2437,13 +2437,13 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             }
         }
 
-        Data.TempPlayer[session.Id].InTrade = -1;
+        Data.TempPlayer[session.Id].InTrade = 0;
         NetworkSend.SendPlayerMessage(session.Id, "You declined the trade.", (int)ColorName.BrightRed);
         NetworkSend.SendCloseTrade(session.Id);
 
         if (hasValidTarget)
         {
-            Data.TempPlayer[tradeTarget].InTrade = -1;
+            Data.TempPlayer[tradeTarget].InTrade = 0;
             NetworkSend.SendPlayerMessage(tradeTarget, GetPlayerName(session.Id) + " has declined the trade.", (int)ColorName.BrightRed);
             NetworkSend.SendCloseTrade(tradeTarget);
         }
