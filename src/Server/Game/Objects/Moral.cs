@@ -15,7 +15,7 @@ using Core.Objects;
 
 namespace Server;
 
-public class Moral : MoralBase, IData, IAsyncData
+public class Moral : MoralBase, IAsyncData
 {
     public static async ValueTask OnLoadAsync(int index, CancellationToken cancellationToken)
     {

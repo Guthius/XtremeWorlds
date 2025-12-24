@@ -15,7 +15,7 @@ using Core.Objects;
 
 namespace Server;
 
-public class Projectile : ProjectileBase, IData, IAsyncData
+public class Projectile : ProjectileBase, IAsyncData
 {
     private static bool TryGetProjectileSlot(int index, out int speed, out byte range, out int damage, out int animation)
     {
