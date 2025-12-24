@@ -17,11 +17,11 @@ namespace Server;
 
 public class Projectile : ProjectileBase, IData, IAsyncData
 {
-    private static bool TryGetProjectileSnapshot(int projId, out int speed, out byte range, out int damage, out int animation)
+    private static bool TryGetProjectileSnapshot(int index, out int speed, out byte range, out int damage, out int animation)
     {
         try
         {
-            if (projId < 0)
+            if (index < 0)
             {
                 speed = 1;
                 range = 0;
@@ -30,7 +30,7 @@ public class Projectile : ProjectileBase, IData, IAsyncData
                 return false;
             }
 
-            var proj = Projectile.Instance[projId];
+            var proj = Projectile.Instance[index];
             speed = proj.Speed;
             range = proj.Range;
             damage = proj.Damage;
