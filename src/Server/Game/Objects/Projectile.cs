@@ -17,7 +17,7 @@ namespace Server;
 
 public class Projectile : ProjectileBase, IData, IAsyncData
 {
-    private static bool TryGetProjectileSnapshot(int index, out int speed, out byte range, out int damage, out int animation)
+    private static bool TryGetProjectileSlot(int index, out int speed, out byte range, out int damage, out int animation)
     {
         try
         {
@@ -374,8 +374,8 @@ public class Projectile : ProjectileBase, IData, IAsyncData
                     continue;
                 }
 
-                var projId = mp.ProjectileNum;
-                if (!TryGetProjectileSnapshot(projId, out var speed, out var range, out var damage, out var animation))
+                var index = mp.ProjectileNum;
+                if (!TryGetProjectileSlot(index, out var speed, out var range, out var damage, out var animation))
                 {
                     MapProjectile.OnClear(map, i);
                     continue;
@@ -433,7 +433,7 @@ public class Projectile : ProjectileBase, IData, IAsyncData
                                 int ty = Math.Clamp(mp.Y / Constants.TileSize, 0, Server.Map.Instance[map].MaxY - 1);
                                 NetworkSend.SendAnimation(map, animation, tx, ty);
                                 // Try to apply attack on expire at destination
-                                OnAttack(map, ref mp, tx, ty, projId);
+                                OnAttack(map, ref mp, tx, ty, index);
                             }
                             MapProjectile.OnClear(map, i);
                             moved = false;
@@ -450,7 +450,7 @@ public class Projectile : ProjectileBase, IData, IAsyncData
                             int tx = Math.Clamp(prevTileX, 0, Server.Map.Instance[map].MaxX - 1);
                             int ty = Math.Clamp(prevTileY, 0, Server.Map.Instance[map].MaxY - 1);
                             NetworkSend.SendAnimation(map, animation, tx, ty);
-                            OnAttack(map, ref mp, tx, ty, projId);
+                            OnAttack(map, ref mp, tx, ty, index);
                         }
                         MapProjectile.OnClear(map, i);
                         moved = false;
@@ -469,7 +469,7 @@ public class Projectile : ProjectileBase, IData, IAsyncData
                                 int tx = Math.Clamp(prevTileX, 0, Server.Map.Instance[map].MaxX - 1);
                                 int ty = Math.Clamp(prevTileY, 0, Server.Map.Instance[map].MaxY - 1);
                                 NetworkSend.SendAnimation(map, animation, tx, ty);
-                                OnAttack(map, ref mp, tx, ty, projId);
+                                OnAttack(map, ref mp, tx, ty, index);
                             }
                         }
                         MapProjectile.OnClear(map, i);
@@ -483,7 +483,7 @@ public class Projectile : ProjectileBase, IData, IAsyncData
                         if (animation >= 0)
                         {
                             NetworkSend.SendAnimation(map, animation, tileX, tileY);
-                            OnAttack(map, ref mp, tileX, tileY, projId);
+                            OnAttack(map, ref mp, tileX, tileY, index);
                         }
                         
                         MapProjectile.OnClear(map, i);
