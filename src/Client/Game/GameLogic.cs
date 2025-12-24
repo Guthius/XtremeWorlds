@@ -23,6 +23,9 @@ namespace Client
         {
             bool isInBounds = false;
 
+            if (Map.Instance.Count <= GetPlayerMap(GameState.MyIndex))
+                return isInBounds;
+                
             if (GameState.CurX >= 0 & GameState.CurX <= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX)
             {
                 if (GameState.CurY >= 0 & GameState.CurY <= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)

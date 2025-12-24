@@ -1780,6 +1780,12 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         GameState.MapData = false;
 
+        for (int n = 0; n <= GetPlayerMap(GameState.MyIndex); n++)
+        {
+            if (Client.Map.Instance.Count <= n)
+                Client.Map.Instance.Add(new Map());
+        }
+
         if (buffer.ReadInt32() == 1)
         {
             map = buffer.ReadInt32();

@@ -69,6 +69,7 @@ namespace Client
                 {
                     if (_animationTmr[layer] < _tick)
                     {
+                        if (Map.Instance.Count <= GetPlayerMap(GameState.MyIndex)) continue; // No maps loaded
                         byte mapMaxX = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
                         for (byte x = 0; x < mapMaxX; x++)
                         {
