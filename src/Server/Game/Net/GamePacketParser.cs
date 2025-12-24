@@ -1078,14 +1078,6 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         var map = GetPlayerMap(session.Id);
 
-        for (int i = 0; i <= map; i++)
-        {
-            if (Server.Map.Instance.Count <= i)
-            {
-                Server.Map.Instance.Add(new Map());
-            }
-        }
-
         var ii = Server.Map.Instance[map].Revision + 1;
         Map.OnClear(map);
 
