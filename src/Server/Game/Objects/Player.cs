@@ -878,7 +878,7 @@ public class Player : PlayerBase
         // Check the player isn't doing something
         if (Data.TempPlayer[playerId].InBank ||
             Data.TempPlayer[playerId].InShop >= 0 ||
-            Data.TempPlayer[playerId].InTrade >= 0)
+            Data.TempPlayer[playerId].InTrade > 0)
         {
             return;
         }

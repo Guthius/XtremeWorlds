@@ -1016,11 +1016,11 @@ public class Crystalshire
                     var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
                     lstShop.Items.Add($"{i + 1}: {name}");
                 }
-                var shopIndex = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Shop >= 0 ? Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Shop + 1 : 0;
+                var shopIndex = Map.Instance[GetPlayerMap(GameState.MyIndex)].Shop >= 0 ? Map.Instance[GetPlayerMap(GameState.MyIndex)].Shop + 1 : 0;
                 lstShop.Value = Math.Clamp(shopIndex, 0, lstShop.Items.Count - 1);
                 lstShop.CallBack[(int)ControlState.MouseMove] = () =>
                 {
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Shop = lstShop.Value <= 0 ? -1 : lstShop.Value - 1;
+                    Map.Instance[GetPlayerMap(GameState.MyIndex)].Shop = lstShop.Value <= 0 ? -1 : lstShop.Value - 1;
                 };
             }
 
@@ -1095,16 +1095,16 @@ public class Crystalshire
             // Settings checkboxes
             if (WindowManager.TryGetControl("winMapEditor", "chkNoMapRespawn", out var chkNoMapRespawn))
             {
-                chkNoMapRespawn.Value = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].NoRespawn ? 1 : 0;
+                chkNoMapRespawn.Value = Map.Instance[GetPlayerMap(GameState.MyIndex)].NoRespawn ? 1 : 0;
                 chkNoMapRespawn.CallBack[(int)ControlState.MouseDown] = () =>
                 {
                     chkNoMapRespawn.Value = chkNoMapRespawn.Value == 0 ? 1 : 0;
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].NoRespawn = chkNoMapRespawn.Value == 1;
+                    Map.Instance[GetPlayerMap(GameState.MyIndex)].NoRespawn = chkNoMapRespawn.Value == 1;
                 };
             }
             if (WindowManager.TryGetControl("winMapEditor", "chkIndoors", out var chkIndoors))
             {
-                chkIndoors.Value = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Indoors ? 1 : 0;
+                chkIndoors.Value = Map.Instance[GetPlayerMap(GameState.MyIndex)].Indoors ? 1 : 0;
                 chkIndoors.CallBack[(int)ControlState.MouseDown] = () =>
                 {
                     chkIndoors.Value = chkIndoors.Value == 0 ? 1 : 0;

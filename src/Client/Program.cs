@@ -1813,7 +1813,7 @@ namespace Client
                 bool LocalIsDirBlocked()
                 {
                     byte argdir = (byte) i;
-                    var n = GameLogic.IsDirBlocked(ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].DirBlock, ref argdir);
+                    var n = GameLogic.IsDirBlocked(ref Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].DirBlock, ref argdir);
                     return n;
                 }
 
@@ -2508,14 +2508,14 @@ namespace Client
             // Auto-cancel target if player is off the current camera viewport (native world rect)
             CancelTargetIfOffCamera();
 
-            if (GameState.NumPanoramas > 0 & Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Panorama > 0)
+            if (GameState.NumPanoramas > 0 & Map.Instance[GetPlayerMap(GameState.MyIndex)].Panorama > 0)
             {
-                Map.DrawPanorama(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Panorama);
+                Map.DrawPanorama(Map.Instance[GetPlayerMap(GameState.MyIndex)].Panorama);
             }
 
-            if (GameState.NumParallax > 0 & Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Parallax > 0)
+            if (GameState.NumParallax > 0 & Map.Instance[GetPlayerMap(GameState.MyIndex)].Parallax > 0)
             {
-                Map.DrawParallax(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Parallax);
+                Map.DrawParallax(Map.Instance[GetPlayerMap(GameState.MyIndex)].Parallax);
             }
 
             // Draw lower tiles

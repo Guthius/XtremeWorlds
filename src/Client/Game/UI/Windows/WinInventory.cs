@@ -82,7 +82,7 @@ public class WinInventory
 
             // exit out if we're offering item in a trade.
             var amountModifier = 0;
-            if (Trade.InTrade >= 0)
+            if (Trade.InTrade > 0)
             {
                 for (var tradeSlot = 0; tradeSlot < Variables.MaxInventory; tradeSlot++)
                 {
@@ -140,7 +140,7 @@ public class WinInventory
 
     public static void OnMouseDown()
     {
-        if (Trade.InTrade == 1)
+        if (Trade.InTrade == -1)
         {
             return;
         }
@@ -199,7 +199,7 @@ public class WinInventory
                 return;
             }
 
-            if (Trade.InTrade >= 0)
+            if (Trade.InTrade > 0)
             {
                 for (var i = 0; i < Variables.MaxInventory; i++)
                 {
@@ -268,7 +268,7 @@ public class WinInventory
             return;
         }
 
-        if (Trade.InTrade >= 0)
+        if (Trade.InTrade > 0)
         {
             for (var i = 0; i < Variables.MaxInventory; i++)
             {

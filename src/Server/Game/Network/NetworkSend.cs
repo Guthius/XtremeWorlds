@@ -1171,9 +1171,16 @@ public static class NetworkSend
 
         packetWriter.WriteEnum(ServerPackets.SMapReport);
 
+        var mapCount = Server.Map.Instance.Count;
         for (var i = 0; i < Core.Globals.Variables.MaxMaps; i++)
         {
-            packetWriter.WriteString(Server.Map.Instance[i].Name);
+            var name = "";
+            if (i >= 0 && i < mapCount)
+            {
+                name = Server.Map.Instance[i]?.Name ?? "";
+            }
+
+            packetWriter.WriteString(name);
         }
 
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
@@ -1865,7 +1872,9 @@ public static class NetworkSend
 
     public static void SendNpcs(int playerId)
     {
-        for (var npcNum = 0; npcNum < Core.Globals.Variables.MaxNpcs; npcNum++)
+        var npcCount = Npc.Instance.Count;
+        var loopTo = Math.Min(Core.Globals.Variables.MaxNpcs, npcCount);
+        for (var npcNum = 0; npcNum < loopTo; npcNum++)
         {
             SendUpdateNpcTo(playerId, npcNum);
         }
@@ -1873,39 +1882,45 @@ public static class NetworkSend
 
     public static void SendUpdateNpcTo(int playerId, int npcNum)
     {
+        if (npcNum < 0 || npcNum >= Npc.Instance.Count)
+        {
+            return;
+        }
+
+        var npc = Npc.Instance[npcNum];
         var buffer = new PacketWriter();
 
         buffer.WriteEnum(ServerPackets.SUpdateNpc);
         buffer.WriteInt32(npcNum);
-        buffer.WriteInt32(Npc.Instance[npcNum].Animation);
-        buffer.WriteString(Npc.Instance[npcNum].AttackSay ?? string.Empty);
-        buffer.WriteByte(Npc.Instance[npcNum].Behavior);
+        buffer.WriteInt32(npc.Animation);
+        buffer.WriteString(npc.AttackSay ?? string.Empty);
+        buffer.WriteByte(npc.Behavior);
 
         for (var i = 0; i < Core.Globals.Variables.MaxDropItems; i++)
         {
-            buffer.WriteInt32(Npc.Instance[npcNum].DropChance != null ? Npc.Instance[npcNum].DropChance[i] : 0);
-            buffer.WriteInt32(Npc.Instance[npcNum].DropItem != null ? Npc.Instance[npcNum].DropItem[i] : 0);
-            buffer.WriteInt32(Npc.Instance[npcNum].DropItemValue != null ? Npc.Instance[npcNum].DropItemValue[i] : 0);
+            buffer.WriteInt32(npc.DropChance != null ? npc.DropChance[i] : 0);
+            buffer.WriteInt32(npc.DropItem != null ? npc.DropItem[i] : 0);
+            buffer.WriteInt32(npc.DropItemValue != null ? npc.DropItemValue[i] : 0);
         }
 
-        buffer.WriteInt32(Npc.Instance[npcNum].Experience);
-        buffer.WriteByte(Npc.Instance[npcNum].Faction);
-        buffer.WriteInt32(Npc.Instance[npcNum].Hp);
-        buffer.WriteString(Npc.Instance[npcNum].Name ?? string.Empty);
-        buffer.WriteByte(Npc.Instance[npcNum].Range);
-        buffer.WriteByte(Npc.Instance[npcNum].SpawnTime);
-        buffer.WriteInt32(Npc.Instance[npcNum].SpawnSecs);
-        buffer.WriteInt32(Npc.Instance[npcNum].Sprite);
+        buffer.WriteInt32(npc.Experience);
+        buffer.WriteByte(npc.Faction);
+        buffer.WriteInt32(npc.Hp);
+        buffer.WriteString(npc.Name ?? string.Empty);
+        buffer.WriteByte(npc.Range);
+        buffer.WriteByte(npc.SpawnTime);
+        buffer.WriteInt32(npc.SpawnSecs);
+        buffer.WriteInt32(npc.Sprite);
 
         var statCount = Enum.GetValues<Stat>().Length;
         for (var i = 0; i < statCount; i++)
         {
-            buffer.WriteByte(Npc.Instance[npcNum].Stat != null ? Npc.Instance[npcNum].Stat[i] : (byte)0);
+            buffer.WriteByte(npc.Stat != null ? npc.Stat[i] : (byte)0);
         }
 
         for (var i = 0; i < Core.Globals.Variables.MaxNpcSkills; i++)
         {
-            buffer.WriteByte(Npc.Instance[npcNum].Skill != null ? Npc.Instance[npcNum].Skill[i] : (byte)0);
+            buffer.WriteByte(npc.Skill != null ? npc.Skill[i] : (byte)0);
         }
 
         buffer.WriteByte(Npc.Instance[npcNum].Level);

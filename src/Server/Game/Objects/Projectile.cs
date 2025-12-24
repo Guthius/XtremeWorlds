@@ -318,6 +318,19 @@ public class Projectile : ProjectileBase, IData, IAsyncData
         int now = General.GetTimeMs();
         for (int map = 0; map < Core.Globals.Variables.MaxMaps; map++)
         {
+            if (map < 0 || map >= Server.Map.Instance.Count || Server.Map.Instance[map] == null || Server.Map.Instance[map].Tile == null)
+            {
+                // Map not initialized; clear any stray projectiles for this map defensively.
+                for (int i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
+                {
+                    if (Data.MapProjectile[map, i].ProjectileNum >= 0)
+                    {
+                        MapProjectile.OnClear(map, i);
+                    }
+                }
+                continue;
+            }
+
             for (int i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
             {
                 ref var mp = ref Data.MapProjectile[map, i];

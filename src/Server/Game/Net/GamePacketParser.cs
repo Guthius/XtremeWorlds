@@ -1076,8 +1076,15 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             return;
         }
 
-
         var map = GetPlayerMap(session.Id);
+
+        for (int i = 0; i <= map; i++)
+        {
+            if (Server.Map.Instance.Count <= i)
+            {
+                Server.Map.Instance.Add(new Map());
+            }
+        }
 
         var ii = Server.Map.Instance[map].Revision + 1;
         Map.OnClear(map);
@@ -1920,7 +1927,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
     {
         var buffer = new PacketReader(bytes);
 
-        if (Data.TempPlayer[session.Id].InTrade >= 0 | Data.TempPlayer[session.Id].InBank | Data.TempPlayer[session.Id].InShop >= 0)
+        if (Data.TempPlayer[session.Id].InTrade > 0 | Data.TempPlayer[session.Id].InBank | Data.TempPlayer[session.Id].InShop >= 0)
             return;
 
         // Old Slot
@@ -1935,7 +1942,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
     {
         var buffer = new PacketReader(bytes);
 
-        if (Data.TempPlayer[session.Id].InTrade >= 0 | Data.TempPlayer[session.Id].InBank | Data.TempPlayer[session.Id].InShop >= 0)
+        if (Data.TempPlayer[session.Id].InTrade > 0 | Data.TempPlayer[session.Id].InBank | Data.TempPlayer[session.Id].InShop >= 0)
             return;
 
         // Old Slot

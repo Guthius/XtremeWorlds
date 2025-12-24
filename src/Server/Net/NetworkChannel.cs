@@ -116,7 +116,7 @@ internal sealed class NetworkChannel<TSession>(ILogger<NetworkChannel<TSession>>
                 PacketSendStats.FlushIfPending(logger);
 
                 // If we're idle, flush any partial per-second window so it doesn't carry into the next burst.
-                if (!PacketSendStats.Enabled && _packetsSentThisSecond > 0)
+                if (!PacketSendStats.Enabled && _packetsSentThisSecond >= 1000)
                 {
                     logger.LogInformation(
                         "Sent {PacketsSent} packets ({BytesSent} bytes) to {Ip} in last second",

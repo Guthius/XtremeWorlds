@@ -207,7 +207,7 @@ namespace Client
                 return canMove;
             }
 
-            if (Trade.InTrade >= 0)
+            if (Trade.InTrade > 0)
             {
                 Sender.SendDeclineTrade();
             }
