@@ -17,6 +17,36 @@ namespace Server;
 
 public class Projectile : ProjectileBase, IData, IAsyncData
 {
+    private static bool TryGetProjectileSnapshot(int projId, out int speed, out byte range, out int damage, out int animation)
+    {
+        try
+        {
+            if (projId < 0)
+            {
+                speed = 1;
+                range = 0;
+                damage = 0;
+                animation = -1;
+                return false;
+            }
+
+            var proj = Projectile.Instance[projId];
+            speed = proj.Speed;
+            range = proj.Range;
+            damage = proj.Damage;
+            animation = proj.Animation;
+            return true;
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            speed = 1;
+            range = 0;
+            damage = 0;
+            animation = -1;
+            return false;
+        }
+    }
+
     private static void OnAttack(int map, ref Type.MapProjectile mp, int tileX, int tileY, int projId)
     {
         // Build attacker entity snapshot (owner is player for now)
@@ -345,13 +375,13 @@ public class Projectile : ProjectileBase, IData, IAsyncData
                 }
 
                 var projId = mp.ProjectileNum;
-                if (projId < 0 || projId >= Projectile.Instance.Count)
+                if (!TryGetProjectileSnapshot(projId, out var speed, out var range, out var damage, out var animation))
                 {
                     MapProjectile.OnClear(map, i);
                     continue;
                 }
 
-                int stepMs = Math.Max(1, Projectile.Instance[projId].Speed);
+                int stepMs = Math.Max(1, speed);
                 bool moved = false;
                 int prevTileX = mp.X / Constants.TileSize;
                 int prevTileY = mp.Y / Constants.TileSize;
@@ -397,12 +427,11 @@ public class Projectile : ProjectileBase, IData, IAsyncData
                         {
                             // Snap to destination tile center rim if desired; for now, snap to Dest
                             mp.X = mp.DestX; mp.Y = mp.DestY;
-                            int anim = Projectile.Instance[projId].Animation;
-                            if (anim >= 0)
+                            if (animation >= 0)
                             {
                                 int tx = Math.Clamp(mp.X / Constants.TileSize, 0, Server.Map.Instance[map].MaxX - 1);
                                 int ty = Math.Clamp(mp.Y / Constants.TileSize, 0, Server.Map.Instance[map].MaxY - 1);
-                                NetworkSend.SendAnimation(map, anim, tx, ty);
+                                NetworkSend.SendAnimation(map, animation, tx, ty);
                                 // Try to apply attack on expire at destination
                                 OnAttack(map, ref mp, tx, ty, projId);
                             }
@@ -413,15 +442,14 @@ public class Projectile : ProjectileBase, IData, IAsyncData
                     }
 
                     // Range check (Range in tiles in DB, convert to pixels)
-                    if (mp.Range >= (Projectile.Instance[projId].Range + 1) * 32)
+                    if (mp.Range >= (range + 1) * 32)
                     {
                         // Play hit/expire animation at the last tile location if configured
-                        int anim = Projectile.Instance[projId].Animation;
-                        if (anim >= 0)
+                        if (animation >= 0)
                         {
                             int tx = Math.Clamp(prevTileX, 0, Server.Map.Instance[map].MaxX - 1);
                             int ty = Math.Clamp(prevTileY, 0, Server.Map.Instance[map].MaxY - 1);
-                            NetworkSend.SendAnimation(map, anim, tx, ty);
+                            NetworkSend.SendAnimation(map, animation, tx, ty);
                             OnAttack(map, ref mp, tx, ty, projId);
                         }
                         MapProjectile.OnClear(map, i);
@@ -434,14 +462,13 @@ public class Projectile : ProjectileBase, IData, IAsyncData
                     int tileY = Math.Clamp(mp.Y / Constants.TileSize, 0, Core.Globals.Variables.MaxMapY - 1);
                     if (tileX < 0 || tileY < 0 || tileX >= Server.Map.Instance[map].MaxX || tileY >= Server.Map.Instance[map].MaxY)
                     {
-                        int anim = Projectile.Instance[projId].Animation;
-                        if (anim >= 0)
+                        if (animation >= 0)
                         {
                             if (Server.Map.Instance[map].MaxX > 0 && Server.Map.Instance[map].MaxY > 0)
                             {
                                 int tx = Math.Clamp(prevTileX, 0, Server.Map.Instance[map].MaxX - 1);
                                 int ty = Math.Clamp(prevTileY, 0, Server.Map.Instance[map].MaxY - 1);
-                                NetworkSend.SendAnimation(map, anim, tx, ty);
+                                NetworkSend.SendAnimation(map, animation, tx, ty);
                                 OnAttack(map, ref mp, tx, ty, projId);
                             }
                         }
@@ -453,10 +480,9 @@ public class Projectile : ProjectileBase, IData, IAsyncData
                     // Tile collision
                     if (Server.Map.Instance[map].Tile[tileX, tileY].Type == TileType.Blocked || Server.Map.Instance[map].Tile[tileX, tileY].Type2 == TileType.Blocked)
                     {
-                        int anim = Projectile.Instance[projId].Animation;
-                        if (anim >= 0)
+                        if (animation >= 0)
                         {
-                            NetworkSend.SendAnimation(map, anim, tileX, tileY);
+                            NetworkSend.SendAnimation(map, animation, tileX, tileY);
                             OnAttack(map, ref mp, tileX, tileY, projId);
                         }
                         
@@ -494,10 +520,9 @@ public class Projectile : ProjectileBase, IData, IAsyncData
 
                     if (hit)
                     {
-                        int anim = Projectile.Instance[projId].Animation;
-                        if (anim >= 0)
+                        if (animation >= 0)
                         {
-                            NetworkSend.SendAnimation(map, anim, tileX, tileY);
+                            NetworkSend.SendAnimation(map, animation, tileX, tileY);
                         }
 
                         try
@@ -510,7 +535,7 @@ public class Projectile : ProjectileBase, IData, IAsyncData
                             else
                             {
                                 // item/weapon projectile: basic damage
-                                Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, Projectile.Instance[projId].Damage, true);
+                                Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, damage, true);
                             }
                         }
                         catch (Exception ex)
@@ -542,10 +567,9 @@ public class Projectile : ProjectileBase, IData, IAsyncData
                     
                     if (hit)
                     {
-                        int anim = Projectile.Instance[projId].Animation;
-                        if (anim >= 0)
+                        if (animation >= 0)
                         {
-                            NetworkSend.SendAnimation(map, anim, tileX, tileY);
+                            NetworkSend.SendAnimation(map, animation, tileX, tileY);
                         }
 
                         try
@@ -556,7 +580,7 @@ public class Projectile : ProjectileBase, IData, IAsyncData
                             }
                             else
                             {
-                                Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, Projectile.Instance[projId].Damage, true);
+                                Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, damage, true);
                             }
                         }
                         catch (Exception ex)
