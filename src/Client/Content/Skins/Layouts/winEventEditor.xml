@@ -6,21 +6,56 @@
         StartPosition="CenterScreen"
         Visible="false">
 
-	<GroupBox Name="grpDetails" Position="8,24" Size="964,122" Caption="Details">
+	<!-- Page buttons above the Details groupbox -->
+	<Button Name="btnPage1" Text="1" Position="12,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage2" Text="2" Position="42,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage3" Text="3" Position="72,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage4" Text="4" Position="102,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage5" Text="5" Position="132,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage6" Text="6" Position="162,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage7" Text="7" Position="192,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage8" Text="8" Position="222,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage9" Text="9" Position="252,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage10" Text="10" Position="282,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage11" Text="11" Position="312,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage12" Text="12" Position="342,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage13" Text="13" Position="372,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage14" Text="14" Position="402,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+
+	<Button Name="btnPage15" Text="15" Position="432,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage16" Text="16" Position="462,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage17" Text="17" Position="492,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage18" Text="18" Position="522,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage19" Text="19" Position="552,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage20" Text="20" Position="582,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage21" Text="21" Position="612,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage22" Text="22" Position="642,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage23" Text="23" Position="672,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage24" Text="24" Position="702,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage25" Text="25" Position="732,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage26" Text="26" Position="762,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage27" Text="27" Position="792,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage28" Text="28" Position="822,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+
+	<GroupBox Name="grpDetails" Position="8,54" Size="964,120" Caption="Details">
+		<!-- Page tabs: top-left of window (inside Details) -->
+		<!-- Page label + nav: directly below tabs -->
+		<Label Name="lblPageCaption" Text="Page" Position="12,22" Size="50,18"/>
+		<Label Name="lblPage" Text="1 / 1" Position="64,22" Size="90,18"/>
+		<Button Name="btnPrevPage" Text="&lt;" Position="140,18" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+		<Button Name="btnNextPage" Text=">" Position="172,18" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+		<Button Name="btnAddPage" Text="+" Position="204,18" Size="28,22" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+		<Button Name="btnDeletePage" Text="-" Position="236,18" Size="28,22" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+
 		<Label Name="lblName" Text="Name" Position="20,52" Size="80,18"/>
 		<TextBox Name="txtName" Position="100,50" Size="220,22" Design="TextWhite"/>
 		<CheckBox Name="chkGlobal" Text="Global" Position="340,52" Size="90,18" Design="CheckboxNormal"/>
-		<Label Name="lblPosCaption" Text="Position" Position="20,82" Size="80,18"/>
-		<Label Name="lblPosition" Text="(0, 0)" Position="100,82" Size="120,18"/>
-		<Label Name="lblPageCaption" Text="Page" Position="240,82" Size="50,18"/>
-		<Label Name="lblPage" Text="1 / 1" Position="292,82" Size="90,18"/>
-		<Button Name="btnPrevPage" Text="&lt;" Position="390,78" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
-		<Button Name="btnNextPage" Text=">" Position="422,78" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
-		<Button Name="btnAddPage" Text="+" Position="454,78" Size="28,22" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-		<Button Name="btnDeletePage" Text="-" Position="486,78" Size="28,22" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+		<Label Name="lblPosCaption" Text="Position" Position="20,80" Size="80,18"/>
+		<Label Name="lblPosition" Text="(0, 0)" Position="100,80" Size="120,18"/>
+
 	</GroupBox>
 
-	<GroupBox Name="grpPageSettings" Position="8,154" Size="964,140" Caption="Page Settings">
+	<GroupBox Name="grpPageSettings" Position="8,180" Size="964,140" Caption="Page Settings">
 		<Label Name="lblTrigger" Text="Trigger" Position="12,28" Size="80,18"/>
 		<ComboBox Name="cmbTrigger" Position="100,26" Size="160,20"/>
 		<Label Name="lblPositioning" Text="Layer" Position="280,28" Size="80,18"/>
@@ -31,19 +66,21 @@
 		<ComboBox Name="cmbMoveSpeed" Position="360,56" Size="160,20"/>
 		<Label Name="lblMoveFreq" Text="Move Freq" Position="540,58" Size="80,18"/>
 		<ComboBox Name="cmbMoveFreq" Position="620,56" Size="160,20"/>
-		<CheckBox Name="chkWalkAnim" Text="Idle Anim" Position="12,88" Size="100,18" Design="CheckboxNormal"/>
-		<CheckBox Name="chkDirFix" Text="Dir Fix" Position="124,88" Size="90,18" Design="CheckboxNormal"/>
-		<CheckBox Name="chkWalkThrough" Text="Walk Through" Position="226,88" Size="120,18" Design="CheckboxNormal"/>
-		<CheckBox Name="chkShowName" Text="Show Name" Position="360,88" Size="120,18" Design="CheckboxNormal"/>
+		<CheckBox Name="chkWalkAnim" Text="Idle Anim" Position="12,94" Size="100,18" Design="CheckboxNormal"/>
+		<CheckBox Name="chkDirFix" Text="Dir Fix" Position="124,94" Size="90,18" Design="CheckboxNormal"/>
+		<CheckBox Name="chkWalkThrough" Text="Walk Through" Position="226,94" Size="120,18" Design="CheckboxNormal"/>
+		<CheckBox Name="chkShowName" Text="Show Name" Position="360,94" Size="120,18" Design="CheckboxNormal"/>
 	</GroupBox>
 
-	<GroupBox Name="grpCommands" Position="8,302" Size="964,288" Caption="Commands">
-		<ListBox Name="lstCommands" Position="8,28" Size="932,244"/>
-		<ScrollBar Name="sldCommands" Position="940,28" Size="16,244" Min="0" Max="0" Vertical="true"/>
+	<GroupBox Name="grpCommands" Position="8,326" Size="964,244" Caption="Commands">
+		<Button Name="btnAddCommand" Text="Add" Position="8,28" Size="60,22" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+		<Button Name="btnDeleteCommand" Text="Delete" Position="74,28" Size="70,22" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+		<ListBox Name="lstCommands" Position="8,56" Size="932,176"/>
+		<ScrollBar Name="sldCommands" Position="940,56" Size="16,176" Min="0" Max="0" Vertical="true"/>
 	</GroupBox>
 
-	<Button Name="btnOk" Text="OK" Position="726, 600" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-	<Button Name="btnCancel" Text="Cancel" Position="814, 600" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+	<Button Name="btnOk" Text="OK" Position="726, 616" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+	<Button Name="btnCancel" Text="Cancel" Position="814, 616" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
 
 	<Button Name="btnClose" Position="-19,5" Size="16,16" Image="8" ImageHover="9" ImageMouseDown="10"/>
 </Window>

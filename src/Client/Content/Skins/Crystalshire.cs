@@ -3556,6 +3556,15 @@ public class Crystalshire
         if (WindowManager.TryGetControl("winEventEditor", "btnDeletePage", out var btnDel))
             btnDel.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnDeletePage;
 
+        // Page buttons (1..28)
+        for (int i = 1; i <= 28; i++)
+        {
+            int pageIndex = i - 1;
+            var name = $"btnPage{i}";
+            if (WindowManager.TryGetControl("winEventEditor", name, out var btnCtrl))
+                btnCtrl.CallBack[(int)ControlState.MouseDown] = () => WinEventEditor.OnSelectPage(pageIndex);
+        }
+
         // Name
         if (WindowManager.TryGetControl("winEventEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
         {
@@ -3588,7 +3597,7 @@ public class Crystalshire
                 };
                 return;
             }
-
+                
             ctrl.CallBack[(int)ControlState.MouseMove] = WinEventEditor.UpdatePageSettingsFromControls;
             ctrl.CallBack[(int)ControlState.MouseDown] = WinEventEditor.UpdatePageSettingsFromControls;
         }
@@ -3603,11 +3612,20 @@ public class Crystalshire
         WirePageSetting("chkWalkThrough");
         WirePageSetting("chkShowName");
 
+        // Commands: Add
+        if (WindowManager.TryGetControl("winEventEditor", "btnAddCommand", out var btnAddCmd))
+            btnAddCmd.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnAddCommand;
+
+        // Commands: Delete
+        if (WindowManager.TryGetControl("winEventEditor", "btnDeleteCommand", out var btnDelCmd))
+            btnDelCmd.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnDeleteCommand;
+
         // Commands list + scrollbar
         if (WindowManager.TryGetControl("winEventEditor", "lstCommands", out var lstCtrl) && lstCtrl is ListBox lst)
         {
             lst.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnCommandsListMouseDown;
             lst.CallBack[(int)ControlState.MouseScroll] = WinEventEditor.OnCommandsListMouseWheel;
+            lst.CallBack[(int)ControlState.DoubleClick] = WinEventEditor.OnCommandsListDoubleClick;
         }
 
         if (WindowManager.TryGetControl("winEventEditor", "sldCommands", out var sldCtrl) && sldCtrl is ScrollBar sb)
@@ -3615,5 +3633,22 @@ public class Crystalshire
             sb.CallBack[(int)ControlState.MouseMove] = WinEventEditor.OnCommandsScrollBarMove;
             sb.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnCommandsScrollBarMove;
         }
+
+        // Command data fields
+        void WireCommandField(string name)
+        {
+            if (WindowManager.TryGetControl("winEventEditor", name, out var ctrl) && ctrl is TextBox tb)
+                tb.CallBack[(int)ControlState.KeyUp] = WinEventEditor.UpdateSelectedCommandFromControls;
+        }
+
+        WireCommandField("txtCmdText1");
+        WireCommandField("txtCmdText2");
+        WireCommandField("txtCmdText3");
+        WireCommandField("txtCmdData1");
+        WireCommandField("txtCmdData2");
+        WireCommandField("txtCmdData3");
+        WireCommandField("txtCmdData4");
+        WireCommandField("txtCmdData5");
+        WireCommandField("txtCmdData6");
     }
 }

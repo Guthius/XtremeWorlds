@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window Name="winEventCommandData" Caption="Command Data"
+        Size="420,360"
+        Design="WindowNormal"
+        StartPosition="CenterScreen"
+        Visible="false">
+
+	<GroupBox Name="grpCommandData" Position="8,24" Size="404,270" Caption="Command Data">
+		<Label Name="lblCmdSelected" Text="" Position="12,24" Size="380,18"/>
+
+		<Label Name="lblCmdText1" Text="Text1" Position="12,56" Size="50,18"/>
+		<TextBox Name="txtCmdText1" Position="64,54" Size="326,22" Design="TextWhite"/>
+		<Label Name="lblCmdText2" Text="Text2" Position="12,86" Size="50,18"/>
+		<TextBox Name="txtCmdText2" Position="64,84" Size="326,22" Design="TextWhite"/>
+		<Label Name="lblCmdText3" Text="Text3" Position="12,116" Size="50,18"/>
+		<TextBox Name="txtCmdText3" Position="64,114" Size="326,22" Design="TextWhite"/>
+
+		<Label Name="lblCmdData1" Text="D1" Position="12,154" Size="20,18"/>
+		<TextBox Name="txtCmdData1" Position="32,152" Size="60,22" Design="TextWhite"/>
+		<Label Name="lblCmdData2" Text="D2" Position="112,154" Size="20,18"/>
+		<TextBox Name="txtCmdData2" Position="132,152" Size="60,22" Design="TextWhite"/>
+		<Label Name="lblCmdData3" Text="D3" Position="212,154" Size="20,18"/>
+		<TextBox Name="txtCmdData3" Position="232,152" Size="60,22" Design="TextWhite"/>
+
+		<Label Name="lblCmdData4" Text="D4" Position="12,184" Size="20,18"/>
+		<TextBox Name="txtCmdData4" Position="32,182" Size="60,22" Design="TextWhite"/>
+		<Label Name="lblCmdData5" Text="D5" Position="112,184" Size="20,18"/>
+		<TextBox Name="txtCmdData5" Position="132,182" Size="60,22" Design="TextWhite"/>
+		<Label Name="lblCmdData6" Text="D6" Position="212,184" Size="20,18"/>
+		<TextBox Name="txtCmdData6" Position="232,182" Size="60,22" Design="TextWhite"/>
+	</GroupBox>
+
+	<Button Name="btnOk" Text="OK" Position="236, 310" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+	<Button Name="btnCancel" Text="Cancel" Position="324, 310" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+
+	<Button Name="btnClose" Position="-19,5" Size="16,16" Image="8" ImageHover="9" ImageMouseDown="10"/>
+</Window>

@@ -13,19 +13,48 @@ public static class WinEventEditor
     private static bool _hasHistory;
     private static readonly System.Collections.Generic.List<(int listIndex, int commandIndex)> _commandIndexMap = new();
 
+    private static readonly string[] _commandTextControlNames =
+    [
+        "txtCmdText1",
+        "txtCmdText2",
+        "txtCmdText3",
+    ];
+
+    private static readonly string[] _commandDataControlNames =
+    [
+        "txtCmdData1",
+        "txtCmdData2",
+        "txtCmdData3",
+        "txtCmdData4",
+        "txtCmdData5",
+        "txtCmdData6",
+    ];
+
+    private static readonly System.Collections.Generic.List<int> _commandPickerValueMap = new();
+    private static int _pickerTargetListIndex;
+    private static int _pickerTargetCommandIndex;
+    private static bool _pickerTargetIsNew;
+
+    private static int _dataTargetListIndex;
+    private static int _dataTargetCommandIndex;
+    private static bool _dataTargetIsNew;
+    private static Core.Globals.Type.EventCommand _dataHistoryCommand;
+    private static bool _dataHasHistory;
+
+    private const int MaxPageButtons = 28;
+
     public static void Init()
     {
         if (!WindowManager.TryGetControl("winEventEditor", "txtName", out _))
             return;
-
         _isLoading = true;
         try
         {
             // Initialize the editor backing data
-            global::Client.Event.EventEditorInit();
+            Client.Event.EventEditorInit();
 
             // Snapshot original event for Cancel
-            _history = global::Client.Event.Instance;
+            _history = Client.Event.Instance;
             _hasHistory = true;
 
             PopulateCombos();
@@ -39,7 +68,411 @@ public static class WinEventEditor
         finally
         {
             _isLoading = false;
+            RefreshPageButtons();
         }
+    }
+
+    private static void SetCommandDataControlsEnabled(bool enabled)
+    {
+        foreach (var name in _commandTextControlNames)
+        {
+            if (WindowManager.TryGetControl("winEventEditor", name, out var ctrl) && ctrl is not null)
+                ctrl.Enabled = enabled;
+        }
+
+        foreach (var name in _commandDataControlNames)
+        {
+            if (WindowManager.TryGetControl("winEventEditor", name, out var ctrl) && ctrl is not null)
+                ctrl.Enabled = enabled;
+        }
+    }
+
+    private static void ClearCommandDataControls(string selectedLabel)
+    {
+        if (WindowManager.TryGetControl("winEventEditor", "lblCmdSelected", out var selectedCtrl) && selectedCtrl is Label lbl)
+            lbl.Text = selectedLabel;
+
+        foreach (var name in _commandTextControlNames)
+        {
+            if (WindowManager.TryGetControl("winEventEditor", name, out var ctrl) && ctrl is TextBox tb)
+                tb.Text = string.Empty;
+        }
+
+        foreach (var name in _commandDataControlNames)
+        {
+            if (WindowManager.TryGetControl("winEventEditor", name, out var ctrl) && ctrl is TextBox tb)
+                tb.Text = "0";
+        }
+    }
+
+    private static bool TryGetSelectedCommand(out int listIndex, out int commandIndex, out Core.Globals.Type.EventCommand command)
+    {
+        listIndex = -1;
+        commandIndex = -1;
+        command = default;
+
+        if (!WindowManager.TryGetControl("winEventEditor", "lstCommands", out var lstCtrl) || lstCtrl is not ListBox list)
+            return false;
+
+        int selectedIndex = list.SelectedIndex;
+        if (selectedIndex < 0 || selectedIndex >= _commandIndexMap.Count)
+            return false;
+
+        if (!TryGetCurrentPage(out var page))
+            return false;
+
+        (listIndex, commandIndex) = _commandIndexMap[selectedIndex];
+
+        int listCount = Math.Max(1, page.CommandListCount);
+        var lists = page.CommandList ?? Array.Empty<Core.Globals.Type.CommandList>();
+        if (lists.Length < listCount)
+            Array.Resize(ref lists, listCount);
+
+        if (listIndex < 0 || listIndex >= lists.Length)
+            return false;
+
+        var cmdList = lists[listIndex];
+        int cmdCount = Math.Max(0, cmdList.CommandCount);
+        var cmds = cmdList.Commands ?? Array.Empty<Core.Globals.Type.EventCommand>();
+        if (cmds.Length < cmdCount)
+            Array.Resize(ref cmds, cmdCount);
+
+        if (commandIndex < 0 || commandIndex >= cmdCount)
+            return false;
+
+        command = cmds[commandIndex];
+        return true;
+    }
+
+    private static void SetCommand(int listIndex, int commandIndex, Core.Globals.Type.EventCommand command)
+    {
+        if (!TryGetCurrentPage(out var page))
+            return;
+
+        int listCount = Math.Max(1, page.CommandListCount);
+        var lists = page.CommandList ?? Array.Empty<Core.Globals.Type.CommandList>();
+        if (lists.Length < listCount)
+            Array.Resize(ref lists, listCount);
+
+        if (listIndex < 0 || listIndex >= lists.Length)
+            return;
+
+        var cmdList = lists[listIndex];
+        int cmdCount = Math.Max(0, cmdList.CommandCount);
+        var cmds = cmdList.Commands ?? Array.Empty<Core.Globals.Type.EventCommand>();
+        if (cmds.Length < cmdCount)
+            Array.Resize(ref cmds, cmdCount);
+
+        if (commandIndex < 0 || commandIndex >= cmdCount)
+            return;
+
+        cmds[commandIndex] = command;
+        cmdList.Commands = cmds;
+        cmdList.CommandCount = cmds.Length;
+        lists[listIndex] = cmdList;
+        page.CommandList = lists;
+        page.CommandListCount = listCount;
+        SetCurrentPage(page);
+    }
+
+    public static void LoadSelectedCommandToControls()
+    {
+        if (_isLoading)
+            return;
+
+        _isLoading = true;
+        try
+        {
+            if (!TryGetSelectedCommand(out _, out _, out var cmd) || cmd.Index < 0)
+            {
+                ClearCommandDataControls("No command selected");
+                SetCommandDataControlsEnabled(false);
+                return;
+            }
+
+            string cmdName;
+            try { cmdName = ((EventCommand)cmd.Index).ToString(); }
+            catch { cmdName = cmd.Index.ToString(); }
+
+            if (WindowManager.TryGetControl("winEventEditor", "lblCmdSelected", out var selectedCtrl) && selectedCtrl is Label lbl)
+                lbl.Text = cmdName;
+
+            SetCommandDataControlsEnabled(true);
+
+            if (WindowManager.TryGetControl("winEventEditor", "txtCmdText1", out var t1) && t1 is TextBox tb1)
+                tb1.Text = cmd.Text1 ?? string.Empty;
+            if (WindowManager.TryGetControl("winEventEditor", "txtCmdText2", out var t2) && t2 is TextBox tb2)
+                tb2.Text = cmd.Text2 ?? string.Empty;
+            if (WindowManager.TryGetControl("winEventEditor", "txtCmdText3", out var t3) && t3 is TextBox tb3)
+                tb3.Text = cmd.Text3 ?? string.Empty;
+
+            if (WindowManager.TryGetControl("winEventEditor", "txtCmdData1", out var d1) && d1 is TextBox db1)
+                db1.Text = cmd.Data1.ToString();
+            if (WindowManager.TryGetControl("winEventEditor", "txtCmdData2", out var d2) && d2 is TextBox db2)
+                db2.Text = cmd.Data2.ToString();
+            if (WindowManager.TryGetControl("winEventEditor", "txtCmdData3", out var d3) && d3 is TextBox db3)
+                db3.Text = cmd.Data3.ToString();
+            if (WindowManager.TryGetControl("winEventEditor", "txtCmdData4", out var d4) && d4 is TextBox db4)
+                db4.Text = cmd.Data4.ToString();
+            if (WindowManager.TryGetControl("winEventEditor", "txtCmdData5", out var d5) && d5 is TextBox db5)
+                db5.Text = cmd.Data5.ToString();
+            if (WindowManager.TryGetControl("winEventEditor", "txtCmdData6", out var d6) && d6 is TextBox db6)
+                db6.Text = cmd.Data6.ToString();
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private static int ReadIntTextBox(string controlName, int fallback = 0)
+    {
+        if (WindowManager.TryGetControl("winEventEditor", controlName, out var ctrl) && ctrl is TextBox tb)
+        {
+            var s = tb.Text?.Trim();
+            if (int.TryParse(s, out var v))
+                return v;
+        }
+        return fallback;
+    }
+
+    private static string ReadStringTextBox(string controlName)
+    {
+        if (WindowManager.TryGetControl("winEventEditor", controlName, out var ctrl) && ctrl is TextBox tb)
+            return tb.Text ?? string.Empty;
+        return string.Empty;
+    }
+
+    public static void UpdateSelectedCommandFromControls()
+    {
+        if (_isLoading)
+            return;
+
+        if (!TryGetSelectedCommand(out var listIndex, out var commandIndex, out var cmd) || cmd.Index < 0)
+            return;
+
+        cmd.Text1 = ReadStringTextBox("txtCmdText1");
+        cmd.Text2 = ReadStringTextBox("txtCmdText2");
+        cmd.Text3 = ReadStringTextBox("txtCmdText3");
+        cmd.Data1 = ReadIntTextBox("txtCmdData1", cmd.Data1);
+        cmd.Data2 = ReadIntTextBox("txtCmdData2", cmd.Data2);
+        cmd.Data3 = ReadIntTextBox("txtCmdData3", cmd.Data3);
+        cmd.Data4 = ReadIntTextBox("txtCmdData4", cmd.Data4);
+        cmd.Data5 = ReadIntTextBox("txtCmdData5", cmd.Data5);
+        cmd.Data6 = ReadIntTextBox("txtCmdData6", cmd.Data6);
+
+        SetCommand(listIndex, commandIndex, cmd);
+        RefreshCommandsList();
+    }
+
+    private static int ReadIntTextBox(string windowName, string controlName, int fallback = 0)
+    {
+        if (WindowManager.TryGetControl(windowName, controlName, out var ctrl) && ctrl is TextBox tb)
+        {
+            var s = tb.Text?.Trim();
+            if (int.TryParse(s, out var v))
+                return v;
+        }
+        return fallback;
+    }
+
+    private static string ReadStringTextBox(string windowName, string controlName)
+    {
+        if (WindowManager.TryGetControl(windowName, controlName, out var ctrl) && ctrl is TextBox tb)
+            return tb.Text ?? string.Empty;
+        return string.Empty;
+    }
+
+    private static bool TryGetCommandAt(int listIndex, int commandIndex, out Core.Globals.Type.EventCommand cmd)
+    {
+        cmd = default;
+        if (!TryGetCurrentPage(out var page))
+            return false;
+
+        int listCount = Math.Max(1, page.CommandListCount);
+        var lists = page.CommandList ?? Array.Empty<Core.Globals.Type.CommandList>();
+        if (lists.Length < listCount)
+            Array.Resize(ref lists, listCount);
+
+        if (listIndex < 0 || listIndex >= lists.Length)
+            return false;
+
+        var cmdList = lists[listIndex];
+        int cmdCount = Math.Max(0, cmdList.CommandCount);
+        var cmds = cmdList.Commands ?? Array.Empty<Core.Globals.Type.EventCommand>();
+        if (cmds.Length < cmdCount)
+            Array.Resize(ref cmds, cmdCount);
+
+        if (commandIndex < 0 || commandIndex >= cmdCount)
+            return false;
+
+        cmd = cmds[commandIndex];
+        return true;
+    }
+
+    private static void LoadCommandToWindow(string windowName, Core.Globals.Type.EventCommand cmd)
+    {
+        string cmdName;
+        try { cmdName = ((EventCommand)cmd.Index).ToString(); }
+        catch { cmdName = cmd.Index.ToString(); }
+
+        if (WindowManager.TryGetControl(windowName, "lblCmdSelected", out var selectedCtrl) && selectedCtrl is Label lbl)
+            lbl.Text = cmdName;
+
+        if (WindowManager.TryGetControl(windowName, "txtCmdText1", out var t1) && t1 is TextBox tb1)
+            tb1.Text = cmd.Text1 ?? string.Empty;
+        if (WindowManager.TryGetControl(windowName, "txtCmdText2", out var t2) && t2 is TextBox tb2)
+            tb2.Text = cmd.Text2 ?? string.Empty;
+        if (WindowManager.TryGetControl(windowName, "txtCmdText3", out var t3) && t3 is TextBox tb3)
+            tb3.Text = cmd.Text3 ?? string.Empty;
+
+        if (WindowManager.TryGetControl(windowName, "txtCmdData1", out var d1) && d1 is TextBox db1)
+            db1.Text = cmd.Data1.ToString();
+        if (WindowManager.TryGetControl(windowName, "txtCmdData2", out var d2) && d2 is TextBox db2)
+            db2.Text = cmd.Data2.ToString();
+        if (WindowManager.TryGetControl(windowName, "txtCmdData3", out var d3) && d3 is TextBox db3)
+            db3.Text = cmd.Data3.ToString();
+        if (WindowManager.TryGetControl(windowName, "txtCmdData4", out var d4) && d4 is TextBox db4)
+            db4.Text = cmd.Data4.ToString();
+        if (WindowManager.TryGetControl(windowName, "txtCmdData5", out var d5) && d5 is TextBox db5)
+            db5.Text = cmd.Data5.ToString();
+        if (WindowManager.TryGetControl(windowName, "txtCmdData6", out var d6) && d6 is TextBox db6)
+            db6.Text = cmd.Data6.ToString();
+    }
+
+    private static void SelectCommandInList(int listIndex, int commandIndex)
+    {
+        if (!WindowManager.TryGetControl("winEventEditor", "lstCommands", out var ctrl) || ctrl is not ListBox list)
+            return;
+
+        int mappedIndex = -1;
+        for (int i = 0; i < _commandIndexMap.Count; i++)
+        {
+            if (_commandIndexMap[i].listIndex == listIndex && _commandIndexMap[i].commandIndex == commandIndex)
+            {
+                mappedIndex = i;
+                break;
+            }
+        }
+
+        if (mappedIndex < 0 || mappedIndex >= list.Items.Count)
+            return;
+
+        list.SelectedIndex = mappedIndex;
+        list.EnsureVisible(mappedIndex);
+    }
+
+    private static void RemoveCommandAt(int listIndex, int commandIndex)
+    {
+        if (!TryGetCurrentPage(out var page))
+            return;
+
+        int listCount = Math.Max(1, page.CommandListCount);
+        var lists = page.CommandList ?? Array.Empty<Core.Globals.Type.CommandList>();
+        if (lists.Length < listCount)
+            Array.Resize(ref lists, listCount);
+
+        if (listIndex < 0 || listIndex >= lists.Length)
+            return;
+
+        var cmdList = lists[listIndex];
+        int cmdCount = Math.Max(0, cmdList.CommandCount);
+        var cmds = cmdList.Commands ?? Array.Empty<Core.Globals.Type.EventCommand>();
+        if (cmds.Length < cmdCount)
+            Array.Resize(ref cmds, cmdCount);
+
+        if (commandIndex < 0 || commandIndex >= cmdCount)
+            return;
+
+        for (int i = commandIndex; i < cmdCount - 1; i++)
+            cmds[i] = cmds[i + 1];
+
+        if (cmdCount - 1 <= 0)
+        {
+            cmdList.Commands = Array.Empty<Core.Globals.Type.EventCommand>();
+            cmdList.CommandCount = 0;
+        }
+        else
+        {
+            Array.Resize(ref cmds, cmdCount - 1);
+            cmdList.Commands = cmds;
+            cmdList.CommandCount = cmdCount - 1;
+        }
+
+        lists[listIndex] = cmdList;
+        page.CommandList = lists;
+        page.CommandListCount = listCount;
+        SetCurrentPage(page);
+    }
+
+    private static void WireCommandDataWindowControls()
+    {
+        if (WindowManager.TryGetControl("winEventCommandData", "btnClose", out var btnClose) && btnClose is not null)
+            btnClose.CallBack[(int)ControlState.MouseDown] = OnCommandDataCancel;
+        if (WindowManager.TryGetControl("winEventCommandData", "btnCancel", out var btnCancel) && btnCancel is not null)
+            btnCancel.CallBack[(int)ControlState.MouseDown] = OnCommandDataCancel;
+        if (WindowManager.TryGetControl("winEventCommandData", "btnOk", out var btnOk) && btnOk is not null)
+            btnOk.CallBack[(int)ControlState.MouseDown] = OnCommandDataOk;
+    }
+
+    private static void OpenCommandDataEditor(int listIndex, int commandIndex, bool isNew)
+    {
+        _dataTargetListIndex = listIndex;
+        _dataTargetCommandIndex = commandIndex;
+        _dataTargetIsNew = isNew;
+
+        _dataHasHistory = TryGetCommandAt(listIndex, commandIndex, out _dataHistoryCommand);
+
+        WindowManager.ShowWindow("winEventCommandData", forced: true);
+        WireCommandDataWindowControls();
+
+        if (TryGetCommandAt(listIndex, commandIndex, out var cmd) && cmd.Index >= 0)
+            LoadCommandToWindow("winEventCommandData", cmd);
+    }
+
+    public static void OnCommandDataOk()
+    {
+        int listIndex = _dataTargetListIndex;
+        int commandIndex = _dataTargetCommandIndex;
+
+        if (!TryGetCommandAt(listIndex, commandIndex, out var cmd) || cmd.Index < 0)
+            return;
+
+        cmd.Text1 = ReadStringTextBox("winEventCommandData", "txtCmdText1");
+        cmd.Text2 = ReadStringTextBox("winEventCommandData", "txtCmdText2");
+        cmd.Text3 = ReadStringTextBox("winEventCommandData", "txtCmdText3");
+        cmd.Data1 = ReadIntTextBox("winEventCommandData", "txtCmdData1", cmd.Data1);
+        cmd.Data2 = ReadIntTextBox("winEventCommandData", "txtCmdData2", cmd.Data2);
+        cmd.Data3 = ReadIntTextBox("winEventCommandData", "txtCmdData3", cmd.Data3);
+        cmd.Data4 = ReadIntTextBox("winEventCommandData", "txtCmdData4", cmd.Data4);
+        cmd.Data5 = ReadIntTextBox("winEventCommandData", "txtCmdData5", cmd.Data5);
+        cmd.Data6 = ReadIntTextBox("winEventCommandData", "txtCmdData6", cmd.Data6);
+
+        SetCommand(listIndex, commandIndex, cmd);
+        WindowManager.HideWindow("winEventCommandData");
+
+        RefreshCommandsList();
+        SelectCommandInList(listIndex, commandIndex);
+        LoadSelectedCommandToControls();
+    }
+
+    public static void OnCommandDataCancel()
+    {
+        int listIndex = _dataTargetListIndex;
+        int commandIndex = _dataTargetCommandIndex;
+
+        if (_dataTargetIsNew)
+        {
+            RemoveCommandAt(listIndex, commandIndex);
+        }
+        else if (_dataHasHistory)
+        {
+            SetCommand(listIndex, commandIndex, _dataHistoryCommand);
+        }
+
+        WindowManager.HideWindow("winEventCommandData");
+        RefreshCommandsList();
+        LoadSelectedCommandToControls();
     }
 
     private static void PopulateCombos()
@@ -110,48 +543,69 @@ public static class WinEventEditor
         }
     }
 
+    private static void RefreshPageButtons()
+    {
+        int pageCount = Math.Max(1, Client.Event.Instance.PageCount);
+        int selected = Math.Clamp(SelectedPage, 0, pageCount - 1);
+
+        for (int i = 1; i <= MaxPageButtons; i++)
+        {
+            if (!WindowManager.TryGetControl("winEventEditor", $"btnPage{i}", out var ctrl) || ctrl is not Button btn)
+                continue;
+
+            bool visible = i <= pageCount;
+            btn.Visible = visible;
+            if (!visible)
+                continue;
+
+            btn.Text = i.ToString();
+            bool isActive = (i - 1) == selected;
+            btn.Design = isActive ? Design.Green : Design.Orange;
+            btn.DesignHover = isActive ? Design.GreenHover : Design.OrangeHover;
+            btn.DesignMouseDown = isActive ? Design.GreenClick : Design.OrangeClick;
+        }
+    }
+
     private static void ClampSelectedPage()
     {
-        int pageCount = Math.Max(1, global::Client.Event.Instance.PageCount);
+        int pageCount = Math.Max(1, Client.Event.Instance.PageCount);
         SelectedPage = Math.Clamp(SelectedPage, 0, pageCount - 1);
-        global::Client.Event.CurPageNum = SelectedPage;
+        Client.Event.CurPageNum = SelectedPage;
     }
 
     private static bool TryGetCurrentPage(out Core.Globals.Type.EventPage page)
     {
         page = default;
-        if (global::Client.Event.Instance.Pages == null || global::Client.Event.Instance.Pages.Length == 0)
+        if (Client.Event.Instance.Pages == null || Client.Event.Instance.Pages.Length == 0)
             return false;
 
         ClampSelectedPage();
-        if (SelectedPage < 0 || SelectedPage >= global::Client.Event.Instance.Pages.Length)
+        if (SelectedPage < 0 || SelectedPage >= Client.Event.Instance.Pages.Length)
             return false;
 
-        page = global::Client.Event.Instance.Pages[SelectedPage];
+        page = Client.Event.Instance.Pages[SelectedPage];
         return true;
     }
 
     private static void SetCurrentPage(Core.Globals.Type.EventPage page)
     {
-        if (global::Client.Event.Instance.Pages == null || global::Client.Event.Instance.Pages.Length == 0)
+        if (Client.Event.Instance.Pages == null || Client.Event.Instance.Pages.Length == 0)
             return;
 
         ClampSelectedPage();
-        global::Client.Event.Instance.Pages[SelectedPage] = page;
+        Client.Event.Instance.Pages[SelectedPage] = page;
     }
 
     private static void LoadEventToControls()
     {
         // Name
         if (WindowManager.TryGetControl("winEventEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
-        {
-            txtName.Text = global::Client.Event.Instance.Name ?? string.Empty;
-        }
+            txtName.Text = Client.Event.Instance.Name ?? string.Empty;
 
         // Global
         if (WindowManager.TryGetControl("winEventEditor", "chkGlobal", out var globalCtrl) && globalCtrl is CheckBox chkGlobal)
         {
-            chkGlobal.Value = global::Client.Event.Instance.Globals == 1 ? 1 : 0;
+            chkGlobal.Value = Client.Event.Instance.Globals == 1 ? 1 : 0;
         }
 
         // Position label (event-level)
@@ -206,7 +660,7 @@ public static class WinEventEditor
     {
         if (WindowManager.TryGetControl("winEventEditor", "lblPage", out var pageCtrl) && pageCtrl is Label lblPage)
         {
-            int pageCount = Math.Max(1, global::Client.Event.Instance.PageCount);
+            int pageCount = Math.Max(1, Client.Event.Instance.PageCount);
             int display = Math.Clamp(SelectedPage + 1, 1, pageCount);
             lblPage.Text = $"{display} / {pageCount}";
         }
@@ -216,6 +670,9 @@ public static class WinEventEditor
     {
         if (!WindowManager.TryGetControl("winEventEditor", "lstCommands", out var lstCtrl) || lstCtrl is not ListBox list)
             return;
+
+        int prevSelected = list.SelectedIndex;
+        int prevScroll = list.ScrollOffset;
 
         list.Clear();
         _commandIndexMap.Clear();
@@ -254,6 +711,20 @@ public static class WinEventEditor
             }
         }
 
+        // Restore selection/scroll if possible
+        if (list.Items.Count > 0)
+        {
+            list.SelectedIndex = Math.Clamp(prevSelected, -1, list.Items.Count - 1);
+            int visible = list.GetVisibleCount();
+            int max = Math.Max(0, list.Items.Count - visible);
+            list.ScrollOffset = Math.Clamp(prevScroll, 0, max);
+        }
+        else
+        {
+            list.SelectedIndex = -1;
+            list.ScrollOffset = 0;
+        }
+
         // Sync scrollbar max/value if present
         if (WindowManager.TryGetControl("winEventEditor", "sldCommands", out var sldCtrl) && sldCtrl is ScrollBar sb)
         {
@@ -263,6 +734,8 @@ public static class WinEventEditor
             sb.Max = max;
             sb.Value = Math.Clamp(list.ScrollOffset, sb.Min, sb.Max);
         }
+
+        LoadSelectedCommandToControls();
     }
 
     public static void OnCommandsListMouseDown()
@@ -286,6 +759,19 @@ public static class WinEventEditor
             sb.Max = max;
             sb.Value = Math.Clamp(list.ScrollOffset, sb.Min, sb.Max);
         }
+
+        LoadSelectedCommandToControls();
+    }
+
+    public static void OnCommandsListDoubleClick()
+    {
+        if (_isLoading) return;
+        if (!WindowManager.TryGetControl("winEventEditor", "lstCommands", out var ctrl) || ctrl is not ListBox list) return;
+        int selectedIndex = list.SelectedIndex;
+        if (selectedIndex < 0 || selectedIndex >= _commandIndexMap.Count) return;
+
+        var (listIndex, commandIndex) = _commandIndexMap[selectedIndex];
+        OpenCommandPicker(listIndex, commandIndex, isNew: false);
     }
 
     public static void OnCommandsListMouseWheel()
@@ -305,7 +791,7 @@ public static class WinEventEditor
     public static void OnCommandsScrollBarMove()
     {
         if (!WindowManager.TryGetControl("winEventEditor", "lstCommands", out var ctrl) || ctrl is not ListBox list) return;
-        if (!WindowManager.TryGetControl("winEventEditor", "sldCommands", out var sldCtrl)) return;
+        if (!WindowManager.TryGetControl("winEventEditor", "sldCommands", out var sldCtrl) || sldCtrl is null) return;
 
         int visible = list.GetVisibleCount();
         int max = Math.Max(0, list.Items.Count - visible);
@@ -333,7 +819,29 @@ public static class WinEventEditor
             LoadPageToControls();
             RefreshCommandsList();
         }
-        finally { _isLoading = false; }
+        finally
+        {
+            _isLoading = false;
+            RefreshPageButtons();
+        }
+    }
+
+    public static void OnSelectPage(int pageIndex)
+    {
+        if (_isLoading) return;
+        SelectedPage = pageIndex;
+        ClampSelectedPage();
+        _isLoading = true;
+        try
+        {
+            LoadPageToControls();
+            RefreshCommandsList();
+        }
+        finally
+        {
+            _isLoading = false;
+            RefreshPageButtons();
+        }
     }
 
     public static void OnNextPage()
@@ -347,7 +855,306 @@ public static class WinEventEditor
             LoadPageToControls();
             RefreshCommandsList();
         }
-        finally { _isLoading = false; }
+        finally
+        {
+            _isLoading = false;
+            RefreshPageButtons();
+        }
+    }
+
+    public static void OnAddCommand()
+    {
+        if (_isLoading) return;
+        if (!TryGetCurrentPage(out var page)) return;
+
+        // Ensure at least one command list exists
+        int listCount = Math.Max(1, page.CommandListCount);
+        var lists = page.CommandList ?? Array.Empty<Core.Globals.Type.CommandList>();
+        if (lists.Length < listCount)
+            Array.Resize(ref lists, listCount);
+
+        // Append to first list (simple/default path) and open picker to choose a command type
+        var list0 = lists[0];
+        int cmdCount = Math.Max(0, list0.CommandCount);
+        var cmds = list0.Commands ?? Array.Empty<Core.Globals.Type.EventCommand>();
+        Array.Resize(ref cmds, cmdCount + 1);
+        cmds[cmdCount].Index = -1;
+
+        list0.Commands = cmds;
+        list0.CommandCount = cmdCount + 1;
+        lists[0] = list0;
+
+        page.CommandList = lists;
+        page.CommandListCount = listCount;
+
+        SetCurrentPage(page);
+
+        RefreshCommandsList();
+        OpenCommandPicker(0, cmdCount, isNew: true);
+    }
+
+    public static void OnDeleteCommand()
+    {
+        if (_isLoading) return;
+        if (!TryGetCurrentPage(out var page)) return;
+
+        if (!WindowManager.TryGetControl("winEventEditor", "lstCommands", out var ctrl) || ctrl is not ListBox list)
+            return;
+
+        int selectedIndex = list.SelectedIndex;
+        if (selectedIndex < 0 || selectedIndex >= _commandIndexMap.Count)
+            return;
+
+        var (listIndex, commandIndex) = _commandIndexMap[selectedIndex];
+
+        int listCount = Math.Max(1, page.CommandListCount);
+        var lists = page.CommandList ?? Array.Empty<Core.Globals.Type.CommandList>();
+        if (lists.Length < listCount)
+            Array.Resize(ref lists, listCount);
+
+        if (listIndex < 0 || listIndex >= lists.Length)
+            return;
+
+        var cmdList = lists[listIndex];
+        int cmdCount = Math.Max(0, cmdList.CommandCount);
+        var cmds = cmdList.Commands ?? Array.Empty<Core.Globals.Type.EventCommand>();
+        if (cmds.Length < cmdCount)
+            Array.Resize(ref cmds, cmdCount);
+
+        if (commandIndex < 0 || commandIndex >= cmdCount)
+            return;
+
+        for (int i = commandIndex; i < cmdCount - 1; i++)
+            cmds[i] = cmds[i + 1];
+
+        if (cmdCount - 1 <= 0)
+        {
+            cmdList.Commands = Array.Empty<Core.Globals.Type.EventCommand>();
+            cmdList.CommandCount = 0;
+        }
+        else
+        {
+            Array.Resize(ref cmds, cmdCount - 1);
+            cmdList.Commands = cmds;
+            cmdList.CommandCount = cmdCount - 1;
+        }
+
+        lists[listIndex] = cmdList;
+        page.CommandList = lists;
+        page.CommandListCount = listCount;
+        SetCurrentPage(page);
+
+        RefreshCommandsList();
+
+        // Keep selection stable if possible
+        if (list.Items.Count > 0)
+            list.SelectedIndex = Math.Clamp(selectedIndex, 0, list.Items.Count - 1);
+        else
+            list.SelectedIndex = -1;
+    }
+
+    private static void OpenCommandPicker(int listIndex, int commandIndex, bool isNew)
+    {
+        _pickerTargetListIndex = listIndex;
+        _pickerTargetCommandIndex = commandIndex;
+        _pickerTargetIsNew = isNew;
+
+        WindowManager.ShowWindow("winEventCommandSelect", forced: true);
+        WireCommandPickerControls();
+        RefreshCommandPickerList();
+    }
+
+    private static void WireCommandPickerControls()
+    {
+        if (WindowManager.TryGetControl("winEventCommandSelect", "btnClose", out var btnClose) && btnClose is not null)
+            btnClose.CallBack[(int)ControlState.MouseDown] = OnCommandPickerCancel;
+        if (WindowManager.TryGetControl("winEventCommandSelect", "btnCancel", out var btnCancel) && btnCancel is not null)
+            btnCancel.CallBack[(int)ControlState.MouseDown] = OnCommandPickerCancel;
+        if (WindowManager.TryGetControl("winEventCommandSelect", "btnOk", out var btnOk) && btnOk is not null)
+            btnOk.CallBack[(int)ControlState.MouseDown] = OnCommandPickerOk;
+
+        if (WindowManager.TryGetControl("winEventCommandSelect", "lstEventCommands", out var listCtrl) && listCtrl is ListBox list)
+        {
+            list.CallBack[(int)ControlState.MouseDown] = OnCommandPickerListMouseDown;
+            list.CallBack[(int)ControlState.MouseScroll] = OnCommandPickerListMouseWheel;
+            list.CallBack[(int)ControlState.DoubleClick] = OnCommandPickerOk;
+        }
+
+        if (WindowManager.TryGetControl("winEventCommandSelect", "sldEventCommands", out var sldCtrl) && sldCtrl is ScrollBar sb)
+        {
+            sb.CallBack[(int)ControlState.MouseMove] = OnCommandPickerScrollBarMove;
+            sb.CallBack[(int)ControlState.MouseDown] = OnCommandPickerScrollBarMove;
+        }
+    }
+
+    private static void RefreshCommandPickerList()
+    {
+        if (!WindowManager.TryGetControl("winEventCommandSelect", "lstEventCommands", out var listCtrl) || listCtrl is not ListBox list)
+            return;
+
+        list.Clear();
+        _commandPickerValueMap.Clear();
+
+        foreach (EventCommand cmd in Enum.GetValues(typeof(EventCommand)))
+        {
+            list.AddItem(cmd.ToString());
+            _commandPickerValueMap.Add((int)cmd);
+        }
+
+        if (list.Items.Count > 0 && list.SelectedIndex < 0)
+            list.SelectedIndex = 0;
+
+        // Sync scrollbar
+        if (WindowManager.TryGetControl("winEventCommandSelect", "sldEventCommands", out var sldCtrl) && sldCtrl is ScrollBar sb)
+        {
+            int visible = list.GetVisibleCount();
+            int max = Math.Max(0, list.Items.Count - visible);
+            sb.Min = 0;
+            sb.Max = max;
+            sb.Value = Math.Clamp(list.ScrollOffset, sb.Min, sb.Max);
+        }
+    }
+
+    private static void SetPickedCommandIndex(int pickedIndex)
+    {
+        if (!TryGetCurrentPage(out var page)) return;
+
+        int listCount = Math.Max(1, page.CommandListCount);
+        var lists = page.CommandList ?? Array.Empty<Core.Globals.Type.CommandList>();
+        if (lists.Length < listCount)
+            Array.Resize(ref lists, listCount);
+
+        int li = Math.Clamp(_pickerTargetListIndex, 0, Math.Max(0, listCount - 1));
+        var list0 = lists[li];
+        int cmdCount = Math.Max(1, list0.CommandCount);
+        var cmds = list0.Commands ?? Array.Empty<Core.Globals.Type.EventCommand>();
+        if (cmds.Length < cmdCount)
+            Array.Resize(ref cmds, cmdCount);
+
+        int ci = Math.Clamp(_pickerTargetCommandIndex, 0, Math.Max(0, cmds.Length - 1));
+        cmds[ci].Index = pickedIndex;
+
+        list0.Commands = cmds;
+        list0.CommandCount = cmds.Length;
+        lists[li] = list0;
+
+        page.CommandList = lists;
+        page.CommandListCount = listCount;
+        SetCurrentPage(page);
+    }
+
+    public static void OnCommandPickerOk()
+    {
+        if (!WindowManager.TryGetControl("winEventCommandSelect", "lstEventCommands", out var listCtrl) || listCtrl is not ListBox list)
+            return;
+
+        int selected = list.SelectedIndex;
+        if (selected < 0 || selected >= _commandPickerValueMap.Count) return;
+
+        SetPickedCommandIndex(_commandPickerValueMap[selected]);
+        WindowManager.HideWindow("winEventCommandSelect");
+        RefreshCommandsList();
+
+        if (_pickerTargetIsNew)
+            OpenCommandDataEditor(_pickerTargetListIndex, _pickerTargetCommandIndex, isNew: true);
+    }
+
+    public static void OnCommandPickerCancel()
+    {
+        // If we inserted a new placeholder command and cancel out, remove it again.
+        if (_pickerTargetIsNew && TryGetCurrentPage(out var page))
+        {
+            int listCount = Math.Max(1, page.CommandListCount);
+            var lists = page.CommandList ?? Array.Empty<Core.Globals.Type.CommandList>();
+            if (lists.Length < listCount)
+                Array.Resize(ref lists, listCount);
+
+            int li = Math.Clamp(_pickerTargetListIndex, 0, Math.Max(0, listCount - 1));
+            var cl = lists[li];
+            var cmds = cl.Commands ?? Array.Empty<Core.Globals.Type.EventCommand>();
+            int ci = _pickerTargetCommandIndex;
+
+            if (ci >= 0 && ci < cmds.Length)
+            {
+                for (int i = ci; i < cmds.Length - 1; i++)
+                    cmds[i] = cmds[i + 1];
+                Array.Resize(ref cmds, Math.Max(0, cmds.Length - 1));
+
+                // Keep at least one command slot like legacy behavior
+                if (cmds.Length == 0)
+                {
+                    cmds = new Core.Globals.Type.EventCommand[1];
+                    cmds[0].Index = -1;
+                }
+
+                cl.Commands = cmds;
+                cl.CommandCount = cmds.Length;
+                lists[li] = cl;
+                page.CommandList = lists;
+                page.CommandListCount = listCount;
+                SetCurrentPage(page);
+            }
+        }
+
+        WindowManager.HideWindow("winEventCommandSelect");
+        RefreshCommandsList();
+    }
+
+    public static void OnCommandPickerListMouseDown()
+    {
+        if (!WindowManager.TryGetControl("winEventCommandSelect", "lstEventCommands", out var ctrl) || ctrl is not ListBox list) return;
+        var win = WindowManager.GetWindowByName("winEventCommandSelect");
+        if (win is null) return;
+
+        int relY = GameState.CurMouseY - (win.Y + ctrl.Y);
+        int index = list.GetItemIndexAtPosition(relY);
+        if (index < 0 || index >= list.Items.Count) return;
+
+        list.SelectedIndex = index;
+        list.EnsureVisible(index);
+
+        if (WindowManager.TryGetControl("winEventCommandSelect", "sldEventCommands", out var sldCtrl) && sldCtrl is ScrollBar sb)
+        {
+            int visible = list.GetVisibleCount();
+            int max = Math.Max(0, list.Items.Count - visible);
+            sb.Min = 0;
+            sb.Max = max;
+            sb.Value = Math.Clamp(list.ScrollOffset, sb.Min, sb.Max);
+        }
+    }
+
+    public static void OnCommandPickerListMouseWheel()
+    {
+        if (!WindowManager.TryGetControl("winEventCommandSelect", "lstEventCommands", out var ctrl) || ctrl is not ListBox list) return;
+
+        int visible = list.GetVisibleCount();
+        int max = Math.Max(0, list.Items.Count - visible);
+        int delta = GameClient.GetMouseScrollDelta();
+        int step = (delta > 0) ? -1 : 1;
+
+        list.ScrollOffset = Math.Clamp(list.ScrollOffset + step, 0, max);
+        if (WindowManager.TryGetControl("winEventCommandSelect", "sldEventCommands", out var sldCtrl) && sldCtrl is ScrollBar sb)
+            sb.Value = Math.Clamp(list.ScrollOffset, sb.Min, sb.Max);
+    }
+
+    public static void OnCommandPickerScrollBarMove()
+    {
+        if (!WindowManager.TryGetControl("winEventCommandSelect", "lstEventCommands", out var ctrl) || ctrl is not ListBox list) return;
+        if (!WindowManager.TryGetControl("winEventCommandSelect", "sldEventCommands", out var sldCtrl) || sldCtrl is null) return;
+
+        int visible = list.GetVisibleCount();
+        int max = Math.Max(0, list.Items.Count - visible);
+
+        if (sldCtrl is ScrollBar sb)
+        {
+            sb.Min = 0;
+            sb.Max = max;
+            list.ScrollOffset = Math.Clamp(sb.Value, sb.Min, sb.Max);
+        }
+        else
+        {
+            list.ScrollOffset = Math.Clamp(sldCtrl.Value, 0, max);
+        }
     }
 
     private static Core.Globals.Type.EventPage CreateDefaultPage()
@@ -367,7 +1174,7 @@ public static class WinEventEditor
     {
         if (_isLoading) return;
 
-        var ev = global::Client.Event.Instance;
+        var ev = Client.Event.Instance;
         int pageCount = Math.Max(1, ev.PageCount);
 
         var pages = ev.Pages ?? Array.Empty<Core.Globals.Type.EventPage>();
@@ -376,7 +1183,7 @@ public static class WinEventEditor
 
         ev.Pages = pages;
         ev.PageCount = pageCount + 1;
-        global::Client.Event.Instance = ev;
+        Client.Event.Instance = ev;
 
         SelectedPage = pageCount;
         ClampSelectedPage();
@@ -388,14 +1195,18 @@ public static class WinEventEditor
             LoadPageToControls();
             RefreshCommandsList();
         }
-        finally { _isLoading = false; }
+        finally
+        {
+            _isLoading = false;
+            RefreshPageButtons();
+        }
     }
 
     public static void OnDeletePage()
     {
         if (_isLoading) return;
 
-        var ev = global::Client.Event.Instance;
+        var ev = Client.Event.Instance;
         int pageCount = Math.Max(1, ev.PageCount);
         if (pageCount <= 1) return;
         if (ev.Pages == null || ev.Pages.Length < pageCount) return;
@@ -407,7 +1218,7 @@ public static class WinEventEditor
 
         Array.Resize(ref ev.Pages, pageCount - 1);
         ev.PageCount = pageCount - 1;
-        global::Client.Event.Instance = ev;
+        Client.Event.Instance = ev;
 
         SelectedPage = Math.Clamp(removeAt, 0, ev.PageCount - 1);
         ClampSelectedPage();
@@ -419,13 +1230,17 @@ public static class WinEventEditor
             LoadPageToControls();
             RefreshCommandsList();
         }
-        finally { _isLoading = false; }
+        finally
+        {
+            _isLoading = false;
+            RefreshPageButtons();
+        }
     }
 
     public static void OnOk()
     {
-        global::Client.Event.EventEditorOK();
-        global::Client.Event.InEvent = false;
+        Client.Event.EventEditorOK();
+        Client.Event.InEvent = false;
         WindowManager.HideWindow("winEventEditor");
     }
 
@@ -443,23 +1258,23 @@ public static class WinEventEditor
                 Client.Map.Instance[playerMap].Event[eventNum] = _history;
             }
 
-            global::Client.Event.Instance = _history;
+            Client.Event.Instance = _history;
         }
 
-        global::Client.Event.InEvent = false;
+        Client.Event.InEvent = false;
         WindowManager.HideWindow("winEventEditor");
     }
 
     public static void SetEventNameFromControl(string? name)
     {
         if (_isLoading) return;
-        global::Client.Event.Instance.Name = name ?? string.Empty;
+        Client.Event.Instance.Name = name ?? string.Empty;
     }
 
     public static void ToggleGlobalFromControl(int value)
     {
         if (_isLoading) return;
-        global::Client.Event.Instance.Globals = (byte)(value == 1 ? 1 : 0);
+        Client.Event.Instance.Globals = (byte)(value == 1 ? 1 : 0);
     }
 
     public static void UpdatePageSettingsFromControls()
