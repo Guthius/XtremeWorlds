@@ -652,11 +652,11 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     {
         var packetReader = new PacketReader(data);
 
-        var npcNum = packetReader.ReadInt32();
+        var n = packetReader.ReadInt32();
 
-        if (npcNum == 0)
+        if (n == 0)
         {
-            Core.Objects.NpcBase.Instance.Clear();
+            Npc.Instance.Clear();
         }
 
         var npc = new Core.Objects.NpcBase
@@ -695,9 +695,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         npc.Level = packetReader.ReadByte();
         npc.Damage = packetReader.ReadInt32();
 
-        Core.Objects.NpcBase.Instance.Add(npc);
+        Npc.Instance.Add(npc);
 
-        if ((npcNum + 1) == Variables.MaxNpcs)
+        if ((n + 1) == Variables.MaxNpcs)
         {
             if (GameState.InitNpcEditor)
             {

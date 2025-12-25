@@ -388,38 +388,7 @@ public static class NetworkSend
         var packetWriter = new PacketWriter();
 
         packetWriter.WriteEnum(ServerPackets.SUpdateSkill);
-        packetWriter.WriteInt32(index);
-        packetWriter.WriteInt32(Skill.Instance[index].AccessReq);
-        packetWriter.WriteInt32(Skill.Instance[index].AoE);
-        packetWriter.WriteInt32(Skill.Instance[index].CastAnim);
-        packetWriter.WriteInt32(Skill.Instance[index].CastTime);
-        packetWriter.WriteInt32(Skill.Instance[index].CdTime);
-        packetWriter.WriteInt32(Skill.Instance[index].JobReq);
-        packetWriter.WriteInt32(Skill.Instance[index].Dir);
-        packetWriter.WriteInt32(Skill.Instance[index].Duration);
-        packetWriter.WriteInt32(Skill.Instance[index].Icon);
-        packetWriter.WriteInt32(Skill.Instance[index].Interval);
-        packetWriter.WriteBoolean(Skill.Instance[index].IsAoE);
-        packetWriter.WriteInt32(Skill.Instance[index].LevelReq);
-        packetWriter.WriteInt32(Skill.Instance[index].Map);
-        packetWriter.WriteInt32(Skill.Instance[index].MpCost);
-        packetWriter.WriteString(Skill.Instance[index].Name);
-        packetWriter.WriteInt32(Skill.Instance[index].Range);
-        packetWriter.WriteInt32(Skill.Instance[index].SkillAnim);
-        packetWriter.WriteInt32(Skill.Instance[index].StunDuration);
-        packetWriter.WriteInt32(Skill.Instance[index].Type);
-        packetWriter.WriteInt32(Skill.Instance[index].Vital);
-        packetWriter.WriteInt32(Skill.Instance[index].X);
-        packetWriter.WriteInt32(Skill.Instance[index].Y);
-        packetWriter.WriteInt32(Skill.Instance[index].IsProjectile);
-        packetWriter.WriteInt32(Skill.Instance[index].Projectile);
-        packetWriter.WriteInt32(Skill.Instance[index].KnockBack);
-        packetWriter.WriteInt32(Skill.Instance[index].KnockBackTiles);
-        packetWriter.WriteInt32(Skill.Instance[index].MultiDirMask);
-        packetWriter.WriteInt32(Skill.Instance[index].ChainOnHitSkillId);
-        packetWriter.WriteInt32(Skill.Instance[index].CommonEventType);
-        packetWriter.WriteInt32(Skill.Instance[index].CommonEventData1);
-        packetWriter.WriteInt32(Skill.Instance[index].CommonEventData2);
+        WriteSkillDataToPacket(index, packetWriter);
 
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
     }
@@ -429,39 +398,48 @@ public static class NetworkSend
         var packetWriter = new PacketWriter();
 
         packetWriter.WriteEnum(ServerPackets.SUpdateSkill);
-        packetWriter.WriteInt32(skillNum);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].AccessReq);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].AoE);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].CastAnim);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].CastTime);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].CdTime);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].JobReq);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].Dir);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].Duration);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].Icon);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].IsAoE ? 1 : 0);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].LevelReq);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].Map);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].MpCost);
-        packetWriter.WriteString(Skill.Instance[skillNum].Name);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].Range);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].SkillAnim);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].StunDuration);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].Type);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].Vital);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].X);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].Y);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].IsProjectile);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].Projectile);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].KnockBack);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].KnockBackTiles);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].MultiDirMask);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].ChainOnHitSkillId);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].CommonEventType);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].CommonEventData1);
-        packetWriter.WriteInt32(Skill.Instance[skillNum].CommonEventData2);
+        WriteSkillDataToPacket(skillNum, packetWriter);
 
         PlayerService.Instance.SendDataToAll(packetWriter.GetBytes());
+    }
+
+    private static void WriteSkillDataToPacket(int index, PacketWriter packetWriter)
+    {
+        packetWriter.WriteInt32(index);
+
+        var skill = index >= 0 && index < Skill.Instance.Count ? Skill.Instance[index] : new Skill();
+
+        packetWriter.WriteInt32(skill.AccessReq);
+        packetWriter.WriteInt32(skill.AoE);
+        packetWriter.WriteInt32(skill.CastAnim);
+        packetWriter.WriteInt32(skill.CastTime);
+        packetWriter.WriteInt32(skill.CdTime);
+        packetWriter.WriteInt32(skill.JobReq);
+        packetWriter.WriteInt32(skill.Dir);
+        packetWriter.WriteInt32(skill.Duration);
+        packetWriter.WriteInt32(skill.Icon);
+        packetWriter.WriteInt32(skill.Interval);
+        packetWriter.WriteBoolean(skill.IsAoE);
+        packetWriter.WriteInt32(skill.LevelReq);
+        packetWriter.WriteInt32(skill.Map);
+        packetWriter.WriteInt32(skill.MpCost);
+        packetWriter.WriteString(skill.Name ?? string.Empty);
+        packetWriter.WriteInt32(skill.Range);
+        packetWriter.WriteInt32(skill.SkillAnim);
+        packetWriter.WriteInt32(skill.StunDuration);
+        packetWriter.WriteInt32(skill.Type);
+        packetWriter.WriteInt32(skill.Vital);
+        packetWriter.WriteInt32(skill.X);
+        packetWriter.WriteInt32(skill.Y);
+        packetWriter.WriteInt32(skill.IsProjectile);
+        packetWriter.WriteInt32(skill.Projectile);
+        packetWriter.WriteInt32(skill.KnockBack);
+        packetWriter.WriteInt32(skill.KnockBackTiles);
+        packetWriter.WriteInt32(skill.MultiDirMask);
+        packetWriter.WriteInt32(skill.ChainOnHitSkillId);
+        packetWriter.WriteInt32(skill.CommonEventType);
+        packetWriter.WriteInt32(skill.CommonEventData1);
+        packetWriter.WriteInt32(skill.CommonEventData2);
     }
 
     public static void SendStats(int playerId)
@@ -1869,59 +1847,18 @@ public static class NetworkSend
 
     public static void SendNpcs(int playerId)
     {
-        var npcCount = Npc.Instance.Count;
-        var loopTo = Math.Min(Core.Globals.Variables.MaxNpcs, npcCount);
-        for (var npcNum = 0; npcNum < loopTo; npcNum++)
+        for (var i = 0; i < Variables.MaxNpcs; i++)
         {
-            SendUpdateNpcTo(playerId, npcNum);
+            SendUpdateNpcTo(playerId, i);
         }
     }
 
     public static void SendUpdateNpcTo(int playerId, int npcNum)
     {
-        if (npcNum < 0 || npcNum >= Npc.Instance.Count)
-        {
-            return;
-        }
-
-        var npc = Npc.Instance[npcNum];
         var buffer = new PacketWriter();
 
         buffer.WriteEnum(ServerPackets.SUpdateNpc);
-        buffer.WriteInt32(npcNum);
-        buffer.WriteInt32(npc.Animation);
-        buffer.WriteString(npc.AttackSay ?? string.Empty);
-        buffer.WriteByte(npc.Behavior);
-
-        for (var i = 0; i < Core.Globals.Variables.MaxDropItems; i++)
-        {
-            buffer.WriteInt32(npc.DropChance != null ? npc.DropChance[i] : 0);
-            buffer.WriteInt32(npc.DropItem != null ? npc.DropItem[i] : 0);
-            buffer.WriteInt32(npc.DropItemValue != null ? npc.DropItemValue[i] : 0);
-        }
-
-        buffer.WriteInt32(npc.Experience);
-        buffer.WriteByte(npc.Faction);
-        buffer.WriteInt32(npc.Hp);
-        buffer.WriteString(npc.Name ?? string.Empty);
-        buffer.WriteByte(npc.Range);
-        buffer.WriteByte(npc.SpawnTime);
-        buffer.WriteInt32(npc.SpawnSecs);
-        buffer.WriteInt32(npc.Sprite);
-
-        var statCount = Enum.GetValues<Stat>().Length;
-        for (var i = 0; i < statCount; i++)
-        {
-            buffer.WriteByte(npc.Stat != null ? npc.Stat[i] : (byte)0);
-        }
-
-        for (var i = 0; i < Core.Globals.Variables.MaxNpcSkills; i++)
-        {
-            buffer.WriteByte(npc.Skill != null ? npc.Skill[i] : (byte)0);
-        }
-
-        buffer.WriteByte(Npc.Instance[npcNum].Level);
-        buffer.WriteInt32(Npc.Instance[npcNum].Damage);
+        WriteNpcDataToPacket(npcNum, buffer);
 
         PlayerService.Instance.SendDataTo(playerId, buffer.GetBytes());
     }
@@ -1931,42 +1868,51 @@ public static class NetworkSend
         var packet = new PacketWriter();
 
         packet.WriteEnum(ServerPackets.SUpdateNpc);
-        packet.WriteInt32(npcNum);
-        packet.WriteInt32(Npc.Instance[npcNum].Animation);
-        packet.WriteString(Npc.Instance[npcNum].AttackSay ?? string.Empty);
-        packet.WriteByte(Npc.Instance[npcNum].Behavior);
+        WriteNpcDataToPacket(npcNum, packet);
+
+        PlayerService.Instance.SendDataToAll(packet.GetBytes());
+    }
+
+    private static void WriteNpcDataToPacket(int index, PacketWriter packet)
+    {
+        packet.WriteInt32(index);
+
+        var npc = new Npc();
+        if (Npc.Instance.Count > index)
+            npc = (Npc)Npc.Instance[index];
+
+        packet.WriteInt32(npc.Animation);
+        packet.WriteString(npc.AttackSay ?? string.Empty);
+        packet.WriteByte(npc.Behavior);
 
         for (var i = 0; i < Core.Globals.Variables.MaxDropItems; i++)
         {
-            packet.WriteInt32(Npc.Instance[npcNum].DropChance != null ? Npc.Instance[npcNum].DropChance[i] : 0);
-            packet.WriteInt32(Npc.Instance[npcNum].DropItem != null ? Npc.Instance[npcNum].DropItem[i] : 0);
-            packet.WriteInt32(Npc.Instance[npcNum].DropItemValue != null ? Npc.Instance[npcNum].DropItemValue[i] : 0);
+            packet.WriteInt32(npc.DropChance != null && npc.DropChance.Length > i ? npc.DropChance[i] : 0);
+            packet.WriteInt32(npc.DropItem != null && npc.DropItem.Length > i ? npc.DropItem[i] : 0);
+            packet.WriteInt32(npc.DropItemValue != null && npc.DropItemValue.Length > i ? npc.DropItemValue[i] : 0);
         }
 
-        packet.WriteInt32(Npc.Instance[npcNum].Experience);
-        packet.WriteByte(Npc.Instance[npcNum].Faction);
-        packet.WriteInt32(Npc.Instance[npcNum].Hp);
-        packet.WriteString(Npc.Instance[npcNum].Name ?? string.Empty);
-        packet.WriteByte(Npc.Instance[npcNum].Range);
-        packet.WriteByte(Npc.Instance[npcNum].SpawnTime);
-        packet.WriteInt32(Npc.Instance[npcNum].SpawnSecs);
-        packet.WriteInt32(Npc.Instance[npcNum].Sprite);
+        packet.WriteInt32(npc.Experience);
+        packet.WriteByte(npc.Faction);
+        packet.WriteInt32(npc.Hp);
+        packet.WriteString(npc.Name ?? string.Empty);
+        packet.WriteByte(npc.Range);
+        packet.WriteByte(npc.SpawnTime);
+        packet.WriteInt32(npc.SpawnSecs);
+        packet.WriteInt32(npc.Sprite);
 
-        var statCount = Enum.GetValues<Stat>().Length;
-        for (var i = 0; i < statCount; i++)
+        for (var i = 0; i < StatCount; i++)
         {
-            packet.WriteByte(Npc.Instance[npcNum].Stat != null ? Npc.Instance[npcNum].Stat[i] : (byte)0);
+            packet.WriteByte(npc.Stat != null && npc.Stat.Length > i ? npc.Stat[i] : (byte)0);
         }
 
         for (var i = 0; i < Core.Globals.Variables.MaxNpcSkills; i++)
         {
-            packet.WriteByte(Npc.Instance[npcNum].Skill != null ? Npc.Instance[npcNum].Skill[i] : (byte)0);
+            packet.WriteByte(npc.Skill != null && npc.Skill.Length > i ? npc.Skill[i] : (byte)0);
         }
 
-        packet.WriteByte(Npc.Instance[npcNum].Level);
-        packet.WriteInt32(Npc.Instance[npcNum].Damage);
-
-        PlayerService.Instance.SendDataToAll(packet.GetBytes());
+        packet.WriteByte(npc.Level);
+        packet.WriteInt32(npc.Damage);
     }
 
     public static void SendMapNpcVitals(int map, byte mapNpcNum)
