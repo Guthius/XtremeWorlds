@@ -133,11 +133,11 @@ public static class Network
                             parts.Add($"{name}({id}):{snapshot[i].Value}");
                         }
 
-                        Console.WriteLine($"[SEND] bytes={bytes} header={{ {string.Join(", ", parts)} }}");
+                        Console.WriteLine($"[SEND] Bytes={bytes} Header={string.Join(",", parts)}");
                     }
                     else
                     {
-                        Console.WriteLine($"[SEND] bytes={bytes} header={{ }}");
+                        Console.WriteLine($"[SEND] Bytes={bytes} Header={{}}");
                     }
                 }
                 catch
