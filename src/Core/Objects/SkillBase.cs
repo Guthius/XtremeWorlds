@@ -49,14 +49,6 @@ public class SkillBase : IData
 
     public static List<SkillBase> Instance { get; } = new();
 
-    static SkillBase()
-    {
-        for (var i = 0; i < Variables.MaxSkills; i++)
-        {
-            Instance.Add(new SkillBase());
-        }
-    }
-
     public static void OnClear(int index)
     {
         if (Instance.Count > index)
