@@ -507,7 +507,8 @@ namespace Client
 
             if (GameState.InitEventEditor)
             {
-                new EditorEvent().Show();
+                WindowManager.ShowWindow("winEventEditor");
+                Client.Game.UI.Windows.WinEventEditor.Init();
                 GameState.InitEventEditor = false;
             }
 

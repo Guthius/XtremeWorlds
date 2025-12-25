@@ -782,6 +782,7 @@ public class WindowManager
             Safe("UpdateWindow_ProjectileEditor", () => ui.UpdateWindow_ProjectileEditor());
             Safe("UpdateWindow_AnimationEditor", () => ui.UpdateWindow_AnimationEditor());
             Safe("UpdateWindow_SkillEditor", () => ui.UpdateWindow_SkillEditor());
+            Safe("UpdateWindow_EventEditor", () => ui.UpdateWindow_EventEditor());
         }
         else
         {

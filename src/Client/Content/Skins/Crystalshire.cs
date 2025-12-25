@@ -3531,4 +3531,77 @@ public class Crystalshire
         if (WindowManager.TryGetControl("winSkillEditor", "btnCopy", out var btnCopy))
             btnCopy.CallBack[(int)ControlState.MouseDown] = WinSkillEditor.OnCopy;
     }
+
+    public void UpdateWindow_EventEditor()
+    {
+        var window = WindowLoader.FromLayout("winEventEditor");
+
+        // Close / cancel
+        if (WindowManager.TryGetControl("winEventEditor", "btnClose", out var btnClose))
+            btnClose.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnCancel;
+        if (WindowManager.TryGetControl("winEventEditor", "btnCancel", out var btnCancel))
+            btnCancel.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnCancel;
+
+        // OK
+        if (WindowManager.TryGetControl("winEventEditor", "btnOk", out var btnOk))
+            btnOk.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnOk;
+
+        // Page navigation
+        if (WindowManager.TryGetControl("winEventEditor", "btnPrevPage", out var btnPrev))
+            btnPrev.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnPrevPage;
+        if (WindowManager.TryGetControl("winEventEditor", "btnNextPage", out var btnNext))
+            btnNext.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnNextPage;
+        if (WindowManager.TryGetControl("winEventEditor", "btnAddPage", out var btnAdd))
+            btnAdd.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnAddPage;
+        if (WindowManager.TryGetControl("winEventEditor", "btnDeletePage", out var btnDel))
+            btnDel.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnDeletePage;
+
+        // Name
+        if (WindowManager.TryGetControl("winEventEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
+        {
+            txtName.CallBack[(int)ControlState.KeyUp] = () => WinEventEditor.SetEventNameFromControl(txtName.Text);
+        }
+
+        // Global
+        if (WindowManager.TryGetControl("winEventEditor", "chkGlobal", out var globalCtrl) && globalCtrl is CheckBox chkGlobal)
+        {
+            chkGlobal.CallBack[(int)ControlState.MouseDown] = () =>
+            {
+                chkGlobal.Value = chkGlobal.Value == 0 ? 1 : 0;
+                WinEventEditor.ToggleGlobalFromControl(chkGlobal.Value);
+            };
+        }
+
+        // Page setting controls: apply on click/move (matches other editors)
+        void WirePageSetting(string controlName)
+        {
+            if (!WindowManager.TryGetControl("winEventEditor", controlName, out var ctrl))
+                return;
+            ctrl.CallBack[(int)ControlState.MouseMove] = WinEventEditor.UpdatePageSettingsFromControls;
+            ctrl.CallBack[(int)ControlState.MouseDown] = WinEventEditor.UpdatePageSettingsFromControls;
+        }
+
+        WirePageSetting("cmbTrigger");
+        WirePageSetting("cmbPositioning");
+        WirePageSetting("cmbMoveType");
+        WirePageSetting("cmbMoveSpeed");
+        WirePageSetting("cmbMoveFreq");
+        WirePageSetting("chkWalkAnim");
+        WirePageSetting("chkDirFix");
+        WirePageSetting("chkWalkThrough");
+        WirePageSetting("chkShowName");
+
+        // Commands list + scrollbar
+        if (WindowManager.TryGetControl("winEventEditor", "lstCommands", out var lstCtrl) && lstCtrl is ListBox lst)
+        {
+            lst.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnCommandsListMouseDown;
+            lst.CallBack[(int)ControlState.MouseScroll] = WinEventEditor.OnCommandsListMouseWheel;
+        }
+
+        if (WindowManager.TryGetControl("winEventEditor", "sldCommands", out var sldCtrl) && sldCtrl is ScrollBar sb)
+        {
+            sb.CallBack[(int)ControlState.MouseMove] = WinEventEditor.OnCommandsScrollBarMove;
+            sb.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnCommandsScrollBarMove;
+        }
+    }
 }
