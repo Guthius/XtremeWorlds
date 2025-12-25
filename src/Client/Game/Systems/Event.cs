@@ -526,7 +526,7 @@ namespace Client
                                         }
                                         case 4:
                                         {
-                                            EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Conditional Branch: Player Knows Skill [" + Strings.Trim(Data.Skill[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].ConditionalBranch.Data1].Name) + "]");
+                                            EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Conditional Branch: Player Knows Skill [" + Strings.Trim(Skill.Instance[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].ConditionalBranch.Data1].Name) + "]");
                                             break;
                                         }
                                         case 5:
@@ -1058,11 +1058,11 @@ namespace Client
                                 {
                                     if (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data2 == 0)
                                     {
-                                        EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Teach Player Skill [" + Strings.Trim(Data.Skill[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1].Name) + "]");
+                                        EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Teach Player Skill [" + Strings.Trim(Skill.Instance[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1].Name) + "]");
                                     }
                                     else if (Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data2 == 1)
                                     {
-                                        EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Remove Player Skill [" + Strings.Trim(Data.Skill[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1].Name) + "]");
+                                        EditorEvent.Instance.lstCommands.Items.Add(indent + "@>" + "Remove Player Skill [" + Strings.Trim(Skill.Instance[Instance.Pages[CurPageNum].CommandList[curlist].Commands[i].Data1].Name) + "]");
                                     }
 
                                     break;

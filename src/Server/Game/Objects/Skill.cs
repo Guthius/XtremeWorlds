@@ -13,20 +13,11 @@ namespace Server
     {
         public static Task OnLoadAllAsync()
         {
-            EnsureSize(Core.Globals.Variables.MaxSkills);
             return Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxSkills), OnLoadAsync);
         }
 
-        public new static void OnSave(int index)
+        public static void OnSave(int index)
         {
-            if (index < 0 || index >= Core.Globals.Variables.MaxSkills)
-            {
-                return;
-            }
-
-            EnsureSize(index + 1);
-            SyncToData(index);
-
             string json = JsonConvert.SerializeObject(Skill.Instance[index]).ToString();
 
             if (Database.RowExists(index, "skill"))
@@ -48,17 +39,9 @@ namespace Server
                 return;
             }
 
-            EnsureSize(index + 1);
-
             var skillData = JObject.FromObject(data).ToObject<Skill>();
+
             Skill.Instance[index] = skillData ?? new Skill();
-
-            if (Skill.Instance[index].Name is null)
-            {
-                Skill.Instance[index].Name = string.Empty;
-            }
-
-            SyncToData(index);
         }
     }
 }

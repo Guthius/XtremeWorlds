@@ -2073,7 +2073,7 @@ namespace Client
                         {
                             if ((int) Player.Instance[(int) i].Skill[GameState.SkillBuffer].Num >= 0)
                             {
-                                if (Data.Skill[(int) Player.Instance[(int) i].Skill[GameState.SkillBuffer].Num]
+                                if (Skill.Instance[(int) Player.Instance[(int) i].Skill[GameState.SkillBuffer].Num]
                                         .CastTime > 0)
                                 {
                                     // lock to player
@@ -2084,8 +2084,7 @@ namespace Client
                                     // calculate the width to fill
                                     if (width > 0L)
                                         barWidth = (long) Math.Round((General.GetTickCount() - GameState.SkillBufferTimer) /
-                                            (double) (Data
-                                                .Skill[(int) Player.Instance[(int) i].Skill[GameState.SkillBuffer].Num]
+                                            (double) (Client.Skill.Instance[(int) Player.Instance[(int) i].Skill[GameState.SkillBuffer].Num]
                                                 .CastTime * 1000) * width);
 
                                     // draw bar background

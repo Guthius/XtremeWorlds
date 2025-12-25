@@ -108,7 +108,7 @@ namespace Client.Game.UI.Windows
                 cmbSkill.Items.Add("None");
                 for (int i = 0; i < Variables.MaxSkills; i++)
                 {
-                    var raw = Data.Skill[i].Name ?? string.Empty;
+                    var raw = Skill.Instance[i].Name ?? string.Empty;
                     var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
                     cmbSkill.Items.Add($"{i + 1}: {name}");
                 }
@@ -215,7 +215,7 @@ namespace Client.Game.UI.Windows
                 for (int i = 0; i < Variables.MaxStartSkills; i++)
                 {
                     int sid = job.StartSkill[i];
-                    string sname = sid >= 0 && sid < Variables.MaxSkills ? Data.Skill[sid].Name : "(None)";
+                    string sname = sid >= 0 && sid < Variables.MaxSkills ? Skill.Instance[sid].Name : "(None)";
                     lstSkills.AddItem($"{i + 1}: {sname}");
                 }
                 lstSkills.SelectedIndex = 0;

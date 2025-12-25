@@ -951,9 +951,9 @@ namespace Client
                 return;
 
             // Check if player has enough MP
-            if (GetPlayerVital(GameState.MyIndex,Core.Globals.Vital.Mana) < Data.Skill[Player.Instance[GameState.MyIndex].Skill[skillSlot].Num].MpCost)
+            if (GetPlayerVital(GameState.MyIndex,Core.Globals.Vital.Mana) < Client.Skill.Instance[Player.Instance[GameState.MyIndex].Skill[skillSlot].Num].MpCost)
             {
-                TextRenderer.AddText("Not enough mana to cast " + Data.Skill[Player.Instance[GameState.MyIndex].Skill[skillSlot].Num].Name + ".", (int) ColorName.BrightRed);
+                TextRenderer.AddText("Not enough mana to cast " + Client.Skill.Instance[Player.Instance[GameState.MyIndex].Skill[skillSlot].Num].Name + ".", (int) ColorName.BrightRed);
                 return;
             }
 

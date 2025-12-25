@@ -116,7 +116,7 @@ public class WinNpcEditor
                 cmb.Items.Clear();
                 for (int i = 0; i < Variables.MaxSkills; i++)
                 {
-                    var raw = Data.Skill[i].Name ?? string.Empty;
+                    var raw = Skill.Instance[i].Name ?? string.Empty;
                     var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
                     cmb.Items.Add($"{i + 1}: {name}");
                 }

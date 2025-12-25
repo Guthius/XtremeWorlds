@@ -263,7 +263,7 @@ public class Projectile : ProjectileBase, IAsyncData
             return;
         }
 
-        var projectile = itemNum >= 0 ? Item.Instance[itemNum].Projectile : skillNum >= 0 ? Data.Skill[skillNum].Projectile : -1;
+        var projectile = itemNum >= 0 ? Item.Instance[itemNum].Projectile : skillNum >= 0 ? Skill.Instance[skillNum].Projectile : -1;
         if (projectile == -1)
         {
             return;
@@ -316,7 +316,7 @@ public class Projectile : ProjectileBase, IAsyncData
         }
 
         // Skill-defined projectile
-        var projectile = skillNum >= 0 ? Data.Skill[skillNum].Projectile : -1;
+        var projectile = skillNum >= 0 ? Skill.Instance[skillNum].Projectile : -1;
         if (projectile == -1)
         {
             return;

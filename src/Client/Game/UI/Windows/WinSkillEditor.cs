@@ -2,6 +2,7 @@
 using Client.Game.UI.Controls;
 using Client.Net;
 using Core.Globals;
+using Core.Objects;
 using System;
 using System.IO;
 
@@ -10,7 +11,7 @@ namespace Client.Game.UI.Windows;
 public class WinSkillEditor
 {
     public static int SelectedIndex = 0;
-    private static Core.Globals.Type.Skill? _history;
+    private static Skill? _history;
 
     public static void Init()
     {
@@ -34,7 +35,7 @@ public class WinSkillEditor
         list.Clear();
         for (int i = 0; i < Variables.MaxSkills; i++)
         {
-            string name = Strings.Trim(Data.Skill[i].Name);
+            string name = Strings.Trim(Skill.Instance[i].Name);
             if (string.IsNullOrWhiteSpace(name)) name = "None";
             list.AddItem($"{i + 1}: {name}");
         }
@@ -122,7 +123,7 @@ public class WinSkillEditor
         if (index < 0 || index >= Variables.MaxSkills) return;
         SelectedIndex = index;
         GameState.EditorIndex = index;
-        var s = Data.Skill[index];
+        var s = Skill.Instance[index];
 
         // Name
         if (WindowManager.TryGetControl("winSkillEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
@@ -204,7 +205,7 @@ public class WinSkillEditor
         if (win is null) return;
 
         if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxSkills) return;
-        var s = Data.Skill[SelectedIndex];
+        var s = Skill.Instance[SelectedIndex];
 
         if (s.Icon < 1 || s.Icon > GameState.NumSkills) return;
 
@@ -228,13 +229,13 @@ public class WinSkillEditor
 
         if (_history is null)
         {
-            _history = Data.Skill[SelectedIndex];
+            _history = (Skill)Skill.Instance[SelectedIndex];
             if (WindowManager.TryGetControl("winSkillEditor", "btnCopy", out var btn) && btn is Button b)
                 b.Text = "Paste";
             return;
         }
 
-        Data.Skill[SelectedIndex] = _history.Value;
+        Skill.Instance[SelectedIndex] = _history;
         GameState.SkillChanged[SelectedIndex] = true;
         OnLoad(SelectedIndex);
         RefreshList();

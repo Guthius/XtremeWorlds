@@ -1453,7 +1453,7 @@ namespace Client
             cmbCondition_LearntSkill.Items.Clear();
 
             for (i = 0; i < Variables.MaxSkills; i++)
-                cmbCondition_LearntSkill.Items.Add(i + 1 + ". " + Strings.Trim(Data.Skill[i].Name));
+                cmbCondition_LearntSkill.Items.Add(i + 1 + ". " + Strings.Trim(Skill.Instance[i].Name));
             cmbCondition_LearntSkill.SelectedIndex = 0;
             cmbCondition_LevelCompare.Enabled = false;
             cmbCondition_LevelCompare.SelectedIndex = 0;
@@ -1513,7 +1513,7 @@ namespace Client
                 cmbChangeSkills.Items.Clear();
 
                 for (i = 0; i < Variables.MaxSkills; i++)
-                    cmbChangeSkills.Items.Add(Data.Skill[i].Name);
+                    cmbChangeSkills.Items.Add(Skill.Instance[i].Name);
                 cmbChangeSkills.SelectedIndex = 0;
                 cmbChangeJob.Items.Clear();
 

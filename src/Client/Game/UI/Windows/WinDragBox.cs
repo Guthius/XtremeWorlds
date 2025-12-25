@@ -47,7 +47,7 @@ public class WinDragBox
             case DraggablePartType.Skill:
                 if (dragBox.Value >= 0)
                 {
-                    var icon = Data.Skill[dragBox.Value].Icon;
+                    var icon = Skill.Instance[dragBox.Value].Icon;
                     if (icon <= 0 || icon > GameState.NumSkills)
                     {
                         return;

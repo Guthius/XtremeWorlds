@@ -221,7 +221,7 @@ public class WinItemEditor
             cmbSkill.Items.Clear();
             cmbSkill.Items.Add("None");
             for (int i = 0; i < Variables.MaxSkills; i++)
-                cmbSkill.Items.Add($"{i + 1}: {Data.Skill[i].Name}");
+                cmbSkill.Items.Add($"{i + 1}: {Skill.Instance[i].Name}");
         }
 
         // Projectile list

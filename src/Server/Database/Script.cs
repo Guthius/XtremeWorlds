@@ -388,9 +388,9 @@ public class Script
 
         if (skillNum >= 0)
         {
-            idType = Data.Skill[skillNum].CommonEventType - 1;
-            n = Data.Skill[skillNum].CommonEventData1;
-            n2 = Data.Skill[skillNum].CommonEventData2;
+            idType = Skill.Instance[skillNum].CommonEventType - 1;
+            n = Skill.Instance[skillNum].CommonEventData1;
+            n2 = Skill.Instance[skillNum].CommonEventData2;
         }
         else
         {
@@ -483,10 +483,10 @@ public class Script
             return;
 
         // Make sure they are the right class
-        if (Data.Skill[n].JobReq == GetPlayerJob(index) | Data.Skill[n].JobReq == -1)
+        if (Skill.Instance[n].JobReq == GetPlayerJob(index) | Skill.Instance[n].JobReq == -1)
         {
             // Make sure they are the right level
-            i = Data.Skill[n].LevelReq;
+            i = Skill.Instance[n].LevelReq;
 
             if (i <= GetPlayerLevel(index))
             {
@@ -525,7 +525,7 @@ public class Script
         }
         else
         {
-            NetworkSend.SendPlayerMessage(index, string.Format("Only {0} can use this skill.", GameLogic.CheckGrammar(Job.Instance[Data.Skill[n].JobReq].Name, 1)), (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(index, string.Format("Only {0} can use this skill.", GameLogic.CheckGrammar(Job.Instance[Skill.Instance[n].JobReq].Name, 1)), (int)ColorName.BrightRed);
         }
     }
 
@@ -666,9 +666,9 @@ public class Script
         if (Data.TempPlayer[PlayerIndex].StunDuration > 0) return;
 
         int skillId = Server.Player.Instance[PlayerIndex].Skill[skillSlot].Num;
-        if (skillId < 0 || skillId >= Data.Skill.Length) return;
+        if (skillId < 0 || skillId >= Skill.Instance.Count) return;
 
-        ref var skill = ref Data.Skill[skillId];
+        var skill = Skill.Instance[skillId];
 
         // Cooldown check
         long now = General.GetTimeMs();
@@ -1054,8 +1054,8 @@ public class Script
     {
         if (!skillId.HasValue) return false;
         var id = skillId.Value;
-        if (id < 0 || id >= Data.Skill.Length) return false;
-        return Data.Skill[id].Range > 1; // simple heuristic
+        if (id < 0 || id >= Skill.Instance.Count) return false;
+        return Skill.Instance[id].Range > 1; // simple heuristic
     }
 
     public bool AttemptAttack(Entity attacker, Entity target, int? skillId = null, int? damage = null, bool? allowOutOfRange = false)
@@ -1516,7 +1516,7 @@ public class Script
         {
             if (target.Map < 0 || target.Map >= Core.Globals.Variables.MaxMaps) return;
             if (target.Id < 0 || target.Id >= Core.Globals.Variables.MaxMapNpcs) return;
-            ref var mapNpc = ref MapNpc.Instance[target.Map, target.Id];
+            var mapNpc = MapNpc.Instance[target.Map, target.Id];
             if (mapNpc.Num < 0) return;
             int id = (int)vital;
             if (mapNpc.Vital == null || id < 0 || id >= mapNpc.Vital.Length) return;
@@ -1572,8 +1572,8 @@ public class Script
             }
         }
         
-        if (skillId < 0 || skillId >= Data.Skill.Length) return;
-        ref var skill = ref Data.Skill[skillId];
+        if (skillId < 0 || skillId >= Skill.Instance.Count) return;
+        var skill = Skill.Instance[skillId];
 
         // Re-check mana just before execution (Player or npc could have spent mana meanwhile)
         if (skill.MpCost > 0)
@@ -1651,7 +1651,7 @@ public class Script
     private void HandleProjectileSkill(int map, Entity caster, int skillId, Entity? target)
     {
         // Spawn one or more projectiles depending on MultiDirMask. If mask==0, fire in caster's facing or skill.Dir
-        ref var skill = ref Data.Skill[skillId];
+        var skill = Skill.Instance[skillId];
         int mask = skill.MultiDirMask;
         if (mask == 0)
         {
@@ -1681,7 +1681,7 @@ public class Script
         // Apply a single cooldown based on this skill's projectile speed
         if (caster.Type == Core.Globals.Entity.EntityType.Player)
         {
-            var projNum = Data.Skill[skillId].Projectile;
+            var projNum = Skill.Instance[skillId].Projectile;
             if (projNum >= 0)
             {
                 Data.TempPlayer[caster.Id].ProjectileTimer = General.GetTimeMs() + Math.Max(0, Projectile.Instance[projNum].Speed);
@@ -1691,7 +1691,7 @@ public class Script
 
     private void HandleSelfCastSkill(int map, Entity caster, int skillId)
     {
-        ref var skill = ref Data.Skill[skillId];
+        var skill = Skill.Instance[skillId];
         switch (skill.Type)
         {
             case 0: // Damage HP self
@@ -1736,7 +1736,7 @@ public class Script
     private void HandleTargetedSkill(int map, Entity caster, int skillId, Entity? target)
     {
         if (target == null) return;
-        ref var s = ref Data.Skill[skillId];
+        var s = Skill.Instance[skillId];
         if (s.MultiDirMask == 0)
         {
             AttemptAttack(caster, target, skillId);
@@ -1761,7 +1761,7 @@ public class Script
                 }
             }
         }
-        ref var skill = ref Data.Skill[skillId];
+        var skill = Skill.Instance[skillId];
         if (skill.Type == 2 || skill.Type == 3)
         {
             var vital = skill.Type == 2 ? Core.Globals.Vital.Health : Core.Globals.Vital.Mana;
@@ -1774,7 +1774,7 @@ public class Script
     {
         int baseX = (target != null ? target.X : caster.X) / Constants.TileSize;
         int baseY = (target != null ? target.Y : caster.Y) / Constants.TileSize;
-        ref var s = ref Data.Skill[skillId];
+        var s = Skill.Instance[skillId];
         if (s.MultiDirMask == 0)
         {
             ApplyAoE(map, caster, skillId, baseX, baseY);
@@ -1808,7 +1808,7 @@ public class Script
         {
             for (int i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
             {
-                ref var mn = ref MapNpc.Instance[map, i];
+                var mn = MapNpc.Instance[map, i];
                 if (mn.Num < 0) continue;
                 if (mn.X == tx && mn.Y == ty)
                 {
@@ -1823,7 +1823,7 @@ public class Script
 
     public void ApplyAoE(int map, Entity caster, int skillId, int centerX, int centerY)
     {
-        ref var skill = ref Data.Skill[skillId];
+        var skill = Skill.Instance[skillId];
         int radius = skill.AoE;
         bool isDamage = skill.Type == 0 || skill.Type == 1;
         bool isHeal = skill.Type == 2 || skill.Type == 3;
@@ -1868,7 +1868,7 @@ public class Script
 
     private void PlaySkillAnimation(int map, Entity caster, int skillId, Entity target)
     {
-        int anim = Data.Skill[skillId].SkillAnim;
+        int anim = Skill.Instance[skillId].SkillAnim;
         if (anim < 0) return;
         byte tType = (byte)(target.Type == Core.Globals.Entity.EntityType.Player ? TargetType.Player : TargetType.Npc);
         NetworkSend.SendAnimation(map, anim, 0, 0, tType, target.Id);
@@ -1876,12 +1876,12 @@ public class Script
 
     private void TryChainOnHit(int map, Entity caster, int baseSkillId, Entity target)
     {
-        if (baseSkillId < 0 || baseSkillId >= Data.Skill.Length) return;
-        int chainId = Data.Skill[baseSkillId].ChainOnHitSkillId;
-        if (chainId < 0 || chainId >= Data.Skill.Length) return;
+        if (baseSkillId < 0 || baseSkillId >= Skill.Instance.Count) return;
+        int chainId = Skill.Instance[baseSkillId].ChainOnHitSkillId;
+        if (chainId < 0 || chainId >= Skill.Instance.Count) return;
         // For targeted chaining, we can re-use targeted attack semantics by routing HandleTargetedSkill
         // but respect the chain skill's own type definitions.
-        ref var chain = ref Data.Skill[chainId];
+        var chain = Skill.Instance[chainId];
         if (chain.IsProjectile == 1)
         {
             // Fire projectile(s) from caster using chain skill
@@ -1908,7 +1908,7 @@ public class Script
 
     private void FinalizeCast(int map, Entity caster, int skillId, int PlayerSkillSlot)
     {
-        ref var skill = ref Data.Skill[skillId];
+        var skill = Skill.Instance[skillId];
         if (skill.MpCost > 0)
         {
             if (caster.Type == Core.Globals.Entity.EntityType.Player)
@@ -2096,8 +2096,8 @@ public class Script
 
     private void ApplyKnockbackIfAny(Entity attacker, Entity target, int? skillId)
     {
-        if (!skillId.HasValue || skillId.Value < 0 || skillId.Value >= Data.Skill.Length) return;
-        ref var s = ref Data.Skill[skillId.Value];
+        if (!skillId.HasValue || skillId.Value < 0 || skillId.Value >= Skill.Instance.Count) return;
+        var s = Skill.Instance[skillId.Value];
         if (s.KnockBack != 1 || s.KnockBackTiles <= 0) return;
         int steps = Math.Min(5, Math.Max(1, (int)s.KnockBackTiles));
         int map = attacker.Map;

@@ -204,13 +204,13 @@ public class WinHotBar
 
         Skill.OnStream(skillNum);
 
-        if (Data.Skill[skillNum].Name.Length == 0 ||
-            Data.Skill[skillNum].Icon <= 0)
+        if (Skill.Instance[skillNum].Name.Length == 0 ||
+            Skill.Instance[skillNum].Icon <= 0)
         {
             return;
         }
 
-        var path = Path.Combine(DataPath.Skills, Data.Skill[skillNum].Icon.ToString());
+        var path = Path.Combine(DataPath.Skills, Skill.Instance[skillNum].Icon.ToString());
 
         GameClient.RenderTexture(ref path, x, y, 0, 0, 32, 32, 32, 32);
 

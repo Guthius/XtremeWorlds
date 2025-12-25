@@ -1796,7 +1796,7 @@ namespace Client
                 // set name
                 if (WindowManager.TryGetControl("winDescription", "lblName", out var lblName2))
                 {
-                    lblName2!.Text = Data.Skill[(int)skillNum].Name;
+                    lblName2!.Text = Skill.Instance[(int)skillNum].Name;
                     lblName2!.Color = Microsoft.Xna.Framework.Color.White;
                 }
 
@@ -1837,7 +1837,7 @@ namespace Client
                 }
             }
 
-            switch (Data.Skill[(int)skillNum].Type)
+            switch (Skill.Instance[(int)skillNum].Type)
             {
                 case (byte)SkillEffect.DamageHealth:
                     {
@@ -1867,7 +1867,7 @@ namespace Client
             }
 
             // more info
-            switch (Data.Skill[(int)skillNum].Type)
+            switch (Skill.Instance[(int)skillNum].Type)
             {
                 case (byte)SkillEffect.DamageHealth:
                 case (byte)SkillEffect.DamageMana:
@@ -1875,33 +1875,33 @@ namespace Client
                 case (byte)SkillEffect.HealMana:
                     {
                         // damage
-                        AddDescInfo("Vital: " + Data.Skill[(int)skillNum].Vital, Microsoft.Xna.Framework.Color.White);
+                        AddDescInfo("Vital: " + Skill.Instance[(int)skillNum].Vital, Microsoft.Xna.Framework.Color.White);
 
                         // mp cost
-                        AddDescInfo("Cost: " + Data.Skill[(int)skillNum].MpCost + " SP", Microsoft.Xna.Framework.Color.White);
+                        AddDescInfo("Cost: " + Skill.Instance[(int)skillNum].MpCost + " SP", Microsoft.Xna.Framework.Color.White);
 
                         // cast time
-                        AddDescInfo("Cast Time: " + Data.Skill[(int)skillNum].CastTime + "s", Microsoft.Xna.Framework.Color.White);
+                        AddDescInfo("Cast Time: " + Skill.Instance[(int)skillNum].CastTime + "s", Microsoft.Xna.Framework.Color.White);
 
                         // cd time
-                        AddDescInfo("Cooldown: " + Data.Skill[(int)skillNum].CdTime + "s", Microsoft.Xna.Framework.Color.White);
+                        AddDescInfo("Cooldown: " + Skill.Instance[(int)skillNum].CdTime + "s", Microsoft.Xna.Framework.Color.White);
 
                         // aoe
-                        if (Data.Skill[(int)skillNum].AoE > 0)
+                        if (Skill.Instance[(int)skillNum].AoE > 0)
                         {
-                            AddDescInfo("AoE: " + Data.Skill[(int)skillNum].AoE, Microsoft.Xna.Framework.Color.White);
+                            AddDescInfo("AoE: " + Skill.Instance[(int)skillNum].AoE, Microsoft.Xna.Framework.Color.White);
                         }
 
                         // stun
-                        if (Data.Skill[(int)skillNum].StunDuration > 0)
+                        if (Skill.Instance[(int)skillNum].StunDuration > 0)
                         {
-                            AddDescInfo("Stun: " + Data.Skill[(int)skillNum].StunDuration + "s", Microsoft.Xna.Framework.Color.White);
+                            AddDescInfo("Stun: " + Skill.Instance[(int)skillNum].StunDuration + "s", Microsoft.Xna.Framework.Color.White);
                         }
 
                         // dot
-                        if (Data.Skill[(int)skillNum].Duration > 0 & Data.Skill[(int)skillNum].Interval > 0)
+                        if (Skill.Instance[(int)skillNum].Duration > 0 & Skill.Instance[(int)skillNum].Interval > 0)
                         {
-                            AddDescInfo("DoT: " + Data.Skill[(int)skillNum].Duration / (double)Data.Skill[(int)skillNum].Interval + " tick", Microsoft.Xna.Framework.Color.White);
+                            AddDescInfo("DoT: " + Skill.Instance[(int)skillNum].Duration / (double)Skill.Instance[(int)skillNum].Interval + " tick", Microsoft.Xna.Framework.Color.White);
                         }
 
                         break;

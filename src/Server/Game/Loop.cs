@@ -254,7 +254,7 @@ public static class Loop
                     int skillId = -1;
                     if (Player.Instance[entity.Id].Skill != null && slot < Player.Instance[entity.Id].Skill.Length)
                         skillId = Player.Instance[entity.Id].Skill[slot].Num;
-                    int castMs = (skillId >= 0 && skillId < Data.Skill.Length) ? Data.Skill[skillId].CastTime * 1000 : 0;
+                    int castMs = (skillId >= 0 && skillId < Skill.Instance.Count) ? Skill.Instance[skillId].CastTime * 1000 : 0;
                     if (nowMsBuff > Data.TempPlayer[entity.Id].SkillBufferTimer + castMs)
                     {
                         Script.Instance?.CastSkill(map, entity, slot); // bufferedValue is slot for players
@@ -270,7 +270,7 @@ public static class Loop
                 int skillId = entity.SkillBuffer; // NPC stores skillId directly
                 if (skillId >= 0)
                 {
-                    int castMs = (skillId < Data.Skill.Length) ? Data.Skill[skillId].CastTime * 1000 : 0;
+                    int castMs = (skillId < Skill.Instance.Count) ? Skill.Instance[skillId].CastTime * 1000 : 0;
                     if (nowMsBuff > entity.SkillBufferTimer + castMs)
                     {
                         Script.Instance?.CastSkill(map, entity, skillId); // bufferedValue is skillId for NPCs
@@ -425,8 +425,8 @@ public static class Loop
                                         for (int slot = 0; slot < Core.Globals.Variables.MaxNpcSkills && slot < skills.Length; slot++)
                                         {
                                             int sid = skills[slot];
-                                            if (sid <= 0 || sid >= Data.Skill.Length) continue;
-                                            ref var sk = ref Data.Skill[sid];
+                                            if (sid <= 0 || sid >= Skill.Instance.Count) continue;
+                                            var sk = Skill.Instance[sid];
                                             bool inRange = sk.Range == 0 ? (sk.IsAoE || dist <= 1) : dist <= sk.Range;
                                             if (!inRange) continue;
                                             if (map < 0 || map >= Variables.MaxMaps) break;
@@ -494,8 +494,8 @@ public static class Loop
                                             for (int slot2 = 0; slot2 < Core.Globals.Variables.MaxNpcSkills && slot2 < skills2.Length; slot2++)
                                             {
                                                 int sid2 = skills2[slot2];
-                                                if (sid2 <= 0 || sid2 >= Data.Skill.Length) continue;
-                                                ref var sk2 = ref Data.Skill[sid2];
+                                                if (sid2 <= 0 || sid2 >= Skill.Instance.Count) continue;
+                                                var sk2 = Skill.Instance[sid2];
                                                 bool inRange2 = sk2.Range == 0 ? (sk2.IsAoE || dist2 <= 1) : dist2 <= sk2.Range;
                                                 if (!inRange2) continue;
                                                 if (map < 0 || map >= Variables.MaxMaps) break;

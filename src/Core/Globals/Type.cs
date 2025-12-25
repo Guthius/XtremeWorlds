@@ -17,42 +17,6 @@ public static class Type
         public double Bottom;
     }
 
-    public struct Skill
-    {
-        public string Name;
-        public byte Type;
-        public int MpCost;
-        public int LevelReq;
-        public int AccessReq;
-        public int JobReq;
-        public int CastTime;
-        public int CdTime;
-        public int Icon;
-        public int Map;
-        public int X;
-        public int Y;
-        public byte Dir;
-        public int Vital;
-        public int Duration;
-        public int Interval;
-        public int Range;
-        public bool IsAoE;
-        public int AoE;
-        public int CastAnim;
-        public int SkillAnim;
-        public int StunDuration;
-        public int IsProjectile;
-        public int Projectile;
-        public byte KnockBack;
-        public byte KnockBackTiles;
-        public int MultiDirMask; // bitmask of directions to fire simultaneously (0=off)
-        public int ChainOnHitSkillId;
-        // Common Event support (like items): trigger after cast resolves
-        public byte CommonEventType; // maps to CommonEventTrigger enum
-        public int CommonEventData1; // e.g., switch/variable index or event id
-        public int CommonEventData2; // e.g., value for switch/variable, optional
-    }
-
     public struct Item
     {
         public int Num;

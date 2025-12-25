@@ -3353,7 +3353,7 @@ public class Crystalshire
             {
                 int id = WinSkillEditor.SelectedIndex; if (id < 0 || id >= Variables.MaxSkills) return;
                 var newName = txtName.Text ?? string.Empty;
-                Data.Skill[id].Name = newName;
+                Skill.Instance[id].Name = newName;
                 GameState.SkillChanged[id] = true;
 
                 // Update list item text
@@ -3386,38 +3386,38 @@ public class Crystalshire
 
         // Icon
         BindSlider("sldIcon", 0, Math.Max(0, GameState.NumSkills),
-            () => { int i = WinSkillEditor.SelectedIndex; return (i >= 0 && i < Variables.MaxSkills) ? Data.Skill[i].Icon : 0; },
-            v => { int i = WinSkillEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxSkills) { Data.Skill[i].Icon = v; GameState.SkillChanged[i] = true; } });
+            () => { int i = WinSkillEditor.SelectedIndex; return (i >= 0 && i < Variables.MaxSkills) ? Skill.Instance[i].Icon : 0; },
+            v => { int i = WinSkillEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxSkills) { Skill.Instance[i].Icon = v; GameState.SkillChanged[i] = true; } });
 
         // Damage/Vital amount
         BindSlider("sldDamage", 0, 100000,
-            () => { int i = WinSkillEditor.SelectedIndex; return (i >= 0 && i < Variables.MaxSkills) ? Data.Skill[i].Vital : 0; },
-            v => { int i = WinSkillEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxSkills) { Data.Skill[i].Vital = v; GameState.SkillChanged[i] = true; } });
+            () => { int i = WinSkillEditor.SelectedIndex; return (i >= 0 && i < Variables.MaxSkills) ? Skill.Instance[i].Vital : 0; },
+            v => { int i = WinSkillEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxSkills) { Skill.Instance[i].Vital = v; GameState.SkillChanged[i] = true; } });
 
         // MP cost
         BindSlider("sldMpCost", 0, 1024,
-            () => { int i = WinSkillEditor.SelectedIndex; return (i >= 0 && i < Variables.MaxSkills) ? Data.Skill[i].MpCost : 0; },
-            v => { int i = WinSkillEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxSkills) { Data.Skill[i].MpCost = v; GameState.SkillChanged[i] = true; } });
+            () => { int i = WinSkillEditor.SelectedIndex; return (i >= 0 && i < Variables.MaxSkills) ? Skill.Instance[i].MpCost : 0; },
+            v => { int i = WinSkillEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxSkills) { Skill.Instance[i].MpCost = v; GameState.SkillChanged[i] = true; } });
 
         // Cast time
         BindSlider("sldCastTime", 0, 10000,
-            () => { int i = WinSkillEditor.SelectedIndex; return (i >= 0 && i < Variables.MaxSkills) ? Data.Skill[i].CastTime : 0; },
-            v => { int i = WinSkillEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxSkills) { Data.Skill[i].CastTime = v; GameState.SkillChanged[i] = true; } });
+            () => { int i = WinSkillEditor.SelectedIndex; return (i >= 0 && i < Variables.MaxSkills) ? Skill.Instance[i].CastTime : 0; },
+            v => { int i = WinSkillEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxSkills) { Skill.Instance[i].CastTime = v; GameState.SkillChanged[i] = true; } });
 
         // Cooldown
         BindSlider("sldCooldown", 0, 60000,
-            () => { int i = WinSkillEditor.SelectedIndex; return (i >= 0 && i < Variables.MaxSkills) ? Data.Skill[i].CdTime : 0; },
-            v => { int i = WinSkillEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxSkills) { Data.Skill[i].CdTime = v; GameState.SkillChanged[i] = true; } });
+            () => { int i = WinSkillEditor.SelectedIndex; return (i >= 0 && i < Variables.MaxSkills) ? Skill.Instance[i].CdTime : 0; },
+            v => { int i = WinSkillEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxSkills) { Skill.Instance[i].CdTime = v; GameState.SkillChanged[i] = true; } });
 
         // Range
         BindSlider("sldRange", 0, 255,
-            () => { int i = WinSkillEditor.SelectedIndex; return (i >= 0 && i < Variables.MaxSkills) ? Data.Skill[i].Range : 0; },
-            v => { int i = WinSkillEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxSkills) { Data.Skill[i].Range = v; GameState.SkillChanged[i] = true; } });
+            () => { int i = WinSkillEditor.SelectedIndex; return (i >= 0 && i < Variables.MaxSkills) ? Skill.Instance[i].Range : 0; },
+            v => { int i = WinSkillEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxSkills) { Skill.Instance[i].Range = v; GameState.SkillChanged[i] = true; } });
 
         // AoE radius
         BindSlider("sldAoE", 0, 12,
-            () => { int i = WinSkillEditor.SelectedIndex; return (i >= 0 && i < Variables.MaxSkills) ? Data.Skill[i].AoE : 0; },
-            v => { int i = WinSkillEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxSkills) { Data.Skill[i].AoE = v; Data.Skill[i].IsAoE = v > 0; GameState.SkillChanged[i] = true; } });
+            () => { int i = WinSkillEditor.SelectedIndex; return (i >= 0 && i < Variables.MaxSkills) ? Skill.Instance[i].AoE : 0; },
+            v => { int i = WinSkillEditor.SelectedIndex; if (i >= 0 && i < Variables.MaxSkills) { Skill.Instance[i].AoE = v; Skill.Instance[i].IsAoE = v > 0; GameState.SkillChanged[i] = true; } });
 
         // Combos
         void BindCombo(string name, Action<int> apply)
@@ -3436,14 +3436,14 @@ public class Crystalshire
         BindCombo("cmbType", v =>
         {
             int i = WinSkillEditor.SelectedIndex; if (i < 0 || i >= Variables.MaxSkills) return;
-            Data.Skill[i].Type = (byte)v; GameState.SkillChanged[i] = true;
+            Skill.Instance[i].Type = (byte)v; GameState.SkillChanged[i] = true;
         });
 
         // Animation -> SkillAnim
         BindCombo("cmbAnimation", v =>
         {
             int i = WinSkillEditor.SelectedIndex; if (i < 0 || i >= Variables.MaxSkills) return;
-            Data.Skill[i].SkillAnim = Math.Clamp(v, 0, Animation.Instance.Count - 1);
+            Skill.Instance[i].SkillAnim = Math.Clamp(v, 0, Animation.Instance.Count - 1);
             GameState.SkillChanged[i] = true;
         });
 
@@ -3453,13 +3453,13 @@ public class Crystalshire
             int i = WinSkillEditor.SelectedIndex; if (i < 0 || i >= Variables.MaxSkills) return;
             if (v <= 0)
             {
-                Data.Skill[i].IsProjectile = 0;
-                Data.Skill[i].Projectile = -1;
+                Skill.Instance[i].IsProjectile = 0;
+                Skill.Instance[i].Projectile = -1;
             }
             else
             {
-                Data.Skill[i].IsProjectile = 1;
-                Data.Skill[i].Projectile = v - 1;
+                Skill.Instance[i].IsProjectile = 1;
+                Skill.Instance[i].Projectile = v - 1;
             }
             GameState.SkillChanged[i] = true;
         });

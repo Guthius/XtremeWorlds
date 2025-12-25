@@ -379,50 +379,47 @@ public static class NetworkSend
     {
         for (var i = 0; i < Core.Globals.Variables.MaxSkills; i++)
         {
-            if (Data.Skill[i].Name.Length > 0)
-            {
-                SendUpdateSkillTo(playerId, i);
-            }
+            SendUpdateSkillTo(playerId, i);
         }
     }
 
-    public static void SendUpdateSkillTo(int playerId, int skillNum)
+    public static void SendUpdateSkillTo(int playerId, int index)
     {
         var packetWriter = new PacketWriter();
 
         packetWriter.WriteEnum(ServerPackets.SUpdateSkill);
-        packetWriter.WriteInt32(skillNum);
-        packetWriter.WriteInt32(Data.Skill[skillNum].AccessReq);
-        packetWriter.WriteInt32(Data.Skill[skillNum].AoE);
-        packetWriter.WriteInt32(Data.Skill[skillNum].CastAnim);
-        packetWriter.WriteInt32(Data.Skill[skillNum].CastTime);
-        packetWriter.WriteInt32(Data.Skill[skillNum].CdTime);
-        packetWriter.WriteInt32(Data.Skill[skillNum].JobReq);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Dir);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Duration);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Icon);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Interval);
-        packetWriter.WriteInt32(Data.Skill[skillNum].IsAoE ? 1 : 0);
-        packetWriter.WriteInt32(Data.Skill[skillNum].LevelReq);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Map);
-        packetWriter.WriteInt32(Data.Skill[skillNum].MpCost);
-        packetWriter.WriteString(Data.Skill[skillNum].Name);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Range);
-        packetWriter.WriteInt32(Data.Skill[skillNum].SkillAnim);
-        packetWriter.WriteInt32(Data.Skill[skillNum].StunDuration);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Type);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Vital);
-        packetWriter.WriteInt32(Data.Skill[skillNum].X);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Y);
-        packetWriter.WriteInt32(Data.Skill[skillNum].IsProjectile);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Projectile);
-        packetWriter.WriteInt32(Data.Skill[skillNum].KnockBack);
-        packetWriter.WriteInt32(Data.Skill[skillNum].KnockBackTiles);
-        packetWriter.WriteInt32(Data.Skill[skillNum].MultiDirMask);
-        packetWriter.WriteInt32(Data.Skill[skillNum].ChainOnHitSkillId);
-        packetWriter.WriteInt32(Data.Skill[skillNum].CommonEventType);
-        packetWriter.WriteInt32(Data.Skill[skillNum].CommonEventData1);
-        packetWriter.WriteInt32(Data.Skill[skillNum].CommonEventData2);
+        packetWriter.WriteInt32(index);
+        packetWriter.WriteInt32(Skill.Instance[index].AccessReq);
+        packetWriter.WriteInt32(Skill.Instance[index].AoE);
+        packetWriter.WriteInt32(Skill.Instance[index].CastAnim);
+        packetWriter.WriteInt32(Skill.Instance[index].CastTime);
+        packetWriter.WriteInt32(Skill.Instance[index].CdTime);
+        packetWriter.WriteInt32(Skill.Instance[index].JobReq);
+        packetWriter.WriteInt32(Skill.Instance[index].Dir);
+        packetWriter.WriteInt32(Skill.Instance[index].Duration);
+        packetWriter.WriteInt32(Skill.Instance[index].Icon);
+        packetWriter.WriteInt32(Skill.Instance[index].Interval);
+        packetWriter.WriteBoolean(Skill.Instance[index].IsAoE);
+        packetWriter.WriteInt32(Skill.Instance[index].LevelReq);
+        packetWriter.WriteInt32(Skill.Instance[index].Map);
+        packetWriter.WriteInt32(Skill.Instance[index].MpCost);
+        packetWriter.WriteString(Skill.Instance[index].Name);
+        packetWriter.WriteInt32(Skill.Instance[index].Range);
+        packetWriter.WriteInt32(Skill.Instance[index].SkillAnim);
+        packetWriter.WriteInt32(Skill.Instance[index].StunDuration);
+        packetWriter.WriteInt32(Skill.Instance[index].Type);
+        packetWriter.WriteInt32(Skill.Instance[index].Vital);
+        packetWriter.WriteInt32(Skill.Instance[index].X);
+        packetWriter.WriteInt32(Skill.Instance[index].Y);
+        packetWriter.WriteInt32(Skill.Instance[index].IsProjectile);
+        packetWriter.WriteInt32(Skill.Instance[index].Projectile);
+        packetWriter.WriteInt32(Skill.Instance[index].KnockBack);
+        packetWriter.WriteInt32(Skill.Instance[index].KnockBackTiles);
+        packetWriter.WriteInt32(Skill.Instance[index].MultiDirMask);
+        packetWriter.WriteInt32(Skill.Instance[index].ChainOnHitSkillId);
+        packetWriter.WriteInt32(Skill.Instance[index].CommonEventType);
+        packetWriter.WriteInt32(Skill.Instance[index].CommonEventData1);
+        packetWriter.WriteInt32(Skill.Instance[index].CommonEventData2);
 
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
     }
@@ -433,36 +430,36 @@ public static class NetworkSend
 
         packetWriter.WriteEnum(ServerPackets.SUpdateSkill);
         packetWriter.WriteInt32(skillNum);
-        packetWriter.WriteInt32(Data.Skill[skillNum].AccessReq);
-        packetWriter.WriteInt32(Data.Skill[skillNum].AoE);
-        packetWriter.WriteInt32(Data.Skill[skillNum].CastAnim);
-        packetWriter.WriteInt32(Data.Skill[skillNum].CastTime);
-        packetWriter.WriteInt32(Data.Skill[skillNum].CdTime);
-        packetWriter.WriteInt32(Data.Skill[skillNum].JobReq);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Dir);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Duration);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Icon);
-        packetWriter.WriteInt32(Data.Skill[skillNum].IsAoE ? 1 : 0);
-        packetWriter.WriteInt32(Data.Skill[skillNum].LevelReq);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Map);
-        packetWriter.WriteInt32(Data.Skill[skillNum].MpCost);
-        packetWriter.WriteString(Data.Skill[skillNum].Name);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Range);
-        packetWriter.WriteInt32(Data.Skill[skillNum].SkillAnim);
-        packetWriter.WriteInt32(Data.Skill[skillNum].StunDuration);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Type);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Vital);
-        packetWriter.WriteInt32(Data.Skill[skillNum].X);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Y);
-        packetWriter.WriteInt32(Data.Skill[skillNum].IsProjectile);
-        packetWriter.WriteInt32(Data.Skill[skillNum].Projectile);
-        packetWriter.WriteInt32(Data.Skill[skillNum].KnockBack);
-        packetWriter.WriteInt32(Data.Skill[skillNum].KnockBackTiles);
-        packetWriter.WriteInt32(Data.Skill[skillNum].MultiDirMask);
-        packetWriter.WriteInt32(Data.Skill[skillNum].ChainOnHitSkillId);
-        packetWriter.WriteInt32(Data.Skill[skillNum].CommonEventType);
-        packetWriter.WriteInt32(Data.Skill[skillNum].CommonEventData1);
-        packetWriter.WriteInt32(Data.Skill[skillNum].CommonEventData2);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].AccessReq);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].AoE);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].CastAnim);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].CastTime);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].CdTime);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].JobReq);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].Dir);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].Duration);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].Icon);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].IsAoE ? 1 : 0);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].LevelReq);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].Map);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].MpCost);
+        packetWriter.WriteString(Skill.Instance[skillNum].Name);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].Range);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].SkillAnim);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].StunDuration);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].Type);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].Vital);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].X);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].Y);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].IsProjectile);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].Projectile);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].KnockBack);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].KnockBackTiles);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].MultiDirMask);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].ChainOnHitSkillId);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].CommonEventType);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].CommonEventData1);
+        packetWriter.WriteInt32(Skill.Instance[skillNum].CommonEventData2);
 
         PlayerService.Instance.SendDataToAll(packetWriter.GetBytes());
     }
@@ -1418,24 +1415,24 @@ public static class NetworkSend
         packet.WriteInt32(projectile.Animation);
     }
 
-    public static void SendUpdateResourceToAll(int resourceNum)
+    public static void SendUpdateResourceToAll(int index)
     {
         var packet = new PacketWriter();
 
         packet.WriteEnum(ServerPackets.SUpdateResource);
 
-        WriteResourceDataToPacket(resourceNum, packet);
+        WriteResourceDataToPacket(index, packet);
 
         PlayerService.Instance.SendDataToAll(packet.GetBytes());
     }
 
-    public static void SendUpdateResourceTo(int playerId, int resourceNum)
+    public static void SendUpdateResourceTo(int playerId, int index)
     {
         var packet = new PacketWriter();
 
         packet.WriteEnum(ServerPackets.SUpdateResource);
 
-        WriteResourceDataToPacket(resourceNum, packet);
+        WriteResourceDataToPacket(index, packet);
 
         PlayerService.Instance.SendDataTo(playerId, packet.GetBytes());
     }

@@ -49,119 +49,18 @@ public class SkillBase : IData
 
     public static List<SkillBase> Instance { get; } = new();
 
-    public static void EnsureSize(int size)
+    static SkillBase()
     {
-        while (Instance.Count < size)
+        for (var i = 0; i < Variables.MaxSkills; i++)
         {
             Instance.Add(new SkillBase());
         }
     }
 
-    public Core.Globals.Type.Skill ToStruct()
-    {
-        return new Core.Globals.Type.Skill
-        {
-            Name = Name ?? string.Empty,
-            Type = Type,
-            MpCost = MpCost,
-            LevelReq = LevelReq,
-            AccessReq = AccessReq,
-            JobReq = JobReq,
-            CastTime = CastTime,
-            CdTime = CdTime,
-            Icon = Icon,
-            Map = Map,
-            X = X,
-            Y = Y,
-            Dir = Dir,
-            Vital = Vital,
-            Duration = Duration,
-            Interval = Interval,
-            Range = Range,
-            IsAoE = IsAoE,
-            AoE = AoE,
-            CastAnim = CastAnim,
-            SkillAnim = SkillAnim,
-            StunDuration = StunDuration,
-            IsProjectile = IsProjectile,
-            Projectile = Projectile,
-            KnockBack = KnockBack,
-            KnockBackTiles = KnockBackTiles,
-            MultiDirMask = MultiDirMask,
-            ChainOnHitSkillId = ChainOnHitSkillId,
-            CommonEventType = CommonEventType,
-            CommonEventData1 = CommonEventData1,
-            CommonEventData2 = CommonEventData2,
-        };
-    }
-
-    public void FromStruct(Core.Globals.Type.Skill skill)
-    {
-        Name = skill.Name ?? string.Empty;
-        Type = skill.Type;
-        MpCost = skill.MpCost;
-        LevelReq = skill.LevelReq;
-        AccessReq = skill.AccessReq;
-        JobReq = skill.JobReq;
-        CastTime = skill.CastTime;
-        CdTime = skill.CdTime;
-        Icon = skill.Icon;
-        Map = skill.Map;
-        X = skill.X;
-        Y = skill.Y;
-        Dir = skill.Dir;
-        Vital = skill.Vital;
-        Duration = skill.Duration;
-        Interval = skill.Interval;
-        Range = skill.Range;
-        IsAoE = skill.IsAoE;
-        AoE = skill.AoE;
-        CastAnim = skill.CastAnim;
-        SkillAnim = skill.SkillAnim;
-        StunDuration = skill.StunDuration;
-        IsProjectile = skill.IsProjectile;
-        Projectile = skill.Projectile;
-        KnockBack = skill.KnockBack;
-        KnockBackTiles = skill.KnockBackTiles;
-        MultiDirMask = skill.MultiDirMask;
-        ChainOnHitSkillId = skill.ChainOnHitSkillId;
-        CommonEventType = skill.CommonEventType;
-        CommonEventData1 = skill.CommonEventData1;
-        CommonEventData2 = skill.CommonEventData2;
-    }
-
-    public static void SyncToData(int index)
-    {
-        if (index < 0 || index >= Data.Skill.Length)
-        {
-            return;
-        }
-
-        EnsureSize(index + 1);
-        Data.Skill[index] = Instance[index].ToStruct();
-    }
-
-    public static void SyncFromData(int index)
-    {
-        if (index < 0 || index >= Data.Skill.Length)
-        {
-            return;
-        }
-
-        EnsureSize(index + 1);
-        Instance[index].FromStruct(Data.Skill[index]);
-    }
-
     public static void OnClear(int index)
     {
-        if (index < 0 || index >= Variables.MaxSkills)
-        {
-            return;
-        }
-
-        EnsureSize(index + 1);
-        Instance[index] = new SkillBase();
-        SyncToData(index);
+        if (Instance.Count > index)
+            Instance[index] = new SkillBase();
     }
 
     public static void OnClearChanged()

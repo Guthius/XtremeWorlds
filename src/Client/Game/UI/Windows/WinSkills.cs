@@ -67,7 +67,7 @@ public class WinSkills
                 continue;
             }
 
-            var icon = Data.Skill[skillNum].Icon;
+            var icon = Skill.Instance[skillNum].Icon;
             if (icon < 0 || icon >= GameState.NumSkills)
             {
                 continue;

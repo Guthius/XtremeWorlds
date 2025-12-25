@@ -149,7 +149,7 @@ namespace Client
                         {
                             if (Player.Instance[GameState.MyIndex].Skill[_i].Cd > 0)
                             {
-                                if (Player.Instance[GameState.MyIndex].Skill[_i].Cd + Data.Skill[(int)Player.Instance[GameState.MyIndex].Skill[_i].Num].CdTime * 1000 < _tick)
+                                if (Player.Instance[GameState.MyIndex].Skill[_i].Cd + Skill.Instance[(int)Player.Instance[GameState.MyIndex].Skill[_i].Num].CdTime * 1000 < _tick)
                                 {
                                     Player.Instance[GameState.MyIndex].Skill[_i].Cd = 0;
                                 }
@@ -161,7 +161,7 @@ namespace Client
                 // check if we need to unlock the player's skill casting restriction
                 if (GameState.SkillBuffer >= 0)
                 {
-                    if (GameState.SkillBufferTimer + Data.Skill[(int)Player.Instance[GameState.MyIndex].Skill[GameState.SkillBuffer].Num].CastTime * 1000 < _tick)
+                    if (GameState.SkillBufferTimer + Skill.Instance[(int)Player.Instance[GameState.MyIndex].Skill[GameState.SkillBuffer].Num].CastTime * 1000 < _tick)
                     {
                         GameState.SkillBuffer = -1;
                         GameState.SkillBufferTimer = 0;
@@ -509,15 +509,6 @@ namespace Client
             {
                 new EditorEvent().Show();
                 GameState.InitEventEditor = false;
-            }
-
-            if (GameState.InitSkillEditor)
-            {
-                GameState.MyEditorType = EditorType.Skill;
-                GameState.EditorIndex = 0;
-                WindowManager.ShowWindow("winSkillEditor");
-                Client.Game.UI.Windows.WinSkillEditor.Init();
-                GameState.InitSkillEditor = false;
             }
 
             if (GameState.InitScriptEditor)

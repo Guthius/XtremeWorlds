@@ -714,39 +714,58 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     {
         var packetReader = new PacketReader(data);
 
-        var skillNum = packetReader.ReadInt32();
+        var n = packetReader.ReadInt32();
 
-        Data.Skill[skillNum].AccessReq = packetReader.ReadInt32();
-        Data.Skill[skillNum].AoE = packetReader.ReadInt32();
-        Data.Skill[skillNum].CastAnim = packetReader.ReadInt32();
-        Data.Skill[skillNum].CastTime = packetReader.ReadInt32();
-        Data.Skill[skillNum].CdTime = packetReader.ReadInt32();
-        Data.Skill[skillNum].JobReq = packetReader.ReadInt32();
-        Data.Skill[skillNum].Dir = (byte)packetReader.ReadInt32();
-        Data.Skill[skillNum].Duration = packetReader.ReadInt32();
-        Data.Skill[skillNum].Icon = packetReader.ReadInt32();
-        Data.Skill[skillNum].Interval = packetReader.ReadInt32();
-        Data.Skill[skillNum].IsAoE = packetReader.ReadInt32() != 0;
-        Data.Skill[skillNum].LevelReq = packetReader.ReadInt32();
-        Data.Skill[skillNum].Map = packetReader.ReadInt32();
-        Data.Skill[skillNum].MpCost = packetReader.ReadInt32();
-        Data.Skill[skillNum].Name = packetReader.ReadString();
-        Data.Skill[skillNum].Range = packetReader.ReadInt32();
-        Data.Skill[skillNum].SkillAnim = packetReader.ReadInt32();
-        Data.Skill[skillNum].StunDuration = packetReader.ReadInt32();
-        Data.Skill[skillNum].Type = (byte)packetReader.ReadInt32();
-        Data.Skill[skillNum].Vital = packetReader.ReadInt32();
-        Data.Skill[skillNum].X = packetReader.ReadInt32();
-        Data.Skill[skillNum].Y = packetReader.ReadInt32();
-        Data.Skill[skillNum].IsProjectile = packetReader.ReadInt32();
-        Data.Skill[skillNum].Projectile = packetReader.ReadInt32();
-        Data.Skill[skillNum].KnockBack = (byte)packetReader.ReadInt32();
-        Data.Skill[skillNum].KnockBackTiles = (byte)packetReader.ReadInt32();
-        Data.Skill[skillNum].MultiDirMask = packetReader.ReadInt32();
-        Data.Skill[skillNum].ChainOnHitSkillId = packetReader.ReadInt32();
-        Data.Skill[skillNum].CommonEventType = (byte)packetReader.ReadInt32();
-        Data.Skill[skillNum].CommonEventData1 = packetReader.ReadInt32();
-        Data.Skill[skillNum].CommonEventData2 = packetReader.ReadInt32();
+        if (n == 0)
+            Skill.Instance.Clear();
+
+        var skill = new Skill();
+        skill.AccessReq = packetReader.ReadInt32();
+        skill.AoE = packetReader.ReadInt32();
+        skill.CastAnim = packetReader.ReadInt32();
+        skill.CastTime = packetReader.ReadInt32();
+        skill.CdTime = packetReader.ReadInt32();
+        skill.JobReq = packetReader.ReadInt32();
+        skill.Dir = (byte)packetReader.ReadInt32();
+        skill.Duration = packetReader.ReadInt32();
+        skill.Icon = packetReader.ReadInt32();
+        skill.Interval = packetReader.ReadInt32();
+        skill.IsAoE = packetReader.ReadBoolean();
+        skill.LevelReq = packetReader.ReadInt32();
+        skill.Map = packetReader.ReadInt32();
+        skill.MpCost = packetReader.ReadInt32();
+        skill.Name = packetReader.ReadString();
+        skill.Range = packetReader.ReadInt32();
+        skill.SkillAnim = packetReader.ReadInt32();
+        skill.StunDuration = packetReader.ReadInt32();
+        skill.Type = (byte)packetReader.ReadInt32();
+        skill.Vital = packetReader.ReadInt32();
+        skill.X = packetReader.ReadInt32();
+        skill.Y = packetReader.ReadInt32();
+        skill.IsProjectile = packetReader.ReadInt32();
+        skill.Projectile = packetReader.ReadInt32();
+        skill.KnockBack = (byte)packetReader.ReadInt32();
+        skill.KnockBackTiles = (byte)packetReader.ReadInt32();
+        skill.MultiDirMask = packetReader.ReadInt32();
+        skill.ChainOnHitSkillId = packetReader.ReadInt32();
+        skill.CommonEventType = (byte)packetReader.ReadInt32();
+        skill.CommonEventData1 = packetReader.ReadInt32();
+        skill.CommonEventData2 = packetReader.ReadInt32();
+
+        // Update the skill
+        Skill.Instance.Add(skill);
+
+        if ((n + 1) == Core.Globals.Variables.MaxSkills)
+        {
+            if (GameState.InitSkillEditor)
+            {
+                GameState.MyEditorType = EditorType.Skill;
+                GameState.EditorIndex = 0;
+                WindowManager.ShowWindow("winSkillEditor");
+                GameState.InitSkillEditor = false;
+                Client.Game.UI.Windows.WinSkillEditor.Init();
+            }
+        }
     }
 
     private static void Packet_Skills(ReadOnlyMemory<byte> data)
