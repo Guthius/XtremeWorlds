@@ -31,10 +31,10 @@
 		<ComboBox Name="cmbMoveSpeed" Position="360,56" Size="160,20"/>
 		<Label Name="lblMoveFreq" Text="Move Freq" Position="540,58" Size="80,18"/>
 		<ComboBox Name="cmbMoveFreq" Position="620,56" Size="160,20"/>
-		<CheckBox Name="chkWalkAnim" Text="Idle Anim" Position="12,88" Size="100,18" Design="None"/>
-		<CheckBox Name="chkDirFix" Text="Dir Fix" Position="124,88" Size="90,18" Design="None"/>
-		<CheckBox Name="chkWalkThrough" Text="Walk Through" Position="226,88" Size="120,18" Design="None"/>
-		<CheckBox Name="chkShowName" Text="Show Name" Position="360,88" Size="120,18" Design="None"/>
+		<CheckBox Name="chkWalkAnim" Text="Idle Anim" Position="12,88" Size="100,18" Design="CheckboxNormal"/>
+		<CheckBox Name="chkDirFix" Text="Dir Fix" Position="124,88" Size="90,18" Design="CheckboxNormal"/>
+		<CheckBox Name="chkWalkThrough" Text="Walk Through" Position="226,88" Size="120,18" Design="CheckboxNormal"/>
+		<CheckBox Name="chkShowName" Text="Show Name" Position="360,88" Size="120,18" Design="CheckboxNormal"/>
 	</GroupBox>
 
 	<GroupBox Name="grpCommands" Position="8,302" Size="964,288" Caption="Commands">
