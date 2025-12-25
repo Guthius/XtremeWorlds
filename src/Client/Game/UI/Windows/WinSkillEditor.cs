@@ -223,6 +223,34 @@ public class WinSkillEditor
         GameClient.RenderTexture(ref texturePath, drawX, drawY, 0, 0, iconSize, iconSize, iconSize, iconSize);
     }
 
+    public static void OnDrawPreview()
+    {
+        var win = WindowManager.GetWindowByName("winSkillEditor");
+        if (win is null) return;
+
+        if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxSkills) return;
+        if (Skill.Instance.Count <= SelectedIndex) return;
+        var s = Skill.Instance[SelectedIndex];
+
+        if (!WindowManager.TryGetControl("winSkillEditor", "picIcon", out var previewCtrl) || previewCtrl is not PictureBox pic)
+            return;
+
+        if (s.Icon < 1 || s.Icon > GameState.NumSkills) return;
+
+        string texturePath = Path.Combine(DataPath.Skills, s.Icon.ToString());
+        var tex = GameClient.GetGfxInfo(texturePath);
+        if (tex is null || tex.Width == 0 || tex.Height == 0) return;
+
+        int srcSize = 32;
+        int destSize = Math.Min(Math.Min(pic.Width, pic.Height), 128);
+        if (destSize <= 0) return;
+
+        int drawX = win.X + pic.X + (pic.Width - destSize) / 2;
+        int drawY = win.Y + pic.Y + (pic.Height - destSize) / 2;
+
+        GameClient.RenderTexture(ref texturePath, drawX, drawY, 0, 0, destSize, destSize, srcSize, srcSize);
+    }
+
     public static void OnCopyOrPaste()
     {
         if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxSkills) return;
