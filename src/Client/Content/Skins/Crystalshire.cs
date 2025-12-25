@@ -3600,6 +3600,7 @@ public class Crystalshire
                 
             ctrl.CallBack[(int)ControlState.MouseMove] = WinEventEditor.UpdatePageSettingsFromControls;
             ctrl.CallBack[(int)ControlState.MouseDown] = WinEventEditor.UpdatePageSettingsFromControls;
+            ctrl.CallBack[(int)ControlState.MouseUp] = WinEventEditor.UpdatePageSettingsFromControls;
         }
 
         WirePageSetting("cmbTrigger");
@@ -3607,10 +3608,27 @@ public class Crystalshire
         WirePageSetting("cmbMoveType");
         WirePageSetting("cmbMoveSpeed");
         WirePageSetting("cmbMoveFreq");
+        WirePageSetting("cmbGraphicType");
+        WirePageSetting("sldGraphic");
         WirePageSetting("chkWalkAnim");
         WirePageSetting("chkDirFix");
         WirePageSetting("chkWalkThrough");
         WirePageSetting("chkShowName");
+
+        // Graphic coordinate textboxes
+        void WireGraphicCoord(string name)
+        {
+            if (WindowManager.TryGetControl("winEventEditor", name, out var ctrl) && ctrl is TextBox tb)
+                tb.CallBack[(int)ControlState.KeyUp] = WinEventEditor.UpdatePageSettingsFromControls;
+        }
+
+        WireGraphicCoord("txtGraphicX");
+        WireGraphicCoord("txtGraphicY");
+        WireGraphicCoord("txtGraphicX2");
+        WireGraphicCoord("txtGraphicY2");
+
+        // Graphic preview
+        window.GetChild("picGraphic").OnDraw = WinEventEditor.OnDrawGraphicPreview;
 
         // Commands: Add
         if (WindowManager.TryGetControl("winEventEditor", "btnAddCommand", out var btnAddCmd))

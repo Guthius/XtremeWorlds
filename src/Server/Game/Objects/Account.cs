@@ -105,7 +105,6 @@ namespace Server
 
             var accountData = JObject.FromObject(data).ToObject<Account>();
             Account.Instance[index] = accountData;
-            Core.Objects.Bank.Instance = Account.Instance[index].Bank.ToList();
         }
 
         public static Task OnLoadAllAsync()

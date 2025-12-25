@@ -417,6 +417,13 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             Database.CharacterList?.Add(name);
             Database.AddChar(session.Id, slot, name, (byte)sex, (byte)job, sprite).Wait();
 
+            // Ensure the newly created slot is the active character for this session.
+            while (PlayerBase.Instance.Count <= session.Id)
+            {
+                PlayerBase.Instance.Add(new PlayerBase());
+            }
+            PlayerBase.Instance[session.Id] = Account.Instance[session.Id].Player[slot];
+
             Log.Add("Character " + name + " added to " + GetAccountLogin(session.Id) + "'s account.", Constant.PlayerLog);
             Server.Player.OnAdd(session);
         }
@@ -437,14 +444,14 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                     return;
                 }
 
-                for (int n = 0; n < session.Id; n++)
+                // Ensure the in-memory player list is large enough, then assign the selected character
+                // at the session's player index. (Using Add() here breaks indexing and can load the wrong character.)
+                while (PlayerBase.Instance.Count <= session.Id)
                 {
-                    if (PlayerBase.Instance?.Count <= n)
-                    {
-                        PlayerBase.Instance?.Add(new PlayerBase());
-                    }
+                    PlayerBase.Instance.Add(new PlayerBase());
                 }
-                PlayerBase.Instance?.Add(Account.Instance[session.Id].Player[slot]);
+
+                PlayerBase.Instance[session.Id] = Account.Instance[session.Id].Player[slot];
                 Server.Player.OnAdd(session);
             }
             else

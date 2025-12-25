@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window Name="winEventEditor" Caption="Event Editor"
-		Size="980,640"
+		Size="980,610"
         Icon="344" IconOffset="3,5"
         Design="WindowNormal"
         StartPosition="CenterScreen"
@@ -38,8 +38,6 @@
 	<Button Name="btnPage28" Text="28" Position="822,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
 
 	<GroupBox Name="grpDetails" Position="8,54" Size="964,120" Caption="Details">
-		<!-- Page tabs: top-left of window (inside Details) -->
-		<!-- Page label + nav: directly below tabs -->
 		<Label Name="lblPageCaption" Text="Page" Position="12,22" Size="50,18"/>
 		<Label Name="lblPage" Text="1 / 1" Position="64,22" Size="90,18"/>
 		<Button Name="btnPrevPage" Text="&lt;" Position="140,18" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
@@ -52,6 +50,24 @@
 		<CheckBox Name="chkGlobal" Text="Global" Position="340,52" Size="90,18" Design="CheckboxNormal"/>
 		<Label Name="lblPosCaption" Text="Position" Position="20,80" Size="80,18"/>
 		<Label Name="lblPosition" Text="(0, 0)" Position="100,80" Size="120,18"/>
+
+		<!-- Graphic (per-page) -->
+		<Label Name="lblGraphicType" Text="Graphic" Position="420,22" Size="80,18"/>
+		<ComboBox Name="cmbGraphicType" Position="480,20" Size="180,20"/>
+		<Label Name="lblGraphic" Text="Id" Position="420,52" Size="80,18"/>
+		<ScrollBar Name="sldGraphic" Position="480,52" Size="220,14" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+		<Label Name="lblGraphicValue" Text="0" Position="708,50" Size="60,18"/>
+
+		<Label Name="lblGraphicX" Text="X" Position="420,80" Size="18,18"/>
+		<TextBox Name="txtGraphicX" Position="440,78" Size="50,22" Design="TextWhite"/>
+		<Label Name="lblGraphicY" Text="Y" Position="500,80" Size="18,18"/>
+		<TextBox Name="txtGraphicY" Position="520,78" Size="50,22" Design="TextWhite"/>
+		<Label Name="lblGraphicX2" Text="X2" Position="580,80" Size="24,18"/>
+		<TextBox Name="txtGraphicX2" Position="604,78" Size="50,22" Design="TextWhite"/>
+		<Label Name="lblGraphicY2" Text="Y2" Position="664,80" Size="24,18"/>
+		<TextBox Name="txtGraphicY2" Position="688,78" Size="50,22" Design="TextWhite"/>
+
+		<PictureBox Name="picGraphic" Position="768,20" Size="96,96" Design="TextBlack"/>
 
 	</GroupBox>
 
@@ -79,8 +95,8 @@
 		<ScrollBar Name="sldCommands" Position="940,56" Size="16,176" Min="0" Max="0" Vertical="true"/>
 	</GroupBox>
 
-	<Button Name="btnOk" Text="OK" Position="726, 616" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-	<Button Name="btnCancel" Text="Cancel" Position="814, 616" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+	<Button Name="btnOk" Text="OK" Position="405,578" Size="80,24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+	<Button Name="btnCancel" Text="Cancel" Position="495,578" Size="80,24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
 
 	<Button Name="btnClose" Position="-19,5" Size="16,16" Image="8" ImageHover="9" ImageMouseDown="10"/>
 </Window>

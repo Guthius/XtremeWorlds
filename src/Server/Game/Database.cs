@@ -577,14 +577,13 @@ public static class Database
 
         if (Account.Instance[index].Player[slot].Name == "")
         {
-            for (n = 0; n < index; n++)
+            while (PlayerBase.Instance.Count <= index)
             {
-                if (PlayerBase.Instance?.Count <= n)
-                {
-                    PlayerBase.Instance?.Add(new Player());
-                }
+                PlayerBase.Instance.Add(new Player());
             }
-            PlayerBase.Instance?.Add(Account.Instance[index].Player[slot]);
+
+            PlayerBase.Instance[index] = Account.Instance[index].Player[slot];
+            
             Account.Instance[index].Player[slot].Name = name;
             Account.Instance[index].Player[slot].Sex = sex;
             Account.Instance[index].Player[slot].Job = job;
@@ -649,7 +648,7 @@ public static class Database
 
             if (Database.CharacterList?.Count == 1)
                 SetPlayerAccess(index, (int)AccessLevel.Owner);
-
+            
             await Account.OnSave(index);
         }
 

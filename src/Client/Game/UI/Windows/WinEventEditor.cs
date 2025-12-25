@@ -2,6 +2,7 @@ using Client.Game.UI.Controls;
 using Core.Globals;
 using Microsoft.VisualBasic;
 using System;
+using System.IO;
 
 namespace Client.Game.UI.Windows;
 
@@ -229,7 +230,7 @@ public static class WinEventEditor
     {
         if (WindowManager.TryGetControl("winEventEditor", controlName, out var ctrl) && ctrl is TextBox tb)
         {
-            var s = tb.Text?.Trim();
+            var s = GetLiveText(tb).Trim();
             if (int.TryParse(s, out var v))
                 return v;
         }
@@ -239,7 +240,7 @@ public static class WinEventEditor
     private static string ReadStringTextBox(string controlName)
     {
         if (WindowManager.TryGetControl("winEventEditor", controlName, out var ctrl) && ctrl is TextBox tb)
-            return tb.Text ?? string.Empty;
+            return GetLiveText(tb);
         return string.Empty;
     }
 
@@ -269,7 +270,7 @@ public static class WinEventEditor
     {
         if (WindowManager.TryGetControl(windowName, controlName, out var ctrl) && ctrl is TextBox tb)
         {
-            var s = tb.Text?.Trim();
+            var s = GetLiveText(tb).Trim();
             if (int.TryParse(s, out var v))
                 return v;
         }
@@ -279,8 +280,20 @@ public static class WinEventEditor
     private static string ReadStringTextBox(string windowName, string controlName)
     {
         if (WindowManager.TryGetControl(windowName, controlName, out var ctrl) && ctrl is TextBox tb)
-            return tb.Text ?? string.Empty;
+            return GetLiveText(tb);
         return string.Empty;
+    }
+
+    private static string GetLiveText(TextBox tb)
+    {
+        // In this UI framework, TextBox.Render shows Text + GameState.ChatShowLine when active;
+        // Text itself may not update until focus/commit. Read the same "live" value for bindings.
+        var committed = tb.Text ?? string.Empty;
+        var live = ReferenceEquals(WindowManager.ActiveWindow?.ActiveControl, tb)
+            ? committed + (GameState.ChatShowLine ?? string.Empty)
+            : committed;
+
+        return live.Replace("\0", string.Empty);
     }
 
     private static bool TryGetCommandAt(int listIndex, int commandIndex, out Core.Globals.Type.EventCommand cmd)
@@ -541,6 +554,19 @@ public static class WinEventEditor
                 cmbMoveFreq.Items.Add("Highest");
             }
         }
+
+        // Graphic type
+        if (WindowManager.TryGetControl("winEventEditor", "cmbGraphicType", out var gtCtrl) && gtCtrl is ComboBox cmbGraphicType)
+        {
+            if (cmbGraphicType.Items.Count == 0)
+            {
+                cmbGraphicType.Items.Clear();
+                cmbGraphicType.Items.Add("None");
+                cmbGraphicType.Items.Add("Sprite");
+                cmbGraphicType.Items.Add("Tileset");
+                cmbGraphicType.Items.Add("Picture");
+            }
+        }
     }
 
     private static void RefreshPageButtons()
@@ -626,32 +652,8 @@ public static class WinEventEditor
         if (WindowManager.TryGetControl("winEventEditor", "cmbTrigger", out var trigCtrl) && trigCtrl is ComboBox cmbTrigger)
             cmbTrigger.Value = Math.Clamp(page.Trigger, 0, cmbTrigger.Items.Count - 1);
 
-        // Positioning
-        if (WindowManager.TryGetControl("winEventEditor", "cmbPositioning", out var posCtrl) && posCtrl is ComboBox cmbPos)
-            cmbPos.Value = Math.Clamp(page.Position, 0, cmbPos.Items.Count - 1);
-
-        // Move type/speed/freq
-        if (WindowManager.TryGetControl("winEventEditor", "cmbMoveType", out var mtCtrl) && mtCtrl is ComboBox cmbMoveType)
-            cmbMoveType.Value = Math.Clamp(page.MoveType, 0, cmbMoveType.Items.Count - 1);
-
-        if (WindowManager.TryGetControl("winEventEditor", "cmbMoveSpeed", out var msCtrl) && msCtrl is ComboBox cmbMoveSpeed)
-            cmbMoveSpeed.Value = Math.Clamp(page.MoveSpeed, 0, cmbMoveSpeed.Items.Count - 1);
-
-        if (WindowManager.TryGetControl("winEventEditor", "cmbMoveFreq", out var mfCtrl) && mfCtrl is ComboBox cmbMoveFreq)
-            cmbMoveFreq.Value = Math.Clamp(page.MoveFreq, 0, cmbMoveFreq.Items.Count - 1);
-
-        // Flags
-        if (WindowManager.TryGetControl("winEventEditor", "chkWalkAnim", out var waCtrl) && waCtrl is CheckBox chkWalkAnim)
-            chkWalkAnim.Value = page.IdleAnim != 0 ? 1 : 0;
-
-        if (WindowManager.TryGetControl("winEventEditor", "chkDirFix", out var dfCtrl) && dfCtrl is CheckBox chkDirFix)
-            chkDirFix.Value = page.DirFix != 0 ? 1 : 0;
-
-        if (WindowManager.TryGetControl("winEventEditor", "chkWalkThrough", out var wtCtrl) && wtCtrl is CheckBox chkWalkThrough)
-            chkWalkThrough.Value = page.WalkThrough != 0 ? 1 : 0;
-
-        if (WindowManager.TryGetControl("winEventEditor", "chkShowName", out var snCtrl) && snCtrl is CheckBox chkShowName)
-            chkShowName.Value = page.ShowName != 0 ? 1 : 0;
+        // Graphic (per-page)
+        SyncGraphicControlsFromPage(page);
 
         UpdatePageLabel();
     }
@@ -1268,13 +1270,125 @@ public static class WinEventEditor
     public static void SetEventNameFromControl(string? name)
     {
         if (_isLoading) return;
-        Client.Event.Instance.Name = name ?? string.Empty;
+        // Ignore passed-in value; TextBox.Text may not include in-progress typing.
+        Client.Event.Instance.Name = ReadStringTextBox("txtName");
     }
 
     public static void ToggleGlobalFromControl(int value)
     {
         if (_isLoading) return;
         Client.Event.Instance.Globals = (byte)(value == 1 ? 1 : 0);
+    }
+
+    private static int GetGraphicMaxForType(int graphicType)
+    {
+        return graphicType switch
+        {
+            1 => Math.Max(0, GameState.NumCharacters),
+            2 => Math.Max(0, GameState.NumTileSets),
+            3 => Math.Max(0, GameState.NumPictures),
+            _ => 0,
+        };
+    }
+
+    private static void SyncGraphicControlsFromPage(Core.Globals.Type.EventPage page)
+    {
+        int graphicType = page.GraphicType;
+
+        if (WindowManager.TryGetControl("winEventEditor", "cmbGraphicType", out var gtCtrl) && gtCtrl is ComboBox cmbGraphicType)
+        {
+            graphicType = Math.Clamp(page.GraphicType, 0, Math.Max(0, cmbGraphicType.Items.Count - 1));
+            cmbGraphicType.Value = graphicType;
+        }
+
+        int max = GetGraphicMaxForType(graphicType);
+        int graphic = Math.Clamp(page.Graphic, 0, max);
+
+        if (WindowManager.TryGetControl("winEventEditor", "sldGraphic", out var gCtrl) && gCtrl is ScrollBar sb)
+        {
+            sb.Min = 0;
+            sb.Max = max;
+            sb.Value = graphic;
+        }
+
+        if (WindowManager.TryGetControl("winEventEditor", "lblGraphicValue", out var gvCtrl) && gvCtrl is Label lbl)
+            lbl.Text = graphic.ToString();
+
+        if (WindowManager.TryGetControl("winEventEditor", "txtGraphicX", out var gxCtrl) && gxCtrl is TextBox txtX)
+            txtX.Text = page.GraphicX.ToString();
+        if (WindowManager.TryGetControl("winEventEditor", "txtGraphicY", out var gyCtrl) && gyCtrl is TextBox txtY)
+            txtY.Text = page.GraphicY.ToString();
+        if (WindowManager.TryGetControl("winEventEditor", "txtGraphicX2", out var gx2Ctrl) && gx2Ctrl is TextBox txtX2)
+            txtX2.Text = page.GraphicX2.ToString();
+        if (WindowManager.TryGetControl("winEventEditor", "txtGraphicY2", out var gy2Ctrl) && gy2Ctrl is TextBox txtY2)
+            txtY2.Text = page.GraphicY2.ToString();
+    }
+
+    public static void OnDrawGraphicPreview()
+    {
+        var win = WindowManager.GetWindowByName("winEventEditor");
+        if (win is null) return;
+
+        if (!WindowManager.TryGetControl("winEventEditor", "picGraphic", out var ctrl) || ctrl is not PictureBox pic)
+            return;
+
+        if (!TryGetCurrentPage(out var page))
+            return;
+
+        int type = page.GraphicType;
+        int graphic = page.Graphic;
+        if (type <= 0 || graphic <= 0)
+            return;
+
+        int drawX = win.X + pic.X;
+        int drawY = win.Y + pic.Y;
+
+        switch (type)
+        {
+            case 1: // Sprite (character sheet)
+            {
+                if (graphic > GameState.NumCharacters) return;
+                var spritePath = Path.Combine(DataPath.Characters, graphic.ToString());
+                var sprite = GameClient.GetGfxInfo(spritePath);
+                if (sprite is null) return;
+
+                int frameCount = Core.Configurations.SettingsManager.Instance.RunFrames +
+                                 Core.Configurations.SettingsManager.Instance.IdleFrames +
+                                 Core.Configurations.SettingsManager.Instance.AttackFrames;
+                if (frameCount <= 0) frameCount = 1;
+
+                int w = sprite.Width / frameCount;
+                int dirs = Math.Max(1, Core.Configurations.SettingsManager.Instance.SpriteDirections);
+                if (sprite.Height % dirs != 0) dirs = 4;
+                int h = sprite.Height / (dirs == 0 ? 1 : dirs);
+
+                int cx = drawX + (pic.Width - w) / 2;
+                int cy = drawY + (pic.Height - h) / 2;
+                GameClient.RenderTexture(ref spritePath, cx, cy, 0, 0, w, h, w, h);
+                return;
+            }
+
+            case 2: // Tileset (single tile preview)
+            {
+                if (graphic > GameState.NumTileSets) return;
+                var tilesetPath = Path.Combine(DataPath.Tilesets, graphic.ToString());
+                int tileSize = Core.Globals.Constants.TileSize;
+                int srcX = Math.Max(0, page.GraphicX) * tileSize;
+                int srcY = Math.Max(0, page.GraphicY) * tileSize;
+                int tx = drawX + (pic.Width - tileSize) / 2;
+                int ty = drawY + (pic.Height - tileSize) / 2;
+                GameClient.RenderTexture(ref tilesetPath, tx, ty, srcX, srcY, tileSize, tileSize, tileSize, tileSize);
+                return;
+            }
+
+            case 3: // Picture
+            {
+                if (graphic > GameState.NumPictures) return;
+                var picPath = Path.Combine(DataPath.Pictures, graphic.ToString());
+                GameClient.RenderTexture(ref picPath, drawX, drawY, 0, 0, pic.Width, pic.Height, pic.Width, pic.Height);
+                return;
+            }
+        }
     }
 
     public static void UpdatePageSettingsFromControls()
@@ -1308,6 +1422,32 @@ public static class WinEventEditor
 
         if (WindowManager.TryGetControl("winEventEditor", "chkShowName", out var snCtrl) && snCtrl is CheckBox chkShowName)
             page.ShowName = snCtrl.Value == 1 ? 1 : 0;
+
+        // Graphic (per-page)
+        int graphicType = page.GraphicType;
+        if (WindowManager.TryGetControl("winEventEditor", "cmbGraphicType", out var gtCtrl) && gtCtrl is ComboBox cmbGraphicType)
+            graphicType = Math.Clamp(cmbGraphicType.Value, 0, Math.Max(0, cmbGraphicType.Items.Count - 1));
+        page.GraphicType = (byte)graphicType;
+
+        int max = GetGraphicMaxForType(graphicType);
+        if (WindowManager.TryGetControl("winEventEditor", "sldGraphic", out var gCtrl) && gCtrl is ScrollBar sb)
+        {
+            sb.Min = 0;
+            sb.Max = max;
+            page.Graphic = Math.Clamp(sb.Value, sb.Min, sb.Max);
+        }
+        else
+        {
+            page.Graphic = Math.Clamp(page.Graphic, 0, max);
+        }
+
+        if (WindowManager.TryGetControl("winEventEditor", "lblGraphicValue", out var gvCtrl) && gvCtrl is Label lbl)
+            lbl.Text = page.Graphic.ToString();
+
+        page.GraphicX = ReadIntTextBox("txtGraphicX", page.GraphicX);
+        page.GraphicY = ReadIntTextBox("txtGraphicY", page.GraphicY);
+        page.GraphicX2 = ReadIntTextBox("txtGraphicX2", page.GraphicX2);
+        page.GraphicY2 = ReadIntTextBox("txtGraphicY2", page.GraphicY2);
 
         SetCurrentPage(page);
         UpdatePageLabel();
