@@ -134,50 +134,52 @@ namespace Client
 
         public static void DeleteEvent(int X, int Y)
         {
-            int i;
-            int lowIndex = -1;
-
             if (GameState.MyEditorType != EditorType.Map)
                 return;
 
-            // First pass: find all events to delete and shift others down
-            var loopTo = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount;
-            for (i = 0; i < loopTo; i++)
-            {
-                if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event.Length <= i)
-                    break;
+            int mapIndex = GetPlayerMap(GameState.MyIndex);
+            var map = Client.Map.Instance[mapIndex];
 
-                if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].X == X & Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Y == Y)
+            int count = map.EventCount;
+            if (count <= 0 || map.Event == null)
+                return;
+
+            int removeIndex = -1;
+            for (int i = 0; i < count && i < map.Event.Length; i++)
+            {
+                if (map.Event[i].X == X && map.Event[i].Y == Y)
                 {
-                    // Clear the event
-                    ClearEvent(i);
-                    lowIndex = i;
+                    removeIndex = i;
                     break;
                 }
             }
 
-            if (lowIndex != -1)
+            if (removeIndex < 0)
+                return;
+
+            // Shift down within the active range [0, count)
+            for (int i = removeIndex; i < count - 1 && (i + 1) < map.Event.Length; i++)
+                map.Event[i] = map.Event[i + 1];
+
+            if (Data.MapEvents != null)
             {
-                for (i = lowIndex; i < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount; i++)
-                {
-                    if (Information.UBound(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event) > i)
-                    {
-                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i] = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i + 1];
-                    }
-                }
-
-                for (i = lowIndex; i < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount; i++)
-                {
-                    if (Information.UBound(Data.MapEvents) > i)
-                    {
-                        if (Data.MapEvents == null)
-                            break;
-                        Data.MapEvents[i] = Data.MapEvents[i + 1];
-                    }
-                }
-
-                Instance = default;
+                for (int i = removeIndex; i < count - 1 && (i + 1) < Data.MapEvents.Length; i++)
+                    Data.MapEvents[i] = Data.MapEvents[i + 1];
             }
+
+            // Decrement the logical count and resize arrays to keep a trailing empty slot.
+            count = Math.Max(0, count - 1);
+            map.EventCount = count;
+            Array.Resize(ref map.Event, count + 1);
+            if (Data.MapEvents != null)
+                Array.Resize(ref Data.MapEvents, count + 1);
+
+            // Ensure the trailing slot is clean/default so it can't be rendered as an "empty event".
+            if (map.Event.Length > count)
+                map.Event[count] = default;
+
+            Client.Map.Instance[mapIndex] = map;
+            Instance = default;
         }
 
 
