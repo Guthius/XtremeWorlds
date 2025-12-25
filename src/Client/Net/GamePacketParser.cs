@@ -726,7 +726,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         skill.CastTime = packetReader.ReadInt32();
         skill.CdTime = packetReader.ReadInt32();
         skill.JobReq = packetReader.ReadInt32();
-        skill.Dir = (byte)packetReader.ReadInt32();
+        skill.Dir = packetReader.ReadByte();
         skill.Duration = packetReader.ReadInt32();
         skill.Icon = packetReader.ReadInt32();
         skill.Interval = packetReader.ReadInt32();

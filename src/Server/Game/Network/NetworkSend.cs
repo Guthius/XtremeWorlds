@@ -415,7 +415,7 @@ public static class NetworkSend
         packetWriter.WriteInt32(skill.CastTime);
         packetWriter.WriteInt32(skill.CdTime);
         packetWriter.WriteInt32(skill.JobReq);
-        packetWriter.WriteInt32(skill.Dir);
+        packetWriter.WriteByte(skill.Dir);
         packetWriter.WriteInt32(skill.Duration);
         packetWriter.WriteInt32(skill.Icon);
         packetWriter.WriteInt32(skill.Interval);
@@ -423,7 +423,7 @@ public static class NetworkSend
         packetWriter.WriteInt32(skill.LevelReq);
         packetWriter.WriteInt32(skill.Map);
         packetWriter.WriteInt32(skill.MpCost);
-        packetWriter.WriteString(skill.Name ?? string.Empty);
+        packetWriter.WriteString(skill.Name);
         packetWriter.WriteInt32(skill.Range);
         packetWriter.WriteInt32(skill.SkillAnim);
         packetWriter.WriteInt32(skill.StunDuration);
