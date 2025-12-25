@@ -673,7 +673,7 @@ public static class Sender
         packetWriter.WriteInt32(Skill.Instance[index].Duration);
         packetWriter.WriteInt32(Skill.Instance[index].Icon);
         packetWriter.WriteInt32(Skill.Instance[index].Interval);
-        packetWriter.WriteInt32(Skill.Instance[index].IsAoE ? 1 : 0);
+        packetWriter.WriteBoolean(Skill.Instance[index].IsAoE);
         packetWriter.WriteInt32(Skill.Instance[index].LevelReq);
         packetWriter.WriteInt32(Skill.Instance[index].Map);
         packetWriter.WriteInt32(Skill.Instance[index].MpCost);
