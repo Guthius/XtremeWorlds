@@ -3577,6 +3577,18 @@ public class Crystalshire
         {
             if (!WindowManager.TryGetControl("winEventEditor", controlName, out var ctrl))
                 return;
+
+            // CheckBoxes in this UI framework don't reliably toggle themselves; explicitly flip Value then sync.
+            if (ctrl is CheckBox chk)
+            {
+                chk.CallBack[(int)ControlState.MouseDown] = () =>
+                {
+                    chk.Value = chk.Value == 0 ? 1 : 0;
+                    WinEventEditor.UpdatePageSettingsFromControls();
+                };
+                return;
+            }
+
             ctrl.CallBack[(int)ControlState.MouseMove] = WinEventEditor.UpdatePageSettingsFromControls;
             ctrl.CallBack[(int)ControlState.MouseDown] = WinEventEditor.UpdatePageSettingsFromControls;
         }
