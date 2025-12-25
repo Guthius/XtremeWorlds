@@ -738,17 +738,17 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         skill.Range = packetReader.ReadInt32();
         skill.SkillAnim = packetReader.ReadInt32();
         skill.StunDuration = packetReader.ReadInt32();
-        skill.Type = (byte)packetReader.ReadInt32();
+        skill.Type = packetReader.ReadByte();
         skill.Vital = packetReader.ReadInt32();
         skill.X = packetReader.ReadInt32();
         skill.Y = packetReader.ReadInt32();
         skill.IsProjectile = packetReader.ReadInt32();
         skill.Projectile = packetReader.ReadInt32();
-        skill.KnockBack = (byte)packetReader.ReadInt32();
-        skill.KnockBackTiles = (byte)packetReader.ReadInt32();
+        skill.KnockBack = packetReader.ReadByte();
+        skill.KnockBackTiles = packetReader.ReadByte();
         skill.MultiDirMask = packetReader.ReadInt32();
         skill.ChainOnHitSkillId = packetReader.ReadInt32();
-        skill.CommonEventType = (byte)packetReader.ReadInt32();
+        skill.CommonEventType = packetReader.ReadByte();
         skill.CommonEventData1 = packetReader.ReadInt32();
         skill.CommonEventData2 = packetReader.ReadInt32();
 

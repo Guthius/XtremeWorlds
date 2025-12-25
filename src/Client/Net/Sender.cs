@@ -681,7 +681,7 @@ public static class Sender
         packetWriter.WriteInt32(Skill.Instance[index].Range);
         packetWriter.WriteInt32(Skill.Instance[index].SkillAnim);
         packetWriter.WriteInt32(Skill.Instance[index].StunDuration);
-        packetWriter.WriteInt32(Skill.Instance[index].Type);
+        packetWriter.WriteByte(Skill.Instance[index].Type);
         packetWriter.WriteInt32(Skill.Instance[index].Vital);
         packetWriter.WriteInt32(Skill.Instance[index].X);
         packetWriter.WriteInt32(Skill.Instance[index].Y);
@@ -689,11 +689,11 @@ public static class Sender
         packetWriter.WriteInt32(Skill.Instance[index].IsProjectile);
         packetWriter.WriteInt32(Skill.Instance[index].Projectile);
 
-        packetWriter.WriteInt32(Skill.Instance[index].KnockBack);
-        packetWriter.WriteInt32(Skill.Instance[index].KnockBackTiles);
+        packetWriter.WriteByte(Skill.Instance[index].KnockBack);
+        packetWriter.WriteByte(Skill.Instance[index].KnockBackTiles);
         packetWriter.WriteInt32(Skill.Instance[index].MultiDirMask);
         packetWriter.WriteInt32(Skill.Instance[index].ChainOnHitSkillId);
-        packetWriter.WriteInt32(Skill.Instance[index].CommonEventType);
+        packetWriter.WriteByte(Skill.Instance[index].CommonEventType);
         packetWriter.WriteInt32(Skill.Instance[index].CommonEventData1);
         packetWriter.WriteInt32(Skill.Instance[index].CommonEventData2);
         Network.Send(packetWriter);

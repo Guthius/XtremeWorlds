@@ -427,17 +427,17 @@ public static class NetworkSend
         packetWriter.WriteInt32(skill.Range);
         packetWriter.WriteInt32(skill.SkillAnim);
         packetWriter.WriteInt32(skill.StunDuration);
-        packetWriter.WriteInt32(skill.Type);
+        packetWriter.WriteByte(skill.Type);
         packetWriter.WriteInt32(skill.Vital);
         packetWriter.WriteInt32(skill.X);
         packetWriter.WriteInt32(skill.Y);
         packetWriter.WriteInt32(skill.IsProjectile);
         packetWriter.WriteInt32(skill.Projectile);
-        packetWriter.WriteInt32(skill.KnockBack);
-        packetWriter.WriteInt32(skill.KnockBackTiles);
+        packetWriter.WriteByte(skill.KnockBack);
+        packetWriter.WriteByte(skill.KnockBackTiles);
         packetWriter.WriteInt32(skill.MultiDirMask);
         packetWriter.WriteInt32(skill.ChainOnHitSkillId);
-        packetWriter.WriteInt32(skill.CommonEventType);
+        packetWriter.WriteByte(skill.CommonEventType);
         packetWriter.WriteInt32(skill.CommonEventData1);
         packetWriter.WriteInt32(skill.CommonEventData2);
     }

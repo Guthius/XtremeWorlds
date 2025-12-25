@@ -1662,11 +1662,11 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Skill.Instance[skillNum].CastTime = buffer.ReadInt32();
         Skill.Instance[skillNum].CdTime = buffer.ReadInt32();
         Skill.Instance[skillNum].JobReq = buffer.ReadInt32();
-        Skill.Instance[skillNum].Dir = (byte)buffer.ReadInt32();
+        Skill.Instance[skillNum].Dir = buffer.ReadByte();
         Skill.Instance[skillNum].Duration = buffer.ReadInt32();
         Skill.Instance[skillNum].Icon = buffer.ReadInt32();
         Skill.Instance[skillNum].Interval = buffer.ReadInt32();
-        Skill.Instance[skillNum].IsAoE = Convert.ToBoolean(buffer.ReadInt32());
+        Skill.Instance[skillNum].IsAoE = buffer.ReadBoolean();
         Skill.Instance[skillNum].LevelReq = buffer.ReadInt32();
         Skill.Instance[skillNum].Map = buffer.ReadInt32();
         Skill.Instance[skillNum].MpCost = buffer.ReadInt32();
@@ -1674,7 +1674,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Skill.Instance[skillNum].Range = buffer.ReadInt32();
         Skill.Instance[skillNum].SkillAnim = buffer.ReadInt32();
         Skill.Instance[skillNum].StunDuration = buffer.ReadInt32();
-        Skill.Instance[skillNum].Type = (byte)buffer.ReadInt32();
+        Skill.Instance[skillNum].Type = buffer.ReadByte();
         Skill.Instance[skillNum].Vital = buffer.ReadInt32();
         Skill.Instance[skillNum].X = buffer.ReadInt32();
         Skill.Instance[skillNum].Y = buffer.ReadInt32();
@@ -1683,14 +1683,14 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Skill.Instance[skillNum].IsProjectile = buffer.ReadInt32();
         Skill.Instance[skillNum].Projectile = buffer.ReadInt32();
 
-        Skill.Instance[skillNum].KnockBack = (byte)buffer.ReadInt32();
-        Skill.Instance[skillNum].KnockBackTiles = (byte)buffer.ReadInt32();
+        Skill.Instance[skillNum].KnockBack = buffer.ReadByte();
+        Skill.Instance[skillNum].KnockBackTiles = buffer.ReadByte();
         Skill.Instance[skillNum].MultiDirMask = buffer.ReadInt32();
         // chain skills
         Skill.Instance[skillNum].ChainOnHitSkillId = buffer.ReadInt32();
 
         // common event fields
-        Skill.Instance[skillNum].CommonEventType = (byte)buffer.ReadInt32();
+        Skill.Instance[skillNum].CommonEventType = buffer.ReadByte();
         Skill.Instance[skillNum].CommonEventData1 = buffer.ReadInt32();
         Skill.Instance[skillNum].CommonEventData2 = buffer.ReadInt32();
 
