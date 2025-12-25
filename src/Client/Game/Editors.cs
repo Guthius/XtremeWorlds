@@ -1062,22 +1062,16 @@ namespace Client
             }
 
             GameState.MyEditorType = EditorType.None;
-            ClearChanged_Animation();
+            Animation.OnClearChanged();
             Sender.SendCloseEditor();
         }
 
         public static void AnimationEditorCancel()
         {
             GameState.MyEditorType = EditorType.None;
-            ClearChanged_Animation();
+            Animation.OnClearChanged();
             Animation.OnReset();
             Sender.SendCloseEditor();
-        }
-
-        public static void ClearChanged_Animation()
-        {
-            for (int i = 0; i < Variables.MaxAnimations; i++)
-                Animation.IsChanged[i] = false;
         }
 
         #endregion

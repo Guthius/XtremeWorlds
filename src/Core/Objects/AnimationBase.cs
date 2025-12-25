@@ -40,6 +40,11 @@ namespace Core.Objects
             throw new NotImplementedException();
         }
 
+        public static void OnClearChanged()
+        {
+            IsChanged = new bool[Variables.MaxAnimations];
+        }
+
         public static void OnLoad(int index)
         {
             throw new NotImplementedException();

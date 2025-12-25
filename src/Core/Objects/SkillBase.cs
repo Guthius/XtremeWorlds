@@ -47,7 +47,7 @@ public class SkillBase : IData
     public int CommonEventData1 { get; set; }
     public int CommonEventData2 { get; set; }
 
-    public static List<SkillBase> Instance { get; } = new();
+    public static List<SkillBase> Instance { get; private set; } = new List<SkillBase>();
 
     public static void OnClear(int index)
     {
