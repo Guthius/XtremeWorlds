@@ -21,7 +21,7 @@ namespace Core.Objects
             Name = "";
         }
 
-        public static void ClearChanged()
+        public static void OnClearChanged()
         {
             IsChanged = new bool[Variables.MaxProjectiles];
         }

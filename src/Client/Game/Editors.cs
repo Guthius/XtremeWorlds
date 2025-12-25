@@ -1089,22 +1089,16 @@ namespace Client
             }
 
             GameState.MyEditorType = EditorType.None;
-            ClearChanged_Npc();
+            Npc.OnClearChanged();
             Sender.SendCloseEditor();
         }
 
         public static void NpcEditorCancel()
         {
             GameState.MyEditorType = EditorType.None;
-            ClearChanged_Npc();
+            Npc.OnClearChanged();
             Npc.OnReset();
             Sender.SendCloseEditor();
-        }
-
-        public static void ClearChanged_Npc()
-        {
-            for (int i = 0; i < Variables.MaxNpcs; i++)
-                GameState.NpcChanged[i] = false;
         }
 
         #endregion
@@ -1153,22 +1147,16 @@ namespace Client
             }
 
             GameState.MyEditorType = EditorType.None;
-            ClearChanged_Skill();
+            Skill.OnClearChanged();
             Sender.SendCloseEditor();
         }
 
         public static void SkillEditorCancel()
         {
             GameState.MyEditorType = EditorType.None;
-            ClearChanged_Skill();
+            Skill.OnClearChanged();
             Skill.OnReset();
             Sender.SendCloseEditor();
-        }
-
-        public static void ClearChanged_Skill()
-        {
-            for (int i = 0; i < Variables.MaxSkills; i++)
-                GameState.SkillChanged[i] = false;
         }
 
         #endregion
@@ -1185,22 +1173,16 @@ namespace Client
             }
 
             GameState.MyEditorType = EditorType.None;
-            ClearChanged_Shop();
+            Shop.OnClearChanged();
             Sender.SendCloseEditor();
         }
 
         public static void ShopEditorCancel()
         {
             GameState.MyEditorType = EditorType.None;
-            ClearChanged_Shop();
+            Shop.OnClearChanged();
             Shop.OnReset();
             Sender.SendCloseEditor();
-        }
-
-        public static void ClearChanged_Shop()
-        {
-            for (int i = 0; i < Variables.MaxShops; i++)
-                GameState.ShopChanged[i] = false;
         }
 
         #region Job Editor
@@ -1269,16 +1251,11 @@ namespace Client
         public static void MoralEditorCancel()
         {
             GameState.MyEditorType = EditorType.None;
-            ClearChanged_Moral();
+            Moral.OnClearChanged();
             Moral.OnReset();
             Sender.SendCloseEditor();
         }
 
-        public static void ClearChanged_Moral()
-        {
-            for (int i = 0; i < Variables.MaxMorals; i++)
-                Moral.IsChanged[i] = false;
-        }
         #endregion
 
         #region Projectile Editor
@@ -1286,30 +1263,23 @@ namespace Client
         {
             for (int i = 0; i < Variables.MaxProjectiles;  i++)
             {
-                if (GameState.ProjectileChanged[i])
+                if (Projectile.IsChanged[i])
                 {
                     Sender.SendSaveProjectile(i);
                 }
             }
 
             GameState.MyEditorType = EditorType.None;
-            ClearChanged_Projectile();
+            Projectile.OnClearChanged();
             Sender.SendCloseEditor();
         }
 
         public static void ProjectileEditorCancel()
         {
             GameState.MyEditorType = EditorType.None;
-            ClearChanged_Projectile();
+            Projectile.OnClearChanged();
             Projectile.OnReset();
             Sender.SendCloseEditor();
-        }
-
-        public static void ClearChanged_Projectile()
-        {
-            for (int i = 0; i < Variables.MaxProjectiles;  i++)
-                GameState.ProjectileChanged[i] = false;
-
         }
 
         #endregion
