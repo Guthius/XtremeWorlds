@@ -1955,7 +1955,7 @@ public class Script
             {
                 ref var baseNpc = ref MapNpc.Instance[caster.Map, caster.Id];
                 var npcTemplate = caster.Num >= 0 && caster.Num < Npc.Instance.Count ? Npc.Instance[caster.Num] : default;
-                if (npcTemplate.Skill != null && baseNpc.SkillCd != null)
+                if (npcTemplate?.Skill != null && baseNpc.SkillCd != null)
                 {
                     for (int slot = 0; slot < Script.MaxNpcSkills && slot < npcTemplate.Skill.Length && slot < baseNpc.SkillCd.Length; slot++)
                     {
