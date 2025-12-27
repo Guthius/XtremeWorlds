@@ -101,6 +101,18 @@ public class WinSkillEditor
                 if (!string.IsNullOrWhiteSpace(s)) cmbSound.Items.Add(s);
             }
         }
+
+        // Custom Script / Common Event type (0=None, otherwise 1..CommonEventTrigger)
+        if (WindowManager.TryGetControl("winSkillEditor", "cmbCommonEventType", out var ceCtrl) && ceCtrl is ComboBox cmbCe)
+        {
+            cmbCe.Items.Clear();
+            cmbCe.Items.Add("None");
+            foreach (var name in Enum.GetNames(typeof(CommonEventTrigger)))
+            {
+                string display = System.Text.RegularExpressions.Regex.Replace(name, "(?<!^)([A-Z])", " $1");
+                cmbCe.Items.Add(display);
+            }
+        }
     }
 
     public static void OnListMouseDown()
@@ -193,6 +205,16 @@ public class WinSkillEditor
             int val = s.Projectile < 0 ? 0 : s.Projectile + 1;
             cmbProj.Value = Math.Clamp(val, 0, cmbProj.Items.Count - 1);
         }
+
+        // Custom Script / Common Event
+        if (WindowManager.TryGetControl("winSkillEditor", "cmbCommonEventType", out var ceCtrl) && ceCtrl is ComboBox cmbCe)
+            cmbCe.Value = Math.Clamp(s.CommonEventType, 0, cmbCe.Items.Count - 1);
+
+        if (WindowManager.TryGetControl("winSkillEditor", "txtCommonEventData1", out var ce1Ctrl) && ce1Ctrl is TextBox tb1)
+            tb1.Text = s.CommonEventData1.ToString();
+
+        if (WindowManager.TryGetControl("winSkillEditor", "txtCommonEventData2", out var ce2Ctrl) && ce2Ctrl is TextBox tb2)
+            tb2.Text = s.CommonEventData2.ToString();
 
         // Preview draws
         if (WindowManager.TryGetControl("winSkillEditor", "picIcon", out var iconPicCtrl) && iconPicCtrl is PictureBox picIcon)

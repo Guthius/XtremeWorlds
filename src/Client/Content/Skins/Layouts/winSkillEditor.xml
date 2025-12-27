@@ -53,8 +53,16 @@
 		<Label Name="lblSound" Text="Sound" Position="360,88" Size="120,18"/>
 		<ComboBox Name="cmbSound" Position="480,86" Size="160,20"/>
 
-		<Label Name="lblIcon" Text="Icon" Position="360,120" Size="90,18"/>
-		<PictureBox Name="picIcon" Position="360,140" Size="32,32" Design="TextBlack"/>
+		<Label Name="lblCommonEvent" Text="Custom Script" Position="360,120" Size="120,18"/>
+		<Label Name="lblCommonEventType" Text="Type" Position="360,144" Size="120,18"/>
+		<ComboBox Name="cmbCommonEventType" Position="480,142" Size="160,20"/>
+		<Label Name="lblCommonEventData1" Text="Data 1" Position="360,168" Size="120,18"/>
+		<TextBox Name="txtCommonEventData1" Position="480,166" Size="160,22" Design="TextWhite"/>
+		<Label Name="lblCommonEventData2" Text="Data 2" Position="360,192" Size="120,18"/>
+		<TextBox Name="txtCommonEventData2" Position="480,190" Size="160,22" Design="TextWhite"/>
+
+		<Label Name="lblIcon" Text="Icon" Position="360,224" Size="90,18"/>
+		<PictureBox Name="picIcon" Position="360,244" Size="32,32" Design="TextBlack"/>
 	</GroupBox>
 
 	<!-- Action buttons -->

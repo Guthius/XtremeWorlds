@@ -1076,6 +1076,22 @@ public class Script
         var dmg = CalculateDamage(attacker, target, skillId, damage);
         var killed = ApplyDamageExtended(attacker, target, dmg, skillId);
 
+        // Trigger skill common event on successful damage skills when the hit actually lands.
+        // This also covers projectile skills since projectile impact uses AttemptAttack(..., skillId).
+        if (attacker.Type == Entity.EntityType.Player && skillId.HasValue)
+        {
+            int sid = skillId.Value;
+            if (sid >= 0 && sid < Skill.Instance.Count)
+            {
+                var sk = Skill.Instance[sid];
+                bool isDamageSkill = sk.Type == (byte)SkillEffect.DamageHealth || sk.Type == (byte)SkillEffect.DamageMana;
+                if (isDamageSkill && sk.CommonEventType > 0)
+                {
+                    CommonEvent(attacker.Id, -1, sid);
+                }
+            }
+        }
+
         // set cooldown
         attacker.AttackTimer = (int)now; // attacker is a snapshot; we must also update underlying store
         UpdateUnderlyingAttackTimer(attacker, (int)now);
@@ -1957,7 +1973,14 @@ public class Script
         if (caster.Type == Core.Globals.Entity.EntityType.Player && skill.CommonEventType > 0)
         {
             int pid = caster.Id;
-            CommonEvent(pid, -1, skillId);
+
+            // Damage skills trigger their common event on hit inside AttemptAttack() to support projectiles.
+            // Non-damage skills trigger on cast finalize.
+            bool isDamageSkill = skill.Type == (byte)SkillEffect.DamageHealth || skill.Type == (byte)SkillEffect.DamageMana;
+            if (!isDamageSkill)
+            {
+                CommonEvent(pid, -1, skillId);
+            }
         }
     }
 

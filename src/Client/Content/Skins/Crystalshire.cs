@@ -3521,6 +3521,36 @@ public class Crystalshire
             }
         });
 
+        // Custom Script / Common Event type (0=None, otherwise 1..CommonEventTrigger)
+        BindCombo("cmbCommonEventType", v =>
+        {
+            int i = WinSkillEditor.SelectedIndex;
+            if (i >= 0 && i < Variables.MaxSkills && Skill.Instance.Count > i)
+            {
+                Skill.Instance[i].CommonEventType = (byte)Math.Clamp(v, 0, byte.MaxValue);
+                GameState.SkillChanged[i] = true;
+            }
+        });
+
+        // Custom Script data fields
+        void BindIntText(string name, Action<int> apply)
+        {
+            if (WindowManager.TryGetControl("winSkillEditor", name, out var ctrl) && ctrl is TextBox tb)
+            {
+                tb.CallBack[(int)ControlState.KeyUp] = () =>
+                {
+                    int i = WinSkillEditor.SelectedIndex;
+                    if (i < 0 || i >= Variables.MaxSkills || Skill.Instance.Count <= i) return;
+                    if (!int.TryParse(tb.Text, out var v)) return;
+                    apply(v);
+                    GameState.SkillChanged[i] = true;
+                };
+            }
+        }
+
+        BindIntText("txtCommonEventData1", v => Skill.Instance[WinSkillEditor.SelectedIndex].CommonEventData1 = v);
+        BindIntText("txtCommonEventData2", v => Skill.Instance[WinSkillEditor.SelectedIndex].CommonEventData2 = v);
+
         // Buttons
         if (WindowManager.TryGetControl("winSkillEditor", "btnSave", out var btnSave))
             btnSave.CallBack[(int)ControlState.MouseDown] = () => { WinSkillEditor.OnSave(); };

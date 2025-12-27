@@ -2,15 +2,13 @@
 using Core.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
 
 namespace Core.Objects
 {
     public class ItemBase : IData
     {
         public static bool[] IsChanged { get; set; } = new bool[Variables.MaxItems];
-        
+
         public ItemBase()
         {
             AddStat = new int[Enum.GetNames(typeof(Stat)).Length];
@@ -48,6 +46,7 @@ namespace Core.Objects
         public byte KnockBackTiles;
         public int Projectile;
         public int Ammo;
+
         public static List<ItemBase> Instance { get; private set; } = new List<ItemBase>();
 
         public static void OnClear(int index)
@@ -67,24 +66,9 @@ namespace Core.Objects
                 OnClear(i);
         }
 
-        public static void OnDraw(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnLoad(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnSave(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnUpdate(int index)
-        {
-            throw new NotImplementedException();
-        }
+        public static void OnDraw(int index) => throw new NotImplementedException();
+        public static void OnLoad(int index) => throw new NotImplementedException();
+        public static void OnSave(int index) => throw new NotImplementedException();
+        public static void OnUpdate(int index) => throw new NotImplementedException();
     }
 }
