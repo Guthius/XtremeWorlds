@@ -1973,14 +1973,7 @@ public class Script
         if (caster.Type == Core.Globals.Entity.EntityType.Player && skill.CommonEventType > 0)
         {
             int pid = caster.Id;
-
-            // Damage skills trigger their common event on hit inside AttemptAttack() to support projectiles.
-            // Non-damage skills trigger on cast finalize.
-            bool isDamageSkill = skill.Type == (byte)SkillEffect.DamageHealth || skill.Type == (byte)SkillEffect.DamageMana;
-            if (!isDamageSkill)
-            {
-                CommonEvent(pid, -1, skillId);
-            }
+            CommonEvent(pid, -1, skillId);
         }
     }
 
