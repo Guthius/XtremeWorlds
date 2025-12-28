@@ -509,11 +509,11 @@ public enum PartOrigin
 public enum Font
 {
     None,
-    Georgia,
+    GeorgiaSmall,
     Arial,
     Verdana,
     PixelGeorgia,
-    PixelGeorgiaBold
+    Georgia
 }
 
 /// <summary>
