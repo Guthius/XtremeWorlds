@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Window Name="winCharacter" Caption="Character" Size="174, 356" Position="0,0" Font="PixelGeorgiaBold" Icon="62" Design="WindowEmpty" StartPosition="CenterScreen">
+<Window Name="winCharacter" Caption="Character" Size="174, 356" Position="0,0" Font="Georgia" Icon="62" Design="WindowEmpty" StartPosition="CenterScreen">
 	<GroupBox Name="grpCharacter" Position="6,26" Size="158,284">
 		<PictureBox Name="picWhiteBox1" Position="10,8" Size="142,19" Design="TextWhite"/>
 		<PictureBox Name="picWhiteBox2" Position="10,28" Size="142,19" Design="TextWhite"/>
@@ -9,24 +9,24 @@
 		<PictureBox Name="picWhiteBox6" Position="10,108" Size="142,19" Design="TextWhite"/>
 		<PictureBox Name="picWhiteBox7" Position="10,128" Size="142,19" Design="TextWhite"/>
 
-		<Label Name="lblName" Text="Name" Position="14,10" Size="138,10" Font="PixelGeorgiaBold"/>
-		<Label Name="lblJob" Text="Job" Position="14,30" Size="138,10" Font="PixelGeorgiaBold"/>
-		<Label Name="lblLevel" Text="Level" Position="14,50" Size="138,10" Font="PixelGeorgiaBold"/>
-		<Label Name="lblGuild" Text="Guild" Position="14,70" Size="138,10" Font="PixelGeorgiaBold"/>
-		<Label Name="lblHealth" Text="Health" Position="14,90" Size="138,10" Font="PixelGeorgiaBold"/>
-		<Label Name="lblSpirit" Text="Spirit" Position="14,110" Size="138,10" Font="PixelGeorgiaBold"/>
-		<Label Name="lblExperience" Text="Experience" Position="14,130" Size="138,10" Font="PixelGeorgiaBold"/>
+		<Label Name="lblName" Text="Name" Position="14,10" Size="138,10" Font="Georgia"/>
+		<Label Name="lblJob" Text="Job" Position="14,30" Size="138,10" Font="Georgia"/>
+		<Label Name="lblLevel" Text="Level" Position="14,50" Size="138,10" Font="Georgia"/>
+		<Label Name="lblGuild" Text="Guild" Position="14,70" Size="138,10" Font="Georgia"/>
+		<Label Name="lblHealth" Text="Health" Position="14,90" Size="138,10" Font="Georgia"/>
+		<Label Name="lblSpirit" Text="Spirit" Position="14,110" Size="138,10" Font="Georgia"/>
+		<Label Name="lblExperience" Text="Experience" Position="14,130" Size="138,10" Font="Georgia"/>
 
-		<Label Name="lblName2" Text="" Position="10,10" Size="142,10" Font="PixelGeorgiaBold" Align="Right"/>
-		<Label Name="lblJob2" Text="" Position="10,30" Size="142,10" Font="PixelGeorgiaBold" Align="Right"/>
-		<Label Name="lblLevel2" Text="" Position="10,50" Size="142,10" Font="PixelGeorgiaBold" Align="Right"/>
-		<Label Name="lblGuild2" Text="" Position="10,70" Size="142,10" Font="PixelGeorgiaBold" Align="Right"/>
-		<Label Name="lblHealth2" Text="" Position="10,90" Size="142,10" Font="PixelGeorgiaBold" Align="Right"/>
-		<Label Name="lblSpirit2" Text="" Position="10,110" Size="142,10" Font="PixelGeorgiaBold" Align="Right"/>
-		<Label Name="lblExperience2" Text="" Position="10,130" Size="142,10" Font="PixelGeorgiaBold" Align="Right"/>
+		<Label Name="lblName2" Text="" Position="10,10" Size="142,10" Font="Georgia" Align="Right"/>
+		<Label Name="lblJob2" Text="" Position="10,30" Size="142,10" Font="Georgia" Align="Right"/>
+		<Label Name="lblLevel2" Text="" Position="10,50" Size="142,10" Font="Georgia" Align="Right"/>
+		<Label Name="lblGuild2" Text="" Position="10,70" Size="142,10" Font="Georgia" Align="Right"/>
+		<Label Name="lblHealth2" Text="" Position="10,90" Size="142,10" Font="Georgia" Align="Right"/>
+		<Label Name="lblSpirit2" Text="" Position="10,110" Size="142,10" Font="Georgia" Align="Right"/>
+		<Label Name="lblExperience2" Text="" Position="10,130" Size="142,10" Font="Georgia" Align="Right"/>
 
 		<PictureBox Name="picShadow" Position="14,154" Size="134,9" Design="BlackOval"/>
-		<Label Name="lblAttributes" Text="Attributes" Position="14,154" Size="134,10" Font="PixelGeorgiaBold" Align="Center"/>
+		<Label Name="lblAttributes" Text="Attributes" Position="14,154" Size="134,10" Font="Georgia" Align="Center"/>
 
 		<PictureBox Name="picBlackBox1" Position="10,162" Size="142,19" Design="TextBlack"/>
 		<PictureBox Name="picBlackBox2" Position="10,182" Size="142,19" Design="TextBlack"/>
@@ -35,34 +35,34 @@
 		<PictureBox Name="picBlackBox5" Position="10,242" Size="142,19" Design="TextBlack"/>
 		<PictureBox Name="picBlackBox6" Position="10,262" Size="142,19" Design="TextBlack"/>
 
-		<Label Name="lblStrength" Text="Strength" Position="14,166" Size="96,10" Font="PixelGeorgiaBold"/>
-		<Label Name="lblVitality" Text="Vitality" Position="14,186" Size="96,10" Font="PixelGeorgiaBold"/>
-		<Label Name="lblIntelligence" Text="Intelligence" Position="14,206" Size="104,10" Font="PixelGeorgiaBold"/>
-		<Label Name="lblLuck" Text="Luck" Position="14,226" Size="96,10" Font="PixelGeorgiaBold"/>
-		<Label Name="lblSpiritStat" Text="Spirit" Position="14,246" Size="96,10" Font="PixelGeorgiaBold"/>
-		<Label Name="lblStatPoints" Text="Stat Points" Position="14,266" Size="96,10" Font="PixelGeorgiaBold"/>
+		<Label Name="lblStrength" Text="Strength" Position="14,166" Size="96,10" Font="Georgia"/>
+		<Label Name="lblVitality" Text="Vitality" Position="14,186" Size="96,10" Font="Georgia"/>
+		<Label Name="lblIntelligence" Text="Intelligence" Position="14,206" Size="104,10" Font="Georgia"/>
+		<Label Name="lblLuck" Text="Luck" Position="14,226" Size="96,10" Font="Georgia"/>
+		<Label Name="lblSpiritStat" Text="Spirit" Position="14,246" Size="96,10" Font="Georgia"/>
+		<Label Name="lblStatPoints" Text="Stat Points" Position="14,266" Size="96,10" Font="Georgia"/>
 
-		<Label Name="lblStat_1" Text="0" Position="38,164" Size="96,15" Font="PixelGeorgiaBold" Align="Right"/>
+		<Label Name="lblStat_1" Text="0" Position="38,164" Size="96,15" Font="Georgia" Align="Right"/>
 		<Button Name="btnStat_1" Position="136,164" Size="15,15" Image="48" ImageHover="49" ImageMouseDown="50"/>
 		<PictureBox Name="btnGreyStat_1" Position="136,164" Size="15,15" Image="47"/>
 
-		<Label Name="lblStat_2" Text="0" Position="38,184" Size="96,15" Font="PixelGeorgiaBold" Align="Right"/>
+		<Label Name="lblStat_2" Text="0" Position="38,184" Size="96,15" Font="Georgia" Align="Right"/>
 		<Button Name="btnStat_2" Position="136,184" Size="15,15" Image="48" ImageHover="49" ImageMouseDown="50"/>
 		<PictureBox Name="btnGreyStat_2" Position="136,184" Size="15,15" Image="47"/>
 
-		<Label Name="lblStat_3" Text="0" Position="38,204" Size="96,15" Font="PixelGeorgiaBold" Align="Right"/>
+		<Label Name="lblStat_3" Text="0" Position="38,204" Size="96,15" Font="Georgia" Align="Right"/>
 		<Button Name="btnStat_3" Position="136,204" Size="15,15" Image="48" ImageHover="49" ImageMouseDown="50"/>
 		<PictureBox Name="btnGreyStat_3" Position="136,204" Size="15,15" Image="47"/>
 
-		<Label Name="lblStat_4" Text="0" Position="38,224" Size="96,15" Font="PixelGeorgiaBold" Align="Right"/>
+		<Label Name="lblStat_4" Text="0" Position="38,224" Size="96,15" Font="Georgia" Align="Right"/>
 		<Button Name="btnStat_4" Position="136,224" Size="15,15" Image="48" ImageHover="49" ImageMouseDown="50"/>
 		<PictureBox Name="btnGreyStat_4" Position="136,224" Size="15,15" Image="47"/>
 
-		<Label Name="lblStat_5" Text="0" Position="38,244" Size="96,15" Font="PixelGeorgiaBold" Align="Right"/>
+		<Label Name="lblStat_5" Text="0" Position="38,244" Size="96,15" Font="Georgia" Align="Right"/>
 		<Button Name="btnStat_5" Position="136,244" Size="15,15" Image="48" ImageHover="49" ImageMouseDown="50"/>
 		<PictureBox Name="btnGreyStat_5" Position="136,244" Size="15,15" Image="47"/>
 
-		<Label Name="lblPoints" Text="0" Position="53,264" Size="96,15" Font="PixelGeorgiaBold" Align="Right"/>
+		<Label Name="lblPoints" Text="0" Position="53,264" Size="96,15" Font="Georgia" Align="Right"/>
 	</GroupBox>
 
 	<Button Name="btnClose" Position="-19,5" Size="16,16" Image="8" ImageHover="9" ImageMouseDown="10"/>
