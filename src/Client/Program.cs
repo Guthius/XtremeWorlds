@@ -292,6 +292,20 @@ namespace Client
         {
             try
             {
+                static string? ResolveFontFile(string baseDir, string nameNoExt, string ext)
+                {
+                    var a = Path.Combine(baseDir, nameNoExt + ext);
+                    if (File.Exists(a)) return a;
+
+                    var lower = Path.Combine(baseDir, nameNoExt.ToLowerInvariant() + ext);
+                    if (File.Exists(lower)) return lower;
+
+                    var upper = Path.Combine(baseDir, nameNoExt.ToUpperInvariant() + ext);
+                    if (File.Exists(upper)) return upper;
+
+                    return null;
+                }
+
                 foreach (var v in Enum.GetValues(typeof(Core.Globals.BitmapFont)))
                 {
                     if (v is not Core.Globals.BitmapFont bf) continue;
@@ -299,9 +313,9 @@ namespace Client
                     if (string.Equals(name, "None", StringComparison.OrdinalIgnoreCase))
                         continue;
 
-                    var datPath = Path.Combine(DataPath.Fonts, name + ".dat");
-                    var pngPath = Path.Combine(DataPath.Fonts, name + ".png");
-                    if (!File.Exists(datPath) || !File.Exists(pngPath)) continue;
+                    var datPath = ResolveFontFile(DataPath.Fonts, name, ".dat");
+                    var pngPath = ResolveFontFile(DataPath.Fonts, name, ".png");
+                    if (datPath == null || pngPath == null) continue;
                     if (TextRenderer.HasBitmapFont(bf)) continue;
                     try { TextRenderer.LoadLegacyBitmapFont(bf, datPath, pngPath, gd); }
                     catch (Exception ex) { Debug.WriteLine($"Bitmap font load failed {name}: {ex.Message}"); }

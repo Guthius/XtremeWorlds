@@ -131,8 +131,23 @@ public static class TextRenderer
     {
         try
         {
-            var datPath = Path.Combine(DataPath.Fonts, fontName + ".dat");
-            var pngPath = Path.Combine(DataPath.Fonts, fontName + ".png");
+            static string? ResolveFontFile(string baseDir, string nameNoExt, string ext)
+            {
+                var a = Path.Combine(baseDir, nameNoExt + ext);
+                if (File.Exists(a)) return a;
+
+                var lower = Path.Combine(baseDir, nameNoExt.ToLowerInvariant() + ext);
+                if (File.Exists(lower)) return lower;
+
+                var upper = Path.Combine(baseDir, nameNoExt.ToUpperInvariant() + ext);
+                if (File.Exists(upper)) return upper;
+
+                return null;
+            }
+
+            var datPath = ResolveFontFile(DataPath.Fonts, fontName, ".dat");
+            var pngPath = ResolveFontFile(DataPath.Fonts, fontName, ".png");
+            if (datPath == null || pngPath == null) return;
 
             if (!Enum.TryParse<Core.Globals.BitmapFont>(fontName, out Core.Globals.BitmapFont fontEnum))
                 fontEnum = Core.Globals.BitmapFont.Default;
@@ -261,6 +276,7 @@ public static class TextRenderer
 
         int lineAdvance = (int)Math.Round(bf.CharHeight * textSize);
         int gapAdvance = (int)Math.Round(3 * textSize);
+        int shadowOffset = Math.Max(1, (int)Math.Round(textSize));
 
         foreach (var ch in text)
         {
@@ -287,17 +303,20 @@ public static class TextRenderer
             int adv = bf.Adv.TryGetValue(ch, out var a) ? a : rect.Width;
             if (adv <= 0) adv = rect.Width;
 
-            int drawW = (int)Math.Round(adv * textSize);
-            int drawH = (int)Math.Round(bf.CharHeight * textSize);
+            // Draw at the glyph cell size, but advance by the font's per-character advance.
+            // Using advance as draw width squishes glyphs and breaks spacing.
+            int drawW = (int)Math.Round(rect.Width * textSize);
+            int drawH = (int)Math.Round(rect.Height * textSize);
+            int stepX = (int)Math.Round(adv * textSize);
 
             // Shadow 1 (primary)
-            GameClient.SpriteBatch.Draw(bf.Atlas, new Rectangle(lineX + 1, lineY + 1, drawW, drawH), rect, backColor * 0.9f);
+            GameClient.SpriteBatch.Draw(bf.Atlas, new Rectangle(lineX + shadowOffset, lineY + shadowOffset, drawW, drawH), rect, backColor * 0.9f);
             // Shadow 2 (soft offset)
-            GameClient.SpriteBatch.Draw(bf.Atlas, new Rectangle(lineX, lineY + 1, drawW, drawH), rect, backColor * 0.4f);
+            GameClient.SpriteBatch.Draw(bf.Atlas, new Rectangle(lineX, lineY + shadowOffset, drawW, drawH), rect, backColor * 0.4f);
             // Glyph
             GameClient.SpriteBatch.Draw(bf.Atlas, new Rectangle(lineX, lineY, drawW, drawH), rect, frontColor);
 
-            lineX += drawW + (id < len - 1 ? bf.Spacing : 0);
+            lineX += stepX + (id < len - 1 ? (int)Math.Round(bf.Spacing * textSize) : 0);
             id++;
         }
     }

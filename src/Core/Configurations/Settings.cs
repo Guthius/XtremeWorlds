@@ -43,7 +43,7 @@ public class SettingsManager
     public int RunFrames { get; set; } = 4;
     public int AttackFrames { get; set; } = 5;
     public int SpriteDirections { get; set; } = 4;
-    public bool BitmapFont { get; set; } = false;
+    public bool BitmapFont { get; set; } = true;
 
     // When enabled, prints periodic packet send stats to console.
     public bool NetworkDebug { get; set; } = true;
