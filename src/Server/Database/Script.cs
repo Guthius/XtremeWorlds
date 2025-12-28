@@ -1769,8 +1769,8 @@ public class Script
             for (int i = 0; i < dirCount; i++)
             {
                 if ((s.MultiDirMask & (1 << i)) == 0) continue;
-                int tx = caster.X/32 + deltas[i].dx;
-                int ty = caster.Y/32 + deltas[i].dy;
+                int tx = caster.X / 32 + deltas[i].dx;
+                int ty = caster.Y / 32 + deltas[i].dy;
                 // Try find another entity on this tile and attack
                 var extraTarget = FindEntityAt(map, tx, ty, preferOpponentsOf: caster);
                 if (extraTarget != null && (extraTarget.Id != target.Id || extraTarget.Type != target.Type))

@@ -57,27 +57,28 @@
         <CheckBox Name="chkStackable" Text="Stackable" Position="580, 58" Size="120, 20"/>
     </GroupBox>
 
-    <!-- Use group -->
-    <GroupBox Name="grpItemUse" Caption="" Position="260, 292" Size="842, 150">
-        <Label Name="lblEventHeader" Text="Event" Position="8, 8" Size="60, 16"/>
-        <Label Name="lblEventId" Text="Id" Position="80, 8" Size="30, 16"/>
-        <TextBox Name="txtEventId" Position="116, 6" Size="60, 20" Design="TextWhite"/>
-        <Label Name="lblEventValue" Text="Value" Position="182, 8" Size="80, 16"/>
-        <TextBox Name="txtEventValue" Position="266, 6" Size="80, 20" Design="TextWhite"/>
+    <!-- Use group (consumable/skill/projectile/event). This shares the same screen area as grpEquip; type toggles hide/show. -->
+    <GroupBox Name="grpItemUse" Caption="" Position="260, 290" Size="842, 150">
+        <!-- Consumable (Vital) -->
+        <Label Name="lblVitalMod" Text="Vital Mod" Position="8, 12" Size="100, 16"/>
+        <TextBox Name="txtVitalMod" Position="120, 10" Size="140, 20" Design="TextWhite"/>
 
-        <!-- Vital moved to top-left under event -->
-        <Label Name="lblVitalMod" Text="Vital Mod" Position="8, 14" Size="100, 16"/>
-        <TextBox Name="txtVitalMod" Position="120, 12" Size="140, 20" Design="TextWhite"/>
+        <!-- Event -->
+        <Label Name="lblEventHeader" Text="Event" Position="8, 12" Size="60, 16"/>
+        <Label Name="lblEventId" Text="Id" Position="80, 12" Size="30, 16"/>
+        <TextBox Name="txtEventId" Position="116, 10" Size="60, 20" Design="TextWhite"/>
+        <Label Name="lblEventValue" Text="Value" Position="182, 12" Size="80, 16"/>
+        <TextBox Name="txtEventValue" Position="266, 10" Size="80, 20" Design="TextWhite"/>
 
-        <!-- Skill aligned left below vital -->
-        <Label Name="lblSkillHeader" Text="Skill" Position="8, 14" Size="60, 16"/>
-        <ComboBox Name="cmbSkill" Position="80, 12" Size="200, 18"/>
+        <!-- Skill -->
+        <Label Name="lblSkillHeader" Text="Skill" Position="8, 12" Size="60, 16"/>
+        <ComboBox Name="cmbSkill" Position="80, 10" Size="200, 18"/>
 
-        <!-- Projectile left side under Event/Vital/Skill row -->
-        <Label Name="lblProjectileHeader" Text="Projectile" Position="8, 14" Size="80, 16"/>
-        <ComboBox Name="cmbProjectile" Position="96, 12" Size="160, 18"/>
-        <Label Name="lblAmmo" Text="Ammo" Position="250, 14" Size="50, 16"/>
-        <ComboBox Name="cmbAmmo" Position="304, 12" Size="160, 18"/>
+        <!-- Projectile -->
+        <Label Name="lblProjectileHeader" Text="Projectile" Position="8, 12" Size="80, 16"/>
+        <ComboBox Name="cmbProjectile" Position="96, 10" Size="160, 18"/>
+        <Label Name="lblAmmo" Text="Ammo" Position="272, 12" Size="50, 16"/>
+        <ComboBox Name="cmbAmmo" Position="320, 10" Size="160, 18"/>
     </GroupBox>
 
     <!-- Stats group immediately below grpEquip -->

@@ -12,6 +12,12 @@ public class WinItemEditor
     public static int SelectedIndex = 0;
     private static Item? _history;
 
+    private static string DisplayNameOrNone(string? raw)
+    {
+        var trimmed = Strings.Trim(raw ?? string.Empty);
+        return string.IsNullOrWhiteSpace(trimmed) ? "None" : trimmed;
+    }
+
     public static void Init()
     {
         if (!WindowManager.TryGetControl("winItemEditor", "lstIndex", out _))
@@ -21,9 +27,6 @@ public class WinItemEditor
         SelectedIndex = 0;
         RefreshList();
         OnLoad(SelectedIndex);
-
-        // Ensure subtype list is built on init
-        BuildSubtypeList();
 
         // Wire critical sliders to update item data immediately when moved
         if (WindowManager.TryGetControl("winItemEditor", "sldIcon", out var iconScrollCtrl) && iconScrollCtrl is ScrollBar sldIcon)
@@ -109,10 +112,18 @@ public class WinItemEditor
         int prevScroll = list.ScrollOffset;
 
         list.Clear();
-        for (int i = 0; i < Item.Instance.Count; i++)
+        // Always show the full index range so the editor list is never empty,
+        // even if item data is still streaming from the server.
+        for (int i = 0; i < Variables.MaxItems; i++)
         {
-            string name = Strings.Trim(Item.Instance[i].Name);
-            if (string.IsNullOrWhiteSpace(name)) name = "None";
+            string name = "None";
+            if (Item.Instance.Count > i)
+            {
+                var raw = Item.Instance[i].Name ?? string.Empty;
+                var trimmed = Strings.Trim(raw);
+                if (!string.IsNullOrWhiteSpace(trimmed))
+                    name = trimmed;
+            }
             list.AddItem($"{i + 1}: {name}");
         }
 
@@ -163,10 +174,11 @@ public class WinItemEditor
         if (WindowManager.TryGetControl("winItemEditor", "cmbAnimation", out var animCtrl) && animCtrl is ComboBox cmbAnim)
         {
             cmbAnim.Items.Clear();
-            for (int i = 0; i < Animation.Instance.Count; i++)
+            for (int i = 0; i < Variables.MaxAnimations; i++)
             {
-                var raw = Animation.Instance[i].Name ?? string.Empty;
-                var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
+                string name = "None";
+                if (Animation.Instance.Count > i)
+                    name = DisplayNameOrNone(Animation.Instance[i].Name);
                 cmbAnim.Items.Add($"{i + 1}: {name}");
             }
         }
@@ -184,7 +196,12 @@ public class WinItemEditor
         {
             cmbJob.Items.Clear();
             for (int i = 0; i < Variables.MaxJobs; i++)
-                cmbJob.Items.Add(Job.Instance[i].Name);
+            {
+                string name = "None";
+                if (Job.Instance.Count > i)
+                    name = DisplayNameOrNone(Job.Instance[i].Name);
+                cmbJob.Items.Add(name);
+            }
         }
 
         // Access requirements (use AccessLevel enum with spaced names)
@@ -204,7 +221,12 @@ public class WinItemEditor
             cmbTool.Items.Clear();
             cmbTool.Items.Add("None");
             for (int i = 0; i < Variables.MaxResources; i++)
-                cmbTool.Items.Add(Resource.Instance[i].Name);
+            {
+                string name = "None";
+                if (Resource.Instance.Count > i)
+                    name = DisplayNameOrNone(Resource.Instance[i].Name);
+                cmbTool.Items.Add(name);
+            }
         }
 
         // Knockback tiles choices
@@ -221,7 +243,14 @@ public class WinItemEditor
             cmbSkill.Items.Clear();
             cmbSkill.Items.Add("None");
             for (int i = 0; i < Variables.MaxSkills; i++)
-                cmbSkill.Items.Add($"{i + 1}: {Skill.Instance[i].Name}");
+            {
+                string name = "None";
+                if (Skill.Instance.Count > i)
+                {
+                    name = DisplayNameOrNone(Skill.Instance[i].Name);
+                }
+                cmbSkill.Items.Add($"{i + 1}: {name}");
+            }
         }
 
         // Projectile list
@@ -230,7 +259,14 @@ public class WinItemEditor
             cmbProj.Items.Clear();
             cmbProj.Items.Add("None");
             for (int i = 0; i < Variables.MaxProjectiles; i++)
-                cmbProj.Items.Add($"{i + 1}: {Projectile.Instance[i].Name}");
+            {
+                string name = "None";
+                if (Projectile.Instance.Count > i)
+                {
+                    name = DisplayNameOrNone(Projectile.Instance[i].Name);
+                }
+                cmbProj.Items.Add($"{i + 1}: {name}");
+            }
         }
 
         // Ammo list (0 = None, then items)
@@ -238,21 +274,39 @@ public class WinItemEditor
         {
             cmbAmmo.Items.Clear();
             cmbAmmo.Items.Add("None");
-            for (int i = 0; i < Item.Instance.Count; i++)
+            for (int i = 0; i < Variables.MaxItems; i++)
             {
-                var n = Item.Instance[i].Name ?? string.Empty;
-                if (string.IsNullOrWhiteSpace(n)) n = "None";
-                cmbAmmo.Items.Add($"{i + 1}: {n.Trim()}");
+                string name = "None";
+                if (Item.Instance.Count > i)
+                    name = DisplayNameOrNone(Item.Instance[i].Name);
+                cmbAmmo.Items.Add($"{i + 1}: {name}");
             }
         }
     }
 
-    public static void BuildSubtypeList()
+    public static void BuildSubtypeList(int? desiredSubType = null)
     {
         if (!WindowManager.TryGetControl("winItemEditor", "cmbSubType", out var subCtrl) || subCtrl is not ComboBox cmbSub)
             return;
         cmbSub.Items.Clear();
-        var type = (ItemCategory)Item.Instance[SelectedIndex].Type;
+
+        ItemCategory type;
+        int currentSub = desiredSubType ?? cmbSub.Value;
+        if (SelectedIndex >= 0 && SelectedIndex < Item.Instance.Count)
+        {
+            type = (ItemCategory)Item.Instance[SelectedIndex].Type;
+            if (desiredSubType is null)
+                currentSub = Item.Instance[SelectedIndex].SubType;
+        }
+        else if (WindowManager.TryGetControl("winItemEditor", "cmbType", out var typeCtrl) && typeCtrl is ComboBox cmbType)
+        {
+            type = (ItemCategory)Math.Clamp(cmbType.Value, 0, byte.MaxValue);
+        }
+        else
+        {
+            type = ItemCategory.Equipment;
+        }
+
         switch (type)
         {
             case ItemCategory.Equipment:
@@ -277,11 +331,9 @@ public class WinItemEditor
                 // no subtype for other categories
                 break;
         }
+
         if (cmbSub.Items.Count > 0)
-        {
-            var sub = 0;
-            cmbSub.Value = sub;
-        }
+            cmbSub.Value = Math.Clamp(currentSub, 0, cmbSub.Items.Count - 1);
     }
 
     private static void ToggleTypeSections()
@@ -381,8 +433,9 @@ public class WinItemEditor
 
         if (WindowManager.TryGetControl("winItemEditor", "cmbType", out var typeCtrl) && typeCtrl is ComboBox cmbType)
             cmbType.Value = Math.Clamp(item.Type, 0, cmbType.Items.Count - 1);
-        if (WindowManager.TryGetControl("winItemEditor", "cmbSubType", out var subCtrl) && subCtrl is ComboBox cmbSub)
-            cmbSub.Value = item.SubType;
+
+        // Subtype depends on Type; build the list first, then apply selection.
+        BuildSubtypeList(item.SubType);
         if (WindowManager.TryGetControl("winItemEditor", "cmbAnimation", out var animCtrl) && animCtrl is ComboBox cmbAnim)
             cmbAnim.Value = Math.Clamp(item.Animation, 0, cmbAnim.Items.Count - 1);
         if (WindowManager.TryGetControl("winItemEditor", "cmbBind", out var bindCtrl) && bindCtrl is ComboBox cmbBind)
@@ -458,6 +511,8 @@ public class WinItemEditor
         if (WindowManager.TryGetControl("winItemEditor", "txtEventValue", out var eValCtrl) && eValCtrl is TextBox txtEVal)
             txtEVal.Text = item.Data2.ToString();
 
+        ToggleTypeSections();
+
         // Requirements
         if (WindowManager.TryGetControl("winItemEditor", "sldReqLevel", out var rLvlCtrl) && rLvlCtrl is ScrollBar sldReqLevel)
         {
@@ -495,6 +550,10 @@ public class WinItemEditor
             sldReqSpr.Max = Variables.MaxStats;
             sldReqSpr.Value = Math.Clamp(item.StatReq[(int)Stat.Spirit], sldReqSpr.Min, sldReqSpr.Max);
         }
+
+        // Apply visibility rules for the current item type.
+        BuildSubtypeList();
+        ToggleTypeSections();
 
         if (WindowManager.TryGetControl("winItemEditor", "cmbJobReq", out var jCtrl2) && jCtrl2 is ComboBox cmbJob2)
             cmbJob2.Value = Math.Clamp(item.JobReq, 0, cmbJob2.Items.Count - 1);
