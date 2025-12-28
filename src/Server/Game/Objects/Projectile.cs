@@ -458,8 +458,8 @@ public class Projectile : ProjectileBase, IAsyncData
                     }
 
                     // Bounds check
-                    int tileX = Math.Clamp(mp.X / Constants.TileSize, 0, Core.Globals.Variables.MaxMapX - 1);
-                    int tileY = Math.Clamp(mp.Y / Constants.TileSize, 0, Core.Globals.Variables.MaxMapY - 1);
+                    int tileX = Math.Clamp(mp.X / Constants.TileSize, 0, Math.Max(0, Server.Map.Instance[map].MaxX - 1));
+                    int tileY = Math.Clamp(mp.Y / Constants.TileSize, 0, Math.Max(0, Server.Map.Instance[map].MaxY - 1));
                     if (tileX < 0 || tileY < 0 || tileX >= Server.Map.Instance[map].MaxX || tileY >= Server.Map.Instance[map].MaxY)
                     {
                         if (animation >= 0)

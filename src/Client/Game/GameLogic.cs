@@ -2184,8 +2184,9 @@ namespace Client
             if (y < 0)
                 return default;
 
-            int maxMapX = Variables.MaxMapX;
-            int maxMapY = Variables.MaxMapY;
+            var map = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)];
+            int maxMapX = map.MaxX;
+            int maxMapY = map.MaxY;
 
             if (x >= maxMapX)
                 return default;

@@ -2,6 +2,7 @@
 using System;
 using Client.Game.UI;
 using Client.Game.UI.Controls;
+using Client.Game.UI.Windows;
 using Client.Net;
 using Core.Configurations;
 using Core.Globals;
@@ -457,6 +458,18 @@ namespace Client
 
         private static void UpdateEditors()
         {
+            // Map editor: apply debounced map resize from txtMaxX/txtMaxY on the main thread.
+            if (GameState.MyEditorType == EditorType.Map && GameState.MapResizePending)
+            {
+                if (_tick - GameState.MapResizeLastEditTick >= 350)
+                {
+                    GameState.MapResizePending = false;
+                    var nx = (byte)Math.Clamp(GameState.MapResizePendingX, 1, byte.MaxValue);
+                    var ny = (byte)Math.Clamp(GameState.MapResizePendingY, 1, byte.MaxValue);
+                    WinMapEditor.ResizeMap(nx, ny);
+                }
+            }
+
             if (GameState.InitAdminForm)
             {
                 Sender.SendRequestMapReport();

@@ -1,9 +1,11 @@
 using System.IO;
+using Client;
 using Client.Game.UI;
 using Client.Game.UI.Controls;
 using Core.Globals;
 using Microsoft.Xna.Framework;
 using static Core.Globals.Commands;
+using Type = Core.Globals.Type;
 
 namespace Client.Game.UI.Windows;
 
@@ -99,6 +101,98 @@ public class WinMapEditor
         byte tileY = (byte)GameState.EditorTileY;
         int tileset = GameState.CurTileset > 0 ? GameState.CurTileset : Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tileset;
         GameLogic.Dialogue("Map Editor", $"Fill Layer: {layer}", "Are you sure you wish to fill this layer?", DialogueType.FillLayer, DialogueStyle.YesNo, GameState.CurLayer, autotile, tileX, tileY, tileset);
+    }
+
+    public static void QueueResizeFromControls()
+    {
+        if (!WindowManager.TryGetControl("winMapEditor", "txtMaxX", out var xCtrl) || xCtrl is not TextBox)
+            return;
+        if (!WindowManager.TryGetControl("winMapEditor", "txtMaxY", out var yCtrl) || yCtrl is not TextBox)
+            return;
+
+        if (!int.TryParse(xCtrl.Text?.Trim(), out var nx)) return;
+        if (!int.TryParse(yCtrl.Text?.Trim(), out var ny)) return;
+
+        nx = Math.Clamp(nx, 1, byte.MaxValue);
+        ny = Math.Clamp(ny, 1, byte.MaxValue);
+
+        GameState.MapResizePendingX = nx;
+        GameState.MapResizePendingY = ny;
+        GameState.MapResizeLastEditTick = Client.General.GetTickCount();
+        GameState.MapResizePending = true;
+    }
+
+    public static void ResizeMap(byte newMaxX, byte newMaxY, bool updateControls = true)
+    {
+        var mapIndex = GetPlayerMap(GameState.MyIndex);
+        if (Client.Map.Instance.Count <= mapIndex)
+            return;
+
+        var map = Client.Map.Instance[mapIndex];
+        if (newMaxX < 1) newMaxX = 1;
+        if (newMaxY < 1) newMaxY = 1;
+
+        if (map.MaxX == newMaxX && map.MaxY == newMaxY)
+            return;
+
+        var oldTiles = (Type.Tile[,])map.Tile.Clone();
+        var oldMaxX = map.MaxX;
+        var oldMaxY = map.MaxY;
+
+        map.MaxX = newMaxX;
+        map.MaxY = newMaxY;
+
+        map.Tile = new Type.Tile[map.MaxX, map.MaxY];
+
+        // Ensure undo history arrays match new dimensions
+        if (Data.TileHistory == null || Data.TileHistory.Length != GameState.MaxTileHistory)
+            Data.TileHistory = new Type.TileHistory[GameState.MaxTileHistory];
+
+        for (int i = 0; i < GameState.MaxTileHistory; i++)
+        {
+            Data.TileHistory[i].Tile = new Type.Tile[map.MaxX, map.MaxY];
+        }
+
+        // Recreate autotile cache for new size
+        Data.Autotile = new Type.Autotile[map.MaxX, map.MaxY];
+
+        int layerCount = Enum.GetValues(typeof(MapLayer)).Length;
+        int copyMaxX = Math.Min(oldMaxX, map.MaxX);
+        int copyMaxY = Math.Min(oldMaxY, map.MaxY);
+
+        for (int x = 0; x < map.MaxX; x++)
+        {
+            for (int y = 0; y < map.MaxY; y++)
+            {
+                map.Tile[x, y].Layer = new Type.Layer[layerCount];
+                Data.Autotile[x, y].Layer = new Type.QuarterTile[layerCount];
+
+                for (int i = 0; i < GameState.MaxTileHistory; i++)
+                {
+                    Data.TileHistory[i].Tile[x, y].Layer = new Type.Layer[layerCount];
+                }
+
+                if (x < copyMaxX && y < copyMaxY)
+                {
+                    map.Tile[x, y] = oldTiles[x, y];
+                    map.Tile[x, y].Layer ??= new Type.Layer[layerCount];
+                }
+            }
+        }
+
+        // Clamp boot position into bounds
+        if (map.BootX >= map.MaxX) map.BootX = (byte)Math.Max(0, map.MaxX - 1);
+        if (map.BootY >= map.MaxY) map.BootY = (byte)Math.Max(0, map.MaxY - 1);
+
+        if (updateControls)
+        {
+            if (WindowManager.TryGetControl("winMapEditor", "txtMaxX", out var tMaxX))
+                tMaxX.Text = map.MaxX.ToString();
+            if (WindowManager.TryGetControl("winMapEditor", "txtMaxY", out var tMaxY))
+                tMaxY.Text = map.MaxY.ToString();
+        }
+
+        try { Autotile.InitAutotiles(); } catch { }
     }
 
     // Draw the tileset preview into the picTileset PictureBox area

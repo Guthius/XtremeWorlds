@@ -1728,7 +1728,9 @@ public class Script
                     int destMap = skill.Map;
                     int destX = skill.X;
                     int destY = skill.Y;
-                    if (destMap >= 0 && destMap < Server.Map.Instance.Count && destX >= 0 && destX < Core.Globals.Variables.MaxMapX && destY >= 0 && destY < Core.Globals.Variables.MaxMapY)
+                    if (destMap >= 0 && destMap < Server.Map.Instance.Count &&
+                        destX >= 0 && destY >= 0 &&
+                        destX < Server.Map.Instance[destMap].MaxX && destY < Server.Map.Instance[destMap].MaxY)
                     {
                         if (caster.Type == Core.Globals.Entity.EntityType.Player)
                         {

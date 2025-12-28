@@ -209,6 +209,12 @@ namespace Client
         public static int MapEditorTrapVital;
         public static int MapEditorSlideDir;
 
+        // Map editor: debounced map resizing from txtMaxX/txtMaxY.
+        public static bool MapResizePending;
+        public static int MapResizePendingX;
+        public static int MapResizePendingY;
+        public static int MapResizeLastEditTick;
+
         public static Type.Rect Camera;
         public static Type.Rect TileView;
 

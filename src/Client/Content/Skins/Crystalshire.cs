@@ -256,46 +256,14 @@ public class Crystalshire
                 if (WindowManager.TryGetControl("winMapEditor", "chkIndoors", out var chkIndoors))
                     Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Indoors = chkIndoors.Value == 1;
 
-                // Resize map
-                var tempArr = (Type.Tile[,])Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile.Clone();
-                int prevMaxX = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
-                int prevMaxY = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
-
+                // Resize map (applies immediately to in-memory map; save sends the resized map)
+                byte newMaxX = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
+                byte newMaxY = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
                 if (WindowManager.TryGetControl("winMapEditor", "txtMaxX", out var txtMaxX))
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX = (byte)ReadIntSafe(txtMaxX, 1, Variables.MaxMapX, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX);
+                    newMaxX = (byte)ReadIntSafe(txtMaxX, 1, byte.MaxValue, newMaxX);
                 if (WindowManager.TryGetControl("winMapEditor", "txtMaxY", out var txtMaxY))
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY = (byte)ReadIntSafe(txtMaxY, 1, Variables.MaxMapY, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY);
-
-                Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile = new Type.Tile[(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX), (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)];
-                for (int i = 0; i < GameState.MaxTileHistory; i++)
-                {
-                    if (Data.TileHistory![i].Tile == null)
-                        Data.TileHistory![i].Tile = new Type.Tile[(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX), (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)];
-                    else if (Data.TileHistory![i].Tile.GetLength(0) != Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX || Data.TileHistory![i].Tile.GetLength(1) != Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)
-                        Data.TileHistory![i].Tile = new Type.Tile[(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX), (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)];
-                }
-                Data.Autotile = new Type.Autotile[(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX), (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)];
-
-                int x2 = prevMaxX > Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX ? Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX : prevMaxX;
-                int y2 = prevMaxY > Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY ? Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY : prevMaxY;
-                int layerCount = System.Enum.GetValues(typeof(MapLayer)).Length;
-                for (int x = 0; x < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX; x++)
-                {
-                    for (int y = 0; y < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY; y++)
-                    {
-                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer = new Type.Layer[layerCount];
-                        Data.Autotile[x, y].Layer = new Type.QuarterTile[layerCount];
-                        for (int i = 0; i < GameState.MaxTileHistory; i++)
-                        {
-                            if (Data.TileHistory![i].Tile?[x, y].Layer == null || Data.TileHistory![i].Tile[x, y].Layer.Length != layerCount)
-                                Data.TileHistory![i].Tile![x, y].Layer = new Type.Layer[layerCount];
-                        }
-                        if (x < x2 && y < y2)
-                        {
-                            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y] = tempArr[x, y];
-                        }
-                    }
-                }
+                    newMaxY = (byte)ReadIntSafe(txtMaxY, 1, byte.MaxValue, newMaxY);
+                WinMapEditor.ResizeMap(newMaxX, newMaxY, updateControls: false);
 
                 // Send map and close
                 Editors.MapEditorSend();
@@ -1122,8 +1090,16 @@ public class Crystalshire
             if (WindowManager.TryGetControl("winMapEditor", "txtBootX", out var tBX)) tBX.Text = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].BootX.ToString();
             if (WindowManager.TryGetControl("winMapEditor", "txtBootY", out var tBY)) tBY.Text = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].BootY.ToString();
 
-            if (WindowManager.TryGetControl("winMapEditor", "txtMaxX", out var tMaxX)) tMaxX.Text = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX.ToString();
-            if (WindowManager.TryGetControl("winMapEditor", "txtMaxY", out var tMaxY)) tMaxY.Text = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY.ToString();
+            if (WindowManager.TryGetControl("winMapEditor", "txtMaxX", out var tMaxX))
+            {
+                tMaxX.Text = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX.ToString();
+                tMaxX.CallBack[(int)ControlState.KeyUp] = WinMapEditor.QueueResizeFromControls;
+            }
+            if (WindowManager.TryGetControl("winMapEditor", "txtMaxY", out var tMaxY))
+            {
+                tMaxY.Text = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY.ToString();
+                tMaxY.CallBack[(int)ControlState.KeyUp] = WinMapEditor.QueueResizeFromControls;
+            }
         }
 
         // Initialize Effects controls: wire combos, sliders, and live labels
