@@ -3542,6 +3542,9 @@ public class Crystalshire
     {
         var window = WindowLoader.FromLayout("winEventEditor");
 
+        WindowLoader.FromLayout("winEventCommandSelect");
+        WindowLoader.FromLayout("winEventCommandData");
+
         // Close / cancel
         if (WindowManager.TryGetControl("winEventEditor", "btnClose", out var btnClose))
             btnClose.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnCancel;
