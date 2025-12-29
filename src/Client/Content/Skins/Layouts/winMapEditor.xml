@@ -58,7 +58,6 @@
     <ScrollBar Name="sldHeal" Position="282,128" Size="220,12" Min="1" Max="1000" Value="1" Orientation="Horizontal" ThumbSize="16"/>
     <Button Name="btnHeal" Text="OK" Position="510,124" Size="60,18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
     <Label Name="lblTrap" Text="Trap" Position="20,126" Size="60,16"/>
-    <Label Name="lblTrapVital" Text="Vital" Position="84,106" Size="60,16"/>
     <ComboBox Name="cmbTrapVital" Position="84,124" Size="100,18"/>
     <Label Name="lblTrapAmount" Text="Amount: 1" Position="190,126" Size="90,16"/>
     <ScrollBar Name="sldTrap" Position="282,128" Size="220,12" Min="1" Max="1000" Value="1" Orientation="Horizontal" ThumbSize="16"/>
