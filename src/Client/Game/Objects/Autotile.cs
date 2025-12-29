@@ -10,6 +10,323 @@ namespace Client
 
     public class Autotile : IData
     {
+        // RPG Maker XP autotile support (96x128 = 3x4 tiles at 32px each).
+        // The table below matches the 48 RMXP patterns, with 4 quarter pieces per pattern.
+        // Coordinates are pixel offsets relative to the top-left of the 3x4 autotile block.
+        private const int RmxpPatternCount = 48;
+        private static readonly Type.Point[] RmxpPatternQuarters = new Type.Point[RmxpPatternCount * 4]
+        {
+            new Type.Point { X = 32, Y = 64 },
+            new Type.Point { X = 48, Y = 64 },
+            new Type.Point { X = 32, Y = 80 },
+            new Type.Point { X = 48, Y = 80 },
+            new Type.Point { X = 64, Y = 0 },
+            new Type.Point { X = 48, Y = 64 },
+            new Type.Point { X = 32, Y = 80 },
+            new Type.Point { X = 48, Y = 80 },
+            new Type.Point { X = 32, Y = 64 },
+            new Type.Point { X = 80, Y = 0 },
+            new Type.Point { X = 32, Y = 80 },
+            new Type.Point { X = 48, Y = 80 },
+            new Type.Point { X = 64, Y = 0 },
+            new Type.Point { X = 80, Y = 0 },
+            new Type.Point { X = 32, Y = 80 },
+            new Type.Point { X = 48, Y = 80 },
+            new Type.Point { X = 32, Y = 64 },
+            new Type.Point { X = 48, Y = 64 },
+            new Type.Point { X = 32, Y = 80 },
+            new Type.Point { X = 80, Y = 16 },
+            new Type.Point { X = 64, Y = 0 },
+            new Type.Point { X = 48, Y = 64 },
+            new Type.Point { X = 32, Y = 80 },
+            new Type.Point { X = 80, Y = 16 },
+            new Type.Point { X = 32, Y = 64 },
+            new Type.Point { X = 80, Y = 0 },
+            new Type.Point { X = 32, Y = 80 },
+            new Type.Point { X = 80, Y = 16 },
+            new Type.Point { X = 64, Y = 0 },
+            new Type.Point { X = 80, Y = 0 },
+            new Type.Point { X = 32, Y = 80 },
+            new Type.Point { X = 80, Y = 16 },
+            new Type.Point { X = 32, Y = 64 },
+            new Type.Point { X = 48, Y = 64 },
+            new Type.Point { X = 64, Y = 16 },
+            new Type.Point { X = 48, Y = 80 },
+            new Type.Point { X = 64, Y = 0 },
+            new Type.Point { X = 48, Y = 64 },
+            new Type.Point { X = 64, Y = 16 },
+            new Type.Point { X = 48, Y = 80 },
+            new Type.Point { X = 32, Y = 64 },
+            new Type.Point { X = 80, Y = 0 },
+            new Type.Point { X = 64, Y = 16 },
+            new Type.Point { X = 48, Y = 80 },
+            new Type.Point { X = 64, Y = 0 },
+            new Type.Point { X = 80, Y = 0 },
+            new Type.Point { X = 64, Y = 16 },
+            new Type.Point { X = 48, Y = 80 },
+            new Type.Point { X = 32, Y = 64 },
+            new Type.Point { X = 48, Y = 64 },
+            new Type.Point { X = 64, Y = 16 },
+            new Type.Point { X = 80, Y = 16 },
+            new Type.Point { X = 64, Y = 0 },
+            new Type.Point { X = 48, Y = 64 },
+            new Type.Point { X = 64, Y = 16 },
+            new Type.Point { X = 80, Y = 16 },
+            new Type.Point { X = 32, Y = 64 },
+            new Type.Point { X = 80, Y = 0 },
+            new Type.Point { X = 64, Y = 16 },
+            new Type.Point { X = 80, Y = 16 },
+            new Type.Point { X = 64, Y = 0 },
+            new Type.Point { X = 80, Y = 0 },
+            new Type.Point { X = 64, Y = 16 },
+            new Type.Point { X = 80, Y = 16 },
+            new Type.Point { X = 0, Y = 64 },
+            new Type.Point { X = 16, Y = 64 },
+            new Type.Point { X = 0, Y = 80 },
+            new Type.Point { X = 16, Y = 80 },
+            new Type.Point { X = 0, Y = 64 },
+            new Type.Point { X = 80, Y = 0 },
+            new Type.Point { X = 0, Y = 80 },
+            new Type.Point { X = 16, Y = 80 },
+            new Type.Point { X = 0, Y = 64 },
+            new Type.Point { X = 16, Y = 64 },
+            new Type.Point { X = 0, Y = 80 },
+            new Type.Point { X = 80, Y = 16 },
+            new Type.Point { X = 0, Y = 64 },
+            new Type.Point { X = 80, Y = 0 },
+            new Type.Point { X = 0, Y = 80 },
+            new Type.Point { X = 80, Y = 16 },
+            new Type.Point { X = 32, Y = 32 },
+            new Type.Point { X = 48, Y = 32 },
+            new Type.Point { X = 32, Y = 48 },
+            new Type.Point { X = 48, Y = 48 },
+            new Type.Point { X = 32, Y = 32 },
+            new Type.Point { X = 48, Y = 32 },
+            new Type.Point { X = 32, Y = 48 },
+            new Type.Point { X = 80, Y = 16 },
+            new Type.Point { X = 32, Y = 32 },
+            new Type.Point { X = 48, Y = 32 },
+            new Type.Point { X = 64, Y = 16 },
+            new Type.Point { X = 48, Y = 48 },
+            new Type.Point { X = 32, Y = 32 },
+            new Type.Point { X = 48, Y = 32 },
+            new Type.Point { X = 64, Y = 16 },
+            new Type.Point { X = 80, Y = 16 },
+            new Type.Point { X = 64, Y = 64 },
+            new Type.Point { X = 80, Y = 64 },
+            new Type.Point { X = 64, Y = 80 },
+            new Type.Point { X = 80, Y = 80 },
+            new Type.Point { X = 64, Y = 64 },
+            new Type.Point { X = 80, Y = 64 },
+            new Type.Point { X = 64, Y = 16 },
+            new Type.Point { X = 80, Y = 80 },
+            new Type.Point { X = 64, Y = 0 },
+            new Type.Point { X = 80, Y = 64 },
+            new Type.Point { X = 64, Y = 80 },
+            new Type.Point { X = 80, Y = 80 },
+            new Type.Point { X = 64, Y = 0 },
+            new Type.Point { X = 80, Y = 64 },
+            new Type.Point { X = 64, Y = 16 },
+            new Type.Point { X = 80, Y = 80 },
+            new Type.Point { X = 32, Y = 96 },
+            new Type.Point { X = 48, Y = 96 },
+            new Type.Point { X = 32, Y = 112 },
+            new Type.Point { X = 48, Y = 112 },
+            new Type.Point { X = 64, Y = 0 },
+            new Type.Point { X = 48, Y = 96 },
+            new Type.Point { X = 32, Y = 112 },
+            new Type.Point { X = 48, Y = 112 },
+            new Type.Point { X = 32, Y = 96 },
+            new Type.Point { X = 80, Y = 0 },
+            new Type.Point { X = 32, Y = 112 },
+            new Type.Point { X = 48, Y = 112 },
+            new Type.Point { X = 64, Y = 0 },
+            new Type.Point { X = 80, Y = 0 },
+            new Type.Point { X = 32, Y = 112 },
+            new Type.Point { X = 48, Y = 112 },
+            new Type.Point { X = 0, Y = 64 },
+            new Type.Point { X = 80, Y = 64 },
+            new Type.Point { X = 0, Y = 80 },
+            new Type.Point { X = 80, Y = 80 },
+            new Type.Point { X = 32, Y = 32 },
+            new Type.Point { X = 48, Y = 32 },
+            new Type.Point { X = 32, Y = 112 },
+            new Type.Point { X = 48, Y = 112 },
+            new Type.Point { X = 0, Y = 32 },
+            new Type.Point { X = 16, Y = 32 },
+            new Type.Point { X = 0, Y = 48 },
+            new Type.Point { X = 16, Y = 48 },
+            new Type.Point { X = 0, Y = 32 },
+            new Type.Point { X = 16, Y = 32 },
+            new Type.Point { X = 0, Y = 48 },
+            new Type.Point { X = 80, Y = 16 },
+            new Type.Point { X = 64, Y = 32 },
+            new Type.Point { X = 80, Y = 32 },
+            new Type.Point { X = 64, Y = 48 },
+            new Type.Point { X = 80, Y = 48 },
+            new Type.Point { X = 64, Y = 32 },
+            new Type.Point { X = 80, Y = 32 },
+            new Type.Point { X = 64, Y = 16 },
+            new Type.Point { X = 80, Y = 48 },
+            new Type.Point { X = 64, Y = 96 },
+            new Type.Point { X = 80, Y = 96 },
+            new Type.Point { X = 64, Y = 112 },
+            new Type.Point { X = 80, Y = 112 },
+            new Type.Point { X = 64, Y = 0 },
+            new Type.Point { X = 80, Y = 96 },
+            new Type.Point { X = 64, Y = 112 },
+            new Type.Point { X = 80, Y = 112 },
+            new Type.Point { X = 0, Y = 96 },
+            new Type.Point { X = 16, Y = 96 },
+            new Type.Point { X = 0, Y = 112 },
+            new Type.Point { X = 16, Y = 112 },
+            new Type.Point { X = 0, Y = 96 },
+            new Type.Point { X = 80, Y = 0 },
+            new Type.Point { X = 0, Y = 112 },
+            new Type.Point { X = 16, Y = 112 },
+            new Type.Point { X = 0, Y = 32 },
+            new Type.Point { X = 80, Y = 32 },
+            new Type.Point { X = 0, Y = 48 },
+            new Type.Point { X = 80, Y = 48 },
+            new Type.Point { X = 0, Y = 32 },
+            new Type.Point { X = 16, Y = 32 },
+            new Type.Point { X = 0, Y = 112 },
+            new Type.Point { X = 16, Y = 112 },
+            new Type.Point { X = 0, Y = 96 },
+            new Type.Point { X = 80, Y = 96 },
+            new Type.Point { X = 0, Y = 112 },
+            new Type.Point { X = 80, Y = 112 },
+            new Type.Point { X = 64, Y = 32 },
+            new Type.Point { X = 80, Y = 32 },
+            new Type.Point { X = 64, Y = 112 },
+            new Type.Point { X = 80, Y = 112 },
+            new Type.Point { X = 0, Y = 32 },
+            new Type.Point { X = 80, Y = 32 },
+            new Type.Point { X = 0, Y = 112 },
+            new Type.Point { X = 80, Y = 112 },
+            new Type.Point { X = 0, Y = 0 },
+            new Type.Point { X = 16, Y = 0 },
+            new Type.Point { X = 0, Y = 16 },
+            new Type.Point { X = 16, Y = 16 },
+        };
+
+        private static int GetRmxpPatternIndex(int layerNum, int x, int y)
+        {
+            // Adjacent matches
+            bool n = CheckTileMatch(layerNum, x, y, x, y - 1);
+            bool e = CheckTileMatch(layerNum, x, y, x + 1, y);
+            bool s = CheckTileMatch(layerNum, x, y, x, y + 1);
+            bool w = CheckTileMatch(layerNum, x, y, x - 1, y);
+
+            // Diagonal matches
+            bool nw = CheckTileMatch(layerNum, x, y, x - 1, y - 1);
+            bool ne = CheckTileMatch(layerNum, x, y, x + 1, y - 1);
+            bool sw = CheckTileMatch(layerNum, x, y, x - 1, y + 1);
+            bool se = CheckTileMatch(layerNum, x, y, x + 1, y + 1);
+
+            // Concave corner flags (only meaningful when both adjacent sides are present)
+            bool missNw = n && w && !nw;
+            bool missNe = n && e && !ne;
+            bool missSw = s && w && !sw;
+            bool missSe = s && e && !se;
+
+            int sideMask = 0;
+            if (n) sideMask |= 8;
+            if (e) sideMask |= 4;
+            if (s) sideMask |= 2;
+            if (w) sideMask |= 1;
+
+            // The pattern index mapping below matches the 48-pattern RMXP autotile layout.
+            switch (sideMask)
+            {
+                case 15: // N E S W
+                    return 0
+                        + (missNw ? 1 : 0)
+                        + (missNe ? 2 : 0)
+                        + (missSe ? 4 : 0)
+                        + (missSw ? 8 : 0);
+
+                case 14: // N E S
+                    return 16
+                        + (missNe ? 1 : 0)
+                        + (missSe ? 2 : 0);
+
+                case 7: // E S W
+                    return 20
+                        + (missSe ? 1 : 0)
+                        + (missSw ? 2 : 0);
+
+                case 11: // N S W
+                    return 24
+                        + (missSw ? 1 : 0)
+                        + (missNw ? 2 : 0);
+
+                case 13: // N E W
+                    return 28
+                        + (missNw ? 1 : 0)
+                        + (missNe ? 2 : 0);
+
+                case 10: // E W
+                    return 32;
+
+                case 5: // N S
+                    return 33;
+
+                case 6: // E S
+                    return 34 + (missSe ? 1 : 0);
+
+                case 3: // S W
+                    return 36 + (missSw ? 1 : 0);
+
+                case 9: // N W
+                    return 38 + (missNw ? 1 : 0);
+
+                case 12: // N E
+                    return 40 + (missNe ? 1 : 0);
+
+                case 2: // S
+                    return 42;
+
+                case 4: // E
+                    return 43;
+
+                case 8: // N
+                    return 44;
+
+                case 1: // W
+                    return 45;
+
+                case 0: // No side connections (optionally allow diagonal-only blends)
+                    return (nw || ne || sw || se) ? 46 : 47;
+
+                default:
+                    // Remaining side masks aren't expected for RMXP autotiles.
+                    // Fall back to the isolated-tile pattern.
+                    return 47;
+            }
+        }
+
+        private static void CalculateRmxp(int layerNum, int x, int y)
+        {
+            if (Data.Autotile == null || Data.Autotile[x, y].Layer == null)
+                return;
+            if (layerNum < 0 || layerNum >= Data.Autotile[x, y].Layer.Length)
+                return;
+            if (Data.Autotile[x, y].Layer[layerNum].Tile == null)
+                Data.Autotile[x, y].Layer[layerNum].Tile = new Type.Point[5];
+
+            int patternId = GetRmxpPatternIndex(layerNum, x, y);
+            if (patternId < 0 || patternId >= RmxpPatternCount)
+                patternId = 47;
+
+            int baseIndex = patternId * 4;
+            // Order: 0=NW, 1=NE, 2=SW, 3=SE
+            Data.Autotile[x, y].Layer[layerNum].Tile[1] = RmxpPatternQuarters[baseIndex + 0];
+            Data.Autotile[x, y].Layer[layerNum].Tile[2] = RmxpPatternQuarters[baseIndex + 1];
+            Data.Autotile[x, y].Layer[layerNum].Tile[3] = RmxpPatternQuarters[baseIndex + 2];
+            Data.Autotile[x, y].Layer[layerNum].Tile[4] = RmxpPatternQuarters[baseIndex + 3];
+        }
+
         public static void OnClear()
         {
             int x;
@@ -508,6 +825,11 @@ namespace Client
                     CalculateSW_Normal(layerNum, x, y);
                     // South East Quarter
                     CalculateSE_Normal(layerNum, x, y);
+                    break;
+
+                // RPG Maker XP
+                case GameState.AutotileRpgMakerXp:
+                    CalculateRmxp(layerNum, x, y);
                     break;
                 // Cliff
                 case GameState.AutotileCliff:

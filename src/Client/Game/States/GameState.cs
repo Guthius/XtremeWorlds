@@ -381,6 +381,7 @@ namespace Client
         public const byte AutotileAnim = 3;
         public const byte AutotileCliff = 4;
         public const byte AutotileWaterfall = 5;
+        public const byte AutotileRpgMakerXp = 6;
 
         // Rendering
         public const int RenderStateNone = 0;

@@ -424,7 +424,7 @@ public class Crystalshire
             };
 
         // Tileset selector wiring
-        string[] autotileNames = new[] { "None", "Autotile", "Fake Autotile", "Animated", "Cliff", "Waterfall" };
+        string[] autotileNames = new[] { "None", "Autotile", "Fake Autotile", "Animated", "Cliff", "Waterfall", "RPG Maker XP" };
 
         // Populate Layer and Autotile combos and set defaults
         if (WindowManager.TryGetControl("winMapEditor", "cmbLayer", out var cmbLayerCtrl) && cmbLayerCtrl is ComboBox cmbLayer)
@@ -457,6 +457,7 @@ public class Crystalshire
                     case 3: GameState.EditorTileWidth = 6; GameState.EditorTileHeight = 3; break; // animated
                     case 4: GameState.EditorTileWidth = 2; GameState.EditorTileHeight = 2; break; // cliff
                     case 5: GameState.EditorTileWidth = 2; GameState.EditorTileHeight = 3; break; // waterfall
+                    case 6: GameState.EditorTileWidth = 3; GameState.EditorTileHeight = 4; break; // rpg maker xp
                     default: GameState.EditorTileWidth = 1; GameState.EditorTileHeight = 1; break; // none
                 }
                 // Update selection rectangle immediately
