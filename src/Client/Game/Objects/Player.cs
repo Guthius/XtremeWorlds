@@ -730,14 +730,10 @@ namespace Client
 
         public static void OnMove(int index)
         {
-            // BUGFIX: Previously gated all players' pixel movement on the LOCAL player's IsMoving flag,
-            // causing remote players to slide only while you moved (and freeze otherwise), producing
-            // desynced positions and camera jitter when targeting them. Now use each player's own flag.
             if (!IsPlaying(index)) return;
             if (!Player.Instance[index].IsMoving) return;
 
             // Update per‑pixel offsets based on direction.
-            // Speed is configurable per Job via Job Editor (Job.MoveSpeed).
             int jobId = GetPlayerJob(index);
             int jobSpeed = 1;
             if (jobId >= 0 && jobId < Client.Job.Instance.Count)
