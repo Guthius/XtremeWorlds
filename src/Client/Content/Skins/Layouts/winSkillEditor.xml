@@ -53,7 +53,7 @@
 		<Label Name="lblSound" Text="Sound" Position="360,88" Size="120,18"/>
 		<ComboBox Name="cmbSound" Position="480,86" Size="160,20"/>
 
-		<Label Name="lblCommonEvent" Text="Custom Script" Position="360,120" Size="120,18"/>
+		<Label Name="lblCommonEvent" Text="Event" Position="360,120" Size="120,18"/>
 		<Label Name="lblCommonEventType" Text="Type" Position="360,144" Size="120,18"/>
 		<ComboBox Name="cmbCommonEventType" Position="480,142" Size="160,20"/>
 		<Label Name="lblCommonEventData1" Text="Data 1" Position="360,168" Size="120,18"/>
