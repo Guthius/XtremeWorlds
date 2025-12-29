@@ -232,40 +232,28 @@ public class Crystalshire
                 GameState.CameraZoom = Math.Clamp(GameState.CameraZoom, map.MinZoom, map.MaxZoom);
         }
 
+        static string GetLiveText(TextBox tb)
+        {
+            // TextBox.Render shows Text + GameState.ChatShowLine when active;
+            // Text itself may not update until focus/commit.
+            var committed = tb.Text ?? string.Empty;
+            var live = ReferenceEquals(WindowManager.ActiveWindow?.ActiveControl, tb)
+                ? committed + (GameState.ChatShowLine ?? string.Empty)
+                : committed;
+
+            return live.Replace("\0", string.Empty);
+        }
+
         if (WindowManager.TryGetControl("winMapEditor", "txtMinZoom", out var minZoomCtrl) && minZoomCtrl is TextBox txtMinZoom)
         {
             txtMinZoom.Enabled = true;
-            txtMinZoom.CallBack[(int)ControlState.KeyUp] = () =>
-            {
-                var mapIndex = GetPlayerMap(GameState.MyIndex);
-                if (mapIndex < 0 || mapIndex >= Client.Map.Instance.Count) return;
-
-                Client.Map.Instance[mapIndex].MinZoom = ParseFloatOr(txtMinZoom.Text, Client.Map.Instance[mapIndex].MinZoom);
-                ClampMapZoomBounds();
-
-                // Reflect any clamping into the UI
-                txtMinZoom.Text = Client.Map.Instance[mapIndex].MinZoom.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
-                if (WindowManager.TryGetControl("winMapEditor", "txtMaxZoom", out var maxCtrl) && maxCtrl is TextBox t)
-                    t.Text = Client.Map.Instance[mapIndex].MaxZoom.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
-            };
+            // Do not overwrite text on KeyUp; it breaks editing in this UI framework.
         }
 
         if (WindowManager.TryGetControl("winMapEditor", "txtMaxZoom", out var maxZoomCtrl) && maxZoomCtrl is TextBox txtMaxZoom)
         {
             txtMaxZoom.Enabled = true;
-            txtMaxZoom.CallBack[(int)ControlState.KeyUp] = () =>
-            {
-                var mapIndex = GetPlayerMap(GameState.MyIndex);
-                if (mapIndex < 0 || mapIndex >= Client.Map.Instance.Count) return;
-
-                Client.Map.Instance[mapIndex].MaxZoom = ParseFloatOr(txtMaxZoom.Text, Client.Map.Instance[mapIndex].MaxZoom);
-                ClampMapZoomBounds();
-
-                // Reflect any clamping into the UI
-                txtMaxZoom.Text = Client.Map.Instance[mapIndex].MaxZoom.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
-                if (WindowManager.TryGetControl("winMapEditor", "txtMinZoom", out var minCtrl) && minCtrl is TextBox t)
-                    t.Text = Client.Map.Instance[mapIndex].MinZoom.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
-            };
+            // Do not overwrite text on KeyUp; it breaks editing in this UI framework.
         }
 
         // Wire scrollable lists
@@ -285,6 +273,9 @@ public class Crystalshire
         {
             btnSave.CallBack[(int)ControlState.MouseDown] = () =>
             {
+                var mapIndex = GetPlayerMap(GameState.MyIndex);
+                if (mapIndex < 0 || mapIndex >= Client.Map.Instance.Count) return;
+
                 // Helper readers
                 static int ReadIntSafe(Control c, int min, int max, int fallback = 0)
                 {
@@ -294,39 +285,47 @@ public class Crystalshire
                     return n;
                 }
                 int maxMaps = Variables.MaxMaps;
+
+                // Zoom bounds: parse the live text (Text + ChatShowLine) so values are editable
+                if (WindowManager.TryGetControl("winMapEditor", "txtMinZoom", out var minCtrl) && minCtrl is TextBox minTb)
+                    Client.Map.Instance[mapIndex].MinZoom = ParseFloatOr(GetLiveText(minTb), Client.Map.Instance[mapIndex].MinZoom);
+                if (WindowManager.TryGetControl("winMapEditor", "txtMaxZoom", out var maxCtrl) && maxCtrl is TextBox maxTb)
+                    Client.Map.Instance[mapIndex].MaxZoom = ParseFloatOr(GetLiveText(maxTb), Client.Map.Instance[mapIndex].MaxZoom);
+                ClampMapZoomBounds();
+
                 // Name & Music & Shop & Moral
                 if (WindowManager.TryGetControl("winMapEditor", "txtName", out var txtNameCtrl))
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Name = txtNameCtrl.Text?.Trim() ?? string.Empty;
+                    Client.Map.Instance[mapIndex].Name = txtNameCtrl.Text?.Trim() ?? string.Empty;
                 if (WindowManager.TryGetControl("winMapEditor", "cmbMusic", out var musicCtrl) && musicCtrl is ComboBox cmbMusic)
                 {
                     var id = Math.Clamp(cmbMusic.Value, 0, cmbMusic.Items.Count - 1);
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Music = id <= 0 ? string.Empty : cmbMusic.Items[id];
+                    Client.Map.Instance[mapIndex].Music = id <= 0 ? string.Empty : cmbMusic.Items[id];
                 }
                 if (WindowManager.TryGetControl("winMapEditor", "lstShop", out var shopCtrl) && shopCtrl is ComboBox lstShop)
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Shop = lstShop.Value <= 0 ? -1 : lstShop.Value - 1;
+                    Client.Map.Instance[mapIndex].Shop = lstShop.Value <= 0 ? -1 : lstShop.Value - 1;
                 if (WindowManager.TryGetControl("winMapEditor", "lstMoral", out var moralCtrl) && moralCtrl is ComboBox lstMoral)
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Moral = (byte)Math.Clamp(lstMoral.Value, 0, Variables.MaxMorals - 1);
+                    Client.Map.Instance[mapIndex].Moral = (byte)Math.Clamp(lstMoral.Value, 0, Variables.MaxMorals - 1);
 
                 // Links
-                if (WindowManager.TryGetControl("winMapEditor", "txtUp", out var txtUp)) Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Up = (short)ReadIntSafe(txtUp, 0, maxMaps, 0);
-                if (WindowManager.TryGetControl("winMapEditor", "txtDown", out var txtDown)) Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Down = (short)ReadIntSafe(txtDown, 0, maxMaps, 0);
-                if (WindowManager.TryGetControl("winMapEditor", "txtLeft", out var txtLeft)) Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Left = (short)ReadIntSafe(txtLeft, 0, maxMaps, 0);
-                if (WindowManager.TryGetControl("winMapEditor", "txtRight", out var txtRight)) Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Right = (short)ReadIntSafe(txtRight, 0, maxMaps, 0);
+                if (WindowManager.TryGetControl("winMapEditor", "txtUp", out var txtUp)) Client.Map.Instance[mapIndex].Up = (short)ReadIntSafe(txtUp, 0, maxMaps, 0);
+                if (WindowManager.TryGetControl("winMapEditor", "txtDown", out var txtDown)) Client.Map.Instance[mapIndex].Down = (short)ReadIntSafe(txtDown, 0, maxMaps, 0);
+                if (WindowManager.TryGetControl("winMapEditor", "txtLeft", out var txtLeft)) Client.Map.Instance[mapIndex].Left = (short)ReadIntSafe(txtLeft, 0, maxMaps, 0);
+                if (WindowManager.TryGetControl("winMapEditor", "txtRight", out var txtRight)) Client.Map.Instance[mapIndex].Right = (short)ReadIntSafe(txtRight, 0, maxMaps, 0);
 
                 // Boot
-                if (WindowManager.TryGetControl("winMapEditor", "txtBootMap", out var txtBootMap)) Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].BootMap = (short)ReadIntSafe(txtBootMap, 0, maxMaps, 0);
-                if (WindowManager.TryGetControl("winMapEditor", "txtBootX", out var txtBootX)) Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].BootX = (byte)ReadIntSafe(txtBootX, 0, Math.Max((byte)0, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX), 0);
-                if (WindowManager.TryGetControl("winMapEditor", "txtBootY", out var txtBootY)) Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].BootY = (byte)ReadIntSafe(txtBootY, 0, Math.Max((byte)0, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY), 0);
+                if (WindowManager.TryGetControl("winMapEditor", "txtBootMap", out var txtBootMap)) Client.Map.Instance[mapIndex].BootMap = (short)ReadIntSafe(txtBootMap, 0, maxMaps, 0);
+                if (WindowManager.TryGetControl("winMapEditor", "txtBootX", out var txtBootX)) Client.Map.Instance[mapIndex].BootX = (byte)ReadIntSafe(txtBootX, 0, Math.Max((byte)0, Client.Map.Instance[mapIndex].MaxX), 0);
+                if (WindowManager.TryGetControl("winMapEditor", "txtBootY", out var txtBootY)) Client.Map.Instance[mapIndex].BootY = (byte)ReadIntSafe(txtBootY, 0, Math.Max((byte)0, Client.Map.Instance[mapIndex].MaxY), 0);
 
                 // Flags
                 if (WindowManager.TryGetControl("winMapEditor", "chkNoMapRespawn", out var chkNoMapRespawn))
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].NoRespawn = chkNoMapRespawn.Value == 1;
+                    Client.Map.Instance[mapIndex].NoRespawn = chkNoMapRespawn.Value == 1;
                 if (WindowManager.TryGetControl("winMapEditor", "chkIndoors", out var chkIndoors))
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Indoors = chkIndoors.Value == 1;
+                    Client.Map.Instance[mapIndex].Indoors = chkIndoors.Value == 1;
 
                 // Resize map (applies immediately to in-memory map; save sends the resized map)
-                byte newMaxX = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
-                byte newMaxY = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+                byte newMaxX = Client.Map.Instance[mapIndex].MaxX;
+                byte newMaxY = Client.Map.Instance[mapIndex].MaxY;
                 if (WindowManager.TryGetControl("winMapEditor", "txtMaxX", out var txtMaxX))
                     newMaxX = (byte)ReadIntSafe(txtMaxX, 1, byte.MaxValue, newMaxX);
                 if (WindowManager.TryGetControl("winMapEditor", "txtMaxY", out var txtMaxY))
