@@ -12,6 +12,7 @@ namespace Client
 {
     public class Player : PlayerBase
     {
+        private static readonly double[] _moveRemainder = new double[Core.Globals.Variables.MaxPlayers];
         #region Database
 
         public static void OnClear(int index)
@@ -731,19 +732,43 @@ namespace Client
         public static void OnMove(int index)
         {
             if (!IsPlaying(index)) return;
-            if (!Player.Instance[index].IsMoving) return;
+            if (!Player.Instance[index].IsMoving)
+            {
+                if (index >= 0 && index < _moveRemainder.Length) _moveRemainder[index] = 0;
+                return;
+            }
 
             // Update per‑pixel offsets based on direction.
             int jobId = GetPlayerJob(index);
-            int jobSpeed = 1;
+            double jobSpeed = 1.0;
             if (jobId >= 0 && jobId < Client.Job.Instance.Count)
                 jobSpeed = Client.Job.Instance[jobId].MoveSpeed;
 
+            if (jobSpeed <= 0) jobSpeed = 1.0;
+
             // Walking is intentionally slower than running.
             if (Player.Instance[index].Moving == (byte)MovementState.Walking)
-                jobSpeed = Math.Max(1, jobSpeed / 2);
+                jobSpeed *= 0.5;
 
-            for (int step = 0; step < jobSpeed; step++)
+            // Skill-based movement modifier (replicated from server via SPlayerXY).
+            double mult = 1.0;
+            if (index >= 0 && index < Data.TempPlayer.Length)
+            {
+                mult = Data.TempPlayer[index].MoveSpeedMultiplier;
+                if (mult <= 0) mult = 1.0;
+            }
+
+            jobSpeed *= mult;
+
+            // Clamp to keep stepping stable even if data is invalid.
+            jobSpeed = Math.Clamp(jobSpeed, 0.01, 32.0);
+
+            _moveRemainder[index] += jobSpeed;
+            int steps = (int)Math.Floor(_moveRemainder[index]);
+            if (steps <= 0) return;
+            _moveRemainder[index] -= steps;
+
+            for (int step = 0; step < steps; step++)
             {
                 switch (GetPlayerDir(index))
                 {

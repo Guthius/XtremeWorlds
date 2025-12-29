@@ -168,6 +168,9 @@ public static class Type
         public EditorType Editor;
         public byte Slot;
         public int ProjectileTimer;
+
+        public float MoveSpeedMultiplier;
+        public int MoveSpeedMultiplierTimer;
     }
 
     public struct MapItem

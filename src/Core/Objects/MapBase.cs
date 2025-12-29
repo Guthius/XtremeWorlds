@@ -12,6 +12,12 @@ namespace Core.Objects
         public int Revision;
         public byte Moral;
         public int Tileset;
+
+        // Per-map camera zoom bounds.
+        // Client clamps camera zoom to this range and initializes zoom to MinZoom when the map loads.
+        public float MinZoom;
+        public float MaxZoom;
+
         public int Up;
         public int Down;
         public int Left;
@@ -51,6 +57,10 @@ namespace Core.Objects
             Tileset = 1;
             MaxX = Variables.MaxMapX;
             MaxY = Variables.MaxMapY;
+
+            // Defaults match existing clamp behavior.
+            MinZoom = 0.5f;
+            MaxZoom = 4.0f;
 
             Npc = new int[Variables.MaxMapNpcs];
             for (var i = 0; i < Npc.Length; i++)

@@ -440,6 +440,8 @@ public static class NetworkSend
         packetWriter.WriteByte(skill.CommonEventType);
         packetWriter.WriteInt32(skill.CommonEventData1);
         packetWriter.WriteInt32(skill.CommonEventData2);
+
+        packetWriter.WriteSingle(skill.MoveSpeedMultiplier);
     }
 
     public static void SendStats(int playerId)
@@ -584,6 +586,10 @@ public static class NetworkSend
             packetWriter.WriteBoolean(Server.Map.Instance[map].NoRespawn);
             packetWriter.WriteBoolean(Server.Map.Instance[map].Indoors);
             packetWriter.WriteInt32(Server.Map.Instance[map].Shop);
+
+            // Per-map camera zoom bounds
+            packetWriter.WriteSingle(Server.Map.Instance[map].MinZoom);
+            packetWriter.WriteSingle(Server.Map.Instance[map].MaxZoom);
 
             for (var i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
             {
@@ -851,6 +857,22 @@ public static class NetworkSend
         packetWriter.WriteByte(Player.Instance[positionPlayerId].Moving);
         packetWriter.WriteBoolean(Player.Instance[positionPlayerId].IsMoving);
 
+        // Active movement speed multiplier (1.0f = normal).
+        float mult = 1.0f;
+        if (positionPlayerId >= 0 && positionPlayerId < Data.TempPlayer.Length)
+        {
+            mult = Data.TempPlayer[positionPlayerId].MoveSpeedMultiplier;
+            if (mult <= 0) mult = 1.0f;
+            var expiry = Data.TempPlayer[positionPlayerId].MoveSpeedMultiplierTimer;
+            if (expiry > 0 && expiry <= General.GetTimeMs())
+            {
+                Data.TempPlayer[positionPlayerId].MoveSpeedMultiplier = 1.0f;
+                Data.TempPlayer[positionPlayerId].MoveSpeedMultiplierTimer = 0;
+                mult = 1.0f;
+            }
+        }
+        packetWriter.WriteSingle(mult);
+
         PlayerService.Instance.SendDataTo(sendToPlayerId, packetWriter.GetBytes());
     }
 
@@ -865,6 +887,21 @@ public static class NetworkSend
         packetWriter.WriteByte(GetPlayerDir(playerId));
         packetWriter.WriteByte(Player.Instance[playerId].Moving);
         packetWriter.WriteBoolean(Player.Instance[playerId].IsMoving);
+
+        float mult = 1.0f;
+        if (playerId >= 0 && playerId < Data.TempPlayer.Length)
+        {
+            mult = Data.TempPlayer[playerId].MoveSpeedMultiplier;
+            if (mult <= 0) mult = 1.0f;
+            var expiry = Data.TempPlayer[playerId].MoveSpeedMultiplierTimer;
+            if (expiry > 0 && expiry <= General.GetTimeMs())
+            {
+                Data.TempPlayer[playerId].MoveSpeedMultiplier = 1.0f;
+                Data.TempPlayer[playerId].MoveSpeedMultiplierTimer = 0;
+                mult = 1.0f;
+            }
+        }
+        packetWriter.WriteSingle(mult);
 
         NetworkConfig.SendDataToMap(GetPlayerMap(playerId), packetWriter.GetBytes());
     }
@@ -1576,7 +1613,7 @@ public static class NetworkSend
         packetWriter.WriteByte(job.StartX);
         packetWriter.WriteByte(job.StartY);
         packetWriter.WriteInt32(job.BaseExp);
-        packetWriter.WriteInt32(job.MoveSpeed);
+        packetWriter.WriteSingle(job.MoveSpeed);
     }
 
     public static void SendAnimation(int map, int anim, int x, int y, byte lockType = 0, int lockindex = 0)

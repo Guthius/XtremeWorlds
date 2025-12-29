@@ -47,6 +47,9 @@ namespace Server
             Data.TempPlayer[index].InShop = -1;
             Data.TempPlayer[index].InTrade = 0;
             Data.TempPlayer[index].InParty = -1;
+
+            Data.TempPlayer[index].MoveSpeedMultiplier = 1.0f;
+            Data.TempPlayer[index].MoveSpeedMultiplierTimer = 0;
         }
 
         public static void OnClear(int index)

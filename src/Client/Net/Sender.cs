@@ -696,6 +696,8 @@ public static class Sender
         packetWriter.WriteByte(Skill.Instance[index].CommonEventType);
         packetWriter.WriteInt32(Skill.Instance[index].CommonEventData1);
         packetWriter.WriteInt32(Skill.Instance[index].CommonEventData2);
+
+        packetWriter.WriteSingle(Skill.Instance[index].MoveSpeedMultiplier);
         Network.Send(packetWriter);
     }
 
@@ -817,7 +819,7 @@ public static class Sender
         packetWriter.WriteByte(Job.Instance[index].StartX);
         packetWriter.WriteByte(Job.Instance[index].StartY);
         packetWriter.WriteInt32(Job.Instance[index].BaseExp);
-        packetWriter.WriteInt32(Job.Instance[index].MoveSpeed);
+        packetWriter.WriteSingle(Job.Instance[index].MoveSpeed);
 
         Network.Send(packetWriter);
     }
@@ -1198,6 +1200,10 @@ public static class Sender
         packetWriter.WriteBoolean(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].NoRespawn);
         packetWriter.WriteBoolean(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Indoors);
         packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Shop);
+
+        // Per-map camera zoom bounds
+        packetWriter.WriteSingle(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MinZoom);
+        packetWriter.WriteSingle(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxZoom);
 
         for (i = 0; i < Variables.MaxMapNpcs; i++)
         {

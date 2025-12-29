@@ -715,19 +715,32 @@ namespace Client
                 }
             }
 
-        // Camera zoom with mouse wheel (range 0.5 to 4.0)
+            // Camera zoom with mouse wheel
             int currentWheel = Mouse.GetState().ScrollWheelValue;
             if (currentWheel != _prevScrollWheelValue)
             {
                 int delta = currentWheel - _prevScrollWheelValue;
-                // Block zoom while over any GUI window, and in map editor
+                // Block zoom while over any GUI window
                 bool overGui = WindowManager.IsMouseOverAnyWindow;
-                if (delta != 0 && !overGui && GameState.MyEditorType != EditorType.Map)
+                if (delta != 0 && !overGui)
                 {
                     float zoomDelta = delta > 0 ? 0.1f : -0.1f;
                     GameState.CameraZoom += zoomDelta;
-                    GameState.CameraZoom = Math.Clamp(GameState.CameraZoom, 0.5f, 2.0f);
-            // No snap; smoothing handles motion
+
+                    float minZoom = 0.5f;
+                    float maxZoom = 4.0f;
+                    int mapIndex = GetPlayerMap(GameState.MyIndex);
+                    if (mapIndex >= 0 && mapIndex < Client.Map.Instance.Count)
+                    {
+                        minZoom = Client.Map.Instance[mapIndex].MinZoom;
+                        maxZoom = Client.Map.Instance[mapIndex].MaxZoom;
+                    }
+
+                    if (minZoom <= 0) minZoom = 0.5f;
+                    if (maxZoom <= 0) maxZoom = 4.0f;
+                    if (maxZoom < minZoom) maxZoom = minZoom;
+
+                    GameState.CameraZoom = Math.Clamp(GameState.CameraZoom, minZoom, maxZoom);
                 }
                 _prevScrollWheelValue = currentWheel;
             }

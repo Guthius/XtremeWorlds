@@ -216,6 +216,9 @@ public class WinSkillEditor
         if (WindowManager.TryGetControl("winSkillEditor", "txtCommonEventData2", out var ce2Ctrl) && ce2Ctrl is TextBox tb2)
             tb2.Text = s.CommonEventData2.ToString();
 
+        if (WindowManager.TryGetControl("winSkillEditor", "txtMoveSpeedMultiplier", out var msmCtrl) && msmCtrl is TextBox tbMs)
+            tbMs.Text = (s.MoveSpeedMultiplier <= 0 ? 1.0f : s.MoveSpeedMultiplier).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+
         // Preview draws
         if (WindowManager.TryGetControl("winSkillEditor", "picIcon", out var iconPicCtrl) && iconPicCtrl is PictureBox picIcon)
             picIcon.OnDraw = OnDrawIcon;

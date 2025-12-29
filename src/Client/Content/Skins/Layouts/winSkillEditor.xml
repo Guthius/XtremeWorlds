@@ -61,8 +61,11 @@
 		<Label Name="lblCommonEventData2" Text="Data 2" Position="360,192" Size="120,18"/>
 		<TextBox Name="txtCommonEventData2" Position="480,190" Size="160,22" Design="TextWhite"/>
 
-		<Label Name="lblIcon" Text="Icon" Position="360,224" Size="90,18"/>
-		<PictureBox Name="picIcon" Position="360,244" Size="32,32" Design="TextBlack"/>
+		<Label Name="lblMoveSpeedMultiplier" Text="Move Speed" Position="360,216" Size="120,18"/>
+		<TextBox Name="txtMoveSpeedMultiplier" Position="480,214" Size="160,22" Design="TextWhite"/>
+
+		<Label Name="lblIcon" Text="Icon" Position="360,246" Size="90,18"/>
+		<PictureBox Name="picIcon" Position="360,266" Size="32,32" Design="TextBlack"/>
 	</GroupBox>
 
 	<!-- Action buttons -->

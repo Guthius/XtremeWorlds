@@ -107,6 +107,11 @@
     <TextBox Name="txtMaxX" Position="72,292" Size="50,20" Design="TextWhite"/>
     <Label Name="lblMaxY" Text="Max Y" Position="128,294" Size="50,16"/>
     <TextBox Name="txtMaxY" Position="180,292" Size="50,20" Design="TextWhite"/>
+
+    <Label Name="lblMinZoom" Text="Min Zoom" Position="20,322" Size="70,16"/>
+    <TextBox Name="txtMinZoom" Position="92,320" Size="60,20" Design="TextWhite"/>
+    <Label Name="lblMaxZoom" Text="Max Zoom" Position="164,322" Size="70,16"/>
+    <TextBox Name="txtMaxZoom" Position="236,320" Size="60,20" Design="TextWhite"/>
   </GroupBox>
 
   <GroupBox Name="grpNpcs" Caption="" Position="6,26" Size="788,624">

@@ -359,7 +359,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             job.StartX = packetReader.ReadByte();
             job.StartY = packetReader.ReadByte();
             job.BaseExp = packetReader.ReadInt32();
-            job.MoveSpeed = packetReader.ReadInt32();
+            job.MoveSpeed = packetReader.ReadSingle();
 
             Job.Instance.Add(job);
 
@@ -413,7 +413,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         job.StartX = packetReader.ReadByte();
         job.StartY = packetReader.ReadByte();
         job.BaseExp = packetReader.ReadInt32();
-        job.MoveSpeed = packetReader.ReadInt32();
+        job.MoveSpeed = packetReader.ReadSingle();
 
         // Update the job
         Job.Instance.Add(job);
@@ -753,6 +753,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         skill.CommonEventType = packetReader.ReadByte();
         skill.CommonEventData1 = packetReader.ReadInt32();
         skill.CommonEventData2 = packetReader.ReadInt32();
+
+        skill.MoveSpeedMultiplier = packetReader.ReadSingle();
 
         // Update the skill
         Skill.Instance.Add(skill);
@@ -1733,11 +1735,26 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             SetPlayerDir(index, dir);
             Player.Instance[index].Moving = moving;
             Player.Instance[index].IsMoving = buffer.ReadBoolean();
+
+            // Active movement speed multiplier for smooth stepping.
+            if (index >= 0 && index < Data.TempPlayer.Length)
+            {
+                var mult = buffer.ReadSingle();
+                if (mult <= 0) mult = 1.0f;
+                Data.TempPlayer[index].MoveSpeedMultiplier = mult;
+            }
+            else
+            {
+                _ = buffer.ReadSingle();
+            }
         }
         else
         {
             // Consume boolean to keep reader aligned
             _ = buffer.ReadBoolean();
+
+            // Consume multiplier
+            _ = buffer.ReadSingle();
         }
     }
 
@@ -1840,6 +1857,18 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].NoRespawn = buffer.ReadBoolean();
             Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Indoors = buffer.ReadBoolean();
             Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Shop = buffer.ReadInt32();
+
+            // Per-map camera zoom bounds
+            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MinZoom = buffer.ReadSingle();
+            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxZoom = buffer.ReadSingle();
+
+            // Apply min zoom on map load (and keep zoom within bounds)
+            var mapZoomMin = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MinZoom;
+            var mapZoomMax = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxZoom;
+            if (mapZoomMin <= 0) mapZoomMin = 0.5f;
+            if (mapZoomMax <= 0) mapZoomMax = 4.0f;
+            if (mapZoomMax < mapZoomMin) mapZoomMax = mapZoomMin;
+            GameState.CameraZoom = Math.Clamp(mapZoomMin, mapZoomMin, mapZoomMax);
 
             Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile = new Core.Globals.Type.Tile[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY];
             Data.TileHistory = new Core.Globals.Type.TileHistory[GameState.MaxTileHistory];

@@ -13,6 +13,8 @@ public class SkillBase : IData
         JobReq = -1;
         Projectile = -1;
         ChainOnHitSkillId = -1;
+
+        MoveSpeedMultiplier = 1.0f;
     }
 
     public string Name { get; set; }
@@ -46,6 +48,10 @@ public class SkillBase : IData
     public byte CommonEventType { get; set; }
     public int CommonEventData1 { get; set; }
     public int CommonEventData2 { get; set; }
+
+    // Multiplies movement speed while this skill effect is active (typically via Duration).
+    // 1.0 = no change, <1 slows, >1 speeds up.
+    public float MoveSpeedMultiplier { get; set; }
 
     public static List<SkillBase> Instance { get; private set; } = new List<SkillBase>();
 

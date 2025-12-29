@@ -1121,6 +1121,10 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Server.Map.Instance[map].Indoors = packetReader.ReadBoolean();
         Server.Map.Instance[map].Shop = packetReader.ReadInt32();
 
+        // Per-map camera zoom bounds
+        Server.Map.Instance[map].MinZoom = packetReader.ReadSingle();
+        Server.Map.Instance[map].MaxZoom = packetReader.ReadSingle();
+
         Server.Map.Instance[map].Tile = new Type.Tile[Server.Map.Instance[map].MaxX, Server.Map.Instance[map].MaxY];
 
         for (x = 0; x < Core.Globals.Variables.MaxMapNpcs; x++)
@@ -1701,6 +1705,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Skill.Instance[skillNum].CommonEventType = buffer.ReadByte();
         Skill.Instance[skillNum].CommonEventData1 = buffer.ReadInt32();
         Skill.Instance[skillNum].CommonEventData2 = buffer.ReadInt32();
+
+        Skill.Instance[skillNum].MoveSpeedMultiplier = buffer.ReadSingle();
 
         // Save it
         NetworkSend.SendUpdateSkillToAll(skillNum);
@@ -2784,7 +2790,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         instance.StartX = buffer.ReadByte();
         instance.StartY = buffer.ReadByte();
         instance.BaseExp = buffer.ReadInt32();
-        instance.MoveSpeed = buffer.ReadInt32();
+        instance.MoveSpeed = buffer.ReadSingle();
     
         Job.OnSave(index);
         NetworkSend.SendJobToAll(session.Id);

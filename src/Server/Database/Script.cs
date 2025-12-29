@@ -1631,6 +1631,23 @@ public class Script
             HandleTargetedSkill(map, entity, skillId, resolvedTarget);
         }
 
+        // Apply temporary movement speed modifier to the caster (player only).
+        // Uses Skill.Duration (seconds) for effect lifetime.
+        if (entity.Type == Core.Globals.Entity.EntityType.Player)
+        {
+            var mult = skill.MoveSpeedMultiplier;
+            if (mult <= 0) mult = 1.0f;
+
+            // Only treat this as a timed effect if Duration is positive.
+            // (Duration == 0 => no persistent speed effect)
+            if (Math.Abs(mult - 1.0f) > 0.0001f && skill.Duration > 0)
+            {
+                var now = General.GetTimeMs();
+                Data.TempPlayer[entity.Id].MoveSpeedMultiplier = mult;
+                Data.TempPlayer[entity.Id].MoveSpeedMultiplierTimer = now + skill.Duration * 1000;
+            }
+        }
+
         FinalizeCast(map, entity, skillId, PlayerSkillSlot);
     }
 

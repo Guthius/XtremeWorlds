@@ -34,6 +34,10 @@ public class Player : PlayerBase
         // Set the flag so we know the person is in the game
         Data.TempPlayer[session.Id].InGame = true;
 
+        // Default temporary move speed modifier.
+        Data.TempPlayer[session.Id].MoveSpeedMultiplier = 1.0f;
+        Data.TempPlayer[session.Id].MoveSpeedMultiplierTimer = 0;
+
         // Send an ok to client to start receiving in game data
         NetworkSend.SendLoginOk(session.Id);
 

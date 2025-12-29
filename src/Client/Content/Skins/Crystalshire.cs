@@ -200,6 +200,74 @@ public class Crystalshire
     {
         var window = WindowLoader.FromLayout("winMapEditor");
 
+        // Zoom bounds (map editor only)
+        static float ParseFloatOr(string s, float fallback)
+        {
+            if (string.IsNullOrWhiteSpace(s)) return fallback;
+            s = s.Trim();
+            // accept both '.' and ',' as decimal separators
+            if (float.TryParse(s, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var v))
+                return v;
+            if (float.TryParse(s, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.CurrentCulture, out v))
+                return v;
+            if (float.TryParse(s.Replace(',', '.'), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out v))
+                return v;
+            return fallback;
+        }
+
+        static void ClampMapZoomBounds()
+        {
+            var mapIndex = GetPlayerMap(GameState.MyIndex);
+            if (mapIndex < 0 || mapIndex >= Client.Map.Instance.Count) return;
+
+            var map = Client.Map.Instance[mapIndex];
+
+            // Keep sane limits and ordering.
+            map.MinZoom = Math.Clamp(map.MinZoom <= 0 ? 0.5f : map.MinZoom, 0.5f, 4.0f);
+            map.MaxZoom = Math.Clamp(map.MaxZoom <= 0 ? 4.0f : map.MaxZoom, 0.5f, 4.0f);
+            if (map.MaxZoom < map.MinZoom)
+                map.MaxZoom = map.MinZoom;
+
+            if (GameState.MyEditorType == EditorType.Map)
+                GameState.CameraZoom = Math.Clamp(GameState.CameraZoom, map.MinZoom, map.MaxZoom);
+        }
+
+        if (WindowManager.TryGetControl("winMapEditor", "txtMinZoom", out var minZoomCtrl) && minZoomCtrl is TextBox txtMinZoom)
+        {
+            txtMinZoom.Enabled = true;
+            txtMinZoom.CallBack[(int)ControlState.KeyUp] = () =>
+            {
+                var mapIndex = GetPlayerMap(GameState.MyIndex);
+                if (mapIndex < 0 || mapIndex >= Client.Map.Instance.Count) return;
+
+                Client.Map.Instance[mapIndex].MinZoom = ParseFloatOr(txtMinZoom.Text, Client.Map.Instance[mapIndex].MinZoom);
+                ClampMapZoomBounds();
+
+                // Reflect any clamping into the UI
+                txtMinZoom.Text = Client.Map.Instance[mapIndex].MinZoom.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+                if (WindowManager.TryGetControl("winMapEditor", "txtMaxZoom", out var maxCtrl) && maxCtrl is TextBox t)
+                    t.Text = Client.Map.Instance[mapIndex].MaxZoom.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+            };
+        }
+
+        if (WindowManager.TryGetControl("winMapEditor", "txtMaxZoom", out var maxZoomCtrl) && maxZoomCtrl is TextBox txtMaxZoom)
+        {
+            txtMaxZoom.Enabled = true;
+            txtMaxZoom.CallBack[(int)ControlState.KeyUp] = () =>
+            {
+                var mapIndex = GetPlayerMap(GameState.MyIndex);
+                if (mapIndex < 0 || mapIndex >= Client.Map.Instance.Count) return;
+
+                Client.Map.Instance[mapIndex].MaxZoom = ParseFloatOr(txtMaxZoom.Text, Client.Map.Instance[mapIndex].MaxZoom);
+                ClampMapZoomBounds();
+
+                // Reflect any clamping into the UI
+                txtMaxZoom.Text = Client.Map.Instance[mapIndex].MaxZoom.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+                if (WindowManager.TryGetControl("winMapEditor", "txtMinZoom", out var minCtrl) && minCtrl is TextBox t)
+                    t.Text = Client.Map.Instance[mapIndex].MinZoom.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+            };
+        }
+
         // Wire scrollable lists
         WireScrollableList("winMapEditor", "lstIndex", "sldNpcList");
 
@@ -2726,6 +2794,28 @@ public class Crystalshire
                 };
             }
         }
+
+        // Float binder
+        void BindFloatText(string name, Action<float> apply, float min, float max)
+        {
+            if (WindowManager.TryGetControl("winJobEditor", name, out var c) && c is TextBox tb)
+            {
+                tb.Enabled = true;
+                tb.CallBack[(int)ControlState.KeyUp] = () =>
+                {
+                    var s = tb.Text?.Trim() ?? string.Empty;
+                    float v;
+                    if (!float.TryParse(s, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out v)
+                        && !float.TryParse(s, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.CurrentCulture, out v)
+                        && !float.TryParse(s.Replace(',', '.'), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out v))
+                    {
+                        v = min;
+                    }
+                    v = Math.Clamp(v, min, max);
+                    apply(v);
+                };
+            }
+        }
         BindIntText("txtStartMap", v => { 
             int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return;
             if (id >= 0) { Job.Instance[id].StartMap = v; } }, 0, int.MaxValue);
@@ -2735,11 +2825,11 @@ public class Crystalshire
         BindIntText("txtStartY", v => {
             int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return;
             if (id >= 0) { Job.Instance[id].StartY = (byte)Math.Clamp(v, 0, 255); } }, 0, 255);
-        BindIntText("txtMoveSpeed", v => {
+        BindFloatText("txtMoveSpeed", v => {
             int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return;
             Job.Instance[id].MoveSpeed = v;
             Job.IsChanged[id] = true;
-        }, 1, 8);
+        }, 0.1f, 32.0f);
 
         // Sprite bars
         void BindSpriteBar(string name, Func<int> get, Action<int> apply)
@@ -3531,6 +3621,37 @@ public class Crystalshire
 
         BindIntText("txtCommonEventData1", v => Skill.Instance[WinSkillEditor.SelectedIndex].CommonEventData1 = v);
         BindIntText("txtCommonEventData2", v => Skill.Instance[WinSkillEditor.SelectedIndex].CommonEventData2 = v);
+
+        // Move speed multiplier (float)
+        static float ParseFloatOr(string s, float fallback)
+        {
+            if (string.IsNullOrWhiteSpace(s)) return fallback;
+            s = s.Trim();
+            if (float.TryParse(s, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var v))
+                return v;
+            if (float.TryParse(s, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.CurrentCulture, out v))
+                return v;
+            if (float.TryParse(s.Replace(',', '.'), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out v))
+                return v;
+            return fallback;
+        }
+
+        if (WindowManager.TryGetControl("winSkillEditor", "txtMoveSpeedMultiplier", out var msmCtrl) && msmCtrl is TextBox tbMs)
+        {
+            tbMs.CallBack[(int)ControlState.KeyUp] = () =>
+            {
+                int i = WinSkillEditor.SelectedIndex;
+                if (i < 0 || i >= Variables.MaxSkills || Skill.Instance.Count <= i) return;
+
+                var current = Skill.Instance[i].MoveSpeedMultiplier;
+                var v = ParseFloatOr(tbMs.Text, current <= 0 ? 1.0f : current);
+                v = Math.Clamp(v, 0.1f, 32.0f);
+                Skill.Instance[i].MoveSpeedMultiplier = v;
+                GameState.SkillChanged[i] = true;
+
+                tbMs.Text = v.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+            };
+        }
 
         // Buttons
         if (WindowManager.TryGetControl("winSkillEditor", "btnSave", out var btnSave))

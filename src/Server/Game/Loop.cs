@@ -9,6 +9,8 @@ namespace Server;
 
 public static class Loop
 {
+    private static readonly double[] PlayerMoveRemainder = new double[Core.Globals.Variables.MaxPlayers];
+
     public static async System.Threading.Tasks.Task ServerAsync()
     {
         var tmr25 = 0;
@@ -56,20 +58,60 @@ public static class Loop
                     {
                         // Speed is configurable per Job via Job Editor (Job.MoveSpeed).
                         int jobId = basePlayer.Job;
-                        int jobSpeed = 1;
+                        double jobSpeed = 1.0;
                         if (jobId >= 0 && jobId < Job.Instance.Count)
                             jobSpeed = Job.Instance[jobId].MoveSpeed;
 
+                        if (jobSpeed <= 0) jobSpeed = 1.0;
+
+                        // Skill-based movement modifier (temporary).
+                        // Expiry is checked against current tick time.
+                        float mult = 1.0f;
+                        if (id >= 0 && id < Data.TempPlayer.Length)
+                        {
+                            mult = Data.TempPlayer[id].MoveSpeedMultiplier;
+                            if (mult <= 0) mult = 1.0f;
+                            if (Data.TempPlayer[id].MoveSpeedMultiplierTimer > 0 && Data.TempPlayer[id].MoveSpeedMultiplierTimer <= tick)
+                            {
+                                Data.TempPlayer[id].MoveSpeedMultiplier = 1.0f;
+                                Data.TempPlayer[id].MoveSpeedMultiplierTimer = 0;
+                                mult = 1.0f;
+                            }
+                        }
+
                         // Walking is intentionally slower than running.
                         if (basePlayer.Moving == (byte)MovementState.Walking)
-                            jobSpeed = Math.Max(1, jobSpeed / 2);
+                            jobSpeed *= 0.5;
 
-                        for (int step = 0; step < jobSpeed; step++)
+                        jobSpeed *= mult;
+
+                        // Fractional speeds accumulate across ticks.
+                        if (id >= 0 && id < PlayerMoveRemainder.Length)
+                            PlayerMoveRemainder[id] += jobSpeed;
+
+                        int steps = 0;
+                        if (id >= 0 && id < PlayerMoveRemainder.Length)
+                        {
+                            steps = (int)Math.Floor(PlayerMoveRemainder[id]);
+                            if (steps > 0) PlayerMoveRemainder[id] -= steps;
+                        }
+
+                        if (steps <= 0)
+                            continue;
+
+                        // Safety cap to prevent pathological loops if data is bad.
+                        if (steps > 64) steps = 64;
+
+                        for (int step = 0; step < steps; step++)
                         {
                             Player.OnMove(id, basePlayer.Dir, basePlayer.Moving, false);
                             if (id < 0 || id >= Player.Instance.Count) break;
                             if (!Player.Instance[id].IsMoving && Player.Instance[id].Moving == 0) break;
                         }
+                    }
+                    else
+                    {
+                        if (id >= 0 && id < PlayerMoveRemainder.Length) PlayerMoveRemainder[id] = 0;
                     }
                 }
 
@@ -118,6 +160,20 @@ public static class Loop
                 }
 
                 Clock.Instance.Tick();
+
+                // Expire any temporary move speed multipliers (even if players are idle).
+                foreach (var player in PlayerService.Instance.Players)
+                {
+                    var id = player.Id;
+                    if (id < 0 || id >= Data.TempPlayer.Length) continue;
+
+                    if (Data.TempPlayer[id].MoveSpeedMultiplierTimer > 0 && Data.TempPlayer[id].MoveSpeedMultiplierTimer <= tick)
+                    {
+                        Data.TempPlayer[id].MoveSpeedMultiplier = 1.0f;
+                        Data.TempPlayer[id].MoveSpeedMultiplierTimer = 0;
+                        NetworkSend.SendPlayerXYToMap(id);
+                    }
+                }
 
                 // Move the timer up 1000ms.
                 tmr1000 = General.GetTimeMs() + 1000;
