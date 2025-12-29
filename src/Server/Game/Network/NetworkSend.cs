@@ -1576,6 +1576,7 @@ public static class NetworkSend
         packetWriter.WriteByte(job.StartX);
         packetWriter.WriteByte(job.StartY);
         packetWriter.WriteInt32(job.BaseExp);
+        packetWriter.WriteInt32(job.MoveSpeed);
     }
 
     public static void SendAnimation(int map, int anim, int x, int y, byte lockType = 0, int lockindex = 0)

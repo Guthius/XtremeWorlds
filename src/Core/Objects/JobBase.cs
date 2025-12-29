@@ -19,6 +19,7 @@ namespace Core.Objects
             FemaleSprite = 0;
             MaleSprite = 0;
             StartMap = 1;
+            MoveSpeed = 1;
 
             for (int i = 0; i < Core.Globals.Variables.MaxStartItems; i++)
             {
@@ -44,6 +45,7 @@ namespace Core.Objects
         public byte StartX;
         public byte StartY;
         public int BaseExp;
+        public int MoveSpeed;
 
         public static List<JobBase> Instance { get; private set; } = new List<JobBase>();
 

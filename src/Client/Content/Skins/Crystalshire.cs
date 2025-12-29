@@ -2735,6 +2735,11 @@ public class Crystalshire
         BindIntText("txtStartY", v => {
             int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return;
             if (id >= 0) { Job.Instance[id].StartY = (byte)Math.Clamp(v, 0, 255); } }, 0, 255);
+        BindIntText("txtMoveSpeed", v => {
+            int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return;
+            Job.Instance[id].MoveSpeed = v;
+            Job.IsChanged[id] = true;
+        }, 1, 8);
 
         // Sprite bars
         void BindSpriteBar(string name, Func<int> get, Action<int> apply)

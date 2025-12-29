@@ -31,6 +31,9 @@
     <Label Name="lblStartY" Text="Y" Position="180, 34" Size="16, 16"/>
     <TextBox Name="txtStartY" Position="198, 32" Size="40, 20" Design="TextWhite"/>
 
+    <Label Name="lblMoveSpeed" Text="Move Speed" Position="8, 62" Size="80, 16"/>
+    <TextBox Name="txtMoveSpeed" Position="88, 60" Size="60, 20" Design="TextWhite"/>
+
     <Label Name="lblMaleSprite" Text="Male Sprite" Position="260, 20" Size="120, 16"/>
     <ScrollBar Name="sldMaleSprite" Position="344, 22" Size="100, 12" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
     <PictureBox Name="picMale" Position="504, 16" Size="64, 64" Design="TextBlack"/>

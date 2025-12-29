@@ -817,6 +817,7 @@ public static class Sender
         packetWriter.WriteByte(Job.Instance[index].StartX);
         packetWriter.WriteByte(Job.Instance[index].StartY);
         packetWriter.WriteInt32(Job.Instance[index].BaseExp);
+        packetWriter.WriteInt32(Job.Instance[index].MoveSpeed);
 
         Network.Send(packetWriter);
     }

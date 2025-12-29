@@ -207,6 +207,7 @@ namespace Client
                             Player.OnAttack(mouse: true);
                         }
                     }
+                    
                     // Process player movements
                     for (_i = 0; _i < Player.Instance.Count; _i++)
                     {

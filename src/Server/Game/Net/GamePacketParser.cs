@@ -2784,6 +2784,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         instance.StartX = buffer.ReadByte();
         instance.StartY = buffer.ReadByte();
         instance.BaseExp = buffer.ReadInt32();
+        instance.MoveSpeed = buffer.ReadInt32();
     
         Job.OnSave(index);
         NetworkSend.SendJobToAll(session.Id);

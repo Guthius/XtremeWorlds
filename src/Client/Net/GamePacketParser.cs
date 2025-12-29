@@ -359,6 +359,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             job.StartX = packetReader.ReadByte();
             job.StartY = packetReader.ReadByte();
             job.BaseExp = packetReader.ReadInt32();
+            job.MoveSpeed = packetReader.ReadInt32();
 
             Job.Instance.Add(job);
 
@@ -412,6 +413,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         job.StartX = packetReader.ReadByte();
         job.StartY = packetReader.ReadByte();
         job.BaseExp = packetReader.ReadInt32();
+        job.MoveSpeed = packetReader.ReadInt32();
 
         // Update the job
         Job.Instance.Add(job);

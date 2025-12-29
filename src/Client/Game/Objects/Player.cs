@@ -737,37 +737,49 @@ namespace Client
             if (!Player.Instance[index].IsMoving) return;
 
             // Update per‑pixel offsets based on direction.
-            // NOTE: This assumes 1px per tick step. If variable speed is desired later, introduce a per-player speed.
-            switch (GetPlayerDir(index))
+            // Speed is configurable per Job via Job Editor (Job.MoveSpeed).
+            int jobId = GetPlayerJob(index);
+            int jobSpeed = 1;
+            if (jobId >= 0 && jobId < Client.Job.Instance.Count)
+                jobSpeed = Client.Job.Instance[jobId].MoveSpeed;
+
+            // Walking is intentionally slower than running.
+            if (Player.Instance[index].Moving == (byte)MovementState.Walking)
+                jobSpeed = Math.Max(1, jobSpeed / 2);
+
+            for (int step = 0; step < jobSpeed; step++)
             {
-                case (int)Direction.Up:
-                    Player.Instance[index].Y -= 1;
-                    break;
-                case (int)Direction.Down:
-                    Player.Instance[index].Y += 1;
-                    break;
-                case (int)Direction.Left:
-                    Player.Instance[index].X -= 1;
-                    break;
-                case (int)Direction.Right:
-                    Player.Instance[index].X += 1;
-                    break;
-                case (int)Direction.UpRight:
-                    Player.Instance[index].X += 1;
-                    Player.Instance[index].Y -= 1;
-                    break;
-                case (int)Direction.UpLeft:
-                    Player.Instance[index].X -= 1;
-                    Player.Instance[index].Y -= 1;
-                    break;
-                case (int)Direction.DownRight:
-                    Player.Instance[index].X += 1;
-                    Player.Instance[index].Y += 1;
-                    break;
-                case (int)Direction.DownLeft:
-                    Player.Instance[index].X -= 1;
-                    Player.Instance[index].Y += 1;
-                    break;
+                switch (GetPlayerDir(index))
+                {
+                    case (int)Direction.Up:
+                        Player.Instance[index].Y -= 1;
+                        break;
+                    case (int)Direction.Down:
+                        Player.Instance[index].Y += 1;
+                        break;
+                    case (int)Direction.Left:
+                        Player.Instance[index].X -= 1;
+                        break;
+                    case (int)Direction.Right:
+                        Player.Instance[index].X += 1;
+                        break;
+                    case (int)Direction.UpRight:
+                        Player.Instance[index].X += 1;
+                        Player.Instance[index].Y -= 1;
+                        break;
+                    case (int)Direction.UpLeft:
+                        Player.Instance[index].X -= 1;
+                        Player.Instance[index].Y -= 1;
+                        break;
+                    case (int)Direction.DownRight:
+                        Player.Instance[index].X += 1;
+                        Player.Instance[index].Y += 1;
+                        break;
+                    case (int)Direction.DownLeft:
+                        Player.Instance[index].X -= 1;
+                        Player.Instance[index].Y += 1;
+                        break;
+                }
             }
         }
 

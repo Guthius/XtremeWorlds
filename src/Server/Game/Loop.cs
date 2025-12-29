@@ -54,7 +54,22 @@ public static class Loop
 
                     if (basePlayer.Moving > 0)
                     {
-                        Player.OnMove(id, basePlayer.Dir, basePlayer.Moving, false);
+                        // Speed is configurable per Job via Job Editor (Job.MoveSpeed).
+                        int jobId = basePlayer.Job;
+                        int jobSpeed = 1;
+                        if (jobId >= 0 && jobId < Job.Instance.Count)
+                            jobSpeed = Job.Instance[jobId].MoveSpeed;
+
+                        // Walking is intentionally slower than running.
+                        if (basePlayer.Moving == (byte)MovementState.Walking)
+                            jobSpeed = Math.Max(1, jobSpeed / 2);
+
+                        for (int step = 0; step < jobSpeed; step++)
+                        {
+                            Player.OnMove(id, basePlayer.Dir, basePlayer.Moving, false);
+                            if (id < 0 || id >= Player.Instance.Count) break;
+                            if (!Player.Instance[id].IsMoving && Player.Instance[id].Moving == 0) break;
+                        }
                     }
                 }
 

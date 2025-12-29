@@ -181,6 +181,7 @@ namespace Client.Game.UI.Windows
             if (WindowManager.TryGetControl("winJobEditor", "txtStartMap", out var sm)) sm.Text = job.StartMap.ToString();
             if (WindowManager.TryGetControl("winJobEditor", "txtStartX", out var sx)) sx.Text = job.StartX.ToString();
             if (WindowManager.TryGetControl("winJobEditor", "txtStartY", out var sy)) sy.Text = job.StartY.ToString();
+            if (WindowManager.TryGetControl("winJobEditor", "txtMoveSpeed", out var ms)) ms.Text = (job.MoveSpeed <= 0 ? 1 : job.MoveSpeed).ToString();
 
             // Sprite sliders reflect current values
             if (WindowManager.TryGetControl("winJobEditor", "sldMaleSprite", out var msCtrl) && msCtrl is ScrollBar sbMale)
