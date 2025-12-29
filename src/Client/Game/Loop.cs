@@ -174,8 +174,8 @@ namespace Client
                 {
                     if (GameState.CanMoveNow)
                     {
-                        Player.CheckMovement(); // Check if player is trying to move
-                        Player.OnCheckAttack();   // Keyboard attack
+                        Player.OnMove(); // Check if player is trying to move
+                        Player.OnAttack(); // Keyboard attack
                         // Mouse attack support:
                         // 1. On fresh press, face cursor & attempt attack.
                         // 2. While held, keep facing cursor and attempt attack when cooldown ready.
@@ -184,7 +184,7 @@ namespace Client
                         if (leftPressedNow && !leftPressedPrev && !WindowManager.IsWindowActive)
                         {
                             Player.UpdateFacingFromMouse(GameClient.CurrentMouseState.X, GameClient.CurrentMouseState.Y);
-                            Player.OnCheckAttack(mouse: true);
+                            Player.OnAttack(mouse: true);
                         }
                         else if (leftPressedNow && !WindowManager.IsWindowActive)
                         {
@@ -204,7 +204,7 @@ namespace Client
                                 }
                             }   
                             // Attempt attack each tick; internal cooldown logic in OnCheckAttack prevents spam.
-                            Player.OnCheckAttack(mouse: true);
+                            Player.OnAttack(mouse: true);
                         }
                     }
                     // Process player movements

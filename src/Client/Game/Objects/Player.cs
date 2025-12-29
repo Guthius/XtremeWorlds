@@ -35,7 +35,7 @@ namespace Client
         private static int _lastMovePacketTime;
         private static int _lastCancelCastPacketTime;
 
-        public static void CheckMovement()
+        public static void OnMove()
         {
             // Guard against invalid player or map state
             if (GameState.MyIndex < 0 || GameState.MyIndex >= Core.Globals.Variables.MaxPlayers)
@@ -234,7 +234,6 @@ namespace Client
                         SetPlayerDir(GameState.MyIndex, (int) Direction.Down);
                         return canMove;
                     }
-
                     break;
                 }
 
@@ -772,7 +771,7 @@ namespace Client
             }
         }
 
-        public static void OnCheckAttack(bool mouse = false)
+        public static void OnAttack(bool mouse = false)
         {
             int attackSpeed;
             var x = default(int);
