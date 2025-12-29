@@ -41,9 +41,9 @@ namespace Client
             if (GameState.MyIndex < 0 || GameState.MyIndex >= Core.Globals.Variables.MaxPlayers)
                 return;
 
-            int mapIdx = GetPlayerMap(GameState.MyIndex);
+            int mapId = GetPlayerMap(GameState.MyIndex);
 
-            if (mapIdx < 0 || mapIdx >= Client.Map.Instance.Count)
+            if (mapId < 0 || mapId >= Client.Map.Instance.Count)
                 return;
 
             if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX <= 0 || Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY <= 0)
