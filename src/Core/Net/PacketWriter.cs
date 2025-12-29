@@ -10,18 +10,40 @@ public sealed class PacketWriter(int capacity = PacketWriter.InitialCapacity)
     private const int CompressionThreshold = 128;
     private const uint CompressionFlag = 1u << 31;
 
-    private byte[] _buffer = new byte[capacity];
+    // Hard upper bound to avoid pathological allocations from accidental misuse.
+    // This is the *uncompressed* payload size (not counting the 4-byte length prefix added by GetBytes()).
+    private const int MaxPayloadSize = 64 * 1024 * 1024;
+
+    private byte[] _buffer = new byte[capacity < 0 ? throw new ArgumentOutOfRangeException(nameof(capacity), "Capacity cannot be negative.") : capacity];
     private int _offset;
 
     private void EnsureSpaceAvailable(int space)
     {
-        var requiredSize = _offset + space;
+        if (space < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(space), "Space cannot be negative.");
+        }
+
+        var requiredSizeLong = (long)_offset + space;
+        if (requiredSizeLong > MaxPayloadSize)
+        {
+            throw new InvalidOperationException($"PacketWriter exceeded max payload size ({MaxPayloadSize} bytes). Requested={requiredSizeLong}.");
+        }
+
+        var requiredSize = (int)requiredSizeLong;
         if (requiredSize <= _buffer.Length)
         {
             return;
         }
 
-        var desiredCapacity = Math.Max(requiredSize, _buffer.Length * 2);
+        var doubled = (long)_buffer.Length * 2;
+        var desiredCapacityLong = Math.Max(requiredSizeLong, doubled);
+        if (desiredCapacityLong > MaxPayloadSize)
+        {
+            desiredCapacityLong = MaxPayloadSize;
+        }
+
+        var desiredCapacity = (int)desiredCapacityLong;
 
         Array.Resize(ref _buffer, desiredCapacity);
     }
@@ -46,7 +68,17 @@ public sealed class PacketWriter(int capacity = PacketWriter.InitialCapacity)
     
     private byte[] GetBytesCompressed()
     {
+        if (_offset < 4)
+        {
+            throw new InvalidOperationException("Cannot compress a packet without a 4-byte packet id header.");
+        }
+
         var packetId = BinaryPrimitives.ReadUInt32LittleEndian(_buffer.AsSpan(0, 4));
+
+        if ((packetId & CompressionFlag) != 0)
+        {
+            throw new InvalidOperationException("Packet id already contains the compression flag bit; cannot safely mark as compressed.");
+        }
 
         packetId |= CompressionFlag;
 
@@ -60,7 +92,7 @@ public sealed class PacketWriter(int capacity = PacketWriter.InitialCapacity)
         BinaryPrimitives.WriteUInt32LittleEndian(packet.AsSpan(4, 4), packetId);
         BinaryPrimitives.WriteInt32LittleEndian(packet.AsSpan(8, 4), uncompressedSize);
 
-        if (_offset > 0)
+        if (compressedBytes.Length > 0)
         {
             compressedBytes.CopyTo(packet.AsSpan(12));
         }
@@ -164,7 +196,25 @@ public sealed class PacketWriter(int capacity = PacketWriter.InitialCapacity)
 
     public void WriteEnum<T>(T value) where T : Enum
     {
-        WriteInt32(Convert.ToInt32(value));
+        // The wire protocol uses 32-bit integers for enum values.
+        // Guard against enums backed by 64-bit types (or values that overflow int32).
+        var underlying = Enum.GetUnderlyingType(typeof(T));
+        if (underlying == typeof(long) || underlying == typeof(ulong))
+        {
+            throw new NotSupportedException($"Enum '{typeof(T).FullName}' is backed by {underlying.Name}; PacketWriter only supports enums representable as Int32.");
+        }
+
+        int intValue;
+        try
+        {
+            intValue = checked(Convert.ToInt32(value));
+        }
+        catch (Exception ex) when (ex is OverflowException or InvalidCastException or FormatException)
+        {
+            throw new ArgumentOutOfRangeException(nameof(value), value, $"Enum value for '{typeof(T).FullName}' is not representable as Int32.");
+        }
+
+        WriteInt32(intValue);
     }
 
     public void WriteUInt32(uint value)
