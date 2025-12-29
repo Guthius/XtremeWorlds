@@ -37,7 +37,7 @@ namespace Client
 
             string path = System.IO.Path.Combine(DataPath.Music, fileName);
 
-            if (!SettingsManager.Instance.Music || !File.Exists(path))
+        if (!SettingsManager.Instance.Music || !File.Exists(path) || (GameState.InGame && SettingsManager.Instance.MenuMusic == fileName))
             {
                 StopMusic();
                 return;
@@ -75,7 +75,7 @@ namespace Client
             }
         }
 
-        public static void InitializeBass()
+        public static void Init()
         {
             // Initialize BASS with the default output device
             if (!Bass.Init(-1, 44100, DeviceInitFlags.Default))

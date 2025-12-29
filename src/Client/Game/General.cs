@@ -56,7 +56,7 @@ namespace Client
             CheckInterface();
             CheckGradients();
             CheckDesigns();
-            Audio.InitializeBass();
+            Audio.Init();
             UIScript.Load();
             WindowManager.Init();
             GameState.Ping = -1;
