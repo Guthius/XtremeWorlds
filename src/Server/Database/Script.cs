@@ -1083,12 +1083,7 @@ public class Script
             int sid = skillId.Value;
             if (sid >= 0 && sid < Skill.Instance.Count)
             {
-                var sk = Skill.Instance[sid];
-                bool isDamageSkill = sk.Type == (byte)SkillEffect.DamageHealth || sk.Type == (byte)SkillEffect.DamageMana;
-                if (isDamageSkill && sk.CommonEventType > 0)
-                {
-                    CommonEvent(attacker.Id, -1, sid);
-                }
+                CommonEvent(attacker.Id -1, sid);
             }
         }
 
