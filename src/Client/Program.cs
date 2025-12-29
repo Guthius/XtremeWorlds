@@ -2137,21 +2137,39 @@ namespace Client
             }
         }
 
-        public void DrawEyeDropper()
+        public static void DrawEyeDropper()
         {
             if (SpriteBatch == null) return;
-            SpriteBatch.Begin();
 
             // Define rectangle parameters.
-            var position = new Vector2(GameLogic.ConvertMapX(GameState.CurXGame), GameLogic.ConvertMapY(GameState.CurYGame));
-            var size = new Vector2(Constants.TileSize, Constants.TileSize);
+            int x = GameState.CurXGame;
+            int y = GameState.CurYGame;
+            int w = 1;
+            int h = 1;
+
+            // Show selection outline while drag-selecting, and also after capture when a multi-tile stamp is active.
+            if (GameState.EyeDropperSelecting || (GameState.EditorStampActive && (GameState.EditorStampWidth > 1 || GameState.EditorStampHeight > 1)))
+            {
+                int minX = Math.Min(GameState.EyeDropperSelStart.X, GameState.EyeDropperSelEnd.X);
+                int minY = Math.Min(GameState.EyeDropperSelStart.Y, GameState.EyeDropperSelEnd.Y);
+                int maxX = Math.Max(GameState.EyeDropperSelStart.X, GameState.EyeDropperSelEnd.X);
+                int maxY = Math.Max(GameState.EyeDropperSelStart.Y, GameState.EyeDropperSelEnd.Y);
+                x = minX;
+                y = minY;
+                w = (maxX - minX) + 1;
+                h = (maxY - minY) + 1;
+            }
+
+            var position = new Vector2(
+                GameLogic.ConvertMapX(x * Constants.TileSize),
+                GameLogic.ConvertMapY(y * Constants.TileSize));
+            var size = new Vector2(Constants.TileSize * w, Constants.TileSize * h);
             var fillColor = Color.Transparent; // No fill
-            var outlineColor = Color.Cyan; // Cyan outline
+            var outlineColor = Color.Red; // Red outline
             int outlineThickness = 1; // Thickness of outline
 
             // Draw the rectangle with an outline.
             DrawRectangle(position, size, fillColor, outlineColor, outlineThickness);
-            SpriteBatch.End();
         }
 
         public static void DrawGrid()
@@ -2780,6 +2798,12 @@ namespace Client
             if (GameState.MapGrid && GameState.MyEditorType == EditorType.Map)
             {
                 DrawGrid();
+            }
+
+            // Draw eyedropper selection outline in the Map editor
+            if (GameState.MyEditorType == EditorType.Map && GameState.EyeDropper)
+            {
+                DrawEyeDropper();
             }
 
             for (i = 0; i < Player.Instance.Count; i++)

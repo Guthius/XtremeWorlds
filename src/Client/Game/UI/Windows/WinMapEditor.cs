@@ -282,6 +282,18 @@ public class WinMapEditor
         if (win is null) return;
         if (!WindowManager.TryGetControl("winMapEditor", "picTileset", out var ctrl)) return;
 
+        // Choosing from the tileset palette should override any captured map stamp.
+        // Also disable eyedropper so the next click on the map paints as expected.
+        GameState.EyeDropperSelecting = false;
+        GameState.EyeDropper = false;
+        GameState.EditorStampActive = false;
+        GameState.EditorStampWidth = 0;
+        GameState.EditorStampHeight = 0;
+        GameState.EditorStampTileset = null;
+        GameState.EditorStampX = null;
+        GameState.EditorStampY = null;
+        GameState.EditorStampAutoTile = null;
+
         int relX = GameState.CurMouseX - (win.X + ctrl.X);
         int relY = GameState.CurMouseY - (win.Y + ctrl.Y);
         if (relX < 0 || relY < 0 || relX >= ctrl.Width || relY >= ctrl.Height) return;

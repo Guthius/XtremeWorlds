@@ -340,6 +340,20 @@ namespace Client
 
         public static bool MapGrid;
         public static bool EyeDropper;
+
+        // Map editor: eyedropper drag-selection state (to pick multi-tile stamps)
+        public static bool EyeDropperSelecting;
+        public static Point EyeDropperSelStart;
+        public static Point EyeDropperSelEnd;
+
+        // Map editor: tile stamp buffer (used for multi-tile paint)
+        public static bool EditorStampActive;
+        public static int EditorStampWidth;
+        public static int EditorStampHeight;
+        public static int[,]? EditorStampTileset;
+        public static int[,]? EditorStampX;
+        public static int[,]? EditorStampY;
+        public static byte[,]? EditorStampAutoTile;
         public static int TileHistoryIndex;
         public static int TileHistoryHighIndex;
         public static bool HideLayers;

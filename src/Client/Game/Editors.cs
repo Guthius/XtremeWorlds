@@ -21,6 +21,16 @@ namespace Client
         {
             if (GameClient.IsMouseButtonDown(MouseButton.Left)) // Primary (Left) Mouse Button
             {
+                // Choosing from the tileset palette uses the contiguous-tileset stamping path.
+                // Clear any previously captured map-stamp.
+                GameState.EditorStampActive = false;
+                GameState.EditorStampWidth = 0;
+                GameState.EditorStampHeight = 0;
+                GameState.EditorStampTileset = null;
+                GameState.EditorStampX = null;
+                GameState.EditorStampY = null;
+                GameState.EditorStampAutoTile = null;
+
                 GameState.EditorTileWidth = 1;
                 GameState.EditorTileHeight = 1;
 
@@ -78,10 +88,31 @@ namespace Client
             if (!GameLogic.IsInBounds())
                 return;
 
-            if (GameState.EyeDropper && GameClient.IsMouseButtonDown(MouseButton.Left))
+            if (GameState.EyeDropper)
             {
-                MapEditorEyeDropper();
-                return;
+                // Drag-select a rectangle on the map; finalize on mouse release.
+                if (GameClient.IsMouseButtonDown(MouseButton.Left))
+                {
+                    if (!GameState.EyeDropperSelecting)
+                    {
+                        GameState.EyeDropperSelecting = true;
+                        GameState.EyeDropperSelStart = new Microsoft.Xna.Framework.Point(x, y);
+                        GameState.EyeDropperSelEnd = GameState.EyeDropperSelStart;
+                    }
+                    else
+                    {
+                        GameState.EyeDropperSelEnd = new Microsoft.Xna.Framework.Point(x, y);
+                    }
+
+                    return;
+                }
+
+                if (GameState.EyeDropperSelecting)
+                {
+                    GameState.EyeDropperSelecting = false;
+                    MapEditorEyeDropper(GameState.EyeDropperSelStart.X, GameState.EyeDropperSelStart.Y, GameState.EyeDropperSelEnd.X, GameState.EyeDropperSelEnd.Y);
+                    return;
+                }
             }
 
             var instance = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y];
@@ -561,6 +592,48 @@ namespace Client
             int newTileX;
             int newTileY;
 
+            // If we have a captured stamp (eyedropper), paint exact tile data.
+            // Only applies to normal tiles (no forced autotile mode) and when not erasing.
+            if (GameState.EditorStampActive && theAutotile == 0 && GameState.CurAutotileType == 0 && !Conversions.ToBoolean(eraseTile))
+            {
+                int stampW = Math.Max(1, GameState.EditorStampWidth);
+                int stampH = Math.Max(1, GameState.EditorStampHeight);
+
+                if (GameState.EditorStampTileset is not null && GameState.EditorStampX is not null && GameState.EditorStampY is not null && GameState.EditorStampAutoTile is not null)
+                {
+                    bool anyAutotile = false;
+                    int mapIndex = GetPlayerMap(GameState.MyIndex);
+                    var map = Client.Map.Instance[mapIndex];
+
+                    for (int dy = 0; dy < stampH; dy++)
+                    {
+                        for (int dx = 0; dx < stampW; dx++)
+                        {
+                            int tx = x + dx;
+                            int ty = y + dy;
+                            if (tx < 0 || ty < 0 || tx >= map.MaxX || ty >= map.MaxY) continue;
+
+                            ref var tile = ref map.Tile[tx, ty];
+                            tile.Layer[CurLayer].Tileset = GameState.EditorStampTileset[dx, dy];
+                            tile.Layer[CurLayer].X = GameState.EditorStampX[dx, dy];
+                            tile.Layer[CurLayer].Y = GameState.EditorStampY[dx, dy];
+                            tile.Layer[CurLayer].AutoTile = GameState.EditorStampAutoTile[dx, dy];
+                            if (tile.Layer[CurLayer].AutoTile > 0) anyAutotile = true;
+
+                            Autotile.CacheRenderState(tx, ty, CurLayer);
+                        }
+                    }
+
+                    if (anyAutotile)
+                    {
+                        // Re-init so changes are visible.
+                        Autotile.InitAutotiles();
+                    }
+
+                    return;
+                }
+            }
+
             newTileX = GameState.EditorTileX;
             newTileY = GameState.EditorTileY;
 
@@ -695,8 +768,85 @@ namespace Client
                 GameState.EditorTileHeight = 1;
                 GameState.EditorTileSelStart = new Microsoft.Xna.Framework.Point(GameState.EditorTileX, GameState.EditorTileY);
                 GameState.EditorTileSelEnd = new Microsoft.Xna.Framework.Point(GameState.EditorTileX + 1, GameState.EditorTileY + 1);
-                // Keep EyeDropper enabled until toggled off by user
+
+                // Track the map selection for red outline feedback.
+                GameState.EyeDropperSelStart = new Microsoft.Xna.Framework.Point(GameState.CurX, GameState.CurY);
+                GameState.EyeDropperSelEnd = GameState.EyeDropperSelStart;
+
+                // Also populate the stamp buffer for single-tile paint.
+                GameState.EditorStampActive = true;
+                GameState.EditorStampWidth = 1;
+                GameState.EditorStampHeight = 1;
+                GameState.EditorStampTileset = new int[1, 1];
+                GameState.EditorStampX = new int[1, 1];
+                GameState.EditorStampY = new int[1, 1];
+                GameState.EditorStampAutoTile = new byte[1, 1];
+                GameState.EditorStampTileset[0, 0] = instance.Layer[CurLayer].Tileset;
+                GameState.EditorStampX[0, 0] = instance.Layer[CurLayer].X;
+                GameState.EditorStampY[0, 0] = instance.Layer[CurLayer].Y;
+                GameState.EditorStampAutoTile[0, 0] = (byte)instance.Layer[CurLayer].AutoTile;
+
+                // After capture, switch back to painting.
+                GameState.EyeDropperSelecting = false;
+                GameState.EyeDropper = false;
             }
+        }
+
+        public static void MapEditorEyeDropper(int startX, int startY, int endX, int endY)
+        {
+            int layer = GameState.CurLayer;
+            int mapIndex = GetPlayerMap(GameState.MyIndex);
+            var map = Client.Map.Instance[mapIndex];
+
+            int minX = Math.Min(startX, endX);
+            int minY = Math.Min(startY, endY);
+            int maxX = Math.Max(startX, endX);
+            int maxY = Math.Max(startY, endY);
+
+            // Clamp to map bounds
+            minX = Math.Clamp(minX, 0, map.MaxX - 1);
+            minY = Math.Clamp(minY, 0, map.MaxY - 1);
+            maxX = Math.Clamp(maxX, 0, map.MaxX - 1);
+            maxY = Math.Clamp(maxY, 0, map.MaxY - 1);
+
+            int width = (maxX - minX) + 1;
+            int height = (maxY - minY) + 1;
+            // Capture exact tiles as a stamp buffer (supports mixed tilesets and arbitrary atlas coords).
+            GameState.EditorStampActive = true;
+            GameState.EditorStampWidth = width;
+            GameState.EditorStampHeight = height;
+            GameState.EditorStampTileset = new int[width, height];
+            GameState.EditorStampX = new int[width, height];
+            GameState.EditorStampY = new int[width, height];
+            GameState.EditorStampAutoTile = new byte[width, height];
+
+            for (int dy = 0; dy < height; dy++)
+            {
+                for (int dx = 0; dx < width; dx++)
+                {
+                    ref var t = ref map.Tile[minX + dx, minY + dy];
+                    var l = t.Layer[layer];
+                    GameState.EditorStampTileset[dx, dy] = l.Tileset;
+                    GameState.EditorStampX[dx, dy] = l.X;
+                    GameState.EditorStampY[dx, dy] = l.Y;
+                    GameState.EditorStampAutoTile[dx, dy] = (byte)l.AutoTile;
+                }
+            }
+
+            // Keep existing selection semantics so the pencil paints a rectangle.
+            // CurTileset/EditorTileX/Y are still used by other UI bits; set them from top-left.
+            ref var tl = ref map.Tile[minX, minY];
+            GameState.CurTileset = tl.Layer[layer].Tileset;
+            GameState.EditorTileX = tl.Layer[layer].X;
+            GameState.EditorTileY = tl.Layer[layer].Y;
+            GameState.EditorTileWidth = width;
+            GameState.EditorTileHeight = height;
+            GameState.EditorTileSelStart = new Microsoft.Xna.Framework.Point(GameState.EditorTileX, GameState.EditorTileY);
+            GameState.EditorTileSelEnd = new Microsoft.Xna.Framework.Point(GameState.EditorTileX + width, GameState.EditorTileY + height);
+
+            // After capture, switch back to painting.
+            GameState.EyeDropperSelecting = false;
+            GameState.EyeDropper = false;
         }
 
         public static void Undo()
@@ -855,7 +1005,6 @@ namespace Client
             int i;
             int x;
             int y;
-
             // Get the number of layers from the MapLayer enum
             int layerCount = Enum.GetValues(typeof(MapLayer)).Length;
 
