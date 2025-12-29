@@ -1998,10 +1998,19 @@ namespace Client
 
         public static void OpenShop(long shopNum)
         {
+            var shopIndex = (int)shopNum;
+            if (shopIndex < 0 || shopIndex >= Shop.Instance.Count)
+            {
+                GameState.InShop = -1;
+                return;
+            }
+
             // set globals
-            GameState.InShop = (int)shopNum;
+            GameState.InShop = shopIndex;
             GameState.ShopSelectedSlot = 0;
-            GameState.ShopSelectedItem = Shop.Instance[GameState.InShop].TradeItem[1].Item;
+            GameState.ShopSelectedItem = Shop.Instance[GameState.InShop].TradeItem.Length > 0
+                ? Shop.Instance[GameState.InShop].TradeItem[0].Item
+                : -1;
             WindowManager.Windows[WindowManager.GetWindowIndex("winShop")].Controls[WindowManager.GetControlIndex("winShop", "CheckboxSelling")].Value = 0;
             WindowManager.Windows[WindowManager.GetWindowIndex("winShop")].Controls[WindowManager.GetControlIndex("winShop", "CheckboxBuying")].Value = 0;
             WindowManager.Windows[WindowManager.GetWindowIndex("winShop")].Controls[WindowManager.GetControlIndex("winShop", "btnSell")].Visible = false;
