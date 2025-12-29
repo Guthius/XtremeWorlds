@@ -146,6 +146,7 @@ namespace Client
                 {
                     for (_i = 0; _i < Variables.MaxPlayerSkills; _i++)
                     {
+                        if (Player.Instance.Count <= GameState.MyIndex) break;
                         if (Player.Instance[GameState.MyIndex].Skill[_i].Num >= 0)
                         {
                             if (Player.Instance[GameState.MyIndex].Skill[_i].Cd > 0)
@@ -207,7 +208,7 @@ namespace Client
                             Player.OnAttack(mouse: true);
                         }
                     }
-                    
+
                     // Process player movements
                     for (_i = 0; _i < Player.Instance.Count; _i++)
                     {
