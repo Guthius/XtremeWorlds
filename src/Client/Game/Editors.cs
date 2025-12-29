@@ -534,6 +534,9 @@ namespace Client
                 return;
             }
 
+            // Discard any queued resize changes when cancelling.
+            GameState.MapResizePending = false;
+
             var packetWriter = new PacketWriter(8);
             
             packetWriter.WriteEnum(Packets.ClientPackets.CNeedMap);
@@ -558,6 +561,15 @@ namespace Client
 
         public static void MapEditorSend()
         {
+            // Apply queued resize (if any) only at save time.
+            if (GameState.MyEditorType == EditorType.Map && GameState.MapResizePending)
+            {
+                var nx = (byte)Math.Clamp(GameState.MapResizePendingX, 1, byte.MaxValue);
+                var ny = (byte)Math.Clamp(GameState.MapResizePendingY, 1, byte.MaxValue);
+                GameState.MapResizePending = false;
+                WinMapEditor.ResizeMap(nx, ny, updateControls: false);
+            }
+
             // Send the edited map to the server
             Sender.SendMap();
 

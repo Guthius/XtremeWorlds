@@ -634,9 +634,9 @@ namespace Server
 
             var layerCount = Enum.GetValues(typeof(MapLayer)).Length;
 
-            for (int y = 0; y < mwMap.MaxX; y++)
-            {
-                for (int x = 0; x < mwMap.MaxY; x++)
+            for (int x = 0; x < mwMap.MaxX; x++)
+                {
+                for (int y = 0; y < mwMap.MaxY; y++)
                 {
                     mwMap.Tile[x, y].Layer = new Core.Globals.Type.Layer[layerCount];
                     mwMap.Tile[x, y].Data1 = csMap.Tile[x, y].Data1;

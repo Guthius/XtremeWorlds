@@ -460,17 +460,7 @@ namespace Client
 
         private static void UpdateEditors()
         {
-            // Map editor: apply debounced map resize from txtMaxX/txtMaxY on the main thread.
-            if (GameState.MyEditorType == EditorType.Map && GameState.MapResizePending)
-            {
-                if (_tick - GameState.MapResizeLastEditTick >= 350)
-                {
-                    GameState.MapResizePending = false;
-                    var nx = (byte)Math.Clamp(GameState.MapResizePendingX, 1, byte.MaxValue);
-                    var ny = (byte)Math.Clamp(GameState.MapResizePendingY, 1, byte.MaxValue);
-                    WinMapEditor.ResizeMap(nx, ny);
-                }
-            }
+            // Map editor: map resize is queued and applied on save.
 
             if (GameState.InitAdminForm)
             {

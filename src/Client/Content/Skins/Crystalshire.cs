@@ -323,14 +323,16 @@ public class Crystalshire
                 if (WindowManager.TryGetControl("winMapEditor", "chkIndoors", out var chkIndoors))
                     Client.Map.Instance[mapIndex].Indoors = chkIndoors.Value == 1;
 
-                // Resize map (applies immediately to in-memory map; save sends the resized map)
+                // Resize map is queued and applied on save.
                 byte newMaxX = Client.Map.Instance[mapIndex].MaxX;
                 byte newMaxY = Client.Map.Instance[mapIndex].MaxY;
                 if (WindowManager.TryGetControl("winMapEditor", "txtMaxX", out var txtMaxX))
                     newMaxX = (byte)ReadIntSafe(txtMaxX, 1, byte.MaxValue, newMaxX);
                 if (WindowManager.TryGetControl("winMapEditor", "txtMaxY", out var txtMaxY))
                     newMaxY = (byte)ReadIntSafe(txtMaxY, 1, byte.MaxValue, newMaxY);
-                WinMapEditor.ResizeMap(newMaxX, newMaxY, updateControls: false);
+                GameState.MapResizePendingX = newMaxX;
+                GameState.MapResizePendingY = newMaxY;
+                GameState.MapResizePending = true;
 
                 // Send map and close
                 Editors.MapEditorSend();

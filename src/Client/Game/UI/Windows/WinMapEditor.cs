@@ -135,14 +135,14 @@ public class WinMapEditor
         if (map.MaxX == newMaxX && map.MaxY == newMaxY)
             return;
 
-        var oldTiles = (Type.Tile[,])map.Tile.Clone();
+        var oldTiles = map.Tile;
         var oldMaxX = map.MaxX;
         var oldMaxY = map.MaxY;
 
         map.MaxX = newMaxX;
         map.MaxY = newMaxY;
 
-        map.Tile = new Type.Tile[map.MaxX, map.MaxY];
+        var newTiles = new Type.Tile[map.MaxX, map.MaxY];
 
         // Ensure undo history arrays match new dimensions
         if (Data.TileHistory == null || Data.TileHistory.Length != GameState.MaxTileHistory)
@@ -164,21 +164,36 @@ public class WinMapEditor
         {
             for (int y = 0; y < map.MaxY; y++)
             {
-                map.Tile[x, y].Layer = new Type.Layer[layerCount];
+                // Always initialize supporting caches to correct dimensions.
                 Data.Autotile[x, y].Layer = new Type.QuarterTile[layerCount];
-
                 for (int i = 0; i < GameState.MaxTileHistory; i++)
                 {
                     Data.TileHistory[i].Tile[x, y].Layer = new Type.Layer[layerCount];
                 }
 
-                if (x < copyMaxX && y < copyMaxY)
+                // Preserve old tile data when possible.
+                if (oldTiles != null && x < copyMaxX && y < copyMaxY)
                 {
-                    map.Tile[x, y] = oldTiles[x, y];
-                    map.Tile[x, y].Layer ??= new Type.Layer[layerCount];
+                    var oldTile = oldTiles[x, y];
+                    newTiles[x, y] = oldTile;
+
+                    // Ensure layer array is always present and correctly sized.
+                    var resizedLayers = new Type.Layer[layerCount];
+                    if (oldTile.Layer != null)
+                    {
+                        Array.Copy(oldTile.Layer, resizedLayers, Math.Min(oldTile.Layer.Length, layerCount));
+                    }
+                    newTiles[x, y].Layer = resizedLayers;
+                }
+                else
+                {
+                    // New blank tile.
+                    newTiles[x, y].Layer = new Type.Layer[layerCount];
                 }
             }
         }
+
+        map.Tile = newTiles;
 
         // Clamp boot position into bounds
         if (map.BootX >= map.MaxX) map.BootX = (byte)Math.Max(0, map.MaxX - 1);
