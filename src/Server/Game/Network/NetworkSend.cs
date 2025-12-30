@@ -353,7 +353,7 @@ public static class NetworkSend
         }
 
         packetWriter.WriteInt32(shop.BuyRate);
-        packetWriter.WriteString(shop.Name ?? string.Empty);
+        packetWriter.WriteString(shop.Name);
 
         var tradeItems = shop.TradeItem;
         for (var i = 0; i < Core.Globals.Variables.MaxTrades; i++)
@@ -1422,7 +1422,7 @@ public static class NetworkSend
         if (Projectile.Instance.Count > index)
             projectile = (Projectile)Projectile.Instance[index];
             
-        packet.WriteString(projectile.Name ?? string.Empty);
+        packet.WriteString(projectile.Name);
         packet.WriteInt32(projectile.Sprite);
         packet.WriteInt32(projectile.Range);
         packet.WriteInt32(projectile.Speed);
@@ -1474,6 +1474,11 @@ public static class NetworkSend
         packet.WriteInt32(resource.LvlRequired);
         packet.WriteInt32(resource.ToolRequired);
         packet.WriteBoolean(resource.Walkthrough);
+
+        // common event fields (0 = none)
+        packet.WriteByte(resource.CommonEventType);
+        packet.WriteInt32(resource.CommonEventData1);
+        packet.WriteInt32(resource.CommonEventData2);
     }
 
     public static void SendMapResourceToMap(int map)
@@ -1920,7 +1925,7 @@ public static class NetworkSend
             npc = (Npc)Npc.Instance[index];
 
         packet.WriteInt32(npc.Animation);
-        packet.WriteString(npc.AttackSay ?? string.Empty);
+        packet.WriteString(npc.AttackSay);
         packet.WriteByte(npc.Behavior);
 
         for (var i = 0; i < Core.Globals.Variables.MaxDropItems; i++)
@@ -1933,7 +1938,7 @@ public static class NetworkSend
         packet.WriteInt32(npc.Experience);
         packet.WriteByte(npc.Faction);
         packet.WriteInt32(npc.Hp);
-        packet.WriteString(npc.Name ?? string.Empty);
+        packet.WriteString(npc.Name);
         packet.WriteByte(npc.Range);
         packet.WriteByte(npc.SpawnTime);
         packet.WriteInt32(npc.SpawnSecs);
@@ -1951,6 +1956,14 @@ public static class NetworkSend
 
         packet.WriteByte(npc.Level);
         packet.WriteInt32(npc.Damage);
+
+        packet.WriteInt32(npc.DeathSwitch);
+        packet.WriteInt32(npc.DeathVariable);
+
+        // common event fields (0 = none)
+        packet.WriteByte(npc.CommonEventType);
+        packet.WriteInt32(npc.CommonEventData1);
+        packet.WriteInt32(npc.CommonEventData2);
     }
 
     public static void SendMapNpcVitals(int map, byte mapNpcNum)

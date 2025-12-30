@@ -22,6 +22,11 @@ namespace Core.Objects
         public bool Walkthrough;
         public int Animation;
 
+        // Optional common event trigger (0 = none; otherwise matches editor selection)
+        public byte CommonEventType;
+        public int CommonEventData1;
+        public int CommonEventData2;
+
         public static List<ResourceBase> Instance { get; private set; } = new List<ResourceBase>();
 
         public ResourceBase()

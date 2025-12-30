@@ -256,7 +256,7 @@ public static class TextRenderer
             
         }
 
-        var dimensions = spriteFont.MeasureString(text ?? string.Empty);
+        var dimensions = spriteFont.MeasureString(text);
         return (int)Math.Round(dimensions.Y * (effectiveScale / BaseScale) * textSize);
     }
 

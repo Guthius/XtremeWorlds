@@ -14,7 +14,7 @@ public class WinItemEditor
 
     private static string DisplayNameOrNone(string? raw)
     {
-        var trimmed = Strings.Trim(raw ?? string.Empty);
+        var trimmed = Strings.Trim(raw);
         return string.IsNullOrWhiteSpace(trimmed) ? "None" : trimmed;
     }
 

@@ -116,7 +116,7 @@ public sealed class ListBox : Control
 
     public void AddItem(string item)
     {
-        Items.Add(item ?? string.Empty);
+        Items.Add(item);
     }
 
     public void RemoveAt(int index)

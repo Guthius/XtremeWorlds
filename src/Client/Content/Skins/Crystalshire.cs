@@ -1643,6 +1643,27 @@ public class Crystalshire
             }
         }, 0, 100000000);
 
+        // Death tracking
+        BindIntText("txtDeathSwitch", v =>
+        {
+            if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Variables.MaxNpcs)
+            {
+                if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
+                    Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].DeathSwitch = Math.Max(0, v);
+                GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
+            }
+        }, 0, Variables.MaxSwitches - 1);
+
+        BindIntText("txtDeathVariable", v =>
+        {
+            if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Variables.MaxNpcs)
+            {
+                if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
+                    Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].DeathVariable = Math.Max(0, v);
+                GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
+            }
+        }, 0, Variables.MaxVariables - 1);
+
         // Sliders for stats (HP uses textbox only; no slider binding)
 
         BindScrollBar(

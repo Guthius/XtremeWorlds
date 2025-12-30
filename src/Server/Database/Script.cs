@@ -398,42 +398,62 @@ public class Script
 
     private void CommonEvent(int index, int itemNum, int skillNum = -1)
     {
-        int idType;
-        int n, n2;
-
         if (skillNum >= 0)
         {
-            idType = Skill.Instance[skillNum].CommonEventType - 1;
-            n = Skill.Instance[skillNum].CommonEventData1;
-            n2 = Skill.Instance[skillNum].CommonEventData2;
+            TriggerCommonEvent(index,
+                Skill.Instance[skillNum].CommonEventType,
+                Skill.Instance[skillNum].CommonEventData1,
+                Skill.Instance[skillNum].CommonEventData2);
         }
         else
         {
-            // Item-driven common events directly use the enum as SubType
-            idType = Item.Instance[itemNum].SubType;
-            n = Item.Instance[itemNum].Data1;
-            n2 = Item.Instance[itemNum].Data2;
+            // Item-driven common events use SubType as the trigger enum (0..)
+            TriggerCommonEventRaw(index,
+                Item.Instance[itemNum].SubType,
+                Item.Instance[itemNum].Data1,
+                Item.Instance[itemNum].Data2);
+        }
+    }
+
+    /// <summary>
+    /// Triggers a common event using the skill-style encoding:
+    /// 0 = none, 1..N = (CommonEventTrigger + 1).
+    /// </summary>
+    public void TriggerCommonEvent(int playerId, byte commonEventType, int data1, int data2)
+    {
+        if (commonEventType <= 0)
+        {
+            return;
         }
 
-        switch (idType)
+        TriggerCommonEventRaw(playerId, commonEventType - 1, data1, data2);
+    }
+
+    /// <summary>
+    /// Triggers a common event where the trigger type is already 0-based (CommonEventTrigger).
+    /// </summary>
+    private void TriggerCommonEventRaw(int playerId, int triggerType, int data1, int data2)
+    {
+        switch (triggerType)
         {
             case (byte)CommonEventTrigger.Switch:
-                Server.Player.Instance[index].Switches[Math.Max(0, n)] = (byte)Math.Max(0, n2); break;
-                
+                Server.Player.Instance[playerId].Switches[Math.Max(0, data1)] = (byte)Math.Max(0, data2);
+                break;
+
             case (byte)CommonEventTrigger.Variable:
-                Server.Player.Instance[index].Variables[Math.Max(0, n)] = n2; break;
+                Server.Player.Instance[playerId].Variables[Math.Max(0, data1)] = data2;
+                break;
 
             case (byte)CommonEventTrigger.Key:
-                EventLogic.TriggerEvent(index, 1, 0, GetPlayerX(index), GetPlayerY(index)); break;
+                EventLogic.TriggerEvent(playerId, 1, 0, GetPlayerX(playerId), GetPlayerY(playerId));
+                break;
 
             case (byte)CommonEventTrigger.Script:
                 // Minimal sample custom scripts
-                if (n == 0)
-                    NetworkSend.SendPlayerMessage(index, "You feel a strange sensation...", (int)ColorName.BrightCyan);
+                if (data1 == 0)
+                    NetworkSend.SendPlayerMessage(playerId, "You feel a strange sensation...", (int)ColorName.BrightCyan);
                 else
-                    NetworkSend.SendPlayerMessage(index, "Nothing happens.", (int)ColorName.Yellow);
-                break;
-            default:
+                    NetworkSend.SendPlayerMessage(playerId, "Nothing happens.", (int)ColorName.Yellow);
                 break;
         }
     }
@@ -984,6 +1004,23 @@ public class Script
                 
                 // Store original NPC number for respawn and set to dead state
                 int originalNpcNum = mapNpc.Num;
+
+                // Death switch/variable (applied to killer if Player)
+                if (attacker.Type == Entity.EntityType.Player && originalNpcNum >= 0 && originalNpcNum < Npc.Instance.Count)
+                {
+                    var npcTemplate = Npc.Instance[originalNpcNum];
+
+                    if (npcTemplate.DeathSwitch > 0 && npcTemplate.DeathSwitch < Core.Globals.Variables.MaxSwitches)
+                    {
+                        Server.Player.Instance[attacker.Id].Switches[npcTemplate.DeathSwitch] = 1;
+                    }
+
+                    if (npcTemplate.DeathVariable > 0 && npcTemplate.DeathVariable < Core.Globals.Variables.MaxVariables)
+                    {
+                        Server.Player.Instance[attacker.Id].Variables[npcTemplate.DeathVariable] += 1;
+                    }
+                }
+
                 mapNpc.Num = -1; // regular dead
                 mapNpc.SpawnWait = currentTime + deathTimerMs; // respawn time
                 mapNpc.Vital[(int)Core.Globals.Vital.Health] = 0;

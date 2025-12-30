@@ -71,7 +71,7 @@ public static class Strings
 	public static string Replace(string? expression, string? find, string? replacement)
 	{
 		if (string.IsNullOrEmpty(expression) || string.IsNullOrEmpty(find)) return expression ?? string.Empty;
-		return expression!.Replace(find!, replacement ?? string.Empty);
+		return expression!.Replace(find!, replacement);
 	}
 
 	public static string UCase(string? s) => (s ?? string.Empty).ToUpperInvariant();
@@ -268,7 +268,7 @@ public static class Interaction
 {
 	public static int MsgBox(string? prompt)
 	{
-		Console.WriteLine(prompt ?? string.Empty);
+		Console.WriteLine(prompt);
 		return 0;
 	}
 	public static string InputBox(string prompt, string title = "", string defaultResponse = "")

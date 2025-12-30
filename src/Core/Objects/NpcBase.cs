@@ -41,6 +41,15 @@ public class NpcBase : IData
     public byte Level { get; set; }
     public int Damage { get; set; }
 
+    // Optional death tracking (0 = none)
+    public int DeathSwitch { get; set; }
+    public int DeathVariable { get; set; }
+
+    // Optional common event trigger (0 = none; otherwise matches editor selection)
+    public byte CommonEventType { get; set; }
+    public int CommonEventData1 { get; set; }
+    public int CommonEventData2 { get; set; }
+
     public static List<NpcBase> Instance { get; } = new();
 
     public static void OnClear(int index)

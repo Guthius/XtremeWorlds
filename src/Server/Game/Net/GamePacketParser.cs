@@ -3116,6 +3116,11 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Resource.Instance[index].ToolRequired = packetReader.ReadInt32();
         Resource.Instance[index].Walkthrough = packetReader.ReadBoolean();
 
+        // common event fields (0 = none)
+        Resource.Instance[index].CommonEventType = packetReader.ReadByte();
+        Resource.Instance[index].CommonEventData1 = packetReader.ReadInt32();
+        Resource.Instance[index].CommonEventData2 = packetReader.ReadInt32();
+
         Resource.OnSave(index);
 
         General.Logger.LogInformation("{AccountName} saved Resource #{ResourceNum}",
@@ -3529,6 +3534,14 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         Npc.Instance[npcNum].Level = packetReader.ReadByte();
         Npc.Instance[npcNum].Damage = packetReader.ReadInt32();
+
+        Npc.Instance[npcNum].DeathSwitch = packetReader.ReadInt32();
+        Npc.Instance[npcNum].DeathVariable = packetReader.ReadInt32();
+
+        // common event fields (0 = none)
+        Npc.Instance[npcNum].CommonEventType = packetReader.ReadByte();
+        Npc.Instance[npcNum].CommonEventData1 = packetReader.ReadInt32();
+        Npc.Instance[npcNum].CommonEventData2 = packetReader.ReadInt32();
 
         Npc.OnSave(npcNum);
 

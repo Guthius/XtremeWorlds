@@ -697,6 +697,13 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         npc.Level = packetReader.ReadByte();
         npc.Damage = packetReader.ReadInt32();
 
+        npc.DeathSwitch = packetReader.ReadInt32();
+        npc.DeathVariable = packetReader.ReadInt32();
+
+        npc.CommonEventType = packetReader.ReadByte();
+        npc.CommonEventData1 = packetReader.ReadInt32();
+        npc.CommonEventData2 = packetReader.ReadInt32();
+
         Npc.Instance.Add(npc);
 
         if ((n + 1) == Variables.MaxNpcs)
@@ -1325,6 +1332,10 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         resource.LvlRequired = buffer.ReadInt32();
         resource.ToolRequired = buffer.ReadInt32();
         resource.Walkthrough = buffer.ReadBoolean();
+
+        resource.CommonEventType = buffer.ReadByte();
+        resource.CommonEventData1 = buffer.ReadInt32();
+        resource.CommonEventData2 = buffer.ReadInt32();
 
         // Update the resource
         Resource.Instance.Add(resource);

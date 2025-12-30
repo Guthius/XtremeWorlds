@@ -243,6 +243,16 @@ public class WinNpcEditor
         {
             txtDmg.Text = npc.Damage.ToString();
         }
+
+        // Death tracking
+        if (WindowManager.TryGetControl("winNpcEditor", "txtDeathSwitch", out var deathSwitchCtrl) && deathSwitchCtrl is TextBox txtDs)
+        {
+            txtDs.Text = npc.DeathSwitch.ToString();
+        }
+        if (WindowManager.TryGetControl("winNpcEditor", "txtDeathVariable", out var dvCtrl) && dvCtrl is TextBox txtDv)
+        {
+            txtDv.Text = npc.DeathVariable.ToString();
+        }
         if (WindowManager.TryGetControl("winNpcEditor", "txtRange", out var rangeCtrl) && rangeCtrl is TextBox txtRange)
         {
             txtRange.Text = npc.Range.ToString();

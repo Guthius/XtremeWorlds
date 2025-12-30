@@ -32,6 +32,12 @@
     <Label Name="lblSprite" Text="Sprite" Position="270, 74" Size="54, 16"/>
     <ScrollBar Name="sldSprite" Position="320, 74" Size="96, 12" Min="0" Max="1" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 
+    <!-- Death tracking -->
+    <Label Name="lblDeathSwitch" Text="Death Switch" Position="270, 96" Size="80, 16"/>
+    <TextBox Name="txtDeathSwitch" Position="350, 94" Size="66, 18" Design="TextWhite"/>
+    <Label Name="lblDeathVariable" Text="Death Variable" Position="270, 120" Size="84, 16"/>
+    <TextBox Name="txtDeathVariable" Position="350, 118" Size="66, 18" Design="TextWhite"/>
+
     <!-- Stats -->
     <Label Name="lblHp" Text="HP" Position="8, 160" Size="40, 16"/>
     <TextBox Name="txtHp" Position="48, 158" Size="80, 18" Design="TextWhite"/>

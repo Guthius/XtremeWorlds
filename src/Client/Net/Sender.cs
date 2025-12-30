@@ -587,6 +587,10 @@ public static class Sender
         packetWriter.WriteInt32(Resource.Instance[index].LvlRequired);
         packetWriter.WriteInt32(Resource.Instance[index].ToolRequired);
         packetWriter.WriteBoolean(Resource.Instance[index].Walkthrough);
+
+        packetWriter.WriteByte(Resource.Instance[index].CommonEventType);
+        packetWriter.WriteInt32(Resource.Instance[index].CommonEventData1);
+        packetWriter.WriteInt32(Resource.Instance[index].CommonEventData2);
         Network.Send(packetWriter);
     }
 
@@ -613,7 +617,7 @@ public static class Sender
         packetWriter.WriteEnum(Packets.ClientPackets.CSaveNpc);
         packetWriter.WriteInt32(index);
         packetWriter.WriteInt32(npc.Animation);
-        packetWriter.WriteString(npc.AttackSay ?? string.Empty);
+        packetWriter.WriteString(npc.AttackSay);
         packetWriter.WriteByte(npc.Behavior);
 
         for (var i = 0; i < Variables.MaxDropItems; i++)
@@ -626,7 +630,7 @@ public static class Sender
         packetWriter.WriteInt32(npc.Experience);
         packetWriter.WriteByte(npc.Faction);
         packetWriter.WriteInt32(npc.Hp);
-        packetWriter.WriteString(npc.Name ?? string.Empty);
+        packetWriter.WriteString(npc.Name);
         packetWriter.WriteByte(npc.Range);
         packetWriter.WriteByte(npc.SpawnTime);
         packetWriter.WriteInt32(npc.SpawnSecs);
@@ -644,6 +648,13 @@ public static class Sender
 
         packetWriter.WriteByte(npc.Level);
         packetWriter.WriteInt32(npc.Damage);
+
+        packetWriter.WriteInt32(npc.DeathSwitch);
+        packetWriter.WriteInt32(npc.DeathVariable);
+
+        packetWriter.WriteByte(npc.CommonEventType);
+        packetWriter.WriteInt32(npc.CommonEventData1);
+        packetWriter.WriteInt32(npc.CommonEventData2);
         Network.Send(packetWriter);
     }
 
