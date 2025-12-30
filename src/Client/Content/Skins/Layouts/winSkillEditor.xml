@@ -24,7 +24,7 @@
 		<ComboBox Name="cmbAnimation" Position="140,86" Size="220,20"/>
 
 		<Label Name="lblIcon" Text="Icon" Position="12,122" Size="120,18"/>
-		<ScrollBar Name="sldIcon" Position="140,122" Size="200,14" Min="0" Max="1024" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+		<ScrollBar Name="sldIcon" Position="140,122" Size="200,12" Min="0" Max="1024" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 
 		<Label Name="lblDamage" Text="Damage" Position="12,156" Size="120,18"/>
 		<TextBox Name="txtDamage" Position="140,154" Size="220,22" Design="TextWhite"/>
@@ -39,13 +39,13 @@
 		<TextBox Name="txtCooldown" Position="140,226" Size="220,22" Design="TextWhite"/>
 
 		<Label Name="lblRange" Text="Range" Position="12,252" Size="120,18"/>
-		<ScrollBar Name="sldRange" Position="140,252" Size="200,14" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+		<ScrollBar Name="sldRange" Position="140,252" Size="200,12" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 
 		<Label Name="lblCastTime" Text="Cast Time" Position="12,276" Size="120,18"/>
 		<TextBox Name="txtCastTime" Position="140,274" Size="220,22" Design="TextWhite"/>
 
 		<Label Name="lblAoe" Text="AoE Radius" Position="12,300" Size="120,18"/>
-		<ScrollBar Name="sldAoE" Position="140,300" Size="200,14" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+		<ScrollBar Name="sldAoE" Position="140,300" Size="200,12" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 
 		<Label Name="lblProjectile" Text="Projectile" Position="12,324" Size="120,18"/>
 		<ComboBox Name="cmbProjectile" Position="140,322" Size="220,20"/>
