@@ -72,7 +72,7 @@ namespace Client
 
         public static Type.Picture Picture;
 
-         public static void OnDraw(int id) // draw on map, outside the editor
+        public static void OnDraw(int id) // draw on map, outside the editor
         {
             int x;
             int y;
@@ -81,162 +81,159 @@ namespace Client
             var sRect = default(Microsoft.Xna.Framework.Rectangle);
             var spritetop = default(int);
 
-            try
+            if (Data.MapEvents?[id].Visible == false)
             {
-                if (Data.MapEvents?[id].Visible == false)
-                {
+                return;
+            }
+
+            if (EditorType.Map == GameState.MyEditorType)
+                return;
+
+            switch (Data.MapEvents?[id].GraphicType)
+            {
+                case 0:
                     return;
-                }
+                case 1:
+                    {
+                        // Segmented character event (idle/run/attack) mirroring player/NPC logic.
+                        if (Data.MapEvents[id].Graphic <= 0 || Data.MapEvents[id].Graphic > GameState.NumCharacters)
+                            return;
 
-                if (EditorType.Map == GameState.MyEditorType)
-                    return;
+                        var gfxInfo = GameClient.GetGfxInfo(Path.Combine(DataPath.Characters, Data.MapEvents[id].Graphic.ToString()));
+                        if (gfxInfo == null) return;
 
-                switch (Data.MapEvents?[id].GraphicType)
-                {
-                    case 0:
-                        return;
-                    case 1:
+                        int directionRows = GameClient.ComputeDirectionRows(gfxInfo.Height, Math.Max(1, SettingsManager.Instance.SpriteDirections));
+                        spritetop = GameClient.MapDirectionToRow((Direction)Data.MapEvents[id].ShowDir, directionRows);
+
+                        int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
+                        int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
+                        int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
+                        int expectedTotalColumns = idleFrames + runFrames + attackFrames;
+                        int frameRowHeight = gfxInfo.Height / Math.Max(1, directionRows);
+                        if (frameRowHeight <= 0) frameRowHeight = gfxInfo.Height; // safety fallback
+                        int autoColsBySquare = frameRowHeight > 0 ? gfxInfo.Width / frameRowHeight : 1;
+                        if (autoColsBySquare <= 0) autoColsBySquare = 1;
+                        bool widthDivisible = expectedTotalColumns > 0 && gfxInfo.Width % expectedTotalColumns == 0;
+                        bool canSegment = widthDivisible; // same relaxed heuristic as NPCs
+                        int frameColumnsForWidth = canSegment ? expectedTotalColumns : autoColsBySquare;
+
+                        // Segment ordering
+                        string orderCsv = SettingsManager.Instance.SpriteSegmentOrder ?? "idle,run,attack";
+                        var tokens = orderCsv.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                        if (tokens.Length != 3) tokens = new[] { "idle", "run", "attack" };
+                        for (int i = 0; i < tokens.Length; i++) tokens[i] = tokens[i].Trim().ToLowerInvariant();
+                        if (!(tokens.Contains("idle") && tokens.Contains("run") && tokens.Contains("attack")))
+                            tokens = new[] { "idle", "run", "attack" };
+
+                        int runningOffset = 0;
+                        int idleOffset = 0, runOffset = 0, attackOffset = 0;
+                        for (int i = 0; i < tokens.Length; i++)
                         {
-                            // Segmented character event (idle/run/attack) mirroring player/NPC logic.
-                            if (Data.MapEvents[id].Graphic <= 0 || Data.MapEvents[id].Graphic > GameState.NumCharacters)
-                                return;
-
-                            var gfxInfo = GameClient.GetGfxInfo(Path.Combine(DataPath.Characters, Data.MapEvents[id].Graphic.ToString()));
-                            if (gfxInfo == null) return;
-
-                            int directionRows = GameClient.ComputeDirectionRows(gfxInfo.Height, Math.Max(1, SettingsManager.Instance.SpriteDirections));
-                            spritetop = GameClient.MapDirectionToRow((Direction)Data.MapEvents[id].ShowDir, directionRows);
-
-                            int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
-                            int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
-                            int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
-                            int expectedTotalColumns = idleFrames + runFrames + attackFrames;
-                            int frameRowHeight = gfxInfo.Height / Math.Max(1, directionRows);
-                            if (frameRowHeight <= 0) frameRowHeight = gfxInfo.Height; // safety fallback
-                            int autoColsBySquare = frameRowHeight > 0 ? gfxInfo.Width / frameRowHeight : 1;
-                            if (autoColsBySquare <= 0) autoColsBySquare = 1;
-                            bool widthDivisible = expectedTotalColumns > 0 && gfxInfo.Width % expectedTotalColumns == 0;
-                            bool canSegment = widthDivisible; // same relaxed heuristic as NPCs
-                            int frameColumnsForWidth = canSegment ? expectedTotalColumns : autoColsBySquare;
-
-                            // Segment ordering
-                            string orderCsv = SettingsManager.Instance.SpriteSegmentOrder ?? "idle,run,attack";
-                            var tokens = orderCsv.Split(',', StringSplitOptions.RemoveEmptyEntries);
-                            if (tokens.Length != 3) tokens = new[] { "idle", "run", "attack" };
-                            for (int i = 0; i < tokens.Length; i++) tokens[i] = tokens[i].Trim().ToLowerInvariant();
-                            if (!(tokens.Contains("idle") && tokens.Contains("run") && tokens.Contains("attack")))
-                                tokens = new[] { "idle", "run", "attack" };
-
-                            int runningOffset = 0;
-                            int idleOffset = 0, runOffset = 0, attackOffset = 0;
-                            for (int i = 0; i < tokens.Length; i++)
-                            {
-                                string t = tokens[i];
-                                if (t == "idle") idleOffset = runningOffset;
-                                else if (t == "run") runOffset = runningOffset;
-                                else if (t == "attack") attackOffset = runningOffset;
-                                if (t == "idle") runningOffset += idleFrames;
-                                else if (t == "run") runningOffset += runFrames;
-                                else if (t == "attack") runningOffset += attackFrames;
-                            }
-
-                            bool isMoving = Data.MapEvents[id].Moving != 0 && Data.MapEvents[id].IdleAnim == 0;
-                            bool isAttacking = false; // events currently have no attack cycle; placeholder if added later
-
-                            byte frameWithinSegment;
-                            if (canSegment)
-                            {
-                                if (isAttacking)
-                                    frameWithinSegment = (byte)(Data.MapEvents[id].Steps % Math.Max(1, attackFrames));
-                                else if (isMoving)
-                                    frameWithinSegment = (byte)(Data.MapEvents[id].Steps % Math.Max(1, runFrames));
-                                else
-                                    frameWithinSegment = (byte)(Data.MapEvents[id].Steps % Math.Max(1, idleFrames));
-                            }
-                            else
-                            {
-                                frameWithinSegment = (byte)(Data.MapEvents[id].Steps % frameColumnsForWidth);
-                            }
-
-                            int segmentOffset = 0;
-                            if (canSegment)
-                            {
-                                if (isAttacking) segmentOffset = attackOffset;
-                                else if (isMoving) segmentOffset = runOffset;
-                                else segmentOffset = idleOffset;
-                            }
-                            int frameColumn = Math.Min(frameColumnsForWidth - 1, segmentOffset + frameWithinSegment);
-
-                            double frameWidthD = gfxInfo.Width / (double)frameColumnsForWidth;
-                            double frameHeightD = frameRowHeight;
-                            sRect = new Microsoft.Xna.Framework.Rectangle(
-                                (int)Math.Round(frameColumn * frameWidthD),
-                                (int)Math.Round(spritetop * frameHeightD),
-                                (int)Math.Round(frameWidthD),
-                                (int)Math.Round(frameHeightD));
-
-                            width = sRect.Width;
-                            height = sRect.Height;
-
-                            // Center consistent with NPC/Player logic
-                            x = (int)Math.Round(Data.MapEvents[id].X - (frameWidthD - 32d) / 2d);
-                            if (frameRowHeight > 32)
-                                y = (int)Math.Round(Data.MapEvents[id].Y - (frameHeightD - 32d));
-                            else
-                                y = Data.MapEvents[id].Y;
-
-                            GameClient.DrawCharacterSprite(Data.MapEvents[id].Graphic, x, y, sRect);
-                            break;
+                            string t = tokens[i];
+                            if (t == "idle") idleOffset = runningOffset;
+                            else if (t == "run") runOffset = runningOffset;
+                            else if (t == "attack") attackOffset = runningOffset;
+                            if (t == "idle") runningOffset += idleFrames;
+                            else if (t == "run") runningOffset += runFrames;
+                            else if (t == "attack") runningOffset += attackFrames;
                         }
-                    case 2:
+
+                        bool isMoving = Data.MapEvents[id].Moving != 0 && Data.MapEvents[id].IdleAnim == 0;
+                        bool isAttacking = false; // events currently have no attack cycle; placeholder if added later
+
+                        byte frameWithinSegment;
+                        if (canSegment)
                         {
-                            if (Data.MapEvents[id].Graphic < 1 |
-                                Data.MapEvents[id].Graphic > GameState.NumTileSets)
-                                return;
-
-                            if (Data.MapEvents[id].GraphicY2 > 0 | Data.MapEvents[id].GraphicX2 > 0)
-                            {
-                                sRect.X = Data.MapEvents[id].GraphicX * 32;
-                                sRect.Y = Data.MapEvents[id].GraphicY * 32;
-                                sRect.Width = Data.MapEvents[id].GraphicX2 * 32;
-                                sRect.Height = Data.MapEvents[id].GraphicY2 * 32;
-                            }
+                            if (isAttacking)
+                                frameWithinSegment = (byte)(Data.MapEvents[id].Steps % Math.Max(1, attackFrames));
+                            else if (isMoving)
+                                frameWithinSegment = (byte)(Data.MapEvents[id].Steps % Math.Max(1, runFrames));
                             else
-                            {
-                                sRect.X = Data.MapEvents[id].GraphicY * 32;
-                                sRect.Height = sRect.Top + 32;
-                                sRect.Y = Data.MapEvents[id].GraphicX * 32;
-                                sRect.Width = sRect.Left + 32;
-                            }
-
-                            x = Data.MapEvents[id].X * 32;
-                            y = Data.MapEvents[id].Y * 32;
-                            x = (int)Math.Round(x - (sRect.Right - sRect.Left) / 2d);
-                            y = y - (sRect.Bottom - sRect.Top) + 32;
-
-                            if (Data.MapEvents[id].GraphicY2 > 1)
-                            {
-                                string argPath = Path.Combine(DataPath.Tilesets,
-                                    Data.MapEvents[id].Graphic.ToString());
-                                GameClient.RenderTexture(ref argPath,
-                                    GameLogic.ConvertMapX(Data.MapEvents[id].X),
-                                    GameLogic.ConvertMapY(Data.MapEvents[id].Y) - Constants.TileSize,
-                                    sRect.Left, sRect.Top, sRect.Width, sRect.Height);
-                            }
-                            else
-                            {
-                                string argPath1 = Path.Combine(DataPath.Tilesets,
-                                    Data.MapEvents[id].Graphic.ToString());
-                                GameClient.RenderTexture(ref argPath1,
-                                    GameLogic.ConvertMapX(Data.MapEvents[id].X),
-                                    GameLogic.ConvertMapY(Data.MapEvents[id].Y), sRect.Left,
-                                    sRect.Top,
-                                    sRect.Width, sRect.Height);
-                            }
-
-                            break;
+                                frameWithinSegment = (byte)(Data.MapEvents[id].Steps % Math.Max(1, idleFrames));
                         }
-                }
+                        else
+                        {
+                            frameWithinSegment = (byte)(Data.MapEvents[id].Steps % frameColumnsForWidth);
+                        }
+
+                        int segmentOffset = 0;
+                        if (canSegment)
+                        {
+                            if (isAttacking) segmentOffset = attackOffset;
+                            else if (isMoving) segmentOffset = runOffset;
+                            else segmentOffset = idleOffset;
+                        }
+                        int frameColumn = Math.Min(frameColumnsForWidth - 1, segmentOffset + frameWithinSegment);
+
+                        double frameWidthD = gfxInfo.Width / (double)frameColumnsForWidth;
+                        double frameHeightD = frameRowHeight;
+                        sRect = new Microsoft.Xna.Framework.Rectangle(
+                            (int)Math.Round(frameColumn * frameWidthD),
+                            (int)Math.Round(spritetop * frameHeightD),
+                            (int)Math.Round(frameWidthD),
+                            (int)Math.Round(frameHeightD));
+
+                        width = sRect.Width;
+                        height = sRect.Height;
+
+                        // Center consistent with NPC/Player logic
+                        x = (int)Math.Round(Data.MapEvents[id].X - (frameWidthD - 32d) / 2d);
+                        if (frameRowHeight > 32)
+                            y = (int)Math.Round(Data.MapEvents[id].Y - (frameHeightD - 32d));
+                        else
+                            y = Data.MapEvents[id].Y;
+
+                        GameClient.DrawCharacterSprite(Data.MapEvents[id].Graphic, x, y, sRect);
+                        break;
+                    }
+                case 2:
+                    {
+                        if (Data.MapEvents[id].Graphic < 1 |
+                            Data.MapEvents[id].Graphic > GameState.NumTileSets)
+                            return;
+
+                        if (Data.MapEvents[id].GraphicY2 > 0 | Data.MapEvents[id].GraphicX2 > 0)
+                        {
+                            sRect.X = Data.MapEvents[id].GraphicX * 32;
+                            sRect.Y = Data.MapEvents[id].GraphicY * 32;
+                            sRect.Width = Data.MapEvents[id].GraphicX2 * 32;
+                            sRect.Height = Data.MapEvents[id].GraphicY2 * 32;
+                        }
+                        else
+                        {
+                            sRect.X = Data.MapEvents[id].GraphicY * 32;
+                            sRect.Height = sRect.Top + 32;
+                            sRect.Y = Data.MapEvents[id].GraphicX * 32;
+                            sRect.Width = sRect.Left + 32;
+                        }
+
+                        x = Data.MapEvents[id].X * 32;
+                        y = Data.MapEvents[id].Y * 32;
+                        x = (int)Math.Round(x - (sRect.Right - sRect.Left) / 2d);
+                        y = y - (sRect.Bottom - sRect.Top) + 32;
+
+                        if (Data.MapEvents[id].GraphicY2 > 1)
+                        {
+                            string argPath = Path.Combine(DataPath.Tilesets,
+                                Data.MapEvents[id].Graphic.ToString());
+                            GameClient.RenderTexture(ref argPath,
+                                GameLogic.ConvertMapX(Data.MapEvents[id].X),
+                                GameLogic.ConvertMapY(Data.MapEvents[id].Y) - Constants.TileSize,
+                                sRect.Left, sRect.Top, sRect.Width, sRect.Height);
+                        }
+                        else
+                        {
+                            string argPath1 = Path.Combine(DataPath.Tilesets,
+                                Data.MapEvents[id].Graphic.ToString());
+                            GameClient.RenderTexture(ref argPath1,
+                                GameLogic.ConvertMapX(Data.MapEvents[id].X),
+                                GameLogic.ConvertMapY(Data.MapEvents[id].Y), sRect.Left,
+                                sRect.Top,
+                                sRect.Width, sRect.Height);
+                        }
+
+                        break;
+                    }
             }
         }
 
