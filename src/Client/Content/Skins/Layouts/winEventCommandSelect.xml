@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window Name="winEventCommandSelect" Caption="Select Command"
         Size="420,520"
+		Icon="338" IconOffset="3,5"
         Design="WindowNormal"
         StartPosition="CenterScreen"
         Visible="false">
