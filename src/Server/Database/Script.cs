@@ -900,7 +900,11 @@ public class Script
                 if (!NetworkConfig.IsPlaying(id)) continue;
                 int hpMax = GetPlayerMaxVital(id, Core.Globals.Vital.Health);
                 int hpCur = GetPlayerVital(id, Core.Globals.Vital.Health);
-                if (hpMax > 0 && hpCur < hpMax && !Server.Player.Instance[id].Dead)
+                if (hpMax > 0 && hpCur <= 0 && !Server.Player.Instance[id].Dead)
+                {
+                    KillPlayerNoAttacker(id);
+                }
+                else if (hpCur > 0 && hpCur < hpMax && !Server.Player.Instance[id].Dead)
                 {
                     int amount = Math.Max(1, GetPlayerStat(id, Stat.Vitality) / 2);
                     SetPlayerVital(id, Core.Globals.Vital.Health, Math.Min(hpMax, hpCur + amount));
@@ -926,6 +930,37 @@ public class Script
         }
     }
 
+    public void KillPlayerNoAttacker(int playerId, string? deathMessage = null)
+    {
+        if (playerId < 0 || playerId >= Server.Player.Instance.Count) return;
+        if (!NetworkConfig.IsPlaying(playerId)) return;
+        if (Server.Player.Instance[playerId].Dead) return;
+
+        Server.Player.Instance[playerId].Dead = true;
+        SetPlayerVital(playerId, Core.Globals.Vital.Health, 0);
+        NetworkSend.SendVital(playerId, Core.Globals.Vital.Health);
+
+        if (!string.IsNullOrWhiteSpace(deathMessage))
+        {
+            NetworkSend.SendPlayerMessage(playerId, deathMessage, (int)ColorName.BrightRed);
+        }
+
+        var deathPacket = new Core.Net.PacketWriter();
+        deathPacket.WriteInt32((int)ServerPackets.SPlayerDead);
+        deathPacket.WriteInt32(DeathSpawnTimeMs);
+        deathPacket.WriteInt32(playerId);
+        PlayerService.Instance.SendDataTo(playerId, deathPacket.GetBytes());
+
+        System.Threading.Tasks.Task.Run(async () =>
+        {
+            await System.Threading.Tasks.Task.Delay(DeathSpawnTimeMs);
+            if (IsPlaying(playerId) && Server.Player.Instance[playerId].Dead)
+            {
+                OnDeath(playerId);
+            }
+        });
+    }
+
     public struct DamageResult
     {
         public int Raw;
@@ -941,6 +976,13 @@ public class Script
     {
         if (target.Type == Entity.EntityType.Player)
         {
+            if (target.Id < 0 || target.Id >= Server.Player.Instance.Count) return;
+            if (Server.Player.Instance[target.Id].Dead) return;
+
+            Server.Player.Instance[target.Id].Dead = true;
+            SetPlayerVital(target.Id, Core.Globals.Vital.Health, 0);
+            NetworkSend.SendVital(target.Id, Core.Globals.Vital.Health);
+
             if (Moral.Instance[Server.Map.Instance[GetPlayerMap(target.Id)].Moral].DropItems)
             {
                 var equipCount = Enum.GetValues(typeof(Equipment)).Length;
@@ -1252,6 +1294,12 @@ public class Script
 
     private bool IsAlive(Entity e)
     {
+        if (e == null) return false;
+        if (e.Type == Entity.EntityType.Player)
+        {
+            if (e.Id < 0 || e.Id >= Server.Player.Instance.Count) return false;
+            return !Server.Player.Instance[e.Id].Dead && GetPlayerVital(e.Id, Core.Globals.Vital.Health) > 0;
+        }
         if (e.Vital == null) return false;
         return e.Vital[(int)Core.Globals.Vital.Health] > 0;
     }
@@ -1587,11 +1635,7 @@ public class Script
             NetworkSend.SendVital(pid, vital);
             if (!isHeal && newVal <= 0 && vital == Core.Globals.Vital.Health)
             {
-                // Player death routine (reuse existing logic if available)
-                if (caster != null && caster.Type == Core.Globals.Entity.EntityType.Player)
-                {
-                    HandleDeath(caster, target);
-                }
+                HandleDeath(caster, target);
             }
         }
         else if (target.Type == Core.Globals.Entity.EntityType.Npc)
@@ -2213,14 +2257,28 @@ public class Script
     private bool ApplyDamageExtended(Entity attacker, Entity target, DamageResult dmg, int? skillId)
     {
         // Reuse existing ApplyDamage but capture death result
-        var before = target.Vital != null ? target.Vital[(int)Core.Globals.Vital.Health] : 0;
+        int before;
+        if (target.Type == Entity.EntityType.Player)
+        {
+            before = GetPlayerVital(target.Id, Core.Globals.Vital.Health);
+        }
+        else if (target.Type == Entity.EntityType.Npc && target.Map >= 0 && target.Map < Core.Globals.Variables.MaxMaps && target.Id >= 0 && target.Id < Core.Globals.Variables.MaxMapNpcs)
+        {
+            before = MapNpc.Instance[target.Map, target.Id].Vital[(int)Core.Globals.Vital.Health];
+        }
+        else
+        {
+            before = target.Vital != null ? target.Vital[(int)Core.Globals.Vital.Health] : 0;
+        }
         ApplyDamage(attacker, target, dmg, skillId);
-        var after = target.Type == Entity.EntityType.Player ? GetPlayerVital(target.Id, Core.Globals.Vital.Health) : (target.Vital != null ? target.Vital[(int)Core.Globals.Vital.Health] : 0);
+        int after = target.Type == Entity.EntityType.Player
+            ? GetPlayerVital(target.Id, Core.Globals.Vital.Health)
+            : (target.Vital != null ? target.Vital[(int)Core.Globals.Vital.Health] : 0);
         if (target.Type == Entity.EntityType.Npc && target.Map >= 0 && target.Map < Core.Globals.Variables.MaxMaps && target.Id >= 0 && target.Id < Core.Globals.Variables.MaxMapNpcs)
         {
             after = MapNpc.Instance[target.Map, target.Id].Vital[(int)Core.Globals.Vital.Health];
         }
-        return before > 0 && after <= 0; // HandleDeath already executed if true
+        return before > 0 && after <= 0;
     }
 
     private void ApplyKnockbackIfAny(Entity attacker, Entity target, int? skillId)
@@ -2283,7 +2341,7 @@ public class Script
                 for (int mi = 0; mi < Core.Globals.Variables.MaxMapNpcs; mi++)
                 {
                     if (mi == target.Id) continue;
-                    if (MapNpc.Instance[map, mi].Num >= 0 && MapNpc.Instance[map, mi].X/32 == nx && MapNpc.Instance[map, mi].Y/32 == ny) { occ = true; break; }
+                    if (MapNpc.Instance[map, mi].Num >= 0 && MapNpc.Instance[map, mi].X / 32 == nx && MapNpc.Instance[map, mi].Y / 32 == ny) { occ = true; break; }
                 }
                 if (!occ)
                 {

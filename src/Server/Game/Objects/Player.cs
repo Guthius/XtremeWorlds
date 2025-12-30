@@ -579,7 +579,7 @@ public class Player : PlayerBase
                 if (tv == Core.Globals.Vital.Health && GetPlayerVital(playerId, Core.Globals.Vital.Health) - trapAmount <= 0)
                 {
                     OnKill(playerId);
-                    NetworkSend.SendPlayerMessage(playerId, "You've been killed by a trap.", (int)ColorName.BrightRed);
+                    Script.Instance?.KillPlayerNoAttacker(playerId, "You've been killed by a trap.");
                 }
                 else
                 {
