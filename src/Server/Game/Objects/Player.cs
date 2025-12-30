@@ -186,10 +186,21 @@ public class Player : PlayerBase
         int trapVital = (int)Core.Globals.Vital.Health; // default trap vital is Health
         int trapAmount = 0;
 
+        // Validate player index early (OnMove can be called from network and server loop).
+        if (playerId < 0 || playerId >= Player.Instance.Count || playerId >= Data.TempPlayer.Length)
+        {
+            return;
+        }
+
+        if (!NetworkConfig.IsPlaying(playerId))
+        {
+            return;
+        }
+
         // Check for subscript out of range
         var count = System.Enum.GetValues(typeof(MovementState)).Length;
         var count2 = System.Enum.GetValues(typeof(Direction)).Length;
-        if (dir < 0 || dir > count2 || movement < 0 || movement > count)
+        if (dir < 0 || dir >= count2 || movement < 0 || movement >= count)
         {
             return;
         }
@@ -218,6 +229,32 @@ public class Player : PlayerBase
         var moved = false;
         var map = GetPlayerMap(playerId);
 
+        // Map data is stored in a list; map id is not a guarantee that the list is populated.
+        var mapCount = Server.Map.Instance.Count;
+        if (map < 0 || map >= mapCount)
+        {
+            General.Logger.LogWarning("OnMove rejected: invalid map index {Map} (Map.Instance.Count={Count}) for player {PlayerId}", map, mapCount, playerId);
+            NetworkSend.SendPlayerXY(playerId);
+            return;
+        }
+
+        var mapData = Server.Map.Instance[map];
+        if (mapData.Tile == null || mapData.MaxX <= 0 || mapData.MaxY <= 0)
+        {
+            General.Logger.LogWarning("OnMove rejected: map {Map} has no tile data or invalid bounds (MaxX={MaxX}, MaxY={MaxY}) for player {PlayerId}", map, mapData.MaxX, mapData.MaxY, playerId);
+            NetworkSend.SendPlayerXY(playerId);
+            return;
+        }
+
+        var playerX = GetPlayerX(playerId);
+        var playerY = GetPlayerY(playerId);
+        if (playerX < 0 || playerY < 0 || playerX >= mapData.MaxX || playerY >= mapData.MaxY)
+        {
+            General.Logger.LogWarning("OnMove rejected: out-of-bounds position x={X}, y={Y} on map {Map} (MaxX={MaxX}, MaxY={MaxY}) for player {PlayerId}", playerX, playerY, map, mapData.MaxX, mapData.MaxY, playerId);
+            NetworkSend.SendPlayerXY(playerId);
+            return;
+        }
+
         switch ((Direction) dir)
         {
             case Direction.Up:
@@ -234,11 +271,18 @@ public class Player : PlayerBase
                 }
                 else if (Server.Map.Instance[map].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type != TileType.NoCrossing && Server.Map.Instance[map].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type2 != TileType.NoCrossing)
                 {
-                    if (Server.Map.Instance[GetPlayerMap(playerId)].Up > 0)
+                    var upMap = Server.Map.Instance[map].Up;
+                    if (upMap > 0)
                     {
-                        var newMapY = Server.Map.Instance[Server.Map.Instance[GetPlayerMap(playerId)].Up].MaxY;
-                        
-                        OnWarp(playerId, Server.Map.Instance[GetPlayerMap(playerId)].Up, GetPlayerX(playerId), newMapY, (int) Direction.Up);
+                        if (upMap < 0 || upMap >= Server.Map.Instance.Count)
+                        {
+                            General.Logger.LogWarning("OnMove warp rejected: invalid Up map index {WarpMap} from map {Map} for player {PlayerId}", upMap, map, playerId);
+                            NetworkSend.SendPlayerXY(playerId);
+                            break;
+                        }
+
+                        var newMapY = Server.Map.Instance[upMap].MaxY;
+                        OnWarp(playerId, upMap, GetPlayerX(playerId), newMapY, (int)Direction.Up);
                         
                         didWarp = true;
                         moved = true;
@@ -260,11 +304,11 @@ public class Player : PlayerBase
                     
                     moved = true;
                 }
-                else if (Server.Map.Instance[GetPlayerMap(playerId)].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type != TileType.NoCrossing && Server.Map.Instance[GetPlayerMap(playerId)].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type2 != TileType.NoCrossing)
+                else if (Server.Map.Instance[map].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type != TileType.NoCrossing && Server.Map.Instance[map].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type2 != TileType.NoCrossing)
                 {
-                    if (Server.Map.Instance[GetPlayerMap(playerId)].Down > 0)
+                    if (Server.Map.Instance[map].Down > 0)
                     {
-                        OnWarp(playerId, Server.Map.Instance[GetPlayerMap(playerId)].Down, GetPlayerX(playerId), 0, (int) Direction.Down);
+                        OnWarp(playerId, Server.Map.Instance[map].Down, GetPlayerX(playerId), 0, (int)Direction.Down);
                         
                         didWarp = true;
                         moved = true;
@@ -286,13 +330,21 @@ public class Player : PlayerBase
                     
                     moved = true;
                 }
-                else if (Server.Map.Instance[GetPlayerMap(playerId)].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type != TileType.NoCrossing && Server.Map.Instance[GetPlayerMap(playerId)].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type2 != TileType.NoCrossing)
+                else if (Server.Map.Instance[map].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type != TileType.NoCrossing && Server.Map.Instance[map].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type2 != TileType.NoCrossing)
                 {
-                    if (Server.Map.Instance[GetPlayerMap(playerId)].Left > 0)
+                    var leftMap = Server.Map.Instance[map].Left;
+                    if (leftMap > 0)
                     {
-                        var newMapX = Server.Map.Instance[Server.Map.Instance[GetPlayerMap(playerId)].Left].MaxX;
+                        if (leftMap < 0 || leftMap >= Server.Map.Instance.Count)
+                        {
+                            General.Logger.LogWarning("OnMove warp rejected: invalid Left map index {WarpMap} from map {Map} for player {PlayerId}", leftMap, map, playerId);
+                            NetworkSend.SendPlayerXY(playerId);
+                            break;
+                        }
 
-                        OnWarp(playerId, Server.Map.Instance[GetPlayerMap(playerId)].Left, newMapX, GetPlayerY(playerId), (int) Direction.Left);
+                        var newMapX = Server.Map.Instance[leftMap].MaxX;
+
+                        OnWarp(playerId, leftMap, newMapX, GetPlayerY(playerId), (int)Direction.Left);
 
                         didWarp = true;
                         moved = true;
@@ -314,11 +366,11 @@ public class Player : PlayerBase
                     
                     moved = true;
                 }
-                else if (Server.Map.Instance[GetPlayerMap(playerId)].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type != TileType.NoCrossing && Server.Map.Instance[GetPlayerMap(playerId)].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type2 != TileType.NoCrossing)
+                else if (Server.Map.Instance[map].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type != TileType.NoCrossing && Server.Map.Instance[map].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type2 != TileType.NoCrossing)
                 {
-                    if (Server.Map.Instance[GetPlayerMap(playerId)].Right > 0)
+                    if (Server.Map.Instance[map].Right > 0)
                     {
-                        OnWarp(playerId, Server.Map.Instance[GetPlayerMap(playerId)].Right, 0, GetPlayerY(playerId), (int) Direction.Right);
+                        OnWarp(playerId, Server.Map.Instance[map].Right, 0, GetPlayerY(playerId), (int)Direction.Right);
                         
                         didWarp = true;
                         moved = true;
@@ -396,17 +448,21 @@ public class Player : PlayerBase
                 break;
         }
 
-        if (GetPlayerX(playerId) >= 0 &&
+        // Re-evaluate current map after potential warp.
+        var currentMap = GetPlayerMap(playerId);
+        if (currentMap >= 0 && currentMap < Server.Map.Instance.Count &&
+            Server.Map.Instance[currentMap].Tile != null &&
+            GetPlayerX(playerId) >= 0 &&
             GetPlayerY(playerId) >= 0 &&
-            GetPlayerX(playerId) < Server.Map.Instance[GetPlayerMap(playerId)].MaxX &&
-            GetPlayerY(playerId) < Server.Map.Instance[GetPlayerMap(playerId)].MaxY)
+            GetPlayerX(playerId) < Server.Map.Instance[currentMap].MaxX &&
+            GetPlayerY(playerId) < Server.Map.Instance[currentMap].MaxY)
         {
             for (var i = 0; i < Data.TempPlayer[playerId].EventMap.CurrentEvents; i++)
             {
                 EventLogic.TriggerEvent(playerId, i, 1, GetPlayerX(playerId), GetPlayerY(playerId));
             }
 
-            ref var tile = ref Server.Map.Instance[GetPlayerMap(playerId)].Tile[GetPlayerX(playerId), GetPlayerY(playerId)];
+            ref var tile = ref Server.Map.Instance[currentMap].Tile[GetPlayerX(playerId), GetPlayerY(playerId)];
 
             map = -1;
             x = 0;
