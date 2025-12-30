@@ -184,6 +184,21 @@ namespace Client.Game.UI.Windows
             if (WindowManager.TryGetControl("winJobEditor", "txtMoveSpeed", out var ms))
                 ms.Text = (job.MoveSpeed <= 0 ? 1.0f : job.MoveSpeed).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
 
+            // Base stats
+            if (job.Stat != null)
+            {
+                if (WindowManager.TryGetControl("winJobEditor", "txtStr", out var st) && st is TextBox tbStr)
+                    tbStr.Text = job.Stat[(int)Stat.Strength].ToString();
+                if (WindowManager.TryGetControl("winJobEditor", "txtVit", out var vt) && vt is TextBox tbVit)
+                    tbVit.Text = job.Stat[(int)Stat.Vitality].ToString();
+                if (WindowManager.TryGetControl("winJobEditor", "txtInt", out var it) && it is TextBox tbInt)
+                    tbInt.Text = job.Stat[(int)Stat.Intelligence].ToString();
+                if (WindowManager.TryGetControl("winJobEditor", "txtLuck", out var lk) && lk is TextBox tbLuck)
+                    tbLuck.Text = job.Stat[(int)Stat.Luck].ToString();
+                if (WindowManager.TryGetControl("winJobEditor", "txtSpi", out var sp) && sp is TextBox tbSpi)
+                    tbSpi.Text = job.Stat[(int)Stat.Spirit].ToString();
+            }
+
             // Sprite sliders reflect current values
             if (WindowManager.TryGetControl("winJobEditor", "sldMaleSprite", out var msCtrl) && msCtrl is ScrollBar sbMale)
             {

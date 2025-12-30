@@ -2953,6 +2953,33 @@ public class Crystalshire
             Job.IsChanged[id] = true;
         }, 0.1f, 32.0f);
 
+        // Base stats
+        BindIntText("txtStr", v => {
+            int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return;
+            Job.Instance[id].Stat[(int)Stat.Strength] = v;
+            Job.IsChanged[id] = true;
+        }, 0, Variables.MaxStats);
+        BindIntText("txtVit", v => {
+            int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return;
+            Job.Instance[id].Stat[(int)Stat.Vitality] = v;
+            Job.IsChanged[id] = true;
+        }, 0, Variables.MaxStats);
+        BindIntText("txtInt", v => {
+            int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return;
+            Job.Instance[id].Stat[(int)Stat.Intelligence] = v;
+            Job.IsChanged[id] = true;
+        }, 0, Variables.MaxStats);
+        BindIntText("txtLuck", v => {
+            int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return;
+            Job.Instance[id].Stat[(int)Stat.Luck] = v;
+            Job.IsChanged[id] = true;
+        }, 0, Variables.MaxStats);
+        BindIntText("txtSpi", v => {
+            int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return;
+            Job.Instance[id].Stat[(int)Stat.Spirit] = v;
+            Job.IsChanged[id] = true;
+        }, 0, Variables.MaxStats);
+
         // Sprite bars
         void BindSpriteBar(string name, Func<int> get, Action<int> apply)
         {

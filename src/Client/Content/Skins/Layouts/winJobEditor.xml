@@ -31,8 +31,20 @@
     <Label Name="lblStartY" Text="Y" Position="180, 34" Size="16, 16"/>
     <TextBox Name="txtStartY" Position="198, 32" Size="40, 20" Design="TextWhite"/>
 
-    <Label Name="lblMoveSpeed" Text="Move Speed" Position="8, 62" Size="80, 16"/>
-    <TextBox Name="txtMoveSpeed" Position="88, 60" Size="60, 20" Design="TextWhite"/>
+    <Label Name="lblMoveSpeed" Text="Move Speed" Position="8, 54" Size="80, 16"/>
+    <TextBox Name="txtMoveSpeed" Position="88, 52" Size="60, 20" Design="TextWhite"/>
+
+    <Label Name="lblStr" Text="Str" Position="8, 74" Size="28, 16"/>
+    <TextBox Name="txtStr" Position="40, 72" Size="40, 20" Design="TextWhite"/>
+    <Label Name="lblVit" Text="Vit" Position="88, 74" Size="28, 16"/>
+    <TextBox Name="txtVit" Position="120, 72" Size="40, 20" Design="TextWhite"/>
+    <Label Name="lblInt" Text="Int" Position="168, 74" Size="28, 16"/>
+    <TextBox Name="txtInt" Position="200, 72" Size="40, 20" Design="TextWhite"/>
+
+    <Label Name="lblLuck" Text="Luck" Position="8, 94" Size="32, 16"/>
+    <TextBox Name="txtLuck" Position="40, 92" Size="40, 20" Design="TextWhite"/>
+    <Label Name="lblSpi" Text="Spi" Position="88, 94" Size="28, 16"/>
+    <TextBox Name="txtSpi" Position="120, 92" Size="40, 20" Design="TextWhite"/>
 
     <Label Name="lblMaleSprite" Text="Male Sprite" Position="260, 20" Size="120, 16"/>
     <ScrollBar Name="sldMaleSprite" Position="344, 22" Size="100, 12" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
