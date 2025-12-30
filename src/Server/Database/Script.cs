@@ -129,6 +129,11 @@ public class Script
 
     }
 
+    public void ServerHour()
+    {
+
+    }
+
     public void OnJoin(int index)
     {
         // Warp the Player to his saved location

@@ -20,6 +20,7 @@ public static class Loop
         var tmr1000 = 0;
         var tmrProj = 0;
         var tmr60000 = 0;
+        var tmr3600000 = 0;
         var lastUpdateSavePlayers = 0;
         var lastUpdateMapSpawnItems = 0;
 
@@ -132,6 +133,20 @@ public static class Loop
                 // Server-side projectile pixel movement and sparse map broadcasts
                 Projectile.OnUpdate();
                 tmrProj = General.GetTimeMs() + 5;
+            }
+
+            if (tick > tmr3600000)
+            {
+                try
+                {
+                    Script.Instance?.ServerHour();
+                }
+                catch (Exception ex)
+                {
+                    General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(Loop));
+                }
+
+                tmr3600000 = General.GetTimeMs() + 3600000;
             }
 
             if (tick > tmr60000)
