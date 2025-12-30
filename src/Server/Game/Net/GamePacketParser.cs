@@ -157,186 +157,211 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
     private static async void Packet_Login(GameSession session, ReadOnlyMemory<byte> bytes)
     {
-        var reader = new PacketReader(bytes);
-
-        if (NetworkConfig.IsPlaying(session.Id))
+        try
         {
-            NetworkSend.SendAlert(session, SystemMessage.Connection, Menu.Login);
-            return;
-        }
+            var reader = new PacketReader(bytes);
 
-        if (NetworkConfig.IsLoggedIn(session.Id))
-        {
-            return;
-        }
+            if (NetworkConfig.IsPlaying(session.Id))
+            {
+                NetworkSend.SendAlert(session, SystemMessage.Connection, Menu.Login);
+                return;
+            }
 
-        if (General.GetShutDownTimer != null && General.GetShutDownTimer.IsRunning)
-        {
-            NetworkSend.SendAlert(session, SystemMessage.ServerMaintenance, Menu.Login);
-            return;
-        }
+            if (NetworkConfig.IsLoggedIn(session.Id))
+            {
+                return;
+            }
 
-        var usernameBytes = reader.ReadBytes().ToArray();
-        var login = System.Text.Encoding.UTF8.GetString(session.Decrypt(usernameBytes)).ToLower().Replace("\0", "");
+            if (General.GetShutDownTimer != null && General.GetShutDownTimer.IsRunning)
+            {
+                NetworkSend.SendAlert(session, SystemMessage.ServerMaintenance, Menu.Login);
+                return;
+            }
 
-        var passwordBytes = reader.ReadBytes().ToArray();
-        var password = System.Text.Encoding.UTF8.GetString(session.Decrypt(passwordBytes)).Replace("\0", "");
+            var usernameBytes = reader.ReadBytes().ToArray();
+            var login = System.Text.Encoding.UTF8.GetString(session.Decrypt(usernameBytes)).ToLower().Replace("\0", "");
 
-        // Get the current executing assembly
-        var assembly = Assembly.GetExecutingAssembly();
+            var passwordBytes = reader.ReadBytes().ToArray();
+            var password = System.Text.Encoding.UTF8.GetString(session.Decrypt(passwordBytes)).Replace("\0", "");
 
-        // Retrieve the version information
-        var clientVersionBytes = reader.ReadBytes().ToArray();
-        var serverVersion = assembly.GetName().Version?.ToString();
-        var clientVersion = System.Text.Encoding.UTF8.GetString(session.Decrypt(clientVersionBytes));
+            // Get the current executing assembly
+            var assembly = Assembly.GetExecutingAssembly();
 
-        // Check versions
-        if (clientVersion != serverVersion)
-        {
-            NetworkSend.SendAlert(session, SystemMessage.ClientOutdated, Menu.Login);
-            return;
-        }
+            // Retrieve the version information
+            var clientVersionBytes = reader.ReadBytes().ToArray();
+            var serverVersion = assembly.GetName().Version?.ToString();
+            var clientVersion = System.Text.Encoding.UTF8.GetString(session.Decrypt(clientVersionBytes));
 
-        if (login.Length > Core.Globals.Variables.NameLength | login.Length < Core.Globals.Variables.MinimumNameLength)
-        {
-            NetworkSend.SendAlert(session, SystemMessage.NameLengthInvalid);
-            return;
-        }
+            // Check versions
+            if (clientVersion != serverVersion)
+            {
+                NetworkSend.SendAlert(session, SystemMessage.ClientOutdated, Menu.Login);
+                return;
+            }
 
-        if (NetworkConfig.IsMultiLogin(session.Id, login))
-        {
-            NetworkSend.SendAlert(session, SystemMessage.MultipleAccountsNotAllowed, Menu.Login);
-            return;
-        }
+            if (login.Length > Core.Globals.Variables.NameLength | login.Length < Core.Globals.Variables.MinimumNameLength)
+            {
+                NetworkSend.SendAlert(session, SystemMessage.NameLengthInvalid);
+                return;
+            }
 
-        for (int i = 0; i <= session.Id; i++)
-        {
-            if (Account.Instance.Count <= i)
-                Account.Instance.Add(new Account());
-        }
+            if (NetworkConfig.IsMultiLogin(session.Id, login))
+            {
+                NetworkSend.SendAlert(session, SystemMessage.MultipleAccountsNotAllowed, Menu.Login);
+                return;
+            }
 
-        Account.Instance[session.Id].Login = login;
+            for (int i = 0; i <= session.Id; i++)
+            {
+                if (Account.Instance.Count <= i)
+                    Account.Instance.Add(new Account());
+            }
 
-        await Account.OnLoadAsync(session.Id, new CancellationToken());
+            Account.Instance[session.Id].Login = login;
 
-        if (Account.Instance[session.Id].Login != login)
-        {
-            NetworkSend.SendAlert(session, SystemMessage.Login, Menu.Login);
-            return;
-        }
+            await Account.OnLoadAsync(session.Id, new CancellationToken());
+
+            if (Account.Instance[session.Id].Login != login)
+            {
+                NetworkSend.SendAlert(session, SystemMessage.Login, Menu.Login);
+                return;
+            }
         
-        if (GetPlayerPassword(session.Id) != password)
-        {
-            NetworkSend.SendAlert(session, SystemMessage.WrongPassword, Menu.Login);
-            return;
+            if (GetPlayerPassword(session.Id) != password)
+            {
+                NetworkSend.SendAlert(session, SystemMessage.WrongPassword, Menu.Login);
+                return;
+            }
+
+            if (Database.IsBanned(session.Id, session.Channel.IpAddress))
+            {
+                NetworkSend.SendAlert(session, SystemMessage.Banned, Menu.Login);
+                return;
+            }
+
+            if (GetAccountLogin(session.Id) == "")
+            {
+                NetworkSend.SendAlert(session, SystemMessage.DatabaseError, Menu.Login);
+                return;
+            }
+
+            General.Logger.LogInformation("{AccountName} has logged in from {IpAddress}",
+                GetAccountLogin(session.Id), session.Channel.IpAddress);
+
+            PlayerService.Instance.AddPlayer(session.Id, session.Channel);
+            NetworkSend.SendVariables(session);
+            NetworkSend.SendPlayerCharacters(session);
+            NetworkSend.SendJobs(session);
         }
-
-        if (Database.IsBanned(session.Id, session.Channel.IpAddress))
+        catch (System.Security.Cryptography.CryptographicException ex)
         {
-            NetworkSend.SendAlert(session, SystemMessage.Banned, Menu.Login);
-            return;
+            General.Logger.LogWarning(ex, "Login decrypt failed for {IpAddress} (id={SessionId})", session.Channel.IpAddress, session.Id);
+            NetworkSend.SendAlert(session, SystemMessage.Connection, Menu.Login);
         }
-
-        if (GetAccountLogin(session.Id) == "")
+        catch (Exception ex)
         {
-            NetworkSend.SendAlert(session, SystemMessage.DatabaseError, Menu.Login);
-            return;
+            General.Logger.LogError(ex, "Unhandled error in login handler for {IpAddress} (id={SessionId})", session.Channel.IpAddress, session.Id);
+            NetworkSend.SendAlert(session, SystemMessage.Connection, Menu.Login);
         }
-
-        General.Logger.LogInformation("{AccountName} has logged in from {IpAddress}",
-            GetAccountLogin(session.Id), session.Channel.IpAddress);
-
-        PlayerService.Instance.AddPlayer(session.Id, session.Channel);
-        NetworkSend.SendVariables(session);
-        NetworkSend.SendPlayerCharacters(session);
-        NetworkSend.SendJobs(session);
     }
 
     private static void Packet_Register(GameSession session, ReadOnlyMemory<byte> bytes)
     {
-        var buffer = new PacketReader(bytes);
-
-        if (NetworkConfig.IsPlaying(session.Id) ||
-            NetworkConfig.IsLoggedIn(session.Id))
+        try
         {
-            return;
-        }
+            var buffer = new PacketReader(bytes);
 
-        // check if its banned
-        // Cut off last portion of ip
-        if (Database.IsBanned(session.Id, session.Channel.IpAddress))
-        {
-            NetworkSend.SendAlert(session, SystemMessage.Banned, Menu.Register);
-            return;
-        }
+            if (NetworkConfig.IsPlaying(session.Id) ||
+                NetworkConfig.IsLoggedIn(session.Id))
+            {
+                return;
+            }
 
-        if (General.GetShutDownTimer is { IsRunning: true })
-        {
-            NetworkSend.SendAlert(session, SystemMessage.ServerMaintenance, Menu.Register);
-            return;
-        }
+            // check if its banned
+            // Cut off last portion of ip
+            if (Database.IsBanned(session.Id, session.Channel.IpAddress))
+            {
+                NetworkSend.SendAlert(session, SystemMessage.Banned, Menu.Register);
+                return;
+            }
 
-        var usernameBytes = buffer.ReadBytes().ToArray();
-        var login = System.Text.Encoding.UTF8.GetString(session.Decrypt(usernameBytes)).ToLower().Replace("\0", "");
+            if (General.GetShutDownTimer is { IsRunning: true })
+            {
+                NetworkSend.SendAlert(session, SystemMessage.ServerMaintenance, Menu.Register);
+                return;
+            }
 
-        var passwordBytes = buffer.ReadBytes().ToArray();
-        var password = System.Text.Encoding.UTF8.GetString(session.Decrypt(passwordBytes)).Replace("\0", "");
+            var usernameBytes = buffer.ReadBytes().ToArray();
+            var login = System.Text.Encoding.UTF8.GetString(session.Decrypt(usernameBytes)).ToLower().Replace("\0", "");
+
+            var passwordBytes = buffer.ReadBytes().ToArray();
+            var password = System.Text.Encoding.UTF8.GetString(session.Decrypt(passwordBytes)).Replace("\0", "");
 
         // Get the current executing assembly
         var assembly = Assembly.GetExecutingAssembly();
 
         // Retrieve the version information
-        var clientVersionBytes = buffer.ReadBytes().ToArray();
-        var serverVersion = assembly.GetName().Version?.ToString();
-        var clientVersion = System.Text.Encoding.UTF8.GetString(session.Decrypt(clientVersionBytes));
+            var clientVersionBytes = buffer.ReadBytes().ToArray();
+            var serverVersion = assembly.GetName().Version?.ToString();
+            var clientVersion = System.Text.Encoding.UTF8.GetString(session.Decrypt(clientVersionBytes));
 
         // Check versions
-        if (clientVersion != serverVersion)
-        {
-            NetworkSend.SendAlert(session, SystemMessage.ClientOutdated, Menu.Register);
-            return;
-        }
-
-        var x = General.IsValidLogin(login);
-
-        switch (x) // Check if the username is valid
-        {
-            case -1:
-                NetworkSend.SendAlert(session, SystemMessage.NameContainsIllegalCharacters, Menu.Register);
+            if (clientVersion != serverVersion)
+            {
+                NetworkSend.SendAlert(session, SystemMessage.ClientOutdated, Menu.Register);
                 return;
+            }
 
-            case 0:
-                NetworkSend.SendAlert(session, SystemMessage.NameLengthInvalid, Menu.Register);
+            var x = General.IsValidLogin(login);
+
+            switch (x) // Check if the username is valid
+            {
+                case -1:
+                    NetworkSend.SendAlert(session, SystemMessage.NameContainsIllegalCharacters, Menu.Register);
+                    return;
+
+                case 0:
+                    NetworkSend.SendAlert(session, SystemMessage.NameLengthInvalid, Menu.Register);
+                    return;
+            }
+
+            if (NetworkConfig.IsMultiLogin(session.Id, login))
+            {
+                NetworkSend.SendAlert(session, SystemMessage.MultipleAccountsNotAllowed, Menu.Register);
                 return;
-        }
+            }
 
-        if (NetworkConfig.IsMultiLogin(session.Id, login))
-        {
-            NetworkSend.SendAlert(session, SystemMessage.MultipleAccountsNotAllowed, Menu.Register);
-            return;
-        }
-
-        var userData = Database.SelectRowByColumn("id", Database.GetStringHash(login), "account", "data");
-        if (userData is not null)
-        {
-            NetworkSend.SendAlert(session, SystemMessage.NameTaken, Menu.Register);
-            return;
-        }
+            var userData = Database.SelectRowByColumn("id", Database.GetStringHash(login), "account", "data");
+            if (userData is not null)
+            {
+                NetworkSend.SendAlert(session, SystemMessage.NameTaken, Menu.Register);
+                return;
+            }
         
-        for (int i = 0; i <= session.Id; i++)
-        {
-            if (Account.Instance.Count <= i)
-                Account.Instance.Add(new Account());
+            for (int i = 0; i <= session.Id; i++)
+            {
+                if (Account.Instance.Count <= i)
+                    Account.Instance.Add(new Account());
+            }
+            Account.Instance[session.Id].Login = login;
+            Account.Instance[session.Id].Password = password;
+
+            Account.OnSave(session.Id).Wait();
+
+            // send them to the character portal
+            NetworkSend.SendPlayerCharacters(session);
+            NetworkSend.SendJobs(session);
         }
-        
-        Account.Instance[session.Id].Login = login;
-        Account.Instance[session.Id].Password = password;
-
-        Account.OnSave(session.Id).Wait();
-
-        // send them to the character portal
-        NetworkSend.SendPlayerCharacters(session);
-        NetworkSend.SendJobs(session);
+        catch (System.Security.Cryptography.CryptographicException ex)
+        {
+            General.Logger.LogWarning(ex, "Register decrypt failed for {IpAddress} (id={SessionId})", session.Channel.IpAddress, session.Id);
+            NetworkSend.SendAlert(session, SystemMessage.Connection, Menu.Register);
+        }
+        catch (Exception ex)
+        {
+            General.Logger.LogError(ex, "Unhandled error in register handler for {IpAddress} (id={SessionId})", session.Channel.IpAddress, session.Id);
+            NetworkSend.SendAlert(session, SystemMessage.Connection, Menu.Register);
+        }
     }
 
     private static void Packet_AddChar(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -1791,8 +1816,14 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var y = buffer.ReadInt32();
         var rclick = (byte)buffer.ReadInt32();
 
+        var mapId = GetPlayerMap(session.Id);
+        if (mapId < 0 || mapId >= Server.Map.Instance.Count)
+            return;
+
+        var map = Server.Map.Instance[mapId];
+
         // Prevent subscript out of range
-        if (x < 0 | x > (int)Server.Map.Instance[GetPlayerMap(session.Id)].MaxX | y < 0 | y > (int)Server.Map.Instance[GetPlayerMap(session.Id)].MaxY)
+        if (x < 0 | x > (int)map.MaxX | y < 0 | y > (int)map.MaxY)
             return;
 
         // Check for a player   
@@ -1863,15 +1894,15 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var count = Core.Globals.Variables.MaxMapItems;
         for (var i = 0; i < count; i++)
         {
-            if (MapItem.Instance[GetPlayerMap(session.Id), i].Num >= 0)
+            if (MapItem.Instance[mapId, i].Num >= 0)
             {
-                if (!string.IsNullOrEmpty(Item.Instance[(int)MapItem.Instance[GetPlayerMap(session.Id), i].Num].Name))
+                if (!string.IsNullOrEmpty(Item.Instance[(int)MapItem.Instance[mapId, i].Num].Name))
                 {
-                    if (Math.Floor((double)MapItem.Instance[GetPlayerMap(session.Id), i].X / Constants.TileSize) == x)
+                    if (Math.Floor((double)MapItem.Instance[mapId, i].X / Constants.TileSize) == x)
                     {
-                        if (Math.Floor((double)MapItem.Instance[GetPlayerMap(session.Id), i].Y / Constants.TileSize) == y)
+                        if (Math.Floor((double)MapItem.Instance[mapId, i].Y / Constants.TileSize) == y)
                         {
-                            NetworkSend.SendPlayerMessage(session.Id, "You see " + MapItem.Instance[GetPlayerMap(session.Id), i].Value + " " + Item.Instance[(int)MapItem.Instance[GetPlayerMap(session.Id), i].Num].Name + ".", (int)ColorName.BrightGreen);
+                            NetworkSend.SendPlayerMessage(session.Id, "You see " + MapItem.Instance[mapId, i].Value + " " + Item.Instance[(int)MapItem.Instance[mapId, i].Num].Name + ".", (int)ColorName.BrightGreen);
                             return;
                         }
                     }
@@ -1883,11 +1914,11 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var count2 = Core.Globals.Variables.MaxMapNpcs;
         for (var i = 0; i < count2; i++)
         {
-            if (MapNpc.Instance[GetPlayerMap(session.Id), i].Num >= 0)
+            if (MapNpc.Instance[mapId, i].Num >= 0)
             {
-                if (Math.Floor((double)MapNpc.Instance[GetPlayerMap(session.Id), i].X / Constants.TileSize) == x)
+                if (Math.Floor((double)MapNpc.Instance[mapId, i].X / Constants.TileSize) == x)
                 {
-                    if (Math.Floor((double)MapNpc.Instance[GetPlayerMap(session.Id), i].Y / Constants.TileSize) == y)
+                    if (Math.Floor((double)MapNpc.Instance[mapId, i].Y / Constants.TileSize) == y)
                     {
                         // Change target
                         if (Data.TempPlayer[session.Id].TargetType == 0)

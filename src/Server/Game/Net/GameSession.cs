@@ -18,20 +18,40 @@ public sealed class GameSession(int id, INetworkChannel channel, GameSessionMana
 
     public byte[] Decrypt(byte[] bytes)
     {
-        using var aes = Aes.Create();
-        
-        aes.Key = Aes.Key;
-        aes.IV = Aes.IV;
-        aes.Mode = CipherMode.CBC;
-        aes.Padding = PaddingMode.PKCS7;
-        
-        using var memoryStream = new MemoryStream();
-        using var cryptoStream = new CryptoStream(memoryStream, aes.CreateDecryptor(), CryptoStreamMode.Write);
+        if (bytes is null || bytes.Length == 0)
+        {
+            return Array.Empty<byte>();
+        }
 
-        cryptoStream.Write(bytes, 0, bytes.Length);
-        cryptoStream.FlushFinalBlock();
+        // CBC requires whole blocks. If the client sent plaintext (or used the wrong key/IV),
+        // the length is often not a multiple of 16.
+        if ((bytes.Length & 0x0F) != 0)
+        {
+            return Array.Empty<byte>();
+        }
 
-        return memoryStream.ToArray();
+        try
+        {
+            using var aes = Aes.Create();
+
+            aes.Key = Aes.Key;
+            aes.IV = Aes.IV;
+            aes.Mode = CipherMode.CBC;
+            aes.Padding = PaddingMode.PKCS7;
+
+            using var memoryStream = new MemoryStream();
+            using var cryptoStream = new CryptoStream(memoryStream, aes.CreateDecryptor(), CryptoStreamMode.Write);
+
+            cryptoStream.Write(bytes, 0, bytes.Length);
+            cryptoStream.FlushFinalBlock();
+
+            return memoryStream.ToArray();
+        }
+        catch (CryptographicException)
+        {
+            // Bad/early ciphertext should never crash the server. Callers can treat empty as "decrypt failed".
+            return Array.Empty<byte>();
+        }
     }
     
     public void Parse(ReadOnlySpan<byte> bytes)
