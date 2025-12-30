@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window Name="winEventCommandData" Caption="Command Data"
         Size="420,360"
+		Icon="346" IconOffset="3,5"	
         Design="WindowNormal"
         StartPosition="CenterScreen"
         Visible="false">
