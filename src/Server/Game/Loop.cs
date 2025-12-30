@@ -251,7 +251,8 @@ public static class Loop
         // // This is used for respawning map items //
         // ///////////////////////////////////////////
 
-        for (var map = 0; map < Variables.MaxMaps; map++)
+        var mapCount = Math.Min(Variables.MaxMaps, Server.Map.Instance.Count);
+        for (var map = 0; map < mapCount; map++)
         {
             for (var mapItemNum = 0; mapItemNum < Variables.MaxMapItems; mapItemNum++)
             {
@@ -269,7 +270,11 @@ public static class Loop
         Entity.Instances.Clear();
 
         var entities = Entity.Instances;
-        var mapCount = Variables.MaxMaps;
+        var mapCount = Math.Min(Variables.MaxMaps, Server.Map.Instance.Count);
+        if (mapCount <= 0)
+        {
+            return;
+        }
 
         // Use entities from entity class
         for (var map = 0; map < mapCount; map++)

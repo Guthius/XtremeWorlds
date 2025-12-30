@@ -226,7 +226,7 @@ namespace Server
         public static bool CanMove(int map, int mapNpcNum, byte dir)
         {
             int count = System.Enum.GetValues(typeof(Direction)).Length;
-            if (map < 0 || map >= Core.Globals.Variables.MaxMaps || mapNpcNum < 0 || mapNpcNum >= Core.Globals.Variables.MaxMapNpcs || dir > count)
+            if (map < 0 || map >= Server.Map.Instance.Count || mapNpcNum < 0 || mapNpcNum >= Core.Globals.Variables.MaxMapNpcs || dir > count)
             {
                 return false;
             }
