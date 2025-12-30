@@ -5,12 +5,12 @@ using Core;
 using Core.Configurations;
 using Core.Globals;
 using Core.Net;
-using Microsoft.VisualBasic.CompilerServices;
 using Microsoft.Xna.Framework;
 using static Core.Globals.Type;
 using EventCommand = Core.Globals.EventCommand;
 using Type = Core.Globals.Type;
 using static Core.Globals.Commands;
+using System.IO;
 
 namespace Client
 {
