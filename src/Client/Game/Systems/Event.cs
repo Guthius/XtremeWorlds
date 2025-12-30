@@ -623,9 +623,10 @@ namespace Client
             var name = Data.MapEvents[index].Name;
 
             // X position: use same centering math as player names (sprite feet center)
-            int baseWorldX = Data.MapEvents[index].X;
-            int feetCenterX = GameLogic.ConvertMapX(baseWorldX) + Constants.TileSize / 2 - 4;
-            var textX = feetCenterX - (int)(TextRenderer.Fonts[Font.Georgia].MeasureString(name).X / 2f);
+            int baseWorldX = GameLogic.ConvertMapX(Data.MapEvents[index].X);
+            var size = TextRenderer.Fonts[Font.Georgia].MeasureString(name);
+            var padding = (int)(size.X / 6);
+            var drawX = (int)(baseWorldX + (Constants.TileSize - size.X) / 2 + padding);
 
             if (Data.MapEvents[index].GraphicType == 1)
             {
@@ -669,7 +670,6 @@ namespace Client
             {
                 if (Data.MapEvents[index].GraphicY2 > 0)
                 {
-                    textX = textX + Data.MapEvents[index].GraphicY2 * Constants.TileSize / 2 - 6;
                     textY = GameLogic.ConvertMapY(Data.MapEvents[index].Y) - Data.MapEvents[index].GraphicY2 * Constants.TileSize + 16;
                 }
                 else
@@ -682,7 +682,7 @@ namespace Client
                 textY = GameLogic.ConvertMapY(Data.MapEvents[index].Y) - 16;
             }
 
-            TextRenderer.Render(name, textX, textY, color, backcolor);
+            TextRenderer.Render(name, drawX, textY, color, backcolor);
         }
 
         public static void OnDraw()
