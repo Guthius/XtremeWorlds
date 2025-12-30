@@ -2393,11 +2393,11 @@ namespace Client
             // Draw lower tiles
             if (GameState.NumTileSets > 0)
             {
-                var loopTo = (int) Math.Round(GameState.TileView.Right + 1d);
-                for (x = (int) Math.Round(GameState.TileView.Left - 1d); x < loopTo; x++)
+                var count = (int) Math.Round(GameState.TileView.Right + 1d);
+                for (x = (int) Math.Round(GameState.TileView.Left - 1d); x < count; x++)
                 {
-                    var loopTo1 = (int) Math.Round(GameState.TileView.Bottom + 1d);
-                    for (y = (int) Math.Round(GameState.TileView.Top - 1d); y < loopTo1; y++)
+                    var count2 = (int) Math.Round(GameState.TileView.Bottom + 1d);
+                    for (y = (int) Math.Round(GameState.TileView.Top - 1d); y < count2; y++)
                     {
                         if (GameLogic.IsValidMapPoint(x, y))
                         {
@@ -2412,8 +2412,8 @@ namespace Client
             {
                 if (GameState.CurrentEvents > 0 & GameState.CurrentEvents <= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount)
                 {
-                    var loopTo2 = Information.UBound(Data.MapEvents);
-                    for (i = 0; i <= loopTo2; i++)
+                    var count2 = Information.UBound(Data.MapEvents);
+                    for (i = 0; i <= count2; i++)
                     {
                         if (Data.MapEvents?[i].Position == 0)
                         {
@@ -2449,8 +2449,8 @@ namespace Client
             }
 
             // Y-based render. Renders Players, Npcs and Resources based on Y-axis.
-            var loopTo3 = (int) Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
-            for (y = 0; y < loopTo3; y++)
+            var count3 = (int) Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+            for (y = 0; y < count3; y++)
             {
                 if (GameState.NumCharacters > 0)
                 {
@@ -2479,8 +2479,8 @@ namespace Client
                     {
                         if (GameState.CurrentEvents > 0 & GameState.CurrentEvents <= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount)
                         {
-                            var loopTo4 = Information.UBound(Data.MapEvents);
-                            for (i = 0; i <= loopTo4; i++)
+                            var count4 = Information.UBound(Data.MapEvents);
+                            for (i = 0; i <= count4; i++)
                             {
                                 if (Data.MapEvents?[i].Position == 1)
                                 {
@@ -2556,8 +2556,8 @@ namespace Client
                     {
                         if (GameState.ResourceIndex > 0)
                         {
-                            var loopTo5 = GameState.ResourceIndex;
-                            for (i = 0; i < loopTo5; i++)                               
+                            var count5 = GameState.ResourceIndex;
+                            for (i = 0; i < count5; i++)                               
                                 if (MapResource.Instance[i].Y == y)
                                 {
                                     MapResource.OnDraw(i);
@@ -2593,8 +2593,8 @@ namespace Client
 
             if (Data.MapEvents != null && GameState.CurrentEvents > 0 & GameState.CurrentEvents <= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount)
             {
-                var loopTo6 = GameState.CurrentEvents;
-                for (i = 0; i < loopTo6; i++)
+                var count6 = GameState.CurrentEvents;
+                for (i = 0; i < count6; i++)
                 {
                     if (i < Data.MapEvents.Length && Data.MapEvents[i].Position == 2)
                     {
@@ -2605,11 +2605,11 @@ namespace Client
 
             if (GameState.NumTileSets > 0)
             {
-                var loopTo7 = (int) Math.Round(GameState.TileView.Right + 1d);
-                for (x = (int) Math.Round(GameState.TileView.Left - 1d); x < loopTo7; x++)
+                var count7 = (int) Math.Round(GameState.TileView.Right + 1d);
+                for (x = (int) Math.Round(GameState.TileView.Left - 1d); x < count7; x++)
                 {
-                    var loopTo8 = (int) Math.Round(GameState.TileView.Bottom + 1d);
-                    for (y = (int) Math.Round(GameState.TileView.Top - 1d); y < loopTo8; y++)
+                    var count8 = (int) Math.Round(GameState.TileView.Bottom + 1d);
+                    for (y = (int) Math.Round(GameState.TileView.Top - 1d); y < count8; y++)
                     {
                         if (GameLogic.IsValidMapPoint(x, y))
                         {
@@ -2646,8 +2646,8 @@ namespace Client
             {
                 if (GameState.CurrentEvents > 0 && Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount >= GameState.CurrentEvents)
                 {
-                    var loopTo9 = GameState.CurrentEvents;
-                    for (i = 0; i < loopTo9; i++)
+                    var count9 = GameState.CurrentEvents;
+                    for (i = 0; i < count9; i++)
                     {
                         if (Data.MapEvents?[i].Visible == true)
                         {
@@ -2688,7 +2688,7 @@ namespace Client
             if (GameState.Bfps)
             {
                 string fps = "FPS: " + GetFps();
-                TextRenderer.OnDraw(fps, (int) Math.Round(GameState.Camera.Left - 24d),
+                TextRenderer.Render(fps, (int) Math.Round(GameState.Camera.Left - 24d),
                     (int) Math.Round(GameState.Camera.Top + 60d), Color.Yellow, Color.Black);
             }
 
@@ -2700,16 +2700,16 @@ namespace Client
                 string map = " (Map #" + GetPlayerMap(GameState.MyIndex) + ")";
                 string curMouse = "Mouse X: " + (int)GameState.CurMouseXGame + " Y: " + (int)GameState.CurMouseYGame;
 
-                TextRenderer.OnDraw(cur, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 15f),
+                TextRenderer.Render(cur, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 15f),
                     Color.Yellow, Color.Black);
 
-                TextRenderer.OnDraw(curMouse, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 30f),
+                TextRenderer.Render(curMouse, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 30f),
                     Color.Yellow, Color.Black);
 
-                TextRenderer.OnDraw(loc, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 45f),
+                TextRenderer.Render(loc, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 45f),
                     Color.Yellow, Color.Black);
 
-                TextRenderer.OnDraw(map, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 60f),
+                TextRenderer.Render(map, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 60f),
                     Color.Yellow, Color.Black);
             }
             
@@ -2841,11 +2841,11 @@ namespace Client
 
             if (GameState.MapEditorTab == (int) MapEditorTab.Directions)
             {
-                var loopTo10 = (int) Math.Round(GameState.TileView.Right + 1d);
-                for (x = (int) Math.Round(GameState.TileView.Left - 1d); x < loopTo10; x++)
+                var count10 = (int) Math.Round(GameState.TileView.Right + 1d);
+                for (x = (int) Math.Round(GameState.TileView.Left - 1d); x < count10; x++)
                 {
-                    var loopTo11 = (int) Math.Round(GameState.TileView.Bottom + 1d);
-                    for (y = (int) Math.Round(GameState.TileView.Top - 1d); y < loopTo11; y++)
+                    var count11 = (int) Math.Round(GameState.TileView.Bottom + 1d);
+                    for (y = (int) Math.Round(GameState.TileView.Top - 1d); y < count11; y++)
                     {
                         if (GameLogic.IsValidMapPoint(x, y))
                         {

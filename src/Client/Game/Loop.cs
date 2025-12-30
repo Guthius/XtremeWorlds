@@ -225,8 +225,8 @@ namespace Client
                         
                     }
 
-                    var loopTo2 = GameState.CurrentEvents;
-                    for (_i = 0; _i < loopTo2; _i++)
+                    var count = GameState.CurrentEvents;
+                    for (_i = 0; _i < count; _i++)
                     {
                         Event.OnMove(_i);
                     }
@@ -372,8 +372,8 @@ namespace Client
                         }
                     }
 
-                    var loopTo = GameState.CurrentEvents;
-                    for (_i = 0; _i < loopTo; _i++)
+                    var count = GameState.CurrentEvents;
+                    for (_i = 0; _i < count; _i++)
                     {
                         if (Core.Globals.Data.MapEvents != null && _i < Core.Globals.Data.MapEvents.Length)
                         {
@@ -497,7 +497,7 @@ namespace Client
                 if (WindowManager.TryGetControl("winAdmin", "lstMaps", out var lstCtrl) && lstCtrl is ListBox lst)
                 {
                     lst.Clear();
-                    for (int i = 0, loopTo = GameState.MapNames.Length; i < loopTo; i++)
+                    for (int i = 0, count = GameState.MapNames.Length; i < count; i++)
                     {
                         var raw = GameState.MapNames[i] ?? string.Empty;
                         var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();

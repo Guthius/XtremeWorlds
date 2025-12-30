@@ -47,7 +47,7 @@ public class WindowRenderer
                 var lineWidth = TextRenderer.GetTextWidth(line, window.Font, scale);
                 var left = x + (window.Width - lineWidth) / 2;
 
-                TextRenderer.OnDraw(line, left, y, Color.White, Color.Black, window.Font);
+                TextRenderer.Render(line, left, y, Color.White, Color.Black, window.Font);
 
                 y += 16;
             }
@@ -102,7 +102,7 @@ public class WindowRenderer
             window.Width, window.Height,
             window.Width, window.Height);
 
-        TextRenderer.OnDraw(window.Text, window.X + 32, window.Y + 4, Color.White, Color.Black, window.Font);
+        TextRenderer.Render(window.Text, window.X + 32, window.Y + 4, Color.White, Color.Black, window.Font);
     }
 
     private static void RenderWindowNoBar(Window window)
@@ -128,7 +128,7 @@ public class WindowRenderer
             window.Width, window.Height,
             window.Width, window.Height);
 
-        TextRenderer.OnDraw(window.Text, window.X + 32, window.Y + 4, Color.White, Color.Black, window.Font);
+        TextRenderer.Render(window.Text, window.X + 32, window.Y + 4, Color.White, Color.Black, window.Font);
     }
 
     private static void RenderWindowDescription(Window window)

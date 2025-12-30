@@ -321,7 +321,7 @@ public static class TextRenderer
         }
     }
 
-    public static void OnDraw(string text, int x, int y, Color frontColor, Color backColor, Font font = Font.Georgia, float textSize = 1.0f)
+    public static void Render(string text, int x, int y, Color frontColor, Color backColor, Font font = Font.Georgia, float textSize = 1.0f)
     {
         if (SettingsManager.Instance.BitmapFont)
         {
@@ -427,11 +427,11 @@ public static class TextRenderer
     public static void DrawMapAttributes()
     {
         int tA;
-        var loopTo = (int)GameState.TileView.Right;
-        for (var x = (int)GameState.TileView.Left; x < loopTo; x++)
+        var count = (int)GameState.TileView.Right;
+        for (var x = (int)GameState.TileView.Left; x < count; x++)
         {
-            var loopTo1 = (int)GameState.TileView.Bottom;
-            for (var y = (int)GameState.TileView.Top; y < loopTo1; y++)
+            var count2 = (int)GameState.TileView.Bottom;
+            for (var y = (int)GameState.TileView.Top; y < count2; y++)
             {
                 if (!GameLogic.IsValidMapPoint(x, y)) continue;
                 ref var instance = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y];
@@ -440,18 +440,18 @@ public static class TextRenderer
                 tA = GameState.EditorAttribute == 1 ? (int)instance.Type : (int)instance.Type2;
                 switch (tA)
                 {
-                    case (int)TileType.Blocked: OnDraw("B", tX, tY, Color.Red, Color.Black); break;
-                    case (int)TileType.Warp: OnDraw("W", tX, tY, Color.Blue, Color.Black); break;
-                    case (int)TileType.Item: OnDraw("I", tX, tY, Color.White, Color.Black); break;
-                    case (int)TileType.NpcAvoid: OnDraw("N", tX, tY, Color.White, Color.Black); break;
-                    case (int)TileType.Resource: OnDraw("R", tX, tY, Color.Green, Color.Black); break;
-                    case (int)TileType.NpcSpawn: OnDraw("S", tX, tY, Color.Yellow, Color.Black); break;
-                    case (int)TileType.Shop: OnDraw("S", tX, tY, Color.Blue, Color.Black); break;
-                    case (int)TileType.Bank: OnDraw("B", tX, tY, Color.Blue, Color.Black); break;
-                    case (int)TileType.Heal: OnDraw("H", tX, tY, Color.Green, Color.Black); break;
-                    case (int)TileType.Trap: OnDraw("T", tX, tY, Color.Red, Color.Black); break;
-                    case (int)TileType.Animation: OnDraw("A", tX, tY, Color.Red, Color.Black); break;
-                    case (int)TileType.NoCrossing: OnDraw("X", tX, tY, Color.Red, Color.Black); break;
+                    case (int)TileType.Blocked: Render("B", tX, tY, Color.Red, Color.Black); break;
+                    case (int)TileType.Warp: Render("W", tX, tY, Color.Blue, Color.Black); break;
+                    case (int)TileType.Item: Render("I", tX, tY, Color.White, Color.Black); break;
+                    case (int)TileType.NpcAvoid: Render("N", tX, tY, Color.White, Color.Black); break;
+                    case (int)TileType.Resource: Render("R", tX, tY, Color.Green, Color.Black); break;
+                    case (int)TileType.NpcSpawn: Render("S", tX, tY, Color.Yellow, Color.Black); break;
+                    case (int)TileType.Shop: Render("S", tX, tY, Color.Blue, Color.Black); break;
+                    case (int)TileType.Bank: Render("B", tX, tY, Color.Blue, Color.Black); break;
+                    case (int)TileType.Heal: Render("H", tX, tY, Color.Green, Color.Black); break;
+                    case (int)TileType.Trap: Render("T", tX, tY, Color.Red, Color.Black); break;
+                    case (int)TileType.Animation: Render("A", tX, tY, Color.Red, Color.Black); break;
+                    case (int)TileType.NoCrossing: Render("X", tX, tY, Color.Red, Color.Black); break;
                 }
             }
         }
@@ -515,7 +515,7 @@ public static class TextRenderer
 
         if (General.GetTickCount() < Data.ActionMessage[index].Created + time)
         {
-            OnDraw(Data.ActionMessage[index].Message, x, y, GameClient.QbColorToXnaColor(Data.ActionMessage[index].Color), Color.Black);
+            Render(Data.ActionMessage[index].Message, x, y, GameClient.QbColorToXnaColor(Data.ActionMessage[index].Color), Color.Black);
         }
         else
         {
@@ -557,7 +557,7 @@ public static class TextRenderer
                     yOffset -= 10 * wrappedLines.Length;
                     for (var j = 0; j < wrappedLines.Length; j++)
                     {
-                        OnDraw(wrappedLines[j], (int)xO, (int)(yO + yOffset + 10 * j), color2, color2);
+                        Render(wrappedLines[j], (int)xO, (int)(yO + yOffset + 10 * j), color2, color2);
                     }
                     rLines += wrappedLines.Length;
                     for (var x = 0; x < wrappedLines.Length; x++)
@@ -566,7 +566,7 @@ public static class TextRenderer
                 else
                 {
                     yOffset -= 12L;
-                    OnDraw(Data.Chat[(int)i].Text, (int)xO, (int)(yO + yOffset), color2, color2);
+                    Render(Data.Chat[(int)i].Text, (int)xO, (int)(yO + yOffset), color2, color2);
                     rLines++;
                     if (GetTextWidth(Data.Chat[(int)i].Text) > topWidth)
                         topWidth = GetTextWidth(Data.Chat[(int)i].Text);
@@ -582,6 +582,6 @@ public static class TextRenderer
 
     public static void DrawMapName()
     {
-        OnDraw(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Name, (int)Math.Round(GameState.ResolutionWidth / 2d - GetTextWidth(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Name)), 10, GameState.DrawMapNameColor, Color.Black);
+        Render(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Name, (int)Math.Round(GameState.ResolutionWidth / 2d - GetTextWidth(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Name)), 10, GameState.DrawMapNameColor, Color.Black);
     }
 }

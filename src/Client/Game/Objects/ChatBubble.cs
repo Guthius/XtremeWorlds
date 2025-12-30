@@ -117,8 +117,8 @@ public class ChatBubble : IData
         // find max width
         tmpNum = Information.UBound(theArray);
 
-        var loopTo = tmpNum;
-        for (i = 0L; i <= loopTo; i++)
+        var count = tmpNum;
+        for (i = 0L; i <= count; i++)
         {
             if (TextRenderer.GetTextWidth(theArray[(int) i], Font.Georgia) > maxWidth)
                 maxWidth = TextRenderer.GetTextWidth(theArray[(int) i], Font.Georgia);
@@ -180,8 +180,8 @@ public class ChatBubble : IData
         // render each line centralized
         tmpNum = Information.UBound(theArray);
 
-        var loopTo1 = tmpNum;
-        for (i = 0; i <= loopTo1; i++)
+        var count2 = tmpNum;
+        for (i = 0; i <= count2; i++)
         {
             if (theArray[(int) i] == null)
                 continue;
@@ -194,7 +194,7 @@ public class ChatBubble : IData
             // Calculate horizontal and vertical centers with padding
             double padding = (double) actualWidth / 6.0d;
 
-            TextRenderer.OnDraw(theArray[(int) i],
+            TextRenderer.Render(theArray[(int) i],
                 (int) Math.Round(x - theArray[(int) i].Length / 2d - TextRenderer.GetTextWidth(theArray[(int) i]) / 2d +
                                     padding), (int) y2, GameClient.QbColorToXnaColor(instance.Color),
                 Color.Black);

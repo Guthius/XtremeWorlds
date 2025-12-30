@@ -250,8 +250,7 @@ namespace Client
             if (count == 0)
                 return;
 
-            var loopTo = count;
-            for (i = 0; i < loopTo; i++)
+            for (i = 0; i < count; i++)
             {
                 if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].X == X & Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Y == Y)
                 {
@@ -271,8 +270,7 @@ namespace Client
 
             if (count > 0)
             {
-                var loopTo = count;
-                for (i = 0; i < loopTo; i++)
+                for (i = 0; i < count; i++)
                 {
                     if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].X == x & Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Y == y)
                     {
@@ -361,8 +359,7 @@ namespace Client
             // make sure there's not already an event
             if (count > 0)
             {
-                var loopTo = count;
-                for (i = 0; i < loopTo; i++)
+                for (i = 0; i < count; i++)
                 {
                     if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].X == X & Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Y == Y)
                     {
@@ -685,7 +682,7 @@ namespace Client
                 textY = GameLogic.ConvertMapY(Data.MapEvents[index].Y) - 16;
             }
 
-            TextRenderer.OnDraw(name, textX, textY, color, backcolor);
+            TextRenderer.Render(name, textX, textY, color, backcolor);
         }
 
         public static void OnDraw()
@@ -720,7 +717,7 @@ namespace Client
                 {
                     case 0: // Text Event (draw simple 'E' at the tile origin like other 32x32 textures)
                     {
-                        TextRenderer.OnDraw("E", screenX, screenY, Color.Green, Color.Black);
+                        TextRenderer.Render("E", screenX, screenY, Color.Green, Color.Black);
                         break;
                     }
 

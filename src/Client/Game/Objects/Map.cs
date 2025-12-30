@@ -425,7 +425,7 @@ namespace Client
             // Clear map events
             Data.MapEvents = new Type.MapEvent[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount];
 
-            for (int i = 0, loopTo = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount; i < loopTo; i++)
+            for (int i = 0, count = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount; i < count; i++)
             {
                 Data.MapEvents = default;
             }

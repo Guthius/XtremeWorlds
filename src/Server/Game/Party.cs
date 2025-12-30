@@ -131,8 +131,8 @@ public static class Party
             if (Data.Party[partyNum].Leader == index)
             {
                 // got a blank slot?
-                var loopTo = Variables.MaxPartyMembers;
-                for (var i = 0; i < loopTo; i++)
+                var count = Variables.MaxPartyMembers;
+                for (var i = 0; i < count; i++)
                 {
                     if (Data.Party[partyNum].Member[i] == -1)
                     {
@@ -276,8 +276,8 @@ public static class Party
                 if (i < highindex)
                 {
                     // move everyone down a slot
-                    var loopTo1 = Variables.MaxPartyMembers - 1;
-                    for (var x = i; x < (int)loopTo1; x++)
+                    var count1 = Variables.MaxPartyMembers - 1;
+                    for (var x = i; x < (int)count1; x++)
                     {
                         Data.Party[partyNum].Member[x] = Data.Party[partyNum].Member[x + 1];
                         Data.Party[partyNum].Member[x + 1] = 0;
@@ -324,8 +324,8 @@ public static class Party
         }
 
         // check members in others maps
-        var loopTo = Variables.MaxPartyMembers;
-        for (i = 0; i < loopTo; i++)
+        var count = Variables.MaxPartyMembers;
+        for (i = 0; i < count; i++)
         {
             tmpindex = Data.Party[partyNum].Member[i];
             if (tmpindex > -1)
@@ -353,8 +353,8 @@ public static class Party
         }
 
         // loop through and give everyone exp
-        var loopTo1 = Variables.MaxPartyMembers;
-        for (i = 0; i < loopTo1; i++)
+        var count2 = Variables.MaxPartyMembers;
+        for (i = 0; i < count2; i++)
         {
             tmpindex = Data.Party[partyNum].Member[i];
             // existing member?
@@ -388,8 +388,8 @@ public static class Party
         {
             if (Data.Party[Data.TempPlayer[index].InParty].Leader >= 0)
             {
-                var loopTo = Data.Party[Data.TempPlayer[index].InParty].MemberCount;
-                for (var i = 0; i < loopTo; i++)
+                var count = Data.Party[Data.TempPlayer[index].InParty].MemberCount;
+                for (var i = 0; i < count; i++)
                     Player.OnWarp(Data.Party[Data.TempPlayer[index].InParty].Member[i], map, x, y,
                         (byte)Direction.Down);
             }

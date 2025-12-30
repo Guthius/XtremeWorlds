@@ -780,8 +780,8 @@ public static class Loop
                 var mapResource = MapResource.Instance[map];
                 if (mapResource.ResourceCount > 0 && mapResource.ResourceData != null)
                 {
-                    int loopTo = Math.Min(mapResource.ResourceCount, mapResource.ResourceData.Length);
-                    for (int i = 0; i < loopTo; i++)
+                    int count = Math.Min(mapResource.ResourceCount, mapResource.ResourceData.Length);
+                    for (int i = 0; i < count; i++)
                     {
                         var resData = mapResource.ResourceData[i];
                         if (resData.X < 0 || resData.Y < 0 || resData.X >= Server.Map.Instance[map].MaxX || resData.Y >= Server.Map.Instance[map].MaxY)

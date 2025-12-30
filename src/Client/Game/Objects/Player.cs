@@ -681,8 +681,8 @@ namespace Client
                 }
             }
 
-            var loopTo = GameState.CurrentEvents;
-            for (i = 0; i < loopTo; i++)
+            var count = GameState.CurrentEvents;
+            for (i = 0; i < count; i++)
             {
                 if (Data.MapEvents?[i].Visible == true)
                 {
@@ -934,7 +934,7 @@ namespace Client
 
                 if (General.GetTickCount() > Player.Instance[GameState.MyIndex].EventTimer)
                 {
-                    for (int i = 0, loopTo = GameState.CurrentEvents; i < loopTo; i++)
+                    for (int i = 0, count = GameState.CurrentEvents; i < count; i++)
                     {
                         if (Data.MapEvents?.Length < GameState.CurrentEvents)
                             break;
@@ -1119,7 +1119,7 @@ namespace Client
                 }
             }
 
-            TextRenderer.OnDraw(name, drawX, textY, color, backColor, Font.Georgia);
+            TextRenderer.Render(name, drawX, textY, color, backColor, Font.Georgia);
         }
 
          public static void OnDraw(int index)

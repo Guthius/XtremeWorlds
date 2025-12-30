@@ -631,8 +631,8 @@ public class Script
         SetPlayerVital(index, Core.Globals.Vital.Health, 0);
 
         // Restore vitals
-        var count = System.Enum.GetValues(typeof(Vital)).Length;
-        for (int i = 0, loopTo = count; i < loopTo; i++)
+        var vitalCount = System.Enum.GetValues(typeof(Vital)).Length;
+        for (int i = 0, count = vitalCount; i < count; i++)
             SetPlayerVital(index, (Vital)i, GetPlayerMaxVital(index, (Vital)i));
 
         // If the Player the attacker killed was a pk then take it away

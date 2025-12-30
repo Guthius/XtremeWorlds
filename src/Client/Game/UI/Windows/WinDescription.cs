@@ -63,7 +63,7 @@ public class WinDescription
         var offset = 18;
         for (var i = 0; i < GameState.Description.Length; i++)
         {
-            TextRenderer.OnDraw(GameState.Description[i].Caption,
+            TextRenderer.Render(GameState.Description[i].Caption,
                 x + 140 - TextRenderer.GetTextWidth(GameState.Description[i].Caption) / 2,
                 y + offset,
                 GameClient.ToXnaColor(GameState.Description[i].Color),

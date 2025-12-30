@@ -69,7 +69,7 @@ public class WinHotBar
 
             var slotNumberStr = slotNumber.ToString();
 
-            TextRenderer.OnDraw(slotNumberStr, x + 4, y + 19, Color.White, Color.White, winHotbar.Font);
+            TextRenderer.Render(slotNumberStr, x + 4, y + 19, Color.White, Color.White, winHotbar.Font);
         }
     }
 

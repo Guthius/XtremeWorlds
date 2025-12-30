@@ -1,7 +1,6 @@
 ﻿using Core;
 using Core.Globals;
 using Core.Interfaces;
-using Microsoft.VisualBasic.CompilerServices;
 using Type = Core.Globals.Type;
 using static Core.Globals.Commands;
 
@@ -335,11 +334,11 @@ namespace Client
 
             Data.Autotile = new Type.Autotile[(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX), (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)];
 
-            var loopTo = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
-            for (x = 0; x < loopTo; x++)
+            var count = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
+            for (x = 0; x < count; x++)
             {
-                var loopTo1 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
-                for (y = 0; y < loopTo1; y++)
+                var count2 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+                for (y = 0; y < count2; y++)
                 {
                     int layerCount = System.Enum.GetValues(typeof(MapLayer)).Length;
                     Data.Autotile[x, y].Layer = new Type.QuarterTile[layerCount];
@@ -650,11 +649,11 @@ namespace Client
             // First, we need to re-size the array
 
             Data.Autotile = new Type.Autotile[(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX), (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)];
-            var loopTo = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
-            for (x = 0; x < loopTo; x++)
+            var count = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
+            for (x = 0; x < count; x++)
             {
-                var loopTo1 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
-                for (y = 0; y < loopTo1; y++)
+                var count3 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+                for (y = 0; y < count3; y++)
                 {
                     int layerCount = System.Enum.GetValues(typeof(MapLayer)).Length;
                     Data.Autotile[x, y].Layer = new Type.QuarterTile[layerCount];
@@ -733,11 +732,11 @@ namespace Client
             Type.AutoSe[4].X = 48;
             Type.AutoSe[4].Y = 80;
 
-            var loopTo2 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
-            for (x = 0; x < loopTo2; x++)
+            var count2 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
+            for (x = 0; x < count2; x++)
             {
-                var loopTo3 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
-                for (y = 0; y < loopTo3; y++)
+                var count3 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+                for (y = 0; y < count3; y++)
                 {
                     if (Data.Autotile[x, y].Layer == null)
                         return;

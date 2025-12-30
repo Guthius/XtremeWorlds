@@ -1516,7 +1516,7 @@ public class WindowManager
                                 color = (int)ColorName.BrightGreen;
                             }
 
-                            TextRenderer.OnDraw(
+                            TextRenderer.Render(
                                 GameLogic.ConvertCurrency((int)amountValue),
                                 (int)x,
                                 (int)y,
@@ -1582,7 +1582,7 @@ public class WindowManager
                             color = (int)ColorName.BrightGreen;
                         }
 
-                        TextRenderer.OnDraw(
+                        TextRenderer.Render(
                             GameLogic.ConvertCurrency((int)amountValue),
                             (int)x,
                             (int)y,

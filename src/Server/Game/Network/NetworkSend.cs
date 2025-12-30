@@ -672,7 +672,7 @@ public static class NetworkSend
 
                         if (eventPage.MoveRouteCount > 0)
                         {
-                            for (int y = 0, loopTo6 = eventPage.MoveRouteCount; y < loopTo6; y++)
+                            for (int y = 0, count6 = eventPage.MoveRouteCount; y < count6; y++)
                             {
                                 packetWriter.WriteInt32(eventPage.MoveRoute[y].Index);
                                 packetWriter.WriteInt32(eventPage.MoveRoute[y].Data1);
@@ -1791,8 +1791,8 @@ public static class NetworkSend
 
     public static void SendDataToParty(int partyNum, byte[] data)
     {
-        var loopTo = Data.Party[partyNum].MemberCount;
-        for (var i = 0; i < loopTo; i++)
+        var count = Data.Party[partyNum].MemberCount;
+        for (var i = 0; i < count; i++)
         {
             if (Data.Party[partyNum].Member[i] > 0)
             {

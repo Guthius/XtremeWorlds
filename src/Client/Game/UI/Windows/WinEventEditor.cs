@@ -1,6 +1,5 @@
 using Client.Game.UI.Controls;
 using Core.Globals;
-using Microsoft.VisualBasic;
 using System;
 using System.IO;
 

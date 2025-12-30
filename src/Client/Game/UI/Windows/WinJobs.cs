@@ -160,7 +160,7 @@ public class WinJobs
 
             var padding = (int) (textSize.X / 6);
 
-            TextRenderer.OnDraw(line, x + padding, y, Color.White, Color.Black, winJobs.Font);
+            TextRenderer.Render(line, x + padding, y, Color.White, Color.Black, winJobs.Font);
 
             y += lineHeight;
         }

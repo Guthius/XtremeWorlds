@@ -1134,11 +1134,11 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         }
 
         var instance = Server.Map.Instance[map];
-        var loopTo1 = (int)instance.MaxX;
-        for (x = 0; x < loopTo1; x++)
+        var count = (int)instance.MaxX;
+        for (x = 0; x < count; x++)
         {
-            var loopTo2 = (int)instance.MaxY;
-            for (y = 0; y < loopTo2; y++)
+            var count2 = (int)instance.MaxY;
+            for (y = 0; y < count2; y++)
             {
                 instance.Tile[x, y].Data1 = packetReader.ReadInt32();
                 instance.Tile[x, y].Data2 = packetReader.ReadInt32();
@@ -1147,9 +1147,9 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                 instance.Tile[x, y].Data2_2 = packetReader.ReadInt32();
                 instance.Tile[x, y].Data3_2 = packetReader.ReadInt32();
                 instance.Tile[x, y].DirBlock = (byte)packetReader.ReadInt32();
-                var loopTo3 = Enum.GetValues(typeof(MapLayer)).Length;
-                instance.Tile[x, y].Layer = new Type.Layer[loopTo3];
-                for (var i = 0; i < (int)loopTo3; i++)
+                var count3 = Enum.GetValues(typeof(MapLayer)).Length;
+                instance.Tile[x, y].Layer = new Type.Layer[count3];
+                for (var i = 0; i < (int)count3; i++)
                 {
                     instance.Tile[x, y].Layer[i].Tileset = packetReader.ReadInt32();
                     instance.Tile[x, y].Layer[i].X = packetReader.ReadInt32();
@@ -1167,8 +1167,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         if (Server.Map.Instance[map].EventCount > 0)
         {
             Server.Map.Instance[map].Event = new Type.Event[Server.Map.Instance[map].EventCount];
-            var loopTo4 = Server.Map.Instance[map].EventCount;
-            for (var i = 0; i < loopTo4; i++)
+            var count4 = Server.Map.Instance[map].EventCount;
+            for (var i = 0; i < count4; i++)
             {
                 {
                     ref var instance1 = ref Server.Map.Instance[map].Event[i];
@@ -1184,8 +1184,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                     Server.Map.Instance[map].Event[i].Pages = new Type.EventPage[Server.Map.Instance[map].Event[i].PageCount];
                     Array.Resize(ref Data.TempPlayer[i].EventMap.EventPages, Server.Map.Instance[map].Event[i].PageCount);
 
-                    var loopTo5 = Server.Map.Instance[map].Event[i].PageCount;
-                    for (x = 0; x < (int)loopTo5; x++)
+                    var count5 = Server.Map.Instance[map].Event[i].PageCount;
+                    for (x = 0; x < (int)count5; x++)
                     {
                         {
                             ref var instance2 = ref Server.Map.Instance[map].Event[i].Pages[x];
@@ -1223,8 +1223,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                             if (instance2.MoveRouteCount > 0)
                             {
                                 Server.Map.Instance[map].Event[i].Pages[x].MoveRoute = new Type.MoveRoute[instance2.MoveRouteCount];
-                                var loopTo6 = instance2.MoveRouteCount;
-                                for (y = 0; y < (int)loopTo6; y++)
+                                var count6 = instance2.MoveRouteCount;
+                                for (y = 0; y < (int)count6; y++)
                                 {
                                     instance2.MoveRoute[y].Index = packetReader.ReadInt32();
                                     instance2.MoveRoute[y].Data1 = packetReader.ReadInt32();
@@ -1248,54 +1248,53 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
                         if (Server.Map.Instance[map].Event[i].Pages[x].CommandListCount > 0)
                         {
                             Server.Map.Instance[map].Event[i].Pages[x].CommandList = new Type.CommandList[Server.Map.Instance[map].Event[i].Pages[x].CommandListCount];
-                            var loopTo7 = Server.Map.Instance[map].Event[i].Pages[x].CommandListCount;
-                            for (y = 0; y < (int)loopTo7; y++)
+                            var count7 = Server.Map.Instance[map].Event[i].Pages[x].CommandListCount;
+                            for (y = 0; y < (int)count7; y++)
                             {
                                 Server.Map.Instance[map].Event[i].Pages[x].CommandList[y].CommandCount = packetReader.ReadInt32();
                                 Server.Map.Instance[map].Event[i].Pages[x].CommandList[y].ParentList = packetReader.ReadInt32();
                                 if (Server.Map.Instance[map].Event[i].Pages[x].CommandList[y].CommandCount > 0)
                                 {
                                     Server.Map.Instance[map].Event[i].Pages[x].CommandList[y].Commands = new Type.EventCommand[Server.Map.Instance[map].Event[i].Pages[x].CommandList[y].CommandCount];
-                                    for (int z = 0, loopTo8 = Server.Map.Instance[map].Event[i].Pages[x].CommandList[y].CommandCount; z < (int)loopTo8; z++)
-                                    {
+                                    for (int z = 0, count8 = Server.Map.Instance[map].Event[i].Pages[x].CommandList[y].CommandCount; z < (int)count8; z++)
+                                    {             
+                                        ref var instance3 = ref Server.Map.Instance[map].Event[i].Pages[x].CommandList[y].Commands[z];
+                                        instance3.Index = packetReader.ReadInt32();
+                                        instance3.Text1 = packetReader.ReadString();
+                                        instance3.Text2 = packetReader.ReadString();
+                                        instance3.Text3 = packetReader.ReadString();
+                                        instance3.Text4 = packetReader.ReadString();
+                                        instance3.Text5 = packetReader.ReadString();
+                                        instance3.Data1 = packetReader.ReadInt32();
+                                        instance3.Data2 = packetReader.ReadInt32();
+                                        instance3.Data3 = packetReader.ReadInt32();
+                                        instance3.Data4 = packetReader.ReadInt32();
+                                        instance3.Data5 = packetReader.ReadInt32();
+                                        instance3.Data6 = packetReader.ReadInt32();
+                                        instance3.ConditionalBranch.CommandList = packetReader.ReadInt32();
+                                        instance3.ConditionalBranch.Condition = packetReader.ReadInt32();
+                                        instance3.ConditionalBranch.Data1 = packetReader.ReadInt32();
+                                        instance3.ConditionalBranch.Data2 = packetReader.ReadInt32();
+                                        instance3.ConditionalBranch.Data3 = packetReader.ReadInt32();
+                                        instance3.ConditionalBranch.ElseCommandList = packetReader.ReadInt32();
+                                        instance3.MoveRouteCount = packetReader.ReadInt32();
+                                        var tmpCount = instance3.MoveRouteCount;
+                                        if (tmpCount > 0)
                                         {
-                                            ref var instance3 = ref Server.Map.Instance[map].Event[i].Pages[x].CommandList[y].Commands[z];
-                                            instance3.Index = packetReader.ReadInt32();
-                                            instance3.Text1 = packetReader.ReadString();
-                                            instance3.Text2 = packetReader.ReadString();
-                                            instance3.Text3 = packetReader.ReadString();
-                                            instance3.Text4 = packetReader.ReadString();
-                                            instance3.Text5 = packetReader.ReadString();
-                                            instance3.Data1 = packetReader.ReadInt32();
-                                            instance3.Data2 = packetReader.ReadInt32();
-                                            instance3.Data3 = packetReader.ReadInt32();
-                                            instance3.Data4 = packetReader.ReadInt32();
-                                            instance3.Data5 = packetReader.ReadInt32();
-                                            instance3.Data6 = packetReader.ReadInt32();
-                                            instance3.ConditionalBranch.CommandList = packetReader.ReadInt32();
-                                            instance3.ConditionalBranch.Condition = packetReader.ReadInt32();
-                                            instance3.ConditionalBranch.Data1 = packetReader.ReadInt32();
-                                            instance3.ConditionalBranch.Data2 = packetReader.ReadInt32();
-                                            instance3.ConditionalBranch.Data3 = packetReader.ReadInt32();
-                                            instance3.ConditionalBranch.ElseCommandList = packetReader.ReadInt32();
-                                            instance3.MoveRouteCount = packetReader.ReadInt32();
-                                            var tmpCount = instance3.MoveRouteCount;
-                                            if (tmpCount > 0)
+                                            Array.Resize(ref instance3.MoveRoute, tmpCount);
+                                            for (int w = 0, count9 = tmpCount; w < (int)count9; w++)
                                             {
-                                                Array.Resize(ref instance3.MoveRoute, tmpCount);
-                                                for (int w = 0, loopTo9 = tmpCount; w < (int)loopTo9; w++)
-                                                {
-                                                    instance3.MoveRoute[w].Index = packetReader.ReadInt32();
-                                                    instance3.MoveRoute[w].Data1 = packetReader.ReadInt32();
-                                                    instance3.MoveRoute[w].Data2 = packetReader.ReadInt32();
-                                                    instance3.MoveRoute[w].Data3 = packetReader.ReadInt32();
-                                                    instance3.MoveRoute[w].Data4 = packetReader.ReadInt32();
-                                                    instance3.MoveRoute[w].Data5 = packetReader.ReadInt32();
-                                                    instance3.MoveRoute[w].Data6 = packetReader.ReadInt32();
-                                                }
+                                                instance3.MoveRoute[w].Index = packetReader.ReadInt32();
+                                                instance3.MoveRoute[w].Data1 = packetReader.ReadInt32();
+                                                instance3.MoveRoute[w].Data2 = packetReader.ReadInt32();
+                                                instance3.MoveRoute[w].Data3 = packetReader.ReadInt32();
+                                                instance3.MoveRoute[w].Data4 = packetReader.ReadInt32();
+                                                instance3.MoveRoute[w].Data5 = packetReader.ReadInt32();
+                                                instance3.MoveRoute[w].Data6 = packetReader.ReadInt32();
                                             }
                                         }
                                     }
+                                
                                 }
                             }
                         }
@@ -1304,8 +1303,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             }
         }
 
-        var loopTo13 = Server.Map.Instance[map].EventCount;
-        for (var i = 0; i < loopTo13; i++)
+        var count13 = Server.Map.Instance[map].EventCount;
+        for (var i = 0; i < count13; i++)
         {
             if (Server.Map.Instance[map].Event[i].PageCount == 0)
             {
@@ -1332,8 +1331,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         }
 
         // Clear it all out
-        var loopTo11 = Core.Globals.Variables.MaxMapItems;
-        for (var i = 0; i < loopTo11; i++)
+        var count11 = Core.Globals.Variables.MaxMapItems;
+        for (var i = 0; i < count11; i++)
         {
             MapItem.OnClear(i, GetPlayerMap(session.Id));
         }
@@ -1395,8 +1394,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             return;
 
         // Clear out it all
-        var loopTo = Core.Globals.Variables.MaxMapItems;
-        for (i = 0; i < loopTo; i++)
+        var count = Core.Globals.Variables.MaxMapItems;
+        for (i = 0; i < count; i++)
         {
             MapItem.OnClear(i, GetPlayerMap(session.Id));
         }
@@ -1405,8 +1404,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         MapItem.Spawn(GetPlayerMap(session.Id));
 
         // Respawn NpcS
-        var loopTo1 = Core.Globals.Variables.MaxMapNpcs;
-        for (i = 0; i < loopTo1; i++)
+        var count2 = Core.Globals.Variables.MaxMapNpcs;
+        for (i = 0; i < count2; i++)
             MapNpc.OnSpawn(i, GetPlayerMap(session.Id));
 
         EventLogic.SpawnMapEventsFor(session.Id, GetPlayerMap(session.Id));
@@ -1606,7 +1605,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Shop.Instance[shopNum].BuyRate = buffer.ReadInt32();
         Shop.Instance[shopNum].Name = buffer.ReadString();
 
-        for (int i = 0, loopTo = Core.Globals.Variables.MaxTrades; i < loopTo; i++)
+        for (int i = 0, count = Core.Globals.Variables.MaxTrades; i < count; i++)
         {
             Shop.Instance[shopNum].TradeItem[i].CostItem = buffer.ReadInt32();
             Shop.Instance[shopNum].TradeItem[i].CostValue = buffer.ReadInt32();
@@ -1861,8 +1860,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         }
 
         // Check for an item
-        var loopTo1 = Core.Globals.Variables.MaxMapItems;
-        for (var i = 0; i < loopTo1; i++)
+        var count = Core.Globals.Variables.MaxMapItems;
+        for (var i = 0; i < count; i++)
         {
             if (MapItem.Instance[GetPlayerMap(session.Id), i].Num >= 0)
             {
@@ -1881,8 +1880,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         }
 
         // Check for an npc
-        var loopTo2 = Core.Globals.Variables.MaxMapNpcs;
-        for (var i = 0; i < loopTo2; i++)
+        var count2 = Core.Globals.Variables.MaxMapNpcs;
+        for (var i = 0; i < count2; i++)
         {
             if (MapNpc.Instance[GetPlayerMap(session.Id), i].Num >= 0)
             {
@@ -2131,7 +2130,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         }
 
         // it's fine, let's go ahead
-        for (int i = 0, loopTo = instance.CostValue; i < loopTo; i++)
+        for (int i = 0, count = instance.CostValue; i < count; i++)
             Server.Player.TakeInv(session.Id, instance.CostItem, instance.CostValue);
         Server.Player.GiveInv(session.Id, instance.Item, instance.ItemValue);
 
@@ -2312,7 +2311,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             Array.Resize(ref Data.TempPlayer[session.Id].TradeOffer, Core.Globals.Variables.MaxInventory);
             Array.Resize(ref Data.TempPlayer[tradeTarget].TradeOffer, Core.Globals.Variables.MaxInventory);
 
-            for (int i = 0, loopTo = Core.Globals.Variables.MaxInventory; i < loopTo; i++)
+            for (int i = 0, count = Core.Globals.Variables.MaxInventory; i < count; i++)
             {
                 Data.TempPlayer[session.Id].TradeOffer[i].Num = -1;
                 Data.TempPlayer[session.Id].TradeOffer[i].Value = 0;
@@ -2357,8 +2356,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         }
 
         // take their items
-        var loopTo = Core.Globals.Variables.MaxInventory;
-        for (i = 0; i < loopTo; i++)
+        var count = Core.Globals.Variables.MaxInventory;
+        for (i = 0; i < count; i++)
         {
             tmpTradeItem[i].Num = -1;
             tmpTradeItem2[i].Num = -1;
@@ -2393,8 +2392,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         }
 
         // taken all items. now they can't not get items because of no inventory space.
-        var loopTo1 = Core.Globals.Variables.MaxInventory;
-        for (i = 0; i < loopTo1; i++)
+        var count2 = Core.Globals.Variables.MaxInventory;
+        for (i = 0; i < count2; i++)
         {
             // player
             if (tmpTradeItem2[i].Num >= 0)
@@ -2415,8 +2414,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         NetworkSend.SendInventory(tradeTarget);
 
         // they now have all the items. Clear out values + let them out of the trade.
-        var loopTo2 = Core.Globals.Variables.MaxInventory;
-        for (i = 0; i < loopTo2; i++)
+        var count3 = Core.Globals.Variables.MaxInventory;
+        for (i = 0; i < count3; i++)
         {
             Data.TempPlayer[session.Id].TradeOffer[i].Num = -1;
             Data.TempPlayer[session.Id].TradeOffer[i].Value = 0;
@@ -2439,7 +2438,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var tradeTarget = (int)Data.TempPlayer[session.Id].InTrade;
         var hasValidTarget = tradeTarget >= 0 && tradeTarget < Core.Globals.Variables.MaxPlayers;
 
-        for (int i = 0, loopTo = Core.Globals.Variables.MaxInventory; i < loopTo; i++)
+        for (int i = 0, count = Core.Globals.Variables.MaxInventory; i < count; i++)
         {
             Data.TempPlayer[session.Id].TradeOffer[i].Num = -1;
             Data.TempPlayer[session.Id].TradeOffer[i].Value = 0;
@@ -2493,8 +2492,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         if (Item.Instance[itemNum].Type == (byte)ItemCategory.Currency | Item.Instance[itemNum].Stackable == 1)
         {
             // check if already offering same currency item
-            var loopTo = Core.Globals.Variables.MaxInventory;
-            for (i = 0; i < loopTo; i++)
+            var count = Core.Globals.Variables.MaxInventory;
+            for (i = 0; i < count; i++)
             {
                 if (Data.TempPlayer[session.Id].TradeOffer[i].Num == invSlot)
                 {
@@ -2525,8 +2524,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         else
         {
             // make sure they're not already offering it
-            var loopTo1 = Core.Globals.Variables.MaxInventory;
-            for (i = 0; i < loopTo1; i++)
+            var count3 = Core.Globals.Variables.MaxInventory;
+            for (i = 0; i < count3; i++)
             {
                 if (Data.TempPlayer[session.Id].TradeOffer[i].Num == invSlot)
                 {
@@ -2537,8 +2536,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         }
 
         // not already offering - find earliest empty slot
-        var loopTo2 = Core.Globals.Variables.MaxInventory;
-        for (i = 0; i < loopTo2; i++)
+        var count2 = Core.Globals.Variables.MaxInventory;
+        for (i = 0; i < count2; i++)
         {
             if (Data.TempPlayer[session.Id].TradeOffer[i].Num == -1)
             {
@@ -2771,8 +2770,8 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         instance.MaleSprite = buffer.ReadInt32();
         instance.FemaleSprite = buffer.ReadInt32();
 
-        var loopTo = Enum.GetNames(typeof(Stat)).Length;
-        for (x = 0; x < loopTo; x++)
+        var count = Enum.GetNames(typeof(Stat)).Length;
+        for (x = 0; x < count; x++)
             instance.Stat[x] = buffer.ReadInt32();
 
         for (var q = 0; q < Core.Globals.Variables.MaxStartItems; q++)

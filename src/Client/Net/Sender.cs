@@ -1264,8 +1264,8 @@ public static class Sender
 
                 if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].PageCount > 0)
                 {
-                    var loopTo3 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].PageCount;
-                    for (x = 0; x < loopTo3; x++)
+                    var count = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].PageCount;
+                    for (x = 0; x < count; x++)
                     {
                         {
                             ref var instance1 = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x];
@@ -1297,8 +1297,8 @@ public static class Sender
 
                             if (instance1.MoveRouteCount > 0)
                             {
-                                var loopTo4 = instance1.MoveRouteCount;
-                                for (y = 0; y < loopTo4; y++)
+                                var count2 = instance1.MoveRouteCount;
+                                for (y = 0; y < count2; y++)
                                 {
                                     packetWriter.WriteInt32(instance1.MoveRoute[y].Index);
                                     packetWriter.WriteInt32(instance1.MoveRoute[y].Data1);
@@ -1321,14 +1321,14 @@ public static class Sender
 
                         if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandListCount > 0)
                         {
-                            var loopTo5 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandListCount;
-                            for (y = 0; y < loopTo5; y++)
+                            var count3 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandListCount;
+                            for (y = 0; y < count3; y++)
                             {
                                 packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount);
                                 packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].ParentList);
                                 if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount > 0)
                                 {
-                                    for (int z = 0, loopTo6 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount; z < loopTo6; z++)
+                                    for (int z = 0, count4 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount; z < count4; z++)
                                     {
                                         {
                                             ref var instance2 = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].Commands[z];
@@ -1353,7 +1353,7 @@ public static class Sender
                                             packetWriter.WriteInt32(instance2.MoveRouteCount);
                                             if (instance2.MoveRouteCount > 0)
                                             {
-                                                for (int w = 0, loopTo7 = instance2.MoveRouteCount; w < loopTo7; w++)
+                                                for (int w = 0, count5 = instance2.MoveRouteCount; w < count5; w++)
                                                 {
                                                     packetWriter.WriteInt32(instance2.MoveRoute[w].Index);
                                                     packetWriter.WriteInt32(instance2.MoveRoute[w].Data1);

@@ -42,7 +42,7 @@ public sealed class TextBox : Control
 
         var textSize = spriteFont.MeasureString(text);
 
-        TextRenderer.OnDraw(
+        TextRenderer.Render(
             text,
             X + x + XOffset,
             Y + y + YOffset + (int) (Height - textSize.Y) / 2,

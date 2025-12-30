@@ -210,8 +210,8 @@ namespace Client
                 name = "";
 
                 // Get the desired player from the user text
-                var loopTo = Strings.Len(chatText);
-                for (i = 0; i < loopTo; i++)
+                var count = Strings.Len(chatText);
+                for (i = 0; i < count; i++)
                 {
 
                     if ((Strings.Mid(chatText, i, 1) ?? "") != (Strings.Space(1) ?? ""))
@@ -1203,11 +1203,11 @@ namespace Client
                         {
                             if (GameState.DiaData2 > 0L)
                             {
-                                var loopTo = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
-                                for (x = 0; x < loopTo; x++)
+                                var count = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
+                                for (x = 0; x < count; x++)
                                 {
-                                    var loopTo1 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
-                                    for (y = 0; y < loopTo1; y++)
+                                    var count2 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+                                    for (y = 0; y < count2; y++)
                                     {
                                         Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[(int)GameState.DiaData1].X = (int)GameState.DiaData3;
                                         Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[(int)GameState.DiaData1].Y = (int)GameState.DiaData4;
@@ -1222,11 +1222,11 @@ namespace Client
                             }
                             else
                             {
-                                var loopTo2 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
-                                for (x = 0; x < loopTo2; x++)
+                                var count = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
+                                for (x = 0; x < count; x++)
                                 {
-                                    var loopTo3 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
-                                    for (y = 0; y < loopTo3; y++)
+                                    var count2 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+                                    for (y = 0; y < count2; y++)
                                     {
                                         Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[(int)GameState.DiaData1].X = (int)GameState.DiaData3;
                                         Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[(int)GameState.DiaData1].Y = (int)GameState.DiaData4;
@@ -1242,11 +1242,11 @@ namespace Client
 
                     case DialogueType.ClearLayer:
                         {
-                            var loopTo4 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
-                            for (x = 0; x < loopTo4; x++)
+                            var count = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
+                            for (x = 0; x < count; x++)
                             {
-                                var loopTo5 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
-                                for (y = 0; y < loopTo5; y++)
+                                var count2 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+                                for (y = 0; y < count2; y++)
                                 {
                                     {
                                         ref var instance = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y];
@@ -1264,11 +1264,11 @@ namespace Client
 
                     case DialogueType.ClearAttributes:
                         {
-                            var loopTo6 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
-                            for (x = 0; x < loopTo6; x++)
+                            var count = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
+                            for (x = 0; x < count; x++)
                             {
-                                var loopTo7 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
-                                for (y = 0; y < loopTo7; y++)
+                                var count2 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+                                for (y = 0; y < count2; y++)
                                 {
                                     Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Type = 0;
                                     Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Type2 = 0;
@@ -2214,9 +2214,9 @@ namespace Client
             int yMax = Math.Min(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY, yCenter + distance);
 
             var cells = new List<Microsoft.Xna.Framework.Vector2>();
-            for (int y = yMin, loopTo = yMax; y < loopTo; y++)
+            for (int y = yMin, count2 = yMax; y < count2; y++)
             {
-                for (int x = xMin, loopTo1 = xMax; x < loopTo1; x++)
+                for (int x = xMin, count = xMax; x < count; x++)
                     cells.Add(new Microsoft.Xna.Framework.Vector2(x, y));
             }
             return cells;
@@ -2232,14 +2232,14 @@ namespace Client
             var borderCells = new List<Microsoft.Xna.Framework.Vector2>();
 
             // Top and bottom border
-            for (int x = xMin, loopTo = xMax; x < loopTo; x++)
+            for (int x = xMin, count = xMax; x < count; x++)
             {
                 borderCells.Add(new Microsoft.Xna.Framework.Vector2(x, yMin));
                 borderCells.Add(new Microsoft.Xna.Framework.Vector2(x, yMax));
             }
 
             // Left and right border
-            for (int y = yMin + 1, loopTo1 = yMax - 1; y < loopTo1; y++)
+            for (int y = yMin + 1, count = yMax - 1; y < count; y++)
             {
                 borderCells.Add(new Microsoft.Xna.Framework.Vector2(xMin, y));
                 borderCells.Add(new Microsoft.Xna.Framework.Vector2(xMax, y));

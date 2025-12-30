@@ -19,6 +19,7 @@ namespace Client
             ref var instance = ref Data.Blood[index];
             if (instance.X < GameState.TileView.Left | instance.X > GameState.TileView.Right)
                 return;
+                
             if (instance.Y < GameState.TileView.Top | instance.Y > GameState.TileView.Bottom)
                 return;
 

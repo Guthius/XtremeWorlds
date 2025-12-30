@@ -104,7 +104,7 @@ public static class Database
             var dataTable = "id SERIAL PRIMARY KEY, data jsonb";
             var playerTable = "id BIGINT PRIMARY KEY, data jsonb, bank jsonb";
 
-            for (int i = 1, loopTo = Variables.MaxCharacters; i <= loopTo; i++)
+            for (int i = 1, count = Variables.MaxCharacters; i <= count; i++)
                 playerTable += $", character{i} jsonb";
 
             var tableNames = new[] { "job", "item", "map", "npc", "shop", "skill", "resource", "animation", "projectile", "moral" };

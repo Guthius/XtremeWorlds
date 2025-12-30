@@ -457,12 +457,12 @@ namespace Client
 
             x = 0;
 
-            for (int x2 = 0, loopTo = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX; x2 < loopTo; x2++)
+            for (int x2 = 0, count = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX; x2 < count; x2++)
             {
-                for (int y2 = 0, loopTo1 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY; y2 < loopTo1; y2++)
+                for (int y2 = 0, count2 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY; y2 < count2; y2++)
                 {
                     // Use Layer.Length instead of MapLayer.Count
-                    for (int i2 = 0, loopTo2 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x2, y2].Layer != null ? Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x2, y2].Layer.Length : 0; i2 < loopTo2; i2++)
+                    for (int i2 = 0, count3 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x2, y2].Layer != null ? Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x2, y2].Layer.Length : 0; i2 < count3; i2++)
                     {
                         ref var currentTile = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x2, y2];
                         ref var historyTile = ref Data.TileHistory![GameState.TileHistoryIndex].Tile[x2, y2];
@@ -697,12 +697,12 @@ namespace Client
             else // multitile
             {
                 y2 = 0; // starting tile for y axis
-                var loopTo = GameState.CurY + GameState.EditorTileHeight;
-                for (y = GameState.CurY; y < loopTo; y++)
+                var count = GameState.CurY + GameState.EditorTileHeight;
+                for (y = GameState.CurY; y < count; y++)
                 {
                     x2 = 0; // re-set x count every y loop
-                    var loopTo1 = GameState.CurX + GameState.EditorTileWidth;
-                    for (x = GameState.CurX; x < loopTo1; x++)
+                    var count2 = GameState.CurX + GameState.EditorTileWidth;
+                    for (x = GameState.CurX; x < count2; x++)
                     {
                         if (x >= 0 & x < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX)
                         {
@@ -872,9 +872,9 @@ namespace Client
 
             int layerCount = Enum.GetValues(typeof(MapLayer)).Length;
 
-            for (int x = 0, loopTo = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX; x < loopTo; x++)
+            for (int x = 0, count = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX; x < count; x++)
             {
-                for (int y = 0, loopTo1 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY; y < loopTo1; y++)
+                for (int y = 0, count2 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY; y < count2; y++)
                 {
                     for (int i = 0; i < layerCount; i++)
                     {
@@ -948,9 +948,9 @@ namespace Client
 
             int layerCount = Enum.GetValues(typeof(MapLayer)).Length;
 
-            for (int x = 0, loopTo = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX; x < loopTo; x++)
+            for (int x = 0, count = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX; x < count; x++)
             {
-                for (int y = 0, loopTo1 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY; y < loopTo1; y++)
+                for (int y = 0, count2 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY; y < count2; y++)
                 {
                     for (int i = 0; i < layerCount; i++)
                     {
@@ -1025,11 +1025,11 @@ namespace Client
             GameState.TmpMaxX = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
             GameState.TmpMaxY = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
 
-            var loopTo = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
-            for (x = 0; x < loopTo; x++)
+            var count = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
+            for (x = 0; x < count; x++)
             {
-                var loopTo1 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
-                for (y = 0; y < loopTo1; y++)
+                var count2 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+                for (y = 0; y < count2; y++)
                 {
                     ref var instance = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y];
                     Data.TempTile[x, y].Layer = new Type.Layer[layerCount];
@@ -1072,11 +1072,11 @@ namespace Client
             Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX = GameState.TmpMaxX;
             Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY = GameState.TmpMaxY;
 
-            var loopTo2 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
-            for (x = 0; x < loopTo2; x++)
+            var count2 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
+            for (x = 0; x < count2; x++)
             {
-                var loopTo3 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
-                for (y = 0; y < loopTo3; y++)
+                var count3 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+                for (y = 0; y < count3; y++)
                 {
                     ref var instance1 = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y];
                     Array.Resize(ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer, layerCount);

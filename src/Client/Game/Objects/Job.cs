@@ -14,7 +14,7 @@ namespace Client
         public static void OnStream(int index)
         {
             if (index < 0 || index >= Variables.MaxJobs) return;
-            if (JobBase.Instance.Count <= index)
+            if (Job.Instance.Count <= index)
             {
                 //Sender.SendRequestJob(index);
             }

@@ -2,10 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 
-// Lightweight compatibility shims to remove Microsoft.VisualBasic dependency.
-// Intent: unblock compilation while we migrate call sites to idiomatic C#.
-// Note: VB functions are 1-based where applicable; we mirror that behavior.
-
 public static class Strings
 {
 	public static int Len(string? s) => s?.Length ?? 0;

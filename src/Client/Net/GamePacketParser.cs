@@ -1294,9 +1294,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         if (GameState.ResourceIndex > 0)
         {
-
-            var loopTo = GameState.ResourceIndex;
-            for (i = 0; i < loopTo; i++)
+            var count = GameState.ResourceIndex;
+            for (i = 0; i < count; i++)
             {
                 Core.Objects.MapResource.Instance[i].State = buffer.ReadByte();
                 Core.Objects.MapResource.Instance[i].X = buffer.ReadInt32();
@@ -1927,11 +1926,11 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             for (x = 0; x < Variables.MaxMapNpcs; x++)
                 Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[x] = buffer.ReadInt32();
 
-            var loopTo = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
-            for (x = 0; x < loopTo; x++)
+            var count = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
+            for (x = 0; x < count; x++)
             {
-                var loopTo1 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
-                for (y = 0; y < loopTo1; y++)
+                var count2 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+                for (y = 0; y < count2; y++)
                 {
                     Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data1 = buffer.ReadInt32();
                     Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data2 = buffer.ReadInt32();
@@ -1980,23 +1979,21 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount > 0)
             {
                 Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event = new Core.Globals.Type.Event[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount];
-                var loopTo2 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount;
-                for (i = 0; i < loopTo2; i++)
-                {
-                    {
-                        ref var instance = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i];
-                        instance.Name = buffer.ReadString();
-                        instance.Globals = buffer.ReadByte();
-                        instance.X = buffer.ReadInt32();
-                        instance.Y = buffer.ReadInt32();
-                        instance.PageCount = buffer.ReadInt32();
-                    }
-
+                var count2 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount;
+                for (i = 0; i < count2; i++)
+                {               
+                    ref var instance = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i];
+                    instance.Name = buffer.ReadString();
+                    instance.Globals = buffer.ReadByte();
+                    instance.X = buffer.ReadInt32();
+                    instance.Y = buffer.ReadInt32();
+                    instance.PageCount = buffer.ReadInt32();
+                
                     if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].PageCount > 0)
                     {
                         Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages = new Core.Globals.Type.EventPage[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].PageCount];
-                        var loopTo3 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].PageCount;
-                        for (x = 0; x < loopTo3; x++)
+                        var count3 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].PageCount;
+                        for (x = 0; x < count3; x++)
                         {
                             {
                                 ref var instance1 = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x];
@@ -2034,8 +2031,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
                                 if (instance1.MoveRouteCount > 0)
                                 {
                                     Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].MoveRoute = new Core.Globals.Type.MoveRoute[instance1.MoveRouteCount];
-                                    var loopTo4 = instance1.MoveRouteCount;
-                                    for (y = 0; y < loopTo4; y++)
+                                    var count4 = instance1.MoveRouteCount;
+                                    for (y = 0; y < count4; y++)
                                     {
                                         instance1.MoveRoute[y].Index = buffer.ReadInt32();
                                         instance1.MoveRoute[y].Data1 = buffer.ReadInt32();
@@ -2059,15 +2056,15 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
                             if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandListCount > 0)
                             {
                                 Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList = new Core.Globals.Type.CommandList[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandListCount];
-                                var loopTo5 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandListCount;
-                                for (y = 0; y < loopTo5; y++)
+                                var count5 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandListCount;
+                                for (y = 0; y < count5; y++)
                                 {
                                     Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount = buffer.ReadInt32();
                                     Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].ParentList = buffer.ReadInt32();
                                     if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount > 0)
                                     {
                                         Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].Commands = new Core.Globals.Type.EventCommand[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount];
-                                        for (int z = 0, loopTo6 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount; z < loopTo6; z++)
+                                        for (int z = 0, count6 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount; z < count6; z++)
                                         {
                                             {
                                                 ref var instance2 = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].Commands[z];
@@ -2093,7 +2090,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
                                                 if (instance2.MoveRouteCount > 0)
                                                 {
                                                     Array.Resize(ref instance2.MoveRoute, instance2.MoveRouteCount);
-                                                    for (int w = 0, loopTo7 = instance2.MoveRouteCount; w < loopTo7; w++)
+                                                    for (int w = 0, count7 = instance2.MoveRouteCount; w < count7; w++)
                                                     {
                                                         instance2.MoveRoute[w].Index = buffer.ReadInt32();
                                                         instance2.MoveRoute[w].Data1 = buffer.ReadInt32();
@@ -2142,8 +2139,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
             if (GameState.ResourceIndex > 0)
             {
-                var loopTo8 = GameState.ResourceIndex;
-                for (i = 0; i < loopTo8; i++)
+                var count = GameState.ResourceIndex;
+                for (i = 0; i < count; i++)
                 {
                     Core.Objects.MapResource.Instance[i].State = buffer.ReadByte();
                     Core.Objects.MapResource.Instance[i].X = buffer.ReadInt32();
@@ -2369,91 +2366,87 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount > 0)
         {
             Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event = new Core.Globals.Type.Event[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount];
-            var loopTo = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount;
-            for (i = 0; i < loopTo; i++)
-            {
-                {
-                    ref var instance = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i];
-                    instance.Name = buffer.ReadString();
-                    instance.Globals = buffer.ReadByte();
-                    instance.X = buffer.ReadInt32();
-                    instance.Y = buffer.ReadInt32();
-                    instance.PageCount = buffer.ReadInt32();
-                }
+            var count = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount;
+            for (i = 0; i < count; i++)
+            {                
+                ref var instance = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i];
+                instance.Name = buffer.ReadString();
+                instance.Globals = buffer.ReadByte();
+                instance.X = buffer.ReadInt32();
+                instance.Y = buffer.ReadInt32();
+                instance.PageCount = buffer.ReadInt32();
 
                 if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].PageCount > 0)
                 {
                     Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages = new Core.Globals.Type.EventPage[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].PageCount];
-                    var loopTo1 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].PageCount;
-                    for (x = 0; x < loopTo1; x++)
+                    var count2 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].PageCount;
+                    for (x = 0; x < count2; x++)
                     {
+                        ref var instance1 = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x];
+                        instance1.ChkVariable = buffer.ReadInt32();
+                        instance1.VariableIndex = buffer.ReadInt32();
+                        instance1.VariableCondition = buffer.ReadInt32();
+                        instance1.VariableCompare = buffer.ReadInt32();
+                        instance1.ChkSwitch = buffer.ReadInt32();
+                        instance1.SwitchIndex = buffer.ReadInt32();
+                        instance1.SwitchCompare = buffer.ReadInt32();
+                        instance1.ChkHasItem = buffer.ReadInt32();
+                        instance1.HasItemIndex = buffer.ReadInt32();
+                        instance1.HasItemAmount = buffer.ReadInt32();
+                        instance1.ChkSelfSwitch = buffer.ReadInt32();
+                        instance1.SelfSwitchIndex = buffer.ReadInt32();
+                        instance1.SelfSwitchCompare = buffer.ReadInt32();
+                        instance1.GraphicType = buffer.ReadByte();
+                        instance1.Graphic = buffer.ReadInt32();
+                        instance1.GraphicX = buffer.ReadInt32();
+                        instance1.GraphicY = buffer.ReadInt32();
+                        instance1.GraphicX2 = buffer.ReadInt32();
+                        instance1.GraphicY2 = buffer.ReadInt32();
+
+                        instance1.MoveType = buffer.ReadByte();
+                        instance1.MoveSpeed = buffer.ReadByte();
+                        instance1.MoveFreq = buffer.ReadByte();
+                        instance1.MoveRouteCount = buffer.ReadInt32();
+                        instance1.IgnoreMoveRoute = buffer.ReadInt32();
+                        instance1.RepeatMoveRoute = buffer.ReadInt32();
+
+                        if (instance1.MoveRouteCount > 0)
                         {
-                            ref var instance1 = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x];
-                            instance1.ChkVariable = buffer.ReadInt32();
-                            instance1.VariableIndex = buffer.ReadInt32();
-                            instance1.VariableCondition = buffer.ReadInt32();
-                            instance1.VariableCompare = buffer.ReadInt32();
-                            instance1.ChkSwitch = buffer.ReadInt32();
-                            instance1.SwitchIndex = buffer.ReadInt32();
-                            instance1.SwitchCompare = buffer.ReadInt32();
-                            instance1.ChkHasItem = buffer.ReadInt32();
-                            instance1.HasItemIndex = buffer.ReadInt32();
-                            instance1.HasItemAmount = buffer.ReadInt32();
-                            instance1.ChkSelfSwitch = buffer.ReadInt32();
-                            instance1.SelfSwitchIndex = buffer.ReadInt32();
-                            instance1.SelfSwitchCompare = buffer.ReadInt32();
-                            instance1.GraphicType = buffer.ReadByte();
-                            instance1.Graphic = buffer.ReadInt32();
-                            instance1.GraphicX = buffer.ReadInt32();
-                            instance1.GraphicY = buffer.ReadInt32();
-                            instance1.GraphicX2 = buffer.ReadInt32();
-                            instance1.GraphicY2 = buffer.ReadInt32();
-
-                            instance1.MoveType = buffer.ReadByte();
-                            instance1.MoveSpeed = buffer.ReadByte();
-                            instance1.MoveFreq = buffer.ReadByte();
-                            instance1.MoveRouteCount = buffer.ReadInt32();
-                            instance1.IgnoreMoveRoute = buffer.ReadInt32();
-                            instance1.RepeatMoveRoute = buffer.ReadInt32();
-
-                            if (instance1.MoveRouteCount > 0)
+                            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].MoveRoute = new Core.Globals.Type.MoveRoute[instance1.MoveRouteCount];
+                            var count3 = instance1.MoveRouteCount;
+                            for (y = 0; y < count3; y++)
                             {
-                                Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].MoveRoute = new Core.Globals.Type.MoveRoute[instance1.MoveRouteCount];
-                                var loopTo2 = instance1.MoveRouteCount;
-                                for (y = 0; y < loopTo2; y++)
-                                {
-                                    instance1.MoveRoute[y].Index = buffer.ReadInt32();
-                                    instance1.MoveRoute[y].Data1 = buffer.ReadInt32();
-                                    instance1.MoveRoute[y].Data2 = buffer.ReadInt32();
-                                    instance1.MoveRoute[y].Data3 = buffer.ReadInt32();
-                                    instance1.MoveRoute[y].Data4 = buffer.ReadInt32();
-                                    instance1.MoveRoute[y].Data5 = buffer.ReadInt32();
-                                    instance1.MoveRoute[y].Data6 = buffer.ReadInt32();
-                                }
+                                instance1.MoveRoute[y].Index = buffer.ReadInt32();
+                                instance1.MoveRoute[y].Data1 = buffer.ReadInt32();
+                                instance1.MoveRoute[y].Data2 = buffer.ReadInt32();
+                                instance1.MoveRoute[y].Data3 = buffer.ReadInt32();
+                                instance1.MoveRoute[y].Data4 = buffer.ReadInt32();
+                                instance1.MoveRoute[y].Data5 = buffer.ReadInt32();
+                                instance1.MoveRoute[y].Data6 = buffer.ReadInt32();
                             }
-
-                            instance1.IdleAnim = buffer.ReadInt32();
-                            instance1.DirFix = buffer.ReadInt32();
-                            instance1.WalkThrough = buffer.ReadInt32();
-                            instance1.ShowName = buffer.ReadInt32();
-                            instance1.Trigger = buffer.ReadByte();
-                            instance1.CommandListCount = buffer.ReadInt32();
-                            instance1.Position = buffer.ReadByte();
                         }
+
+                        instance1.IdleAnim = buffer.ReadInt32();
+                        instance1.DirFix = buffer.ReadInt32();
+                        instance1.WalkThrough = buffer.ReadInt32();
+                        instance1.ShowName = buffer.ReadInt32();
+                        instance1.Trigger = buffer.ReadByte();
+                        instance1.CommandListCount = buffer.ReadInt32();
+                        instance1.Position = buffer.ReadByte();
 
                         if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandListCount > 0)
                         {
                             Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList = new Core.Globals.Type.CommandList[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandListCount];
-                            var loopTo3 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandListCount;
-                            for (y = 0; y < loopTo3; y++)
+                            var count4 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandListCount;
+                            for (y = 0; y < count4; y++)
                             {
                                 Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount = buffer.ReadInt32();
                                 Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].ParentList = buffer.ReadInt32();
                                 if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount > 0)
                                 {
                                     Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].Commands = new Core.Globals.Type.EventCommand[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount];
-                                    var loopTo4 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount;
-                                    for (z = 0; z < loopTo4; z++)
+                                    var count5 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount;
+                                    for (z = 0; z < count5; z++)
                                     {
                                         {
                                             ref var instance2 = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].Commands[z];
@@ -2480,8 +2473,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
                                             if (instance2.MoveRouteCount > 0)
                                             {
                                                 instance2.MoveRoute = new Core.Globals.Type.MoveRoute[instance2.MoveRouteCount];
-                                                var loopTo5 = instance2.MoveRouteCount;
-                                                for (w = 0; w < loopTo5; w++)
+                                                var count6 = instance2.MoveRouteCount;
+                                                for (w = 0; w < count6; w++)
                                                 {
                                                     instance2.MoveRoute[w].Index = buffer.ReadInt32();
                                                     instance2.MoveRoute[w].Data1 = buffer.ReadInt32();
@@ -2531,8 +2524,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         else
         {
             Event.EventChatType = 1;
-            var loopTo = choices;
-            for (i = 0; i < loopTo; i++)
+            var count = choices;
+            for (i = 0; i < count; i++)
             {
                 Event.EventChoices[i] = buffer.ReadString();
                 Event.EventChoiceVisible[i] = true;

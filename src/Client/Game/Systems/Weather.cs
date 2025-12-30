@@ -114,10 +114,10 @@ namespace Client
                 {
                     // Create an array to store pixel data
                     var whitePixels = new Microsoft.Xna.Framework.Color[(GameState.ResolutionWidth * GameState.ResolutionHeight)];
-                    var loopTo = 0;
+                    var count = 0;
 
                     // Fill the pixel array with semi-transparent white pixels
-                    for (i = 0, loopTo = whitePixels.Length; i < loopTo; i++)
+                    for (i = 0, count = whitePixels.Length; i < count; i++)
                         whitePixels[i] = new Microsoft.Xna.Framework.Color(255, 255, 255, 150); // White with 150 alpha
 
                     // Set the pixel data for the texture

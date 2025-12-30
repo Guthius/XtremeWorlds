@@ -54,7 +54,7 @@ public sealed class CheckBox : Control
             _ => 0
         };
 
-        TextRenderer.OnDraw(Text, left, Y + y, Color, Color.Black, Font);
+        TextRenderer.Render(Text, left, Y + y, Color, Color.Black, Font);
     }
 
     private void RenderChat(int x, int y)
@@ -67,7 +67,7 @@ public sealed class CheckBox : Control
 
         var left = (int) Math.Round(X + 22 - TextRenderer.GetTextWidth(Text, Font) / 2d + x);
 
-        TextRenderer.OnDraw(Text, left + 8, Y + y + 4, Color, Color.Black, Font);
+        TextRenderer.Render(Text, left + 8, Y + y + 4, Color, Color.Black, Font);
     }
 
     private void RenderBuying(int x, int y)
