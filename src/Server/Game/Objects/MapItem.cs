@@ -53,10 +53,10 @@ namespace Server
                             continue;
                         }
 
-                        Core.Objects.ItemBase item;
+                        Item item;
                         try
                         {
-                            item = items[itemNum];
+                            item = (Item)items[itemNum];
                         }
                         catch (ArgumentOutOfRangeException)
                         {
@@ -84,10 +84,10 @@ namespace Server
                             continue;
                         }
 
-                        Core.Objects.ItemBase item;
+                        Item item;
                         try
                         {
-                            item = items[itemNum];
+                            item = (Item)items[itemNum];
                         }
                         catch (ArgumentOutOfRangeException)
                         {
@@ -123,10 +123,10 @@ namespace Server
                 return;
             }
 
-            Core.Objects.ItemBase item;
+            Item item;
             try
             {
-                item = Item.Instance[itemNum];
+                item = (Item)Item.Instance[itemNum];
             }
             catch (ArgumentOutOfRangeException)
             {
