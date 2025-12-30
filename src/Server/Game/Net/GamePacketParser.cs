@@ -1552,7 +1552,10 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
     {
         // Prevent hacking
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Mapper)
+        {
+            NetworkSend.SendPlayerMessage(session.Id, "Invalid access level.", (int)ColorName.BrightRed);
             return;
+        }
 
         var user = IsEditorLocked(session.Id, EditorType.Map);
 
@@ -1583,7 +1586,10 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
     {
         // Prevent hacking
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        {
+            NetworkSend.SendPlayerMessage(session.Id, "Invalid access level.", (int)ColorName.BrightRed);
             return;
+        }
 
         var user = IsEditorLocked(session.Id, EditorType.Shop);
 
@@ -1649,7 +1655,10 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
     {
         // Prevent hacking
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        {
+            NetworkSend.SendPlayerMessage(session.Id, "Invalid access level.", (int)ColorName.BrightRed);
             return;
+        }
 
         var user = IsEditorLocked(session.Id, EditorType.Skill);
 
@@ -2768,7 +2777,10 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
     {
         // Prevent hacking
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        {
+            NetworkSend.SendPlayerMessage(session.Id, "Invalid access level.", (int)ColorName.BrightRed);
             return;
+        }
 
         var user = IsEditorLocked(session.Id, EditorType.Job);
 
@@ -2855,6 +2867,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
     {
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
         {
+            NetworkSend.SendPlayerMessage(session.Id, "Invalid access level.", (int)ColorName.BrightRed);
             return;
         }
 
@@ -2931,6 +2944,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
     {
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Owner)
         {
+            NetworkSend.SendPlayerMessage(session.Id, "Invalid access level.", (int)ColorName.BrightRed);
             return;
         }
 
@@ -3023,6 +3037,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
     {
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
         {
+            NetworkSend.SendPlayerMessage(session.Id, "Invalid access level.", (int)ColorName.BrightRed);
             return;
         }
 
@@ -3087,6 +3102,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
     {
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
         {
+            NetworkSend.SendPlayerMessage(session.Id, "Invalid access level.", (int)ColorName.BrightRed);
             return;
         }
 
@@ -3192,6 +3208,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
     {
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Mapper)
         {
+            NetworkSend.SendPlayerMessage(session.Id, "Invalid access level.", (int)ColorName.BrightRed);
             return;
         }
 
@@ -3338,6 +3355,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
     {
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
         {
+            NetworkSend.SendPlayerMessage(session.Id, "Invalid access level.", (int)ColorName.BrightRed);
             return;
         }
 
@@ -3512,6 +3530,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
     {
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
         {
+            NetworkSend.SendPlayerMessage(session.Id, "Invalid access level.", (int)ColorName.BrightRed);
             return;
         }
 

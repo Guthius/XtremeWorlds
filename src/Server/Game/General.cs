@@ -507,41 +507,40 @@ public static class General
                     break;
                 }
 
-                // SetPlayerAccess implementation stub
-                void SetPlayerAccess(int id, byte lvl)
-                {
-                    Player.Instance[id].Access = lvl;
-                }
-
                 switch (access)
                 {
                     case (byte)AccessLevel.Player:
                         SetPlayerAccess(playerIndex, access);
                         NetworkSend.SendPlayerData(playerIndex);
+                        await Account.OnSave(playerIndex);
                         NetworkSend.SendPlayerMessage(playerIndex, "Your access has been set to Player!", (int)ColorName.Yellow);
                         Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(playerIndex));
                         break;
                     case (byte)AccessLevel.Moderator:
                         SetPlayerAccess(playerIndex, access);
                         NetworkSend.SendPlayerData(playerIndex);
+                        await Account.OnSave(playerIndex);
                         NetworkSend.SendPlayerMessage(playerIndex, "Your access has been set to Moderator!", (int)ColorName.Yellow);
                         Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(playerIndex));
                         break;
                     case (byte)AccessLevel.Mapper:
                         SetPlayerAccess(playerIndex, access);
                         NetworkSend.SendPlayerData(playerIndex);
+                        await Account.OnSave(playerIndex);
                         NetworkSend.SendPlayerMessage(playerIndex, "Your access has been set to Mapper!", (int)ColorName.Yellow);
                         Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(playerIndex));
                         break;
                     case (byte)AccessLevel.Developer:
                         SetPlayerAccess(playerIndex, access);
                         NetworkSend.SendPlayerData(playerIndex);
+                        await Account.OnSave(playerIndex);
                         NetworkSend.SendPlayerMessage(playerIndex, "Your access has been set to Developer!", (int)ColorName.Yellow);
                         Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(playerIndex));
                         break;
                     case (byte)AccessLevel.Owner:
                         SetPlayerAccess(playerIndex, access);
                         NetworkSend.SendPlayerData(playerIndex);
+                        await Account.OnSave(playerIndex);
                         NetworkSend.SendPlayerMessage(playerIndex, "Your access has been set to Owner!", (int)ColorName.Yellow);
                         Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(playerIndex));
                         break;
