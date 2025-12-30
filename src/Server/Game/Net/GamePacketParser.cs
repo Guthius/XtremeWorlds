@@ -297,15 +297,15 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
             var passwordBytes = buffer.ReadBytes().ToArray();
             var password = System.Text.Encoding.UTF8.GetString(session.Decrypt(passwordBytes)).Replace("\0", "");
 
-        // Get the current executing assembly
-        var assembly = Assembly.GetExecutingAssembly();
+            // Get the current executing assembly
+            var assembly = Assembly.GetExecutingAssembly();
 
-        // Retrieve the version information
+            // Retrieve the version information
             var clientVersionBytes = buffer.ReadBytes().ToArray();
             var serverVersion = assembly.GetName().Version?.ToString();
             var clientVersion = System.Text.Encoding.UTF8.GetString(session.Decrypt(clientVersionBytes));
 
-        // Check versions
+            // Check versions
             if (clientVersion != serverVersion)
             {
                 NetworkSend.SendAlert(session, SystemMessage.ClientOutdated, Menu.Register);
