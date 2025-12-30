@@ -111,10 +111,6 @@ namespace Server
 
             if (data is null)
             {
-                if (Server.Map.Instance.Count <= index)
-                {
-                    Server.Map.Instance.Add(new Map());
-                }
                 OnClear(index);
                 return;
             }
