@@ -12,6 +12,22 @@ public class WinItemEditor
     public static int SelectedIndex = 0;
     private static Item? _history;
 
+    public static void OnTypeChanged(int newType)
+    {
+        // If item data isn't loaded yet, don't attempt to mutate or toggle UI.
+        if (SelectedIndex < 0 || SelectedIndex >= Item.Instance.Count)
+            return;
+
+        var clampedType = (byte)Math.Clamp(newType, 0, byte.MaxValue);
+        if (Item.Instance[SelectedIndex].Type == clampedType)
+            return;
+
+        Item.Instance[SelectedIndex].Type = clampedType;
+        BuildSubtypeList();
+        ToggleTypeSections();
+        Item.IsChanged[SelectedIndex] = true;
+    }
+
     private static string DisplayNameOrNone(string? raw)
     {
         var trimmed = Strings.Trim(raw);
@@ -56,11 +72,7 @@ public class WinItemEditor
         {
             cmbType.CallBack[(int)ControlState.MouseMove] = () =>
             {
-                if (SelectedIndex < 0 || SelectedIndex >= Core.Globals.Variables.MaxItems) return;
-                Item.Instance[SelectedIndex].Type = (byte)Math.Clamp(cmbType.Value, 0, byte.MaxValue);
-                BuildSubtypeList();
-                ToggleTypeSections();
-                Item.IsChanged[SelectedIndex] = true;
+                OnTypeChanged(cmbType.Value);
             };
             // Apply initial visibility state
             ToggleTypeSections();
@@ -330,7 +342,6 @@ public class WinItemEditor
                 cmbSub.Items.Add("SP");
                 cmbSub.Items.Add("Exp");
                 break;
-            case ItemCategory.Event:
             default:
                 // no subtype for other categories
                 break;
@@ -342,7 +353,19 @@ public class WinItemEditor
 
     private static void ToggleTypeSections()
     {
-        var type = (ItemCategory)Item.Instance[SelectedIndex].Type;
+        ItemCategory type;
+        if (SelectedIndex >= 0 && SelectedIndex < Item.Instance.Count)
+        {
+            type = (ItemCategory)Item.Instance[SelectedIndex].Type;
+        }
+        else if (WindowManager.TryGetControl("winItemEditor", "cmbType", out var typeCtrl) && typeCtrl is ComboBox cmbType)
+        {
+            type = (ItemCategory)Math.Clamp(cmbType.Value, 0, byte.MaxValue);
+        }
+        else
+        {
+            type = ItemCategory.Equipment;
+        }
 
         static void SetVisible(string name, bool vis)
         {
@@ -446,6 +469,9 @@ public class WinItemEditor
 
         // Subtype depends on Type; build the list first, then apply selection.
         BuildSubtypeList(item.SubType);
+
+        // Ensure the correct group/field visibility for this item's type.
+        ToggleTypeSections();
         if (WindowManager.TryGetControl("winItemEditor", "cmbAnimation", out var animCtrl) && animCtrl is ComboBox cmbAnim)
             cmbAnim.Value = Math.Clamp(item.Animation, 0, cmbAnim.Items.Count - 1);
         if (WindowManager.TryGetControl("winItemEditor", "cmbBind", out var bindCtrl) && bindCtrl is ComboBox cmbBind)

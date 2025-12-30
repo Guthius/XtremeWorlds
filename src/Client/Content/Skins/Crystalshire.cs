@@ -2093,11 +2093,7 @@ public class Crystalshire
 
         BindCombo("cmbType", v =>
         {
-            if (WinItemEditor.SelectedIndex >= 0)
-            {
-                Item.Instance[WinItemEditor.SelectedIndex].Type = (byte)v;
-                Item.IsChanged[WinItemEditor.SelectedIndex] = true;
-            }
+            WinItemEditor.OnTypeChanged(v);
         });
 
         BindCombo("cmbSubType", v =>
