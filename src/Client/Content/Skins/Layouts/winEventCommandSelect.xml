@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window Name="winEventCommandSelect" Caption="Select Command"
-        Size="420,520"
+		Size="420,485"
 		Icon="338" IconOffset="3,5"
         Design="WindowNormal"
         StartPosition="CenterScreen"
         Visible="false">
 
-	<GroupBox Name="grpCommands" Position="8,24" Size="404,436" Caption="Commands">
+	<GroupBox Name="grpCommands" Position="8,24" Size="404,416" Caption="Commands">
 		<ListBox Name="lstEventCommands" Position="8,28" Size="372,392"/>
 		<ScrollBar Name="sldEventCommands" Position="380,28" Size="16,392" Min="0" Max="0" Vertical="true"/>
 	</GroupBox>
 
-	<Button Name="btnOk" Text="OK" Position="236, 474" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-	<Button Name="btnCancel" Text="Cancel" Position="324, 474" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+	<Button Name="btnOk" Text="OK" Position="126, 449" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+	<Button Name="btnCancel" Text="Cancel" Position="214, 449" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
 
 	<Button Name="btnClose" Position="-19,5" Size="16,16" Image="8" ImageHover="9" ImageMouseDown="10"/>
 </Window>

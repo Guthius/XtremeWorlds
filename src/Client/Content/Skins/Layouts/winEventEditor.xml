@@ -91,6 +91,7 @@
 	<GroupBox Name="grpCommands" Position="8,326" Size="964,244" Caption="Commands">
 		<Button Name="btnAddCommand" Text="Add" Position="8,28" Size="60,22" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 		<Button Name="btnDeleteCommand" Text="Delete" Position="74,28" Size="70,22" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+		<Button Name="btnEditCommand" Text="Edit" Position="150,28" Size="60,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
 		<ListBox Name="lstCommands" Position="8,56" Size="932,176"/>
 		<ScrollBar Name="sldCommands" Position="940,56" Size="16,176" Min="0" Max="0" Vertical="true"/>
 	</GroupBox>

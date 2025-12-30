@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window Name="winEventCommandData" Caption="Command Data"
-        Size="420,360"
+        Size="420,335"
 		Icon="346" IconOffset="3,5"	
         Design="WindowNormal"
         StartPosition="CenterScreen"
@@ -31,8 +31,8 @@
 		<TextBox Name="txtCmdData6" Position="232,182" Size="60,22" Design="TextWhite"/>
 	</GroupBox>
 
-	<Button Name="btnOk" Text="OK" Position="236, 310" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-	<Button Name="btnCancel" Text="Cancel" Position="324, 310" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+	<Button Name="btnOk" Text="OK" Position="126, 300" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+	<Button Name="btnCancel" Text="Cancel" Position="214, 300" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
 
 	<Button Name="btnClose" Position="-19,5" Size="16,16" Image="8" ImageHover="9" ImageMouseDown="10"/>
 </Window>

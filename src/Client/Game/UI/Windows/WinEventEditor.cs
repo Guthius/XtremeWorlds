@@ -44,6 +44,40 @@ public static class WinEventEditor
 
     private const int MaxPageButtons = 28;
 
+    private static string FormatCommandDisplayName(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            return string.Empty;
+
+        // Turn PascalCase/camelCase into spaced words: "ShowText" -> "Show Text".
+        // Also handles digit boundaries: "ShowText2" -> "Show Text 2".
+        var sb = new System.Text.StringBuilder(name.Length + 8);
+        sb.Append(name[0]);
+
+        for (int i = 1; i < name.Length; i++)
+        {
+            char c = name[i];
+            char prev = name[i - 1];
+            char? next = i + 1 < name.Length ? name[i + 1] : null;
+
+            bool isUpper = char.IsUpper(c);
+            bool prevIsLower = char.IsLower(prev);
+            bool prevIsDigit = char.IsDigit(prev);
+            bool isDigit = char.IsDigit(c);
+
+            // Insert a space between lower->upper (aB), digit->letter (2A), letter->digit (A2),
+            // and acronym->word (ABc -> A Bc at the last upper before a lower).
+            bool acronymBoundary = isUpper && next is not null && char.IsLower(next.Value) && char.IsUpper(prev);
+
+            if ((isUpper && prevIsLower) || (isDigit && !prevIsDigit) || (!isDigit && prevIsDigit) || acronymBoundary)
+                sb.Append(' ');
+
+            sb.Append(c);
+        }
+
+        return sb.ToString();
+    }
+
     public static void Init()
     {
         if (!WindowManager.TryGetControl("winEventEditor", "txtName", out _))
@@ -776,6 +810,21 @@ public static class WinEventEditor
         OpenCommandPicker(listIndex, commandIndex, isNew: false);
     }
 
+    public static void OnEditCommand()
+    {
+        if (_isLoading) return;
+        if (!WindowManager.TryGetControl("winEventEditor", "lstCommands", out var ctrl) || ctrl is not ListBox list) return;
+
+        int selectedIndex = list.SelectedIndex;
+        if (selectedIndex < 0 || selectedIndex >= _commandIndexMap.Count) return;
+
+        var (listIndex, commandIndex) = _commandIndexMap[selectedIndex];
+        if (!TryGetCommandAt(listIndex, commandIndex, out var cmd) || cmd.Index < 0)
+            return;
+
+        OpenCommandDataEditor(listIndex, commandIndex, isNew: false);
+    }
+
     public static void OnCommandsListMouseWheel()
     {
         if (!WindowManager.TryGetControl("winEventEditor", "lstCommands", out var ctrl) || ctrl is not ListBox list) return;
@@ -999,7 +1048,7 @@ public static class WinEventEditor
 
         foreach (EventCommand cmd in Enum.GetValues(typeof(EventCommand)))
         {
-            list.AddItem(cmd.ToString());
+            list.AddItem(FormatCommandDisplayName(cmd.ToString()));
             _commandPickerValueMap.Add((int)cmd);
         }
 

@@ -3775,12 +3775,16 @@ public class Crystalshire
         if (WindowManager.TryGetControl("winEventEditor", "btnDeleteCommand", out var btnDelCmd))
             btnDelCmd.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnDeleteCommand;
 
+        // Commands: Edit
+        if (WindowManager.TryGetControl("winEventEditor", "btnEditCommand", out var btnEditCmd))
+            btnEditCmd.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnEditCommand;
+
         // Commands list + scrollbar
         if (WindowManager.TryGetControl("winEventEditor", "lstCommands", out var lstCtrl) && lstCtrl is ListBox lst)
         {
             lst.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnCommandsListMouseDown;
             lst.CallBack[(int)ControlState.MouseScroll] = WinEventEditor.OnCommandsListMouseWheel;
-            lst.CallBack[(int)ControlState.DoubleClick] = WinEventEditor.OnCommandsListDoubleClick;
+            lst.CallBack[(int)ControlState.DoubleClick] = WinEventEditor.OnEditCommand;
         }
 
         if (WindowManager.TryGetControl("winEventEditor", "sldCommands", out var sldCtrl) && sldCtrl is ScrollBar sb)
