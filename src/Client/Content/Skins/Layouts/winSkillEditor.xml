@@ -27,25 +27,25 @@
 		<ScrollBar Name="sldIcon" Position="140,122" Size="200,14" Min="0" Max="1024" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 
 		<Label Name="lblDamage" Text="Damage" Position="12,156" Size="120,18"/>
-		<ScrollBar Name="sldDamage" Position="140,156" Size="200,14" Min="0" Max="100000" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+		<TextBox Name="txtDamage" Position="140,154" Size="220,22" Design="TextWhite"/>
 
 		<Label Name="lblMpCost" Text="MP Cost" Position="12,180" Size="120,18"/>
-		<ScrollBar Name="sldMpCost" Position="140,180" Size="200,14" Min="0" Max="1024" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+		<TextBox Name="txtMpCost" Position="140,178" Size="220,22" Design="TextWhite"/>
 
 		<Label Name="lblSpCost" Text="SP Cost" Position="12,204" Size="120,18"/>
-		<ScrollBar Name="sldSpCost" Position="140,204" Size="200,14" Min="0" Max="1024" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+		<TextBox Name="txtSpCost" Position="140,202" Size="220,22" Design="TextWhite"/>
 
 		<Label Name="lblCooldown" Text="Cooldown" Position="12,228" Size="120,18"/>
-		<ScrollBar Name="sldCooldown" Position="140,228" Size="200,14" Min="0" Max="60000" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+		<TextBox Name="txtCooldown" Position="140,226" Size="220,22" Design="TextWhite"/>
 
 		<Label Name="lblRange" Text="Range" Position="12,252" Size="120,18"/>
 		<ScrollBar Name="sldRange" Position="140,252" Size="200,14" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 
 		<Label Name="lblCastTime" Text="Cast Time" Position="12,276" Size="120,18"/>
-		<ScrollBar Name="sldCastTime" Position="140,276" Size="200,14" Min="0" Max="10000" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+		<TextBox Name="txtCastTime" Position="140,274" Size="220,22" Design="TextWhite"/>
 
 		<Label Name="lblAoe" Text="AoE Radius" Position="12,300" Size="120,18"/>
-		<ScrollBar Name="sldAoE" Position="140,300" Size="200,14" Min="0" Max="12" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+		<ScrollBar Name="sldAoE" Position="140,300" Size="200,14" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 
 		<Label Name="lblProjectile" Text="Projectile" Position="12,324" Size="120,18"/>
 		<ComboBox Name="cmbProjectile" Position="140,322" Size="220,20"/>

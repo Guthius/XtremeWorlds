@@ -20,6 +20,7 @@ public class SkillBase : IData
     public string Name { get; set; }
     public byte Type { get; set; }
     public int MpCost { get; set; }
+    public int SpCost { get; set; }
     public int LevelReq { get; set; }
     public int AccessReq { get; set; }
     public int JobReq { get; set; }

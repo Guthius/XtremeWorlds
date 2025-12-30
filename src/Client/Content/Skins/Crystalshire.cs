@@ -15,11 +15,9 @@ public class Crystalshire
 {
     private static string GetLiveText(TextBox tb)
     {
-        // TextBox.Render shows Text + GameState.ChatShowLine when active;
-        // Text itself may not update until focus/commit.
-        var committed = tb.Text ?? string.Empty;
+        var committed = tb.Text;
         var live = ReferenceEquals(WindowManager.ActiveWindow?.ActiveControl, tb)
-            ? committed + (GameState.ChatShowLine ?? string.Empty)
+            ? committed + (GameState.ChatShowLine)
             : committed;
 
         return live.Replace("\0", string.Empty);
@@ -246,11 +244,9 @@ public class Crystalshire
 
         static string GetLiveText(TextBox tb)
         {
-            // TextBox.Render shows Text + GameState.ChatShowLine when active;
-            // Text itself may not update until focus/commit.
-            var committed = tb.Text ?? string.Empty;
+            var committed = tb.Text;
             var live = ReferenceEquals(WindowManager.ActiveWindow?.ActiveControl, tb)
-                ? committed + (GameState.ChatShowLine ?? string.Empty)
+                ? committed + (GameState.ChatShowLine)
                 : committed;
 
             return live.Replace("\0", string.Empty);
@@ -307,7 +303,7 @@ public class Crystalshire
 
                 // Name & Music & Shop & Moral
                 if (WindowManager.TryGetControl("winMapEditor", "txtName", out var txtNameCtrl))
-                    Client.Map.Instance[mapIndex].Name = txtNameCtrl.Text?.Trim() ?? string.Empty;
+                    Client.Map.Instance[mapIndex].Name = txtNameCtrl.Text?.Trim();
                 if (WindowManager.TryGetControl("winMapEditor", "cmbMusic", out var musicCtrl) && musicCtrl is ComboBox cmbMusic)
                 {
                     var id = Math.Clamp(cmbMusic.Value, 0, cmbMusic.Items.Count - 1);
@@ -588,7 +584,7 @@ public class Crystalshire
                     {
                         if (WindowManager.TryGetControl("winAdmin", "lstMaps", out var listCtrl) && listCtrl is ListBox lst)
                         {
-                            var lines = (lst.Text ?? string.Empty).Split('\n');
+                            var lines = (lst.Text).Split('\n');
                             if (lines.Length == 0) return;
                             var start = Math.Clamp(lst.Value, 0, Math.Max(0, lines.Length - 1));
                             var line = lines[start];
@@ -1981,6 +1977,25 @@ public class Crystalshire
             }
         }, -1000, 1000);
 
+        // Equipment fields: use textboxes (precision edit)
+        BindIntText("txtDamage", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Item.Instance[WinItemEditor.SelectedIndex].Data2 = v;
+                Item.IsChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        }, 0, 100000000);
+
+        BindIntText("txtSpeed", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Item.Instance[WinItemEditor.SelectedIndex].Speed = v;
+                Item.IsChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        }, 0, 100000000);
+
         // Event id / value reuse Data1 / Data2
         BindIntText("txtEventId", v =>
         {
@@ -1999,6 +2014,34 @@ public class Crystalshire
                 Item.IsChanged[WinItemEditor.SelectedIndex] = true;
             }
         }, 0, int.MaxValue);
+
+        // Event style (match NPC/Resource common event UI): CommonEventType + CommonEventData1 + CommonEventData2
+        BindCombo("cmbEventType", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Item.Instance[WinItemEditor.SelectedIndex].CommonEventType = (byte)Math.Clamp(v, 0, byte.MaxValue);
+                Item.IsChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        });
+
+        BindIntText("txtEventData1", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Item.Instance[WinItemEditor.SelectedIndex].CommonEventData1 = v;
+                Item.IsChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        }, int.MinValue, int.MaxValue);
+
+        BindIntText("txtEventData2", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Item.Instance[WinItemEditor.SelectedIndex].CommonEventData2 = v;
+                Item.IsChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        }, int.MinValue, int.MaxValue);
 
         // Requirements via sliders
         void BindReqStatSlider(string name, Func<int> get, Action<int> apply)
@@ -2513,7 +2556,7 @@ public class Crystalshire
                     }
                     else
                     {
-                        var lines = (lst.Text ?? string.Empty).Split('\n');
+                        var lines = (lst.Text).Split('\n');
                         if (lines.Length == 0) return;
                         var start = Math.Clamp(lst.Value, 0, Math.Max(0, lines.Length - 1));
                         line = lines[start];
@@ -2662,7 +2705,7 @@ public class Crystalshire
             txtName.CallBack[(int)ControlState.KeyUp] = () =>
             {
                 int id = WinShopEditor.SelectedIndex; if (id < 0 || id >= Variables.MaxShops) return;
-                var newName = txtName.Text ?? string.Empty;
+                var newName = txtName.Text;
                 Shop.Instance[id].Name = newName;
                 GameState.ShopChanged[id] = true;
 
@@ -2832,7 +2875,7 @@ public class Crystalshire
             txtName.CallBack[(int)ControlState.KeyUp] = () =>
             {
                 int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return;
-                var newName = txtName.Text ?? string.Empty;
+                var newName = txtName.Text;
                 Job.Instance[id].Name = newName;
                 Job.IsChanged[id] = true;
 
@@ -2853,11 +2896,10 @@ public class Crystalshire
             int id = WinJobEditor.SelectedIndex;
             if (id >= 0 || id < Job.Instance.Count)
             {
-                txtDesc.Enabled = true;
                 txtDesc.CallBack[(int)ControlState.KeyUp] = () =>
                 {
                     if (id < 0 || id >= Job.Instance.Count) return;
-                    Job.Instance[id].Desc = txtDesc.Text ?? string.Empty;
+                    Job.Instance[id].Desc = txtDesc.Text;
                     Job.IsChanged[id] = true;
                 };
             }
@@ -3203,7 +3245,7 @@ public class Crystalshire
             txtName.CallBack[(int)ControlState.KeyUp] = () =>
             {
                 int id = WinMoralEditor.SelectedIndex; if (id < 0 || id >= Variables.MaxMorals) return;
-                var newName = txtName.Text ?? string.Empty;
+                var newName = txtName.Text;
                 Moral.Instance[id].Name = newName;
                 Moral.IsChanged[id] = true;
 
@@ -3292,7 +3334,7 @@ public class Crystalshire
             txtName.CallBack[(int)ControlState.KeyUp] = () =>
             {
                 int id = WinProjectileEditor.SelectedIndex; if (id < 0 || id >= Variables.MaxProjectiles) return;
-                var newName = txtName.Text ?? string.Empty;
+                var newName = txtName.Text;
                 Projectile.Instance[id].Name = newName;
                 GameState.ProjectileChanged[id] = true;
 
@@ -3562,7 +3604,7 @@ public class Crystalshire
                 int id = WinSkillEditor.SelectedIndex;
                 if (id >= 0 && id < Variables.MaxSkills && Skill.Instance.Count > id)
                 {
-                    var newName = txtName.Text ?? string.Empty;
+                    var newName = txtName.Text;
                     Skill.Instance[id].Name = newName;
                     GameState.SkillChanged[id] = true;
 
@@ -3596,6 +3638,22 @@ public class Crystalshire
             }
         }
 
+        // Helper to bind an integer textbox with clamping.
+        void BindRangedIntText(string name, int min, int max, Action<int> apply)
+        {
+            if (WindowManager.TryGetControl("winSkillEditor", name, out var c) && c is TextBox tb)
+            {
+                tb.Enabled = true;
+                tb.CallBack[(int)ControlState.KeyUp] = () =>
+                {
+                    var s = GetLiveText(tb).Trim();
+                    if (!int.TryParse(s, out var v)) v = min;
+                    v = Math.Clamp(v, min, max);
+                    apply(v);
+                };
+            }
+        }
+
         // Icon
         BindSlider("sldIcon", 0, Math.Max(0, GameState.NumSkills), v =>
         {
@@ -3608,7 +3666,7 @@ public class Crystalshire
         });
 
         // Damage/Vital amount
-        BindSlider("sldDamage", 0, 100000, v =>
+        BindRangedIntText("txtDamage", 0, 100000, v =>
         {
             int i = WinSkillEditor.SelectedIndex;
             if (i >= 0 && i < Variables.MaxSkills && Skill.Instance.Count > i)
@@ -3619,7 +3677,7 @@ public class Crystalshire
         });
 
         // MP cost
-        BindSlider("sldMpCost", 0, 1024, v =>
+        BindRangedIntText("txtMpCost", 0, 1024, v =>
         {
             int i = WinSkillEditor.SelectedIndex;
             if (i >= 0 && i < Variables.MaxSkills && Skill.Instance.Count > i)
@@ -3629,8 +3687,19 @@ public class Crystalshire
             }
         });
 
+        // SP cost
+        BindRangedIntText("txtSpCost", 0, 1024, v =>
+        {
+            int i = WinSkillEditor.SelectedIndex;
+            if (i >= 0 && i < Variables.MaxSkills && Skill.Instance.Count > i)
+            {
+                Skill.Instance[i].SpCost = v;
+                GameState.SkillChanged[i] = true;
+            }
+        });
+
         // Cast time
-        BindSlider("sldCastTime", 0, 10000, v =>
+        BindRangedIntText("txtCastTime", 0, 10000, v =>
         {
             int i = WinSkillEditor.SelectedIndex;
             if (i >= 0 && i < Variables.MaxSkills && Skill.Instance.Count > i)
@@ -3641,7 +3710,7 @@ public class Crystalshire
         });
 
         // Cooldown
-        BindSlider("sldCooldown", 0, 60000, v =>
+        BindRangedIntText("txtCooldown", 0, 60000, v =>
         {
             int i = WinSkillEditor.SelectedIndex;
             if (i >= 0 && i < Variables.MaxSkills && Skill.Instance.Count > i)

@@ -28,6 +28,12 @@ namespace Core.Objects
         public int Data1;
         public int Data2;
         public int Data3;
+
+        // Common event trigger (match NPC/Skill/Resource editors)
+        // 0 = None, 1..N = (CommonEventTrigger + 1)
+        public byte CommonEventType;
+        public int CommonEventData1;
+        public int CommonEventData2;
         public int JobReq;
         public int AccessReq;
         public int LevelReq;

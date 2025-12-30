@@ -765,6 +765,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         skill.MoveSpeedMultiplier = packetReader.ReadSingle();
 
+        skill.SpCost = packetReader.ReadInt32();
+
         // Update the skill
         Skill.Instance.Add(skill);
 
@@ -1160,7 +1162,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         int statCount = System.Enum.GetValues(typeof(Stat)).Length;
         for (i = 0; i < statCount; i++)
-            item.AddStat[i] = (byte)buffer.ReadInt32();
+            item.AddStat[i] = buffer.ReadInt32();
 
         item.Animation = buffer.ReadInt32();
         item.BindType = buffer.ReadByte();
@@ -1169,29 +1171,34 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         item.Data2 = buffer.ReadInt32();
         item.Data3 = buffer.ReadInt32();
         item.LevelReq = buffer.ReadInt32();
-        item.Mastery = (byte)buffer.ReadInt32();
+        item.Mastery = buffer.ReadByte();
         item.Name = buffer.ReadString();
         item.Paperdoll = buffer.ReadInt32();
         item.Icon = buffer.ReadInt32();
         item.Price = buffer.ReadInt32();
-        item.Rarity = (byte)buffer.ReadInt32();
+        item.Rarity = buffer.ReadByte();
         item.Speed = buffer.ReadInt32();
 
-        item.Stackable = (byte)buffer.ReadInt32();
+        item.Stackable = buffer.ReadByte();
         item.Description = buffer.ReadString();
 
         for (i = 0; i < statCount; i++)
-            item.StatReq[i] = (byte)buffer.ReadInt32();
+            item.StatReq[i] = buffer.ReadInt32();
 
-        item.Type = (byte)buffer.ReadInt32();
-        item.SubType = (byte)buffer.ReadInt32();
-        item.ItemLevel = (byte)buffer.ReadInt32();
+        item.Type = buffer.ReadByte();
+        item.SubType = buffer.ReadByte();
+        item.ItemLevel = buffer.ReadByte();
 
-        item.KnockBack = (byte)buffer.ReadInt32();
-        item.KnockBackTiles = (byte)buffer.ReadInt32();
+        item.KnockBack = buffer.ReadByte();
+        item.KnockBackTiles = buffer.ReadByte();
 
         item.Projectile = buffer.ReadInt32();
         item.Ammo = buffer.ReadInt32();
+
+        // Common event trigger (0=None; 1.. = CommonEventTrigger + 1)
+        item.CommonEventType = buffer.ReadByte();
+        item.CommonEventData1 = buffer.ReadInt32();
+        item.CommonEventData2 = buffer.ReadInt32();
 
         if (n == GameState.DescLastItem)
         {

@@ -319,11 +319,9 @@ public static class WinEventEditor
 
     private static string GetLiveText(TextBox tb)
     {
-        // In this UI framework, TextBox.Render shows Text + GameState.ChatShowLine when active;
-        // Text itself may not update until focus/commit. Read the same "live" value for bindings.
-        var committed = tb.Text ?? string.Empty;
+        var committed = tb.Text;
         var live = ReferenceEquals(WindowManager.ActiveWindow?.ActiveControl, tb)
-            ? committed + (GameState.ChatShowLine ?? string.Empty)
+            ? committed + (GameState.ChatShowLine)
             : committed;
 
         return live.Replace("\0", string.Empty);

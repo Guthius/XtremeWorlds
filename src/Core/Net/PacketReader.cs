@@ -8,6 +8,8 @@ public ref struct PacketReader(ReadOnlyMemory<byte> memory)
 {
     private ReadOnlyMemory<byte> _memory = memory;
 
+    public int RemainingBytes => _memory.Length;
+
     private void EnsureBytesAvailable(int count)
     {
         if (count > _memory.Length)

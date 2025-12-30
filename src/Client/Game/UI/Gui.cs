@@ -199,7 +199,7 @@ public class WindowManager
             Alpha = alpha,
             XOffset = xOffset,
             YOffset = yOffset,
-            ZOrder = window.Controls.Count,
+            ZOrder = ZOrderCon,
             Censor = censor,
             Icon = icon,
             Design = designNorm,

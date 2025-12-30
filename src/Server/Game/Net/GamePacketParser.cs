@@ -1732,6 +1732,9 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
 
         Skill.Instance[skillNum].MoveSpeedMultiplier = buffer.ReadSingle();
 
+        // Optional trailing fields (backward compatible)
+        Skill.Instance[skillNum].SpCost = buffer.RemainingBytes >= sizeof(int) ? buffer.ReadInt32() : 0;
+
         // Save it
         NetworkSend.SendUpdateSkillToAll(skillNum);
         Skill.OnSave(skillNum);
@@ -3241,7 +3244,7 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var statCount = Enum.GetNames<Stat>().Length;
         for (var i = 0; i < statCount; i++)
         {
-            Item.Instance[index].AddStat[i] = (byte)packetReader.ReadInt32();
+            Item.Instance[index].AddStat[i] = packetReader.ReadInt32();
         }
 
         Item.Instance[index].Animation = packetReader.ReadInt32();
@@ -3251,28 +3254,33 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Item.Instance[index].Data2 = packetReader.ReadInt32();
         Item.Instance[index].Data3 = packetReader.ReadInt32();
         Item.Instance[index].LevelReq = packetReader.ReadInt32();
-        Item.Instance[index].Mastery = (byte)packetReader.ReadInt32();
+        Item.Instance[index].Mastery = packetReader.ReadByte();
         Item.Instance[index].Name = packetReader.ReadString();
         Item.Instance[index].Paperdoll = packetReader.ReadInt32();
         Item.Instance[index].Icon = packetReader.ReadInt32();
         Item.Instance[index].Price = packetReader.ReadInt32();
-        Item.Instance[index].Rarity = (byte)packetReader.ReadInt32();
+        Item.Instance[index].Rarity = packetReader.ReadByte();
         Item.Instance[index].Speed = packetReader.ReadInt32();
-        Item.Instance[index].Stackable = (byte)packetReader.ReadInt32();
+        Item.Instance[index].Stackable = packetReader.ReadByte();
         Item.Instance[index].Description = packetReader.ReadString();
 
         for (var i = 0; i < statCount; i++)
         {
-            Item.Instance[index].StatReq[i] = (byte)packetReader.ReadInt32();
+            Item.Instance[index].StatReq[i] = packetReader.ReadInt32();
         }
 
-        Item.Instance[index].Type = (byte)packetReader.ReadInt32();
-        Item.Instance[index].SubType = (byte)packetReader.ReadInt32();
-        Item.Instance[index].ItemLevel = (byte)packetReader.ReadInt32();
-        Item.Instance[index].KnockBack = (byte)packetReader.ReadInt32();
-        Item.Instance[index].KnockBackTiles = (byte)packetReader.ReadInt32();
+        Item.Instance[index].Type = packetReader.ReadByte();
+        Item.Instance[index].SubType = packetReader.ReadByte();
+        Item.Instance[index].ItemLevel = packetReader.ReadByte();
+        Item.Instance[index].KnockBack = packetReader.ReadByte();
+        Item.Instance[index].KnockBackTiles = packetReader.ReadByte();
         Item.Instance[index].Projectile = packetReader.ReadInt32();
         Item.Instance[index].Ammo = packetReader.ReadInt32();
+
+        Item.Instance[index].CommonEventType = packetReader.ReadByte();
+        Item.Instance[index].CommonEventData1 = packetReader.ReadInt32();
+        Item.Instance[index].CommonEventData2 = packetReader.ReadInt32();
+    
         Item.OnSave(index);
 
         General.Logger.LogInformation("{AccountName} saved item #{ItemNum}",

@@ -407,11 +407,21 @@ public class Script
         }
         else
         {
-            // Item-driven common events use SubType as the trigger enum (0..)
+            var item = Item.Instance[itemNum];
+
+            // Items now use the same encoding as NPC/Skill/Resource editors:
+            // 0 = none, 1..N = (CommonEventTrigger + 1).
+            // Backward compatibility: older items stored trigger in SubType/Data1/Data2.
+            if (item.CommonEventType > 0)
+            {
+                TriggerCommonEvent(index, item.CommonEventType, item.CommonEventData1, item.CommonEventData2);
+                return;
+            }
+
             TriggerCommonEventRaw(index,
-                Item.Instance[itemNum].SubType,
-                Item.Instance[itemNum].Data1,
-                Item.Instance[itemNum].Data2);
+                item.SubType,
+                item.Data1,
+                item.Data2);
         }
     }
 
@@ -721,6 +731,12 @@ public class Script
         if (GetPlayerVital(PlayerIndex, Core.Globals.Vital.Mana) < skill.MpCost)
         {
             NetworkSend.SendPlayerMessage(PlayerIndex, "Not enough mana.", (int)ColorName.BrightRed);
+            return;
+        }
+
+        if (GetPlayerVital(PlayerIndex, Core.Globals.Vital.Stamina) < skill.SpCost)
+        {
+            NetworkSend.SendPlayerMessage(PlayerIndex, "Not enough stamina.", (int)ColorName.BrightRed);
             return;
         }
 
@@ -1641,7 +1657,7 @@ public class Script
         if (skillId < 0 || skillId >= Skill.Instance.Count) return;
         var skill = Skill.Instance[skillId];
 
-        // Re-check mana just before execution (Player or npc could have spent mana meanwhile)
+        // Re-check resource costs just before execution (Player or npc could have spent resources meanwhile)
         if (skill.MpCost > 0)
         {
             if (entity.Type == Core.Globals.Entity.EntityType.Player)
@@ -1651,6 +1667,18 @@ public class Script
             else if (entity.Type == Core.Globals.Entity.EntityType.Npc)
             {
                 if (entity.Vital == null || entity.Vital.Length <= (int)Core.Globals.Vital.Mana || entity.Vital[(int)Core.Globals.Vital.Mana] < skill.MpCost) return;
+            }
+        }
+
+        if (skill.SpCost > 0)
+        {
+            if (entity.Type == Core.Globals.Entity.EntityType.Player)
+            {
+                if (GetPlayerVital(entity.Id, Core.Globals.Vital.Stamina) < skill.SpCost) return;
+            }
+            else if (entity.Type == Core.Globals.Entity.EntityType.Npc)
+            {
+                if (entity.Vital == null || entity.Vital.Length <= (int)Core.Globals.Vital.Stamina || entity.Vital[(int)Core.Globals.Vital.Stamina] < skill.SpCost) return;
             }
         }
 
@@ -2008,6 +2036,22 @@ public class Script
                 caster.Vital[(int)Core.Globals.Vital.Mana] = Math.Max(0, caster.Vital[(int)Core.Globals.Vital.Mana] - skill.MpCost);
             }
         }
+
+        if (skill.SpCost > 0)
+        {
+            if (caster.Type == Core.Globals.Entity.EntityType.Player)
+            {
+                int pid = caster.Id;
+                int cur = GetPlayerVital(pid, Core.Globals.Vital.Stamina);
+                SetPlayerVital(pid, Core.Globals.Vital.Stamina, Math.Max(0, cur - skill.SpCost));
+                NetworkSend.SendVital(pid, Core.Globals.Vital.Stamina);
+            }
+            else if (caster.Type == Core.Globals.Entity.EntityType.Npc && caster.Vital != null && caster.Vital.Length > (int)Core.Globals.Vital.Stamina)
+            {
+                caster.Vital[(int)Core.Globals.Vital.Stamina] = Math.Max(0, caster.Vital[(int)Core.Globals.Vital.Stamina] - skill.SpCost);
+            }
+        }
+        
         if (caster.Type == Core.Globals.Entity.EntityType.Player && PlayerSkillSlot >= 0)
         {
             int pid = caster.Id;

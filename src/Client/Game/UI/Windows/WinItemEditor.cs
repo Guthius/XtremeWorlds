@@ -269,6 +269,15 @@ public class WinItemEditor
             }
         }
 
+        // Event type list (matches server common event types used by items)
+        if (WindowManager.TryGetControl("winItemEditor", "cmbEventType", out var evtCtrl) && evtCtrl is ComboBox cmbEvt)
+        {
+            cmbEvt.Items.Clear();
+            cmbEvt.Items.Add("None");
+            foreach (var name in Enum.GetNames(typeof(CommonEventTrigger)))
+                cmbEvt.Items.Add(name);
+        }
+
         // Ammo list (0 = None, then items)
         if (WindowManager.TryGetControl("winItemEditor", "cmbAmmo", out var ammoCtrl) && ammoCtrl is ComboBox cmbAmmo)
         {
@@ -322,11 +331,6 @@ public class WinItemEditor
                 cmbSub.Items.Add("Exp");
                 break;
             case ItemCategory.Event:
-                cmbSub.Items.Add("Switches");
-                cmbSub.Items.Add("Variables");
-                cmbSub.Items.Add("Key");
-                cmbSub.Items.Add("Custom Script");
-                break;
             default:
                 // no subtype for other categories
                 break;
@@ -374,6 +378,10 @@ public class WinItemEditor
         bool isProjectile = type == ItemCategory.Projectile;
         bool isEvent = type == ItemCategory.Event;
 
+        // SubType combobox is used for equipment/consumable; for Event we show an inline event-type selector.
+        SetVisible("lblSubType", !isEvent);
+        SetVisible("cmbSubType", !isEvent);
+
         // Consumable controls
         SetVisible("lblVitalMod", isConsumable);
         SetVisible("txtVitalMod", isConsumable);
@@ -390,10 +398,12 @@ public class WinItemEditor
 
         // Event controls
         SetVisible("lblEventHeader", isEvent);
-        SetVisible("lblEventId", isEvent);
-        SetVisible("txtEventId", isEvent);
-        SetVisible("lblEventValue", isEvent);
-        SetVisible("txtEventValue", isEvent);
+        SetVisible("lblEventType", isEvent);
+        SetVisible("cmbEventType", isEvent);
+        SetVisible("lblEventData1", isEvent);
+        SetVisible("txtEventData1", isEvent);
+        SetVisible("lblEventData2", isEvent);
+        SetVisible("txtEventData2", isEvent);
     }
 
     public static void OnLoad(int index)
@@ -506,10 +516,27 @@ public class WinItemEditor
             cmbProj.Value = Math.Clamp(item.Projectile + 1, 0, cmbProj.Items.Count - 1);
         if (WindowManager.TryGetControl("winItemEditor", "cmbAmmo", out var ammoCtrl) && ammoCtrl is ComboBox cmbAmmo)
             cmbAmmo.Value = Math.Clamp(item.Ammo + 1, 0, cmbAmmo.Items.Count - 1);
-        if (WindowManager.TryGetControl("winItemEditor", "txtEventId", out var eIdCtrl) && eIdCtrl is TextBox txtEId)
-            txtEId.Text = item.Data1.ToString();
-        if (WindowManager.TryGetControl("winItemEditor", "txtEventValue", out var eValCtrl) && eValCtrl is TextBox txtEVal)
-            txtEVal.Text = item.Data2.ToString();
+        if (WindowManager.TryGetControl("winItemEditor", "cmbEventType", out var evtCtrl) && evtCtrl is ComboBox cmbEvt)
+        {
+            var ceType = item.CommonEventType;
+            var ce1 = item.CommonEventData1;
+            var ce2 = item.CommonEventData2;
+
+            // Legacy items stored event trigger in SubType/Data1/Data2.
+            if ((ItemCategory)item.Type == ItemCategory.Event && ceType == 0)
+            {
+                ceType = (byte)(item.SubType + 1);
+                ce1 = item.Data1;
+                ce2 = item.Data2;
+            }
+
+            cmbEvt.Value = Math.Clamp(ceType, 0, Math.Max(0, cmbEvt.Items.Count - 1));
+
+            if (WindowManager.TryGetControl("winItemEditor", "txtEventData1", out var eD1Ctrl) && eD1Ctrl is TextBox txtED1)
+                txtED1.Text = ce1.ToString();
+            if (WindowManager.TryGetControl("winItemEditor", "txtEventData2", out var eD2Ctrl) && eD2Ctrl is TextBox txtED2)
+                txtED2.Text = ce2.ToString();
+        }
 
         ToggleTypeSections();
 

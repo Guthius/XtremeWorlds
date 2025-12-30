@@ -65,10 +65,12 @@
 
         <!-- Event -->
         <Label Name="lblEventHeader" Text="Event" Position="8, 12" Size="60, 16"/>
-        <Label Name="lblEventId" Text="Id" Position="80, 12" Size="30, 16"/>
-        <TextBox Name="txtEventId" Position="116, 10" Size="60, 20" Design="TextWhite"/>
-        <Label Name="lblEventValue" Text="Value" Position="182, 12" Size="80, 16"/>
-        <TextBox Name="txtEventValue" Position="266, 10" Size="80, 20" Design="TextWhite"/>
+        <Label Name="lblEventType" Text="Type" Position="80, 12" Size="40, 16"/>
+        <ComboBox Name="cmbEventType" Position="116, 10" Size="160, 18"/>
+        <Label Name="lblEventData1" Text="Data 1" Position="288, 12" Size="60, 16"/>
+        <TextBox Name="txtEventData1" Position="348, 10" Size="80, 20" Design="TextWhite"/>
+        <Label Name="lblEventData2" Text="Data 2" Position="440, 12" Size="60, 16"/>
+        <TextBox Name="txtEventData2" Position="500, 10" Size="80, 20" Design="TextWhite"/>
 
         <!-- Skill -->
         <Label Name="lblSkillHeader" Text="Skill" Position="8, 12" Size="60, 16"/>

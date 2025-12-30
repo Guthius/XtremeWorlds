@@ -442,6 +442,8 @@ public static class NetworkSend
         packetWriter.WriteInt32(skill.CommonEventData2);
 
         packetWriter.WriteSingle(skill.MoveSpeedMultiplier);
+
+        packetWriter.WriteInt32(skill.SpCost);
     }
 
     public static void SendStats(int playerId)
@@ -1578,13 +1580,17 @@ public static class NetworkSend
             packet.WriteInt32(item.StatReq[i]);
         }
 
-        packet.WriteInt32(item.Type);
-        packet.WriteInt32(item.SubType);
-        packet.WriteInt32(item.ItemLevel);
-        packet.WriteInt32(item.KnockBack);
-        packet.WriteInt32(item.KnockBackTiles);
+        packet.WriteByte(item.Type);
+        packet.WriteByte(item.SubType);
+        packet.WriteByte(item.ItemLevel);
+        packet.WriteByte(item.KnockBack);
+        packet.WriteByte(item.KnockBackTiles);
         packet.WriteInt32(item.Projectile);
         packet.WriteInt32(item.Ammo);
+
+        packet.WriteByte(item.CommonEventType);
+        packet.WriteInt32(item.CommonEventData1);
+        packet.WriteInt32(item.CommonEventData2);
     }
 
      public static void WriteJobDataToPacket(int index, PacketWriter packetWriter)

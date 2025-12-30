@@ -149,18 +149,21 @@ public class WinSkillEditor
             sldIcon.Value = Math.Clamp(s.Icon, sldIcon.Min, sldIcon.Max);
         }
 
-        // Damage/Vital amount
-        if (WindowManager.TryGetControl("winSkillEditor", "sldDamage", out var dmgCtrl) && dmgCtrl is ScrollBar sldDmg)
-        {
-            sldDmg.Min = 0; sldDmg.Max = 100000;
-            sldDmg.Value = Math.Clamp(s.Vital, sldDmg.Min, sldDmg.Max);
-        }
-
         // MP cost
         if (WindowManager.TryGetControl("winSkillEditor", "sldMpCost", out var mpCtrl) && mpCtrl is ScrollBar sldMp)
         {
             sldMp.Min = 0; sldMp.Max = 1024;
             sldMp.Value = Math.Clamp(s.MpCost, sldMp.Min, sldMp.Max);
+        }
+        if (WindowManager.TryGetControl("winSkillEditor", "txtMpCost", out var mpTxtCtrl) && mpTxtCtrl is TextBox txtMp)
+        {
+            txtMp.Text = s.MpCost.ToString();
+        }
+
+        // SP Cost
+        if (WindowManager.TryGetControl("winSkillEditor", "txtSpCost", out var spTxtCtrl) && spTxtCtrl is TextBox txtSp)
+        {
+            txtSp.Text = s.SpCost.ToString();
         }
 
         // Cooldown
@@ -168,6 +171,10 @@ public class WinSkillEditor
         {
             sldCd.Min = 0; sldCd.Max = 60000;
             sldCd.Value = Math.Clamp(s.CdTime, sldCd.Min, sldCd.Max);
+        }
+        if (WindowManager.TryGetControl("winSkillEditor", "txtCooldown", out var cdTxtCtrl) && cdTxtCtrl is TextBox txtCd)
+        {
+            txtCd.Text = s.CdTime.ToString();
         }
 
         // Range
@@ -182,6 +189,22 @@ public class WinSkillEditor
         {
             sldCast.Min = 0; sldCast.Max = 10000;
             sldCast.Value = Math.Clamp(s.CastTime, sldCast.Min, sldCast.Max);
+        }
+        if (WindowManager.TryGetControl("winSkillEditor", "txtCastTime", out var ctTxtCtrl) && ctTxtCtrl is TextBox txtCast)
+        {
+            txtCast.Text = s.CastTime.ToString();
+        }
+
+        // Damage / Vital
+        if (WindowManager.TryGetControl("winSkillEditor", "sldDamage", out var dmgCtrl) && dmgCtrl is ScrollBar sldDmg)
+        {
+            sldDmg.Min = 0;
+            sldDmg.Max = 100000;
+            sldDmg.Value = Math.Clamp(s.Vital, sldDmg.Min, sldDmg.Max);
+        }
+        if (WindowManager.TryGetControl("winSkillEditor", "txtDamage", out var dmgTxtCtrl) && dmgTxtCtrl is TextBox txtDmg)
+        {
+            txtDmg.Text = s.Vital.ToString();
         }
 
         // AoE
