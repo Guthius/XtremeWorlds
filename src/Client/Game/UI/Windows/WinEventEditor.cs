@@ -1,5 +1,6 @@
 using Client.Game.UI.Controls;
 using Core.Globals;
+using Core.Objects;
 using System;
 using System.IO;
 
@@ -457,6 +458,91 @@ public static class WinEventEditor
             btnCancel.CallBack[(int)ControlState.MouseDown] = OnCommandDataCancel;
         if (WindowManager.TryGetControl("winEventCommandData", "btnOk", out var btnOk) && btnOk is not null)
             btnOk.CallBack[(int)ControlState.MouseDown] = OnCommandDataOk;
+
+        if (WindowManager.TryGetControl("winEventCommandData", "cmbCmdPick1", out var pickCtrl) && pickCtrl is ComboBox cmbPick)
+        {
+            int last = cmbPick.Value;
+            cmbPick.CallBack[(int)ControlState.MouseMove] = () =>
+            {
+                if (_isLoading)
+                    return;
+
+                if (cmbPick.Value == last)
+                    return;
+
+                last = cmbPick.Value;
+
+                if (WindowManager.TryGetControl("winEventCommandData", "txtCmdData1", out var d1) && d1 is TextBox tb)
+                    tb.Text = cmbPick.Value.ToString();
+            };
+        }
+    }
+
+    private static void ConfigureCommandDataPicker(Core.Globals.Type.EventCommand cmd)
+    {
+        if (!WindowManager.TryGetControl("winEventCommandData", "lblCmdPick1", out var lblCtrl) || lblCtrl is not Label lbl)
+            return;
+        if (!WindowManager.TryGetControl("winEventCommandData", "cmbCmdPick1", out var cmbCtrl) || cmbCtrl is not ComboBox cmb)
+            return;
+
+        string? pickLabel = null;
+        int max = 0;
+        Func<int, string?>? nameFor = null;
+
+        EventCommand index;
+        try { index = (EventCommand)cmd.Index; }
+        catch { index = default; }
+
+        switch (index)
+        {
+            case EventCommand.OpenShop:
+                pickLabel = "Shop";
+                max = Variables.MaxShops;
+                nameFor = i => i >= 0 && i < Shop.Instance.Count ? Shop.Instance[i].Name : null;
+                break;
+            case EventCommand.PlayAnimation:
+                pickLabel = "Animation";
+                max = Variables.MaxAnimations;
+                nameFor = i => i >= 0 && i < AnimationBase.Instance.Count ? AnimationBase.Instance[i].Name : null;
+                break;
+            case EventCommand.ChangeItems:
+                pickLabel = "Item";
+                max = Variables.MaxItems;
+                nameFor = i => i >= 0 && i < ItemBase.Instance.Count ? ItemBase.Instance[i].Name : null;
+                break;
+            case EventCommand.ChangeSkills:
+                pickLabel = "Skill";
+                max = Variables.MaxSkills;
+                nameFor = i => i >= 0 && i < SkillBase.Instance.Count ? SkillBase.Instance[i].Name : null;
+                break;
+            case EventCommand.ChangeJob:
+                pickLabel = "Job";
+                max = Variables.MaxJobs;
+                nameFor = i => i >= 0 && i < JobBase.Instance.Count ? JobBase.Instance[i].Name : null;
+                break;
+        }
+
+        if (string.IsNullOrWhiteSpace(pickLabel) || max <= 0 || nameFor is null)
+        {
+            lbl.Visible = false;
+            cmb.Visible = false;
+            return;
+        }
+
+        lbl.Text = pickLabel;
+        lbl.Visible = true;
+        cmb.Visible = true;
+
+        cmb.Items.Clear();
+        for (int i = 0; i < max; i++)
+        {
+            var name = nameFor(i);
+            if (string.IsNullOrWhiteSpace(name))
+                name = "(unused)";
+            cmb.Items.Add($"{i}: {name}");
+        }
+
+        cmb.Value = Math.Clamp(cmd.Data1, 0, Math.Max(0, max - 1));
     }
 
     private static void OpenCommandDataEditor(int listIndex, int commandIndex, bool isNew)
@@ -471,7 +557,18 @@ public static class WinEventEditor
         WireCommandDataWindowControls();
 
         if (TryGetCommandAt(listIndex, commandIndex, out var cmd) && cmd.Index >= 0)
-            LoadCommandToWindow("winEventCommandData", cmd);
+        {
+            _isLoading = true;
+            try
+            {
+                LoadCommandToWindow("winEventCommandData", cmd);
+                ConfigureCommandDataPicker(cmd);
+            }
+            finally
+            {
+                _isLoading = false;
+            }
+        }
     }
 
     public static void OnCommandDataOk()
@@ -683,6 +780,33 @@ public static class WinEventEditor
         if (WindowManager.TryGetControl("winEventEditor", "cmbTrigger", out var trigCtrl) && trigCtrl is ComboBox cmbTrigger)
             cmbTrigger.Value = Math.Clamp(page.Trigger, 0, cmbTrigger.Items.Count - 1);
 
+        // Positioning
+        if (WindowManager.TryGetControl("winEventEditor", "cmbPositioning", out var posCtrl) && posCtrl is ComboBox cmbPos)
+            cmbPos.Value = Math.Clamp(page.Position, 0, cmbPos.Items.Count - 1);
+
+        // Move settings
+        if (WindowManager.TryGetControl("winEventEditor", "cmbMoveType", out var mtCtrl) && mtCtrl is ComboBox cmbMoveType)
+            cmbMoveType.Value = Math.Clamp(page.MoveType, 0, cmbMoveType.Items.Count - 1);
+
+        if (WindowManager.TryGetControl("winEventEditor", "cmbMoveSpeed", out var msCtrl) && msCtrl is ComboBox cmbMoveSpeed)
+            cmbMoveSpeed.Value = Math.Clamp(page.MoveSpeed, 0, cmbMoveSpeed.Items.Count - 1);
+
+        if (WindowManager.TryGetControl("winEventEditor", "cmbMoveFreq", out var mfCtrl) && mfCtrl is ComboBox cmbMoveFreq)
+            cmbMoveFreq.Value = Math.Clamp(page.MoveFreq, 0, cmbMoveFreq.Items.Count - 1);
+
+        // Flags
+        if (WindowManager.TryGetControl("winEventEditor", "chkWalkAnim", out var waCtrl) && waCtrl is CheckBox chkWalkAnim)
+            chkWalkAnim.Value = page.IdleAnim == 1 ? 1 : 0;
+
+        if (WindowManager.TryGetControl("winEventEditor", "chkDirFix", out var dfCtrl) && dfCtrl is CheckBox chkDirFix)
+            chkDirFix.Value = page.DirFix == 1 ? 1 : 0;
+
+        if (WindowManager.TryGetControl("winEventEditor", "chkWalkThrough", out var wtCtrl) && wtCtrl is CheckBox chkWalkThrough)
+            chkWalkThrough.Value = page.WalkThrough == 1 ? 1 : 0;
+
+        if (WindowManager.TryGetControl("winEventEditor", "chkShowName", out var snCtrl) && snCtrl is CheckBox chkShowName)
+            chkShowName.Value = page.ShowName == 1 ? 1 : 0;
+
         // Graphic (per-page)
         SyncGraphicControlsFromPage(page);
 
@@ -735,9 +859,11 @@ public static class WinEventEditor
                 if (!string.IsNullOrWhiteSpace(preview))
                     preview = preview.Length > 24 ? preview.Substring(0, 24) + "..." : preview;
 
+                var data = $"(D1:{cmd.Data1} D2:{cmd.Data2} D3:{cmd.Data3} D4:{cmd.Data4} D5:{cmd.Data5} D6:{cmd.Data6})";
+
                 var line = string.IsNullOrWhiteSpace(preview)
-                    ? $"{listIndex}:{cmdIndex} {name}"
-                    : $"{listIndex}:{cmdIndex} {name} - {preview}";
+                    ? $"{listIndex}:{cmdIndex} {name} {data}"
+                    : $"{listIndex}:{cmdIndex} {name} {data} - {preview}";
 
                 list.AddItem(line);
                 _commandIndexMap.Add((listIndex, cmdIndex));

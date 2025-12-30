@@ -29,6 +29,9 @@
 		<TextBox Name="txtCmdData5" Position="132,182" Size="60,22" Design="TextWhite"/>
 		<Label Name="lblCmdData6" Text="D6" Position="212,184" Size="20,18"/>
 		<TextBox Name="txtCmdData6" Position="232,182" Size="60,22" Design="TextWhite"/>
+
+		<Label Name="lblCmdPick1" Text="Pick" Position="12,214" Size="50,18" Visible="false"/>
+		<ComboBox Name="cmbCmdPick1" Position="64,212" Size="326,22" Visible="false"/>
 	</GroupBox>
 
 	<Button Name="btnOk" Text="OK" Position="126, 300" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>

@@ -3428,8 +3428,21 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
     public static void Packet_Event(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
-        var eventId = buffer.ReadInt32();
-        EventLogic.TriggerEvent(session.Id, eventId, 0, GetPlayerX(session.Id), GetPlayerY(session.Id));
+        var localEventIndex = buffer.ReadInt32();
+
+        // Client sends the *local* event index (0..CurrentEvents-1) from SSpawnEvent.
+        // Server event processing uses the *map* event id, stored in the player's 1-based EventPages.
+        int slot = localEventIndex + 1;
+        if (slot <= 0 || slot > Data.TempPlayer[session.Id].EventMap.CurrentEvents)
+            return;
+        if (Data.TempPlayer[session.Id].EventMap.EventPages == null || slot >= Data.TempPlayer[session.Id].EventMap.EventPages.Length)
+            return;
+
+        int mapEventId = Data.TempPlayer[session.Id].EventMap.EventPages[slot].EventId;
+        if (mapEventId < 0)
+            return;
+
+        EventLogic.TriggerEvent(session.Id, mapEventId, 0, GetPlayerX(session.Id), GetPlayerY(session.Id));
     }
 
     public static void Packet_RequestSwitchesAndVariables(GameSession session, ReadOnlyMemory<byte> bytes) => NetworkSend.SendSwitchesAndVariables(session.Id);

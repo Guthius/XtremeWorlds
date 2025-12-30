@@ -92,10 +92,17 @@ namespace Client.Game.UI.Windows
                 int prev = cmbItem.Value;
                 cmbItem.Items.Clear();
                 cmbItem.Items.Add("None");
-                for (int i = 0; i < Core.Globals.Variables.MaxItems; i++)
+                int max = Core.Globals.Variables.MaxItems;
+                int loaded = Item.Instance?.Count ?? 0;
+                for (int i = 0; i < max; i++)
                 {
-                    var raw = Item.Instance[i].Name ?? string.Empty;
-                    var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
+                    string name = "None";
+                    if (i >= 0 && i < loaded)
+                    {
+                        var raw = Item.Instance[i].Name ?? string.Empty;
+                        name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
+                    }
+
                     cmbItem.Items.Add($"{i + 1}: {name}");
                 }
                 cmbItem.Value = (prev >= 0 && prev < cmbItem.Items.Count) ? prev : 0;
@@ -106,10 +113,17 @@ namespace Client.Game.UI.Windows
                 int prev = cmbSkill.Value;
                 cmbSkill.Items.Clear();
                 cmbSkill.Items.Add("None");
-                for (int i = 0; i < Variables.MaxSkills; i++)
+                int max = Variables.MaxSkills;
+                int loaded = Skill.Instance?.Count ?? 0;
+                for (int i = 0; i < max; i++)
                 {
-                    var raw = Skill.Instance[i].Name ?? string.Empty;
-                    var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
+                    string name = "None";
+                    if (i >= 0 && i < loaded)
+                    {
+                        var raw = Skill.Instance[i].Name ?? string.Empty;
+                        name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
+                    }
+
                     cmbSkill.Items.Add($"{i + 1}: {name}");
                 }
                 cmbSkill.Value = (prev >= 0 && prev < cmbSkill.Items.Count) ? prev : 0;

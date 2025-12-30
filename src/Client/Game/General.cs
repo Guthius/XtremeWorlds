@@ -295,11 +295,19 @@ namespace Client
 
         public static int IsEq(long startX, long startY)
         {
-            var equipmentCount = Enum.GetValues<Equipment>().Length;
+            if (GameState.MyIndex < 0 || GameState.MyIndex >= Player.Instance.Count)
+                return -1;
 
-            for (var i = 0; i < equipmentCount; i++)
+            var player = Player.Instance[GameState.MyIndex];
+            if (player.Paperdoll == null)
+                return -1;
+
+            var equipmentCount = Enum.GetValues<Equipment>().Length;
+            var slotCount = Math.Min(equipmentCount, player.Paperdoll.Length);
+
+            for (var i = 0; i < slotCount; i++)
             {
-                if (Player.Instance[GameState.MyIndex].Paperdoll[i].Num < 0)
+                if (player.Paperdoll[i].Num < 0)
                 {
                     continue;
                 }
@@ -323,12 +331,18 @@ namespace Client
 
         public static int IsInv(long startX, long startY)
         {
-            for (var i = 0; i < Variables.MaxInventory; i++)
+            if (GameState.MyIndex < 0 || GameState.MyIndex >= Player.Instance.Count)
+                return -1;
+
+            var player = Player.Instance[GameState.MyIndex];
+            if (player.Inventory == null)
+                return -1;
+
+            var slotCount = Math.Min((int)Variables.MaxInventory, player.Inventory.Length);
+            for (var i = 0; i < slotCount; i++)
             {
-                if (Player.Instance[GameState.MyIndex].Paperdoll[i].Num < 0)
-                {
+                if (player.Inventory[i].Num < 0)
                     continue;
-                }
 
                 Type.Rect rec;
 
@@ -376,24 +390,30 @@ namespace Client
 
         public static int IsBank(long startX, long startY)
         {
-            int isBank = default;
-            Type.Rect tempRec;
+            if (GameState.MyIndex < 0 || GameState.MyIndex >= Bank.Instance.Count)
+                return -1;
 
-            for (int i = 0; i < Bank.Instance.Count; i++)
+            if (GameState.BankColumns <= 0)
+                return -1;
+
+            var bank = Bank.Instance[GameState.MyIndex];
+
+            var slotCount = Math.Min((int)Variables.MaxBank, bank.Item.Length);
+            for (var i = 0; i < slotCount; i++)
             {
-                if (Bank.Instance[GameState.MyIndex].Item[i].Num >= 0)
-                {
-                    tempRec.Top = startY + GameState.BankTop + (GameState.BankOffsetY + Constants.TileSize) * (i / GameState.BankColumns);
-                    tempRec.Bottom = tempRec.Top + Constants.TileSize;
-                    tempRec.Left = startX + GameState.BankLeft + (GameState.BankOffsetX + Constants.TileSize) * (i % GameState.BankColumns);
-                    tempRec.Right = tempRec.Left + Constants.TileSize;
+                if (bank.Item[i].Num < 0)
+                    continue;
 
-                    if (GameState.CurMouseX >= tempRec.Left && GameState.CurMouseX <= tempRec.Right &&
-                        GameState.CurMouseY >= tempRec.Top && GameState.CurMouseY <= tempRec.Bottom)
-                    {
-                        isBank = i;
-                        return isBank;
-                    }
+                Type.Rect tempRec;
+                tempRec.Top = startY + GameState.BankTop + (GameState.BankOffsetY + Constants.TileSize) * (i / GameState.BankColumns);
+                tempRec.Bottom = tempRec.Top + Constants.TileSize;
+                tempRec.Left = startX + GameState.BankLeft + (GameState.BankOffsetX + Constants.TileSize) * (i % GameState.BankColumns);
+                tempRec.Right = tempRec.Left + Constants.TileSize;
+
+                if (GameState.CurMouseX >= tempRec.Left && GameState.CurMouseX <= tempRec.Right &&
+                    GameState.CurMouseY >= tempRec.Top && GameState.CurMouseY <= tempRec.Bottom)
+                {
+                    return i;
                 }
             }
 
@@ -402,11 +422,24 @@ namespace Client
 
         public static int IsShop(long startX, long startY)
         {
-            int isShop = default;
-            Type.Rect tempRec;
-            int i;
+            if (GameState.ShopColumns <= 0)
+                return -1;
 
-            for (i = 0; i < Variables.MaxTrades; i++)
+            // When selling, we will later use this slot as an inventory index.
+            // Apply the same safety checks as IsInv so UI hover/click can't crash.
+            if (GameState.ShopIsSelling)
+            {
+                if (GameState.MyIndex < 0 || GameState.MyIndex >= Player.Instance.Count)
+                    return -1;
+
+                var player = Player.Instance[GameState.MyIndex];
+                if (player.Inventory == null)
+                    return -1;
+            }
+
+            Type.Rect tempRec;
+
+            for (var i = 0; i < Variables.MaxTrades; i++)
             {
                 tempRec.Top = startY + GameState.ShopTop + (GameState.ShopOffsetY + Constants.TileSize) * (i / GameState.ShopColumns);
                 tempRec.Bottom = tempRec.Top + Constants.TileSize;
@@ -416,8 +449,7 @@ namespace Client
                 if (GameState.CurMouseX >= tempRec.Left && GameState.CurMouseX <= tempRec.Right &&
                     GameState.CurMouseY >= tempRec.Top && GameState.CurMouseY <= tempRec.Bottom)
                 {
-                    isShop = i;
-                    return isShop;
+                    return i;
                 }
             }
 
@@ -426,11 +458,16 @@ namespace Client
 
         public static int IsTrade(long startX, long startY)
         {
-            int isTrade = default;
-            Type.Rect tempRec;
-            int i;
+            if (GameState.TradeColumns <= 0)
+                return -1;
 
-            for (i = 0; i < Variables.MaxInventory; i++)
+            Type.Rect tempRec;
+
+            var slotCount = (int)Variables.MaxInventory;
+            slotCount = Math.Min(slotCount, Data.TradeYourOffer.Length);
+            slotCount = Math.Min(slotCount, Data.TradeTheirOffer.Length);
+
+            for (var i = 0; i < slotCount; i++)
             {
                 tempRec.Top = startY + GameState.TradeTop + (GameState.TradeOffsetY + Constants.TileSize) * (i / GameState.TradeColumns);
                 tempRec.Bottom = tempRec.Top + Constants.TileSize;
@@ -441,8 +478,7 @@ namespace Client
                 {
                     if (GameState.CurMouseY >= tempRec.Top & GameState.CurMouseY <= tempRec.Bottom)
                     {
-                        isTrade = i;
-                        return isTrade;
+                        return i;
                     }
                 }
             }

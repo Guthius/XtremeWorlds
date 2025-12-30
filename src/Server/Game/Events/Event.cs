@@ -176,8 +176,8 @@ namespace Server
             var pageId = Data.TempPlayer[index].EventMap.EventPages[eventId].PageId;
             if (Server.Map.Instance[map].Event[eventId].Pages[pageId].CommandListCount <= 0) return;
 
-            var processing = Data.TempPlayer[index].EventProcessing[eventId];
-            processing.Active = 0;
+            ref var processing = ref Data.TempPlayer[index].EventProcessing[eventId];
+            processing.Active = 1;
             processing.ActionTimer = General.GetTimeMs();
             processing.CurList = 0;
             processing.CurSlot = 0;
@@ -588,7 +588,7 @@ namespace Server
         {
             for (var i = 0; i < Data.TempPlayer[index].EventProcessingCount; i++)
             {
-                var proc = Data.TempPlayer[index].EventProcessing[i];
+                ref var proc = ref Data.TempPlayer[index].EventProcessing[i];
                 if (proc.EventId != eventId || proc.PageId != pageId || proc.WaitingForResponse != 1) continue;
 
                 var cmd = Server.Map.Instance[GetPlayerMap(index)].Event[eventId].Pages[pageId].CommandList[proc.CurList].Commands[proc.CurSlot - 1];
@@ -601,7 +601,7 @@ namespace Server
 
         private static void UpdateEventProcessing(int index, int procIndex, int reply, Type.EventCommand cmd)
         {
-            var proc = Data.TempPlayer[index].EventProcessing[procIndex];
+            ref var proc = ref Data.TempPlayer[index].EventProcessing[procIndex];
             proc.ListLeftOff[proc.CurList] = proc.CurSlot - 1;
             proc.CurList = reply switch
             {

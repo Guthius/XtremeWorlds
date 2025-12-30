@@ -266,7 +266,7 @@ public class Player : PlayerBase
             case Direction.Up:
                 if (GetPlayerY(playerId) > 0)
                 {
-                    if (IsTileBlocked(map, GetPlayerX(playerId), GetPlayerY(playerId) - 1, Direction.Up))
+                    if (IsTileBlocked(playerId, map, GetPlayerX(playerId), GetPlayerY(playerId) - 1, Direction.Up))
                     {
                         NetworkSend.SendPlayerXY(playerId);
                         return;
@@ -300,7 +300,7 @@ public class Player : PlayerBase
             case Direction.Down:
                 if (GetPlayerY(playerId) < Server.Map.Instance[map].MaxY - 1)
                 {
-                    if (IsTileBlocked(map, GetPlayerX(playerId), GetPlayerY(playerId) + 1, Direction.Down))
+                    if (IsTileBlocked(playerId, map, GetPlayerX(playerId), GetPlayerY(playerId) + 1, Direction.Down))
                     {
                         NetworkSend.SendPlayerXY(playerId);
                         return;
@@ -326,7 +326,7 @@ public class Player : PlayerBase
             case Direction.Left:
                 if (GetPlayerX(playerId) > 0)
                 {
-                    if (IsTileBlocked(map, GetPlayerX(playerId) - 1, GetPlayerY(playerId), Direction.Left))
+                    if (IsTileBlocked(playerId, map, GetPlayerX(playerId) - 1, GetPlayerY(playerId), Direction.Left))
                     {
                         NetworkSend.SendPlayerXY(playerId);
                         return;
@@ -362,7 +362,7 @@ public class Player : PlayerBase
             case Direction.Right:
                 if (GetPlayerX(playerId) < Server.Map.Instance[map].MaxX - 1)
                 {
-                    if (IsTileBlocked(map, GetPlayerX(playerId) + 1, GetPlayerY(playerId), Direction.Right))
+                    if (IsTileBlocked(playerId, map, GetPlayerX(playerId) + 1, GetPlayerY(playerId), Direction.Right))
                     {
                         NetworkSend.SendPlayerXY(playerId);
                         return;
@@ -388,7 +388,7 @@ public class Player : PlayerBase
             case Direction.UpRight:
                 if (GetPlayerY(playerId) > 0 && GetPlayerX(playerId) < Server.Map.Instance[map].MaxX - 1)
                 {
-                    if (IsTileBlocked(map, GetPlayerX(playerId) + 1, GetPlayerY(playerId) - 1, Direction.UpRight))
+                    if (IsTileBlocked(playerId, map, GetPlayerX(playerId) + 1, GetPlayerY(playerId) - 1, Direction.UpRight))
                     {
                         NetworkSend.SendPlayerXY(playerId);
                         return;
@@ -405,7 +405,7 @@ public class Player : PlayerBase
             case Direction.UpLeft:
                 if (GetPlayerY(playerId) > 0 && GetPlayerX(playerId) > 0)
                 {
-                    if (IsTileBlocked(map, GetPlayerX(playerId) - 1, GetPlayerY(playerId) - 1, Direction.UpLeft))
+                    if (IsTileBlocked(playerId, map, GetPlayerX(playerId) - 1, GetPlayerY(playerId) - 1, Direction.UpLeft))
                     {
                         NetworkSend.SendPlayerXY(playerId);
                         return;
@@ -422,7 +422,7 @@ public class Player : PlayerBase
             case Direction.DownRight:
                 if (GetPlayerY(playerId) < Server.Map.Instance[map].MaxY - 1 && GetPlayerX(playerId) < Server.Map.Instance[map].MaxX - 1)
                 {
-                    if (IsTileBlocked(map, GetPlayerX(playerId) + 1, GetPlayerY(playerId) + 1, Direction.DownRight))
+                    if (IsTileBlocked(playerId, map, GetPlayerX(playerId) + 1, GetPlayerY(playerId) + 1, Direction.DownRight))
                     {
                         NetworkSend.SendPlayerXY(playerId);
                         return;
@@ -439,7 +439,7 @@ public class Player : PlayerBase
             case Direction.DownLeft:
                 if (GetPlayerY(playerId) < Server.Map.Instance[map].MaxY - 1 && GetPlayerX(playerId) > 0)
                 {
-                    if (IsTileBlocked(map, GetPlayerX(playerId) - 1, GetPlayerY(playerId) + 1, Direction.DownLeft))
+                    if (IsTileBlocked(playerId, map, GetPlayerX(playerId) - 1, GetPlayerY(playerId) + 1, Direction.DownLeft))
                     {
                         NetworkSend.SendPlayerXY(playerId);
                         return;
@@ -463,9 +463,17 @@ public class Player : PlayerBase
             GetPlayerX(playerId) < Server.Map.Instance[currentMap].MaxX &&
             GetPlayerY(playerId) < Server.Map.Instance[currentMap].MaxY)
         {
-            for (var i = 0; i < Data.TempPlayer[playerId].EventMap.CurrentEvents; i++)
+            // Player Touch events: EventPages is 1-based.
+            for (var slot = 1; slot <= Data.TempPlayer[playerId].EventMap.CurrentEvents; slot++)
             {
-                EventLogic.TriggerEvent(playerId, i, 1, GetPlayerX(playerId), GetPlayerY(playerId));
+                if (Data.TempPlayer[playerId].EventMap.EventPages == null || slot >= Data.TempPlayer[playerId].EventMap.EventPages.Length)
+                    break;
+
+                var mapEventId = Data.TempPlayer[playerId].EventMap.EventPages[slot].EventId;
+                if (mapEventId < 0)
+                    continue;
+
+                EventLogic.TriggerEvent(playerId, mapEventId, 1, GetPlayerX(playerId), GetPlayerY(playerId));
             }
 
             ref var tile = ref Server.Map.Instance[currentMap].Tile[GetPlayerX(playerId), GetPlayerY(playerId)];
@@ -609,73 +617,20 @@ public class Player : PlayerBase
             General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(OnMove));
         }
 
-        x = GetPlayerX(playerId);
-        y = GetPlayerY(playerId);
-
-        if (Data.TempPlayer[playerId].EventMap.CurrentEvents <= 0)
-        {
-            return;
-        }
-            
-        for (var i = 0; i < Data.TempPlayer[playerId].EventMap.CurrentEvents; i++)
-        {
-            var beginEvent = false;
-
-            if (Data.TempPlayer[playerId].EventMap.EventPages[i].EventId < 0)
-            {
-                continue;
-            }
-                
-            if (Server.Map.Instance[GetPlayerMap(playerId)].Event[Data.TempPlayer[playerId].EventMap.EventPages[i].EventId].Globals == 1)
-            {
-                if (Server.Map.Instance[GetPlayerMap(playerId)].Event[Data.TempPlayer[playerId].EventMap.EventPages[i].EventId].X == x & Server.Map.Instance[GetPlayerMap(playerId)].Event[Data.TempPlayer[playerId].EventMap.EventPages[i].EventId].Y == y & Server.Map.Instance[GetPlayerMap(playerId)].Event[Data.TempPlayer[playerId].EventMap.EventPages[i].EventId].Pages[Data.TempPlayer[playerId].EventMap.EventPages[i].PageId].Trigger == 1 & Data.TempPlayer[playerId].EventMap.EventPages[i].Visible)
-                {
-                    beginEvent = true;
-                }
-            }
-            else if (Data.TempPlayer[playerId].EventMap.EventPages[i].X == x & Data.TempPlayer[playerId].EventMap.EventPages[i].Y == y & Server.Map.Instance[GetPlayerMap(playerId)].Event[Data.TempPlayer[playerId].EventMap.EventPages[i].EventId].Pages[Data.TempPlayer[playerId].EventMap.EventPages[i].PageId].Trigger == 1 & Data.TempPlayer[playerId].EventMap.EventPages[i].Visible)
-            {
-                beginEvent = true;
-            }
-
-            if (!beginEvent)
-            {
-                continue;
-            }
-            
-            // Process this event, it is on-touch and everything checks out.
-            if (Server.Map.Instance[GetPlayerMap(playerId)].Event[Data.TempPlayer[playerId].EventMap.EventPages[i].EventId].Pages[Data.TempPlayer[playerId].EventMap.EventPages[i].PageId].CommandListCount > 0)
-            {
-                Data.TempPlayer[playerId].EventProcessing[Data.TempPlayer[playerId].EventMap.EventPages[i].EventId].Active = 0;
-                Data.TempPlayer[playerId].EventProcessing[Data.TempPlayer[playerId].EventMap.EventPages[i].EventId].ActionTimer = General.GetTimeMs();
-                Data.TempPlayer[playerId].EventProcessing[Data.TempPlayer[playerId].EventMap.EventPages[i].EventId].CurList = 0;
-                Data.TempPlayer[playerId].EventProcessing[Data.TempPlayer[playerId].EventMap.EventPages[i].EventId].CurSlot = 0;
-                Data.TempPlayer[playerId].EventProcessing[Data.TempPlayer[playerId].EventMap.EventPages[i].EventId].EventId = Data.TempPlayer[playerId].EventMap.EventPages[i].EventId;
-                Data.TempPlayer[playerId].EventProcessing[Data.TempPlayer[playerId].EventMap.EventPages[i].EventId].PageId = Data.TempPlayer[playerId].EventMap.EventPages[i].PageId;
-                Data.TempPlayer[playerId].EventProcessing[Data.TempPlayer[playerId].EventMap.EventPages[i].EventId].WaitingForResponse = 0;
-
-                var eventId = Data.TempPlayer[playerId].EventMap.EventPages[i].EventId;
-                var pageId = Data.TempPlayer[playerId].EventMap.EventPages[i].PageId;
-                var commandListCount = Server.Map.Instance[GetPlayerMap(playerId)].Event[eventId].Pages[pageId].CommandListCount;
-
-                Array.Resize(ref Data.TempPlayer[playerId].EventProcessing[eventId].ListLeftOff, commandListCount);
-            }
-
-            beginEvent = false;
-        }
+        // Player Touch triggering is handled above (1-based EventPages loop).
     }
 
-    public static bool IsTileBlocked(int map, int x, int y, Direction dir)
+    public static bool IsTileBlocked(int playerId, int map, int x, int y, Direction dir)
     {
         try
         {
             if (Moral.Instance[Server.Map.Instance[map].Moral].PlayerBlock)
             {
-                foreach (var playerId in PlayerService.Instance.PlayerIds)
+                foreach (var otherPlayerId in PlayerService.Instance.PlayerIds)
                 {
-                    if (GetPlayerMap(playerId) == map &&
-                        GetPlayerX(playerId) == x &&
-                        GetPlayerY(playerId) == y)
+                    if (GetPlayerMap(otherPlayerId) == map &&
+                        GetPlayerX(otherPlayerId) == x &&
+                        GetPlayerY(otherPlayerId) == y)
                     {
                         return true;
                     }
@@ -692,6 +647,39 @@ public class Player : PlayerBase
                     {
                         return true;
                     }
+                }
+            }
+
+            // Block by events with WalkThrough disabled.
+            var tempPlayer = Data.TempPlayer[playerId];
+            var eventMap = tempPlayer.EventMap;
+            if (eventMap.CurrentEvents > 0 && eventMap.EventPages != null && Server.Map.Instance[map].EventCount > 0)
+            {
+                // EventPages is 1-based.
+                for (var slot = 1; slot <= eventMap.CurrentEvents; slot++)
+                {
+                    if (slot >= eventMap.EventPages.Length)
+                        break;
+
+                    var page = eventMap.EventPages[slot];
+                    if (page.EventId < 0 || !page.Visible)
+                        continue;
+
+                    var mapEventId = page.EventId;
+                    if (mapEventId < 0 || mapEventId >= Server.Map.Instance[map].EventCount)
+                        continue;
+
+                    var ev = Server.Map.Instance[map].Event[mapEventId];
+                    if (page.PageId < 0 || page.PageId >= ev.PageCount)
+                        continue;
+
+                    if (ev.Pages[page.PageId].WalkThrough != 0)
+                        continue;
+
+                    var eventTileX = ev.Globals == 1 ? ev.X : (page.X / Constants.TileSize);
+                    var eventTileY = ev.Globals == 1 ? ev.Y : (page.Y / Constants.TileSize);
+                    if (eventTileX == x && eventTileY == y)
+                        return true;
                 }
             }
 

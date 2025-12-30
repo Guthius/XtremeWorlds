@@ -2463,18 +2463,8 @@ namespace Client
                         }
                     }
 
-                    // Players
-                    for (i = 0; i < PlayerBase.Instance.Count; i++)
-                    {
-                        if (IsPlaying(i) & GetPlayerMap(i) == GetPlayerMap(GameState.MyIndex))
-                        {
-                            if (GetPlayerY(i) == y)
-                            {
-                                Player.OnDraw(i);
-                            }
-                        }
-                    }
-
+                    // Events (Same as Player): draw in the Y-pass so they sort with the world.
+                    // Draw before players so events on the same row don't always appear above the player.
                     if (GameState.MyEditorType != EditorType.Map)
                     {
                         if (GameState.CurrentEvents > 0 & GameState.CurrentEvents <= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount)
@@ -2489,6 +2479,18 @@ namespace Client
                                         Event.OnDraw(i);
                                     }
                                 }
+                            }
+                        }
+                    }
+
+                    // Players
+                    for (i = 0; i < PlayerBase.Instance.Count; i++)
+                    {
+                        if (IsPlaying(i) & GetPlayerMap(i) == GetPlayerMap(GameState.MyIndex))
+                        {
+                            if (GetPlayerY(i) == y)
+                            {
+                                Player.OnDraw(i);
                             }
                         }
                     }

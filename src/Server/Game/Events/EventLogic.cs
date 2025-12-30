@@ -794,15 +794,16 @@ namespace Server
                                         case 39: // Turn Off Through
                                             instance.WalkThrough = 0;
                                             break;
-                                        case 40: //Turn on Fix Position
-                                            instance.Position = 1;
-                                            sendUpdate = true;
-                                            break;
-                                        case 41: //Turn off Fix Position
+                                        // Event draw priority (0=Below Player, 1=Same as Player, 2=Above Player)
+                                        case 40: // Below Player
                                             instance.Position = 0;
                                             sendUpdate = true;
                                             break;
-                                        case 42: //Turn on Below Player
+                                        case 41: // Same as Player
+                                            instance.Position = 1;
+                                            sendUpdate = true;
+                                            break;
+                                        case 42: // Above Player
                                             instance.Position = 2;
                                             sendUpdate = true;
                                             break;
@@ -1084,6 +1085,7 @@ namespace Server
                                                             eventProcessing.EventId = eventId; // This should be the *map* event ID
                                                             eventProcessing.PageId = Data.TempPlayer[i].EventMap.EventPages[eventId].PageId; // Local page ID.
                                                             eventProcessing.WaitingForResponse = 0;
+                                                            eventProcessing.ListLeftOff = new int[Server.Map.Instance[map].Event[eventId].Pages[eventProcessing.PageId].CommandListCount];
                                                         }
                                                     }
 
@@ -1277,18 +1279,19 @@ namespace Server
                                             break; // Turn Off Direction Fix
                                         case 38: instance.WalkThrough = 1; break; // Turn On Through
                                         case 39: instance.WalkThrough = 0; break; // Turn Off Through
-                                        case 40:
-                                            instance.Position = 1;
-                                            sendUpdate = true;
-                                            break; // Turn On Fixed
-                                        case 41:
+                                        // Event draw priority (0=Below Player, 1=Same as Player, 2=Above Player)
+                                        case 40: // Below Player
                                             instance.Position = 0;
                                             sendUpdate = true;
-                                            break; // Turn Off Fixed
-                                        case 42:
+                                            break;
+                                        case 41: // Same as Player
+                                            instance.Position = 1;
+                                            sendUpdate = true;
+                                            break;
+                                        case 42: // Above Player
                                             instance.Position = 2;
                                             sendUpdate = true;
-                                            break; //Turn on Below player
+                                            break;
 
                                         case 43: // Change Graphic
                                         {
@@ -1575,7 +1578,6 @@ namespace Server
                                     continue;
                                 }
 
-
                                 if (!restartlist && !endprocess)
                                 {
                                     // Process the current event command.
@@ -1627,6 +1629,10 @@ namespace Server
                                                 else //end of list
                                                     nextCommandType = 2;
 
+                                                // Client expects: choiceCount (int), then AnotherChat (int).
+                                                // For ShowText there are no choices, so choiceCount=0 and AnotherChat carries
+                                                // the "next command" hint used by the UI flow.
+                                                buffer.WriteInt32(0);
                                                 buffer.WriteInt32(nextCommandType);
                                                 PlayerService.Instance.SendDataTo(i, buffer.GetBytes());
                                             }
@@ -2923,11 +2929,11 @@ namespace Server
             // 2. Find the relevant event for the player
             var eventMap = Data.TempPlayer[playerIndex].EventMap;
             int localEventIndex = -1;
-            for (int i = 0; i < eventMap.CurrentEvents; i++)
+            for (int slot = 1; slot <= eventMap.CurrentEvents; slot++)
             {
-                if (eventMap.EventPages[i].EventId == eventId)
+                if (eventMap.EventPages[slot].EventId == eventId)
                 {
-                    localEventIndex = i + 1;
+                    localEventIndex = slot;
                     break;
                 }
             }
@@ -2943,23 +2949,34 @@ namespace Server
             if (page.Trigger != triggerType)
                 return false;
 
-            // 4. Calculate intended tile based on player direction (if not walk-through)
-            if (page.WalkThrough == 0)
+            // 4. Determine the target tile based on trigger type.
+            // Action Button (0): trigger the tile in front of the player.
+            // Player Touch (1): trigger the tile the player is on.
+            var playerX = GetPlayerX(playerIndex);
+            var playerY = GetPlayerY(playerIndex);
+            if (triggerType == 0)
             {
-                (int x, int y)? offset = GetOffsetByDirection(GetPlayerDir(playerIndex), GetPlayerX(playerIndex), GetPlayerY(playerIndex), Server.Map.Instance[map]);
+                (int x, int y)? offset = GetOffsetByDirection(GetPlayerDir(playerIndex), playerX, playerY, Server.Map.Instance[map]);
                 if (offset == null)
                     return false;
+
                 (targetX, targetY) = offset.Value;
             }
+            else
+            {
+                targetX = playerX;
+                targetY = playerY;
+            }
 
-            // 5. Validate player is at the event's coordinates
-            if (targetX * 32 != eventPage.X || targetY * 32 != eventPage.Y)
+            // 5. Validate the target tile matches the event tile.
+            // Event page X/Y are in pixels; targetX/targetY are tiles.
+            if (targetX * Constants.TileSize != eventPage.X || targetY * Constants.TileSize != eventPage.Y)
                 return false;
 
             // 6. Begin event processing if applicable
             if (page.CommandListCount > 0)
             {
-                ref var eventProcessing = ref Data.TempPlayer[playerIndex].EventProcessing[localEventIndex];
+                ref var eventProcessing = ref Data.TempPlayer[playerIndex].EventProcessing[eventPage.EventId];
                 if (eventProcessing.Active == 0)
                 {
                     eventProcessing.Active = 1;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window Name="winBars" Size="239,77" Position="10,10" Font="Georgia" Design="WindowNoBar">
 	<GroupBox Name="grpBars" Position="6,6" Size="224,61">
-		<PictureBox Name="picOverlay" Position="0,0" Size="0,0"/>
+		<PictureBox Name="picOverlay" Position="0,0" Size="224,61"/>
 
 		<!-- Blank bar frames slightly up/left -->
 		<PictureBox Name="picHP_Blank" Position="12,12" Size="207,13" Image="24"/>
