@@ -177,6 +177,17 @@ public class WinNpcEditor
                 cmbDropSlot.Value = 0;
             }
         }
+
+        // Common event trigger type (0=None; 1.. = CommonEventTrigger)
+        if (WindowManager.TryGetControl("winNpcEditor", "cmbCommonEventType", out var ceCtrl) && ceCtrl is ComboBox cmbCe)
+        {
+            if (cmbCe.Items.Count == 0)
+            {
+                cmbCe.Items.Add("None");
+                foreach (var name in Enum.GetNames(typeof(CommonEventTrigger)))
+                    cmbCe.Items.Add(name);
+            }
+        }
     }
 
     // Load selected NPC data into UI controls.
@@ -249,9 +260,31 @@ public class WinNpcEditor
         {
             txtDs.Text = npc.DeathSwitch.ToString();
         }
+        if (WindowManager.TryGetControl("winNpcEditor", "txtDeathSwitchValue", out var deathSwitchValCtrl) && deathSwitchValCtrl is TextBox txtDsVal)
+        {
+            txtDsVal.Text = npc.DeathSwitchValue.ToString();
+        }
         if (WindowManager.TryGetControl("winNpcEditor", "txtDeathVariable", out var dvCtrl) && dvCtrl is TextBox txtDv)
         {
             txtDv.Text = npc.DeathVariable.ToString();
+        }
+        if (WindowManager.TryGetControl("winNpcEditor", "txtDeathVariableValue", out var dvValCtrl) && dvValCtrl is TextBox txtDvVal)
+        {
+            txtDvVal.Text = npc.DeathVariableValue.ToString();
+        }
+
+        // Common event trigger
+        if (WindowManager.TryGetControl("winNpcEditor", "cmbCommonEventType", out var ceCtrl) && ceCtrl is ComboBox cmbCe)
+        {
+            cmbCe.Value = Math.Clamp(npc.CommonEventType, 0, Math.Max(0, cmbCe.Items.Count - 1));
+        }
+        if (WindowManager.TryGetControl("winNpcEditor", "txtCommonEventData1", out var ce1Ctrl) && ce1Ctrl is TextBox txtCe1)
+        {
+            txtCe1.Text = npc.CommonEventData1.ToString();
+        }
+        if (WindowManager.TryGetControl("winNpcEditor", "txtCommonEventData2", out var ce2Ctrl) && ce2Ctrl is TextBox txtCe2)
+        {
+            txtCe2.Text = npc.CommonEventData2.ToString();
         }
         if (WindowManager.TryGetControl("winNpcEditor", "txtRange", out var rangeCtrl) && rangeCtrl is TextBox txtRange)
         {

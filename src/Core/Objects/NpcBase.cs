@@ -43,7 +43,9 @@ public class NpcBase : IData
 
     // Optional death tracking (0 = none)
     public int DeathSwitch { get; set; }
+    public int DeathSwitchValue { get; set; } = 1;
     public int DeathVariable { get; set; }
+    public int DeathVariableValue { get; set; } = 1;
 
     // Optional common event trigger (0 = none; otherwise matches editor selection)
     public byte CommonEventType { get; set; }

@@ -14,17 +14,17 @@
   <!-- Details group -->
   <GroupBox Name="grpDetails" Caption="Details" Position="260, 28" Size="450, 352">
     <!-- Core fields -->
-    <Label Name="lblName" Text="Name" Position="8, 20" Size="80, 16"/>
+    <Label Name="lblName" Text="Name" Position="12, 20" Size="80, 16"/>
     <TextBox Name="txtName" Position="72, 16" Size="234, 16" Design="TextWhite"/>
-    <Label Name="lblAttackSay" Text="Attack Say" Position="8, 36" Size="100, 16"/>
+    <Label Name="lblAttackSay" Text="Attack Say" Position="12, 36" Size="100, 16"/>
     <TextBox Name="txtAttackSay" Position="72, 34" Size="234, 16" Design="TextWhite"/>
-    <Label Name="lblBehavior" Text="Behavior" Position="8, 60" Size="80, 16"/>
+    <Label Name="lblBehavior" Text="Behavior" Position="12, 60" Size="80, 16"/>
     <ComboBox Name="cmbBehavior" Position="72, 58" Size="120, 18"/>
-    <Label Name="lblSpawnPeriod" Text="Spawn" Position="8, 84" Size="70, 16"/>
+    <Label Name="lblSpawnPeriod" Text="Spawn" Position="12, 84" Size="70, 16"/>
     <ComboBox Name="cmbSpawnPeriod" Position="72, 82" Size="120, 18"/>
-    <Label Name="lblAnimation" Text="Animation" Position="8, 108" Size="90, 16"/>
+    <Label Name="lblAnimation" Text="Animation" Position="12, 108" Size="90, 16"/>
     <ComboBox Name="cmbAnimation" Position="72, 106" Size="168, 18"/>
-    <Label Name="lblFaction" Text="Faction" Position="8, 132" Size="70, 16"/>
+    <Label Name="lblFaction" Text="Faction" Position="12, 132" Size="70, 16"/>
     <ComboBox Name="cmbFaction" Position="72, 130" Size="168, 18"/>
 
     <!-- Sprite preview -->
@@ -33,10 +33,25 @@
     <ScrollBar Name="sldSprite" Position="320, 74" Size="96, 12" Min="0" Max="1" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 
     <!-- Death tracking -->
-    <Label Name="lblDeathSwitch" Text="Death Switch" Position="270, 96" Size="80, 16"/>
-    <TextBox Name="txtDeathSwitch" Position="350, 94" Size="66, 18" Design="TextWhite"/>
-    <Label Name="lblDeathVariable" Text="Death Variable" Position="270, 120" Size="100, 16"/>
-    <TextBox Name="txtDeathVariable" Position="350, 118" Size="66, 18" Design="TextWhite"/>
+    <Label Name="lblDeathSwitch" Text="Death Switch" Position="250, 96" Size="80, 16"/>
+    <Label Name="lblDeathSwitchId" Text="Id" Position="310, 96" Size="16, 16"/>
+    <TextBox Name="txtDeathSwitch" Position="330, 94" Size="32, 18" Design="TextWhite"/>
+    <Label Name="lblDeathSwitchValue" Text="Val" Position="366, 96" Size="22, 16"/>
+    <TextBox Name="txtDeathSwitchValue" Position="390, 94" Size="32, 18" Design="TextWhite"/>
+    <Label Name="lblDeathVariable" Text="Death Variable" Position="250, 120" Size="100, 16"/>
+    <Label Name="lblDeathVariableId" Text="Id" Position="310, 120" Size="16, 16"/>
+    <TextBox Name="txtDeathVariable" Position="335, 118" Size="32, 18" Design="TextWhite"/>
+    <Label Name="lblDeathVariableValue" Text="Val" Position="370, 120" Size="22, 16"/>
+    <TextBox Name="txtDeathVariableValue" Position="395, 118" Size="32, 18" Design="TextWhite"/>
+
+    <!-- Common event trigger -->
+    <Label Name="lblCommonEvent" Text="Event" Position="270, 144" Size="80, 16"/>
+    <Label Name="lblCommonEventType" Text="Type" Position="270, 162" Size="60, 16"/>
+    <ComboBox Name="cmbCommonEventType" Position="350, 160" Size="96, 18"/>
+    <Label Name="lblCommonEventData1" Text="Data 1" Position="270, 184" Size="60, 16"/>
+    <TextBox Name="txtCommonEventData1" Position="350, 182" Size="96, 18" Design="TextWhite"/>
+    <Label Name="lblCommonEventData2" Text="Data 2" Position="270, 208" Size="60, 16"/>
+    <TextBox Name="txtCommonEventData2" Position="350, 206" Size="96, 18" Design="TextWhite"/>
 
     <!-- Stats -->
     <Label Name="lblHp" Text="HP" Position="8, 160" Size="40, 16"/>
@@ -45,10 +60,10 @@
     <TextBox Name="txtExp" Position="48, 184" Size="80, 18" Design="TextWhite"/>
     <Label Name="lblLevel" Text="Level" Position="8, 204" Size="60, 18"/>
     <TextBox Name="txtLevel" Position="72, 204" Size="80, 18" Design="TextWhite"/>
-    <Label Name="lblDamage" Text="Damage" Position="168, 160" Size="60, 16"/>
-    <TextBox Name="txtDamage" Position="234, 158" Size="80, 18" Design="TextWhite"/>
-    <Label Name="lblRange" Text="Range" Position="168, 192" Size="60, 16"/>
-    <ScrollBar Name="sldRange" Position="234, 194" Size="160, 12" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+    <Label Name="lblDamage" Text="Damage" Position="136, 160" Size="60, 16"/>
+    <TextBox Name="txtDamage" Position="180, 158" Size="70, 18" Design="TextWhite"/>
+    <Label Name="lblRange" Text="Range" Position="136, 184" Size="60, 16"/>
+    <ScrollBar Name="sldRange" Position="180, 184" Size="70, 12" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 
     <!-- Skills -->
     <Label Name="lblSkills" Text="Skills" Position="8, 232" Size="60, 16"/>

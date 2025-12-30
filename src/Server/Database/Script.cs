@@ -1012,12 +1012,15 @@ public class Script
 
                     if (npcTemplate.DeathSwitch > 0 && npcTemplate.DeathSwitch < Core.Globals.Variables.MaxSwitches)
                     {
-                        Server.Player.Instance[attacker.Id].Switches[npcTemplate.DeathSwitch] = 1;
+                        var val = npcTemplate.DeathSwitchValue;
+                        if (val < 0) val = 0;
+                        Server.Player.Instance[attacker.Id].Switches[npcTemplate.DeathSwitch] = (byte)Math.Clamp(val, 0, byte.MaxValue);
                     }
 
                     if (npcTemplate.DeathVariable > 0 && npcTemplate.DeathVariable < Core.Globals.Variables.MaxVariables)
                     {
-                        Server.Player.Instance[attacker.Id].Variables[npcTemplate.DeathVariable] += 1;
+                        var add = npcTemplate.DeathVariableValue;
+                        Server.Player.Instance[attacker.Id].Variables[npcTemplate.DeathVariable] += add;
                     }
                 }
 

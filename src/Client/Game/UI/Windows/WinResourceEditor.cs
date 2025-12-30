@@ -111,6 +111,24 @@ public class WinResourceEditor
         SetBar("sldLvlReq", "lblLvlReqVal", r.LvlRequired, 0, GameState.MaxLevel);
         SetBar("sldNormalPic", "lblNormalPicVal", r.ResourceImage, 0, GameState.NumResources);
         SetBar("sldExhaustedPic", "lblExhaustedPicVal", r.ExhaustedImage, 0, GameState.NumResources);
+
+        // Common event trigger (0=None; 1.. = CommonEventTrigger)
+        if (WindowManager.TryGetControl("winResourceEditor", "cmbCommonEventType", out var ceCtrl) && ceCtrl is ComboBox cmbCe)
+        {
+            if (cmbCe.Items.Count == 0)
+            {
+                cmbCe.Items.Add("None");
+                foreach (var name in Enum.GetNames(typeof(CommonEventTrigger)))
+                    cmbCe.Items.Add(name);
+            }
+
+            cmbCe.Value = Math.Clamp(r.CommonEventType, 0, Math.Max(0, cmbCe.Items.Count - 1));
+        }
+
+        if (WindowManager.TryGetControl("winResourceEditor", "txtCommonEventData1", out var ce1Ctrl) && ce1Ctrl is TextBox txtCe1)
+            txtCe1.Text = r.CommonEventData1.ToString();
+        if (WindowManager.TryGetControl("winResourceEditor", "txtCommonEventData2", out var ce2Ctrl) && ce2Ctrl is TextBox txtCe2)
+            txtCe2.Text = r.CommonEventData2.ToString();
     }
 
     // Refresh list display names

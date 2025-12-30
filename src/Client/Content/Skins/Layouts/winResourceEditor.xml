@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window Name="winResourceEditor" Caption="Resource Editor"
-        Size="760, 500"
+	Size="760, 580"
         Icon="590" IconOffset="3, 5"
         Design="WindowNormal"
         StartPosition="CenterScreen"
         Visible="false">
 
 	<!-- Left: Resource index list -->
-	<GroupBox Name="grpList" Position="8,32" Size="200, 426" Caption="Resources">
+	<GroupBox Name="grpList" Position="8,32" Size="200, 506" Caption="Resources">
 		<ListBox Name="lstIndex" Position="8, 24" Size="164, 390"/>
 		<ScrollBar Name="sldList" Position="172, 24" Size="16, 390" Min="0" Max="0" Value="0" Orientation="Vertical"/>
 	</GroupBox>
 
 	<!-- Right: Details -->
-	<GroupBox Name="grpDetails" Position="212, 32" Size="536, 426" Caption="Details">
+	<GroupBox Name="grpDetails" Position="212, 32" Size="536, 506" Caption="Details">
 		<!-- Name / Messages -->
 		<Label Name="lblName" Text="Name" Position="8, 28" Size="60, 16"/>
 		<TextBox Name="txtName" Position="84, 24" Size="180, 20" Design="TextWhite"/>
@@ -65,13 +65,22 @@
 		<ScrollBar Name="sldExhaustedPic" Position="368,240" Size="156, 16" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 		<Label Name="lblExhaustedPicVal" Text="0" Position="528,244" Size="32, 16"/>
 		<PictureBox Name="picExhausted" Position="368,260" Size="150,130"/>
+
+		<!-- Common event trigger -->
+		<Label Name="lblCommonEvent" Text="Event" Position="8, 402" Size="120,18"/>
+		<Label Name="lblCommonEventType" Text="Type" Position="8, 426" Size="120,18"/>
+		<ComboBox Name="cmbCommonEventType" Position="84, 424" Size="180,20"/>
+		<Label Name="lblCommonEventData1" Text="Data 1" Position="276,426" Size="84,18"/>
+		<TextBox Name="txtCommonEventData1" Position="368,424" Size="156,20" Design="TextWhite"/>
+		<Label Name="lblCommonEventData2" Text="Data 2" Position="276,450" Size="84,18"/>
+		<TextBox Name="txtCommonEventData2" Position="368,448" Size="156,20" Design="TextWhite"/>
 	</GroupBox>
 
 	<!-- Action buttons (centered at bottom like other editors) -->
-	<Button Name="btnSave" Text="Save" Position="302, 466	" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-	<Button Name="btnDelete" Text="Delete" Position="394, 466" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
-	<Button Name="btnCopy" Text="Copy" Position="486, 466" Size="80, 24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
-	<Button Name="btnCancel" Text="Cancel" Position="578, 466" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+	<Button Name="btnSave" Text="Save" Position="302, 546" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+	<Button Name="btnDelete" Text="Delete" Position="394, 546" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+	<Button Name="btnCopy" Text="Copy" Position="486, 546" Size="80, 24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnCancel" Text="Cancel" Position="578, 546" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
 
 	<!-- Close -->
 	<Button Name="btnClose" Position="-19, 5" Size="16, 16" Image="8" ImageHover="9" ImageMouseDown="10"/>

@@ -3568,6 +3568,9 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         Npc.Instance[npcNum].DeathSwitch = packetReader.ReadInt32();
         Npc.Instance[npcNum].DeathVariable = packetReader.ReadInt32();
 
+        Npc.Instance[npcNum].DeathSwitchValue = packetReader.ReadInt32();
+        Npc.Instance[npcNum].DeathVariableValue = packetReader.ReadInt32();
+
         // common event fields (0 = none)
         Npc.Instance[npcNum].CommonEventType = packetReader.ReadByte();
         Npc.Instance[npcNum].CommonEventData1 = packetReader.ReadInt32();

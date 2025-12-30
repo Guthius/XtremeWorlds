@@ -1959,6 +1959,8 @@ public static class NetworkSend
 
         packet.WriteInt32(npc.DeathSwitch);
         packet.WriteInt32(npc.DeathVariable);
+        packet.WriteInt32(npc.DeathSwitchValue);
+        packet.WriteInt32(npc.DeathVariableValue);
 
         // common event fields (0 = none)
         packet.WriteByte(npc.CommonEventType);

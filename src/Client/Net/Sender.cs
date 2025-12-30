@@ -651,6 +651,8 @@ public static class Sender
 
         packetWriter.WriteInt32(npc.DeathSwitch);
         packetWriter.WriteInt32(npc.DeathVariable);
+        packetWriter.WriteInt32(npc.DeathSwitchValue);
+        packetWriter.WriteInt32(npc.DeathVariableValue);
 
         packetWriter.WriteByte(npc.CommonEventType);
         packetWriter.WriteInt32(npc.CommonEventData1);
