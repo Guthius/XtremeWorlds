@@ -900,7 +900,7 @@ public class Script
                 if (!NetworkConfig.IsPlaying(id)) continue;
                 int hpMax = GetPlayerMaxVital(id, Core.Globals.Vital.Health);
                 int hpCur = GetPlayerVital(id, Core.Globals.Vital.Health);
-                if (hpCur > 0 && hpCur < hpMax)
+                if (hpMax > 0 && hpCur < hpMax && !Server.Player.Instance[id].Dead)
                 {
                     int amount = Math.Max(1, GetPlayerStat(id, Stat.Vitality) / 2);
                     SetPlayerVital(id, Core.Globals.Vital.Health, Math.Min(hpMax, hpCur + amount));
