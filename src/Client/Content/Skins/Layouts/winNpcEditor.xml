@@ -35,7 +35,7 @@
     <!-- Death tracking -->
     <Label Name="lblDeathSwitch" Text="Death Switch" Position="270, 96" Size="80, 16"/>
     <TextBox Name="txtDeathSwitch" Position="350, 94" Size="66, 18" Design="TextWhite"/>
-    <Label Name="lblDeathVariable" Text="Death Variable" Position="270, 120" Size="84, 16"/>
+    <Label Name="lblDeathVariable" Text="Death Variable" Position="270, 120" Size="100, 16"/>
     <TextBox Name="txtDeathVariable" Position="350, 118" Size="66, 18" Design="TextWhite"/>
 
     <!-- Stats -->
@@ -65,7 +65,7 @@
     <ComboBox Name="cmbDropSlot" Position="112, 302" Size="60, 18"/>
     <Label Name="lblDropItem" Text="Item" Position="180, 304" Size="40, 16"/>
     <ComboBox Name="cmbDropItem" Position="224, 302" Size="184, 18"/>
-    <Label Name="lblAmount" Text="Amount" Position="0, 328" Size="60, 16"/>
+    <Label Name="lblAmount" Text="Amount" Position="8, 328" Size="60, 16"/>
     <TextBox Name="txtAmount" Position="72, 326" Size="80, 18" Design="TextWhite"/>
     <Label Name="lblChance" Text="Chance" Position="168, 328" Size="60, 16"/>
     <ScrollBar Name="sldChance" Position="228, 326" Size="160, 12" Min="0" Max="100" Value="0" Orientation="Horizontal" ThumbSize="16"/>
