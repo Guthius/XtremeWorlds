@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Core;
 using static Core.Globals.Type;
 using static Core.Globals.Commands;
@@ -1370,68 +1371,83 @@ namespace Server
 
         public static void ProcessEventCommands()
         {
+            // Snapshot player ids to avoid enumerating a mutable LinkedList while running in parallel.
+            var playerIds = PlayerService.Instance.PlayerIds.ToArray();
+
             // Parallel processing for each player.
-            Parallel.ForEach(PlayerService.Instance.PlayerIds, i =>
+            Parallel.ForEach(playerIds, i =>
             {
-                if (!NetworkConfig.IsPlaying(i) || Data.TempPlayer[i].GettingMap || Data.TempPlayer[i].EventMap.CurrentEvents <= 0) return;
-
-                int map = Player.Instance[i].Map; // Cache map number.
-
-                // Iterate through the player's events.
-                for (int x = 0; x < Data.TempPlayer[i].EventMap.CurrentEvents; x++)
+                try
                 {
-                    if (x >= Data.TempPlayer[i].EventMap.EventPages.Length)
-                        break;
+                    if (i < 0 || i >= Data.TempPlayer.Length) return;
+                    if (!NetworkConfig.IsPlaying(i) || Data.TempPlayer[i].GettingMap || Data.TempPlayer[i].EventMap.CurrentEvents <= 0) return;
 
-                    if (Data.TempPlayer[i].EventProcessingCount <= 0) continue;
+                    if (i < 0 || Player.Instance == null || i >= Player.Instance.Count) return;
+                    int map = Player.Instance[i].Map; // Cache map number.
 
-                    ref var eventPage = ref Data.TempPlayer[i].EventMap.EventPages[x];
-
-                    if (!eventPage.Visible) continue;
-
-                    // Check event and page validity.
-                    if (eventPage.EventId >= Server.Map.Instance[map].Event.Length || Server.Map.Instance[map].Event == null || Server.Map.Instance[map].Event[eventPage.EventId].Pages == null || eventPage.PageId >= Server.Map.Instance[map].Event[eventPage.EventId].Pages.Length) continue;
-
-                    // Handle parallel process events (Trigger == 2).
-                    if (Server.Map.Instance[map].Event[eventPage.EventId].Pages[eventPage.PageId].Trigger == 2)
+                    // Iterate through the player's events.
+                    for (int x = 0; x < Data.TempPlayer[i].EventMap.CurrentEvents; x++)
                     {
-                        // If not already active, start the event processing.
-                        if (Data.TempPlayer[i].EventProcessing[eventPage.EventId].Active == 0) // Use map event ID for indexing.
-                        {
-                            if (Server.Map.Instance[map].Event[eventPage.EventId].Pages[eventPage.PageId].CommandListCount > 0)
-                            {
-                                ref var eventProcessing = ref Data.TempPlayer[i].EventProcessing[eventPage.EventId]; // And here.
-                                eventProcessing.Active = 1;
-                                eventProcessing.ActionTimer = General.GetTimeMs();
-                                eventProcessing.CurList = 0;
-                                eventProcessing.CurSlot = 0;
-                                eventProcessing.EventId = eventPage.EventId;
-                                eventProcessing.PageId = eventPage.PageId;
-                                eventProcessing.WaitingForResponse = 0;
+                        if (x >= Data.TempPlayer[i].EventMap.EventPages.Length)
+                            break;
 
-                                // Allocate ListLeftOff array.
-                                eventProcessing.ListLeftOff = new int[Server.Map.Instance[map].Event[eventPage.EventId].Pages[eventPage.PageId].CommandListCount];
+                        if (Data.TempPlayer[i].EventProcessingCount <= 0) continue;
+
+                        ref var eventPage = ref Data.TempPlayer[i].EventMap.EventPages[x];
+
+                        if (!eventPage.Visible) continue;
+
+                        // Check event and page validity.
+                        if (eventPage.EventId >= Server.Map.Instance[map].Event.Length || Server.Map.Instance[map].Event == null || Server.Map.Instance[map].Event[eventPage.EventId].Pages == null || eventPage.PageId >= Server.Map.Instance[map].Event[eventPage.EventId].Pages.Length) continue;
+
+                        // Handle parallel process events (Trigger == 2).
+                        if (Server.Map.Instance[map].Event[eventPage.EventId].Pages[eventPage.PageId].Trigger == 2)
+                        {
+                            // If not already active, start the event processing.
+                            if (Data.TempPlayer[i].EventProcessing[eventPage.EventId].Active == 0) // Use map event ID for indexing.
+                            {
+                                if (Server.Map.Instance[map].Event[eventPage.EventId].Pages[eventPage.PageId].CommandListCount > 0)
+                                {
+                                    ref var eventProcessing = ref Data.TempPlayer[i].EventProcessing[eventPage.EventId]; // And here.
+                                    eventProcessing.Active = 1;
+                                    eventProcessing.ActionTimer = General.GetTimeMs();
+                                    eventProcessing.CurList = 0;
+                                    eventProcessing.CurSlot = 0;
+                                    eventProcessing.EventId = eventPage.EventId;
+                                    eventProcessing.PageId = eventPage.PageId;
+                                    eventProcessing.WaitingForResponse = 0;
+
+                                    // Allocate ListLeftOff array.
+                                    eventProcessing.ListLeftOff = new int[Server.Map.Instance[map].Event[eventPage.EventId].Pages[eventPage.PageId].CommandListCount];
+                                }
                             }
                         }
                     }
                 }
+                catch (Exception ex)
+                {
+                    General.Logger.LogError(ex, "ProcessEventCommands crashed for player {PlayerId}", i);
+                }
             });
 
             // Process active event commands for each player.
-            Parallel.ForEach(PlayerService.Instance.PlayerIds, i =>
+            Parallel.ForEach(playerIds, i =>
             {
-                if (!NetworkConfig.IsPlaying(i) || Data.TempPlayer[i].EventProcessingCount <= 0 || Data.TempPlayer[i].GettingMap) return;
-
-                int map = GetPlayerMap(i); // Cache map number
-                bool restartloop;
-                do
+                try
                 {
-                    restartloop = false;
-                    for (int x = 0; x <= Data.TempPlayer[i].EventProcessingCount; x++)
-                    {
-                        if (Data.TempPlayer[i].EventProcessing[x].Active != 1) continue;
+                    if (i < 0 || i >= Data.TempPlayer.Length) return;
+                    if (!NetworkConfig.IsPlaying(i) || Data.TempPlayer[i].EventProcessingCount <= 0 || Data.TempPlayer[i].GettingMap) return;
 
-                        ref var instance1 = ref Data.TempPlayer[i].EventProcessing[x];
+                    int map = GetPlayerMap(i); // Cache map number
+                    bool restartloop;
+                    do
+                    {
+                        restartloop = false;
+                        for (int x = 0; x <= Data.TempPlayer[i].EventProcessingCount; x++)
+                        {
+                            if (Data.TempPlayer[i].EventProcessing[x].Active != 1) continue;
+
+                            ref var instance1 = ref Data.TempPlayer[i].EventProcessing[x];
 
                         // Basic validity checks
                         if (instance1.EventId < 0 || instance1.EventId >= Server.Map.Instance[map].Event.Length) continue;
@@ -2225,13 +2241,18 @@ namespace Server
 
 
                         // Clean up finished event processes.
-                        if (removeEventProcess)
-                        {
-                            instance1.Active = 0;
-                            restartloop = true;
+                            if (removeEventProcess)
+                            {
+                                instance1.Active = 0;
+                                restartloop = true;
+                            }
                         }
-                    }
-                } while (restartloop);
+                    } while (restartloop);
+                }
+                catch (Exception ex)
+                {
+                    General.Logger.LogError(ex, "ProcessEventCommands (active) crashed for player {PlayerId}", i);
+                }
             });
         }
 
@@ -2248,13 +2269,33 @@ namespace Server
 
         public static string ParseEventText(int index, string txt)
         {
+            if (string.IsNullOrEmpty(txt))
+                return string.Empty;
+
+            // PlayerBase.Instance is a List; the player id may be invalid during disconnect/races.
+            if (index < 0 || Player.Instance == null || index >= Player.Instance.Count)
+                return txt;
+
+            var player = Player.Instance[index];
+            if (player == null)
+                return txt;
+
+            var playerName = player.Name ?? string.Empty;
+
+            string playerClass = string.Empty;
+            var jobId = (int)player.Job;
+            if (jobId >= 0 && Job.Instance != null && jobId < Job.Instance.Count)
+            {
+                playerClass = Job.Instance[jobId].Name ?? string.Empty;
+            }
+
             // Use StringBuilder for efficient string manipulation.
             var sb = new System.Text.StringBuilder(txt);
 
-            sb.Replace("/name", Player.Instance[index].Name);
-            sb.Replace("/p", Player.Instance[index].Name);
-            sb.Replace("$playername$", Player.Instance[index].Name);
-            sb.Replace("$playerclass$", Job.Instance[Player.Instance[index].Job].Name);
+            sb.Replace("/name", playerName);
+            sb.Replace("/p", playerName);
+            sb.Replace("$playername$", playerName);
+            sb.Replace("$playerclass$", playerClass);
 
             // Process variables (/v[variableIndex]).
             int start = sb.ToString().IndexOf("/v"); // Find the first occurrence.
@@ -2273,10 +2314,10 @@ namespace Server
                     if (int.TryParse(varIndexStr, out int varIndex))
                     {
                         // Make sure the variable index is within bounds
-                        if (varIndex >= 0 && varIndex < Player.Instance[index].Variables.Length)
+                        if (player.Variables != null && varIndex >= 0 && varIndex < player.Variables.Length)
                         {
                             sb.Remove(start, end - start);
-                            sb.Insert(start, Player.Instance[index].Variables[varIndex].ToString());
+                            sb.Insert(start, player.Variables[varIndex].ToString());
                         }
                         else
                         {
