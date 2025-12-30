@@ -4,6 +4,9 @@ namespace Client.Game.UI.Windows;
 
 public class WinComboMenu
 {
+    private static TextBox? _previousTextBox;
+    private static Window? _previousTextBoxWindow;
+
     /// <summary>
     /// Returns true if the combo menu is currently open for the given window/control.
     /// </summary>
@@ -17,15 +20,62 @@ public class WinComboMenu
             return true;
         return false;
     }
+
+    private static void CapturePreviousTextBoxFocus()
+    {
+        // Focus in this UI is represented by ActiveWindow.ActiveControl and is only
+        // meaningful for TextBox controls.
+        if (WindowManager.ActiveWindow?.ActiveControl is TextBox tb)
+        {
+            _previousTextBoxWindow = WindowManager.ActiveWindow;
+            _previousTextBox = tb;
+        }
+    }
+
+    private static void RestorePreviousTextBoxFocus()
+    {
+        if (_previousTextBoxWindow is null || _previousTextBox is null)
+        {
+            return;
+        }
+
+        try
+        {
+            if (_previousTextBoxWindow.Visible &&
+                _previousTextBox.Visible &&
+                _previousTextBox.Enabled &&
+                _previousTextBoxWindow.Controls.Contains(_previousTextBox))
+            {
+                WindowManager.ActiveWindow = _previousTextBoxWindow;
+                _previousTextBoxWindow.ActiveControl = _previousTextBox;
+
+                // Optional: fire any focus-enter callback if wired.
+                if (_previousTextBox.CallBack.Count > (int)ControlState.FocusEnter)
+                {
+                    _previousTextBox.CallBack[(int)ControlState.FocusEnter]?.Invoke();
+                }
+            }
+        }
+        finally
+        {
+            _previousTextBoxWindow = null;
+            _previousTextBox = null;
+        }
+    }
     
     public static void Close()
     {
         WindowManager.HideWindow("winComboMenuBG");
         WindowManager.HideWindow("winComboMenu");
+
+        // When the combo menu closes, return focus to the previously focused TextBox.
+        RestorePreviousTextBoxFocus();
     }
 
     public static void Show(Window window, int controlIndex)
     {
+        CapturePreviousTextBoxFocus();
+
         if (window.Controls[controlIndex] is not ComboBox comboBox)
         {
             return;

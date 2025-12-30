@@ -1056,14 +1056,8 @@ public class WindowManager
                                     int id = relY / itemHeight;
                                     if (inMenu && id >= 0 && id < comboBox.Items.Count)
                                     {
-                                        int prev = comboBox.Value;
                                         comboBox.Value = id;
-                                        if (comboBox.Value != prev)
-                                        {
-                                            // Fire the conventional callback immediately on selection.
-                                            // Many parts of the UI (editors) rely on MouseMove to mean "value changed".
-                                            comboBox.CallBack[(int)ControlState.MouseMove]?.Invoke();
-                                        }
+    
                                         // If this is the options resolution combobox, apply immediately
                                         if (string.Equals(curWindow.Name, "winOptions",
                                                 StringComparison.CurrentCultureIgnoreCase) &&
