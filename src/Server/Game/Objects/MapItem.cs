@@ -156,6 +156,15 @@ namespace Server
             {
                 SpawnSlot(slot, itemNum, itemVal, map, x, y);
             }
+
+            try
+            {
+                Script.Instance?.OnSpawnItem();
+            }
+            catch (Exception ex)
+            {
+                General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(OnSpawn));
+            }
         }
 
         public static void SpawnSlot(int mapItemSlot, int itemNum, int itemVal, int map, int x, int y)

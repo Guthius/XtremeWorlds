@@ -8,6 +8,7 @@ using static Core.Net.Packets;
 using static Core.Globals.Commands;
 using Server.Game;
 using MapNpcData = Core.Globals.Type.MapNpc;
+using Microsoft.Extensions.Logging;
 
 namespace Server
 {
@@ -157,6 +158,15 @@ namespace Server
             // If we suceeded in spawning then send it to everyone
             if (spawned)
             {
+                try
+                {
+                    Script.Instance?.OnSpawnNpc();
+                }
+                catch (Exception ex)
+                {
+                    General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(OnSpawn));
+                }
+
                 var packet = new PacketWriter();
 
                 packet.WriteInt32((int) ServerPackets.SSpawnNpc);

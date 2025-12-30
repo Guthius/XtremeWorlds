@@ -134,6 +134,16 @@ public class Script
 
     }
 
+    public void OnSpawnItem()
+    {
+
+    }
+
+    public void OnSpawnNpc()
+    {
+
+    }
+
     public void OnJoin(int index)
     {
         // Warp the Player to his saved location
