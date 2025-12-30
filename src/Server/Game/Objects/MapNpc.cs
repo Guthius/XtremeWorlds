@@ -200,11 +200,11 @@ namespace Server
                 }
             }
 
-            for (var mapNpcNum = 0; mapNpcNum < Core.Globals.Variables.MaxMapNpcs; mapNpcNum++)
+            for (var i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
             {
-                if (Instance[map, mapNpcNum].Num >= 0 &&
-                    Instance[map, mapNpcNum].X == x &&
-                    Instance[map, mapNpcNum].Y == y)
+                if (Instance[map, i].Num >= 0 &&
+                    Instance[map, i].X == x &&
+                    Instance[map, i].Y == y)
                 {
                     return false;
                 }
@@ -233,6 +233,7 @@ namespace Server
 
             var x = Instance[map, mapNpcNum].X;
             var y = Instance[map, mapNpcNum].Y;
+            
             // If already in mid-move, don't allow a new tile move.
             if (Instance[map, mapNpcNum].Moving == (byte)MovementState.Walking && _stepRemaining[map, mapNpcNum] > 0)
                 return false;
