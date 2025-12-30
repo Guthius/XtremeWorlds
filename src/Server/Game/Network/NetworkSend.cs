@@ -1782,6 +1782,16 @@ public static class NetworkSend
         var map = GetPlayerMap(index);
 
         buffer.WriteEnum(ServerPackets.SMapEventData);
+
+        if (map < 0 || map >= Server.Map.Instance.Count)
+        {
+            General.Logger.LogWarning("SendMapEventData called with invalid map {MapId} for player {PlayerId}", map, index);
+            buffer.WriteInt32(0);
+            PlayerService.Instance.SendDataTo(index, buffer.GetBytes());
+            SendSwitchesAndVariables(index);
+            return;
+        }
+
         buffer.WriteInt32(Server.Map.Instance[map].EventCount);
 
         if (Server.Map.Instance[map].EventCount > 0)
