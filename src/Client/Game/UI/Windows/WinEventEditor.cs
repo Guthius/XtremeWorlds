@@ -495,6 +495,11 @@ public static class WinEventEditor
 
         switch (index)
         {
+            case EventCommand.AddText:
+                pickLabel = "Color";
+                max = Enum.GetValues<ColorName>().Length;
+                nameFor = i => Enum.GetName(typeof(ColorName), i);
+                break;
             case EventCommand.OpenShop:
                 pickLabel = "Shop";
                 max = Variables.MaxShops;

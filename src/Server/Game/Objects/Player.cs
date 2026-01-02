@@ -619,8 +619,6 @@ public class Player : PlayerBase
         {
             General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(OnMove));
         }
-
-        // Player Touch triggering is handled above (1-based EventPages loop).
     }
 
     public static bool IsTileBlocked(int playerId, int map, int x, int y, Direction dir)
