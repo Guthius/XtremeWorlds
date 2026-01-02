@@ -129,24 +129,10 @@
     <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
 
-  <!-- Always include Eto.Forms, but only include platform-specific backends based on TFM resolution -->
-  <ItemGroup>
-    <PackageReference Include="Eto.Forms" />
-  </ItemGroup>
-
   <!-- Windows-only backends (require -windows TFM) -->
   <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-windows'">
-    <PackageReference Include="Eto.Platform.Wpf" />
-    <PackageReference Include="Eto.Platform.Windows" />
     <PackageReference Include="ImeSharp" />
     <PackageReference Include="NVorbis" />
-  </ItemGroup>
-
-  <!-- Non-Windows backends: Gtk for Linux always; Mac64 only when explicitly enabled -->
-  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
-    <PackageReference Include="Eto.Platform.Gtk" />
-    <!-- You likely need Eto.Platform.Mac64 here too if building on Mac -->
-    <!-- <PackageReference Include="Eto.Platform.Mac64" /> -->
   </ItemGroup>
 
   <!-- Other platform-agnostic and always-needed packages -->

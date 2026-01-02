@@ -128,7 +128,6 @@ public static class Packets
         CMouseAttack = 106,
         CCloseEditor = 107,
 
-        // Make sure COUNT is below everything else
         CCancelCast = 108,
 
         // Make sure COUNT is below everything else
