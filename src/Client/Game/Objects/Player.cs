@@ -686,7 +686,10 @@ namespace Client
             {
                 if (Data.MapEvents?[i].Visible == true)
                 {
-                    if (Data.MapEvents[i].X == x & Data.MapEvents[i].Y == y)
+                    // Server sends event positions in world pixels (tile * 32). Movement/collision here is tile-based.
+                    var eventTileX = Math.Floor((double)Data.MapEvents[i].X / Constants.TileSize);
+                    var eventTileY = Math.Floor((double)Data.MapEvents[i].Y / Constants.TileSize);
+                    if (eventTileX == x & eventTileY == y)
                     {
                         if (Data.MapEvents[i].WalkThrough == 0)
                         {
