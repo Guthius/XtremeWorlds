@@ -14,6 +14,27 @@ namespace Server
 {
     public class Map : MapBase, IAsyncData
     {
+        private static void EnsureMapListSize(int size)
+        {
+            if (size <= 0)
+            {
+                return;
+            }
+
+            if (Server.Map.Instance.Count >= size)
+            {
+                return;
+            }
+
+            lock (Server.Map.Instance)
+            {
+                while (Server.Map.Instance.Count < size)
+                {
+                    Server.Map.Instance.Add(new Map());
+                }
+            }
+        }
+
         private static Core.Globals.Type.Tile[,] CreateTile(byte maxX, byte maxY)
         {
             var tile = new Core.Globals.Type.Tile[maxX, maxY];
@@ -49,6 +70,8 @@ namespace Server
 
         public static System.Threading.Tasks.Task OnLoadAllAsync()
         {
+            // Parallel map loading assigns by index; ensure indices exist up-front.
+            EnsureMapListSize(Core.Globals.Variables.MaxMaps);
             return Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxMaps), OnLoadAsync);
         }
 
@@ -83,17 +106,21 @@ namespace Server
                 Directory.CreateDirectory(sdMapDir);
             }
 
-            if (System.IO.File.Exists(xwMapsDir + @"\map" + index + ".dat"))
+            var xwMapPath = Path.Combine(xwMapsDir, $"map{index}.dat");
+            if (System.IO.File.Exists(xwMapPath))
             {
-                var xwMap = LoadXwMap(mapsDir + @"\map" + index + ".dat");
+                var xwMap = LoadXwMap(xwMapPath);
                 Server.Map.Instance[index] = MapFromXwMap(xwMap);
+                MapResource.OnUpdate(index);
                 return;
             }
 
-            if (File.Exists(csMapsDir + @"\map" + index + ".ini"))
+            var csMapPath = Path.Combine(csMapsDir, $"map{index}.ini");
+            if (File.Exists(csMapPath))
             {
-                var csMap = LoadCsMap(csMapsDir + @"\map" + index + ".ini");
+                var csMap = LoadCsMap(csMapPath);
                 Server.Map.Instance[index] = MapFromCsMap(csMap);
+                MapResource.OnUpdate(index);
                 return;
             }
 
@@ -102,6 +129,7 @@ namespace Server
             {
                 SdMap sdMap = LoadSdMap(mapPath);
                 Server.Map.Instance[index] = MapFromSdMap(sdMap);
+                MapResource.OnUpdate(index);
                 return;
             }
 
@@ -115,8 +143,8 @@ namespace Server
                 return;
             }
 
-            var mapData = JObject.FromObject(data).ToObject<Map>();
-            Server.Map.Instance.Add(mapData ?? new Map());
+            var mapData = data.ToObject<Map>();
+            Server.Map.Instance[index] = mapData ?? new Map();
 
             MapResource.OnUpdate(index);
         }

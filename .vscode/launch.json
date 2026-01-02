@@ -6,7 +6,7 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build Client",
-      "program": "${workspaceFolder}/Build/Client/osx-arm64/XtremeWorlds.Client.dll",
+      "program": "${workspaceFolder}/Build/Client/linux-x64/XtremeWorlds.Client.dll",
       "args": [],
       "cwd": "${workspaceFolder}/Build/Client",
       "stopAtEntry": false,
