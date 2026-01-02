@@ -680,7 +680,6 @@ public class Player : PlayerBase
             if (x < 0 || y < 0 || x > Server.Map.Instance[map].MaxX || y > Server.Map.Instance[map].MaxY)
                 return true;
 
-            // If moral data isn't loaded or is invalid, default to blocking to avoid overlap/collision bypass.
             var index = Server.Map.Instance[map].Moral;
             var playerBlock = true;
             var npcBlock = true;
@@ -723,7 +722,7 @@ public class Player : PlayerBase
                 var globalEvents = Event.TempEventMap[map];
                 if (globalEvents.Event != null && globalEvents.EventCount > 0)
                 {
-                    for (var i = 0; i < globalEvents.EventCount && i < globalEvents.Event.Length; i++)
+                    for (var i = 1; i <= globalEvents.EventCount && i < globalEvents.Event.Length; i++)
                     {
                         var ge = globalEvents.Event[i];
                         if (ge.WalkThrough != 0)
@@ -743,7 +742,7 @@ public class Player : PlayerBase
             if (eventMap.CurrentEvents > 0 && eventMap.EventPages != null)
             {
                 // EventPages is 1-based in this code-path.
-                for (var slot = 1; slot <= eventMap.CurrentEvents && slot < eventMap.EventPages.Length; slot++)
+                for (var slot = 1; slot <= eventMap.CurrentEvents && slot <= eventMap.EventPages.Length; slot++)
                 {
                     var page = eventMap.EventPages[slot];
                     if (!page.Visible)
@@ -752,7 +751,7 @@ public class Player : PlayerBase
                         continue;
 
                     // MapEvent.X/Y are pixel coordinates (multiples of TileSize).
-                    if ((page.X / Constants.TileSize) == x && (page.Y / Constants.TileSize) == y)
+                    if (Math.Floor((double)page.X / Constants.TileSize) == x && Math.Floor((double)page.Y / Constants.TileSize) == y)
                         return true;
                 }
             }

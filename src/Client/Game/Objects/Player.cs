@@ -7,12 +7,14 @@ using Type = Core.Globals.Type;
 using Microsoft.Xna.Framework;
 using Core.Configurations;
 using Core.Objects;
+using Core.Interfaces;
 
 namespace Client
 {
-    public class Player : PlayerBase
+    public class Player : PlayerBase, IData
     {
         private static readonly double[] _moveRemainder = new double[Core.Globals.Variables.MaxPlayers];
+
         #region Database
 
         public static void OnClear(int index)
@@ -459,6 +461,8 @@ namespace Client
                         {
                             Sender.SendPlayerDir();
                         }
+
+                        return canMove;
                     }
                 }
                 else if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Up > 0)
@@ -479,6 +483,8 @@ namespace Client
                         {
                             Sender.SendPlayerDir();
                         }
+
+                        return canMove;
                     }
                 }
                 else if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Down > 0)
@@ -499,6 +505,8 @@ namespace Client
                         {
                             Sender.SendPlayerDir();
                         }
+
+                        return canMove;
                     }
                 }
                 else if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Left > 0)
@@ -519,6 +527,8 @@ namespace Client
                         {
                             Sender.SendPlayerDir();
                         }
+
+                        return canMove;
                     }
                 }
                 else if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Right > 0)
@@ -540,6 +550,8 @@ namespace Client
                         {
                             Sender.SendPlayerDir();
                         }
+
+                        return canMove;
                     }
                 }
                 else if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Up > 0 & Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Right > 0)
@@ -559,6 +571,8 @@ namespace Client
                         {
                             Sender.SendPlayerDir();
                         }
+
+                        return canMove;
                     }
                 }
                 else if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Up > 0 & Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Left > 0)
@@ -578,6 +592,8 @@ namespace Client
                         {
                             Sender.SendPlayerDir();
                         }
+
+                        return canMove;
                     }
                 }
                 else if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Down > 0 & Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Right > 0)
@@ -597,6 +613,8 @@ namespace Client
                         {
                             Sender.SendPlayerDir();
                         }
+
+                        return canMove;
                     }
                 }
                 else if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Down > 0 & Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Left > 0)
@@ -735,49 +753,15 @@ namespace Client
             }
 
             var count = GameState.CurrentEvents;
-            for (i = 0; i < count; i++)
+            if (count > 0 && Data.MapEvents != null)
             {
-                if (Data.MapEvents?[i].Visible == true)
+                int mapId = GetPlayerMap(GameState.MyIndex);
+                for (i = 0; i < count; i++)
                 {
-                    // Server sends event positions in world pixels (tile * 32). Movement/collision here is tile-based.
-                    var map = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)];
-                    var eventTileX = (int)Math.Floor((double)Data.MapEvents[i].X / Constants.TileSize);
-                    var eventTileY = (int)Math.Floor((double)Data.MapEvents[i].Y / Constants.TileSize);
-
-                    // Some maps/events appear to be consistently offset by +1 tile in X when coming from runtime packets.
-                    // If the map has an event definition at (x-1,y) but not at (x,y), snap left by one tile.
-                    // This keeps collision aligned with the editor-defined event location.
-                    if (map.EventCount > 0 && map.Event != null)
+                    if (Math.Floor((double)Data.MapEvents[i].X) == x & Math.Floor((double)Data.MapEvents[i].Y) == y)
                     {
-                        bool hasAtComputed = false;
-                        bool hasAtLeft = false;
-
-                        for (var e = 0; e < map.EventCount && e < map.Event.Length; e++)
-                        {
-                            if (map.Event[e].X == eventTileX && map.Event[e].Y == eventTileY)
-                            {
-                                hasAtComputed = true;
-                                break;
-                            }
-
-                            if (map.Event[e].X == eventTileX - 1 && map.Event[e].Y == eventTileY)
-                            {
-                                hasAtLeft = true;
-                            }
-                        }
-
-                        if (!hasAtComputed && hasAtLeft)
-                        {
-                            eventTileX -= 1;
-                        }
-                    }
-                    if (eventTileX == x & eventTileY == y)
-                    {
-                        if (Data.MapEvents[i].WalkThrough == 0)
-                        {
-                            OnCheckDir = true;
-                            return OnCheckDir;
-                        }
+                        OnCheckDir = true;
+                        return OnCheckDir;
                     }
                 }
             }
@@ -1420,7 +1404,7 @@ namespace Client
             }
         }
 
-        public static void OnStream(int index)
+        public static void OnReset()
         {
             throw new NotImplementedException();
         }
