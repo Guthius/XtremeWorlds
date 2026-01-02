@@ -54,8 +54,7 @@ namespace Client
                 }
 
                 if (_tmr25 < _tick)
-                {
-                    Audio.PlayMusic(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Music);
+                {Audio.PlayMusic(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Music);
                     UpdateEditors();
                     _tmr25 = _tick + 25;
                 }

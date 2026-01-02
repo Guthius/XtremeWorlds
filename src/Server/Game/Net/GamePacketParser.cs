@@ -605,16 +605,24 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         var tmpX = buffer.ReadInt32();
         var tmpY = buffer.ReadInt32();
 
+        // Prevent invalid movement states (client can send arbitrary bytes)
+        var movementCount = Enum.GetValues(typeof(MovementState)).Length;
+        if (movement >= movementCount)
+        {
+            return;
+        }
+
         SetPlayerDir(session.Id, dir);
+
+        // Always apply requested movement so the server loop can start stepping.
+        // If the client is slightly out of sync, we correct them without broadcasting to the whole map.
+        PlayerBase.Instance[session.Id].Moving = movement;
 
         if (tmpX != GetPlayerRawX(session.Id) || tmpY != GetPlayerRawY(session.Id))
         {
             // Desync detected, correct client
-            NetworkSend.SendPlayerXYToMap(session.Id);
-            return;
+            NetworkSend.SendPlayerXY(session.Id);
         }
-
-        PlayerBase.Instance[session.Id].Moving = movement;
 
         // Requirement: moving cancels any buffered cast
         if (Data.TempPlayer[session.Id].SkillBuffer >= 0)

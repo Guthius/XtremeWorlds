@@ -17,6 +17,8 @@ namespace Server;
 
 public class Player : PlayerBase
 {
+    private static readonly int[] LastPlayerXYBroadcastMs = new int[Core.Globals.Variables.MaxPlayers];
+
     public static void OnLevel(int playerId)
     {
         try
@@ -598,9 +600,22 @@ public class Player : PlayerBase
         {
             OnWarp(playerId, GetPlayerMap(playerId), GetPlayerX(playerId), GetPlayerY(playerId), (byte) Direction.Down);
         }
-        
+
+        var wasMoving = Player.Instance[playerId].IsMoving;
         Player.Instance[playerId].IsMoving = true;
-        NetworkSend.SendPlayerXYToMap(playerId);
+
+        // Throttle movement broadcasts: clients already have direction/move speed and can smoothly step.
+        // Send immediately on movement start, on warp-triggered transitions, periodically, and on tile boundaries.
+        var now = General.GetTimeMs();
+        var last = (playerId >= 0 && playerId < LastPlayerXYBroadcastMs.Length) ? LastPlayerXYBroadcastMs[playerId] : 0;
+        var onTileBoundary = (GetPlayerRawX(playerId) % Constants.TileSize == 0) && (GetPlayerRawY(playerId) % Constants.TileSize == 0);
+        var shouldSend = !wasMoving || expectingWarp || didWarp || onTileBoundary || now - last >= 100;
+        if (shouldSend)
+        {
+            if (playerId >= 0 && playerId < LastPlayerXYBroadcastMs.Length)
+                LastPlayerXYBroadcastMs[playerId] = now;
+            NetworkSend.SendPlayerXYToMap(playerId);
+        }
 
         try
         {
