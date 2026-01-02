@@ -36,18 +36,85 @@ public static class WinEventEditor
     private static int _pickerTargetCommandIndex;
     private static bool _pickerTargetIsNew;
 
+    private static readonly System.Collections.Generic.List<int> _cmdPick1ValueMap = new();
+    private static readonly System.Collections.Generic.List<int> _cmdPick2ValueMap = new();
+    private static string _cmdPick1TargetTextBox = "txtCmdData1";
+    private static string _cmdPick2TargetTextBox = "txtCmdData2";
+
     private static int _dataTargetListIndex;
     private static int _dataTargetCommandIndex;
     private static bool _dataTargetIsNew;
     private static Core.Globals.Type.EventCommand _dataHistoryCommand;
     private static bool _dataHasHistory;
 
-    private const int MaxPageButtons = 28;
+    private const int MaxPageButtons = 30;
+
+    private static bool TryGetEventCommandIndex(int rawIndex, out EventCommand index)
+    {
+        try
+        {
+            index = (EventCommand)rawIndex;
+            return true;
+        }
+        catch
+        {
+            index = default;
+            return false;
+        }
+    }
+
+    private static bool IsConditionalBranch(Core.Globals.Type.EventCommand cmd)
+    {
+        return TryGetEventCommandIndex(cmd.Index, out var index) && index == EventCommand.ConditionalBranch;
+    }
+
+    private static void ResetCommandDataLabels(string windowName)
+    {
+        if (WindowManager.TryGetControl(windowName, "lblCmdText1", out var t1) && t1 is Label lt1)
+            lt1.Text = "Text1";
+        if (WindowManager.TryGetControl(windowName, "lblCmdText2", out var t2) && t2 is Label lt2)
+            lt2.Text = "Text2";
+        if (WindowManager.TryGetControl(windowName, "lblCmdText3", out var t3) && t3 is Label lt3)
+            lt3.Text = "Text3";
+
+        if (WindowManager.TryGetControl(windowName, "lblCmdData1", out var d1) && d1 is Label ld1)
+            ld1.Text = "D1";
+        if (WindowManager.TryGetControl(windowName, "lblCmdData2", out var d2) && d2 is Label ld2)
+            ld2.Text = "D2";
+        if (WindowManager.TryGetControl(windowName, "lblCmdData3", out var d3) && d3 is Label ld3)
+            ld3.Text = "D3";
+        if (WindowManager.TryGetControl(windowName, "lblCmdData4", out var d4) && d4 is Label ld4)
+            ld4.Text = "D4";
+        if (WindowManager.TryGetControl(windowName, "lblCmdData5", out var d5) && d5 is Label ld5)
+            ld5.Text = "D5";
+        if (WindowManager.TryGetControl(windowName, "lblCmdData6", out var d6) && d6 is Label ld6)
+            ld6.Text = "D6";
+    }
+
+    private static void ConfigureConditionalBranchLabels(string windowName)
+    {
+        if (WindowManager.TryGetControl(windowName, "lblCmdData1", out var d1) && d1 is Label ld1)
+            ld1.Text = "Cond";
+        if (WindowManager.TryGetControl(windowName, "lblCmdData2", out var d2) && d2 is Label ld2)
+            ld2.Text = "A";
+        if (WindowManager.TryGetControl(windowName, "lblCmdData3", out var d3) && d3 is Label ld3)
+            ld3.Text = "B";
+        if (WindowManager.TryGetControl(windowName, "lblCmdData4", out var d4) && d4 is Label ld4)
+            ld4.Text = "C";
+        if (WindowManager.TryGetControl(windowName, "lblCmdData5", out var d5) && d5 is Label ld5)
+            ld5.Text = "IfLst";
+        if (WindowManager.TryGetControl(windowName, "lblCmdData6", out var d6) && d6 is Label ld6)
+            ld6.Text = "Else";
+    }
 
     private static string FormatCommandDisplayName(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
             return string.Empty;
+
+        // Friendly label for the editor: keep it short.
+        if (string.Equals(name, nameof(EventCommand.ConditionalBranch), StringComparison.Ordinal))
+            return "Condition";
 
         // Turn PascalCase/camelCase into spaced words: "ShowText" -> "Show Text".
         // Also handles digit boundaries: "ShowText2" -> "Show Text 2".
@@ -234,6 +301,11 @@ public static class WinEventEditor
 
             SetCommandDataControlsEnabled(true);
 
+            // Reset labels each load; specific commands can override.
+            ResetCommandDataLabels("winEventEditor");
+            if (IsConditionalBranch(cmd))
+                ConfigureConditionalBranchLabels("winEventEditor");
+
             if (WindowManager.TryGetControl("winEventEditor", "txtCmdText1", out var t1) && t1 is TextBox tb1)
                 tb1.Text = cmd.Text1 ?? string.Empty;
             if (WindowManager.TryGetControl("winEventEditor", "txtCmdText2", out var t2) && t2 is TextBox tb2)
@@ -241,18 +313,36 @@ public static class WinEventEditor
             if (WindowManager.TryGetControl("winEventEditor", "txtCmdText3", out var t3) && t3 is TextBox tb3)
                 tb3.Text = cmd.Text3 ?? string.Empty;
 
-            if (WindowManager.TryGetControl("winEventEditor", "txtCmdData1", out var d1) && d1 is TextBox db1)
-                db1.Text = cmd.Data1.ToString();
-            if (WindowManager.TryGetControl("winEventEditor", "txtCmdData2", out var d2) && d2 is TextBox db2)
-                db2.Text = cmd.Data2.ToString();
-            if (WindowManager.TryGetControl("winEventEditor", "txtCmdData3", out var d3) && d3 is TextBox db3)
-                db3.Text = cmd.Data3.ToString();
-            if (WindowManager.TryGetControl("winEventEditor", "txtCmdData4", out var d4) && d4 is TextBox db4)
-                db4.Text = cmd.Data4.ToString();
-            if (WindowManager.TryGetControl("winEventEditor", "txtCmdData5", out var d5) && d5 is TextBox db5)
-                db5.Text = cmd.Data5.ToString();
-            if (WindowManager.TryGetControl("winEventEditor", "txtCmdData6", out var d6) && d6 is TextBox db6)
-                db6.Text = cmd.Data6.ToString();
+            if (IsConditionalBranch(cmd))
+            {
+                if (WindowManager.TryGetControl("winEventEditor", "txtCmdData1", out var d1) && d1 is TextBox db1)
+                    db1.Text = cmd.ConditionalBranch.Condition.ToString();
+                if (WindowManager.TryGetControl("winEventEditor", "txtCmdData2", out var d2) && d2 is TextBox db2)
+                    db2.Text = cmd.ConditionalBranch.Data1.ToString();
+                if (WindowManager.TryGetControl("winEventEditor", "txtCmdData3", out var d3) && d3 is TextBox db3)
+                    db3.Text = cmd.ConditionalBranch.Data2.ToString();
+                if (WindowManager.TryGetControl("winEventEditor", "txtCmdData4", out var d4) && d4 is TextBox db4)
+                    db4.Text = cmd.ConditionalBranch.Data3.ToString();
+                if (WindowManager.TryGetControl("winEventEditor", "txtCmdData5", out var d5) && d5 is TextBox db5)
+                    db5.Text = cmd.ConditionalBranch.CommandList.ToString();
+                if (WindowManager.TryGetControl("winEventEditor", "txtCmdData6", out var d6) && d6 is TextBox db6)
+                    db6.Text = cmd.ConditionalBranch.ElseCommandList.ToString();
+            }
+            else
+            {
+                if (WindowManager.TryGetControl("winEventEditor", "txtCmdData1", out var d1) && d1 is TextBox db1)
+                    db1.Text = cmd.Data1.ToString();
+                if (WindowManager.TryGetControl("winEventEditor", "txtCmdData2", out var d2) && d2 is TextBox db2)
+                    db2.Text = cmd.Data2.ToString();
+                if (WindowManager.TryGetControl("winEventEditor", "txtCmdData3", out var d3) && d3 is TextBox db3)
+                    db3.Text = cmd.Data3.ToString();
+                if (WindowManager.TryGetControl("winEventEditor", "txtCmdData4", out var d4) && d4 is TextBox db4)
+                    db4.Text = cmd.Data4.ToString();
+                if (WindowManager.TryGetControl("winEventEditor", "txtCmdData5", out var d5) && d5 is TextBox db5)
+                    db5.Text = cmd.Data5.ToString();
+                if (WindowManager.TryGetControl("winEventEditor", "txtCmdData6", out var d6) && d6 is TextBox db6)
+                    db6.Text = cmd.Data6.ToString();
+            }
         }
         finally
         {
@@ -289,12 +379,33 @@ public static class WinEventEditor
         cmd.Text1 = ReadStringTextBox("txtCmdText1");
         cmd.Text2 = ReadStringTextBox("txtCmdText2");
         cmd.Text3 = ReadStringTextBox("txtCmdText3");
-        cmd.Data1 = ReadIntTextBox("txtCmdData1", cmd.Data1);
-        cmd.Data2 = ReadIntTextBox("txtCmdData2", cmd.Data2);
-        cmd.Data3 = ReadIntTextBox("txtCmdData3", cmd.Data3);
-        cmd.Data4 = ReadIntTextBox("txtCmdData4", cmd.Data4);
-        cmd.Data5 = ReadIntTextBox("txtCmdData5", cmd.Data5);
-        cmd.Data6 = ReadIntTextBox("txtCmdData6", cmd.Data6);
+
+        if (IsConditionalBranch(cmd))
+        {
+            cmd.ConditionalBranch.Condition = ReadIntTextBox("txtCmdData1", cmd.ConditionalBranch.Condition);
+            cmd.ConditionalBranch.Data1 = ReadIntTextBox("txtCmdData2", cmd.ConditionalBranch.Data1);
+            cmd.ConditionalBranch.Data2 = ReadIntTextBox("txtCmdData3", cmd.ConditionalBranch.Data2);
+            cmd.ConditionalBranch.Data3 = ReadIntTextBox("txtCmdData4", cmd.ConditionalBranch.Data3);
+            cmd.ConditionalBranch.CommandList = ReadIntTextBox("txtCmdData5", cmd.ConditionalBranch.CommandList);
+            cmd.ConditionalBranch.ElseCommandList = ReadIntTextBox("txtCmdData6", cmd.ConditionalBranch.ElseCommandList);
+
+            // Mirror into Data fields for quick preview in the simple list view.
+            cmd.Data1 = cmd.ConditionalBranch.Condition;
+            cmd.Data2 = cmd.ConditionalBranch.Data1;
+            cmd.Data3 = cmd.ConditionalBranch.Data2;
+            cmd.Data4 = cmd.ConditionalBranch.Data3;
+            cmd.Data5 = cmd.ConditionalBranch.CommandList;
+            cmd.Data6 = cmd.ConditionalBranch.ElseCommandList;
+        }
+        else
+        {
+            cmd.Data1 = ReadIntTextBox("txtCmdData1", cmd.Data1);
+            cmd.Data2 = ReadIntTextBox("txtCmdData2", cmd.Data2);
+            cmd.Data3 = ReadIntTextBox("txtCmdData3", cmd.Data3);
+            cmd.Data4 = ReadIntTextBox("txtCmdData4", cmd.Data4);
+            cmd.Data5 = ReadIntTextBox("txtCmdData5", cmd.Data5);
+            cmd.Data6 = ReadIntTextBox("txtCmdData6", cmd.Data6);
+        }
 
         SetCommand(listIndex, commandIndex, cmd);
         RefreshCommandsList();
@@ -357,6 +468,10 @@ public static class WinEventEditor
 
     private static void LoadCommandToWindow(string windowName, Core.Globals.Type.EventCommand cmd)
     {
+        // Reset labels each load; specific commands can override.
+        ResetCommandDataLabels(windowName);
+        if (IsConditionalBranch(cmd))
+            ConfigureConditionalBranchLabels(windowName);
         string cmdName;
         try { cmdName = ((EventCommand)cmd.Index).ToString(); }
         catch { cmdName = cmd.Index.ToString(); }
@@ -371,18 +486,36 @@ public static class WinEventEditor
         if (WindowManager.TryGetControl(windowName, "txtCmdText3", out var t3) && t3 is TextBox tb3)
             tb3.Text = cmd.Text3 ?? string.Empty;
 
-        if (WindowManager.TryGetControl(windowName, "txtCmdData1", out var d1) && d1 is TextBox db1)
-            db1.Text = cmd.Data1.ToString();
-        if (WindowManager.TryGetControl(windowName, "txtCmdData2", out var d2) && d2 is TextBox db2)
-            db2.Text = cmd.Data2.ToString();
-        if (WindowManager.TryGetControl(windowName, "txtCmdData3", out var d3) && d3 is TextBox db3)
-            db3.Text = cmd.Data3.ToString();
-        if (WindowManager.TryGetControl(windowName, "txtCmdData4", out var d4) && d4 is TextBox db4)
-            db4.Text = cmd.Data4.ToString();
-        if (WindowManager.TryGetControl(windowName, "txtCmdData5", out var d5) && d5 is TextBox db5)
-            db5.Text = cmd.Data5.ToString();
-        if (WindowManager.TryGetControl(windowName, "txtCmdData6", out var d6) && d6 is TextBox db6)
-            db6.Text = cmd.Data6.ToString();
+        if (IsConditionalBranch(cmd))
+        {
+            if (WindowManager.TryGetControl(windowName, "txtCmdData1", out var d1) && d1 is TextBox db1)
+                db1.Text = cmd.ConditionalBranch.Condition.ToString();
+            if (WindowManager.TryGetControl(windowName, "txtCmdData2", out var d2) && d2 is TextBox db2)
+                db2.Text = cmd.ConditionalBranch.Data1.ToString();
+            if (WindowManager.TryGetControl(windowName, "txtCmdData3", out var d3) && d3 is TextBox db3)
+                db3.Text = cmd.ConditionalBranch.Data2.ToString();
+            if (WindowManager.TryGetControl(windowName, "txtCmdData4", out var d4) && d4 is TextBox db4)
+                db4.Text = cmd.ConditionalBranch.Data3.ToString();
+            if (WindowManager.TryGetControl(windowName, "txtCmdData5", out var d5) && d5 is TextBox db5)
+                db5.Text = cmd.ConditionalBranch.CommandList.ToString();
+            if (WindowManager.TryGetControl(windowName, "txtCmdData6", out var d6) && d6 is TextBox db6)
+                db6.Text = cmd.ConditionalBranch.ElseCommandList.ToString();
+        }
+        else
+        {
+            if (WindowManager.TryGetControl(windowName, "txtCmdData1", out var d1) && d1 is TextBox db1)
+                db1.Text = cmd.Data1.ToString();
+            if (WindowManager.TryGetControl(windowName, "txtCmdData2", out var d2) && d2 is TextBox db2)
+                db2.Text = cmd.Data2.ToString();
+            if (WindowManager.TryGetControl(windowName, "txtCmdData3", out var d3) && d3 is TextBox db3)
+                db3.Text = cmd.Data3.ToString();
+            if (WindowManager.TryGetControl(windowName, "txtCmdData4", out var d4) && d4 is TextBox db4)
+                db4.Text = cmd.Data4.ToString();
+            if (WindowManager.TryGetControl(windowName, "txtCmdData5", out var d5) && d5 is TextBox db5)
+                db5.Text = cmd.Data5.ToString();
+            if (WindowManager.TryGetControl(windowName, "txtCmdData6", out var d6) && d6 is TextBox db6)
+                db6.Text = cmd.Data6.ToString();
+        }
     }
 
     private static void SelectCommandInList(int listIndex, int commandIndex)
@@ -477,35 +610,105 @@ public static class WinEventEditor
             };
         }
 
-        if (WindowManager.TryGetControl("winEventCommandData", "cmbCmdPick1", out var pickCtrl) && pickCtrl is ComboBox cmbPick)
+        void WireDataPicker(string comboName, System.Collections.Generic.List<int> valueMap, Func<string> targetTextBox)
         {
-            int last = cmbPick.Value;
-            cmbPick.CallBack[(int)ControlState.MouseMove] = () =>
+            if (WindowManager.TryGetControl("winEventCommandData", comboName, out var pickCtrl) && pickCtrl is ComboBox cmbPick)
             {
-                if (_isLoading)
-                    return;
+                int last = cmbPick.Value;
+                cmbPick.CallBack[(int)ControlState.MouseMove] = () =>
+                {
+                    if (_isLoading)
+                        return;
 
-                if (cmbPick.Value == last)
-                    return;
+                    if (cmbPick.Value == last)
+                        return;
 
-                last = cmbPick.Value;
+                    last = cmbPick.Value;
 
-                if (WindowManager.TryGetControl("winEventCommandData", "txtCmdData1", out var d1) && d1 is TextBox tb)
-                    tb.Text = cmbPick.Value.ToString();
-            };
+                    int mapped = cmbPick.Value;
+                    if (cmbPick.Value >= 0 && cmbPick.Value < valueMap.Count)
+                        mapped = valueMap[cmbPick.Value];
+
+                    var target = targetTextBox();
+                    if (!string.IsNullOrWhiteSpace(target) && WindowManager.TryGetControl("winEventCommandData", target, out var d1) && d1 is TextBox tb)
+                        tb.Text = mapped.ToString();
+                };
+            }
         }
+
+        WireDataPicker("cmbCmdPick1", _cmdPick1ValueMap, () => _cmdPick1TargetTextBox);
+        WireDataPicker("cmbCmdPick2", _cmdPick2ValueMap, () => _cmdPick2TargetTextBox);
+    }
+
+    private static void ConfigureCommandDataPickerRow(
+        string labelName,
+        string comboName,
+        System.Collections.Generic.List<int> valueMap,
+        string? pickLabel,
+        (int value, string name)[]? items,
+        string targetTextBox,
+        int currentValue)
+    {
+        if (!WindowManager.TryGetControl("winEventCommandData", labelName, out var lblCtrl) || lblCtrl is not Label lbl)
+            return;
+        if (!WindowManager.TryGetControl("winEventCommandData", comboName, out var cmbCtrl) || cmbCtrl is not ComboBox cmb)
+            return;
+
+        if (string.IsNullOrWhiteSpace(pickLabel) || items is null || items.Length <= 0)
+        {
+            lbl.Visible = false;
+            cmb.Visible = false;
+            valueMap.Clear();
+            return;
+        }
+
+        lbl.Text = pickLabel;
+        lbl.Visible = true;
+        cmb.Visible = true;
+
+        valueMap.Clear();
+        cmb.Items.Clear();
+
+        for (int i = 0; i < items.Length; i++)
+        {
+            var (value, name) = items[i];
+            var display = string.IsNullOrWhiteSpace(name) ? "(unused)" : name;
+            cmb.Items.Add(display);
+            valueMap.Add(value);
+        }
+
+        // Select current value.
+        int selected = 0;
+        for (int i = 0; i < valueMap.Count; i++)
+        {
+            if (valueMap[i] == currentValue)
+            {
+                selected = i;
+                break;
+            }
+        }
+        cmb.Value = Math.Clamp(selected, 0, Math.Max(0, cmb.Items.Count - 1));
+
+        if (comboName == "cmbCmdPick1")
+            _cmdPick1TargetTextBox = targetTextBox;
+        else if (comboName == "cmbCmdPick2")
+            _cmdPick2TargetTextBox = targetTextBox;
     }
 
     private static void ConfigureCommandDataPicker(Core.Globals.Type.EventCommand cmd)
     {
-        if (!WindowManager.TryGetControl("winEventCommandData", "lblCmdPick1", out var lblCtrl) || lblCtrl is not Label lbl)
-            return;
-        if (!WindowManager.TryGetControl("winEventCommandData", "cmbCmdPick1", out var cmbCtrl) || cmbCtrl is not ComboBox cmb)
-            return;
+        // Default: hide both pickers.
+        ConfigureCommandDataPickerRow("lblCmdPick1", "cmbCmdPick1", _cmdPick1ValueMap, null, null, "txtCmdData1", 0);
+        ConfigureCommandDataPickerRow("lblCmdPick2", "cmbCmdPick2", _cmdPick2ValueMap, null, null, "txtCmdData2", 0);
 
-        string? pickLabel = null;
-        int max = 0;
-        Func<int, string?>? nameFor = null;
+        string? pick1Label = null;
+        string? pick2Label = null;
+        (int value, string name)[]? pick1Items = null;
+        (int value, string name)[]? pick2Items = null;
+        string pick1Target = "txtCmdData1";
+        string pick2Target = "txtCmdData2";
+        int pick1CurrentValue = cmd.Data1;
+        int pick2CurrentValue = cmd.Data2;
 
         EventCommand index;
         try { index = (EventCommand)cmd.Index; }
@@ -517,98 +720,198 @@ public static class WinEventEditor
         switch (index)
         {
             case EventCommand.AddText:
-                pickLabel = "Color";
-                max = Enum.GetValues<ColorName>().Length;
-                nameFor = i => Enum.GetName(typeof(ColorName), i);
+                pick1Label = "Color";
+                pick1Items = BuildEnumItems<ColorName>();
                 break;
             case EventCommand.OpenShop:
-                pickLabel = "Shop";
-                max = Variables.MaxShops;
-                nameFor = i => i >= 0 && i < Shop.Instance.Count ? Shop.Instance[i].Name : null;
+                pick1Label = "Shop";
+                pick1Items = BuildIndexItems(Variables.MaxShops, i => i >= 0 && i < Shop.Instance.Count ? Shop.Instance[i].Name : null);
                 break;
             case EventCommand.PlayAnimation:
-                pickLabel = "Animation";
-                max = Variables.MaxAnimations;
-                nameFor = i => i >= 0 && i < AnimationBase.Instance.Count ? AnimationBase.Instance[i].Name : null;
+                pick1Label = "Animation";
+                pick1Items = BuildIndexItems(Variables.MaxAnimations, i => i >= 0 && i < AnimationBase.Instance.Count ? AnimationBase.Instance[i].Name : null);
                 break;
             case EventCommand.ChangeItems:
-                pickLabel = "Item";
-                max = Variables.MaxItems;
-                nameFor = i => i >= 0 && i < ItemBase.Instance.Count ? ItemBase.Instance[i].Name : null;
+                pick1Label = "Item";
+                pick1Items = BuildIndexItems(Variables.MaxItems, i => i >= 0 && i < ItemBase.Instance.Count ? ItemBase.Instance[i].Name : null);
                 break;
             case EventCommand.ChangeSkills:
-                pickLabel = "Skill";
-                max = Variables.MaxSkills;
-                nameFor = i => i >= 0 && i < SkillBase.Instance.Count ? SkillBase.Instance[i].Name : null;
+                pick1Label = "Skill";
+                pick1Items = BuildIndexItems(Variables.MaxSkills, i => i >= 0 && i < SkillBase.Instance.Count ? SkillBase.Instance[i].Name : null);
                 break;
             case EventCommand.ChangeJob:
-                pickLabel = "Job";
-                max = Variables.MaxJobs;
-                nameFor = i => i >= 0 && i < JobBase.Instance.Count ? JobBase.Instance[i].Name : null;
+                pick1Label = "Job";
+                pick1Items = BuildIndexItems(Variables.MaxJobs, i => i >= 0 && i < JobBase.Instance.Count ? JobBase.Instance[i].Name : null);
                 break;
 
             case EventCommand.ChangeSex:
-                pickLabel = "Sex";
-                max = Enum.GetValues<Sex>().Length;
-                nameFor = i => Enum.GetName(typeof(Sex), i);
+                pick1Label = "Sex";
+                pick1Items = BuildEnumItems<Sex>();
+                break;
+
+            case EventCommand.ChangeSprite:
+                pick1Label = "Sprite";
+                pick1Target = "txtCmdData1";
+                pick1Items = BuildIndexItems(Math.Max(0, Client.GameState.NumCharacters + 1), i => i == 0 ? "None" : $"{i}");
+                pick1CurrentValue = cmd.Data1;
                 break;
 
             case EventCommand.SetAccessLevel:
-                pickLabel = "Access";
-                max = Enum.GetValues<AccessLevel>().Length;
-                nameFor = i => Enum.GetName(typeof(AccessLevel), i);
+                pick1Label = "Access";
+                pick1Items = BuildEnumItems<AccessLevel>();
                 break;
 
             case EventCommand.SpawnNpc:
-                pickLabel = "Npc";
-                max = hasPlayerMap && Client.Map.Instance[playerMap].Npc != null ? Client.Map.Instance[playerMap].Npc.Length : 0;
-                nameFor = slot =>
-                {
-                    if (!hasPlayerMap)
-                        return null;
+                pick1Label = "Npc";
+                pick1Items = BuildIndexItems(
+                    hasPlayerMap && Client.Map.Instance[playerMap].Npc != null ? Client.Map.Instance[playerMap].Npc.Length : 0,
+                    slot =>
+                    {
+                        if (!hasPlayerMap)
+                            return null;
 
-                    var map = Client.Map.Instance[playerMap];
-                    if (map.Npc == null || slot < 0 || slot >= map.Npc.Length)
-                        return null;
+                        var map = Client.Map.Instance[playerMap];
+                        if (map.Npc == null || slot < 0 || slot >= map.Npc.Length)
+                            return null;
 
-                    int npcNum = map.Npc[slot];
-                    if (npcNum < 0)
-                        return "(empty)";
+                        int npcNum = map.Npc[slot];
+                        if (npcNum < 0)
+                            return "(empty)";
 
-                    var npcName = npcNum < NpcBase.Instance.Count ? (NpcBase.Instance[npcNum].Name ?? string.Empty) : string.Empty;
-                    npcName = string.IsNullOrWhiteSpace(npcName) ? "(unnamed)" : npcName.Trim();
-                    return $"{npcName} (npc {npcNum})";
-                };
+                        var npcName = npcNum < NpcBase.Instance.Count ? (NpcBase.Instance[npcNum].Name ?? string.Empty) : string.Empty;
+                        npcName = string.IsNullOrWhiteSpace(npcName) ? "(unnamed)" : npcName.Trim();
+                        return $"{npcName} (npc {npcNum})";
+                    });
                 break;
 
             case EventCommand.SetFog:
-                pickLabel = "Fog";
-                max = Math.Max(0, Client.GameState.NumFogs + 1); // 0=None, 1..NumFogs
-                nameFor = i => i == 0 ? "None" : $"Fog {i}";
+                pick1Label = "Fog";
+                pick1Items = BuildIndexItems(Math.Max(0, Client.GameState.NumFogs + 1), i => i == 0 ? "None" : $"{i}");
+                break;
+
+            case EventCommand.ShowPicture:
+                pick1Label = "Picture";
+                pick1Items = BuildIndexItems(Math.Max(0, Client.GameState.NumPictures + 1), i => i == 0 ? "None" : $"{i}");
+                break;
+
+            case EventCommand.ModifyVariable:
+                pick1Label = "Variable";
+                pick1Target = "txtCmdData1";
+                pick1Items = BuildIndexItems(Variables.MaxVariables, i => $"{i}");
+
+                pick2Label = "Value";
+                pick2Target = "txtCmdData2";
+                pick2Items =
+                [
+                    (0, "Set"),
+                    (1, "Add"),
+                    (2, "Subtract"),
+                    (3, "Random"),
+                ];
+                pick2CurrentValue = cmd.Data2;
+                break;
+
+            case EventCommand.ModifySwitch:
+                pick1Label = "Switch";
+                pick1Target = "txtCmdData1";
+                pick1Items = BuildIndexItems(Variables.MaxSwitches, i => $"{i}");
+
+                pick2Label = "Value";
+                pick2Target = "txtCmdData2";
+                pick2Items =
+                [
+                    (0, "Off"),
+                    (1, "On"),
+                ];
+                pick2CurrentValue = cmd.Data2;
+                break;
+
+            case EventCommand.ModifySelfSwitch:
+                pick1Label = "Self";
+                pick1Target = "txtCmdData1";
+                pick1Items =
+                [
+                    (0, "A"),
+                    (1, "B"),
+                    (2, "C"),
+                    (3, "D"),
+                ];
+
+                pick2Label = "Value";
+                pick2Target = "txtCmdData2";
+                pick2Items =
+                [
+                    (0, "Off"),
+                    (1, "On"),
+                ];
+                pick2CurrentValue = cmd.Data2;
+                break;
+
+            case EventCommand.ConditionalBranch:
+                pick1Label = "Condition";
+                pick1Target = "txtCmdData1";
+                pick1CurrentValue = cmd.ConditionalBranch.Condition;
+                pick1Items =
+                [
+                    (0, "Variable"),
+                    (1, "Switch"),
+                    (2, "Item"),
+                    (3, "Job"),
+                    (4, "Skill"),
+                    (5, "Level"),
+                    (6, "Self Switch"),
+                    (7, "Timer"),
+                    (8, "Gender"),
+                    (9, "Time of Day"),
+                ];
                 break;
         }
 
-        if (string.IsNullOrWhiteSpace(pickLabel) || max <= 0 || nameFor is null)
+        ConfigureCommandDataPickerRow(
+            "lblCmdPick1",
+            "cmbCmdPick1",
+            _cmdPick1ValueMap,
+            pick1Label,
+            pick1Items,
+            pick1Target,
+            pick1CurrentValue);
+
+        ConfigureCommandDataPickerRow(
+            "lblCmdPick2",
+            "cmbCmdPick2",
+            _cmdPick2ValueMap,
+            pick2Label,
+            pick2Items,
+            pick2Target,
+            pick2CurrentValue);
+    }
+
+    private static (int value, string name)[] BuildEnumItems<T>() where T : struct, Enum
+    {
+        var values = Enum.GetValues<T>();
+        var result = new (int value, string name)[values.Length];
+        for (int i = 0; i < values.Length; i++)
         {
-            lbl.Visible = false;
-            cmb.Visible = false;
-            return;
+            int v = Convert.ToInt32(values[i]);
+            result[i] = (v, Enum.GetName(typeof(T), values[i]) ?? v.ToString());
         }
+        return result;
+    }
 
-        lbl.Text = pickLabel;
-        lbl.Visible = true;
-        cmb.Visible = true;
+    private static (int value, string name)[] BuildIndexItems(int count, Func<int, string?> nameFor)
+    {
+        if (count <= 0)
+            return Array.Empty<(int value, string name)>();
 
-        cmb.Items.Clear();
-        for (int i = 0; i < max; i++)
+        var items = new (int value, string name)[count];
+        for (int i = 0; i < count; i++)
         {
             var name = nameFor(i);
             if (string.IsNullOrWhiteSpace(name))
                 name = "(unused)";
-            cmb.Items.Add($"{i}: {name}");
+            items[i] = (i, $"{i}: {name}");
         }
-
-        cmb.Value = Math.Clamp(cmd.Data1, 0, Math.Max(0, max - 1));
+        return items;
     }
 
     private static string GetComboSelectedName(ComboBox cmb)
@@ -754,12 +1057,40 @@ public static class WinEventEditor
         }
         cmd.Text2 = ReadStringTextBox("winEventCommandData", "txtCmdText2");
         cmd.Text3 = ReadStringTextBox("winEventCommandData", "txtCmdText3");
-        cmd.Data1 = ReadIntTextBox("winEventCommandData", "txtCmdData1", cmd.Data1);
-        cmd.Data2 = ReadIntTextBox("winEventCommandData", "txtCmdData2", cmd.Data2);
-        cmd.Data3 = ReadIntTextBox("winEventCommandData", "txtCmdData3", cmd.Data3);
-        cmd.Data4 = ReadIntTextBox("winEventCommandData", "txtCmdData4", cmd.Data4);
-        cmd.Data5 = ReadIntTextBox("winEventCommandData", "txtCmdData5", cmd.Data5);
-        cmd.Data6 = ReadIntTextBox("winEventCommandData", "txtCmdData6", cmd.Data6);
+
+        if (IsConditionalBranch(cmd))
+        {
+            int cond = ReadIntTextBox("winEventCommandData", "txtCmdData1", cmd.ConditionalBranch.Condition);
+            int a = ReadIntTextBox("winEventCommandData", "txtCmdData2", cmd.ConditionalBranch.Data1);
+            int b = ReadIntTextBox("winEventCommandData", "txtCmdData3", cmd.ConditionalBranch.Data2);
+            int c = ReadIntTextBox("winEventCommandData", "txtCmdData4", cmd.ConditionalBranch.Data3);
+            int ifList = ReadIntTextBox("winEventCommandData", "txtCmdData5", cmd.ConditionalBranch.CommandList);
+            int elseList = ReadIntTextBox("winEventCommandData", "txtCmdData6", cmd.ConditionalBranch.ElseCommandList);
+
+            cmd.ConditionalBranch.Condition = cond;
+            cmd.ConditionalBranch.Data1 = a;
+            cmd.ConditionalBranch.Data2 = b;
+            cmd.ConditionalBranch.Data3 = c;
+            cmd.ConditionalBranch.CommandList = ifList;
+            cmd.ConditionalBranch.ElseCommandList = elseList;
+
+            // Mirror for preview.
+            cmd.Data1 = cond;
+            cmd.Data2 = a;
+            cmd.Data3 = b;
+            cmd.Data4 = c;
+            cmd.Data5 = ifList;
+            cmd.Data6 = elseList;
+        }
+        else
+        {
+            cmd.Data1 = ReadIntTextBox("winEventCommandData", "txtCmdData1", cmd.Data1);
+            cmd.Data2 = ReadIntTextBox("winEventCommandData", "txtCmdData2", cmd.Data2);
+            cmd.Data3 = ReadIntTextBox("winEventCommandData", "txtCmdData3", cmd.Data3);
+            cmd.Data4 = ReadIntTextBox("winEventCommandData", "txtCmdData4", cmd.Data4);
+            cmd.Data5 = ReadIntTextBox("winEventCommandData", "txtCmdData5", cmd.Data5);
+            cmd.Data6 = ReadIntTextBox("winEventCommandData", "txtCmdData6", cmd.Data6);
+        }
 
         SetCommand(listIndex, commandIndex, cmd);
         WindowManager.HideWindow("winEventCommandData");
@@ -1219,16 +1550,24 @@ public static class WinEventEditor
         if (lists.Length < listCount)
             Array.Resize(ref lists, listCount);
 
-        // Append to first list (simple/default path) and open picker to choose a command type
-        var list0 = lists[0];
-        int cmdCount = Math.Max(0, list0.CommandCount);
-        var cmds = list0.Commands ?? Array.Empty<Core.Globals.Type.EventCommand>();
+        // Append to the currently selected list (so nested lists are editable).
+        int targetList = 0;
+        if (WindowManager.TryGetControl("winEventEditor", "lstCommands", out var listCtrl) && listCtrl is ListBox lb)
+        {
+            int selectedIndex = lb.SelectedIndex;
+            if (selectedIndex >= 0 && selectedIndex < _commandIndexMap.Count)
+                targetList = Math.Clamp(_commandIndexMap[selectedIndex].listIndex, 0, Math.Max(0, listCount - 1));
+        }
+
+        var cmdList = lists[targetList];
+        int cmdCount = Math.Max(0, cmdList.CommandCount);
+        var cmds = cmdList.Commands ?? Array.Empty<Core.Globals.Type.EventCommand>();
         Array.Resize(ref cmds, cmdCount + 1);
         cmds[cmdCount].Index = -1;
 
-        list0.Commands = cmds;
-        list0.CommandCount = cmdCount + 1;
-        lists[0] = list0;
+        cmdList.Commands = cmds;
+        cmdList.CommandCount = cmdCount + 1;
+        lists[targetList] = cmdList;
 
         page.CommandList = lists;
         page.CommandListCount = listCount;
@@ -1236,7 +1575,7 @@ public static class WinEventEditor
         SetCurrentPage(page);
 
         RefreshCommandsList();
-        OpenCommandPicker(0, cmdCount, isNew: true);
+        OpenCommandPicker(targetList, cmdCount, isNew: true);
     }
 
     public static void OnDeleteCommand()
@@ -1379,6 +1718,46 @@ public static class WinEventEditor
 
         int ci = Math.Clamp(_pickerTargetCommandIndex, 0, Math.Max(0, cmds.Length - 1));
         cmds[ci].Index = pickedIndex;
+
+        // If this is a Conditional Branch, auto-create/assign the If/Else command lists.
+        if (TryGetEventCommandIndex(pickedIndex, out var idx) && idx == EventCommand.ConditionalBranch)
+        {
+            int nextListIndex = Math.Max(0, listCount);
+            int required = nextListIndex + 2;
+
+            if (lists.Length < required)
+                Array.Resize(ref lists, required);
+
+            // Ensure the page knows it has these lists.
+            listCount = Math.Max(listCount, required);
+
+            int ifList = nextListIndex;
+            int elseList = nextListIndex + 1;
+
+            if (lists[ifList].Commands == null || lists[ifList].Commands.Length == 0)
+            {
+                lists[ifList].ParentList = li;
+                lists[ifList].CommandCount = 1;
+                lists[ifList].Commands = new Core.Globals.Type.EventCommand[1];
+                lists[ifList].Commands[0].Index = -1;
+            }
+
+            if (lists[elseList].Commands == null || lists[elseList].Commands.Length == 0)
+            {
+                lists[elseList].ParentList = li;
+                lists[elseList].CommandCount = 1;
+                lists[elseList].Commands = new Core.Globals.Type.EventCommand[1];
+                lists[elseList].Commands[0].Index = -1;
+            }
+
+            ref var cmd = ref cmds[ci];
+            cmd.ConditionalBranch.CommandList = ifList;
+            cmd.ConditionalBranch.ElseCommandList = elseList;
+
+            // Mirror into Data for preview.
+            cmd.Data5 = ifList;
+            cmd.Data6 = elseList;
+        }
 
         list0.Commands = cmds;
         list0.CommandCount = cmds.Length;

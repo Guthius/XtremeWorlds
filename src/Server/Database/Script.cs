@@ -6,6 +6,8 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net.NetworkInformation;
 using System.Reflection;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using static Core.Globals.Commands;
 using static Core.Net.Packets;
 using static Core.Globals.Type;
@@ -34,6 +36,10 @@ public class Script
     private static bool[] _isUsingItem = new bool[Variables.MaxPlayers];
     private static bool[] _isEquippingItem = new bool[Variables.MaxPlayers];
     private static bool[] _isUnequippingItem = new bool[Variables.MaxPlayers];
+
+    private const int DoorResetMs = 30000;
+    private static readonly object _doorResetLock = new();
+    private static readonly Dictionary<(int map, int x, int y), long> _doorResetExpiryByTile = new();
 
     // Timers for periodic regeneration
     private static long _lastNpcRegen;
@@ -379,7 +385,7 @@ public class Script
                 case (byte)ItemCategory.Event:
                     {
                         // Trigger item-driven common event using item's SubType/Data1/Data2
-                        CommonEvent(index, itemNum);
+                        CommonEvent(index, itemNum, invNum);
                         break;
                     }
 
@@ -396,7 +402,7 @@ public class Script
         }
     }
 
-    private void CommonEvent(int index, int itemNum, int skillNum = -1)
+    private void CommonEvent(int index, int itemNum, int invNum, int skillNum = -1)
     {
         if (skillNum >= 0)
         {
@@ -408,6 +414,24 @@ public class Script
         else
         {
             var item = Item.Instance[itemNum];
+
+            // Key usage is tile-type driven (unlock/unblock the facing tile) rather than firing an event.
+            // Handle both new and legacy item encodings.
+            var triggerType = -1;
+            if (item.CommonEventType > 0)
+            {
+                triggerType = item.CommonEventType - 1;
+            }
+            else
+            {
+                triggerType = item.SubType;
+            }
+
+            if (triggerType == (byte)CommonEventTrigger.Key)
+            {
+                TryUseKeyOnFacingTile(index, itemNum, invNum);
+                return;
+            }
 
             // Items now use the same encoding as NPC/Skill/Resource editors:
             // 0 = none, 1..N = (CommonEventTrigger + 1).
@@ -423,6 +447,170 @@ public class Script
                 item.Data1,
                 item.Data2);
         }
+    }
+
+    // Backward-compatible overload for existing call sites (e.g. skill-driven common events).
+    private void CommonEvent(int index, int itemNum, int skillNum = -1)
+    {
+        CommonEvent(index, itemNum, -1, skillNum);
+    }
+
+    private static void TryUseKeyOnFacingTile(int playerId, int keyItemNum, int invNum)
+    {
+        var map = GetPlayerMap(playerId);
+        if (map < 0 || map >= Server.Map.Instance.Count)
+        {
+            return;
+        }
+
+        var maxX = Server.Map.Instance[map].MaxX;
+        var maxY = Server.Map.Instance[map].MaxY;
+
+        var (dx, dy) = GetDirectionDelta((Direction)GetPlayerDir(playerId));
+        var x = GetPlayerX(playerId) + dx;
+        var y = GetPlayerY(playerId) + dy;
+
+        if (x < 0 || y < 0 || x >= maxX || y >= maxY)
+        {
+            return;
+        }
+
+        ref var tile = ref Server.Map.Instance[map].Tile[x, y];
+        var opened = false;
+        var openedDoor = false;
+
+        if (tile.Type == TileType.Key)
+        {
+            tile.Type = TileType.KeyOpen;
+            opened = true;
+        }
+        else if (tile.Type == TileType.Door)
+        {
+            tile.Type = TileType.KeyOpen;
+            opened = true;
+            openedDoor = true;
+        }
+
+        if (tile.Type2 == TileType.Key)
+        {
+            tile.Type2 = TileType.KeyOpen;
+            opened = true;
+        }
+        else if (tile.Type2 == TileType.Door)
+        {
+            tile.Type2 = TileType.KeyOpen;
+            opened = true;
+            openedDoor = true;
+        }
+
+        if (!opened)
+        {
+            return;
+        }
+
+        // Unblock movement after unlocking.
+        tile.DirBlock = 0;
+
+        // Consume the key only when it successfully unlocks something.
+        if (invNum >= 0)
+        {
+            Server.Player.TakeInvSlot(playerId, invNum, 1);
+            NetworkSend.SendInventoryUpdate(playerId, invNum);
+        }
+
+        // Broadcast updated map so clients see the tile become unblocked/open.
+        BroadcastMapToPlayersOnMap(map);
+
+        // If we opened a Door, auto-relock it after 30 seconds.
+        if (openedDoor)
+        {
+            ScheduleDoorReset(map, x, y);
+        }
+    }
+
+    private static void BroadcastMapToPlayersOnMap(int map)
+    {
+        foreach (var otherPlayerId in PlayerService.Instance.PlayerIds)
+        {
+            if (GetPlayerMap(otherPlayerId) != map)
+            {
+                continue;
+            }
+
+            NetworkSend.SendMapData(otherPlayerId, map, true);
+        }
+    }
+
+    private static void ScheduleDoorReset(int map, int x, int y)
+    {
+        var expiry = General.GetTimeMs() + DoorResetMs;
+        lock (_doorResetLock)
+        {
+            _doorResetExpiryByTile[(map, x, y)] = expiry;
+        }
+
+        _ = System.Threading.Tasks.Task.Run(async () =>
+        {
+            await System.Threading.Tasks.Task.Delay(DoorResetMs).ConfigureAwait(false);
+
+            long expectedExpiry;
+            lock (_doorResetLock)
+            {
+                if (!_doorResetExpiryByTile.TryGetValue((map, x, y), out expectedExpiry))
+                {
+                    return;
+                }
+
+                if (expectedExpiry != expiry)
+                {
+                    // Door was re-opened; a newer timer will handle it.
+                    return;
+                }
+
+                _doorResetExpiryByTile.Remove((map, x, y));
+            }
+
+            if (map < 0 || map >= Server.Map.Instance.Count)
+            {
+                return;
+            }
+
+            if (x < 0 || y < 0 || x >= Server.Map.Instance[map].MaxX || y >= Server.Map.Instance[map].MaxY)
+            {
+                return;
+            }
+
+            ref var tile = ref Server.Map.Instance[map].Tile[x, y];
+
+            // Only reset tiles that are currently open back into Door.
+            if (tile.Type == TileType.KeyOpen)
+            {
+                tile.Type = TileType.Door;
+            }
+
+            if (tile.Type2 == TileType.KeyOpen)
+            {
+                tile.Type2 = TileType.Door;
+            }
+
+            BroadcastMapToPlayersOnMap(map);
+        });
+    }
+
+    private static (int dx, int dy) GetDirectionDelta(Direction direction)
+    {
+        return direction switch
+        {
+            Direction.Up => (0, -1),
+            Direction.Down => (0, 1),
+            Direction.Left => (-1, 0),
+            Direction.Right => (1, 0),
+            Direction.UpLeft => (-1, -1),
+            Direction.UpRight => (1, -1),
+            Direction.DownLeft => (-1, 1),
+            Direction.DownRight => (1, 1),
+            _ => (0, 0)
+        };
     }
 
     /// <summary>
@@ -455,7 +643,6 @@ public class Script
                 break;
 
             case (byte)CommonEventTrigger.Key:
-                EventLogic.TriggerEvent(playerId, 1, 0, GetPlayerX(playerId), GetPlayerY(playerId));
                 break;
 
             case (byte)CommonEventTrigger.Script:

@@ -762,8 +762,10 @@ public class Player : PlayerBase
                 return true;
             }
 
-            return Server.Map.Instance[map].Tile[x, y].Type == TileType.Blocked ||
-                   Server.Map.Instance[map].Tile[x, y].Type2 == TileType.Blocked;
+                 return Server.Map.Instance[map].Tile[x, y].Type == TileType.Blocked ||
+                     Server.Map.Instance[map].Tile[x, y].Type2 == TileType.Blocked ||
+                     Server.Map.Instance[map].Tile[x, y].Type == TileType.Door ||
+                     Server.Map.Instance[map].Tile[x, y].Type2 == TileType.Door;
         }
         catch (Exception ex)
         {
