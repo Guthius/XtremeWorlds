@@ -229,12 +229,6 @@ public class Player : PlayerBase
         var moved = false;
         var map = GetPlayerMap(playerId);
 
-        for (int i = 0; i <= map; i++)
-        {
-            if (Server.Map.Instance.Count > i) continue;
-            Server.Map.Instance.Add(new Map());
-        }
-
         // Map data is stored in a list; map id is not a guarantee that the list is populated.
         var mapCount = Server.Map.Instance.Count;
         if (map < 0 || map >= mapCount)
