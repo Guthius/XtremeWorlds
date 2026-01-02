@@ -456,7 +456,7 @@ namespace Server
             tileY = y;
         }
 
-        private static void SendEventMove(int map, int eventId, int x, int y, int dir, int currentDir, int speed, int index = -1)
+        private static void SendEventMove(int map, int eventId, int x, int y, byte dir, byte currentDir, int speed, int index = -1)
         {
             var packetWriter = new PacketWriter(24);
 
@@ -464,8 +464,8 @@ namespace Server
             packetWriter.WriteInt32(eventId);
             packetWriter.WriteInt32(x);
             packetWriter.WriteInt32(y);
-            packetWriter.WriteInt32(dir);
-            packetWriter.WriteInt32(currentDir);
+            packetWriter.WriteByte(dir);
+            packetWriter.WriteByte(currentDir);
             packetWriter.WriteInt32(speed);
 
             if (index == -1)

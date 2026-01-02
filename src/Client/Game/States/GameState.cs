@@ -12,6 +12,40 @@ namespace Client
     {
         public GameState()
         {
+            
+        }
+
+        public static void OnClear()
+        {
+            Data.TileHistory = new Type.TileHistory[GameState.MaxTileHistory]; // Fixed type name
+
+            // Reset tile history indices
+            GameState.TileHistoryIndex = 0;
+
+            for (int i = 0; i < GameState.MaxTileHistory; i++)
+            {
+                Data.TileHistory[i].Tile = new Type.Tile[Client.Map.Instance[Commands.GetPlayerMap(GameState.MyIndex)].MaxX, Client.Map.Instance[Commands.GetPlayerMap(GameState.MyIndex)].MaxY];
+            }
+    
+            // Clear map events
+            Data.MapEvents = new Type.MapEvent[Client.Map.Instance[Commands.GetPlayerMap(GameState.MyIndex)].EventCount];
+
+            for (int i = 0, count = Client.Map.Instance[Commands.GetPlayerMap(GameState.MyIndex)].EventCount; i < count; i++)
+            {
+                Data.MapEvents = default;
+            }
+
+            GameState.CurrentEvents = 0;
+
+            for (int i = 0; i < Variables.MaxMapNpcs; i++)
+            {
+                MapNpc.OnClear(i);
+            }
+
+            for (int i = 0; i < Variables.MaxMapItems; i++)
+            {
+                MapItem.OnClear(i);
+            }
         }
 
         public static float CameraZoom = 1.0f;

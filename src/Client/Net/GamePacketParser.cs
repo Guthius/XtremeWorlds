@@ -2327,7 +2327,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         int x;
         int y;
         byte dir;
-        int showDir;
+        byte showDir;
         int movementSpeed;
         var buffer = new PacketReader(data);
 
@@ -2336,7 +2336,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         x = buffer.ReadInt32() * Constants.TileSize;
         y = buffer.ReadInt32() * Constants.TileSize;
         dir = buffer.ReadByte();
-        showDir = buffer.ReadInt32();
+        showDir = buffer.ReadByte();
         movementSpeed = buffer.ReadInt32();
 
         if (id > GameState.CurrentEvents)
@@ -2348,7 +2348,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             ref var instance = ref Data.MapEvents[id];
             instance.X = x;
             instance.Y = y;
-            instance.Dir = (byte)dir;
+            instance.Dir = dir;
             instance.Moving = 1;
             instance.ShowDir = (byte)showDir;
             instance.MovementSpeed = movementSpeed;

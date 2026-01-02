@@ -181,6 +181,7 @@ namespace Client
         {
             Map.Instance.Add(new Map());
             Map.OnClear();
+            GameState.OnClear();
             Npc.OnClear();
             Resource.OnClear();
             Item.OnClear();

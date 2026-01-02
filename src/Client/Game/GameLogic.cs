@@ -1326,6 +1326,7 @@ namespace Client
 
                     case DialogueType.DeleteMap:
                         Map.OnClear();
+                        GameState.OnClear();
                         break;
 
                     case DialogueType.ClearDirBlocks:

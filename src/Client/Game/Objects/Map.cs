@@ -408,41 +408,6 @@ namespace Client
             string argPath = System.IO.Path.Combine(DataPath.Pictures, index.ToString());
             GameClient.RenderTexture(ref argPath, posX, posY, 0, 0, gfx.Width, gfx.Height, gfx.Width, gfx.Height);
         }
-
-        public static void OnClear()
-        {
-            MapBase.OnClear(GetPlayerMap(GameState.MyIndex));
-            Data.TileHistory = new Type.TileHistory[GameState.MaxTileHistory]; // Fixed type name
-
-            // Reset tile history indices
-            GameState.TileHistoryIndex = 0;
-
-            for (int i = 0; i < GameState.MaxTileHistory; i++)
-            {
-                Data.TileHistory[i].Tile = new Type.Tile[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY];
-            }
-      
-            // Clear map events
-            Data.MapEvents = new Type.MapEvent[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount];
-
-            for (int i = 0, count = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount; i < count; i++)
-            {
-                Data.MapEvents = default;
-            }
-
-            GameState.CurrentEvents = 0;
-
-            for (int i = 0; i < Variables.MaxMapNpcs; i++)
-            {
-                MapNpc.OnClear(i);
-            }
-
-            for (int i = 0; i < Variables.MaxMapItems; i++)
-            {
-                MapItem.OnClear(i);
-            }
-        }
-
     }
 
     #endregion
