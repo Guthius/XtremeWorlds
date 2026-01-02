@@ -1188,25 +1188,6 @@ namespace Client
             }
         }
 
-        // Simple modal numeric prompt to replace VB Interaction.InputBox on cross-platform
-        public static int? PromptIndex(Form owner, string title, string message, int min, int max, int defaultValue)
-        {
-            var dlg = new Dialog { Title = title, ClientSize = new Size(360, 140), Padding = 10 };
-            var num = new NumericStepper { MinValue = min, MaxValue = max, Value = defaultValue, DecimalPlaces = 0 };
-            var ok = new Button { Text = "OK" };
-            var cancel = new Button { Text = "Cancel" };
-            int? result = null;
-            ok.Click += (s, e) => { result = (int)Math.Round(num.Value); dlg.Close(); };
-            cancel.Click += (s, e) => { result = null; dlg.Close(); };
-            var layout = new DynamicLayout { Spacing = new Size(6, 6) };
-            layout.AddRow(new Label { Text = message });
-            layout.AddRow(num);
-            layout.AddRow(new StackLayout { Orientation = Orientation.Horizontal, Spacing = 6, Items = { ok, cancel } });
-            dlg.Content = layout;
-            dlg.ShowModal(owner);
-            return result;
-        }
-
         #region Animation Editor
         public static void AnimationEditorOK()
         {
