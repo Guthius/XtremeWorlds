@@ -65,7 +65,7 @@ namespace Client
             throw new NotImplementedException();
         }
 
-        public static void OnReset()
+        public static void OnClear()
         {
             for (int i = 0; i < MapItem.Instance.Length; i++)
                 OnClear(i);

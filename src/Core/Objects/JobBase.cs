@@ -60,7 +60,7 @@ namespace Core.Objects
                 IsChanged[i] = false;
         }
 
-        public static void OnReset()
+        public static void OnClear()
         {
             for (int i = 0; i < Instance.Count; i++)
                 OnClear(i);

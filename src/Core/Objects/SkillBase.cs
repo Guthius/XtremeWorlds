@@ -66,12 +66,10 @@ public class SkillBase
         IsChanged = new bool[Variables.MaxSkills];
     }
 
-    public static void OnReset()
+    public static void OnClear()
     {
         for (var i = 0; i < Variables.MaxSkills; i++)
-        {
             OnClear(i);
-        }
     }
 
 }

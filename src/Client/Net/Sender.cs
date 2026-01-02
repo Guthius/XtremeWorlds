@@ -248,7 +248,7 @@ public static class Sender
 
         packetWriter.WriteEnum(Packets.ClientPackets.CSetAccess);
         packetWriter.WriteString(name);
-        packetWriter.WriteInt32(access);
+        packetWriter.WriteByte(access);
 
         Network.Send(packetWriter);
     }
@@ -276,7 +276,7 @@ public static class Sender
         var packetWriter = new PacketWriter(8);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CPlayerDir);
-        packetWriter.WriteInt32(GetPlayerDir(GameState.MyIndex));
+        packetWriter.WriteByte(GetPlayerDir(GameState.MyIndex));
 
         Network.Send(packetWriter);
     }
@@ -301,12 +301,12 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendTrainStat(byte statNum)
+    public static void SendTrainStat(int stat)
     {
         var packetWriter = new PacketWriter(8);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CTrainStat);
-        packetWriter.WriteInt32(statNum);
+        packetWriter.WriteInt32(stat);
 
         Network.Send(packetWriter);
     }
@@ -393,7 +393,7 @@ public static class Sender
     {
         var buffer = new PacketWriter(4);
 
-        buffer.WriteInt32((int) Packets.ClientPackets.CSwapInvSlots);
+        buffer.WriteEnum(Packets.ClientPackets.CSwapInvSlots);
         buffer.WriteInt32(oldSlot);
         buffer.WriteInt32(newSlot);
 
@@ -469,7 +469,7 @@ public static class Sender
         packetWriter.WriteEnum(Packets.ClientPackets.CSearch);
         packetWriter.WriteInt32(curX);
         packetWriter.WriteInt32(curY);
-        packetWriter.WriteInt32(rClick);
+        packetWriter.WriteInt32((int)rClick);
 
         Network.Send(packetWriter);
     }
@@ -1162,7 +1162,7 @@ public static class Sender
         var packetWriter = new PacketWriter(4);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CRequestNewMap);
-        packetWriter.WriteInt32(GetPlayerDir(GameState.MyIndex));
+        packetWriter.WriteInt32((int)GetPlayerDir(GameState.MyIndex));
 
         Network.Send(packetWriter);
 
@@ -1192,27 +1192,27 @@ public static class Sender
         packetWriter.WriteEnum(Packets.ClientPackets.CSaveMap);
         packetWriter.WriteString(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Name);
         packetWriter.WriteString(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Music);
-        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Moral);
+        packetWriter.WriteInt32((int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Moral);
         packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tileset);
         packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Up);
         packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Down);
         packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Left);
         packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Right);
         packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].BootMap);
-        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].BootX);
-        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].BootY);
-        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX);
-        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY);
-        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Weather);
+        packetWriter.WriteInt32((int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].BootX);
+        packetWriter.WriteInt32((int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].BootY);
+        packetWriter.WriteInt32((int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX);
+        packetWriter.WriteInt32((int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY);
+        packetWriter.WriteInt32((int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Weather);
         packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Fog);
         packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].WeatherIntensity);
-        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].FogOpacity);
-        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].FogSpeed);
+        packetWriter.WriteInt32((int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].FogOpacity);
+        packetWriter.WriteInt32((int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].FogSpeed);
         packetWriter.WriteBoolean(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTint);
-        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintR);
-        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintG);
-        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintB);
-        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintA);
+        packetWriter.WriteInt32((int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintR);
+        packetWriter.WriteInt32((int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintG);
+        packetWriter.WriteInt32((int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintB);
+        packetWriter.WriteInt32((int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintA);
         packetWriter.WriteByte(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Panorama);
         packetWriter.WriteByte(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Parallax);
         packetWriter.WriteByte(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Brightness);
@@ -1239,7 +1239,7 @@ public static class Sender
                 packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data1_2);
                 packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data2_2);
                 packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data3_2);
-                packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].DirBlock);
+                packetWriter.WriteInt32((int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].DirBlock);
 
                 int layerCount = Enum.GetValues<MapLayer>().Length;
                 for (i = 0; i < layerCount; i++)
@@ -1247,7 +1247,7 @@ public static class Sender
                     packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[i].Tileset);
                     packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[i].X);
                     packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[i].Y);
-                    packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[i].AutoTile);
+                    packetWriter.WriteInt32((int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[i].AutoTile);
                 }
 
                 packetWriter.WriteInt32((int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Type);
@@ -1538,7 +1538,7 @@ public static class Sender
         packetWriter.WriteInt32(index);
         packetWriter.WriteString(Projectile.Instance[index].Name);
         packetWriter.WriteInt32(Projectile.Instance[index].Sprite);
-        packetWriter.WriteInt32(Projectile.Instance[index].Range);
+        packetWriter.WriteInt32((int)Projectile.Instance[index].Range);
         packetWriter.WriteInt32(Projectile.Instance[index].Speed);
         packetWriter.WriteInt32(Projectile.Instance[index].Damage);
         packetWriter.WriteInt32(Projectile.Instance[index].Animation);
@@ -1556,7 +1556,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendClearProjectile(int index, int collisionindex, byte collisionType, int collisionZone)
+    public static void SendClearProjectile(int index, int collisionindex, int collisionType, int collisionZone)
     {
         var packetWriter = new PacketWriter(20);
 

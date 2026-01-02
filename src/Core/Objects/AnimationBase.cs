@@ -40,13 +40,11 @@ namespace Core.Objects
             IsChanged = new bool[Variables.MaxAnimations];
         }
 
-
-        public static void OnReset()
+        public static void OnClear()
         {
             for (int i = 0; i < Instance.Count; i++)
                 OnClear(i);
         }
-
 
         public static void OnClear(int index)
         {

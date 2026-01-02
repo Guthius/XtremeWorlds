@@ -698,7 +698,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         if (Data.TempPlayer[session.Id].GettingMap == true)
             return;
 
-        var dir = buffer.ReadInt32();
+        var dir = buffer.ReadByte();
 
         // Prevent hacking: accept full 8-direction enum range
         int dirCount = Enum.GetNames(typeof(Direction)).Length;
@@ -1803,7 +1803,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         var n = GameLogic.FindPlayer(buffer.ReadString());
 
         // The access
-        var i = buffer.ReadInt32();
+        var i = buffer.ReadByte();
 
         // Check for invalid access level
         if (i >= (int)AccessLevel.Player && i <= (int)AccessLevel.Owner)
@@ -2030,7 +2030,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         // Old Slot
         double oldSlot = buffer.ReadInt32();
         double newSlot = buffer.ReadInt32();
-
 
         Server.Player.PlayerSwitchInvSlots(session.Id, (int)oldSlot, (int)newSlot);
     }

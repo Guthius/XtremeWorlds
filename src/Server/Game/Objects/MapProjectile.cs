@@ -47,7 +47,7 @@ namespace Server
             throw new NotImplementedException();
         }
 
-        public static void OnReset()
+        public static void OnClear()
         {
             for (int map = 0; map < Core.Globals.Variables.MaxMaps; map++)
             {

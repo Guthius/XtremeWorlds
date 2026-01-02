@@ -295,7 +295,7 @@ namespace Client
             }
         }
 
-        public static void OnReset()
+        public static void OnClear()
         {
             int i;
 

@@ -147,7 +147,7 @@ namespace Client
             throw new NotImplementedException();
         }
 
-        public static void OnReset()
+        public static void OnClear()
         {
             for (int i = 0; i < Data.MapProjectile.GetLength(1); i++)
                 OnClear(i);

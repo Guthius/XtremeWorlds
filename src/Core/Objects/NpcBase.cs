@@ -66,12 +66,10 @@ public class NpcBase
         IsChanged = new bool[Variables.MaxNpcs];
     }
 
-    public static void OnReset()
+    public static void OnClear()
     {
         for (var i = 0; i < Instance.Count; i++)
-        {
             OnClear(i);
-        }
     }
 
 }

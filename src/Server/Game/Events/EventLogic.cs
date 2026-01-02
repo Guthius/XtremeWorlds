@@ -175,7 +175,7 @@ namespace Server
                                     packetWriter.WriteInt32(id);
                                     ref var instance = ref Data.TempPlayer[i].EventMap.EventPages[pageNum]; //find actual index of eventpage  
                                     packetWriter.WriteString(Server.Map.Instance[GetPlayerMap(i)].Event[instance.EventId].Name);
-                                    packetWriter.WriteInt32(instance.Dir);
+                                    packetWriter.WriteByte(instance.Dir);
                                     packetWriter.WriteByte(instance.GraphicType);
                                     packetWriter.WriteInt32(instance.Graphic);
                                     packetWriter.WriteInt32(instance.GraphicX);
@@ -328,14 +328,14 @@ namespace Server
                             Event.CancelMove(map, x, i, false);
 
                             instance.Dir = newPage.GraphicType == 1
-                                ? (newPage.GraphicY % 4) switch
+                                ? (byte)((newPage.GraphicY % 4) switch
                                 {
-                                    0 => (int) Direction.Down,
-                                    1 => (int) Direction.Left,
-                                    2 => (int) Direction.Right,
-                                    _ => (int) Direction.Up // 3
-                                }
-                                : 0;
+                                    0 => Direction.Down,
+                                    1 => Direction.Left,
+                                    2 => Direction.Right,
+                                    _ => Direction.Up // 3
+                                })
+                                : (byte)0;
 
                             instance.Graphic = newPage.Graphic;
                             instance.GraphicType = newPage.GraphicType;
@@ -417,7 +417,7 @@ namespace Server
 
                             ref var instance1 = ref Data.TempPlayer[i].EventMap.EventPages[x];
                             buffer.WriteString(Server.Map.Instance[map].Event[instance1.EventId].Name);
-                            buffer.WriteInt32(instance1.Dir);
+                            buffer.WriteByte(instance1.Dir);
                             buffer.WriteByte(instance1.GraphicType);
                             buffer.WriteInt32(instance1.Graphic);
                             buffer.WriteInt32(instance1.GraphicX);
@@ -468,14 +468,14 @@ namespace Server
                         case 1: // Random Movement
                         {
                             // Direction 0-3 (Up/Down/Left/Right). Adjust max to 3 because NextInt is inclusive.
-                            int rand = General.GetRandom.NextInt(0, 3); // 0-3 for direction.
+                            byte rand = (byte)General.GetRandom.NextInt(0, 3); // 0-3 for direction.
 
                             // Prefer changing direction each tile.
                             if (rand == globalEvent.Dir)
                             {
-                                rand = (rand + General.GetRandom.NextInt(1, 3)) % 4;
+                                rand = (byte)((rand + General.GetRandom.NextInt(1, 3)) % 4);
                             }
-                            if (Event.CanMove(0, i, globalEvent.X, globalEvent.Y, x, globalEvent.WalkThrough, (byte) rand, true))
+                            if (Event.CanMove(0, i, globalEvent.X, globalEvent.Y, x, globalEvent.WalkThrough, rand, true))
                             {
                                 int actualMoveSpeed = globalEvent.MoveSpeed switch
                                 {
@@ -487,7 +487,7 @@ namespace Server
                                     5 => 24,
                                     _ => DefaultMovementSpeed
                                 };
-                                Event.Move(0, i, x, rand, actualMoveSpeed, true);
+                                Event.OnMove(0, i, x, rand, actualMoveSpeed, true);
                             }
                             else
                             {
@@ -557,7 +557,7 @@ namespace Server
                                         case 1: // Move Up
                                             if (Event.CanMove(playerId, map, instance.X, instance.Y, eventId, walkThrough, (byte) Direction.Up, isGlobal))
                                             {
-                                                Event.Move(playerId, map, eventId, (int) Direction.Up, actualmovespeed, isGlobal);
+                                                Event.OnMove(playerId, map, eventId, (byte)Direction.Up, actualmovespeed, isGlobal);
                                             }
                                             else if (instance.IgnoreIfCannotMove == 0)
                                             {
@@ -568,7 +568,7 @@ namespace Server
                                         case 2: // Move Down
                                             if (Event.CanMove(playerId, map, instance.X, instance.Y, eventId, walkThrough, (byte) Direction.Down, isGlobal))
                                             {
-                                                Event.Move(playerId, map, eventId, (int) Direction.Down, actualmovespeed, isGlobal);
+                                                Event.OnMove(playerId, map, eventId, (byte)Direction.Down, actualmovespeed, isGlobal);
                                             }
                                             else if (instance.IgnoreIfCannotMove == 0)
                                             {
@@ -579,7 +579,7 @@ namespace Server
                                         case 3: // Move Left
                                             if (Event.CanMove(playerId, map, instance.X, instance.Y, eventId, walkThrough, (byte) Direction.Left, isGlobal))
                                             {
-                                                Event.Move(playerId, map, eventId, (int) Direction.Left, actualmovespeed, isGlobal);
+                                                Event.OnMove(playerId, map, eventId, (byte)Direction.Left, actualmovespeed, isGlobal);
                                             }
                                             else if (instance.IgnoreIfCannotMove == 0)
                                             {
@@ -590,7 +590,7 @@ namespace Server
                                         case 4: // Move Right
                                             if (Event.CanMove(playerId, map, instance.X, instance.Y, eventId, walkThrough, (byte) Direction.Right, isGlobal))
                                             {
-                                                Event.Move(playerId, map, eventId, (int) Direction.Right, actualmovespeed, isGlobal);
+                                                Event.OnMove(playerId, map, eventId, (byte)Direction.Right, actualmovespeed, isGlobal);
                                             }
                                             else if (instance.IgnoreIfCannotMove == 0)
                                             {
@@ -600,10 +600,10 @@ namespace Server
                                             break;
                                         case 5: // Move Random
                                         {
-                                            int z = (int) Math.Floor((double) General.GetRandom.NextInt(0, 4)); // 0-3
-                                            if (Event.CanMove(playerId, map, instance.X, instance.Y, eventId, walkThrough, (byte) z, isGlobal))
+                                            byte z = (byte)General.GetRandom.NextInt(0, 4); // 0-3
+                                            if (Event.CanMove(playerId, map, instance.X, instance.Y, eventId, walkThrough, z, isGlobal))
                                             {
-                                                Event.Move(playerId, map, eventId, z, actualmovespeed, isGlobal);
+                                                Event.OnMove(playerId, map, eventId, z, actualmovespeed, isGlobal);
                                             }
                                             else if (instance.IgnoreIfCannotMove == 0)
                                             {
@@ -621,7 +621,7 @@ namespace Server
                                                 if (Event.IsOneBlockAway(instance.X, instance.Y, GetPlayerX(playerId), GetPlayerY(playerId)))
                                                 {
                                                     // Face the player.
-                                                    Event.Dir(playerId, GetPlayerMap(playerId), eventId, Event.GetDirToPlayer(playerId, GetPlayerMap(playerId), eventId), false);
+                                                    Event.Dir(playerId, GetPlayerMap(playerId), eventId, (byte)Event.GetDirToPlayer(playerId, GetPlayerMap(playerId), eventId), false);
                                                     if (instance.IgnoreIfCannotMove == 0)
                                                     {
                                                         instance.MoveRouteStep--;
@@ -630,12 +630,12 @@ namespace Server
                                                 else
                                                 {
                                                     // Try to move towards the player.
-                                                    int z = Event.CanMoveTowardsPlayer(playerId, map, eventId);
+                                                    byte z = Event.CanMoveTowardsPlayer(playerId, map, eventId);
                                                     if (z < 4) // Valid direction (0-3).
                                                     {
-                                                        if (Event.CanMove(playerId, map, instance.X, instance.Y, eventId, walkThrough, (byte) z, isGlobal))
+                                                        if (Event.CanMove(playerId, map, instance.X, instance.Y, eventId, walkThrough, z, isGlobal))
                                                         {
-                                                            Event.Move(playerId, map, eventId, z, actualmovespeed, isGlobal);
+                                                            Event.OnMove(playerId, map, eventId, z, actualmovespeed, isGlobal);
                                                         }
                                                         else if (instance.IgnoreIfCannotMove == 0)
                                                         {
@@ -661,7 +661,7 @@ namespace Server
                                                 {
                                                     if (Event.CanMove(playerId, map, instance.X, instance.Y, eventId, walkThrough, (byte) z, isGlobal))
                                                     {
-                                                        Event.Move(playerId, map, eventId, z, actualmovespeed, isGlobal);
+                                                        Event.OnMove(playerId, map, eventId, (byte)z, actualmovespeed, isGlobal);
                                                     }
                                                     else if (instance.IgnoreIfCannotMove == 0)
                                                     {
@@ -676,7 +676,7 @@ namespace Server
                                         case 8: // Move Forward
                                             if (Event.CanMove(playerId, map, instance.X, instance.Y, eventId, walkThrough, (byte) instance.Dir, isGlobal))
                                             {
-                                                Event.Move(playerId, map, eventId, instance.Dir, actualmovespeed, isGlobal);
+                                                Event.OnMove(playerId, map, eventId, (byte)instance.Dir, actualmovespeed, isGlobal);
                                             }
                                             else if (instance.IgnoreIfCannotMove == 0)
                                             {
@@ -686,7 +686,7 @@ namespace Server
                                             break;
                                         case 9: // Move Backward
                                         {
-                                            int z = instance.Dir switch
+                                            byte z = instance.Dir switch
                                             {
                                                 (byte) Direction.Up => (byte) Direction.Down,
                                                 (byte) Direction.Down => (byte) Direction.Up,
@@ -694,9 +694,9 @@ namespace Server
                                                 (byte) Direction.Right => (byte) Direction.Left,
                                                 _ => instance.Dir // Invalid direction, keep current.
                                             };
-                                            if (Event.CanMove(playerId, map, instance.X, instance.Y, eventId, walkThrough, (byte) z, isGlobal))
+                                            if (Event.CanMove(playerId, map, instance.X, instance.Y, eventId, walkThrough, z, isGlobal))
                                             {
-                                                Event.Move(playerId, map, eventId, z, actualmovespeed, isGlobal);
+                                                Event.OnMove(playerId, map, eventId, z, actualmovespeed, isGlobal);
                                             }
                                             else if (instance.IgnoreIfCannotMove == 0)
                                             {
@@ -718,7 +718,7 @@ namespace Server
                                         // Turn 90 degrees clockwise, counter-clockwise, 180 degrees, or at random
                                         case 17: // Turn Right 90 Degrees
                                         {
-                                            int z = instance.Dir switch
+                                            byte z = instance.Dir switch
                                             {
                                                 (byte) Direction.Up => (byte) Direction.Right,
                                                 (byte) Direction.Right => (byte) Direction.Down,
@@ -731,7 +731,7 @@ namespace Server
                                         }
                                         case 18: // Turn Left 90 Degrees
                                         {
-                                            int z = instance.Dir switch
+                                            byte z = instance.Dir switch
                                             {
                                                 (byte) Direction.Up => (byte) Direction.Left,
                                                 (byte) Direction.Right => (byte) Direction.Up,
@@ -744,7 +744,7 @@ namespace Server
                                         }
                                         case 19: // Turn 180 Degrees
                                         {
-                                            int z = instance.Dir switch
+                                            byte z = instance.Dir switch
                                             {
                                                 (byte) Direction.Up => (byte) Direction.Down,
                                                 (byte) Direction.Right => (byte) Direction.Left,
@@ -757,7 +757,7 @@ namespace Server
                                         }
                                         case 20: // Turn Random
                                         {
-                                            int z = (int) Math.Floor((double) General.GetRandom.NextInt(0, 4));
+                                            byte z = (byte)General.GetRandom.NextInt(0, 4);
                                             Event.Dir(playerId, map, eventId, z, isGlobal);
                                             break;
                                         }
@@ -765,7 +765,7 @@ namespace Server
                                         {
                                             if (!isGlobal)
                                             {
-                                                int z = Event.GetDirToPlayer(playerId, map, eventId);
+                                                byte z = (byte)Event.GetDirToPlayer(playerId, map, eventId);
                                                 Event.Dir(playerId, map, eventId, z, isGlobal);
                                             }
 
@@ -776,7 +776,7 @@ namespace Server
                                         {
                                             if (!isGlobal)
                                             {
-                                                int z = Event.GetDirAwayFromPlayer(playerId, map, eventId);
+                                                byte z = (byte)Event.GetDirAwayFromPlayer(playerId, map, eventId);
                                                 Event.Dir(playerId, map, eventId, z, isGlobal);
                                             }
 
@@ -873,18 +873,18 @@ namespace Server
 
                                             ref var instance1 = ref Event.TempEventMap[i].Event[x];
                                             buffer.WriteString(Server.Map.Instance[i].Event[x].Name); // Global event, use map index
-                                            buffer.WriteInt32(instance1.Dir);
+                                            buffer.WriteByte(instance1.Dir);
                                             buffer.WriteByte(instance1.GraphicType);
                                             buffer.WriteInt32(instance1.Graphic);
                                             buffer.WriteInt32(instance1.GraphicX);
                                             buffer.WriteInt32(instance1.GraphicX2);
                                             buffer.WriteInt32(instance1.GraphicY);
                                             buffer.WriteInt32(instance1.GraphicY2);
-                                            buffer.WriteInt32(instance1.MoveSpeed);
+                                            buffer.WriteByte(instance1.MoveSpeed);
                                             buffer.WriteInt32(instance1.X);
                                             buffer.WriteInt32(instance1.Y);
                                             buffer.WriteByte(instance1.Position);
-                                            buffer.WriteInt32(instance1.Active);
+                                            buffer.WriteBoolean(instance1.Active != 0);
                                             buffer.WriteInt32(instance1.WalkingAnim); // Corrected property names
                                             buffer.WriteInt32(instance1.FixedDir);
                                             buffer.WriteInt32(instance1.WalkThrough);
@@ -971,7 +971,7 @@ namespace Server
                             case 1: // Random
                             {
                                 // Direction 0-3 inclusive (NextInt inclusive upper bound).
-                                int rand = General.GetRandom.NextInt(0, 3);
+                                byte rand = (byte)General.GetRandom.NextInt(0, 3);
                                 if (Event.CanMove(i, map, localEvent.X, localEvent.Y, x, localEvent.WalkThrough, (byte) rand, false))
                                 {
                                     int actualMoveSpeed = localEvent.MoveSpeed switch
@@ -984,7 +984,7 @@ namespace Server
                                         5 => 24,
                                         _ => DefaultMovementSpeed
                                     };
-                                    Event.Move(i, map, x, rand, actualMoveSpeed, false);
+                                    Event.OnMove(i, map, x, rand, actualMoveSpeed, false);
                                 }
                                 else
                                 {
@@ -1051,7 +1051,7 @@ namespace Server
                                             case 1: // Move Up
                                                 if (Event.CanMove(i, map, instance.X, instance.Y, eventId, walkThrough, (byte) Direction.Up, isGlobal))
                                                 {
-                                                    Event.Move(i, map, eventId, (int) Direction.Up, actualmovespeed, isGlobal);
+                                                    Event.OnMove(i, map, eventId, (byte)Direction.Up, actualmovespeed, isGlobal);
                                                 }
                                                 else if (instance.IgnoreIfCannotMove == 0)
                                                 {
@@ -1062,7 +1062,7 @@ namespace Server
                                             case 2: // Move Down
                                                 if (Event.CanMove(i, map, instance.X, instance.Y, eventId, walkThrough, (byte) Direction.Down, isGlobal))
                                                 {
-                                                    Event.Move(i, map, eventId, (int) Direction.Down, actualmovespeed, isGlobal);
+                                                    Event.OnMove(i, map, eventId, (byte)Direction.Down, actualmovespeed, isGlobal);
                                                 }
                                                 else if (instance.IgnoreIfCannotMove == 0)
                                                 {
@@ -1073,7 +1073,7 @@ namespace Server
                                             case 3: // Move Left
                                                 if (Event.CanMove(i, map, instance.X, instance.Y, eventId, walkThrough, (byte) Direction.Left, isGlobal))
                                                 {
-                                                    Event.Move(i, map, eventId, (int) Direction.Left, actualmovespeed, isGlobal);
+                                                    Event.OnMove(i, map, eventId, (byte)Direction.Left, actualmovespeed, isGlobal);
                                                 }
                                                 else if (instance.IgnoreIfCannotMove == 0)
                                                 {
@@ -1084,7 +1084,7 @@ namespace Server
                                             case 4: // Move Right
                                                 if (Event.CanMove(i, map, instance.X, instance.Y, eventId, walkThrough, (byte) Direction.Right, isGlobal))
                                                 {
-                                                    Event.Move(i, map, eventId, (int) Direction.Right, actualmovespeed, isGlobal);
+                                                    Event.OnMove(i, map, eventId, (byte)Direction.Right, actualmovespeed, isGlobal);
                                                 }
                                                 else if (instance.IgnoreIfCannotMove == 0)
                                                 {
@@ -1094,10 +1094,10 @@ namespace Server
                                                 break;
                                             case 5: // Move Random
                                             {
-                                                int z = (int) Math.Floor((double) General.GetRandom.NextInt(0, 4));
+                                                byte z = (byte)General.GetRandom.NextInt(0, 4);
                                                 if (Event.CanMove(i, map, instance.X, instance.Y, eventId, walkThrough, (byte) z, isGlobal))
                                                 {
-                                                    Event.Move(i, map, eventId, z, actualmovespeed, isGlobal);
+                                                    Event.OnMove(i, map, eventId, z, actualmovespeed, isGlobal);
                                                 }
                                                 else if (instance.IgnoreIfCannotMove == 0)
                                                 {
@@ -1113,7 +1113,7 @@ namespace Server
                                                 {
                                                     if (Event.IsOneBlockAway(instance.X, instance.Y, GetPlayerX(i), GetPlayerY(i)))
                                                     {
-                                                        Event.Dir(i, map, eventId, Event.GetDirToPlayer(i, map, eventId), false);
+                                                        Event.Dir(i, map, eventId, (byte)Event.GetDirToPlayer(i, map, eventId), false);
 
                                                         // Activate event if triggered by player action.
                                                         int mapEventId2 = Data.TempPlayer[i].EventMap.EventPages[eventId].EventId;
@@ -1147,7 +1147,7 @@ namespace Server
                                                         {
                                                             if (Event.CanMove(i, map, instance.X, instance.Y, eventId, walkThrough, (byte) z, isGlobal))
                                                             {
-                                                                Event.Move(i, map, eventId, z, actualmovespeed, isGlobal);
+                                                                Event.OnMove(i, map, eventId, (byte)z, actualmovespeed, isGlobal);
                                                             }
                                                             else if (instance.IgnoreIfCannotMove == 0)
                                                             {
@@ -1172,7 +1172,7 @@ namespace Server
                                                     {
                                                         if (Event.CanMove(i, map, instance.X, instance.Y, eventId, walkThrough, (byte) z, isGlobal))
                                                         {
-                                                            Event.Move(i, map, eventId, z, actualmovespeed, isGlobal);
+                                                            Event.OnMove(i, map, eventId, (byte)z, actualmovespeed, isGlobal);
                                                         }
                                                         else if (instance.IgnoreIfCannotMove == 0)
                                                         {
@@ -1186,7 +1186,7 @@ namespace Server
                                             case 8: // Move Forward
                                                 if (Event.CanMove(i, map, instance.X, instance.Y, eventId, walkThrough, (byte) instance.Dir, isGlobal))
                                                 {
-                                                    Event.Move(i, map, eventId, instance.Dir, actualmovespeed, isGlobal);
+                                                    Event.OnMove(i, map, eventId, instance.Dir, actualmovespeed, isGlobal);
                                                 }
                                                 else if (instance.IgnoreIfCannotMove == 0)
                                                 {
@@ -1197,7 +1197,7 @@ namespace Server
 
                                             case 9: // Move Backward
                                             {
-                                                int z = instance.Dir switch
+                                                byte z = instance.Dir switch
                                                 {
                                                     (byte) Direction.Up => (byte) Direction.Down,
                                                     (byte) Direction.Down => (byte) Direction.Up,
@@ -1208,7 +1208,7 @@ namespace Server
 
                                                 if (Event.CanMove(i, map, instance.X, instance.Y, eventId, walkThrough, (byte) z, isGlobal))
                                                 {
-                                                    Event.Move(i, map, eventId, z, actualmovespeed, isGlobal);
+                                                    Event.OnMove(i, map, eventId, z, actualmovespeed, isGlobal);
                                                 }
                                                 else if (instance.IgnoreIfCannotMove == 0)
                                                 {
@@ -1229,7 +1229,7 @@ namespace Server
                                             // Turn 90 degrees clockwise, counter-clockwise, 180 degrees
                                             case 17: // Turn Right 90 Degrees
                                             {
-                                                int z = instance.Dir switch
+                                                byte z = instance.Dir switch
                                                 {
                                                     (byte) Direction.Up => (byte) Direction.Right,
                                                     (byte) Direction.Right => (byte) Direction.Down,
@@ -1242,7 +1242,7 @@ namespace Server
                                             }
                                             case 18: // Turn Left 90 Degrees
                                             {
-                                                int z = instance.Dir switch
+                                                byte z = instance.Dir switch
                                                 {
                                                     (byte) Direction.Up => (byte) Direction.Left,
                                                     (byte) Direction.Right => (byte) Direction.Up,
@@ -1255,7 +1255,7 @@ namespace Server
                                             }
                                             case 19: // Turn 180 Degrees
                                             {
-                                                int z = instance.Dir switch
+                                                byte z = instance.Dir switch
                                                 {
                                                     (byte) Direction.Up => (byte) Direction.Down,
                                                     (byte) Direction.Right => (byte) Direction.Left,
@@ -1268,7 +1268,7 @@ namespace Server
                                             }
                                             case 20: // Turn Random
                                             {
-                                                int z = (int) Math.Floor((double) General.GetRandom.NextInt(0, 4));
+                                                byte z = (byte)General.GetRandom.NextInt(0, 4);
                                                 Event.Dir(i, map, eventId, z, isGlobal);
                                                 break;
                                             }
@@ -1277,7 +1277,7 @@ namespace Server
                                                 if (!isGlobal)
                                                 {
                                                     int z = Event.GetDirToPlayer(i, map, eventId);
-                                                    Event.Dir(i, map, eventId, z, isGlobal);
+                                                    Event.Dir(i, map, eventId, (byte)z, isGlobal);
                                                 }
 
                                                 break;
@@ -1287,7 +1287,7 @@ namespace Server
                                                 if (!isGlobal)
                                                 {
                                                     int z = Event.GetDirAwayFromPlayer(i, map, eventId);
-                                                    Event.Dir(i, map, eventId, z, isGlobal);
+                                                    Event.Dir(i, map, eventId, (byte)z, isGlobal);
                                                 }
 
                                                 break;
@@ -1376,7 +1376,7 @@ namespace Server
 
                                             ref var instance1 = ref Data.TempPlayer[i].EventMap.EventPages[eventId];
                                             buffer.WriteString(Server.Map.Instance[map].Event[instance1.EventId].Name); //use map event Id
-                                            buffer.WriteInt32(instance1.Dir);
+                                            buffer.WriteByte(instance1.Dir);
                                             buffer.WriteByte(instance1.GraphicType);
                                             buffer.WriteInt32(instance1.Graphic);
                                             buffer.WriteInt32(instance1.GraphicX);
@@ -2700,14 +2700,14 @@ namespace Server
                         tempEvent.X = Server.Map.Instance[map].Event[i].X;
                         tempEvent.Y = Server.Map.Instance[map].Event[i].Y;
                         tempEvent.Dir = Server.Map.Instance[map].Event[i].Pages[0].GraphicType == 1
-                            ? (Server.Map.Instance[map].Event[i].Pages[0].GraphicY % 4) switch
+                            ? (byte)((Server.Map.Instance[map].Event[i].Pages[0].GraphicY % 4) switch
                             {
-                                0 => (int) Direction.Down,
-                                1 => (int) Direction.Left,
-                                2 => (int) Direction.Right,
-                                _ => (int) Direction.Up
-                            }
-                            : (int) Direction.Down;
+                                0 => Direction.Down,
+                                1 => Direction.Left,
+                                2 => Direction.Right,
+                                _ => Direction.Up
+                            })
+                            : (byte)Direction.Down;
                         tempEvent.Active = 0;
                         tempEvent.MoveType = Server.Map.Instance[map].Event[i].Pages[0].MoveType;
 
@@ -2853,14 +2853,14 @@ namespace Server
 
                     // Set up the event page data.
                     instance1.Dir = eventPage.GraphicType == 1
-                        ? (eventPage.GraphicY % 4) switch
+                        ? (byte)((eventPage.GraphicY % 4) switch
                         {
-                            0 => (int) Direction.Down,
-                            1 => (int) Direction.Left,
-                            2 => (int) Direction.Right,
-                            _ => (int) Direction.Up
-                        }
-                        : 0;
+                            0 => Direction.Down,
+                            1 => Direction.Left,
+                            2 => Direction.Right,
+                            _ => Direction.Up
+                        })
+                        : (byte)0;
 
                     instance1.Graphic = eventPage.Graphic;
                     instance1.GraphicType = eventPage.GraphicType;
@@ -2946,7 +2946,7 @@ namespace Server
                 buffer.WriteInt32(slot - 1);
 
                 buffer.WriteString(Server.Map.Instance[map].Event[eventPage.EventId].Name);
-                buffer.WriteInt32(eventPage.Dir);
+                buffer.WriteByte(eventPage.Dir);
                 buffer.WriteByte(eventPage.GraphicType);
                 buffer.WriteInt32(eventPage.Graphic);
                 buffer.WriteInt32(eventPage.GraphicX);
@@ -2958,7 +2958,7 @@ namespace Server
                 buffer.WriteInt32(eventPage.Y);
                 buffer.WriteByte(eventPage.Position);
                 buffer.WriteBoolean(eventPage.Visible);
-                buffer.WriteInt32(Server.Map.Instance[map].Event[eventPage.EventId].Pages[eventPage.PageId].IdleAnim);
+                buffer.WriteInt32((int)Server.Map.Instance[map].Event[eventPage.EventId].Pages[eventPage.PageId].IdleAnim);
                 buffer.WriteInt32(Server.Map.Instance[map].Event[eventPage.EventId].Pages[eventPage.PageId].DirFix);
                 buffer.WriteInt32(Server.Map.Instance[map].Event[eventPage.EventId].Pages[eventPage.PageId].WalkThrough);
                 buffer.WriteInt32(Server.Map.Instance[map].Event[eventPage.EventId].Pages[eventPage.PageId].ShowName);

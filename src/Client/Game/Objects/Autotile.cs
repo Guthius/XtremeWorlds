@@ -1611,11 +1611,6 @@ namespace Client
             throw new NotImplementedException();
         }
 
-        public static void OnReset()
-        {
-            throw new NotImplementedException();
-        }
-
         public static void OnLoad(int index)
         {
             throw new NotImplementedException();

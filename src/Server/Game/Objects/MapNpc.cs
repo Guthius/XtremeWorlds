@@ -374,7 +374,7 @@ namespace Server
             buffer.WriteInt32(Instance[map, mapNpcNum].X);
             buffer.WriteInt32(Instance[map, mapNpcNum].Y);
             buffer.WriteByte(Instance[map, mapNpcNum].Dir);
-            buffer.WriteInt32((int)MovementState.Walking);
+            buffer.WriteByte((byte)MovementState.Walking);
             NetworkConfig.SendDataToMap(map, buffer.GetBytes());
         }
 

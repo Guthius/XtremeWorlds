@@ -1404,7 +1404,7 @@ namespace Client
             }
         }
 
-        public static void OnReset()
+        public static void OnClear()
         {
             throw new NotImplementedException();
         }

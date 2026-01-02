@@ -39,7 +39,7 @@ namespace Client
         
         }
 
-        public static void OnReset()
+        public static void OnClear()
         {
             for (int i = 0; i < Data.Blood.Length; i++)
                 OnClear(i);

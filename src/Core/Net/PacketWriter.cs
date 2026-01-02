@@ -180,6 +180,14 @@ public sealed class PacketWriter(int capacity = PacketWriter.InitialCapacity)
         _offset += sizeof(short);
     }
 
+#if DEBUG
+    [Obsolete("WriteInt16 requires a 'short'. Use WriteByte for 1-byte values.", true)]
+    public void WriteInt16(byte value) => throw new NotSupportedException();
+
+    [Obsolete("WriteInt16 requires a 'short'. Choose the correct width explicitly.", true)]
+    public void WriteInt16(sbyte value) => throw new NotSupportedException();
+#endif
+
     public void WriteUInt16(ushort value)
     {
         EnsureSpaceAvailable(sizeof(ushort));
@@ -187,12 +195,37 @@ public sealed class PacketWriter(int capacity = PacketWriter.InitialCapacity)
         _offset += sizeof(ushort);
     }
 
+#if DEBUG
+    [Obsolete("WriteUInt16 requires a 'ushort'. Use WriteByte for 1-byte values.", true)]
+    public void WriteUInt16(byte value) => throw new NotSupportedException();
+
+    [Obsolete("WriteUInt16 requires a 'ushort'. Use WriteChar for 'char' values.", true)]
+    public void WriteUInt16(char value) => throw new NotSupportedException();
+#endif
+
     public void WriteInt32(int value)
     {
         EnsureSpaceAvailable(sizeof(int));
         BinaryPrimitives.WriteInt32LittleEndian(_buffer.AsSpan(_offset), value);
         _offset += sizeof(int);
     }
+
+#if DEBUG
+    [Obsolete("WriteInt32 requires an 'int'. Use WriteByte/WriteUInt16/WriteInt16 for smaller widths (or cast to int explicitly if the wire type is Int32).", true)]
+    public void WriteInt32(byte value) => throw new NotSupportedException();
+
+    [Obsolete("WriteInt32 requires an 'int'. Choose the correct width explicitly.", true)]
+    public void WriteInt32(sbyte value) => throw new NotSupportedException();
+
+    [Obsolete("WriteInt32 requires an 'int'. Use WriteInt16 for 2-byte signed values (or cast to int explicitly if the wire type is Int32).", true)]
+    public void WriteInt32(short value) => throw new NotSupportedException();
+
+    [Obsolete("WriteInt32 requires an 'int'. Use WriteUInt16 for 2-byte unsigned values (or cast to int explicitly if the wire type is Int32).", true)]
+    public void WriteInt32(ushort value) => throw new NotSupportedException();
+
+    [Obsolete("WriteInt32 requires an 'int'. Use WriteChar for 'char' values.", true)]
+    public void WriteInt32(char value) => throw new NotSupportedException();
+#endif
 
     public void WriteEnum<T>(T value) where T : Enum
     {
@@ -224,6 +257,17 @@ public sealed class PacketWriter(int capacity = PacketWriter.InitialCapacity)
         _offset += sizeof(uint);
     }
 
+#if DEBUG
+    [Obsolete("WriteUInt32 requires a 'uint'. Use WriteByte/WriteUInt16 for smaller widths (or cast to uint explicitly if the wire type is UInt32).", true)]
+    public void WriteUInt32(byte value) => throw new NotSupportedException();
+
+    [Obsolete("WriteUInt32 requires a 'uint'. Use WriteUInt16 for 2-byte unsigned values (or cast to uint explicitly if the wire type is UInt32).", true)]
+    public void WriteUInt32(ushort value) => throw new NotSupportedException();
+
+    [Obsolete("WriteUInt32 requires a 'uint'. Use WriteChar for 'char' values.", true)]
+    public void WriteUInt32(char value) => throw new NotSupportedException();
+#endif
+
     public void WriteSingle(float value)
     {
         EnsureSpaceAvailable(sizeof(float));
@@ -238,6 +282,23 @@ public sealed class PacketWriter(int capacity = PacketWriter.InitialCapacity)
         _offset += sizeof(long);
     }
 
+#if DEBUG
+    [Obsolete("WriteInt64 requires a 'long'. Use WriteInt32 for 4-byte signed values (or cast to long explicitly if the wire type is Int64).", true)]
+    public void WriteInt64(int value) => throw new NotSupportedException();
+
+    [Obsolete("WriteInt64 requires a 'long'. Use WriteUInt32 for 4-byte unsigned values (or cast to long explicitly if the wire type is Int64).", true)]
+    public void WriteInt64(uint value) => throw new NotSupportedException();
+
+    [Obsolete("WriteInt64 requires a 'long'. Use WriteInt16 for 2-byte signed values.", true)]
+    public void WriteInt64(short value) => throw new NotSupportedException();
+
+    [Obsolete("WriteInt64 requires a 'long'. Use WriteUInt16 for 2-byte unsigned values.", true)]
+    public void WriteInt64(ushort value) => throw new NotSupportedException();
+
+    [Obsolete("WriteInt64 requires a 'long'. Use WriteByte for 1-byte values.", true)]
+    public void WriteInt64(byte value) => throw new NotSupportedException();
+#endif
+
     public void WriteUInt64(ulong value)
     {
         EnsureSpaceAvailable(sizeof(ulong));
@@ -245,10 +306,29 @@ public sealed class PacketWriter(int capacity = PacketWriter.InitialCapacity)
         _offset += sizeof(ulong);
     }
 
+#if DEBUG
+    [Obsolete("WriteUInt64 requires an 'ulong'. Use WriteUInt32 for 4-byte unsigned values (or cast to ulong explicitly if the wire type is UInt64).", true)]
+    public void WriteUInt64(uint value) => throw new NotSupportedException();
+
+    [Obsolete("WriteUInt64 requires an 'ulong'. Use WriteInt32 for 4-byte signed values (or cast to ulong explicitly if the wire type is UInt64).", true)]
+    public void WriteUInt64(int value) => throw new NotSupportedException();
+
+    [Obsolete("WriteUInt64 requires an 'ulong'. Use WriteUInt16 for 2-byte unsigned values.", true)]
+    public void WriteUInt64(ushort value) => throw new NotSupportedException();
+
+    [Obsolete("WriteUInt64 requires an 'ulong'. Use WriteByte for 1-byte values.", true)]
+    public void WriteUInt64(byte value) => throw new NotSupportedException();
+#endif
+
     public void WriteDouble(double value)
     {
         EnsureSpaceAvailable(sizeof(double));
         BinaryPrimitives.WriteDoubleLittleEndian(_buffer.AsSpan(_offset), value);
         _offset += sizeof(double);
     }
+
+#if DEBUG
+    [Obsolete("WriteDouble requires a 'double'. Use WriteSingle for 4-byte floats.", true)]
+    public void WriteDouble(float value) => throw new NotSupportedException();
+#endif
 }

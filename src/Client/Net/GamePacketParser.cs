@@ -531,21 +531,21 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     {
         var packetReader = new PacketReader(data);
 
-        var mapNpcNum = packetReader.ReadInt32();
+        var npc = packetReader.ReadInt32();
         var x = packetReader.ReadInt32();
         var y = packetReader.ReadInt32();
         var dir = packetReader.ReadByte();
-        var movement = packetReader.ReadInt32();
+        var movement = packetReader.ReadByte();
 
-        ref var mapNpc = ref MapNpc.Instance[mapNpcNum];
+        ref var mapNpc = ref MapNpc.Instance[npc];
 
         // Server signals start of a 1-tile move. Keep the authoritative starting position,
         // initialize client-side step bookkeeping, and set moving state/dir.
         mapNpc.X = x;
         mapNpc.Y = y;
         mapNpc.Dir = dir;
-        mapNpc.Moving = (byte)movement;
-        Client.Npc.StartStep(mapNpcNum, x, y, dir);
+        mapNpc.Moving = movement;
+        Client.Npc.StartStep(npc, x, y, dir);
     }
 
     private static void Packet_NpcDir(ReadOnlyMemory<byte> data)
@@ -1299,7 +1299,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             MapAnimation.Index = 1;
         {
             if (MapAnimation.Instance == null)
-                MapAnimation.OnReset();
+                MapAnimation.OnClear();
 
             if (MapAnimation.Instance == null)
                 return;
@@ -1809,7 +1809,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         int x;
         int y;
         int i;
-        byte needMap;
+        int needMap;
         var buffer = new PacketReader(data);
 
         GameState.GettingMap = true;
@@ -1829,10 +1829,10 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             MapNpc.OnClear(i);
         }
         
-        Blood.OnReset();
+        Blood.OnClear();
         Map.OnClear();
-        ChatBubble.OnReset();
-        MapAnimation.OnReset();
+        ChatBubble.OnClear();
+        MapAnimation.OnClear();
 
         GameState.ResourceIndex = 0;
 
@@ -2300,7 +2300,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
             ref var instance = ref Data.MapEvents[id];
             instance.Name = buffer.ReadString();
-            instance.Dir = buffer.ReadInt32();
+            instance.Dir = buffer.ReadByte();
             instance.ShowDir = instance.Dir;
             instance.GraphicType = buffer.ReadByte();
             instance.Graphic = buffer.ReadInt32();
@@ -2326,7 +2326,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         int id;
         int x;
         int y;
-        int dir;
+        byte dir;
         int showDir;
         int movementSpeed;
         var buffer = new PacketReader(data);
@@ -2335,7 +2335,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         // Server sends start-of-step coordinates in tile units; client stores/draws them in world pixels.
         x = buffer.ReadInt32() * Constants.TileSize;
         y = buffer.ReadInt32() * Constants.TileSize;
-        dir = buffer.ReadInt32();
+        dir = buffer.ReadByte();
         showDir = buffer.ReadInt32();
         movementSpeed = buffer.ReadInt32();
 
@@ -2348,9 +2348,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             ref var instance = ref Data.MapEvents[id];
             instance.X = x;
             instance.Y = y;
-            instance.Dir = dir;
+            instance.Dir = (byte)dir;
             instance.Moving = 1;
-            instance.ShowDir = showDir;
+            instance.ShowDir = (byte)showDir;
             instance.MovementSpeed = movementSpeed;
 
             // Begin a 1-tile (32px) client-side step like NPCs.
@@ -2856,7 +2856,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         int i;
         var buffer = new PacketReader(data);
 
-        Bank.OnReset();
+        Bank.OnClear();
         for (i = 0; i <= GameState.MyIndex; i++)
         {
             Bank.Instance.Add(new Bank());

@@ -258,7 +258,7 @@ public static class Type
     {
         public int X;
         public int Y;
-        public int Dir;
+        public byte Dir;
         public int Active;
         public int WalkingAnim;
         public int FixedDir;
@@ -389,7 +389,7 @@ public static class Type
     {
         public string Name;
         public int Steps;
-        public int Dir;
+        public byte Dir;
         public int X;
         public int Y;
         public int WalkingAnim;

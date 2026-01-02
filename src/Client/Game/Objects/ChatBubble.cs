@@ -208,7 +208,7 @@ public class ChatBubble : IData
         }
     }
 
-    public static void OnReset()
+    public static void OnClear()
     {
         for (int i = 0; i < Data.ChatBubble.Length; i++)
             OnClear(i);

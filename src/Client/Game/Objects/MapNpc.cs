@@ -283,9 +283,10 @@ namespace Client
             throw new NotImplementedException();
         }
 
-        public static void OnReset()
+        public static void OnClear()
         {
-            throw new NotImplementedException();
+            for (int i = 0; i < Instance.Length; i++)
+                OnClear(i);
         }
 
         public static void OnStream(int index)

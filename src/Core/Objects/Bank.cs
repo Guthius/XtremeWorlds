@@ -34,7 +34,7 @@ namespace Core.Objects
             throw new NotImplementedException();
         }
 
-        public static void OnReset()
+        public static void OnClear()
         {
             for (int i = 0; i < Variables.MaxBank; i++)
                 OnClear(i);

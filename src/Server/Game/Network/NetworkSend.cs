@@ -26,7 +26,7 @@ public static class NetworkSend
 
         packetWriter.WriteEnum(ServerPackets.SAlertMsg);
         packetWriter.WriteByte((byte)menuNo);
-        packetWriter.WriteInt32((byte)menuReset);
+        packetWriter.WriteEnum(menuReset);
         packetWriter.WriteInt32(kick ? 1 : 0);
 
         session.Channel.Send(packetWriter.GetBytes());
@@ -46,7 +46,7 @@ public static class NetworkSend
         var packetWriter = new PacketWriter(16);
         packetWriter.WriteEnum(ServerPackets.SAlertMsg);
         packetWriter.WriteByte((byte)menuNo);
-        packetWriter.WriteInt32((byte)menuReset);
+        packetWriter.WriteEnum(menuReset);
         packetWriter.WriteInt32(kick ? 1 : 0);
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
 
@@ -972,7 +972,7 @@ public static class NetworkSend
 
         packetWriter.WriteEnum(ServerPackets.SSayMsg);
         packetWriter.WriteString(GetPlayerName(playerId));
-        packetWriter.WriteInt32(GetPlayerAccess(playerId));
+        packetWriter.WriteInt32((int)GetPlayerAccess(playerId));
         packetWriter.WriteBoolean(GetPlayerPk(playerId));
         packetWriter.WriteString(message);
         packetWriter.WriteString("[Map]:");
@@ -987,7 +987,7 @@ public static class NetworkSend
 
         packetWriter.WriteEnum(ServerPackets.SSayMsg);
         packetWriter.WriteString(GetPlayerName(playerId));
-        packetWriter.WriteInt32(GetPlayerAccess(playerId));
+        packetWriter.WriteInt32((int)GetPlayerAccess(playerId));
         packetWriter.WriteBoolean(GetPlayerPk(playerId));
         packetWriter.WriteString(message);
         packetWriter.WriteString("[Global]:");
@@ -1081,7 +1081,7 @@ public static class NetworkSend
         }
 
         packetWriter.WriteEnum(ServerPackets.STradeUpdate);
-        packetWriter.WriteInt32(dataType);
+        packetWriter.WriteInt32((int)dataType);
 
         switch (dataType)
         {
@@ -1155,7 +1155,7 @@ public static class NetworkSend
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
     }
 
-    public static void SendTradeStatus(int playerId, byte status)
+    public static void SendTradeStatus(int playerId, int status)
     {
         var packetWriter = new PacketWriter(8);
 
@@ -1433,7 +1433,7 @@ public static class NetworkSend
             
         packet.WriteString(projectile.Name);
         packet.WriteInt32(projectile.Sprite);
-        packet.WriteInt32(projectile.Range);
+        packet.WriteInt32((int)projectile.Range);
         packet.WriteInt32(projectile.Speed);
         packet.WriteInt32(projectile.Damage);
         packet.WriteInt32(projectile.Animation);
@@ -1636,7 +1636,7 @@ public static class NetworkSend
         packet.WriteInt32(anim);
         packet.WriteInt32(x);
         packet.WriteInt32(y);
-        packet.WriteInt32(lockType);
+        packet.WriteInt32((int)lockType);
         packet.WriteInt32(lockindex);
 
         NetworkConfig.SendDataToMap(map, packet.GetBytes());
@@ -1650,7 +1650,7 @@ public static class NetworkSend
         packet.WriteInt32(anim);
         packet.WriteInt32(x);
         packet.WriteInt32(y);
-        packet.WriteInt32(lockType);
+        packet.WriteInt32((int)lockType);
         packet.WriteInt32(lockindex);
 
         PlayerService.Instance.SendDataTo(index, packet.GetBytes());
@@ -1986,7 +1986,7 @@ public static class NetworkSend
         var packet = new PacketWriter(4);
 
         packet.WriteInt32((int)ServerPackets.SMapNpcVitals);
-        packet.WriteInt32(mapNpcNum);
+        packet.WriteInt32((int)mapNpcNum);
 
         var vitalCount = Enum.GetValues<Vital>().Length;
         for (var i = 0; i < vitalCount; i++)

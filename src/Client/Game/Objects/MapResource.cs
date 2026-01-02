@@ -20,7 +20,7 @@ namespace Core.Objects
             throw new NotImplementedException();
         }
 
-        public static void OnReset()
+        public static void OnClear()
         {
             throw new NotImplementedException();
         }

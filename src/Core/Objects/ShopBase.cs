@@ -33,12 +33,9 @@ public class ShopBase
             Instance[index] = new ShopBase();
     }
 
-    public static void OnReset()
+    public static void OnClear()
     {
         for (var i = 0; i < Variables.MaxShops; i++)
-        {
             OnClear(i);
-        }
     }
-
 }

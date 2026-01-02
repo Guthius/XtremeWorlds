@@ -145,7 +145,7 @@ namespace Server
         private sealed class ActiveEventMove
         {
             public int RemainingPixels;
-            public int Dir;
+            public byte Dir;
             public int Speed;
         }
 
@@ -279,9 +279,9 @@ namespace Server
         private static bool IsValidMapAndDirection(int map, byte dir) =>
             map >= 0 && map < Core.Globals.Variables.MaxMaps && dir >= 0 && dir <= System.Enum.GetValues(typeof(Direction)).Length;
 
-        public static void Dir(int playerIndex, int map, int eventId, int dir, bool globalEvent = false)
+        public static void Dir(int playerIndex, int map, int eventId, byte dir, bool globalEvent = false)
         {
-            if (!IsValidMapAndDirection(map, (byte) dir)) return;
+            if (!IsValidMapAndDirection(map, dir)) return;
 
             var eventIndex = GetEventIndex(playerIndex, eventId, globalEvent);
             if (eventIndex == -1) return;
@@ -339,9 +339,9 @@ namespace Server
             }
         }
 
-        public static void Move(int index, int map, int eventId, int dir, int movementSpeed, bool globalEvent = false)
+        public static void OnMove(int index, int map, int eventId, byte dir, int movementSpeed, bool globalEvent = false)
         {
-            if (!IsValidMapAndDirection(map, (byte) dir)) return;
+            if (!IsValidMapAndDirection(map, dir)) return;
 
             var eventIndex = GetEventIndex(index, eventId, globalEvent);
             if (eventIndex == -1) return;
@@ -483,7 +483,7 @@ namespace Server
 
         public static byte GetNpcDir(int x, int y, int x1, int y1)
         {
-            byte direction = (int) Direction.Right;
+            byte direction = (byte)Direction.Right;
             var maxDistance = 0;
             UpdateDirectionAndDistance(x - x1, (int) Direction.Right, (int) Direction.Left, ref direction, ref maxDistance);
             UpdateDirectionAndDistance(y - y1, (int) Direction.Down, (int) Direction.Up, ref direction, ref maxDistance);
@@ -500,18 +500,20 @@ namespace Server
             }
         }
 
-        public static int CanMoveTowardsPlayer(int playerId, int map, int eventId)
+        public static byte CanMoveTowardsPlayer(int playerId, int map, int eventId)
         {
             if (!IsValidPlayerEvent(playerId, map, eventId)) return 4; // Invalid direction as failure
 
             var (px, py, ex, ey, walkThrough) = GetPlayerAndEventPositions(playerId, map, eventId);
-            return PathfindingType switch
+            var dir = PathfindingType switch
             {
                 1 => RandomMoveTowardsPlayer(playerId, map, eventId, ex, ey, px, py, walkThrough),
                 2 => BfsMoveTowardsPlayer(playerId, map, eventId, ex, ey, px, py, walkThrough),
                 3 => AStarMoveTowardsPlayer(playerId, map, eventId, ex, ey, px, py, walkThrough), // New A* pathfinding
                 _ => RandomDirection()
             };
+
+            return (byte)dir;
         }
 
         private static bool IsValidPlayerEvent(int playerId, int map, int eventId) =>
@@ -532,7 +534,7 @@ namespace Server
             var i = Random.Shared.Next(0, 4);
             foreach (var dir in GetDirectionOrder(i))
             {
-                if (ShouldMoveTowards(ex, ey, px, py, dir) && CanMove(playerId, map, ex, ey, eventId, walkThrough, (byte) dir, false))
+                if (ShouldMoveTowards(ex, ey, px, py, dir) && CanMove(playerId, map, ex, ey, eventId, walkThrough, (byte)dir, false))
                 {
                     return dir;
                 }
@@ -680,7 +682,7 @@ namespace Server
         {
             if (!IsValidPlayerEvent(playerId, map, eventId)) return (int) Direction.Right;
             var (px, py, ex, ey, _) = GetPlayerAndEventPositions(playerId, map, eventId);
-            byte direction = (int) Direction.Right;
+            byte direction = (byte)Direction.Right;
             var maxDistance = 0;
             UpdateDirectionAndDistance(px - ex, (int) Direction.Left, (int) Direction.Right, ref direction, ref maxDistance);
             UpdateDirectionAndDistance(py - ey, (int) Direction.Up, (int) Direction.Down, ref direction, ref maxDistance);
@@ -696,7 +698,7 @@ namespace Server
             var dir = GetDirectionToTarget(TempEventMap[map].Event[eventId].X, TempEventMap[map].Event[eventId].Y, targetX, targetY);
             if (CanMove(index, map, TempEventMap[map].Event[eventId].X, TempEventMap[map].Event[eventId].Y, eventId, 0, (byte) dir, globalEvent))
             {
-                Move(index, map, eventId, dir, speed, globalEvent);
+                OnMove(index, map, eventId, (byte)dir, speed, globalEvent);
                 if (TempEventMap[map].Event[eventId].X == targetX && TempEventMap[map].Event[eventId].Y == targetY)
                     TempEventMap[map].Event[eventId].PatrolStep++;
             }
@@ -709,7 +711,7 @@ namespace Server
         {
             var dir = CanMoveTowardsPlayer(targetPlayerId, map, eventId);
             if (dir != 4)
-                Move(index, map, eventId, dir, speed, globalEvent);
+                OnMove(index, map, eventId, (byte)dir, speed, globalEvent);
         }
 
         #endregion

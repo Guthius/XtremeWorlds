@@ -181,23 +181,23 @@ namespace Client
         {
             Map.Instance.Add(new Map());
             Map.OnClear();
-            Npc.OnReset();
-            Resource.OnReset();
-            Item.OnReset();
-            Shop.OnReset();
-            Skill.OnReset();
-            Animation.OnReset();
-            MapAnimation.OnReset();
-            Projectile.OnReset();
-            Job.OnReset();
-            Moral.OnReset();
-            Bank.OnReset();
+            Npc.OnClear();
+            Resource.OnClear();
+            Item.OnClear();
+            Shop.OnClear();
+            Skill.OnClear();
+            Animation.OnClear();
+            MapAnimation.OnClear();
+            Projectile.OnClear();
+            Job.OnClear();
+            Moral.OnClear();
+            Bank.OnClear();
             Party.OnClear();
 
             for (int i = 0; i < Player.Instance.Count; i++)
                 Player.OnClear(i);
 
-            Animation.OnReset();
+            Animation.OnClear();
             Autotile.OnClear();
 
             // clear chat
