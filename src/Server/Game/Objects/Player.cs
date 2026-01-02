@@ -221,12 +221,6 @@ public class Player : PlayerBase
             return;
         }
 
-        if (Data.TempPlayer[playerId].InShop >= 0 || Data.TempPlayer[playerId].InBank)
-        {
-            NetworkSend.SendPlayerXY(playerId);
-            return;
-        }
-
         SetPlayerDir(playerId, dir);
         var moved = false;
         var map = GetPlayerMap(playerId);
