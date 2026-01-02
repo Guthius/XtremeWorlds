@@ -1,7 +1,5 @@
 ﻿using Client.Net;
 using Core.Globals;
-using Eto.Drawing;
-using Eto.Forms;
 using System;
 using System.Linq;
 using System.Net.Http.Headers;

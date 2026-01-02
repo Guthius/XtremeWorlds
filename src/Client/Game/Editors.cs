@@ -5,8 +5,6 @@ using Client.Net;
 using Core;
 using Core.Globals;
 using Core.Net;
-using Eto.Forms;
-using Eto.Drawing;
 using Type = Core.Globals.Type;
 using static Core.Globals.Commands;
 

@@ -4,7 +4,6 @@ using System.Data.Common;
 using Client.Game.UI;
 using Client.Game.UI.Windows;
 using System.Linq;
-using Eto.Forms;
 using Client.Net;
 using Core.Configurations;
 using Core.Globals;
