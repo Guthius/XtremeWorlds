@@ -1565,14 +1565,14 @@ public static class NetworkSend
         packet.WriteInt32(item.Data2);
         packet.WriteInt32(item.Data3);
         packet.WriteInt32(item.LevelReq);
-        packet.WriteInt32(item.Mastery);
+        packet.WriteByte(item.Mastery);
         packet.WriteString(item.Name);
         packet.WriteInt32(item.Paperdoll);
         packet.WriteInt32(item.Icon);
         packet.WriteInt32(item.Price);
-        packet.WriteInt32(item.Rarity);
+        packet.WriteByte(item.Rarity);
         packet.WriteInt32(item.Speed);
-        packet.WriteInt32(item.Stackable);
+        packet.WriteByte(item.Stackable);
         packet.WriteString(item.Description);
 
         for (var i = 0; i < statCount; i++)
