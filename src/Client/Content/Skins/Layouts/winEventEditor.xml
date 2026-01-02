@@ -105,8 +105,8 @@
 		<TextBox Name="txtVariableValue" Position="308,74" Size="32,22" Design="TextWhite"/>
 
 		<CheckBox Name="chkPageSelfSwitch" Text="Self-Switch" Position="12,100" Size="60,18" Design="CheckboxNormal"/>
-		<ComboBox Name="cmbSelfSwitchIndex" Position="100,98" Size="46,20"/>
-		<ComboBox Name="cmbSelfSwitchCompare" Position="150,98" Size="54,20"/>
+		<ComboBox Name="cmbSelfSwitchIndex" Position="110,98" Size="46,20"/>
+		<ComboBox Name="cmbSelfSwitchCompare" Position="160,98" Size="54,20"/>
 
 		<!-- Move Route (when Move Type = Route) -->
 		<Label Name="lblMoveRoute" Text="Route" Position="780,28" Size="60,18"/>
