@@ -54,8 +54,9 @@ internal static class PacketSendStats
         var packetId = TryReadPacketId(packetBytes);
         if (packetId >= 0)
         {
+            var packetLength = packetBytes.Length;
             SentCounts.AddOrUpdate(packetId, 1, static (_, v) => v + 1);
-            SentBytesByPacket.AddOrUpdate(packetId, packetBytes.Length, static (_, v) => v + packetBytes.Length);
+            SentBytesByPacket.AddOrUpdate(packetId, packetLength, (_, v) => v + packetLength);
         }
 
         // Flush once per second across all channels.
