@@ -1,9 +1,8 @@
 using Core.Globals;
-using Core.Interfaces;
 
 namespace Core.Objects
 {
-    public class MoralBase : IData
+    public class MoralBase
     {
         public static bool[] IsChanged = new bool[Variables.MaxMorals];
 
@@ -36,30 +35,10 @@ namespace Core.Objects
                 Instance[index] = new MoralBase();
         }
 
-        public static void OnDraw(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnLoad(int index)
-        {
-            throw new NotImplementedException();
-        }
-
         public static void OnReset()
         {
             for (int i = 0; i < Instance.Count; i++)
                 OnClear(i);
-        }
-
-        public static void OnSave(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnUpdate(int index)
-        {
-            throw new NotImplementedException();
         }
     }
 }

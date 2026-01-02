@@ -46,7 +46,7 @@ public sealed class GroupBox : Control
         }
         if (minX == int.MaxValue)
         {
-            return (Width: 1, Height: 1);
+            return (1, 1);
         }
         int w = (maxX - minX) + BorderPadding * 2;
         int h = (maxY - minY) + BorderPadding * 2;

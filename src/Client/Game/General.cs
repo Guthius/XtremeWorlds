@@ -393,9 +393,6 @@ namespace Client
             if (GameState.MyIndex < 0 || GameState.MyIndex >= Bank.Instance.Count)
                 return -1;
 
-            if (GameState.BankColumns <= 0)
-                return -1;
-
             var bank = Bank.Instance[GameState.MyIndex];
 
             var slotCount = Math.Min((int)Variables.MaxBank, bank.Item.Length);
@@ -422,9 +419,6 @@ namespace Client
 
         public static int IsShop(long startX, long startY)
         {
-            if (GameState.ShopColumns <= 0)
-                return -1;
-
             // When selling, we will later use this slot as an inventory index.
             // Apply the same safety checks as IsInv so UI hover/click can't crash.
             if (GameState.ShopIsSelling)
@@ -458,9 +452,6 @@ namespace Client
 
         public static int IsTrade(long startX, long startY)
         {
-            if (GameState.TradeColumns <= 0)
-                return -1;
-
             Type.Rect tempRec;
 
             var slotCount = (int)Variables.MaxInventory;

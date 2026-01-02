@@ -249,7 +249,33 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     {
         var packetReader = new PacketReader(data);
 
+        ResetClientStateForNewLogin();
+
         GameState.MyIndex = packetReader.ReadInt32();
+    }
+
+    private static void ResetClientStateForNewLogin()
+    {
+        // Wipe any leftover player instances from a previous session.
+        Player.Instance.Clear();
+        for (var i = 0; i < Variables.MaxPlayers; i++)
+        {
+            Player.Instance.Add(new Player());
+        }
+
+        // Reset per-player transient state used by movement smoothing and misc gameplay flags.
+        Data.TempPlayer = new TempPlayer[Variables.MaxPlayers];
+
+        // Clear local input/mode flags that can keep the client simulating movement.
+        GameState.DirUp = false;
+        GameState.DirDown = false;
+        GameState.DirLeft = false;
+        GameState.DirRight = false;
+
+        GameState.InGame = false;
+        GameState.GettingMap = false;
+        GameState.PlayerData = false;
+        GameState.MapData = false;
     }
 
     public static void Packet_PlayerCharacters(ReadOnlyMemory<byte> data)

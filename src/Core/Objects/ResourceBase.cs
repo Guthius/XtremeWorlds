@@ -1,13 +1,12 @@
 using Core.Globals;
-using Core.Interfaces;
 
 namespace Core.Objects
 {
-    public class ResourceBase : IData
+    public class ResourceBase
     {
         public static bool[] IsChanged = new bool[Variables.MaxResources];
 
-        public string Name;
+        public string Name = string.Empty;
         public string SuccessMessage;
         public string EmptyMessage;
         public int ResourceType;
@@ -46,15 +45,6 @@ namespace Core.Objects
                 Instance[index] = new ResourceBase();
         }
 
-        public static void OnDraw(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnLoad(int index)
-        {
-            throw new NotImplementedException();
-        }
 
         public static void OnReset()
         {
@@ -62,14 +52,5 @@ namespace Core.Objects
                 OnClear(i);
         }
 
-        public static void OnSave(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnUpdate(int index)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

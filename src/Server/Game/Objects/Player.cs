@@ -19,6 +19,55 @@ public class Player : PlayerBase
 {
     private static readonly int[] LastPlayerXYBroadcastMs = new int[Core.Globals.Variables.MaxPlayers];
 
+    private static void ResetDisconnectedPlayerSlot(int playerId)
+    {
+        if (playerId < 0 || playerId >= Core.Globals.Variables.MaxPlayers)
+        {
+            return;
+        }
+
+        // Clear persistent player data stored in the global list.
+        // Important: do not Remove() here, indices are player ids.
+        if (PlayerBase.Instance.Count > playerId)
+        {
+            PlayerBase.Instance[playerId] = new PlayerBase();
+        }
+
+        // Reset transient per-connection/player runtime state.
+        if (Data.TempPlayer is null || playerId >= Data.TempPlayer.Length)
+        {
+            return;
+        }
+
+        var tp = new Core.Globals.Type.TempPlayer
+        {
+            InGame = false,
+            GettingMap = false,
+
+            Target = -1,
+            TargetType = 0,
+
+            PartyInvite = -1,
+            InParty = -1,
+
+            SkillBuffer = -1,
+            InShop = -1,
+            InTrade = 0,
+
+            Editor = EditorType.None,
+
+            MoveSpeedMultiplier = 1.0f,
+            MoveSpeedMultiplierTimer = 0,
+
+            SkillCd = new int[Core.Globals.Variables.MaxPlayerSkills],
+            TradeOffer = new Core.Globals.Type.Item[Core.Globals.Variables.MaxInventory],
+            EventProcessing = new Core.Globals.Type.EventProcessing[1],
+            EventMap = new Core.Globals.Type.EventMap { CurrentEvents = 0, EventPages = new Core.Globals.Type.MapEvent[1] },
+        };
+
+        Data.TempPlayer[playerId] = tp;
+    }
+
     public static void OnLevel(int playerId)
     {
         try
@@ -1343,6 +1392,15 @@ public class Player : PlayerBase
             catch
             {
                 // ignore
+            }
+
+            try
+            {
+                ResetDisconnectedPlayerSlot(playerId);
+            }
+            catch (Exception ex)
+            {
+                General.Logger.LogError(ex, "Error resetting disconnected player slot for playerId={PlayerId}", playerId);
             }
 
             General.UpdateCaption();

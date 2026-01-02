@@ -80,10 +80,14 @@ public class WinMapEditor
             string name = "None";
             try
             {
-                int npcIndex = (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc != null && slot < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc.Length) ? Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[slot] : -1;
-                if (npcIndex >= 0 && npcIndex < Core.Globals.Variables.MaxNpcs && npcIndex < (Npc.Instance?.Count ?? 0))
+                int npcIndex = (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc != null && slot < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc.Length)
+                    ? Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[slot]
+                    : -1;
+
+                var npcs = Npc.Instance;
+                if (npcs is not null && npcIndex >= 0 && npcIndex < Core.Globals.Variables.MaxNpcs && npcIndex < npcs.Count)
                 {
-                    var raw = Npc.Instance[npcIndex].Name ?? string.Empty;
+                    var raw = npcs[npcIndex].Name ?? string.Empty;
                     if (!string.IsNullOrWhiteSpace(raw)) name = raw.Trim();
                 }
             }

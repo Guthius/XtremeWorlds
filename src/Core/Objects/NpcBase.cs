@@ -1,9 +1,8 @@
 using Core.Globals;
-using Core.Interfaces;
 
 namespace Core.Objects;
 
-public class NpcBase : IData
+public class NpcBase
 {
     public static bool[] IsChanged { get; set; } = new bool[Variables.MaxNpcs];
 
@@ -75,8 +74,4 @@ public class NpcBase : IData
         }
     }
 
-    public static void OnDraw(int index) => throw new NotImplementedException();
-    public static void OnLoad(int index) => throw new NotImplementedException();
-    public static void OnSave(int index) => throw new NotImplementedException();
-    public static void OnUpdate(int index) => throw new NotImplementedException();
 }

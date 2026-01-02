@@ -17,6 +17,27 @@ namespace Server;
 
 public class Resource : ResourceBase, IAsyncData
 {
+    private static void EnsureSize(int size)
+    {
+        if (size <= 0)
+        {
+            return;
+        }
+
+        if (Resource.Instance.Count >= size)
+        {
+            return;
+        }
+
+        lock (Resource.Instance)
+        {
+            while (Resource.Instance.Count < size)
+            {
+                Resource.Instance.Add(new Resource());
+            }
+        }
+    }
+
     public static void OnSave(int index)
     {
         var json = JsonConvert.SerializeObject(Resource.Instance[index]);
@@ -33,11 +54,13 @@ public class Resource : ResourceBase, IAsyncData
 
     public static async System.Threading.Tasks.Task OnLoadAllAsync()
     {
+        EnsureSize(Core.Globals.Variables.MaxResources);
         await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxResources), Resource.OnLoadAsync);
     }
 
     public static async ValueTask OnLoadAsync(int index, CancellationToken cancellationToken)
     {
+        EnsureSize(Core.Globals.Variables.MaxResources);
         var data = await Database.SelectRowAsync(index, "resource", "data");
         if (data is null)
         {
@@ -47,6 +70,7 @@ public class Resource : ResourceBase, IAsyncData
 
         var resourceData = JObject.FromObject(data).ToObject<Resource>();
 
-        Resource.Instance.Add(resourceData ?? new Resource());
+        EnsureSize(index + 1);
+        Resource.Instance[index] = resourceData ?? new Resource();
     }
 }

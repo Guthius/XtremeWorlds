@@ -15,8 +15,29 @@ using Core.Objects;
 
 namespace Server;
 
-public class Animation : AnimationBase, IData, IAsyncData
+public class Animation : AnimationBase, IAsyncData
 {
+    private static void EnsureSize(int size)
+    {
+        if (size <= 0)
+        {
+            return;
+        }
+
+        if (Animation.Instance.Count >= size)
+        {
+            return;
+        }
+
+        lock (Animation.Instance)
+        {
+            while (Animation.Instance.Count < size)
+            {
+                Animation.Instance.Add(new Animation());
+            }
+        }
+    }
+
     public static void OnSave(int index)
     {
         var json = JsonConvert.SerializeObject(Animation.Instance[index]);
@@ -33,11 +54,13 @@ public class Animation : AnimationBase, IData, IAsyncData
 
     public static Task OnLoadAllAsync()
     {
+        EnsureSize(Variables.MaxAnimations);
         return Parallel.ForEachAsync(Enumerable.Range(0, Variables.MaxAnimations), OnLoadAsync);
     }
 
     public static async ValueTask OnLoadAsync(int index, CancellationToken cancellationToken)
     {
+        EnsureSize(Variables.MaxAnimations);
         var data = await Database.SelectRowAsync(index, "animation", "data");
         if (data is null)
         {
@@ -47,6 +70,7 @@ public class Animation : AnimationBase, IData, IAsyncData
 
         var animationData = JObject.FromObject(data).ToObject<Animation>();
 
-        Animation.Instance.Add(animationData ?? new Animation());
+        EnsureSize(index + 1);
+        Animation.Instance[index] = animationData ?? new Animation();
     }
 }

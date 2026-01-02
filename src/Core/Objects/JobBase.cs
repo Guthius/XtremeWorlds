@@ -1,9 +1,8 @@
 using Core.Globals;
-using Core.Interfaces;
 
 namespace Core.Objects
 {
-    public class JobBase : IData
+    public class JobBase
     { 
         public static bool[] IsChanged { get; set; } = new bool[Variables.MaxJobs];
 
@@ -61,30 +60,10 @@ namespace Core.Objects
                 IsChanged[i] = false;
         }
 
-        public static void OnDraw(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnLoad(int index)
-        {
-            throw new NotImplementedException();
-        }
-
         public static void OnReset()
         {
             for (int i = 0; i < Instance.Count; i++)
                 OnClear(i);
-        }
-        
-        public static void OnSave(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnUpdate(int index)
-        {
-            throw new NotImplementedException();
         }
     }
 }

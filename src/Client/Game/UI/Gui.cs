@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Client.Game.UI.Controls;
 using Client.Game.UI.Windows;
 using Core.Configurations;
@@ -71,13 +72,13 @@ public class WindowManager
     }
 
     // Safe helpers to avoid null/KeyNotFound when UI isn't fully initialized
-    public static bool TryGetWindow(string windowName, out Window? window)
+    public static bool TryGetWindow(string windowName, [NotNullWhen(true)] out Window? window)
     {
         window = GetWindowByName(windowName);
         return window is not null;
     }
 
-    public static bool TryGetControl(string windowName, string controlName, out Control? control)
+    public static bool TryGetControl(string windowName, string controlName, [NotNullWhen(true)] out Control? control)
     {
         control = null;
         var window = GetWindowByName(windowName);

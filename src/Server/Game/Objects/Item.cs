@@ -17,6 +17,27 @@ namespace Server;
 
 public class Item : ItemBase, IAsyncData
 {
+    private static void EnsureSize(int size)
+    {
+        if (size <= 0)
+        {
+            return;
+        }
+
+        if (Item.Instance.Count >= size)
+        {
+            return;
+        }
+
+        lock (Item.Instance)
+        {
+            while (Item.Instance.Count < size)
+            {
+                Item.Instance.Add(new Item());
+            }
+        }
+    }
+
     public static void OnSave(int index)
     {
         var json = JsonConvert.SerializeObject(Item.Instance[index]);
@@ -33,11 +54,13 @@ public class Item : ItemBase, IAsyncData
 
     public static Task OnLoadAllAsync()
     {
+        EnsureSize(Core.Globals.Variables.MaxItems);
         return Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxItems), OnLoadAsync);
     }
 
     public static async ValueTask OnLoadAsync(int index, CancellationToken cancellationToken)
     {
+        EnsureSize(Core.Globals.Variables.MaxItems);
         var data = await Database.SelectRowAsync(index, "item", "data");
         if (data is null)
         {
@@ -47,6 +70,9 @@ public class Item : ItemBase, IAsyncData
 
         var itemData = JObject.FromObject(data).ToObject<Item>();
 
-        Item.Instance.Add(itemData ?? new Item());
+        lock (Item.Instance)
+        {
+            Item.Instance[index] = itemData ?? new Item();
+        }
     }
 }

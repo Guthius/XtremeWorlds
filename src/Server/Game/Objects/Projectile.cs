@@ -17,6 +17,27 @@ namespace Server;
 
 public class Projectile : ProjectileBase, IAsyncData
 {
+    private static void EnsureSize(int size)
+    {
+        if (size <= 0)
+        {
+            return;
+        }
+
+        if (Projectile.Instance.Count >= size)
+        {
+            return;
+        }
+
+        lock (Projectile.Instance)
+        {
+            while (Projectile.Instance.Count < size)
+            {
+                Projectile.Instance.Add(new Projectile());
+            }
+        }
+    }
+
     private static bool TryGetProjectileSlot(int index, out int speed, out byte range, out int damage, out int animation)
     {
         try
@@ -146,6 +167,7 @@ public class Projectile : ProjectileBase, IAsyncData
 
     public static async ValueTask OnLoadAsync(int index, CancellationToken cancellationToken)
     {
+        EnsureSize(Core.Globals.Variables.MaxProjectiles);
         var data = await Database.SelectRowAsync(index, "projectile", "data");
         if (data is null)
         {
@@ -161,7 +183,8 @@ public class Projectile : ProjectileBase, IAsyncData
             return;
         }
 
-        Projectile.Instance.Add(projectileData ?? new Projectile());
+        EnsureSize(index + 1);
+        Projectile.Instance[index] = projectileData ?? new Projectile();
     }
 
     public static void OnFireFreeAim(int playerId, short vx, short vy, int itemNum)

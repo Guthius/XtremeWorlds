@@ -1,11 +1,10 @@
 using Core.Globals;
-using Core.Interfaces;
 using System;
 using System.Collections.Generic;
 
 namespace Core.Objects
 {
-    public class MapBase : IData
+    public class MapBase
     {
         public string Name;
         public string Music;
@@ -98,24 +97,5 @@ namespace Core.Objects
             }
         }
 
-        public static void OnDraw(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnLoad(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnSave(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnUpdate(int index)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

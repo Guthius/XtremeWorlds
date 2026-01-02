@@ -1,5 +1,4 @@
 ﻿using Core.Globals;
-using Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -7,7 +6,7 @@ using System.Text;
 
 namespace Core.Objects
 {
-    public class AnimationBase : IData
+    public class AnimationBase
     {
         public byte Count = 2;
 
@@ -27,28 +26,20 @@ namespace Core.Objects
             }
         }
 
-        public string Name;
-        public string Sound;
-        public int[] Sprite;
-        public int[] Frames;
-        public int[] LoopCount;
-        public int[] LoopTime;
+        public string Name = string.Empty;
+        public string Sound = string.Empty;
+        public int[] Sprite = Array.Empty<int>();
+        public int[] Frames = Array.Empty<int>();
+        public int[] LoopCount = Array.Empty<int>();
+        public int[] LoopTime = Array.Empty<int>();
 
         public static List<AnimationBase> Instance { get; private set; } = new List<AnimationBase>();
-        public static void OnDraw(int index)
-        {
-            throw new NotImplementedException();
-        }
 
         public static void OnClearChanged()
         {
             IsChanged = new bool[Variables.MaxAnimations];
         }
 
-        public static void OnLoad(int index)
-        {
-            throw new NotImplementedException();
-        }
 
         public static void OnReset()
         {
@@ -56,20 +47,11 @@ namespace Core.Objects
                 OnClear(i);
         }
 
-        public static void OnUpdate(int index)
-        {
-            throw new NotImplementedException();
-        }
 
         public static void OnClear(int index)
         {
             if (Instance.Count > index)
                 Instance[index] = new AnimationBase();
-        }
-
-        public static void OnSave(int index)
-        {
-            throw new NotImplementedException();
         }
     }
 }

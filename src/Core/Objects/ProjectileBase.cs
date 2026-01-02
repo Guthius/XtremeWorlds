@@ -1,9 +1,8 @@
 using Core.Globals;
-using Core.Interfaces;
 
 namespace Core.Objects
 {
-    public class ProjectileBase : IData
+    public class ProjectileBase
     {
         public static bool[] IsChanged = new bool[Variables.MaxProjectiles];
 
@@ -26,10 +25,6 @@ namespace Core.Objects
             IsChanged = new bool[Variables.MaxProjectiles];
         }
 
-        public static void OnDraw(int index)
-        {
-            throw new NotImplementedException();
-        }
 
         public static void OnClear(int index)
         {
@@ -43,24 +38,5 @@ namespace Core.Objects
                 OnClear(i);
         }
 
-        public static void OnLoad(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnSave(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static void OnUpdate(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static implicit operator ProjectileBase(int v)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

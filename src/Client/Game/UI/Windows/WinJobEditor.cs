@@ -93,13 +93,14 @@ namespace Client.Game.UI.Windows
                 cmbItem.Items.Clear();
                 cmbItem.Items.Add("None");
                 int max = Core.Globals.Variables.MaxItems;
-                int loaded = Item.Instance?.Count ?? 0;
+                var items = Item.Instance;
+                int loaded = items?.Count ?? 0;
                 for (int i = 0; i < max; i++)
                 {
                     string name = "None";
-                    if (i >= 0 && i < loaded)
+                    if (items is not null && i >= 0 && i < loaded)
                     {
-                        var raw = Item.Instance[i].Name ?? string.Empty;
+                        var raw = items[i].Name ?? string.Empty;
                         name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
                     }
 
@@ -114,13 +115,14 @@ namespace Client.Game.UI.Windows
                 cmbSkill.Items.Clear();
                 cmbSkill.Items.Add("None");
                 int max = Variables.MaxSkills;
-                int loaded = Skill.Instance?.Count ?? 0;
+                var skills = Skill.Instance;
+                int loaded = skills?.Count ?? 0;
                 for (int i = 0; i < max; i++)
                 {
                     string name = "None";
-                    if (i >= 0 && i < loaded)
+                    if (skills is not null && i >= 0 && i < loaded)
                     {
-                        var raw = Skill.Instance[i].Name ?? string.Empty;
+                        var raw = skills[i].Name ?? string.Empty;
                         name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
                     }
 

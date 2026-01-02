@@ -87,7 +87,7 @@ namespace Client
             }
         }
 
-        public new static void MouseDown(int x, int y, bool movedMouse = true)
+        public static void MouseDown(int x, int y, bool movedMouse = true)
         {
             int i;
             bool isModified = false;

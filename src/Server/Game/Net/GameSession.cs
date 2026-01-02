@@ -6,7 +6,7 @@ namespace Server.Game.Net;
 public sealed class GameSession(int id, INetworkChannel channel, GameSessionManager sessionManager) : IDisposable
 {
     private const int InitialBufferSize = 0xFFFF;
-    private const int MaxBufferSize = 8 * 1024 * 1024; // 8 MiB safety cap
+    private const int MaxBufferSize = 64 * 1024 * 1024; // 64 MiB safety cap
 
     private readonly GamePacketParser _parser = new();
     private byte[] _buffer = new byte[InitialBufferSize];

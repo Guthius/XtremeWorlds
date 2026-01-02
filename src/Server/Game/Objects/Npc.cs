@@ -16,8 +16,30 @@ namespace Server;
 
 public class Npc : NpcBase, IAsyncData
 {
+    private static void EnsureSize(int size)
+    {
+        if (size <= 0)
+        {
+            return;
+        }
+
+        if (Npc.Instance.Count >= size)
+        {
+            return;
+        }
+
+        lock (Npc.Instance)
+        {
+            while (Npc.Instance.Count < size)
+            {
+                Npc.Instance.Add(new Npc());
+            }
+        }
+    }
+
     public static Task OnLoadAllAsync()
     {
+        EnsureSize(Core.Globals.Variables.MaxNpcs);
         return Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxNpcs), OnLoadAsync);
     }
 
@@ -49,6 +71,7 @@ public class Npc : NpcBase, IAsyncData
 
         var npcData = JObject.FromObject(data).ToObject<Npc>();
 
-        Npc.Instance.Add(npcData ?? new Npc());
+        EnsureSize(index + 1);
+        Npc.Instance[index] = npcData ?? new Npc();
     }
 }

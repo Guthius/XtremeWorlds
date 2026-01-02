@@ -11,7 +11,7 @@ using System.Security.AccessControl;
 
 namespace Server
 {
-    public class Account : IAsyncData
+    public class Account : IData, IAsyncData
     {
         public string Login;
         public string Password;
@@ -107,12 +107,23 @@ namespace Server
             }
 
             var accountData = JObject.FromObject(data).ToObject<Account>();
+            if (accountData is null)
+            {
+                Account.OnClear(index);
+                return;
+            }
+
             Account.Instance[index] = accountData;
         }
 
         public static Task OnLoadAllAsync()
         {
             return Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxPlayers), OnLoadAsync);
+        }
+
+        static void IData.OnSave(int index)
+        {
+            throw new NotImplementedException();
         }
     }
 }

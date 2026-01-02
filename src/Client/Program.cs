@@ -399,7 +399,7 @@ namespace Client
             SpriteBatch?.Draw(texture, destRect, srcRect, color);
         }
 
-        public static Texture2D GetTexture(string path)
+        public static Texture2D? GetTexture(string path)
         {
             if (!TextureCache.ContainsKey(path))
             {

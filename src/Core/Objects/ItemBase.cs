@@ -1,11 +1,10 @@
 ﻿using Core.Globals;
-using Core.Interfaces;
 using System;
 using System.Collections.Generic;
 
 namespace Core.Objects
 {
-    public class ItemBase : IData
+    public class ItemBase
     {
         public static bool[] IsChanged { get; set; } = new bool[Variables.MaxItems];
 
@@ -71,10 +70,5 @@ namespace Core.Objects
             for (int i = 0; i < Instance.Count; i++)
                 OnClear(i);
         }
-
-        public static void OnDraw(int index) => throw new NotImplementedException();
-        public static void OnLoad(int index) => throw new NotImplementedException();
-        public static void OnSave(int index) => throw new NotImplementedException();
-        public static void OnUpdate(int index) => throw new NotImplementedException();
     }
 }

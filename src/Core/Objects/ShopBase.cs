@@ -1,9 +1,8 @@
 using Core.Globals;
-using Core.Interfaces;
 
 namespace Core.Objects;
 
-public class ShopBase : IData
+public class ShopBase
 {
     public static bool[] IsChanged { get; set; } = new bool[Variables.MaxShops];
 
@@ -42,11 +41,4 @@ public class ShopBase : IData
         }
     }
 
-    public static void OnDraw(int index) => throw new NotImplementedException();
-
-    public static void OnLoad(int index) => throw new NotImplementedException();
-
-    public static void OnSave(int index) => throw new NotImplementedException();
-
-    public static void OnUpdate(int index) => throw new NotImplementedException();
 }

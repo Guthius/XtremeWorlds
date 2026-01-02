@@ -361,11 +361,7 @@ public static class NetworkSend
     {
         packetWriter.WriteInt32(shopNum);
 
-        var shop = new Shop();
-        if (shopNum >= 0 && shopNum < Shop.Instance.Count)
-        {
-            shop = (Shop)Shop.Instance[shopNum];
-        }
+        var shop = shopNum >= 0 && shopNum < Shop.Instance.Count ? Shop.Instance[shopNum] : new ShopBase();
 
         packetWriter.WriteInt32(shop.BuyRate);
         packetWriter.WriteString(shop.Name);
@@ -1367,9 +1363,7 @@ public static class NetworkSend
     {
         packet.WriteInt32(index);
 
-        var moral = new Moral();
-        if (Moral.Instance.Count > index)
-            moral = (Moral)Moral.Instance[index];
+        var moral = index >= 0 && index < Moral.Instance.Count ? Moral.Instance[index] : new MoralBase();
 
         packet.WriteString(moral.Name);
         packet.WriteByte(moral.Color);
@@ -1435,9 +1429,7 @@ public static class NetworkSend
     {
         packet.WriteInt32(index);
 
-        var projectile = new Projectile();
-        if (Projectile.Instance.Count > index)
-            projectile = (Projectile)Projectile.Instance[index];
+        var projectile = index >= 0 && index < Projectile.Instance.Count ? Projectile.Instance[index] : new ProjectileBase();
             
         packet.WriteString(projectile.Name);
         packet.WriteInt32(projectile.Sprite);
@@ -1473,9 +1465,7 @@ public static class NetworkSend
     {
         packet.WriteInt32(index);
 
-        var resource = new Resource();
-        if (Resource.Instance.Count > index)
-            resource = (Resource)Resource.Instance[index];
+        var resource = index >= 0 && index < Resource.Instance.Count ? Resource.Instance[index] : new ResourceBase();
 
         packet.WriteInt32(resource.Animation);
         packet.WriteString(resource.EmptyMessage);
@@ -1562,9 +1552,7 @@ public static class NetworkSend
 
         packet.WriteInt32(index);
 
-        var item = new Item();
-        if (Item.Instance.Count > index)
-            item = (Item)Item.Instance[index];
+        var item = index >= 0 && index < Item.Instance.Count ? Item.Instance[index] : new ItemBase();
 
         packet.WriteInt32(item.AccessReq);
 
@@ -1610,9 +1598,7 @@ public static class NetworkSend
 
      public static void WriteJobDataToPacket(int index, PacketWriter packetWriter)
     {
-        var job = new Job();
-        if (Job.Instance.Count > index)
-            job = (Job)Job.Instance[index];
+        var job = index >= 0 && index < Job.Instance.Count ? Job.Instance[index] : new JobBase();
 
         packetWriter.WriteString(job.Name);
         packetWriter.WriteString(job.Desc);
@@ -1704,9 +1690,7 @@ public static class NetworkSend
     {
         packet.WriteInt32(index);
 
-        var animation = new Animation();
-        if (Animation.Instance.Count > index)
-            animation = (Animation)Animation.Instance[index];
+        var animation = index >= 0 && index < Animation.Instance.Count ? Animation.Instance[index] : new AnimationBase();
 
         foreach (var frame in animation.Frames)
         {
@@ -1951,9 +1935,7 @@ public static class NetworkSend
     {
         packet.WriteInt32(index);
 
-        var npc = new Npc();
-        if (Npc.Instance.Count > index)
-            npc = (Npc)Npc.Instance[index];
+        var npc = index >= 0 && index < Npc.Instance.Count ? Npc.Instance[index] : new NpcBase();
 
         packet.WriteInt32(npc.Animation);
         packet.WriteString(npc.AttackSay);

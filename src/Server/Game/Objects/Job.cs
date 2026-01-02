@@ -11,8 +11,30 @@ namespace Server
 {
     public class Job : JobBase, IAsyncData
     {
+        private static void EnsureSize(int size)
+        {
+            if (size <= 0)
+            {
+                return;
+            }
+
+            if (Job.Instance.Count >= size)
+            {
+                return;
+            }
+
+            lock (Job.Instance)
+            {
+                while (Job.Instance.Count < size)
+                {
+                    Job.Instance.Add(new Job());
+                }
+            }
+        }
+
         public static Task OnLoadAllAsync()
         {
+            EnsureSize(Core.Globals.Variables.MaxJobs);
             return Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxJobs), OnLoadAsync);
         }
 
@@ -42,8 +64,9 @@ namespace Server
             }
 
             var jobData = JObject.FromObject(data).ToObject<Job>();
-            
-            Job.Instance.Add(jobData ?? new Job());
+
+            EnsureSize(index + 1);
+            Job.Instance[index] = jobData ?? new Job();
         }
     }
 }

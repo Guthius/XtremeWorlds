@@ -2,6 +2,7 @@
 using Core.Globals;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using static Core.Globals.Commands;
@@ -70,7 +71,7 @@ public static class TextRenderer
         BitmapFonts[font] = bf;
     }
 
-    private static bool TryGetBitmapFont(Core.Globals.BitmapFont font, out BitmapFont bf) => BitmapFonts.TryGetValue(font, out bf);
+    private static bool TryGetBitmapFont(Core.Globals.BitmapFont font, [NotNullWhen(true)] out BitmapFont? bf) => BitmapFonts.TryGetValue(font, out bf);
 
     public static bool LoadLegacyBitmapFont(Core.Globals.BitmapFont font, string datPath, string pngPath, GraphicsDevice gd)
     {
@@ -323,6 +324,11 @@ public static class TextRenderer
 
     public static void Render(string text, int x, int y, Color frontColor, Color backColor, Font font = Font.Georgia, float textSize = 1.0f)
     {
+        if (GameClient.SpriteBatch is null)
+        {
+            return;
+        }
+
         if (SettingsManager.Instance.BitmapFont)
         {
             if (Enum.TryParse<Core.Globals.BitmapFont>(font.ToString(), out var bfEnum) && HasBitmapFont(bfEnum))

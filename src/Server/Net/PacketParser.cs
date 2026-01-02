@@ -6,6 +6,7 @@ namespace Server.Net;
 public abstract class PacketParser<TPacketId, TSession> where TPacketId : Enum
 {
     private const uint CompressionFlag = 1u << 31;
+    private const int MaxPacketSize = 64 * 1024 * 1024; // Must be <= GameSession MaxBufferSize
 
     private readonly Dictionary<int, Action<TSession, ReadOnlyMemory<byte>>> _handlers = [];
 
@@ -21,6 +22,13 @@ public abstract class PacketParser<TPacketId, TSession> where TPacketId : Enum
         while (bytes.Length >= 4)
         {
             var packetSize = BitConverter.ToInt32(bytes.Span);
+
+            // Defensive: invalid sizes indicate stream corruption or a bad client.
+            if (packetSize < 0 || packetSize > MaxPacketSize)
+            {
+                throw new InvalidDataException($"Invalid packet size {packetSize} (max={MaxPacketSize})");
+            }
+
             if (packetSize > bytes.Length - 4)
             {
                 break;

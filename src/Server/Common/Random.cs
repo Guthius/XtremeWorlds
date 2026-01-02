@@ -1,6 +1,6 @@
-namespace Core.Common;
+namespace Server.Common;
 
-public sealed class RandomUtility
+public sealed class ServerRandomUtility
 {
     private readonly Random _random = new();
     private readonly Lock _lock = new();

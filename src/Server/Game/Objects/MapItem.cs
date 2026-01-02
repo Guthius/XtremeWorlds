@@ -53,15 +53,7 @@ namespace Server
                             continue;
                         }
 
-                        Item item;
-                        try
-                        {
-                            item = (Item)items[itemNum];
-                        }
-                        catch (ArgumentOutOfRangeException)
-                        {
-                            continue;
-                        }
+                        var item = items[itemNum];
 
                         if (item.Type == (byte)ItemCategory.Currency ||
                             item.Stackable == 1)
@@ -84,15 +76,7 @@ namespace Server
                             continue;
                         }
 
-                        Item item;
-                        try
-                        {
-                            item = (Item)items[itemNum];
-                        }
-                        catch (ArgumentOutOfRangeException)
-                        {
-                            continue;
-                        }
+                        var item = items[itemNum];
 
                         if (item.Type == (byte)ItemCategory.Currency ||
                             item.Stackable == 1)
@@ -123,15 +107,7 @@ namespace Server
                 return;
             }
 
-            Item item;
-            try
-            {
-                item = (Item)Item.Instance[itemNum];
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                return;
-            }
+            var item = Item.Instance[itemNum];
 
             var slot = FindOpenSlot(map);
             if (slot == -1)

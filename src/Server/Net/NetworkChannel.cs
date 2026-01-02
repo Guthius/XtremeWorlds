@@ -7,12 +7,13 @@ using Microsoft.Extensions.Logging;
 
 namespace Server.Net;
 
-internal sealed class NetworkChannel<TSession>(ILogger<NetworkChannel<TSession>> logger, TcpClient tcpClient) : INetworkChannel where TSession : IDisposable
+internal sealed class NetworkChannel<TSession> : INetworkChannel where TSession : IDisposable
 {
-    private const int BufferSize = 1024;
+    private const int BufferSize = 8 * 1024;
 
-    private readonly TcpClient _tcpClient = tcpClient;
-    private readonly NetworkStream _networkStream = tcpClient.GetStream();
+    private readonly ILogger<NetworkChannel<TSession>> _logger;
+    private readonly TcpClient _tcpClient;
+    private readonly NetworkStream _networkStream;
     private readonly Channel<byte[]> _sendChannel = Channel.CreateUnbounded<byte[]>();
     private bool _started;
 
@@ -26,7 +27,15 @@ internal sealed class NetworkChannel<TSession>(ILogger<NetworkChannel<TSession>>
 
     private readonly Dictionary<int, (long Count, long Bytes)> _packetsByIdThisSecond = new();
 
-    public string IpAddress { get; } = (tcpClient.Client.RemoteEndPoint as IPEndPoint)?.Address.ToString() ?? "(none)";
+    public string IpAddress { get; }
+
+    public NetworkChannel(ILogger<NetworkChannel<TSession>> logger, TcpClient tcpClient)
+    {
+        _logger = logger;
+        _tcpClient = tcpClient;
+        _networkStream = tcpClient.GetStream();
+        IpAddress = (tcpClient.Client.RemoteEndPoint as IPEndPoint)?.Address.ToString() ?? "(none)";
+    }
 
     public async System.Threading.Tasks.Task StartAsync(INetworkChannelProxy channelProxy, TSession session, CancellationToken cancellationToken)
     {
@@ -56,17 +65,17 @@ internal sealed class NetworkChannel<TSession>(ILogger<NetworkChannel<TSession>>
             }
             catch (Exception ex) when (ex is IOException or ObjectDisposedException or OperationCanceledException)
             {
-                logger.LogDebug(ex, "Network connection terminated");
+                _logger.LogDebug(ex, "Network connection terminated");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Unexpected exception handling network connection");
+                _logger.LogError(ex, "Unexpected exception handling network connection");
             }
             finally
             {
                 await channelProxy.OnDisconnectedAsync(this, cancellationToken);
 
-                tcpClient.Close();
+                _tcpClient.Close();
 
                 session.Dispose();
             }
@@ -127,7 +136,7 @@ internal sealed class NetworkChannel<TSession>(ILogger<NetworkChannel<TSession>>
                                         return $"{name}({kvp.Key}):{kvp.Value.Count} ({kvp.Value.Bytes}B)";
                                     });
 
-                                logger.LogInformation(
+                                _logger.LogInformation(
                                     "Sent {PacketsSent} packets ({BytesSent} bytes) to {Ip} in last second; top={{ {Top} }}",
                                     _packetsSentThisSecond,
                                     _bytesSentThisSecond,
@@ -136,7 +145,7 @@ internal sealed class NetworkChannel<TSession>(ILogger<NetworkChannel<TSession>>
                             }
                             else
                             {
-                                logger.LogInformation(
+                                _logger.LogInformation(
                                     "Sent {PacketsSent} packets ({BytesSent} bytes) to {Ip} in last second",
                                     _packetsSentThisSecond,
                                     _bytesSentThisSecond,
@@ -151,16 +160,16 @@ internal sealed class NetworkChannel<TSession>(ILogger<NetworkChannel<TSession>>
                         }
                     }
 
-                    PacketSendStats.RecordSent(bytes, logger);
+                    PacketSendStats.RecordSent(bytes, _logger);
                 }
 
                 // We drained the current burst; force a flush/reset so stats don't carry across idle gaps.
-                PacketSendStats.FlushIfPending(logger);
+                PacketSendStats.FlushIfPending(_logger);
 
                 // If we're idle, flush any partial per-second window so it doesn't carry into the next burst.
                 if (!PacketSendStats.Enabled && _packetsSentThisSecond >= 1000)
                 {
-                    logger.LogInformation(
+                    _logger.LogInformation(
                         "Sent {PacketsSent} packets ({BytesSent} bytes) to {Ip} in last second",
                         _packetsSentThisSecond,
                         _bytesSentThisSecond,
@@ -180,7 +189,7 @@ internal sealed class NetworkChannel<TSession>(ILogger<NetworkChannel<TSession>>
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Send loop terminated for {Ip}", IpAddress);
+            _logger.LogWarning(ex, "Send loop terminated for {Ip}", IpAddress);
         }
     }
 
@@ -217,14 +226,14 @@ internal sealed class NetworkChannel<TSession>(ILogger<NetworkChannel<TSession>>
         var enqueued = Interlocked.Increment(ref _packetsEnqueued);
         if (!_sendChannel.Writer.TryWrite(bytes))
         {
-            logger.LogWarning("Send dropped (channel closed) to {Ip} (attempted packet size={Size})", IpAddress, bytes.Length);
+            _logger.LogWarning("Send dropped (channel closed) to {Ip} (attempted packet size={Size})", IpAddress, bytes.Length);
             return;
         }
 
         // Log the first enqueue so we can confirm the server attempted to send anything.
         if (enqueued == 1)
         {
-            logger.LogInformation("Enqueued first packet (size={Size}) to {Ip}", bytes.Length, IpAddress);
+            _logger.LogInformation("Enqueued first packet (size={Size}) to {Ip}", bytes.Length, IpAddress);
         }
     }
 
