@@ -38,6 +38,18 @@ public sealed class PlayerService : IPlayerService
         return true;
     }
 
+    public bool Disconnect(int playerId)
+    {
+        var player = _players.FirstOrDefault(x => x.Id == playerId);
+        if (player is null)
+        {
+            return false;
+        }
+
+        player.Disconnect();
+        return true;
+    }
+
     public void SendDataToAll(byte[] bytes)
     {
         foreach (var player in _players)

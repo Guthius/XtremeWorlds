@@ -8,6 +8,31 @@ namespace Server;
 
 public static class NetworkConfig
 {
+    public static int FindConnectedPlayerIdByLogin(string login)
+    {
+        if (string.IsNullOrWhiteSpace(login) || Account.Instance is null)
+        {
+            return -1;
+        }
+
+        foreach (var otherPlayerId in PlayerService.Instance.PlayerIds)
+        {
+            if (otherPlayerId < 0 || otherPlayerId >= Account.Instance.Count)
+            {
+                continue;
+            }
+
+            var otherLogin = Account.Instance[otherPlayerId].Login;
+            if (!string.IsNullOrEmpty(otherLogin) &&
+                otherLogin.Equals(login, StringComparison.CurrentCultureIgnoreCase))
+            {
+                return otherPlayerId;
+            }
+        }
+
+        return -1;
+    }
+
     public static bool IsLoggedIn(int index)
     {
         if (Account.Instance == null || Account.Instance.Count <= index)

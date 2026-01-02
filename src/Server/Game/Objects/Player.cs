@@ -658,11 +658,11 @@ public class Player : PlayerBase
 
             if (npcBlock)
             {
-                for (var mapNpcNum = 0; mapNpcNum < Core.Globals.Variables.MaxMapNpcs; mapNpcNum++)
+                for (var i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
                 {
-                    if (MapNpc.Instance[map, mapNpcNum].Num >= 0 &&
-                        (int)Math.Floor((double)MapNpc.Instance[map, mapNpcNum].X / Constants.TileSize) == x &&
-                        (int)Math.Floor((double)MapNpc.Instance[map, mapNpcNum].Y / Constants.TileSize) == y)
+                    if (MapNpc.Instance[map, i].Num >= 0 &&
+                        (int)Math.Floor((double)MapNpc.Instance[map, i].X / Constants.TileSize) == x &&
+                        (int)Math.Floor((double)MapNpc.Instance[map, i].Y / Constants.TileSize) == y)
                     {
                         return true;
                     }
@@ -734,16 +734,16 @@ public class Player : PlayerBase
         }
 
         var totalQuantity = 0;
-        for (var invSlot = 0; invSlot < Core.Globals.Variables.MaxInventory; invSlot++)
+        for (var i = 0; i < Core.Globals.Variables.MaxInventory; i++)
         {
-            if (GetPlayerInventory(playerId, invSlot) != itemNum)
+            if (GetPlayerInventory(playerId, i) != itemNum)
             {
                 continue;
             }
 
             if (Item.Instance[itemNum].Type == (byte) ItemCategory.Currency || Item.Instance[itemNum].Stackable == 1)
             {
-                totalQuantity += GetPlayerInventoryValue(playerId, invSlot);
+                totalQuantity += GetPlayerInventoryValue(playerId, i);
             }
             else
             {
@@ -761,11 +761,11 @@ public class Player : PlayerBase
             return -1;
         }
 
-        for (var invSlot = 0; invSlot < Core.Globals.Variables.MaxInventory; invSlot++)
+        for (var i = 0; i < Core.Globals.Variables.MaxInventory; i++)
         {
-            if (GetPlayerInventory(playerId, invSlot) == itemNum)
+            if (GetPlayerInventory(playerId, i) == itemNum)
             {
-                return invSlot;
+                return i;
             }
         }
 
@@ -1293,31 +1293,62 @@ public class Player : PlayerBase
 
     public static async System.Threading.Tasks.Task OnExit(int playerId)
     {
-        General.Logger.LogInformation("{AccountName} | {PlayerName} has stopped playing {GameName}",
-            GetAccountLogin(playerId), GetPlayerName(playerId),
-            SettingsManager.Instance.GameName);
-        
         try
         {
-            Script.Instance?.OnLeave(playerId);
+            General.Logger.LogInformation("{AccountName} | {PlayerName} has stopped playing {GameName}",
+                GetAccountLogin(playerId), GetPlayerName(playerId),
+                SettingsManager.Instance.GameName);
+
+            try
+            {
+                Script.Instance?.OnLeave(playerId);
+            }
+            catch (Exception ex)
+            {
+                General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(OnExit));
+            }
+
+            if (Data.TempPlayer[playerId].InGame)
+            {
+                await Account.OnSave(playerId);
+            }
         }
         catch (Exception ex)
         {
-            General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(OnExit));
+            // Save failures or unexpected errors should not prevent cleanup.
+            General.Logger.LogError(ex, "Unhandled error during OnExit for playerId={PlayerId}", playerId);
         }
-
-        if (Data.TempPlayer[playerId].InGame)
+        finally
         {
-            await Account.OnSave(playerId);
-        }
-        
-        Account.OnClear(playerId);
+            try
+            {
+                Account.OnClear(playerId);
+            }
+            catch (Exception ex)
+            {
+                General.Logger.LogError(ex, "Error clearing account state during OnExit for playerId={PlayerId}", playerId);
+            }
 
-        PlayerService.Instance.RemovePlayer(playerId);
-        
-        Data.TempPlayer[playerId].InGame = false;
-        
-        General.UpdateCaption();
+            try
+            {
+                PlayerService.Instance.RemovePlayer(playerId);
+            }
+            catch (Exception ex)
+            {
+                General.Logger.LogError(ex, "Error removing player service entry during OnExit for playerId={PlayerId}", playerId);
+            }
+
+            try
+            {
+                Data.TempPlayer[playerId].InGame = false;
+            }
+            catch
+            {
+                // ignore
+            }
+
+            General.UpdateCaption();
+        }
     }
 
     public static int OnKill(int playerId)

@@ -31,7 +31,14 @@ public static class NetworkSend
 
         session.Channel.Send(packetWriter.GetBytes());
 
-        _ = Player.OnExit(session.Id);
+        if (kick)
+        {
+            session.Channel.Close();
+        }
+        else
+        {
+            _ = Player.OnExit(session.Id);
+        }
     }
 
     public static void SendAlert(int playerId, SystemMessage menuNo, Menu menuReset = 0, bool kick = true)
@@ -42,7 +49,15 @@ public static class NetworkSend
         packetWriter.WriteInt32((byte)menuReset);
         packetWriter.WriteInt32(kick ? 1 : 0);
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
-        _ = Player.OnExit(playerId);
+
+        if (kick)
+        {
+            PlayerService.Instance.Disconnect(playerId);
+        }
+        else
+        {
+            _ = Player.OnExit(playerId);
+        }
     }
 
     public static void SendGlobalMessage(string message)

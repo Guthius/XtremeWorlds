@@ -184,6 +184,21 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             var passwordBytes = reader.ReadBytes().ToArray();
             var password = System.Text.Encoding.UTF8.GetString(session.Decrypt(passwordBytes)).Replace("\0", "");
 
+            // If this account is already connected, take over the session by disconnecting the old one.
+            // This prevents "stuck logged in" states from blocking re-login.
+            var existingPlayerId = NetworkConfig.FindConnectedPlayerIdByLogin(login);
+            if (existingPlayerId > 0 && existingPlayerId != session.Id)
+            {
+                General.Logger.LogInformation(
+                    "Login takeover for {AccountName}: disconnecting existing session {ExistingId} in favor of {NewId}",
+                    login,
+                    existingPlayerId,
+                    session.Id);
+
+                // Best-effort notify then disconnect.
+                NetworkSend.SendAlert(existingPlayerId, SystemMessage.Connection, Menu.Login, kick: true);
+            }
+
             // Get the current executing assembly
             var assembly = Assembly.GetExecutingAssembly();
 

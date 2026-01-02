@@ -11,6 +11,7 @@ internal sealed class NetworkChannel<TSession>(ILogger<NetworkChannel<TSession>>
 {
     private const int BufferSize = 1024;
 
+    private readonly TcpClient _tcpClient = tcpClient;
     private readonly NetworkStream _networkStream = tcpClient.GetStream();
     private readonly Channel<byte[]> _sendChannel = Channel.CreateUnbounded<byte[]>();
     private bool _started;
@@ -196,5 +197,16 @@ internal sealed class NetworkChannel<TSession>(ILogger<NetworkChannel<TSession>>
     public void Close()
     {
         _sendChannel.Writer.TryComplete();
+
+        // Ensure the receive loop unblocks so the connection fully tears down.
+        // This will ultimately trigger OnDisconnectedAsync and session cleanup.
+        try
+        {
+            _tcpClient.Close();
+        }
+        catch
+        {
+            // Ignore close errors; connection may already be disposed.
+        }
     }
 }
