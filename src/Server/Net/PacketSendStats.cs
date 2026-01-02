@@ -11,17 +11,28 @@ internal static class PacketSendStats
     private const uint CompressionFlag = 1u << 31;
 
     private static readonly ConcurrentDictionary<int, long> SentCounts = new();
+    private static readonly ConcurrentDictionary<int, long> SentBytesByPacket = new();
+    private static long _sentPackets;
     private static long _sentBytes;
     private static long _windowStartTick;
     private static volatile bool _enabled;
     private static int _topN = 6;
 
+    private static volatile bool _perConnectionEnabled;
+    private static int _perConnectionThreshold = 1000;
+
     public static bool Enabled => _enabled;
+    public static bool PerConnectionEnabled => _perConnectionEnabled;
+    public static int PerConnectionThreshold => _perConnectionThreshold;
+    public static int TopN => _topN;
 
     public static void Configure(IConfiguration configuration)
     {
         _enabled = configuration.GetValue("Networking:LogSentPacketsPerSecond", false);
         _topN = Math.Clamp(configuration.GetValue("Networking:LogSentPacketsTopN", 6), 0, 50);
+
+        _perConnectionEnabled = configuration.GetValue("Networking:LogSentPacketsPerSecondByConnection", false);
+        _perConnectionThreshold = Math.Clamp(configuration.GetValue("Networking:LogSentPacketsConnectionThreshold", 1000), 1, 1_000_000);
     }
 
     public static void RecordSent(ReadOnlySpan<byte> packetBytes, ILogger logger)
@@ -37,16 +48,15 @@ internal static class PacketSendStats
             Interlocked.CompareExchange(ref _windowStartTick, Environment.TickCount64, 0);
         }
 
-        if (packetBytes.Length >= 8)
-        {
-            var packetId = ReadPacketId(packetBytes);
-            if (packetId >= 0)
-            {
-                SentCounts.AddOrUpdate(packetId, 1, static (_, v) => v + 1);
-            }
-        }
-
+        Interlocked.Increment(ref _sentPackets);
         Interlocked.Add(ref _sentBytes, packetBytes.Length);
+
+        var packetId = TryReadPacketId(packetBytes);
+        if (packetId >= 0)
+        {
+            SentCounts.AddOrUpdate(packetId, 1, static (_, v) => v + 1);
+            SentBytesByPacket.AddOrUpdate(packetId, packetBytes.Length, static (_, v) => v + packetBytes.Length);
+        }
 
         // Flush once per second across all channels.
         var now = Environment.TickCount64;
@@ -56,7 +66,7 @@ internal static class PacketSendStats
             // Only one thread should advance the window.
             if (Interlocked.CompareExchange(ref _windowStartTick, now, start) == start)
             {
-                Flush(logger);
+                Flush(logger, windowMs: now - start);
             }
         }
     }
@@ -74,13 +84,16 @@ internal static class PacketSendStats
             return;
         }
 
+        var start = Volatile.Read(ref _windowStartTick);
+        var now = Environment.TickCount64;
+
         // Force a flush/reset even if < 1 second has elapsed.
-        Flush(logger);
+        Flush(logger, windowMs: start == 0 ? 0 : Math.Max(0, now - start));
         // Reset the window so the next burst starts a fresh 1-second interval.
         Interlocked.Exchange(ref _windowStartTick, 0);
     }
 
-    private static int ReadPacketId(ReadOnlySpan<byte> packetBytes)
+    internal static int TryReadPacketId(ReadOnlySpan<byte> packetBytes)
     {
         // Packet format from PacketWriter.GetBytes():
         // [0..4) = int32 payloadSize
@@ -96,29 +109,43 @@ internal static class PacketSendStats
         return unchecked((int)raw);
     }
 
-    private static void Flush(ILogger logger)
+    private static void Flush(ILogger logger, long windowMs)
     {
+        var packets = Interlocked.Exchange(ref _sentPackets, 0);
         var bytes = Interlocked.Exchange(ref _sentBytes, 0);
         var snapshot = SentCounts.ToArray();
         SentCounts.Clear();
+        var bytesByPacket = SentBytesByPacket.ToArray();
+        SentBytesByPacket.Clear();
 
         Array.Sort(snapshot, static (a, b) => b.Value.CompareTo(a.Value));
         var take = Math.Min(_topN, snapshot.Length);
 
         if (take <= 0)
         {
-            logger.LogInformation("[SEND] bytes={Bytes} header={{ }}", bytes);
+            logger.LogInformation("[SEND] packets={Packets} bytes={Bytes} windowMs={WindowMs} header={{ }}", packets, bytes, windowMs);
             return;
         }
+
+        var bytesMap = bytesByPacket.ToDictionary(k => k.Key, v => v.Value);
 
         var parts = new List<string>(take);
         for (var i = 0; i < take; i++)
         {
             var id = snapshot[i].Key;
             var name = Enum.GetName(typeof(Packets.ServerPackets), id) ?? id.ToString();
-            parts.Add($"{name}({id}):{snapshot[i].Value}");
+            bytesMap.TryGetValue(id, out var bytesForId);
+            parts.Add($"{name}({id}):{snapshot[i].Value} ({bytesForId}B)");
         }
 
-        logger.LogInformation("[SEND] bytes={Bytes} header={{ {Header} }}", bytes, string.Join(", ", parts));
+        var avg = packets > 0 ? (bytes / (double)packets) : 0;
+
+        logger.LogInformation(
+            "[SEND] packets={Packets} bytes={Bytes} avg={AvgBytes:F1} windowMs={WindowMs} top={{ {Header} }}",
+            packets,
+            bytes,
+            avg,
+            windowMs,
+            string.Join(", ", parts));
     }
 }

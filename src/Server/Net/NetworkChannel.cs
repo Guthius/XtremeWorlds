@@ -24,6 +24,8 @@ internal sealed class NetworkChannel<TSession>(ILogger<NetworkChannel<TSession>>
     private long _packetsSentThisSecond;
     private long _bytesSentThisSecond;
 
+    private readonly Dictionary<int, (long Count, long Bytes)> _packetsByIdThisSecond = new();
+
     public string IpAddress { get; } = (tcpClient.Client.RemoteEndPoint as IPEndPoint)?.Address.ToString() ?? "(none)";
 
     public async System.Threading.Tasks.Task StartAsync(INetworkChannelProxy channelProxy, TSession session, CancellationToken cancellationToken)
@@ -84,8 +86,8 @@ internal sealed class NetworkChannel<TSession>(ILogger<NetworkChannel<TSession>>
                     Interlocked.Increment(ref _packetsSent);
                     Interlocked.Add(ref _bytesSent, bytes.Length);
 
-                    // Per-connection per-second counter (only when global packet stats are disabled).
-                    if (!PacketSendStats.Enabled)
+                    // Per-connection per-second counter (enabled explicitly, or as a fallback when global stats are disabled).
+                    if (PacketSendStats.PerConnectionEnabled || !PacketSendStats.Enabled)
                     {
                         var now = Environment.TickCount64;
                         if (_secondStartTick == 0)
@@ -96,17 +98,56 @@ internal sealed class NetworkChannel<TSession>(ILogger<NetworkChannel<TSession>>
                         _packetsSentThisSecond++;
                         _bytesSentThisSecond += bytes.Length;
 
-                        if (now - _secondStartTick >= 1000 && _packetsSentThisSecond >= 1000)
+                        if (PacketSendStats.PerConnectionEnabled)
                         {
-                            logger.LogInformation(
-                                "Sent {PacketsSent} packets ({BytesSent} bytes) to {Ip} in last second",
-                                _packetsSentThisSecond,
-                                _bytesSentThisSecond,
-                                IpAddress);
+                            var packetId = PacketSendStats.TryReadPacketId(bytes);
+                            if (packetId >= 0)
+                            {
+                                if (_packetsByIdThisSecond.TryGetValue(packetId, out var cur))
+                                {
+                                    _packetsByIdThisSecond[packetId] = (cur.Count + 1, cur.Bytes + bytes.Length);
+                                }
+                                else
+                                {
+                                    _packetsByIdThisSecond[packetId] = (1, bytes.Length);
+                                }
+                            }
+                        }
+
+                        if (now - _secondStartTick >= 1000 && _packetsSentThisSecond >= (PacketSendStats.PerConnectionEnabled ? PacketSendStats.PerConnectionThreshold : 1000))
+                        {
+                            if (PacketSendStats.PerConnectionEnabled && _packetsByIdThisSecond.Count > 0 && PacketSendStats.TopN > 0)
+                            {
+                                var top = _packetsByIdThisSecond
+                                    .OrderByDescending(kvp => kvp.Value.Count)
+                                    .Take(PacketSendStats.TopN)
+                                    .Select(kvp =>
+                                    {
+                                        var name = Enum.GetName(typeof(Core.Net.Packets.ServerPackets), kvp.Key) ?? kvp.Key.ToString();
+                                        return $"{name}({kvp.Key}):{kvp.Value.Count} ({kvp.Value.Bytes}B)";
+                                    });
+
+                                logger.LogInformation(
+                                    "Sent {PacketsSent} packets ({BytesSent} bytes) to {Ip} in last second; top={{ {Top} }}",
+                                    _packetsSentThisSecond,
+                                    _bytesSentThisSecond,
+                                    IpAddress,
+                                    string.Join(", ", top));
+                            }
+                            else
+                            {
+                                logger.LogInformation(
+                                    "Sent {PacketsSent} packets ({BytesSent} bytes) to {Ip} in last second",
+                                    _packetsSentThisSecond,
+                                    _bytesSentThisSecond,
+                                    IpAddress);
+                            }
 
                             _packetsSentThisSecond = 0;
                             _bytesSentThisSecond = 0;
                             _secondStartTick = now;
+
+                            _packetsByIdThisSecond.Clear();
                         }
                     }
 
@@ -128,6 +169,8 @@ internal sealed class NetworkChannel<TSession>(ILogger<NetworkChannel<TSession>>
                     _packetsSentThisSecond = 0;
                     _bytesSentThisSecond = 0;
                     _secondStartTick = 0;
+
+                    _packetsByIdThisSecond.Clear();
                 }
             }
         }
