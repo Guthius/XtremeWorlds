@@ -2268,7 +2268,11 @@ public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, Gam
         var x = buffer.ReadInt32();
         var y = buffer.ReadInt32();
 
-        if (x < 0 || x >= Server.Map.Instance[GetPlayerMap(session.Id)].MaxX || y < 0 || y >= Server.Map.Instance[GetPlayerMap(session.Id)].MaxY)
+        var mapId = GetPlayerMap(session.Id);
+        if (mapId < 0 || mapId >= Server.Map.Instance.Count)
+            return;
+
+        if (x < 0 || x >= Server.Map.Instance[mapId].MaxX || y < 0 || y >= Server.Map.Instance[mapId].MaxY)
             return;
 
         x *= 32;
