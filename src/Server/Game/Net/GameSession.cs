@@ -5,10 +5,11 @@ namespace Server.Game.Net;
 
 public sealed class GameSession(int id, INetworkChannel channel, GameSessionManager sessionManager) : IDisposable
 {
-    private const int BufferSize = 0xFFFF;
+    private const int InitialBufferSize = 0xFFFF;
+    private const int MaxBufferSize = 8 * 1024 * 1024; // 8 MiB safety cap
 
     private readonly GamePacketParser _parser = new();
-    private readonly byte[] _buffer = new byte[BufferSize];
+    private byte[] _buffer = new byte[InitialBufferSize];
     private int _bufferOffset;
     private bool _disposed;
 
@@ -56,10 +57,20 @@ public sealed class GameSession(int id, INetworkChannel channel, GameSessionMana
     
     public void Parse(ReadOnlySpan<byte> bytes)
     {
-        var space = BufferSize - _bufferOffset;
-        if (bytes.Length > space)
+        if (bytes.Length <= 0)
+            return;
+
+        // Ensure capacity for incoming bytes (allow dynamic growth beyond initial size)
+        var required = _bufferOffset + bytes.Length;
+        if (required > _buffer.Length)
         {
-            throw new InvalidOperationException("Buffer is full");
+            var newCapacity = Math.Max(required, _buffer.Length * 2);
+            if (newCapacity > MaxBufferSize)
+            {
+                throw new InvalidOperationException($"Receive buffer exceeded max size ({MaxBufferSize} bytes)");
+            }
+
+            Array.Resize(ref _buffer, newCapacity);
         }
 
         bytes.CopyTo(_buffer.AsSpan(_bufferOffset));

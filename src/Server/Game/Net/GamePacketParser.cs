@@ -20,135 +20,135 @@ using Core.Objects;
 
 namespace Server.Game.Net;
 
-public sealed class GamePacketParser : PacketParser<GamePacketId.FromClient, GameSession>
+public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameSession>
 {
     public GamePacketParser()
     {
-        Bind(GamePacketId.FromClient.CCheckPing, Packet_Ping);
-        Bind(GamePacketId.FromClient.CLogin, Packet_Login);
-        Bind(GamePacketId.FromClient.CRegister, Packet_Register);
-        Bind(GamePacketId.FromClient.CAddChar, Packet_AddChar);
-        Bind(GamePacketId.FromClient.CUseChar, Packet_UseChar);
-        Bind(GamePacketId.FromClient.CDelChar, Packet_DelChar);
-        Bind(GamePacketId.FromClient.CLogout, Packet_Logout);
-        Bind(GamePacketId.FromClient.CSayMessage, Packet_SayMessage);
-        Bind(GamePacketId.FromClient.CBroadcastMessage, Packet_BroadCastMsg);
-        Bind(GamePacketId.FromClient.CPlayerMessage, Packet_PlayerMsg);
-        Bind(GamePacketId.FromClient.CAdminMessage, Packet_SendAdminMessage);
-        Bind(GamePacketId.FromClient.CPlayerMove, Packet_PlayerMove);
-        Bind(GamePacketId.FromClient.CStopPlayerMove, Packet_StopPlayerMove);
-        Bind(GamePacketId.FromClient.CPlayerDir, Packet_PlayerDirection);
-        Bind(GamePacketId.FromClient.CUseItem, Packet_UseItem);
-        Bind(GamePacketId.FromClient.CAttack, Packet_Attack);
-        Bind(GamePacketId.FromClient.CMouseAttack, Packet_MouseAttack);
-        Bind(GamePacketId.FromClient.CPlayerInfoRequest, Packet_PlayerInfo);
-        Bind(GamePacketId.FromClient.CWarpMeTo, Packet_WarpMeTo);
-        Bind(GamePacketId.FromClient.CWarpToMe, Packet_WarpToMe);
-        Bind(GamePacketId.FromClient.CWarpTo, Packet_WarpTo);
-        Bind(GamePacketId.FromClient.CSetSprite, Packet_SetSprite);
-        Bind(GamePacketId.FromClient.CGetStats, Packet_GetStats);
-        Bind(GamePacketId.FromClient.CRequestNewMap, Packet_RequestNewMap);
-        Bind(GamePacketId.FromClient.CSaveMap, Packet_MapData);
-        Bind(GamePacketId.FromClient.CNeedMap, Packet_NeedMap);
-        Bind(GamePacketId.FromClient.CMapGetItem, Packet_GetItem);
-        Bind(GamePacketId.FromClient.CMapDropItem, Packet_DropItem);
-        Bind(GamePacketId.FromClient.CMapRespawn, Packet_RespawnMap);
-        Bind(GamePacketId.FromClient.CMapReport, Packet_MapReport);
-        Bind(GamePacketId.FromClient.CKickPlayer, Packet_KickPlayer);
-        Bind(GamePacketId.FromClient.CBanList, Packet_Banlist);
-        Bind(GamePacketId.FromClient.CBanDestroy, Packet_DestroyBans);
-        Bind(GamePacketId.FromClient.CBanPlayer, Packet_BanPlayer);
+        Bind(Packets.ClientPackets.CCheckPing, Packet_Ping);
+        Bind(Packets.ClientPackets.CLogin, Packet_Login);
+        Bind(Packets.ClientPackets.CRegister, Packet_Register);
+        Bind(Packets.ClientPackets.CAddChar, Packet_AddChar);
+        Bind(Packets.ClientPackets.CUseChar, Packet_UseChar);
+        Bind(Packets.ClientPackets.CDelChar, Packet_DelChar);
+        Bind(Packets.ClientPackets.CLogout, Packet_Logout);
+        Bind(Packets.ClientPackets.CSayMsg, Packet_SayMessage);
+        Bind(Packets.ClientPackets.CBroadcastMsg, Packet_BroadCastMsg);
+        Bind(Packets.ClientPackets.CPlayerMsg, Packet_PlayerMsg);
+        Bind(Packets.ClientPackets.CAdminMessage, Packet_SendAdminMessage);
+        Bind(Packets.ClientPackets.CPlayerMove, Packet_PlayerMove);
+        Bind(Packets.ClientPackets.CStopPlayerMove, Packet_StopPlayerMove);
+        Bind(Packets.ClientPackets.CPlayerDir, Packet_PlayerDirection);
+        Bind(Packets.ClientPackets.CUseItem, Packet_UseItem);
+        Bind(Packets.ClientPackets.CAttack, Packet_Attack);
+        Bind(Packets.ClientPackets.CMouseAttack, Packet_MouseAttack);
+        Bind(Packets.ClientPackets.CPlayerInfoRequest, Packet_PlayerInfo);
+        Bind(Packets.ClientPackets.CWarpMeTo, Packet_WarpMeTo);
+        Bind(Packets.ClientPackets.CWarpToMe, Packet_WarpToMe);
+        Bind(Packets.ClientPackets.CWarpTo, Packet_WarpTo);
+        Bind(Packets.ClientPackets.CSetSprite, Packet_SetSprite);
+        Bind(Packets.ClientPackets.CGetStats, Packet_GetStats);
+        Bind(Packets.ClientPackets.CRequestNewMap, Packet_RequestNewMap);
+        Bind(Packets.ClientPackets.CSaveMap, Packet_MapData);
+        Bind(Packets.ClientPackets.CNeedMap, Packet_NeedMap);
+        Bind(Packets.ClientPackets.CMapGetItem, Packet_GetItem);
+        Bind(Packets.ClientPackets.CMapDropItem, Packet_DropItem);
+        Bind(Packets.ClientPackets.CMapRespawn, Packet_RespawnMap);
+        Bind(Packets.ClientPackets.CMapReport, Packet_MapReport);
+        Bind(Packets.ClientPackets.CKickPlayer, Packet_KickPlayer);
+        Bind(Packets.ClientPackets.CBanList, Packet_Banlist);
+        Bind(Packets.ClientPackets.CBanDestroy, Packet_DestroyBans);
+        Bind(Packets.ClientPackets.CBanPlayer, Packet_BanPlayer);
 
-        Bind(GamePacketId.FromClient.CRequestEditMap, Packet_RequestEditMap);
+        Bind(Packets.ClientPackets.CRequestEditMap, Packet_RequestEditMap);
 
-        Bind(GamePacketId.FromClient.CSetAccess, Packet_SetAccess);
-        Bind(GamePacketId.FromClient.CWhosOnline, Packet_WhosOnline);
-        Bind(GamePacketId.FromClient.CSetMotd, Packet_SetMotd);
-        Bind(GamePacketId.FromClient.CSearch, Packet_PlayerSearch);
-        Bind(GamePacketId.FromClient.CSkills, Packet_Skills);
-        Bind(GamePacketId.FromClient.CCast, Packet_Cast);
-        Bind(GamePacketId.FromClient.CSwapInvSlots, Packet_SwapInvSlots);
-        Bind(GamePacketId.FromClient.CSwapSkillSlots, Packet_SwapSkillSlots);
+        Bind(Packets.ClientPackets.CSetAccess, Packet_SetAccess);
+        Bind(Packets.ClientPackets.CWhosOnline, Packet_WhosOnline);
+        Bind(Packets.ClientPackets.CSetMotd, Packet_SetMotd);
+        Bind(Packets.ClientPackets.CSearch, Packet_PlayerSearch);
+        Bind(Packets.ClientPackets.CSkills, Packet_Skills);
+        Bind(Packets.ClientPackets.CCast, Packet_Cast);
+        Bind(Packets.ClientPackets.CSwapInvSlots, Packet_SwapInvSlots);
+        Bind(Packets.ClientPackets.CSwapSkillSlots, Packet_SwapSkillSlots);
 
-        Bind(GamePacketId.FromClient.CCheckPing, Packet_CheckPing);
-        Bind(GamePacketId.FromClient.CUnequip, Packet_UnEquip);
-        Bind(GamePacketId.FromClient.CRequestPlayerData, Packet_RequestPlayerData);
-        Bind(GamePacketId.FromClient.CRequestItem, Packet_RequestItem);
-        Bind(GamePacketId.FromClient.CRequestNpc, Packet_RequestNpc);
-        Bind(GamePacketId.FromClient.CRequestResource, Packet_RequestResource);
-        Bind(GamePacketId.FromClient.CSpawnItem, Packet_SpawnItem);
-        Bind(GamePacketId.FromClient.CTrainStat, Packet_TrainStat);
+        Bind(Packets.ClientPackets.CCheckPing, Packet_CheckPing);
+        Bind(Packets.ClientPackets.CUnequip, Packet_UnEquip);
+        Bind(Packets.ClientPackets.CRequestPlayerData, Packet_RequestPlayerData);
+        Bind(Packets.ClientPackets.CRequestItem, Packet_RequestItem);
+        Bind(Packets.ClientPackets.CRequestNpc, Packet_RequestNpc);
+        Bind(Packets.ClientPackets.CRequestResource, Packet_RequestResource);
+        Bind(Packets.ClientPackets.CSpawnItem, Packet_SpawnItem);
+        Bind(Packets.ClientPackets.CTrainStat, Packet_TrainStat);
 
-        Bind(GamePacketId.FromClient.CRequestAnimation, Packet_RequestAnimation);
-        Bind(GamePacketId.FromClient.CRequestSkill, Packet_RequestSkill);
-        Bind(GamePacketId.FromClient.CRequestShop, Packet_RequestShop);
-        Bind(GamePacketId.FromClient.CRequestLevelUp, Packet_RequestLevelUp);
-        Bind(GamePacketId.FromClient.CForgetSkill, Packet_ForgetSkill);
-        Bind(GamePacketId.FromClient.CCloseShop, Packet_CloseShop);
-        Bind(GamePacketId.FromClient.CBuyItem, Packet_BuyItem);
-        Bind(GamePacketId.FromClient.CSellItem, Packet_SellItem);
-        Bind(GamePacketId.FromClient.CChangeBankSlots, Packet_ChangeBankSlots);
-        Bind(GamePacketId.FromClient.CDepositItem, Packet_DepositItem);
-        Bind(GamePacketId.FromClient.CWithdrawItem, Packet_WithdrawItem);
-        Bind(GamePacketId.FromClient.CCloseBank, Packet_CloseBank);
-        Bind(GamePacketId.FromClient.CAdminWarp, Packet_AdminWarp);
+        Bind(Packets.ClientPackets.CRequestAnimation, Packet_RequestAnimation);
+        Bind(Packets.ClientPackets.CRequestSkill, Packet_RequestSkill);
+        Bind(Packets.ClientPackets.CRequestShop, Packet_RequestShop);
+        Bind(Packets.ClientPackets.CRequestLevelUp, Packet_RequestLevelUp);
+        Bind(Packets.ClientPackets.CForgetSkill, Packet_ForgetSkill);
+        Bind(Packets.ClientPackets.CCloseShop, Packet_CloseShop);
+        Bind(Packets.ClientPackets.CBuyItem, Packet_BuyItem);
+        Bind(Packets.ClientPackets.CSellItem, Packet_SellItem);
+        Bind(Packets.ClientPackets.CChangeBankSlots, Packet_ChangeBankSlots);
+        Bind(Packets.ClientPackets.CDepositItem, Packet_DepositItem);
+        Bind(Packets.ClientPackets.CWithdrawItem, Packet_WithdrawItem);
+        Bind(Packets.ClientPackets.CCloseBank, Packet_CloseBank);
+        Bind(Packets.ClientPackets.CAdminWarp, Packet_AdminWarp);
 
-        Bind(GamePacketId.FromClient.CTradeInvite, Packet_TradeInvite);
-        Bind(GamePacketId.FromClient.CHandleTradeInvite, Packet_HandleTradeInvite);
-        Bind(GamePacketId.FromClient.CAcceptTrade, Packet_AcceptTrade);
-        Bind(GamePacketId.FromClient.CDeclineTrade, Packet_DeclineTrade);
-        Bind(GamePacketId.FromClient.CTradeItem, Packet_TradeItem);
-        Bind(GamePacketId.FromClient.CUntradeItem, Packet_UntradeItem);
+        Bind(Packets.ClientPackets.CTradeInvite, Packet_TradeInvite);
+        Bind(Packets.ClientPackets.CHandleTradeInvite, Packet_HandleTradeInvite);
+        Bind(Packets.ClientPackets.CAcceptTrade, Packet_AcceptTrade);
+        Bind(Packets.ClientPackets.CDeclineTrade, Packet_DeclineTrade);
+        Bind(Packets.ClientPackets.CTradeItem, Packet_TradeItem);
+        Bind(Packets.ClientPackets.CUntradeItem, Packet_UntradeItem);
 
-        Bind(GamePacketId.FromClient.CAdmin, Packet_Admin);
+        Bind(Packets.ClientPackets.CAdmin, Packet_Admin);
 
-        Bind(GamePacketId.FromClient.CSetHotbarSlot, Packet_SetHotbarSlot);
-        Bind(GamePacketId.FromClient.CDeleteHotbarSlot, Packet_DeleteHotbarSlot);
-        Bind(GamePacketId.FromClient.CUseHotbarSlot, Packet_UseHotbarSlot);
+        Bind(Packets.ClientPackets.CSetHotbarSlot, Packet_SetHotbarSlot);
+        Bind(Packets.ClientPackets.CDeleteHotbarSlot, Packet_DeleteHotbarSlot);
+        Bind(Packets.ClientPackets.CUseHotbarSlot, Packet_UseHotbarSlot);
 
-        Bind(GamePacketId.FromClient.CSkillLearn, Packet_SkillLearn);
+        Bind(Packets.ClientPackets.CSkillLearn, Packet_SkillLearn);
 
-        Bind(GamePacketId.FromClient.CEventChatReply, Packet_EventChatReply);
-        Bind(GamePacketId.FromClient.CEvent, Packet_Event);
-        Bind(GamePacketId.FromClient.CRequestSwitchesAndVariables, Packet_RequestSwitchesAndVariables);
-        Bind(GamePacketId.FromClient.CSwitchesAndVariables, Packet_SwitchesAndVariables);
+        Bind(Packets.ClientPackets.CEventChatReply, Packet_EventChatReply);
+        Bind(Packets.ClientPackets.CEvent, Packet_Event);
+        Bind(Packets.ClientPackets.CRequestSwitchesAndVariables, Packet_RequestSwitchesAndVariables);
+        Bind(Packets.ClientPackets.CSwitchesAndVariables, Packet_SwitchesAndVariables);
 
-        Bind(GamePacketId.FromClient.CRequestProjectile, Packet_RequestProjectile);
-        Bind(GamePacketId.FromClient.CClearProjectile, Packet_ClearProjectile);
+        Bind(Packets.ClientPackets.CRequestProjectile, Packet_RequestProjectile);
+        Bind(Packets.ClientPackets.CClearProjectile, Packet_ClearProjectile);
 
-        Bind(GamePacketId.FromClient.CEmote, Packet_Emote);
+        Bind(Packets.ClientPackets.CEmote, Packet_Emote);
 
-        Bind(GamePacketId.FromClient.CRequestParty, Packet_PartyRquest);
-        Bind(GamePacketId.FromClient.CAcceptParty, Packet_AcceptParty);
-        Bind(GamePacketId.FromClient.CDeclineParty, Packet_DeclineParty);
-        Bind(GamePacketId.FromClient.CLeaveParty, Packet_LeaveParty);
-        Bind(GamePacketId.FromClient.CPartyChatMsg, Packet_PartyChatMsg);
-        Bind(GamePacketId.FromClient.CRequestEditItem, Packet_RequestEditItem);
-        Bind(GamePacketId.FromClient.CSaveItem, Packet_SaveItem);
-        Bind(GamePacketId.FromClient.CRequestEditNpc, Packet_RequestEditNpc);
-        Bind(GamePacketId.FromClient.CSaveNpc, Packet_SaveNpc);
-        Bind(GamePacketId.FromClient.CRequestEditShop, Packet_RequestEditShop);
-        Bind(GamePacketId.FromClient.CSaveShop, Packet_SaveShop);
-        Bind(GamePacketId.FromClient.CRequestEditSkill, Packet_RequestEditSkill);
-        Bind(GamePacketId.FromClient.CSaveSkill, Packet_SaveSkill);
-        Bind(GamePacketId.FromClient.CRequestEditResource, Packet_RequestEditResource);
-        Bind(GamePacketId.FromClient.CSaveResource, Packet_SaveResource);
-        Bind(GamePacketId.FromClient.CRequestEditAnimation, Packet_RequestEditAnimation);
-        Bind(GamePacketId.FromClient.CSaveAnimation, Packet_SaveAnimation);
-        Bind(GamePacketId.FromClient.CRequestEditProjectile, Packet_RequestEditProjectile);
-        Bind(GamePacketId.FromClient.CSaveProjectile, Packet_SaveProjectile);
-        Bind(GamePacketId.FromClient.CRequestEditJob, Packet_RequestEditJob);
-        Bind(GamePacketId.FromClient.CSaveJob, Packet_SaveJob);
+        Bind(Packets.ClientPackets.CRequestParty, Packet_PartyRquest);
+        Bind(Packets.ClientPackets.CAcceptParty, Packet_AcceptParty);
+        Bind(Packets.ClientPackets.CDeclineParty, Packet_DeclineParty);
+        Bind(Packets.ClientPackets.CLeaveParty, Packet_LeaveParty);
+        Bind(Packets.ClientPackets.CPartyChatMsg, Packet_PartyChatMsg);
+        Bind(Packets.ClientPackets.CRequestEditItem, Packet_RequestEditItem);
+        Bind(Packets.ClientPackets.CSaveItem, Packet_SaveItem);
+        Bind(Packets.ClientPackets.CRequestEditNpc, Packet_RequestEditNpc);
+        Bind(Packets.ClientPackets.CSaveNpc, Packet_SaveNpc);
+        Bind(Packets.ClientPackets.CRequestEditShop, Packet_RequestEditShop);
+        Bind(Packets.ClientPackets.CSaveShop, Packet_SaveShop);
+        Bind(Packets.ClientPackets.CRequestEditSkill, Packet_RequestEditSkill);
+        Bind(Packets.ClientPackets.CSaveSkill, Packet_SaveSkill);
+        Bind(Packets.ClientPackets.CRequestEditResource, Packet_RequestEditResource);
+        Bind(Packets.ClientPackets.CSaveResource, Packet_SaveResource);
+        Bind(Packets.ClientPackets.CRequestEditAnimation, Packet_RequestEditAnimation);
+        Bind(Packets.ClientPackets.CSaveAnimation, Packet_SaveAnimation);
+        Bind(Packets.ClientPackets.CRequestEditProjectile, Packet_RequestEditProjectile);
+        Bind(Packets.ClientPackets.CSaveProjectile, Packet_SaveProjectile);
+        Bind(Packets.ClientPackets.CRequestEditJob, Packet_RequestEditJob);
+        Bind(Packets.ClientPackets.CSaveJob, Packet_SaveJob);
 
-        Bind(GamePacketId.FromClient.CRequestMoral, Packet_RequestMoral);
-        Bind(GamePacketId.FromClient.CRequestEditMoral, Packet_RequestEditMoral);
-        Bind(GamePacketId.FromClient.CSaveMoral, Packet_SaveMoral);
+        Bind(Packets.ClientPackets.CRequestMoral, Packet_RequestMoral);
+        Bind(Packets.ClientPackets.CRequestEditMoral, Packet_RequestEditMoral);
+        Bind(Packets.ClientPackets.CSaveMoral, Packet_SaveMoral);
 
-        Bind(GamePacketId.FromClient.CRequestEditScript, Packet_RequestEditScript);
-        Bind(GamePacketId.FromClient.CSaveScript, Packet_SaveScript);
+        Bind(Packets.ClientPackets.CRequestEditScript, Packet_RequestEditScript);
+        Bind(Packets.ClientPackets.CSaveScript, Packet_SaveScript);
 
-        Bind(GamePacketId.FromClient.CCloseEditor, Packet_CloseEditor);
-        Bind(GamePacketId.FromClient.CCancelCast, Packet_CancelCast);
+        Bind(Packets.ClientPackets.CCloseEditor, Packet_CloseEditor);
+        Bind(Packets.ClientPackets.CCancelCast, Packet_CancelCast);
     }
 
     private static void Packet_Ping(GameSession session, ReadOnlyMemory<byte> bytes)

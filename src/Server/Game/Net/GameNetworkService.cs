@@ -22,7 +22,15 @@ public sealed class GameNetworkService : NetworkService<GameSession>
 
     public override Task OnBytesReceivedAsync(GameSession session, ReadOnlySpan<byte> bytes, CancellationToken cancellationToken)
     {
-        session.Parse(bytes);
+        try
+        {
+            session.Parse(bytes);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Parse error from {session.Channel.IpAddress} (id={session.Id}): {ex.Message}");
+            session.Channel.Close();
+        }
 
         return Task.CompletedTask;
     }
