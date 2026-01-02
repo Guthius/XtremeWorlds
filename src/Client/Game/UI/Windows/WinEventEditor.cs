@@ -1294,7 +1294,7 @@ public static class WinEventEditor
                 pick1Items = BuildIndexItems(Math.Max(0, Client.GameState.NumPictures + 1), i => i == 0 ? "None" : $"{i}");
                 break;
 
-            case EventCommand.ModifyVariable:
+            case EventCommand.Variable:
                 pick1Label = "Variable";
                 pick1Target = "txtCmdData1";
                 pick1Items = BuildIndexItems(Variables.MaxVariables, i => $"{i}");
@@ -1311,7 +1311,7 @@ public static class WinEventEditor
                 pick2CurrentValue = cmd.Data2;
                 break;
 
-            case EventCommand.ModifySwitch:
+            case EventCommand.Switch:
                 pick1Label = "Switch";
                 pick1Target = "txtCmdData1";
                 pick1Items = BuildIndexItems(Variables.MaxSwitches, i => $"{i}");
@@ -1326,8 +1326,8 @@ public static class WinEventEditor
                 pick2CurrentValue = cmd.Data2;
                 break;
 
-            case EventCommand.ModifySelfSwitch:
-                pick1Label = "Self";
+            case EventCommand.SelfSwitch:
+                pick1Label = "Switch";
                 pick1Target = "txtCmdData1";
                 pick1Items =
                 [
@@ -1416,7 +1416,6 @@ public static class WinEventEditor
                         break;
 
                     case 1: // Switch
-                    case 6: // Self Switch
                         pick2Label = "Value";
                         pick2Target = "txtCmdData3";
                         pick2CurrentValue = cmd.ConditionalBranch.Data2;
@@ -1424,6 +1423,19 @@ public static class WinEventEditor
                         [
                             (0, "On"),
                             (1, "Off"),
+                        ];
+                        break;
+
+                    case 6: // Self Switch
+                        pick2Label = "Value";
+                        pick2Target = "txtCmdData2";
+                        pick2CurrentValue = cmd.ConditionalBranch.Data1;
+                        pick2Items =
+                        [
+                            (0, "A"),
+                            (1, "B"),
+                            (2, "C"),
+                            (3, "D"),
                         ];
                         break;
 

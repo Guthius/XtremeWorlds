@@ -357,9 +357,9 @@ public enum EventCommand
     ShowChatBubble,
 
     // Game Progression
-    ModifyVariable,
-    ModifySwitch,
-    ModifySelfSwitch,
+    Variable,
+    Switch,
+    SelfSwitch,
 
     // Flow Control
     ConditionalBranch,

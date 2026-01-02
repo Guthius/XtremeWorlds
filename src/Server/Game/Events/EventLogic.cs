@@ -921,97 +921,60 @@ namespace Server
             // Parallel processing for each player.
             Parallel.ForEach(PlayerService.Instance.PlayerIds, i =>
             {
-                if (Data.TempPlayer[i].EventMap.CurrentEvents <= 0) return;
-
-                int map = GetPlayerMap(i);
-
-                // Iterate through local events for the player.
-                for (int x = 0; x < Data.TempPlayer[i].EventMap.CurrentEvents; x++)
+                try
                 {
-                    if (x >= Data.TempPlayer[i].EventMap.EventPages.Length)
-                        break;
+                    if (Data.TempPlayer == null || i < 0 || i >= Data.TempPlayer.Length)
+                        return;
 
-                    // Bounds check.
-                    if (Data.TempPlayer[i].EventMap.EventPages[x].EventId >= Server.Map.Instance[map].Event.Length) continue;
+                    // Skip non-playing or half-disconnected players.
+                    if (!Data.TempPlayer[i].InGame)
+                        return;
 
+                    int map = GetPlayerMap(i);
+                    if (map < 0 || Server.Map.Instance == null || map >= Server.Map.Instance.Count)
+                        return;
+                    if (Server.Map.Instance[map].Event == null)
+                        return;
 
-                    ref var localEvent = ref Data.TempPlayer[i].EventMap.EventPages[x];
+                    if (Data.TempPlayer[i].EventMap.EventPages == null)
+                        return;
+                    if (Data.TempPlayer[i].EventMap.CurrentEvents <= 0)
+                        return;
 
-
-                    // Only process visible, non-global events.
-                    if (Server.Map.Instance[map].Event[localEvent.EventId].Globals != 0 || !localEvent.Visible) continue;
-
-                    // Don't queue new movement while the event is mid-step.
-                    if (Event.IsMoving(map, x, i, false)) continue;
-
-
-                    // Check move timer.
-                    if (localEvent.MoveTimer > General.GetTimeMs()) continue;
-
-                    // Process movement based on MoveType.
-                    switch (localEvent.MoveType)
+                    // Iterate through local events for the player.
+                    for (int x = 0; x < Data.TempPlayer[i].EventMap.CurrentEvents; x++)
                     {
-                        case 0: // Fixed
+                        if (x >= Data.TempPlayer[i].EventMap.EventPages.Length)
                             break;
 
-                        case 1: // Random
+                        // Bounds check.
+                        int mapEventId = Data.TempPlayer[i].EventMap.EventPages[x].EventId;
+                        if (mapEventId < 0 || mapEventId >= Server.Map.Instance[map].Event.Length) continue;
+
+                        ref var localEvent = ref Data.TempPlayer[i].EventMap.EventPages[x];
+
+                        // Only process visible, non-global events.
+                        if (Server.Map.Instance[map].Event[mapEventId].Globals != 0 || !localEvent.Visible) continue;
+
+                        // Don't queue new movement while the event is mid-step.
+                        if (Event.IsMoving(map, x, i, false)) continue;
+
+                        // Check move timer.
+                        if (localEvent.MoveTimer > General.GetTimeMs()) continue;
+
+                        // Process movement based on MoveType.
+                        switch (localEvent.MoveType)
                         {
-                            // Direction 0-3 inclusive (NextInt inclusive upper bound).
-                            int rand = General.GetRandom.NextInt(0, 3);
-                            if (Event.CanMove(i, map, localEvent.X, localEvent.Y, x, localEvent.WalkThrough, (byte) rand, false))
+                            case 0: // Fixed
+                                break;
+
+                            case 1: // Random
                             {
-                                int actualMoveSpeed = localEvent.MoveSpeed switch
+                                // Direction 0-3 inclusive (NextInt inclusive upper bound).
+                                int rand = General.GetRandom.NextInt(0, 3);
+                                if (Event.CanMove(i, map, localEvent.X, localEvent.Y, x, localEvent.WalkThrough, (byte) rand, false))
                                 {
-                                    0 => 2,
-                                    1 => 3,
-                                    2 => 4,
-                                    3 => 6,
-                                    4 => 12,
-                                    5 => 24,
-                                    _ => DefaultMovementSpeed
-                                };
-                                Event.Move(i, map, x, rand, actualMoveSpeed, false);
-                            }
-                            else
-                            {
-                                Event.Dir(i, map, x, rand, false);
-                            }
-
-                            break;
-                        }
-                        case 2: // Custom Move Route
-                        {
-                            ref var instance = ref Data.TempPlayer[i].EventMap.EventPages[x];
-                            bool isGlobal = false;
-                            bool sendUpdate = false;
-                            int eventId = x;
-                            int walkThrough = instance.WalkThrough;
-                            bool doNotProcessMoveRoute = false;
-
-                            if (instance.MoveRouteCount > 0)
-                            {
-                                if (instance.MoveRouteStep >= instance.MoveRouteCount)
-                                {
-                                    if (instance.RepeatMoveRoute == 1)
-                                    {
-                                        instance.MoveRouteStep = 0;
-                                        instance.MoveRouteComplete = 1; // Reset for repeating.
-                                    }
-                                    else
-                                    {
-                                        doNotProcessMoveRoute = true;
-                                        instance.MoveRouteComplete = 1; // Mark as complete.
-                                    }
-                                }
-                                else //still moving
-                                    instance.MoveRouteComplete = 0;
-
-
-                                if (!doNotProcessMoveRoute)
-                                {
-                                    instance.MoveRouteStep++;
-
-                                    int actualmovespeed = instance.MoveSpeed switch
+                                    int actualMoveSpeed = localEvent.MoveSpeed switch
                                     {
                                         0 => 2,
                                         1 => 3,
@@ -1021,113 +984,191 @@ namespace Server
                                         5 => 24,
                                         _ => DefaultMovementSpeed
                                     };
+                                    Event.Move(i, map, x, rand, actualMoveSpeed, false);
+                                }
+                                else
+                                {
+                                    Event.Dir(i, map, x, rand, false);
+                                }
 
+                                break;
+                            }
+                            case 2: // Custom Move Route
+                            {
+                                ref var instance = ref Data.TempPlayer[i].EventMap.EventPages[x];
+                                bool isGlobal = false;
+                                bool sendUpdate = false;
+                                int eventId = x;
+                                int walkThrough = instance.WalkThrough;
+                                bool doNotProcessMoveRoute = false;
 
-                                    // Get next move route step, handling potential out-of-bounds access.
-                                    if (instance.MoveRouteStep < 0 || instance.MoveRouteStep >= instance.MoveRoute.Length)
+                                if (instance.MoveRouteCount > 0)
+                                {
+                                    if (instance.MoveRouteStep >= instance.MoveRouteCount)
                                     {
-                                        //error, route step out of range
-                                        break; // Exit the switch statement.
-                                    }
-
-                                    var nextMove = instance.MoveRoute[instance.MoveRouteStep];
-
-                                    switch (nextMove.Index)
-                                    {
-                                        case 1: // Move Up
-                                            if (Event.CanMove(i, map, instance.X, instance.Y, eventId, walkThrough, (byte) Direction.Up, isGlobal))
-                                            {
-                                                Event.Move(i, map, eventId, (int) Direction.Up, actualmovespeed, isGlobal);
-                                            }
-                                            else if (instance.IgnoreIfCannotMove == 0)
-                                            {
-                                                instance.MoveRouteStep--;
-                                            }
-
-                                            break;
-                                        case 2: // Move Down
-                                            if (Event.CanMove(i, map, instance.X, instance.Y, eventId, walkThrough, (byte) Direction.Down, isGlobal))
-                                            {
-                                                Event.Move(i, map, eventId, (int) Direction.Down, actualmovespeed, isGlobal);
-                                            }
-                                            else if (instance.IgnoreIfCannotMove == 0)
-                                            {
-                                                instance.MoveRouteStep--;
-                                            }
-
-                                            break;
-                                        case 3: // Move Left
-                                            if (Event.CanMove(i, map, instance.X, instance.Y, eventId, walkThrough, (byte) Direction.Left, isGlobal))
-                                            {
-                                                Event.Move(i, map, eventId, (int) Direction.Left, actualmovespeed, isGlobal);
-                                            }
-                                            else if (instance.IgnoreIfCannotMove == 0)
-                                            {
-                                                instance.MoveRouteStep--;
-                                            }
-
-                                            break;
-                                        case 4: // Move Right
-                                            if (Event.CanMove(i, map, instance.X, instance.Y, eventId, walkThrough, (byte) Direction.Right, isGlobal))
-                                            {
-                                                Event.Move(i, map, eventId, (int) Direction.Right, actualmovespeed, isGlobal);
-                                            }
-                                            else if (instance.IgnoreIfCannotMove == 0)
-                                            {
-                                                instance.MoveRouteStep--;
-                                            }
-
-                                            break;
-                                        case 5: // Move Random
+                                        if (instance.RepeatMoveRoute == 1)
                                         {
-                                            int z = (int) Math.Floor((double) General.GetRandom.NextInt(0, 4));
-                                            if (Event.CanMove(i, map, instance.X, instance.Y, eventId, walkThrough, (byte) z, isGlobal))
-                                            {
-                                                Event.Move(i, map, eventId, z, actualmovespeed, isGlobal);
-                                            }
-                                            else if (instance.IgnoreIfCannotMove == 0)
-                                            {
-                                                instance.MoveRouteStep--;
-                                            }
+                                            instance.MoveRouteStep = 0;
+                                            instance.MoveRouteComplete = 1; // Reset for repeating.
+                                        }
+                                        else
+                                        {
+                                            doNotProcessMoveRoute = true;
+                                            instance.MoveRouteComplete = 1; // Mark as complete.
+                                        }
+                                    }
+                                    else //still moving
+                                        instance.MoveRouteComplete = 0;
 
-                                            break;
+
+                                    if (!doNotProcessMoveRoute)
+                                    {
+                                        instance.MoveRouteStep++;
+
+                                        int actualmovespeed = instance.MoveSpeed switch
+                                        {
+                                            0 => 2,
+                                            1 => 3,
+                                            2 => 4,
+                                            3 => 6,
+                                            4 => 12,
+                                            5 => 24,
+                                            _ => DefaultMovementSpeed
+                                        };
+
+
+                                        // Get next move route step, handling potential out-of-bounds access.
+                                        if (instance.MoveRouteStep < 0 || instance.MoveRouteStep >= instance.MoveRoute.Length)
+                                        {
+                                            //error, route step out of range
+                                            break; // Exit the switch statement.
                                         }
 
-                                        case 6: // Move Toward Player
-                                        {
-                                            if (!isGlobal)
-                                            {
-                                                if (Event.IsOneBlockAway(instance.X, instance.Y, GetPlayerX(i), GetPlayerY(i)))
-                                                {
-                                                    Event.Dir(i, map, eventId, Event.GetDirToPlayer(i, map, eventId), false);
+                                        var nextMove = instance.MoveRoute[instance.MoveRouteStep];
 
-                                                    // Activate event if triggered by player action.
-                                                    if (Server.Map.Instance[map].Event[eventId].Pages[Data.TempPlayer[i].EventMap.EventPages[eventId].PageId].Trigger == 1)
+                                        switch (nextMove.Index)
+                                        {
+                                            case 1: // Move Up
+                                                if (Event.CanMove(i, map, instance.X, instance.Y, eventId, walkThrough, (byte) Direction.Up, isGlobal))
+                                                {
+                                                    Event.Move(i, map, eventId, (int) Direction.Up, actualmovespeed, isGlobal);
+                                                }
+                                                else if (instance.IgnoreIfCannotMove == 0)
+                                                {
+                                                    instance.MoveRouteStep--;
+                                                }
+
+                                                break;
+                                            case 2: // Move Down
+                                                if (Event.CanMove(i, map, instance.X, instance.Y, eventId, walkThrough, (byte) Direction.Down, isGlobal))
+                                                {
+                                                    Event.Move(i, map, eventId, (int) Direction.Down, actualmovespeed, isGlobal);
+                                                }
+                                                else if (instance.IgnoreIfCannotMove == 0)
+                                                {
+                                                    instance.MoveRouteStep--;
+                                                }
+
+                                                break;
+                                            case 3: // Move Left
+                                                if (Event.CanMove(i, map, instance.X, instance.Y, eventId, walkThrough, (byte) Direction.Left, isGlobal))
+                                                {
+                                                    Event.Move(i, map, eventId, (int) Direction.Left, actualmovespeed, isGlobal);
+                                                }
+                                                else if (instance.IgnoreIfCannotMove == 0)
+                                                {
+                                                    instance.MoveRouteStep--;
+                                                }
+
+                                                break;
+                                            case 4: // Move Right
+                                                if (Event.CanMove(i, map, instance.X, instance.Y, eventId, walkThrough, (byte) Direction.Right, isGlobal))
+                                                {
+                                                    Event.Move(i, map, eventId, (int) Direction.Right, actualmovespeed, isGlobal);
+                                                }
+                                                else if (instance.IgnoreIfCannotMove == 0)
+                                                {
+                                                    instance.MoveRouteStep--;
+                                                }
+
+                                                break;
+                                            case 5: // Move Random
+                                            {
+                                                int z = (int) Math.Floor((double) General.GetRandom.NextInt(0, 4));
+                                                if (Event.CanMove(i, map, instance.X, instance.Y, eventId, walkThrough, (byte) z, isGlobal))
+                                                {
+                                                    Event.Move(i, map, eventId, z, actualmovespeed, isGlobal);
+                                                }
+                                                else if (instance.IgnoreIfCannotMove == 0)
+                                                {
+                                                    instance.MoveRouteStep--;
+                                                }
+
+                                                break;
+                                            }
+
+                                            case 6: // Move Toward Player
+                                            {
+                                                if (!isGlobal)
+                                                {
+                                                    if (Event.IsOneBlockAway(instance.X, instance.Y, GetPlayerX(i), GetPlayerY(i)))
                                                     {
-                                                        if (Server.Map.Instance[map].Event[eventId].Pages[Data.TempPlayer[i].EventMap.EventPages[eventId].PageId].CommandListCount > 0)
+                                                        Event.Dir(i, map, eventId, Event.GetDirToPlayer(i, map, eventId), false);
+
+                                                        // Activate event if triggered by player action.
+                                                        int mapEventId2 = Data.TempPlayer[i].EventMap.EventPages[eventId].EventId;
+                                                        if (mapEventId2 >= 0 && mapEventId2 < Server.Map.Instance[map].Event.Length &&
+                                                            Server.Map.Instance[map].Event[mapEventId2].Pages[Data.TempPlayer[i].EventMap.EventPages[eventId].PageId].Trigger == 1)
                                                         {
-                                                            // Start event processing.
-                                                            ref var eventProcessing = ref Data.TempPlayer[i].EventProcessing[eventId]; // Use EventId (local index)
-                                                            eventProcessing.Active = 1;
-                                                            eventProcessing.ActionTimer = General.GetTimeMs();
-                                                            eventProcessing.CurList = 0;
-                                                            eventProcessing.CurSlot = 0;
-                                                            eventProcessing.EventId = eventId; // This should be the *map* event ID
-                                                            eventProcessing.PageId = Data.TempPlayer[i].EventMap.EventPages[eventId].PageId; // Local page ID.
-                                                            eventProcessing.WaitingForResponse = 0;
-                                                            eventProcessing.ListLeftOff = new int[Server.Map.Instance[map].Event[eventId].Pages[eventProcessing.PageId].CommandListCount];
+                                                            if (Server.Map.Instance[map].Event[mapEventId2].Pages[Data.TempPlayer[i].EventMap.EventPages[eventId].PageId].CommandListCount > 0)
+                                                            {
+                                                                // Start event processing.
+                                                                ref var eventProcessing = ref Data.TempPlayer[i].EventProcessing[eventId]; // Use EventId (local index)
+                                                                eventProcessing.Active = 1;
+                                                                eventProcessing.ActionTimer = General.GetTimeMs();
+                                                                eventProcessing.CurList = 0;
+                                                                eventProcessing.CurSlot = 0;
+                                                                eventProcessing.EventId = mapEventId2; // Map event ID
+                                                                eventProcessing.PageId = Data.TempPlayer[i].EventMap.EventPages[eventId].PageId; // Local page ID.
+                                                                eventProcessing.WaitingForResponse = 0;
+                                                                eventProcessing.ListLeftOff = new int[Server.Map.Instance[map].Event[mapEventId2].Pages[eventProcessing.PageId].CommandListCount];
+                                                            }
+                                                        }
+
+                                                        if (instance.IgnoreIfCannotMove == 0)
+                                                        {
+                                                            instance.MoveRouteStep--;
                                                         }
                                                     }
-
-                                                    if (instance.IgnoreIfCannotMove == 0)
+                                                    else
                                                     {
-                                                        instance.MoveRouteStep--;
+                                                        int z = Event.CanMoveTowardsPlayer(i, map, eventId);
+                                                        if (z < 4)
+                                                        {
+                                                            if (Event.CanMove(i, map, instance.X, instance.Y, eventId, walkThrough, (byte) z, isGlobal))
+                                                            {
+                                                                Event.Move(i, map, eventId, z, actualmovespeed, isGlobal);
+                                                            }
+                                                            else if (instance.IgnoreIfCannotMove == 0)
+                                                            {
+                                                                instance.MoveRouteStep--;
+                                                            }
+                                                        }
+                                                        else if (instance.IgnoreIfCannotMove == 0)
+                                                        {
+                                                            instance.MoveRouteStep = instance.MoveRouteStep - 1;
+                                                        }
                                                     }
                                                 }
-                                                else
+
+                                                break;
+                                            }
+                                            case 7: // Move Away From Player
+                                            {
+                                                if (!isGlobal)
                                                 {
-                                                    int z = Event.CanMoveTowardsPlayer(i, map, eventId);
-                                                    if (z < 4)
+                                                    int z = Event.CanMoveAwayFromPlayer(i, map, eventId);
+                                                    if (z < 5) // Valid direction.
                                                     {
                                                         if (Event.CanMove(i, map, instance.X, instance.Y, eventId, walkThrough, (byte) z, isGlobal))
                                                         {
@@ -1138,265 +1179,245 @@ namespace Server
                                                             instance.MoveRouteStep--;
                                                         }
                                                     }
-                                                    else if (instance.IgnoreIfCannotMove == 0)
-                                                    {
-                                                        instance.MoveRouteStep = instance.MoveRouteStep - 1;
-                                                    }
                                                 }
-                                            }
 
-                                            break;
-                                        }
-                                        case 7: // Move Away From Player
-                                        {
-                                            if (!isGlobal)
-                                            {
-                                                int z = Event.CanMoveAwayFromPlayer(i, map, eventId);
-                                                if (z < 5) // Valid direction.
+                                                break;
+                                            }
+                                            case 8: // Move Forward
+                                                if (Event.CanMove(i, map, instance.X, instance.Y, eventId, walkThrough, (byte) instance.Dir, isGlobal))
                                                 {
-                                                    if (Event.CanMove(i, map, instance.X, instance.Y, eventId, walkThrough, (byte) z, isGlobal))
-                                                    {
-                                                        Event.Move(i, map, eventId, z, actualmovespeed, isGlobal);
-                                                    }
-                                                    else if (instance.IgnoreIfCannotMove == 0)
-                                                    {
-                                                        instance.MoveRouteStep--;
-                                                    }
+                                                    Event.Move(i, map, eventId, instance.Dir, actualmovespeed, isGlobal);
                                                 }
-                                            }
-
-                                            break;
-                                        }
-                                        case 8: // Move Forward
-                                            if (Event.CanMove(i, map, instance.X, instance.Y, eventId, walkThrough, (byte) instance.Dir, isGlobal))
-                                            {
-                                                Event.Move(i, map, eventId, instance.Dir, actualmovespeed, isGlobal);
-                                            }
-                                            else if (instance.IgnoreIfCannotMove == 0)
-                                            {
-                                                instance.MoveRouteStep--;
-                                            }
-
-                                            break;
-
-                                        case 9: // Move Backward
-                                        {
-                                            int z = instance.Dir switch
-                                            {
-                                                (byte) Direction.Up => (byte) Direction.Down,
-                                                (byte) Direction.Down => (byte) Direction.Up,
-                                                (byte) Direction.Left => (byte) Direction.Right,
-                                                (byte) Direction.Right => (byte) Direction.Left,
-                                                _ => instance.Dir
-                                            };
-                                            
-                                            if (Event.CanMove(i, map, instance.X, instance.Y, eventId, walkThrough, (byte) z, isGlobal))
-                                            {
-                                                Event.Move(i, map, eventId, z, actualmovespeed, isGlobal);
-                                            }
-                                            else if (instance.IgnoreIfCannotMove == 0)
-                                            {
-                                                instance.MoveRouteStep--;
-                                            }
-
-                                            break;
-                                        }
-                                        case 10: instance.MoveTimer = General.GetTimeMs() + 100; break;
-                                        case 11: instance.MoveTimer = General.GetTimeMs() + 500; break;
-                                        case 12: instance.MoveTimer = General.GetTimeMs() + 1000; break;
-
-                                        case 13: Event.Dir(i, map, eventId, (byte) Direction.Up, isGlobal); break;
-                                        case 14: Event.Dir(i, map, eventId, (byte) Direction.Down, isGlobal); break;
-                                        case 15: Event.Dir(i, map, eventId, (byte) Direction.Left, isGlobal); break;
-                                        case 16: Event.Dir(i, map, eventId, (byte) Direction.Right, isGlobal); break;
-
-                                        // Turn 90 degrees clockwise, counter-clockwise, 180 degrees
-                                        case 17: // Turn Right 90 Degrees
-                                        {
-                                            int z = instance.Dir switch
-                                            {
-                                                (byte) Direction.Up => (byte) Direction.Right,
-                                                (byte) Direction.Right => (byte) Direction.Down,
-                                                (byte) Direction.Left => (byte) Direction.Up,
-                                                (byte) Direction.Down => (byte) Direction.Left,
-                                                _ => instance.Dir
-                                            };
-                                            Event.Dir(i, map, eventId, z, isGlobal);
-                                            break;
-                                        }
-                                        case 18: // Turn Left 90 Degrees
-                                        {
-                                            int z = instance.Dir switch
-                                            {
-                                                (byte) Direction.Up => (byte) Direction.Left,
-                                                (byte) Direction.Right => (byte) Direction.Up,
-                                                (byte) Direction.Left => (byte) Direction.Down,
-                                                (byte) Direction.Down => (byte) Direction.Right,
-                                                _ => instance.Dir
-                                            };
-                                            Event.Dir(i, map, eventId, z, isGlobal);
-                                            break;
-                                        }
-                                        case 19: // Turn 180 Degrees
-                                        {
-                                            int z = instance.Dir switch
-                                            {
-                                                (byte) Direction.Up => (byte) Direction.Down,
-                                                (byte) Direction.Right => (byte) Direction.Left,
-                                                (byte) Direction.Left => (byte) Direction.Right,
-                                                (byte) Direction.Down => (byte) Direction.Up,
-                                                _ => instance.Dir
-                                            };
-                                            Event.Dir(i, map, eventId, z, isGlobal);
-                                            break;
-                                        }
-                                        case 20: // Turn Random
-                                        {
-                                            int z = (int) Math.Floor((double) General.GetRandom.NextInt(0, 4));
-                                            Event.Dir(i, map, eventId, z, isGlobal);
-                                            break;
-                                        }
-                                        case 21: // Turn Toward Player
-                                        {
-                                            if (!isGlobal)
-                                            {
-                                                int z = Event.GetDirToPlayer(i, map, eventId);
-                                                Event.Dir(i, map, eventId, z, isGlobal);
-                                            }
-
-                                            break;
-                                        }
-                                        case 22: // Turn Away from Player
-                                        {
-                                            if (!isGlobal)
-                                            {
-                                                int z = Event.GetDirAwayFromPlayer(i, map, eventId);
-                                                Event.Dir(i, map, eventId, z, isGlobal);
-                                            }
-
-                                            break;
-                                        }
-
-                                        // Change Speed, Frequency, Graphic
-                                        case 23: instance.MoveSpeed = 0; break;
-                                        case 24: instance.MoveSpeed = 1; break;
-                                        case 25: instance.MoveSpeed = 2; break;
-                                        case 26: instance.MoveSpeed = 3; break;
-                                        case 27: instance.MoveSpeed = 4; break;
-                                        case 28: instance.MoveSpeed = 5; break;
-
-                                        case 29: instance.MoveFreq = 0; break;
-                                        case 30: instance.MoveFreq = 1; break;
-                                        case 31: instance.MoveFreq = 2; break;
-                                        case 32: instance.MoveFreq = 3; break;
-                                        case 33: instance.MoveFreq = 4; break;
-
-                                        case 34:
-                                            instance.WalkingAnim = 1;
-                                            sendUpdate = true;
-                                            break; // Turn On Walking Animation
-                                        case 35:
-                                            instance.WalkingAnim = 0;
-                                            sendUpdate = true;
-                                            break; // Turn Off Walking Animation
-                                        case 36:
-                                            instance.FixedDir = 1;
-                                            sendUpdate = true;
-                                            break; // Turn On Direction Fix
-                                        case 37:
-                                            instance.FixedDir = 0;
-                                            sendUpdate = true;
-                                            break; // Turn Off Direction Fix
-                                        case 38: instance.WalkThrough = 1; break; // Turn On Through
-                                        case 39: instance.WalkThrough = 0; break; // Turn Off Through
-                                        // Event draw priority (0=Below Player, 1=Same as Player, 2=Above Player)
-                                        case 40: // Below Player
-                                            instance.Position = 0;
-                                            sendUpdate = true;
-                                            break;
-                                        case 41: // Same as Player
-                                            instance.Position = 1;
-                                            sendUpdate = true;
-                                            break;
-                                        case 42: // Above Player
-                                            instance.Position = 2;
-                                            sendUpdate = true;
-                                            break;
-
-                                        case 43: // Change Graphic
-                                        {
-                                            instance.GraphicType = (byte) nextMove.Data1;
-                                            instance.Graphic = nextMove.Data2;
-                                            instance.GraphicX = nextMove.Data3;
-                                            instance.GraphicX2 = nextMove.Data4;
-                                            instance.GraphicY = nextMove.Data5;
-                                            instance.GraphicY2 = nextMove.Data6;
-
-                                            // Adjust direction if it's a character graphic.
-                                            if (instance.GraphicType == 1)
-                                            {
-                                                instance.Dir = instance.GraphicY switch
+                                                else if (instance.IgnoreIfCannotMove == 0)
                                                 {
-                                                    0 => (int) Direction.Down,
-                                                    1 => (int) Direction.Left,
-                                                    2 => (int) Direction.Right,
-                                                    3 => (int) Direction.Up,
+                                                    instance.MoveRouteStep--;
+                                                }
+
+                                                break;
+
+                                            case 9: // Move Backward
+                                            {
+                                                int z = instance.Dir switch
+                                                {
+                                                    (byte) Direction.Up => (byte) Direction.Down,
+                                                    (byte) Direction.Down => (byte) Direction.Up,
+                                                    (byte) Direction.Left => (byte) Direction.Right,
+                                                    (byte) Direction.Right => (byte) Direction.Left,
                                                     _ => instance.Dir
                                                 };
+
+                                                if (Event.CanMove(i, map, instance.X, instance.Y, eventId, walkThrough, (byte) z, isGlobal))
+                                                {
+                                                    Event.Move(i, map, eventId, z, actualmovespeed, isGlobal);
+                                                }
+                                                else if (instance.IgnoreIfCannotMove == 0)
+                                                {
+                                                    instance.MoveRouteStep--;
+                                                }
+
+                                                break;
+                                            }
+                                            case 10: instance.MoveTimer = General.GetTimeMs() + 100; break;
+                                            case 11: instance.MoveTimer = General.GetTimeMs() + 500; break;
+                                            case 12: instance.MoveTimer = General.GetTimeMs() + 1000; break;
+
+                                            case 13: Event.Dir(i, map, eventId, (byte) Direction.Up, isGlobal); break;
+                                            case 14: Event.Dir(i, map, eventId, (byte) Direction.Down, isGlobal); break;
+                                            case 15: Event.Dir(i, map, eventId, (byte) Direction.Left, isGlobal); break;
+                                            case 16: Event.Dir(i, map, eventId, (byte) Direction.Right, isGlobal); break;
+
+                                            // Turn 90 degrees clockwise, counter-clockwise, 180 degrees
+                                            case 17: // Turn Right 90 Degrees
+                                            {
+                                                int z = instance.Dir switch
+                                                {
+                                                    (byte) Direction.Up => (byte) Direction.Right,
+                                                    (byte) Direction.Right => (byte) Direction.Down,
+                                                    (byte) Direction.Left => (byte) Direction.Up,
+                                                    (byte) Direction.Down => (byte) Direction.Left,
+                                                    _ => instance.Dir
+                                                };
+                                                Event.Dir(i, map, eventId, z, isGlobal);
+                                                break;
+                                            }
+                                            case 18: // Turn Left 90 Degrees
+                                            {
+                                                int z = instance.Dir switch
+                                                {
+                                                    (byte) Direction.Up => (byte) Direction.Left,
+                                                    (byte) Direction.Right => (byte) Direction.Up,
+                                                    (byte) Direction.Left => (byte) Direction.Down,
+                                                    (byte) Direction.Down => (byte) Direction.Right,
+                                                    _ => instance.Dir
+                                                };
+                                                Event.Dir(i, map, eventId, z, isGlobal);
+                                                break;
+                                            }
+                                            case 19: // Turn 180 Degrees
+                                            {
+                                                int z = instance.Dir switch
+                                                {
+                                                    (byte) Direction.Up => (byte) Direction.Down,
+                                                    (byte) Direction.Right => (byte) Direction.Left,
+                                                    (byte) Direction.Left => (byte) Direction.Right,
+                                                    (byte) Direction.Down => (byte) Direction.Up,
+                                                    _ => instance.Dir
+                                                };
+                                                Event.Dir(i, map, eventId, z, isGlobal);
+                                                break;
+                                            }
+                                            case 20: // Turn Random
+                                            {
+                                                int z = (int) Math.Floor((double) General.GetRandom.NextInt(0, 4));
+                                                Event.Dir(i, map, eventId, z, isGlobal);
+                                                break;
+                                            }
+                                            case 21: // Turn Toward Player
+                                            {
+                                                if (!isGlobal)
+                                                {
+                                                    int z = Event.GetDirToPlayer(i, map, eventId);
+                                                    Event.Dir(i, map, eventId, z, isGlobal);
+                                                }
+
+                                                break;
+                                            }
+                                            case 22: // Turn Away from Player
+                                            {
+                                                if (!isGlobal)
+                                                {
+                                                    int z = Event.GetDirAwayFromPlayer(i, map, eventId);
+                                                    Event.Dir(i, map, eventId, z, isGlobal);
+                                                }
+
+                                                break;
                                             }
 
-                                            sendUpdate = true;
-                                            break;
+                                            // Change Speed, Frequency, Graphic
+                                            case 23: instance.MoveSpeed = 0; break;
+                                            case 24: instance.MoveSpeed = 1; break;
+                                            case 25: instance.MoveSpeed = 2; break;
+                                            case 26: instance.MoveSpeed = 3; break;
+                                            case 27: instance.MoveSpeed = 4; break;
+                                            case 28: instance.MoveSpeed = 5; break;
+
+                                            case 29: instance.MoveFreq = 0; break;
+                                            case 30: instance.MoveFreq = 1; break;
+                                            case 31: instance.MoveFreq = 2; break;
+                                            case 32: instance.MoveFreq = 3; break;
+                                            case 33: instance.MoveFreq = 4; break;
+
+                                            case 34:
+                                                instance.WalkingAnim = 1;
+                                                sendUpdate = true;
+                                                break; // Turn On Walking Animation
+                                            case 35:
+                                                instance.WalkingAnim = 0;
+                                                sendUpdate = true;
+                                                break; // Turn Off Walking Animation
+                                            case 36:
+                                                instance.FixedDir = 1;
+                                                sendUpdate = true;
+                                                break; // Turn On Direction Fix
+                                            case 37:
+                                                instance.FixedDir = 0;
+                                                sendUpdate = true;
+                                                break; // Turn Off Direction Fix
+                                            case 38: instance.WalkThrough = 1; break; // Turn On Through
+                                            case 39: instance.WalkThrough = 0; break; // Turn Off Through
+                                            // Event draw priority (0=Below Player, 1=Same as Player, 2=Above Player)
+                                            case 40: // Below Player
+                                                instance.Position = 0;
+                                                sendUpdate = true;
+                                                break;
+                                            case 41: // Same as Player
+                                                instance.Position = 1;
+                                                sendUpdate = true;
+                                                break;
+                                            case 42: // Above Player
+                                                instance.Position = 2;
+                                                sendUpdate = true;
+                                                break;
+
+                                            case 43: // Change Graphic
+                                            {
+                                                instance.GraphicType = (byte) nextMove.Data1;
+                                                instance.Graphic = nextMove.Data2;
+                                                instance.GraphicX = nextMove.Data3;
+                                                instance.GraphicX2 = nextMove.Data4;
+                                                instance.GraphicY = nextMove.Data5;
+                                                instance.GraphicY2 = nextMove.Data6;
+
+                                                // Adjust direction if it's a character graphic.
+                                                if (instance.GraphicType == 1)
+                                                {
+                                                    instance.Dir = instance.GraphicY switch
+                                                    {
+                                                        0 => (int) Direction.Down,
+                                                        1 => (int) Direction.Left,
+                                                        2 => (int) Direction.Right,
+                                                        3 => (int) Direction.Up,
+                                                        _ => instance.Dir
+                                                    };
+                                                }
+
+                                                sendUpdate = true;
+                                                break;
+                                            }
+                                        }
+
+                                        // Send update if necessary.
+                                        if (sendUpdate && Data.TempPlayer[i].EventMap.EventPages[eventId].EventId >= 0)
+                                        {
+                                            var buffer = new PacketWriter();
+                                            buffer.WriteEnum(ServerPackets.SSpawnEvent);
+                                            buffer.WriteInt32(Data.TempPlayer[i].EventMap.CurrentEvents);
+                                            buffer.WriteInt32(Data.TempPlayer[i].EventMap.EventPages[eventId].EventId); // Use map event ID
+
+                                            ref var instance1 = ref Data.TempPlayer[i].EventMap.EventPages[eventId];
+                                            buffer.WriteString(Server.Map.Instance[map].Event[instance1.EventId].Name); //use map event Id
+                                            buffer.WriteInt32(instance1.Dir);
+                                            buffer.WriteByte(instance1.GraphicType);
+                                            buffer.WriteInt32(instance1.Graphic);
+                                            buffer.WriteInt32(instance1.GraphicX);
+                                            buffer.WriteInt32(instance1.GraphicX2);
+                                            buffer.WriteInt32(instance1.GraphicY);
+                                            buffer.WriteInt32(instance1.GraphicY2);
+                                            buffer.WriteInt32(instance1.MovementSpeed); // Use consistent naming
+                                            buffer.WriteInt32(instance1.X);
+                                            buffer.WriteInt32(instance1.Y);
+                                            buffer.WriteByte(instance1.Position);
+                                            buffer.WriteBoolean(instance1.Visible);
+                                            buffer.WriteInt32(instance1.WalkingAnim);
+                                            buffer.WriteInt32(instance1.FixedDir);
+                                            buffer.WriteInt32(instance1.WalkThrough);
+                                            buffer.WriteInt32(instance1.ShowName);
+                                            PlayerService.Instance.SendDataTo(i, buffer.GetBytes());
                                         }
                                     }
 
-                                    // Send update if necessary.
-                                    if (sendUpdate && Data.TempPlayer[i].EventMap.EventPages[eventId].EventId >= 0)
-                                    {
-                                        var buffer = new PacketWriter();
-                                        buffer.WriteEnum(ServerPackets.SSpawnEvent);
-                                        buffer.WriteInt32(Data.TempPlayer[i].EventMap.CurrentEvents);
-                                        buffer.WriteInt32(Data.TempPlayer[i].EventMap.EventPages[eventId].EventId); // Use map event ID
-
-                                        ref var instance1 = ref Data.TempPlayer[i].EventMap.EventPages[eventId];
-                                        buffer.WriteString(Server.Map.Instance[map].Event[instance1.EventId].Name); //use map event Id
-                                        buffer.WriteInt32(instance1.Dir);
-                                        buffer.WriteByte(instance1.GraphicType);
-                                        buffer.WriteInt32(instance1.Graphic);
-                                        buffer.WriteInt32(instance1.GraphicX);
-                                        buffer.WriteInt32(instance1.GraphicX2);
-                                        buffer.WriteInt32(instance1.GraphicY);
-                                        buffer.WriteInt32(instance1.GraphicY2);
-                                        buffer.WriteInt32(instance1.MovementSpeed); // Use consistent naming
-                                        buffer.WriteInt32(instance1.X);
-                                        buffer.WriteInt32(instance1.Y);
-                                        buffer.WriteByte(instance1.Position);
-                                        buffer.WriteBoolean(instance1.Visible);
-                                        buffer.WriteInt32(instance1.WalkingAnim);
-                                        buffer.WriteInt32(instance1.FixedDir);
-                                        buffer.WriteInt32(instance1.WalkThrough);
-                                        buffer.WriteInt32(instance1.ShowName);
-                                        PlayerService.Instance.SendDataTo(i, buffer.GetBytes());
-                                    }
+                                    doNotProcessMoveRoute = false; // Reset for the next loop iteration.
                                 }
 
-                                doNotProcessMoveRoute = false; // Reset for the next loop iteration.
+                                break;
                             }
-
-                            break;
                         }
-                    }
 
-                    // Set next move timer based on MoveFreq.
-                    localEvent.MoveTimer = General.GetTimeMs() + localEvent.MoveFreq switch
-                    {
-                        0 => 4000,
-                        1 => 2000,
-                        2 => 1000,
-                        3 => 500,
-                        4 => 250,
-                        _ => 1000
-                    };
+                        // Set next move timer based on MoveFreq.
+                        localEvent.MoveTimer = General.GetTimeMs() + localEvent.MoveFreq switch
+                        {
+                            0 => 4000,
+                            1 => 2000,
+                            2 => 1000,
+                            3 => 500,
+                            4 => 250,
+                            _ => 1000
+                        };
+                    }
+                }
+                catch (Exception ex)
+                {
+                    General.Logger.LogError(ex, "ProcessLocalMovement crashed for player {PlayerId}", i);
                 }
             });
         }
@@ -1737,7 +1758,7 @@ namespace Server
                                             instance1.WaitingForResponse = 0; // No response needed (choices handled separately).
                                             break;
                                         }
-                                        case (byte) EventCommand.ModifyVariable:
+                                        case (byte) EventCommand.Variable:
                                         {
                                             switch (command.Data2)
                                             {
@@ -1759,7 +1780,7 @@ namespace Server
                                             SpawnMapEventsFor(i, map);
                                             break;
                                         }
-                                        case (byte) EventCommand.ModifySwitch:
+                                        case (byte) EventCommand.Switch:
                                         {
                                             Player.Instance[i].Switches[command.Data1] = (byte) (command.Data2 == 0 ? 0 : 1);
 
@@ -1768,7 +1789,7 @@ namespace Server
                                             break;
                                         }
 
-                                        case (byte) EventCommand.ModifySelfSwitch:
+                                        case (byte) EventCommand.SelfSwitch:
                                         {
                                             // Determine whether it's a global or local self switch.
                                             if (Server.Map.Instance[map].Event[instance1.EventId].Globals == 1)

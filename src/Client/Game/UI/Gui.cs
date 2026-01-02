@@ -628,10 +628,16 @@ public class WindowManager
 
     public static void HideWindows()
     {
-        for (var i = 1; i <= Windows.Count - 1; i++)
+        // Windows are stored in a dictionary and indices may not be contiguous (lazy-loaded layouts, etc.).
+        // Hide everything reliably.
+        foreach (var kvp in Windows)
         {
-            HideWindow(i);
+            if (kvp.Key == 0)
+                continue;
+            kvp.Value.Visible = false;
         }
+
+        ActiveWindow = null;
     }
 
     public static void ShowWindow(string windowName, bool forced = false, bool resetPosition = true)
