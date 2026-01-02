@@ -2332,8 +2332,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         var buffer = new PacketReader(data);
 
         id = buffer.ReadInt32();
-        x = buffer.ReadInt32();
-        y = buffer.ReadInt32();
+        // Server sends event move coordinates in tile units; client stores/draws them in world pixels.
+        x = buffer.ReadInt32() * Constants.TileSize;
+        y = buffer.ReadInt32() * Constants.TileSize;
         dir = buffer.ReadInt32();
         showDir = buffer.ReadInt32();
         movementSpeed = buffer.ReadInt32();
@@ -2364,7 +2365,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         if (i > GameState.CurrentEvents)
             return;
-
         {
             if (Data.MapEvents == null)
                 return;

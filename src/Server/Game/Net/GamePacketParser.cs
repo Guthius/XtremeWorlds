@@ -187,6 +187,22 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             // If this account is already connected, take over the session by disconnecting the old one.
             // This prevents "stuck logged in" states from blocking re-login.
             var existingPlayerId = NetworkConfig.FindConnectedPlayerIdByLogin(login);
+
+            if (existingPlayerId == -1)
+            {
+                foreach (PlayerBase player in PlayerBase.Instance)
+                {
+                    if (player is null || player.Name is null)
+                        continue;
+
+                    if (player.Name.Equals(login, StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        existingPlayerId = PlayerBase.Instance.IndexOf(player);
+                        break;
+                    }
+                }
+            }
+
             if (existingPlayerId > 0 && existingPlayerId != session.Id)
             {
                 General.Logger.LogInformation(
@@ -197,6 +213,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
                 // Best-effort notify then disconnect.
                 NetworkSend.SendAlert(existingPlayerId, SystemMessage.Connection, Menu.Login, kick: true);
+                NetworkSend.SendAlert(session.Id, SystemMessage.MultipleAccountsNotAllowed, Menu.Login, kick: true);
+                return;
             }
 
             // Get the current executing assembly

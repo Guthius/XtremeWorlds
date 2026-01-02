@@ -127,6 +127,59 @@ namespace Client
             }
         }
 
+        public static void UpdateFacingFromMouse(int mouseX, int mouseY)
+        {
+            if (!GameState.InGame)
+                return;
+
+            int index = GameState.MyIndex;
+            if (index < 0 || index >= Player.Instance.Count)
+                return;
+
+            int worldX = GetPlayerRawX(index) + Constants.TileSize / 2;
+            int worldY = GetPlayerRawY(index) + Constants.TileSize / 2;
+            int screenX = GameLogic.ConvertMapX(worldX);
+            int screenY = GameLogic.ConvertMapY(worldY);
+
+            int dx = mouseX - screenX;
+            int dy = mouseY - screenY;
+
+            // Ignore tiny jitter.
+            if (Math.Abs(dx) + Math.Abs(dy) < 2)
+                return;
+
+            int newDir;
+            int absDx = Math.Abs(dx);
+            int absDy = Math.Abs(dy);
+
+            // Favor cardinals when clearly dominant; otherwise choose diagonals.
+            if (absDx > absDy * 2)
+            {
+                newDir = dx >= 0 ? (int)Direction.Right : (int)Direction.Left;
+            }
+            else if (absDy > absDx * 2)
+            {
+                newDir = dy >= 0 ? (int)Direction.Down : (int)Direction.Up;
+            }
+            else
+            {
+                if (dx >= 0 && dy < 0)
+                    newDir = (int)Direction.UpRight;
+                else if (dx < 0 && dy < 0)
+                    newDir = (int)Direction.UpLeft;
+                else if (dx >= 0 && dy >= 0)
+                    newDir = (int)Direction.DownRight;
+                else
+                    newDir = (int)Direction.DownLeft;
+            }
+
+            if (Player.Instance[index].Dir != newDir)
+            {
+                Player.Instance[index].Dir = (byte)newDir;
+                Sender.SendPlayerDir();
+            }
+        }
+
         public static bool IsTryingToMove()
         {
             bool isTryingToMove = default;
@@ -687,8 +740,37 @@ namespace Client
                 if (Data.MapEvents?[i].Visible == true)
                 {
                     // Server sends event positions in world pixels (tile * 32). Movement/collision here is tile-based.
-                    var eventTileX = Math.Floor((double)Data.MapEvents[i].X / Constants.TileSize);
-                    var eventTileY = Math.Floor((double)Data.MapEvents[i].Y / Constants.TileSize);
+                    var map = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)];
+                    var eventTileX = (int)Math.Floor((double)Data.MapEvents[i].X / Constants.TileSize);
+                    var eventTileY = (int)Math.Floor((double)Data.MapEvents[i].Y / Constants.TileSize);
+
+                    // Some maps/events appear to be consistently offset by +1 tile in X when coming from runtime packets.
+                    // If the map has an event definition at (x-1,y) but not at (x,y), snap left by one tile.
+                    // This keeps collision aligned with the editor-defined event location.
+                    if (map.EventCount > 0 && map.Event != null)
+                    {
+                        bool hasAtComputed = false;
+                        bool hasAtLeft = false;
+
+                        for (var e = 0; e < map.EventCount && e < map.Event.Length; e++)
+                        {
+                            if (map.Event[e].X == eventTileX && map.Event[e].Y == eventTileY)
+                            {
+                                hasAtComputed = true;
+                                break;
+                            }
+
+                            if (map.Event[e].X == eventTileX - 1 && map.Event[e].Y == eventTileY)
+                            {
+                                hasAtLeft = true;
+                            }
+                        }
+
+                        if (!hasAtComputed && hasAtLeft)
+                        {
+                            eventTileX -= 1;
+                        }
+                    }
                     if (eventTileX == x & eventTileY == y)
                     {
                         if (Data.MapEvents[i].WalkThrough == 0)
@@ -704,33 +786,6 @@ namespace Client
         }
 
         /// <summary>
-        /// Update player facing based on mouse cursor screen position. Converts current player world position
-        /// to screen center and sets an 8-direction facing, then sends direction packet.
-        /// </summary>
-        public static void UpdateFacingFromMouse(int mouseScreenX, int mouseScreenY)
-        {
-            if (GameState.MyIndex < 0 | GameState.MyIndex > Core.Globals.Variables.MaxPlayers) return;
-            int playerScreenX = GameLogic.ConvertMapX(GetPlayerRawX(GameState.MyIndex)) + Constants.TileSize / 2;
-            int playerScreenY = GameLogic.ConvertMapY(GetPlayerRawY(GameState.MyIndex)) + Constants.TileSize / 2;
-            int dx = mouseScreenX - playerScreenX;
-            int dy = mouseScreenY - playerScreenY; // positive downwards
-            if (dx == 0 && dy == 0) return;
-            double angle = Math.Atan2(dy, dx) * 180.0 / Math.PI; // degrees
-            Direction dir;
-            if (angle > -22.5 && angle <= 22.5) dir = Direction.Right;
-            else if (angle > 22.5 && angle <= 67.5) dir = Direction.DownRight;
-            else if (angle > 67.5 && angle <= 112.5) dir = Direction.Down;
-            else if (angle > 112.5 && angle <= 157.5) dir = Direction.DownLeft;
-            else if (angle > 157.5 || angle <= -157.5) dir = Direction.Left;
-            else if (angle > -157.5 && angle <= -112.5) dir = Direction.UpLeft;
-            else if (angle > -112.5 && angle <= -67.5) dir = Direction.Up;
-            else dir = Direction.UpRight;
-            if (Player.Instance[GameState.MyIndex].Dir != (byte)dir)
-            {
-                Player.Instance[GameState.MyIndex].Dir = (byte)dir;
-                Sender.SendPlayerDir();
-            }
-        }
 
         public static void OnMove(int index)
         {
