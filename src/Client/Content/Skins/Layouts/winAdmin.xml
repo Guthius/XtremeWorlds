@@ -11,7 +11,7 @@
 		<Label Name="lblPlayerName" Text="Player Name:" Position="12,40" Size="110,14"/>
 		<TextBox Name="txtName" Position="125,38" Size="300,18"/>
 
-		<Label Name="lblAccessLevel" Text="Access Level:" Position="12,66" Size="110,14"/>
+		<Label Name="lblAccessLevel" Text="Access" Position="12,66" Size="110,14"/>
 		<ComboBox Name="cmbAccess" Position="125,64" Size="200,18"/>
 		<Button Name="btnSetAccess" Text="Set" Position="330,64" Size="100,22"
 				Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
