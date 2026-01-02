@@ -184,6 +184,10 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             var passwordBytes = reader.ReadBytes().ToArray();
             var password = System.Text.Encoding.UTF8.GetString(session.Decrypt(passwordBytes)).Replace("\0", "");
 
+            // Read the remaining payload before any await; PacketReader cannot cross await boundaries.
+            var clientVersionBytes = reader.ReadBytes().ToArray();
+            var clientVersion = System.Text.Encoding.UTF8.GetString(session.Decrypt(clientVersionBytes));
+
             // If this account is already connected, take over the session by disconnecting the old one.
             // This prevents "stuck logged in" states from blocking re-login.
             var existingPlayerId = NetworkConfig.FindConnectedPlayerIdByLogin(login);
@@ -212,18 +216,14 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
                     session.Id);
 
                 // Best-effort notify then disconnect.
-                NetworkSend.SendAlert(existingPlayerId, SystemMessage.Connection, Menu.Login, kick: true);
-                NetworkSend.SendAlert(session.Id, SystemMessage.MultipleAccountsNotAllowed, Menu.Login, kick: true);
-                return;
+                await Server.Player.OnExit(existingPlayerId);
             }
 
             // Get the current executing assembly
             var assembly = Assembly.GetExecutingAssembly();
 
             // Retrieve the version information
-            var clientVersionBytes = reader.ReadBytes().ToArray();
             var serverVersion = assembly.GetName().Version?.ToString();
-            var clientVersion = System.Text.Encoding.UTF8.GetString(session.Decrypt(clientVersionBytes));
 
             // Check versions
             if (clientVersion != serverVersion)
