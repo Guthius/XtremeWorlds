@@ -1160,6 +1160,15 @@ namespace Client
                             GameState.Info = true;
                             break;
                         }
+
+                    case DialogueType.RenameVarSwitch:
+                        {
+                            // DiaData1 = mode (0 switches / 1 variables), DiaData2 = id
+                            var mode = (int)GameState.DiaData1;
+                            var id = (int)GameState.DiaData2;
+                            WinEventEditor.ApplyVarSwitchRenameFromDialogue(diaInput ?? string.Empty, mode, id);
+                            break;
+                        }
                 }
             }
 

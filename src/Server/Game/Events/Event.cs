@@ -142,10 +142,51 @@ namespace Server
 
         #region Movement
 
+        private sealed class ActiveEventMove
+        {
+            public int RemainingPixels;
+            public int Dir;
+            public int Speed;
+        }
+
+        // Tracks active 1-tile event steps so we can send a stop packet after exactly 32px.
+        // Key: (map, eventId, playerKey, globalEvent)
+        private static readonly ConcurrentDictionary<(int map, int eventId, int playerKey, bool globalEvent), ActiveEventMove>
+            ActiveMoves = new();
+
+        private static (int map, int eventId, int playerKey, bool globalEvent) GetMoveKey(int map, int eventId, int index, bool globalEvent) =>
+            (map, eventId, globalEvent ? -1 : index, globalEvent);
+
+        public static bool IsMoving(int map, int eventId, int index, bool globalEvent)
+        {
+            if (map < 0 || map >= Core.Globals.Variables.MaxMaps) return false;
+            var key = GetMoveKey(map, eventId, index, globalEvent);
+            return ActiveMoves.TryGetValue(key, out var m) && m.RemainingPixels > 0;
+        }
+
+        public static void CancelMove(int map, int eventId, int index, bool globalEvent)
+        {
+            if (map < 0 || map >= Core.Globals.Variables.MaxMaps) return;
+            var key = GetMoveKey(map, eventId, index, globalEvent);
+            ActiveMoves.TryRemove(key, out _);
+        }
+
         private static bool IsTileWalkable(int map, int x, int y)
         {
-            if (x < 0 || x > Server.Map.Instance[map].MaxX || y < 0 || y > Server.Map.Instance[map].MaxY) return false;
-            var tile = Server.Map.Instance[map].Tile[x, y];
+            if (map < 0 || map >= Core.Globals.Variables.MaxMaps)
+                return false;
+
+            var mapInstance = Server.Map.Instance[map];
+            if (mapInstance?.Tile == null)
+                return false;
+
+            // Prefer actual tile array bounds (more robust than MaxX/MaxY if they ever diverge).
+            int maxX = mapInstance.Tile.GetLength(0) - 1;
+            int maxY = mapInstance.Tile.GetLength(1) - 1;
+            if (x < 0 || x > maxX || y < 0 || y > maxY)
+                return false;
+
+            var tile = mapInstance.Tile[x, y];
 
             // Any non-blocked tile is walkable. Special tiles (warp, item, npc spawn, etc.) remain walkable.
             if (tile.Type == TileType.Blocked || tile.Type2 == TileType.Blocked) return false;
@@ -256,7 +297,14 @@ namespace Server
                     Data.TempPlayer[playerIndex].EventMap.EventPages[eventIndex].Dir = dir;
             }
 
-            SendEventDirection(map, eventId, globalEvent ? TempEventMap[map].Event[eventId].Dir : Data.TempPlayer[playerIndex].EventMap.EventPages[eventIndex].Dir);
+            if (globalEvent)
+            {
+                SendEventDirection(map, eventId, TempEventMap[map].Event[eventId].Dir);
+            }
+            else
+            {
+                SendEventDirection(map, eventId, Data.TempPlayer[playerIndex].EventMap.EventPages[eventIndex].Dir, playerIndex);
+            }
         }
 
         private static int GetEventIndex(int playerIndex, int eventId, bool globalEvent)
@@ -273,7 +321,7 @@ namespace Server
             return -1;
         }
 
-        private static void SendEventDirection(int map, int eventId, int currentDir)
+        private static void SendEventDirection(int map, int eventId, int currentDir, int index = -1)
         {
             var packetWriter = new PacketWriter(12);
 
@@ -281,7 +329,14 @@ namespace Server
             packetWriter.WriteInt32(eventId);
             packetWriter.WriteInt32(currentDir);
 
-            NetworkConfig.SendDataToMap(map, packetWriter.GetBytes());
+            if (index == -1)
+            {
+                NetworkConfig.SendDataToMap(map, packetWriter.GetBytes());
+            }
+            else
+            {
+                PlayerService.Instance.SendDataTo(index, packetWriter.GetBytes());
+            }
         }
 
         public static void Move(int index, int map, int eventId, int dir, int movementSpeed, bool globalEvent = false)
@@ -291,41 +346,114 @@ namespace Server
             var eventIndex = GetEventIndex(index, eventId, globalEvent);
             if (eventIndex == -1) return;
 
+            // Prevent issuing a new step while we're already mid-step.
+            var moveKey = GetMoveKey(map, eventId, index, globalEvent);
+            if (ActiveMoves.TryGetValue(moveKey, out var existing) && existing.RemainingPixels > 0)
+            {
+                return;
+            }
+
             lock (TempEventLock)
             {
                 if (globalEvent)
                 {
-                    var eventData = TempEventMap[map].Event[eventIndex];
+                    ref var eventData = ref TempEventMap[map].Event[eventIndex];
                     if (Server.Map.Instance[map].Event[eventId].Pages[0].DirFix == 0)
                         eventData.Dir = dir;
 
-                    switch (dir)
-                    {
-                        case (byte) Direction.Up: eventData.Y--; break;
-                        case (byte) Direction.Down: eventData.Y++; break;
-                        case (byte) Direction.Left: eventData.X--; break;
-                        case (byte) Direction.Right: eventData.X++; break;
-                    }
-
-                    SendEventMove(map, eventId, eventData.X, eventData.Y, dir, eventData.Dir, movementSpeed, 0);
+                    // Start-of-step: send current tile coords (client will pixel-step 32px).
+                    SendEventMove(map, eventId, eventData.X, eventData.Y, dir, eventData.Dir, movementSpeed);
                 }
                 else
                 {
-                    var eventData = Data.TempPlayer[index].EventMap.EventPages[eventIndex];
+                    ref var eventData = ref Data.TempPlayer[index].EventMap.EventPages[eventIndex];
                     if (Server.Map.Instance[map].Event[eventId].Pages[Data.TempPlayer[index].EventMap.EventPages[eventIndex].PageId].DirFix == 0)
                         eventData.Dir = dir;
 
-                    switch (dir)
-                    {
-                        case (byte) Direction.Up: eventData.Y--; break;
-                        case (byte) Direction.Down: eventData.Y++; break;
-                        case (byte) Direction.Left: eventData.X--; break;
-                        case (byte) Direction.Right: eventData.X++; break;
-                    }
-
+                    // Start-of-step: send current tile coords to the owning player.
                     SendEventMove(map, eventId, eventData.X, eventData.Y, dir, eventData.Dir, movementSpeed, index);
                 }
             }
+
+            // Begin a new 1-tile move (32px). Completion is handled by ProcessActiveEventMovement.
+            var next = new ActiveEventMove { RemainingPixels = Constants.TileSize, Dir = dir, Speed = movementSpeed };
+            ActiveMoves[moveKey] = next;
+        }
+
+        /// <summary>
+        /// Advances active event movement by 1px per tick; when a tile step completes (32px),
+        /// commits the tile coordinate and sends SEventDir to stop client movement.
+        /// </summary>
+        public static void ProcessActiveEventMovement()
+        {
+            foreach (var kvp in ActiveMoves)
+            {
+                var key = kvp.Key;
+                var state = kvp.Value;
+                if (state.RemainingPixels <= 0)
+                {
+                    ActiveMoves.TryRemove(key, out _);
+                    continue;
+                }
+
+                state.RemainingPixels -= 1;
+                if (state.RemainingPixels > 0)
+                {
+                    continue;
+                }
+
+                // Step finished.
+                ActiveMoves.TryRemove(key, out _);
+
+                int map = key.map;
+                int eventId = key.eventId;
+                int playerKey = key.playerKey;
+                bool globalEvent = key.globalEvent;
+                int dir = state.Dir;
+
+                if (map < 0 || map >= Core.Globals.Variables.MaxMaps) continue;
+
+                lock (TempEventLock)
+                {
+                    if (globalEvent)
+                    {
+                        if (TempEventMap[map].EventCount <= eventId) continue;
+                        ref var ev = ref TempEventMap[map].Event[eventId];
+                        ApplyDirDelta(ref ev.X, ref ev.Y, map, dir);
+                        SendEventDirection(map, eventId, ev.Dir);
+                    }
+                    else
+                    {
+                        var playerId = playerKey;
+                        if (!NetworkConfig.IsPlaying(playerId)) continue;
+                        var eventIndex = GetEventIndex(playerId, eventId, false);
+                        if (eventIndex == -1) continue;
+
+                        ref var ev = ref Data.TempPlayer[playerId].EventMap.EventPages[eventIndex];
+                        ApplyDirDelta(ref ev.X, ref ev.Y, map, dir);
+                        SendEventDirection(map, eventId, ev.Dir, playerId);
+                    }
+                }
+            }
+        }
+
+        private static void ApplyDirDelta(ref int tileX, ref int tileY, int map, int dir)
+        {
+            int x = tileX;
+            int y = tileY;
+            switch ((Direction)dir)
+            {
+                case Direction.Up: y--; break;
+                case Direction.Down: y++; break;
+                case Direction.Left: x--; break;
+                case Direction.Right: x++; break;
+            }
+
+            // Clamp within map bounds.
+            x = Math.Max(0, Math.Min(x, Server.Map.Instance[map].MaxX));
+            y = Math.Max(0, Math.Min(y, Server.Map.Instance[map].MaxY));
+            tileX = x;
+            tileY = y;
         }
 
         private static void SendEventMove(int map, int eventId, int x, int y, int dir, int currentDir, int speed, int index = -1)

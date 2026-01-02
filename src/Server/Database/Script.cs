@@ -643,6 +643,9 @@ public class Script
                 break;
 
             case (byte)CommonEventTrigger.Key:
+                // Skills can act as keys by setting Skill.CommonEventType to (Key + 1).
+                // invNum = -1 means don't consume an inventory item.
+                TryUseKeyOnFacingTile(playerId, -1, -1);
                 break;
 
             case (byte)CommonEventTrigger.Script:

@@ -13,12 +13,16 @@ public static class WinEventEditor
     private static Core.Globals.Type.Event _history;
     private static bool _hasHistory;
     private static readonly System.Collections.Generic.List<(int listIndex, int commandIndex)> _commandIndexMap = new();
+    private static readonly System.Collections.Generic.List<int> _varSwitchIndexMap = new();
+    private static int _lastVarSwitchTypeValue;
 
     private static readonly string[] _commandTextControlNames =
     [
         "txtCmdText1",
         "txtCmdText2",
         "txtCmdText3",
+        "txtCmdText4",
+        "txtCmdText5",
     ];
 
     private static readonly string[] _commandDataControlNames =
@@ -47,6 +51,19 @@ public static class WinEventEditor
     private static Core.Globals.Type.EventCommand _dataHistoryCommand;
     private static bool _dataHasHistory;
 
+    private static readonly string[] _moveRouteControlNames =
+    [
+        "lblMoveRoute",
+        "lstMoveRoute",
+        "sldMoveRoute",
+        "btnRouteUp",
+        "btnRouteDown",
+        "btnRouteLeft",
+        "btnRouteRight",
+        "btnRouteRemove",
+        "btnRouteClear",
+    ];
+
     private const int MaxPageButtons = 30;
 
     private static bool TryGetEventCommandIndex(int rawIndex, out EventCommand index)
@@ -68,6 +85,11 @@ public static class WinEventEditor
         return TryGetEventCommandIndex(cmd.Index, out var index) && index == EventCommand.ConditionalBranch;
     }
 
+    private static bool IsShowChoices(Core.Globals.Type.EventCommand cmd)
+    {
+        return TryGetEventCommandIndex(cmd.Index, out var index) && index == EventCommand.ShowChoices;
+    }
+
     private static void ResetCommandDataLabels(string windowName)
     {
         if (WindowManager.TryGetControl(windowName, "lblCmdText1", out var t1) && t1 is Label lt1)
@@ -76,6 +98,10 @@ public static class WinEventEditor
             lt2.Text = "Text2";
         if (WindowManager.TryGetControl(windowName, "lblCmdText3", out var t3) && t3 is Label lt3)
             lt3.Text = "Text3";
+        if (WindowManager.TryGetControl(windowName, "lblCmdText4", out var t4) && t4 is Label lt4)
+            lt4.Text = "Text4";
+        if (WindowManager.TryGetControl(windowName, "lblCmdText5", out var t5) && t5 is Label lt5)
+            lt5.Text = "Text5";
 
         if (WindowManager.TryGetControl(windowName, "lblCmdData1", out var d1) && d1 is Label ld1)
             ld1.Text = "D1";
@@ -105,6 +131,18 @@ public static class WinEventEditor
             ld5.Text = "IfLst";
         if (WindowManager.TryGetControl(windowName, "lblCmdData6", out var d6) && d6 is Label ld6)
             ld6.Text = "Else";
+    }
+
+    private static void ConfigureShowChoicesLabels(string windowName)
+    {
+        if (WindowManager.TryGetControl(windowName, "lblCmdData1", out var d1) && d1 is Label ld1)
+            ld1.Text = "Grp 1";
+        if (WindowManager.TryGetControl(windowName, "lblCmdData2", out var d2) && d2 is Label ld2)
+            ld2.Text = "Grp 2";
+        if (WindowManager.TryGetControl(windowName, "lblCmdData3", out var d3) && d3 is Label ld3)
+            ld3.Text = "Grp 3";
+        if (WindowManager.TryGetControl(windowName, "lblCmdData4", out var d4) && d4 is Label ld4)
+            ld4.Text = "Grp 4";
     }
 
     private static string FormatCommandDisplayName(string name)
@@ -155,22 +193,430 @@ public static class WinEventEditor
             // Initialize the editor backing data
             Client.Event.EventEditorInit();
 
+            // Ensure we have up-to-date variable/switch names for pickers + rename UI.
+            Client.Net.Sender.SendRequestSwitchesAndVariables();
+
             // Snapshot original event for Cancel
             _history = Client.Event.Instance;
             _hasHistory = true;
 
             PopulateCombos();
 
+            PopulateVarSwitchTypeCombo();
+            RefreshVarSwitchList();
+
             SelectedPage = 0;
             ClampSelectedPage();
             LoadEventToControls();
             LoadPageToControls();
+            RefreshMoveRouteControls();
             RefreshCommandsList();
         }
         finally
         {
             _isLoading = false;
             RefreshPageButtons();
+        }
+    }
+
+    private static string FormatMoveRouteStep(Core.Globals.Type.MoveRoute route)
+    {
+        return route.Index switch
+        {
+            1 => "Up",
+            2 => "Down",
+            3 => "Left",
+            4 => "Right",
+            _ => $"{route.Index}",
+        };
+    }
+
+    private static void SetMoveRouteControlsEnabled(bool enabled)
+    {
+        foreach (var name in _moveRouteControlNames)
+        {
+            if (WindowManager.TryGetControl("winEventEditor", name, out var ctrl) && ctrl is not null)
+                ctrl.Enabled = enabled;
+        }
+    }
+
+    private static void SetMoveRouteControlsVisible(bool visible)
+    {
+        foreach (var name in _moveRouteControlNames)
+        {
+            if (WindowManager.TryGetControl("winEventEditor", name, out var ctrl) && ctrl is not null)
+                ctrl.Visible = visible;
+        }
+    }
+
+    private static void RefreshMoveRouteControls()
+    {
+        if (!TryGetCurrentPage(out var page))
+            return;
+
+        bool isRoute = page.MoveType == 2;
+        SetMoveRouteControlsVisible(isRoute);
+        SetMoveRouteControlsEnabled(isRoute);
+
+        if (!WindowManager.TryGetControl("winEventEditor", "lstMoveRoute", out var listCtrl) || listCtrl is not ListBox list)
+            return;
+
+        int prevSelected = list.SelectedIndex;
+        int prevScroll = list.ScrollOffset;
+
+        list.Clear();
+
+        int count = Math.Max(0, page.MoveRouteCount);
+        var route = page.MoveRoute ?? Array.Empty<Core.Globals.Type.MoveRoute>();
+
+        for (int i = 0; i < count && i < route.Length; i++)
+        {
+            list.AddItem($"{i + 1}: {FormatMoveRouteStep(route[i])}");
+        }
+
+        // Restore selection/scroll if possible
+        if (list.Items.Count > 0)
+        {
+            list.SelectedIndex = Math.Clamp(prevSelected, -1, list.Items.Count - 1);
+            int visible = list.GetVisibleCount();
+            int max = Math.Max(0, list.Items.Count - visible);
+            list.ScrollOffset = Math.Clamp(prevScroll, 0, max);
+        }
+        else
+        {
+            list.SelectedIndex = -1;
+            list.ScrollOffset = 0;
+        }
+
+        // Sync scrollbar
+        if (WindowManager.TryGetControl("winEventEditor", "sldMoveRoute", out var sldCtrl) && sldCtrl is ScrollBar sb)
+        {
+            int visible = list.GetVisibleCount();
+            int max = Math.Max(0, list.Items.Count - visible);
+            sb.Min = 0;
+            sb.Max = max;
+            sb.Value = Math.Clamp(list.ScrollOffset, sb.Min, sb.Max);
+        }
+    }
+
+    private static void AddMoveRouteStep(int index)
+    {
+        if (_isLoading) return;
+        if (!TryGetCurrentPage(out var page)) return;
+
+        int count = Math.Max(0, page.MoveRouteCount);
+        var route = page.MoveRoute ?? Array.Empty<Core.Globals.Type.MoveRoute>();
+        if (route.Length < count)
+            Array.Resize(ref route, count);
+
+        Array.Resize(ref route, count + 1);
+        route[count] = new Core.Globals.Type.MoveRoute { Index = index };
+
+        page.MoveRoute = route;
+        page.MoveRouteCount = count + 1;
+        SetCurrentPage(page);
+        RefreshMoveRouteControls();
+    }
+
+    private static void RemoveMoveRouteStep()
+    {
+        if (_isLoading) return;
+        if (!TryGetCurrentPage(out var page)) return;
+
+        int count = Math.Max(0, page.MoveRouteCount);
+        if (count <= 0) return;
+
+        var route = page.MoveRoute ?? Array.Empty<Core.Globals.Type.MoveRoute>();
+        if (route.Length < count)
+            Array.Resize(ref route, count);
+
+        int removeAt = count - 1;
+        if (WindowManager.TryGetControl("winEventEditor", "lstMoveRoute", out var ctrl) && ctrl is ListBox list)
+        {
+            int selected = list.SelectedIndex;
+            if (selected >= 0 && selected < count)
+                removeAt = selected;
+        }
+
+        for (int i = removeAt; i < count - 1; i++)
+            route[i] = route[i + 1];
+
+        if (count - 1 <= 0)
+        {
+            page.MoveRouteCount = 0;
+            page.MoveRoute = Array.Empty<Core.Globals.Type.MoveRoute>();
+        }
+        else
+        {
+            Array.Resize(ref route, count - 1);
+            page.MoveRoute = route;
+            page.MoveRouteCount = count - 1;
+        }
+
+        SetCurrentPage(page);
+        RefreshMoveRouteControls();
+    }
+
+    private static void ClearMoveRoute()
+    {
+        if (_isLoading) return;
+        if (!TryGetCurrentPage(out var page)) return;
+
+        page.MoveRouteCount = 0;
+        page.MoveRoute = Array.Empty<Core.Globals.Type.MoveRoute>();
+        SetCurrentPage(page);
+        RefreshMoveRouteControls();
+    }
+
+    public static void OnMoveRouteAddUp() => AddMoveRouteStep(1);
+    public static void OnMoveRouteAddDown() => AddMoveRouteStep(2);
+    public static void OnMoveRouteAddLeft() => AddMoveRouteStep(3);
+    public static void OnMoveRouteAddRight() => AddMoveRouteStep(4);
+    public static void OnMoveRouteRemove() => RemoveMoveRouteStep();
+    public static void OnMoveRouteClear() => ClearMoveRoute();
+
+    public static void OnMoveRouteListMouseDown()
+    {
+        if (!WindowManager.TryGetControl("winEventEditor", "lstMoveRoute", out var ctrl) || ctrl is not ListBox list) return;
+        var win = WindowManager.GetWindowByName("winEventEditor");
+        if (win is null) return;
+
+        int relY = GameState.CurMouseY - (win.Y + ctrl.Y);
+        int index = list.GetItemIndexAtPosition(relY);
+        if (index < 0 || index >= list.Items.Count) return;
+
+        list.SelectedIndex = index;
+        list.EnsureVisible(index);
+
+        if (WindowManager.TryGetControl("winEventEditor", "sldMoveRoute", out var sldCtrl) && sldCtrl is ScrollBar sb)
+        {
+            int visible = list.GetVisibleCount();
+            int max = Math.Max(0, list.Items.Count - visible);
+            sb.Min = 0;
+            sb.Max = max;
+            sb.Value = Math.Clamp(list.ScrollOffset, sb.Min, sb.Max);
+        }
+    }
+
+    public static void OnMoveRouteListMouseWheel()
+    {
+        if (!WindowManager.TryGetControl("winEventEditor", "lstMoveRoute", out var ctrl) || ctrl is not ListBox list) return;
+
+        int visible = list.GetVisibleCount();
+        int max = Math.Max(0, list.Items.Count - visible);
+        int delta = GameClient.GetMouseScrollDelta();
+        int step = (delta > 0) ? -1 : 1;
+
+        list.ScrollOffset = Math.Clamp(list.ScrollOffset + step, 0, max);
+        if (WindowManager.TryGetControl("winEventEditor", "sldMoveRoute", out var sldCtrl) && sldCtrl is ScrollBar sb)
+            sb.Value = Math.Clamp(list.ScrollOffset, sb.Min, sb.Max);
+    }
+
+    public static void OnMoveRouteScrollBarMove()
+    {
+        if (!WindowManager.TryGetControl("winEventEditor", "lstMoveRoute", out var ctrl) || ctrl is not ListBox list) return;
+        if (!WindowManager.TryGetControl("winEventEditor", "sldMoveRoute", out var sldCtrl) || sldCtrl is null) return;
+
+        int visible = list.GetVisibleCount();
+        int max = Math.Max(0, list.Items.Count - visible);
+
+        if (sldCtrl is ScrollBar sb)
+        {
+            sb.Min = 0;
+            sb.Max = max;
+            list.ScrollOffset = Math.Clamp(sb.Value, sb.Min, sb.Max);
+        }
+        else
+        {
+            list.ScrollOffset = Math.Clamp(sldCtrl.Value, 0, max);
+        }
+    }
+
+    private static void PopulateVarSwitchTypeCombo()
+    {
+        if (!WindowManager.TryGetControl("winEventEditor", "cmbVarSwitchType", out var ctrl) || ctrl is not ComboBox cmb)
+            return;
+
+        if (cmb.Items.Count == 0)
+        {
+            cmb.Items.Add("Switches");
+            cmb.Items.Add("Variables");
+        }
+
+        cmb.Value = Math.Clamp(cmb.Value, 0, Math.Max(0, cmb.Items.Count - 1));
+        _lastVarSwitchTypeValue = cmb.Value;
+    }
+
+    private static void SetVarSwitchIndexLabel(int? id)
+    {
+        if (!WindowManager.TryGetControl("winEventEditor", "lblVarSwitchIndex", out var ctrl) || ctrl is not Label lbl)
+            return;
+        lbl.Text = id is null ? "Index: -" : $"Index: {id.Value}";
+    }
+
+    private static void RefreshVarSwitchList()
+    {
+        if (!WindowManager.TryGetControl("winEventEditor", "lstVarSwitchNames", out var listCtrl) || listCtrl is not ListBox list)
+            return;
+
+        int mode = 0;
+        if (WindowManager.TryGetControl("winEventEditor", "cmbVarSwitchType", out var typeCtrl) && typeCtrl is ComboBox cmb)
+            mode = Math.Clamp(cmb.Value, 0, 1);
+
+        list.Items.Clear();
+        _varSwitchIndexMap.Clear();
+
+        int count = mode == 0 ? Variables.MaxSwitches : Variables.MaxVariables;
+        for (int i = 0; i < count; i++)
+        {
+            string name = mode == 0
+                ? (i >= 0 && i < Client.Event.Switches.Length ? (Client.Event.Switches[i] ?? string.Empty) : string.Empty)
+                : (i >= 0 && i < Client.Event.Variables.Length ? (Client.Event.Variables[i] ?? string.Empty) : string.Empty);
+
+            name = name.Trim();
+            list.Items.Add(string.IsNullOrWhiteSpace(name) ? $"{i}" : $"{i}: {name}");
+            _varSwitchIndexMap.Add(i);
+        }
+
+        list.SelectedIndex = Math.Clamp(list.SelectedIndex, 0, Math.Max(0, list.Items.Count - 1));
+        list.ScrollOffset = Math.Clamp(list.ScrollOffset, 0, Math.Max(0, list.Items.Count - list.GetVisibleCount()));
+
+        if (WindowManager.TryGetControl("winEventEditor", "sldVarSwitchNames", out var sldCtrl) && sldCtrl is ScrollBar sb)
+        {
+            int visible = list.GetVisibleCount();
+            int max = Math.Max(0, list.Items.Count - visible);
+            sb.Min = 0;
+            sb.Max = max;
+            sb.Value = Math.Clamp(list.ScrollOffset, sb.Min, sb.Max);
+        }
+
+        if (list.SelectedIndex >= 0 && list.SelectedIndex < _varSwitchIndexMap.Count)
+            SetVarSwitchIndexLabel(_varSwitchIndexMap[list.SelectedIndex]);
+        else
+            SetVarSwitchIndexLabel(null);
+    }
+
+    public static void OnVarSwitchTypeChanged()
+    {
+        if (_isLoading) return;
+        if (WindowManager.TryGetControl("winEventEditor", "cmbVarSwitchType", out var ctrl) && ctrl is ComboBox cmb)
+        {
+            int current = Math.Clamp(cmb.Value, 0, 1);
+            if (current == _lastVarSwitchTypeValue)
+                return;
+            _lastVarSwitchTypeValue = current;
+        }
+
+        RefreshVarSwitchList();
+    }
+
+    public static void OnVarSwitchListMouseDown()
+    {
+        if (_isLoading) return;
+        if (!WindowManager.TryGetControl("winEventEditor", "lstVarSwitchNames", out var ctrl) || ctrl is not ListBox list) return;
+        var win = WindowManager.GetWindowByName("winEventEditor");
+        if (win is null) return;
+
+        int relY = GameState.CurMouseY - (win.Y + ctrl.Y);
+        int index = list.GetItemIndexAtPosition(relY);
+        if (index < 0 || index >= list.Items.Count) return;
+
+        list.SelectedIndex = index;
+        list.EnsureVisible(index);
+
+        if (WindowManager.TryGetControl("winEventEditor", "sldVarSwitchNames", out var sldCtrl) && sldCtrl is ScrollBar sb)
+        {
+            int visible = list.GetVisibleCount();
+            int max = Math.Max(0, list.Items.Count - visible);
+            sb.Min = 0;
+            sb.Max = max;
+            sb.Value = Math.Clamp(list.ScrollOffset, sb.Min, sb.Max);
+        }
+
+        if (index >= 0 && index < _varSwitchIndexMap.Count)
+            SetVarSwitchIndexLabel(_varSwitchIndexMap[index]);
+    }
+
+    public static void OnVarSwitchListMouseWheel()
+    {
+        if (_isLoading) return;
+        if (!WindowManager.TryGetControl("winEventEditor", "lstVarSwitchNames", out var ctrl) || ctrl is not ListBox list) return;
+
+        int visible = list.GetVisibleCount();
+        int max = Math.Max(0, list.Items.Count - visible);
+        int delta = GameClient.GetMouseScrollDelta();
+        int step = (delta > 0) ? -1 : 1;
+
+        list.ScrollOffset = Math.Clamp(list.ScrollOffset + step, 0, max);
+
+        if (WindowManager.TryGetControl("winEventEditor", "sldVarSwitchNames", out var sldCtrl) && sldCtrl is ScrollBar sb)
+        {
+            sb.Min = 0;
+            sb.Max = max;
+            sb.Value = Math.Clamp(list.ScrollOffset, sb.Min, sb.Max);
+        }
+    }
+
+    public static void OnVarSwitchScrollBarMove()
+    {
+        if (_isLoading) return;
+        if (!WindowManager.TryGetControl("winEventEditor", "lstVarSwitchNames", out var listCtrl) || listCtrl is not ListBox list) return;
+        if (!WindowManager.TryGetControl("winEventEditor", "sldVarSwitchNames", out var sldCtrl) || sldCtrl is not ScrollBar sb) return;
+
+        int visible = list.GetVisibleCount();
+        int max = Math.Max(0, list.Items.Count - visible);
+        sb.Min = 0;
+        sb.Max = max;
+        list.ScrollOffset = Math.Clamp(sb.Value, 0, max);
+    }
+
+    public static void OnRenameVarSwitch()
+    {
+        if (_isLoading) return;
+        if (!WindowManager.TryGetControl("winEventEditor", "lstVarSwitchNames", out var ctrl) || ctrl is not ListBox list) return;
+
+        int selected = list.SelectedIndex;
+        if (selected < 0 || selected >= _varSwitchIndexMap.Count)
+            return;
+
+        int id = _varSwitchIndexMap[selected];
+        int mode = 0;
+        if (WindowManager.TryGetControl("winEventEditor", "cmbVarSwitchType", out var typeCtrl) && typeCtrl is ComboBox cmb)
+            mode = Math.Clamp(cmb.Value, 0, 1);
+
+        string kind = mode == 0 ? "switch" : "variable";
+        GameLogic.Dialogue("Rename", $"Enter a new name for {kind} {id}.", "", DialogueType.RenameVarSwitch, DialogueStyle.Input, mode, id);
+    }
+
+    public static void ApplyVarSwitchRenameFromDialogue(string name, int mode, int id)
+    {
+        var trimmed = (name ?? string.Empty).Trim();
+        mode = Math.Clamp(mode, 0, 1);
+
+        if (mode == 0)
+        {
+            if (id < 0 || id >= Client.Event.Switches.Length) return;
+            Client.Event.Switches[id] = trimmed;
+        }
+        else
+        {
+            if (id < 0 || id >= Client.Event.Variables.Length) return;
+            Client.Event.Variables[id] = trimmed;
+        }
+
+        Client.Net.Sender.SendSwitchesAndVariables();
+        RefreshVarSwitchList();
+
+        // Restore selection to the renamed id if present.
+        if (WindowManager.TryGetControl("winEventEditor", "lstVarSwitchNames", out var ctrl) && ctrl is ListBox list)
+        {
+            int idx = _varSwitchIndexMap.IndexOf(id);
+            if (idx >= 0 && idx < list.Items.Count)
+            {
+                list.SelectedIndex = idx;
+                list.EnsureVisible(idx);
+                SetVarSwitchIndexLabel(id);
+            }
         }
     }
 
@@ -305,6 +751,8 @@ public static class WinEventEditor
             ResetCommandDataLabels("winEventEditor");
             if (IsConditionalBranch(cmd))
                 ConfigureConditionalBranchLabels("winEventEditor");
+            if (IsShowChoices(cmd))
+                ConfigureShowChoicesLabels("winEventEditor");
 
             if (WindowManager.TryGetControl("winEventEditor", "txtCmdText1", out var t1) && t1 is TextBox tb1)
                 tb1.Text = cmd.Text1 ?? string.Empty;
@@ -312,6 +760,10 @@ public static class WinEventEditor
                 tb2.Text = cmd.Text2 ?? string.Empty;
             if (WindowManager.TryGetControl("winEventEditor", "txtCmdText3", out var t3) && t3 is TextBox tb3)
                 tb3.Text = cmd.Text3 ?? string.Empty;
+            if (WindowManager.TryGetControl("winEventEditor", "txtCmdText4", out var t4) && t4 is TextBox tb4)
+                tb4.Text = cmd.Text4 ?? string.Empty;
+            if (WindowManager.TryGetControl("winEventEditor", "txtCmdText5", out var t5) && t5 is TextBox tb5)
+                tb5.Text = cmd.Text5 ?? string.Empty;
 
             if (IsConditionalBranch(cmd))
             {
@@ -364,7 +816,8 @@ public static class WinEventEditor
     private static string ReadStringTextBox(string controlName)
     {
         if (WindowManager.TryGetControl("winEventEditor", controlName, out var ctrl) && ctrl is TextBox tb)
-            return GetLiveText(tb);
+            return GetLiveText(tb) ?? string.Empty;
+
         return string.Empty;
     }
 
@@ -379,6 +832,8 @@ public static class WinEventEditor
         cmd.Text1 = ReadStringTextBox("txtCmdText1");
         cmd.Text2 = ReadStringTextBox("txtCmdText2");
         cmd.Text3 = ReadStringTextBox("txtCmdText3");
+        cmd.Text4 = ReadStringTextBox("txtCmdText4");
+        cmd.Text5 = ReadStringTextBox("txtCmdText5");
 
         if (IsConditionalBranch(cmd))
         {
@@ -472,6 +927,23 @@ public static class WinEventEditor
         ResetCommandDataLabels(windowName);
         if (IsConditionalBranch(cmd))
             ConfigureConditionalBranchLabels(windowName);
+
+        if (IsShowChoices(cmd))
+            ConfigureShowChoicesLabels(windowName);
+
+        if (TryGetEventCommandIndex(cmd.Index, out var idx) && idx == EventCommand.ShowChoices)
+        {
+            if (WindowManager.TryGetControl(windowName, "lblCmdText1", out var lbl1Ctrl) && lbl1Ctrl is Label lt1)
+                lt1.Text = "Prompt";
+            if (WindowManager.TryGetControl(windowName, "lblCmdText2", out var lbl2Ctrl) && lbl2Ctrl is Label lt2)
+                lt2.Text = "Choice 1";
+            if (WindowManager.TryGetControl(windowName, "lblCmdText3", out var lbl3Ctrl) && lbl3Ctrl is Label lt3)
+                lt3.Text = "Choice 2";
+            if (WindowManager.TryGetControl(windowName, "lblCmdText4", out var lbl4Ctrl) && lbl4Ctrl is Label lt4)
+                lt4.Text = "Choice 3";
+            if (WindowManager.TryGetControl(windowName, "lblCmdText5", out var lbl5Ctrl) && lbl5Ctrl is Label lt5)
+                lt5.Text = "Choice 4";
+        }
         string cmdName;
         try { cmdName = ((EventCommand)cmd.Index).ToString(); }
         catch { cmdName = cmd.Index.ToString(); }
@@ -485,6 +957,10 @@ public static class WinEventEditor
             tb2.Text = cmd.Text2 ?? string.Empty;
         if (WindowManager.TryGetControl(windowName, "txtCmdText3", out var t3) && t3 is TextBox tb3)
             tb3.Text = cmd.Text3 ?? string.Empty;
+        if (WindowManager.TryGetControl(windowName, "txtCmdText4", out var t4) && t4 is TextBox tb4)
+            tb4.Text = cmd.Text4 ?? string.Empty;
+        if (WindowManager.TryGetControl(windowName, "txtCmdText5", out var t5) && t5 is TextBox tb5)
+            tb5.Text = cmd.Text5 ?? string.Empty;
 
         if (IsConditionalBranch(cmd))
         {
@@ -1057,6 +1533,8 @@ public static class WinEventEditor
         }
         cmd.Text2 = ReadStringTextBox("winEventCommandData", "txtCmdText2");
         cmd.Text3 = ReadStringTextBox("winEventCommandData", "txtCmdText3");
+        cmd.Text4 = ReadStringTextBox("winEventCommandData", "txtCmdText4");
+        cmd.Text5 = ReadStringTextBox("winEventCommandData", "txtCmdText5");
 
         if (IsConditionalBranch(cmd))
         {
@@ -1202,7 +1680,7 @@ public static class WinEventEditor
 
     private static void RefreshPageButtons()
     {
-        int pageCount = Math.Max(1, Client.Event.Instance.PageCount);
+        int pageCount = Math.Clamp(Math.Max(1, Client.Event.Instance.PageCount), 1, MaxPageButtons);
         int selected = Math.Clamp(SelectedPage, 0, pageCount - 1);
 
         for (int i = 1; i <= MaxPageButtons; i++)
@@ -1225,7 +1703,7 @@ public static class WinEventEditor
 
     private static void ClampSelectedPage()
     {
-        int pageCount = Math.Max(1, Client.Event.Instance.PageCount);
+        int pageCount = Math.Clamp(Math.Max(1, Client.Event.Instance.PageCount), 1, MaxPageButtons);
         SelectedPage = Math.Clamp(SelectedPage, 0, pageCount - 1);
         Client.Event.CurPageNum = SelectedPage;
     }
@@ -1313,6 +1791,8 @@ public static class WinEventEditor
         // Graphic (per-page)
         SyncGraphicControlsFromPage(page);
 
+        RefreshMoveRouteControls();
+
         UpdatePageLabel();
     }
 
@@ -1320,7 +1800,7 @@ public static class WinEventEditor
     {
         if (WindowManager.TryGetControl("winEventEditor", "lblPage", out var pageCtrl) && pageCtrl is Label lblPage)
         {
-            int pageCount = Math.Max(1, Client.Event.Instance.PageCount);
+            int pageCount = Math.Clamp(Math.Max(1, Client.Event.Instance.PageCount), 1, MaxPageButtons);
             int display = Math.Clamp(SelectedPage + 1, 1, pageCount);
             lblPage.Text = $"{display} / {pageCount}";
         }
@@ -1347,12 +1827,21 @@ public static class WinEventEditor
         for (int listIndex = 0; listIndex < page.CommandListCount && listIndex < page.CommandList.Length; listIndex++)
         {
             var cmdList = page.CommandList[listIndex];
-            if (cmdList.CommandCount <= 0 || cmdList.Commands == null) continue;
+            if (cmdList.CommandCount <= 0 || cmdList.Commands == null)
+            {
+                list.AddItem($"{listIndex}:(empty)");
+                _commandIndexMap.Add((listIndex, -1));
+                continue;
+            }
+
+            bool any = false;
 
             for (int cmdIndex = 0; cmdIndex < cmdList.CommandCount && cmdIndex < cmdList.Commands.Length; cmdIndex++)
             {
                 var cmd = cmdList.Commands[cmdIndex];
                 if (cmd.Index < 0) continue;
+
+                any = true;
 
                 string name;
                 try { name = ((EventCommand)cmd.Index).ToString(); }
@@ -1370,6 +1859,12 @@ public static class WinEventEditor
 
                 list.AddItem(line);
                 _commandIndexMap.Add((listIndex, cmdIndex));
+            }
+
+            if (!any)
+            {
+                list.AddItem($"{listIndex}:(empty)");
+                _commandIndexMap.Add((listIndex, -1));
             }
         }
 
@@ -1433,6 +1928,7 @@ public static class WinEventEditor
         if (selectedIndex < 0 || selectedIndex >= _commandIndexMap.Count) return;
 
         var (listIndex, commandIndex) = _commandIndexMap[selectedIndex];
+        if (commandIndex < 0) return;
         OpenCommandPicker(listIndex, commandIndex, isNew: false);
     }
 
@@ -1445,6 +1941,7 @@ public static class WinEventEditor
         if (selectedIndex < 0 || selectedIndex >= _commandIndexMap.Count) return;
 
         var (listIndex, commandIndex) = _commandIndexMap[selectedIndex];
+        if (commandIndex < 0) return;
         if (!TryGetCommandAt(listIndex, commandIndex, out var cmd) || cmd.Index < 0)
             return;
 
@@ -1759,6 +2256,36 @@ public static class WinEventEditor
             cmd.Data6 = elseList;
         }
 
+        // If this is ShowChoices, auto-create/assign 4 choice sub-groups.
+        if (TryGetEventCommandIndex(pickedIndex, out var idx2) && idx2 == EventCommand.ShowChoices)
+        {
+            int nextListIndex = Math.Max(0, listCount);
+            int required = nextListIndex + 4;
+
+            if (lists.Length < required)
+                Array.Resize(ref lists, required);
+
+            listCount = Math.Max(listCount, required);
+
+            for (int k = 0; k < 4; k++)
+            {
+                int listId = nextListIndex + k;
+                if (lists[listId].Commands == null || lists[listId].Commands.Length == 0)
+                {
+                    lists[listId].ParentList = li;
+                    lists[listId].CommandCount = 1;
+                    lists[listId].Commands = new Core.Globals.Type.EventCommand[1];
+                    lists[listId].Commands[0].Index = -1;
+                }
+            }
+
+            ref var cmd = ref cmds[ci];
+            cmd.Data1 = nextListIndex;
+            cmd.Data2 = nextListIndex + 1;
+            cmd.Data3 = nextListIndex + 2;
+            cmd.Data4 = nextListIndex + 3;
+        }
+
         list0.Commands = cmds;
         list0.CommandCount = cmds.Length;
         lists[li] = list0;
@@ -1901,6 +2428,10 @@ public static class WinEventEditor
 
         var ev = Client.Event.Instance;
         int pageCount = Math.Max(1, ev.PageCount);
+
+        // UI only supports 30 pages (buttons 1..30).
+        if (pageCount >= MaxPageButtons)
+            return;
 
         var pages = ev.Pages ?? Array.Empty<Core.Globals.Type.EventPage>();
         Array.Resize(ref pages, pageCount + 1);
@@ -2174,5 +2705,6 @@ public static class WinEventEditor
 
         SetCurrentPage(page);
         UpdatePageLabel();
+        RefreshMoveRouteControls();
     }
 }

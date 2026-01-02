@@ -3920,8 +3920,8 @@ public class Crystalshire
         if (WindowManager.TryGetControl("winEventEditor", "btnDeletePage", out var btnDel))
             btnDel.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnDeletePage;
 
-        // Page buttons (1..28)
-        for (int i = 1; i <= 28; i++)
+        // Page buttons (1..30)
+        for (int i = 1; i <= 30; i++)
         {
             int pageIndex = i - 1;
             var name = $"btnPage{i}";
@@ -3979,6 +3979,32 @@ public class Crystalshire
         WirePageSetting("chkWalkThrough");
         WirePageSetting("chkShowName");
 
+        // Move route editor controls
+        if (WindowManager.TryGetControl("winEventEditor", "btnRouteUp", out var btnRouteUp))
+            btnRouteUp.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnMoveRouteAddUp;
+        if (WindowManager.TryGetControl("winEventEditor", "btnRouteDown", out var btnRouteDown))
+            btnRouteDown.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnMoveRouteAddDown;
+        if (WindowManager.TryGetControl("winEventEditor", "btnRouteLeft", out var btnRouteLeft))
+            btnRouteLeft.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnMoveRouteAddLeft;
+        if (WindowManager.TryGetControl("winEventEditor", "btnRouteRight", out var btnRouteRight))
+            btnRouteRight.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnMoveRouteAddRight;
+        if (WindowManager.TryGetControl("winEventEditor", "btnRouteRemove", out var btnRouteRemove))
+            btnRouteRemove.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnMoveRouteRemove;
+        if (WindowManager.TryGetControl("winEventEditor", "btnRouteClear", out var btnRouteClear))
+            btnRouteClear.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnMoveRouteClear;
+
+        if (WindowManager.TryGetControl("winEventEditor", "lstMoveRoute", out var routeListCtrl) && routeListCtrl is ListBox routeList)
+        {
+            routeList.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnMoveRouteListMouseDown;
+            routeList.CallBack[(int)ControlState.MouseScroll] = WinEventEditor.OnMoveRouteListMouseWheel;
+        }
+
+        if (WindowManager.TryGetControl("winEventEditor", "sldMoveRoute", out var routeSldCtrl) && routeSldCtrl is ScrollBar routeSb)
+        {
+            routeSb.CallBack[(int)ControlState.MouseMove] = WinEventEditor.OnMoveRouteScrollBarMove;
+            routeSb.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnMoveRouteScrollBarMove;
+        }
+
         // Graphic coordinate textboxes
         void WireGraphicCoord(string name)
         {
@@ -4018,6 +4044,31 @@ public class Crystalshire
         {
             sb.CallBack[(int)ControlState.MouseMove] = WinEventEditor.OnCommandsScrollBarMove;
             sb.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnCommandsScrollBarMove;
+        }
+
+        // Variables/Switches rename panel
+        if (WindowManager.TryGetControl("winEventEditor", "cmbVarSwitchType", out var vsTypeCtrl))
+        {
+            vsTypeCtrl.CallBack[(int)ControlState.MouseMove] = WinEventEditor.OnVarSwitchTypeChanged;
+            vsTypeCtrl.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnVarSwitchTypeChanged;
+            vsTypeCtrl.CallBack[(int)ControlState.MouseUp] = WinEventEditor.OnVarSwitchTypeChanged;
+        }
+
+        if (WindowManager.TryGetControl("winEventEditor", "lstVarSwitchNames", out var vsListCtrl) && vsListCtrl is ListBox vsList)
+        {
+            vsList.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnVarSwitchListMouseDown;
+            vsList.CallBack[(int)ControlState.MouseScroll] = WinEventEditor.OnVarSwitchListMouseWheel;
+        }
+
+        if (WindowManager.TryGetControl("winEventEditor", "sldVarSwitchNames", out var vsSldCtrl) && vsSldCtrl is ScrollBar vsSb)
+        {
+            vsSb.CallBack[(int)ControlState.MouseMove] = WinEventEditor.OnVarSwitchScrollBarMove;
+            vsSb.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnVarSwitchScrollBarMove;
+        }
+
+        if (WindowManager.TryGetControl("winEventEditor", "btnRenameVarSwitch", out var vsRenameBtn))
+        {
+            vsRenameBtn.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnRenameVarSwitch;
         }
 
         // Command data fields

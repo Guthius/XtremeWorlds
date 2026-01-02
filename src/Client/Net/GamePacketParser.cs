@@ -2332,7 +2332,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         var buffer = new PacketReader(data);
 
         id = buffer.ReadInt32();
-        // Server sends event move coordinates in tile units; client stores/draws them in world pixels.
+        // Server sends start-of-step coordinates in tile units; client stores/draws them in world pixels.
         x = buffer.ReadInt32() * Constants.TileSize;
         y = buffer.ReadInt32() * Constants.TileSize;
         dir = buffer.ReadInt32();
@@ -2352,6 +2352,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             instance.Moving = 1;
             instance.ShowDir = showDir;
             instance.MovementSpeed = movementSpeed;
+
+            // Begin a 1-tile (32px) client-side step like NPCs.
+            Client.Event.StartStep(id, x, y, (byte)dir);
         }
     }
 
@@ -2372,6 +2375,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             instance.Dir = dir;
             instance.ShowDir = dir;
             instance.Moving = 0;
+
+            // Ensure we finish at the exact destination for the last step.
+            Client.Event.SnapToDest(i);
         }
     }
 

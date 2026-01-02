@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window Name="winEventEditor" Caption="Event Editor"
-		Size="980,610"
+		Size="980,650"
         Icon="344" IconOffset="3,5"
         Design="WindowNormal"
         StartPosition="CenterScreen"
@@ -36,6 +36,8 @@
 	<Button Name="btnPage26" Text="26" Position="762,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
 	<Button Name="btnPage27" Text="27" Position="792,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
 	<Button Name="btnPage28" Text="28" Position="822,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage29" Text="29" Position="852,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnPage30" Text="30" Position="882,26" Size="28,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>	
 
 	<GroupBox Name="grpDetails" Position="8,54" Size="964,120" Caption="Details">
 		<Label Name="lblPageCaption" Text="Page" Position="12,22" Size="50,18"/>
@@ -71,33 +73,52 @@
 
 	</GroupBox>
 
-	<GroupBox Name="grpPageSettings" Position="8,180" Size="964,140" Caption="Page Settings">
+	<GroupBox Name="grpPageSettings" Position="8,180" Size="964,180" Caption="Page Settings">
 		<Label Name="lblTrigger" Text="Trigger" Position="12,28" Size="80,18"/>
 		<ComboBox Name="cmbTrigger" Position="100,26" Size="160,20"/>
 		<Label Name="lblPositioning" Text="Layer" Position="280,28" Size="80,18"/>
 		<ComboBox Name="cmbPositioning" Position="360,26" Size="160,20"/>
-		<Label Name="lblMoveType" Text="Move Type" Position="12,58" Size="80,18"/>
-		<ComboBox Name="cmbMoveType" Position="100,56" Size="160,20"/>
+		<Label Name="lblMoveType" Text="Move Type" Position="12,58" Size="98,18"/>
+		<ComboBox Name="cmbMoveType" Position="112,56" Size="148,20"/>
 		<Label Name="lblMoveSpeed" Text="Move Speed" Position="280,58" Size="80,18"/>
 		<ComboBox Name="cmbMoveSpeed" Position="360,56" Size="160,20"/>
-		<Label Name="lblMoveFreq" Text="Move Freq" Position="540,58" Size="80,18"/>
-		<ComboBox Name="cmbMoveFreq" Position="620,56" Size="160,20"/>
-		<CheckBox Name="chkWalkAnim" Text="Idle Anim" Position="12,94" Size="100,18" Design="CheckboxNormal"/>
-		<CheckBox Name="chkDirFix" Text="Dir Fix" Position="124,94" Size="90,18" Design="CheckboxNormal"/>
-		<CheckBox Name="chkWalkThrough" Text="Walk Through" Position="226,94" Size="120,18" Design="CheckboxNormal"/>
-		<CheckBox Name="chkShowName" Text="Show Name" Position="360,94" Size="120,18" Design="CheckboxNormal"/>
+		<Label Name="lblMoveFreq" Text="Move Freq" Position="12,84" Size="98,18"/>
+		<ComboBox Name="cmbMoveFreq" Position="112,82" Size="148,20"/>
+		<CheckBox Name="chkWalkAnim" Text="Idle Anim" Position="12,114" Size="100,18" Design="CheckboxNormal"/>
+		<CheckBox Name="chkDirFix" Text="Dir Fix" Position="124,114" Size="90,18" Design="CheckboxNormal"/>
+		<CheckBox Name="chkWalkThrough" Text="Walk Through" Position="226,114" Size="120,18" Design="CheckboxNormal"/>
+		<CheckBox Name="chkShowName" Text="Show Name" Position="360,114" Size="120,18" Design="CheckboxNormal"/>
+
+		<!-- Move Route (when Move Type = Route) -->
+		<Label Name="lblMoveRoute" Text="Route" Position="540,28" Size="60,18"/>
+		<Button Name="btnRouteRemove" Text="Del" Position="604,24" Size="40,22" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+		<Button Name="btnRouteClear" Text="Clr" Position="650,24" Size="40,22" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+		<ListBox Name="lstMoveRoute" Position="540,48" Size="200,74"/>
+		<ScrollBar Name="sldMoveRoute" Position="744,48" Size="16,74" Min="0" Max="0" Vertical="true"/>
+		<Button Name="btnRouteUp" Text="Up" Position="540,126" Size="48,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+		<Button Name="btnRouteDown" Text="Down" Position="590,126" Size="48,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+		<Button Name="btnRouteLeft" Text="Left" Position="640,126" Size="48,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+		<Button Name="btnRouteRight" Text="Right" Position="690,126" Size="48,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
 	</GroupBox>
 
-	<GroupBox Name="grpCommands" Position="8,326" Size="964,244" Caption="Commands">
+	<GroupBox Name="grpCommands" Position="8,366" Size="964,244" Caption="Commands">
 		<Button Name="btnAddCommand" Text="Add" Position="8,28" Size="60,22" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 		<Button Name="btnDeleteCommand" Text="Delete" Position="74,28" Size="70,22" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
 		<Button Name="btnEditCommand" Text="Edit" Position="150,28" Size="60,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
-		<ListBox Name="lstCommands" Position="8,56" Size="932,176"/>
-		<ScrollBar Name="sldCommands" Position="940,56" Size="16,176" Min="0" Max="0" Vertical="true"/>
+		<ListBox Name="lstCommands" Position="8,56" Size="616,176"/>
+		<ScrollBar Name="sldCommands" Position="624,56" Size="16,176" Min="0" Max="0" Vertical="true"/>
+
+		<!-- Variables / Switches -->
+		<Label Name="lblVarSwitch" Text="Type" Position="648,28" Size="60,18"/>
+		<ComboBox Name="cmbVarSwitchType" Position="708,26" Size="240,20"/>
+		<ListBox Name="lstVarSwitchNames" Position="648,56" Size="284,140"/>
+		<ScrollBar Name="sldVarSwitchNames" Position="932,56" Size="16,140" Min="0" Max="0" Vertical="true"/>
+		<Label Name="lblVarSwitchIndex" Text="Index: -" Position="648,200" Size="100,18"/>
+		<Button Name="btnRenameVarSwitch" Text="Rename" Position="708,198" Size="240,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
 	</GroupBox>
 
-	<Button Name="btnOk" Text="OK" Position="405,578" Size="80,24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-	<Button Name="btnCancel" Text="Cancel" Position="495,578" Size="80,24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+	<Button Name="btnOk" Text="OK" Position="405,618" Size="80,24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+	<Button Name="btnCancel" Text="Cancel" Position="495,618" Size="80,24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
 
 	<Button Name="btnClose" Position="-19,5" Size="16,16" Image="8" ImageHover="9" ImageMouseDown="10"/>
 </Window>

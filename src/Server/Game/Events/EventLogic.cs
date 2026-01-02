@@ -318,6 +318,15 @@ namespace Server
                             ref var instance = ref Data.TempPlayer[i].EventMap.EventPages[x]; // Use x, as this is the correct index into *this player's* event list
                             EventPage newPage = Server.Map.Instance[map].Event[id].Pages[z];
 
+                            // Respawn should start from the event's spawn location, not wherever it last moved.
+                            instance.X = Server.Map.Instance[map].Event[id].X;
+                            instance.Y = Server.Map.Instance[map].Event[id].Y;
+                            instance.MoveRouteStep = 0;
+                            instance.MoveTimer = General.GetTimeMs();
+
+                            // If the event despawned mid-step, clear any active step state.
+                            Event.CancelMove(map, x, i, false);
+
                             instance.Dir = newPage.GraphicType == 1
                                 ? (newPage.GraphicY % 4) switch
                                 {
@@ -386,6 +395,15 @@ namespace Server
                             {
                                 Event.TempEventMap[map].Event[id].Active = z;
                                 Event.TempEventMap[map].Event[id].Position = newPage.Position;
+
+                                // Global events also respawn at their spawn location.
+                                Event.TempEventMap[map].Event[id].X = Server.Map.Instance[map].Event[id].X;
+                                Event.TempEventMap[map].Event[id].Y = Server.Map.Instance[map].Event[id].Y;
+                                Event.TempEventMap[map].Event[id].Dir = instance.Dir;
+                                Event.TempEventMap[map].Event[id].MoveRouteStep = 0;
+                                Event.TempEventMap[map].Event[id].MoveTimer = General.GetTimeMs();
+
+                                Event.CancelMove(map, id, 0, true);
                             }
 
                             // Send the spawn event packet.
@@ -433,6 +451,9 @@ namespace Server
                 {
                     if (Event.TempEventMap[i].Event[x].Active <= 0) continue;
 
+                    // Don't queue new movement while the event is mid-step.
+                    if (Event.IsMoving(i, x, 0, true)) continue;
+
                     // Check if it's time to process movement.
                     if (Event.TempEventMap[i].Event[x].MoveTimer > General.GetTimeMs()) continue;
 
@@ -448,6 +469,12 @@ namespace Server
                         {
                             // Direction 0-3 (Up/Down/Left/Right). Adjust max to 3 because NextInt is inclusive.
                             int rand = General.GetRandom.NextInt(0, 3); // 0-3 for direction.
+
+                            // Prefer changing direction each tile.
+                            if (rand == globalEvent.Dir)
+                            {
+                                rand = (rand + General.GetRandom.NextInt(1, 3)) % 4;
+                            }
                             if (Event.CanMove(0, i, globalEvent.X, globalEvent.Y, x, globalEvent.WalkThrough, (byte) rand, true))
                             {
                                 int actualMoveSpeed = globalEvent.MoveSpeed switch
@@ -913,6 +940,9 @@ namespace Server
 
                     // Only process visible, non-global events.
                     if (Server.Map.Instance[map].Event[localEvent.EventId].Globals != 0 || !localEvent.Visible) continue;
+
+                    // Don't queue new movement while the event is mid-step.
+                    if (Event.IsMoving(map, x, i, false)) continue;
 
 
                     // Check move timer.

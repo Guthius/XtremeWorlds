@@ -598,7 +598,8 @@ public enum DialogueType
     Information,
     CopyMap,
     PasteMap,
-    Disconnect
+    Disconnect,
+    RenameVarSwitch
 }
 
 /// <summary>

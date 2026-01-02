@@ -61,6 +61,45 @@ namespace Client
         public static string[] Switches = new string[Core.Globals.Variables.MaxSwitches];
         public static string[] Variables = new string[Core.Globals.Variables.MaxVariables];
 
+        // Client-side event movement bookkeeping (NPC-style stepped movement)
+        private static readonly int[] RemainingPixels = new int[Core.Globals.Variables.MaxEvents];
+        private static readonly int[] DestX = new int[Core.Globals.Variables.MaxEvents];
+        private static readonly int[] DestY = new int[Core.Globals.Variables.MaxEvents];
+
+        public static void StartStep(int id, int startX, int startY, byte dir)
+        {
+            if (id < 0 || id >= Core.Globals.Variables.MaxEvents) return;
+            RemainingPixels[id] = Constants.TileSize;
+            var (dx, dy) = GetDirectionDelta(dir, Constants.TileSize);
+            DestX[id] = startX + dx;
+            DestY[id] = startY + dy;
+        }
+
+        public static void SnapToDest(int id)
+        {
+            if (id < 0) return;
+            if (Data.MapEvents == null) return;
+            if (id >= Data.MapEvents.Length) return;
+            if (RemainingPixels[id] > 0)
+            {
+                Data.MapEvents[id].X = DestX[id];
+                Data.MapEvents[id].Y = DestY[id];
+                RemainingPixels[id] = 0;
+            }
+        }
+
+        private static (int dx, int dy) GetDirectionDelta(byte dir, int amount)
+        {
+            return (Direction)dir switch
+            {
+                Direction.Up => (0, -amount),
+                Direction.Down => (0, amount),
+                Direction.Left => (-amount, 0),
+                Direction.Right => (amount, 0),
+                _ => (0, 0)
+            };
+        }
+
         public static bool EventCopy;
         public static bool EventPaste;
         public static Type.EventList[]? EventList;
@@ -447,43 +486,44 @@ namespace Client
 
         public static void OnMove(int id)
         {
-            // Guard: ensure event system and target index are valid
             if (id < 0) return;
-
             if (Data.MapEvents == null) return;
-            if (id >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount) return;
             if (id >= Data.MapEvents.Length) return;
+            if (id >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount) return;
 
-            // Some events may be uninitialized structs (default). We can skip if MovementSpeed == 0 and name null/empty and not moving.
-            if (Data.MapEvents[id].Moving != 1) return;
+            if (GameState.MyEditorType == EditorType.Map) return;
 
-            if (GameState.MyEditorType == EditorType.Map)
-                return;
-                
-            // Only process if actually moving toward next tile
-            if (Data.MapEvents[id].Moving > 0)
+            // Only process active walking state
+            if (Data.MapEvents[id].Moving != 1)
             {
-                int dir = Data.MapEvents[id].Dir;
-                // Adjust position when heading Right or Down first (mimicking original intent)
-                if (dir == (int)Direction.Right || dir == (int)Direction.Down ||
-                    dir == (int)Direction.Left || dir == (int)Direction.Up)
-                {
-                    switch (dir)
-                    {
-                        case (int)Direction.Up:
-                            Data.MapEvents[id].Y -= 1;
-                            break;
-                        case (int)Direction.Down:
-                            Data.MapEvents[id].Y += 1;
-                            break;
-                        case (int)Direction.Left:
-                            Data.MapEvents[id].X -= 1;
-                            break;
-                        case (int)Direction.Right:
-                            Data.MapEvents[id].X += 1;
-                            break;
-                    }
-                }
+                RemainingPixels[id] = 0;
+                return;
+            }
+
+            // Initialize step bookkeeping if needed
+            if (RemainingPixels[id] <= 0)
+            {
+                RemainingPixels[id] = Constants.TileSize;
+                var (fullDx, fullDy) = GetDirectionDelta((byte)Data.MapEvents[id].Dir, Constants.TileSize);
+                DestX[id] = Data.MapEvents[id].X + fullDx;
+                DestY[id] = Data.MapEvents[id].Y + fullDy;
+            }
+
+            // Move 1px per walk tick (matches NPC/event server tick cadence)
+            var (dx, dy) = GetDirectionDelta((byte)Data.MapEvents[id].Dir, 1);
+            Data.MapEvents[id].X += dx;
+            Data.MapEvents[id].Y += dy;
+            RemainingPixels[id]--;
+
+            if (RemainingPixels[id] <= 0)
+            {
+                // Clamp to planned destination to avoid drift
+                Data.MapEvents[id].X = DestX[id];
+                Data.MapEvents[id].Y = DestY[id];
+                RemainingPixels[id] = 0;
+
+                // Defensive: stop locally in case SEventDir is delayed/dropped.
+                Data.MapEvents[id].Moving = 0;
             }
         }
 
