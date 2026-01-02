@@ -38,6 +38,21 @@ namespace Client
         private static int _lastMouseAttackX = int.MinValue; // cache last facing update
         private static int _lastMouseAttackY = int.MinValue;
 
+        private static void TryPlayCurrentMapMusic()
+        {
+            if (!GameState.InGame)
+                return;
+
+            if (GameState.MyIndex < 0 || GameState.MyIndex >= Player.Instance.Count)
+                return;
+
+            var mapId = GetPlayerMap(GameState.MyIndex);
+            if (mapId < 0 || mapId >= Client.Map.Instance.Count)
+                return;
+
+            Audio.PlayMusic(Client.Map.Instance[mapId].Music);
+        }
+
         public static void Game()
         {
             _tick = General.GetTickCount();
@@ -54,7 +69,8 @@ namespace Client
                 }
 
                 if (_tmr25 < _tick)
-                {Audio.PlayMusic(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Music);
+                {
+                    TryPlayCurrentMapMusic();
                     UpdateEditors();
                     _tmr25 = _tick + 25;
                 }

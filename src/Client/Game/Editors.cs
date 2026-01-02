@@ -15,6 +15,22 @@ namespace Client
     {
         private static float tilesetOffsetX = 0;
         private static float tilesetOffsetY = 0;
+
+        public static int? PromptIndex(object? owner, string title, string prompt, int min, int max, int defaultValue)
+        {
+            // The client UI is event-driven and does not currently expose a synchronous modal input API.
+            // Keep this as a simple, safe fallback so editor features compile and remain usable.
+            if (min > max)
+            {
+                (min, max) = (max, min);
+            }
+
+            var value = defaultValue;
+            if (value < min) value = min;
+            if (value > max) value = max;
+            return value;
+        }
+
         public static void MapEditorChooseTile(float X, float Y)
         {
             if (GameClient.IsMouseButtonDown(MouseButton.Left)) // Primary (Left) Mouse Button
