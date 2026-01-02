@@ -580,6 +580,12 @@ public static class WinEventEditor
                     return $"{npcName} (npc {npcNum})";
                 };
                 break;
+
+            case EventCommand.SetFog:
+                pickLabel = "Fog";
+                max = Math.Max(0, Client.GameState.NumFogs + 1); // 0=None, 1..NumFogs
+                nameFor = i => i == 0 ? "None" : $"Fog {i}";
+                break;
         }
 
         if (string.IsNullOrWhiteSpace(pickLabel) || max <= 0 || nameFor is null)
