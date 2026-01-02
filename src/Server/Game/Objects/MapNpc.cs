@@ -231,6 +231,52 @@ namespace Server
                 return false;
             }
 
+            static bool IsEventBlockingTile(int mapId, int tileX, int tileY)
+            {
+                // Global events (authoritative server-side position)
+                if (Event.TempEventMap != null && mapId >= 0 && mapId < Event.TempEventMap.Length)
+                {
+                    var globalEvents = Event.TempEventMap[mapId];
+                    if (globalEvents.Event != null && globalEvents.EventCount > 0)
+                    {
+                        for (var i = 0; i < globalEvents.EventCount && i < globalEvents.Event.Length; i++)
+                        {
+                            var ge = globalEvents.Event[i];
+                            if (ge.WalkThrough != 0)
+                                continue;
+
+                            // Global events use pixel coordinates; movement/collision is tile-based.
+                            var gx = (int)Math.Floor((double)ge.X / Constants.TileSize);
+                            var gy = (int)Math.Floor((double)ge.Y / Constants.TileSize);
+                            if (gx == tileX && gy == tileY)
+                                return true;
+                        }
+                    }
+                }
+
+                // Non-global map events: fall back to the map-defined position and first page WalkThrough.
+                if (Server.Map.Instance[mapId].EventCount > 0 && Server.Map.Instance[mapId].Event != null)
+                {
+                    for (var i = 0; i < Server.Map.Instance[mapId].EventCount && i < Server.Map.Instance[mapId].Event.Length; i++)
+                    {
+                        var ev = Server.Map.Instance[mapId].Event[i];
+                        if (ev.Globals == 1)
+                            continue;
+                        if (ev.PageCount <= 0 || ev.Pages == null)
+                            continue;
+
+                        if (ev.Pages[0].WalkThrough != 0)
+                            continue;
+
+                        // Event.X/Y are tile coordinates.
+                        if (ev.X == tileX && ev.Y == tileY)
+                            return true;
+                    }
+                }
+
+                return false;
+            }
+
             var x = Instance[map, mapNpcNum].X;
             var y = Instance[map, mapNpcNum].Y;
             
@@ -252,6 +298,10 @@ namespace Server
 
             // Check map bounds
             if (nextTileX < 0 || nextTileY < 0 || nextTileX >= Server.Map.Instance[map].MaxX || nextTileY >= Server.Map.Instance[map].MaxY)
+                return false;
+
+            // Block by events with WalkThrough disabled
+            if (IsEventBlockingTile(map, nextTileX, nextTileY))
                 return false;
 
             // Check tile walkability

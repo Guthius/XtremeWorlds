@@ -14,7 +14,7 @@ namespace Server
 {
     public class Map : MapBase, IAsyncData
     {
-        private static void EnsureMapListSize(int size)
+        private static void EnsureSize(int size)
         {
             if (size <= 0)
             {
@@ -71,7 +71,7 @@ namespace Server
         public static System.Threading.Tasks.Task OnLoadAllAsync()
         {
             // Parallel map loading assigns by index; ensure indices exist up-front.
-            EnsureMapListSize(Core.Globals.Variables.MaxMaps);
+            EnsureSize(Core.Globals.Variables.MaxMaps);
             return Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxMaps), OnLoadAsync);
         }
 

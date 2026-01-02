@@ -17,22 +17,52 @@ namespace Server;
 
 public class Moral : MoralBase, IAsyncData
 {
+    private static void EnsureSize(int size)
+    {
+        if (size <= 0)
+        {
+            return;
+        }
+
+        if (Moral.Instance.Count >= size)
+        {
+            return;
+        }
+
+        lock (Moral.Instance)
+        {
+            while (Moral.Instance.Count < size)
+            {
+                Moral.Instance.Add(new Moral());
+            }
+        }
+    }
+
     public static async ValueTask OnLoadAsync(int index, CancellationToken cancellationToken)
     {
+        EnsureSize(Core.Globals.Variables.MaxMorals);
+
         var data = await Database.SelectRowAsync(index, "moral", "data");
         if (data is null)
         {
-            OnClear(index);
+            lock (Moral.Instance)
+            {
+                Moral.Instance[index] = new Moral();
+            }
             return;
         }
 
         var moralData = JObject.FromObject(data).ToObject<Moral>();
 
-        Moral.Instance.Add(moralData ?? new Moral());
+        lock (Moral.Instance)
+        {
+            Moral.Instance[index] = moralData ?? new Moral();
+        }
     }
 
     public static async System.Threading.Tasks.Task OnLoadAllAsync()
     {
+        EnsureSize(Core.Globals.Variables.MaxMorals);
         await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxMorals), OnLoadAsync);
     }
 

@@ -627,7 +627,23 @@ public class Player : PlayerBase
     {
         try
         {
-            if (Moral.Instance[Server.Map.Instance[map].Moral].PlayerBlock)
+            if (map < 0 || map >= Server.Map.Instance.Count)
+                return true;
+
+            if (x < 0 || y < 0 || x > Server.Map.Instance[map].MaxX || y > Server.Map.Instance[map].MaxY)
+                return true;
+
+            // If moral data isn't loaded or is invalid, default to blocking to avoid overlap/collision bypass.
+            var index = Server.Map.Instance[map].Moral;
+            var playerBlock = true;
+            var npcBlock = true;
+            if (index >= 0 && index < Moral.Instance.Count)
+            {
+                playerBlock = Moral.Instance[index].PlayerBlock;
+                npcBlock = Moral.Instance[index].NpcBlock;
+            }
+
+            if (playerBlock)
             {
                 foreach (var otherPlayerId in PlayerService.Instance.PlayerIds)
                 {
@@ -640,13 +656,13 @@ public class Player : PlayerBase
                 }
             }
 
-            if (Moral.Instance[Server.Map.Instance[map].Moral].NpcBlock)
+            if (npcBlock)
             {
                 for (var mapNpcNum = 0; mapNpcNum < Core.Globals.Variables.MaxMapNpcs; mapNpcNum++)
                 {
                     if (MapNpc.Instance[map, mapNpcNum].Num >= 0 &&
-                        MapNpc.Instance[map, mapNpcNum].X == x &&
-                        MapNpc.Instance[map, mapNpcNum].Y == y)
+                        (int)Math.Floor((double)MapNpc.Instance[map, mapNpcNum].X / Constants.TileSize) == x &&
+                        (int)Math.Floor((double)MapNpc.Instance[map, mapNpcNum].Y / Constants.TileSize) == y)
                     {
                         return true;
                     }
@@ -654,34 +670,42 @@ public class Player : PlayerBase
             }
 
             // Block by events with WalkThrough disabled.
-            var tempPlayer = Data.TempPlayer[playerId];
-            var eventMap = tempPlayer.EventMap;
-            if (eventMap.CurrentEvents > 0 && eventMap.EventPages != null && Server.Map.Instance[map].EventCount > 0)
+            // Global events (authoritative server-side position)
+            if (Event.TempEventMap != null && map >= 0 && map < Event.TempEventMap.Length)
             {
-                // EventPages is 1-based.
-                for (var slot = 1; slot <= eventMap.CurrentEvents; slot++)
+                var globalEvents = Event.TempEventMap[map];
+                if (globalEvents.Event != null && globalEvents.EventCount > 0)
                 {
-                    if (slot >= eventMap.EventPages.Length)
-                        break;
+                    for (var i = 0; i < globalEvents.EventCount && i < globalEvents.Event.Length; i++)
+                    {
+                        var ge = globalEvents.Event[i];
+                        if (ge.WalkThrough != 0)
+                            continue;
 
+                        // Global events use pixel coordinates; movement/collision is tile-based.
+                        var gx = (int)Math.Floor((double)ge.X / Constants.TileSize);
+                        var gy = (int)Math.Floor((double)ge.Y / Constants.TileSize);
+                        if (gx == x && gy == y)
+                            return true;
+                    }
+                }
+            }
+
+            // Player-scoped event pages (local/non-global events, and also globals as the client sees them)
+            var eventMap = Data.TempPlayer[playerId].EventMap;
+            if (eventMap.CurrentEvents > 0 && eventMap.EventPages != null)
+            {
+                // EventPages is 1-based in this code-path.
+                for (var slot = 1; slot <= eventMap.CurrentEvents && slot < eventMap.EventPages.Length; slot++)
+                {
                     var page = eventMap.EventPages[slot];
-                    if (page.EventId < 0 || !page.Visible)
+                    if (!page.Visible)
+                        continue;
+                    if (page.WalkThrough != 0)
                         continue;
 
-                    var mapEventId = page.EventId;
-                    if (mapEventId < 0 || mapEventId >= Server.Map.Instance[map].EventCount)
-                        continue;
-
-                    var ev = Server.Map.Instance[map].Event[mapEventId];
-                    if (page.PageId < 0 || page.PageId >= ev.PageCount)
-                        continue;
-
-                    if (ev.Pages[page.PageId].WalkThrough != 0)
-                        continue;
-
-                    var eventTileX = ev.Globals == 1 ? ev.X : (page.X / Constants.TileSize);
-                    var eventTileY = ev.Globals == 1 ? ev.Y : (page.Y / Constants.TileSize);
-                    if (eventTileX == x && eventTileY == y)
+                    // MapEvent.X/Y are pixel coordinates (multiples of TileSize).
+                    if ((page.X / Constants.TileSize) == x && (page.Y / Constants.TileSize) == y)
                         return true;
                 }
             }
@@ -695,8 +719,9 @@ public class Player : PlayerBase
             return Server.Map.Instance[map].Tile[x, y].Type == TileType.Blocked ||
                    Server.Map.Instance[map].Tile[x, y].Type2 == TileType.Blocked;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            General.Logger.LogError(ex, "Error in IsTileBlocked for player {PlayerId} on map {Map} at x={X}, y={Y}", playerId, map, x, y);
             return false;
         }
      }
