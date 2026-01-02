@@ -7,8 +7,8 @@
         Visible="false">
 
 	<GroupBox Name="grpCommands" Position="8,24" Size="404,416" Caption="Commands">
-		<ListBox Name="lstEventCommands" Position="8,28" Size="372,392"/>
-		<ScrollBar Name="sldEventCommands" Position="380,28" Size="16,392" Min="0" Max="0" Vertical="true"/>
+		<ListBox Name="lstEventCommands" Position="8,24" Size="372,392"/>
+		<ScrollBar Name="sldEventCommands" Position="380,24" Size="16,392" Min="0" Max="0" Vertical="true"/>
 	</GroupBox>
 
 	<Button Name="btnOk" Text="OK" Position="126, 449" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>

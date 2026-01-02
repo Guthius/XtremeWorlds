@@ -8,7 +8,7 @@
 
 	<!-- Moderation -->
 	<GroupBox Name="grpModeration" Position="4,24" Size="624,192" Caption="Moderation">
-		<Label Name="lblPlayerName" Text="Player Name:" Position="12,40" Size="110,14"/>
+		<Label Name="lblPlayerName" Text="Player Name" Position="12,40" Size="110,14"/>
 		<TextBox Name="txtName" Position="125,38" Size="300,18"/>
 
 		<Label Name="lblAccessLevel" Text="Access" Position="12,66" Size="110,14"/>
@@ -16,12 +16,12 @@
 		<Button Name="btnSetAccess" Text="Set" Position="330,64" Size="100,22"
 				Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 
-		<Label Name="lblMap" Text="Map Number:" Position="12,92" Size="110,14"/>
+		<Label Name="lblMap" Text="Map Number" Position="12,92" Size="110,14"/>
 		<TextBox Name="txtAdminMap" Position="125,90" Size="100,18"/>
 		<Button Name="btnWarpTo" Text="Warp" Position="230,90" Size="100,22"
 				Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 
-		<Label Name="lblSprite" Text="Sprite:" Position="12,118" Size="110,14"/>
+		<Label Name="lblSprite" Text="Sprite" Position="12,118" Size="110,14"/>
 		<TextBox Name="txtSprite" Position="125,116" Size="100,18"/>
 		<Button Name="btnSetSprite" Text="Set" Position="230,116" Size="100,22"
 				Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
