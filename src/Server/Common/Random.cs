@@ -1,8 +1,8 @@
 namespace Server.Common;
 
-public sealed class ServerRandomUtility
+public sealed class Random
 {
-    private readonly Random _random = new();
+    private readonly System.Random _random = new();
     private readonly Lock _lock = new();
 
     public double NextDouble(double minValue, double maxValue)
