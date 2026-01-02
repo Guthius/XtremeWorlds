@@ -11,6 +11,7 @@
 
 		<Label Name="lblCmdText1" Text="Text1" Position="12,56" Size="50,18"/>
 		<TextBox Name="txtCmdText1" Position="64,54" Size="326,22" Design="TextWhite"/>
+		<ComboBox Name="cmbCmdText1" Position="64,54" Size="326,22" Visible="false"/>
 		<Label Name="lblCmdText2" Text="Text2" Position="12,86" Size="50,18"/>
 		<TextBox Name="txtCmdText2" Position="64,84" Size="326,22" Design="TextWhite"/>
 		<Label Name="lblCmdText3" Text="Text3" Position="12,116" Size="50,18"/>
@@ -30,8 +31,8 @@
 		<Label Name="lblCmdData6" Text="D6" Position="212,184" Size="20,18"/>
 		<TextBox Name="txtCmdData6" Position="232,182" Size="60,22" Design="TextWhite"/>
 
-		<Label Name="lblCmdPick1" Text="Pick" Position="12,214" Size="50,18" Visible="false"/>
-		<ComboBox Name="cmbCmdPick1" Position="64,212" Size="326,22" Visible="false"/>
+		<Label Name="lblCmdPick1" Text="Pick" Position="12,214" Size="80,18" Visible="false"/>
+		<ComboBox Name="cmbCmdPick1" Position="96,212" Size="294,22" Visible="false"/>
 	</GroupBox>
 
 	<Button Name="btnOk" Text="OK" Position="126, 300" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>

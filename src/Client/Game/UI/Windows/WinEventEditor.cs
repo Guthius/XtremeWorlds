@@ -459,6 +459,24 @@ public static class WinEventEditor
         if (WindowManager.TryGetControl("winEventCommandData", "btnOk", out var btnOk) && btnOk is not null)
             btnOk.CallBack[(int)ControlState.MouseDown] = OnCommandDataOk;
 
+        if (WindowManager.TryGetControl("winEventCommandData", "cmbCmdText1", out var text1PickCtrl) && text1PickCtrl is ComboBox cmbText1Pick)
+        {
+            int last = cmbText1Pick.Value;
+            cmbText1Pick.CallBack[(int)ControlState.MouseMove] = () =>
+            {
+                if (_isLoading)
+                    return;
+
+                if (cmbText1Pick.Value == last)
+                    return;
+
+                last = cmbText1Pick.Value;
+
+                if (WindowManager.TryGetControl("winEventCommandData", "txtCmdText1", out var d1) && d1 is TextBox tb)
+                    tb.Text = GetComboSelectedName(cmbText1Pick);
+            };
+        }
+
         if (WindowManager.TryGetControl("winEventCommandData", "cmbCmdPick1", out var pickCtrl) && pickCtrl is ComboBox cmbPick)
         {
             int last = cmbPick.Value;
@@ -493,6 +511,9 @@ public static class WinEventEditor
         try { index = (EventCommand)cmd.Index; }
         catch { index = default; }
 
+        int playerMap = Commands.GetPlayerMap(Client.GameState.MyIndex);
+        bool hasPlayerMap = playerMap >= 0 && playerMap < Client.Map.Instance.Count;
+
         switch (index)
         {
             case EventCommand.AddText:
@@ -525,6 +546,40 @@ public static class WinEventEditor
                 max = Variables.MaxJobs;
                 nameFor = i => i >= 0 && i < JobBase.Instance.Count ? JobBase.Instance[i].Name : null;
                 break;
+
+            case EventCommand.ChangeSex:
+                pickLabel = "Sex";
+                max = Enum.GetValues<Sex>().Length;
+                nameFor = i => Enum.GetName(typeof(Sex), i);
+                break;
+
+            case EventCommand.SetAccessLevel:
+                pickLabel = "Access";
+                max = Enum.GetValues<AccessLevel>().Length;
+                nameFor = i => Enum.GetName(typeof(AccessLevel), i);
+                break;
+
+            case EventCommand.SpawnNpc:
+                pickLabel = "Npc";
+                max = hasPlayerMap && Client.Map.Instance[playerMap].Npc != null ? Client.Map.Instance[playerMap].Npc.Length : 0;
+                nameFor = slot =>
+                {
+                    if (!hasPlayerMap)
+                        return null;
+
+                    var map = Client.Map.Instance[playerMap];
+                    if (map.Npc == null || slot < 0 || slot >= map.Npc.Length)
+                        return null;
+
+                    int npcNum = map.Npc[slot];
+                    if (npcNum < 0)
+                        return "(empty)";
+
+                    var npcName = npcNum < NpcBase.Instance.Count ? (NpcBase.Instance[npcNum].Name ?? string.Empty) : string.Empty;
+                    npcName = string.IsNullOrWhiteSpace(npcName) ? "(unnamed)" : npcName.Trim();
+                    return $"{npcName} (npc {npcNum})";
+                };
+                break;
         }
 
         if (string.IsNullOrWhiteSpace(pickLabel) || max <= 0 || nameFor is null)
@@ -550,6 +605,106 @@ public static class WinEventEditor
         cmb.Value = Math.Clamp(cmd.Data1, 0, Math.Max(0, max - 1));
     }
 
+    private static string GetComboSelectedName(ComboBox cmb)
+    {
+        if (cmb.Value < 0 || cmb.Value >= cmb.Items.Count)
+            return string.Empty;
+
+        var display = cmb.Items[cmb.Value] ?? string.Empty;
+        if (string.Equals(display, "None", StringComparison.OrdinalIgnoreCase))
+            return string.Empty;
+
+        var sep = display.IndexOf(": ", StringComparison.Ordinal);
+        return sep >= 0 ? display.Substring(sep + 2) : display;
+    }
+
+    private static void ConfigureCommandText1Picker(Core.Globals.Type.EventCommand cmd)
+    {
+        if (!WindowManager.TryGetControl("winEventCommandData", "lblCmdText1", out var lblCtrl) || lblCtrl is not Label lbl)
+            return;
+        if (!WindowManager.TryGetControl("winEventCommandData", "txtCmdText1", out var txtCtrl) || txtCtrl is not TextBox txt)
+            return;
+        if (!WindowManager.TryGetControl("winEventCommandData", "cmbCmdText1", out var cmbCtrl) || cmbCtrl is not ComboBox cmb)
+            return;
+
+        EventCommand index;
+        try { index = (EventCommand)cmd.Index; }
+        catch { index = default; }
+
+        bool useMusic = index == EventCommand.PlayBgm;
+        bool useSound = index == EventCommand.PlaySound;
+        if (!useMusic && !useSound)
+        {
+            lbl.Text = "Text1";
+            txt.Visible = true;
+            cmb.Visible = false;
+            return;
+        }
+
+        lbl.Text = useMusic ? "Music" : "Sound";
+        txt.Visible = false;
+        cmb.Visible = true;
+
+        cmb.Items.Clear();
+        cmb.Items.Add("None");
+
+        try
+        {
+            if (useMusic)
+            {
+                General.CacheMusic();
+                for (int i = 0; i < Audio.MusicCache.Length; i++)
+                {
+                    var name = Audio.MusicCache[i] ?? string.Empty;
+                    if (!string.IsNullOrWhiteSpace(name))
+                        cmb.Items.Add($"{i + 1}: {name}");
+                }
+            }
+            else
+            {
+                General.CacheSound();
+                for (int i = 0; i < Audio.SoundCache.Length; i++)
+                {
+                    var name = Audio.SoundCache[i] ?? string.Empty;
+                    if (!string.IsNullOrWhiteSpace(name))
+                        cmb.Items.Add($"{i + 1}: {name}");
+                }
+            }
+        }
+        catch
+        {
+            // If caches fail (missing folders, etc.), keep the combo minimal.
+        }
+
+        // Select the current command.Text1 if it exists in the list.
+        int found = 0;
+        if (!string.IsNullOrWhiteSpace(cmd.Text1))
+        {
+            for (int i = 0; i < cmb.Items.Count; i++)
+            {
+                var itemName = i == 0 ? string.Empty : GetComboSelectedNameFromItem(cmb.Items[i]);
+                if (string.Equals(itemName, cmd.Text1, StringComparison.OrdinalIgnoreCase))
+                {
+                    found = i;
+                    break;
+                }
+            }
+        }
+        cmb.Value = Math.Clamp(found, 0, Math.Max(0, cmb.Items.Count - 1));
+
+        // Keep Text1 textbox consistent so existing code paths still work.
+        txt.Text = GetComboSelectedName(cmb);
+    }
+
+    private static string GetComboSelectedNameFromItem(string? display)
+    {
+        var s = display ?? string.Empty;
+        if (string.Equals(s, "None", StringComparison.OrdinalIgnoreCase))
+            return string.Empty;
+        var sep = s.IndexOf(": ", StringComparison.Ordinal);
+        return sep >= 0 ? s.Substring(sep + 2) : s;
+    }
+
     private static void OpenCommandDataEditor(int listIndex, int commandIndex, bool isNew)
     {
         _dataTargetListIndex = listIndex;
@@ -568,6 +723,7 @@ public static class WinEventEditor
             {
                 LoadCommandToWindow("winEventCommandData", cmd);
                 ConfigureCommandDataPicker(cmd);
+                ConfigureCommandText1Picker(cmd);
             }
             finally
             {
@@ -584,7 +740,12 @@ public static class WinEventEditor
         if (!TryGetCommandAt(listIndex, commandIndex, out var cmd) || cmd.Index < 0)
             return;
 
+        // For sound/music commands we prefer the combo box selection (if visible).
         cmd.Text1 = ReadStringTextBox("winEventCommandData", "txtCmdText1");
+        if (WindowManager.TryGetControl("winEventCommandData", "cmbCmdText1", out var cmbCtrl) && cmbCtrl is ComboBox cmb && cmb.Visible)
+        {
+            cmd.Text1 = GetComboSelectedName(cmb);
+        }
         cmd.Text2 = ReadStringTextBox("winEventCommandData", "txtCmdText2");
         cmd.Text3 = ReadStringTextBox("winEventCommandData", "txtCmdText3");
         cmd.Data1 = ReadIntTextBox("winEventCommandData", "txtCmdData1", cmd.Data1);
