@@ -3979,6 +3979,21 @@ public class Crystalshire
         WirePageSetting("chkWalkThrough");
         WirePageSetting("chkShowName");
 
+        // Page conditions
+        WirePageSetting("chkPageHasItem");
+        WirePageSetting("cmbHasItemIndex");
+        WirePageSetting("txtHasItemValue");
+        WirePageSetting("chkPageSwitch");
+        WirePageSetting("cmbSwitchIndex");
+        WirePageSetting("cmbSwitchCompare");
+        WirePageSetting("chkPageVariable");
+        WirePageSetting("cmbVariableIndex");
+        WirePageSetting("cmbVariableCompare");
+        WirePageSetting("txtVariableValue");
+        WirePageSetting("chkPageSelfSwitch");
+        WirePageSetting("cmbSelfSwitchIndex");
+        WirePageSetting("cmbSelfSwitchCompare");
+
         // Move route editor controls
         if (WindowManager.TryGetControl("winEventEditor", "btnRouteUp", out var btnRouteUp))
             btnRouteUp.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnMoveRouteAddUp;
@@ -4016,6 +4031,16 @@ public class Crystalshire
         WireGraphicCoord("txtGraphicY");
         WireGraphicCoord("txtGraphicX2");
         WireGraphicCoord("txtGraphicY2");
+
+        // Condition textboxes (apply on key up)
+        void WireConditionText(string name)
+        {
+            if (WindowManager.TryGetControl("winEventEditor", name, out var ctrl) && ctrl is TextBox tb)
+                tb.CallBack[(int)ControlState.KeyUp] = WinEventEditor.UpdatePageSettingsFromControls;
+        }
+
+        WireConditionText("txtHasItemValue");
+        WireConditionText("txtVariableValue");
 
         // Graphic preview
         window.GetChild("picGraphic").OnDraw = WinEventEditor.OnDrawGraphicPreview;

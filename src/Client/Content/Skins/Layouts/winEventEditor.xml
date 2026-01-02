@@ -74,31 +74,50 @@
 	</GroupBox>
 
 	<GroupBox Name="grpPageSettings" Position="8,180" Size="964,180" Caption="Page Settings">
-		<Label Name="lblTrigger" Text="Trigger" Position="12,28" Size="80,18"/>
-		<ComboBox Name="cmbTrigger" Position="100,26" Size="160,20"/>
-		<Label Name="lblPositioning" Text="Layer" Position="280,28" Size="80,18"/>
-		<ComboBox Name="cmbPositioning" Position="360,26" Size="160,20"/>
-		<Label Name="lblMoveType" Text="Move Type" Position="12,58" Size="98,18"/>
-		<ComboBox Name="cmbMoveType" Position="112,56" Size="148,20"/>
-		<Label Name="lblMoveSpeed" Text="Move Speed" Position="260,58" Size="100,18"/>
-		<ComboBox Name="cmbMoveSpeed" Position="360,56" Size="160,20"/>
-		<Label Name="lblMoveFreq" Text="Move Freq" Position="12,84" Size="98,18"/>
-		<ComboBox Name="cmbMoveFreq" Position="112,82" Size="148,20"/>
-		<CheckBox Name="chkWalkAnim" Text="Idle Anim" Position="12,114" Size="100,18" Design="CheckboxNormal"/>
-		<CheckBox Name="chkDirFix" Text="Dir Fix" Position="124,114" Size="90,18" Design="CheckboxNormal"/>
-		<CheckBox Name="chkWalkThrough" Text="Walk Through" Position="226,114" Size="120,18" Design="CheckboxNormal"/>
-		<CheckBox Name="chkShowName" Text="Show Name" Position="360,114" Size="120,18" Design="CheckboxNormal"/>
+		<Label Name="lblTrigger" Text="Trigger" Position="360,28" Size="80,18"/>
+		<ComboBox Name="cmbTrigger" Position="440,26" Size="160,20"/>
+		<Label Name="lblPositioning" Text="Layer" Position="610,28" Size="60,18"/>
+		<ComboBox Name="cmbPositioning" Position="700,26" Size="110,20"/>
+		<Label Name="lblMoveType" Text="Move Type" Position="360,58" Size="100,18"/>
+		<ComboBox Name="cmbMoveType" Position="440,56" Size="160,20"/>
+		<Label Name="lblMoveSpeed" Text="Move Speed" Position="610,58" Size="100,18"/>
+		<ComboBox Name="cmbMoveSpeed" Position="700,56" Size="120,20"/>
+		<Label Name="lblMoveFreq" Text="Move Freq" Position="360,84" Size="100,18"/>
+		<ComboBox Name="cmbMoveFreq" Position="440,82" Size="160,20"/>
+		<CheckBox Name="chkWalkAnim" Text="Idle Anim" Position="12,156" Size="100,18" Design="CheckboxNormal"/>
+		<CheckBox Name="chkDirFix" Text="Dir Fix" Position="124,156" Size="90,18" Design="CheckboxNormal"/>
+		<CheckBox Name="chkWalkThrough" Text="Walk Through" Position="226,156" Size="120,18" Design="CheckboxNormal"/>
+		<CheckBox Name="chkShowName" Text="Show Name" Position="360,156" Size="120,18" Design="CheckboxNormal"/>
+
+		<!-- Page conditions (moved left) -->
+		<CheckBox Name="chkPageHasItem" Text="Has Item" Position="12,28" Size="90,18" Design="CheckboxNormal"/>
+		<ComboBox Name="cmbHasItemIndex" Position="104,26" Size="140,20"/>
+		<Label Name="lblHasItemAmount" Text="Value" Position="250,28" Size="60,18"/>
+		<TextBox Name="txtHasItemValue" Position="294,26" Size="46,22" Design="TextWhite"/>
+
+		<CheckBox Name="chkPageSwitch" Text="Switch" Position="12,52" Size="72,18" Design="CheckboxNormal"/>
+		<ComboBox Name="cmbSwitchIndex" Position="86,50" Size="162,20"/>
+		<ComboBox Name="cmbSwitchCompare" Position="252,50" Size="88,20"/>
+
+		<CheckBox Name="chkPageVariable" Text="Variable" Position="12,76" Size="80,18" Design="CheckboxNormal"/>
+		<ComboBox Name="cmbVariableIndex" Position="94,74" Size="162,20"/>
+		<ComboBox Name="cmbVariableCompare" Position="260,74" Size="44,20"/>
+		<TextBox Name="txtVariableValue" Position="308,74" Size="32,22" Design="TextWhite"/>
+
+		<CheckBox Name="chkPageSelfSwitch" Text="Self-Switch" Position="12,100" Size="60,18" Design="CheckboxNormal"/>
+		<ComboBox Name="cmbSelfSwitchIndex" Position="100,98" Size="46,20"/>
+		<ComboBox Name="cmbSelfSwitchCompare" Position="150,98" Size="54,20"/>
 
 		<!-- Move Route (when Move Type = Route) -->
-		<Label Name="lblMoveRoute" Text="Route" Position="540,28" Size="60,18"/>
-		<Button Name="btnRouteRemove" Text="Del" Position="604,24" Size="40,22" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
-		<Button Name="btnRouteClear" Text="Clr" Position="650,24" Size="40,22" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
-		<ListBox Name="lstMoveRoute" Position="540,48" Size="200,74"/>
-		<ScrollBar Name="sldMoveRoute" Position="744,48" Size="16,74" Min="0" Max="0" Vertical="true"/>
-		<Button Name="btnRouteUp" Text="Up" Position="540,126" Size="48,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
-		<Button Name="btnRouteDown" Text="Down" Position="590,126" Size="48,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
-		<Button Name="btnRouteLeft" Text="Left" Position="640,126" Size="48,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
-		<Button Name="btnRouteRight" Text="Right" Position="690,126" Size="48,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+		<Label Name="lblMoveRoute" Text="Route" Position="780,28" Size="60,18"/>
+		<Button Name="btnRouteRemove" Text="Del" Position="844,24" Size="40,22" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+		<Button Name="btnRouteClear" Text="Clr" Position="890,24" Size="40,22" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+		<ListBox Name="lstMoveRoute" Position="780,48" Size="160,74"/>
+		<ScrollBar Name="sldMoveRoute" Position="944,48" Size="16,74" Min="0" Max="0" Vertical="true"/>
+		<Button Name="btnRouteUp" Text="Up" Position="780,126" Size="48,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+		<Button Name="btnRouteDown" Text="Down" Position="830,126" Size="48,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+		<Button Name="btnRouteLeft" Text="Left" Position="880,126" Size="48,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+		<Button Name="btnRouteRight" Text="Right" Position="930,126" Size="48,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
 	</GroupBox>
 
 	<GroupBox Name="grpCommands" Position="8,366" Size="964,244" Caption="Commands">

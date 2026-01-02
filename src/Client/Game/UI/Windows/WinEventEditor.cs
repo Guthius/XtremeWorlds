@@ -1172,7 +1172,7 @@ public static class WinEventEditor
         for (int i = 0; i < items.Length; i++)
         {
             var (value, name) = items[i];
-            var display = string.IsNullOrWhiteSpace(name) ? "(unused)" : name;
+            var display = string.IsNullOrWhiteSpace(name) ? "None" : name;
             cmb.Items.Add(display);
             valueMap.Add(value);
         }
@@ -1327,7 +1327,7 @@ public static class WinEventEditor
                 break;
 
             case EventCommand.SelfSwitch:
-                pick1Label = "Switch";
+                pick1Label = "Self-Switch";
                 pick1Target = "txtCmdData1";
                 pick1Items =
                 [
@@ -1497,7 +1497,7 @@ public static class WinEventEditor
         {
             var name = nameFor(i);
             if (string.IsNullOrWhiteSpace(name))
-                name = "(unused)";
+                name = "None";
             items[i] = (i, $"{i}: {name}");
         }
         return items;
@@ -1789,6 +1789,90 @@ public static class WinEventEditor
                 cmbGraphicType.Items.Add("Picture");
             }
         }
+
+        // Page conditions
+        if (WindowManager.TryGetControl("winEventEditor", "cmbVariableCompare", out var vcCtrl) && vcCtrl is ComboBox cmbVarCompare)
+        {
+            if (cmbVarCompare.Items.Count == 0)
+            {
+                cmbVarCompare.Items.Clear();
+                cmbVarCompare.Items.Add("==");
+                cmbVarCompare.Items.Add(">=");
+                cmbVarCompare.Items.Add("<=");
+                cmbVarCompare.Items.Add(">");
+                cmbVarCompare.Items.Add("<");
+                cmbVarCompare.Items.Add("!=");
+            }
+        }
+
+        if (WindowManager.TryGetControl("winEventEditor", "cmbSwitchIndex", out var siCtrl) && siCtrl is ComboBox cmbSwitchIndex)
+        {
+            if (cmbSwitchIndex.Items.Count == 0)
+            {
+                cmbSwitchIndex.Items.Clear();
+                var items = BuildIndexItems(
+                    Variables.MaxSwitches,
+                    i => i >= 0 && Client.Event.Switches != null && i < Client.Event.Switches.Length ? Client.Event.Switches[i] : null);
+                for (int i = 0; i < items.Length; i++)
+                    cmbSwitchIndex.Items.Add(items[i].name);
+            }
+        }
+
+        if (WindowManager.TryGetControl("winEventEditor", "cmbVariableIndex", out var viCtrl) && viCtrl is ComboBox cmbVariableIndex)
+        {
+            if (cmbVariableIndex.Items.Count == 0)
+            {
+                cmbVariableIndex.Items.Clear();
+                var items = BuildIndexItems(
+                    Variables.MaxVariables,
+                    i => i >= 0 && Client.Event.Variables != null && i < Client.Event.Variables.Length ? Client.Event.Variables[i] : null);
+                for (int i = 0; i < items.Length; i++)
+                    cmbVariableIndex.Items.Add(items[i].name);
+            }
+        }
+
+        if (WindowManager.TryGetControl("winEventEditor", "cmbHasItemIndex", out var hiCtrl) && hiCtrl is ComboBox cmbHasItemIndex)
+        {
+            if (cmbHasItemIndex.Items.Count == 0)
+            {
+                cmbHasItemIndex.Items.Clear();
+                var items = BuildIndexItems(Variables.MaxItems, i => i >= 0 && i < ItemBase.Instance.Count ? ItemBase.Instance[i].Name : null);
+                for (int i = 0; i < items.Length; i++)
+                    cmbHasItemIndex.Items.Add(items[i].name);
+            }
+        }
+
+        if (WindowManager.TryGetControl("winEventEditor", "cmbSwitchCompare", out var scCtrl) && scCtrl is ComboBox cmbSwitchCompare)
+        {
+            if (cmbSwitchCompare.Items.Count == 0)
+            {
+                cmbSwitchCompare.Items.Clear();
+                cmbSwitchCompare.Items.Add("Off");
+                cmbSwitchCompare.Items.Add("On");
+            }
+        }
+
+        if (WindowManager.TryGetControl("winEventEditor", "cmbSelfSwitchCompare", out var sscCtrl) && sscCtrl is ComboBox cmbSelfSwitchCompare)
+        {
+            if (cmbSelfSwitchCompare.Items.Count == 0)
+            {
+                cmbSelfSwitchCompare.Items.Clear();
+                cmbSelfSwitchCompare.Items.Add("Off");
+                cmbSelfSwitchCompare.Items.Add("On");
+            }
+        }
+
+        if (WindowManager.TryGetControl("winEventEditor", "cmbSelfSwitchIndex", out var ssIdxCtrl) && ssIdxCtrl is ComboBox cmbSelfSwitchIndex)
+        {
+            if (cmbSelfSwitchIndex.Items.Count == 0)
+            {
+                cmbSelfSwitchIndex.Items.Clear();
+                cmbSelfSwitchIndex.Items.Add("A");
+                cmbSelfSwitchIndex.Items.Add("B");
+                cmbSelfSwitchIndex.Items.Add("C");
+                cmbSelfSwitchIndex.Items.Add("D");
+            }
+        }
     }
 
     private static void RefreshPageButtons()
@@ -1900,6 +1984,37 @@ public static class WinEventEditor
 
         if (WindowManager.TryGetControl("winEventEditor", "chkShowName", out var snCtrl) && snCtrl is CheckBox chkShowName)
             chkShowName.Value = page.ShowName == 1 ? 1 : 0;
+
+        // Conditions
+        if (WindowManager.TryGetControl("winEventEditor", "chkPageHasItem", out var hiCtrl) && hiCtrl is CheckBox chkHasItem)
+            chkHasItem.Value = page.ChkHasItem == 1 ? 1 : 0;
+        if (WindowManager.TryGetControl("winEventEditor", "cmbHasItemIndex", out var hiiCtrl) && hiiCtrl is ComboBox cmbHasItemIndex)
+            cmbHasItemIndex.Value = Math.Clamp(page.HasItemIndex, 0, Math.Max(0, cmbHasItemIndex.Items.Count - 1));
+        if (WindowManager.TryGetControl("winEventEditor", "txtHasItemValue", out var hivCtrl) && hivCtrl is TextBox txtHasItemValue)
+            txtHasItemValue.Text = page.HasItemAmount.ToString();
+
+        if (WindowManager.TryGetControl("winEventEditor", "chkPageSwitch", out var swCtrl) && swCtrl is CheckBox chkSwitch)
+            chkSwitch.Value = page.ChkSwitch == 1 ? 1 : 0;
+        if (WindowManager.TryGetControl("winEventEditor", "cmbSwitchIndex", out var swiCtrl) && swiCtrl is ComboBox cmbSwitchIndex)
+            cmbSwitchIndex.Value = Math.Clamp(page.SwitchIndex, 0, Math.Max(0, cmbSwitchIndex.Items.Count - 1));
+        if (WindowManager.TryGetControl("winEventEditor", "cmbSwitchCompare", out var swcCtrl) && swcCtrl is ComboBox cmbSwitchCompare)
+            cmbSwitchCompare.Value = Math.Clamp(page.SwitchCompare, 0, Math.Max(0, cmbSwitchCompare.Items.Count - 1));
+
+        if (WindowManager.TryGetControl("winEventEditor", "chkPageVariable", out var vCtrl) && vCtrl is CheckBox chkVariable)
+            chkVariable.Value = page.ChkVariable == 1 ? 1 : 0;
+        if (WindowManager.TryGetControl("winEventEditor", "cmbVariableIndex", out var viCtrl) && viCtrl is ComboBox cmbVariableIndex)
+            cmbVariableIndex.Value = Math.Clamp(page.VariableIndex, 0, Math.Max(0, cmbVariableIndex.Items.Count - 1));
+        if (WindowManager.TryGetControl("winEventEditor", "cmbVariableCompare", out var vcCtrl) && vcCtrl is ComboBox cmbVariableCompare)
+            cmbVariableCompare.Value = Math.Clamp(page.VariableCompare, 0, Math.Max(0, cmbVariableCompare.Items.Count - 1));
+        if (WindowManager.TryGetControl("winEventEditor", "txtVariableValue", out var vvCtrl) && vvCtrl is TextBox txtVariableValue)
+            txtVariableValue.Text = page.VariableCondition.ToString();
+
+        if (WindowManager.TryGetControl("winEventEditor", "chkPageSelfSwitch", out var ssCtrl) && ssCtrl is CheckBox chkSelfSwitch)
+            chkSelfSwitch.Value = page.ChkSelfSwitch == 1 ? 1 : 0;
+        if (WindowManager.TryGetControl("winEventEditor", "cmbSelfSwitchIndex", out var ssiCtrl) && ssiCtrl is ComboBox cmbSelfSwitchIndex)
+            cmbSelfSwitchIndex.Value = Math.Clamp(page.SelfSwitchIndex, 0, Math.Max(0, cmbSelfSwitchIndex.Items.Count - 1));
+        if (WindowManager.TryGetControl("winEventEditor", "cmbSelfSwitchCompare", out var sscCtrl) && sscCtrl is ComboBox cmbSelfSwitchCompare)
+            cmbSelfSwitchCompare.Value = Math.Clamp(page.SelfSwitchCompare, 0, Math.Max(0, cmbSelfSwitchCompare.Items.Count - 1));
 
         // Graphic (per-page)
         SyncGraphicControlsFromPage(page);
@@ -2852,6 +2967,35 @@ public static class WinEventEditor
 
         if (WindowManager.TryGetControl("winEventEditor", "chkShowName", out var snCtrl) && snCtrl is CheckBox chkShowName)
             page.ShowName = snCtrl.Value == 1 ? 1 : 0;
+
+        // Conditions
+        if (WindowManager.TryGetControl("winEventEditor", "chkPageHasItem", out var hiCtrl) && hiCtrl is CheckBox chkHasItem)
+            page.ChkHasItem = chkHasItem.Value == 1 ? 1 : 0;
+        if (WindowManager.TryGetControl("winEventEditor", "cmbHasItemIndex", out var hiiCtrl) && hiiCtrl is ComboBox cmbHasItemIndex)
+            page.HasItemIndex = Math.Clamp(cmbHasItemIndex.Value, 0, Math.Max(0, cmbHasItemIndex.Items.Count - 1));
+        page.HasItemAmount = ReadIntTextBox("txtHasItemValue", page.HasItemAmount);
+
+        if (WindowManager.TryGetControl("winEventEditor", "chkPageSwitch", out var swCtrl) && swCtrl is CheckBox chkSwitch)
+            page.ChkSwitch = chkSwitch.Value == 1 ? 1 : 0;
+        if (WindowManager.TryGetControl("winEventEditor", "cmbSwitchIndex", out var swiCtrl) && swiCtrl is ComboBox cmbSwitchIndex)
+            page.SwitchIndex = Math.Clamp(cmbSwitchIndex.Value, 0, Math.Max(0, cmbSwitchIndex.Items.Count - 1));
+        if (WindowManager.TryGetControl("winEventEditor", "cmbSwitchCompare", out var swcCtrl) && swcCtrl is ComboBox cmbSwitchCompare)
+            page.SwitchCompare = Math.Clamp(cmbSwitchCompare.Value, 0, Math.Max(0, cmbSwitchCompare.Items.Count - 1));
+
+        if (WindowManager.TryGetControl("winEventEditor", "chkPageVariable", out var vCtrl) && vCtrl is CheckBox chkVariable)
+            page.ChkVariable = chkVariable.Value == 1 ? 1 : 0;
+        if (WindowManager.TryGetControl("winEventEditor", "cmbVariableIndex", out var viCtrl) && viCtrl is ComboBox cmbVariableIndex)
+            page.VariableIndex = Math.Clamp(cmbVariableIndex.Value, 0, Math.Max(0, cmbVariableIndex.Items.Count - 1));
+        page.VariableCondition = ReadIntTextBox("txtVariableValue", page.VariableCondition);
+        if (WindowManager.TryGetControl("winEventEditor", "cmbVariableCompare", out var vcCtrl) && vcCtrl is ComboBox cmbVariableCompare)
+            page.VariableCompare = Math.Clamp(cmbVariableCompare.Value, 0, Math.Max(0, cmbVariableCompare.Items.Count - 1));
+
+        if (WindowManager.TryGetControl("winEventEditor", "chkPageSelfSwitch", out var ssCtrl) && ssCtrl is CheckBox chkSelfSwitch)
+            page.ChkSelfSwitch = chkSelfSwitch.Value == 1 ? 1 : 0;
+        if (WindowManager.TryGetControl("winEventEditor", "cmbSelfSwitchIndex", out var ssiCtrl) && ssiCtrl is ComboBox cmbSelfSwitchIndex)
+            page.SelfSwitchIndex = Math.Clamp(cmbSelfSwitchIndex.Value, 0, Math.Max(0, cmbSelfSwitchIndex.Items.Count - 1));
+        if (WindowManager.TryGetControl("winEventEditor", "cmbSelfSwitchCompare", out var sscCtrl) && sscCtrl is ComboBox cmbSelfSwitchCompare)
+            page.SelfSwitchCompare = Math.Clamp(cmbSelfSwitchCompare.Value, 0, Math.Max(0, cmbSelfSwitchCompare.Items.Count - 1));
 
         // Graphic (per-page)
         int graphicType = page.GraphicType;
