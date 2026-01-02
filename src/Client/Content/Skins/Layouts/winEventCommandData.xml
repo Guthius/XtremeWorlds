@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window Name="winEventCommandData" Caption="Command Data"
-	Size="420,430"
+	Size="420,400"
 		Icon="346" IconOffset="3,5"	
         Design="WindowNormal"
         StartPosition="CenterScreen"
         Visible="false">
 
-	<GroupBox Name="grpCommandData" Position="8,24" Size="404,360" Caption="Command Data">
+	<GroupBox Name="grpCommandData" Position="8,24" Size="404,330" Caption="Command Data">
 		<Label Name="lblCmdSelected" Text="" Position="12,24" Size="380,18"/>
 
-		<Label Name="lblCmdText1" Text="Text1" Position="12,56" Size="50,18"/>
-		<TextBox Name="txtCmdText1" Position="64,54" Size="326,22" Design="TextWhite"/>
-		<ComboBox Name="cmbCmdText1" Position="64,54" Size="326,22" Visible="false"/>
-		<Label Name="lblCmdText2" Text="Text2" Position="12,86" Size="50,18"/>
-		<TextBox Name="txtCmdText2" Position="64,84" Size="326,22" Design="TextWhite"/>
-		<Label Name="lblCmdText3" Text="Text3" Position="12,116" Size="50,18"/>
-		<TextBox Name="txtCmdText3" Position="64,114" Size="326,22" Design="TextWhite"/>
-		<Label Name="lblCmdText4" Text="Text4" Position="12,146" Size="50,18"/>
-		<TextBox Name="txtCmdText4" Position="64,144" Size="326,22" Design="TextWhite"/>
-		<Label Name="lblCmdText5" Text="Text5" Position="12,176" Size="50,18"/>
-		<TextBox Name="txtCmdText5" Position="64,174" Size="326,22" Design="TextWhite"/>
+		<Label Name="lblCmdText1" Text="Text1" Position="12,56" Size="80,18"/>
+		<TextBox Name="txtCmdText1" Position="96,54" Size="294,22" Design="TextWhite"/>
+		<ComboBox Name="cmbCmdText1" Position="96,54" Size="294,22" Visible="false"/>
+		<Label Name="lblCmdText2" Text="Text2" Position="12,86" Size="80,18"/>
+		<TextBox Name="txtCmdText2" Position="96,84" Size="294,22" Design="TextWhite"/>
+		<Label Name="lblCmdText3" Text="Text3" Position="12,116" Size="80,18"/>
+		<TextBox Name="txtCmdText3" Position="96,114" Size="294,22" Design="TextWhite"/>
+		<Label Name="lblCmdText4" Text="Text4" Position="12,146" Size="80,18"/>
+		<TextBox Name="txtCmdText4" Position="96,144" Size="294,22" Design="TextWhite"/>
+		<Label Name="lblCmdText5" Text="Text5" Position="12,176" Size="80,18"/>
+		<TextBox Name="txtCmdText5" Position="96,174" Size="294,22" Design="TextWhite"/>
 
-		<Label Name="lblCmdData1" Text="D1" Position="12,214" Size="20,18"/>
-		<TextBox Name="txtCmdData1" Position="32,212" Size="60,22" Design="TextWhite"/>
-		<Label Name="lblCmdData2" Text="D2" Position="112,214" Size="20,18"/>
-		<TextBox Name="txtCmdData2" Position="132,212" Size="60,22" Design="TextWhite"/>
-		<Label Name="lblCmdData3" Text="D3" Position="212,214" Size="20,18"/>
-		<TextBox Name="txtCmdData3" Position="232,212" Size="60,22" Design="TextWhite"/>
+		<Label Name="lblCmdData1" Text="D1" Position="12,214" Size="60,18"/>
+		<TextBox Name="txtCmdData1" Position="72,212" Size="60,22" Design="TextWhite"/>
+		<Label Name="lblCmdData2" Text="D2" Position="142,214" Size="60,18"/>
+		<TextBox Name="txtCmdData2" Position="202,212" Size="60,22" Design="TextWhite"/>
+		<Label Name="lblCmdData3" Text="D3" Position="272,214" Size="60,18"/>
+		<TextBox Name="txtCmdData3" Position="332,212" Size="58,22" Design="TextWhite"/>
 
-		<Label Name="lblCmdData4" Text="D4" Position="12,244" Size="20,18"/>
-		<TextBox Name="txtCmdData4" Position="32,242" Size="60,22" Design="TextWhite"/>
-		<Label Name="lblCmdData5" Text="D5" Position="112,244" Size="20,18"/>
-		<TextBox Name="txtCmdData5" Position="132,242" Size="60,22" Design="TextWhite"/>
-		<Label Name="lblCmdData6" Text="D6" Position="212,244" Size="20,18"/>
-		<TextBox Name="txtCmdData6" Position="232,242" Size="60,22" Design="TextWhite"/>
+		<Label Name="lblCmdData4" Text="D4" Position="12,244" Size="60,18"/>
+		<TextBox Name="txtCmdData4" Position="72,242" Size="60,22" Design="TextWhite"/>
+		<Label Name="lblCmdData5" Text="D5" Position="142,244" Size="60,18"/>
+		<TextBox Name="txtCmdData5" Position="202,242" Size="60,22" Design="TextWhite"/>
+		<Label Name="lblCmdData6" Text="D6" Position="272,244" Size="60,18"/>
+		<TextBox Name="txtCmdData6" Position="332,242" Size="58,22" Design="TextWhite"/>
 
 		<Label Name="lblCmdPick1" Text="Pick" Position="12,274" Size="80,18" Visible="false"/>
 		<ComboBox Name="cmbCmdPick1" Position="96,272" Size="294,22" Visible="false"/>
@@ -41,8 +41,8 @@
 		<ComboBox Name="cmbCmdPick2" Position="96,302" Size="294,22" Visible="false"/>
 	</GroupBox>
 
-	<Button Name="btnOk" Text="OK" Position="126, 395" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-	<Button Name="btnCancel" Text="Cancel" Position="214, 395" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+	<Button Name="btnOk" Text="OK" Position="126, 365" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+	<Button Name="btnCancel" Text="Cancel" Position="214, 365" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
 
 	<Button Name="btnClose" Position="-19,5" Size="16,16" Image="8" ImageHover="9" ImageMouseDown="10"/>
 </Window>

@@ -152,7 +152,7 @@ public static class WinEventEditor
 
         // Friendly label for the editor: keep it short.
         if (string.Equals(name, nameof(EventCommand.ConditionalBranch), StringComparison.Ordinal))
-            return "Condition";
+            return "Conditional Branch";
 
         // Turn PascalCase/camelCase into spaced words: "ShowText" -> "Show Text".
         // Also handles digit boundaries: "ShowText2" -> "Show Text 2".
@@ -1108,6 +1108,30 @@ public static class WinEventEditor
                     var target = targetTextBox();
                     if (!string.IsNullOrWhiteSpace(target) && WindowManager.TryGetControl("winEventCommandData", target, out var d1) && d1 is TextBox tb)
                         tb.Text = mapped.ToString();
+
+                    // Conditional Branch: when the Type changes, refresh the Value picker items/target.
+                    if (comboName == "cmbCmdPick1")
+                    {
+                        if (TryGetCommandAt(_dataTargetListIndex, _dataTargetCommandIndex, out var cmd) && IsConditionalBranch(cmd))
+                        {
+                            // Build a lightweight "live" view of the command based on current textbox state.
+                            var live = cmd;
+                            live.ConditionalBranch.Condition = ReadIntTextBox("winEventCommandData", "txtCmdData1", live.ConditionalBranch.Condition);
+                            live.ConditionalBranch.Data1 = ReadIntTextBox("winEventCommandData", "txtCmdData2", live.ConditionalBranch.Data1);
+                            live.ConditionalBranch.Data2 = ReadIntTextBox("winEventCommandData", "txtCmdData3", live.ConditionalBranch.Data2);
+                            live.ConditionalBranch.Data3 = ReadIntTextBox("winEventCommandData", "txtCmdData4", live.ConditionalBranch.Data3);
+
+                            _isLoading = true;
+                            try
+                            {
+                                ConfigureCommandDataPicker(live);
+                            }
+                            finally
+                            {
+                                _isLoading = false;
+                            }
+                        }
+                    }
                 };
             }
         }
@@ -1324,7 +1348,7 @@ public static class WinEventEditor
                 break;
 
             case EventCommand.ConditionalBranch:
-                pick1Label = "Condition";
+                pick1Label = "Type";
                 pick1Target = "txtCmdData1";
                 pick1CurrentValue = cmd.ConditionalBranch.Condition;
                 pick1Items =
@@ -1340,6 +1364,83 @@ public static class WinEventEditor
                     (8, "Gender"),
                     (9, "Time of Day"),
                 ];
+
+                // Make the most common Conditional Branch values easier to pick.
+                // Mapping (server-side):
+                // - Variable: Data1=VarId, Data2=Operator, Data3=CompareValue
+                // - Switch:   Data1=SwitchId, Data2=RequiredState (0=On, 1=Off)
+                // - Item:     Data1=ItemId, Data2=Amount
+                // - Job:      Data1=JobId
+                // - Skill:    Data1=SkillId
+                // - Level:    Data1=CompareLevel, Data2=Operator
+                // - SelfSw:   Data1=SelfSwitch(A-D), Data2=RequiredState (0=On, 1=Off)
+                // - Gender:   Data1=Sex
+                // - Time:     Data1=TimeOfDay
+                switch (cmd.ConditionalBranch.Condition)
+                {
+                    case 2: // Item
+                        pick2Label = "Item";
+                        pick2Target = "txtCmdData2";
+                        pick2CurrentValue = cmd.ConditionalBranch.Data1;
+                        pick2Items = BuildIndexItems(Variables.MaxItems, i => i >= 0 && i < ItemBase.Instance.Count ? ItemBase.Instance[i].Name : null);
+                        break;
+
+                    case 3: // Job
+                        pick2Label = "Job";
+                        pick2Target = "txtCmdData2";
+                        pick2CurrentValue = cmd.ConditionalBranch.Data1;
+                        pick2Items = BuildIndexItems(Variables.MaxJobs, i => i >= 0 && i < JobBase.Instance.Count ? JobBase.Instance[i].Name : null);
+                        break;
+
+                    case 4: // Skill
+                        pick2Label = "Skill";
+                        pick2Target = "txtCmdData2";
+                        pick2CurrentValue = cmd.ConditionalBranch.Data1;
+                        pick2Items = BuildIndexItems(Variables.MaxSkills, i => i >= 0 && i < SkillBase.Instance.Count ? SkillBase.Instance[i].Name : null);
+                        break;
+
+                    case 0: // Variable
+                    case 5: // Level
+                        pick2Label = "Operator";
+                        pick2Target = "txtCmdData3";
+                        pick2CurrentValue = cmd.ConditionalBranch.Data2;
+                        pick2Items =
+                        [
+                            (0, "=="),
+                            (1, ">="),
+                            (2, "<="),
+                            (3, ">"),
+                            (4, "<"),
+                            (5, "!="),
+                        ];
+                        break;
+
+                    case 1: // Switch
+                    case 6: // Self Switch
+                        pick2Label = "Value";
+                        pick2Target = "txtCmdData3";
+                        pick2CurrentValue = cmd.ConditionalBranch.Data2;
+                        pick2Items =
+                        [
+                            (0, "On"),
+                            (1, "Off"),
+                        ];
+                        break;
+
+                    case 8: // Gender
+                        pick2Label = "Value";
+                        pick2Target = "txtCmdData2";
+                        pick2CurrentValue = cmd.ConditionalBranch.Data1;
+                        pick2Items = BuildEnumItems<Sex>();
+                        break;
+
+                    case 9: // Time of Day
+                        pick2Label = "Value";
+                        pick2Target = "txtCmdData2";
+                        pick2CurrentValue = cmd.ConditionalBranch.Data1;
+                        pick2Items = BuildEnumItems<Core.TimeOfDay>();
+                        break;
+                }
                 break;
         }
 
@@ -1824,12 +1925,48 @@ public static class WinEventEditor
         if (page.CommandListCount <= 0 || page.CommandList == null)
             return;
 
+        string GetListLabel(int listIndex)
+        {
+            // If this list is a ShowChoices sub-list, display it as "Choice N".
+            for (int parentListIndex = 0; parentListIndex < page.CommandListCount && parentListIndex < page.CommandList.Length; parentListIndex++)
+            {
+                var parentList = page.CommandList[parentListIndex];
+                if (parentList.CommandCount <= 0 || parentList.Commands == null)
+                    continue;
+
+                for (int parentCmdIndex = 0; parentCmdIndex < parentList.CommandCount && parentCmdIndex < parentList.Commands.Length; parentCmdIndex++)
+                {
+                    var parentCmd = parentList.Commands[parentCmdIndex];
+                    if (!IsShowChoices(parentCmd))
+                        continue;
+
+                    string WithText(int n, int data, string text)
+                    {
+                        // Show the underlying DataN (list index) since that's what the engine uses.
+                        var prefix = $"Choice {n} (D{n}:{data})";
+                        if (!string.IsNullOrWhiteSpace(text))
+                            return $"{prefix}: {text}";
+                        return prefix;
+                    }
+
+                    // ShowChoices stores choices in Text2..Text5 (Text1 is prompt).
+                    if (parentCmd.Data1 == listIndex) return WithText(1, parentCmd.Data1, parentCmd.Text2);
+                    if (parentCmd.Data2 == listIndex) return WithText(2, parentCmd.Data2, parentCmd.Text3);
+                    if (parentCmd.Data3 == listIndex) return WithText(3, parentCmd.Data3, parentCmd.Text4);
+                    if (parentCmd.Data4 == listIndex) return WithText(4, parentCmd.Data4, parentCmd.Text5);
+                }
+            }
+
+            return listIndex.ToString();
+        }
+
         for (int listIndex = 0; listIndex < page.CommandListCount && listIndex < page.CommandList.Length; listIndex++)
         {
             var cmdList = page.CommandList[listIndex];
+            string listLabel = GetListLabel(listIndex);
             if (cmdList.CommandCount <= 0 || cmdList.Commands == null)
             {
-                list.AddItem($"{listIndex}:(empty)");
+                list.AddItem($"{listLabel}:(empty)");
                 _commandIndexMap.Add((listIndex, -1));
                 continue;
             }
@@ -1854,8 +1991,8 @@ public static class WinEventEditor
                 var data = $"(D1:{cmd.Data1} D2:{cmd.Data2} D3:{cmd.Data3} D4:{cmd.Data4} D5:{cmd.Data5} D6:{cmd.Data6})";
 
                 var line = string.IsNullOrWhiteSpace(preview)
-                    ? $"{listIndex}:{cmdIndex} {name} {data}"
-                    : $"{listIndex}:{cmdIndex} {name} {data} - {preview}";
+                    ? $"{listLabel}:{cmdIndex} {name} {data}"
+                    : $"{listLabel}:{cmdIndex} {name} {data} - {preview}";
 
                 list.AddItem(line);
                 _commandIndexMap.Add((listIndex, cmdIndex));
@@ -1863,7 +2000,7 @@ public static class WinEventEditor
 
             if (!any)
             {
-                list.AddItem($"{listIndex}:(empty)");
+                list.AddItem($"{listLabel}:(empty)");
                 _commandIndexMap.Add((listIndex, -1));
             }
         }
@@ -2053,7 +2190,18 @@ public static class WinEventEditor
         {
             int selectedIndex = lb.SelectedIndex;
             if (selectedIndex >= 0 && selectedIndex < _commandIndexMap.Count)
-                targetList = Math.Clamp(_commandIndexMap[selectedIndex].listIndex, 0, Math.Max(0, listCount - 1));
+            {
+                var (selectedListIndex, selectedCommandIndex) = _commandIndexMap[selectedIndex];
+                targetList = Math.Clamp(selectedListIndex, 0, Math.Max(0, listCount - 1));
+
+                // If user has the ShowChoices command selected, default Add to Choice 1 list.
+                if (selectedCommandIndex >= 0 && TryGetCommandAt(selectedListIndex, selectedCommandIndex, out var selectedCmd) && IsShowChoices(selectedCmd))
+                {
+                    int choice1List = selectedCmd.Data1;
+                    if (choice1List >= 0 && choice1List < listCount)
+                        targetList = choice1List;
+                }
+            }
         }
 
         var cmdList = lists[targetList];
@@ -2420,6 +2568,22 @@ public static class WinEventEditor
         page.MoveRouteCount = 0;
         page.MoveRoute = Array.Empty<Core.Globals.Type.MoveRoute>();
         return page;
+    }
+
+    public static void OnClearCommands()
+    {
+        if (_isLoading) return;
+        if (!TryGetCurrentPage(out var page)) return;
+
+        // Reset to a single empty list with a single placeholder command.
+        page.CommandListCount = 1;
+        page.CommandList = new Core.Globals.Type.CommandList[1];
+        page.CommandList[0].CommandCount = 1;
+        page.CommandList[0].Commands = new Core.Globals.Type.EventCommand[1];
+        page.CommandList[0].Commands[0].Index = -1;
+
+        SetCurrentPage(page);
+        RefreshCommandsList();
     }
 
     public static void OnAddPage()

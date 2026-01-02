@@ -4032,6 +4032,10 @@ public class Crystalshire
         if (WindowManager.TryGetControl("winEventEditor", "btnEditCommand", out var btnEditCmd))
             btnEditCmd.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnEditCommand;
 
+        // Commands: Clear
+        if (WindowManager.TryGetControl("winEventEditor", "btnClearCommands", out var btnClearCmds))
+            btnClearCmds.CallBack[(int)ControlState.MouseDown] = WinEventEditor.OnClearCommands;
+
         // Commands list + scrollbar
         if (WindowManager.TryGetControl("winEventEditor", "lstCommands", out var lstCtrl) && lstCtrl is ListBox lst)
         {

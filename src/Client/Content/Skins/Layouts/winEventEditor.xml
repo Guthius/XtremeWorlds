@@ -49,7 +49,7 @@
 
 		<Label Name="lblName" Text="Name" Position="20,52" Size="80,18"/>
 		<TextBox Name="txtName" Position="100,50" Size="220,22" Design="TextWhite"/>
-		<CheckBox Name="chkGlobal" Text="Global" Position="340,52" Size="90,18" Design="CheckboxNormal"/>
+		<CheckBox Name="chkGlobal" Text="Global" Position="272,22" Size="90,18" Design="CheckboxNormal"/>
 		<Label Name="lblPosCaption" Text="Position" Position="20,80" Size="80,18"/>
 		<Label Name="lblPosition" Text="(0, 0)" Position="100,80" Size="120,18"/>
 
@@ -80,7 +80,7 @@
 		<ComboBox Name="cmbPositioning" Position="360,26" Size="160,20"/>
 		<Label Name="lblMoveType" Text="Move Type" Position="12,58" Size="98,18"/>
 		<ComboBox Name="cmbMoveType" Position="112,56" Size="148,20"/>
-		<Label Name="lblMoveSpeed" Text="Move Speed" Position="280,58" Size="80,18"/>
+		<Label Name="lblMoveSpeed" Text="Move Speed" Position="260,58" Size="100,18"/>
 		<ComboBox Name="cmbMoveSpeed" Position="360,56" Size="160,20"/>
 		<Label Name="lblMoveFreq" Text="Move Freq" Position="12,84" Size="98,18"/>
 		<ComboBox Name="cmbMoveFreq" Position="112,82" Size="148,20"/>
@@ -105,6 +105,7 @@
 		<Button Name="btnAddCommand" Text="Add" Position="8,28" Size="60,22" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 		<Button Name="btnDeleteCommand" Text="Delete" Position="74,28" Size="70,22" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
 		<Button Name="btnEditCommand" Text="Edit" Position="150,28" Size="60,22" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+		<Button Name="btnClearCommands" Text="Clear" Position="216,28" Size="60,22" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
 		<ListBox Name="lstCommands" Position="8,56" Size="616,176"/>
 		<ScrollBar Name="sldCommands" Position="624,56" Size="16,176" Min="0" Max="0" Vertical="true"/>
 
