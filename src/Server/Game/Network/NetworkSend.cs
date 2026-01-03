@@ -46,7 +46,7 @@ public static class NetworkSend
         var packetWriter = new PacketWriter(16);
         packetWriter.WriteEnum(ServerPackets.SAlertMsg);
         packetWriter.WriteByte((byte)menuNo);
-        packetWriter.WriteEnum(menuReset);
+        packetWriter.WriteByte((byte)menuReset);
         packetWriter.WriteInt32(kick ? 1 : 0);
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
 
