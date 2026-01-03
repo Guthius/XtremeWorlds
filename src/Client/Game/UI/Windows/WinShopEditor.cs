@@ -202,7 +202,7 @@ public class WinShopEditor
         };
         Array.Copy(pasted.TradeItem, clone.TradeItem, pasted.TradeItem.Length);
         Shop.Instance[SelectedIndex] = clone;
-        GameState.ShopChanged[SelectedIndex] = true;
+        Shop.IsChanged[SelectedIndex] = true;
         // Refresh UI to reflect pasted data
         OnLoad(SelectedIndex);
         RefreshList();
@@ -218,14 +218,14 @@ public class WinShopEditor
         if (id < 0 || id >= Variables.MaxTrades) return;
         ref var trade = ref Shop.Instance[SelectedIndex].TradeItem[id];
         trade.Item = -1; trade.ItemValue = 0; trade.CostItem = -1; trade.CostValue = 0;
-        GameState.ShopChanged[SelectedIndex] = true;
+        Shop.IsChanged[SelectedIndex] = true;
         OnLoad(SelectedIndex);
     }
 
     public static void OnClear()
     {
         Shop.OnClear(SelectedIndex);
-        GameState.ShopChanged[SelectedIndex] = true;
+        Shop.IsChanged[SelectedIndex] = true;
         OnLoad(SelectedIndex);
         RefreshList();
     }

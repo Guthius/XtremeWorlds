@@ -1152,15 +1152,15 @@ public class Player : PlayerBase
         return false;
     }
 
-    public static void UseItem(int playerId, int invNum)
+    public static void UseItem(int playerId, int inv)
     {
-        if (invNum < 0 || invNum > Core.Globals.Variables.MaxInventory)
+        if (inv < 0 || inv >= Core.Globals.Variables.MaxInventory)
         {
             return;
         }
 
-        var item = GetPlayerInventory(playerId, invNum);
-        if (item < 0 || item > Core.Globals.Variables.MaxItems)
+        var item = GetPlayerInventory(playerId, inv);
+        if (item < 0 || item >= Core.Globals.Variables.MaxItems)
         {
             return;
         }
@@ -1172,7 +1172,7 @@ public class Player : PlayerBase
 
         try
         {
-            Script.Instance?.UseItem(playerId, item, invNum);
+            Script.Instance?.UseItem(playerId, item, inv);
         }
         catch (Exception ex)
         {

@@ -312,7 +312,7 @@ public class WinSkillEditor
         }
 
         Skill.Instance[SelectedIndex] = _history;
-        GameState.SkillChanged[SelectedIndex] = true;
+        Skill.IsChanged[SelectedIndex] = true;
         OnLoad(SelectedIndex);
         RefreshList();
     }
@@ -332,7 +332,7 @@ public class WinSkillEditor
     public static void OnDelete()
     {
         Skill.OnClear(SelectedIndex);
-        GameState.SkillChanged[SelectedIndex] = true;
+        Skill.IsChanged[SelectedIndex] = true;
         OnLoad(SelectedIndex);
         RefreshList();
     }

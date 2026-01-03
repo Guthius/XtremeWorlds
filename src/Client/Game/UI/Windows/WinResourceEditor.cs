@@ -165,7 +165,7 @@ public class WinResourceEditor
         // Paste clipboard into current slot
         var pasted = _history;
         Resource.Instance[SelectedIndex] = pasted;
-        GameState.ResourceChanged[SelectedIndex] = true;
+        Resource.IsChanged[SelectedIndex] = true;
         _history = null;
         if (WindowManager.TryGetControl("winResourceEditor", "btnCopy", out var btn2) && btn2 is Button b2) b2.Text = "Copy";
         OnLoad(SelectedIndex);
@@ -188,7 +188,7 @@ public class WinResourceEditor
     public static void OnDelete()
     {
         MapResource.OnClear(GameState.EditorIndex);
-        GameState.ResourceChanged[GameState.EditorIndex] = true;
+        Resource.IsChanged[GameState.EditorIndex] = true;
         OnLoad(GameState.EditorIndex);
         RefreshList();
     }

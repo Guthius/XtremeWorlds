@@ -393,7 +393,7 @@ public class WinNpcEditor
         if (SelectedIndex >= Core.Objects.NpcBase.Instance.Count) return;
         var pasted = _history;
         Core.Objects.NpcBase.Instance[SelectedIndex] = pasted;
-        GameState.NpcChanged[SelectedIndex] = true;
+        Npc.IsChanged[SelectedIndex] = true;
         // Refresh UI to reflect pasted data
         OnLoad(SelectedIndex);
         RefreshList();
@@ -415,7 +415,7 @@ public class WinNpcEditor
     public static void OnDelete()
     {
         Core.Objects.NpcBase.OnClear(SelectedIndex);
-        GameState.NpcChanged[SelectedIndex] = true;
+        Npc.IsChanged[SelectedIndex] = true;
         OnLoad(SelectedIndex);
         RefreshList();
     }

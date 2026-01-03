@@ -1401,7 +1401,7 @@ public class Crystalshire
                 var newName = GetLiveText(txtName);
                 if (id < Core.Objects.NpcBase.Instance.Count)
                     Core.Objects.NpcBase.Instance[id].Name = newName;
-                GameState.NpcChanged[id] = true;
+                Npc.IsChanged[id] = true;
             };
         }
 
@@ -1423,7 +1423,7 @@ public class Crystalshire
                 {
                     if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
                         Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].AttackSay = GetLiveText(txtAtk);
-                    GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
+                    Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
                 }
             };
         }
@@ -1442,10 +1442,10 @@ public class Crystalshire
             }
         }
 
-        BindCombo("cmbBehavior", v => { if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count) { Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Behavior = (byte)v; GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true; } });
-        BindCombo("cmbFaction", v => { if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count) { Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Faction = (byte)v; GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true; } });
-        BindCombo("cmbSpawnPeriod", v => { if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count) { Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].SpawnTime = (byte)v; GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true; } });
-        BindCombo("cmbAnimation", v => { if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count) { Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Animation = (byte)v; GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true; } });
+        BindCombo("cmbBehavior", v => { if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count) { Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Behavior = (byte)v; Npc.IsChanged[WinNpcEditor.SelectedIndex] = true; } });
+        BindCombo("cmbFaction", v => { if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count) { Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Faction = (byte)v; Npc.IsChanged[WinNpcEditor.SelectedIndex] = true; } });
+        BindCombo("cmbSpawnPeriod", v => { if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count) { Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].SpawnTime = (byte)v; Npc.IsChanged[WinNpcEditor.SelectedIndex] = true; } });
+        BindCombo("cmbAnimation", v => { if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count) { Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Animation = (byte)v; Npc.IsChanged[WinNpcEditor.SelectedIndex] = true; } });
 
         // Skills 1..6
         void BindSkill(string ctrlName, int id)
@@ -1456,7 +1456,7 @@ public class Crystalshire
                 {
                     if (WinNpcEditor.SelectedIndex >= Core.Objects.NpcBase.Instance.Count) return;
                     Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Skill[id] = (byte)Math.Clamp(v, 0, Variables.MaxSkills - 1);
-                    GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
+                    Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
                 }
             });
         }
@@ -1491,7 +1491,7 @@ public class Crystalshire
                 {
                     if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
                         Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Sprite = v;
-                    GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
+                    Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
                 }
             });
 
@@ -1519,7 +1519,7 @@ public class Crystalshire
                     WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
                 {
                     Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].DropItem[slot] = Math.Clamp(cmbItem.Value, 0, Item.Instance.Count - 1);
-                    GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
+                    Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
                 }
             };
         }
@@ -1575,7 +1575,7 @@ public class Crystalshire
                 WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
             {
                 Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].DropItemValue[slot] = v;
-                GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
+                Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
             }
         }, 0, 999999);
 
@@ -1607,7 +1607,7 @@ public class Crystalshire
                     WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
                 {
                     Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].DropChance[slot] = v;
-                    GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
+                    Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
                 }
             });
 
@@ -1618,7 +1618,7 @@ public class Crystalshire
             {
                 if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
                     Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Hp = v;
-                GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
+                Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
             }
         }, 0, 100000000);
 
@@ -1628,7 +1628,7 @@ public class Crystalshire
             {
                 if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
                     Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Experience = v;
-                GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
+                Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
             }
         }, 0, 100000000);
 
@@ -1638,7 +1638,7 @@ public class Crystalshire
             {
                 if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
                     Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Level = (byte)Math.Clamp(v, 0, 255);
-                GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
+                Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
             }
         }, 0, 255);
 
@@ -1648,7 +1648,7 @@ public class Crystalshire
             {
                 if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
                     Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Damage = v;
-                GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
+                Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
             }
         }, 0, 100000000);
 
@@ -1659,7 +1659,7 @@ public class Crystalshire
             {
                 if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
                     Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].DeathSwitch = Math.Max(0, v);
-                GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
+                Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
             }
         }, 0, Variables.MaxSwitches - 1);
 
@@ -1669,7 +1669,7 @@ public class Crystalshire
             {
                 if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
                     Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].DeathSwitchValue = Math.Max(0, v);
-                GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
+                Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
             }
         }, 0, 100000000);
 
@@ -1679,7 +1679,7 @@ public class Crystalshire
             {
                 if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
                     Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].DeathVariable = Math.Max(0, v);
-                GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
+                Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
             }
         }, 0, Variables.MaxVariables - 1);
 
@@ -1689,7 +1689,7 @@ public class Crystalshire
             {
                 if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
                     Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].DeathVariableValue = Math.Max(0, v);
-                GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
+                Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
             }
         }, 0, 100000000);
 
@@ -1699,7 +1699,7 @@ public class Crystalshire
             if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
             {
                 Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].CommonEventType = (byte)Math.Clamp(v, 0, byte.MaxValue);
-                GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
+                Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
             }
         });
 
@@ -1708,7 +1708,7 @@ public class Crystalshire
             if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
             {
                 Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].CommonEventData1 = v;
-                GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
+                Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
             }
         }, int.MinValue, int.MaxValue);
 
@@ -1717,7 +1717,7 @@ public class Crystalshire
             if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
             {
                 Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].CommonEventData2 = v;
-                GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
+                Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
             }
         }, int.MinValue, int.MaxValue);
 
@@ -1732,7 +1732,7 @@ public class Crystalshire
                 {
                     if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
                         Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Damage = v;
-                    GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
+                    Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
                 }
             },
             "txtDamage");
@@ -1747,7 +1747,7 @@ public class Crystalshire
                 {
                     if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
                         Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Range = (byte)v;
-                    GameState.NpcChanged[WinNpcEditor.SelectedIndex] = true;
+                    Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
                 }
             });
 
@@ -2703,7 +2703,7 @@ public class Crystalshire
                 int id = WinShopEditor.SelectedIndex; if (id < 0 || id >= Variables.MaxShops) return;
                 var newName = txtName.Text;
                 Shop.Instance[id].Name = newName;
-                GameState.ShopChanged[id] = true;
+                Shop.IsChanged[id] = true;
 
                 // Update list item text without losing selection/scroll
                 if (WindowManager.TryGetControl("winShopEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox lb)
@@ -2727,7 +2727,7 @@ public class Crystalshire
                 if (int.TryParse(txtBuy.Text, out var rate))
                 {
                     Shop.Instance[WinShopEditor.SelectedIndex].BuyRate = rate;
-                    GameState.ShopChanged[WinShopEditor.SelectedIndex] = true;
+                    Shop.IsChanged[WinShopEditor.SelectedIndex] = true;
                 }
             };
         }
@@ -2750,7 +2750,7 @@ public class Crystalshire
                     trade.ItemValue = Math.Max(0, itemQty);
                 if (WindowManager.TryGetControl("winShopEditor", "txtCostValue", out var cqCtrl) && cqCtrl is TextBox txtCQ && int.TryParse(txtCQ.Text, out var costQty))
                     trade.CostValue = Math.Max(0, costQty);
-                GameState.ShopChanged[WinShopEditor.SelectedIndex] = true;
+                Shop.IsChanged[WinShopEditor.SelectedIndex] = true;
                 WinShopEditor.OnLoad(WinShopEditor.SelectedIndex);
             };
         }
@@ -3121,7 +3121,7 @@ public class Crystalshire
                 int id = WinResourceEditor.SelectedIndex; if (id < 0 || id >= Variables.MaxResources) return;
                 var newName = GetLiveText(txtName);
                 Resource.Instance[id].Name = newName;
-                GameState.ResourceChanged[id] = true;
+                Resource.IsChanged[id] = true;
 
                 // Update list item text without losing selection/scroll
                 if (WindowManager.TryGetControl("winResourceEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox lb)
@@ -3143,7 +3143,7 @@ public class Crystalshire
                 if (i >= 0 && i < Variables.MaxResources)
                 {
                     Resource.Instance[i].SuccessMessage = GetLiveText(txtMsg);
-                    GameState.ResourceChanged[i] = true;
+                    Resource.IsChanged[i] = true;
                 }
             };
         if (WindowManager.TryGetControl("winResourceEditor", "txtMessage2", out var msg2Ctrl) && msg2Ctrl is TextBox txtMsg2)
@@ -3153,7 +3153,7 @@ public class Crystalshire
                 if (i >= 0 && i < Variables.MaxResources)
                 {
                     Resource.Instance[i].EmptyMessage = GetLiveText(txtMsg2);
-                    GameState.ResourceChanged[i] = true;
+                    Resource.IsChanged[i] = true;
                 }
             };
         if (WindowManager.TryGetControl("winResourceEditor", "txtRewardExp", out var expCtrl) && expCtrl is TextBox txtExp)
@@ -3164,7 +3164,7 @@ public class Crystalshire
                 {
                     var s = GetLiveText(txtExp).Trim();
                     Resource.Instance[i].ExperienceReward = int.TryParse(s, out var exp) ? exp : 0;
-                    GameState.ResourceChanged[i] = true;
+                    Resource.IsChanged[i] = true;
                 }
             };
 
@@ -3177,7 +3177,7 @@ public class Crystalshire
                 {
                     int id = GameState.EditorIndex; if (id < 0 || id >= Variables.MaxResources) return;
                     apply(Math.Max(0, combo.Value));
-                    GameState.ResourceChanged[id] = true;
+                    Resource.IsChanged[id] = true;
                 };
             }
         }
@@ -3197,7 +3197,7 @@ public class Crystalshire
                 var s = GetLiveText(txtCe1).Trim();
                 if (!int.TryParse(s, out var v)) v = 0;
                 Resource.Instance[i].CommonEventData1 = v;
-                GameState.ResourceChanged[i] = true;
+                Resource.IsChanged[i] = true;
             };
         }
         if (WindowManager.TryGetControl("winResourceEditor", "txtCommonEventData2", out var ce2Ctrl) && ce2Ctrl is TextBox txtCe2)
@@ -3209,7 +3209,7 @@ public class Crystalshire
                 var s = GetLiveText(txtCe2).Trim();
                 if (!int.TryParse(s, out var v)) v = 0;
                 Resource.Instance[i].CommonEventData2 = v;
-                GameState.ResourceChanged[i] = true;
+                Resource.IsChanged[i] = true;
             };
         }
 
@@ -3223,7 +3223,7 @@ public class Crystalshire
                 {
                     int v = Math.Clamp(sb.Value, sb.Min, sb.Max);
                     apply(v);
-                    if (WinResourceEditor.SelectedIndex >= 0) GameState.ResourceChanged[WinResourceEditor.SelectedIndex] = true;
+                    if (WinResourceEditor.SelectedIndex >= 0) Resource.IsChanged[WinResourceEditor.SelectedIndex] = true;
                 };
             }
         }
@@ -3359,7 +3359,7 @@ public class Crystalshire
                 int id = WinProjectileEditor.SelectedIndex; if (id < 0 || id >= Variables.MaxProjectiles) return;
                 var newName = txtName.Text;
                 Projectile.Instance[id].Name = newName;
-                GameState.ProjectileChanged[id] = true;
+                Projectile.IsChanged[id] = true;
 
                 // Update list item text without losing selection/scroll
                 if (WindowManager.TryGetControl("winProjectileEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox lb)
@@ -3381,7 +3381,7 @@ public class Crystalshire
             {
                 int id = WinProjectileEditor.SelectedIndex; if (id < 0 || id >= Variables.MaxProjectiles) return;
                 Projectile.Instance[id].Sprite = sbSprite.Value;
-                GameState.ProjectileChanged[id] = true;
+                Projectile.IsChanged[id] = true;
             };
         }
 
@@ -3396,7 +3396,7 @@ public class Crystalshire
                     int id = WinProjectileEditor.SelectedIndex; if (id < 0 || id >= Variables.MaxProjectiles) return;
                     int v = Math.Clamp(sb.Value, sb.Min, sb.Max);
                     apply(v);
-                    GameState.ProjectileChanged[id] = true;
+                    Projectile.IsChanged[id] = true;
                     if (WindowManager.TryGetControl("winProjectileEditor", labelName, out var lCtrl) && lCtrl is Label lbl) lbl.Text = v.ToString();
                 };
             }
@@ -3423,7 +3423,7 @@ public class Crystalshire
                 int id = WinProjectileEditor.SelectedIndex; if (id < 0 || id >= Variables.MaxProjectiles) return;
                 int sel = Math.Clamp(cmbAnim.Value, 0, cmbAnim.Items.Count - 1);
                 Projectile.Instance[id].Animation = sel == 0 ? -1 : sel - 1;
-                GameState.ProjectileChanged[id] = true;
+                Projectile.IsChanged[id] = true;
             };
         }
 
@@ -3629,7 +3629,7 @@ public class Crystalshire
                 {
                     var newName = txtName.Text;
                     Skill.Instance[id].Name = newName;
-                    GameState.SkillChanged[id] = true;
+                    Skill.IsChanged[id] = true;
 
                     // Update list item text
                     if (WindowManager.TryGetControl("winSkillEditor", "lstIndex", out var lstCtrl) && lstCtrl is ListBox lb)
@@ -3684,7 +3684,7 @@ public class Crystalshire
             if (i >= 0 && i < Variables.MaxSkills && Skill.Instance.Count > i)
             {
                 Skill.Instance[i].Icon = v;
-                GameState.SkillChanged[i] = true;
+                Skill.IsChanged[i] = true;
             }
         });
 
@@ -3695,7 +3695,7 @@ public class Crystalshire
             if (i >= 0 && i < Variables.MaxSkills && Skill.Instance.Count > i)
             {
                 Skill.Instance[i].Vital = v;
-                GameState.SkillChanged[i] = true;
+                Skill.IsChanged[i] = true;
             }
         });
 
@@ -3706,7 +3706,7 @@ public class Crystalshire
             if (i >= 0 && i < Variables.MaxSkills && Skill.Instance.Count > i)
             {
                 Skill.Instance[i].MpCost = v;
-                GameState.SkillChanged[i] = true;
+                Skill.IsChanged[i] = true;
             }
         });
 
@@ -3717,7 +3717,7 @@ public class Crystalshire
             if (i >= 0 && i < Variables.MaxSkills && Skill.Instance.Count > i)
             {
                 Skill.Instance[i].SpCost = v;
-                GameState.SkillChanged[i] = true;
+                Skill.IsChanged[i] = true;
             }
         });
 
@@ -3728,7 +3728,7 @@ public class Crystalshire
             if (i >= 0 && i < Variables.MaxSkills && Skill.Instance.Count > i)
             {
                 Skill.Instance[i].CastTime = v;
-                GameState.SkillChanged[i] = true;
+                Skill.IsChanged[i] = true;
             }
         });
 
@@ -3739,7 +3739,7 @@ public class Crystalshire
             if (i >= 0 && i < Variables.MaxSkills && Skill.Instance.Count > i)
             {
                 Skill.Instance[i].CdTime = v;
-                GameState.SkillChanged[i] = true;
+                Skill.IsChanged[i] = true;
             }
         });
 
@@ -3750,19 +3750,19 @@ public class Crystalshire
             if (i >= 0 && i < Variables.MaxSkills && Skill.Instance.Count > i)
             {
                 Skill.Instance[i].Range = v;
-                GameState.SkillChanged[i] = true;
+                Skill.IsChanged[i] = true;
             }
         });
 
         // AoE radius
-        BindSlider("sldAoE", 0, 12, v =>
+        BindSlider("sldAoE", 0, 32, v =>
         {
             int i = WinSkillEditor.SelectedIndex;
             if (i >= 0 && i < Variables.MaxSkills && Skill.Instance.Count > i)
             {
                 Skill.Instance[i].AoE = v;
                 Skill.Instance[i].IsAoE = v > 0;
-                GameState.SkillChanged[i] = true;
+                Skill.IsChanged[i] = true;
             }
         });
 
@@ -3786,7 +3786,7 @@ public class Crystalshire
             if (i >= 0 && i < Variables.MaxSkills && Skill.Instance.Count > i)
             {
                 Skill.Instance[i].Type = (byte)v;
-                GameState.SkillChanged[i] = true;
+                Skill.IsChanged[i] = true;
             }
         });
 
@@ -3797,7 +3797,7 @@ public class Crystalshire
             if (i >= 0 && i < Variables.MaxSkills && Skill.Instance.Count > i)
             {
                 Skill.Instance[i].SkillAnim = Math.Clamp(v, 0, Animation.Instance.Count - 1);
-                GameState.SkillChanged[i] = true;
+                Skill.IsChanged[i] = true;
             }
         });
 
@@ -3817,7 +3817,7 @@ public class Crystalshire
                     Skill.Instance[i].IsProjectile = 1;
                     Skill.Instance[i].Projectile = v - 1;
                 }
-                GameState.SkillChanged[i] = true;
+                Skill.IsChanged[i] = true;
             }
         });
 
@@ -3828,7 +3828,7 @@ public class Crystalshire
             if (i >= 0 && i < Variables.MaxSkills && Skill.Instance.Count > i)
             {
                 Skill.Instance[i].CommonEventType = (byte)Math.Clamp(v, 0, byte.MaxValue);
-                GameState.SkillChanged[i] = true;
+                Skill.IsChanged[i] = true;
             }
         });
 
@@ -3843,7 +3843,7 @@ public class Crystalshire
                     if (i < 0 || i >= Variables.MaxSkills || Skill.Instance.Count <= i) return;
                     if (!int.TryParse(tb.Text, out var v)) return;
                     apply(v);
-                    GameState.SkillChanged[i] = true;
+                    Skill.IsChanged[i] = true;
                 };
             }
         }
@@ -3876,7 +3876,7 @@ public class Crystalshire
                 var v = ParseFloatOr(tbMs.Text, current <= 0 ? 1.0f : current);
                 v = Math.Clamp(v, 0.1f, 32.0f);
                 Skill.Instance[i].MoveSpeedMultiplier = v;
-                GameState.SkillChanged[i] = true;
+                Skill.IsChanged[i] = true;
 
                 tbMs.Text = v.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
             };

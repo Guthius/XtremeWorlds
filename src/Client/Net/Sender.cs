@@ -1538,7 +1538,7 @@ public static class Sender
         packetWriter.WriteInt32(index);
         packetWriter.WriteString(Projectile.Instance[index].Name);
         packetWriter.WriteInt32(Projectile.Instance[index].Sprite);
-        packetWriter.WriteInt32((int)Projectile.Instance[index].Range);
+        packetWriter.WriteByte(Projectile.Instance[index].Range);
         packetWriter.WriteInt32(Projectile.Instance[index].Speed);
         packetWriter.WriteInt32(Projectile.Instance[index].Damage);
         packetWriter.WriteInt32(Projectile.Instance[index].Animation);

@@ -491,10 +491,6 @@ namespace Client
         public static bool InitScriptEditor;
 
         // Editor edited items array
-        public static bool[] NpcChanged = new bool[Variables.MaxNpcs];
-        public static bool[] ResourceChanged = new bool[Variables.MaxResources];
-        public static bool[] SkillChanged = new bool[Variables.MaxSkills];
-        public static bool[] ShopChanged = new bool[Variables.MaxShops];
-        public static bool[] ProjectileChanged = new bool[Variables.MaxProjectiles];
+
     }
 }

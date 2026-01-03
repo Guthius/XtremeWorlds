@@ -135,7 +135,7 @@ public class WinProjectileEditor
             return;
         }
         Projectile.Instance[SelectedIndex] = _history;
-        GameState.ProjectileChanged[SelectedIndex] = true;
+        Projectile.IsChanged[SelectedIndex] = true;
         _history = null;
         if (WindowManager.TryGetControl("winProjectileEditor", "btnCopy", out var btn2) && btn2 is Button b2) b2.Text = "Copy";
         OnLoad(SelectedIndex);
@@ -157,7 +157,8 @@ public class WinProjectileEditor
     public static void OnDelete()
     {
         Projectile.OnClear(GameState.EditorIndex);
-        GameState.ProjectileChanged[SelectedIndex] = true;
+        if (SelectedIndex >= 0 && SelectedIndex < Variables.MaxProjectiles)
+            Projectile.IsChanged[SelectedIndex] = true;
         OnLoad(GameState.EditorIndex);
         RefreshList();
     }

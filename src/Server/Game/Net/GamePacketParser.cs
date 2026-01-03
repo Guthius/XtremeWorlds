@@ -3066,7 +3066,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
         Projectile.Instance[index].Name = packetReader.ReadString();
         Projectile.Instance[index].Sprite = packetReader.ReadInt32();
-        Projectile.Instance[index].Range = (byte)packetReader.ReadInt32();
+        Projectile.Instance[index].Range = packetReader.ReadByte();
         Projectile.Instance[index].Speed = packetReader.ReadInt32();
         Projectile.Instance[index].Damage = packetReader.ReadInt32();
         Projectile.Instance[index].Animation = packetReader.ReadInt32();

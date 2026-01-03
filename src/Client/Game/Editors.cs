@@ -1238,7 +1238,7 @@ namespace Client
         {
             for (int i = 0; i < Variables.MaxNpcs; i++)
             {
-                if (GameState.NpcChanged[i])
+                if (Npc.IsChanged[i])
                 {
                     Sender.SendSaveNpc(i);
                 }
@@ -1267,7 +1267,7 @@ namespace Client
 
             for (i = 0; i < Variables.MaxResources; i++)
             {
-                if (GameState.ResourceChanged[i])
+                if (Resource.IsChanged[i])
                 {
                     Sender.SendSaveResource(i);
                 }
@@ -1296,7 +1296,7 @@ namespace Client
 
             for (i = 0; i < Variables.MaxSkills; i++)
             {
-                if (GameState.SkillChanged[i])
+                if (Skill.IsChanged[i])
                 {
                     Sender.SendSaveSkill(i);
                 }
@@ -1322,7 +1322,7 @@ namespace Client
 
             for (i = 0; i < Variables.MaxShops; i++)
             {
-                if (GameState.ShopChanged[i])
+                if (Shop.IsChanged[i])
                 {
                     Sender.SendSaveShop(i);
                 }
@@ -1417,7 +1417,7 @@ namespace Client
         #region Projectile Editor
         public static void ProjectileEditorOK()
         {
-            for (int i = 0; i < Variables.MaxProjectiles;  i++)
+            for (int i = 0; i < Variables.MaxProjectiles; i++)
             {
                 if (Projectile.IsChanged[i])
                 {

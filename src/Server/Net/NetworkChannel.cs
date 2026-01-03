@@ -45,7 +45,7 @@ internal sealed class NetworkChannel<TSession> : INetworkChannel where TSession 
             return;
         }
 
-        if (Debugger.IsAttached)
+        try
         {
             await channelProxy.OnConnectedAsync(this, cancellationToken);
 
@@ -53,32 +53,35 @@ internal sealed class NetworkChannel<TSession> : INetworkChannel where TSession 
                 RunSend(cancellationToken),
                 RunReceive(channelProxy, cancellationToken));
         }
-        else
+        catch (Exception ex) when (ex is IOException or SocketException or ObjectDisposedException or OperationCanceledException)
         {
+            // Typical disconnect/cancellation paths (eg. Broken pipe).
+            _logger.LogDebug(ex, "Network connection terminated");
+        }
+        catch (Exception ex)
+        {
+            // In debug, keep unexpected exceptions loud.
+            if (Debugger.IsAttached)
+            {
+                throw;
+            }
+
+            _logger.LogError(ex, "Unexpected exception handling network connection");
+        }
+        finally
+        {
+            await channelProxy.OnDisconnectedAsync(this, cancellationToken);
+
             try
             {
-                await channelProxy.OnConnectedAsync(this, cancellationToken);
-
-                await Task.WhenAll(
-                    RunSend(cancellationToken),
-                    RunReceive(channelProxy, cancellationToken));
-            }
-            catch (Exception ex) when (ex is IOException or ObjectDisposedException or OperationCanceledException)
-            {
-                _logger.LogDebug(ex, "Network connection terminated");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Unexpected exception handling network connection");
-            }
-            finally
-            {
-                await channelProxy.OnDisconnectedAsync(this, cancellationToken);
-
                 _tcpClient.Close();
-
-                session.Dispose();
             }
+            catch
+            {
+                // ignore
+            }
+
+            session.Dispose();
         }
     }
 
@@ -186,6 +189,11 @@ internal sealed class NetworkChannel<TSession> : INetworkChannel where TSession 
         catch (OperationCanceledException)
         {
             // normal shutdown
+        }
+        catch (Exception ex) when (ex is IOException or SocketException or ObjectDisposedException)
+        {
+            // Normal termination (eg. remote closed the connection).
+            _logger.LogDebug(ex, "Send loop ended for {Ip}", IpAddress);
         }
         catch (Exception ex)
         {
