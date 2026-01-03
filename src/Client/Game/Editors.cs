@@ -1274,7 +1274,7 @@ namespace Client
             }
 
             GameState.MyEditorType = EditorType.None;
-            Resource.ClearChanged();
+            Resource.OnClearChanged();
             Sender.SendCloseEditor();
         }
 
