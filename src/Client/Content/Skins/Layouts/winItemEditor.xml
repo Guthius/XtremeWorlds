@@ -83,17 +83,17 @@
         <ComboBox Name="cmbAmmo" Position="320, 10" Size="160, 18"/>
     </GroupBox>
 
-    <!-- Stats group immediately below grpEquip -->
+    <!-- Stats group -->
     <GroupBox Name="grpStats" Caption="" Position="260, 446" Size="842, 70">
-        <Label Name="lblStr" Text="STR" Position="8, 12" Size="60, 16"/>
+        <Label Name="lblStr" Text="Strength" Position="8, 12" Size="60, 16"/>
         <ScrollBar Name="sldStr" Position="80, 14" Size="200, 12" Min="-255" Max="255" Orientation="Horizontal" ThumbSize="16"/>
-        <Label Name="lblVit" Text="VIT" Position="300, 12" Size="60, 16"/>
+        <Label Name="lblVit" Text="Vitality" Position="300, 12" Size="60, 16"/>
         <ScrollBar Name="sldVit" Position="360, 14" Size="200, 12" Min="-255" Max="255" Orientation="Horizontal" ThumbSize="16"/>
-        <Label Name="lblLuck" Text="LCK" Position="580, 12" Size="60, 16"/>
+        <Label Name="lblLuck" Text="Luck" Position="580, 12" Size="60, 16"/>
         <ScrollBar Name="sldLuck" Position="640, 14" Size="168, 12" Min="-255" Max="255" Orientation="Horizontal" ThumbSize="16"/>
-        <Label Name="lblInt" Text="INT" Position="8, 42" Size="60, 16"/>
+        <Label Name="lblInt" Text="Intelligence" Position="8, 42" Size="60, 16"/>
         <ScrollBar Name="sldInt" Position="80, 44" Size="200, 12" Min="-255" Max="255" Orientation="Horizontal" ThumbSize="16"/>
-        <Label Name="lblSpr" Text="SPR" Position="300, 42" Size="60, 16"/>
+        <Label Name="lblSpr" Text="Spirit" Position="300, 42" Size="60, 16"/>
         <ScrollBar Name="sldSpr" Position="360, 44" Size="200, 12" Min="-255" Max="255" Orientation="Horizontal" ThumbSize="16"/>
     </GroupBox>
 
