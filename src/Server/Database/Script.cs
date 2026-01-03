@@ -996,9 +996,9 @@ public class Script
 
     public void OnLevel(int index)
     {
-        int level_count;
+        int count;
 
-        level_count = 0;
+        count = 0;
 
         while (GetPlayerExperience(index) >= GetPlayerNextLevel(index))
         {
@@ -1008,20 +1008,20 @@ public class Script
             points += ((int)Math.Floor((decimal)GetPlayerStat(index, Stat.Luck) / 10));
             SetPlayerPoints(index, expRollover);
             SetPlayerExperience(index, expRollover);
-            level_count += 1;
+            count += 1;
         }
 
-        if (level_count > 0)
+        if (count > 0)
         {
-            if (level_count == 1)
+            if (count == 1)
             {
                 // singular
-                NetworkSend.SendGlobalMessage(GetPlayerName(index) + " has gained " + level_count + " level!");
+                NetworkSend.SendGlobalMessage(GetPlayerName(index) + " has gained " + count + " level!");
             }
             else
             {
                 // plural
-                NetworkSend.SendGlobalMessage(GetPlayerName(index) + " has gained " + level_count + " levels!");
+                NetworkSend.SendGlobalMessage(GetPlayerName(index) + " has gained " + count + " levels!");
             }
             NetworkSend.SendActionMessage(GetPlayerMap(index), "Level Up", (int)ColorName.Yellow, 1, GetPlayerX(index) * 32, GetPlayerY(index) * 32);
             NetworkSend.SendExperience(index);

@@ -1207,9 +1207,7 @@ namespace Client
         #region Animation Editor
         public static void AnimationEditorOK()
         {
-            int i;
-
-            for (i = 0; i < Variables.MaxAnimations; i++)
+            for (int i = 0; i < Variables.MaxAnimations; i++)
             {
                 if (Animation.IsChanged[i])
                 {
