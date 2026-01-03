@@ -1281,7 +1281,7 @@ namespace Client
         public static void ResourceEditorCancel()
         {
             GameState.MyEditorType = EditorType.None;
-            Resource.ClearChanged();
+            Resource.OnClearChanged();
             Resource.OnClear();
             Sender.SendCloseEditor();
         }
