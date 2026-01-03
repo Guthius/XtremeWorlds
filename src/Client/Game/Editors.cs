@@ -207,14 +207,14 @@ namespace Client
                         if (GameState.EditorAttribute == 1)
                         {
                             instance1.Type = TileType.Item;
-                            instance1.Data1 = GameState.ItemEditorNum;
+                            instance1.Data1 = GameState.ItemEditor;
                             instance1.Data2 = GameState.ItemEditorValue;
                             instance1.Data3 = 0;
                         }
                         else
                         {
                             instance1.Type2 = TileType.Item;
-                            instance1.Data1_2 = GameState.ItemEditorNum;
+                            instance1.Data1_2 = GameState.ItemEditor;
                             instance1.Data2_2 = GameState.ItemEditorValue;
                             instance1.Data3_2 = 0;
                         }
@@ -245,14 +245,14 @@ namespace Client
                         if (GameState.EditorAttribute == 1)
                         {
                             instance1.Type = TileType.Resource;
-                            instance1.Data1 = GameState.ResourceEditorNum;
+                            instance1.Data1 = GameState.ResourceEditor;
                             instance1.Data2 = 0;
                             instance1.Data3 = 0;
                         }
                         else
                         {
                             instance1.Type2 = TileType.Resource;
-                            instance1.Data1_2 = GameState.ResourceEditorNum;
+                            instance1.Data1_2 = GameState.ResourceEditor;
                             instance1.Data2_2 = 0;
                             instance1.Data3_2 = 0;
                         }
@@ -264,14 +264,14 @@ namespace Client
                         if (GameState.EditorAttribute == 1)
                         {
                             instance1.Type = TileType.NpcSpawn;
-                            instance1.Data1 = GameState.SpawnNpcNum;
+                            instance1.Data1 = GameState.SpawnNpc;
                             instance1.Data2 = GameState.SpawnNpcDir;
                             instance1.Data3 = 0;
                         }
                         else
                         {
                             instance1.Type2 = TileType.NpcSpawn;
-                            instance1.Data1_2 = GameState.SpawnNpcNum;
+                            instance1.Data1_2 = GameState.SpawnNpc;
                             instance1.Data2_2 = GameState.SpawnNpcDir;
                             instance1.Data3_2 = 0;
                         }

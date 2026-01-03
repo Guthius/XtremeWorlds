@@ -4,6 +4,7 @@ namespace Core.Objects;
 
 public class ShopBase
 {
+    public static bool[] IsStreaming { get; set; } = new bool[Variables.MaxShops];
     public static bool[] IsChanged { get; set; } = new bool[Variables.MaxShops];
 
     public string Name { get; set; } = "";
@@ -25,6 +26,7 @@ public class ShopBase
     public static void OnClearChanged()
     {
         IsChanged = new bool[Variables.MaxShops];
+        IsStreaming = new bool[Variables.MaxShops];
     }
 
     public static void OnClear(int index)

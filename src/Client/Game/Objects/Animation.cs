@@ -19,8 +19,11 @@ namespace Client
         public static void OnStream(int index)
         {
             if (index < 0 || index >= Variables.MaxAnimations) return;
-            if (Animation.Instance.Count <= index)
+            if (IsStreaming[index]) return;
+
+            if (Animation.Instance.Count <= index || string.IsNullOrEmpty(Animation.Instance[index].Name))
             {
+                IsStreaming[index] = true;
                 Sender.SendRequestAnimation(index);
             }
         }

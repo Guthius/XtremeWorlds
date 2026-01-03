@@ -1108,7 +1108,7 @@ public class Player : PlayerBase
         {
             if (!Moral.Instance[Server.Map.Instance[GetPlayerMap(playerId)].Moral].CanUseItem)
             {
-                NetworkSend.SendPlayerMessage(playerId, "You can't use items here!", (int) ColorName.BrightRed);
+                NetworkSend.SendPlayerMessage(playerId, "You can't use items with this moral!", (int) ColorName.BrightRed);
                 return false;
             }
         }
@@ -1143,7 +1143,7 @@ public class Player : PlayerBase
             return false;
         }
 
-        if (!Data.TempPlayer[playerId].InBank && Data.TempPlayer[playerId].InShop < 0 && Data.TempPlayer[playerId].InTrade < 0)
+        if (!Data.TempPlayer[playerId].InBank && Data.TempPlayer[playerId].InShop < 0 && Data.TempPlayer[playerId].InTrade <= 0)
         {
             return true;
         }
@@ -1159,20 +1159,20 @@ public class Player : PlayerBase
             return;
         }
 
-        var itemNum = GetPlayerInventory(playerId, invNum);
-        if (itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems)
+        var item = GetPlayerInventory(playerId, invNum);
+        if (item < 0 || item > Core.Globals.Variables.MaxItems)
         {
             return;
         }
 
-        if (!CanUseItem(playerId, itemNum))
+        if (!CanUseItem(playerId, item))
         {
             return;
         }
 
         try
         {
-            Script.Instance?.UseItem(playerId, itemNum, invNum);
+            Script.Instance?.UseItem(playerId, item, invNum);
         }
         catch (Exception ex)
         {
@@ -1300,8 +1300,8 @@ public class Player : PlayerBase
             return;
         }
 
-        var itemNum = GetPlayerPaperdoll(playerId, (Equipment) eqSlot);
-        if (itemNum < 0 || itemNum >= Core.Globals.Variables.MaxItems)
+        var item = GetPlayerPaperdoll(playerId, (Equipment) eqSlot);
+        if (item < 0 || item >= Core.Globals.Variables.MaxItems)
         {
             return;
         }
@@ -1309,11 +1309,11 @@ public class Player : PlayerBase
         if (GetPlayerPaperdoll(playerId, (Equipment)eqSlot) < 0 || GetPlayerPaperdoll(playerId, (Equipment)eqSlot) > Core.Globals.Variables.MaxItems)
             return;
 
-        if (FindOpenInvSlot(playerId, itemNum) >= 0)
+        if (FindOpenInvSlot(playerId, item) >= 0)
         {
             try
             {
-                Script.Instance?.UnEquipItem(playerId, itemNum, eqSlot, invSlot);
+                Script.Instance?.UnEquipItem(playerId, item, eqSlot, invSlot);
             }
             catch (Exception ex)
             {

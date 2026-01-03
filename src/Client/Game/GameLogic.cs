@@ -1100,7 +1100,7 @@ namespace Client
             if (WindowManager.TryGetControl("winDialogue", "txtInput", out var inp)) inp!.Text = string.Empty;
 
             // Set state
-            GameState.DiaIndex = index;
+            GameState.Dialogue = index;
             GameState.DiaData1 = data1;
             GameState.DiaData2 = data2;
             GameState.DiaData3 = data3;
@@ -1125,7 +1125,7 @@ namespace Client
             if (index == 1L) // Okay button
             {
                 // Dialogue index
-                switch (GameState.DiaIndex)
+                switch (GameState.Dialogue)
                 {
                     case DialogueType.TradeAmount:
                         {
@@ -1175,7 +1175,7 @@ namespace Client
             else if (index == 2L) // Yes button
             {
                 // Dialogue index
-                switch (GameState.DiaIndex)
+                switch (GameState.Dialogue)
                 {
                     case DialogueType.Trade:
                         {
@@ -1348,7 +1348,7 @@ namespace Client
             else if (index == 3L) // No button
             {
                 // Dialogue index
-                switch (GameState.DiaIndex)
+                switch (GameState.Dialogue)
                 {
                     case DialogueType.Trade:
                         {
@@ -1365,7 +1365,7 @@ namespace Client
             }
 
             CloseDialogue();
-            GameState.DiaIndex = 0L;
+            GameState.Dialogue = 0L;
             diaInput = "";
         }
 

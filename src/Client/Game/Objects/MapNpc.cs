@@ -75,7 +75,7 @@ namespace Client
             {
                 textWidth = (int)Math.Round(textWidth * TextRenderer.BaseScale);
             }
-            var drawX = baseScreenX + (int)Math.Round(Constants.TileSize / 2d - textWidth / 2d);
+            var drawX = baseScreenX + (Constants.TileSize - textWidth) / 2;
 
             int spriteNum = Npc.Instance[(int)npcNum].Sprite;
             if (spriteNum <= 0 || spriteNum > GameState.NumCharacters)

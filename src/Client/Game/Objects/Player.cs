@@ -1123,20 +1123,20 @@ namespace Client
             {
                 textWidth = (int)Math.Round(textWidth * TextRenderer.BaseScale);
             }
-            var drawX = playerScreenX + (int)Math.Round(Constants.TileSize / 2d - textWidth / 2d);
+            var drawX = playerScreenX + (Constants.TileSize - textWidth) / 2;
 
             // Y position: mirror NPC/event logic using sprite graphics when available
             int textY;
-            int spriteNum = Player.Instance[index].Sprite;
+            int sprite = Player.Instance[index].Sprite;
 
-            if (spriteNum <= 0 || spriteNum > GameState.NumCharacters)
+            if (sprite <= 0 || sprite > GameState.NumCharacters)
             {
                 // No valid graphic: render at feet (just above base tile)
                 textY = GameLogic.ConvertMapY(playerWorldY) - 16;
             }
             else
             {
-                var gfxInfo = GameClient.GetGfxInfo(System.IO.Path.Combine(Core.Globals.DataPath.Characters, spriteNum.ToString()));
+                var gfxInfo = GameClient.GetGfxInfo(System.IO.Path.Combine(Core.Globals.DataPath.Characters, sprite.ToString()));
                 if (gfxInfo == null || gfxInfo.Height <= 0)
                 {
                     // Missing or invalid graphic: fallback to feet
@@ -1176,17 +1176,17 @@ namespace Client
             byte anim; // frame index within chosen segment
             int x;
             int y;
-            int spriteNum;
+            int sprite;
             var spriteleft = default(int);
             int attackSpeed; // attack speed duration (ms) controlling full attack cycle length
             Rectangle rect;
 
-            spriteNum = GetPlayerSprite(index);
+            sprite = GetPlayerSprite(index);
 
             if (index < 0 | index > Core.Globals.Variables.MaxPlayers)
                 return;
 
-            if (spriteNum <= 0 | spriteNum > GameState.NumCharacters)
+            if (sprite <= 0 | sprite > GameState.NumCharacters)
                 return;
 
             // Derive attack speed duration (ms). If stored as seconds, multiply here; if already ms, keep as-is.
@@ -1218,7 +1218,7 @@ namespace Client
             // Dynamic row index from direction
             // We'll compute directionRows below once gfxInfo known; use placeholder for now
 
-            var gfxInfo = GameClient.GetGfxInfo(System.IO.Path.Combine(Core.Globals.DataPath.Characters, spriteNum.ToString()));
+            var gfxInfo = GameClient.GetGfxInfo(System.IO.Path.Combine(Core.Globals.DataPath.Characters, sprite.ToString()));
             if (gfxInfo == null)
             {
                 // Handle the case where the graphic information is not found
@@ -1350,7 +1350,7 @@ namespace Client
             // DrawShadow(x, y + 16)
             if (GetPlayerDir(index) == (byte)Direction.Up)
             {
-                GameClient.DrawCharacterSprite(spriteNum, x, y, rect);
+                GameClient.DrawCharacterSprite(sprite, x, y, rect);
             }
 
             // check for paperdolling with directional draw order rules
@@ -1389,7 +1389,7 @@ namespace Client
 
             if (GetPlayerDir(index) != (byte)Direction.Up)
             {
-                GameClient.DrawCharacterSprite(spriteNum, x, y, rect);
+                GameClient.DrawCharacterSprite(sprite, x, y, rect);
             }
 
             // Check to see if we want to stop showing emote

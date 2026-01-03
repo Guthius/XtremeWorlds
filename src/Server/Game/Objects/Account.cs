@@ -1,13 +1,10 @@
 using Core.Globals;
 using Core.Interfaces;
 using Core.Objects;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Server.Game.Net;
 using static Server.Globals.Commands;
 using static Server.Database;
-using Newtonsoft.Json;
-using System.Threading.Tasks;
-using System.Security.AccessControl;
 
 namespace Server
 {
@@ -20,6 +17,27 @@ namespace Server
         public Bank[] Bank;
 
         public static List<Account> Instance { get; set; } = new List<Account>();
+
+        public static void EnsureSize(int size)
+        {
+            if (size <= 0)
+            {
+                return;
+            }
+
+            if (Instance.Count >= size)
+            {
+                return;
+            }
+
+            lock (Instance)
+            {
+                while (Instance.Count < size)
+                {
+                    Instance.Add(new Account());
+                }
+            }
+        }
 
         public Account()
         {
@@ -96,9 +114,8 @@ namespace Server
 
         public static async ValueTask OnLoadAsync(int index, CancellationToken cancellationToken)
         {
-            string login = GetAccountLogin(index);
             JObject data;
-            data = SelectRowByColumn("id", GetStringHash(login), "account", "data");
+            data = SelectRowByColumn("id", GetStringHash(GetAccountLogin(index)), "account", "data");
 
             if (data is null)
             {
@@ -118,6 +135,7 @@ namespace Server
 
         public static Task OnLoadAllAsync()
         {
+            EnsureSize(Core.Globals.Variables.MaxPlayers);
             return Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxPlayers), OnLoadAsync);
         }
 

@@ -14,8 +14,9 @@ namespace Client
         public static void OnStream(int index)
         {
             if (index < 0 || index >= Core.Globals.Variables.MaxItems) return;
-            if (Item.Instance.Count <= index)
+            if (!IsStreaming[index])
             {
+                IsStreaming[index] = true;
                 Sender.SendRequestItem(index);
             }
         }

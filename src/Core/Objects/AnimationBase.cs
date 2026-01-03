@@ -10,6 +10,7 @@ namespace Core.Objects
     {
         public byte Count = 2;
 
+        public static bool[] IsStreaming { get; set; } = new bool[Variables.MaxAnimations];
         public static bool[] IsChanged { get; set; } = new bool[Variables.MaxAnimations];
 
         public AnimationBase()
@@ -38,6 +39,7 @@ namespace Core.Objects
         public static void OnClearChanged()
         {
             IsChanged = new bool[Variables.MaxAnimations];
+            IsStreaming = new bool[Variables.MaxAnimations];
         }
 
         public static void OnClear()

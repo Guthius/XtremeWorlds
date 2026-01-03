@@ -63,7 +63,7 @@ namespace Client
         public static string? DiaHeader;
         public static string? DiaBody;
         public static string? DiaBody2;
-        public static DialogueType DiaIndex;
+        public static DialogueType Dialogue;
         public static long DiaData1;
         public static long DiaData2;
         public static long DiaData3;
@@ -231,15 +231,15 @@ namespace Client
         public static bool AdminPanel;
 
         // Spawn
-        public static int SpawnNpcNum;
+        public static int SpawnNpc;
         public static int SpawnNpcDir;
 
         // Items
-        public static int ItemEditorNum;
+        public static int ItemEditor;
         public static int ItemEditorValue;
 
         // Resources
-        public static int ResourceEditorNum;
+        public static int ResourceEditor;
 
          // Used for map editor heal & trap & slide tiles
         public static int MapEditorHealType;

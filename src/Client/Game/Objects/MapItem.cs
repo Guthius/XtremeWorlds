@@ -17,7 +17,7 @@ namespace Client
         {
             Rectangle srcRec;
             Rectangle destRec;
-            int picNum;
+            int icon;
             int x;
             int y;
 
@@ -26,9 +26,13 @@ namespace Client
 
             Item.OnStream(MapItem.Instance[itemNum].Num);
 
-            picNum = Item.Instance[MapItem.Instance[itemNum].Num].Icon;
+            // Item data may not be loaded yet; wait for streaming to populate before drawing.
+            if (Item.Instance.Count <= MapItem.Instance[itemNum].Num)
+                return;
 
-            if (picNum < 1 | picNum > GameState.NumItems)
+            icon = Item.Instance[MapItem.Instance[itemNum].Num].Icon;
+
+            if (icon < 1 | icon > GameState.NumItems)
                 return;
 
             ref var instance = ref MapItem.Instance[itemNum];
@@ -46,7 +50,7 @@ namespace Client
             x = GameLogic.ConvertMapX(MapItem.Instance[itemNum].X);
             y = GameLogic.ConvertMapY(MapItem.Instance[itemNum].Y);
 
-            string argPath = System.IO.Path.Combine(Core.Globals.DataPath.Items, picNum.ToString());
+            string argPath = System.IO.Path.Combine(Core.Globals.DataPath.Items, icon.ToString());
             GameClient.RenderTexture(ref argPath, x, y, srcRec.X, srcRec.Y, srcRec.Width, srcRec.Height, srcRec.Width,
                 srcRec.Height);
         }

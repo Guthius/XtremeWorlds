@@ -636,7 +636,7 @@ public class Crystalshire
                     btn.CallBack[(int)ControlState.MouseDown] = () =>
                     {
                         if (WindowManager.TryGetControl("winMapEditor", "cmbMapItem", out var c) && c is ComboBox cb)
-                            GameState.ItemEditorNum = Math.Clamp(cb.Value, 0, Item.Instance.Count - 1);
+                            GameState.ItemEditor = Math.Clamp(cb.Value, 0, Item.Instance.Count - 1);
                         if (WindowManager.TryGetControl("winMapEditor", "sldMapItemValue", out var s))
                             GameState.ItemEditorValue = Math.Clamp(s.Value, 1, 1024);
                     };
@@ -664,14 +664,14 @@ public class Crystalshire
                         }
                         cmb.Value = 0;
                     }
-                    cmb.CallBack[(int)ControlState.MouseMove] = () => { GameState.ResourceEditorNum = Math.Clamp(cmb.Value, 0, Variables.MaxResources - 1); };
+                    cmb.CallBack[(int)ControlState.MouseMove] = () => { GameState.ResourceEditor = Math.Clamp(cmb.Value, 0, Variables.MaxResources - 1); };
                 }
                 if (WindowManager.TryGetControl("winMapEditor", "btnResourceOk", out var btn))
                 {
                     btn.CallBack[(int)ControlState.MouseDown] = () =>
                     {
                         if (WindowManager.TryGetControl("winMapEditor", "cmbResource", out var c) && c is ComboBox cb)
-                            GameState.ResourceEditorNum = Math.Clamp(cb.Value, 0, Variables.MaxResources - 1);
+                            GameState.ResourceEditor = Math.Clamp(cb.Value, 0, Variables.MaxResources - 1);
                     };
                 }
             }
@@ -723,7 +723,7 @@ public class Crystalshire
                             slot = Math.Max(0, cb.Value); // index maps to slot (0=None, 1..)
                         if (WindowManager.TryGetControl("winMapEditor", "sldNpcDir", out var s))
                             GameState.SpawnNpcDir = Math.Clamp(s.Value, 0, 3);
-                        GameState.SpawnNpcNum = slot;
+                        GameState.SpawnNpc = slot;
                     };
                 }
             }
@@ -3563,13 +3563,13 @@ public class Crystalshire
                     int id = WinAnimationEditor.SelectedIndex; if (id < 0 || id >= Animation.Instance.Count) return;
                     var a = Animation.Instance[id];
 
-                    int spriteNum = 0;
+                    int sprite = 0;
                     if (WindowManager.TryGetControl("winAnimationEditor", barSpriteName, out var sc) && sc is ScrollBar sbSprite)
-                        spriteNum = sbSprite.Value;
+                        sprite = sbSprite.Value;
 
-                    if (spriteNum <= 0 || spriteNum > GameState.NumAnimations) return;
+                    if (sprite <= 0 || sprite > GameState.NumAnimations) return;
 
-                    var path = System.IO.Path.Combine(DataPath.Animations, spriteNum + GameState.GfxExt);
+                    var path = System.IO.Path.Combine(DataPath.Animations, sprite + GameState.GfxExt);
                     var tex = GameClient.GetGfxInfo(path);
                     if (tex is null || tex.Width == 0 || tex.Height == 0) return;
 

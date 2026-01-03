@@ -17,9 +17,13 @@ namespace Client
         #region Database
 
         public static void OnStream(int index)
-{           if (index < 0 || index >= Core.Globals.Variables.MaxProjectiles) return;
-            if (Projectile.Instance.Count <= index)
+        {
+            if (index < 0 || index >= Core.Globals.Variables.MaxProjectiles) return;
+            if (!IsStreaming[index])
+            {
+                IsStreaming[index] = true;
                 Sender.SendRequestProjectile(index);
+            }
         }
 
         #endregion

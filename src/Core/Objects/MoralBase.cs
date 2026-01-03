@@ -4,6 +4,7 @@ namespace Core.Objects
 {
     public class MoralBase
     {
+        public static bool[] IsStreaming = new bool[Variables.MaxMorals];
         public static bool[] IsChanged = new bool[Variables.MaxMorals];
 
         public string Name;
@@ -27,6 +28,7 @@ namespace Core.Objects
         public static void OnClearChanged()
         {
             IsChanged = new bool[Variables.MaxMorals];
+            IsStreaming = new bool[Variables.MaxMorals];
         }
 
         public static void OnClear(int index)

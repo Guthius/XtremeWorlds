@@ -14,8 +14,9 @@ namespace Client
         public static void OnStream(int index)
         {
             if (index < 0 || index >= Variables.MaxSkills) return;
-            if (Skill.Instance.Count <= index)
+            if (!IsStreaming[index])
             {
+                IsStreaming[index] = true;
                 Sender.SendRequestSkill(index);
             }
         }

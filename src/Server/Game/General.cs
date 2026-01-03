@@ -287,7 +287,7 @@ public static class General
 
     public static async System.Threading.Tasks.Task LoadGameContentAsync()
     {
-        const int maxConcurrency = 4;
+        const int maxConcurrency = 10;
         using var semaphore = new SemaphoreSlim(maxConcurrency);
 
         var tasks = new[]

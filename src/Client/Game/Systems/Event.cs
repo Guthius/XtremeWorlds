@@ -671,18 +671,18 @@ namespace Client
             {
                 textWidth = (int)Math.Round(textWidth * TextRenderer.BaseScale);
             }
-            var drawX = baseWorldX + (int)Math.Round(Constants.TileSize / 2d - textWidth / 2d);
+            var drawX = baseWorldX + (Constants.TileSize - textWidth) / 2;
 
             if (Data.MapEvents[index].GraphicType == 1)
             {
-                int spriteNum = Data.MapEvents[index].Graphic;
-                if (spriteNum <= 0 || spriteNum > GameState.NumCharacters)
+                int sprite = Data.MapEvents[index].Graphic;
+                if (sprite <= 0 || sprite > GameState.NumCharacters)
                 {
                     textY = GameLogic.ConvertMapY(Data.MapEvents[index].Y) - 16;
                 }
                 else
                 {
-                    var gfxInfo = GameClient.GetGfxInfo(System.IO.Path.Combine(Core.Globals.DataPath.Characters, spriteNum.ToString()));
+                    var gfxInfo = GameClient.GetGfxInfo(System.IO.Path.Combine(Core.Globals.DataPath.Characters, sprite.ToString()));
                     if (gfxInfo == null || gfxInfo.Height <= 0)
                     {
                         textY = GameLogic.ConvertMapY(Data.MapEvents[index].Y) - 16;

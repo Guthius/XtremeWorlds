@@ -17,8 +17,9 @@ namespace Client
         public static void OnStream(int index)
         {
             if (index < 0 || index >= Variables.MaxResources) return;
-            if (Resource.Instance.Count <= index)
+            if (!IsStreaming[index])
             {
+                IsStreaming[index] = true;
                 Sender.SendRequestResource(index);
             }
         }

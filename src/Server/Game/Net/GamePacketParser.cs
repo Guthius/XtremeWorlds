@@ -244,14 +244,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
                 return;
             }
 
-            for (int i = 0; i <= session.Id; i++)
-            {
-                if (Account.Instance.Count <= i)
-                    Account.Instance.Add(new Account());
-            }
-
+            Account.EnsureSize(session.Id + 1);
             Account.Instance[session.Id].Login = login;
-
             await Account.OnLoadAsync(session.Id, new CancellationToken());
 
             if (Account.Instance[session.Id].Login != login)
@@ -371,11 +365,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
                 return;
             }
         
-            for (int i = 0; i <= session.Id; i++)
-            {
-                if (Account.Instance.Count <= i)
-                    Account.Instance.Add(new Account());
-            }
             Account.Instance[session.Id].Login = login;
             Account.Instance[session.Id].Password = password;
 
@@ -448,15 +437,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             if (job < 0 | job > Core.Globals.Variables.MaxJobs)
                 return;
 
-            if (Job.Instance.Count <= job)
-            {
-                for (int i = Job.Instance.Count; i <= job; i++)
-                {
-                    var instance = new Job();
-                    Job.Instance.Add(instance);
-                }
-            }
-
             if (sex == (byte)Sex.Male)
             {
                 sprite = Job.Instance[job].MaleSprite;
@@ -475,11 +455,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             Database.CharacterList?.Add(name);
             Database.AddChar(session.Id, slot, name, (byte)sex, (byte)job, sprite).Wait();
 
-            // Ensure the newly created slot is the active character for this session.
-            while (PlayerBase.Instance.Count <= session.Id)
-            {
-                PlayerBase.Instance.Add(new PlayerBase());
-            }
             PlayerBase.Instance[session.Id] = Account.Instance[session.Id].Player[slot];
 
             Log.Add("Character " + name + " added to " + GetAccountLogin(session.Id) + "'s account.", Constant.PlayerLog);
@@ -502,13 +477,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
                     return;
                 }
 
-                // Ensure the in-memory player list is large enough, then assign the selected character
-                // at the session's player index. (Using Add() here breaks indexing and can load the wrong character.)
-                while (PlayerBase.Instance.Count <= session.Id)
-                {
-                    PlayerBase.Instance.Add(new PlayerBase());
-                }
-
+                PlayerBase.EnsureSize(session.Id + 1);
                 PlayerBase.Instance[session.Id] = Account.Instance[session.Id].Player[slot];
                 Server.Player.OnAdd(session);
             }
@@ -1666,14 +1635,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         if (shopNum < 0 | shopNum > Core.Globals.Variables.MaxShops)
             return;
 
-        for (var i = 0; i <= shopNum; i++)
-        {
-            if (Shop.Instance.Count <= i)
-            {
-                Shop.Instance.Add(new Shop());
-            }
-        }
-
         Shop.Instance[shopNum].BuyRate = buffer.ReadInt32();
         Shop.Instance[shopNum].Name = buffer.ReadString();
 
@@ -1727,68 +1688,60 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
     {
         var buffer = new PacketReader(bytes);
 
-        var skillNum = buffer.ReadInt32();
+        var skill = buffer.ReadInt32();
 
         // Prevent hacking
-        if (skillNum < 0 | skillNum > Core.Globals.Variables.MaxSkills)
+        if (skill < 0 | skill > Core.Globals.Variables.MaxSkills)
             return;
 
-        for (int i = 0; i <= skillNum; i++)
-        {
-            if (Skill.Instance.Count <= i)
-            {
-                Skill.Instance.Add(new Skill());
-            }
-        }
-
-        Skill.Instance[skillNum].AccessReq = buffer.ReadInt32();
-        Skill.Instance[skillNum].AoE = buffer.ReadInt32();
-        Skill.Instance[skillNum].CastAnim = buffer.ReadInt32();
-        Skill.Instance[skillNum].CastTime = buffer.ReadInt32();
-        Skill.Instance[skillNum].CdTime = buffer.ReadInt32();
-        Skill.Instance[skillNum].JobReq = buffer.ReadInt32();
-        Skill.Instance[skillNum].Dir = buffer.ReadByte();
-        Skill.Instance[skillNum].Duration = buffer.ReadInt32();
-        Skill.Instance[skillNum].Icon = buffer.ReadInt32();
-        Skill.Instance[skillNum].Interval = buffer.ReadInt32();
-        Skill.Instance[skillNum].IsAoE = buffer.ReadBoolean();
-        Skill.Instance[skillNum].LevelReq = buffer.ReadInt32();
-        Skill.Instance[skillNum].Map = buffer.ReadInt32();
-        Skill.Instance[skillNum].MpCost = buffer.ReadInt32();
-        Skill.Instance[skillNum].Name = buffer.ReadString();
-        Skill.Instance[skillNum].Range = buffer.ReadInt32();
-        Skill.Instance[skillNum].SkillAnim = buffer.ReadInt32();
-        Skill.Instance[skillNum].StunDuration = buffer.ReadInt32();
-        Skill.Instance[skillNum].Type = buffer.ReadByte();
-        Skill.Instance[skillNum].Vital = buffer.ReadInt32();
-        Skill.Instance[skillNum].X = buffer.ReadInt32();
-        Skill.Instance[skillNum].Y = buffer.ReadInt32();
+        Skill.Instance[skill].AccessReq = buffer.ReadInt32();
+        Skill.Instance[skill].AoE = buffer.ReadInt32();
+        Skill.Instance[skill].CastAnim = buffer.ReadInt32();
+        Skill.Instance[skill].CastTime = buffer.ReadInt32();
+        Skill.Instance[skill].CdTime = buffer.ReadInt32();
+        Skill.Instance[skill].JobReq = buffer.ReadInt32();
+        Skill.Instance[skill].Dir = buffer.ReadByte();
+        Skill.Instance[skill].Duration = buffer.ReadInt32();
+        Skill.Instance[skill].Icon = buffer.ReadInt32();
+        Skill.Instance[skill].Interval = buffer.ReadInt32();
+        Skill.Instance[skill].IsAoE = buffer.ReadBoolean();
+        Skill.Instance[skill].LevelReq = buffer.ReadInt32();
+        Skill.Instance[skill].Map = buffer.ReadInt32();
+        Skill.Instance[skill].MpCost = buffer.ReadInt32();
+        Skill.Instance[skill].Name = buffer.ReadString();
+        Skill.Instance[skill].Range = buffer.ReadInt32();
+        Skill.Instance[skill].SkillAnim = buffer.ReadInt32();
+        Skill.Instance[skill].StunDuration = buffer.ReadInt32();
+        Skill.Instance[skill].Type = buffer.ReadByte();
+        Skill.Instance[skill].Vital = buffer.ReadInt32();
+        Skill.Instance[skill].X = buffer.ReadInt32();
+        Skill.Instance[skill].Y = buffer.ReadInt32();
 
         // projectiles
-        Skill.Instance[skillNum].IsProjectile = buffer.ReadInt32();
-        Skill.Instance[skillNum].Projectile = buffer.ReadInt32();
+        Skill.Instance[skill].IsProjectile = buffer.ReadInt32();
+        Skill.Instance[skill].Projectile = buffer.ReadInt32();
 
-        Skill.Instance[skillNum].KnockBack = buffer.ReadByte();
-        Skill.Instance[skillNum].KnockBackTiles = buffer.ReadByte();
-        Skill.Instance[skillNum].MultiDirMask = buffer.ReadInt32();
+        Skill.Instance[skill].KnockBack = buffer.ReadByte();
+        Skill.Instance[skill].KnockBackTiles = buffer.ReadByte();
+        Skill.Instance[skill].MultiDirMask = buffer.ReadInt32();
         
         // chain skills
-        Skill.Instance[skillNum].ChainOnHitSkillId = buffer.ReadInt32();
+        Skill.Instance[skill].ChainOnHitSkillId = buffer.ReadInt32();
 
         // common event fields
-        Skill.Instance[skillNum].CommonEventType = buffer.ReadByte();
-        Skill.Instance[skillNum].CommonEventData1 = buffer.ReadInt32();
-        Skill.Instance[skillNum].CommonEventData2 = buffer.ReadInt32();
+        Skill.Instance[skill].CommonEventType = buffer.ReadByte();
+        Skill.Instance[skill].CommonEventData1 = buffer.ReadInt32();
+        Skill.Instance[skill].CommonEventData2 = buffer.ReadInt32();
 
-        Skill.Instance[skillNum].MoveSpeedMultiplier = buffer.ReadSingle();
+        Skill.Instance[skill].MoveSpeedMultiplier = buffer.ReadSingle();
 
         // Optional trailing fields (backward compatible)
-        Skill.Instance[skillNum].SpCost = buffer.RemainingBytes >= sizeof(int) ? buffer.ReadInt32() : 0;
+        Skill.Instance[skill].SpCost = buffer.RemainingBytes >= sizeof(int) ? buffer.ReadInt32() : 0;
 
         // Save it
-        NetworkSend.SendUpdateSkillToAll(skillNum);
-        Skill.OnSave(skillNum);
-        Log.Add(GetAccountLogin(session.Id) + " saved Skill #" + skillNum + ".", Constant.AdminLog);
+        NetworkSend.SendUpdateSkillToAll(skill);
+        Skill.OnSave(skill);
+        Log.Add(GetAccountLogin(session.Id) + " saved Skill #" + skill + ".", Constant.AdminLog);
     }
 
     public static void Packet_SetAccess(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -2948,14 +2901,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             return;
         }
 
-        for (var i = 0; i <= index; i++)
-        {
-            if (Moral.Instance.Count <= i)
-            {
-                Moral.Instance.Add(new Moral());
-            }
-        }
-
         var moral = Moral.Instance[index];
 
         moral.Name = packetReader.ReadString();
@@ -3119,14 +3064,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             return;
         }
 
-        for (var i = 0; i <= index; i++)
-        {
-            if (Projectile.Instance.Count <= i)
-            {
-                Projectile.Instance.Add(new Projectile());
-            }
-        }
-
         Projectile.Instance[index].Name = packetReader.ReadString();
         Projectile.Instance[index].Sprite = packetReader.ReadInt32();
         Projectile.Instance[index].Range = (byte)packetReader.ReadInt32();
@@ -3184,14 +3121,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         if (index < 0 || index >= Core.Globals.Variables.MaxResources)
         {
             return;
-        }
-
-        for (var i = 0; i <= index; i++)
-        {
-            if (Resource.Instance.Count <= i)
-            {
-                Resource.Instance.Add(new Resource());
-            }
         }
 
         Resource.Instance[index].Animation = packetReader.ReadInt32();
@@ -3290,14 +3219,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         if (index < 0 || index > Core.Globals.Variables.MaxItems)
         {
             return;
-        }
-
-        for (var i = 0; i <= index; i++)
-        {
-            if (Item.Instance.Count <= i)
-            {
-                Item.Instance.Add(new Item());
-            }
         }
 
         Item.Instance[index].AccessReq = packetReader.ReadInt32();
@@ -3434,14 +3355,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         if (index < 0 || index > Variables.MaxAnimations)
         {
             return;
-        }
-
-        for (var i = 0; i <= index; i++)
-        {
-            if (Animation.Instance.Count <= i)
-            {
-                Animation.Instance.Add(new Animation());
-            }
         }
 
         for (var i = 0; i < Animation.Instance[index].Frames.Length; i++)

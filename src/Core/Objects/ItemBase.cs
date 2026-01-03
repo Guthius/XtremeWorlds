@@ -6,6 +6,7 @@ namespace Core.Objects
 {
     public class ItemBase
     {
+        public static bool[] IsStreaming { get; set; } = new bool[Variables.MaxItems];
         public static bool[] IsChanged { get; set; } = new bool[Variables.MaxItems];
 
         public ItemBase()
@@ -27,9 +28,6 @@ namespace Core.Objects
         public int Data1;
         public int Data2;
         public int Data3;
-
-        // Common event trigger (match NPC/Skill/Resource editors)
-        // 0 = None, 1..N = (CommonEventTrigger + 1)
         public byte CommonEventType;
         public int CommonEventData1;
         public int CommonEventData2;
@@ -63,6 +61,7 @@ namespace Core.Objects
         public static void OnClearChanged()
         {
             IsChanged = new bool[Variables.MaxItems];
+            IsStreaming = new bool[Variables.MaxItems];
         }
 
         public static void OnClear()

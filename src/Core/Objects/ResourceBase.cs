@@ -4,6 +4,7 @@ namespace Core.Objects
 {
     public class ResourceBase
     {
+        public static bool[] IsStreaming = new bool[Variables.MaxResources];
         public static bool[] IsChanged = new bool[Variables.MaxResources];
 
         public string Name = string.Empty;
@@ -34,9 +35,10 @@ namespace Core.Objects
             EmptyMessage = "";
         }
 
-        public static void ClearChanged()
+        public static void OnClearChanged()
         {
             IsChanged = new bool[Variables.MaxResources];
+            IsStreaming = new bool[Variables.MaxResources];
         }
 
         public static void OnClear(int index)

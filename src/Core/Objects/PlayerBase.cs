@@ -43,6 +43,27 @@ namespace Core.Objects
 
         public static List<PlayerBase> Instance { get; private set; } = new List<PlayerBase>();
 
+        public static void EnsureSize(int size)
+        {
+            if (size <= 0)
+            {
+                return;
+            }
+
+            if (Instance.Count >= size)
+            {
+                return;
+            }
+
+            lock (Instance)
+            {
+                while (Instance.Count < size)
+                {
+                    Instance.Add(new PlayerBase());
+                }
+            }
+        }
+
         public PlayerBase()
         {
             Name = "";

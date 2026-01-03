@@ -4,6 +4,7 @@ namespace Core.Objects;
 
 public class SkillBase
 {
+    public static bool[] IsStreaming { get; set; } = new bool[Variables.MaxSkills];
     public static bool[] IsChanged { get; set; } = new bool[Variables.MaxSkills];
 
     public SkillBase()
@@ -64,6 +65,7 @@ public class SkillBase
     public static void OnClearChanged()
     {
         IsChanged = new bool[Variables.MaxSkills];
+        IsStreaming = new bool[Variables.MaxSkills];
     }
 
     public static void OnClear()

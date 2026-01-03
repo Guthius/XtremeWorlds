@@ -255,11 +255,13 @@ namespace Client
             }
         }
 
-        public static void OnStream(int npcNum)
+        public static void OnStream(int index)
         {
-            if (npcNum >= 0 && string.IsNullOrEmpty(Npc.Instance[npcNum].Name))
+            if (index < 0 || index >= Variables.MaxNpcs) return;
+            if (!IsStreaming[index])
             {
-                Sender.SendRequestNpc(npcNum);
+                IsStreaming[index] = true;
+                Sender.SendRequestNpc(index);
             }
         }
     }

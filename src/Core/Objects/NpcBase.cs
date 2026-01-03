@@ -4,6 +4,7 @@ namespace Core.Objects;
 
 public class NpcBase
 {
+    public static bool[] IsStreaming { get; set; } = new bool[Variables.MaxNpcs];
     public static bool[] IsChanged { get; set; } = new bool[Variables.MaxNpcs];
 
     public NpcBase()
@@ -64,6 +65,7 @@ public class NpcBase
     public static void OnClearChanged()
     {
         IsChanged = new bool[Variables.MaxNpcs];
+        IsStreaming = new bool[Variables.MaxNpcs];
     }
 
     public static void OnClear()

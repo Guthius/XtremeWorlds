@@ -10,6 +10,8 @@ public static class Network
 {
     private static bool DebugPackets => SettingsManager.Instance.NetworkDebug;
 
+    private const uint CompressionFlag = 1u << 31;
+
     private static readonly ConcurrentDictionary<int, long> SentCounts = new();
     private static long _sentBytes;
     private static int _lastSentReportTick;
@@ -105,7 +107,7 @@ public static class Network
             if (data.Length >= 8)
             {
                 // PacketWriter.GetBytes() prefix: [len:int32][packetId:int32]...
-                int id = BinaryPrimitives.ReadInt32LittleEndian(data.AsSpan(4, 4));
+                int id = unchecked((int)(BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(4, 4)) & ~CompressionFlag));
                 SentCounts.AddOrUpdate(id, 1, static (_, v) => v + 1);
             }
 
@@ -121,6 +123,12 @@ public static class Network
                     var snapshot = SentCounts.ToArray();
                     SentCounts.Clear();
 
+                    long packets = 0;
+                    for (int i = 0; i < snapshot.Length; i++)
+                    {
+                        packets += snapshot[i].Value;
+                    }
+
                     Array.Sort(snapshot, static (a, b) => b.Value.CompareTo(a.Value));
                     int take = Math.Min(6, snapshot.Length);
                     if (take > 0)
@@ -133,11 +141,11 @@ public static class Network
                             parts.Add($"{name}({id}):{snapshot[i].Value}");
                         }
 
-                        Console.WriteLine($"[SEND] Bytes={bytes} Header={string.Join(",", parts)}");
+                        Console.WriteLine($"[SEND] Packets={packets} Bytes={bytes} Header={string.Join(",", parts)}");
                     }
                     else
                     {
-                        Console.WriteLine($"[SEND] Bytes={bytes} Header={{}}");
+                        Console.WriteLine($"[SEND] Packets={packets} Bytes={bytes} Header={{}}");
                     }
                 }
                 catch

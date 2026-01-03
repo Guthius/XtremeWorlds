@@ -59,13 +59,13 @@ public class WinInventory
 
         for (var slot = 0; slot < Variables.MaxInventory; slot++)
         {
-            var itemNum = GetPlayerInventory(GameState.MyIndex, slot);
-            if (itemNum < 0 || itemNum >= Core.Globals.Variables.MaxItems)
+            var item = GetPlayerInventory(GameState.MyIndex, slot);
+            if (item < 0 || item >= Core.Globals.Variables.MaxItems)
             {
                 continue;
             }
 
-            Item.OnStream(itemNum);
+            Item.OnStream(item);
 
             if (WindowManager.DragBox.Origin == PartOrigin.Inventory &&
                 WindowManager.DragBox.Slot == slot)
@@ -73,9 +73,14 @@ public class WinInventory
                 continue;
             }
 
-            var itemIcon = Item.Instance[itemNum].Icon;
+            if (Item.Instance.Count <= item)
+            {
+                continue;
+            }
 
-            if (itemIcon <= 0 || itemIcon > GameState.NumItems)
+            var icon = Item.Instance[item].Icon;
+
+            if (icon <= 0 || icon > GameState.NumItems)
             {
                 return;
             }
@@ -112,12 +117,12 @@ public class WinInventory
 
             if (!skipItem)
             {
-                if (itemIcon > 0 && itemIcon <= GameState.NumItems)
+                if (icon > 0 && icon <= GameState.NumItems)
                 {
                     var top = yO + GameState.InvTop + (GameState.InvOffsetY + 32) * (slot / GameState.InvColumns);
                     var left = xO + GameState.InvLeft + (GameState.InvOffsetX + 32) * (slot % GameState.InvColumns);
 
-                    var iconPath = Path.Combine(DataPath.Items, itemIcon.ToString());
+                    var iconPath = Path.Combine(DataPath.Items, icon.ToString());
 
                     GameClient.RenderTexture(ref iconPath, left, top, 0, 0, 32, 32, 32, 32);
 

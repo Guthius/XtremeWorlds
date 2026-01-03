@@ -25,12 +25,13 @@ namespace Client
 
         #region Database
 
-        public static void OnStream(int Index)
+        public static void OnStream(int index)
         {
-            if (Index < 0 || Index >= Core.Globals.Variables.MaxShops) return;
-            if (Shop.Instance.Count <= Index)
+            if (index < 0 || index >= Core.Globals.Variables.MaxShops) return;
+            if (!IsStreaming[index])
             {
-                Sender.SendRequestShop(Index);
+                IsStreaming[index] = true;
+                Sender.SendRequestShop(index);
             }
             
         }
