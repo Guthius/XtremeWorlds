@@ -47,7 +47,7 @@ public static class NetworkSend
         packetWriter.WriteEnum(ServerPackets.SAlertMsg);
         packetWriter.WriteByte((byte)menuNo);
         packetWriter.WriteByte((byte)menuReset);
-        packetWriter.WriteInt32(kick ? 1 : 0);
+        packetWriter.WriteBoolean(kick);
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
 
         if (kick)

@@ -202,7 +202,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         var dialogueIndex = buffer.ReadByte();
         var menuReset = buffer.ReadByte();
-        var kick = buffer.ReadInt32();
+        var kick = buffer.ReadBoolean();
 
         if (menuReset > 0)
         {
