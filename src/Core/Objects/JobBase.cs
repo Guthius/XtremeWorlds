@@ -54,7 +54,7 @@ namespace Core.Objects
                 Instance[index] = new JobBase();
         }
 
-        public static void ClearChanged()
+        public static void OnClearChanged()
         {
             for (int i = 0; i < Variables.MaxJobs; i++)
                 IsChanged[i] = false;

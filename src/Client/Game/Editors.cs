@@ -1358,7 +1358,7 @@ namespace Client
         public static void JobEditorCancel()
         {
             GameState.MyEditorType = EditorType.None;
-            Job.ClearChanged();
+            Job.OnClearChanged();
             Job.OnClear();
             Sender.SendCloseEditor();
         }
