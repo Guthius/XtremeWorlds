@@ -7,8 +7,8 @@ namespace Client.Game.UI;
 
 public class WindowLoader
 {
-    private const Font DefaultWindowFont = Font.Georgia;
-    private const Font DefaultControlFont = Font.Georgia;
+    private static Font DefaultWindowFont => TextRenderer.ConfiguredFont;
+    private static Font DefaultControlFont => TextRenderer.ConfiguredFont;
 
     public static Window FromLayout(string layoutName)
     {

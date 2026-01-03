@@ -1,5 +1,6 @@
 ﻿using Core.Configurations;
 using Core.Globals;
+using Client.Game.UI.Controls;
 using Microsoft.Xna.Framework;
 using System.IO;
 
@@ -145,21 +146,35 @@ public class WinJobs
             text = Job.Instance[GameState.NewCharJob].Desc;
         }
 
-        TextRenderer.WordWrap(text, winJobs.Font, 250, ref lines);
+        // Prefer layout-driven bounds: center within the description background.
+        int bgX = 108;
+        int bgY = 55;
+        int bgW = 210;
+        if (WindowManager.TryGetControl("winJobs", "picBackground", out var picBackground) && picBackground is PictureBox bg)
+        {
+            bgX = bg.X;
+            bgY = bg.Y;
+            bgW = bg.Width;
+        }
 
-        var y = winJobs.Y + 60;
+        var wrapWidth = Math.Max(1, bgW - 10);
+        TextRenderer.WordWrap(text, winJobs.Font, wrapWidth, ref lines);
+
+        var y = winJobs.Y + bgY + 5;
 
         foreach (var line in lines)
         {
             if (line == "" || line == null) continue;
-            
-            var x = winJobs.X + 108 + 200 / 2 - TextRenderer.GetTextWidth(line, winJobs.Font) / 2;
 
+            var textWidth = TextRenderer.GetTextWidth(line, winJobs.Font);
+
+            // Keep the historical padding correction, but include it in the centering math.
             var textClean = new string(line.Where(c => TextRenderer.Fonts[winJobs.Font].Characters.Contains(c)).ToArray());
             var textSize = TextRenderer.Fonts[winJobs.Font].MeasureString(textClean);
+            var padding = (int)(textSize.X / 6);
+            var totalWidth = textWidth + padding * 2;
 
-            var padding = (int) (textSize.X / 6);
-
+            var x = winJobs.X + bgX + (bgW - totalWidth) / 2;
             TextRenderer.Render(line, x + padding, y, Color.White, Color.Black, winJobs.Font);
 
             y += lineHeight;

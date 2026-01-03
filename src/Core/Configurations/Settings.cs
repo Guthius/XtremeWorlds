@@ -45,6 +45,13 @@ public class SettingsManager
     public int SpriteDirections { get; set; } = 4;
     public bool BitmapFont { get; set; } = true;
 
+    // Default UI sprite font name. Must match a Core.Globals.Font enum name (e.g. "Georgia", "Arial", "Verdana").
+    public string FontName { get; set; } = "Georgia";
+
+    // When BitmapFont is enabled, this selects which legacy bitmap font to use for UI/text that requests Font.Georgia.
+    // Must match a Core.Globals.BitmapFont enum name (e.g. "Georgia", "Georgia_16", "Verdana_12").
+    public string BitmapFontName { get; set; } = "Georgia";
+
     public bool NetworkDebug { get; set; } = true;
     
     private static SettingsManager Load()

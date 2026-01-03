@@ -662,11 +662,16 @@ namespace Client
             var backcolor = Color.Black;
             var name = Data.MapEvents[index].Name;
 
+            var uiFont = TextRenderer.ConfiguredFont;
+
             // X position: use same centering math as player names (sprite feet center)
             int baseWorldX = GameLogic.ConvertMapX(Data.MapEvents[index].X);
-            var size = TextRenderer.Fonts[Font.Georgia].MeasureString(name);
-            var padding = (int)(size.X / 6);
-            var drawX = (int)(baseWorldX + (Constants.TileSize - size.X) / 2 + padding);
+            var textWidth = TextRenderer.GetTextWidth(name, uiFont);
+            if (!SettingsManager.Instance.BitmapFont)
+            {
+                textWidth = (int)Math.Round(textWidth * TextRenderer.BaseScale);
+            }
+            var drawX = baseWorldX + (int)Math.Round(Constants.TileSize / 2d - textWidth / 2d);
 
             if (Data.MapEvents[index].GraphicType == 1)
             {
@@ -700,7 +705,8 @@ namespace Client
                         if (frameHeight > 32) spriteTopWorldY = baseWorldY - (frameHeight - 32);
 
                         int spriteTopScreenY = GameLogic.ConvertMapY(spriteTopWorldY);
-                        int textPixelHeight = (int)Math.Ceiling(TextRenderer.Fonts[Font.Georgia].LineSpacing * TextRenderer.BaseScale);
+                        var spriteFont = TextRenderer.Fonts.TryGetValue(uiFont, out var sf) ? sf : TextRenderer.Fonts.Values.FirstOrDefault();
+                        int textPixelHeight = (int)Math.Ceiling(((spriteFont?.LineSpacing ?? 16) * TextRenderer.BaseScale));
                         int margin = 8;
                         textY = spriteTopScreenY - textPixelHeight + margin;
                     }
@@ -722,7 +728,7 @@ namespace Client
                 textY = GameLogic.ConvertMapY(Data.MapEvents[index].Y) - 16;
             }
 
-            TextRenderer.Render(name, drawX, textY, color, backcolor);
+            TextRenderer.Render(name, drawX, textY, color, backcolor, uiFont);
         }
 
         public static void OnDraw()

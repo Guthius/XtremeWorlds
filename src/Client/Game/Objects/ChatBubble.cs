@@ -77,7 +77,9 @@ public class ChatBubble : IData
                             y -= shift; // move anchor up to sprite top
                         }
                         // Nameplate sits (margin + textHeight) above spriteTop
-                        int textHeight = (int)Math.Ceiling(TextRenderer.Fonts[Font.Georgia].LineSpacing * 12f / 16f);
+                        var nameFont = TextRenderer.ConfiguredFont;
+                        var spriteFont = TextRenderer.Fonts.TryGetValue(nameFont, out var sf) ? sf : TextRenderer.Fonts.Values.FirstOrDefault();
+                        int textHeight = (int)Math.Ceiling(((spriteFont?.LineSpacing ?? 16) * 12f / 16f));
                         int nameGap = 4; // from TextRenderer
                         int bubbleExtra = 4; // extra visual gap above name
                         y -= (textHeight);
@@ -112,7 +114,8 @@ public class ChatBubble : IData
         instance.Msg = instance.Msg.Replace("\0", string.Empty);
 
         // word wrap
-        TextRenderer.WordWrap(instance.Msg, Font.Georgia, GameState.ChatBubbleWidth, ref theArray);
+        var uiFont = TextRenderer.ConfiguredFont;
+        TextRenderer.WordWrap(instance.Msg, uiFont, GameState.ChatBubbleWidth, ref theArray);
 
         // find max width
         tmpNum = Information.UBound(theArray);
@@ -120,8 +123,8 @@ public class ChatBubble : IData
         var count = tmpNum;
         for (i = 0L; i <= count; i++)
         {
-            if (TextRenderer.GetTextWidth(theArray[(int) i], Font.Georgia) > maxWidth)
-                maxWidth = TextRenderer.GetTextWidth(theArray[(int) i], Font.Georgia);
+            if (TextRenderer.GetTextWidth(theArray[(int)i], uiFont) > maxWidth)
+                maxWidth = TextRenderer.GetTextWidth(theArray[(int)i], uiFont);
         }
 
         // calculate the new position 
@@ -187,7 +190,8 @@ public class ChatBubble : IData
                 continue;
 
             // Measure button text size and apply padding
-            var textSize = TextRenderer.Fonts[Font.Georgia].MeasureString(theArray[(int) i]);
+            var spriteFont2 = TextRenderer.Fonts.TryGetValue(uiFont, out var sf2) ? sf2 : TextRenderer.Fonts.Values.FirstOrDefault();
+            var textSize = (spriteFont2 ?? TextRenderer.Fonts.Values.First()).MeasureString(theArray[(int)i]);
             float actualWidth = textSize.X;
             float actualHeight = textSize.Y;
 

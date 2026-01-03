@@ -68,9 +68,14 @@ namespace Client
             if (name == null) return;
 
             // X position: match player name centering over the tile
-            var size = TextRenderer.Fonts[Font.Georgia].MeasureString(name);
-            var padding = GameLogic.ConvertMapX((int)size.X / 6);
-            var drawX = (int)(baseWorldX + (Constants.TileSize - size.X) / 2 + padding);
+            var baseScreenX = GameLogic.ConvertMapX(baseWorldX);
+            var uiFont = TextRenderer.ConfiguredFont;
+            var textWidth = TextRenderer.GetTextWidth(name, uiFont);
+            if (!SettingsManager.Instance.BitmapFont)
+            {
+                textWidth = (int)Math.Round(textWidth * TextRenderer.BaseScale);
+            }
+            var drawX = baseScreenX + (int)Math.Round(Constants.TileSize / 2d - textWidth / 2d);
 
             int spriteNum = Npc.Instance[(int)npcNum].Sprite;
             if (spriteNum <= 0 || spriteNum > GameState.NumCharacters)
@@ -78,7 +83,7 @@ namespace Client
                 // No valid graphic: render just above feet similar to player fallback
                 int screenY = GameLogic.ConvertMapY(baseWorldY);
                 textY = screenY - 16;
-                TextRenderer.Render(name, drawX, textY, color, backColor);
+                TextRenderer.Render(name, drawX, textY, color, backColor, uiFont);
                 return;
             }
 
@@ -87,7 +92,7 @@ namespace Client
             {
                 int screenY = GameLogic.ConvertMapY(baseWorldY);
                 textY = screenY - 16;
-                TextRenderer.Render(name, drawX, textY, color, backColor);
+                TextRenderer.Render(name, drawX, textY, color, backColor, uiFont);
                 return;
             }
 
@@ -108,10 +113,11 @@ namespace Client
             int spriteTopScreenY = GameLogic.ConvertMapY(spriteTopWorldY);
 
             // Y position: mirror player Y logic (label-style just above head)
-            int textPixelHeight = (int)Math.Ceiling(TextRenderer.Fonts[Font.Georgia].LineSpacing * TextRenderer.BaseScale);
+            var spriteFont = TextRenderer.Fonts.TryGetValue(uiFont, out var sf) ? sf : TextRenderer.Fonts.Values.FirstOrDefault();
+            int textPixelHeight = (int)Math.Ceiling(((spriteFont?.LineSpacing ?? 16) * TextRenderer.BaseScale));
             int margin = 8;
             textY = spriteTopScreenY - textPixelHeight + margin;
-            TextRenderer.Render(name, drawX, textY, color, backColor);
+            TextRenderer.Render(name, drawX, textY, color, backColor, uiFont);
         }
 
         public static void OnDraw(int mapNpcNum)

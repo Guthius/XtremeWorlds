@@ -128,6 +128,22 @@ public static class TextRenderer
 
     public static bool HasBitmapFont(Core.Globals.BitmapFont font) => BitmapFonts.ContainsKey(font);
 
+    public static Font ConfiguredFont
+    {
+        get
+        {
+            var configured = SettingsManager.Instance.FontName;
+            if (!string.IsNullOrWhiteSpace(configured) &&
+                Enum.TryParse<Font>(configured, ignoreCase: true, out var parsed) &&
+                parsed != Font.None)
+            {
+                return parsed;
+            }
+
+            return Font.Georgia;
+        }
+    }
+
     public static void TryLoadLegacyFont(GraphicsDevice gd, string fontName)
     {
         try
@@ -156,6 +172,30 @@ public static class TextRenderer
             _ = LoadLegacyBitmapFont(fontEnum, datPath, pngPath, gd);
         }
         catch { }
+    }
+
+    private static bool TryResolveBitmapFont(Font requestedFont, out Core.Globals.BitmapFont bitmapFont)
+    {
+        bitmapFont = Core.Globals.BitmapFont.None;
+
+        // Prefer explicitly configured bitmap font for all UI text when bitmap fonts are enabled.
+        var configured = SettingsManager.Instance.BitmapFontName;
+        if (!string.IsNullOrWhiteSpace(configured) &&
+            Enum.TryParse<Core.Globals.BitmapFont>(configured, ignoreCase: true, out var configuredEnum) &&
+            HasBitmapFont(configuredEnum))
+        {
+            bitmapFont = configuredEnum;
+            return true;
+        }
+
+        // Fallback: map by enum name (Font.* -> BitmapFont.* when available).
+        if (Enum.TryParse<Core.Globals.BitmapFont>(requestedFont.ToString(), out var byName) && HasBitmapFont(byName))
+        {
+            bitmapFont = byName;
+            return true;
+        }
+
+        return false;
     }
 
     public static int GetTextWidth(string text, Core.Globals.BitmapFont font, float textSize = 1.0f)
@@ -198,22 +238,30 @@ public static class TextRenderer
         return (int)(w * textSize);
     }
 
-    public static int GetTextWidth(string text, Font font = Font.Georgia, float textSize = 1.0f)
+    public static int GetTextWidth(string text, Font font = Font.None, float textSize = 1.0f)
     {
+        if (font == Font.None) font = ConfiguredFont;
+
         if (SettingsManager.Instance.BitmapFont)
         {
-            if (Enum.TryParse<Core.Globals.BitmapFont>(font.ToString(), out var bfEnum))
-            {
-                if (HasBitmapFont(bfEnum))
-                    return GetTextWidth(text ?? string.Empty, bfEnum, textSize);
-            }
+            if (TryResolveBitmapFont(font, out var bfEnum))
+                return GetTextWidth(text ?? string.Empty, bfEnum, textSize);
         }
 
         if (!Fonts.TryGetValue(font, out var spriteFont))
         {
-            if (Fonts.Count > 0) spriteFont = Fonts.Values.First();
-            else return (int)Math.Round((text?.Length ?? 0) * 8f * textSize);
-            
+            // Fallback to configured font if the requested one isn't loaded.
+            if (!Fonts.TryGetValue(ConfiguredFont, out spriteFont))
+            {
+                if (Fonts.Count > 0)
+                {
+                    spriteFont = Fonts.Values.First();
+                }
+                else
+                {
+                    return (int)Math.Round((text?.Length ?? 0) * 8f * textSize);
+                }
+            }
         }
 
         var sanitized = SanitizeText(text ?? string.Empty, spriteFont);
@@ -232,18 +280,16 @@ public static class TextRenderer
         return lines * h + (lines - 1) * gap;
     }
 
-    public static int GetTextHeight(string text, Font font = Font.Georgia, float textSize = 1.0f)
+    public static int GetTextHeight(string text, Font font = Font.None, float textSize = 1.0f)
     {
-        if (SettingsManager.Instance.BitmapFont &&
-            Enum.TryParse<Core.Globals.BitmapFont>(font.ToString(), out var bfEnum))
-        {
-            if (HasBitmapFont(bfEnum))
-                return GetTextHeight(text ?? string.Empty, bfEnum, textSize);
-        }
+        if (font == Font.None) font = ConfiguredFont;
+
+        if (SettingsManager.Instance.BitmapFont && TryResolveBitmapFont(font, out var bfEnum))
+            return GetTextHeight(text ?? string.Empty, bfEnum, textSize);
 
         if (!Fonts.TryGetValue(font, out var spriteFont))
         {
-            if (!Fonts.TryGetValue(Font.Georgia, out spriteFont))
+            if (!Fonts.TryGetValue(ConfiguredFont, out spriteFont))
             {
                 if (Fonts.Count > 0) spriteFont = Fonts.Values.First();
                 else
@@ -322,16 +368,18 @@ public static class TextRenderer
         }
     }
 
-    public static void Render(string text, int x, int y, Color frontColor, Color backColor, Font font = Font.Georgia, float textSize = 1.0f)
+    public static void Render(string text, int x, int y, Color frontColor, Color backColor, Font font = Font.None, float textSize = 1.0f)
     {
         if (GameClient.SpriteBatch is null)
         {
             return;
         }
 
+        if (font == Font.None) font = ConfiguredFont;
+
         if (SettingsManager.Instance.BitmapFont)
         {
-            if (Enum.TryParse<Core.Globals.BitmapFont>(font.ToString(), out var bfEnum) && HasBitmapFont(bfEnum))
+            if (TryResolveBitmapFont(font, out var bfEnum))
             {
                 OnDraw(text, x, y, frontColor, backColor, bfEnum, textSize);
                 return;
@@ -340,7 +388,11 @@ public static class TextRenderer
 
         if (!Fonts.TryGetValue(font, out var spriteFont))
         {
-            if (!Fonts.TryGetValue(Font.Georgia, out spriteFont)) return;       
+            if (!Fonts.TryGetValue(ConfiguredFont, out spriteFont))
+            {
+                if (Fonts.Count > 0) spriteFont = Fonts.Values.First();
+                else return;
+            }
         }
 
         var sanitizedText = SanitizeText(text ?? string.Empty, spriteFont);
@@ -360,7 +412,7 @@ public static class TextRenderer
     public static void AddText(string text, int color, long alpha = 255L, byte channel = 0)
     {
         string[] wrappedLines = System.Array.Empty<string>();
-        WordWrap(text, Font.Georgia, WindowManager.Windows[WindowManager.GetWindowIndex("winChat")].Width, ref wrappedLines);
+        WordWrap(text, ConfiguredFont, WindowManager.Windows[WindowManager.GetWindowIndex("winChat")].Width, ref wrappedLines);
         GameState.ChatHighIndex += wrappedLines.Length;
         if (GameState.ChatHighIndex > Variables.ChatLines) GameState.ChatHighIndex = Variables.ChatLines;
 
@@ -559,7 +611,7 @@ public static class TextRenderer
                 if (GetTextWidth(Data.Chat[i].Text) > width)
                 {
                     string[] wrappedLines = new string[0];
-                    WordWrap(Data.Chat[(int)i].Text, Font.Georgia, width, ref wrappedLines);
+                    WordWrap(Data.Chat[(int)i].Text, ConfiguredFont, width, ref wrappedLines);
                     yOffset -= 10 * wrappedLines.Length;
                     for (var j = 0; j < wrappedLines.Length; j++)
                     {

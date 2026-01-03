@@ -265,7 +265,7 @@ namespace Client
                 {
                     var loaded = LoadFont(DataPath.Fonts, f);
                     TextRenderer.Fonts[f] = loaded;
-                    if (defaultFont == null || f == Font.Georgia)
+                    if (defaultFont == null || f == TextRenderer.ConfiguredFont)
                         defaultFont = loaded;
                 }
                 catch (Exception ex)
