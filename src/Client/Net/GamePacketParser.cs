@@ -238,7 +238,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
                     break;
             }
         }
-        else if (kick > 0 || GameState.InGame)
+        else if (kick || GameState.InGame)
         {
             GameLogic.LogoutGame();
         }

@@ -65,9 +65,9 @@ public sealed class CheckBox : Control
 
         GameClient.RenderTexture(ref path, X + x, Y + y, 0, 0, 49, 23, 49, 23);
 
-        var left = (int) Math.Round(X + 22 - TextRenderer.GetTextWidth(Text, Font) / 2d + x);
+        var left = (int)Math.Round(X + (Width / 2d) - (TextRenderer.GetTextWidth(Text, Font) / 2d) + x);
 
-        TextRenderer.Render(Text, left + 8, Y + y + 4, Color, Color.Black, Font);
+        TextRenderer.Render(Text, left, Y + y + 4, Color, Color.Black, Font);
     }
 
     private void RenderBuying(int x, int y)
