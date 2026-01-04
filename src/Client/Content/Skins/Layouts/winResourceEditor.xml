@@ -8,8 +8,8 @@
 
 	<!-- Left: Resource index list -->
 	<GroupBox Name="grpList" Position="8,32" Size="200, 506" Caption="Resources">
-		<ListBox Name="lstIndex" Position="8, 24" Size="164, 390"/>
-		<ScrollBar Name="sldList" Position="172, 24" Size="16, 390" Min="0" Max="0" Value="0" Orientation="Vertical"/>
+		<ListBox Name="lstIndex" Position="8, 28" Size="170, 466"/>
+		<ScrollBar Name="sldList" Position="178, 28" Size="16, 466" Min="0" Max="0" Value="0" Orientation="Vertical"/>
 	</GroupBox>
 
 	<!-- Right: Details -->
