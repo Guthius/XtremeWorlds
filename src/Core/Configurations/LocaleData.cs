@@ -242,7 +242,7 @@ public sealed class LocaleData
                 new LocaleItem("Luck", "Luck: "),
                 new LocaleItem("Spirit", "Spirit: "),
                 new LocaleItem("Points", "Points Available: "),
-                new LocaleItem("SkillLabel", "Skills:")
+                new LocaleItem("Skill", "Skills:")
             ]
         };
     }

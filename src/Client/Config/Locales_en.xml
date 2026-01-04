@@ -138,5 +138,5 @@
   <Character Key="Luck" Value="Luck: " />
   <Character Key="Spirit" Value="Spirit: " />
   <Character Key="Points" Value="Points Available: " />
-  <Character Key="SkillLabel" Value="Skills:" />
+  <Character Key="Skill" Value="Skills:" />
 </Locales>
