@@ -575,6 +575,17 @@ public static class Database
         int n;
         int i;
 
+        // Ensure backing collections are sized to accommodate the player index.
+        // This prevents List<T>.set_Item out-of-range when assigning PlayerBase.Instance[index].
+        Account.EnsureSize(index + 1);
+        Core.Objects.PlayerBase.EnsureSize(index + 1);
+
+        // Validate character slot against the player's character array bounds.
+        if (slot < 0 || slot >= Account.Instance[index].Player.Length)
+        {
+            return;
+        }
+
         if (Account.Instance[index].Player[slot].Name == "")
         {
             PlayerBase.Instance[index] = Account.Instance[index].Player[slot];

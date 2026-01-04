@@ -51,14 +51,12 @@ public class Script
     private const int PlayerRegenIntervalMs = 10000; // 10 seconds like legacy
     private const int BaseAttackSpeedMs = 1000; // fallback when no weapon speed
     private const int DeathSpawnTimeMs = 60000; // 1 minute
-
     private const long ItemSpawnTime = 30000L; // 30 seconds
     private const long ItemDespawnTime = 90000L; // 1:30 seconds
-
     private const byte StatPerLevel = 5;
-    private const byte MaxLevel = 99;
 
     // Mutable script-driven limits (initialized from engine defaults)
+    public static byte MaxLevel = Variables.MaxLevel;
     public static int MaxAnimations = Variables.MaxAnimations;
     public static byte MaxBank = Variables.MaxBank;
     public static byte MaxJobs = Variables.MaxJobs;
@@ -91,7 +89,6 @@ public class Script
     public static byte MaxStartSkills = Variables.MaxStartSkills;
     public static int MaxSwitches = Variables.MaxSwitches;
     public static int MaxVariables = Variables.MaxVariables;
-    public static int MaxPoints = Variables.MaxPoints;
     public static byte MaxCharacters = Variables.MaxCharacters;
     public static int ChatLines = Variables.ChatLines;
     public static byte MaxStats = Variables.MaxStats;
@@ -106,6 +103,58 @@ public class Script
     public static int ServerShutdown = Variables.ServerShutdown;
     public static string Welcome = Variables.Welcome;
     public static string Website = Variables.Website;
+
+    // Apply the script-configured values back into the engine's global Variables.
+    // Call this after loading the script and before initializing game content.
+    public void ApplyEngineVariables()
+    {
+        Variables.MaxLevel = MaxLevel;
+        Variables.MaxAnimations = MaxAnimations;
+        Variables.MaxBank = MaxBank;
+        Variables.MaxJobs = MaxJobs;
+        Variables.MaxMorals = MaxMorals;
+        Variables.MaxInventory = MaxInv;
+        Variables.MaxItems = MaxItems;
+        Variables.MaxMaps = MaxMaps;
+        Variables.MaxMapItems = MaxMapItems;
+        Variables.MaxMapNpcs = MaxMapNpcs;
+        Variables.MaxNpcs = MaxNpcs;
+        Variables.MaxNpcSkills = MaxNpcSkills;
+        Variables.MaxParty = MaxParty;
+        Variables.MaxPartyMembers = MaxPartyMembers;
+        Variables.MaxPlayers = MaxPlayers;
+        Variables.MaxPlayerSkills = MaxPlayerSkills;
+        Variables.MaxResources = MaxResources;
+        Variables.MaxShops = MaxShops;
+        Variables.MaxSkills = MaxSkills;
+        Variables.MaxTrades = MaxTrades;
+        Variables.NameLength = NameLength;
+        Variables.MinimumNameLength = Minimum_NameLength;
+        Variables.ChatLength = ChatLength;
+        Variables.MaxHotbar = MaxHotbar;
+        Variables.MaxMapX = MaxMapx;
+        Variables.MaxMapY = MaxMapy;
+        Variables.MaxProjectiles = MaxProjectiles;
+        Variables.MaxDropItems = MaxDropItems;
+        Variables.MaxStartItems = MaxStartItems;
+        Variables.MaxStartSkills = MaxStartSkills;
+        Variables.MaxSwitches = MaxSwitches;
+        Variables.MaxVariables = MaxVariables;
+        Variables.MaxCharacters = MaxCharacters;
+        Variables.ChatLines = ChatLines;
+        Variables.MaxStats = MaxStats;
+        Variables.MaxQuests = MaxQuests;
+        Variables.MaxEvents = MaxEvents;
+        Variables.MaxGuilds = MaxGuilds;
+        Variables.MaxEventChoices = MaxEventChoices;
+        Variables.TileSize = TileSize;
+        Variables.MaxWeatherParticles = MaxWeatherParticles;
+        Variables.MaxBackups = MaxBackups;
+        Variables.SaveInterval = SaveInterval;
+        Variables.ServerShutdown = ServerShutdown;
+        Variables.Welcome = Welcome;
+        Variables.Website = Website;
+    }
     
     public long ItemDespawnTimeMs()
     {
@@ -701,19 +750,19 @@ public class Script
         }
     }
 
-    public void LearnSkill(int index, int itemNum, int skillNum = -1)
+    public void LearnSkill(int index, int item, int skill = -1)
     {
         int n;
         int i;
 
         // Get the skill num
-        if (skillNum >= 0)
+        if (skill >= 0)
         {
-            n = skillNum;
+            n = skill;
         }
         else
         {
-            n = Item.Instance[itemNum].Data1;
+            n = Item.Instance[item].Data1;
         }
 
         if (n < 0 | n >= Variables.MaxSkills)
@@ -736,10 +785,10 @@ public class Script
                     if (!HasSkill(index, n))
                     {
                         SetPlayerSkill(index, i, n);
-                        if (itemNum >= 0)
+                        if (item >= 0)
                         {
-                            NetworkSend.SendAnimation(GetPlayerMap(index), Item.Instance[itemNum].Animation, 0, 0, (byte)TargetType.Player, index);
-                            TakeInv(index, itemNum, 1);
+                            NetworkSend.SendAnimation(GetPlayerMap(index), Item.Instance[item].Animation, 0, 0, (byte)TargetType.Player, index);
+                            TakeInv(index, item, 1);
                         }
                         NetworkSend.SendPlayerMessage(index, "You study the skill carefully.", (int)ColorName.Yellow);
                         NetworkSend.SendPlayerMessage(index, "You have learned a new skill!", (int)ColorName.BrightGreen);

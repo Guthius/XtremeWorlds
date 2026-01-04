@@ -431,13 +431,13 @@ public static class General
     public static async System.Threading.Tasks.Task HandlePlayerCommandAsync(string[] command)
     {
         // Defensive: command[1] may not exist for some commands
-        var playerIndex = -1;
+        var player = -1;
         if (command.Length > 1)
-            playerIndex = GameLogic.FindPlayer(command[1]);
+            player = GameLogic.FindPlayer(command[1]);
 
         if (command is ["/help"]) await SendHelpMessageAsync();
 
-        if (playerIndex == -1 || !NetworkConfig.IsPlaying(playerIndex))
+        if (player == -1 || !NetworkConfig.IsPlaying(player))
         {
             return;
         }
@@ -445,27 +445,27 @@ public static class General
         {
             case "/teleport":
                 if (int.TryParse(command[2], out var x) && int.TryParse(command[3], out var y))
-                    await TeleportPlayerAsync(playerIndex, x, y);
+                    await TeleportPlayerAsync(player, x, y);
                 break;
 
             case "/kick":               
-                await KickPlayerAsync(playerIndex);
+                await KickPlayerAsync(player);
                 break;
 
             case "/broadcast":
-                await BroadcastMessageAsync(playerIndex, string.Join(" ", command[2..]));
+                await BroadcastMessageAsync(player, string.Join(" ", command[2..]));
                 break;
 
             case "/status":
-                await SendServerStatusAsync(playerIndex);
+                await SendServerStatusAsync(player);
                 break;
 
             case "/whisper":
-                await SendWhisperAsync(playerIndex, "Server", string.Join(" ", command[2..]));
+                await SendWhisperAsync(player, "Server", string.Join(" ", command[2..]));
                 break;
             
             case "/save":
-                await SavePlayerDataAsync(playerIndex);
+                await SavePlayerDataAsync(player);
                 break;
 
             case "/shutdown":
@@ -510,42 +510,42 @@ public static class General
                 switch (access)
                 {
                     case (byte)AccessLevel.Player:
-                        SetPlayerAccess(playerIndex, access);
-                        NetworkSend.SendPlayerData(playerIndex);
-                        await Account.OnSave(playerIndex);
-                        NetworkSend.SendPlayerMessage(playerIndex, "Your access has been set to Player!", (int)ColorName.Yellow);
-                        Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(playerIndex));
+                        SetPlayerAccess(player, access);
+                        NetworkSend.SendPlayerData(player);
+                        await Account.OnSave(player);
+                        NetworkSend.SendPlayerMessage(player, "Your access has been set to Player!", (int)ColorName.Yellow);
+                        Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(player));
                         break;
                     case (byte)AccessLevel.Moderator:
-                        SetPlayerAccess(playerIndex, access);
-                        NetworkSend.SendPlayerData(playerIndex);
-                        await Account.OnSave(playerIndex);
-                        NetworkSend.SendPlayerMessage(playerIndex, "Your access has been set to Moderator!", (int)ColorName.Yellow);
-                        Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(playerIndex));
+                        SetPlayerAccess(player, access);
+                        NetworkSend.SendPlayerData(player);
+                        await Account.OnSave(player);
+                        NetworkSend.SendPlayerMessage(player, "Your access has been set to Moderator!", (int)ColorName.Yellow);
+                        Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(player));
                         break;
                     case (byte)AccessLevel.Mapper:
-                        SetPlayerAccess(playerIndex, access);
-                        NetworkSend.SendPlayerData(playerIndex);
-                        await Account.OnSave(playerIndex);
-                        NetworkSend.SendPlayerMessage(playerIndex, "Your access has been set to Mapper!", (int)ColorName.Yellow);
-                        Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(playerIndex));
+                        SetPlayerAccess(player, access);
+                        NetworkSend.SendPlayerData(player);
+                        await Account.OnSave(player);
+                        NetworkSend.SendPlayerMessage(player, "Your access has been set to Mapper!", (int)ColorName.Yellow);
+                        Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(player));
                         break;
                     case (byte)AccessLevel.Developer:
-                        SetPlayerAccess(playerIndex, access);
-                        NetworkSend.SendPlayerData(playerIndex);
-                        await Account.OnSave(playerIndex);
-                        NetworkSend.SendPlayerMessage(playerIndex, "Your access has been set to Developer!", (int)ColorName.Yellow);
-                        Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(playerIndex));
+                        SetPlayerAccess(player, access);
+                        NetworkSend.SendPlayerData(player);
+                        await Account.OnSave(player);
+                        NetworkSend.SendPlayerMessage(player, "Your access has been set to Developer!", (int)ColorName.Yellow);
+                        Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(player));
                         break;
                     case (byte)AccessLevel.Owner:
-                        SetPlayerAccess(playerIndex, access);
-                        NetworkSend.SendPlayerData(playerIndex);
-                        await Account.OnSave(playerIndex);
-                        NetworkSend.SendPlayerMessage(playerIndex, "Your access has been set to Owner!", (int)ColorName.Yellow);
-                        Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(playerIndex));
+                        SetPlayerAccess(player, access);
+                        NetworkSend.SendPlayerData(player);
+                        await Account.OnSave(player);
+                        NetworkSend.SendPlayerMessage(player, "Your access has been set to Owner!", (int)ColorName.Yellow);
+                        Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(player));
                         break;
                     default:
-                        Console.WriteLine("Failed to set the access level to " + access + " for player " + GetPlayerName(playerIndex));
+                        Console.WriteLine("Failed to set the access level to " + access + " for player " + GetPlayerName(player));
                         break;
                             
                 }
@@ -554,10 +554,10 @@ public static class General
 
             case "/ban":
             {
-                Account.Instance[playerIndex].Banned = true;
-                var task = Player.OnExit(playerIndex);
+                Account.Instance[player].Banned = true;
+                var task = Player.OnExit(player);
                 task.Wait();
-                Console.WriteLine($"Player {GetPlayerName(playerIndex)} has been banned by the server.");
+                Console.WriteLine($"Player {GetPlayerName(player)} has been banned by the server.");
                         
                 break;
             }

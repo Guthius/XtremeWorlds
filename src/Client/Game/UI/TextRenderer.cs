@@ -640,6 +640,8 @@ public static class TextRenderer
 
     public static void DrawMapName()
     {
-        Render(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Name, (int)Math.Round(GameState.ResolutionWidth / 2d - GetTextWidth(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Name)), 10, GameState.DrawMapNameColor, Color.Black);
+        int map = GetPlayerMap(GameState.MyIndex);
+        if (map < 0 || map >= Variables.MaxMaps) return;
+        Render(Client.Map.Instance[map].Name, (int)Math.Round(GameState.ResolutionWidth / 2d - GetTextWidth(Client.Map.Instance[map].Name)), 10, GameState.DrawMapNameColor, Color.Black);
     }
 }

@@ -1074,7 +1074,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         // The sprite
         var n = buffer.ReadInt32();
 
-
         SetPlayerSprite(session.Id, n);
         NetworkSend.SendPlayerData(session.Id);
     }

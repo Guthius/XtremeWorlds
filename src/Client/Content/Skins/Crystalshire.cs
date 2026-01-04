@@ -3228,7 +3228,7 @@ public class Crystalshire
             }
         }
 
-        BindBar("sldLvlReq", "lblLvlReqVal", v => Resource.Instance[GameState.EditorIndex].LvlRequired = v, 0, GameState.MaxLevel);
+        BindBar("sldLvlReq", "lblLvlReqVal", v => Resource.Instance[GameState.EditorIndex].LvlRequired = v, 0, Variables.MaxLevel);
         BindBar("sldNormalPic", "lblNormalPicVal", v => Resource.Instance[GameState.EditorIndex].ResourceImage = v, 0, GameState.NumResources);
         BindBar("sldExhaustedPic", "lblExhaustedPicVal", v => Resource.Instance[GameState.EditorIndex].ExhaustedImage = v, 0, GameState.NumResources);
 

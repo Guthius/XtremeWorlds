@@ -72,7 +72,7 @@ public class Player : PlayerBase
     {
         try
         {
-                
+            Script.Instance?.OnLevel(playerId);
         }
         catch (Exception ex)
         {
@@ -1503,19 +1503,19 @@ public class Player : PlayerBase
         Account.Instance[playerId].Bank[slot].Item[bankSlot].Value = value;
     }
 
-    public static int FindOpenbankSlot(int playerId, int itemNum)
+    public static int FindOpenbankSlot(int playerId, int item)
     {
-        if (!NetworkConfig.IsPlaying(playerId) || itemNum < 0 || itemNum >= Core.Globals.Variables.MaxItems)
+        if (!NetworkConfig.IsPlaying(playerId) || item < 0 || item >= Core.Globals.Variables.MaxItems)
         {
             return -1;
         }
 
-        if (Item.Instance[itemNum].Type == (byte) ItemCategory.Currency ||
-            Item.Instance[itemNum].Stackable == 1)
+        if (Item.Instance[item].Type == (byte) ItemCategory.Currency ||
+            Item.Instance[item].Stackable == 1)
         {
             for (var bankSlot = 0; bankSlot < Core.Globals.Variables.MaxBank; bankSlot++)
             {
-                if (GetBank(playerId, bankSlot) == itemNum)
+                if (GetBank(playerId, bankSlot) == item)
                 {
                     return bankSlot;
                 }

@@ -2380,14 +2380,18 @@ namespace Client
             // Auto-cancel target if player is off the current camera viewport (native world rect)
             CancelTargetIfOffCamera();
 
-            if (GameState.NumPanoramas > 0 & Map.Instance[GetPlayerMap(GameState.MyIndex)].Panorama > 0)
+            var map = GetPlayerMap(GameState.MyIndex);
+            if (map < 0 || map >= Client.Map.Instance.Count)
+                return;
+
+            if (GameState.NumPanoramas > 0 & Map.Instance[map].Panorama > 0)
             {
-                Map.DrawPanorama(Map.Instance[GetPlayerMap(GameState.MyIndex)].Panorama);
+                Map.DrawPanorama(Map.Instance[map].Panorama);
             }
 
-            if (GameState.NumParallax > 0 & Map.Instance[GetPlayerMap(GameState.MyIndex)].Parallax > 0)
+            if (GameState.NumParallax > 0 & Map.Instance[map].Parallax > 0)
             {
-                Map.DrawParallax(Map.Instance[GetPlayerMap(GameState.MyIndex)].Parallax);
+                Map.DrawParallax(Map.Instance[map].Parallax);
             }
 
             // Draw lower tiles
@@ -2410,7 +2414,7 @@ namespace Client
             // events
             if (GameState.MyEditorType != EditorType.Map)
             {
-                if (GameState.CurrentEvents > 0 & GameState.CurrentEvents <= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount)
+                if (GameState.CurrentEvents > 0 & GameState.CurrentEvents <= Client.Map.Instance[map].EventCount)
                 {
                     var count2 = Information.UBound(Data.MapEvents);
                     for (i = 0; i <= count2; i++)
@@ -2449,7 +2453,7 @@ namespace Client
             }
 
             // Y-based render. Renders Players, Npcs and Resources based on Y-axis.
-            var count3 = (int) Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+            var count3 = (int) Client.Map.Instance[map].MaxY;
             for (y = 0; y < count3; y++)
             {
                 if (GameState.NumCharacters > 0)
@@ -2467,7 +2471,7 @@ namespace Client
                     // Draw before players so events on the same row don't always appear above the player.
                     if (GameState.MyEditorType != EditorType.Map)
                     {
-                        if (GameState.CurrentEvents > 0 & GameState.CurrentEvents <= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount)
+                        if (GameState.CurrentEvents > 0 & GameState.CurrentEvents <= Client.Map.Instance[map].EventCount)
                         {
                             var count4 = Information.UBound(Data.MapEvents);
                             for (i = 0; i <= count4; i++)
@@ -2486,7 +2490,7 @@ namespace Client
                     // Players
                     for (i = 0; i < PlayerBase.Instance.Count; i++)
                     {
-                        if (IsPlaying(i) & GetPlayerMap(i) == GetPlayerMap(GameState.MyIndex))
+                        if (IsPlaying(i) & GetPlayerMap(i) == map)
                         {
                             if (GetPlayerY(i) == y)
                             {
@@ -2575,25 +2579,29 @@ namespace Client
             {
                 for (i = 0; i < MapAnimation.Instance?.Length; i++)
                 {
-                    if (MapAnimation.Instance?[i].Used?[1] == true)
+                    var used = MapAnimation.Instance?[i].Used;
+                    if (used != null && used.Length > 1 && used[1])
                     {
                         MapAnimation.OnDraw(i, 1);
-                    }
-                }       
-            }
-
-            if (GameState.NumProjectiles > 0)
-            {
-                for (i = 0; i < Variables.MaxProjectiles; i++)
-                {
-                    if (Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, i].ProjectileNum >= 0)
-                    {
-                        MapProjectile.OnDraw(i);
                     }
                 }
             }
 
-            if (Data.MapEvents != null && GameState.CurrentEvents > 0 & GameState.CurrentEvents <= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount)
+            if (GameState.NumProjectiles > 0)
+            {
+                if (map >= 0 && map < Core.Globals.Data.MapProjectile.GetLength(0))
+                {
+                    for (i = 0; i < Variables.MaxProjectiles; i++)
+                    {
+                        if (Core.Globals.Data.MapProjectile[map, i].ProjectileNum >= 0)
+                        {
+                            MapProjectile.OnDraw(i);
+                        }
+                    }
+                }
+            }
+
+            if (Data.MapEvents != null && GameState.CurrentEvents > 0 & GameState.CurrentEvents <= Client.Map.Instance[map].EventCount)
             {
                 var count6 = GameState.CurrentEvents;
                 for (i = 0; i < count6; i++)
@@ -2638,7 +2646,7 @@ namespace Client
 
             for (i = 0; i < Player.Instance.Count; i++)
             {
-                if (IsPlaying(i) & GetPlayerMap(i) == GetPlayerMap(GameState.MyIndex))
+                if (IsPlaying(i) & GetPlayerMap(i) == map)
                 {
                     Player.OnDrawName(i);
                 }
@@ -2646,7 +2654,7 @@ namespace Client
 
             if (GameState.MyEditorType != EditorType.Map)
             {
-                if (GameState.CurrentEvents > 0 && Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount >= GameState.CurrentEvents)
+                if (GameState.CurrentEvents > 0 && Client.Map.Instance[map].EventCount >= GameState.CurrentEvents)
                 {
                     var count9 = GameState.CurrentEvents;
                     for (i = 0; i < count9; i++)
@@ -2699,7 +2707,7 @@ namespace Client
             {
                 string cur = "Cur X: " + GameState.CurXGame + " Y: " + GameState.CurYGame;
                 string loc = "Loc X: " + GetPlayerX(GameState.MyIndex) + " Y: " + GetPlayerY(GameState.MyIndex);
-                string map = " (Map #" + GetPlayerMap(GameState.MyIndex) + ")";
+                string pos = " (Map #" + map + ")";
                 string curMouse = "Mouse X: " + (int)GameState.CurMouseXGame + " Y: " + (int)GameState.CurMouseYGame;
 
                 TextRenderer.Render(cur, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 15f),
@@ -2711,7 +2719,7 @@ namespace Client
                 TextRenderer.Render(loc, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 45f),
                     Color.Yellow, Color.Black);
 
-                TextRenderer.Render(map, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 60f),
+                TextRenderer.Render(pos, (int)GameState.CurMouseXGame, (int)Math.Round(GameState.CurMouseYGame + 60f),
                     Color.Yellow, Color.Black);
             }
             

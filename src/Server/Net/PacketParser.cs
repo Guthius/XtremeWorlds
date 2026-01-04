@@ -1,5 +1,6 @@
 ﻿using System.IO.Compression;
 using System.Runtime.InteropServices;
+using Microsoft.Extensions.Logging;
 
 namespace Server.Net;
 
@@ -91,8 +92,8 @@ public abstract class PacketParser<TPacketId, TSession> where TPacketId : Enum
         catch (Exception ex)
         {
             // Never let handler exceptions tear down the TCP session.
-            // Log to stderr; higher-level logging can be added later.
-            Console.WriteLine($"Packet handler error (id={packetId}): {ex}");
+            // Use server logger for visibility.
+            Server.General.Logger.LogError(ex, "Packet handler error (id={PacketId})", packetId);
         }
     }
 

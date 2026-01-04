@@ -108,7 +108,7 @@ public class WinResourceEditor
                     lbl.Text = Math.Clamp(value, min, max).ToString();
             }
         }
-        SetBar("sldLvlReq", "lblLvlReqVal", r.LvlRequired, 0, GameState.MaxLevel);
+        SetBar("sldLvlReq", "lblLvlReqVal", r.LvlRequired, 0, Variables.MaxLevel);
         SetBar("sldNormalPic", "lblNormalPicVal", r.ResourceImage, 0, GameState.NumResources);
         SetBar("sldExhaustedPic", "lblExhaustedPicVal", r.ExhaustedImage, 0, GameState.NumResources);
 

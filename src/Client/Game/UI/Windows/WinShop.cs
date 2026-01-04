@@ -376,15 +376,15 @@ public class WinShop
                 GameClient.RenderTexture(ref selectedSlotTexturePath, left, top, 0, 0, 32, 32, 32, 32);
             }
 
-            var itemNum = GetPlayerInventory(GameState.MyIndex, i);
-            if (itemNum < 0 || itemNum >= Core.Globals.Variables.MaxItems)
+            var item = GetPlayerInventory(GameState.MyIndex, i);
+            if (item < 0 || item >= Variables.MaxItems)
             {
                 continue;
             }
 
-            Item.OnStream(itemNum);
+            Item.OnStream(item);
 
-            var itemIcon = Item.Instance[itemNum].Icon;
+            var itemIcon = Item.Instance[item].Icon;
             if (itemIcon <= 0 || itemIcon > GameState.NumItems)
             {
                 continue;

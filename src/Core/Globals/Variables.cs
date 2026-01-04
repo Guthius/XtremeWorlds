@@ -34,6 +34,7 @@ public static class Variables
     public static byte MaxStartSkills = 10;
     public static int MaxSwitches = 100;
     public static int MaxVariables = 100;
+    public static byte MaxLevel = 99;
     public static int MaxPoints = 255;
     public static byte MaxCharacters = 3;
     public static int ChatLines = 1000;

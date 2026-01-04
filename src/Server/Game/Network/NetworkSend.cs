@@ -27,7 +27,7 @@ public static class NetworkSend
         packetWriter.WriteEnum(ServerPackets.SAlertMsg);
         packetWriter.WriteByte((byte)menuNo);
         packetWriter.WriteEnum(menuReset);
-        packetWriter.WriteInt32(kick ? 1 : 0);
+        packetWriter.WriteBoolean(kick);
 
         session.Channel.Send(packetWriter.GetBytes());
 
@@ -189,12 +189,13 @@ public static class NetworkSend
         w.WriteByte(Variables.MaxDropItems);
         w.WriteByte(Variables.MaxStartItems);
         w.WriteByte(Variables.MaxStartSkills);
-        w.WriteInt32(Variables.MaxPoints);
         w.WriteByte(Variables.MaxCharacters);
         w.WriteByte(Variables.MaxStats);
         w.WriteByte(Variables.MaxQuests);
         w.WriteByte(Variables.MaxGuilds);
         w.WriteByte(Variables.MaxEventChoices);
+        w.WriteByte(Variables.MaxLevel);
+        w.WriteInt32(Variables.MaxPoints);
 
         session.Channel.Send(w.GetBytes());
     }
@@ -214,7 +215,6 @@ public static class NetworkSend
 
         packetWriter.WriteEnum(ServerPackets.SPlayerExp);
         packetWriter.WriteInt32(playerId);
-        packetWriter.WriteInt32(Script.Instance?.GetPlayerMaxLevel());
         packetWriter.WriteInt32(GetPlayerExperience(playerId));
         packetWriter.WriteInt32(Script.Instance?.GetPlayerNextLevel(playerId));
 
@@ -830,7 +830,7 @@ public static class NetworkSend
         packetWriter.WriteEnum(ServerPackets.SPlayerData);
         packetWriter.WriteInt32(playerId);
         packetWriter.WriteString(GetPlayerName(playerId));
-        packetWriter.WriteInt32(GetPlayerJob(playerId));
+        packetWriter.WriteByte(GetPlayerJob(playerId));
         packetWriter.WriteInt32(GetPlayerLevel(playerId));
         packetWriter.WriteInt32(GetPlayerPoints(playerId));
         packetWriter.WriteInt32(GetPlayerSprite(playerId));
@@ -1433,7 +1433,7 @@ public static class NetworkSend
             
         packet.WriteString(projectile.Name);
         packet.WriteInt32(projectile.Sprite);
-        packet.WriteInt32((int)projectile.Range);
+        packet.WriteByte(projectile.Range);
         packet.WriteInt32(projectile.Speed);
         packet.WriteInt32(projectile.Damage);
         packet.WriteInt32(projectile.Animation);

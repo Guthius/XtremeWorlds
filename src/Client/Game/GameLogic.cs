@@ -2419,9 +2419,13 @@ namespace Client
             int nativeWidth = GameState.ResolutionWidth;
             int nativeHeight = GameState.ResolutionHeight;
 
+            var map = GetPlayerMap(GameState.MyIndex);
+            if (map < 0 || map >= Client.Map.Instance.Count)
+                return;
+
             // Find the center of the map
-            float mapWidth = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX * Constants.TileSize;
-            float mapHeight = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY * Constants.TileSize;
+            float mapWidth = Client.Map.Instance[map].MaxX * Constants.TileSize;
+            float mapHeight = Client.Map.Instance[map].MaxY * Constants.TileSize;
             float mapCenterX = mapWidth / 2f;
             float mapCenterY = mapHeight / 2f;
 

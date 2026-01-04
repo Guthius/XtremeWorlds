@@ -169,7 +169,7 @@ public class WinItemEditor
         if (WindowManager.TryGetControl("winItemEditor", "cmbLevel", out var lvlComboCtrl) && lvlComboCtrl is ComboBox cmbLevel)
         {
             cmbLevel.Items.Clear();
-            for (int i = 1; i <= GameState.MaxLevel; i++)
+            for (int i = 1; i <= Variables.MaxLevel; i++)
                 cmbLevel.Items.Add(i.ToString());
         }
 
@@ -570,7 +570,7 @@ public class WinItemEditor
         if (WindowManager.TryGetControl("winItemEditor", "sldReqLevel", out var rLvlCtrl) && rLvlCtrl is ScrollBar sldReqLevel)
         {
             sldReqLevel.Min = 1;
-            sldReqLevel.Max = GameState.MaxLevel;
+            sldReqLevel.Max = Variables.MaxLevel;
             sldReqLevel.Value = Math.Clamp(item.LevelReq, sldReqLevel.Min, sldReqLevel.Max);
         }
         if (WindowManager.TryGetControl("winItemEditor", "sldReqStr", out var rStrCtrl) && rStrCtrl is ScrollBar sldReqStr)

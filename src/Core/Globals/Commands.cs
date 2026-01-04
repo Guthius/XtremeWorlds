@@ -63,7 +63,7 @@ public static class Commands
         return PlayerBase.Instance[index].Sprite;
     }
 
-    public static int GetPlayerJob(int index)
+    public static byte GetPlayerJob(int index)
     {
         if (!ValidPlayerIndex(index)) return 0;
         return PlayerBase.Instance[index].Job;
@@ -307,16 +307,18 @@ public static class Commands
         PlayerBase.Instance[index].Name = name;
     }
 
-    public static void SetPlayerJob(int index, int job)
+    public static void SetPlayerJob(int index, byte job)
     {
         if (!ValidPlayerIndex(index)) return;
-        PlayerBase.Instance[index].Job = (byte)job;
+        PlayerBase.Instance[index].Job = job;
     }
 
     public static void SetPlayerPoints(int index, int points)
     {
         if (!ValidPlayerIndex(index)) return;
-        PlayerBase.Instance[index].Points = (byte)points;
+        if (points < 0) points = 0;
+        if (points > Variables.MaxPoints) points = Variables.MaxPoints;
+        PlayerBase.Instance[index].Points = points;
     }
 
     public static void SetPlayerStat(int index, Stat stat, int value)
@@ -383,6 +385,8 @@ public static class Commands
     public static void SetPlayerLevel(int index, int level)
     {
         if (!ValidPlayerIndex(index)) return;
+        if (level < 0) level = 0;
+        if (level > Variables.MaxLevel) level = Variables.MaxLevel;
         PlayerBase.Instance[index].Level = (byte)level;
     }
 

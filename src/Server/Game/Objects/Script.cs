@@ -54,7 +54,18 @@ public static class Script
             if (instance is not null)
             {
                 Instance = instance;
-                General.Logger.LogInformation("Script loaded successfully!");       
+                General.Logger.LogInformation("Script loaded successfully!");  
+                     
+                // Allow script to push its configuration into engine variables prior to initialization.
+                try
+                {
+                    Instance.ApplyEngineVariables();
+                }
+                catch (Exception ex)
+                {
+                    General.Logger.LogError(ex, "[Script] Error applying engine variables");
+                }
+
                 for (int i = 0; i < Player.Instance.Count; i++)
                 {
                     if (IsPlaying(i))
@@ -62,6 +73,7 @@ public static class Script
                         NetworkSend.SendAlert(i, SystemMessage.ServerMaintenance, Menu.Login);    
                     }
                 }
+                
                 General.InitalizeCoreData();
                 await General.LoadGameContentAsync();
                 await General.SpawnGameObjectsAsync();

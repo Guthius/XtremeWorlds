@@ -149,7 +149,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         var r = new PacketReader(data);
 
         Variables.MaxAnimations = r.ReadInt32();
-        Core.Globals.Variables.MaxItems = r.ReadInt32();
+        Variables.MaxItems = r.ReadInt32();
         Variables.MaxMaps = r.ReadInt32();
         Variables.MaxNpcs = r.ReadInt32();
         Variables.MaxParty = r.ReadInt32();
@@ -186,12 +186,13 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Variables.MaxDropItems = r.ReadByte();
         Variables.MaxStartItems = r.ReadByte();
         Variables.MaxStartSkills = r.ReadByte();
-        Variables.MaxPoints = r.ReadInt32();
         Variables.MaxCharacters = r.ReadByte();
         Variables.MaxStats = r.ReadByte();
         Variables.MaxQuests = r.ReadByte();
         Variables.MaxGuilds = r.ReadByte();
         Variables.MaxEventChoices = r.ReadByte();
+        Variables.MaxLevel = r.ReadByte();
+        Variables.MaxPoints = r.ReadInt32();
 
         General.ClearGameData();  
     }
@@ -249,33 +250,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     {
         var packetReader = new PacketReader(data);
 
-        ResetClientStateForNewLogin();
-
         GameState.MyIndex = packetReader.ReadInt32();
-    }
-
-    private static void ResetClientStateForNewLogin()
-    {
-        // Wipe any leftover player instances from a previous session.
-        Player.Instance.Clear();
-        for (var i = 0; i < Variables.MaxPlayers; i++)
-        {
-            Player.Instance.Add(new Player());
-        }
-
-        // Reset per-player transient state used by movement smoothing and misc gameplay flags.
-        Data.TempPlayer = new TempPlayer[Variables.MaxPlayers];
-
-        // Clear local input/mode flags that can keep the client simulating movement.
-        GameState.DirUp = false;
-        GameState.DirDown = false;
-        GameState.DirLeft = false;
-        GameState.DirRight = false;
-
-        GameState.InGame = false;
-        GameState.GettingMap = false;
-        GameState.PlayerData = false;
-        GameState.MapData = false;
     }
 
     public static void Packet_PlayerCharacters(ReadOnlyMemory<byte> data)
@@ -1616,8 +1591,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             if (Player.Instance.Count <= n)
                 Player.Instance.Add(new Player());
         }
+       
         SetPlayerName(i, buffer.ReadString());
-        SetPlayerJob(i, buffer.ReadInt32());
+        SetPlayerJob(i, buffer.ReadByte());
         SetPlayerLevel(i, buffer.ReadInt32());
         SetPlayerPoints(i, buffer.ReadInt32());
         SetPlayerSprite(i, buffer.ReadInt32());
@@ -1723,18 +1699,15 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         int index;
         int tnl;
         var buffer = new PacketReader(data);
-        int maxLevel = 0;
 
         index = buffer.ReadInt32();
-        maxLevel = buffer.ReadInt32();
-        GameState.MaxLevel = maxLevel;
         SetPlayerExperience(index, buffer.ReadInt32());
 
         tnl = buffer.ReadInt32();
         GameState.NextlevelExp = tnl;
 
         // set max width
-        if (GetPlayerLevel(GameState.MyIndex) < GameState.MaxLevel)
+        if (GetPlayerLevel(GameState.MyIndex) < Variables.MaxLevel)
         {
             if (GetPlayerExperience(GameState.MyIndex) > 0)
             {
@@ -2738,11 +2711,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         var projectile = new Projectile();
 
-
-
         projectile.Name = buffer.ReadString();
         projectile.Sprite = buffer.ReadInt32();
-        projectile.Range = (byte)buffer.ReadInt32();
+        projectile.Range = buffer.ReadByte();
         projectile.Speed = buffer.ReadInt32();
         projectile.Damage = buffer.ReadInt32();
         projectile.Animation = buffer.ReadInt32();
