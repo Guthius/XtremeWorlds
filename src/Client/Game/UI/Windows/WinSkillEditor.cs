@@ -225,9 +225,13 @@ public class WinSkillEditor
         // Projectile (0=None => IsProjectile=0)
         if (WindowManager.TryGetControl("winSkillEditor", "cmbProjectile", out var projCtrl) && projCtrl is ComboBox cmbProj)
         {
-            int val = s.Projectile < 0 ? 0 : s.Projectile + 1;
+            int val = s.IsProjectile == 0 ? 0 : (s.Projectile < 0 ? 0 : s.Projectile + 1);
             cmbProj.Value = Math.Clamp(val, 0, cmbProj.Items.Count - 1);
         }
+
+        // IsProjectile checkbox
+        if (WindowManager.TryGetControl("winSkillEditor", "chkProjectile", out var chkCtrl) && chkCtrl is CheckBox chk)
+            chk.Value = s.IsProjectile == 1 ? 1 : 0;
 
         // Custom Script / Common Event
         if (WindowManager.TryGetControl("winSkillEditor", "cmbCommonEventType", out var ceCtrl) && ceCtrl is ComboBox cmbCe)

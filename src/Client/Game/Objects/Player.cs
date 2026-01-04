@@ -1068,7 +1068,7 @@ namespace Client
             }
         }
 
-        public static int FindSkill(int skillNum)
+        public static int FindSkill(int skill)
         {
             int findSkill = default;
             int i;
@@ -1076,7 +1076,7 @@ namespace Client
             findSkill = 0;
 
             // Check for subscript out of range
-            if (skillNum < 0 | skillNum >= Core.Globals.Variables.MaxSkills)
+            if (skill < 0 | skill >= Core.Globals.Variables.MaxSkills)
             {
                 return findSkill;
             }
@@ -1084,7 +1084,7 @@ namespace Client
             for (i = 0; i < Core.Globals.Variables.MaxPlayerSkills; i++)
             {
                 // Check to see if the player has the skill
-                if (GetPlayerSkill(GameState.MyIndex, i) == skillNum)
+                if (GetPlayerSkill(GameState.MyIndex, i) == skill)
                 {
                     findSkill = i;
                     return findSkill;

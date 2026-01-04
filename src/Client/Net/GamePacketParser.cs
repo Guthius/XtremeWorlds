@@ -879,7 +879,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     private static void Packet_StartSkillBuffer(ReadOnlyMemory<byte> data)
     {
         var reader = new PacketReader(data);
-        // Packet id already consumed by dispatcher
         int slot = reader.ReadInt32();
         GameState.SkillBuffer = slot;
         GameState.SkillBufferTimer = General.GetTickCount(); // could offset with serverStart if clock sync later
@@ -2741,7 +2740,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         {
             ref var instance = ref Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, i];
-            instance.ProjectileNum = buffer.ReadInt32();
+            instance.Index = buffer.ReadInt32();
             instance.Owner = buffer.ReadInt32();
             instance.OwnerType = buffer.ReadByte();
             instance.Dir = buffer.ReadByte();

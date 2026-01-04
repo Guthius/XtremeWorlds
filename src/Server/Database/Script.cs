@@ -55,6 +55,12 @@ public class Script
     private const long ItemDespawnTime = 90000L; // 1:30 seconds
     private const byte StatPerLevel = 5;
 
+    // When a buffered cast is executing, we defer chain-on-hit until after FinalizeCast()
+    // so costs/cooldowns resolve before the chain skill fires.
+    private readonly List<(int skillId, Entity target)> _queuedChainOnHit = new();
+    private (Core.Globals.Entity.EntityType type, int id, int map)? _activeCastChainCaster;
+    private int _activeCastChainSkillId = -1;
+
     // Mutable script-driven limits (initialized from engine defaults)
     public static byte MaxLevel = Variables.MaxLevel;
     public static int MaxAnimations = Variables.MaxAnimations;
@@ -951,10 +957,8 @@ public class Script
         // Stunned
         if (Data.TempPlayer[player].StunDuration > 0) return;
 
-        int skillId = Server.Player.Instance[player].Skill[skillSlot].Num;
-        if (skillId < 0 || skillId >= Skill.Instance.Count) return;
-
-        var skill = Skill.Instance[skillId];
+        int skill = Server.Player.Instance[player].Skill[skillSlot].Num;
+        if (skill < 0 || skill >= Skill.Instance.Count) return;
 
         // Cooldown check
         long now = General.GetTimeMs();
@@ -969,13 +973,13 @@ public class Script
         }
 
         // Mana check (only deduct on finalize) - ensure sufficient now
-        if (GetPlayerVital(player, Core.Globals.Vital.Mana) < skill.MpCost)
+        if (GetPlayerVital(player, Core.Globals.Vital.Mana) < Skill.Instance[skill].MpCost)
         {
             NetworkSend.SendPlayerMessage(player, "Not enough mana.", (int)ColorName.BrightRed);
             return;
         }
 
-        if (GetPlayerVital(player, Core.Globals.Vital.Stamina) < skill.SpCost)
+        if (GetPlayerVital(player, Core.Globals.Vital.Stamina) < Skill.Instance[skill].SpCost)
         {
             NetworkSend.SendPlayerMessage(player, "Not enough stamina.", (int)ColorName.BrightRed);
             return;
@@ -985,15 +989,15 @@ public class Script
         var map = GetPlayerMap(player);
         if (map < 0 || map >= Server.Map.Instance.Count) return;
 
-        var moralId = Server.Map.Instance[map].Moral;
-        if (moralId >= 0 && !Moral.Instance[moralId].CanCast)
+        var moral = Server.Map.Instance[map].Moral;
+        if (moral >= 0 && !Moral.Instance[moral].CanCast)
         {
             NetworkSend.SendPlayerMessage(player, "You cannot cast here.", (int)ColorName.BrightRed);
             return;
         }
 
         // Always buffer, even for instant-cast skills. If castTime == 0 we treat it as 1 tick latency (next 25ms cycle) for consistency.
-        int effectiveCastTime = skill.CastTime;
+        int effectiveCastTime = Skill.Instance[skill].CastTime;
         if (effectiveCastTime < 0) effectiveCastTime = 0;
 
         // Buffer the skill for later completion by server loop
@@ -1494,21 +1498,21 @@ public class Script
         if (attacker.Type == Entity.EntityType.Npc && attacker.Num >= 0)
         {
             var map = attacker.Map;
-            var mapNpcIndex = attacker.Id;
-            if (map >= 0 && map < Core.Globals.Variables.MaxMaps && mapNpcIndex >= 0 && mapNpcIndex < Core.Globals.Variables.MaxMapNpcs)
+            var index = attacker.Id;
+            if (map >= 0 && map < Core.Globals.Variables.MaxMaps && index >= 0 && index < Core.Globals.Variables.MaxMapNpcs)
             {
-                ref var baseNpc = ref MapNpc.Instance[map, mapNpcIndex];
-                if (baseNpc.TargetType == 0)
+                ref var npc = ref MapNpc.Instance[map, index];
+                if (npc.TargetType == 0)
                 {
                     if (target.Type == Entity.EntityType.Player)
                     {
-                        baseNpc.TargetType = (byte)TargetType.Player;
-                        baseNpc.Target = target.Id;
+                        npc.TargetType = (byte)TargetType.Player;
+                        npc.Target = target.Id;
                     }
                     else if (target.Type == Entity.EntityType.Npc)
                     {
-                        baseNpc.TargetType = (byte)TargetType.Npc;
-                        baseNpc.Target = target.Id;
+                        npc.TargetType = (byte)TargetType.Npc;
+                        npc.Target = target.Id;
                     }
                 }
             }
@@ -1519,10 +1523,19 @@ public class Script
             HandleDeath(attacker, target);
         }
 
-        // Chain casting on hit if this came from a skill and damage actually landed
+        // Chain casting on hit if this came from a skill and damage actually landed.
+        // If this hit is part of a buffered cast execution, defer chaining until after FinalizeCast().
         if (skillId.HasValue && skillId.Value >= 0 && dmg.Final > 0)
         {
-            TryChainOnHit(attacker.Map, attacker, skillId.Value, target);
+            if (ShouldDeferChainOnHit(attacker, skillId.Value))
+            {
+                _queuedChainOnHit.Add((skillId.Value, target));
+            }
+            else
+            {
+                TryChainOnHit(attacker.Map, attacker, skillId.Value, target);
+            }
+
             ApplyKnockbackIfAny(attacker, target, skillId);
         }
 
@@ -1911,109 +1924,118 @@ public class Script
         }
     }
 
-    private void CastSkill(int map, Entity entity, int bufferedValue)
+    public void CastSkill(int map, Entity entity, int skill, int slot)
     {
         if (entity == null) return;
         if (entity.Map != map) return;
-
-        int skillId = -1;
-        int PlayerSkillSlot = -1;
-        if (entity.Type == Core.Globals.Entity.EntityType.Player)
-        {
-            PlayerSkillSlot = bufferedValue;
-            if (PlayerSkillSlot < 0 || PlayerSkillSlot >= Server.Player.Instance[entity.Id].Skill.Length) return;
-            skillId = Server.Player.Instance[entity.Id].Skill[PlayerSkillSlot].Num;
-        }
-        else if (entity.Type == Core.Globals.Entity.EntityType.Npc)
-        {
-            for (int i = 0; i < Script.MaxNpcSkills; i++)
-            {
-                if (i == bufferedValue)
-                {
-                    skillId = Npc.Instance[entity.Num].Skill[i];
-                    break;
-                }
-            }
-        }
-        
-        if (skillId < 0 || skillId >= Skill.Instance.Count) return;
-        var skill = Skill.Instance[skillId];
+        if (skill < 0 || skill >= Skill.Instance.Count) return;
 
         // Re-check resource costs just before execution (Player or npc could have spent resources meanwhile)
-        if (skill.MpCost > 0)
+        if (Skill.Instance[skill].MpCost > 0)
         {
             if (entity.Type == Core.Globals.Entity.EntityType.Player)
             {
-                if (GetPlayerVital(entity.Id, Core.Globals.Vital.Mana) < skill.MpCost) return;
+                if (GetPlayerVital(entity.Id, Core.Globals.Vital.Mana) < Skill.Instance[skill].MpCost) return;
             }
             else if (entity.Type == Core.Globals.Entity.EntityType.Npc)
             {
-                if (entity.Vital == null || entity.Vital.Length <= (int)Core.Globals.Vital.Mana || entity.Vital[(int)Core.Globals.Vital.Mana] < skill.MpCost) return;
+                if (entity.Vital == null || entity.Vital.Length <= (int)Core.Globals.Vital.Mana || entity.Vital[(int)Core.Globals.Vital.Mana] < Skill.Instance[skill].MpCost) return;
             }
         }
 
-        if (skill.SpCost > 0)
+        if (Skill.Instance[skill].SpCost > 0)
         {
             if (entity.Type == Core.Globals.Entity.EntityType.Player)
             {
-                if (GetPlayerVital(entity.Id, Core.Globals.Vital.Stamina) < skill.SpCost) return;
+                if (GetPlayerVital(entity.Id, Core.Globals.Vital.Stamina) < Skill.Instance[skill].SpCost) return;
             }
             else if (entity.Type == Core.Globals.Entity.EntityType.Npc)
             {
-                if (entity.Vital == null || entity.Vital.Length <= (int)Core.Globals.Vital.Stamina || entity.Vital[(int)Core.Globals.Vital.Stamina] < skill.SpCost) return;
+                if (entity.Vital == null || entity.Vital.Length <= (int)Core.Globals.Vital.Stamina || entity.Vital[(int)Core.Globals.Vital.Stamina] < Skill.Instance[skill].SpCost) return;
             }
         }
 
         Entity resolvedTarget = null;
-        if (skill.Range > 0)
+        if (Skill.Instance[skill].Range > 0)
         {
             resolvedTarget = ResolveTargetEntity(map, entity);
         }
 
         // Optional cast (wind-up) animation already played when buffering; only play execution anim here.
-        bool isProjectile = skill.IsProjectile == 1;
-        bool isAoE = skill.IsAoE;
-        int range = skill.Range;
+        bool isProjectile = Skill.Instance[skill].IsProjectile == 1;
+        bool isAoE = Skill.Instance[skill].IsAoE;
+        int range = Skill.Instance[skill].Range;
 
-        if (isProjectile)
-        {
-            HandleProjectileSkill(map, entity, skillId, resolvedTarget);
-        }
-        else if (range == 0 && !isAoE)
-        {
-            HandleSelfCastSkill(map, entity, skillId);
-        }
-        else if (range == 0 && isAoE)
-        {
-            HandleSelfCastAoESkill(map, entity, skillId);
-        }
-        else if (range > 0 && isAoE)
-        {
-            HandleTargetedAoESkill(map, entity, skillId, resolvedTarget);
-        }
-        else if (range > 0)
-        {
-            HandleTargetedSkill(map, entity, skillId, resolvedTarget);
-        }
+        _activeCastChainCaster = (entity.Type, entity.Id, map);
+        _activeCastChainSkillId = skill;
+        _queuedChainOnHit.Clear();
 
-        // Apply temporary movement speed modifier to the caster (player only).
-        // Uses Skill.Duration (seconds) for effect lifetime.
-        if (entity.Type == Core.Globals.Entity.EntityType.Player)
-        {
-            var mult = skill.MoveSpeedMultiplier;
-            if (mult <= 0) mult = 1.0f;
-
-            // Only treat this as a timed effect if Duration is positive.
-            // (Duration == 0 => no persistent speed effect)
-            if (Math.Abs(mult - 1.0f) > 0.0001f && skill.Duration > 0)
+        try
             {
-                var now = General.GetTimeMs();
-                Data.TempPlayer[entity.Id].MoveSpeedMultiplier = mult;
-                Data.TempPlayer[entity.Id].MoveSpeedMultiplierTimer = now + skill.Duration * 1000;
+            if (isProjectile)
+            {
+                NetworkSend.SendPlayerMessage(entity.Id, $"Casting projectile: {Skill.Instance[skill].Name}", (int)ColorName.Yellow);
+                HandleProjectileSkill(map, entity, skill, resolvedTarget);
+            }
+            else if (range == 0 && !isAoE)
+            {
+                HandleSelfCastSkill(map, entity, skill);
+            }
+            else if (range == 0 && isAoE)
+            {
+                HandleSelfCastAoESkill(map, entity, skill);
+            }
+            else if (range > 0 && isAoE)
+            {
+                HandleTargetedAoESkill(map, entity, skill, resolvedTarget);
+            }
+            else if (range > 0)
+            {
+                HandleTargetedSkill(map, entity, skill, resolvedTarget);
+            }
+
+            // Apply temporary movement speed modifier to the caster (player only).
+            // Uses Skill.Duration (seconds) for effect lifetime.
+            if (entity.Type == Core.Globals.Entity.EntityType.Player)
+            {
+                var mult = Skill.Instance[skill].MoveSpeedMultiplier;
+                if (mult <= 0) mult = 1.0f;
+
+                // Only treat this as a timed effect if Duration is positive.
+                // (Duration == 0 => no persistent speed effect)
+                if (Math.Abs(mult - 1.0f) > 0.0001f && Skill.Instance[skill].Duration > 0)
+                {
+                    var now = General.GetTimeMs();
+                    Data.TempPlayer[entity.Id].MoveSpeedMultiplier = mult;
+                    Data.TempPlayer[entity.Id].MoveSpeedMultiplierTimer = now + Skill.Instance[skill].Duration * 1000;
+                }
+            }
+
+            FinalizeCast(map, entity, skill, slot);
+
+            if (_queuedChainOnHit.Count > 0)
+            {
+                foreach (var (skillId, target) in _queuedChainOnHit)
+                {
+                    TryChainOnHit(map, entity, skillId, target);
+                }
+                _queuedChainOnHit.Clear();
             }
         }
+        finally
+        {
+            _activeCastChainCaster = null;
+            _activeCastChainSkillId = -1;
+            _queuedChainOnHit.Clear();
+        }
+    }
 
-        FinalizeCast(map, entity, skillId, PlayerSkillSlot);
+    private bool ShouldDeferChainOnHit(Entity attacker, int skillId)
+    {
+        if (_activeCastChainCaster == null) return false;
+        if (_activeCastChainSkillId != skillId) return false;
+        var (type, id, map) = _activeCastChainCaster.Value;
+        return attacker.Type == type && attacker.Id == id && attacker.Map == map;
     }
 
     private Entity? ResolveTargetEntity(int map, Entity entity)
@@ -2269,10 +2291,10 @@ public class Script
         NetworkSend.SendAnimation(map, anim, 0, 0, tType, target.Id);
     }
 
-    private void TryChainOnHit(int map, Entity caster, int baseSkillId, Entity target)
+    private void TryChainOnHit(int map, Entity caster, int skill, Entity target)
     {
-        if (baseSkillId < 0 || baseSkillId >= Skill.Instance.Count) return;
-        int chainId = Skill.Instance[baseSkillId].ChainOnHitSkillId;
+        if (skill < 0 || skill >= Skill.Instance.Count) return;
+        int chainId = Skill.Instance[skill].ChainOnHitSkillId;
         if (chainId < 0 || chainId >= Skill.Instance.Count) return;
         // For targeted chaining, we can re-use targeted attack semantics by routing HandleTargetedSkill
         // but respect the chain skill's own type definitions.
@@ -2348,15 +2370,15 @@ public class Script
             // Set NPC cooldown on the slot that matches this skillId
             if (caster.Map >= 0 && caster.Map < Core.Globals.Variables.MaxMaps && caster.Id >= 0 && caster.Id < Core.Globals.Variables.MaxMapNpcs)
             {
-                ref var baseNpc = ref MapNpc.Instance[caster.Map, caster.Id];
+                ref var npc = ref MapNpc.Instance[caster.Map, caster.Id];
                 var npcTemplate = caster.Num >= 0 && caster.Num < Npc.Instance.Count ? Npc.Instance[caster.Num] : default;
-                if (npcTemplate?.Skill != null && baseNpc.SkillCd != null)
+                if (npcTemplate?.Skill != null && npc.SkillCd != null)
                 {
-                    for (int slot = 0; slot < Script.MaxNpcSkills && slot < npcTemplate.Skill.Length && slot < baseNpc.SkillCd.Length; slot++)
+                    for (int slot = 0; slot < Script.MaxNpcSkills && slot < npcTemplate.Skill.Length && slot < npc.SkillCd.Length; slot++)
                     {
                         if (npcTemplate.Skill[slot] == skillId)
                         {
-                            baseNpc.SkillCd[slot] = General.GetTimeMs() + skill.CdTime * 1000;
+                            npc.SkillCd[slot] = General.GetTimeMs() + skill.CdTime * 1000;
                             break;
                         }
                     }

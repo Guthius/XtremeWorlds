@@ -49,6 +49,7 @@
 
 		<Label Name="lblProjectile" Text="Projectile" Position="12,324" Size="120,18"/>
 		<ComboBox Name="cmbProjectile" Position="140,322" Size="220,20"/>
+		<CheckBox Name="chkProjectile" Text="Projectile" Position="360,324" Size="160,18" Design="CheckboxNormal"/>
 
 		<Label Name="lblSound" Text="Sound" Position="360,88" Size="120,18"/>
 		<ComboBox Name="cmbSound" Position="480,86" Size="160,20"/>

@@ -99,7 +99,7 @@ public class Projectile : ProjectileBase, IAsyncData
                     {
                         if (mp.SkillId >= 0)
                         {
-                            Script.Instance?.CastSkill(map, targetEntity, mp.SkillId);
+                            Script.Instance?.CastSkill(map, targetEntity, mp.SkillId, -1);
                         }
                         else
                         {
@@ -115,7 +115,7 @@ public class Projectile : ProjectileBase, IAsyncData
             }
         }
 
-        // Then NPC target at tile excluding owner NPC
+        // Then npc target at tile excluding owner npc
         for (int n = 0; n < Core.Globals.Variables.MaxMapNpcs; n++)
         {
             ref var mn = ref MapNpc.Instance[map, n];
@@ -130,7 +130,7 @@ public class Projectile : ProjectileBase, IAsyncData
                     {
                         if (mp.SkillId >= 0)
                         {
-                            Script.Instance?.CastSkill(map, targetEntity, mp.SkillId);
+                            Script.Instance?.CastSkill(map, targetEntity, mp.SkillId, -1);
                         }
                         else
                         {
@@ -193,7 +193,7 @@ public class Projectile : ProjectileBase, IAsyncData
         var mapProjectileNum = -1;
         for (var i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
         {
-            if (Data.MapProjectile[map, i].ProjectileNum < 0)
+            if (Data.MapProjectile[map, i].Index < 0)
             {
                 mapProjectileNum = i; break;
             }
@@ -206,7 +206,7 @@ public class Projectile : ProjectileBase, IAsyncData
 
         ref var mp = ref Data.MapProjectile[map, mapProjectileNum];
         Data.TempPlayer[playerId].ProjectileTimer = General.GetTimeMs() + Item.Instance[itemNum].Speed;
-        mp.ProjectileNum = projectileNum;
+        mp.Index = projectileNum;
         mp.Owner = playerId;
         mp.OwnerType = (byte)TargetType.Player;
         
@@ -235,17 +235,17 @@ public class Projectile : ProjectileBase, IAsyncData
         var mapProjectileNum = -1;
         for (var i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
         {
-            if (Data.MapProjectile[map, i].ProjectileNum < 0)
+            if (Data.MapProjectile[map, i].Index < 0)
             { mapProjectileNum = i; break; }
         }
         if (mapProjectileNum == -1) return;
-        int projectileNum = itemNum >= 0 ? Item.Instance[itemNum].Projectile : -1;
-        if (projectileNum < 0) return;
+        int index = itemNum >= 0 ? Item.Instance[itemNum].Projectile : -1;
+        if (index < 0) return;
         if (Data.TempPlayer[playerId].ProjectileTimer > General.GetTimeMs()) return;
 
         ref var mp = ref Data.MapProjectile[map, mapProjectileNum];
         Data.TempPlayer[playerId].ProjectileTimer = General.GetTimeMs() + Item.Instance[itemNum].Speed;
-        mp.ProjectileNum = projectileNum;
+        mp.Index = index;
         mp.Owner = playerId;
         mp.OwnerType = (byte)TargetType.Player;
         // Angle purely for 8-dir visual; movement is driven by vx/vy
@@ -263,7 +263,7 @@ public class Projectile : ProjectileBase, IAsyncData
         mp.Vx = vx; mp.Vy = vy; mp.FreeAim = 1; mp.SkillId = -1;
         mp.AccX = 0; mp.AccY = 0; mp.Range = 0;
         mp.DestX = destX; mp.DestY = destY;
-        mp.TravelTime = General.GetTimeMs() + Math.Max(1, Projectile.Instance[projectileNum].Speed);
+        mp.TravelTime = General.GetTimeMs() + Math.Max(1, Projectile.Instance[index].Speed);
         mp.Timer = General.GetTimeMs() + 60000;
         NetworkSend.SendProjectileToMap(map, mapProjectileNum);
     }
@@ -274,7 +274,7 @@ public class Projectile : ProjectileBase, IAsyncData
         var mapProjectileNum = -1;
         for (var i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
         {
-            if (Data.MapProjectile[map, i].ProjectileNum < 0)
+            if (Data.MapProjectile[map, i].Index < 0)
             {
                 mapProjectileNum = i;
                 break;
@@ -306,7 +306,7 @@ public class Projectile : ProjectileBase, IAsyncData
             int cooldownMs = Projectile.Instance[projectile].Speed;
             Data.TempPlayer[playerId].ProjectileTimer = General.GetTimeMs() + cooldownMs;
         }
-        mapProjectile.ProjectileNum = projectile;
+        mapProjectile.Index = projectile;
         mapProjectile.Owner = playerId;
         mapProjectile.OwnerType = (byte)TargetType.Player;
         mapProjectile.Dir = dir >= 0 ? (byte) dir : GetPlayerDir(playerId);
@@ -320,26 +320,26 @@ public class Projectile : ProjectileBase, IAsyncData
         NetworkSend.SendProjectileToMap(map, mapProjectileNum);
     }
 
-    public static void OnNpcProjectile(int map, int mapNpcNum, int skillNum, int dir = -1)
+    public static void OnNpcProjectile(int map, int mapNpcNum, int skill, int dir = -1)
     {
         // Find free map projectile slot
-        var mapProjectileNum = -1;
+        var index = -1;
         for (var i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
         {
-            if (Data.MapProjectile[map, i].ProjectileNum < 0)
+            if (Data.MapProjectile[map, i].Index < 0)
             {
-                mapProjectileNum = i;
+                index = i;
                 break;
             }
         }
 
-        if (mapProjectileNum == -1)
+        if (index == -1)
         {
             return;
         }
 
         // Skill-defined projectile
-        var projectile = skillNum >= 0 ? Skill.Instance[skillNum].Projectile : -1;
+        var projectile = skill >= 0 ? Skill.Instance[skill].Projectile : -1;
         if (projectile == -1)
         {
             return;
@@ -350,20 +350,20 @@ public class Projectile : ProjectileBase, IAsyncData
         if (mapNpcNum < 0 || mapNpcNum >= Core.Globals.Variables.MaxMapNpcs) return;
         if (MapNpc.Instance[map, mapNpcNum].Num < 0) return;
 
-        ref var mapProjectile = ref Data.MapProjectile[map, mapProjectileNum];
+        ref var mapProjectile = ref Data.MapProjectile[map, index];
 
-        mapProjectile.ProjectileNum = projectile;
+        mapProjectile.Index = projectile;
         mapProjectile.Owner = mapNpcNum;
         mapProjectile.OwnerType = (byte) TargetType.Npc;
         mapProjectile.Dir = dir >= 0 ? (byte) dir : MapNpc.Instance[map, mapNpcNum].Dir;
         mapProjectile.X = MapNpc.Instance[map, mapNpcNum].X;
         mapProjectile.Y = MapNpc.Instance[map, mapNpcNum].Y;
-        mapProjectile.SkillId = skillNum;
+        mapProjectile.SkillId = skill;
         mapProjectile.Range = 0;
         mapProjectile.TravelTime = General.GetTimeMs() + Math.Max(1, Projectile.Instance[projectile].Speed);
         mapProjectile.Timer = General.GetTimeMs() + 60000;
 
-        NetworkSend.SendProjectileToMap(map, mapProjectileNum);
+        NetworkSend.SendProjectileToMap(map, index);
     }
 
     public static void OnUpdate()
@@ -376,7 +376,7 @@ public class Projectile : ProjectileBase, IAsyncData
                 // Map not initialized; clear any stray projectiles for this map defensively.
                 for (int i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
                 {
-                    if (Data.MapProjectile[map, i].ProjectileNum >= 0)
+                    if (Data.MapProjectile[map, i].Index >= 0)
                     {
                         MapProjectile.OnClear(map, i);
                     }
@@ -388,7 +388,7 @@ public class Projectile : ProjectileBase, IAsyncData
             {
                 ref var mp = ref Data.MapProjectile[map, i];
                 // Skip empty slots
-                if (mp.ProjectileNum < 0) continue;
+                if (mp.Index < 0) continue;
 
                 // Expire long-running projectiles defensively
                 if (mp.Timer > 0 && now > mp.Timer)
@@ -397,7 +397,7 @@ public class Projectile : ProjectileBase, IAsyncData
                     continue;
                 }
 
-                var index = mp.ProjectileNum;
+                var index = mp.Index;
                 if (!TryGetProjectileSlot(index, out var speed, out var range, out var damage, out var animation))
                 {
                     MapProjectile.OnClear(map, i);
@@ -553,7 +553,7 @@ public class Projectile : ProjectileBase, IAsyncData
                             if (mp.SkillId >= 0)
                             {
                                 // skill-based projectile: resolve as targeted skill
-                                Script.Instance?.CastSkill(map, attackerEntity, mp.SkillId);
+                                Script.Instance?.CastSkill(map, attackerEntity, mp.SkillId, -1);
                             }
                             else
                             {
@@ -581,7 +581,10 @@ public class Projectile : ProjectileBase, IAsyncData
                             if (!(mp.OwnerType == (byte)TargetType.Npc && mp.Owner == n))
                             {
                                 hit = true;
-                                attackerEntity = Core.Globals.Entity.FromPlayer(mp.Owner, Player.Instance[mp.Owner]);
+                                if (mp.OwnerType == (byte)TargetType.Player)
+                                    attackerEntity = Core.Globals.Entity.FromPlayer(mp.Owner, Player.Instance[mp.Owner]);
+                                else
+                                    attackerEntity = Core.Globals.Entity.FromNpc(mp.Owner, MapNpc.Instance[map, mp.Owner]);
                                 targetEntity = Core.Globals.Entity.FromNpc(n, mn);
                             }
                             break;

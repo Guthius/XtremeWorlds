@@ -2098,37 +2098,40 @@ namespace Client
 
                         if (GameState.SkillBuffer >= 0)
                         {
-                            if ((int) Player.Instance[(int) i].Skill[GameState.SkillBuffer].Num >= 0)
+                            if (Player.Instance[(int) i].Skill[GameState.SkillBuffer].Num >= 0)
                             {
-                                if (Skill.Instance[(int) Player.Instance[(int) i].Skill[GameState.SkillBuffer].Num]
-                                        .CastTime > 0)
+                                if (Skill.Instance.Count > Player.Instance[(int) i].Skill[GameState.SkillBuffer].Num)
                                 {
-                                    // lock to player
-                                    tmpX = (long)Math.Round(GetPlayerRawX((int)i) + 16 - width / 2d);
+                                    if (Skill.Instance[Player.Instance[(int) i].Skill[GameState.SkillBuffer].Num]
+                                            .CastTime > 0)
+                                    {
+                                        // lock to player
+                                        tmpX = (long)Math.Round(GetPlayerRawX((int)i) + 16 - width / 2d);
 
-                                    tmpY = GetPlayerRawY((int)i) + 35 + height;
+                                        tmpY = GetPlayerRawY((int)i) + 35 + height;
 
-                                    // calculate the width to fill
-                                    if (width > 0L)
-                                        barWidth = (long) Math.Round((General.GetTickCount() - GameState.SkillBufferTimer) /
-                                            (double) (Client.Skill.Instance[(int) Player.Instance[(int) i].Skill[GameState.SkillBuffer].Num]
-                                                .CastTime * 1000) * width);
+                                        // calculate the width to fill
+                                        if (width > 0L)
+                                            barWidth = (long) Math.Round((General.GetTickCount() - GameState.SkillBufferTimer) /
+                                                (double) (Client.Skill.Instance[(int) Player.Instance[(int) i].Skill[GameState.SkillBuffer].Num]
+                                                    .CastTime * 1000) * width);
 
-                                    // draw bar background
-                                    top = height * 3L; // cooldown bar background
-                                    left = 0L;
-                                    string argPath6 = Path.Combine(DataPath.Misc, "Bars");
-                                    RenderTexture(ref argPath6, GameLogic.ConvertMapX((int) tmpX),
-                                        GameLogic.ConvertMapY((int) tmpY), (int) left, (int) top, (int) width, (int) height,
-                                        (int) width, (int) height);
+                                        // draw bar background
+                                        top = height * 3L; // cooldown bar background
+                                        left = 0L;
+                                        string argPath6 = Path.Combine(DataPath.Misc, "Bars");
+                                        RenderTexture(ref argPath6, GameLogic.ConvertMapX((int) tmpX),
+                                            GameLogic.ConvertMapY((int) tmpY), (int) left, (int) top, (int) width, (int) height,
+                                            (int) width, (int) height);
 
-                                    // draw the bar proper
-                                    top = height * 2L; // cooldown bar
-                                    left = 0L;
-                                    string argPath7 = Path.Combine(DataPath.Misc, "Bars");
-                                    RenderTexture(ref argPath7, GameLogic.ConvertMapX((int) tmpX),
-                                        GameLogic.ConvertMapY((int) tmpY), (int) left, (int) top, (int) barWidth, (int) height,
-                                        (int) barWidth, (int) height);
+                                        // draw the bar proper
+                                        top = height * 2L; // cooldown bar
+                                        left = 0L;
+                                        string argPath7 = Path.Combine(DataPath.Misc, "Bars");
+                                        RenderTexture(ref argPath7, GameLogic.ConvertMapX((int) tmpX),
+                                            GameLogic.ConvertMapY((int) tmpY), (int) left, (int) top, (int) barWidth, (int) height,
+                                            (int) barWidth, (int) height);
+                                    }
                                 }
                             }
                         }
@@ -2679,7 +2682,7 @@ namespace Client
                 {
                     for (i = 0; i < Variables.MaxProjectiles; i++)
                     {
-                        if (Core.Globals.Data.MapProjectile[map, i].ProjectileNum >= 0)
+                        if (Core.Globals.Data.MapProjectile[map, i].Index >= 0)
                         {
                             MapProjectile.OnDraw(i);
                         }

@@ -1805,6 +1805,7 @@ namespace Client
                 // set name
                 if (WindowManager.TryGetControl("winDescription", "lblName", out var lblName2))
                 {
+                    if (Skill.Instance.Count <= skillNum) return;
                     lblName2!.Text = Skill.Instance[(int)skillNum].Name;
                     lblName2!.Color = Microsoft.Xna.Framework.Color.White;
                 }

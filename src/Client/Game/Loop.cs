@@ -162,11 +162,12 @@ namespace Client
                     for (_i = 0; _i < Variables.MaxPlayerSkills; _i++)
                     {
                         if (Player.Instance.Count <= GameState.MyIndex) break;
+                        if (Skill.Instance.Count <= Player.Instance[GameState.MyIndex].Skill[_i].Num) break;
                         if (Player.Instance[GameState.MyIndex].Skill[_i].Num >= 0)
                         {
                             if (Player.Instance[GameState.MyIndex].Skill[_i].Cd > 0)
                             {
-                                if (Player.Instance[GameState.MyIndex].Skill[_i].Cd + Skill.Instance[(int)Player.Instance[GameState.MyIndex].Skill[_i].Num].CdTime * 1000 < _tick)
+                                if (Player.Instance[GameState.MyIndex].Skill[_i].Cd + Skill.Instance[Player.Instance[GameState.MyIndex].Skill[_i].Num].CdTime * 1000 < _tick)
                                 {
                                     Player.Instance[GameState.MyIndex].Skill[_i].Cd = 0;
                                 }
@@ -178,10 +179,13 @@ namespace Client
                 // check if we need to unlock the player's skill casting restriction
                 if (GameState.SkillBuffer >= 0)
                 {
-                    if (GameState.SkillBufferTimer + Skill.Instance[(int)Player.Instance[GameState.MyIndex].Skill[GameState.SkillBuffer].Num].CastTime * 1000 < _tick)
+                    if (Skill.Instance.Count > Player.Instance[GameState.MyIndex].Skill[GameState.SkillBuffer].Num)
                     {
-                        GameState.SkillBuffer = -1;
-                        GameState.SkillBufferTimer = 0;
+                        if (GameState.SkillBufferTimer + Skill.Instance[Player.Instance[GameState.MyIndex].Skill[GameState.SkillBuffer].Num].CastTime * 1000 < _tick)
+                        {
+                            GameState.SkillBuffer = -1;
+                            GameState.SkillBufferTimer = 0;
+                        }
                     }
                 }
                 

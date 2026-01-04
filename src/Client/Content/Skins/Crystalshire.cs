@@ -3817,9 +3817,43 @@ public class Crystalshire
                     Skill.Instance[i].IsProjectile = 1;
                     Skill.Instance[i].Projectile = v - 1;
                 }
+
+                if (WindowManager.TryGetControl("winSkillEditor", "chkProjectile", out var chkCtrl) && chkCtrl is CheckBox chk)
+                    chk.Value = Skill.Instance[i].IsProjectile == 1 ? 1 : 0;
                 Skill.IsChanged[i] = true;
             }
         });
+
+        // IsProjectile checkbox
+        if (WindowManager.TryGetControl("winSkillEditor", "chkProjectile", out var isProjCtrl) && isProjCtrl is CheckBox chkIsProj)
+        {
+            chkIsProj.CallBack[(int)ControlState.MouseDown] = () =>
+            {
+                int i = WinSkillEditor.SelectedIndex;
+                if (i < 0 || i >= Variables.MaxSkills || Skill.Instance.Count <= i) return;
+
+                chkIsProj.Value = chkIsProj.Value == 0 ? 1 : 0;
+                bool enabled = chkIsProj.Value == 1;
+
+                Skill.Instance[i].IsProjectile = enabled ? 1 : 0;
+                if (!enabled)
+                {
+                    Skill.Instance[i].Projectile = -1;
+                    if (WindowManager.TryGetControl("winSkillEditor", "cmbProjectile", out var projCtrl) && projCtrl is ComboBox cmbProj)
+                        cmbProj.Value = 0;
+                }
+                else
+                {
+                    if (Skill.Instance[i].Projectile < 0)
+                        Skill.Instance[i].Projectile = 0;
+
+                    if (WindowManager.TryGetControl("winSkillEditor", "cmbProjectile", out var projCtrl) && projCtrl is ComboBox cmbProj)
+                        cmbProj.Value = Math.Clamp(Skill.Instance[i].Projectile + 1, 0, cmbProj.Items.Count - 1);
+                }
+
+                Skill.IsChanged[i] = true;
+            };
+        }
 
         // Custom Script / Common Event type (0=None, otherwise 1..CommonEventTrigger)
         BindCombo("cmbCommonEventType", v =>

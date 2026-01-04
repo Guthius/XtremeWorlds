@@ -1384,7 +1384,7 @@ public static class NetworkSend
 
         packet.WriteEnum(ServerPackets.SMapProjectile);
         packet.WriteInt32(projectileNum);
-        packet.WriteInt32(mapProjectile.ProjectileNum);
+        packet.WriteInt32(mapProjectile.Index);
         packet.WriteInt32(mapProjectile.Owner);
         packet.WriteByte(mapProjectile.OwnerType);
         packet.WriteByte(mapProjectile.Dir);

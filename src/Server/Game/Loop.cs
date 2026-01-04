@@ -304,25 +304,25 @@ public static class Loop
                     continue;
                 }
 
-                var basePlayer = Player.Instance[id];
-                if (basePlayer is null)
+                var player = Player.Instance[id];
+                if (player is null)
                 {
                     continue;
                 }
 
-                if (basePlayer.Map != map)
+                if (player.Map != map)
                 {
                     continue;
                 }
 
-                var player = Entity.FromPlayer(id, basePlayer);
+                var entity = Entity.FromPlayer(id, player);
                 if (!IsPlaying(i.Id))
                 {
                     continue;
                 }
 
                 player.Map = map;
-                entities.Add(player);
+                entities.Add(entity);
             }
         }
 
@@ -332,13 +332,10 @@ public static class Loop
         {
             var entity = entities[x];
             if (entity == null) continue;
-            var vitals = entity.Vital; // capture early
+            var vitals = entity.Vital;
             var map = entity.Map;
 
-            // Only process entities that are Npcs
-            if (entity.Num < 0) continue;
-
-            // Resolve completed skill buffers for both players and NPCs
+            // Resolve completed skill buffers for both players and npcs
             long nowMsBuff = General.GetTimeMs();
             if (entity.Type == Core.Globals.Entity.EntityType.Player)
             {
@@ -351,7 +348,7 @@ public static class Loop
                     int castMs = (skillId >= 0 && skillId < Skill.Instance.Count) ? Skill.Instance[skillId].CastTime * 1000 : 0;
                     if (nowMsBuff > Data.TempPlayer[entity.Id].SkillBufferTimer + castMs)
                     {
-                        Script.Instance?.CastSkill(map, entity, slot); // bufferedValue is slot for players
+                        Script.Instance?.CastSkill(map, entity, skillId, slot);
                         // clear buffer
                         Data.TempPlayer[entity.Id].SkillBuffer = -1;
                         Data.TempPlayer[entity.Id].SkillBufferTimer = 0;
@@ -361,13 +358,13 @@ public static class Loop
             }
             else if (entity.Type == Core.Globals.Entity.EntityType.Npc)
             {
-                int skillId = entity.SkillBuffer; // NPC stores skillId directly
-                if (skillId >= 0)
+                int skill = entity.SkillBuffer;
+                if (skill >= 0)
                 {
-                    int castMs = (skillId < Skill.Instance.Count) ? Skill.Instance[skillId].CastTime * 1000 : 0;
+                    int castMs = (skill < Skill.Instance.Count) ? Skill.Instance[skill].CastTime * 1000 : 0;
                     if (nowMsBuff > entity.SkillBufferTimer + castMs)
                     {
-                        Script.Instance?.CastSkill(map, entity, skillId); // bufferedValue is skillId for NPCs
+                        Script.Instance?.CastSkill(map, entity, skill, -1);
                         // clear snapshot & underlying map npc buffer
                         entity.SkillBuffer = -1;
                         entity.SkillBufferTimer = 0;
@@ -375,14 +372,17 @@ public static class Loop
                         {
                             if (entity.Id >= 0 && entity.Id < Variables.MaxMapNpcs)
                             {
-                                ref var baseNpc = ref MapNpc.Instance[map, entity.Id];
-                                baseNpc.SkillBuffer = -1;
-                                baseNpc.SkillBufferTimer = 0;
+                                ref var npc = ref MapNpc.Instance[map, entity.Id];
+                                npc.SkillBuffer = -1;
+                                npc.SkillBufferTimer = 0;
                             }
                         }
                     }
                 }
             }
+            
+            // Only process NPC-specific logic below
+            if (entity.Type != Core.Globals.Entity.EntityType.Npc || entity.Num < 0) continue;
             else
             {
                 // ATTACKING ON SIGHT (use tile-based distance; ensure property name consistency)
@@ -529,7 +529,7 @@ public static class Loop
                                             bool cdReady = baseNpc.SkillCd == null || slot >= baseNpc.SkillCd.Length || baseNpc.SkillCd[slot] <= nowMs;
                                             if (!cdReady) continue;
                                             if (entity.Vital == null || entity.Vital.Length <= (int)Core.Globals.Vital.Mana || entity.Vital[(int)Core.Globals.Vital.Mana] < sk.MpCost) continue;
-                                            Script.Instance?.CastSkill(map, entity, sid);
+                                            Script.Instance?.CastSkill(map, entity, sid, slot);
                                             didCast = true;
                                             break;
                                         }
@@ -598,7 +598,7 @@ public static class Loop
                                                 bool cdReady2 = baseNpc2.SkillCd == null || slot2 >= baseNpc2.SkillCd.Length || baseNpc2.SkillCd[slot2] <= nowMs2;
                                                 if (!cdReady2) continue;
                                                 if (entity.Vital == null || entity.Vital.Length <= (int)Core.Globals.Vital.Mana || entity.Vital[(int)Core.Globals.Vital.Mana] < sk2.MpCost) continue;
-                                                Script.Instance?.CastSkill(map, entity, sid2);
+                                                Script.Instance?.CastSkill(map, entity, sid2, slot2);
                                                 didCast2 = true;
                                                 break;
                                             }

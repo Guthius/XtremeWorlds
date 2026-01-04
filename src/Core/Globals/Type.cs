@@ -467,7 +467,7 @@ public static class Type
 
     public struct MapProjectile
     {
-        public int ProjectileNum;
+        public int Index;
         public int Owner;
         public byte OwnerType;
         public int X;

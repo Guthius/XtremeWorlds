@@ -12,7 +12,7 @@ namespace Client
     {
         public static void OnClear(int projectileNum)
         {
-            Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, projectileNum].ProjectileNum = -1;
+            Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, projectileNum].Index = -1;
             Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, projectileNum].Owner = 0;
             Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, projectileNum].OwnerType = 0;
             Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, projectileNum].X = 0;
@@ -65,7 +65,7 @@ namespace Client
             if (y > Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY | y < 0)
                 return;
 
-            int projectile = Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, projectileNum].ProjectileNum;
+            int projectile = Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, projectileNum].Index;
             if (projectile < 0 || projectile >= Projectile.Instance.Count)
             {
                 return;
