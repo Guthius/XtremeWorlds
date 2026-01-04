@@ -72,7 +72,7 @@ public class Player : PlayerBase
     {
         try
         {
-            Script.Instance?.OnLevel(playerId);
+                
         }
         catch (Exception ex)
         {

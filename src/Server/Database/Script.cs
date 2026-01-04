@@ -26,6 +26,9 @@ using Item = Server.Item;
 using MapItem = Server.MapItem;
 using MapNpc = Server.MapNpc;
 using Map = Server.Map;
+using Resource = Server.Resource;
+using Shop = Server.Shop;
+using Projectile = Server.Projectile;
 using Core.Globals;
 using Server.Game;
 
@@ -1003,7 +1006,7 @@ public class Script
             SetPlayerLevel(index, GetPlayerLevel(index) + 1);
             int points = StatPerLevel;
             points += ((int)Math.Floor((decimal)GetPlayerStat(index, Stat.Luck) / 10));
-            SetPlayerPoints(index, expRollover);
+            SetPlayerPoints(index, GetPlayerPoints(index) + points);
             SetPlayerExperience(index, expRollover);
             count += 1;
         }

@@ -39,7 +39,7 @@ namespace Server
 
         public static void OnLevel(int playerId, int skillSlot)
         {
-            var levels = 0;
+            var count = 0;
 
             if (GetPlayerGatherSkillLevel(playerId, skillSlot) == Script.Instance?.MaxLevel)
             {
@@ -54,17 +54,17 @@ namespace Server
                 SetPlayerGatherSkillExperience(playerId, skillSlot, expRollover);
                 SetPlayerGatherSkillMaxExperience(playerId, skillSlot, (int)GetSkillNextLevel(playerId, skillSlot));
 
-                levels++;
+                count++;
             }
 
-            if (levels == 0)
+            if (count == 0)
             {
                 return;
             }
 
-            NetworkSend.SendPlayerMessage(playerId, levels == 1
-                ? $"Your {GetResourceSkillName((ResourceSkill)skillSlot)} has gone up a level!"
-                : $"Your {GetResourceSkillName((ResourceSkill)skillSlot)} has gone up by {levels} levels!", (int)ColorName.BrightGreen);
+            NetworkSend.SendPlayerMessage(playerId, count == 1
+                ? $"Your {GetResourceSkillName((ResourceSkill)skillSlot)} has gained a level!"
+                : $"Your {GetResourceSkillName((ResourceSkill)skillSlot)} has gained {count} levels!", (int)ColorName.BrightGreen);
 
             NetworkSend.SendPlayerData(playerId);
         }
