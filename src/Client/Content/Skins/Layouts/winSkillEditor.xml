@@ -23,6 +23,19 @@
 		<Label Name="lblAnimation" Text="Animation" Position="12,88" Size="120,18"/>
 		<ComboBox Name="cmbAnimation" Position="140,86" Size="220,20"/>
 
+		<Label Name="lblChainOnHit" Text="Chain On Hit" Position="380,26" Size="120,18"/>
+		<ComboBox Name="cmbChainOnHit" Position="460,24" Size="160,20"/>
+
+		<Label Name="lblMultiDirMask" Text="MultiDir" Position="380,50" Size="120,18"/>
+		<CheckBox Name="chkDirDown" Text="D" Position="460,48" Size="34,18" Design="CheckboxNormal"/>
+		<CheckBox Name="chkDirRight" Text="R" Position="500,48" Size="34,18" Design="CheckboxNormal"/>
+		<CheckBox Name="chkDirLeft" Text="L" Position="540,48" Size="34,18" Design="CheckboxNormal"/>
+		<CheckBox Name="chkDirUp" Text="U" Position="580,48" Size="34,18" Design="CheckboxNormal"/>
+		<CheckBox Name="chkDirDownRight" Text="DR" Position="460,68" Size="44,18" Design="CheckboxNormal"/>
+		<CheckBox Name="chkDirDownLeft" Text="DL" Position="504,68" Size="44,18" Design="CheckboxNormal"/>
+		<CheckBox Name="chkDirUpRight" Text="UR" Position="548,68" Size="44,18" Design="CheckboxNormal"/>
+		<CheckBox Name="chkDirUpLeft" Text="UL" Position="592,68" Size="44,18" Design="CheckboxNormal"/>
+
 		<Label Name="lblIcon" Text="Icon" Position="12,122" Size="120,18"/>
 		<ScrollBar Name="sldIcon" Position="140,122" Size="200,12" Min="0" Max="1024" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 
@@ -51,22 +64,22 @@
 		<ComboBox Name="cmbProjectile" Position="140,322" Size="220,20"/>
 		<CheckBox Name="chkProjectile" Text="Projectile" Position="360,324" Size="160,18" Design="CheckboxNormal"/>
 
-		<Label Name="lblSound" Text="Sound" Position="360,88" Size="120,18"/>
-		<ComboBox Name="cmbSound" Position="480,86" Size="160,20"/>
+		<Label Name="lblSound" Text="Sound" Position="380,84" Size="120,18"/>
+		<ComboBox Name="cmbSound" Position="460,82" Size="160,20"/>
 
-		<Label Name="lblCommonEvent" Text="Event" Position="360,120" Size="120,18"/>
-		<Label Name="lblCommonEventType" Text="Type" Position="360,144" Size="120,18"/>
-		<ComboBox Name="cmbCommonEventType" Position="480,142" Size="160,20"/>
-		<Label Name="lblCommonEventData1" Text="Data 1" Position="360,168" Size="120,18"/>
-		<TextBox Name="txtCommonEventData1" Position="480,166" Size="160,22" Design="TextWhite"/>
-		<Label Name="lblCommonEventData2" Text="Data 2" Position="360,192" Size="120,18"/>
-		<TextBox Name="txtCommonEventData2" Position="480,190" Size="160,22" Design="TextWhite"/>
+		<Label Name="lblCommonEvent" Text="Event" Position="380,116" Size="120,18"/>
+		<Label Name="lblCommonEventType" Text="Type" Position="380,140" Size="120,18"/>
+		<ComboBox Name="cmbCommonEventType" Position="460,138" Size="160,20"/>
+		<Label Name="lblCommonEventData1" Text="Data 1" Position="380,164" Size="120,18"/>
+		<TextBox Name="txtCommonEventData1" Position="460,162" Size="160,22" Design="TextWhite"/>
+		<Label Name="lblCommonEventData2" Text="Data 2" Position="380,188" Size="120,18"/>
+		<TextBox Name="txtCommonEventData2" Position="460,186" Size="160,22" Design="TextWhite"/>
 
-		<Label Name="lblMoveSpeedMultiplier" Text="Move Speed" Position="360,216" Size="120,18"/>
-		<TextBox Name="txtMoveSpeedMultiplier" Position="480,214" Size="160,22" Design="TextWhite"/>
+		<Label Name="lblMoveSpeedMultiplier" Text="Move Speed" Position="380,212" Size="120,18"/>
+		<TextBox Name="txtMoveSpeedMultiplier" Position="460,210" Size="160,22" Design="TextWhite"/>
 
-		<Label Name="lblIcon" Text="Icon" Position="360,246" Size="90,18"/>
-		<PictureBox Name="picIcon" Position="360,266" Size="32,32" Design="TextBlack"/>
+		<Label Name="lblIcon" Text="Icon" Position="380,242" Size="90,18"/>
+		<PictureBox Name="picIcon" Position="460,238" Size="32,32" Design="TextBlack"/>
 	</GroupBox>
 
 	<!-- Action buttons -->

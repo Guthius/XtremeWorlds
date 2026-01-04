@@ -81,6 +81,19 @@ public class WinSkillEditor
             }
         }
 
+        // Chain on hit skill (0=None, otherwise 1..MaxSkills)
+        if (WindowManager.TryGetControl("winSkillEditor", "cmbChainOnHit", out var chainCtrl) && chainCtrl is ComboBox cmbChain)
+        {
+            cmbChain.Items.Clear();
+            cmbChain.Items.Add("None");
+            for (int i = 0; i < Variables.MaxSkills; i++)
+            {
+                var raw = Skill.Instance[i].Name ?? string.Empty;
+                var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
+                cmbChain.Items.Add($"{i + 1}: {name}");
+            }
+        }
+
         // Projectile list (0=None)
         if (WindowManager.TryGetControl("winSkillEditor", "cmbProjectile", out var projCtrl) && projCtrl is ComboBox cmbProj)
         {
@@ -210,7 +223,7 @@ public class WinSkillEditor
         // AoE
         if (WindowManager.TryGetControl("winSkillEditor", "sldAoE", out var aoeCtrl) && aoeCtrl is ScrollBar sldAoE)
         {
-            sldAoE.Min = 0; sldAoE.Max = 12;
+            sldAoE.Min = 0; sldAoE.Max = 32;
             sldAoE.Value = Math.Clamp(s.AoE, sldAoE.Min, sldAoE.Max);
         }
 
@@ -221,6 +234,30 @@ public class WinSkillEditor
         // Animation (bind to SkillAnim)
         if (WindowManager.TryGetControl("winSkillEditor", "cmbAnimation", out var animCtrl) && animCtrl is ComboBox cmbAnim)
             cmbAnim.Value = Math.Clamp(s.SkillAnim, 0, cmbAnim.Items.Count - 1);
+
+        // Chain on hit (0=None => ChainOnHitSkillId=-1)
+        if (WindowManager.TryGetControl("winSkillEditor", "cmbChainOnHit", out var chainCtrl) && chainCtrl is ComboBox cmbChain)
+        {
+            int val = s.ChainOnHitSkillId < 0 ? 0 : s.ChainOnHitSkillId + 1;
+            cmbChain.Value = Math.Clamp(val, 0, cmbChain.Items.Count - 1);
+        }
+
+        // Multi-direction mask (8 directions; bit order matches server usage)
+        static void SetDirCheck(string name, int mask, int bit)
+        {
+            if (WindowManager.TryGetControl("winSkillEditor", name, out var c) && c is CheckBox chk)
+                chk.Value = (mask & (1 << bit)) != 0 ? 1 : 0;
+        }
+
+        int m = s.MultiDirMask;
+        SetDirCheck("chkDirDown", m, 0);
+        SetDirCheck("chkDirRight", m, 1);
+        SetDirCheck("chkDirLeft", m, 2);
+        SetDirCheck("chkDirUp", m, 3);
+        SetDirCheck("chkDirDownRight", m, 4);
+        SetDirCheck("chkDirDownLeft", m, 5);
+        SetDirCheck("chkDirUpRight", m, 6);
+        SetDirCheck("chkDirUpLeft", m, 7);
 
         // Projectile (0=None => IsProjectile=0)
         if (WindowManager.TryGetControl("winSkillEditor", "cmbProjectile", out var projCtrl) && projCtrl is ComboBox cmbProj)

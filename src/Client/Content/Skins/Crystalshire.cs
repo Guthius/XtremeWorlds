@@ -3641,6 +3641,14 @@ public class Crystalshire
                             lb.EnsureVisible(id);
                         }
                     }
+
+                    // Update chain-on-hit combo item label for this skill (index + 1 because 0 is "None")
+                    if (WindowManager.TryGetControl("winSkillEditor", "cmbChainOnHit", out var chainCtrl) && chainCtrl is ComboBox cmbChain)
+                    {
+                        int itemIndex = id + 1;
+                        if (itemIndex >= 1 && itemIndex < cmbChain.Items.Count)
+                            cmbChain.Items[itemIndex] = $"{id + 1}: {newName}";
+                    }
                 }
             };
         }
@@ -3743,6 +3751,38 @@ public class Crystalshire
             }
         });
 
+        // Multi-direction mask via 8 direction checkboxes
+        void WireDirCheckbox(string name, int bit)
+        {
+            if (WindowManager.TryGetControl("winSkillEditor", name, out var ctrl) && ctrl is CheckBox chk)
+            {
+                chk.CallBack[(int)ControlState.MouseDown] = () =>
+                {
+                    int i = WinSkillEditor.SelectedIndex;
+                    if (i < 0 || i >= Variables.MaxSkills || Skill.Instance.Count <= i) return;
+
+                    chk.Value = chk.Value == 0 ? 1 : 0;
+                    int mask = Skill.Instance[i].MultiDirMask;
+                    if (chk.Value == 1)
+                        mask |= (1 << bit);
+                    else
+                        mask &= ~(1 << bit);
+                    Skill.Instance[i].MultiDirMask = mask;
+                    Skill.IsChanged[i] = true;
+                };
+            }
+        }
+
+        // Bit order matches server: Down, Right, Left, Up, DownRight, DownLeft, UpRight, UpLeft
+        WireDirCheckbox("chkDirDown", 0);
+        WireDirCheckbox("chkDirRight", 1);
+        WireDirCheckbox("chkDirLeft", 2);
+        WireDirCheckbox("chkDirUp", 3);
+        WireDirCheckbox("chkDirDownRight", 4);
+        WireDirCheckbox("chkDirDownLeft", 5);
+        WireDirCheckbox("chkDirUpRight", 6);
+        WireDirCheckbox("chkDirUpLeft", 7);
+
         // Range
         BindSlider("sldRange", 0, 255, v =>
         {
@@ -3820,6 +3860,17 @@ public class Crystalshire
 
                 if (WindowManager.TryGetControl("winSkillEditor", "chkProjectile", out var chkCtrl) && chkCtrl is CheckBox chk)
                     chk.Value = Skill.Instance[i].IsProjectile == 1 ? 1 : 0;
+                Skill.IsChanged[i] = true;
+            }
+        });
+
+        // Chain on hit -> Skill.ChainOnHitSkillId (0=None => -1)
+        BindCombo("cmbChainOnHit", v =>
+        {
+            int i = WinSkillEditor.SelectedIndex;
+            if (i >= 0 && i < Variables.MaxSkills && Skill.Instance.Count > i)
+            {
+                Skill.Instance[i].ChainOnHitSkillId = v <= 0 ? -1 : v - 1;
                 Skill.IsChanged[i] = true;
             }
         });
