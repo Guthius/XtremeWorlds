@@ -489,7 +489,9 @@ namespace Client
             if (id < 0) return;
             if (Data.MapEvents == null) return;
             if (id >= Data.MapEvents.Length) return;
-            if (id >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount) return;
+            var map = GetPlayerMap(GameState.MyIndex);
+            if (map < 0 || map >= Client.Map.Instance.Count) return;
+            if (id >= Client.Map.Instance[map].EventCount) return;
 
             if (GameState.MyEditorType == EditorType.Map) return;
 

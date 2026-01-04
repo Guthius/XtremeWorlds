@@ -641,7 +641,7 @@ public static class TextRenderer
     public static void DrawMapName()
     {
         int map = GetPlayerMap(GameState.MyIndex);
-        if (map < 0 || map >= Variables.MaxMaps) return;
+        if (map < 0 || map >= Map.Instance.Count) return;
         Render(Client.Map.Instance[map].Name, (int)Math.Round(GameState.ResolutionWidth / 2d - GetTextWidth(Client.Map.Instance[map].Name)), 10, GameState.DrawMapNameColor, Color.Black);
     }
 }
