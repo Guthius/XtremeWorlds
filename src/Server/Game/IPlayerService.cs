@@ -6,6 +6,6 @@ public interface IPlayerService
 {
     IEnumerable<Player> Players { get; }
     bool IsConnected(int playerId);
-    void AddPlayer(int playerId, INetworkChannel channel);
+    void OnAdd(int playerId, INetworkChannel channel);
     bool RemovePlayer(int playerId);
 }

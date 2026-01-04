@@ -44,12 +44,12 @@ namespace Client
             if (GameState.MyIndex < 0 || GameState.MyIndex >= Core.Globals.Variables.MaxPlayers)
                 return;
 
-            int mapId = GetPlayerMap(GameState.MyIndex);
+            int map = GetPlayerMap(GameState.MyIndex);
 
-            if (mapId < 0 || mapId >= Client.Map.Instance.Count)
+            if (map < 0 || map >= Client.Map.Instance.Count)
                 return;
 
-            if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX <= 0 || Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY <= 0)
+            if (Client.Map.Instance[map].MaxX <= 0 || Client.Map.Instance[map].MaxY <= 0)
                 return;
 
             // Refresh facing based on current key state (diagonals prioritized)
@@ -74,9 +74,9 @@ namespace Client
                 // Warp detection with bounds checks to avoid out-of-range
                 int tx = GetPlayerX(GameState.MyIndex);
                 int ty = GetPlayerY(GameState.MyIndex);
-                if (tx >= 0 && ty >= 0 && tx < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX && ty < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)
+                if (tx >= 0 && ty >= 0 && tx < Client.Map.Instance[map].MaxX && ty < Client.Map.Instance[map].MaxY)
                 {
-                    var tile = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[tx, ty];
+                    var tile = Client.Map.Instance[map].Tile[tx, ty];
                     if (tile.Type == TileType.Warp || tile.Type2 == TileType.Warp)
                         GameState.GettingMap = true;
                 }

@@ -223,10 +223,10 @@ namespace Server
             return true;
         }
 
-        public static bool CanMove(int map, int mapNpcNum, byte dir)
+        public static bool CanMove(int map, int npc, byte dir)
         {
             int count = System.Enum.GetValues(typeof(Direction)).Length;
-            if (map < 0 || map >= Server.Map.Instance.Count || mapNpcNum < 0 || mapNpcNum >= Core.Globals.Variables.MaxMapNpcs || dir > count)
+            if (map < 0 || map >= Server.Map.Instance.Count || npc < 0 || npc >= Core.Globals.Variables.MaxMapNpcs || dir > count)
             {
                 return false;
             }
@@ -277,11 +277,11 @@ namespace Server
                 return false;
             }
 
-            var x = Instance[map, mapNpcNum].X;
-            var y = Instance[map, mapNpcNum].Y;
+            var x = Instance[map, npc].X;
+            var y = Instance[map, npc].Y;
             
             // If already in mid-move, don't allow a new tile move.
-            if (Instance[map, mapNpcNum].Moving == (byte)MovementState.Walking && _stepRemaining[map, mapNpcNum] > 0)
+            if (Instance[map, npc].Moving == (byte)MovementState.Walking && _stepRemaining[map, npc] > 0)
                 return false;
 
             int tileX = x / Constants.TileSize;
@@ -331,7 +331,7 @@ namespace Server
             // Check for other NPC collision (using tile grid)
             for (var i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
             {
-                if (i == mapNpcNum) continue;
+                if (i == npc) continue;
                 if (Instance[map, i].Num < 0) continue;
                 int npcTileX = (int)Math.Floor((double)Instance[map, i].X / Constants.TileSize);
                 int npcTileY = (int)Math.Floor((double)Instance[map, i].Y / Constants.TileSize);
@@ -342,7 +342,7 @@ namespace Server
             }
 
             // Prevent movement if skill buffer is active
-            if (Instance[map, mapNpcNum].SkillBuffer >= 0)
+            if (Instance[map, npc].SkillBuffer >= 0)
             {
                 return false;
             }

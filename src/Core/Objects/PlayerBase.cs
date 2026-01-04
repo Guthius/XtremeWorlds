@@ -57,9 +57,47 @@ namespace Core.Objects
 
             lock (Instance)
             {
+                if (Data.TempPlayer is null)
+                {
+                    Data.TempPlayer = new TempPlayer[Math.Max(size, Core.Globals.Variables.MaxPlayers)];
+                }
+
+                if (Data.TempPlayer.Length < size)
+                {
+                    Array.Resize(ref Data.TempPlayer, size);
+                }
+
                 while (Instance.Count < size)
                 {
+                    var index = Instance.Count;
                     Instance.Add(new PlayerBase());
+
+                    // Clear and re-init transient per-player runtime state for the new slot.
+                    Data.TempPlayer[index] = new TempPlayer
+                    {
+                        InGame = false,
+                        GettingMap = false,
+
+                        Target = -1,
+                        TargetType = 0,
+
+                        PartyInvite = -1,
+                        InParty = -1,
+
+                        SkillBuffer = -1,
+                        InShop = -1,
+                        InTrade = 0,
+
+                        Editor = EditorType.None,
+
+                        MoveSpeedMultiplier = 1.0f,
+                        MoveSpeedMultiplierTimer = 0,
+
+                        SkillCd = new int[Core.Globals.Variables.MaxPlayerSkills],
+                        TradeOffer = new Item[Core.Globals.Variables.MaxInventory],
+                        EventProcessing = new EventProcessing[1],
+                        EventMap = new EventMap { CurrentEvents = 0, EventPages = new MapEvent[1] },
+                    };
                 }
             }
         }

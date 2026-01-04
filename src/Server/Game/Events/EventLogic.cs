@@ -1939,17 +1939,25 @@ namespace Server
                                             break;
 
                                         case (byte) EventCommand.GiveExperience:
+                                            SetPlayerExperience(i, GetPlayerExperience(i) + command.Data1);
+                                            Player.OnLevel(i);
+                                            break;
+
+                                        case (byte) EventCommand.LevelUp:
                                             SetPlayerExperience(i, Script.Instance?.GetPlayerNextLevel(i));
                                             Player.OnLevel(i);
-                                            NetworkSend.SendExperience(i);
+                                            break;
+
+                                        case (byte) EventCommand.ChangePoints:
+                                            SetPlayerPoints(i, GetPlayerPoints(i) + command.Data1);
                                             NetworkSend.SendPlayerData(i);
                                             break;
 
                                         case (byte) EventCommand.ChangeLevel:
-                                            SetPlayerLevel(i, command.Data1);
+                                            SetPlayerLevel(i, GetPlayerLevel(i) + command.Data1);
                                             SetPlayerExperience(i, 0);
-                                            NetworkSend.SendExperience(i);
                                             NetworkSend.SendPlayerData(i);
+                                            NetworkSend.SendExperience(i);
                                             break;
 
                                         case (byte) EventCommand.ChangeSkills:

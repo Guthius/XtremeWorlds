@@ -275,7 +275,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             General.Logger.LogInformation("{AccountName} has logged in from {IpAddress}",
                 GetAccountLogin(session.Id), session.Channel.IpAddress);
 
-            PlayerService.Instance.AddPlayer(session.Id, session.Channel);
+            PlayerService.Instance.OnAdd(session.Id, session.Channel);
             NetworkSend.SendVariables(session);
             NetworkSend.SendPlayerCharacters(session);
             NetworkSend.SendJobs(session);
@@ -2261,11 +2261,11 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         var x = buffer.ReadInt32();
         var y = buffer.ReadInt32();
 
-        var mapId = GetPlayerMap(session.Id);
-        if (mapId < 0 || mapId >= Server.Map.Instance.Count)
+        var map = GetPlayerMap(session.Id);
+        if (map < 0 || map >= Server.Map.Instance.Count)
             return;
 
-        if (x < 0 || x >= Server.Map.Instance[mapId].MaxX || y < 0 || y >= Server.Map.Instance[mapId].MaxY)
+        if (x < 0 || x >= Server.Map.Instance[map].MaxX || y < 0 || y >= Server.Map.Instance[map].MaxY)
             return;
 
         x *= 32;

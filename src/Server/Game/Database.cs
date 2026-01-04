@@ -577,11 +577,6 @@ public static class Database
 
         if (Account.Instance[index].Player[slot].Name == "")
         {
-            while (PlayerBase.Instance.Count <= index)
-            {
-                PlayerBase.Instance.Add(new Player());
-            }
-
             PlayerBase.Instance[index] = Account.Instance[index].Player[slot];
             
             Account.Instance[index].Player[slot].Name = name;

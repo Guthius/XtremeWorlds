@@ -996,10 +996,7 @@ public class Script
 
     public void OnLevel(int index)
     {
-        int count;
-
-        count = 0;
-
+        int count = 0;
         while (GetPlayerExperience(index) >= GetPlayerNextLevel(index))
         {
             var expRollover = GetPlayerExperience(index) - GetPlayerNextLevel(index);
@@ -2614,6 +2611,13 @@ public class Script
 
         long val = (long)(1 + (speed / 2) + baseJobSpirit) * 2L;
         return (int)Math.Max(1, Math.Min(int.MaxValue, val));
+    }
+
+    public int GetPlayerPointsPerLevel(int index)
+    {
+        if (index < 0 || index >= Server.Player.Instance.Count) return 0;
+
+        return StatPerLevel;
     }
 
     public int GetPlayerMaxVital(int index, Vital vital)

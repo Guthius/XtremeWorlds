@@ -18,7 +18,7 @@ public sealed class PlayerService : IPlayerService
         return _players.Any(x => x.Id == playerId);
     }
 
-    public void AddPlayer(int playerId, INetworkChannel channel)
+    public void OnAdd(int playerId, INetworkChannel channel)
     {
         _playerIds.AddLast(playerId);
         _players.AddLast(new Player(playerId, channel));

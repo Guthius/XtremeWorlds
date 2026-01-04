@@ -378,6 +378,7 @@ public enum EventCommand
     GiveExperience,
     LevelUp,
     ChangeLevel,
+    ChangePoints,
     ChangeSkills,
     ChangeJob,
     ChangeSprite,
