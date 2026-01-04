@@ -58,15 +58,16 @@ public class WinProjectileEditor
     {
         if (WindowManager.TryGetControl("winProjectileEditor", "cmbAnimation", out var animCtrl) && animCtrl is ComboBox cmbAnim)
         {
-            if (cmbAnim.Items.Count == 0)
+            cmbAnim.Items.Clear();
+            cmbAnim.Items.Add("None");
+
+            // Always add a full set of choices so the combo is usable even if
+            // animation data isn't loaded yet (names will show as "None").
+            for (int i = 0; i < Variables.MaxAnimations; i++)
             {
-                cmbAnim.Items.Add("None");
-                for (int i = 0; i < Variables.MaxAnimations; i++)
-                {
-                    var raw = Animation.Instance[i].Name ?? string.Empty;
-                    var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
-                    cmbAnim.Items.Add($"{i + 1}: {name}");
-                }
+                string raw = i < Animation.Instance.Count ? (Animation.Instance[i].Name ?? string.Empty) : string.Empty;
+                var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
+                cmbAnim.Items.Add($"{i + 1}: {name}");
             }
         }
     }
@@ -92,6 +93,9 @@ public class WinProjectileEditor
         SelectedIndex = index;
         GameState.EditorIndex = index;
         var p = Projectile.Instance[index];
+
+        // Keep combo items in sync with the latest animation data
+        PopulateCombos();
 
         if (WindowManager.TryGetControl("winProjectileEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
             txtName.Text = p.Name ?? string.Empty;

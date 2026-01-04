@@ -3408,15 +3408,13 @@ public class Crystalshire
         // Animation combo (0=None then +1 offset)
         if (WindowManager.TryGetControl("winProjectileEditor", "cmbAnimation", out var animCtrl) && animCtrl is ComboBox cmbAnim)
         {
-            if (cmbAnim.Items.Count == 0)
+            cmbAnim.Items.Clear();
+            cmbAnim.Items.Add("None");
+            for (int i = 0; i < Variables.MaxAnimations; i++)
             {
-                cmbAnim.Items.Add("None");
-                for (int i = 0; i < Animation.Instance.Count; i++)
-                {
-                    var raw = Animation.Instance[i].Name ?? string.Empty;
-                    var nm = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
-                    cmbAnim.Items.Add($"{i + 1}: {nm}");
-                }
+                string raw = i < Animation.Instance.Count ? (Animation.Instance[i].Name ?? string.Empty) : string.Empty;
+                var nm = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
+                cmbAnim.Items.Add($"{i + 1}: {nm}");
             }
             cmbAnim.CallBack[(int)ControlState.MouseMove] = () =>
             {
