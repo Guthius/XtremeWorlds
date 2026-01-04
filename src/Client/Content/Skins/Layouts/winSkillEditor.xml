@@ -26,7 +26,7 @@
 		<Label Name="lblChainOnHit" Text="Chain On Hit" Position="380,26" Size="120,18"/>
 		<ComboBox Name="cmbChainOnHit" Position="460,24" Size="160,20"/>
 
-		<Label Name="lblMultiDirMask" Text="MultiDir" Position="380,50" Size="120,18"/>
+		<Label Name="lblMultiDirMask" Text="Directions" Position="380,50" Size="120,18"/>
 		<CheckBox Name="chkDirDown" Text="D" Position="460,48" Size="34,18" Design="CheckboxNormal"/>
 		<CheckBox Name="chkDirRight" Text="R" Position="500,48" Size="34,18" Design="CheckboxNormal"/>
 		<CheckBox Name="chkDirLeft" Text="L" Position="540,48" Size="34,18" Design="CheckboxNormal"/>
@@ -35,7 +35,6 @@
 		<CheckBox Name="chkDirDownLeft" Text="DL" Position="504,68" Size="44,18" Design="CheckboxNormal"/>
 		<CheckBox Name="chkDirUpRight" Text="UR" Position="548,68" Size="44,18" Design="CheckboxNormal"/>
 		<CheckBox Name="chkDirUpLeft" Text="UL" Position="592,68" Size="44,18" Design="CheckboxNormal"/>
-
 		<Label Name="lblIcon" Text="Icon" Position="12,122" Size="120,18"/>
 		<ScrollBar Name="sldIcon" Position="140,122" Size="200,12" Min="0" Max="1024" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 
@@ -64,11 +63,10 @@
 		<ComboBox Name="cmbProjectile" Position="140,322" Size="220,20"/>
 		<CheckBox Name="chkProjectile" Text="Projectile" Position="360,324" Size="160,18" Design="CheckboxNormal"/>
 
-		<Label Name="lblSound" Text="Sound" Position="380,84" Size="120,18"/>
-		<ComboBox Name="cmbSound" Position="460,82" Size="160,20"/>
+		<Label Name="lblSound" Text="Sound" Position="380,108" Size="120,18"/>
+		<ComboBox Name="cmbSound" Position="460,108" Size="160,20"/>
 
-		<Label Name="lblCommonEvent" Text="Event" Position="380,116" Size="120,18"/>
-		<Label Name="lblCommonEventType" Text="Type" Position="380,140" Size="120,18"/>
+		<Label Name="lblCommonEventType" Text="Event" Position="380,140" Size="120,18"/>
 		<ComboBox Name="cmbCommonEventType" Position="460,138" Size="160,20"/>
 		<Label Name="lblCommonEventData1" Text="Data 1" Position="380,164" Size="120,18"/>
 		<TextBox Name="txtCommonEventData1" Position="460,162" Size="160,22" Design="TextWhite"/>
