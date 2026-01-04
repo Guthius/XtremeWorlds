@@ -1053,7 +1053,7 @@ public class Script
         {
             var expRollover = GetPlayerExperience(index) - GetPlayerNextLevel(index);
             SetPlayerLevel(index, GetPlayerLevel(index) + 1);
-            int points = StatPerLevel;
+            int points = GetPlayerPointsPerLevel(index);
             points += ((int)Math.Floor((decimal)GetPlayerStat(index, Stat.Luck) / 10));
             SetPlayerPoints(index, GetPlayerPoints(index) + points);
             SetPlayerExperience(index, expRollover);
