@@ -1971,10 +1971,9 @@ public class Script
         _queuedChainOnHit.Clear();
 
         try
-            {
+        {
             if (isProjectile)
             {
-                NetworkSend.SendPlayerMessage(entity.Id, $"Casting projectile: {Skill.Instance[skill].Name}", (int)ColorName.Yellow);
                 HandleProjectileSkill(map, entity, skill, resolvedTarget);
             }
             else if (range == 0 && !isAoE)
