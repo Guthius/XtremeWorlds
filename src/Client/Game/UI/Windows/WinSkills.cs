@@ -53,13 +53,13 @@ public class WinSkills
 
         for (var slot = 0; slot < Variables.MaxPlayerSkills; slot++)
         {
-            var skillNum = Player.Instance[GameState.MyIndex].Skill[slot].Num;
-            if (skillNum < 0 || skillNum >= Variables.MaxSkills)
+            var skill = Player.Instance[GameState.MyIndex].Skill[slot].Num;
+            if (skill < 0 || skill >= Variables.MaxSkills)
             {
                 continue;
             }
 
-            Skill.OnStream(skillNum);
+            Skill.OnStream(skill);
 
             if (WindowManager.DragBox.Origin == PartOrigin.SkillTree &&
                 WindowManager.DragBox.Slot == slot)
@@ -67,7 +67,12 @@ public class WinSkills
                 continue;
             }
 
-            var icon = Skill.Instance[skillNum].Icon;
+            if (Skill.Instance.Count <= skill)
+            {
+                continue;
+            }
+
+            var icon = Skill.Instance[skill].Icon;
             if (icon < 0 || icon >= GameState.NumSkills)
             {
                 continue;

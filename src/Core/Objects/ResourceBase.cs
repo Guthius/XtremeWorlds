@@ -45,6 +45,8 @@ namespace Core.Objects
         {
             if (Instance.Count > index)
                 Instance[index] = new ResourceBase();
+            IsChanged[index] = false;
+            IsStreaming[index] = false;
         }
 
 

@@ -56,6 +56,8 @@ namespace Core.Objects
         {
             if (Instance.Count > index)
                 Instance[index] = new ItemBase();
+            IsChanged[index] = false;
+            IsStreaming[index] = false;
         }
 
         public static void OnClearChanged()

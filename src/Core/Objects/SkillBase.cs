@@ -60,6 +60,8 @@ public class SkillBase
     {
         if (Instance.Count > index)
             Instance[index] = new SkillBase();
+        IsChanged[index] = false;
+        IsStreaming[index] = false;
     }
 
     public static void OnClearChanged()

@@ -69,10 +69,11 @@
 	</GroupBox>
 
 	<!-- Action buttons -->
-	<Button Name="btnSave" Text="Save" Position="410, 392" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
-	<Button Name="btnDelete" Text="Delete" Position="498, 392" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
-	<Button Name="btnCopy" Text="Copy" Position="586, 392" Size="80, 24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
-	<Button Name="btnCancel" Text="Cancel" Position="674, 392" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+	<Button Name="btnLearn" Text="Learn" Position="353, 392" Size="80, 24" Design="Blue" DesignHover="BlueHover" DesignMouseDown="BlueClick"/>
+	<Button Name="btnSave" Text="Save" Position="441, 392" Size="80, 24" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+	<Button Name="btnDelete" Text="Delete" Position="529, 392" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
+	<Button Name="btnCopy" Text="Copy" Position="617, 392" Size="80, 24" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>
+	<Button Name="btnCancel" Text="Cancel" Position="705, 392" Size="80, 24" Design="Red" DesignHover="RedHover" DesignMouseDown="RedClick"/>
 
 	<Button Name="btnClose" Position="-19,5" Size="16,16" Image="8" ImageHover="9" ImageMouseDown="10"/>
 </Window>

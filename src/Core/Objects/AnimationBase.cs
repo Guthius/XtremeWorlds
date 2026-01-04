@@ -52,6 +52,8 @@ namespace Core.Objects
         {
             if (Instance.Count > index)
                 Instance[index] = new AnimationBase();
+            IsChanged[index] = false;
+            IsStreaming[index] = false;
         }
     }
 }

@@ -60,6 +60,8 @@ public class NpcBase
         {
             Instance[index] = new NpcBase();
         }
+        IsChanged[index] = false;
+        IsStreaming[index] = false;
     }
 
     public static void OnClearChanged()

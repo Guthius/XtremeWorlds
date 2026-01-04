@@ -35,6 +35,8 @@ namespace Core.Objects
         {
             if (Instance.Count > index)
                 Instance[index] = new MoralBase();
+            IsChanged[index] = false;
+            IsStreaming[index] = false;
         }
 
         public static void OnClear()

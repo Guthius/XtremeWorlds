@@ -52,6 +52,7 @@ namespace Core.Objects
         {
             if (Instance.Count > index)
                 Instance[index] = new JobBase();
+            IsChanged[index] = false;
         }
 
         public static void OnClearChanged()

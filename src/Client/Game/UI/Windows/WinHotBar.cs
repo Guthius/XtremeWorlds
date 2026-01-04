@@ -61,15 +61,15 @@ public class WinHotBar
                 }
             }
 
-            var slotNumber = slot + 1;
-            if (slotNumber > 9)
+            var hotbar = slot + 1;
+            if (hotbar > 9)
             {
-                slotNumber = 0;
+                hotbar = 0;
             }
 
-            var slotNumberStr = slotNumber.ToString();
+            var str = hotbar.ToString();
 
-            TextRenderer.Render(slotNumberStr, x + 4, y + 19, Color.White, Color.White, winHotbar.Font);
+            TextRenderer.Render(str, x + 4, y + 19, Color.White, Color.White, winHotbar.Font);
         }
     }
 
@@ -82,6 +82,13 @@ public class WinHotBar
         }
 
         var slot = GameLogic.IsHotbar(winHotbar.X, winHotbar.Y);
+        // Right-click: remove hotbar slot
+        if (slot >= 0 && GameClient.IsMouseButtonDown(MouseButton.Right))
+        {
+            Sender.SendDeleteHotbar(slot);
+            return;
+        }
+
         if (slot >= 0)
         {
             ref var dragBox = ref WindowManager.DragBox;
@@ -200,24 +207,29 @@ public class WinHotBar
 
     private static void DrawSkillTreeSlot(int slot, int x, int y)
     {
-        var skillNum = Player.Instance[GameState.MyIndex].Hotbar[slot].Slot;
+        var skill = Player.Instance[GameState.MyIndex].Hotbar[slot].Slot;
 
-        Skill.OnStream(skillNum);
+        Skill.OnStream(skill);
 
-        if (Skill.Instance[skillNum].Name.Length == 0 ||
-            Skill.Instance[skillNum].Icon <= 0)
+        if (Skill.Instance.Count <= skill)
+        {
+            return;
+        }
+        
+        if (Skill.Instance[skill].Name.Length == 0 ||
+            Skill.Instance[skill].Icon <= 0)
         {
             return;
         }
 
-        var path = Path.Combine(DataPath.Skills, Skill.Instance[skillNum].Icon.ToString());
+        var path = Path.Combine(DataPath.Skills, Skill.Instance[skill].Icon.ToString());
 
         GameClient.RenderTexture(ref path, x, y, 0, 0, 32, 32, 32, 32);
 
         for (var i = 0; i < Variables.MaxPlayerSkills; i++)
         {
             if (GetPlayerSkill(GameState.MyIndex, i) < 0 ||
-                GetPlayerSkill(GameState.MyIndex, i) != skillNum ||
+                GetPlayerSkill(GameState.MyIndex, i) != skill ||
                 GetPlayerSkillCd(GameState.MyIndex, i) <= 0)
             {
                 continue;

@@ -338,4 +338,11 @@ public class WinSkillEditor
     }
 
     public static void OnCopy() => OnCopyOrPaste();
+
+    public static void OnLearn()
+    {
+        int i = SelectedIndex;
+        if (i < 0 || i >= Variables.MaxSkills) return;
+        Sender.SendLearnSkill(i);
+    }
 }

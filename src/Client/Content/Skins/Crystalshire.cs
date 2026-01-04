@@ -3891,6 +3891,8 @@ public class Crystalshire
             btnDelete.CallBack[(int)ControlState.MouseDown] = () => { WinSkillEditor.OnDelete(); };
         if (WindowManager.TryGetControl("winSkillEditor", "btnCopy", out var btnCopy))
             btnCopy.CallBack[(int)ControlState.MouseDown] = WinSkillEditor.OnCopy;
+        if (WindowManager.TryGetControl("winSkillEditor", "btnLearn", out var btnLearn))
+            btnLearn.CallBack[(int)ControlState.MouseDown] = () => { WinSkillEditor.OnLearn(); };
     }
 
     public void UpdateWindow_EventEditor()

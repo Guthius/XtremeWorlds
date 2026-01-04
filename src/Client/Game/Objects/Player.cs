@@ -1012,7 +1012,7 @@ namespace Client
         public static void CastSkill(int skillSlot)
         {
             // Check for subscript out of range
-            if (skillSlot < 0 | skillSlot > Core.Globals.Variables.MaxPlayerSkills)
+            if (skillSlot < 0 | skillSlot >= Core.Globals.Variables.MaxPlayerSkills)
                 return;
 
             if (Player.Instance[GameState.MyIndex].Skill[skillSlot].Cd > 0)
@@ -1028,6 +1028,13 @@ namespace Client
             if (GetPlayerVital(GameState.MyIndex,Core.Globals.Vital.Mana) < Client.Skill.Instance[Player.Instance[GameState.MyIndex].Skill[skillSlot].Num].MpCost)
             {
                 TextRenderer.AddText("Not enough mana to cast " + Client.Skill.Instance[Player.Instance[GameState.MyIndex].Skill[skillSlot].Num].Name + ".", (int) ColorName.BrightRed);
+                return;
+            }
+
+            // Check if player has enough SP
+            if (GetPlayerVital(GameState.MyIndex,Core.Globals.Vital.Stamina) < Client.Skill.Instance[Player.Instance[GameState.MyIndex].Skill[skillSlot].Num].SpCost)
+            {
+                TextRenderer.AddText("Not enough stamina to cast " + Client.Skill.Instance[Player.Instance[GameState.MyIndex].Skill[skillSlot].Num].Name + ".", (int) ColorName.BrightRed);
                 return;
             }
 
@@ -1069,7 +1076,7 @@ namespace Client
             findSkill = 0;
 
             // Check for subscript out of range
-            if (skillNum < 0 | skillNum > Core.Globals.Variables.MaxSkills)
+            if (skillNum < 0 | skillNum >= Core.Globals.Variables.MaxSkills)
             {
                 return findSkill;
             }
@@ -1377,8 +1384,10 @@ namespace Client
             {
                 if (GetPlayerPaperdoll(index, eq) >= 0)
                 {
-                    var itemIndex = GetPlayerPaperdoll(index, eq);
-                    var paperId = Item.Instance[itemIndex].Paperdoll;
+                    var item = GetPlayerPaperdoll(index, eq);
+                    if (item < 0 || item >= Item.Instance.Count)
+                        continue;
+                    var paperId = Item.Instance[item].Paperdoll;
                     if (paperId > 0)
                     {
                         // Pass segment context so equipment animates consistently with base sprite.

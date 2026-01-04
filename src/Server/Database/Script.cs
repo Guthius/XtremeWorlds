@@ -212,13 +212,13 @@ public class Script
 
         // Send all the required game data to the user.
         OnCheckEquipment(index);
+        NetworkSend.SendPlayerData(index);
         NetworkSend.SendInventory(index);
+        NetworkSend.SendPlayerSkills(index);
         NetworkSend.SendWornEquipment(index);
         NetworkSend.SendExperience(index);
         NetworkSend.SendHotbar(index);
-        NetworkSend.SendPlayerSkills(index);
         NetworkSend.SendStats(index);
-        NetworkSend.SendPlayerData(index);
 
         // Send the flag so they know they can start doing stuff
         NetworkSend.SendInGame(index);
@@ -938,57 +938,57 @@ public class Script
     }
 
     // Initiate a Player skill cast (buffer or instant). Called from Packet_Cast with (PlayerIndex, skillSlot)
-    public void BufferSkill(int PlayerIndex, int skillSlot)
+    public void BufferSkill(int player, int skillSlot)
     {
         // Basic validations
-        if (PlayerIndex < 0 || PlayerIndex >= Server.Player.Instance.Count) return;
-        if (!IsPlaying(PlayerIndex)) return;
-        if (skillSlot < 0 || skillSlot >= Server.Player.Instance[PlayerIndex].Skill.Length) return;
+        if (player < 0 || player >= Server.Player.Instance.Count) return;
+        if (!IsPlaying(player)) return;
+        if (skillSlot < 0 || skillSlot >= Server.Player.Instance[player].Skill.Length) return;
 
         // Already casting something
-        if (Data.TempPlayer[PlayerIndex].SkillBuffer >= 0) return;
+        if (Data.TempPlayer[player].SkillBuffer >= 0) return;
 
         // Stunned
-        if (Data.TempPlayer[PlayerIndex].StunDuration > 0) return;
+        if (Data.TempPlayer[player].StunDuration > 0) return;
 
-        int skillId = Server.Player.Instance[PlayerIndex].Skill[skillSlot].Num;
+        int skillId = Server.Player.Instance[player].Skill[skillSlot].Num;
         if (skillId < 0 || skillId >= Skill.Instance.Count) return;
 
         var skill = Skill.Instance[skillId];
 
         // Cooldown check
         long now = General.GetTimeMs();
-        if (Data.TempPlayer[PlayerIndex].SkillCd != null && skillSlot < Data.TempPlayer[PlayerIndex].SkillCd.Length)
+        if (Data.TempPlayer[player].SkillCd != null && skillSlot < Data.TempPlayer[player].SkillCd.Length)
         {
-            var cdExpiry = Data.TempPlayer[PlayerIndex].SkillCd[skillSlot];
+            var cdExpiry = Data.TempPlayer[player].SkillCd[skillSlot];
             if (cdExpiry > now)
             {
-                NetworkSend.SendPlayerMessage(PlayerIndex, "That skill is still cooling down.", (int)ColorName.BrightRed);
+                NetworkSend.SendPlayerMessage(player, "That skill is still cooling down.", (int)ColorName.BrightRed);
                 return;
             }
         }
 
         // Mana check (only deduct on finalize) - ensure sufficient now
-        if (GetPlayerVital(PlayerIndex, Core.Globals.Vital.Mana) < skill.MpCost)
+        if (GetPlayerVital(player, Core.Globals.Vital.Mana) < skill.MpCost)
         {
-            NetworkSend.SendPlayerMessage(PlayerIndex, "Not enough mana.", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(player, "Not enough mana.", (int)ColorName.BrightRed);
             return;
         }
 
-        if (GetPlayerVital(PlayerIndex, Core.Globals.Vital.Stamina) < skill.SpCost)
+        if (GetPlayerVital(player, Core.Globals.Vital.Stamina) < skill.SpCost)
         {
-            NetworkSend.SendPlayerMessage(PlayerIndex, "Not enough stamina.", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(player, "Not enough stamina.", (int)ColorName.BrightRed);
             return;
         }
 
         // Moral / map rule check
-        var map = GetPlayerMap(PlayerIndex);
+        var map = GetPlayerMap(player);
         if (map < 0 || map >= Server.Map.Instance.Count) return;
 
         var moralId = Server.Map.Instance[map].Moral;
         if (moralId >= 0 && !Moral.Instance[moralId].CanCast)
         {
-            NetworkSend.SendPlayerMessage(PlayerIndex, "You cannot cast here.", (int)ColorName.BrightRed);
+            NetworkSend.SendPlayerMessage(player, "You cannot cast here.", (int)ColorName.BrightRed);
             return;
         }
 
@@ -997,9 +997,9 @@ public class Script
         if (effectiveCastTime < 0) effectiveCastTime = 0;
 
         // Buffer the skill for later completion by server loop
-        Data.TempPlayer[PlayerIndex].SkillBuffer = skillSlot;
-        Data.TempPlayer[PlayerIndex].SkillBufferTimer = (int)now;
-        NetworkSend.SendStartSkillBuffer(PlayerIndex, skillSlot, effectiveCastTime);
+        Data.TempPlayer[player].SkillBuffer = skillSlot;
+        Data.TempPlayer[player].SkillBufferTimer = (int)now;
+        NetworkSend.SendStartSkillBuffer(player, skillSlot, effectiveCastTime);
     }
 
     public int OnKill(int index)

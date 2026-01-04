@@ -31,6 +31,8 @@ namespace Core.Objects
         {
             if (Instance.Count > index)
                 Instance[index] = new ProjectileBase();
+            IsChanged[index] = false;
+            IsStreaming[index] = false;
         }
 
         public static void OnClear()

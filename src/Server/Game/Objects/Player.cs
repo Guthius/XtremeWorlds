@@ -1187,18 +1187,18 @@ public class Player : PlayerBase
             return;
         }
 
-        var oldNum = GetPlayerInventory(playerId, oldSlot);
+        var oldInv = GetPlayerInventory(playerId, oldSlot);
         var oldValue = GetPlayerInventoryValue(playerId, oldSlot);
-        var newNum = GetPlayerInventory(playerId, newSlot);
+        var newInv = GetPlayerInventory(playerId, newSlot);
         var newValue = GetPlayerInventoryValue(playerId, newSlot);
         var oldBound = Player.Instance[playerId].Inventory[oldSlot].Bound;
         var newBound = Player.Instance[playerId].Inventory[newSlot].Bound;
 
-        if (newNum >= 0)
+        if (newInv >= 0)
         {
-            if (oldNum == newNum & Item.Instance[newNum].Stackable == 1) // Same item, if we can stack it, lets do that :P
+            if (oldInv == newInv & Item.Instance[newInv].Stackable == 1) // Same item, if we can stack it, lets do that :P
             {
-                SetInventory(playerId, newSlot, newNum);
+                SetInventory(playerId, newSlot, newInv);
                 SetInventoryValue(playerId, newSlot, oldValue + newValue);
                 SetInventory(playerId, oldSlot, 0);
                 SetInventoryValue(playerId, oldSlot, 0);
@@ -1211,9 +1211,9 @@ public class Player : PlayerBase
             }
             else
             {
-                SetInventory(playerId, newSlot, oldNum);
+                SetInventory(playerId, newSlot, oldInv);
                 SetInventoryValue(playerId, newSlot, oldValue);
-                SetInventory(playerId, oldSlot, newNum);
+                SetInventory(playerId, oldSlot, newInv);
                 SetInventoryValue(playerId, oldSlot, newValue);
                 Player.Instance[playerId].Inventory[oldSlot].Bound = newBound;
                 Player.Instance[playerId].Inventory[newSlot].Bound = oldBound;
@@ -1221,9 +1221,9 @@ public class Player : PlayerBase
         }
         else
         {
-            SetInventory(playerId, newSlot, oldNum);
+            SetInventory(playerId, newSlot, oldInv);
             SetInventoryValue(playerId, newSlot, oldValue);
-            SetInventory(playerId, oldSlot, newNum);
+            SetInventory(playerId, oldSlot, newInv);
             SetInventoryValue(playerId, oldSlot, newValue);
             Player.Instance[playerId].Inventory[oldSlot].Bound = newBound;
             Player.Instance[playerId].Inventory[newSlot].Bound = oldBound;
@@ -1239,33 +1239,33 @@ public class Player : PlayerBase
             return;
         }
 
-        var oldNum = GetPlayerSkill(playerId, oldSlot);
+        var oldSkill = GetPlayerSkill(playerId, oldSlot);
         var oldValue = GetPlayerSkillCd(playerId, oldSlot);
-        var newNum = GetPlayerSkill(playerId, newSlot);
+        var newSkill = GetPlayerSkill(playerId, newSlot);
         var newValue = GetPlayerSkillCd(playerId, newSlot);
 
-        if (newNum >= 0)
+        if (newSkill >= 0)
         {
-            if (oldNum == newNum & Item.Instance[newNum].Stackable == 1) // Same item, if we can stack it, lets do that :P
+            if (oldSkill == newSkill & Item.Instance[newSkill].Stackable == 1) // Same item, if we can stack it, lets do that :P
             {
-                SetPlayerSkill(playerId, newSlot, newNum);
+                SetPlayerSkill(playerId, newSlot, newSkill);
                 SetPlayerSkillCd(playerId, newSlot, newValue);
                 SetPlayerSkill(playerId, oldSlot, 0);
                 SetPlayerSkillCd(playerId, oldSlot, 0);
             }
             else
             {
-                SetPlayerSkill(playerId, newSlot, oldNum);
+                SetPlayerSkill(playerId, newSlot, oldSkill);
                 SetPlayerSkillCd(playerId, newSlot, oldValue);
-                SetPlayerSkill(playerId, oldSlot, newNum);
+                SetPlayerSkill(playerId, oldSlot, newSkill);
                 SetPlayerSkillCd(playerId, oldSlot, newValue);
             }
         }
         else
         {
-            SetPlayerSkill(playerId, newSlot, oldNum);
+            SetPlayerSkill(playerId, newSlot, oldSkill);
             SetPlayerSkillCd(playerId, newSlot, oldValue);
-            SetPlayerSkill(playerId, oldSlot, newNum);
+            SetPlayerSkill(playerId, oldSlot, newSkill);
             SetPlayerSkillCd(playerId, oldSlot, newValue);
         }
 
@@ -1278,14 +1278,14 @@ public class Player : PlayerBase
 
         foreach (var equipment in equipments)
         {
-            var itemNum = GetPlayerPaperdoll(playerId, equipment);
-            if (itemNum < 0)
+            var item = GetPlayerPaperdoll(playerId, equipment);
+            if (item < 0)
             {
                 SetPlayerPaperdoll(playerId, -1, equipment);
                 continue;
             }
 
-            if (Item.Instance[itemNum].SubType != (byte) equipment)
+            if (Item.Instance[item].SubType != (byte) equipment)
             {
                 SetPlayerPaperdoll(playerId, -1, equipment);
             }

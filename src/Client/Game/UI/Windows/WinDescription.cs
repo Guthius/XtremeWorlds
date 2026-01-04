@@ -46,11 +46,19 @@ public class WinDescription
                         picBar.Value, 12,
                         picBar.Value, 12);
                 }
+
+                // Draw selected skill's icon (not item icon)
+                if (GameState.DescItem < 0 || GameState.DescItem >= Skill.Instance.Count)
+                    return;
+
+                Skill.OnStream(GameState.DescItem);
                 
-                var iconPath = Path.Combine(DataPath.Skills, Item.Instance[GameState.DescItem].Icon.ToString());
+                int icon = Skill.Instance[GameState.DescItem].Icon;
+                if (icon < 1 || icon > GameState.NumSkills)
+                    return;
 
-                GameClient.RenderTexture(ref iconPath, x + 20, y + 34, 0, 0, 64, 64, 32, 32);
-
+                var path = Path.Combine(DataPath.Skills, icon.ToString());
+                GameClient.RenderTexture(ref path, x + 20, y + 34, 0, 0, 64, 64, 32, 32);
                 break;
             }
         }

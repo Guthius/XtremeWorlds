@@ -1557,15 +1557,15 @@ namespace Client
                 {
                     if (GameState.PlayerData)
                     {
-                        int slotNum = -1;
+                        int slot = -1;
                         if (WindowManager.TryGetWindow("winHotbar", out var winHotbar))
                         {
-                            slotNum = (int) GameLogic.IsHotbar(winHotbar!.X, winHotbar!.Y);
+                            slot = GameLogic.IsHotbar(winHotbar!.X, winHotbar!.Y);
                         }
 
-                        if (slotNum >= 0L)
+                        if (slot >= 0L)
                         {
-                            Sender.SendDeleteHotbar(slotNum);
+                            Sender.SendDeleteHotbar(slot);
                         }
 
                         if (GameState.VbKeyShift == true)
@@ -2189,6 +2189,92 @@ namespace Client
             }
         }
 
+        // Visual hover effect reflects the current selection size in the Map editor
+        private static void DrawMapEditorHoverTileHighlight()
+        {
+            if (SpriteBatch == null) return;
+
+            int map = GetPlayerMap(GameState.MyIndex);
+            int x = GameState.CurXGame;
+            int y = GameState.CurYGame;
+
+            if (map < 0 || map >= Client.Map.Instance.Count) return;
+            if (x < 0 || y < 0) return;
+
+            var mi = Client.Map.Instance[map];
+            if (x >= mi.MaxX || y >= mi.MaxY) return;
+
+            // Determine selection dimensions: prefer captured stamp, otherwise tileset selection/autotile size.
+            int selW = 1;
+            int selH = 1;
+
+            if (GameState.EditorStampActive)
+            {
+                selW = Math.Max(1, GameState.EditorStampWidth);
+                selH = Math.Max(1, GameState.EditorStampHeight);
+            }
+            else
+            {
+                selW = Math.Max(1, GameState.EditorTileWidth);
+                selH = Math.Max(1, GameState.EditorTileHeight);
+            }
+
+            // Clamp selection to map bounds from hover origin.
+            selW = Math.Min(selW, mi.MaxX - x);
+            selH = Math.Min(selH, mi.MaxY - y);
+            if (selW <= 0 || selH <= 0) return;
+
+            int px = GameLogic.ConvertMapX(x * Constants.TileSize);
+            int py = GameLogic.ConvertMapY(y * Constants.TileSize);
+
+            var pos = new Vector2(px, py);
+            var size = new Vector2(Constants.TileSize * selW, Constants.TileSize * selH);
+
+            // Semi-transparent fill with a subtle outline covering the selection area
+            var fill = new Color(255, 255, 255, 40);
+            var outline = Color.Yellow;
+            DrawRectangle(pos, size, fill, outline, 1f);
+
+            // Also render a ghost preview of the selected tiles at the hover location.
+            // Stamp preview supports mixed tilesets; contiguous selection preview uses current tileset.
+            float previewAlpha = 0.6f;
+
+            if (GameState.EditorStampActive && GameState.EditorStampTileset is not null && GameState.EditorStampX is not null && GameState.EditorStampY is not null)
+            {
+                for (int dy = 0; dy < selH; dy++)
+                {
+                    for (int dx = 0; dx < selW; dx++)
+                    {
+                        int tx = GameState.EditorStampTileset[dx, dy];
+                        int sx = GameState.EditorStampX[dx, dy] * Constants.TileSize;
+                        int sy = GameState.EditorStampY[dx, dy] * Constants.TileSize;
+
+                        if (tx <= 0 || tx > GameState.NumTileSets) continue;
+
+                        string path = Path.Combine(DataPath.Tilesets, tx.ToString());
+                        int destX = px + dx * Constants.TileSize;
+                        int destY = py + dy * Constants.TileSize;
+                        RenderTexture(ref path, destX, destY, sx, sy, Constants.TileSize, Constants.TileSize, Constants.TileSize, Constants.TileSize, previewAlpha);
+                    }
+                }
+            }
+            else if (GameState.CurAutotileType == 0 && GameState.CurTileset > 0 && GameState.CurTileset <= GameState.NumTileSets)
+            {
+                string path = Path.Combine(DataPath.Tilesets, GameState.CurTileset.ToString());
+                for (int dy = 0; dy < selH; dy++)
+                {
+                    for (int dx = 0; dx < selW; dx++)
+                    {
+                        int sx = (GameState.EditorTileX + dx) * Constants.TileSize;
+                        int sy = (GameState.EditorTileY + dy) * Constants.TileSize;
+                        int destX = px + dx * Constants.TileSize;
+                        int destY = py + dy * Constants.TileSize;
+                        RenderTexture(ref path, destX, destY, sx, sy, Constants.TileSize, Constants.TileSize, Constants.TileSize, Constants.TileSize, previewAlpha);
+                    }
+                }
+            }
+        }
+
         public static void DrawTarget(int x2, int y2)
         {
             Rectangle rec;
@@ -2642,6 +2728,11 @@ namespace Client
             if (GameState.MyEditorType == EditorType.Map && GameState.EyeDropper)
             {
                 DrawEyeDropper();
+            }
+            // Hover tile highlight in Map editor
+            if (GameState.MyEditorType == EditorType.Map)
+            {
+                DrawMapEditorHoverTileHighlight();
             }
 
             for (i = 0; i < Player.Instance.Count; i++)

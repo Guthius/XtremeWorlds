@@ -790,10 +790,10 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         for (var i = 0; i < Variables.MaxPlayerSkills; i++)
         {
-            var skillNum = packetReader.ReadInt32();
+            var skill = packetReader.ReadInt32();
             if (GameState.MyIndex >= 0 && i >= 0 && i < Variables.MaxPlayerSkills)
             {
-                SetPlayerSkill(GameState.MyIndex, i, skillNum);
+                SetPlayerSkill(GameState.MyIndex, i, skill);
             }
         }
     }

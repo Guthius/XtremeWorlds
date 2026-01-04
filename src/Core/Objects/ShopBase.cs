@@ -33,6 +33,8 @@ public class ShopBase
     {
         if (Instance.Count > index)
             Instance[index] = new ShopBase();
+        IsChanged[index] = false;
+        IsStreaming[index] = false;
     }
 
     public static void OnClear()
