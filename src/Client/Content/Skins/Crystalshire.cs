@@ -2531,7 +2531,7 @@ public class Crystalshire
                 var colon = line.IndexOf(':');
                 if (colon > 0 && int.TryParse(line.AsSpan(0, colon), out var map))
                 {
-                    var target = Math.Max(0, map - 1); // display is 1-based; engine expects 0-based
+                    var target = Math.Max(0, map);
                     Sender.WarpTo(target);
                 }
             };
@@ -2561,7 +2561,7 @@ public class Crystalshire
                     var colon = line.IndexOf(':');
                     if (colon > 0 && int.TryParse(line.AsSpan(0, colon), out var map))
                     {
-                        var target = Math.Max(0, map - 1); // convert 1-based display to 0-based map id
+                        var target = Math.Max(0, map);
                         Sender.WarpTo(target);
                     }
                 }
