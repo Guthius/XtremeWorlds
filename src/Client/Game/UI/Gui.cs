@@ -802,6 +802,24 @@ public class WindowManager
         Window? curWindow = null;
         var curControl = -1;
 
+        // If an item/skill is being dragged, keep the drag box under the cursor and
+        // allow dropping on mouse-up anywhere (not just over winDragBox).
+        if (DragBox.Type != DraggablePartType.None)
+        {
+            var winDragBox = GetWindowByName("winDragBox");
+            if (winDragBox is not null && winDragBox.Visible)
+            {
+                winDragBox.X = GameState.CurMouseX;
+                winDragBox.Y = GameState.CurMouseY;
+            }
+
+            if (GameClient.IsMouseButtonUp(MouseButton.Left) &&
+                GameClient.PreviousMouseState.LeftButton == ButtonState.Pressed)
+            {
+                WinDragBox.DragBox_Check();
+            }
+        }
+
         // Check for MouseDown to start the drag timer
         if (GameClient.IsMouseButtonDown(MouseButton.Left) &&
             GameClient.PreviousMouseState.LeftButton == ButtonState.Released)

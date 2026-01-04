@@ -145,11 +145,6 @@ public class WinInventory
 
     public static void OnMouseDown()
     {
-        if (Trade.InTrade == 0)
-        {
-            return;
-        }
-
         var winInventory = WindowManager.GetWindowByName("winInventory");
         if (winInventory is null)
         {
