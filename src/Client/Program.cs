@@ -2150,8 +2150,8 @@ namespace Client
             int w = 1;
             int h = 1;
 
-            // Show selection outline while drag-selecting, and also after capture when a multi-tile stamp is active.
-            if (GameState.EyeDropperSelecting || (GameState.EditorStampActive && (GameState.EditorStampWidth > 1 || GameState.EditorStampHeight > 1)))
+            // Show selection outline only while drag-selecting.
+            if (GameState.EyeDropperSelecting)
             {
                 int minX = Math.Min(GameState.EyeDropperSelStart.X, GameState.EyeDropperSelEnd.X);
                 int minY = Math.Min(GameState.EyeDropperSelStart.Y, GameState.EyeDropperSelEnd.Y);
@@ -2727,8 +2727,8 @@ namespace Client
                 DrawGrid();
             }
 
-            // Draw eyedropper selection outline in the Map editor
-            if (GameState.MyEditorType == EditorType.Map && GameState.EyeDropper)
+            // Draw eyedropper selection outline only while actively selecting.
+            if (GameState.MyEditorType == EditorType.Map && GameState.EyeDropperSelecting)
             {
                 DrawEyeDropper();
             }

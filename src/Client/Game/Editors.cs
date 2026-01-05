@@ -102,7 +102,9 @@ namespace Client
             if (!GameLogic.IsInBounds())
                 return;
 
-            if (GameState.EyeDropper)
+            // Eyedropper can be toggled via UI, or temporarily invoked via Shift+drag.
+            // Once a selection starts, keep processing until it finalizes on mouse release.
+            if (GameState.EyeDropper || GameState.EyeDropperSelecting || GameState.VbKeyShift == true)
             {
                 // Drag-select a rectangle on the map; finalize on mouse release.
                 if (GameClient.IsMouseButtonDown(MouseButton.Left))
