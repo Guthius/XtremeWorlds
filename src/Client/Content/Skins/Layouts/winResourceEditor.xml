@@ -31,14 +31,14 @@
 		<Label Name="lblRewardItem" Text="Reward" Position="8, 100" Size="100, 16"/>
 		<ComboBox Name="cmbRewardItem" Position="84,96" Size="180,20"/>
 
-		<Label Name="lblRewardExp" Text="Experience" Position="276, 96" Size="100, 16"/>
+		<Label Name="lblRewardExp" Text="Experience" Position="272, 96" Size="100, 16"/>
 		<TextBox Name="txtRewardExp" Position="368,96" Size="156, 16" Min="0" Max="1000000" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 
 		<!-- Tool / Animation -->
 		<Label Name="lblTool" Text="Tool Req" Position="8, 136" Size="80, 16"/>
 		<ComboBox Name="cmbTool" Position="84,132" Size="180, 20"/>
 
-		<Label Name="lblAnimation" Text="Animation" Position="276,134" Size="90,16"/>
+		<Label Name="lblAnimation" Text="Animation" Position="272,134" Size="90,16"/>
 		<ComboBox Name="cmbAnimation" Position="368,132" Size="156,20"/>
 
 		<!-- Health / Respawn -->
@@ -67,8 +67,7 @@
 		<PictureBox Name="picExhausted" Position="368,260" Size="150,130"/>
 
 		<!-- Common event trigger -->
-		<Label Name="lblCommonEvent" Text="Event" Position="8, 402" Size="120,18"/>
-		<Label Name="lblCommonEventType" Text="Type" Position="8, 426" Size="120,18"/>
+		<Label Name="lblCommonEvent" Text="Event" Position="8, 426" Size="120,18"/>
 		<ComboBox Name="cmbCommonEventType" Position="84, 424" Size="180,20"/>
 		<Label Name="lblCommonEventData1" Text="Data 1" Position="276,426" Size="84,18"/>
 		<TextBox Name="txtCommonEventData1" Position="368,424" Size="156,20" Design="TextWhite"/>
