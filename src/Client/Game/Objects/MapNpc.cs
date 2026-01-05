@@ -50,6 +50,8 @@ namespace Client
             if (npc < 0 | npc > Variables.MaxNpcs) return;
             if (EditorType.Map == GameState.MyEditorType) return;
 
+            if (Npc.Instance.Count <= (int)npc)
+                return;
             switch (Npc.Instance[(int)npc].Behavior)
             {
                 case 0: color = Color.Red; backColor = Color.Black; break;
@@ -120,7 +122,7 @@ namespace Client
             TextRenderer.Render(name, drawX, textY, color, backColor, uiFont);
         }
 
-        public static void OnDraw(int mapNpcNum)
+        public static void OnDraw(int npc)
         {
             // Segmented NPC draw mirroring player logic (Idle/Run/Attack) with fallback.
             byte anim = 0; // frame within chosen segment
@@ -132,15 +134,15 @@ namespace Client
             int attackSpeed = 1000; // attack duration (ms) for one full NPC attack animation cycle
 
             // Check if Npc exists
-            if (MapNpc.Instance[(int)mapNpcNum].Num < 0 ||
-                MapNpc.Instance[(int)mapNpcNum].Num > Variables.MaxNpcs)
+            if (MapNpc.Instance[(int)npc].Num < 0 ||
+                MapNpc.Instance[(int)npc].Num > Variables.MaxNpcs)
                 return;
 
             if (EditorType.Map == GameState.MyEditorType)
                 return;
 
-            x = (int)Math.Floor((double)MapNpc.Instance[(int)mapNpcNum].X / Constants.TileSize);
-            y = (int)Math.Floor((double)MapNpc.Instance[(int)mapNpcNum].Y / Constants.TileSize);
+            x = (int)Math.Floor((double)MapNpc.Instance[(int)npc].X / Constants.TileSize);
+            y = (int)Math.Floor((double)MapNpc.Instance[(int)npc].Y / Constants.TileSize);
 
             // Ensure Npc is within the tile view range
             if (x < GameState.TileView.Left |
@@ -152,14 +154,16 @@ namespace Client
                 return;
 
             // Stream Npc if not yet loaded
-            Npc.OnStream((int)MapNpc.Instance[(int)mapNpcNum].Num);
+            Npc.OnStream(MapNpc.Instance[npc].Num);
 
-            if (MapNpc.Instance[(int)mapNpcNum].Num < 0 ||
-                MapNpc.Instance[(int)mapNpcNum].Num > Variables.MaxNpcs)
+            if (MapNpc.Instance[npc].Num < 0 ||
+                MapNpc.Instance[npc].Num > Variables.MaxNpcs)
                 return;
-                
-            // Get the sprite of the Npc
-            sprite = Npc.Instance[(int)MapNpc.Instance[(int)mapNpcNum].Num].Sprite;
+
+            if (Npc.Instance.Count <= MapNpc.Instance[npc].Num)
+                return;
+
+            sprite = Npc.Instance[MapNpc.Instance[npc].Num].Sprite;
 
             // Validate sprite
             if (sprite < 1 | sprite > GameState.NumCharacters)
@@ -167,12 +171,12 @@ namespace Client
 
             // Timing flags
             long tick = General.GetTickCount();
-            bool isAttacking = MapNpc.Instance[mapNpcNum].Attacking == 1; // treat full attack duration as attack
-            bool provisionalMoving = MapNpc.Instance[mapNpcNum].Moving != 0;
+            bool isAttacking = MapNpc.Instance[npc].Attacking == 1; // treat full attack duration as attack
+            bool provisionalMoving = MapNpc.Instance[npc].Moving != 0;
 
             // Reset attacking state if attack timer has passed
             {
-                ref var instance = ref MapNpc.Instance[(int)mapNpcNum];
+                ref var instance = ref MapNpc.Instance[npc];
                 if (instance.AttackTimer + attackSpeed < General.GetTickCount())
                 {
                     instance.Attacking = 0;
@@ -186,7 +190,7 @@ namespace Client
             int directionRows = GameClient.ComputeDirectionRows(gfxInfo.Height, Math.Max(1, SettingsManager.Instance.SpriteDirections));
 
             // Map direction to row after computing available rows
-            spriteLeft = GameClient.MapDirectionToRow((Direction)MapNpc.Instance[(int)mapNpcNum].Dir, directionRows);
+            spriteLeft = GameClient.MapDirectionToRow((Direction)MapNpc.Instance[(int)npc].Dir, directionRows);
             int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
             int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
             int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
@@ -232,7 +236,7 @@ namespace Client
             {
                 if (isAttacking)
                 {
-                    long elapsed = tick - MapNpc.Instance[mapNpcNum].AttackTimer;
+                    long elapsed = tick - MapNpc.Instance[npc].AttackTimer;
                     if (elapsed < 0) elapsed = 0;
                     long duration = attackSpeed;
                     if (duration <= 0) duration = 1;
@@ -244,16 +248,16 @@ namespace Client
                 }
                 else if (isMoving)
                 {
-                    anim = (byte)(MapNpc.Instance[mapNpcNum].Steps % runFrames);
+                    anim = (byte)(MapNpc.Instance[npc].Steps % runFrames);
                 }
                 else
                 {
-                    anim = (byte)(MapNpc.Instance[mapNpcNum].Steps % idleFrames); // idle animated
+                    anim = (byte)(MapNpc.Instance[npc].Steps % idleFrames); // idle animated
                 }
             }
             else
             {
-                anim = (byte)(MapNpc.Instance[mapNpcNum].Steps % frameColumnsForWidth);
+                anim = (byte)(MapNpc.Instance[npc].Steps % frameColumnsForWidth);
             }
 
             // Frame placement
@@ -275,11 +279,11 @@ namespace Client
                 (int)Math.Round(frameHeightD));
 
             // X/Y positioning
-            x = (int)Math.Round(MapNpc.Instance[mapNpcNum].X - (gfxInfo.Width / (double)frameColumnsForWidth - 32d) / 2d);
+            x = (int)Math.Round(MapNpc.Instance[npc].X - (gfxInfo.Width / (double)frameColumnsForWidth - 32d) / 2d);
             if ((gfxInfo.Height / directionRows) > 32)
-                y = (int)Math.Round(MapNpc.Instance[mapNpcNum].Y - (gfxInfo.Height / (double)directionRows - 32d));
+                y = (int)Math.Round(MapNpc.Instance[npc].Y - (gfxInfo.Height / (double)directionRows - 32d));
             else
-                y = MapNpc.Instance[mapNpcNum].Y;
+                y = MapNpc.Instance[npc].Y;
 
             GameClient.DrawCharacterSprite(sprite, x, y, rect);
         }

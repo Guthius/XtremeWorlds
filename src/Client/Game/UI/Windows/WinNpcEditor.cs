@@ -122,6 +122,31 @@ public class WinNpcEditor
                 }
             }
         }
+
+        // Death switch/variable selectors (use event names arrays received from server)
+        void FillEventNames(string ctrlName, int count, Func<int, string> getName)
+        {
+            if (WindowManager.TryGetControl("winNpcEditor", ctrlName, out var ctrl) && ctrl is ComboBox cmb)
+            {
+                cmb.Items.Clear();
+                for (int i = 0; i < count; i++)
+                {
+                    var raw = getName(i) ?? string.Empty;
+                    var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
+                    cmb.Items.Add($"{i}: {name}");
+                }
+            }
+        }
+
+        FillEventNames(
+            "cmbDeathSwitch",
+            Variables.MaxSwitches,
+            i => i >= 0 && i < Client.Event.Switches.Length ? Client.Event.Switches[i] : string.Empty);
+
+        FillEventNames(
+            "cmbDeathVariable",
+            Variables.MaxVariables,
+            i => i >= 0 && i < Client.Event.Variables.Length ? Client.Event.Variables[i] : string.Empty);
         FillSkills("cmbSkill1");
         FillSkills("cmbSkill2");
         FillSkills("cmbSkill3");
@@ -246,31 +271,33 @@ public class WinNpcEditor
         {
             txtExp.Text = npc.Experience.ToString();
         }
-        if (WindowManager.TryGetControl("winNpcEditor", "txtLevel", out var lvlCtrl) && lvlCtrl is TextBox txtLvl)
+        if (WindowManager.TryGetControl("winNpcEditor", "sldLevel", out var lvlSldCtrl) && lvlSldCtrl is ScrollBar sbLevel)
         {
-            txtLvl.Text = npc.Level.ToString();
+            sbLevel.Max = Math.Clamp((int)Variables.MaxLevel, 0, 255);
+            sbLevel.Value = Math.Clamp((int)npc.Level, sbLevel.Min, sbLevel.Max);
         }
         if (WindowManager.TryGetControl("winNpcEditor", "txtDamage", out var dmgCtrl) && dmgCtrl is TextBox txtDmg)
         {
             txtDmg.Text = npc.Damage.ToString();
         }
 
-        // Death tracking
-        if (WindowManager.TryGetControl("winNpcEditor", "txtDeathSwitch", out var deathSwitchCtrl) && deathSwitchCtrl is TextBox txtDs)
-        {
-            txtDs.Text = npc.DeathSwitch.ToString();
-        }
         if (WindowManager.TryGetControl("winNpcEditor", "txtDeathSwitchValue", out var deathSwitchValCtrl) && deathSwitchValCtrl is TextBox txtDsVal)
         {
             txtDsVal.Text = npc.DeathSwitchValue.ToString();
         }
-        if (WindowManager.TryGetControl("winNpcEditor", "txtDeathVariable", out var dvCtrl) && dvCtrl is TextBox txtDv)
-        {
-            txtDv.Text = npc.DeathVariable.ToString();
-        }
         if (WindowManager.TryGetControl("winNpcEditor", "txtDeathVariableValue", out var dvValCtrl) && dvValCtrl is TextBox txtDvVal)
         {
             txtDvVal.Text = npc.DeathVariableValue.ToString();
+        }
+
+        // Death tracking (combo selectors)
+        if (WindowManager.TryGetControl("winNpcEditor", "cmbDeathSwitch", out var deathSwitchComboCtrl) && deathSwitchComboCtrl is ComboBox cmbDs)
+        {
+            cmbDs.Value = Math.Clamp(npc.DeathSwitch, 0, Math.Max(0, cmbDs.Items.Count - 1));
+        }
+        if (WindowManager.TryGetControl("winNpcEditor", "cmbDeathVariable", out var deathVarComboCtrl) && deathVarComboCtrl is ComboBox cmbDv)
+        {
+            cmbDv.Value = Math.Clamp(npc.DeathVariable, 0, Math.Max(0, cmbDv.Items.Count - 1));
         }
 
         // Common event trigger

@@ -1632,15 +1632,23 @@ public class Crystalshire
             }
         }, 0, 100000000);
 
-        BindIntText("txtLevel", v =>
-        {
-            if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Variables.MaxNpcs)
+        BindScrollBar(
+            "sldLevel",
+            () => (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
+                ? Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Level
+                : 0,
+            v =>
             {
-                if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
-                    Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Level = (byte)Math.Clamp(v, 0, 255);
-                Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
-            }
-        }, 0, 255);
+                if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Variables.MaxNpcs)
+                {
+                    if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
+                    {
+                        var maxLevel = Math.Clamp((int)Variables.MaxLevel, 0, 255);
+                        Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Level = (byte)Math.Clamp((int)v, 0, maxLevel);
+                    }
+                    Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
+                }
+            });
 
         BindIntText("txtDamage", v =>
         {
@@ -1653,15 +1661,15 @@ public class Crystalshire
         }, 0, 100000000);
 
         // Death tracking
-        BindIntText("txtDeathSwitch", v =>
+        BindCombo("cmbDeathSwitch", v =>
         {
             if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Variables.MaxNpcs)
             {
                 if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
-                    Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].DeathSwitch = Math.Max(0, v);
+                    Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].DeathSwitch = Math.Clamp(v, 0, Variables.MaxSwitches - 1);
                 Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
             }
-        }, 0, Variables.MaxSwitches - 1);
+        });
 
         BindIntText("txtDeathSwitchValue", v =>
         {
@@ -1673,15 +1681,15 @@ public class Crystalshire
             }
         }, 0, 100000000);
 
-        BindIntText("txtDeathVariable", v =>
+        BindCombo("cmbDeathVariable", v =>
         {
             if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Variables.MaxNpcs)
             {
                 if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
-                    Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].DeathVariable = Math.Max(0, v);
+                    Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].DeathVariable = Math.Clamp(v, 0, Variables.MaxVariables - 1);
                 Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
             }
-        }, 0, Variables.MaxVariables - 1);
+        });
 
         BindIntText("txtDeathVariableValue", v =>
         {
