@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Core.Globals;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -25,16 +26,28 @@ builder.Services.AddNetworkService<GameSession, GameSessionManager, GameNetworkS
 builder.Services.AddHostedService<ConsoleInputService>();
 builder.Services.AddSerilog((services, loggerConfiguration) =>
 {
+    Directory.CreateDirectory(DataPath.Logs);
+    var hasConsoleSink = builder.Configuration
+        .GetSection("Serilog:WriteTo")
+        .GetChildren()
+        .Any(x => string.Equals(x["Name"], "Console", StringComparison.OrdinalIgnoreCase));
+
     loggerConfiguration
         .ReadFrom.Configuration(builder.Configuration)
-        .ReadFrom.Services(services)
-        .WriteTo.File(
-            path: DataPath.Logs,
-            restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Error,
-            rollingInterval: RollingInterval.Day,
-            retainedFileCountLimit: 7,
-            shared: true
-        );
+        .ReadFrom.Services(services);
+
+    if (!hasConsoleSink)
+    {
+        loggerConfiguration.WriteTo.Console(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information);
+    }
+
+    loggerConfiguration.WriteTo.File(
+        path: DataPath.Logs,
+        restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Error,
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 7,
+        shared: true
+    );
 });
 var app = builder.Build();
 await app.RunAsync();

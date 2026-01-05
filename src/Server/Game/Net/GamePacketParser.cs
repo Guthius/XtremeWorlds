@@ -689,9 +689,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
     {
         var buffer = new PacketReader(bytes);
 
-        var invNum = buffer.ReadInt32();
+        var inv = buffer.ReadInt32();
 
-        Server.Player.UseItem(session.Id, invNum);
+        Server.Player.UseItem(session.Id, inv);
     }
 
     public static void Packet_Attack(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -886,8 +886,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         if (Data.TempPlayer[session.Id].StunDuration > 0) return;
 
         // Ensure player holds a weapon with projectile or skill casting projectile
-        int itemNum = GetPlayerPaperdoll(session.Id, Equipment.Weapon);
-        if (itemNum < 0 || Item.Instance[itemNum].Projectile < 0)
+        int item = GetPlayerPaperdoll(session.Id, Equipment.Weapon);
+        if (item < 0 || Item.Instance[item].Projectile < 0)
         {
             // fallback: trigger normal attack if no projectile
             Packet_Attack(session, ReadOnlyMemory<byte>.Empty);
@@ -895,7 +895,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
 
         // Check ammo availability first (do not deduct yet)
-        int ammoId = Item.Instance[itemNum].Ammo;
+        int ammoId = Item.Instance[item].Ammo;
         if (ammoId >= 0 && Server.Player.HasItem(session.Id, ammoId) <= 0)
         {
             NetworkSend.SendPlayerMessage(session.Id, "Out of " + Item.Instance[ammoId].Name + "!", (int)ColorName.BrightRed);
@@ -931,7 +931,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         if (dx == 0 && dy == 0)
         {
             // if zero vector, default to current facing
-            Projectile.OnShoot(session.Id, -1, itemNum);
+            Projectile.OnShoot(session.Id, -1, item);
             return;
         }
 
@@ -941,7 +941,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         short vy = (short)Math.Clamp((int)Math.Round(dy / length * 1000.0), short.MinValue, short.MaxValue);
 
         // Fire with free-aim using helper and stop at target
-        Server.Projectile.OnFreeAim(session.Id, vx, vy, itemNum, targetX, targetY);
+        Server.Projectile.OnFreeAim(session.Id, vx, vy, item, targetX, targetY);
         NetworkSend.SendPlayerAttack(session.Id);
     }
 
@@ -1628,28 +1628,28 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
             return;
 
-        var shopNum = buffer.ReadInt32();
+        var shop = buffer.ReadInt32();
 
         // Prevent hacking
-        if (shopNum < 0 | shopNum > Core.Globals.Variables.MaxShops)
+        if (shop < 0 | shop > Core.Globals.Variables.MaxShops)
             return;
 
-        Shop.Instance[shopNum].BuyRate = buffer.ReadInt32();
-        Shop.Instance[shopNum].Name = buffer.ReadString();
+        Shop.Instance[shop].BuyRate = buffer.ReadInt32();
+        Shop.Instance[shop].Name = buffer.ReadString();
 
         for (int i = 0, count = Core.Globals.Variables.MaxTrades; i < count; i++)
         {
-            Shop.Instance[shopNum].TradeItem[i].CostItem = buffer.ReadInt32();
-            Shop.Instance[shopNum].TradeItem[i].CostValue = buffer.ReadInt32();
-            Shop.Instance[shopNum].TradeItem[i].Item = buffer.ReadInt32();
-            Shop.Instance[shopNum].TradeItem[i].ItemValue = buffer.ReadInt32();
+            Shop.Instance[shop].TradeItem[i].CostItem = buffer.ReadInt32();
+            Shop.Instance[shop].TradeItem[i].CostValue = buffer.ReadInt32();
+            Shop.Instance[shop].TradeItem[i].Item = buffer.ReadInt32();
+            Shop.Instance[shop].TradeItem[i].ItemValue = buffer.ReadInt32();
         }
 
 
         // Save it
-        NetworkSend.SendUpdateShopToAll(shopNum);
-        Shop.OnSave(shopNum);
-        Log.Add(GetAccountLogin(session.Id) + " saving shop #" + shopNum + ".", Constant.AdminLog);
+        NetworkSend.SendUpdateShopToAll(shop);
+        Shop.OnSave(shop);
+        Log.Add(GetAccountLogin(session.Id) + " saving shop #" + shop + ".", Constant.AdminLog);
     }
 
     public static void Packet_RequestEditSkill(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -2189,17 +2189,17 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             return;
 
         // seems to be valid
-        double itemNum = GetPlayerInventory(session.Id, invSlot);
-        var shopNum = Data.TempPlayer[session.Id].InShop;
+        double item = GetPlayerInventory(session.Id, invSlot);
+        var shop = Data.TempPlayer[session.Id].InShop;
 
-        if (shopNum < 0 || shopNum > Core.Globals.Variables.MaxShops)
+        if (shop < 0 || shop > Core.Globals.Variables.MaxShops)
         {
             return;
         }
 
         // work out price
-        var multiplier = Shop.Instance[(int)shopNum].BuyRate / 100d;
-        var price = (int)Math.Round(Item.Instance[(int)itemNum].Price * multiplier);
+        var multiplier = Shop.Instance[(int)shop].BuyRate / 100d;
+        var price = (int)Math.Round(Item.Instance[(int)item].Price * multiplier);
 
         // item has cost?
         if (price < 0)
@@ -2210,11 +2210,11 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
 
         // take item and give gold
-        Server.Player.TakeInv(session.Id, (int)itemNum, 1);
+        Server.Player.TakeInv(session.Id, (int)item, 1);
         Server.Player.GiveInv(session.Id, 0, price);
 
         // send confirmation message & reset their shop action
-        NetworkSend.SendPlayerMessage(session.Id, "Sold the " + Item.Instance[(int)itemNum].Name + " for " + price + " " + Item.Instance[(int)itemNum].Name + "!", (int)ColorName.BrightGreen);
+        NetworkSend.SendPlayerMessage(session.Id, "Sold the " + Item.Instance[(int)item].Name + " for " + price + " " + Item.Instance[(int)item].Name + "!", (int)ColorName.BrightGreen);
         NetworkSend.ResetShopAction();
     }
 
@@ -2377,7 +2377,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
     public static void Packet_AcceptTrade(GameSession session, ReadOnlyMemory<byte> bytes)
     {
-        int itemNum;
+        int item;
         int i;
         var tmpTradeItem = new Type.Item[Core.Globals.Variables.MaxInventory];
         var tmpTradeItem2 = new Type.Item[Core.Globals.Variables.MaxInventory];
@@ -2404,11 +2404,11 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             // player
             if (Data.TempPlayer[session.Id].TradeOffer[i].Num >= 0)
             {
-                itemNum = (int)PlayerBase.Instance[session.Id].Inventory[(int)Data.TempPlayer[session.Id].TradeOffer[i].Num].Num;
-                if (itemNum >= 0)
+                item = (int)PlayerBase.Instance[session.Id].Inventory[(int)Data.TempPlayer[session.Id].TradeOffer[i].Num].Num;
+                if (item >= 0)
                 {
                     // store temp
-                    tmpTradeItem[i].Num = itemNum;
+                    tmpTradeItem[i].Num = item;
                     tmpTradeItem[i].Value = Data.TempPlayer[session.Id].TradeOffer[i].Value;
                     // take item
                     Server.Player.TakeInvSlot(session.Id, (int)Data.TempPlayer[session.Id].TradeOffer[i].Num, tmpTradeItem[i].Value);
@@ -2418,11 +2418,11 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             // target
             if (Data.TempPlayer[tradeTarget].TradeOffer[i].Num >= 0)
             {
-                itemNum = GetPlayerInventory(tradeTarget, (int)Data.TempPlayer[tradeTarget].TradeOffer[i].Num);
-                if (itemNum >= 0)
+                item = GetPlayerInventory(tradeTarget, (int)Data.TempPlayer[tradeTarget].TradeOffer[i].Num);
+                if (item >= 0)
                 {
                     // store temp
-                    tmpTradeItem2[i].Num = itemNum;
+                    tmpTradeItem2[i].Num = item;
                     tmpTradeItem2[i].Value = Data.TempPlayer[tradeTarget].TradeOffer[i].Value;
                     // take item
                     Server.Player.TakeInvSlot(tradeTarget, (int)Data.TempPlayer[tradeTarget].TradeOffer[i].Num, tmpTradeItem2[i].Value);
@@ -2513,9 +2513,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         if (invSlot < 0 | invSlot > Core.Globals.Variables.MaxInventory)
             return;
 
-        var itemNum = GetPlayerInventory(session.Id, invSlot);
+        var item = GetPlayerInventory(session.Id, invSlot);
 
-        if (itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems)
+        if (item < 0 || item > Core.Globals.Variables.MaxItems)
             return;
 
         // make sure they have the amount they offer
@@ -2528,7 +2528,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             return;
         }
 
-        if (Item.Instance[itemNum].Type == (byte)ItemCategory.Currency | Item.Instance[itemNum].Stackable == 1)
+        if (Item.Instance[item].Type == (byte)ItemCategory.Currency | Item.Instance[item].Stackable == 1)
         {
             // check if already offering same currency item
             var count = Core.Globals.Variables.MaxInventory;
@@ -2760,11 +2760,11 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
             return;
 
-        var skillNum = buffer.ReadInt32();
+        var skill = buffer.ReadInt32();
 
         try
         {
-            Script.Instance?.LearnSkill(session.Id, -1, skillNum);
+            Script.Instance?.LearnSkill(session.Id, -1, skill);
         }
         catch (Exception ex)
         {
@@ -2919,7 +2919,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
         Moral.OnSave(index);
 
-        General.Logger.LogInformation("{AccountName} saved moral #{MoralNum}",
+        General.Logger.LogInformation("{AccountName} saved moral #{Moral}",
             GetAccountLogin(session.Id), index);
 
         NetworkSend.SendUpdateMoralToAll(index);
@@ -3075,7 +3075,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
         Projectile.OnSave(index);
 
-        General.Logger.LogInformation("{AccountName} saved projectile #{ProjectileNum}",
+        General.Logger.LogInformation("{AccountName} saved projectile #{Projectile}",
             GetAccountLogin(session.Id), index);
 
         NetworkSend.SendUpdateProjectileToAll(index);
@@ -3147,7 +3147,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
         Resource.OnSave(index);
 
-        General.Logger.LogInformation("{AccountName} saved Resource #{ResourceNum}",
+        General.Logger.LogInformation("{AccountName} saved Resource #{Resource}",
             GetAccountLogin(session.Id), index);
 
         NetworkSend.SendUpdateResourceToAll(index);
@@ -3267,7 +3267,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
     
         Item.OnSave(index);
 
-        General.Logger.LogInformation("{AccountName} saved item #{ItemNum}",
+        General.Logger.LogInformation("{AccountName} saved item #{Item}",
             GetAccountLogin(session.Id), index);
         NetworkSend.SendUpdateItemToAll(index);
     }
@@ -3281,7 +3281,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
     {
         var buffer = new PacketReader(bytes);
 
-        var invNum = buffer.ReadInt32();
+        var inv = buffer.ReadInt32();
         var amount = buffer.ReadInt32();
 
         if (Data.TempPlayer[session.Id].InBank || Data.TempPlayer[session.Id].InShop >= 0)
@@ -3289,20 +3289,20 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             return;
         }
 
-        if (invNum < 0 || invNum > Core.Globals.Variables.MaxInventory)
+        if (inv < 0 || inv > Core.Globals.Variables.MaxInventory)
         {
             return;
         }
 
-        if (GetPlayerInventory(session.Id, invNum) < 0 || GetPlayerInventory(session.Id, invNum) > Core.Globals.Variables.MaxItems)
+        if (GetPlayerInventory(session.Id, inv) < 0 || GetPlayerInventory(session.Id, inv) > Core.Globals.Variables.MaxItems)
         {
             return;
         }
 
-        if (Item.Instance[GetPlayerInventory(session.Id, invNum)].Type == (byte)ItemCategory.Currency ||
-            Item.Instance[GetPlayerInventory(session.Id, invNum)].Stackable == 1)
+        if (Item.Instance[GetPlayerInventory(session.Id, inv)].Type == (byte)ItemCategory.Currency ||
+            Item.Instance[GetPlayerInventory(session.Id, inv)].Stackable == 1)
         {
-            if (amount < 0 | amount > GetPlayerInventoryValue(session.Id, invNum))
+            if (amount < 0 | amount > GetPlayerInventoryValue(session.Id, inv))
             {
                 return;
             }
@@ -3310,7 +3310,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
         try
         {
-            Script.Instance?.MapDropItem(session.Id, invNum, amount);
+            Script.Instance?.MapDropItem(session.Id, inv, amount);
         }
         catch (Exception ex)
         {
@@ -3383,7 +3383,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
         Animation.OnSave(index);
 
-        General.Logger.LogInformation("{AccountName} saved animation #{AnimationNum}",
+        General.Logger.LogInformation("{AccountName} saved animation #{Animation}",
             GetAccountLogin(session.Id), index);
 
         NetworkSend.SendUpdateAnimationToAll(index);
@@ -3393,13 +3393,13 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
     {
         var packetReader = new PacketReader(bytes);
 
-        var animationNum = packetReader.ReadInt32();
-        if (animationNum < 0 || animationNum >= Variables.MaxAnimations)
+        var animation = packetReader.ReadInt32();
+        if (animation < 0 || animation >= Variables.MaxAnimations)
         {
             return;
         }
 
-        NetworkSend.SendUpdateAnimationTo(session.Id, animationNum);
+        NetworkSend.SendUpdateAnimationTo(session.Id, animation);
     }
 
     public static void Packet_Event(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -3524,62 +3524,62 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             return;
         }
 
-        var npcNum = packetReader.ReadInt32();
-        if (npcNum < 0 | npcNum > Core.Globals.Variables.MaxNpcs)
+        var npc = packetReader.ReadInt32();
+        if (npc < 0 | npc > Core.Globals.Variables.MaxNpcs)
         {
             return;
         }
 
-        Npc.Instance[npcNum].Animation = packetReader.ReadInt32();
-        Npc.Instance[npcNum].AttackSay = packetReader.ReadString();
-        Npc.Instance[npcNum].Behavior = packetReader.ReadByte();
+        Npc.Instance[npc].Animation = packetReader.ReadInt32();
+        Npc.Instance[npc].AttackSay = packetReader.ReadString();
+        Npc.Instance[npc].Behavior = packetReader.ReadByte();
 
         for (var i = 0; i < Core.Globals.Variables.MaxDropItems; i++)
         {
-            Npc.Instance[npcNum].DropChance[i] = packetReader.ReadInt32();
-            Npc.Instance[npcNum].DropItem[i] = packetReader.ReadInt32();
-            Npc.Instance[npcNum].DropItemValue[i] = packetReader.ReadInt32();
+            Npc.Instance[npc].DropChance[i] = packetReader.ReadInt32();
+            Npc.Instance[npc].DropItem[i] = packetReader.ReadInt32();
+            Npc.Instance[npc].DropItemValue[i] = packetReader.ReadInt32();
         }
 
-        Npc.Instance[npcNum].Experience = packetReader.ReadInt32();
-        Npc.Instance[npcNum].Faction = packetReader.ReadByte();
-        Npc.Instance[npcNum].Hp = packetReader.ReadInt32();
-        Npc.Instance[npcNum].Name = packetReader.ReadString();
-        Npc.Instance[npcNum].Range = packetReader.ReadByte();
-        Npc.Instance[npcNum].SpawnTime = packetReader.ReadByte();
-        Npc.Instance[npcNum].SpawnSecs = packetReader.ReadInt32();
-        Npc.Instance[npcNum].Sprite = packetReader.ReadInt32();
+        Npc.Instance[npc].Experience = packetReader.ReadInt32();
+        Npc.Instance[npc].Faction = packetReader.ReadByte();
+        Npc.Instance[npc].Hp = packetReader.ReadInt32();
+        Npc.Instance[npc].Name = packetReader.ReadString();
+        Npc.Instance[npc].Range = packetReader.ReadByte();
+        Npc.Instance[npc].SpawnTime = packetReader.ReadByte();
+        Npc.Instance[npc].SpawnSecs = packetReader.ReadInt32();
+        Npc.Instance[npc].Sprite = packetReader.ReadInt32();
 
         var statCount = Enum.GetValues<Stat>().Length;
         for (var i = 0; i < statCount; i++)
         {
-            Npc.Instance[npcNum].Stat[i] = packetReader.ReadByte();
+            Npc.Instance[npc].Stat[i] = packetReader.ReadByte();
         }
 
         for (var i = 0; i < Core.Globals.Variables.MaxNpcSkills; i++)
         {
-            Npc.Instance[npcNum].Skill[i] = packetReader.ReadByte();
+            Npc.Instance[npc].Skill[i] = packetReader.ReadByte();
         }
 
-        Npc.Instance[npcNum].Level = packetReader.ReadByte();
-        Npc.Instance[npcNum].Damage = packetReader.ReadInt32();
+        Npc.Instance[npc].Level = packetReader.ReadByte();
+        Npc.Instance[npc].Damage = packetReader.ReadInt32();
 
-        Npc.Instance[npcNum].DeathSwitch = packetReader.ReadInt32();
-        Npc.Instance[npcNum].DeathVariable = packetReader.ReadInt32();
+        Npc.Instance[npc].DeathSwitch = packetReader.ReadInt32();
+        Npc.Instance[npc].DeathVariable = packetReader.ReadInt32();
 
-        Npc.Instance[npcNum].DeathSwitchValue = packetReader.ReadInt32();
-        Npc.Instance[npcNum].DeathVariableValue = packetReader.ReadInt32();
+        Npc.Instance[npc].DeathSwitchValue = packetReader.ReadInt32();
+        Npc.Instance[npc].DeathVariableValue = packetReader.ReadInt32();
 
         // common event fields (0 = none)
-        Npc.Instance[npcNum].CommonEventType = packetReader.ReadByte();
-        Npc.Instance[npcNum].CommonEventData1 = packetReader.ReadInt32();
-        Npc.Instance[npcNum].CommonEventData2 = packetReader.ReadInt32();
+        Npc.Instance[npc].CommonEventType = packetReader.ReadByte();
+        Npc.Instance[npc].CommonEventData1 = packetReader.ReadInt32();
+        Npc.Instance[npc].CommonEventData2 = packetReader.ReadInt32();
 
-        Npc.OnSave(npcNum);
+        Npc.OnSave(npc);
 
-        General.Logger.LogInformation("{AccountName} saved NPC #{NpcNum}",
-            GetAccountLogin(session.Id), npcNum);
+        General.Logger.LogInformation("{AccountName} saved NPC #{Npc}",
+            GetAccountLogin(session.Id), npc);
 
-        NetworkSend.SendUpdateNpcToAll(npcNum);
+        NetworkSend.SendUpdateNpcToAll(npc);
     }
 }
