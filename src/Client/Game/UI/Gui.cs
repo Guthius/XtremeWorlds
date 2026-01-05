@@ -587,29 +587,41 @@ public class WindowManager
             return false;
         }
 
-        switch (window.Controls[controlIndex])
+        var control = window.Controls[controlIndex];
+        if (control is null || !control.Visible || !control.Enabled)
+        {
+            return false;
+        }
+
+        switch (control)
         {
             case TextBox:
                 window.LastControl = window.ActiveControl;
-                window.ActiveControl = window.Controls[controlIndex];
+                window.ActiveControl = control;
                 return true;
         }
 
         return false;
     }
 
-    public static bool SetActiveControl(Window window, int controlIndex)
+    public static bool SetActiveControl(Window window, int index)
     {
-        if (controlIndex < 0 || controlIndex >= window.Controls.Count)
+        if (index < 0 || index >= window.Controls.Count)
         {
             return false;
         }
 
-        switch (window.Controls[controlIndex])
+        var control = window.Controls[index];
+        if (control is null || !control.Visible || !control.Enabled)
+        {
+            return false;
+        }
+
+        switch (control)
         {
             case TextBox:
                 window.LastControl = window.ActiveControl;
-                window.ActiveControl = window.Controls[controlIndex];
+                window.ActiveControl = control;
                 return true;
         }
 
@@ -759,6 +771,7 @@ public class WindowManager
             Safe("UpdateWindow_Characters", () => ui.UpdateWindow_Characters());
             Safe("UpdateWindow_ChatSmall", () => ui.UpdateWindow_ChatSmall());
             Safe("UpdateWindow_Chat", () => ui.UpdateWindow_Chat());
+            Safe("UpdateWindow_EventChat", () => ui.UpdateWindow_EventChat());
             Safe("UpdateWindow_Menu", () => ui.UpdateWindow_Menu());
             Safe("UpdateWindow_Description", () => ui.UpdateWindow_Description());
             Safe("UpdateWindow_Inventory", () => ui.UpdateWindow_Inventory());
