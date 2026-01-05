@@ -2657,28 +2657,29 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         var oldSlot = buffer.ReadInt32();
         var skill = buffer.ReadInt32();
 
-        if (newSlot < 0 | newSlot > Core.Globals.Variables.MaxHotbar)
+        var hotbar = PlayerBase.Instance[session.Id].Hotbar;
+        if (newSlot < 0 || newSlot >= hotbar.Length || newSlot >= Core.Globals.Variables.MaxHotbar)
             return;
 
         if (type == (byte)PartOrigin.Hotbar)
         {
-            if (oldSlot < 0 | oldSlot > Core.Globals.Variables.MaxHotbar)
+            if (oldSlot < 0 || oldSlot >= hotbar.Length || oldSlot >= Core.Globals.Variables.MaxHotbar)
                 return;
 
-            var oldItem = PlayerBase.Instance[session.Id].Hotbar[oldSlot].Slot;
-            var oldType = PlayerBase.Instance[session.Id].Hotbar[oldSlot].SlotType;
-            var newItem = PlayerBase.Instance[session.Id].Hotbar[newSlot].Slot;
-            var newType = PlayerBase.Instance[session.Id].Hotbar[newSlot].SlotType;
+            var oldItem = hotbar[oldSlot].Slot;
+            var oldType = hotbar[oldSlot].SlotType;
+            var newItem = hotbar[newSlot].Slot;
+            var newType = hotbar[newSlot].SlotType;
 
-            PlayerBase.Instance[session.Id].Hotbar[newSlot].Slot = oldItem;
-            PlayerBase.Instance[session.Id].Hotbar[newSlot].SlotType = oldType;
-            PlayerBase.Instance[session.Id].Hotbar[oldSlot].Slot = newItem;
-            PlayerBase.Instance[session.Id].Hotbar[oldSlot].SlotType = newType;
+            hotbar[newSlot].Slot = oldItem;
+            hotbar[newSlot].SlotType = oldType;
+            hotbar[oldSlot].Slot = newItem;
+            hotbar[oldSlot].SlotType = newType;
         }
         else
         {
-            PlayerBase.Instance[session.Id].Hotbar[newSlot].Slot = skill;
-            PlayerBase.Instance[session.Id].Hotbar[newSlot].SlotType = type;
+            hotbar[newSlot].Slot = skill;
+            hotbar[newSlot].SlotType = type;
         }
 
         NetworkSend.SendHotbar(session.Id);
@@ -2690,11 +2691,12 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
         var slot = buffer.ReadInt32();
 
-        if (slot < 0 | slot > Core.Globals.Variables.MaxHotbar)
+        var hotbar = PlayerBase.Instance[session.Id].Hotbar;
+        if (slot < 0 || slot >= hotbar.Length || slot >= Core.Globals.Variables.MaxHotbar)
             return;
 
-        PlayerBase.Instance[session.Id].Hotbar[slot].Slot = -1;
-        PlayerBase.Instance[session.Id].Hotbar[slot].SlotType = 0;
+        hotbar[slot].Slot = -1;
+        hotbar[slot].SlotType = 0;
 
         NetworkSend.SendHotbar(session.Id);
     }
@@ -2705,17 +2707,18 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
         var slot = buffer.ReadInt32();
 
-        if (slot < 0 | slot > Core.Globals.Variables.MaxHotbar)
+        var hotbar = PlayerBase.Instance[session.Id].Hotbar;
+        if (slot < 0 || slot >= hotbar.Length || slot >= Core.Globals.Variables.MaxHotbar)
             return;
 
-        if (PlayerBase.Instance[session.Id].Hotbar[slot].Slot >= 0)
+        if (hotbar[slot].Slot >= 0)
         {
-            if (PlayerBase.Instance[session.Id].Hotbar[slot].SlotType == (byte)DraggablePartType.Item)
+            if (hotbar[slot].SlotType == (byte)DraggablePartType.Item)
             {
                 int eqSlot = -1;
                 for (int i = 0; i < 4; i++)
                 {
-                    if (PlayerBase.Instance[session.Id].Paperdoll[i].Num == PlayerBase.Instance[session.Id].Hotbar[slot].Slot)
+                    if (PlayerBase.Instance[session.Id].Paperdoll[i].Num == hotbar[slot].Slot)
                     {
                         eqSlot = i;
                         break;
@@ -2730,14 +2733,14 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
                 }
                 else
                 {
-                    Server.Player.UseItem(session.Id, Server.Player.FindItemSlot(session.Id, (int)PlayerBase.Instance[session.Id].Hotbar[slot].Slot));
+                    Server.Player.UseItem(session.Id, Server.Player.FindItemSlot(session.Id, (int)hotbar[slot].Slot));
                 }
             }
-            else if (PlayerBase.Instance[session.Id].Hotbar[slot].SlotType == (byte)DraggablePartType.Skill)
+            else if (hotbar[slot].SlotType == (byte)DraggablePartType.Skill)
             {
                 try
                 {
-                    Script.Instance?.BufferSkill(session.Id, PlayerBase.Instance[session.Id].Hotbar[slot].Slot);
+                    Script.Instance?.BufferSkill(session.Id, hotbar[slot].Slot);
                 }
                 catch (Exception ex)
                 {
