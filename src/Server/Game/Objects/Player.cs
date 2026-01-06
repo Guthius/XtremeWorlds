@@ -146,8 +146,8 @@ public class Player : PlayerBase
         y = Math.Clamp(y, 0, Math.Max(0, mapData.MaxY - 1)) * 32;
 
         // Save old map to send erase player data to
-        var oldMapNum = GetPlayerMap(playerId);
-        var changingMaps = oldMapNum != map;
+        var oldMap = GetPlayerMap(playerId);
+        var changingMaps = oldMap != map;
 
         // Only reset event state when changing maps (or explicitly resending).
         // OnWarp is also used as a corrective "snap"; clearing events in that case causes
@@ -166,14 +166,14 @@ public class Player : PlayerBase
         {
             try
             {
-                Script.Instance?.LeaveMap(playerId, oldMapNum);
+                Script.Instance?.LeaveMap(playerId, oldMap);
             }
             catch (Exception ex)
             {
                 General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(OnWarp));
             }
 
-            NetworkSend.SendLeaveMap(playerId, oldMapNum);   
+            NetworkSend.SendLeaveMap(playerId, oldMap);   
         }
 
         SetPlayerMap(playerId, map);
@@ -196,23 +196,23 @@ public class Player : PlayerBase
         }
 
         // Now we check if there were any players left on the map the player just left, and if not stop processing npcs
-        if (oldMapNum >= 0 && oldMapNum < Core.Globals.Variables.MaxMaps && GameLogic.GetTotalMapPlayers(oldMapNum) == 0)
+        if (oldMap >= 0 && oldMap < Core.Globals.Variables.MaxMaps && GameLogic.GetTotalMapPlayers(oldMap) == 0)
         {
             // Regenerate all Npcs' health
-            for (var mapNpcNum = 0; mapNpcNum < Core.Globals.Variables.MaxMapNpcs; mapNpcNum++)
+            for (var npc = 0; npc < Core.Globals.Variables.MaxMapNpcs; npc++)
             {
                 var vitalCount = (int)System.Enum.GetValues(typeof(Vital)).Length;
                 for (var i = 0; i < vitalCount; i++)
                 {
-                    if (MapNpc.Instance[oldMapNum, mapNpcNum].Num >= 0)
+                    if (MapNpc.Instance[oldMap, npc].Num >= 0)
                     {
-                        MapNpc.Instance[oldMapNum, mapNpcNum].Vital[i] = GameLogic.GetNpcMaxVital(MapNpc.Instance[oldMapNum, mapNpcNum].Num, (Vital)i);
+                        MapNpc.Instance[oldMap, npc].Vital[i] = GameLogic.GetNpcMaxVital(MapNpc.Instance[oldMap, npc].Num, (Vital)i);
                     }
                 }
             }
         }
 
-        if (oldMapNum != map || send)
+        if (oldMap != map || send)
         {
             if (Server.Map.Instance[map].Moral < 0 || Server.Map.Instance[map].Moral >= Core.Globals.Variables.MaxMorals)
             {
