@@ -24,16 +24,15 @@ public class WinDescription
 
         switch (GameState.DescType)
         {
-            case 1: // Inventory Item
+            case 1: // Item
             {
                 var iconPath = Path.Combine(DataPath.Items, Item.Instance[GameState.DescItem].Icon.ToString());
 
                 GameClient.RenderTexture(ref iconPath, x + 20, y + 34, 0, 0, 64, 64, 32, 32);
-
                 break;
             }
 
-            case 2: // Skill Icon
+            case 2: // Skill
             {
                 var picBar = winDescription.GetChild("picBar");
                 if (picBar.Visible)
