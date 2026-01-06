@@ -2765,16 +2765,20 @@ namespace Client
 
             if (GameState.MyEditorType != EditorType.Map)
             {
-                if (GameState.CurrentEvents > 0 && Client.Map.Instance[map].EventCount >= GameState.CurrentEvents)
+                if (GameState.CurrentEvents > 0 && Data.MapEvents != null)
                 {
-                    var count9 = GameState.CurrentEvents;
-                    for (i = 0; i < count9; i++)
+                    // CurrentEvents can temporarily exceed the local array length while packets are in-flight.
+                    var count9 = Math.Min(GameState.CurrentEvents, Data.MapEvents.Length);
+                    if (count9 > 0 && Client.Map.Instance[map].EventCount >= count9)
                     {
-                        if (Data.MapEvents?[i].Visible == true)
+                        for (i = 0; i < count9; i++)
                         {
-                            if (Data.MapEvents[i].ShowName == 1)
+                            if (Data.MapEvents[i].Visible)
                             {
-                                Event.OnDrawName(i);
+                                if (Data.MapEvents[i].ShowName == 1)
+                                {
+                                    Event.OnDrawName(i);
+                                }
                             }
                         }
                     }
