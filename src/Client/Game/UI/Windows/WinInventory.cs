@@ -160,7 +160,7 @@ public class WinInventory
             dragBox.Origin = PartOrigin.Inventory;
             dragBox.Slot = slot;
 
-            var windowIndex = WindowManager.GetWindowIndex("winDragBox");
+            var windowIndex = WindowManager.GetWindow("winDragBox");
             var window = WindowManager.Windows[windowIndex];
 
             window.X = GameState.CurMouseX;

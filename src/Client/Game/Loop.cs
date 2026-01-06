@@ -511,7 +511,7 @@ namespace Client
             if (GameState.InitMapReport)
             {
                 // Populate the Admin map list control in the skin window
-                var admin = WindowManager.GetWindowIndex("winAdmin");
+                var admin = WindowManager.GetWindow("winAdmin");
 
                 if (WindowManager.TryGetControl("winAdmin", "lstMaps", out var lstCtrl) && lstCtrl is ListBox lst)
                 {

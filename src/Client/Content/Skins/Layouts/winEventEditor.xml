@@ -54,22 +54,25 @@
 		<Label Name="lblPosition" Text="(0, 0)" Position="100,80" Size="120,18"/>
 
 		<!-- Graphic (per-page) -->
-		<Label Name="lblGraphicType" Text="Graphic" Position="420,22" Size="80,18"/>
-		<ComboBox Name="cmbGraphicType" Position="480,20" Size="180,20"/>
-		<Label Name="lblGraphic" Text="Id" Position="420,52" Size="80,18"/>
-		<ScrollBar Name="sldGraphic" Position="480,52" Size="220,14" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
-		<Label Name="lblGraphicValue" Text="0" Position="708,50" Size="60,18"/>
+		<PictureBox Name="picGraphicPanel" Position="588,18" Size="368,100" Design="Green"/>
+		<Label Name="lblGraphicType" Text="Graphic" Position="600,22" Size="60,18"/>
+		<ComboBox Name="cmbGraphicType" Position="660,20" Size="180,20"/>
+		<Label Name="lblGraphic" Text="Id" Position="600,52" Size="60,18"/>
+		<ScrollBar Name="sldGraphic" Position="660,52" Size="180,14" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+		<Label Name="lblGraphicValue" Text="0" Position="844,50" Size="40,18"/>
 
-		<Label Name="lblGraphicX" Text="X" Position="420,80" Size="18,18"/>
-		<TextBox Name="txtGraphicX" Position="440,78" Size="50,22" Design="TextWhite"/>
-		<Label Name="lblGraphicY" Text="Y" Position="500,80" Size="18,18"/>
-		<TextBox Name="txtGraphicY" Position="520,78" Size="50,22" Design="TextWhite"/>
-		<Label Name="lblGraphicX2" Text="X2" Position="580,80" Size="24,18"/>
-		<TextBox Name="txtGraphicX2" Position="604,78" Size="50,22" Design="TextWhite"/>
-		<Label Name="lblGraphicY2" Text="Y2" Position="664,80" Size="24,18"/>
-		<TextBox Name="txtGraphicY2" Position="688,78" Size="50,22" Design="TextWhite"/>
+		<!-- Graphic coords (aligned on one row) -->
+		<Label Name="lblGraphicX" Text="X" Position="600,74" Size="14,18"/>
+		<TextBox Name="txtGraphicX" Position="614,72" Size="34,22" Design="TextWhite"/>
+		<Label Name="lblGraphicY" Text="Y" Position="652,74" Size="14,18"/>
+		<TextBox Name="txtGraphicY" Position="666,72" Size="34,22" Design="TextWhite"/>
 
-		<PictureBox Name="picGraphic" Position="768,20" Size="96,96" Design="TextBlack"/>
+		<Label Name="lblGraphicX2" Text="X2" Position="704,74" Size="18,18"/>
+		<TextBox Name="txtGraphicX2" Position="724,72" Size="34,22" Design="TextWhite"/>
+		<Label Name="lblGraphicY2" Text="Y2" Position="762,74" Size="18,18"/>
+		<TextBox Name="txtGraphicY2" Position="782,72" Size="34,22" Design="TextWhite"/>
+
+		<PictureBox Name="picGraphic" Position="856,20" Size="96,96" Design="TextBlack"/>
 
 	</GroupBox>
 
@@ -77,7 +80,7 @@
 		<Label Name="lblTrigger" Text="Trigger" Position="360,28" Size="80,18"/>
 		<ComboBox Name="cmbTrigger" Position="440,26" Size="160,20"/>
 		<Label Name="lblPositioning" Text="Layer" Position="610,28" Size="60,18"/>
-		<ComboBox Name="cmbPositioning" Position="700,26" Size="110,20"/>
+		<ComboBox Name="cmbPositioning" Position="680,26" Size="130,20"/>
 		<Label Name="lblMoveType" Text="Move Type" Position="360,58" Size="100,18"/>
 		<ComboBox Name="cmbMoveType" Position="440,56" Size="160,20"/>
 		<Label Name="lblMoveSpeed" Text="Move Speed" Position="610,58" Size="100,18"/>

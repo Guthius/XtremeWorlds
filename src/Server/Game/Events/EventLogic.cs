@@ -291,7 +291,6 @@ namespace Server
                                 }
                             }
 
-
                             if (spawnEvent)
                             {
                                 p = z; // Store the highest-priority valid page index
@@ -869,7 +868,7 @@ namespace Server
                                         {
                                             buffer.WriteEnum(ServerPackets.SSpawnEvent);
                                             buffer.WriteInt32(Data.TempPlayer[i].EventMap.CurrentEvents);
-                                            buffer.WriteInt32(eventId); // Event ID.
+                                            buffer.WriteInt32(eventId);
 
                                             ref var instance1 = ref Event.TempEventMap[i].Event[x];
                                             buffer.WriteString(Server.Map.Instance[i].Event[x].Name); // Global event, use map index
@@ -1132,6 +1131,7 @@ namespace Server
                                                                 eventProcessing.PageId = Data.TempPlayer[i].EventMap.EventPages[eventId].PageId; // Local page ID.
                                                                 eventProcessing.WaitingForResponse = 0;
                                                                 eventProcessing.ListLeftOff = new int[Server.Map.Instance[map].Event[mapEventId2].Pages[eventProcessing.PageId].CommandListCount];
+                                                                Array.Fill(eventProcessing.ListLeftOff, -1);
                                                             }
                                                         }
 
@@ -1473,6 +1473,7 @@ namespace Server
 
                                     // Allocate ListLeftOff array.
                                     eventProcessing.ListLeftOff = new int[Server.Map.Instance[map].Event[eventPage.EventId].Pages[eventPage.PageId].CommandListCount];
+                                    Array.Fill(eventProcessing.ListLeftOff, -1);
                                 }
                             }
                         }
@@ -1598,10 +1599,10 @@ namespace Server
                                 }
 
                                 // Restore saved position in the command list, if any.
-                                if (instance1.ListLeftOff[instance1.CurList] > 0)
+                                if (instance1.ListLeftOff[instance1.CurList] >= 0)
                                 {
                                     instance1.CurSlot = instance1.ListLeftOff[instance1.CurList] + 1;
-                                    instance1.ListLeftOff[instance1.CurList] = 0; // Clear the saved position.
+                                    instance1.ListLeftOff[instance1.CurList] = -1; // Clear the saved position.
                                 }
 
                                 // Check again, since curslot and curlist may have changed
@@ -1688,17 +1689,17 @@ namespace Server
                                                 PlayerService.Instance.SendDataTo(i, buffer.GetBytes());
                                             }
 
-                                            instance1.WaitingForResponse = 0; // No response needed.
+                                            instance1.WaitingForResponse = 1; // Wait for the client to continue (reply=0).
                                             break;
                                         }
-                                        case (byte) EventCommand.ShowChoices:
+                                        case (byte) EventCommand.ShowChoices:   
                                         {
                                             var buffer = new PacketWriter();
                                             {
                                                 buffer.WriteEnum(ServerPackets.SEventChat);
                                                 buffer.WriteInt32(instance1.EventId);
                                                 buffer.WriteInt32(instance1.PageId);
-                                                buffer.WriteInt32(command.Data5); // Face Icon
+                                                buffer.WriteInt32(command.Data5);
                                                 buffer.WriteString(ParseEventText(i, command.Text1));
 
                                                 // Determine the number of choices.
@@ -1755,7 +1756,7 @@ namespace Server
                                                 PlayerService.Instance.SendDataTo(i, buffer.GetBytes());
                                             }
 
-                                            instance1.WaitingForResponse = 0; // No response needed (choices handled separately).
+                                            instance1.WaitingForResponse = 1; // Wait for the client reply.
                                             break;
                                         }
                                         case (byte) EventCommand.Variable:
@@ -1844,15 +1845,15 @@ namespace Server
                                                     break;
                                                 case 5: // Level
                                                 {
-                                                    int playerLevel = GetPlayerLevel(i);
+                                                    int level = GetPlayerLevel(i);
                                                     switch (branch.Data2)
                                                     {
-                                                        case 0: conditionMet = playerLevel == branch.Data1; break;
-                                                        case 1: conditionMet = playerLevel >= branch.Data1; break;
-                                                        case 2: conditionMet = playerLevel <= branch.Data1; break;
-                                                        case 3: conditionMet = playerLevel > branch.Data1; break;
-                                                        case 4: conditionMet = playerLevel < branch.Data1; break;
-                                                        case 5: conditionMet = playerLevel != branch.Data1; break;
+                                                        case 0: conditionMet = level == branch.Data1; break;
+                                                        case 1: conditionMet = level >= branch.Data1; break;
+                                                        case 2: conditionMet = level <= branch.Data1; break;
+                                                        case 3: conditionMet = level > branch.Data1; break;
+                                                        case 4: conditionMet = level < branch.Data1; break;
+                                                        case 5: conditionMet = level != branch.Data1; break;
                                                     }
 
                                                     break;
@@ -2306,11 +2307,11 @@ namespace Server
 
 
                         // Clean up finished event processes.
-                            if (removeEventProcess)
-                            {
-                                instance1.Active = 0;
-                                restartloop = true;
-                            }
+                        if (removeEventProcess)
+                        {
+                            instance1.Active = 0;
+                            restartloop = true;
+                        }
                         }
                     } while (restartloop);
                 }
@@ -2426,6 +2427,7 @@ namespace Server
                 return;
 
             listLeftOff = new int[commandList.Length];
+            Array.Fill(listLeftOff, -1);
             int[] currentListOption = new int[commandList.Length];
 
             curList = 0;
@@ -2439,10 +2441,10 @@ namespace Server
                 restartlist = false;
 
                 // Restore position if returning from a nested list.
-                if (listLeftOff[curList] > 0)
+                if (listLeftOff[curList] >= 0)
                 {
                     curSlot = listLeftOff[curList];
-                    listLeftOff[curList] = 0;
+                    listLeftOff[curList] = -1;
                 }
 
                 // Check for out-of-bounds conditions.
@@ -3028,27 +3030,38 @@ namespace Server
             }
 
             // 5. Validate the target tile matches the event tile.
-            // Event page X/Y are in pixels; targetX/targetY are tiles.
-            if (targetX * Constants.TileSize != eventPage.X || targetY * Constants.TileSize != eventPage.Y)
+            // Event page X/Y are in pixels and may be mid-step (not aligned to tile origin).
+            // Consider the event "on" the target tile if its tile-sized bounds intersect the target tile.
+            var tileLeft = targetX * Constants.TileSize;
+            var tileTop = targetY * Constants.TileSize;
+            var tileRight = tileLeft + Constants.TileSize;
+            var tileBottom = tileTop + Constants.TileSize;
+
+            var evLeft = eventPage.X;
+            var evTop = eventPage.Y;
+            var evRight = evLeft + Constants.TileSize;
+            var evBottom = evTop + Constants.TileSize;
+
+            if (!(evLeft < tileRight && evRight > tileLeft && evTop < tileBottom && evBottom > tileTop))
                 return false;
 
             // 6. Begin event processing if applicable
             if (page.CommandListCount > 0)
             {
                 ref var eventProcessing = ref Data.TempPlayer[playerIndex].EventProcessing[eventPage.EventId];
-                if (eventProcessing.Active == 0)
-                {
-                    eventProcessing.Active = 1;
-                    eventProcessing.ActionTimer = General.GetTimeMs();
-                    eventProcessing.CurList = 0;
-                    eventProcessing.CurSlot = 0;
-                    eventProcessing.EventId = eventPage.EventId;
-                    eventProcessing.PageId = eventPage.PageId;
-                    eventProcessing.WaitingForResponse = 0;
-                    eventProcessing.ListLeftOff = new int[page.CommandListCount];
-                    // Event successfully triggered and processing started.
-                    return true;
-                }
+
+                eventProcessing.Active = 1;
+                eventProcessing.ActionTimer = General.GetTimeMs();
+                eventProcessing.CurList = 0;
+                eventProcessing.CurSlot = 0;
+                eventProcessing.EventId = eventPage.EventId;
+                eventProcessing.PageId = eventPage.PageId;
+                eventProcessing.WaitingForResponse = 0;
+                eventProcessing.ListLeftOff = new int[page.CommandListCount];
+                Array.Fill(eventProcessing.ListLeftOff, -1);
+                // Event successfully triggered and processing started.
+                return true;
+            
             }
 
             return false;

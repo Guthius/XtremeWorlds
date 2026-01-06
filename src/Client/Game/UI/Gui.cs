@@ -532,7 +532,7 @@ public class WindowManager
         ZOrderCon++;
     }
 
-    public static int GetWindowIndex(string windowName)
+    public static int GetWindow(string windowName)
     {
         foreach (var kvp in Windows)
         {
@@ -547,7 +547,7 @@ public class WindowManager
 
     public static Window? GetWindowByName(string windowName)
     {
-        var windowIndex = GetWindowIndex(windowName);
+        var windowIndex = GetWindow(windowName);
         if (windowIndex == 0)
         {
             return null;
@@ -556,9 +556,9 @@ public class WindowManager
         return Windows[windowIndex];
     }
 
-    public static int GetControlIndex(string window, string controlName)
+    public static int GetControl(string window, string controlName)
     {
-        var index = GetWindowIndex(window);
+        var index = GetWindow(window);
 
         for (var i = 0; i <= Windows[index].Controls.Count - 1; i++)
         {
@@ -580,7 +580,7 @@ public class WindowManager
 
     public static bool SetActiveControl(Window window, string controlName)
     {
-        var controlIndex = GetControlIndex(window.Name, controlName);
+        var controlIndex = GetControl(window.Name, controlName);
 
         if (controlIndex < 0 || controlIndex >= window.Controls.Count)
         {
@@ -654,14 +654,14 @@ public class WindowManager
 
     public static void ShowWindow(string windowName, bool forced = false, bool resetPosition = true)
     {
-        var index = GetWindowIndex(windowName);
+        var index = GetWindow(windowName);
         if (index == 0)
         {
             try
             {
                 // Try to lazily load the layout if it's not already loaded via the skin script
                 WindowLoader.FromLayout(windowName);
-                index = GetWindowIndex(windowName);
+                index = GetWindow(windowName);
             }
             catch
             {
@@ -718,7 +718,7 @@ public class WindowManager
 
     public static void HideWindow(string windowName)
     {
-        HideWindow(GetWindowIndex(windowName));
+        HideWindow(GetWindow(windowName));
     }
 
     public static void HideWindow(long windowIndex)
@@ -1448,7 +1448,7 @@ public class WindowManager
         // Helper to safely apply changes when a window exists
         static void TryApply(string name, Action<Window> apply)
         {
-            var id = GetWindowIndex(name);
+            var id = GetWindow(name);
             if (id == 0)
             {
                 return;

@@ -717,6 +717,11 @@ public class Player : PlayerBase
 
             // Block by events with WalkThrough disabled.
             // Global events (authoritative server-side position)
+            var tileLeft = x * Constants.TileSize;
+            var tileTop = y * Constants.TileSize;
+            var tileRight = tileLeft + Constants.TileSize;
+            var tileBottom = tileTop + Constants.TileSize;
+
             if (Event.TempEventMap != null && map >= 0 && map < Event.TempEventMap.Length)
             {
                 var globalEvents = Event.TempEventMap[map];
@@ -728,10 +733,13 @@ public class Player : PlayerBase
                         if (ge.WalkThrough != 0)
                             continue;
 
-                        // Global events use pixel coordinates; movement/collision is tile-based.
-                        var gx = (int)Math.Floor((double)ge.X / Constants.TileSize);
-                        var gy = (int)Math.Floor((double)ge.Y / Constants.TileSize);
-                        if (gx == x && gy == y)
+                        // Global events use pixel coordinates and can be mid-step (off the tile grid).
+                        // Treat them as blocking if their tile-sized bounds intersect the destination tile.
+                        var evLeft = ge.X;
+                        var evTop = ge.Y;
+                        var evRight = evLeft + Constants.TileSize;
+                        var evBottom = evTop + Constants.TileSize;
+                        if (evLeft < tileRight && evRight > tileLeft && evTop < tileBottom && evBottom > tileTop)
                             return true;
                     }
                 }
@@ -750,8 +758,13 @@ public class Player : PlayerBase
                     if (page.WalkThrough != 0)
                         continue;
 
-                    // MapEvent.X/Y are pixel coordinates (multiples of TileSize).
-                    if (Math.Floor((double)page.X / Constants.TileSize) == x && Math.Floor((double)page.Y / Constants.TileSize) == y)
+                    // MapEvent.X/Y are pixel coordinates and may be mid-step.
+                    // Treat the event as blocking if its bounds intersect the destination tile.
+                    var evLeft = page.X;
+                    var evTop = page.Y;
+                    var evRight = evLeft + Constants.TileSize;
+                    var evBottom = evTop + Constants.TileSize;
+                    if (evLeft < tileRight && evRight > tileLeft && evTop < tileBottom && evBottom > tileTop)
                         return true;
                 }
             }

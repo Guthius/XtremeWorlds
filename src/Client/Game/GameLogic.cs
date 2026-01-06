@@ -1819,7 +1819,7 @@ namespace Client
                     // Else
                     tmpWidth = 66;
                     // End If
-                    instance.Controls[WindowManager.GetControlIndex("winDescription", "picBar")].Value = tmpWidth;
+                    instance.Controls[WindowManager.GetControl("winDescription", "picBar")].Value = tmpWidth;
                     // does it rank up?
                     // If Type.Skill(skillNum).NextRank > 0 Then
                     // sUse = "Uses: " & PlayerSkills(SkillSlot).Uses & "/" & Type.Skill(skillNum).NextUses
@@ -1833,17 +1833,17 @@ namespace Client
                     sUse = "Max Rank";
                     // End If
                     // show controls
-                    instance.Controls[WindowManager.GetControlIndex("winDescription", "lblJob")].Visible = true;
-                    instance.Controls[WindowManager.GetControlIndex("winDescription", "picBar")].Visible = true;
+                    instance.Controls[WindowManager.GetControl("winDescription", "lblJob")].Visible = true;
+                    instance.Controls[WindowManager.GetControl("winDescription", "picBar")].Visible = true;
                     // set vals
-                    instance.Controls[WindowManager.GetControlIndex("winDescription", "lblJob")].Text = sUse;
-                    instance.Controls[WindowManager.GetControlIndex("winDescription", "lblJob")].Color = Microsoft.Xna.Framework.Color.White;
+                    instance.Controls[WindowManager.GetControl("winDescription", "lblJob")].Text = sUse;
+                    instance.Controls[WindowManager.GetControl("winDescription", "lblJob")].Color = Microsoft.Xna.Framework.Color.White;
                 }
                 else
                 {
                     // hide some controls
-                    instance.Controls[WindowManager.GetControlIndex("winDescription", "lblJob")].Visible = false;
-                    instance.Controls[WindowManager.GetControlIndex("winDescription", "picBar")].Visible = false;
+                    instance.Controls[WindowManager.GetControl("winDescription", "lblJob")].Visible = false;
+                    instance.Controls[WindowManager.GetControl("winDescription", "picBar")].Visible = false;
                 }
             }
 
@@ -1971,7 +1971,7 @@ namespace Client
 
         public static void SetOptionsScreen()
         {
-            var windowIndex = WindowManager.GetWindowIndex("winOptions");
+            var windowIndex = WindowManager.GetWindow("winOptions");
             
             // Resolutions (add directly to ComboBox)
             if (WindowManager.TryGetControl("winOptions", "cmbRes", out var cmbCtrl) && cmbCtrl is Client.Game.UI.Controls.ComboBox cmbRes)
@@ -1996,13 +1996,13 @@ namespace Client
 
             // fill the options screen
             {
-                var instance = WindowManager.Windows[WindowManager.GetWindowIndex("winOptions")];
-                instance.Controls[WindowManager.GetControlIndex("winOptions", "chkMusic")].Value = SettingsManager.Instance.Music ? 1 : 0;
-                instance.Controls[WindowManager.GetControlIndex("winOptions", "chkSound")].Value = SettingsManager.Instance.Sound ? 1 : 0;
-                instance.Controls[WindowManager.GetControlIndex("winOptions", "chkAutotile")].Value = SettingsManager.Instance.Autotile ? 1 : 0;
-                instance.Controls[WindowManager.GetControlIndex("winOptions", "chkFullscreen")].Value = SettingsManager.Instance.Fullscreen ? 1 : 0;
-                instance.Controls[WindowManager.GetControlIndex("winOptions", "chkVsync")].Value = SettingsManager.Instance.Vsync ? 1 : 0;
-                instance.Controls[WindowManager.GetControlIndex("winOptions", "cmbRes")].Value = SettingsManager.Instance.Resolution;
+                var instance = WindowManager.Windows[WindowManager.GetWindow("winOptions")];
+                instance.Controls[WindowManager.GetControl("winOptions", "chkMusic")].Value = SettingsManager.Instance.Music ? 1 : 0;
+                instance.Controls[WindowManager.GetControl("winOptions", "chkSound")].Value = SettingsManager.Instance.Sound ? 1 : 0;
+                instance.Controls[WindowManager.GetControl("winOptions", "chkAutotile")].Value = SettingsManager.Instance.Autotile ? 1 : 0;
+                instance.Controls[WindowManager.GetControl("winOptions", "chkFullscreen")].Value = SettingsManager.Instance.Fullscreen ? 1 : 0;
+                instance.Controls[WindowManager.GetControl("winOptions", "chkVsync")].Value = SettingsManager.Instance.Vsync ? 1 : 0;
+                instance.Controls[WindowManager.GetControl("winOptions", "cmbRes")].Value = SettingsManager.Instance.Resolution;
             }
         }
 
@@ -2021,10 +2021,10 @@ namespace Client
             GameState.ShopSelectedItem = Shop.Instance[GameState.InShop].TradeItem.Length > 0
                 ? Shop.Instance[GameState.InShop].TradeItem[0].Item
                 : -1;
-            WindowManager.Windows[WindowManager.GetWindowIndex("winShop")].Controls[WindowManager.GetControlIndex("winShop", "CheckboxSelling")].Value = 0;
-            WindowManager.Windows[WindowManager.GetWindowIndex("winShop")].Controls[WindowManager.GetControlIndex("winShop", "CheckboxBuying")].Value = 0;
-            WindowManager.Windows[WindowManager.GetWindowIndex("winShop")].Controls[WindowManager.GetControlIndex("winShop", "btnSell")].Visible = false;
-            WindowManager.Windows[WindowManager.GetWindowIndex("winShop")].Controls[WindowManager.GetControlIndex("winShop", "btnBuy")].Visible = true;
+            WindowManager.Windows[WindowManager.GetWindow("winShop")].Controls[WindowManager.GetControl("winShop", "CheckboxSelling")].Value = 0;
+            WindowManager.Windows[WindowManager.GetWindow("winShop")].Controls[WindowManager.GetControl("winShop", "CheckboxBuying")].Value = 0;
+            WindowManager.Windows[WindowManager.GetWindow("winShop")].Controls[WindowManager.GetControl("winShop", "btnSell")].Visible = false;
+            WindowManager.Windows[WindowManager.GetWindow("winShop")].Controls[WindowManager.GetControl("winShop", "btnBuy")].Visible = true;
             GameState.ShopIsSelling = false;
 
             // set the current item
@@ -2052,13 +2052,13 @@ namespace Client
 
             // make sure we're in a party
             {
-                var instance = WindowManager.Windows[WindowManager.GetWindowIndex("winParty")];
+                var instance = WindowManager.Windows[WindowManager.GetWindow("winParty")];
                 for (i = 0L; i <= 3L; i++)
                 {
                     // get the pIndex from the control
-                    if (instance.Controls[WindowManager.GetControlIndex("winParty", "picChar" + i)].Visible == true)
+                    if (instance.Controls[WindowManager.GetControl("winParty", "picChar" + i)].Visible == true)
                     {
-                        pIndex = instance.Controls[WindowManager.GetControlIndex("winParty", "picChar" + i)].Value;
+                        pIndex = instance.Controls[WindowManager.GetControl("winParty", "picChar" + i)].Value;
                         // make sure they exist
                         if (pIndex > 0L)
                         {
@@ -2068,21 +2068,21 @@ namespace Client
                                 if (GetPlayerVital((int)pIndex, Core.Globals.Vital.Health) > 0 & GetPlayerMaxVital((int)pIndex, Core.Globals.Vital.Health) > 0)
                                 {
                                     width = (int)Math.Round(GetPlayerVital((int)pIndex, Core.Globals.Vital.Health) / (double)barWidth / (GetPlayerMaxVital((int)pIndex, Core.Globals.Vital.Health) / (double)barWidth) * barWidth);
-                                    instance.Controls[WindowManager.GetControlIndex("winParty", "picBar_HP" + i)].Width = width;
+                                    instance.Controls[WindowManager.GetControl("winParty", "picBar_HP" + i)].Width = width;
                                 }
                                 else
                                 {
-                                    instance.Controls[WindowManager.GetControlIndex("winParty", "picBar_HP" + i)].Width = 0;
+                                    instance.Controls[WindowManager.GetControl("winParty", "picBar_HP" + i)].Width = 0;
                                 }
                                 // get their spirit
                                 if (GetPlayerVital((int)pIndex, Core.Globals.Vital.Stamina) > 0 & GetPlayerMaxVital((int)pIndex, Core.Globals.Vital.Stamina) > 0)
                                 {
                                     width = (int)Math.Round(GetPlayerVital((int)pIndex, Core.Globals.Vital.Stamina) / (double)barWidth / (GetPlayerMaxVital((int)pIndex, Core.Globals.Vital.Stamina) / (double)barWidth) * barWidth);
-                                    instance.Controls[WindowManager.GetControlIndex("winParty", "picBar_SP" + i)].Width = width;
+                                    instance.Controls[WindowManager.GetControl("winParty", "picBar_SP" + i)].Width = width;
                                 }
                                 else
                                 {
-                                    instance.Controls[WindowManager.GetControlIndex("winParty", "picBar_SP" + i)].Width = 0;
+                                    instance.Controls[WindowManager.GetControl("winParty", "picBar_SP" + i)].Width = 0;
                                 }
                             }
                         }
@@ -2098,13 +2098,13 @@ namespace Client
 
             // set the controls up
             {
-                var instance = WindowManager.Windows[WindowManager.GetWindowIndex("winTrade")];
+                var instance = WindowManager.Windows[WindowManager.GetWindow("winTrade")];
                 instance.Text = "Trading with " + GetPlayerName(Trade.InTrade);
-                instance.Controls[WindowManager.GetControlIndex("winTrade", "lblYourTrade")].Text = GetPlayerName(GameState.MyIndex) + "'s Offer";
-                instance.Controls[WindowManager.GetControlIndex("winTrade", "lblTheirTrade")].Text = GetPlayerName(Trade.InTrade) + "'s Offer";
-                instance.Controls[WindowManager.GetControlIndex("winTrade", "lblYourValue")].Text = "0g";
-                instance.Controls[WindowManager.GetControlIndex("winTrade", "lblTheirValue")].Text = "0g";
-                instance.Controls[WindowManager.GetControlIndex("winTrade", "lblStatus")].Text = "Choose items to offer.";
+                instance.Controls[WindowManager.GetControl("winTrade", "lblYourTrade")].Text = GetPlayerName(GameState.MyIndex) + "'s Offer";
+                instance.Controls[WindowManager.GetControl("winTrade", "lblTheirTrade")].Text = GetPlayerName(Trade.InTrade) + "'s Offer";
+                instance.Controls[WindowManager.GetControl("winTrade", "lblYourValue")].Text = "0g";
+                instance.Controls[WindowManager.GetControl("winTrade", "lblTheirValue")].Text = "0g";
+                instance.Controls[WindowManager.GetControl("winTrade", "lblStatus")].Text = "Choose items to offer.";
             }
         }
 
@@ -2113,9 +2113,9 @@ namespace Client
             GameState.PlayerMenuIndex = index;
             if (GameState.PlayerMenuIndex == 0L | GameState.PlayerMenuIndex == GameState.MyIndex)
                 return;
-            WindowManager.Windows[WindowManager.GetWindowIndex("winPlayerMenu")].X = x - 5;
-            WindowManager.Windows[WindowManager.GetWindowIndex("winPlayerMenu")].Y = y - 5;
-            WindowManager.Windows[WindowManager.GetWindowIndex("winPlayerMenu")].Controls[WindowManager.GetControlIndex("winPlayerMenu", "btnName")].Text = GetPlayerName((int)GameState.PlayerMenuIndex);
+            WindowManager.Windows[WindowManager.GetWindow("winPlayerMenu")].X = x - 5;
+            WindowManager.Windows[WindowManager.GetWindow("winPlayerMenu")].Y = y - 5;
+            WindowManager.Windows[WindowManager.GetWindow("winPlayerMenu")].Controls[WindowManager.GetControl("winPlayerMenu", "btnName")].Text = GetPlayerName((int)GameState.PlayerMenuIndex);
             WindowManager.ShowWindow("winRightClickBG");
             WindowManager.ShowWindow("winPlayerMenu");
         }
@@ -2172,8 +2172,8 @@ namespace Client
                     amount = GetPlayerInventoryValue(GameState.MyIndex, (int)i);
                 }
             }
-            WindowManager.Windows[WindowManager.GetWindowIndex("winShop")].Controls[WindowManager.GetControlIndex("winShop", "lblGold")].Text = Strings.Format(amount, "#,###,###,###") + "g";
-            WindowManager.Windows[WindowManager.GetWindowIndex("winInventory")].Controls[WindowManager.GetControlIndex("winInventory", "lblGold")].Text = Strings.Format(amount, "#,###,###,###") + "g";
+            WindowManager.Windows[WindowManager.GetWindow("winShop")].Controls[WindowManager.GetControl("winShop", "lblGold")].Text = Strings.Format(amount, "#,###,###,###") + "g";
+            WindowManager.Windows[WindowManager.GetWindow("winInventory")].Controls[WindowManager.GetControl("winInventory", "lblGold")].Text = Strings.Format(amount, "#,###,###,###") + "g";
         }
 
         public static int Clamp(int value, int min, int max)

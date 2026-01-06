@@ -221,6 +221,18 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
+    public static void SendEventChatReply(int eventId, int pageId, int reply)
+    {
+        var packetWriter = new PacketWriter(16);
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CEventChatReply);
+        packetWriter.WriteInt32(eventId);
+        packetWriter.WriteInt32(pageId);
+        packetWriter.WriteInt32(reply);
+
+        Network.Send(packetWriter);
+    }
+
     public static void SendSpawnItem(int index, int amount)
     {
         var packetWriter = new PacketWriter(12);
@@ -1506,10 +1518,10 @@ public static class Sender
 
     public static void SendCloseBank()
     {
-        if (WindowManager.Windows[WindowManager.GetWindowIndex("winBank")].Visible == true)
+        if (WindowManager.Windows[WindowManager.GetWindow("winBank")].Visible == true)
         {
-            WindowManager.HideWindow(WindowManager.GetWindowIndex("winBank"));
-            WindowManager.HideWindow(WindowManager.GetWindowIndex("winDescription"));
+            WindowManager.HideWindow(WindowManager.GetWindow("winBank"));
+            WindowManager.HideWindow(WindowManager.GetWindow("winDescription"));
         }
 
         var packetWriter = new PacketWriter(4);

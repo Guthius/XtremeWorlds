@@ -226,6 +226,7 @@ namespace Server
             processing.PageId = pageId;
             processing.WaitingForResponse = 0;
             processing.ListLeftOff = new int[Server.Map.Instance[map].Event[eventId].Pages[pageId].CommandListCount];
+            Array.Fill(processing.ListLeftOff, -1);
         }
 
         private static bool IsNpcBlocking(int map, int x, int y)
@@ -718,17 +719,101 @@ namespace Server
    
         public static void ProcessEventReply(int index, int eventId, int pageId, int reply)
         {
-            for (var i = 0; i < Data.TempPlayer[index].EventProcessingCount; i++)
+            for (var i = 0; i <= Data.TempPlayer[index].EventProcessingCount; i++)
             {
                 ref var proc = ref Data.TempPlayer[index].EventProcessing[i];
                 if (proc.EventId != eventId || proc.PageId != pageId || proc.WaitingForResponse != 1) continue;
 
-                var cmd = Server.Map.Instance[GetPlayerMap(index)].Event[eventId].Pages[pageId].CommandList[proc.CurList].Commands[proc.CurSlot - 1];
-                if (reply == 0 && cmd.Index == (byte) EventCommand.ShowText)
+                // Treat a negative reply as an explicit cancel/abort.
+                if (reply < 0)
+                {
+                    AbortEventProcessing(index, i);
+                    break;
+                }
+
+                // Resolve the command we were waiting on. CurSlot is advanced after executing the command,
+                // so the "prompt" command is typically at CurSlot-1. Clamp defensively.
+                var map = GetPlayerMap(index);
+                var commandList = Server.Map.Instance[map].Event[eventId].Pages[pageId].CommandList;
+                if (proc.CurList < 0 || proc.CurList >= commandList.Length)
+                {
                     proc.WaitingForResponse = 0;
-                else if (reply > 0 && cmd.Index == (byte) EventCommand.ShowChoices)
-                    UpdateEventProcessing(index, i, reply, cmd);
+                    break;
+                }
+
+                var commands = commandList[proc.CurList].Commands;
+                if (commands == null || commands.Length == 0)
+                {
+                    proc.WaitingForResponse = 0;
+                    break;
+                }
+
+                var promptSlot = Math.Clamp(proc.CurSlot - 1, 0, commands.Length - 1);
+                var cmd = commands[promptSlot];
+
+                if (cmd.Index == (byte)EventCommand.ShowText)
+                {
+                    // Any reply means "continue".
+                    proc.WaitingForResponse = 0;
+                    proc.ActionTimer = General.GetTimeMs();
+                    break;
+                }
+
+                if (cmd.Index == (byte)EventCommand.ShowChoices)
+                {
+                    if (reply is >= 1 and <= 4)
+                    {
+                        UpdateEventProcessing(index, i, reply, cmd);
+                        proc.ActionTimer = General.GetTimeMs();
+                    }
+                    else
+                    {
+                        proc.WaitingForResponse = 0;
+                    }
+
+                    if (proc.CurList == 0)
+                    {
+                        // Invalid reply; abort processing.
+                        AbortEventProcessing(index, i);
+                    }
+
+                    break;
+                }
+
+                // Unknown prompt type; unblock to avoid soft-lock.
+                proc.WaitingForResponse = 0;
+                break;
             }
+        }
+
+        private static void AbortEventProcessing(int player, int procIndex)
+        {
+            if (player < 0 || player >= Core.Globals.Variables.MaxPlayers)
+            {
+                return;
+            }
+
+            // Best-effort: release any client-side hold so movement can't stay stuck.
+            try
+            {
+                var buffer = new PacketWriter(8);
+                buffer.WriteEnum(ServerPackets.SHoldPlayer);
+                buffer.WriteInt32(1); // Release
+                PlayerService.Instance.SendDataTo(player, buffer.GetBytes());
+            }
+            catch
+            {
+                // Ignore send failures; we still clear server-side processing below.
+            }
+
+            ref var proc = ref Data.TempPlayer[player].EventProcessing[procIndex];
+            proc.WaitingForResponse = 0;
+            proc.Active = 0;
+            proc.EventId = -1;
+            proc.PageId = -1;
+            proc.CurList = 0;
+            proc.CurSlot = 0;
+            proc.ActionTimer = 0;
         }
 
         private static void UpdateEventProcessing(int index, int procIndex, int reply, Type.EventCommand cmd)
@@ -746,6 +831,7 @@ namespace Server
             proc.CurSlot = 0;
             proc.WaitingForResponse = 0;
         }
+        
         public static void SerializeMapEvents(PacketWriter buffer, int map)
         {
             for (var i = 0; i < Server.Map.Instance[map].EventCount; i++)

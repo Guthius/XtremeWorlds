@@ -13,14 +13,14 @@ public class WinChat
 
     public static void OnDraw()
     {
-        var winIndex = WindowManager.GetWindowByName("winChat");
-        if (winIndex is null)
+        var index = WindowManager.GetWindowByName("winChat");
+        if (index is null)
         {
             return;
         }
 
-        var x = winIndex.X;
-        var y = winIndex.Y + 16;
+        var x = index.X;
+        var y = index.Y + 16;
 
         DesignRenderer.Render(Design.WindowDescription, x, y, 352, 152);
 
@@ -123,20 +123,20 @@ public class WinChat
     public static void Show()
     {
         var winChat = WindowManager.GetWindowByName("winChat");
-        if (winChat is null)
+        if (winChat is null)    
         {
             return;
         }
         
-        var windowIndex = WindowManager.GetWindowIndex("winChat");
-        var controlIndex = WindowManager.GetControlIndex("winChat", "txtChat");
+        var window = WindowManager.GetWindow("winChat");
+        var control = WindowManager.GetControl("winChat", "txtChat");
 
         WindowManager.ShowWindow("winChat", resetPosition: false);
         WindowManager.HideWindow("winChatSmall");
 
         WindowManager.ActiveWindow = winChat;
-        WindowManager.SetActiveControl(windowIndex, controlIndex);
-        WindowManager.Windows[windowIndex].Controls[controlIndex].Visible = true;
+        WindowManager.SetActiveControl(window, control);
+        WindowManager.Windows[window].Controls[control].Visible = true;
 
         GameState.InSmallChat = false;
         GameState.ChatScroll = 0;
@@ -150,8 +150,8 @@ public class WinChat
             return;
         }
         
-        var windowIndex = WindowManager.GetWindowIndex("winChat");
-        var controlIndex = WindowManager.GetControlIndex("winChat", "txtChat");
+        var windowIndex = WindowManager.GetWindow("winChat");
+        var controlIndex = WindowManager.GetControl("winChat", "txtChat");
 
         WindowManager.ShowWindow("winChatSmall", resetPosition: false);
         WindowManager.HideWindow("winChat");

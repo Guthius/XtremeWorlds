@@ -3407,11 +3407,10 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         var buffer = new PacketReader(bytes);
         var localEventIndex = buffer.ReadInt32();
 
-        // Client sends the *local* event index (0..CurrentEvents-1) from SSpawnEvent.
-        // Server event processing uses the *map* event id, stored in the player's 1-based EventPages.
         int slot = localEventIndex + 1;
         if (slot <= 0 || slot > Data.TempPlayer[session.Id].EventMap.CurrentEvents)
             return;
+            
         if (Data.TempPlayer[session.Id].EventMap.EventPages == null || slot >= Data.TempPlayer[session.Id].EventMap.EventPages.Length)
             return;
 
@@ -3440,7 +3439,13 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         var buffer = new PacketReader(bytes);
         int eventId = buffer.ReadInt32(), pageId = buffer.ReadInt32(), reply = buffer.ReadInt32();
 
-        General.Logger.LogInformation($"Player {session.Id} responded to event {eventId} with reply {reply}");
+        General.Logger.LogInformation(
+            "Player {PlayerId} responded to event {EventId}/{PageId} with reply {Reply}",
+            session.Id,
+            eventId,
+            pageId,
+            reply
+        );
         Event.ProcessEventReply(session.Id, eventId, pageId, reply);
     }
 

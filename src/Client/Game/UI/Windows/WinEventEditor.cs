@@ -85,6 +85,11 @@ public static class WinEventEditor
         return TryGetEventCommandIndex(cmd.Index, out var index) && index == EventCommand.ConditionalBranch;
     }
 
+    private static bool IsShowChatBubble(Core.Globals.Type.EventCommand cmd)
+    {
+        return TryGetEventCommandIndex(cmd.Index, out var index) && index == EventCommand.ShowChatBubble;
+    }
+
     private static bool IsShowChoices(Core.Globals.Type.EventCommand cmd)
     {
         return TryGetEventCommandIndex(cmd.Index, out var index) && index == EventCommand.ShowChoices;
@@ -1112,14 +1117,23 @@ public static class WinEventEditor
                     // Conditional Branch: when the Type changes, refresh the Value picker items/target.
                     if (comboName == "cmbCmdPick1")
                     {
-                        if (TryGetCommandAt(_dataTargetListIndex, _dataTargetCommandIndex, out var cmd) && IsConditionalBranch(cmd))
+                        if (TryGetCommandAt(_dataTargetListIndex, _dataTargetCommandIndex, out var cmd) && (IsConditionalBranch(cmd) || IsShowChatBubble(cmd)))
                         {
                             // Build a lightweight "live" view of the command based on current textbox state.
                             var live = cmd;
-                            live.ConditionalBranch.Condition = ReadIntTextBox("winEventCommandData", "txtCmdData1", live.ConditionalBranch.Condition);
-                            live.ConditionalBranch.Data1 = ReadIntTextBox("winEventCommandData", "txtCmdData2", live.ConditionalBranch.Data1);
-                            live.ConditionalBranch.Data2 = ReadIntTextBox("winEventCommandData", "txtCmdData3", live.ConditionalBranch.Data2);
-                            live.ConditionalBranch.Data3 = ReadIntTextBox("winEventCommandData", "txtCmdData4", live.ConditionalBranch.Data3);
+                            if (IsConditionalBranch(cmd))
+                            {
+                                live.ConditionalBranch.Condition = ReadIntTextBox("winEventCommandData", "txtCmdData1", live.ConditionalBranch.Condition);
+                                live.ConditionalBranch.Data1 = ReadIntTextBox("winEventCommandData", "txtCmdData2", live.ConditionalBranch.Data1);
+                                live.ConditionalBranch.Data2 = ReadIntTextBox("winEventCommandData", "txtCmdData3", live.ConditionalBranch.Data2);
+                                live.ConditionalBranch.Data3 = ReadIntTextBox("winEventCommandData", "txtCmdData4", live.ConditionalBranch.Data3);
+                            }
+                            else
+                            {
+                                // ShowChatBubble: target type drives which secondary picker we show.
+                                live.Data1 = ReadIntTextBox("winEventCommandData", "txtCmdData1", live.Data1);
+                                live.Data2 = ReadIntTextBox("winEventCommandData", "txtCmdData2", live.Data2);
+                            }
 
                             _isLoading = true;
                             try
@@ -1222,6 +1236,65 @@ public static class WinEventEditor
             case EventCommand.AddText:
                 pick1Label = "Color";
                 pick1Items = BuildEnumItems<ColorName>();
+                break;
+
+            case EventCommand.ShowChatBubble:
+                pick1Label = "Target";
+                pick1Target = "txtCmdData1";
+                pick1Items =
+                [
+                    ((int)TargetType.Player, "Player"),
+                    ((int)TargetType.Npc, "Npc"),
+                    ((int)TargetType.Event, "Event"),
+                ];
+
+                // Data2 means different things based on target.
+                // - Npc: runtime npc index (map slot)
+                // - Event: map event index
+                if ((byte)cmd.Data1 == (byte)TargetType.Npc)
+                {
+                    pick2Label = "Npc";
+                    pick2Target = "txtCmdData2";
+                    pick2Items = BuildIndexItems(
+                        hasPlayerMap && Client.Map.Instance[playerMap].Npc != null ? Client.Map.Instance[playerMap].Npc.Length : 0,
+                        slot =>
+                        {
+                            if (!hasPlayerMap)
+                                return null;
+
+                            var map = Client.Map.Instance[playerMap];
+                            if (map.Npc == null || slot < 0 || slot >= map.Npc.Length)
+                                return null;
+
+                            int npcNum = map.Npc[slot];
+                            if (npcNum < 0)
+                                return "None";
+
+                            var npcName = npcNum < NpcBase.Instance.Count ? (NpcBase.Instance[npcNum].Name ?? string.Empty) : string.Empty;
+                            npcName = string.IsNullOrWhiteSpace(npcName) ? "None" : npcName.Trim();
+                            return $"{npcName} ({npcNum})";
+                        });
+                }
+                else if ((byte)cmd.Data1 == (byte)TargetType.Event)
+                {
+                    pick2Label = "Event";
+                    pick2Target = "txtCmdData2";
+                    pick2Items = BuildIndexItems(
+                        hasPlayerMap && Client.Map.Instance[playerMap].Event != null ? Client.Map.Instance[playerMap].Event.Length : 0,
+                        i =>
+                        {
+                            if (!hasPlayerMap)
+                                return null;
+
+                            var map = Client.Map.Instance[playerMap];
+                            if (map.Event == null || i < 0 || i >= map.Event.Length)
+                                return null;
+
+                            var name = map.Event[i].Name ?? string.Empty;
+                            name = string.IsNullOrWhiteSpace(name) ? "None" : name.Trim();
+                            return name;
+                        });
+                }
                 break;
             case EventCommand.OpenShop:
                 pick1Label = "Shop";

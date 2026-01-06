@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window Name="winEventChat" Caption="" Size="552, 170" Position="0, 0" Font="Georgia" Design="None" Visible="false">
+
+    <!-- Green background like chat -->
+    <PictureBox Name="picBackground" Position="0, 0" Size="552, 170" Design="Green"/>
+
+    <!-- Event message text (wrapped) -->
+    <Label Name="lblEventText" Text="" Position="14, 14" Size="370, 142" Font="Georgia" Align="Left"/>
+
+    <!-- Choices panel + up to 4 choices (RPG Maker-like stacked list) -->
+    <PictureBox Name="picChoices" Position="394, 14" Size="144, 142" Design="Green"/>
+
+    <Button Name="btnEventChoice1" Text="" Position="402, 22" Size="128, 28" Font="Georgia"
+            Design="TextBlack" DesignHover="TextWhite" DesignMouseDown="TextWhite"/>
+    <Button Name="btnEventChoice2" Text="" Position="402, 54" Size="128, 28" Font="Georgia"
+            Design="TextBlack" DesignHover="TextWhite" DesignMouseDown="TextWhite"/>
+    <Button Name="btnEventChoice3" Text="" Position="402, 86" Size="128, 28" Font="Georgia"
+            Design="TextBlack" DesignHover="TextWhite" DesignMouseDown="TextWhite"/>
+    <Button Name="btnEventChoice4" Text="" Position="402, 118" Size="128, 28" Font="Georgia"
+            Design="TextBlack" DesignHover="TextWhite" DesignMouseDown="TextWhite"/>
+
+</Window>

@@ -4,7 +4,7 @@ public class WinMenu
 {
     public static void OnCharacterClick()
     {
-        var windowIndex = WindowManager.GetWindowIndex("winCharacter");
+        var windowIndex = WindowManager.GetWindow("winCharacter");
 
         if (WindowManager.Windows[windowIndex].Visible)
         {
@@ -18,7 +18,7 @@ public class WinMenu
 
     public static void OnInventoryClick()
     {
-        var windowIndex = WindowManager.GetWindowIndex("winInventory");
+        var windowIndex = WindowManager.GetWindow("winInventory");
 
         if (WindowManager.Windows[windowIndex].Visible)
         {
@@ -32,7 +32,7 @@ public class WinMenu
 
     public static void OnSkillsClick()
     {
-        var windowIndex = WindowManager.GetWindowIndex("winSkills");
+        var windowIndex = WindowManager.GetWindow("winSkills");
 
         if (WindowManager.Windows[windowIndex].Visible)
         {

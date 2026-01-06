@@ -966,6 +966,7 @@ namespace Client
             int mouseYGame = mousePosGame.Item2;
             GameState.CurMouseXGame = mouseXGame;
             GameState.CurMouseYGame = mouseYGame;
+
             if (mouseXGame >= 0 && mouseYGame >= 0)
             {
                 // Absolute world tile under the mouse: floor((cameraOffsetPx + mousePx) / tileSize)
@@ -1034,13 +1035,20 @@ namespace Client
             // Handle Escape key to toggle menus or cancel casts
             if (IsKeyStateActive(Keys.Escape))
             {
+                // If an event prompt is open, cancel/abort it.
+                if (IsWindowVisible("winEventChat"))
+                {
+                    WinEventChat.OnCancel();
+                    return;
+                }
+
                 // If we're casting/buffering a skill, cancel it first
                 if (GameState.SkillBuffer >= 0)
                 {
                     GameState.SkillBuffer = -1;
                     GameState.SkillBufferTimer = 0;
                     Sender.SendCancelCast();
-                    return; // consume this press
+                    return;
                 }
 
                 // First: clear target with server if one is selected
@@ -1213,13 +1221,22 @@ namespace Client
         // Helper methods
         private static void UpdateMovementKeys()
         {
+            if (IsWindowVisible("winChat"))
+            {
+                GameState.DirUp = false;
+                GameState.DirDown = false;
+                GameState.DirLeft = false;
+                GameState.DirRight = false;
+                return;
+            }
+
             GameState.DirUp = CurrentKeyboardState.IsKeyDown(Keys.W) | CurrentKeyboardState.IsKeyDown(Keys.Up);
             GameState.DirDown = CurrentKeyboardState.IsKeyDown(Keys.S) | CurrentKeyboardState.IsKeyDown(Keys.Down);
             GameState.DirLeft = CurrentKeyboardState.IsKeyDown(Keys.A) | CurrentKeyboardState.IsKeyDown(Keys.Left);
             GameState.DirRight = CurrentKeyboardState.IsKeyDown(Keys.D) | CurrentKeyboardState.IsKeyDown(Keys.Right);
         }
 
-        private static bool IsWindowVisible(string windowName)
+        public static bool IsWindowVisible(string windowName)
         {
             return WindowManager.TryGetWindow(windowName, out var window) && window!.Visible;
         }
@@ -1977,7 +1994,7 @@ namespace Client
             long tmpY;
             var barWidth = default(long);
             long i;
-            long npcNum;
+            long npc;
 
             // dynamic bar calculations (defensively handle missing texture)
             var barsInfo = GetGfxInfo(Path.Combine(DataPath.Misc, "Bars"));
@@ -1994,13 +2011,13 @@ namespace Client
             // render Npc health bars
             for (i = 0L; i < Variables.MaxMapNpcs; i++)
             {
-                npcNum = (long) MapNpc.Instance[(int) i].Num;
+                npc = (long) MapNpc.Instance[(int) i].Num;
                 // exists?
-                if (npcNum >= 0L && npcNum < Variables.MaxNpcs)
+                if (npc >= 0L && npc < Npc.Instance.Count)
                 {
                     // alive?
                     if (MapNpc.Instance[(int) i].Vital[(int) Core.Globals.Vital.Health] > 0 &
-                        MapNpc.Instance[(int) i].Vital[(int) Core.Globals.Vital.Health] < Npc.Instance[(int) npcNum].Hp)
+                        MapNpc.Instance[(int) i].Vital[(int) Core.Globals.Vital.Health] < Npc.Instance[(int) npc].Hp)
                     {
                         // lock to Npc
                         tmpX = (long) Math.Round(MapNpc.Instance[(int) i].X + 16 - width / 2d);
@@ -2010,7 +2027,7 @@ namespace Client
                         if (width > 0)
                             GameState.BarWidthNpcHPMax[(int) i] = (int) Math.Round(
                                 MapNpc.Instance[(int) i].Vital[(int) Core.Globals.Vital.Health] / (double) width /
-                                (Npc.Instance[(int) npcNum].Hp / (double) width) * width);
+                                (Npc.Instance[(int) npc].Hp / (double) width) * width);
 
                         // draw bar background
                         top = height * 3L; // HP bar background

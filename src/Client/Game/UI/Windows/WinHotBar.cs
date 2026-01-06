@@ -104,7 +104,7 @@ public class WinHotBar
             dragBox.Origin = PartOrigin.Hotbar;
             dragBox.Slot = slot;
 
-            var windowIndex = WindowManager.GetWindowIndex("winDragBox");
+            var windowIndex = WindowManager.GetWindow("winDragBox");
             var winDragBox = WindowManager.Windows[windowIndex];
 
             winDragBox.X = GameState.CurMouseX;

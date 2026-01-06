@@ -157,7 +157,7 @@ public class WinBank
             dragBox.Origin = PartOrigin.Bank;
             dragBox.Slot = slot;
 
-            var windowIndex = WindowManager.GetWindowIndex("winDragBox");
+            var windowIndex = WindowManager.GetWindow("winDragBox");
             var window = WindowManager.Windows[windowIndex];
 
             window.X = GameState.CurMouseX;

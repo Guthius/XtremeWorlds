@@ -285,10 +285,10 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         WindowManager.HideWindows();
         WindowManager.ShowWindow("WinCharacters");
 
-        long winNum = WindowManager.GetWindowIndex("WinCharacters");
+        long winNum = WindowManager.GetWindow("WinCharacters");
         for (var i = 0L; i < Variables.MaxCharacters; i++)
         {
-            long conNum = WindowManager.GetControlIndex("WinCharacters", "lblCharName_" + (i + 1));
+            long conNum = WindowManager.GetControl("WinCharacters", "lblCharName_" + (i + 1));
             {
                 var control = WindowManager.Windows[winNum].Controls[(int) conNum];
 
@@ -298,29 +298,29 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             if (isSlotEmpty[(int) i])
             {
                 // create button
-                conNum = WindowManager.GetControlIndex("WinCharacters", "btnCreateChar_" + (i + 1));
+                conNum = WindowManager.GetControl("WinCharacters", "btnCreateChar_" + (i + 1));
                 WindowManager.Windows[winNum].Controls[(int) conNum].Visible = true;
 
                 // select button
-                conNum = WindowManager.GetControlIndex("WinCharacters", "btnSelectChar_" + (i + 1));
+                conNum = WindowManager.GetControl("WinCharacters", "btnSelectChar_" + (i + 1));
                 WindowManager.Windows[winNum].Controls[(int) conNum].Visible = false;
 
                 // delete button
-                conNum = WindowManager.GetControlIndex("WinCharacters", "btnDelChar_" + (i + 1));
+                conNum = WindowManager.GetControl("WinCharacters", "btnDelChar_" + (i + 1));
                 WindowManager.Windows[winNum].Controls[(int) conNum].Visible = false;
             }
             else
             {
                 // create button
-                conNum = WindowManager.GetControlIndex("WinCharacters", "btnCreateChar_" + (i + 1));
+                conNum = WindowManager.GetControl("WinCharacters", "btnCreateChar_" + (i + 1));
                 WindowManager.Windows[winNum].Controls[(int) conNum].Visible = false;
 
                 // select button
-                conNum = WindowManager.GetControlIndex("WinCharacters", "btnSelectChar_" + (i + 1));
+                conNum = WindowManager.GetControl("WinCharacters", "btnSelectChar_" + (i + 1));
                 WindowManager.Windows[winNum].Controls[(int) conNum].Visible = true;
 
                 // delete button
-                conNum = WindowManager.GetControlIndex("WinCharacters", "btnDelChar_" + (i + 1));
+                conNum = WindowManager.GetControl("WinCharacters", "btnDelChar_" + (i + 1));
                 WindowManager.Windows[winNum].Controls[(int) conNum].Visible = true;
             }
         }
@@ -1624,34 +1624,34 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
             // set form
             {
-                var instance = WindowManager.Windows[WindowManager.GetWindowIndex("winCharacter")];
-                instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblName")].Text = "Name";
-                instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblJob")].Text = "Job";
-                instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblLevel")].Text = "Level";
-                instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblGuild")].Text = "Guild";
-                instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblName2")].Text = GetPlayerName(GameState.MyIndex);
-                instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblJob2")].Text = Job.Instance[GetPlayerJob(GameState.MyIndex)].Name;
-                instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblLevel2")].Text = GetPlayerLevel(GameState.MyIndex).ToString();
-                instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblGuild2")].Text = "None";
+                var instance = WindowManager.Windows[WindowManager.GetWindow("winCharacter")];
+                instance.Controls[WindowManager.GetControl("winCharacter", "lblName")].Text = "Name";
+                instance.Controls[WindowManager.GetControl("winCharacter", "lblJob")].Text = "Job";
+                instance.Controls[WindowManager.GetControl("winCharacter", "lblLevel")].Text = "Level";
+                instance.Controls[WindowManager.GetControl("winCharacter", "lblGuild")].Text = "Guild";
+                instance.Controls[WindowManager.GetControl("winCharacter", "lblName2")].Text = GetPlayerName(GameState.MyIndex);
+                instance.Controls[WindowManager.GetControl("winCharacter", "lblJob2")].Text = Job.Instance[GetPlayerJob(GameState.MyIndex)].Name;
+                instance.Controls[WindowManager.GetControl("winCharacter", "lblLevel2")].Text = GetPlayerLevel(GameState.MyIndex).ToString();
+                instance.Controls[WindowManager.GetControl("winCharacter", "lblGuild2")].Text = "None";
                 WinCharacter.Update();
 
                 // stats
                 for (x = 0; x < statCount; x++)
-                    instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblStat_" + (x + 1))].Text = GetPlayerStat(GameState.MyIndex, (Stat)x).ToString();
+                    instance.Controls[WindowManager.GetControl("winCharacter", "lblStat_" + (x + 1))].Text = GetPlayerStat(GameState.MyIndex, (Stat)x).ToString();
 
                 // points
-                instance.Controls[WindowManager.GetControlIndex("winCharacter", "lblPoints")].Text = GetPlayerPoints(GameState.MyIndex).ToString();
+                instance.Controls[WindowManager.GetControl("winCharacter", "lblPoints")].Text = GetPlayerPoints(GameState.MyIndex).ToString();
 
                 // grey out buttons
                 if (GetPlayerPoints(GameState.MyIndex) == 0)
                 {
                     for (x = 0; x < statCount; x++)
-                        instance.Controls[WindowManager.GetControlIndex("winCharacter", "btnGreyStat_" + (x + 1))].Visible = true;
+                        instance.Controls[WindowManager.GetControl("winCharacter", "btnGreyStat_" + (x + 1))].Visible = true;
                 }
                 else
                 {
                     for (x = 0; x < statCount; x++)
-                        instance.Controls[WindowManager.GetControlIndex("winCharacter", "btnGreyStat_" + (x + 1))].Visible = false;
+                        instance.Controls[WindowManager.GetControl("winCharacter", "btnGreyStat_" + (x + 1))].Visible = false;
                 }
             }
             GameState.PlayerData = true;
@@ -2530,9 +2530,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             Event.EventChoiceVisible[i] = false;
         }
 
-        Event.EventChatType = 0;
         if (choices == 0)
         {
+            Event.EventChatType = 0;
         }
         else
         {
@@ -2546,6 +2546,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
 
         Event.AnotherChat = buffer.ReadInt32();
+
+        WinEventChat.Show();
     }
 
     public static void Packet_EventStart(ReadOnlyMemory<byte> data)
@@ -2556,6 +2558,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     public static void Packet_EventEnd(ReadOnlyMemory<byte> data)
     {
         Event.InEvent = false;
+
+        WinEventChat.OnEventEnded();
     }
 
     public static void Packet_Picture(ReadOnlyMemory<byte> data)
@@ -2840,7 +2844,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         GameState.InBank = true;
 
-        if (!(WindowManager.Windows[WindowManager.GetWindowIndex("winBank")].Visible == true))
+        if (!(WindowManager.Windows[WindowManager.GetWindow("winBank")].Visible == true))
         {
             WindowManager.ShowWindow("winBank", resetPosition: false);
         }

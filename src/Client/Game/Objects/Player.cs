@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework;
 using Core.Configurations;
 using Core.Objects;
 using Core.Interfaces;
+using Client.Game.UI.Windows;
 
 namespace Client
 {
@@ -261,6 +262,12 @@ namespace Client
             if (!GameState.InSmallChat)
             {
                 return canMove;
+            }
+
+            if (GameClient.IsWindowVisible("winEventChat"))
+            {
+                // Moving cancels the event prompt.
+                WinEventChat.OnCancel();
             }
 
             if (Trade.InTrade > 0)
@@ -986,10 +993,12 @@ namespace Client
                             // Check for 32 pixels around the map event
                             int eventX = Data.MapEvents[i].X;
                             int eventY = Data.MapEvents[i].Y;
+
                             // Assume eventX and eventY are in pixel coordinates
                             // If they are in tile coordinates, multiply by tile size (e.g., 32)
                             int px = x;
                             int py = y;
+
                             // If x/y are tile coordinates, multiply by tile size
                             // For now, assume all are pixel coordinates
                             if (Math.Abs(px - eventX) <= Constants.TileSize && Math.Abs(py - eventY) <= Constants.TileSize)

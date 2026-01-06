@@ -13,7 +13,7 @@ namespace Client
         public static void OnClose()
         {
             InTrade = 0;
-            WindowManager.HideWindow(WindowManager.GetWindowIndex("winTrade"));
+            WindowManager.HideWindow(WindowManager.GetWindow("winTrade"));
         }
 
         #region Globals & Type

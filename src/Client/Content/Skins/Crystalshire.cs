@@ -966,7 +966,6 @@ public class Crystalshire
             };
 
         // Faux header tabs like Admin
-        var winIndex = WindowManager.GetWindowIndex("winMapEditor");
 
         void ShowTab(string tab)
         {
@@ -2276,6 +2275,26 @@ public class Crystalshire
         window.OnDraw = WinChat.OnDrawSmall;
     }
 
+    public void UpdateWindow_EventChat()
+    {
+        var window = WindowLoader.FromLayout("winEventChat");
+
+        // Event chat is a modal-style message box; keep it fixed.
+        window.CanDrag = false;
+
+        // Choice buttons (hidden until an event prompt arrives)
+        window.GetChild("btnEventChoice1").CallBack[(int)ControlState.MouseDown] = WinEventChat.OnChoice1;
+        window.GetChild("btnEventChoice2").CallBack[(int)ControlState.MouseDown] = WinEventChat.OnChoice2;
+        window.GetChild("btnEventChoice3").CallBack[(int)ControlState.MouseDown] = WinEventChat.OnChoice3;
+        window.GetChild("btnEventChoice4").CallBack[(int)ControlState.MouseDown] = WinEventChat.OnChoice4;
+
+        window.GetChild("btnEventChoice1").Visible = false;
+        window.GetChild("btnEventChoice2").Visible = false;
+        window.GetChild("btnEventChoice3").Visible = false;
+        window.GetChild("btnEventChoice4").Visible = false;
+        window.GetChild("picChoices").Visible = false;
+    }
+
     public void UpdateWindow_Hotbar()
     {
         var window = WindowLoader.FromLayout("winHotbar");
@@ -2644,7 +2663,7 @@ public class Crystalshire
         };
 
         // Provide tab-like buttons to switch visible groups (because TabPage is a transparent container in our loader)
-        var winIndex = WindowManager.GetWindowIndex("winAdmin");
+        var winIndex = WindowManager.GetWindow("winAdmin");
 
         void ShowTab(string tab)
         {

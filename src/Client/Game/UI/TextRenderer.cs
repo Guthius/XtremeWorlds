@@ -412,7 +412,7 @@ public static class TextRenderer
     public static void AddText(string text, int color, long alpha = 255L, byte channel = 0)
     {
         string[] wrappedLines = System.Array.Empty<string>();
-        WordWrap(text, ConfiguredFont, WindowManager.Windows[WindowManager.GetWindowIndex("winChat")].Width, ref wrappedLines);
+        WordWrap(text, ConfiguredFont, WindowManager.Windows[WindowManager.GetWindow("winChat")].Width, ref wrappedLines);
         GameState.ChatHighIndex += wrappedLines.Length;
         if (GameState.ChatHighIndex > Variables.ChatLines) GameState.ChatHighIndex = Variables.ChatLines;
 
@@ -587,9 +587,9 @@ public static class TextRenderer
         var topWidth = 0;
 
         var xO = 19L;
-        xO += WindowManager.Windows[WindowManager.GetWindowIndex("winChat")].X;
+        xO += WindowManager.Windows[WindowManager.GetWindow("winChat")].X;
         long yO = GameState.ResolutionHeight - 45;
-        var width = (int)WindowManager.Windows[WindowManager.GetWindowIndex("winChat")].Width;
+        var width = (int)WindowManager.Windows[WindowManager.GetWindow("winChat")].Width;
 
         var rLines = 1;
         var i = GameState.ChatScroll;

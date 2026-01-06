@@ -15,8 +15,8 @@ namespace Client
         public static void OnClose()
         {
             Sender.SendCloseShop();
-            WindowManager.HideWindow(WindowManager.GetWindowIndex("winShop"));
-            WindowManager.HideWindow(WindowManager.GetWindowIndex("winDescription"));
+            WindowManager.HideWindow(WindowManager.GetWindow("winShop"));
+            WindowManager.HideWindow(WindowManager.GetWindow("winDescription"));
             GameState.ShopSelectedSlot = 0;
             GameState.ShopSelectedItem = 0;
             GameState.ShopIsSelling = false;

@@ -148,15 +148,15 @@ public class WinSkills
             dragBox.Origin = PartOrigin.SkillTree;
             dragBox.Slot = slot;
 
-            var windowIndex = WindowManager.GetWindowIndex("winDragBox");
-            var window = WindowManager.Windows[windowIndex];
+            var index = WindowManager.GetWindow("winDragBox");
+            var window = WindowManager.Windows[index];
 
             window.X = GameState.CurMouseX;
             window.Y = GameState.CurMouseY;
             window.MovedX = GameState.CurMouseX - window.X;
             window.MovedY = GameState.CurMouseY - window.Y;
 
-            WindowManager.ShowWindow(windowIndex, resetPosition: false);
+            WindowManager.ShowWindow(index, resetPosition: false);
 
             winSkills.State = ControlState.Normal;
         }
