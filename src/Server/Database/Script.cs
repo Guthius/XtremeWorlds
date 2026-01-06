@@ -892,6 +892,8 @@ public class Script
         for (int i = 0, count = vitalCount; i < count; i++)
             SetPlayerVital(index, (Vital)i, GetPlayerMaxVital(index, (Vital)i));
 
+        SendVitals(index);
+
         // If the Player the attacker killed was a pk then take it away
         if (GetPlayerPk(index))
         {
