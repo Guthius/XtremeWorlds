@@ -642,6 +642,21 @@ namespace Client
             var y = default(int);
             int i;
 
+            static bool IntersectsTile(int entityPixelX, int entityPixelY, int tileX, int tileY)
+            {
+                int tileLeft = tileX * Constants.TileSize;
+                int tileTop = tileY * Constants.TileSize;
+                int tileRight = tileLeft + Constants.TileSize;
+                int tileBottom = tileTop + Constants.TileSize;
+
+                int entLeft = entityPixelX;
+                int entTop = entityPixelY;
+                int entRight = entLeft + Constants.TileSize;
+                int entBottom = entTop + Constants.TileSize;
+
+                return entLeft < tileRight && entRight > tileLeft && entTop < tileBottom && entBottom > tileTop;
+            }
+
             if (GetPlayerX(GameState.MyIndex) >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX || GetPlayerY(GameState.MyIndex) >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)
             {
                 OnCheckDir = true;
@@ -736,7 +751,8 @@ namespace Client
                     {
                         if (IsPlaying(i))
                         {
-                            if (Player.Instance[i].X == x & Player.Instance[i].Y == y)
+                            if (i != GameState.MyIndex && GetPlayerMap(i) == GetPlayerMap(GameState.MyIndex) &&
+                                IntersectsTile(GetPlayerRawX(i), GetPlayerRawY(i), x, y))
                             {
                                 OnCheckDir = true;
                                 return OnCheckDir;
@@ -750,7 +766,7 @@ namespace Client
                 {
                     for (i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
                     {
-                        if (MapNpc.Instance[i].Num >= 0 & MapNpc.Instance[i].X == x & MapNpc.Instance[i].Y == y)
+                        if (MapNpc.Instance[i].Num >= 0 && IntersectsTile(MapNpc.Instance[i].X, MapNpc.Instance[i].Y, x, y))
                         {
                             OnCheckDir = true;
                             return OnCheckDir;
@@ -762,10 +778,28 @@ namespace Client
             var count = GameState.CurrentEvents;
             if (count > 0 && Data.MapEvents != null)
             {
-                int mapId = GetPlayerMap(GameState.MyIndex);
-                for (i = 0; i < count; i++)
+                // Event pages are tracked in world pixels (and can be mid-step/off-grid).
+                // Treat them as blocking if their tile-sized bounds intersect the destination tile.
+                int tileLeft = x * Constants.TileSize;
+                int tileTop = y * Constants.TileSize;
+                int tileRight = tileLeft + Constants.TileSize;
+                int tileBottom = tileTop + Constants.TileSize;
+
+                int max = Math.Min(count, Data.MapEvents.Length);
+                for (i = 0; i < max; i++)
                 {
-                    if (Math.Floor((double)Data.MapEvents[i].X) == x & Math.Floor((double)Data.MapEvents[i].Y) == y)
+                    ref var ev = ref Data.MapEvents[i];
+                    if (!ev.Visible)
+                        continue;
+                    if (ev.WalkThrough != 0)
+                        continue;
+
+                    int evLeft = ev.X;
+                    int evTop = ev.Y;
+                    int evRight = evLeft + Constants.TileSize;
+                    int evBottom = evTop + Constants.TileSize;
+
+                    if (evLeft < tileRight && evRight > tileLeft && evTop < tileBottom && evBottom > tileTop)
                     {
                         OnCheckDir = true;
                         return OnCheckDir;

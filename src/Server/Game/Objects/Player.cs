@@ -689,13 +689,28 @@ public class Player : PlayerBase
                 npcBlock = Moral.Instance[index].NpcBlock;
             }
 
+            // Destination tile bounds in pixels.
+            var tileLeft = x * Constants.TileSize;
+            var tileTop = y * Constants.TileSize;
+            var tileRight = tileLeft + Constants.TileSize;
+            var tileBottom = tileTop + Constants.TileSize;
+
             if (playerBlock)
             {
                 foreach (var otherPlayerId in PlayerService.Instance.PlayerIds)
                 {
-                    if (GetPlayerMap(otherPlayerId) == map &&
-                        GetPlayerX(otherPlayerId) == x &&
-                        GetPlayerY(otherPlayerId) == y)
+                    if (otherPlayerId == playerId)
+                        continue;
+                    if (GetPlayerMap(otherPlayerId) != map)
+                        continue;
+
+                    // Players are tracked in pixels and can be mid-step/off-grid.
+                    // Treat them as blocking if their tile-sized bounds intersect the destination tile.
+                    var otherLeft = GetPlayerRawX(otherPlayerId);
+                    var otherTop = GetPlayerRawY(otherPlayerId);
+                    var otherRight = otherLeft + Constants.TileSize;
+                    var otherBottom = otherTop + Constants.TileSize;
+                    if (otherLeft < tileRight && otherRight > tileLeft && otherTop < tileBottom && otherBottom > tileTop)
                     {
                         return true;
                     }
@@ -706,9 +721,16 @@ public class Player : PlayerBase
             {
                 for (var i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
                 {
-                    if (MapNpc.Instance[map, i].Num >= 0 &&
-                        (int)Math.Floor((double)MapNpc.Instance[map, i].X / Constants.TileSize) == x &&
-                        (int)Math.Floor((double)MapNpc.Instance[map, i].Y / Constants.TileSize) == y)
+                    if (MapNpc.Instance[map, i].Num < 0)
+                        continue;
+
+                    // NPCs are tracked in pixels and can be mid-step/off-grid.
+                    // Treat them as blocking if their tile-sized bounds intersect the destination tile.
+                    var npcLeft = MapNpc.Instance[map, i].X;
+                    var npcTop = MapNpc.Instance[map, i].Y;
+                    var npcRight = npcLeft + Constants.TileSize;
+                    var npcBottom = npcTop + Constants.TileSize;
+                    if (npcLeft < tileRight && npcRight > tileLeft && npcTop < tileBottom && npcBottom > tileTop)
                     {
                         return true;
                     }
@@ -717,11 +739,6 @@ public class Player : PlayerBase
 
             // Block by events with WalkThrough disabled.
             // Global events (authoritative server-side position)
-            var tileLeft = x * Constants.TileSize;
-            var tileTop = y * Constants.TileSize;
-            var tileRight = tileLeft + Constants.TileSize;
-            var tileBottom = tileTop + Constants.TileSize;
-
             if (Event.TempEventMap != null && map >= 0 && map < Event.TempEventMap.Length)
             {
                 var globalEvents = Event.TempEventMap[map];

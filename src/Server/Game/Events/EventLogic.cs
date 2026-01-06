@@ -2842,7 +2842,6 @@ namespace Server
                             spawnCurrentEvent = false;
                     }
 
-
                     if (spawnCurrentEvent)
                     {
                         p = z; // Store the valid page index.
