@@ -31,13 +31,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         if (id < 0 || id >= Core.Globals.Variables.MaxPlayers)
             return false;
 
-        if (Data.TempPlayer == null || id >= Data.TempPlayer.Length)
-            return false;
-
-        // PlayerBase.Instance is used heavily by handlers; keep this cheap and defensive.
-        if (PlayerBase.Instance == null || id >= PlayerBase.Instance.Count)
-            return false;
-
         return true;
     }
 
