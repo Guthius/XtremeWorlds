@@ -617,10 +617,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
     {
         var buffer = new PacketReader(bytes);
 
-        // Defensive: packet handlers can be invoked during disconnect races or with invalid session ids.
-        if (session.Id < 0 || session.Id >= PlayerBase.Instance.Count || Data.TempPlayer == null || session.Id >= Data.TempPlayer.Length)
-            return;
-
         if (Data.TempPlayer[session.Id].GettingMap)
             return;
 
