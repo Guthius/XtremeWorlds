@@ -65,7 +65,7 @@ public static class Network
             try
             {
                 Console.WriteLine("Network disconnected");
-                if (GameState.InMenu)
+                if (GameClient.IsWindowVisible("winDialogue"))
                 {
                     return Task.CompletedTask;
                 }
