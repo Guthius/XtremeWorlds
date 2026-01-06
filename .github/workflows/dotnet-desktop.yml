@@ -108,7 +108,7 @@ jobs:
         shell: powershell
         run: |
           cd publish
-          zip -r ../xtremeworlds-windows-${env:GITHUB_REF_NAME}.zip Client Server
+          Compress-Archive -Path Client Server -DestinationPath ../xtremeworlds-windows-${env:GITHUB_REF_NAME}.zip
           cd ..
 
       - name: Upload Zip on Windows
