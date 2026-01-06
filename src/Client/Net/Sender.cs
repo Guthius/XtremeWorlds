@@ -81,16 +81,12 @@ public static class Sender
 
     public static void SendLogin(string username, string password)
     {
-        var usernameBytes = Encrypt(Encoding.UTF8.GetBytes(username));
-        var passwordBytes = Encrypt(Encoding.UTF8.GetBytes(password));
-        var versionBytes = Encrypt(Encoding.UTF8.GetBytes(GetVersion()));
-
         var packetWriter = new PacketWriter();
 
         packetWriter.WriteEnum(Packets.ClientPackets.CLogin);
-        packetWriter.WriteBytes(usernameBytes);
-        packetWriter.WriteBytes(passwordBytes);
-        packetWriter.WriteBytes(versionBytes);
+        packetWriter.WriteBytes(Encrypt(Encoding.UTF8.GetBytes(username)));
+        packetWriter.WriteBytes(Encrypt(Encoding.UTF8.GetBytes(password)));
+        packetWriter.WriteBytes(Encrypt(Encoding.UTF8.GetBytes(GetVersion())));
 
         Network.Send(packetWriter);
     }

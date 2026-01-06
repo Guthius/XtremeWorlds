@@ -311,6 +311,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
                 return;
             }
 
+            // Ensure we have per-session storage before indexing Account.Instance.
+            Account.EnsureSize(session.Id + 1);
+
             // check if its banned
             // Cut off last portion of ip
             if (Database.IsBanned(session.Id, session.Channel.IpAddress))
