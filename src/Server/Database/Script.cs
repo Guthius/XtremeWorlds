@@ -1566,7 +1566,7 @@ public class Script
         return dx <= 1 && dy <= 1; // any adjacent (including diagonals)
     }
 
-    private bool TryChase(int map, int npcIndex, int sx, int sy, int tx, int ty)
+    public bool TryChase(int map, int npcIndex, int sx, int sy, int tx, int ty)
     {
         int dx = tx - sx;
         int dy = ty - sy;
