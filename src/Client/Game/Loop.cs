@@ -355,7 +355,7 @@ namespace Client
                     {
                         if (MapNpc.Instance[_i].Num >= 0)
                         {
-                            GameLogic.SetBarWidth(ref GameState.BarWidthPlayerHPMax[_i], ref GameState.BarWidthPlayerHP[_i]);
+                            GameLogic.SetBarWidth(ref GameState.BarWidthNpcHPMax[_i], ref GameState.BarWidthNpcHP[_i]);
                         }
                     }
 
