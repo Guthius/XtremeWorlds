@@ -70,7 +70,7 @@ public static class Script
                 {
                     if (IsPlaying(i))
                     {
-                        NetworkSend.SendAlert(i, SystemMessage.ServerMaintenance, Menu.Login);    
+                        NetworkSend.SendAlertMessage(i, SystemMessage.ServerMaintenance, Menu.Login);    
                     }
                 }
                 

@@ -16,7 +16,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     public GamePacketParser()
     {
         Bind(Packets.ServerPackets.SAes, Packet_Aes);
-        Bind(Packets.ServerPackets.SAlertMsg, Packet_AlertMsg);
+        Bind(Packets.ServerPackets.SAlertMsg, Packet_AlertMessage);
         Bind(Packets.ServerPackets.SVariables, Packet_Variables);
         Bind(Packets.ServerPackets.SLoginOk, Packet_LoginOk);
         Bind(Packets.ServerPackets.SPlayerCharacters, Packet_PlayerCharacters);
@@ -192,11 +192,11 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         General.ClearGameData();  
     }
 
-    private static void Packet_AlertMsg(ReadOnlyMemory<byte> data)
+    private static void Packet_AlertMessage(ReadOnlyMemory<byte> data)
     {
         var buffer = new PacketReader(data);
 
-        var dialogueIndex = buffer.ReadByte();
+        var dialogue = buffer.ReadByte();
         var menuReset = buffer.ReadByte();
         var kick = buffer.ReadBoolean();
 
@@ -238,7 +238,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         {
             GameLogic.LogoutGame();
         }
-        GameLogic.DialogueAlert(dialogueIndex);
+        GameLogic.DialogueAlert(dialogue);
     }
 
     private static void Packet_LoginOk(ReadOnlyMemory<byte> data)

@@ -20,13 +20,13 @@ public static class NetworkSend
     private static readonly int MapLayerCount = Enum.GetValues<MapLayer>().Length;
     private static readonly int ResourceSkillCount = Enum.GetValues<ResourceSkill>().Length;
 
-    public static void SendAlert(GameSession session, SystemMessage menuNo, Menu menuReset = 0, bool kick = true)
+    public static void SendAlertMessage(GameSession session, SystemMessage menuNo, Menu menuReset = 0, bool kick = true)
     {
         var packetWriter = new PacketWriter(16);
 
         packetWriter.WriteEnum(ServerPackets.SAlertMsg);
         packetWriter.WriteByte((byte)menuNo);
-        packetWriter.WriteEnum(menuReset);
+        packetWriter.WriteByte((byte)menuReset);
         packetWriter.WriteBoolean(kick);
 
         session.Channel.Send(packetWriter.GetBytes());
@@ -41,7 +41,7 @@ public static class NetworkSend
         }
     }
 
-    public static void SendAlert(int playerId, SystemMessage menuNo, Menu menuReset = 0, bool kick = true)
+    public static void SendAlertMessage(int playerId, SystemMessage menuNo, Menu menuReset = 0, bool kick = true)
     {
         var packetWriter = new PacketWriter(16);
         packetWriter.WriteEnum(ServerPackets.SAlertMsg);

@@ -1,4 +1,5 @@
-﻿using Core;
+﻿using Client.Game.UI;
+using Core;
 using Core.Configurations;
 using Core.Net;
 using System.Buffers.Binary;
@@ -64,12 +65,16 @@ public static class Network
             try
             {
                 Console.WriteLine("Network disconnected");
+                if (GameState.InMenu)
+                {
+                    return Task.CompletedTask;
+                }
+
                 // Ensure game returns to menu/login state
                 GameState.InMenu = true;
-                Game.UI.WindowManager.HideWindows();
-                Game.UI.WindowManager.ShowWindow("winLogin");
+                WindowManager.HideWindows();
+                WindowManager.ShowWindow("winLogin");
                 GameLogic.Dialogue("Disconnect", "You lost connection to game server.", "Try to log back in again.", Core.Globals.DialogueType.Disconnect, Core.Globals.DialogueStyle.Okay);
-                // Hide any open windows and show login window
             }
             catch (Exception ex)
             {
