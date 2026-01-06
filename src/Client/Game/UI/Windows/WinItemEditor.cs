@@ -212,7 +212,7 @@ public class WinItemEditor
                 string name = "None";
                 if (Job.Instance.Count > i)
                     name = DisplayNameOrNone(Job.Instance[i].Name);
-                cmbJob.Items.Add(name);
+                cmbJob.Items.Add($"{i}: {name}");
             }
         }
 
