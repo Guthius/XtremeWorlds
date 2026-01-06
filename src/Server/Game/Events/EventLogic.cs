@@ -2848,7 +2848,6 @@ namespace Server
                     }
                 }
 
-
                 // Spawn the event if a valid page was found.
                 if (p >= 0)
                 {
