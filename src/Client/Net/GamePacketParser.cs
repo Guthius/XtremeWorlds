@@ -2314,20 +2314,19 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         if (id > GameState.CurrentEvents)
             return;
 
-        {
-            if (Data.MapEvents == null)
-                return;
-            ref var instance = ref Data.MapEvents[id];
-            instance.X = x;
-            instance.Y = y;
-            instance.Dir = dir;
-            instance.Moving = 1;
-            instance.ShowDir = (byte)showDir;
-            instance.MovementSpeed = movementSpeed;
+        if (Data.MapEvents == null)
+            return;
+        ref var instance = ref Data.MapEvents[id];
+        instance.X = x;
+        instance.Y = y;
+        instance.Dir = dir;
+        instance.Moving = 1;
+        instance.ShowDir = (byte)showDir;
+        instance.MovementSpeed = movementSpeed;
 
-            // Begin a 1-tile (32px) client-side step like NPCs.
-            Client.Event.StartStep(id, x, y, (byte)dir);
-        }
+        // Begin a 1-tile (32px) client-side step like NPCs.
+        Client.Event.StartStep(id, x, y, (byte)dir);
+    
     }
 
     public static void Packet_EventDir(ReadOnlyMemory<byte> data)

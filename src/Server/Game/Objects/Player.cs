@@ -145,16 +145,24 @@ public class Player : PlayerBase
         x = Math.Clamp(x, 0, Math.Max(0, mapData.MaxX - 1)) * 32;
         y = Math.Clamp(y, 0, Math.Max(0, mapData.MaxY - 1)) * 32;
 
-        Data.TempPlayer[playerId].EventProcessingCount = 0;
-        Data.TempPlayer[playerId].EventMap.CurrentEvents = 0; // Clear events
+        // Save old map to send erase player data to
+        var oldMapNum = GetPlayerMap(playerId);
+        var changingMaps = oldMapNum != map;
+
+        // Only reset event state when changing maps (or explicitly resending).
+        // OnWarp is also used as a corrective "snap"; clearing events in that case causes
+        // CurrentEvents to drop back to 0 after events have already been spawned.
+        if (changingMaps || send)
+        {
+            Data.TempPlayer[playerId].EventProcessingCount = 0;
+            Data.TempPlayer[playerId].EventMap.CurrentEvents = 0; // Clear events
+        }
+
         Data.TempPlayer[playerId].Target = -1;
         Data.TempPlayer[playerId].TargetType = 0;
 
         NetworkSend.SendTarget(playerId, 0, 0);
-
-        // Save old map to send erase player data to
-        var oldMapNum = GetPlayerMap(playerId);
-        if (oldMapNum != map)
+        if (changingMaps)
         {
             try
             {
