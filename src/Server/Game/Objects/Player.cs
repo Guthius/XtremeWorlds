@@ -854,11 +854,6 @@ public class Player : PlayerBase
     {
         var map = GetPlayerMap(playerId);
 
-        if (Server.Map.Instance[map].Moral < 0)
-        {
-            return false;
-        }
-
         if (!Moral.Instance[Server.Map.Instance[map].Moral].CanPickupItem)
         {
             NetworkSend.SendPlayerMessage(playerId, "You can't pickup items here!", (int) ColorName.BrightRed);
@@ -878,34 +873,34 @@ public class Player : PlayerBase
         {
             var map = GetPlayerMap(playerId);
 
-            for (var mapItemNum = 0; mapItemNum < Core.Globals.Variables.MaxMapItems; mapItemNum++)
+            for (var i = 0; i < Core.Globals.Variables.MaxMapItems; i++)
             {
-                if (MapItem.Instance[map, mapItemNum].Num < 0 ||
-                    MapItem.Instance[map, mapItemNum].Num >= Core.Globals.Variables.MaxItems)
+                if (MapItem.Instance[map, i].Num < 0 ||
+                    MapItem.Instance[map, i].Num >= Core.Globals.Variables.MaxItems)
                 {
                     continue;
                 }
 
-                if (Math.Floor((double)MapItem.Instance[map, mapItemNum].X / Constants.TileSize) != GetPlayerX(playerId) || Math.Floor((double)MapItem.Instance[map, mapItemNum].Y / Constants.TileSize) != GetPlayerY(playerId))
+                if (Math.Floor((double)MapItem.Instance[map, i].X / Constants.TileSize) != GetPlayerX(playerId) || Math.Floor((double)MapItem.Instance[map, i].Y / Constants.TileSize) != GetPlayerY(playerId))
                 {
                     continue;
                 }
 
-                var slot = Player.FindOpenInvSlot(playerId, MapItem.Instance[map, mapItemNum].Num);
+                var slot = Player.FindOpenInvSlot(playerId, MapItem.Instance[map, i].Num);
                 if (slot == -1)
                 {
                     NetworkSend.SendPlayerMessage(playerId, "Your inventory is full.", (int)ColorName.BrightRed);
                     break;
                 }
 
-                if (!Player.CanPickup(playerId, mapItemNum))
+                if (!Player.CanPickup(playerId, i))
                 {
                     break;
                 }
 
                 try
                 {
-                    Script.Instance?.MapGetItem(playerId, map, mapItemNum, slot);
+                    Script.Instance?.MapGetItem(playerId, map, i, slot);
                 }
                 catch (Exception ex)
                 {
