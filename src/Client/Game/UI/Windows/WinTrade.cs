@@ -97,7 +97,7 @@ public class WinTrade
                 return;
             }
 
-            if (GetPlayerInventory(GameState.MyIndex, Data.TradeYourOffer[slot].Num) == -1)
+            if (GetPlayerInv(GameState.MyIndex, Data.TradeYourOffer[slot].Num) == -1)
             {
                 return;
             }
@@ -141,7 +141,7 @@ public class WinTrade
 
         var y = winTrade.Y - 6;
 
-        GameLogic.ShowItemDesc(x, y, GetPlayerInventory(GameState.MyIndex, Data.TradeYourOffer[slot].Num));
+        GameLogic.ShowItemDesc(x, y, GetPlayerInv(GameState.MyIndex, Data.TradeYourOffer[slot].Num));
     }
 
     public static void OnTheirTradeMouseMove()
@@ -182,7 +182,7 @@ public class WinTrade
 
     private static bool YourOfferIsEmpty(int slot)
     {
-        return slot < 0 || Data.TradeYourOffer[slot].Num == -1 || GetPlayerInventory(GameState.MyIndex, Data.TradeYourOffer[slot].Num) == -1;
+        return slot < 0 || Data.TradeYourOffer[slot].Num == -1 || GetPlayerInv(GameState.MyIndex, Data.TradeYourOffer[slot].Num) == -1;
     }
 
     private static bool TheirOfferIsEmpty(int slot)

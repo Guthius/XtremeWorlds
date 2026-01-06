@@ -236,30 +236,30 @@ public class Script
         NetworkSend.SendPlaySound(index, "Bell.ogg", GetPlayerX(index), GetPlayerY(index));
     }
 
-    public void OnDrop(int index, int mapSlot, int invSlot, int amount, int map, Item item, int itemNum)
+    public void OnDrop(int index, int mapSlot, int invSlot, int amount, int map, Item item, int id)
     {
         // Determine if the item is currency or stackable
         if (item.Type == (byte)ItemCategory.Currency || item.Stackable == 1)
         {
             // Check if dropping more than the Player has, drop all if so
-            var InventoryValue = GetPlayerInventoryValue(index, invSlot);
+            var InventoryValue = GetPlayerInvValue(index, invSlot);
             if (amount >= InventoryValue)
             {
                 amount = InventoryValue;
-                SetInventory(index, invSlot, -1);
-                SetInventoryValue(index, invSlot, 0);
+                SetInv(index, invSlot, -1);
+                SetInvValue(index, invSlot, 0);
             }
             else
             {
-                SetInventoryValue(index, invSlot, InventoryValue - amount);
+                SetInvValue(index, invSlot, InventoryValue - amount);
             }
             NetworkSend.SendMapMessage(map, string.Format("{0} has dropped {1} ({2}x).", GetPlayerName(index), GameLogic.CheckGrammar(item.Name), amount));
         }
         else
         {
             // Not a currency or stackable item
-            SetInventory(index, invSlot, -1);
-            SetInventoryValue(index, invSlot, 0);
+            SetInv(index, invSlot, -1);
+            SetInvValue(index, invSlot, 0);
 
             NetworkSend.SendMapMessage(map, string.Format("{0} has dropped {1}.", GetPlayerName(index), GameLogic.CheckGrammar(item.Name)));
         }
@@ -268,7 +268,7 @@ public class Script
         NetworkSend.SendInventoryUpdate(index, invSlot);
 
         // Spawn the item on the map
-        Server.MapItem.OnSpawn(itemNum, amount, map, GetPlayerX(index), GetPlayerY(index));
+        Server.MapItem.OnSpawn(id, amount, map, GetPlayerX(index), GetPlayerY(index));
     }
 
     public void MapGetItem(int index, int map, int mapSlot, int invSlot)
@@ -280,29 +280,29 @@ public class Script
         _isPickingUp[index] = true;
 
         // Set item in Player's inventory
-        int itemNum = MapItem.Instance[map, mapSlot].Num;
-        SetInventory(index, invSlot, itemNum);
+        var itemId = MapItem.Instance[map, mapSlot].Num;
+        SetInv(index, invSlot, itemId);
 
         string msg;
-        var item = Item.Instance[itemNum];
+        var itemTemplate = Item.Instance[itemId];
         int mapValue = MapItem.Instance[map, mapSlot].Value;
 
-        if (item.BindType == 1)
+        if (itemTemplate.BindType == 1)
         {
             Server.Player.Instance[index].Inventory[invSlot].Bound = 1;
         }
 
-        if (item.Type == (byte)ItemCategory.Currency || item.Stackable == 1)
+        if (itemTemplate.Type == (byte)ItemCategory.Currency || itemTemplate.Stackable == 1)
         {
             // For stackable/currency, add the value from the map item (should be 1 for most drops)
-            SetInventoryValue(index, invSlot, GetPlayerInventoryValue(index, invSlot) + mapValue);
-            msg = mapValue + " " + item.Name;
+            SetInvValue(index, invSlot, GetPlayerInvValue(index, invSlot) + mapValue);
+            msg = mapValue + " " + itemTemplate.Name;
         }
         else
         {
             // For non-stackable, always set to 1 regardless of map item value
-            SetInventoryValue(index, invSlot, 1);
-            msg = item.Name;
+            SetInvValue(index, invSlot, 1);
+            msg = itemTemplate.Name;
         }
 
         // Erase item from the map
@@ -316,7 +316,7 @@ public class Script
         _isPickingUp[index] = false;
     }
 
-    public void UnEquipItem(int index, int itemNum, int eqSlot, int invSlot)
+    public void UnEquipItem(int index, int item, int eqSlot, int invSlot)
     {
         // Prevent re-entrant unequip actions for this Player
         if (_isUnequippingItem[index])
@@ -325,9 +325,9 @@ public class Script
         _isUnequippingItem[index] = true;
         try
         {
-            SetInventory(index, invSlot, Server.Player.Instance[index].Paperdoll[eqSlot].Num);
+            SetInv(index, invSlot, Server.Player.Instance[index].Paperdoll[eqSlot].Num);
             Server.Player.Instance[index].Inventory[invSlot].Bound = Server.Player.Instance[index].Paperdoll[eqSlot].Bound;
-            SetInventoryValue(index, invSlot, 1);
+            SetInvValue(index, invSlot, 1);
 
             NetworkSend.SendPlayerMessage(index, "You unequip " + GameLogic.CheckGrammar(Item.Instance[GetPlayerPaperdoll(index, (Equipment)eqSlot)].Name), (int)ColorName.Yellow);
 
@@ -459,60 +459,61 @@ public class Script
         }
     }
 
-    private void CommonEvent(int index, int itemNum, int invNum, int skillNum = -1)
+    private void CommonEvent(int index, int item, int invNum, int skill = -1)
     {
-        if (skillNum >= 0)
+        if (skill >= 0)
         {
             TriggerCommonEvent(index,
-                Skill.Instance[skillNum].CommonEventType,
-                Skill.Instance[skillNum].CommonEventData1,
-                Skill.Instance[skillNum].CommonEventData2);
+                Skill.Instance[skill].CommonEventType,
+                Skill.Instance[skill].CommonEventData1,
+                Skill.Instance[skill].CommonEventData2);
         }
         else
         {
-            var item = Item.Instance[itemNum];
+            var itemId = item;
+            var itemTemplate = Item.Instance[itemId];
 
             // Key usage is tile-type driven (unlock/unblock the facing tile) rather than firing an event.
             // Handle both new and legacy item encodings.
             var triggerType = -1;
-            if (item.CommonEventType > 0)
+            if (itemTemplate.CommonEventType > 0)
             {
-                triggerType = item.CommonEventType - 1;
+                triggerType = itemTemplate.CommonEventType - 1;
             }
             else
             {
-                triggerType = item.SubType;
+                triggerType = itemTemplate.SubType;
             }
 
             if (triggerType == (byte)CommonEventTrigger.Key)
             {
-                TryUseKeyOnFacingTile(index, itemNum, invNum);
+                TryUseKeyOnFacingTile(index, itemId, invNum);
                 return;
             }
 
             // Items now use the same encoding as NPC/Skill/Resource editors:
             // 0 = none, 1..N = (CommonEventTrigger + 1).
             // Backward compatibility: older items stored trigger in SubType/Data1/Data2.
-            if (item.CommonEventType > 0)
+            if (itemTemplate.CommonEventType > 0)
             {
-                TriggerCommonEvent(index, item.CommonEventType, item.CommonEventData1, item.CommonEventData2);
+                TriggerCommonEvent(index, itemTemplate.CommonEventType, itemTemplate.CommonEventData1, itemTemplate.CommonEventData2);
                 return;
             }
 
             TriggerCommonEventRaw(index,
-                item.SubType,
-                item.Data1,
-                item.Data2);
+                itemTemplate.SubType,
+                itemTemplate.Data1,
+                itemTemplate.Data2);
         }
     }
 
     // Backward-compatible overload for existing call sites (e.g. skill-driven common events).
-    private void CommonEvent(int index, int itemNum, int skillNum = -1)
+    private void CommonEvent(int index, int item, int skill = -1)
     {
-        CommonEvent(index, itemNum, -1, skillNum);
+        CommonEvent(index, item, -1, skill);
     }
 
-    private static void TryUseKeyOnFacingTile(int playerId, int keyItemNum, int invNum)
+    private static void TryUseKeyOnFacingTile(int playerId, int key, int inv)
     {
         var map = GetPlayerMap(playerId);
         if (map < 0 || map >= Server.Map.Instance.Count)
@@ -569,10 +570,10 @@ public class Script
         tile.DirBlock = 0;
 
         // Consume the key only when it successfully unlocks something.
-        if (invNum >= 0)
+        if (inv >= 0)
         {
-            Server.Player.TakeInvSlot(playerId, invNum, 1);
-            NetworkSend.SendInventoryUpdate(playerId, invNum);
+            Server.Player.TakeInvSlot(playerId, inv, 1);
+            NetworkSend.SendInventoryUpdate(playerId, inv);
         }
 
         // Broadcast updated map so clients see the tile become unblocked/open.
@@ -742,8 +743,8 @@ public class Script
             if (tempItem >= 0)
             {
                 m = FindOpenInvSlot(index, tempItem);
-                SetInventory(index, m, tempItem);
-                SetInventoryValue(index, m, 1);
+                SetInv(index, m, tempItem);
+                SetInvValue(index, m, 1);
             }
             NetworkSend.SendWornEquipment(index);
             NetworkSend.SendMapEquipment(index);
@@ -1473,10 +1474,10 @@ public class Script
         {
             // Acquire underlying map npc to set target persistent
             var map = target.Map;
-            var mapNpcIndex = target.Id;
-            if (map >= 0 && map < Core.Globals.Variables.MaxMaps && mapNpcIndex >= 0 && mapNpcIndex < Core.Globals.Variables.MaxMapNpcs)
+            var npc = target.Id;
+            if (map >= 0 && map < Core.Globals.Variables.MaxMaps && npc >= 0 && npc < Core.Globals.Variables.MaxMapNpcs)
             {
-                ref var baseNpc = ref MapNpc.Instance[map, mapNpcIndex];
+                ref var baseNpc = ref MapNpc.Instance[map, npc];
                 // Always switch target to the attacker on hit for snappy aggro behavior
                 if (attacker.Type == Entity.EntityType.Player)
                 {
@@ -2403,10 +2404,10 @@ public class Script
 
         for (int i = 0; i < entity.Paperdoll.Length; i++)
         {
-            var itemNum = entity.Paperdoll[i].Num;
-            if (itemNum >= 0 && itemNum < Item.Instance.Count)
+            var item = entity.Paperdoll[i].Num;
+            if (item >= 0 && item < Item.Instance.Count)
             {
-                total += Item.Instance[itemNum].Data2;
+                total += Item.Instance[item].Data2;
             }
         }
         return total + GetPlayerDefense(entity.Id);

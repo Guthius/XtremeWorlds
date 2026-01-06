@@ -2196,11 +2196,11 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             return;
 
         // has item?
-        if (GetPlayerInventory(session.Id, invSlot) < 0 || GetPlayerInventory(session.Id, invSlot) > Core.Globals.Variables.MaxItems)
+        if (GetPlayerInv(session.Id, invSlot) < 0 || GetPlayerInv(session.Id, invSlot) > Core.Globals.Variables.MaxItems)
             return;
 
         // seems to be valid
-        double item = GetPlayerInventory(session.Id, invSlot);
+        double item = GetPlayerInv(session.Id, invSlot);
         var shop = Data.TempPlayer[session.Id].InShop;
 
         if (shop < 0 || shop > Core.Globals.Variables.MaxShops)
@@ -2429,7 +2429,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             // target
             if (Data.TempPlayer[tradeTarget].TradeOffer[i].Num >= 0)
             {
-                item = GetPlayerInventory(tradeTarget, (int)Data.TempPlayer[tradeTarget].TradeOffer[i].Num);
+                item = GetPlayerInv(tradeTarget, (int)Data.TempPlayer[tradeTarget].TradeOffer[i].Num);
                 if (item >= 0)
                 {
                     // store temp
@@ -2524,13 +2524,13 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         if (invSlot < 0 | invSlot > Core.Globals.Variables.MaxInventory)
             return;
 
-        var item = GetPlayerInventory(session.Id, invSlot);
+        var item = GetPlayerInv(session.Id, invSlot);
 
         if (item < 0 || item > Core.Globals.Variables.MaxItems)
             return;
 
         // make sure they have the amount they offer
-        if (amount < 0 || amount > GetPlayerInventoryValue(session.Id, invSlot))
+        if (amount < 0 || amount > GetPlayerInvValue(session.Id, invSlot))
             return;
 
         if (PlayerBase.Instance[session.Id].Inventory[invSlot].Bound > 0)
@@ -2551,9 +2551,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
                     Data.TempPlayer[session.Id].TradeOffer[i].Value = Data.TempPlayer[session.Id].TradeOffer[i].Value + amount;
 
                     // clamp to limits
-                    if (Data.TempPlayer[session.Id].TradeOffer[i].Value > GetPlayerInventoryValue(session.Id, invSlot))
+                    if (Data.TempPlayer[session.Id].TradeOffer[i].Value > GetPlayerInvValue(session.Id, invSlot))
                     {
-                        Data.TempPlayer[session.Id].TradeOffer[i].Value = GetPlayerInventoryValue(session.Id, invSlot);
+                        Data.TempPlayer[session.Id].TradeOffer[i].Value = GetPlayerInvValue(session.Id, invSlot);
                     }
 
                     // cancel any trade agreement
@@ -3305,15 +3305,15 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             return;
         }
 
-        if (GetPlayerInventory(session.Id, inv) < 0 || GetPlayerInventory(session.Id, inv) > Core.Globals.Variables.MaxItems)
+        if (GetPlayerInv(session.Id, inv) < 0 || GetPlayerInv(session.Id, inv) > Core.Globals.Variables.MaxItems)
         {
             return;
         }
 
-        if (Item.Instance[GetPlayerInventory(session.Id, inv)].Type == (byte)ItemCategory.Currency ||
-            Item.Instance[GetPlayerInventory(session.Id, inv)].Stackable == 1)
+        if (Item.Instance[GetPlayerInv(session.Id, inv)].Type == (byte)ItemCategory.Currency ||
+            Item.Instance[GetPlayerInv(session.Id, inv)].Stackable == 1)
         {
-            if (amount < 0 | amount > GetPlayerInventoryValue(session.Id, inv))
+            if (amount < 0 | amount > GetPlayerInvValue(session.Id, inv))
             {
                 return;
             }

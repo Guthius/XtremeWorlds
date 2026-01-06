@@ -257,9 +257,9 @@ public static class Loop
         var mapCount = Math.Min(Variables.MaxMaps, Server.Map.Instance.Count);
         for (var map = 0; map < mapCount; map++)
         {
-            for (var mapItemNum = 0; mapItemNum < Variables.MaxMapItems; mapItemNum++)
+            for (var mapItem = 0; mapItem < Variables.MaxMapItems; mapItem++)
             {
-                MapItem.OnClear(mapItemNum, map);
+                MapItem.OnClear(mapItem, map);
             }
 
             MapItem.Spawn(map);

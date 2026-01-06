@@ -1517,11 +1517,11 @@ public class WindowManager
         {
             if (Data.TradeYourOffer[i].Num >= 0)
             {
-                long itemNum = GetPlayerInventory(GameState.MyIndex, Data.TradeYourOffer[i].Num);
-                if (itemNum >= 0 & itemNum < Core.Globals.Variables.MaxItems)
+                long item = GetPlayerInv(GameState.MyIndex, Data.TradeYourOffer[i].Num);
+                if (item >= 0 & item < Core.Globals.Variables.MaxItems)
                 {
-                    Item.OnStream((int)itemNum);
-                    long itemPic = Item.Instance[(int)itemNum].Icon;
+                    Item.OnStream((int)item);
+                    long itemPic = Item.Instance[(int)item].Icon;
 
                     if (itemPic > 0 & itemPic <= GameState.NumItems)
                     {
@@ -1583,11 +1583,11 @@ public class WindowManager
         // their items
         for (var i = 0; i < Variables.MaxInventory; i++)
         {
-            long itemNum = Data.TradeTheirOffer[i].Num;
-            if (itemNum >= 0 & itemNum < Core.Globals.Variables.MaxItems)
+            long item = Data.TradeTheirOffer[i].Num;
+            if (item >= 0 & item < Core.Globals.Variables.MaxItems)
             {
-                Item.OnStream((int)itemNum);
-                long itemPic = Item.Instance[(int)itemNum].Icon;
+                Item.OnStream((int)item);
+                long itemPic = Item.Instance[(int)item].Icon;
 
                 if (itemPic > 0 & itemPic <= GameState.NumItems)
                 {

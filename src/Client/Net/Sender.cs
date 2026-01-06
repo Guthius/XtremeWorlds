@@ -451,8 +451,8 @@ public static class Sender
             return;
         }
 
-        if (Item.Instance[GetPlayerInventory(GameState.MyIndex, invNum)].Type == (byte) ItemCategory.Currency ||
-            Item.Instance[GetPlayerInventory(GameState.MyIndex, invNum)].Stackable == 1)
+        if (Item.Instance[GetPlayerInv(GameState.MyIndex, invNum)].Type == (byte) ItemCategory.Currency ||
+            Item.Instance[GetPlayerInv(GameState.MyIndex, invNum)].Stackable == 1)
         {
             if (amount < 0 || amount > Player.Instance[GameState.MyIndex].Inventory[invNum].Value)
             {

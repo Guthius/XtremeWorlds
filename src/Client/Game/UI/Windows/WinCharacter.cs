@@ -77,15 +77,15 @@ public class WinCharacter
 
         for (var i = 0; i < EquipmentTypes.Length; i++)
         {
-            var itemNum = GetPlayerPaperdoll(GameState.MyIndex, EquipmentTypes[i]);
-            if (itemNum < 0)
+            var item = GetPlayerPaperdoll(GameState.MyIndex, EquipmentTypes[i]);
+            if (item < 0)
             {
                 continue;
             }
 
-            Item.OnStream(itemNum);
+            Item.OnStream(item);
 
-            var itemIcon = Item.Instance[itemNum].Icon;
+            var itemIcon = Item.Instance[item].Icon;
             if (itemIcon <= 0 || itemIcon >= GameState.NumItems)
             {
                 continue;

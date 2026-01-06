@@ -111,6 +111,10 @@ public class WinDragBox
                     DropOnInventory(targetWindow);
                     break;
 
+                case "winCharacter":
+                    DropOnCharacter(targetWindow);
+                    break;
+
                 case "winSkills":
                     DropOnSkills(targetWindow);
                     break;
@@ -174,7 +178,7 @@ public class WinDragBox
             case PartOrigin.Inventory:
                 if (WindowManager.DragBox.Type == DraggablePartType.Item)
                 {
-                    if (Item.Instance[GetPlayerInventory(GameState.MyIndex, WindowManager.DragBox.Slot)].Type != (byte) ItemCategory.Currency)
+                    if (Item.Instance[GetPlayerInv(GameState.MyIndex, WindowManager.DragBox.Slot)].Type != (byte) ItemCategory.Currency)
                     {
                         Sender.SendDepositItem(WindowManager.DragBox.Slot, 1);
                     }
@@ -274,6 +278,62 @@ public class WinDragBox
         }
     }
 
+    private static void DropOnCharacter(Window window)
+    {
+        if (WindowManager.DragBox.Origin != PartOrigin.Inventory ||
+            WindowManager.DragBox.Type != DraggablePartType.Item)
+        {
+            return;
+        }
+
+        var invSlot = WindowManager.DragBox.Slot;
+        if (invSlot < 0 || invSlot >= Variables.MaxInventory)
+        {
+            return;
+        }
+
+        var item = GetPlayerInv(GameState.MyIndex, invSlot);
+        if (item < 0 || item >= Item.Instance.Count)
+        {
+            return;
+        }
+
+        // Only allow drag->equip for equipment items. (Avoid accidentally consuming potions, etc.)
+        if (Item.Instance[item].Type != (byte)ItemCategory.Equipment)
+        {
+            return;
+        }
+
+        var equipmentCount = Enum.GetValues<Equipment>().Length;
+        for (var slot = 0; slot < equipmentCount; slot++)
+        {
+            Type.Rect rect;
+
+            rect.Top = window.Y + GameState.EqTop + (GameState.EqOffsetY + Constants.TileSize) * (slot / GameState.EqColumns);
+            rect.Bottom = rect.Top + Constants.TileSize;
+            rect.Left = window.X + GameState.EqLeft + (GameState.EqOffsetX + Constants.TileSize) * (slot % GameState.EqColumns);
+            rect.Right = rect.Left + Constants.TileSize;
+
+            if (GameState.CurMouseX < rect.Left ||
+                GameState.CurMouseX > rect.Right ||
+                GameState.CurMouseY < rect.Top ||
+                GameState.CurMouseY > rect.Bottom)
+            {
+                continue;
+            }
+
+            // Require the item subtype to match the equipment slot we dropped onto.
+            // The server will still validate, but this prevents confusing “nothing happens” drops.
+            if ((Equipment)Item.Instance[item].SubType != (Equipment)slot)
+            {
+                return;
+            }
+
+            Sender.SendUseItem(invSlot);
+            return;
+        }
+    }
+
     private static void DropOnHotBar(Window window)
     {
         if (WindowManager.DragBox.Origin == PartOrigin.None ||
@@ -326,9 +386,9 @@ public class WinDragBox
         switch (WindowManager.DragBox.Origin)
         {
             case PartOrigin.Inventory:
-                if (Item.Instance[GetPlayerInventory(GameState.MyIndex, WindowManager.DragBox.Slot)].Type != (byte) ItemCategory.Currency)
+                if (Item.Instance[GetPlayerInv(GameState.MyIndex, WindowManager.DragBox.Slot)].Type != (byte) ItemCategory.Currency)
                 {
-                    Sender.SendDropItem(WindowManager.DragBox.Slot, GetPlayerInventory(GameState.MyIndex, WindowManager.DragBox.Slot));
+                    Sender.SendDropItem(WindowManager.DragBox.Slot, GetPlayerInv(GameState.MyIndex, WindowManager.DragBox.Slot));
                 }
                 else
                 {

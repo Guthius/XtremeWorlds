@@ -1445,21 +1445,21 @@ namespace Client
             return -1;
         }
 
-        public static void ShowInvDesc(int x, int y, int invNum)
+        public static void ShowInvDesc(int x, int y, int inv)
         {
             // reserved for future use
 
-            if (invNum < 0L | invNum > Core.Globals.Variables.MaxInventory)
+            if (inv < 0L | inv > Core.Globals.Variables.MaxInventory)
                 return;
 
             // show
-            if (GetPlayerInventory(GameState.MyIndex, invNum) >= 0)
+            if (GetPlayerInv(GameState.MyIndex, inv) >= 0)
             {
-                ShowItemDesc(x, y, GetPlayerInventory(GameState.MyIndex, invNum), invNum);
+                ShowItemDesc(x, y, GetPlayerInv(GameState.MyIndex, inv), inv);
             }
         }
 
-        public static void ShowItemDesc(int x, int y, int itemNum, int invNum = -1, int eqNum = -1)
+        public static void ShowItemDesc(int x, int y, int iitem, int inv = -1, int eq = -1)
         {
             var color = default(Microsoft.Xna.Framework.Color);
             string theName;
@@ -1468,7 +1468,7 @@ namespace Client
 
             // set globals
             GameState.DescType = (byte)DraggablePartType.Item; // inventory
-            GameState.DescItem = itemNum;
+            GameState.DescItem = iitem;
 
             // set position (guard if UI not ready)
             if (WindowManager.TryGetWindow("winDescription", out var winDescription))
@@ -1496,29 +1496,29 @@ namespace Client
             // set variables
             {
                 var instance = WindowManager.GetWindowByName("winDescription");
-                if (invNum >= 0)
+                if (inv >= 0)
                 {
-                    if (Player.Instance[GameState.MyIndex].Inventory[invNum].Bound > 0)
-                        theName = "(SB) " + Item.Instance[(int)itemNum].Name;
+                    if (Player.Instance[GameState.MyIndex].Inventory[inv].Bound > 0)
+                        theName = "(SB) " + Item.Instance[(int)iitem].Name;
                     else
-                        theName = Item.Instance[(int)itemNum].Name;
+                        theName = Item.Instance[(int)iitem].Name;
 
 
                     if (WindowManager.TryGetControl("winDescription", "lblName", out var lblName)) lblName!.Text = theName;
                 }
 
-                if (eqNum >= 0)
+                if (eq >= 0)
                 {
-                    if (Player.Instance[GameState.MyIndex].Paperdoll[eqNum].Bound > 0)
-                        theName = "(SB) " + Item.Instance[(int)itemNum].Name;
+                    if (Player.Instance[GameState.MyIndex].Paperdoll[eq].Bound > 0)
+                        theName = "(SB) " + Item.Instance[(int)iitem].Name;
                     else
-                        theName = Item.Instance[(int)itemNum].Name;
+                        theName = Item.Instance[(int)iitem].Name;
 
 
                     if (WindowManager.TryGetControl("winDescription", "lblName", out var lblName)) lblName!.Text = theName;
                 }
 
-                switch (Item.Instance[(int)itemNum].Rarity)
+                switch (Item.Instance[(int)iitem].Rarity)
                 {
                     case 0: // white
                         {
@@ -1555,11 +1555,11 @@ namespace Client
                     lblName0!.Color = color;
 
                 // class req
-                if (Item.Instance[(int)itemNum].JobReq > 0)
+                if (Item.Instance[(int)iitem].JobReq > 0)
                 {
-                    jobName = Job.Instance[Item.Instance[(int)itemNum].JobReq].Name;
+                    jobName = Job.Instance[Item.Instance[(int)iitem].JobReq].Name;
                     // do we match it?
-                    if (GetPlayerJob(GameState.MyIndex) == Item.Instance[(int)itemNum].JobReq)
+                    if (GetPlayerJob(GameState.MyIndex) == Item.Instance[(int)iitem].JobReq)
                     {
                         color = Microsoft.Xna.Framework.Color.Green;
                     }
@@ -1581,11 +1581,11 @@ namespace Client
                 }
 
                 // level
-                if (Item.Instance[(int)itemNum].LevelReq > 0)
+                if (Item.Instance[(int)iitem].LevelReq > 0)
                 {
-                    levelTxt = "Level " + Item.Instance[(int)itemNum].LevelReq;
+                    levelTxt = "Level " + Item.Instance[(int)iitem].LevelReq;
                     // do we match it?
-                    if (GetPlayerLevel(GameState.MyIndex) >= Item.Instance[(int)itemNum].LevelReq)
+                    if (GetPlayerLevel(GameState.MyIndex) >= Item.Instance[(int)iitem].LevelReq)
                     {
                         color = Microsoft.Xna.Framework.Color.Green;
                     }
@@ -1609,11 +1609,11 @@ namespace Client
             GameState.Description = new Type.Text[2];
 
             // go through the rest of the text
-            switch (Item.Instance[(int)itemNum].Type)
+            switch (Item.Instance[(int)iitem].Type)
             {
                 case (byte)ItemCategory.Equipment:
                     {
-                        switch ((Equipment)Item.Instance[(int)itemNum].SubType)
+                        switch ((Equipment)Item.Instance[(int)iitem].SubType)
                         {
                             case Equipment.Weapon:
                                 AddDescInfo("Weapon", Microsoft.Xna.Framework.Color.White);
@@ -1657,109 +1657,109 @@ namespace Client
             }
 
             // more info
-            switch (Item.Instance[(int)itemNum].Type)
+            switch (Item.Instance[(int)iitem].Type)
             {
                 case (byte)ItemCategory.Currency:
                     {
                         // binding
-                        if (Item.Instance[(int)itemNum].BindType == 1)
+                        if (Item.Instance[(int)iitem].BindType == 1)
                         {
                             AddDescInfo("Bind on Pickup", Microsoft.Xna.Framework.Color.White);
                         }
-                        else if (Item.Instance[(int)itemNum].BindType == 2)
+                        else if (Item.Instance[(int)iitem].BindType == 2)
                         {
                             AddDescInfo("Bind on Equip", Microsoft.Xna.Framework.Color.White);
                         }
 
-                        AddDescInfo("Value: " + Item.Instance[(int)itemNum].Price + " g", Microsoft.Xna.Framework.Color.Yellow);
+                        AddDescInfo("Value: " + Item.Instance[(int)iitem].Price + " g", Microsoft.Xna.Framework.Color.Yellow);
                         break;
                     }
                 case (byte)ItemCategory.Equipment:
                     {
                         // Damage/defense
-                        if (Item.Instance[(int)itemNum].SubType == (byte)Equipment.Weapon)
+                        if (Item.Instance[(int)iitem].SubType == (byte)Equipment.Weapon)
                         {
-                            AddDescInfo("Damage: " + Item.Instance[(int)itemNum].Data2, Microsoft.Xna.Framework.Color.White);
-                            AddDescInfo("Speed: " + Item.Instance[(int)itemNum].Speed / 1000d + "s", Microsoft.Xna.Framework.Color.White);
+                            AddDescInfo("Damage: " + Item.Instance[(int)iitem].Data2, Microsoft.Xna.Framework.Color.White);
+                            AddDescInfo("Speed: " + Item.Instance[(int)iitem].Speed / 1000d + "s", Microsoft.Xna.Framework.Color.White);
                         }
-                        else if (Item.Instance[(int)itemNum].Data2 > 0)
+                        else if (Item.Instance[(int)iitem].Data2 > 0)
                         {
-                            AddDescInfo("Defense: " + Item.Instance[(int)itemNum].Data2, Microsoft.Xna.Framework.Color.White);
+                            AddDescInfo("Defense: " + Item.Instance[(int)iitem].Data2, Microsoft.Xna.Framework.Color.White);
                         }
 
                         // binding
-                        if (Item.Instance[(int)itemNum].BindType == 1)
+                        if (Item.Instance[(int)iitem].BindType == 1)
                         {
                             AddDescInfo("Bind on Pickup", Microsoft.Xna.Framework.Color.White);
                         }
-                        else if (Item.Instance[(int)itemNum].BindType == 2)
+                        else if (Item.Instance[(int)iitem].BindType == 2)
                         {
                             AddDescInfo("Bind on Equip", Microsoft.Xna.Framework.Color.White);
                         }
 
-                        AddDescInfo("Value: " + Item.Instance[(int)itemNum].Price + " G", Microsoft.Xna.Framework.Color.Yellow);
+                        AddDescInfo("Value: " + Item.Instance[(int)iitem].Price + " G", Microsoft.Xna.Framework.Color.Yellow);
 
                         // stat bonuses
-                        if (Item.Instance[(int)itemNum].AddStat[(int)Stat.Strength] > 0)
+                        if (Item.Instance[(int)iitem].AddStat[(int)Stat.Strength] > 0)
                         {
-                            AddDescInfo("+" + Item.Instance[(int)itemNum].AddStat[(int)Stat.Strength] + " Str", Microsoft.Xna.Framework.Color.White);
+                            AddDescInfo("+" + Item.Instance[(int)iitem].AddStat[(int)Stat.Strength] + " Str", Microsoft.Xna.Framework.Color.White);
                         }
 
-                        if (Item.Instance[(int)itemNum].AddStat[(int)Stat.Luck] > 0)
+                        if (Item.Instance[(int)iitem].AddStat[(int)Stat.Luck] > 0)
                         {
-                            AddDescInfo("+" + Item.Instance[(int)itemNum].AddStat[(int)Stat.Luck] + " End", Microsoft.Xna.Framework.Color.White);
+                            AddDescInfo("+" + Item.Instance[(int)iitem].AddStat[(int)Stat.Luck] + " End", Microsoft.Xna.Framework.Color.White);
                         }
 
-                        if (Item.Instance[(int)itemNum].AddStat[(int)Stat.Spirit] > 0)
+                        if (Item.Instance[(int)iitem].AddStat[(int)Stat.Spirit] > 0)
                         {
-                            AddDescInfo("+" + Item.Instance[(int)itemNum].AddStat[(int)Stat.Spirit] + " Spi", Microsoft.Xna.Framework.Color.White);
+                            AddDescInfo("+" + Item.Instance[(int)iitem].AddStat[(int)Stat.Spirit] + " Spi", Microsoft.Xna.Framework.Color.White);
                         }
 
-                        if (Item.Instance[(int)itemNum].AddStat[(int)Stat.Luck] > 0)
+                        if (Item.Instance[(int)iitem].AddStat[(int)Stat.Luck] > 0)
                         {
-                            AddDescInfo("+" + Item.Instance[(int)itemNum].AddStat[(int)Stat.Luck] + " Luc", Microsoft.Xna.Framework.Color.White);
+                            AddDescInfo("+" + Item.Instance[(int)iitem].AddStat[(int)Stat.Luck] + " Luc", Microsoft.Xna.Framework.Color.White);
                         }
 
-                        if (Item.Instance[(int)itemNum].AddStat[(int)Stat.Intelligence] > 0)
+                        if (Item.Instance[(int)iitem].AddStat[(int)Stat.Intelligence] > 0)
                         {
-                            AddDescInfo("+" + Item.Instance[(int)itemNum].AddStat[(int)Stat.Intelligence] + " Int", Microsoft.Xna.Framework.Color.White);
+                            AddDescInfo("+" + Item.Instance[(int)iitem].AddStat[(int)Stat.Intelligence] + " Int", Microsoft.Xna.Framework.Color.White);
                         }
 
                         break;
                     }
                 case (byte)ItemCategory.Consumable:
                     {
-                        if (Item.Instance[(int)itemNum].AddStat[(int)Stat.Strength] > 0)
+                        if (Item.Instance[(int)iitem].AddStat[(int)Stat.Strength] > 0)
                         {
-                            AddDescInfo("+" + Item.Instance[(int)itemNum].AddStat[(int)Stat.Strength] + " Str", Microsoft.Xna.Framework.Color.White);
+                            AddDescInfo("+" + Item.Instance[(int)iitem].AddStat[(int)Stat.Strength] + " Str", Microsoft.Xna.Framework.Color.White);
                         }
 
-                        if (Item.Instance[(int)itemNum].AddStat[(int)Stat.Luck] > 0)
+                        if (Item.Instance[(int)iitem].AddStat[(int)Stat.Luck] > 0)
                         {
-                            AddDescInfo("+" + Item.Instance[(int)itemNum].AddStat[(int)Stat.Luck] + " End", Microsoft.Xna.Framework.Color.White);
+                            AddDescInfo("+" + Item.Instance[(int)iitem].AddStat[(int)Stat.Luck] + " End", Microsoft.Xna.Framework.Color.White);
                         }
 
-                        if (Item.Instance[(int)itemNum].AddStat[(int)Stat.Spirit] > 0)
+                        if (Item.Instance[(int)iitem].AddStat[(int)Stat.Spirit] > 0)
                         {
-                            AddDescInfo("+" + Item.Instance[(int)itemNum].AddStat[(int)Stat.Spirit] + " Spi", Microsoft.Xna.Framework.Color.White);
+                            AddDescInfo("+" + Item.Instance[(int)iitem].AddStat[(int)Stat.Spirit] + " Spi", Microsoft.Xna.Framework.Color.White);
                         }
 
-                        if (Item.Instance[(int)itemNum].AddStat[(int)Stat.Luck] > 0)
+                        if (Item.Instance[(int)iitem].AddStat[(int)Stat.Luck] > 0)
                         {
-                            AddDescInfo("+" + Item.Instance[(int)itemNum].AddStat[(int)Stat.Luck] + " Luc", Microsoft.Xna.Framework.Color.White);
+                            AddDescInfo("+" + Item.Instance[(int)iitem].AddStat[(int)Stat.Luck] + " Luc", Microsoft.Xna.Framework.Color.White);
                         }
 
-                        if (Item.Instance[(int)itemNum].AddStat[(int)Stat.Intelligence] > 0)
+                        if (Item.Instance[(int)iitem].AddStat[(int)Stat.Intelligence] > 0)
                         {
-                            AddDescInfo("+" + Item.Instance[(int)itemNum].AddStat[(int)Stat.Intelligence] + " Int", Microsoft.Xna.Framework.Color.White);
+                            AddDescInfo("+" + Item.Instance[(int)iitem].AddStat[(int)Stat.Intelligence] + " Int", Microsoft.Xna.Framework.Color.White);
                         }
 
-                        AddDescInfo("Value: " + Item.Instance[(int)itemNum].Price + " G", Microsoft.Xna.Framework.Color.Yellow);
+                        AddDescInfo("Value: " + Item.Instance[(int)iitem].Price + " G", Microsoft.Xna.Framework.Color.Yellow);
                         break;
                     }
                 case (byte)ItemCategory.Skill:
                     {
-                        AddDescInfo("Value: " + Item.Instance[(int)itemNum].Price + " G", Microsoft.Xna.Framework.Color.Yellow);
+                        AddDescInfo("Value: " + Item.Instance[(int)iitem].Price + " G", Microsoft.Xna.Framework.Color.Yellow);
                         break;
                     }
             }
@@ -1919,12 +1919,13 @@ namespace Client
             }
         }
 
-        public static void ShowShopDesc(int x, int y, int itemNum)
+        public static void ShowShopDesc(int x, int y, int item)
         {
-            if (itemNum < 0L | itemNum > Core.Globals.Variables.MaxItems)
+            if (item < 0L | item > Core.Globals.Variables.MaxItems)
                 return;
+
             // show
-            ShowItemDesc(x, y, itemNum);
+            ShowItemDesc(x, y, item);
         }
 
         public static void ShowEqDesc(int x, int y, long eqNum)
@@ -2167,9 +2168,9 @@ namespace Client
 
             for (i = 0L; i < Variables.MaxInventory; i++)
             {
-                if (GetPlayerInventory(GameState.MyIndex, (int)i) == 1)
+                if (GetPlayerInv(GameState.MyIndex, (int)i) == 1)
                 {
-                    amount = GetPlayerInventoryValue(GameState.MyIndex, (int)i);
+                    amount = GetPlayerInvValue(GameState.MyIndex, (int)i);
                 }
             }
             WindowManager.Windows[WindowManager.GetWindow("winShop")].Controls[WindowManager.GetControl("winShop", "lblGold")].Text = Strings.Format(amount, "#,###,###,###") + "g";

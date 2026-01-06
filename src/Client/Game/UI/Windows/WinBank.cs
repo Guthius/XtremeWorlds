@@ -56,13 +56,13 @@ public class WinBank
 
         for (var slot = 0; slot < Variables.MaxBank; slot++)
         {
-            var itemNum = GetBank(GameState.MyIndex, slot);
-            if (itemNum < 0 || itemNum >= Core.Globals.Variables.MaxItems)
+            var item = GetBank(GameState.MyIndex, slot);
+            if (item < 0 || item >= Core.Globals.Variables.MaxItems)
             {
                 continue;
             }
 
-            Item.OnStream(itemNum);
+            Item.OnStream(item);
 
             if (WindowManager.DragBox.Origin == PartOrigin.Bank &&
                 WindowManager.DragBox.Slot == slot)
@@ -70,7 +70,7 @@ public class WinBank
                 continue;
             }
 
-            var itemIcon = Item.Instance[itemNum].Icon;
+            var itemIcon = Item.Instance[item].Icon;
             if (itemIcon <= 0 || itemIcon > GameState.NumItems)
             {
                 continue;

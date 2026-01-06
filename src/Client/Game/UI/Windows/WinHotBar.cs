@@ -191,16 +191,16 @@ public class WinHotBar
 
     private static void DrawInventorySlot(int slot, int x, int y)
     {
-        var itemNum = Player.Instance[GameState.MyIndex].Hotbar[slot].Slot;
+        var item = Player.Instance[GameState.MyIndex].Hotbar[slot].Slot;
 
-        Item.OnStream(itemNum);
+        Item.OnStream(item);
 
-        if (Item.Instance[itemNum].Name.Length <= 0 || Item.Instance[itemNum].Icon <= 0)
+        if (Item.Instance[item].Name.Length <= 0 || Item.Instance[item].Icon <= 0)
         {
             return;
         }
 
-        var path = Path.Combine(DataPath.Items, Item.Instance[itemNum].Icon.ToString());
+        var path = Path.Combine(DataPath.Items, Item.Instance[item].Icon.ToString());
 
         GameClient.RenderTexture(ref path, x, y, 0, 0, 32, 32, 32, 32);
     }

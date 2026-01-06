@@ -13,7 +13,7 @@ namespace Client
     {
         public static MapItemData[] Instance { get; } = new MapItemData[Variables.MaxMapItems];
 
-        public static void OnDraw(int itemNum)
+        public static void OnDraw(int item)
         {
             Rectangle srcRec;
             Rectangle destRec;
@@ -21,21 +21,21 @@ namespace Client
             int x;
             int y;
 
-            if (MapItem.Instance[itemNum].Num < 0 | MapItem.Instance[itemNum].Num > Core.Globals.Variables.MaxItems)
+            if (MapItem.Instance[item].Num < 0 | MapItem.Instance[item].Num > Core.Globals.Variables.MaxItems)
                 return;
 
-            Item.OnStream(MapItem.Instance[itemNum].Num);
+            Item.OnStream(MapItem.Instance[item].Num);
 
             // Item data may not be loaded yet; wait for streaming to populate before drawing.
-            if (Item.Instance.Count <= MapItem.Instance[itemNum].Num)
+            if (Item.Instance.Count <= MapItem.Instance[item].Num)
                 return;
 
-            icon = Item.Instance[MapItem.Instance[itemNum].Num].Icon;
+            icon = Item.Instance[MapItem.Instance[item].Num].Icon;
 
             if (icon < 1 | icon > GameState.NumItems)
                 return;
 
-            ref var instance = ref MapItem.Instance[itemNum];
+            ref var instance = ref MapItem.Instance[item];
 
             if (Math.Floor((double) instance.X / Constants.TileSize) < GameState.TileView.Left | Math.Floor((double) instance.X / Constants.TileSize) > GameState.TileView.Right)
                 return;
@@ -44,11 +44,11 @@ namespace Client
                 return;
 
             srcRec = new Rectangle(0, 0, Constants.TileSize, Constants.TileSize);
-            destRec = new Rectangle(GameLogic.ConvertMapX(MapItem.Instance[itemNum].X),
-                GameLogic.ConvertMapY(MapItem.Instance[itemNum].Y), Constants.TileSize, Constants.TileSize);
+            destRec = new Rectangle(GameLogic.ConvertMapX(MapItem.Instance[item].X),
+                GameLogic.ConvertMapY(MapItem.Instance[item].Y), Constants.TileSize, Constants.TileSize);
 
-            x = GameLogic.ConvertMapX(MapItem.Instance[itemNum].X);
-            y = GameLogic.ConvertMapY(MapItem.Instance[itemNum].Y);
+            x = GameLogic.ConvertMapX(MapItem.Instance[item].X);
+            y = GameLogic.ConvertMapY(MapItem.Instance[item].Y);
 
             string argPath = System.IO.Path.Combine(Core.Globals.DataPath.Items, icon.ToString());
             GameClient.RenderTexture(ref argPath, x, y, srcRec.X, srcRec.Y, srcRec.Width, srcRec.Height, srcRec.Width,

@@ -283,8 +283,8 @@ public static class NetworkSend
 
         for (var i = 0; i < Core.Globals.Variables.MaxInventory; i++)
         {
-            packetWriter.WriteInt32(GetPlayerInventory(playerId, i));
-            packetWriter.WriteInt32(GetPlayerInventoryValue(playerId, i));
+            packetWriter.WriteInt32(GetPlayerInv(playerId, i));
+            packetWriter.WriteInt32(GetPlayerInvValue(playerId, i));
         }
 
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
@@ -1007,8 +1007,8 @@ public static class NetworkSend
 
         packetWriter.WriteEnum(ServerPackets.SInventoryUpdate);
         packetWriter.WriteInt32(invSlot);
-        packetWriter.WriteInt32(GetPlayerInventory(playerId, invSlot));
-        packetWriter.WriteInt32(GetPlayerInventoryValue(playerId, invSlot));
+        packetWriter.WriteInt32(GetPlayerInv(playerId, invSlot));
+        packetWriter.WriteInt32(GetPlayerInvValue(playerId, invSlot));
 
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
     }
@@ -1097,11 +1097,11 @@ public static class NetworkSend
 
                             if (Item.Instance[Data.TempPlayer[playerId].TradeOffer[i].Num].Type == (int)ItemCategory.Currency || Item.Instance[Data.TempPlayer[playerId].TradeOffer[i].Num].Stackable == 1)
                             {
-                                totalWorth += Item.Instance[GetPlayerInventory(playerId, Data.TempPlayer[playerId].TradeOffer[i].Num)].Price * Data.TempPlayer[playerId].TradeOffer[i].Value;
+                                totalWorth += Item.Instance[GetPlayerInv(playerId, Data.TempPlayer[playerId].TradeOffer[i].Num)].Price * Data.TempPlayer[playerId].TradeOffer[i].Value;
                             }
                             else
                             {
-                                totalWorth += Item.Instance[GetPlayerInventory(playerId, Data.TempPlayer[playerId].TradeOffer[i].Num)].Price;
+                                totalWorth += Item.Instance[GetPlayerInv(playerId, Data.TempPlayer[playerId].TradeOffer[i].Num)].Price;
                             }
                         }
                         else
@@ -1121,21 +1121,21 @@ public static class NetworkSend
                     {
                         if (Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num >= 0)
                         {
-                            packetWriter.WriteInt32(GetPlayerInventory((int)tradeTarget, Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num));
+                            packetWriter.WriteInt32(GetPlayerInv((int)tradeTarget, Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num));
                             packetWriter.WriteInt32(Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Value);
 
-                            if (GetPlayerInventory((int)tradeTarget, Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num) < 0)
+                            if (GetPlayerInv((int)tradeTarget, Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num) < 0)
                             {
                                 continue;
                             }
 
-                            if (Item.Instance[GetPlayerInventory((int)tradeTarget, Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num)].Type == (int)ItemCategory.Currency || Item.Instance[GetPlayerInventory((int)tradeTarget, Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num)].Stackable == 1)
+                            if (Item.Instance[GetPlayerInv((int)tradeTarget, Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num)].Type == (int)ItemCategory.Currency || Item.Instance[GetPlayerInv((int)tradeTarget, Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num)].Stackable == 1)
                             {
-                                totalWorth += Item.Instance[GetPlayerInventory((int)tradeTarget, Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num)].Price * Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Value;
+                                totalWorth += Item.Instance[GetPlayerInv((int)tradeTarget, Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num)].Price * Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Value;
                             }
                             else
                             {
-                                totalWorth += Item.Instance[GetPlayerInventory((int)tradeTarget, Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num)].Price;
+                                totalWorth += Item.Instance[GetPlayerInv((int)tradeTarget, Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num)].Price;
                             }
                         }
                         else
@@ -1372,6 +1372,7 @@ public static class NetworkSend
         packet.WriteBoolean(moral.CanCast);
         packet.WriteBoolean(moral.CanDropItem);
         packet.WriteBoolean(moral.CanPickupItem);
+        packet.WriteBoolean(moral.CanUseItem);
         packet.WriteBoolean(moral.CanPk);
         packet.WriteBoolean(moral.DropItems);
         packet.WriteBoolean(moral.LoseExp);

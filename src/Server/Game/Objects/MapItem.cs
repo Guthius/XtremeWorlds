@@ -47,47 +47,47 @@ namespace Server
                 {
                     if (Server.Map.Instance[map].Tile[x, y].Type == TileType.Item)
                     {
-                        var itemNum = Server.Map.Instance[map].Tile[x, y].Data1;
-                        if (itemNum < 0 || itemNum >= items.Count)
+                        var itemId = Server.Map.Instance[map].Tile[x, y].Data1;
+                        if (itemId < 0 || itemId >= items.Count)
                         {
                             continue;
                         }
 
-                        var item = items[itemNum];
+                        var itemTemplate = items[itemId];
 
-                        if (item.Type == (byte)ItemCategory.Currency ||
-                            item.Stackable == 1)
+                        if (itemTemplate.Type == (byte)ItemCategory.Currency ||
+                            itemTemplate.Stackable == 1)
                         {
                             var value = Server.Map.Instance[map].Tile[x, y].Data2 < 1 ? 1 : Server.Map.Instance[map].Tile[x, y].Data2;
 
-                            OnSpawn(itemNum, value, map, x, y);
+                            OnSpawn(itemId, value, map, x, y);
                         }
                         else
                         {
-                            OnSpawn(itemNum, Server.Map.Instance[map].Tile[x, y].Data2, map, x, y);
+                            OnSpawn(itemId, Server.Map.Instance[map].Tile[x, y].Data2, map, x, y);
                         }
                     }
 
                     if (Server.Map.Instance[map].Tile[x, y].Type2 == TileType.Item)
                     {
-                        var itemNum = Server.Map.Instance[map].Tile[x, y].Data1_2;
-                        if (itemNum < 0 || itemNum >= items.Count)
+                        var itemId = Server.Map.Instance[map].Tile[x, y].Data1_2;
+                        if (itemId < 0 || itemId >= items.Count)
                         {
                             continue;
                         }
 
-                        var item = items[itemNum];
+                        var itemTemplate = items[itemId];
 
-                        if (item.Type == (byte)ItemCategory.Currency ||
-                            item.Stackable == 1)
+                        if (itemTemplate.Type == (byte)ItemCategory.Currency ||
+                            itemTemplate.Stackable == 1)
                         {
                             var value = Server.Map.Instance[map].Tile[x, y].Data2_2 < 1 ? 1 : Server.Map.Instance[map].Tile[x, y].Data2_2;
 
-                            OnSpawn(itemNum, value, map, x, y);
+                            OnSpawn(itemId, value, map, x, y);
                         }
                         else
                         {
-                            OnSpawn(itemNum, Server.Map.Instance[map].Tile[x, y].Data2_2, map, x, y);
+                            OnSpawn(itemId, Server.Map.Instance[map].Tile[x, y].Data2_2, map, x, y);
                         }
                     }
                 }
@@ -95,19 +95,19 @@ namespace Server
         }
 
 
-        public static void OnSpawn(int itemNum, int itemVal, int map, int x, int y)
+        public static void OnSpawn(int id, int val, int map, int x, int y)
         {
-            if (itemNum < 0 || itemNum >= Core.Globals.Variables.MaxItems || map < 0 || map >= Core.Globals.Variables.MaxMaps)
+            if (id < 0 || id >= Core.Globals.Variables.MaxItems || map < 0 || map >= Core.Globals.Variables.MaxMaps)
             {
                 return;
             }
 
-            if (itemNum >= Item.Instance.Count)
+            if (id >= Item.Instance.Count)
             {
                 return;
             }
 
-            var item = Item.Instance[itemNum];
+            var item = Item.Instance[id];
 
             var slot = FindOpenSlot(map);
             if (slot == -1)
@@ -117,7 +117,7 @@ namespace Server
 
             if (item.Type != (byte)ItemCategory.Currency && item.Stackable != 1)
             {
-                for (var i = 0; i < itemVal; i++)
+                for (var i = 0; i < val; i++)
                 {
                     slot = FindOpenSlot(map);
                     if (slot == -1)
@@ -125,12 +125,12 @@ namespace Server
                         return;
                     }
 
-                    SpawnSlot(slot, itemNum, 1, map, x, y);
+                    SpawnSlot(slot, id, 1, map, x, y);
                 }
             }
             else
             {
-                SpawnSlot(slot, itemNum, itemVal, map, x, y);
+                SpawnSlot(slot, id, val, map, x, y);
             }
 
             try
@@ -143,9 +143,9 @@ namespace Server
             }
         }
 
-        public static void SpawnSlot(int mapItemSlot, int itemNum, int itemVal, int map, int x, int y)
+        public static void SpawnSlot(int mapItemSlot, int id, int val, int map, int x, int y)
         {
-            if (mapItemSlot < 0 || mapItemSlot > Core.Globals.Variables.MaxMapItems || itemNum < 0 || itemNum > Core.Globals.Variables.MaxItems || map < 0 || map >= Core.Globals.Variables.MaxMaps)
+            if (mapItemSlot < 0 || mapItemSlot > Core.Globals.Variables.MaxMapItems || id < 0 || id > Core.Globals.Variables.MaxItems || map < 0 || map >= Core.Globals.Variables.MaxMaps)
             {
                 return;
             }
@@ -153,8 +153,8 @@ namespace Server
             x *= 32;
             y *= 32;
 
-            Instance[map, mapItemSlot].Num = itemNum;
-            Instance[map, mapItemSlot].Value = itemVal;
+            Instance[map, mapItemSlot].Num = id;
+            Instance[map, mapItemSlot].Value = val;
             Instance[map, mapItemSlot].X = x;
             Instance[map, mapItemSlot].Y = y;
 
@@ -162,8 +162,8 @@ namespace Server
 
             packet.WriteEnum(ServerPackets.SSpawnItem);
             packet.WriteInt32(mapItemSlot);
-            packet.WriteInt32(itemNum);
-            packet.WriteInt32(itemVal);
+            packet.WriteInt32(id);
+            packet.WriteInt32(val);
             packet.WriteInt32(x);
             packet.WriteInt32(y);
 
@@ -177,11 +177,11 @@ namespace Server
                 return -1;
             }
 
-            for (var mapItemNum = 0; mapItemNum < Core.Globals.Variables.MaxMapItems; mapItemNum++)
+            for (var mapItem = 0; mapItem < Core.Globals.Variables.MaxMapItems; mapItem++)
             {
-                if (Instance[map, mapItemNum].Num == -1)
+                if (Instance[map, mapItem].Num == -1)
                 {
-                    return mapItemNum;
+                    return mapItem;
                 }
             }
 

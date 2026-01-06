@@ -34,7 +34,7 @@ public static class Commands
         return PlayerBase.Instance[index].Name ?? string.Empty;
     }
 
-    public static int GetPlayerInventoryValue(int index, int invslot)
+    public static int GetPlayerInvValue(int index, int invslot)
     {
         if (!ValidPlayerIndex(index)) return 0;
         var p = PlayerBase.Instance[index];
@@ -293,7 +293,7 @@ public static class Commands
         PlayerBase.Instance[index].Map = map;
     }
 
-    public static int GetPlayerInventory(int index, int invslot)
+    public static int GetPlayerInv(int index, int invslot)
     {
         if (!ValidPlayerIndex(index)) return -1;
         var p = PlayerBase.Instance[index];
@@ -330,20 +330,20 @@ public static class Commands
         p.Stat[si] = (byte)value;
     }
 
-    public static void SetInventory(int index, int invSlot, int itemNum)
+    public static void SetInv(int index, int invSlot, int item)
     {
         if (!ValidPlayerIndex(index)) return;
         var p = PlayerBase.Instance[index];
         if (p.Inventory == null || invSlot < 0 || invSlot >= p.Inventory.Length) return;
-        p.Inventory[invSlot].Num = itemNum;
+        p.Inventory[invSlot].Num = item;
     }
 
-    public static void SetInventoryValue(int index, int invslot, int itemValue)
+    public static void SetInvValue(int index, int invSlot, int value)
     {
         if (!ValidPlayerIndex(index)) return;
         var p = PlayerBase.Instance[index];
-        if (p.Inventory == null || invslot < 0 || invslot >= p.Inventory.Length) return;
-        p.Inventory[invslot].Value = itemValue;
+        if (p.Inventory == null || invSlot < 0 || invSlot >= p.Inventory.Length) return;
+        p.Inventory[invSlot].Value = value;
     }
 
     public static void SetPlayerAccess(int index, byte access)
@@ -396,13 +396,13 @@ public static class Commands
         PlayerBase.Instance[index].Dir = (byte)dir;
     }
 
-    public static void SetPlayerPaperdoll(int index, int itemNum, Equipment equipmentSlot)
+    public static void SetPlayerPaperdoll(int index, int item, Equipment equipmentSlot)
     {
         if (!ValidPlayerIndex(index)) return;
         var p = PlayerBase.Instance[index];
         var es = (int)equipmentSlot;
         if (p.Paperdoll == null || es < 0 || es >= p.Paperdoll.Length) return;
-        p.Paperdoll[es].Num = itemNum;
+        p.Paperdoll[es].Num = item;
     }
 
     public static string IsEditorLocked(int index, EditorType id)
@@ -475,12 +475,12 @@ public static class Commands
         return b.Item[bankslot].Num;
     }
 
-    public static void SetBank(int index, byte bankSlot, int itemNum)
+    public static void SetBank(int index, byte bankSlot, int item)
     {
         if (Bank.Instance == null || index < 0 || index >= Bank.Instance.Count) return;
         var b = Bank.Instance[index];
         if (b.Item == null || bankSlot < 0 || bankSlot >= b.Item.Length) return;
-        b.Item[bankSlot].Num = itemNum;
+        b.Item[bankSlot].Num = item;
     }
 
     public static int GetBankValue(int index, int bankSlot)

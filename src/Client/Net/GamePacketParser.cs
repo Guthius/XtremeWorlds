@@ -463,8 +463,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             // Guard against invalid indices
             if (i >= 0 && i < Variables.MaxInventory && GameState.MyIndex >= 0)
             {
-                SetInventory(GameState.MyIndex, i, item);
-                SetInventoryValue(GameState.MyIndex, i, amount);
+                SetInv(GameState.MyIndex, i, item);
+                SetInvValue(GameState.MyIndex, i, amount);
             }
         }
 
@@ -475,13 +475,13 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     {
         var packetReader = new PacketReader(data);
         var invSlot = packetReader.ReadInt32();
-        var itemNum = packetReader.ReadInt32();
+        var item = packetReader.ReadInt32();
         var amount = packetReader.ReadInt32();
 
         if (invSlot >= 0 && invSlot < Variables.MaxInventory && GameState.MyIndex >= 0)
         {
-            SetInventory(GameState.MyIndex, invSlot, itemNum);
-            SetInventoryValue(GameState.MyIndex, invSlot, amount);
+            SetInv(GameState.MyIndex, invSlot, item);
+            SetInvValue(GameState.MyIndex, invSlot, amount);
         }
 
         GameLogic.SetGoldLabel();
@@ -494,10 +494,10 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         for (var i = 0; i < equipmentCount; i++)
         {
-            var itemNum = packetReader.ReadInt32();
+            var item = packetReader.ReadInt32();
 
-            SetPlayerPaperdoll(GameState.MyIndex, itemNum, (Equipment)i);
-            Item.OnStream(itemNum);
+            SetPlayerPaperdoll(GameState.MyIndex, item, (Equipment)i);
+            Item.OnStream(item);
         }
     }
 
@@ -596,9 +596,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     private static void Packet_SpawnItem(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
-        var mapItemNum = packetReader.ReadInt32();
+        var item = packetReader.ReadInt32();
 
-        ref var mapItem = ref MapItem.Instance[mapItemNum];
+        ref var mapItem = ref MapItem.Instance[item];
 
         mapItem.Num = packetReader.ReadInt32();
         mapItem.Value = packetReader.ReadInt32();
@@ -935,9 +935,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         for (var i = 0; i < equipmentCount; i++)
         {
-            var itemNum = packetReader.ReadInt32();
+            var item = packetReader.ReadInt32();
 
-            SetPlayerPaperdoll(player, itemNum, (Equipment) i);
+            SetPlayerPaperdoll(player, item, (Equipment) i);
         }
     }
 
@@ -1125,6 +1125,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         moral.CanCast = packetReader.ReadBoolean();
         moral.CanDropItem = packetReader.ReadBoolean();
         moral.CanPickupItem = packetReader.ReadBoolean();
+        moral.CanUseItem = packetReader.ReadBoolean();
         moral.CanPk = packetReader.ReadBoolean();
         moral.DropItems = packetReader.ReadBoolean();
         moral.LoseExp = packetReader.ReadBoolean();

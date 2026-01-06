@@ -172,7 +172,7 @@ public class WinShop
         {
             if (GameState.ShopIsSelling)
             {
-                if (GetPlayerInventory(GameState.MyIndex, slot) >= 0)
+                if (GetPlayerInv(GameState.MyIndex, slot) >= 0)
                 {
                     GameState.ShopSelectedSlot = slot;
 
@@ -227,16 +227,16 @@ public class WinShop
 
         var y = winShop.Y - 6;
 
-        var itemNum = !GameState.ShopIsSelling
+        var item = !GameState.ShopIsSelling
             ? Shop.Instance[GameState.InShop].TradeItem[slot].Item
-            : GetPlayerInventory(GameState.MyIndex, slot);
+            : GetPlayerInv(GameState.MyIndex, slot);
 
-        if (itemNum == -1)
+        if (item == -1)
         {
             return;
         }
 
-        GameLogic.ShowShopDesc(x, y, itemNum);
+        GameLogic.ShowShopDesc(x, y, item);
     }
 
     public static void UpdateShop()
@@ -298,7 +298,7 @@ public class WinShop
         }
         else
         {
-            GameState.ShopSelectedItem = GetPlayerInventory(GameState.MyIndex, GameState.ShopSelectedSlot);
+            GameState.ShopSelectedItem = GetPlayerInv(GameState.MyIndex, GameState.ShopSelectedSlot);
 
             if (GameState.ShopSelectedItem >= 0)
             {
@@ -343,15 +343,15 @@ public class WinShop
                 GameClient.RenderTexture(ref selectedSlotTexturePath, left, top, 0, 0, 32, 32, 32, 32);
             }
 
-            var itemNum = Shop.Instance[GameState.InShop].TradeItem[i].Item;
-            if (itemNum < 0 || itemNum >= Core.Globals.Variables.MaxItems)
+            var item = Shop.Instance[GameState.InShop].TradeItem[i].Item;
+            if (item < 0 || item >= Core.Globals.Variables.MaxItems)
             {
                 continue;
             }
 
-            Item.OnStream(itemNum);
+            Item.OnStream(item);
 
-            var itemIcon = Item.Instance[itemNum].Icon;
+            var itemIcon = Item.Instance[item].Icon;
             if (itemIcon <= 0 || itemIcon > GameState.NumItems)
             {
                 continue;
@@ -376,7 +376,7 @@ public class WinShop
                 GameClient.RenderTexture(ref selectedSlotTexturePath, left, top, 0, 0, 32, 32, 32, 32);
             }
 
-            var item = GetPlayerInventory(GameState.MyIndex, i);
+            var item = GetPlayerInv(GameState.MyIndex, i);
             if (item < 0 || item >= Variables.MaxItems)
             {
                 continue;
@@ -394,7 +394,7 @@ public class WinShop
 
             GameClient.RenderTexture(ref path, left, top, 0, 0, 32, 32, 32, 32);
 
-            if (GetPlayerInventoryValue(GameState.MyIndex, i) <= 1)
+            if (GetPlayerInvValue(GameState.MyIndex, i) <= 1)
             {
                 continue;
             }
@@ -402,7 +402,7 @@ public class WinShop
             var y = top + 20;
             var x = left + 1;
 
-            var amount = GetPlayerInventoryValue(GameState.MyIndex, i);
+            var amount = GetPlayerInvValue(GameState.MyIndex, i);
             var amountColor = TextRenderer.GetColorForAmount(amount);
 
             TextRenderer.Render(GameLogic.ConvertCurrency(amount), x, y, amountColor, amountColor, winShop.Font);

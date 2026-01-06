@@ -1901,7 +1901,7 @@ namespace Server
                                                 case 0: // Set
                                                     if (Player.HasItem(i, command.Data1) > 0)
                                                     {
-                                                        SetInventoryValue(i, Player.FindItemSlot(i, command.Data1), command.Data3);
+                                                        SetInvValue(i, Player.FindItemSlot(i, command.Data1), command.Data3);
                                                     }
 
                                                     break;
