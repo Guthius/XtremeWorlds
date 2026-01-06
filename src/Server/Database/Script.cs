@@ -284,25 +284,25 @@ public class Script
         SetInv(index, invSlot, itemId);
 
         string msg;
-        var itemTemplate = Item.Instance[itemId];
+        var item = Item.Instance[itemId];
         int mapValue = MapItem.Instance[map, mapSlot].Value;
 
-        if (itemTemplate.BindType == 1)
+        if (item.BindType == 1)
         {
             Server.Player.Instance[index].Inventory[invSlot].Bound = 1;
         }
 
-        if (itemTemplate.Type == (byte)ItemCategory.Currency || itemTemplate.Stackable == 1)
+        if (item.Type == (byte)ItemCategory.Currency || item.Stackable == 1)
         {
             // For stackable/currency, add the value from the map item (should be 1 for most drops)
             SetInvValue(index, invSlot, GetPlayerInvValue(index, invSlot) + mapValue);
-            msg = mapValue + " " + itemTemplate.Name;
+            msg = mapValue + " " + item.Name;
         }
         else
         {
             // For non-stackable, always set to 1 regardless of map item value
             SetInvValue(index, invSlot, 1);
-            msg = itemTemplate.Name;
+            msg = item.Name;
         }
 
         // Erase item from the map
