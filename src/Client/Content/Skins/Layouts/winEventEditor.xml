@@ -87,10 +87,10 @@
 		<ComboBox Name="cmbMoveSpeed" Position="700,56" Size="120,20"/>
 		<Label Name="lblMoveFreq" Text="Move Freq" Position="360,84" Size="100,18"/>
 		<ComboBox Name="cmbMoveFreq" Position="440,82" Size="160,20"/>
-		<CheckBox Name="chkWalkAnim" Text="Idle Anim" Position="12,156" Size="100,18" Design="CheckboxNormal"/>
-		<CheckBox Name="chkDirFix" Text="Dir Fix" Position="124,156" Size="90,18" Design="CheckboxNormal"/>
-		<CheckBox Name="chkWalkThrough" Text="Walk Through" Position="226,156" Size="120,18" Design="CheckboxNormal"/>
-		<CheckBox Name="chkShowName" Text="Show Name" Position="360,156" Size="120,18" Design="CheckboxNormal"/>
+		<CheckBox Name="chkWalkAnim" Text="Idle Anim" Position="12,124" Size="100,18" Design="CheckboxNormal"/>
+		<CheckBox Name="chkDirFix" Text="Dir Fix" Position="124,124" Size="90,18" Design="CheckboxNormal"/>
+		<CheckBox Name="chkWalkThrough" Text="Walk Through" Position="226,124" Size="120,18" Design="CheckboxNormal"/>
+		<CheckBox Name="chkShowName" Text="Show Name" Position="360,124" Size="120,18" Design="CheckboxNormal"/>
 
 		<!-- Page conditions (moved left) -->
 		<CheckBox Name="chkPageHasItem" Text="Has Item" Position="12,28" Size="90,18" Design="CheckboxNormal"/>
