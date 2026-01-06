@@ -16,6 +16,12 @@ public abstract class PacketParser<TPacketId, TSession> where TPacketId : Enum
         _handlers[Convert.ToInt32(packetId)] = handler;
     }
 
+    /// <summary>
+    /// Allow derived parsers to validate a session before dispatching packet handlers.
+    /// Returning false will silently drop the packet.
+    /// </summary>
+    protected virtual bool ValidateSession(TSession session) => true;
+
     public int Parse(TSession session, ReadOnlyMemory<byte> bytes)
     {
         var totalNumberOfBytes = bytes.Length;
@@ -59,6 +65,11 @@ public abstract class PacketParser<TPacketId, TSession> where TPacketId : Enum
             return;
         }
 
+        if (!ValidateSession(session))
+        {
+            return;
+        }
+
         var packetId = BitConverter.ToInt32(bytes.Span);
         var packetData = bytes[4..];
 
@@ -80,8 +91,7 @@ public abstract class PacketParser<TPacketId, TSession> where TPacketId : Enum
 
         if (compressed)
         {
-            HandleCompressed(session, packetData, handler);
-
+            HandleCompressed(session, packetData, packetId, handler);
             return;
         }
 
@@ -97,7 +107,7 @@ public abstract class PacketParser<TPacketId, TSession> where TPacketId : Enum
         }
     }
 
-    private static void HandleCompressed(TSession session, ReadOnlyMemory<byte> bytes, Action<TSession, ReadOnlyMemory<byte>> handler)
+    private void HandleCompressed(TSession session, ReadOnlyMemory<byte> bytes, int packetId, Action<TSession, ReadOnlyMemory<byte>> handler)
     {
         if (bytes.Length < 4)
         {
@@ -116,7 +126,14 @@ public abstract class PacketParser<TPacketId, TSession> where TPacketId : Enum
             return;
         }
 
-        handler(session, buffer.AsMemory());
+        try
+        {
+            handler(session, buffer.AsMemory());
+        }
+        catch (Exception ex)
+        {
+            Server.General.Logger.LogError(ex, "Packet handler error (id={PacketId})", packetId);
+        }
     }
 
     private static bool IsCompressed(int packetId)

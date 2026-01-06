@@ -22,6 +22,25 @@ namespace Server.Game.Net;
 
 public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameSession>
 {
+    protected override bool ValidateSession(GameSession session)
+    {
+        if (session is null)
+            return false;
+
+        var id = session.Id;
+        if (id < 0 || id >= Core.Globals.Variables.MaxPlayers)
+            return false;
+
+        if (Data.TempPlayer == null || id >= Data.TempPlayer.Length)
+            return false;
+
+        // PlayerBase.Instance is used heavily by handlers; keep this cheap and defensive.
+        if (PlayerBase.Instance == null || id >= PlayerBase.Instance.Count)
+            return false;
+
+        return true;
+    }
+
     public GamePacketParser()
     {
         Bind(Packets.ClientPackets.CCheckPing, Packet_Ping);
@@ -58,7 +77,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Bind(Packets.ClientPackets.CBanList, Packet_Banlist);
         Bind(Packets.ClientPackets.CBanDestroy, Packet_DestroyBans);
         Bind(Packets.ClientPackets.CBanPlayer, Packet_BanPlayer);
-
         Bind(Packets.ClientPackets.CRequestEditMap, Packet_RequestEditMap);
 
         Bind(Packets.ClientPackets.CSetAccess, Packet_SetAccess);
