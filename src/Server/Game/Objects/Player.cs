@@ -614,11 +614,13 @@ public class Player : PlayerBase
                 trapAmount = tile.Data1;
                 if (tile.Data2 > 0) trapVital = tile.Data2;
             }
+
             if (tile.Type2 == TileType.Trap)
             {
                 trapAmount += tile.Data1_2;
                 if (tile.Data2_2 > 0) trapVital = tile.Data2_2;
             }
+
             if (trapAmount > 0)
             {
                 var tv = (Vital)trapVital;
@@ -701,6 +703,7 @@ public class Player : PlayerBase
                 {
                     if (otherPlayerId == playerId)
                         continue;
+
                     if (GetPlayerMap(otherPlayerId) != map)
                         continue;
 
@@ -772,6 +775,7 @@ public class Player : PlayerBase
                     var page = eventMap.EventPages[slot];
                     if (!page.Visible)
                         continue;
+                        
                     if (page.WalkThrough != 0)
                         continue;
 
