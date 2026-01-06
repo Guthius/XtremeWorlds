@@ -48,13 +48,11 @@
         <ComboBox Name="cmbAnimation" Position="120, 34" Size="220, 18"/>
         <Label Name="lblBind" Text="Bind" Position="360, 36" Size="60, 16"/>
         <ComboBox Name="cmbBind" Position="424, 34" Size="160, 18"/>
-        <Label Name="lblLevel" Text="Level" Position="8, 60" Size="60, 16"/>
-        <ComboBox Name="cmbLevel" Position="80, 58" Size="120, 18"/>
-        <Label Name="lblPrice" Text="Price" Position="208, 60" Size="60, 16"/>
-        <TextBox Name="txtPrice" Position="264, 58" Size="120, 20" Design="TextWhite"/>
-        <Label Name="lblRarity" Text="Rarity" Position="392, 60" Size="60, 16"/>
-        <ComboBox Name="cmbRarity" Position="452, 58" Size="120, 18"/>
-        <CheckBox Name="chkStackable" Text="Stackable" Position="580, 58" Size="120, 20"/>
+        <Label Name="lblPrice" Text="Price" Position="8, 60" Size="60, 16"/>
+        <TextBox Name="txtPrice" Position="80, 58" Size="120, 20" Design="TextWhite"/>
+        <Label Name="lblRarity" Text="Rarity" Position="208, 60" Size="60, 16"/>
+        <ComboBox Name="cmbRarity" Position="268, 58" Size="120, 18"/>
+        <CheckBox Name="chkStackable" Text="Stackable" Position="396, 58" Size="120, 20"/>
     </GroupBox>
 
     <!-- Use group (consumable/skill/projectile/event). This shares the same screen area as grpEquip; type toggles hide/show. -->
