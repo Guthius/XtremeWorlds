@@ -30,7 +30,7 @@
 		<Label Name="lblLoopCount0" Text="Loop Count" Position="12,140" Size="120,18"/>
 		<ScrollBar Name="nudLoopCount0" Position="140,140" Size="160,14" Min="1" Max="64" Value="1" Orientation="Horizontal" ThumbSize="16"/>
 
-		<Label Name="lblPreview0" Text="Preview 1" Position="360,44" Size="90,18"/>
+		<Label Name="lblPreview0" Text="Preview 1" Position="368,44" Size="90,18"/>
 		<PictureBox Name="picSprite0" Position="368,64" Size="192,192" Design="TextBlack"/>
 
 		<Label Name="lblSprite1" Text="Sprite 2" Position="12,176" Size="120,18"/>
