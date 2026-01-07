@@ -1398,8 +1398,8 @@ public class Crystalshire
             {
                 int id = WinNpcEditor.SelectedIndex; if (id < 0 || id >= Variables.MaxNpcs) return;
                 var newName = GetLiveText(txtName);
-                if (id < Core.Objects.NpcBase.Instance.Count)
-                    Core.Objects.NpcBase.Instance[id].Name = newName;
+                if (id < Npc.Instance.Count)
+                    Npc.Instance[id].Name = newName;
                 Npc.IsChanged[id] = true;
             };
         }
@@ -1420,8 +1420,8 @@ public class Crystalshire
             {
                 if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Variables.MaxNpcs)
                 {
-                    if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
-                        Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].AttackSay = GetLiveText(txtAtk);
+                    if (WinNpcEditor.SelectedIndex < Npc.Instance.Count)
+                        Npc.Instance[WinNpcEditor.SelectedIndex].AttackSay = GetLiveText(txtAtk);
                     Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
                 }
             };
@@ -1441,10 +1441,10 @@ public class Crystalshire
             }
         }
 
-        BindCombo("cmbBehavior", v => { if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count) { Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Behavior = (byte)v; Npc.IsChanged[WinNpcEditor.SelectedIndex] = true; } });
-        BindCombo("cmbFaction", v => { if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count) { Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Faction = (byte)v; Npc.IsChanged[WinNpcEditor.SelectedIndex] = true; } });
-        BindCombo("cmbSpawnPeriod", v => { if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count) { Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].SpawnTime = (byte)v; Npc.IsChanged[WinNpcEditor.SelectedIndex] = true; } });
-        BindCombo("cmbAnimation", v => { if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count) { Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Animation = (byte)v; Npc.IsChanged[WinNpcEditor.SelectedIndex] = true; } });
+        BindCombo("cmbBehavior", v => { if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Npc.Instance.Count) { Npc.Instance[WinNpcEditor.SelectedIndex].Behavior = (byte)v; Npc.IsChanged[WinNpcEditor.SelectedIndex] = true; } });
+        BindCombo("cmbFaction", v => { if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Npc.Instance.Count) { Npc.Instance[WinNpcEditor.SelectedIndex].Faction = (byte)v; Npc.IsChanged[WinNpcEditor.SelectedIndex] = true; } });
+        BindCombo("cmbSpawnPeriod", v => { if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Npc.Instance.Count) { Npc.Instance[WinNpcEditor.SelectedIndex].SpawnTime = (byte)v; Npc.IsChanged[WinNpcEditor.SelectedIndex] = true; } });
+        BindCombo("cmbAnimation", v => { if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Npc.Instance.Count) { Npc.Instance[WinNpcEditor.SelectedIndex].Animation = (byte)v; Npc.IsChanged[WinNpcEditor.SelectedIndex] = true; } });
 
         // Skills 1..6
         void BindSkill(string ctrlName, int id)
@@ -1453,8 +1453,8 @@ public class Crystalshire
             {
                 if (WinNpcEditor.SelectedIndex >= 0)
                 {
-                    if (WinNpcEditor.SelectedIndex >= Core.Objects.NpcBase.Instance.Count) return;
-                    Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Skill[id] = (byte)Math.Clamp(v, 0, Variables.MaxSkills - 1);
+                    if (WinNpcEditor.SelectedIndex >= Npc.Instance.Count) return;
+                    Npc.Instance[WinNpcEditor.SelectedIndex].Skill[id] = (byte)Math.Clamp(v, 0, Variables.MaxSkills - 1);
                     Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
                 }
             });
@@ -1480,19 +1480,21 @@ public class Crystalshire
             };
         }
 
-        // Sprite scrollbar: bind like other sliders so drag/wheel work
-        BindScrollBar(
-            "sldSprite",
-            () => (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count) ? Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Sprite : 1,
-            v =>
+        // Set up sprite scrollbar with proper max value
+        if (WindowManager.TryGetControl("winNpcEditor", "sldSprite", out var spriteScrollCtrl) && spriteScrollCtrl is ScrollBar sbSprite)
+        {
+            sbSprite.Max = Math.Max(1, GameState.NumCharacters);
+        }
+
+        BindScrollBar("sldSprite", () => (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Npc.Instance.Count) ? Npc.Instance[WinNpcEditor.SelectedIndex].Sprite : 0, v =>
+        {
+            if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Variables.MaxNpcs)
             {
-                if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Variables.MaxNpcs)
-                {
-                    if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
-                        Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Sprite = v;
-                    Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
-                }
-            });
+                if (WinNpcEditor.SelectedIndex < Npc.Instance.Count)
+                    Npc.Instance[WinNpcEditor.SelectedIndex].Sprite = v;
+                Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
+            }
+        });
 
         // Drop item combo - save selection for current slot when it changes
         if (WindowManager.TryGetControl("winNpcEditor", "cmbDropItem", out var dropItemCtrl) && dropItemCtrl is ComboBox cmbItem)
@@ -1515,9 +1517,9 @@ public class Crystalshire
                     slot = Math.Clamp(s.Value, 0, 5);
 
                 if (WinNpcEditor.SelectedIndex >= 0 &&
-                    WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
+                    WinNpcEditor.SelectedIndex < Npc.Instance.Count)
                 {
-                    Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].DropItem[slot] = Math.Clamp(cmbItem.Value, 0, Item.Instance.Count - 1);
+                    Npc.Instance[WinNpcEditor.SelectedIndex].DropItem[slot] = Math.Clamp(cmbItem.Value, 0, Item.Instance.Count - 1);
                     Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
                 }
             };
@@ -1571,9 +1573,9 @@ public class Crystalshire
             if (WindowManager.TryGetControl("winNpcEditor", "cmbDropSlot", out var ds) && ds is ComboBox s)
                 slot = Math.Clamp(s.Value, 0, 5);
             if (WinNpcEditor.SelectedIndex >= 0 &&
-                WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
+                WinNpcEditor.SelectedIndex < Npc.Instance.Count)
             {
-                Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].DropItemValue[slot] = v;
+                Npc.Instance[WinNpcEditor.SelectedIndex].DropItemValue[slot] = v;
                 Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
             }
         }, 0, 999999);
@@ -1590,8 +1592,8 @@ public class Crystalshire
                 int slot = 0;
                 if (WindowManager.TryGetControl("winNpcEditor", "cmbDropSlot", out var ds) && ds is ComboBox s)
                     slot = Math.Clamp(s.Value, 0, 5);
-                if (WinNpcEditor.SelectedIndex >= Core.Objects.NpcBase.Instance.Count) return 0;
-                var npc = Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex];
+                if (WinNpcEditor.SelectedIndex >= Npc.Instance.Count) return 0;
+                var npc = Npc.Instance[WinNpcEditor.SelectedIndex];
                 return npc.DropChance[slot];
             },
             v =>
@@ -1603,9 +1605,9 @@ public class Crystalshire
                 if (WindowManager.TryGetControl("winNpcEditor", "cmbDropSlot", out var ds) && ds is ComboBox s)
                     slot = Math.Clamp(s.Value, 0, 5);
                 if (WinNpcEditor.SelectedIndex >= 0 &&
-                    WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
+                    WinNpcEditor.SelectedIndex < Npc.Instance.Count)
                 {
-                    Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].DropChance[slot] = v;
+                    Npc.Instance[WinNpcEditor.SelectedIndex].DropChance[slot] = v;
                     Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
                 }
             });
@@ -1615,8 +1617,8 @@ public class Crystalshire
         {
             if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Variables.MaxNpcs)
             {
-                if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
-                    Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Hp = v;
+                if (WinNpcEditor.SelectedIndex < Npc.Instance.Count)
+                    Npc.Instance[WinNpcEditor.SelectedIndex].Hp = v;
                 Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
             }
         }, 0, 100000000);
@@ -1625,25 +1627,25 @@ public class Crystalshire
         {
             if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Variables.MaxNpcs)
             {
-                if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
-                    Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Experience = v;
+                if (WinNpcEditor.SelectedIndex < Npc.Instance.Count)
+                    Npc.Instance[WinNpcEditor.SelectedIndex].Experience = v;
                 Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
             }
         }, 0, 100000000);
 
         BindScrollBar(
             "sldLevel",
-            () => (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
-                ? Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Level
+            () => (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Npc.Instance.Count)
+                ? Npc.Instance[WinNpcEditor.SelectedIndex].Level
                 : 0,
             v =>
             {
                 if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Variables.MaxNpcs)
                 {
-                    if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
+                    if (WinNpcEditor.SelectedIndex < Npc.Instance.Count)
                     {
                         var maxLevel = Math.Clamp((int)Variables.MaxLevel, 0, 255);
-                        Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Level = (byte)Math.Clamp((int)v, 0, maxLevel);
+                        Npc.Instance[WinNpcEditor.SelectedIndex].Level = (byte)Math.Clamp((int)v, 0, maxLevel);
                     }
                     Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
                 }
@@ -1653,8 +1655,8 @@ public class Crystalshire
         {
             if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Variables.MaxNpcs)
             {
-                if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
-                    Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Damage = v;
+                if (WinNpcEditor.SelectedIndex < Npc.Instance.Count)
+                    Npc.Instance[WinNpcEditor.SelectedIndex].Damage = v;
                 Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
             }
         }, 0, 100000000);
@@ -1664,8 +1666,8 @@ public class Crystalshire
         {
             if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Variables.MaxNpcs)
             {
-                if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
-                    Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].DeathSwitch = Math.Clamp(v, 0, Variables.MaxSwitches - 1);
+                if (WinNpcEditor.SelectedIndex < Npc.Instance.Count)
+                    Npc.Instance[WinNpcEditor.SelectedIndex].DeathSwitch = Math.Clamp(v, 0, Variables.MaxSwitches - 1);
                 Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
             }
         });
@@ -1674,8 +1676,8 @@ public class Crystalshire
         {
             if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Variables.MaxNpcs)
             {
-                if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
-                    Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].DeathSwitchValue = Math.Max(0, v);
+                if (WinNpcEditor.SelectedIndex < Npc.Instance.Count)
+                    Npc.Instance[WinNpcEditor.SelectedIndex].DeathSwitchValue = Math.Max(0, v);
                 Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
             }
         }, 0, 100000000);
@@ -1684,8 +1686,8 @@ public class Crystalshire
         {
             if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Variables.MaxNpcs)
             {
-                if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
-                    Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].DeathVariable = Math.Clamp(v, 0, Variables.MaxVariables - 1);
+                if (WinNpcEditor.SelectedIndex < Npc.Instance.Count)
+                    Npc.Instance[WinNpcEditor.SelectedIndex].DeathVariable = Math.Clamp(v, 0, Variables.MaxVariables - 1);
                 Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
             }
         });
@@ -1694,8 +1696,8 @@ public class Crystalshire
         {
             if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Variables.MaxNpcs)
             {
-                if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
-                    Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].DeathVariableValue = Math.Max(0, v);
+                if (WinNpcEditor.SelectedIndex < Npc.Instance.Count)
+                    Npc.Instance[WinNpcEditor.SelectedIndex].DeathVariableValue = Math.Max(0, v);
                 Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
             }
         }, 0, 100000000);
@@ -1703,27 +1705,27 @@ public class Crystalshire
         // Common event trigger
         BindCombo("cmbCommonEventType", v =>
         {
-            if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
+            if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Npc.Instance.Count)
             {
-                Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].CommonEventType = (byte)Math.Clamp(v, 0, byte.MaxValue);
+                Npc.Instance[WinNpcEditor.SelectedIndex].CommonEventType = (byte)Math.Clamp(v, 0, byte.MaxValue);
                 Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
             }
         });
 
         BindIntText("txtCommonEventData1", v =>
         {
-            if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
+            if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Npc.Instance.Count)
             {
-                Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].CommonEventData1 = v;
+                Npc.Instance[WinNpcEditor.SelectedIndex].CommonEventData1 = v;
                 Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
             }
         }, int.MinValue, int.MaxValue);
 
         BindIntText("txtCommonEventData2", v =>
         {
-            if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
+            if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Npc.Instance.Count)
             {
-                Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].CommonEventData2 = v;
+                Npc.Instance[WinNpcEditor.SelectedIndex].CommonEventData2 = v;
                 Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
             }
         }, int.MinValue, int.MaxValue);
@@ -1732,13 +1734,13 @@ public class Crystalshire
 
         BindScrollBar(
             "sldDamage",
-            () => (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count) ? Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Damage : 0,
+            () => (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Npc.Instance.Count) ? Npc.Instance[WinNpcEditor.SelectedIndex].Damage : 0,
             v =>
             {
                 if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Variables.MaxNpcs)
                 {
-                    if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
-                        Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Damage = v;
+                    if (WinNpcEditor.SelectedIndex < Npc.Instance.Count)
+                        Npc.Instance[WinNpcEditor.SelectedIndex].Damage = v;
                     Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
                 }
             },
@@ -1747,13 +1749,13 @@ public class Crystalshire
         // Range: slider-only, no textbox sync.
         BindScrollBar(
             "sldRange",
-            () => (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count) ? Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Range : 0,
+            () => (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Npc.Instance.Count) ? Npc.Instance[WinNpcEditor.SelectedIndex].Range : 0,
             v =>
             {
                 if (WinNpcEditor.SelectedIndex >= 0 && WinNpcEditor.SelectedIndex < Variables.MaxNpcs)
                 {
-                    if (WinNpcEditor.SelectedIndex < Core.Objects.NpcBase.Instance.Count)
-                        Core.Objects.NpcBase.Instance[WinNpcEditor.SelectedIndex].Range = (byte)v;
+                    if (WinNpcEditor.SelectedIndex < Npc.Instance.Count)
+                        Npc.Instance[WinNpcEditor.SelectedIndex].Range = (byte)v;
                     Npc.IsChanged[WinNpcEditor.SelectedIndex] = true;
                 }
             });

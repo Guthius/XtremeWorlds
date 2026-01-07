@@ -658,7 +658,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             Npc.Instance.Clear();
         }
 
-        var npc = new Core.Objects.NpcBase
+        var npc = new Npc
         {
             Animation = packetReader.ReadInt32(),
             AttackSay = packetReader.ReadString() ?? string.Empty,

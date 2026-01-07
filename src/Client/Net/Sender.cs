@@ -615,12 +615,12 @@ public static class Sender
     {
         var packetWriter = new PacketWriter();
 
-        if (index < 0 || index >= Core.Objects.NpcBase.Instance.Count)
+        if (index < 0 || index >= Npc.Instance.Count)
         {
             return;
         }
 
-        var npc = Core.Objects.NpcBase.Instance[index];
+        var npc = Npc.Instance[index];
 
         packetWriter.WriteEnum(Packets.ClientPackets.CSaveNpc);
         packetWriter.WriteInt32(index);
