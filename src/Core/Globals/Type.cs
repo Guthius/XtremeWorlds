@@ -354,8 +354,8 @@ public static class Type
         public MoveRoute[] MoveRoute;
         public int IgnoreMoveRoute;
         public int RepeatMoveRoute;
-        public int IdleAnim;
-        public int DirFix;
+        public byte IdleAnim;
+        public byte DirFix;
         public int WalkThrough;
         public int ShowName;
         public byte Trigger;
@@ -419,9 +419,9 @@ public static class Type
         public int[] SelfSwitches;
         public int MoveRouteComplete;
         public int Moving;
-        public int ShowDir;
-        public int IdleAnim;
-        public int DirFix;
+        public byte ShowDir;
+        public byte IdleAnim;
+        public byte DirFix;
     }
 
     public struct EventMap

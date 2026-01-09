@@ -2051,8 +2051,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
                                     }
                                 }
 
-                                instance1.IdleAnim = buffer.ReadInt32();
-                                instance1.DirFix = buffer.ReadInt32();
+                                instance1.IdleAnim = buffer.ReadByte();
+                                instance1.DirFix = buffer.ReadByte();
                                 instance1.WalkThrough = buffer.ReadInt32();
                                 instance1.ShowName = buffer.ReadInt32();
                                 instance1.Trigger = buffer.ReadByte();
@@ -2286,8 +2286,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             instance.Y = buffer.ReadInt32();
             instance.Position = buffer.ReadByte();
             instance.Visible = buffer.ReadBoolean();
-            instance.IdleAnim = buffer.ReadInt32();
-            instance.DirFix = buffer.ReadInt32();
+            instance.IdleAnim = buffer.ReadByte();
+            instance.DirFix = buffer.ReadByte();
             instance.WalkThrough = buffer.ReadInt32();
             instance.ShowName = buffer.ReadInt32();
         }
@@ -2321,7 +2321,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         instance.Y = y;
         instance.Dir = dir;
         instance.Moving = 1;
-        instance.ShowDir = (byte)showDir;
+        instance.ShowDir = showDir;
         instance.MovementSpeed = movementSpeed;
 
         // Begin a 1-tile (32px) client-side step like NPCs.
@@ -2438,8 +2438,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
                             }
                         }
 
-                        instance1.IdleAnim = buffer.ReadInt32();
-                        instance1.DirFix = buffer.ReadInt32();
+                        instance1.IdleAnim = buffer.ReadByte();
+                        instance1.DirFix = buffer.ReadByte();
                         instance1.WalkThrough = buffer.ReadInt32();
                         instance1.ShowName = buffer.ReadInt32();
                         instance1.Trigger = buffer.ReadByte();

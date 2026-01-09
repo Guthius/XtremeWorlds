@@ -1280,8 +1280,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
                                 }
                             }
 
-                            instance2.IdleAnim = packetReader.ReadInt32();
-                            instance2.DirFix = packetReader.ReadInt32();
+                            instance2.IdleAnim = (byte)packetReader.ReadInt32();
+                            instance2.DirFix = (byte)packetReader.ReadInt32();
                             instance2.WalkThrough = packetReader.ReadInt32();
                             instance2.ShowName = packetReader.ReadInt32();
                             instance2.Trigger = packetReader.ReadByte();

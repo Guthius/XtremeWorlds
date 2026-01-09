@@ -1326,8 +1326,8 @@ public static class Sender
                                 }
                             }
 
-                            packetWriter.WriteInt32(instance1.IdleAnim);
-                            packetWriter.WriteInt32(instance1.DirFix);
+                            packetWriter.WriteByte(instance1.IdleAnim);
+                            packetWriter.WriteByte(instance1.DirFix);
                             packetWriter.WriteInt32(instance1.WalkThrough);
                             packetWriter.WriteInt32(instance1.ShowName);
                             packetWriter.WriteByte(instance1.Trigger);

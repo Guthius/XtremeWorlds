@@ -913,8 +913,8 @@ namespace Server
                 }
             }
 
-            packetWriter.WriteInt32(page.IdleAnim);
-            packetWriter.WriteInt32(page.DirFix);
+            packetWriter.WriteByte(page.IdleAnim);
+            packetWriter.WriteByte(page.DirFix);
             packetWriter.WriteInt32(page.WalkThrough);
             packetWriter.WriteInt32(page.ShowName);
             packetWriter.WriteByte(page.Trigger);

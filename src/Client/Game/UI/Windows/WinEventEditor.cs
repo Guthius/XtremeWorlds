@@ -3030,10 +3030,10 @@ public static class WinEventEditor
             page.MoveFreq = (byte)Math.Clamp(cmbMoveFreq.Value, 0, Math.Max(0, cmbMoveFreq.Items.Count - 1));
 
         if (WindowManager.TryGetControl("winEventEditor", "chkWalkAnim", out var waCtrl) && waCtrl is CheckBox chkWalkAnim)
-            page.IdleAnim = chkWalkAnim.Value == 1 ? 1 : 0;
+            page.IdleAnim = (byte)(chkWalkAnim.Value == 1 ? 1 : 0);
 
         if (WindowManager.TryGetControl("winEventEditor", "chkDirFix", out var dfCtrl) && dfCtrl is CheckBox chkDirFix)
-            page.DirFix = chkDirFix.Value == 1 ? 1 : 0;
+            page.DirFix = (byte)(chkDirFix.Value == 1 ? 1 : 0);
 
         if (WindowManager.TryGetControl("winEventEditor", "chkWalkThrough", out var wtCtrl) && wtCtrl is CheckBox chkWalkThrough)
             page.WalkThrough = wtCtrl.Value == 1 ? 1 : 0;

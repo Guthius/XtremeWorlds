@@ -187,8 +187,8 @@ namespace Server
                                     packetWriter.WriteInt32(instance.Y);
                                     packetWriter.WriteByte(instance.Position);
                                     packetWriter.WriteBoolean(instance.Visible);
-                                    packetWriter.WriteInt32(Server.Map.Instance[map].Event[id].Pages[page].IdleAnim);
-                                    packetWriter.WriteInt32(Server.Map.Instance[map].Event[id].Pages[page].DirFix);
+                                    packetWriter.WriteByte(Server.Map.Instance[map].Event[id].Pages[page].IdleAnim);
+                                    packetWriter.WriteByte(Server.Map.Instance[map].Event[id].Pages[page].DirFix);
                                     packetWriter.WriteInt32(Server.Map.Instance[map].Event[id].Pages[page].WalkThrough);
                                     packetWriter.WriteInt32(Server.Map.Instance[map].Event[id].Pages[page].ShowName);
 
@@ -428,8 +428,8 @@ namespace Server
                             buffer.WriteInt32(instance1.Y);
                             buffer.WriteByte(instance1.Position);
                             buffer.WriteBoolean(instance1.Visible);
-                            buffer.WriteInt32(Server.Map.Instance[map].Event[id].Pages[z].IdleAnim);
-                            buffer.WriteInt32(Server.Map.Instance[map].Event[id].Pages[z].DirFix);
+                            buffer.WriteByte(Server.Map.Instance[map].Event[id].Pages[z].IdleAnim);
+                            buffer.WriteByte(Server.Map.Instance[map].Event[id].Pages[z].DirFix);
                             buffer.WriteInt32(Server.Map.Instance[map].Event[id].Pages[z].WalkThrough);
                             buffer.WriteInt32(Server.Map.Instance[map].Event[id].Pages[z].ShowName);
 
@@ -2966,10 +2966,10 @@ namespace Server
                 buffer.WriteInt32(eventPage.Y);
                 buffer.WriteByte(eventPage.Position);
                 buffer.WriteBoolean(eventPage.Visible);
-                buffer.WriteInt32((int)Server.Map.Instance[map].Event[eventPage.EventId].Pages[eventPage.PageId].IdleAnim);
-                buffer.WriteInt32(Server.Map.Instance[map].Event[eventPage.EventId].Pages[eventPage.PageId].DirFix);
-                buffer.WriteInt32(Server.Map.Instance[map].Event[eventPage.EventId].Pages[eventPage.PageId].WalkThrough);
-                buffer.WriteInt32(Server.Map.Instance[map].Event[eventPage.EventId].Pages[eventPage.PageId].ShowName);
+                buffer.WriteByte(Map.Instance[map].Event[eventPage.EventId].Pages[eventPage.PageId].IdleAnim);
+                buffer.WriteByte(Map.Instance[map].Event[eventPage.EventId].Pages[eventPage.PageId].DirFix);
+                buffer.WriteInt32(Map.Instance[map].Event[eventPage.EventId].Pages[eventPage.PageId].WalkThrough);
+                buffer.WriteInt32(Map.Instance[map].Event[eventPage.EventId].Pages[eventPage.PageId].ShowName);
             }
 
             PlayerService.Instance.SendDataTo(index, buffer.GetBytes());
