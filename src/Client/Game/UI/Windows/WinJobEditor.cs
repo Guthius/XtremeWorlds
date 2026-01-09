@@ -198,7 +198,7 @@ namespace Client.Game.UI.Windows
             if (WindowManager.TryGetControl("winJobEditor", "txtStartX", out var sx)) sx.Text = job.StartX.ToString();
             if (WindowManager.TryGetControl("winJobEditor", "txtStartY", out var sy)) sy.Text = job.StartY.ToString();
             if (WindowManager.TryGetControl("winJobEditor", "txtMoveSpeed", out var ms))
-                ms.Text = (job.MoveSpeed <= 0 ? 1.0f : job.MoveSpeed).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+                ms.Text = (job.MoveSpeed == 0 ? 1.0f : job.MoveSpeed).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
 
             // Base stats
             if (job.Stat != null)

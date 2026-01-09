@@ -2956,9 +2956,9 @@ public class Crystalshire
                 {
                     var s = tb.Text?.Trim() ?? string.Empty;
                     float v;
-                    if (!float.TryParse(s, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out v)
-                        && !float.TryParse(s, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.CurrentCulture, out v)
-                        && !float.TryParse(s.Replace(',', '.'), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out v))
+                    if (!float.TryParse(s, System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowLeadingSign, System.Globalization.CultureInfo.InvariantCulture, out v)
+                        && !float.TryParse(s, System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowLeadingSign, System.Globalization.CultureInfo.CurrentCulture, out v)
+                        && !float.TryParse(s.Replace(',', '.'), System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowLeadingSign, System.Globalization.CultureInfo.InvariantCulture, out v))
                     {
                         v = min;
                     }
@@ -2980,7 +2980,7 @@ public class Crystalshire
             int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return;
             Job.Instance[id].MoveSpeed = v;
             Job.IsChanged[id] = true;
-        }, 0.1f, 32.0f);
+        }, -32.0f, 32.0f);
 
         // Base stats
         BindIntText("txtStr", v => {
@@ -3968,11 +3968,11 @@ public class Crystalshire
         {
             if (string.IsNullOrWhiteSpace(s)) return fallback;
             s = s.Trim();
-            if (float.TryParse(s, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var v))
+            if (float.TryParse(s, System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowLeadingSign, System.Globalization.CultureInfo.InvariantCulture, out var v))
                 return v;
-            if (float.TryParse(s, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.CurrentCulture, out v))
+            if (float.TryParse(s, System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowLeadingSign, System.Globalization.CultureInfo.CurrentCulture, out v))
                 return v;
-            if (float.TryParse(s.Replace(',', '.'), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out v))
+            if (float.TryParse(s.Replace(',', '.'), System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowLeadingSign, System.Globalization.CultureInfo.InvariantCulture, out v))
                 return v;
             return fallback;
         }
@@ -3984,13 +3984,14 @@ public class Crystalshire
                 int i = WinSkillEditor.SelectedIndex;
                 if (i < 0 || i >= Variables.MaxSkills || Skill.Instance.Count <= i) return;
 
-                var current = Skill.Instance[i].MoveSpeedMultiplier;
-                var v = ParseFloatOr(tbMs.Text, current <= 0 ? 1.0f : current);
-                v = Math.Clamp(v, 0.1f, 32.0f);
-                Skill.Instance[i].MoveSpeedMultiplier = v;
-                Skill.IsChanged[i] = true;
-
-                tbMs.Text = v.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+                var text = tbMs.Text.Trim();
+                if (float.TryParse(text, System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowLeadingSign, System.Globalization.CultureInfo.InvariantCulture, out var v) ||
+                    float.TryParse(text.Replace(',', '.'), System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowLeadingSign, System.Globalization.CultureInfo.InvariantCulture, out v))
+                {
+                    v = Math.Clamp(v, -32.0f, 32.0f);
+                    Skill.Instance[i].MoveSpeedMultiplier = v;
+                    Skill.IsChanged[i] = true;
+                }
             };
         }
 

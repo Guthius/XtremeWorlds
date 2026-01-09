@@ -15,8 +15,8 @@ public static class Loop
     {
         var tmr25 = 0;
         var tmr500 = 0;
-        var tmrWalk = 0;
-        var tmrNpcWalk = 0; // separate NPC pixel movement timer (same cadence as player walk)
+        var tmrPlayerWalk = 0;
+        var tmrNpcWalk = 0;
         var tmr1000 = 0;
         var tmrProj = 0;
         var tmr60000 = 0;
@@ -39,7 +39,7 @@ public static class Loop
                 tmr25 = General.GetTimeMs() + 25;
             }
 
-            if (tick > tmrWalk)
+            if (tick > tmrPlayerWalk)
             {
                 foreach (var player in PlayerService.Instance.Players)
                 {
@@ -57,13 +57,12 @@ public static class Loop
 
                     if (basePlayer.Moving > 0)
                     {
-                        // Speed is configurable per Job via Job Editor (Job.MoveSpeed).
                         int jobId = basePlayer.Job;
                         double jobSpeed = 1.0;
                         if (jobId >= 0 && jobId < Job.Instance.Count)
                             jobSpeed = Job.Instance[jobId].MoveSpeed;
 
-                        if (jobSpeed <= 0) jobSpeed = 1.0;
+                        if (jobSpeed == 0) jobSpeed = 1.0;
 
                         // Skill-based movement modifier (temporary).
                         // Expiry is checked against current tick time.
@@ -71,7 +70,7 @@ public static class Loop
                         if (id >= 0 && id < Data.TempPlayer.Length)
                         {
                             mult = Data.TempPlayer[id].MoveSpeedMultiplier;
-                            if (mult <= 0) mult = 1.0f;
+                            if (mult == 0) mult = 1.0f;
                             if (Data.TempPlayer[id].MoveSpeedMultiplierTimer > 0 && Data.TempPlayer[id].MoveSpeedMultiplierTimer <= tick)
                             {
                                 Data.TempPlayer[id].MoveSpeedMultiplier = 1.0f;
@@ -94,20 +93,46 @@ public static class Loop
                         if (id >= 0 && id < PlayerMoveRemainder.Length)
                         {
                             steps = (int)Math.Floor(PlayerMoveRemainder[id]);
-                            if (steps > 0) PlayerMoveRemainder[id] -= steps;
+                            if (steps != 0) PlayerMoveRemainder[id] -= steps;
                         }
 
-                        if (steps <= 0)
+                        if (steps == 0)
                             continue;
 
+                        // Determine movement direction based on sign of steps
+                        bool reverseDirection = steps < 0;
+                        int absSteps = Math.Abs(steps);
+                        
                         // Safety cap to prevent pathological loops if data is bad.
-                        if (steps > 64) steps = 64;
+                        if (absSteps > 64) absSteps = 64;
 
-                        for (int step = 0; step < steps; step++)
+                        // If negative speed, reverse the player's direction for this movement
+                        byte originalDir = basePlayer.Dir;
+                        if (reverseDirection)
+                        {
+                            // Reverse direction based on actual Direction enum values
+                            // 0=Down, 1=Right, 2=Left, 3=Up
+                            basePlayer.Dir = basePlayer.Dir switch
+                            {
+                                0 => 3, // Down -> Up
+                                1 => 2, // Right -> Left
+                                2 => 1, // Left -> Right
+                                3 => 0, // Up -> Down
+                                _ => basePlayer.Dir
+                            };
+                        }
+
+                        for (int step = 0; step < absSteps; step++)
                         {
                             Player.OnMove(id, basePlayer.Dir, basePlayer.Moving, false);
                             if (id < 0 || id >= Player.Instance.Count) break;
                             if (!Player.Instance[id].IsMoving && Player.Instance[id].Moving == 0) break;
+                        }
+
+                        // Restore original direction if it was reversed
+                        if (reverseDirection && id >= 0 && id < Player.Instance.Count && Player.Instance[id] != null)
+                        {
+                            Player.Instance[id].Dir = originalDir;
                         }
                     }
                     else
@@ -117,7 +142,7 @@ public static class Loop
                 }
 
                 // Player walk tick interval
-                tmrWalk = General.GetTimeMs() + 5;
+                tmrPlayerWalk = General.GetTimeMs() + 5;
             }
 
             if (tick > tmrNpcWalk)
