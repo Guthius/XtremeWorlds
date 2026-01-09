@@ -23,7 +23,7 @@
 		<Label Name="lblAnimation" Text="Animation" Position="12,88" Size="120,18"/>
 		<ComboBox Name="cmbAnimation" Position="140,86" Size="220,20"/>
 
-		<Label Name="lblChainOnHit" Text="Chain On Hit" Position="380,26" Size="120,18"/>
+		<Label Name="lblChainOnHit" Text="Chain" Position="380,26" Size="120,18"/>
 		<ComboBox Name="cmbChainOnHit" Position="460,24" Size="160,20"/>
 
 		<Label Name="lblMultiDirMask" Text="Directions" Position="380,50" Size="120,18"/>
