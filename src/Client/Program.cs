@@ -1412,10 +1412,22 @@ namespace Client
             if (key == Keys.Space)
                 return ' ';
 
+            // Handle the minus/hyphen key
+            if (key == Keys.OemMinus)
+            {
+                return shiftPressed ? '_' : '-';
+            }
+
             // Handle the "/" character (typically mapped to OemQuestion)
             if (key == Keys.OemQuestion)
             {
                 return shiftPressed ? '?' : '/';
+            }
+
+            // Handle period/decimal point
+            if (key == Keys.OemPeriod)
+            {
+                return shiftPressed ? '>' : '.';
             }
 
             // Ignore unsupported keys (e.g., function keys, control keys)
