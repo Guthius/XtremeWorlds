@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Window Name="winBars" Size="239,77" Position="10,10" Font="Georgia" Design="WindowNoBar">
+<Window Name="winBars" Size="239,77" Position="10,10" Font="georgiaBold_16" Design="WindowNoBar">
 	<GroupBox Name="grpBars" Position="6,6" Size="224,61">
 		<PictureBox Name="picOverlay" Position="0,0" Size="224,61"/>
 
@@ -14,8 +14,8 @@
 		<PictureBox Name="picEXP" Position="13,42" Size="74,14" Image="23"/>
 
 		<!-- Centered text inside frames -->
-		<Label Name="lblHP" Text="999/999" Position="12,11" Size="207,10" Font="Georgia" Align="Center"/>
-		<Label Name="lblMP" Text="999/999" Position="12,27" Size="207,10" Font="Georgia" Align="Center"/>
-		<Label Name="lblEXP" Text="999/999" Position="12,45" Size="207,10" Font="Georgia" Align="Center"/>
+		<Label Name="lblHP" Text="999/999" Position="12,11" Size="207,10" Font="georgiaBold_16" Align="Center"/>
+		<Label Name="lblMP" Text="999/999" Position="12,27" Size="207,10" Font="georgiaBold_16" Align="Center"/>
+		<Label Name="lblEXP" Text="999/999" Position="12,45" Size="207,10" Font="georgiaBold_16" Align="Center"/>
 	</GroupBox>
 </Window>

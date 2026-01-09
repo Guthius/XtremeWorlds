@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Window Name="winEscMenu" Size="210,156" Position="0,0" Font="Georgia" Design="WindowNoBar" StartPosition="CenterScreen">
+<Window Name="winEscMenu" Size="210,156" Position="0,0" Font="georgiaBold_16" Design="WindowNoBar" StartPosition="CenterScreen">
 	<GroupBox Name="grpEscMenu" Position="4,4" Size="202,148">
 		<Button Name="btnReturn" Text="Return to Game" Position="12,12" Size="178,28" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
 		<Button Name="btnOptions" Text="Options" Position="12,44" Size="178,28" Design="Orange" DesignHover="OrangeHover" DesignMouseDown="OrangeClick"/>

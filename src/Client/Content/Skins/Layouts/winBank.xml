@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Window Name="winBank" Caption="Bank" Size="390, 373" Position="0, 0" Font="Georgia" Icon="1" Design="WindowEmpty" StartPosition="CenterScreen">
+<Window Name="winBank" Caption="Bank" Size="390, 373" Position="0, 0" Font="georgiaBold_16" Icon="1" Design="WindowEmpty" StartPosition="CenterScreen">
     <Button Name="btnClose" Position="-19, 5" Size="16, 16" Image="8" ImageHover="9" ImageMouseDown="10" />
 </Window>

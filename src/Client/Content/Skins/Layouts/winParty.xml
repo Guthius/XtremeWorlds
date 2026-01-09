@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window Name="winParty" Caption="" Size="252, 158" Position="4, 78"
-        Font="Georgia" Design="WindowParty">
-    <Label Name="lblName1" Text="Name - Level 1" Position="60, 20" Size="173, 10" Font="Georgia"/>
-    <Label Name="lblName2" Text="Name - Level 1" Position="60, 60" Size="173, 10" Font="Georgia"/>
-    <Label Name="lblName3" Text="Name - Level 1" Position="60, 100" Size="173, 10" Font="Georgia"/>
+        Font="georgiaBold_16" Design="WindowParty">
+    <Label Name="lblName1" Text="Name - Level 1" Position="60, 20" Size="173, 10" Font="georgiaBold_16"/>
+    <Label Name="lblName2" Text="Name - Level 1" Position="60, 60" Size="173, 10" Font="georgiaBold_16"/>
+    <Label Name="lblName3" Text="Name - Level 1" Position="60, 100" Size="173, 10" Font="georgiaBold_16"/>
 
     <PictureBox Name="picEmptyBar_HP1" Position="58, 34" Size="173, 9" Image="62"/>
     <PictureBox Name="picEmptyBar_HP2" Position="58, 74" Size="173, 9" Image="62"/>
