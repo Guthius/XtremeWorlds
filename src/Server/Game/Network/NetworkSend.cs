@@ -270,7 +270,10 @@ public static class NetworkSend
 
         packetWriter.WriteEnum(ServerPackets.SJobData);
 
-        WriteJobDataToPacket(job, packetWriter);
+        for (var i = 0; i < Core.Globals.Variables.MaxJobs; i++)
+        {
+            WriteJobDataToPacket(i, packetWriter);
+        }
 
         PlayerService.Instance.SendDataToAll(packetWriter.GetBytes());
     }
