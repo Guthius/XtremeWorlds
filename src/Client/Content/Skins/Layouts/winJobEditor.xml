@@ -36,15 +36,15 @@
 
     <Label Name="lblStr" Text="Strength" Position="8, 74" Size="60, 16"/>
     <TextBox Name="txtStr" Position="72, 72" Size="40, 20" Design="TextWhite"/>
-    <Label Name="lblVit" Text="Vitality" Position="120, 74" Size="60, 16"/>
-    <TextBox Name="txtVit" Position="176, 72" Size="40, 20" Design="TextWhite"/>
-    <Label Name="lblInt" Text="Intelligence" Position="224, 74" Size="80, 16"/>
-    <TextBox Name="txtInt" Position="300, 72" Size="40, 20" Design="TextWhite"/>
+    <Label Name="lblVitality" Text="Vitality" Position="120, 74" Size="60, 16"/>
+    <TextBox Name="txtVitality" Position="176, 72" Size="40, 20" Design="TextWhite"/>
+    <Label Name="lblIntelligence" Text="Intelligence" Position="224, 74" Size="80, 16"/>
+    <TextBox Name="txtIntelligence" Position="300, 72" Size="40, 20" Design="TextWhite"/>
 
     <Label Name="lblLuck" Text="Luck" Position="8, 94" Size="32, 16"/>
     <TextBox Name="txtLuck" Position="72, 92" Size="40, 20" Design="TextWhite"/>
-    <Label Name="lblSpi" Text="Spirit" Position="120, 94" Size="40, 16"/>
-    <TextBox Name="txtSpi" Position="176, 92" Size="40, 20" Design="TextWhite"/>
+    <Label Name="lblSpirit" Text="Spirit" Position="120, 94" Size="40, 16"/>
+    <TextBox Name="txtSpirit" Position="176, 92" Size="40, 20" Design="TextWhite"/>
 
     <Label Name="lblMaleSprite" Text="Male Sprite" Position="340, 20" Size="80, 16"/>
     <ScrollBar Name="sldMaleSprite" Position="424, 22" Size="110, 12" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
