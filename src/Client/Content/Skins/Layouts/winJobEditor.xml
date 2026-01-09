@@ -15,10 +15,10 @@
   <!-- General group: name + description -->
   <GroupBox Name="grpGeneral" Caption="" Position="260, 28" Size="700, 140">
     <Label Name="lblName" Text="Name" Position="8, 16" Size="60, 16"/>
-    <TextBox Name="txtName" Position="72, 14" Size="240, 20" Design="TextWhite"/>
+    <TextBox Name="txtName" Position="80, 14" Size="240, 20" Design="TextWhite"/>
 
     <Label Name="lblDesc" Text="Description" Position="8, 44" Size="100, 16"/>
-    <TextBox Name="txtDesc" Position="72, 42" Size="600, 84" Design="TextWhite" Multiline="true"/>
+    <TextBox Name="txtDesc" Position="80, 42" Size="600, 84" Design="TextWhite" Multiline="true"/>
   </GroupBox>
 
   <!-- Start position and sprites -->
@@ -34,25 +34,25 @@
     <Label Name="lblMoveSpeed" Text="Move Speed" Position="8, 54" Size="80, 16"/>
     <TextBox Name="txtMoveSpeed" Position="88, 52" Size="60, 20" Design="TextWhite"/>
 
-    <Label Name="lblStr" Text="Str" Position="8, 74" Size="28, 16"/>
-    <TextBox Name="txtStr" Position="40, 72" Size="40, 20" Design="TextWhite"/>
-    <Label Name="lblVit" Text="Vit" Position="88, 74" Size="28, 16"/>
-    <TextBox Name="txtVit" Position="120, 72" Size="40, 20" Design="TextWhite"/>
-    <Label Name="lblInt" Text="Int" Position="168, 74" Size="28, 16"/>
-    <TextBox Name="txtInt" Position="200, 72" Size="40, 20" Design="TextWhite"/>
+    <Label Name="lblStr" Text="Strength" Position="8, 74" Size="60, 16"/>
+    <TextBox Name="txtStr" Position="72, 72" Size="40, 20" Design="TextWhite"/>
+    <Label Name="lblVit" Text="Vitality" Position="120, 74" Size="60, 16"/>
+    <TextBox Name="txtVit" Position="176, 72" Size="40, 20" Design="TextWhite"/>
+    <Label Name="lblInt" Text="Intelligence" Position="224, 74" Size="80, 16"/>
+    <TextBox Name="txtInt" Position="300, 72" Size="40, 20" Design="TextWhite"/>
 
     <Label Name="lblLuck" Text="Luck" Position="8, 94" Size="32, 16"/>
-    <TextBox Name="txtLuck" Position="40, 92" Size="40, 20" Design="TextWhite"/>
-    <Label Name="lblSpi" Text="Spi" Position="88, 94" Size="28, 16"/>
-    <TextBox Name="txtSpi" Position="120, 92" Size="40, 20" Design="TextWhite"/>
+    <TextBox Name="txtLuck" Position="72, 92" Size="40, 20" Design="TextWhite"/>
+    <Label Name="lblSpi" Text="Spirit" Position="120, 94" Size="40, 16"/>
+    <TextBox Name="txtSpi" Position="176, 92" Size="40, 20" Design="TextWhite"/>
 
-    <Label Name="lblMaleSprite" Text="Male Sprite" Position="260, 20" Size="120, 16"/>
-    <ScrollBar Name="sldMaleSprite" Position="344, 22" Size="100, 12" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
-    <PictureBox Name="picMale" Position="504, 16" Size="64, 64" Design="TextBlack"/>
+    <Label Name="lblMaleSprite" Text="Male Sprite" Position="340, 20" Size="80, 16"/>
+    <ScrollBar Name="sldMaleSprite" Position="424, 22" Size="110, 12" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+    <PictureBox Name="picMale" Position="630, 16" Size="64, 64" Design="TextBlack"/>
 
-    <Label Name="lblFemaleSprite" Text="Female Sprite" Position="260, 56" Size="120, 16"/>
-    <ScrollBar Name="sldFemaleSprite" Position="354, 58" Size="100, 12" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
-    <PictureBox Name="picFemale" Position="584, 16" Size="64, 64" Design="TextBlack"/>
+    <Label Name="lblFemaleSprite" Text="Female Sprite" Position="340, 56" Size="96, 16"/>
+    <ScrollBar Name="sldFemaleSprite" Position="424, 58" Size="110, 12" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+    <PictureBox Name="picFemale" Position="560, 16" Size="64, 64" Design="TextBlack"/>
   </GroupBox>
 
 	<!-- Start items (left of lower area) -->
