@@ -1883,7 +1883,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             var mapZoomMin = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MinZoom;
             var mapZoomMax = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxZoom;
             if (mapZoomMin <= 0) mapZoomMin = 0.5f;
-            if (mapZoomMax <= 0) mapZoomMax = 4.0f;
+            if (mapZoomMax <= 0) mapZoomMax = 2.0f;
             if (mapZoomMax < mapZoomMin) mapZoomMax = mapZoomMin;
             GameState.CameraZoom = Math.Clamp(mapZoomMin, mapZoomMin, mapZoomMax);
 

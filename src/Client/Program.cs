@@ -728,7 +728,7 @@ namespace Client
                     GameState.CameraZoom += zoomDelta;
 
                     float minZoom = 0.5f;
-                    float maxZoom = 4.0f;
+                    float maxZoom = 2.0f;
                     int mapIndex = GetPlayerMap(GameState.MyIndex);
                     if (mapIndex >= 0 && mapIndex < Client.Map.Instance.Count)
                     {
@@ -737,7 +737,7 @@ namespace Client
                     }
 
                     if (minZoom <= 0) minZoom = 0.5f;
-                    if (maxZoom <= 0) maxZoom = 4.0f;
+                    if (maxZoom <= 0) maxZoom = 2.0f;
                     if (maxZoom < minZoom) maxZoom = minZoom;
 
                     GameState.CameraZoom = Math.Clamp(GameState.CameraZoom, minZoom, maxZoom);

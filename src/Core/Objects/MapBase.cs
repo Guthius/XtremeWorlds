@@ -59,7 +59,7 @@ namespace Core.Objects
 
             // Defaults match existing clamp behavior.
             MinZoom = 0.5f;
-            MaxZoom = 4.0f;
+            MaxZoom = 2.0f;
 
             Npc = new int[Variables.MaxMapNpcs];
             for (var i = 0; i < Npc.Length; i++)

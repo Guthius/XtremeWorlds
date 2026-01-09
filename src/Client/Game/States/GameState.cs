@@ -52,7 +52,7 @@ namespace Client
 
         // Map editor zoom bounds
         public static float MapEditorMinZoom = 0.5f;
-        public static float MapEditorMaxZoom = 4.0f;
+        public static float MapEditorMaxZoom = 2.0f;
 
         public static int ResolutionHeight;
         public static int ResolutionWidth;

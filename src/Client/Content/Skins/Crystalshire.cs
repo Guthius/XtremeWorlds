@@ -233,8 +233,8 @@ public class Crystalshire
             var map = Client.Map.Instance[mapIndex];
 
             // Keep sane limits and ordering.
-            map.MinZoom = Math.Clamp(map.MinZoom <= 0 ? 0.5f : map.MinZoom, 0.5f, 4.0f);
-            map.MaxZoom = Math.Clamp(map.MaxZoom <= 0 ? 4.0f : map.MaxZoom, 0.5f, 4.0f);
+            map.MinZoom = Math.Clamp(map.MinZoom <= 0 ? 0.5f : map.MinZoom, 0.5f, 2.0f);
+            map.MaxZoom = Math.Clamp(map.MaxZoom <= 0 ? 2.0f : map.MaxZoom, 0.5f, 2.0f);
             if (map.MaxZoom < map.MinZoom)
                 map.MaxZoom = map.MinZoom;
 

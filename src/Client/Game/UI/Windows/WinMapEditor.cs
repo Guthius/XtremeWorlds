@@ -569,7 +569,7 @@ public class WinMapEditor
         if (WindowManager.TryGetControl("winMapEditor", "txtMinZoom", out var txtMinZoom))
             txtMinZoom.Text = (map.MinZoom <= 0 ? 0.5f : map.MinZoom).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
         if (WindowManager.TryGetControl("winMapEditor", "txtMaxZoom", out var txtMaxZoom))
-            txtMaxZoom.Text = (map.MaxZoom <= 0 ? 4.0f : map.MaxZoom).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+            txtMaxZoom.Text = (map.MaxZoom <= 0 ? 2.0f : map.MaxZoom).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
 
         // Tileset state + NPC list
         GameState.CurTileset = map.Tileset;
