@@ -24,16 +24,16 @@
 
     <!-- Equipment group -->
     <GroupBox Name="grpEquip" Caption="" Position="260, 290" Size="842, 150">
-        <Label Name="lblSpeed" Text="Attack Speed" Position="16, 12" Size="100, 16"/>
-        <TextBox Name="txtSpeed" Position="100, 10" Size="120, 20" Design="TextWhite"/>
+        <Label Name="lblAttackSpeed" Text="Attack Speed" Position="8, 12" Size="100, 16"/>
+        <TextBox Name="txtAttackSpeed" Position="100, 10" Size="120, 20" Design="TextWhite"/>
         <Label Name="lblDamage" Text="Damage" Position="232, 12" Size="80, 16"/>
         <TextBox Name="txtDamage" Position="292, 10" Size="120, 20" Design="TextWhite"/>
         <CheckBox Name="chkKnockback" Text="Knockback" Position="432, 10" Size="120, 20"/>
-        <Label Name="lblTool" Text="Tool" Position="16, 40" Size="60, 16"/>
+        <Label Name="lblTool" Text="Tool" Position="8, 40" Size="60, 16"/>
         <ComboBox Name="cmbTool" Position="100, 38" Size="160, 18"/>
         <Label Name="lblKnockbackTiles" Text="Distance" Position="272, 40" Size="80, 16"/>
         <ComboBox Name="cmbKnockBackTiles" Position="356, 38" Size="160, 18"/>
-        <Label Name="lblPaperdollEquip" Text="Paperdoll" Position="16, 64" Size="100, 16"/>
+        <Label Name="lblPaperdoll" Text="Paperdoll" Position="8, 64" Size="100, 16"/>
         <ScrollBar Name="sldPaperdoll" Position="100, 66" Size="200, 12" Min="0" Max="0" Orientation="Horizontal" ThumbSize="16"/>
         <PictureBox Name="picPaperdoll" Position="320, 68" Size="80, 80" Image="" Design="TextBlack"/>
     </GroupBox>
