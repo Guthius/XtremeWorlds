@@ -15,34 +15,34 @@
 	<!-- Details group (right) -->
 	<GroupBox Name="grpDetails" Caption="Details" Position="246,28" Size="496,336">
 		<!-- Name -->
-		<Label Name="lblName" Text="Name" Position="12,24" Size="60,18"/>
+		<Label Name="lblName" Text="Name" Position="8,24" Size="60,18"/>
 		<TextBox Name="txtName" Position="80,20" Size="220,22" Design="TextWhite"/>
 
 		<!-- Sprite -->
-		<Label Name="lblSprite" Text="Sprite" Position="12,56" Size="80,18"/>
+		<Label Name="lblSprite" Text="Sprite" Position="8,56" Size="80,18"/>
 		<ScrollBar Name="sldSprite" Position="80,56" Size="180,14" Min="0" Max="1" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 
 		<!-- Range -->
-		<Label Name="lblRange" Text="Range" Position="12,88" Size="60,18"/>
+		<Label Name="lblRange" Text="Range" Position="8,88" Size="60,18"/>
 		<ScrollBar Name="sldRange" Position="80,88" Size="180,14" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 		<Label Name="lblRangeVal" Text="0" Position="268,86" Size="40,18"/>
 
 		<!-- Speed -->
-		<Label Name="lblSpeed" Text="Speed" Position="12,120" Size="80,18"/>
+		<Label Name="lblSpeed" Text="Speed" Position="8,120" Size="80,18"/>
 		<ScrollBar Name="sldSpeed" Position="80,120" Size="180,14" Min="0" Max="1000" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 		<Label Name="lblSpeedVal" Text="0" Position="268,118" Size="60,18"/>
 
 		<!-- Damage -->
-		<Label Name="lblDamage" Text="Damage" Position="12,152" Size="80,18"/>
+		<Label Name="lblDamage" Text="Damage" Position="8,152" Size="80,18"/>
 		<ScrollBar Name="sldDamage" Position="80,152" Size="180,14" Min="0" Max="100000" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 		<Label Name="lblDamageVal" Text="0" Position="268,150" Size="80,18"/>
 
 		<!-- Animation -->
-		<Label Name="lblAnimation" Text="Animation" Position="12,180" Size="100,18"/>
+		<Label Name="lblAnimation" Text="Animation" Position="8,180" Size="100,18"/>
 		<ComboBox Name="cmbAnimation" Position="80,182" Size="220,20"/>
 
 		<!-- Preview -->
-		<Label Name="lblPreview" Text="Preview" Position="12,216" Size="80,18"/>
+		<Label Name="lblPreview" Text="Preview" Position="8,216" Size="80,18"/>
 		<PictureBox Name="picSprite" Position="80,216" Size="96,96" Design="TextBlack"/>
 
 		<!-- Buttons -->
