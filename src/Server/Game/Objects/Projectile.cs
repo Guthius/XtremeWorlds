@@ -139,7 +139,7 @@ public class Projectile : ProjectileBase, IAsyncData
                     }
                     catch (Exception ex)
                     {
-                        General.Logger.LogError(ex, "[Script] Error in {MethodName}", OnAttack);
+                        General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(OnAttack));
                     }
                 }
                 return;
