@@ -108,7 +108,7 @@ public class Projectile : ProjectileBase, IAsyncData
                     }
                     catch (Exception ex)
                     {
-                        General.Logger.LogError(ex, "[Script] Error in {MethodName}", "AttemptAttack");
+                        General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(OnAttack));
                     }
                 }
                 return;
@@ -139,7 +139,7 @@ public class Projectile : ProjectileBase, IAsyncData
                     }
                     catch (Exception ex)
                     {
-                        General.Logger.LogError(ex, "[Script] Error in {MethodName}", "ProjectileAttack");
+                        General.Logger.LogError(ex, "[Script] Error in {MethodName}", OnAttack);
                     }
                 }
                 return;
@@ -611,7 +611,7 @@ public class Projectile : ProjectileBase, IAsyncData
                         }
                         catch (Exception ex)
                         {
-                            General.Logger.LogError(ex, "[Script] Error in {MethodName}", "ProjectileAttack");
+                            General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(OnUpdate));
                         }
                         MapProjectile.OnClear(map, i);
                         moved = false;

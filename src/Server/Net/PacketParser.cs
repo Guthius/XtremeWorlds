@@ -101,8 +101,6 @@ public abstract class PacketParser<TPacketId, TSession> where TPacketId : Enum
         }
         catch (Exception ex)
         {
-            // Never let handler exceptions tear down the TCP session.
-            // Use server logger for visibility.
             Server.General.Logger.LogError(ex, "Packet handler error (id={PacketId})", packetId);
         }
     }
