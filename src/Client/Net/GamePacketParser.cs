@@ -43,7 +43,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Bind(Packets.ServerPackets.SMapItemsData, Packet_MapItemsData);
         Bind(Packets.ServerPackets.SMapNpcData, Packet_MapNpcData);
         Bind(Packets.ServerPackets.SMapNpcUpdate, Packet_MapNpcUpdate);
-        Bind(Packets.ServerPackets.SGlobalMsg, Packet_GlobalMsg);
+        Bind(Packets.ServerPackets.SGlobalMsg, Packet_GlobalMessage);
         Bind(Packets.ServerPackets.SSendAdminMessage, Packet_SendAdminMessage);
         Bind(Packets.ServerPackets.SPlayerMsg, Packet_PlayerMsg);
         Bind(Packets.ServerPackets.SSendMapMessage, Packet_SendMapMessage);
@@ -559,7 +559,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         MapNpc.Instance[npc].AttackTimer = General.GetTickCount();
     }
 
-    private static void Packet_GlobalMsg(ReadOnlyMemory<byte> data)
+    private static void Packet_GlobalMessage(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
         var message = packetReader.ReadString();
