@@ -29,6 +29,7 @@ namespace Server
             Instance[map, index].SkillCd = new int[Core.Globals.Variables.MaxNpcSkills];
             Instance[map, index].Num = -1;
             Instance[map, index].SkillBuffer = -1;
+            Instance[map, index].DeathTimer = 0;
         }
 
 
@@ -81,7 +82,8 @@ namespace Server
 
             Instance[map, mapNpcNum].Num = npcNum;
             Instance[map, mapNpcNum].Target = 0;
-            Instance[map, mapNpcNum].TargetType = 0; // Clear
+            Instance[map, mapNpcNum].TargetType = 0;
+            Instance[map, mapNpcNum].DeathTimer = 0;
 
             var vitals = Enum.GetValues<Vital>();
             foreach (var vital in vitals)
@@ -175,6 +177,7 @@ namespace Server
                 packet.WriteInt32(Instance[map, mapNpcNum].X);
                 packet.WriteInt32(Instance[map, mapNpcNum].Y);
                 packet.WriteByte(Instance[map, mapNpcNum].Dir);
+                packet.WriteInt32(Instance[map, mapNpcNum].DeathTimer);
 
                 var vitalCount = Enum.GetValues<Vital>().Length;
                 for (var i = 0; i < vitalCount; i++)

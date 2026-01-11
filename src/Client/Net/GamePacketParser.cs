@@ -618,6 +618,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         mapNpc.X = packetReader.ReadInt32();
         mapNpc.Y = packetReader.ReadInt32();
         mapNpc.Dir = packetReader.ReadByte();
+        mapNpc.DeathTimer = packetReader.ReadInt32();
 
         var vitalCount = Enum.GetValues<Vital>().Length;
         for (npc = 0; npc < vitalCount; npc++)

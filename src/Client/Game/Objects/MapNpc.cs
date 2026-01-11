@@ -45,14 +45,14 @@ namespace Client
             var color = default(Color);
             var backColor = default(Color);
 
-            double npc = MapNpc.Instance[mapNpcNum].Num;
+            int npc = MapNpc.Instance[mapNpcNum].Num;
 
-            if (npc < 0 | npc > Variables.MaxNpcs) return;
+            if (npc < 0 || npc > Variables.MaxNpcs) return;
             if (EditorType.Map == GameState.MyEditorType) return;
 
-            if (Npc.Instance.Count <= (int)npc)
+            if (Npc.Instance.Count <= npc)
                 return;
-            switch (Npc.Instance[(int)npc].Behavior)
+            switch (Npc.Instance[npc].Behavior)
             {
                 case 0: color = Color.Red; backColor = Color.Black; break;
                 case 1: color = Color.Green; backColor = Color.Black; break;
@@ -62,7 +62,7 @@ namespace Client
             var remaining = MapNpc.Instance[mapNpcNum].DeathTimer - General.GetTickCount() / 1000;
             if (remaining < 0) remaining = 0;
 
-            var name = remaining > 0 ? $"{remaining}..." : Npc.Instance[(int)npc].Name;
+            var name = remaining > 0 ? $"{remaining}..." : Npc.Instance[npc].Name;
 
             int baseWorldX = MapNpc.Instance[mapNpcNum].X;
             int baseWorldY = MapNpc.Instance[mapNpcNum].Y;
@@ -79,8 +79,8 @@ namespace Client
             }
             var drawX = baseScreenX + (Constants.TileSize - textWidth) / 2;
 
-            int spriteNum = Npc.Instance[(int)npc].Sprite;
-            if (spriteNum <= 0 || spriteNum > GameState.NumCharacters)
+            int sprite = Npc.Instance[npc].Sprite;
+            if (sprite <= 0 || sprite > GameState.NumCharacters)
             {
                 // No valid graphic: render just above feet similar to player fallback
                 int screenY = GameLogic.ConvertMapY(baseWorldY);
@@ -89,7 +89,7 @@ namespace Client
                 return;
             }
 
-            var gfxInfo = GameClient.GetGfxInfo(System.IO.Path.Combine(Core.Globals.DataPath.Characters, spriteNum.ToString()));
+            var gfxInfo = GameClient.GetGfxInfo(System.IO.Path.Combine(Core.Globals.DataPath.Characters, sprite.ToString()));
             if (gfxInfo == null || gfxInfo.Height <= 0)
             {
                 int screenY = GameLogic.ConvertMapY(baseWorldY);
@@ -134,15 +134,15 @@ namespace Client
             int attackSpeed = 1000; // attack duration (ms) for one full NPC attack animation cycle
 
             // Check if Npc exists
-            if (MapNpc.Instance[(int)npc].Num < 0 ||
-                MapNpc.Instance[(int)npc].Num > Variables.MaxNpcs)
+            if (MapNpc.Instance[npc].Num < 0 ||
+                MapNpc.Instance[npc].Num > Variables.MaxNpcs)
                 return;
 
             if (EditorType.Map == GameState.MyEditorType)
                 return;
 
-            x = (int)Math.Floor((double)MapNpc.Instance[(int)npc].X / Constants.TileSize);
-            y = (int)Math.Floor((double)MapNpc.Instance[(int)npc].Y / Constants.TileSize);
+            x = (int)Math.Floor((double)MapNpc.Instance[npc].X / Constants.TileSize);
+            y = (int)Math.Floor((double)MapNpc.Instance[npc].Y / Constants.TileSize);
 
             // Ensure Npc is within the tile view range
             if (x < GameState.TileView.Left |
@@ -190,7 +190,7 @@ namespace Client
             int directionRows = GameClient.ComputeDirectionRows(gfxInfo.Height, Math.Max(1, SettingsManager.Instance.SpriteDirections));
 
             // Map direction to row after computing available rows
-            spriteLeft = GameClient.MapDirectionToRow((Direction)MapNpc.Instance[(int)npc].Dir, directionRows);
+            spriteLeft = GameClient.MapDirectionToRow((Direction)MapNpc.Instance[npc].Dir, directionRows);
             int idleFrames = Math.Max(1, SettingsManager.Instance.IdleFrames);
             int runFrames = Math.Max(1, SettingsManager.Instance.RunFrames);
             int attackFrames = Math.Max(1, SettingsManager.Instance.AttackFrames);
