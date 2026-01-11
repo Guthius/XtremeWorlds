@@ -210,21 +210,6 @@ public class Crystalshire
     {
         var window = WindowLoader.FromLayout("winMapEditor");
 
-        // Zoom bounds (map editor only)
-        static float ParseFloatOr(string s, float fallback)
-        {
-            if (string.IsNullOrWhiteSpace(s)) return fallback;
-            s = s.Trim();
-            // accept both '.' and ',' as decimal separators
-            if (float.TryParse(s, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var v))
-                return v;
-            if (float.TryParse(s, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.CurrentCulture, out v))
-                return v;
-            if (float.TryParse(s.Replace(',', '.'), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out v))
-                return v;
-            return fallback;
-        }
-
         static void ClampMapZoomBounds()
         {
             var mapIndex = GetPlayerMap(GameState.MyIndex);
