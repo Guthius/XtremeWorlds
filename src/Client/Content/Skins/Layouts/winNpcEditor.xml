@@ -22,7 +22,7 @@
     <ComboBox Name="cmbBehavior" Position="90, 68" Size="200, 18"/>
     <Label Name="lblSpawnPeriod" Text="Spawn" Position="12, 94" Size="70, 16"/>
     <ComboBox Name="cmbSpawnPeriod" Position="90, 92" Size="200, 18"/>
-    <Label Name="lblAnimation" Text="Animation" Position="12, 118" Size="70, 16"/>
+    <Label Name="lblAnimation" Text="Animation" Position="12, 118" Size="80, 16"/>
     <ComboBox Name="cmbAnimation" Position="90, 116" Size="200, 18"/>
     <Label Name="lblFaction" Text="Faction" Position="12, 142" Size="70, 16"/>
     <ComboBox Name="cmbFaction" Position="90, 140" Size="200, 18"/>
