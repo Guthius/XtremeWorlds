@@ -23,7 +23,7 @@
 		<ScrollBar Name="sldSprite" Position="80,56" Size="180,14" Min="0" Max="1" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 
 		<!-- Range -->
-		<Label Name="lblRange" Text="Range:" Position="12,88" Size="60,18"/>
+		<Label Name="lblRange" Text="Range" Position="12,88" Size="60,18"/>
 		<ScrollBar Name="sldRange" Position="80,88" Size="180,14" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 		<Label Name="lblRangeVal" Text="0" Position="268,86" Size="40,18"/>
 
