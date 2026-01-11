@@ -281,9 +281,9 @@ public class Crystalshire
 
                 // Zoom bounds: parse the live text (Text + ChatShowLine) so values are editable
                 if (WindowManager.TryGetControl("winMapEditor", "txtMinZoom", out var minCtrl) && minCtrl is TextBox minTb)
-                    Client.Map.Instance[mapIndex].MinZoom = ParseFloatOr(GetLiveText(minTb), Client.Map.Instance[mapIndex].MinZoom);
+                    Client.Map.Instance[mapIndex].MinZoom = (float)Conversion.ToDouble(GetLiveText(minTb));
                 if (WindowManager.TryGetControl("winMapEditor", "txtMaxZoom", out var maxCtrl) && maxCtrl is TextBox maxTb)
-                    Client.Map.Instance[mapIndex].MaxZoom = ParseFloatOr(GetLiveText(maxTb), Client.Map.Instance[mapIndex].MaxZoom);
+                    Client.Map.Instance[mapIndex].MaxZoom = (float)Conversion.ToDouble(GetLiveText(maxTb));
                 ClampMapZoomBounds();
 
                 // Name & Music & Shop & Moral
