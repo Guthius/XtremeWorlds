@@ -1423,7 +1423,7 @@ public class Script
         if (!IsAlive(attacker) || !IsAlive(target)) return false;
         if (!IsSkillRanged(skillId) && !IsInMeleeRange(attacker, target) && allowOutOfRange == false) return false;
 
-        if (!Moral.Instance[Server.Map.Instance[GetPlayerMap(attacker.Id)].Moral].CanPk && attacker.Type == Entity.EntityType.Player && target.Type == Entity.EntityType.Player)
+        if (attacker.Type == Entity.EntityType.Player && target.Type == Entity.EntityType.Player && !Moral.Instance[Server.Map.Instance[attacker.Map].Moral].CanPk)
         {
             return false; // PvP not allowed on this map
         }
@@ -2512,7 +2512,7 @@ public class Script
         }
         else if (attacker.Type == Entity.EntityType.Npc)
         {
-            NetworkSend.SendNpcAttack(attacker.Map, (byte)attacker.Id);
+            NetworkSend.SendNpcAttack(attacker.Map, attacker.Id);
         }
     }
 
