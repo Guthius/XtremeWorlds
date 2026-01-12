@@ -32,7 +32,6 @@ namespace Server
             Instance[map, index].DeathTimer = 0;
         }
 
-
         public static async System.Threading.Tasks.Task OnSpawnAll()
         {
             await Task.WhenAll(Enumerable

@@ -66,7 +66,7 @@
   <Chat Key="Help3" Value="-[message] = Party Message" />
   <Chat Key="Help4" Value="![player] [message] = Player Message" />
   <Chat Key="Help5" Value="@[message] = Admin Message" />
-  <Chat Key="Help6" Value="Available Commands: /help, /info, &#xD;&#xA;/fps, /lps, /stats, /trade, &#xD;&#xA;/party, /join, /leave" />
+  <Chat Key="Help6" Value="Available Commands: /help, /info, &#xD;&#xA;/fps, /lps, /stats, /trade, &#xD;&#xA;/party, /join, /leave, /giveup" />
   <Chat Key="AdminGblMsg" Value="''msghere = Global Admin Message" />
   <Chat Key="AdminPvtMsg" Value="= msghere = Private Admin Message" />
   <Chat Key="Admin1" Value="Social Commands:" />

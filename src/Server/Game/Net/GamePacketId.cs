@@ -130,6 +130,9 @@ public static class GamePacketId
         CCloseEditor,
 
         // Cancel current cast/buffer
-        CCancelCast
+        CCancelCast,
+
+        // Request an early respawn while waiting on the death timer.
+        CRespawnNow
     }
 }

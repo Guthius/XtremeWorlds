@@ -149,7 +149,7 @@ public static class General
         {
             try
             {
-                await Loop.OnStart();
+                await Loop.OnUpdate();
             }
             catch (Exception ex)
             {
@@ -159,7 +159,7 @@ public static class General
         }
         else
         {
-            await Loop.OnStart();
+            await Loop.OnUpdate();
         }
     }
 

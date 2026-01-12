@@ -117,6 +117,50 @@ public class WinCharacter
         OnMouseMove();
     }
 
+    public static void OnMouseDown()
+    {
+        var winCharacter = WindowManager.GetWindowByName("winCharacter");
+        if (winCharacter is null)
+        {
+            return;
+        }
+
+        var slot = General.IsEq(winCharacter.X, winCharacter.Y);
+        if (slot < 0 || slot >= EquipmentTypes.Length)
+        {
+            OnMouseMove();
+            return;
+        }
+
+        var item = GetPlayerPaperdoll(GameState.MyIndex, EquipmentTypes[slot]);
+        if (item < 0 || item >= Item.Instance.Count)
+        {
+            OnMouseMove();
+            return;
+        }
+
+        ref var dragBox = ref WindowManager.DragBox;
+
+        dragBox.Type = DraggablePartType.Item;
+        dragBox.Value = item;
+        dragBox.Origin = PartOrigin.Character;
+        dragBox.Slot = slot;
+
+        var windowIndex = WindowManager.GetWindow("winDragBox");
+        var winDragBox = WindowManager.Windows[windowIndex];
+
+        winDragBox.X = GameState.CurMouseX;
+        winDragBox.Y = GameState.CurMouseY;
+        winDragBox.MovedX = GameState.CurMouseX - winDragBox.X;
+        winDragBox.MovedY = GameState.CurMouseY - winDragBox.Y;
+
+        WindowManager.ShowWindow(windowIndex, resetPosition: false);
+
+        winCharacter.State = ControlState.Normal;
+
+        OnMouseMove();
+    }
+
     public static void OnMouseMove()
     {
         if (WindowManager.DragBox.Type != DraggablePartType.None)

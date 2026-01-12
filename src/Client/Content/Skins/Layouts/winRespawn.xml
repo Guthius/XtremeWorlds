@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window Name="winRespawn" Caption="Respawn"
+        Size="220, 120" Position="0, 0"
+        Icon="312" IconOffset="3,5"
+        Font="georgiaBold_16"
+        Design="WindowNormal"
+        StartPosition="CenterScreen"
+        Visible="false">
+
+    <PictureBox Name="picParchment" Position="6, 26" Size="207, 88" Design="Parchment"/>
+
+    <Button Name="btnRespawn" Text="Respawn" Position="76, 64" Size="68, 24" Font="georgiaBold_16"
+            Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+</Window>

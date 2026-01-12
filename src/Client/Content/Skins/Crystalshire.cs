@@ -2317,7 +2317,7 @@ public class Crystalshire
         var window = WindowLoader.FromLayout("winCharacter");
         window.OnDraw = WinCharacter.OnDrawCharacter;
         window.CallBack[(int)ControlState.MouseMove] = WinCharacter.OnMouseMove;
-        window.CallBack[(int)ControlState.MouseDown] = WinCharacter.OnMouseMove;
+        window.CallBack[(int)ControlState.MouseDown] = WinCharacter.OnMouseDown;
         window.CallBack[(int)ControlState.DoubleClick] = WinCharacter.OnDoubleClick;
         window.GetChild("btnClose").CallBack[(int)ControlState.MouseDown] = WinMenu.OnCharacterClick;
         // Stat buttons may exist in layout; wire them if present
@@ -2356,6 +2356,12 @@ public class Crystalshire
         var window = WindowLoader.FromLayout("winDragBox");
         window.OnDraw = WinDragBox.OnDraw;
         window.CallBack[(int)ControlState.MouseUp] = WinDragBox.DragBox_Check;
+    }
+
+    public void UpdateWindow_Respawn()
+    {
+        var window = WindowLoader.FromLayout("winRespawn");
+        window.GetChild("btnRespawn").CallBack[(int)ControlState.MouseDown] = WinRespawn.OnRespawnClick;
     }
 
     public void UpdateWindow_Options()
@@ -2418,6 +2424,7 @@ public class Crystalshire
         window.OnDraw = WinShop.OnDrawBackground;
         window.CallBack[(int)ControlState.MouseMove] = WinShop.OnMouseMove;
         window.CallBack[(int)ControlState.MouseDown] = WinShop.OnMouseDown;
+        window.CallBack[(int)ControlState.DoubleClick] = WinShop.OnDoubleClick;
         window.GetChild("btnClose").CallBack[(int)ControlState.MouseDown] = WinShop.OnClose;
         window.GetChild("picParchment").OnDraw = WinShop.OnDraw;
         window.GetChild("btnBuy").CallBack[(int)ControlState.MouseDown] = WinShop.OnBuy;

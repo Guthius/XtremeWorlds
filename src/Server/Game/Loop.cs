@@ -20,7 +20,7 @@ public static class Loop
     private static int _savePlayersRunning;
     private static long _savePlayersStartedMs;
 
-    public static async System.Threading.Tasks.Task OnStart()
+    public static async System.Threading.Tasks.Task OnUpdate()
     {
         var tmr25 = 0;
         var tmr500 = 0;
@@ -639,63 +639,86 @@ public static class Loop
                         var pid = entity.Target;
                         if (NetworkConfig.IsPlaying(pid) && GetPlayerMap(pid) == map)
                         {
-                            // Clear target if out of chase range
-                            int ex = entity.X / Constants.TileSize;
-                            int ey = entity.Y / Constants.TileSize;
-                            int px = GetPlayerX(pid);
-                            int py = GetPlayerY(pid);
-                            int r = entity.Range;
-                            if (Math.Abs(ex - px) > r || Math.Abs(ey - py) > r)
+                            if (pid < 0 || pid >= Server.Player.Instance.Count || Server.Player.Instance[pid].Dead)
                             {
                                 entity.Target = -1;
                                 entity.TargetType = 0;
-                                // reflect to base map npc if this is an NPC snapshot
+
+                                // If the target player is dead, clear the base MapNpc target too.
                                 if (entity.Type == Core.Globals.Entity.EntityType.Npc && map >= 0 && map < Variables.MaxMaps)
                                 {
                                     if (entity.Id >= 0 && entity.Id < Variables.MaxMapNpcs)
                                     {
                                         ref var npc = ref MapNpc.Instance[map, entity.Id];
-                                        npc.TargetType = 0;
                                         npc.Target = -1;
+                                        npc.TargetType = 0;
+                                        npc.Attacking = 0;
+                                        npc.AttackTimer = 0;
+                                        npc.SkillBuffer = -1;
+                                        npc.SkillBufferTimer = 0;
                                     }
                                 }
                             }
                             else
                             {
-                                var targetEntity = Core.Globals.Entity.FromPlayer(pid, Player.Instance[pid]);
-                                targetEntity.Map = map;
-                                // NPC skills: select a valid skill and cast it directly; otherwise do a basic attack
-                                bool didCast = false;
-                                if (entity.Type == Core.Globals.Entity.EntityType.Npc && entity.Num >= 0 && entity.Num < Npc.Instance.Count)
+                                // Clear target if out of chase range
+                                int ex = entity.X / Constants.TileSize;
+                                int ey = entity.Y / Constants.TileSize;
+                                int px = GetPlayerX(pid);
+                                int py = GetPlayerY(pid);
+                                int r = entity.Range;
+                                if (Math.Abs(ex - px) > r || Math.Abs(ey - py) > r)
                                 {
-                                    var skills = Npc.Instance[entity.Num].Skill;
-                                    if (skills != null)
+                                    entity.Target = -1;
+                                    entity.TargetType = 0;
+                                    // reflect to base map npc if this is an NPC snapshot
+                                    if (entity.Type == Core.Globals.Entity.EntityType.Npc && map >= 0 && map < Variables.MaxMaps)
                                     {
-                                        long nowMs = General.GetTime();
-                                        int dist = Math.Max(Math.Abs(ex - px), Math.Abs(ey - py));
-                                        for (int slot = 0; slot < Core.Globals.Variables.MaxNpcSkills && slot < skills.Length; slot++)
+                                        if (entity.Id >= 0 && entity.Id < Variables.MaxMapNpcs)
                                         {
-                                            int sid = skills[slot];
-                                            if (sid <= 0 || sid >= Skill.Instance.Count) continue;
-                                            var sk = Skill.Instance[sid];
-                                            bool inRange = sk.Range == 0 ? (sk.IsAoE || dist <= 1) : dist <= sk.Range;
-                                            if (!inRange) continue;
-                                            if (map < 0 || map >= Variables.MaxMaps) break;
-                                            if (entity.Id < 0 || entity.Id >= Variables.MaxMapNpcs) break;
-                                            ref var baseNpc = ref MapNpc.Instance[map, entity.Id];
-                                            bool cdReady = baseNpc.SkillCd == null || slot >= baseNpc.SkillCd.Length || baseNpc.SkillCd[slot] <= nowMs;
-                                            if (!cdReady) continue;
-                                            if (entity.Vital == null || entity.Vital.Length <= (int)Core.Globals.Vital.Mana || entity.Vital[(int)Core.Globals.Vital.Mana] < sk.MpCost) continue;
-                                            Script.Instance?.CastSkill(map, entity, sid, slot);
-                                            didCast = true;
-                                            break;
+                                            ref var npc = ref MapNpc.Instance[map, entity.Id];
+                                            npc.TargetType = 0;
+                                            npc.Target = -1;
                                         }
                                     }
                                 }
-
-                                if (!didCast)
+                                else
                                 {
-                                    Script.Instance?.AttemptAttack(entity, targetEntity);
+                                    var targetEntity = Core.Globals.Entity.FromPlayer(pid, Player.Instance[pid]);
+                                    targetEntity.Map = map;
+                                    // NPC skills: select a valid skill and cast it directly; otherwise do a basic attack
+                                    bool didCast = false;
+                                    if (entity.Type == Core.Globals.Entity.EntityType.Npc && entity.Num >= 0 && entity.Num < Npc.Instance.Count)
+                                    {
+                                        var skills = Npc.Instance[entity.Num].Skill;
+                                        if (skills != null)
+                                        {
+                                            long nowMs = General.GetTime();
+                                            int dist = Math.Max(Math.Abs(ex - px), Math.Abs(ey - py));
+                                            for (int slot = 0; slot < Core.Globals.Variables.MaxNpcSkills && slot < skills.Length; slot++)
+                                            {
+                                                int sid = skills[slot];
+                                                if (sid <= 0 || sid >= Skill.Instance.Count) continue;
+                                                var sk = Skill.Instance[sid];
+                                                bool inRange = sk.Range == 0 ? (sk.IsAoE || dist <= 1) : dist <= sk.Range;
+                                                if (!inRange) continue;
+                                                if (map < 0 || map >= Variables.MaxMaps) break;
+                                                if (entity.Id < 0 || entity.Id >= Variables.MaxMapNpcs) break;
+                                                ref var baseNpc = ref MapNpc.Instance[map, entity.Id];
+                                                bool cdReady = baseNpc.SkillCd == null || slot >= baseNpc.SkillCd.Length || baseNpc.SkillCd[slot] <= nowMs;
+                                                if (!cdReady) continue;
+                                                if (entity.Vital == null || entity.Vital.Length <= (int)Core.Globals.Vital.Mana || entity.Vital[(int)Core.Globals.Vital.Mana] < sk.MpCost) continue;
+                                                Script.Instance?.CastSkill(map, entity, sid, slot);
+                                                didCast = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    if (!didCast)
+                                    {
+                                        Script.Instance?.AttemptAttack(entity, targetEntity);
+                                    }
                                 }
                             }
                         }
@@ -728,6 +751,28 @@ public static class Loop
                             var targetEntity = entities[id];
                             if (targetEntity != null && targetEntity.Type == Core.Globals.Entity.EntityType.Npc && targetEntity.Map == map && targetEntity.Num >= 0)
                             {
+                                // Clear target if target NPC is dead (corpse window)
+                                if (map >= 0 && map < Variables.MaxMaps && targetEntity.Id >= 0 && targetEntity.Id < Variables.MaxMapNpcs)
+                                {
+                                    var expiry = MapNpc.Instance[map, targetEntity.Id].DeathTimer;
+                                    if (expiry > 0 && expiry > General.GetTime())
+                                    {
+                                        entity.Target = -1;
+                                        entity.TargetType = 0;
+                                        if (entity.Type == Core.Globals.Entity.EntityType.Npc && entity.Id >= 0 && entity.Id < Variables.MaxMapNpcs)
+                                        {
+                                            ref var npc = ref MapNpc.Instance[map, entity.Id];
+                                            npc.Target = -1;
+                                            npc.TargetType = 0;
+                                            npc.Attacking = 0;
+                                            npc.AttackTimer = 0;
+                                            npc.SkillBuffer = -1;
+                                            npc.SkillBufferTimer = 0;
+                                        }
+                                        goto SkipNpcTargetAttack;
+                                    }
+                                }
+
                                 int ex = entity.X / Constants.TileSize;
                                 int ey = entity.Y / Constants.TileSize;
                                 int tx = targetEntity.X / Constants.TileSize;
@@ -821,6 +866,8 @@ public static class Loop
                                 }
                             }
                         }
+
+                    SkipNpcTargetAttack:;
                     }
                 }
 

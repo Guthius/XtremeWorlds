@@ -193,6 +193,46 @@ public class WinShop
         OnMouseMove();
     }
 
+    public static void OnDoubleClick()
+    {
+        var winShop = WindowManager.GetWindowByName("winShop");
+        if (winShop is null)
+        {
+            return;
+        }
+
+        if (GameState.InShop < 0 || GameState.InShop > Variables.MaxShops)
+        {
+            return;
+        }
+
+        var slot = General.IsShop(winShop.X, winShop.Y);
+        if (slot < 0)
+        {
+            OnMouseMove();
+            return;
+        }
+
+        GameState.ShopSelectedSlot = slot;
+
+        if (GameState.ShopIsSelling)
+        {
+            if (GetPlayerInv(GameState.MyIndex, slot) >= 0)
+            {
+                Sender.SendSellItem(slot);
+            }
+        }
+        else
+        {
+            if (Shop.Instance[GameState.InShop].TradeItem[slot].Item >= 0)
+            {
+                Sender.SendBuyItem(slot);
+            }
+        }
+
+        OnMouseMove();
+    }
+
     public static void OnMouseMove()
     {
         var winShop = WindowManager.GetWindowByName("winShop");

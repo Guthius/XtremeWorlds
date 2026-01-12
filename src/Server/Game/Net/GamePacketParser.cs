@@ -160,6 +160,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
         Bind(Packets.ClientPackets.CCloseEditor, Packet_CloseEditor);
         Bind(Packets.ClientPackets.CCancelCast, Packet_CancelCast);
+        Bind(Packets.ClientPackets.CRespawnNow, Packet_RespawnNow);
     }
 
     private static ValueTask Packet_Ping(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -512,6 +513,41 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendLeftGame(session.Id);
 
         await Server.Player.OnExit(session.Id).ConfigureAwait(false);
+    }
+
+    private static async ValueTask Packet_RespawnNow(GameSession session, ReadOnlyMemory<byte> bytes)
+    {
+        var playerId = session.Id;
+        
+        // No payload.
+        if (!NetworkConfig.IsPlaying(session.Id))
+        {
+            return;
+        }
+
+        // Only allow during the respawn window.
+        if (!Server.Player.Instance[playerId].Dead)
+        {
+            return;
+        }
+
+        var now = (int)General.GetTime();
+        var expiry = Server.Player.Instance[playerId].DeathTimer;
+        if (expiry <= 0 || expiry <= now)
+        {
+            // Timer already expired; normal loop/queued task will handle it.
+            return;
+        }
+
+        // Respawn immediately.
+        try
+        {
+            Script.Instance?.OnDeath(playerId);
+        }
+        catch (Exception ex)
+        {
+            General.Logger.LogError(ex, "Error handling early respawn for playerId={PlayerId}", playerId);
+        }
     }
 
     private static async ValueTask Packet_SayMessage(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -2703,24 +2739,39 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             if (hotbar[slot].SlotType == (byte)DraggablePartType.Item)
             {
                 int eqSlot = -1;
-                for (int i = 0; i < 4; i++)
+                var paperdoll = PlayerBase.Instance[session.Id].Paperdoll;
+                for (int i = 0; i < paperdoll.Length; i++)
                 {
-                    if (PlayerBase.Instance[session.Id].Paperdoll[i].Num == hotbar[slot].Slot)
+                    if (paperdoll[i].Num == hotbar[slot].Slot)
                     {
                         eqSlot = i;
                         break;
                     }
                 }
 
-                int m = Server.Player.FindOpenInvSlot(session.Id, (int)PlayerBase.Instance[session.Id].Paperdoll[eqSlot].Num);
-
-                if (eqSlot >= 0 && m >= 0)
+                if (eqSlot >= 0)
                 {
-                    Server.Player.RemoveEquipment(session.Id, eqSlot, m);
+                    int m = Server.Player.FindOpenInvSlot(session.Id, (int)paperdoll[eqSlot].Num);
+                    if (m >= 0)
+                    {
+                        Server.Player.RemoveEquipment(session.Id, eqSlot, m);
+                    }
+                    else
+                    {
+                        var invSlot = Server.Player.FindItemSlot(session.Id, (int)hotbar[slot].Slot);
+                        if (invSlot >= 0)
+                        {
+                            Server.Player.UseItem(session.Id, invSlot);
+                        }
+                    }
                 }
                 else
                 {
-                    Server.Player.UseItem(session.Id, Server.Player.FindItemSlot(session.Id, (int)hotbar[slot].Slot));
+                    var invSlot = Server.Player.FindItemSlot(session.Id, (int)hotbar[slot].Slot);
+                    if (invSlot >= 0)
+                    {
+                        Server.Player.UseItem(session.Id, invSlot);
+                    }
                 }
             }
             else if (hotbar[slot].SlotType == (byte)DraggablePartType.Skill)

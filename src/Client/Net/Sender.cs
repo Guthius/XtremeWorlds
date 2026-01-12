@@ -14,6 +14,9 @@ public static class Sender
 {
     private static readonly int StatCount = Enum.GetValues<Stat>().Length;
 
+    private const int HotbarUseThrottle = 250;
+    private static readonly int[] LastHotbarUseTick = new int[Variables.MaxHotbar];
+
     public static void SendAddChar(string name, int sex, int job)
     {
         var packetWriter = new PacketWriter();
@@ -940,6 +943,20 @@ public static class Sender
 
     public static void SendUseHotbarSlot(int index)
     {
+        if (index < 0 || index >= Variables.MaxHotbar)
+        {
+            return;
+        }
+
+        var now = Client.General.GetTickCount();
+        var last = LastHotbarUseTick[index];
+        if (last > 0 && now - last < HotbarUseThrottle)
+        {
+            return;
+        }
+
+        LastHotbarUseTick[index] = now;
+
         var packetWriter = new PacketWriter(8);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CUseHotbarSlot);
@@ -1398,6 +1415,15 @@ public static class Sender
         var packetWriter = new PacketWriter(4);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CMapRespawn);
+
+        Network.Send(packetWriter);
+    }
+
+    public static void SendRespawnNow()
+    {
+        var packetWriter = new PacketWriter(4);
+
+        packetWriter.WriteEnum(Packets.ClientPackets.CRespawnNow);
 
         Network.Send(packetWriter);
     }

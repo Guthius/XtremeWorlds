@@ -501,7 +501,8 @@ public enum PartOrigin
     Inventory,
     SkillTree,
     Hotbar,
-    Bank
+    Bank,
+    Character
 }
 
 /// <summary>

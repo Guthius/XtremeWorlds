@@ -810,6 +810,7 @@ public class WindowManager
             Safe("UpdateWindow_Bars", () => ui.UpdateWindow_Bars());
             Safe("UpdateWindow_Dialogue", () => ui.UpdateWindow_Dialogue());
             Safe("UpdateWindow_DragBox", () => ui.UpdateWindow_DragBox());
+            Safe("UpdateWindow_Respawn", () => ui.UpdateWindow_Respawn());
             Safe("UpdateWindow_Options", () => ui.UpdateWindow_Options());
             Safe("UpdateWindow_Trade", () => ui.UpdateWindow_Trade());
             Safe("UpdateWindow_Party", () => ui.UpdateWindow_Party());

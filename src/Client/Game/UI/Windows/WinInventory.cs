@@ -187,55 +187,6 @@ public class WinInventory
         var slot = General.IsInv(winInventory.X, winInventory.Y);
         if (slot >= 0)
         {
-            if (GameState.InBank)
-            {
-                Sender.SendDepositItem(slot, GetPlayerInvValue(GameState.MyIndex, slot));
-                return;
-            }
-
-            if (GameState.InShop >= 0)
-            {
-                Sender.SendSellItem(slot);
-                return;
-            }
-
-            if (Trade.InTrade > 0)
-            {
-                for (var i = 0; i < Variables.MaxInventory; i++)
-                {
-                    if (Data.TradeYourOffer[i].Num != slot)
-                    {
-                        continue;
-                    }
-
-                    if (Item.Instance[GetPlayerInv(GameState.MyIndex, Data.TradeYourOffer[i].Num)].Type != (byte)ItemCategory.Currency)
-                    {
-                        return;
-                    }
-
-                    if (Data.TradeYourOffer[i].Value == GetPlayerInvValue(GameState.MyIndex, Data.TradeYourOffer[i].Num))
-                    {
-                        return;
-                    }
-                }
-
-                if (Item.Instance[GetPlayerInv(GameState.MyIndex, slot)].Type == (byte)ItemCategory.Currency)
-                {
-                    GameLogic.Dialogue(
-                        "Select Amount",
-                        "Please choose how many to offer.", "",
-                        DialogueType.TradeAmount,
-                        DialogueStyle.Input,
-                        slot);
-
-                    return;
-                }
-
-                Sender.SendTradeItem(slot, 0);
-
-                return;
-            }
-
             Sender.SendUseItem(slot);
         }
 

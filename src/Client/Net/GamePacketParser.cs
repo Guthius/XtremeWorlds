@@ -623,15 +623,14 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     private static async ValueTask Packet_SpawnNpc(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
-
         var npc = packetReader.ReadInt32();
-
         ref var mapNpc = ref MapNpc.Instance[npc];
 
         mapNpc.Num = packetReader.ReadInt32();
         mapNpc.X = packetReader.ReadInt32();
         mapNpc.Y = packetReader.ReadInt32();
         mapNpc.Dir = packetReader.ReadByte();
+
         // Server sends remaining ms until respawn (0 if alive)
         var deathTimer = packetReader.ReadInt32();
         mapNpc.DeathTimer = deathTimer > 0 ? Client.General.GetTickCount() + deathTimer : 0;
@@ -664,8 +663,23 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     {
         var packetReader = new PacketReader(data);
         var timer = packetReader.ReadInt32(); // milliseconds until respawn
+        var playerId = packetReader.ReadInt32();
 
-        Player.Instance[packetReader.ReadInt32()].DeathTimer = Client.General.GetTickCount() + timer;
+        Player.Instance[playerId].DeathTimer = timer > 0 ? Client.General.GetTickCount() + timer : 0;
+
+        // If we just died, hard-stop movement immediately.
+        if (playerId == GameState.MyIndex && timer > 0)
+        {
+            Player.Instance[playerId].Moving = 0;
+            Player.Instance[playerId].IsMoving = false;
+
+            GameState.DirUp = false;
+            GameState.DirDown = false;
+            GameState.DirLeft = false;
+            GameState.DirRight = false;
+
+            Sender.SendStopPlayerMove();
+        }
     }
 
     private static async ValueTask Packet_UpdateNpc(ReadOnlyMemory<byte> data)

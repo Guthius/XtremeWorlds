@@ -7,6 +7,17 @@ public class WinBars
 {
     public static void OnDraw()
     {
+        var winRespawn = WindowManager.GetWindowByName("winRespawn");
+        if (winRespawn is not null && GameState.MyIndex >= 0 && GameState.MyIndex < Player.Instance.Count)
+        {
+            var remainingMs = Player.Instance[GameState.MyIndex].DeathTimer - Client.General.GetTickCount();
+            var shouldShow = remainingMs > 0;
+            if (winRespawn.Visible != shouldShow)
+            {
+                winRespawn.Visible = shouldShow;
+            }
+        }
+
         var winBars = WindowManager.GetWindowByName("winBars");
         if (winBars is null)
         {

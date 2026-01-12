@@ -560,6 +560,23 @@ namespace Client
                             break;
                         }
 
+                    // Early respawn while waiting on death timer
+                    case "/respawnnow":
+                    case "/giveup":
+                        {
+                            var remaining = (int)(Player.Instance[GameState.MyIndex].DeathTimer - General.GetTickCount()) / 1000;
+                            if (remaining < 0) remaining = 0;
+
+                            if (remaining <= 0)
+                            {
+                                TextRenderer.AddText("You are not in the respawn window.", (int)ColorName.BrightRed);
+                                goto Continue1;
+                            }
+
+                            Sender.SendRespawnNow();
+                            break;
+                        }
+
                     case "/editmap":
                         {
 

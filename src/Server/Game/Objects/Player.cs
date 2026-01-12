@@ -21,11 +21,6 @@ public class Player : PlayerBase
 
     private static void ResetDisconnectedPlayerSlot(int playerId)
     {
-        if (playerId < 0 || playerId >= Core.Globals.Variables.MaxPlayers)
-        {
-            return;
-        }
-
         // Clear persistent player data stored in the global list.
         // Important: do not Remove() here, indices are player ids.
         if (PlayerBase.Instance.Count > playerId)
@@ -102,11 +97,6 @@ public class Player : PlayerBase
     public static void OnWarp(int playerId, int map, int x, int y, int dir, bool send = false)
     {
         if (!NetworkConfig.IsPlaying(playerId))
-        {
-            return;
-        }
-
-        if (playerId < 0 || playerId >= Data.TempPlayer.Length)
         {
             return;
         }
@@ -244,12 +234,6 @@ public class Player : PlayerBase
         int healAmount = 0;
         int trapVital = (int)Core.Globals.Vital.Health; // default trap vital is Health
         int trapAmount = 0;
-
-        // Validate player index early (OnMove can be called from network and server loop).
-        if (playerId < 0 || playerId >= Player.Instance.Count || playerId >= Data.TempPlayer.Length)
-        {
-            return;
-        }
 
         if (!NetworkConfig.IsPlaying(playerId))
         {

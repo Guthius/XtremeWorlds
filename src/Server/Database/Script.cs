@@ -218,7 +218,7 @@ public class Script
         // the correct timer when relogging the same dead character.
         if (Server.Player.Instance[index].Dead)
         {
-            var now = (int)General.GetTime();
+            var now = General.GetTime();
             var remaining = Server.Player.Instance[index].DeathTimer - now;
             if (remaining <= 0)
             {
@@ -909,6 +909,7 @@ public class Script
         SetPlayerDir(index, (byte)Direction.Down);
         Server.Player.Instance[index].Dead = false;
         Server.Player.Instance[index].DeathTimer = 0;
+        SendPlayerDeath(index, Server.Player.Instance[index].DeathTimer);
 
         // clear targets
         Data.TempPlayer[index].Target = -1;
@@ -1180,13 +1181,14 @@ public class Script
 
     public void KillPlayerNoAttacker(int playerId, string? deathMessage = null)
     {
-        if (playerId < 0 || playerId >= Server.Player.Instance.Count) return;
         if (!NetworkConfig.IsPlaying(playerId)) return;
         if (Server.Player.Instance[playerId].Dead) return;
 
         Server.Player.Instance[playerId].Dead = true;
         SetPlayerVital(playerId, Core.Globals.Vital.Health, 0);
         NetworkSend.SendVital(playerId, Core.Globals.Vital.Health);
+
+        ClearTargetsToDeadPlayer(playerId);
 
         if (!string.IsNullOrWhiteSpace(deathMessage))
         {
@@ -1196,7 +1198,6 @@ public class Script
         // Record a per-character respawn deadline.
         var now = (int)General.GetTime();
         Server.Player.Instance[playerId].DeathTimer = now + DeathSpawnTime;
-
         NetworkSend.SendPlayerDeath(playerId, DeathSpawnTime);
 
         System.Threading.Tasks.Task.Run(async () =>
@@ -1220,6 +1221,57 @@ public class Script
         public int Final => (Dodge || Parry) ? 0 : Mitigated;
     }
 
+    private static void ClearTargetsToDeadPlayer(int deadPlayerId)
+    {
+        if (deadPlayerId < 0 || deadPlayerId >= Variables.MaxPlayers)
+        {
+            return;
+        }
+
+        // Clear the dead player's own target.
+        if (NetworkConfig.IsPlaying(deadPlayerId))
+        {
+            Data.TempPlayer[deadPlayerId].TargetType = 0;
+            Data.TempPlayer[deadPlayerId].Target = -1;
+            NetworkSend.SendTarget(deadPlayerId, 0, 0);
+        }
+
+        var map = GetPlayerMap(deadPlayerId);
+
+        // Clear other players targeting this player.
+        foreach (var otherPlayer in PlayerService.Instance.Players)
+        {
+            var otherId = otherPlayer.Id;
+            if (!NetworkConfig.IsPlaying(otherId)) continue;
+            if (GetPlayerMap(otherId) != map) continue;
+
+            if (Data.TempPlayer[otherId].TargetType == (byte)TargetType.Player && Data.TempPlayer[otherId].Target == deadPlayerId)
+            {
+                Data.TempPlayer[otherId].TargetType = 0;
+                Data.TempPlayer[otherId].Target = -1;
+                NetworkSend.SendTarget(otherId, 0, 0);
+            }
+        }
+
+        // Clear NPCs targeting this player.
+        if (map >= 0 && map < Variables.MaxMaps)
+        {
+            for (var npc = 0; npc < Variables.MaxMapNpcs; npc++)
+            {
+                if (MapNpc.Instance[map, npc].TargetType == (byte)TargetType.Player && MapNpc.Instance[map, npc].Target == deadPlayerId)
+                {
+                    MapNpc.Instance[map, npc].TargetType = 0;
+                    MapNpc.Instance[map, npc].Target = -1;
+
+                    MapNpc.Instance[map, npc].Attacking = 0;
+                    MapNpc.Instance[map, npc].AttackTimer = 0;
+                    MapNpc.Instance[map, npc].SkillBuffer = -1;
+                    MapNpc.Instance[map, npc].SkillBufferTimer = 0;
+                }
+            }
+        }
+    }
+
     private void HandleDeath(Entity attacker, Entity target)
     {
         if (target.Type == Entity.EntityType.Player)
@@ -1230,6 +1282,8 @@ public class Script
             Server.Player.Instance[target.Id].Dead = true;
             SetPlayerVital(target.Id, Core.Globals.Vital.Health, 0);
             NetworkSend.SendVital(target.Id, Core.Globals.Vital.Health);
+
+            ClearTargetsToDeadPlayer(target.Id);
 
             if (Moral.Instance[Server.Map.Instance[GetPlayerMap(target.Id)].Moral].DropItems)
             {
@@ -1364,6 +1418,7 @@ public class Script
                             {
                                 Data.TempPlayer[Player.Id].TargetType = 0;
                                 Data.TempPlayer[Player.Id].Target = -1;
+                                NetworkSend.SendTarget(Player.Id, 0, 0);
                             }
                         }
                     }
@@ -1819,7 +1874,6 @@ public class Script
 
     private int GetPlayerDamage(int PlayerId, int? skillId)
     {
-        if (PlayerId < 0 || PlayerId >= Server.Player.Instance.Count) return 0;
         int power = 0;
         if (skillId >= 0)
             power = GetPlayerStat(PlayerId, Stat.Intelligence) / 2;

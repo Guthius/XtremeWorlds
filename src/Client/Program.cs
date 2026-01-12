@@ -770,7 +770,7 @@ namespace Client
                 _elapsedTime = TimeSpan.Zero;
             }
 
-            Loop.OnStart();
+            Loop.OnUpdate();
 
             base.Update(gameTime);
         }
@@ -1306,7 +1306,7 @@ namespace Client
                 for (int i = 0; i < Variables.MaxHotbar; i++)
                 {
                     // Check if the corresponding hotbar key is pressed
-                    if (CurrentKeyboardState.IsKeyDown((Keys) ((int) Keys.D0 + (i + 1))))
+                    if (IsKeyStateActive((Keys)((int)Keys.D0 + (i + 1))))
                     {
                         Sender.SendUseHotbarSlot(i);
                         return; // Exit once the matching slot is used
@@ -1594,12 +1594,24 @@ namespace Client
                         int slot = -1;
                         if (WindowManager.TryGetWindow("winHotbar", out var winHotbar))
                         {
+                            // Hotbar hit-testing is done in GUI-space.
+                            // This right-click handler runs in the normal (non-GUI-dispatch) context,
+                            // so temporarily swap to GUI mouse coords for the hit test.
+                            var prevMouseX = GameState.CurMouseX;
+                            var prevMouseY = GameState.CurMouseY;
+
+                            GameState.CurMouseX = GameState.CurMouseXGui;
+                            GameState.CurMouseY = GameState.CurMouseYGui;
                             slot = GameLogic.IsHotbar(winHotbar!.X, winHotbar!.Y);
+
+                            GameState.CurMouseX = prevMouseX;
+                            GameState.CurMouseY = prevMouseY;
                         }
 
                         if (slot >= 0L)
                         {
                             Sender.SendDeleteHotbar(slot);
+                            return;
                         }
 
                         if (GameState.VbKeyShift == true)

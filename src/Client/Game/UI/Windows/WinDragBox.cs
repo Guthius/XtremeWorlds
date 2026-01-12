@@ -122,6 +122,10 @@ public class WinDragBox
                 case "winHotbar":
                     DropOnHotBar(targetWindow);
                     break;
+
+                case "winTrade":
+                    DropOnTrade(targetWindow);
+                    break;
             }
         }
         else
@@ -227,6 +231,33 @@ public class WinDragBox
 
                 break;
 
+            case PartOrigin.Character:
+                if (WindowManager.DragBox.Type == DraggablePartType.Item)
+                {
+                    for (var slot = 0; slot < Variables.MaxInventory; slot++)
+                    {
+                        Type.Rect rect;
+
+                        rect.Top = window.Y + GameState.InvTop + (GameState.InvOffsetY + 32) * (slot / GameState.InvColumns);
+                        rect.Bottom = rect.Top + 32;
+                        rect.Left = window.X + GameState.InvLeft + (GameState.InvOffsetX + 32) * (slot % GameState.InvColumns);
+                        rect.Right = rect.Left + 32;
+
+                        if (GameState.CurMouseX < rect.Left ||
+                            GameState.CurMouseX > rect.Right ||
+                            GameState.CurMouseY < rect.Top ||
+                            GameState.CurMouseY > rect.Bottom)
+                        {
+                            continue;
+                        }
+
+                        Sender.SendUnequip(WindowManager.DragBox.Slot);
+                        break;
+                    }
+                }
+
+                break;
+
             case PartOrigin.Bank:
                 if (WindowManager.DragBox.Type == DraggablePartType.Item)
                 {
@@ -280,19 +311,59 @@ public class WinDragBox
 
     private static void DropOnCharacter(Window window)
     {
-        if (WindowManager.DragBox.Origin != PartOrigin.Inventory ||
-            WindowManager.DragBox.Type != DraggablePartType.Item)
+        if (WindowManager.DragBox.Type != DraggablePartType.Item)
         {
             return;
         }
 
-        var invSlot = WindowManager.DragBox.Slot;
+        var origin = WindowManager.DragBox.Origin;
+        if (origin != PartOrigin.Inventory && origin != PartOrigin.Hotbar)
+        {
+            return;
+        }
+
+        static int FindInventorySlotForItem(int itemNum)
+        {
+            if (itemNum < 0 || itemNum >= Item.Instance.Count)
+            {
+                return -1;
+            }
+
+            for (var slot = 0; slot < Variables.MaxInventory; slot++)
+            {
+                if (GetPlayerInv(GameState.MyIndex, slot) == itemNum)
+                {
+                    return slot;
+                }
+            }
+
+            return -1;
+        }
+
+        int invSlot;
+        int item;
+        if (origin == PartOrigin.Inventory)
+        {
+            invSlot = WindowManager.DragBox.Slot;
+            if (invSlot < 0 || invSlot >= Variables.MaxInventory)
+            {
+                return;
+            }
+
+            item = GetPlayerInv(GameState.MyIndex, invSlot);
+        }
+        else
+        {
+            // Hotbar drags store item id in Value; we must resolve it to an inventory slot to equip.
+            item = WindowManager.DragBox.Value;
+            invSlot = FindInventorySlotForItem(item);
+        }
+
         if (invSlot < 0 || invSlot >= Variables.MaxInventory)
         {
             return;
         }
 
-        var item = GetPlayerInv(GameState.MyIndex, invSlot);
         if (item < 0 || item >= Item.Instance.Count)
         {
             return;
@@ -402,8 +473,72 @@ public class WinDragBox
                 break;
 
             case PartOrigin.Hotbar:
-                Sender.SendSetHotbarSlot((int) WindowManager.DragBox.Origin, WindowManager.DragBox.Slot, WindowManager.DragBox.Slot, 0);
+                Sender.SendDeleteHotbar(WindowManager.DragBox.Slot);
                 break;
         }
+    }
+
+    private static void DropOnTrade(Window window)
+    {
+        if (WindowManager.DragBox.Origin != PartOrigin.Inventory ||
+            WindowManager.DragBox.Type != DraggablePartType.Item)
+        {
+            return;
+        }
+
+        var picYour = window.GetChild("picYour");
+        if (picYour is null)
+        {
+            return;
+        }
+
+        var slotX = window.X + picYour.X;
+        var slotY = window.Y + picYour.Y;
+
+        var slot = General.IsTrade(slotX, slotY);
+        if (slot < 0)
+        {
+            return;
+        }
+
+        var invSlot = WindowManager.DragBox.Slot;
+        if (invSlot < 0 || invSlot >= Variables.MaxInventory)
+        {
+            return;
+        }
+
+        // Match the same offer rules as the old inventory double-click trade behavior.
+        for (var i = 0; i < Variables.MaxInventory; i++)
+        {
+            if (Data.TradeYourOffer[i].Num != invSlot)
+            {
+                continue;
+            }
+
+            if (Item.Instance[GetPlayerInv(GameState.MyIndex, Data.TradeYourOffer[i].Num)].Type != (byte)ItemCategory.Currency)
+            {
+                return;
+            }
+
+            if (Data.TradeYourOffer[i].Value == GetPlayerInvValue(GameState.MyIndex, Data.TradeYourOffer[i].Num))
+            {
+                return;
+            }
+        }
+
+        if (Item.Instance[GetPlayerInv(GameState.MyIndex, invSlot)].Type == (byte)ItemCategory.Currency)
+        {
+            GameLogic.Dialogue(
+                "Select Amount",
+                "Please choose how many to offer.",
+                "",
+                DialogueType.TradeAmount,
+                DialogueStyle.Input,
+                invSlot);
+
+            return;
+        }
+
+        Sender.SendTradeItem(invSlot, 0);
     }
 }

@@ -196,6 +196,11 @@ public class WinHotBar
 
         Item.OnStream(item);
 
+        if (Item.Instance.Count <= item)
+        {
+            return;
+        }
+
         if (Item.Instance[item].Name.Length <= 0 || Item.Instance[item].Icon <= 0)
         {
             return;

@@ -130,7 +130,10 @@ public static class Packets
         CMouseAttack,
         CCloseEditor,
 
-        CCancelCast
+        CCancelCast,
+
+        // Request an early respawn while waiting on the death timer.
+        CRespawnNow
     }
 
     public enum ServerPackets
