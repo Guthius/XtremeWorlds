@@ -229,6 +229,24 @@ public class Script
         // Send the flag so they know they can start doing stuff
         NetworkSend.SendInGame(index);
 
+        // If this specific character is currently dead, send their remaining death timer.
+        // This prevents the timer from leaking across character swaps and also re-applies
+        // the correct timer when relogging the same dead character.
+        if (Server.Player.Instance[index].Dead)
+        {
+            var now = (int)General.GetTimeMs();
+            var remainingMs = Server.Player.Instance[index].DeathTimer - now;
+            if (remainingMs <= 0)
+            {
+                // Timer already expired while offline; finish the respawn immediately.
+                OnDeath(index);
+            }
+            else
+            {
+                NetworkSend.SendPlayerDeath(index, remainingMs);
+            }
+        }
+
         // Send welcome messages
         NetworkSend.SendWelcome(index);
     
@@ -906,6 +924,7 @@ public class Script
         // Warp Player away
         SetPlayerDir(index, (byte)Direction.Down);
         Server.Player.Instance[index].Dead = false;
+        Server.Player.Instance[index].DeathTimer = 0;
 
         // clear targets
         Data.TempPlayer[index].Target = -1;
@@ -1190,6 +1209,10 @@ public class Script
             NetworkSend.SendPlayerMessage(playerId, deathMessage, (int)ColorName.BrightRed);
         }
 
+        // Record a per-character respawn deadline.
+        var now = (int)General.GetTimeMs();
+        Server.Player.Instance[playerId].DeathTimer = now + DeathSpawnTimeMs;
+
         NetworkSend.SendPlayerDeath(playerId, DeathSpawnTimeMs);
 
         System.Threading.Tasks.Task.Run(async () =>
@@ -1267,6 +1290,10 @@ public class Script
             }
 
             NetworkSend.SendGlobalMessage(GetPlayerName(target.Id) + " was slain by " + GetEntityName(attacker) + ".");
+
+            // Record a per-character respawn deadline.
+            var now = (int)General.GetTimeMs();
+            Server.Player.Instance[target.Id].DeathTimer = now + DeathSpawnTimeMs;
 
             // Hide the Player on their client immediately (do not broadcast to map)
             NetworkSend.SendPlayerDeath(target.Id, DeathSpawnTimeMs);

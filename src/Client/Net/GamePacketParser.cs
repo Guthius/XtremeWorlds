@@ -246,6 +246,20 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         var packetReader = new PacketReader(data);
 
         GameState.MyIndex = packetReader.ReadInt32();
+
+        // Reset per-character transient death/hold state on (re)entering the game session slot.
+        // This prevents a death timer from one character leaking into another character on the same account.
+        try
+        {
+            if (GameState.MyIndex >= 0 && GameState.MyIndex < Player.Instance.Count)
+            {
+                Player.Instance[GameState.MyIndex].DeathTimer = 0;
+                Player.Instance[GameState.MyIndex].Dead = false;
+            }
+        }
+        catch { }
+
+        try { Event.HoldPlayer = false; } catch { }
     }
 
     public static void Packet_PlayerCharacters(ReadOnlyMemory<byte> data)
