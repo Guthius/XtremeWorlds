@@ -141,6 +141,7 @@ public class WinTrade
 
         var y = winTrade.Y - 6;
 
+        GameState.DescOwnerWindow = "winTrade";
         GameLogic.ShowItemDesc(x, y, GetPlayerInv(GameState.MyIndex, Data.TradeYourOffer[slot].Num));
     }
 
@@ -177,6 +178,7 @@ public class WinTrade
 
         var y = winTrade.Y - 6;
 
+        GameState.DescOwnerWindow = "winTrade";
         GameLogic.ShowItemDesc(x, y, Data.TradeTheirOffer[slot].Num);
     }
 

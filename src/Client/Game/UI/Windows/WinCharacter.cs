@@ -151,6 +151,7 @@ public class WinCharacter
 
         var y = winCharacter.Y - 6;
 
+        GameState.DescOwnerWindow = "winCharacter";
         GameLogic.ShowEqDesc(x, y, slot);
     }
 

@@ -127,6 +127,7 @@ public class WinSkills
 
         var y = winSkills.Y - 6;
 
+        GameState.DescOwnerWindow = "winSkills";
         GameLogic.ShowSkillDesc(x, y, GetPlayerSkill(GameState.MyIndex, slot), slot);
     }
 

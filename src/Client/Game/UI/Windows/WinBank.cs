@@ -136,6 +136,7 @@ public class WinBank
 
         var y = winBank.Y - 6;
 
+        GameState.DescOwnerWindow = "winBank";
         GameLogic.ShowItemDesc(x, y, GetBank(GameState.MyIndex, slot));
     }
 

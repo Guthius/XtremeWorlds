@@ -177,6 +177,7 @@ public class WinHotBar
 
         var y = winHotbar.Y - 6;
 
+        GameState.DescOwnerWindow = "winHotbar";
         switch (Player.Instance[GameState.MyIndex].Hotbar[slot].SlotType)
         {
             case 1: // Inventory

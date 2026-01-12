@@ -19,7 +19,7 @@ public static class Sender
         var packetWriter = new PacketWriter();
 
         packetWriter.WriteEnum(Packets.ClientPackets.CAddChar);
-        packetWriter.WriteByte(GameState.CharNum);
+        packetWriter.WriteByte(GameState.Char);
         packetWriter.WriteString(name);
         packetWriter.WriteInt32(sex);
         packetWriter.WriteInt32(job);

@@ -303,6 +303,7 @@ public class WinInventory
 
         var y = winInventory.Y - 6;
 
+        GameState.DescOwnerWindow = "winInventory";
         GameLogic.ShowInvDesc(x, y, slot);
     }
 }

@@ -86,6 +86,7 @@ namespace Client
         public static byte DescLastType;
         public static long DescLastItem;
         public static Type.Text[]? Description;
+        public static string? DescOwnerWindow;
 
         // New char
         public static int NewCharactersprite;
@@ -98,7 +99,7 @@ namespace Client
         public static long[] CharAccess = new long[(Variables.MaxCharacters)];
         public static long[] CharJob = new long[(Variables.MaxCharacters)];
         public static long[,] CharEq = new long[Variables.MaxCharacters, Enum.GetValues<Equipment>().Length];
-        public static byte CharNum;
+        public static byte Char;
 
         // elastic bars
         public static int[] BarWidthNpcHP = new int[Variables.MaxMapNpcs];

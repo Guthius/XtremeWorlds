@@ -236,6 +236,7 @@ public class WinShop
             return;
         }
 
+        GameState.DescOwnerWindow = "winShop";
         GameLogic.ShowShopDesc(x, y, item);
     }
 

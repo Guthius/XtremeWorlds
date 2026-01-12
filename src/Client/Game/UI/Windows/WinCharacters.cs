@@ -50,7 +50,7 @@ public class WinCharacters
 
     private static void TryCreateCharacter(int slot)
     {
-        GameState.CharNum = (byte) slot;
+        GameState.Char = (byte) slot;
         GameLogic.ShowJobs();
     }
 

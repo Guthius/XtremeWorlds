@@ -723,6 +723,32 @@ public class WindowManager
 
     public static void HideWindow(long windowIndex)
     {
+        if (windowIndex == 0)
+        {
+            return;
+        }
+
+        // If the description tooltip was shown for this window, hide it too.
+        try
+        {
+            if (Windows.TryGetValue(windowIndex, out var win)
+                && !string.IsNullOrEmpty(GameState.DescOwnerWindow)
+                && !string.Equals(win.Name, "winDescription", StringComparison.OrdinalIgnoreCase)
+                && string.Equals(win.Name, GameState.DescOwnerWindow, StringComparison.OrdinalIgnoreCase))
+            {
+                var descIndex = GetWindow("winDescription");
+                if (descIndex != 0 && Windows.TryGetValue(descIndex, out var descWin))
+                {
+                    descWin.Visible = false;
+                }
+
+                GameState.DescOwnerWindow = null;
+                GameState.DescLastType = 0;
+                GameState.DescLastItem = 0;
+            }
+        }
+        catch { }
+
         Windows[windowIndex].Visible = false;
 
         for (var i = Windows.Count - 1; i >= 1; i += -1)
