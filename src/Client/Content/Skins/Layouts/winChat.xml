@@ -7,7 +7,7 @@
     <CheckBox Name="chkGuild" Text="Guild" Position="210, 2" Size="49, 23" Design="CheckboxChat" Font="georgiaBold_16"/>
     <CheckBox Name="chkPlayer" Text="Player" Position="260, 2" Size="49, 23" Design="CheckboxChat" Font="georgiaBold_16"/>    
     <PictureBox Name="picNull" Position="0, 0" Size="0, 0"/>
-    <Button Name="btnChat" Text="Say" Position="295, 140" Size="48, 20" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick" Font="georgiaBold_16"/>
+    <Button Name="btnChat" Text="Say" Position="296, 140" Size="48, 20" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick" Font="georgiaBold_16"/>
     <TextBox Name="txtChat" Position="4, 136" Size="290, 24"/>
     <Button Name="btnUp" Position="328, 28" Size="10, 13" Image="4" ImageHover="52" ImageMouseDown="4"/>
     <Button Name="btnDown" Position="327, 122" Size="10, 13" Image="5" ImageHover="53" ImageMouseDown="5"/>
