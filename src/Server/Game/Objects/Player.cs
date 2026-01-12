@@ -872,6 +872,12 @@ public class Player : PlayerBase
             return false;
         }
 
+        if (Player.Instance[playerId].Dead)
+        {
+            NetworkSend.SendPlayerMessage(playerId, "You can't pick up items while dead.", (int) ColorName.BrightRed);
+            return false;
+        }
+
         if (string.IsNullOrEmpty(MapItem.Instance[map, mapItem].PlayerName) ||
             MapItem.Instance[map, mapItem].PlayerName == GetPlayerName(playerId))
         {
