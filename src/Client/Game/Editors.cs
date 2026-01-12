@@ -543,7 +543,7 @@ namespace Client
             }
         }
 
-        public static void MapEditorCancel()
+        public static void OnCancel()
         {
             if (GameState.MyEditorType != EditorType.Map)
             {

@@ -76,7 +76,7 @@ public class WinMapEditor
         }
     }
 
-    public static void MapEditorCancel()
+    public static void OnCancel()
     {
         if (GameState.MyEditorType != EditorType.Map)
         {
@@ -1150,9 +1150,9 @@ public class WinMapEditor
         }
     }
 
-    public static void OnCancel()
+    public static void OnClose()
     {
-        MapEditorCancel();
+        OnCancel();
         WindowManager.HideWindow("winMapEditor");
     }
 }
