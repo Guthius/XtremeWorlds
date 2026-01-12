@@ -109,11 +109,22 @@ public static class Network
     {
         if (DebugPackets)
         {
+            int log = -1;
             if (data.Length >= 8)
             {
                 // PacketWriter.GetBytes() prefix: [len:int32][packetId:int32]...
-                int id = unchecked((int)(BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(4, 4)) & ~CompressionFlag));
-                SentCounts.AddOrUpdate(id, 1, static (_, v) => v + 1);
+                log = unchecked((int)(BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(4, 4)) & ~CompressionFlag));
+                SentCounts.AddOrUpdate(log, 1, static (_, v) => v + 1);
+            }
+
+            if (log >= 0)
+            {
+                string name = Enum.GetName(typeof(Packets.ClientPackets), log) ?? log.ToString();
+                Console.WriteLine($"[SENT] {name}({log}) Bytes={data.Length}");
+            }
+            else
+            {
+                Console.WriteLine($"[SENT] Bytes={data.Length}");
             }
 
             Interlocked.Add(ref _sentBytes, data.Length);
@@ -145,12 +156,6 @@ public static class Network
                             string name = Enum.GetName(typeof(Packets.ClientPackets), id) ?? id.ToString();
                             parts.Add($"{name}({id}):{snapshot[i].Value}");
                         }
-
-                        Console.WriteLine($"[SEND] Packets={packets} Bytes={bytes} Header={string.Join(",", parts)}");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"[SEND] Packets={packets} Bytes={bytes} Header={{}}");
                     }
                 }
                 catch

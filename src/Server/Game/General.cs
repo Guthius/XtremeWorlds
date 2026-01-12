@@ -219,7 +219,7 @@ public static class General
     private static async System.Threading.Tasks.Task InitializeDatabaseWithRetry(IConfiguration configuration)
     {
         var maxRetries = configuration.GetValue("Database:MaxRetries", 3);
-        var retryDelayMs = configuration.GetValue("Database:RetryDelayMs", 1000);
+        var retryDelay = configuration.GetValue("Database:RetryDelay", 1000);
         Logger.LogInformation("Initializing database...");
         for (var attempt = 1; attempt <= maxRetries; attempt++)
         {
@@ -244,7 +244,7 @@ public static class General
                     throw;
                 }
                 Logger.LogWarning(ex, $"Database initialization failed, attempt {attempt} of {maxRetries}");
-                await System.Threading.Tasks.Task.Delay(retryDelayMs * attempt, Cts.Token);
+                await System.Threading.Tasks.Task.Delay(retryDelay * attempt, Cts.Token);
             }
         }
     }

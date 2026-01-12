@@ -95,11 +95,30 @@ internal sealed class NetworkChannel<TSession> : INetworkChannel where TSession 
                 {
                     await _networkStream.WriteAsync(bytes, cancellationToken);
 
+                    if (PacketSendStats.LogEachSentPacket)
+                    {
+                        var sentPacketId = PacketSendStats.TryReadPacketId(bytes);
+                        if (sentPacketId >= 0)
+                        {
+                            var sentPacketName = Enum.GetName(typeof(Core.Net.Packets.ServerPackets), sentPacketId) ?? sentPacketId.ToString();
+                            _logger.LogInformation(
+                                "Sent {NumberOfBytes} to {IpAddress} packet={PacketName}({PacketId})",
+                                bytes.Length,
+                                IpAddress,
+                                sentPacketName,
+                                sentPacketId);
+                        }
+                        else
+                        {
+                            _logger.LogInformation("Sent {NumberOfBytes} to {IpAddress}", bytes.Length, IpAddress);
+                        }
+                    }
+
                     Interlocked.Increment(ref _packetsSent);
                     Interlocked.Add(ref _bytesSent, bytes.Length);
 
                     // Per-connection per-second counter (enabled explicitly, or as a fallback when global stats are disabled).
-                    if (PacketSendStats.PerConnectionEnabled || !PacketSendStats.Enabled)
+                    if (PacketSendStats.LogEachSentPacket || !PacketSendStats.Enabled)
                     {
                         var now = Environment.TickCount64;
                         if (_secondStartTick == 0)
@@ -110,7 +129,7 @@ internal sealed class NetworkChannel<TSession> : INetworkChannel where TSession 
                         _packetsSentThisSecond++;
                         _bytesSentThisSecond += bytes.Length;
 
-                        if (PacketSendStats.PerConnectionEnabled)
+                        if (PacketSendStats.LogEachSentPacket)
                         {
                             var packetId = PacketSendStats.TryReadPacketId(bytes);
                             if (packetId >= 0)
@@ -126,13 +145,13 @@ internal sealed class NetworkChannel<TSession> : INetworkChannel where TSession 
                             }
                         }
 
-                        if (now - _secondStartTick >= 1000 && _packetsSentThisSecond >= (PacketSendStats.PerConnectionEnabled ? PacketSendStats.PerConnectionThreshold : 1000))
+                        if (now - _secondStartTick >= 1000 && _packetsSentThisSecond >= (PacketSendStats.LogEachSentPacket ? PacketSendStats.PerConnectionThreshold : 1000))
                         {
-                            if (PacketSendStats.PerConnectionEnabled && _packetsByIdThisSecond.Count > 0 && PacketSendStats.TopN > 0)
+                            if (PacketSendStats.LogEachSentPacket && _packetsByIdThisSecond.Count > 0 && PacketSendStats.Top > 0)
                             {
                                 var top = _packetsByIdThisSecond
                                     .OrderByDescending(kvp => kvp.Value.Count)
-                                    .Take(PacketSendStats.TopN)
+                                    .Take(PacketSendStats.Top)
                                     .Select(kvp =>
                                     {
                                         var name = Enum.GetName(typeof(Core.Net.Packets.ServerPackets), kvp.Key) ?? kvp.Key.ToString();
@@ -241,7 +260,21 @@ internal sealed class NetworkChannel<TSession> : INetworkChannel where TSession 
         // Log the first enqueue so we can confirm the server attempted to send anything.
         if (enqueued == 1)
         {
-            _logger.LogInformation("Enqueued first packet (size={Size}) to {Ip}", bytes.Length, IpAddress);
+            var packetId = PacketSendStats.TryReadPacketId(bytes);
+            if (packetId >= 0)
+            {
+                var packetName = Enum.GetName(typeof(Core.Net.Packets.ServerPackets), packetId) ?? packetId.ToString();
+                _logger.LogInformation(
+                    "Enqueued first packet (size={Size}) to {Ip} packet={PacketName}({PacketId})",
+                    bytes.Length,
+                    IpAddress,
+                    packetName,
+                    packetId);
+            }
+            else
+            {
+                _logger.LogInformation("Enqueued first packet (size={Size}) to {Ip}", bytes.Length, IpAddress);
+            }
         }
     }
 

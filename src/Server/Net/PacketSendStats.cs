@@ -16,23 +16,22 @@ internal static class PacketSendStats
     private static long _sentBytes;
     private static long _windowStartTick;
     private static volatile bool _enabled;
-    private static int _topN = 6;
-
-    private static volatile bool _perConnectionEnabled;
+    private static int _top = 6;
     private static int _perConnectionThreshold = 1000;
 
+    private static volatile bool _logEachSentPacket;
+
     public static bool Enabled => _enabled;
-    public static bool PerConnectionEnabled => _perConnectionEnabled;
     public static int PerConnectionThreshold => _perConnectionThreshold;
-    public static int TopN => _topN;
+    public static int Top => _top;
+    public static bool LogEachSentPacket => _logEachSentPacket;
 
     public static void Configure(IConfiguration configuration)
     {
-        _enabled = configuration.GetValue("Networking:LogSentPacketsPerSecond", false);
-        _topN = Math.Clamp(configuration.GetValue("Networking:LogSentPacketsTopN", 6), 0, 50);
-
-        _perConnectionEnabled = configuration.GetValue("Networking:LogSentPacketsPerSecondByConnection", false);
+        _enabled = configuration.GetValue("Networking:LogSentPacketsPerSecond", true);
+        _top = Math.Clamp(configuration.GetValue("Networking:LogSentPacketsTop", 6), 0, 50);
         _perConnectionThreshold = Math.Clamp(configuration.GetValue("Networking:LogSentPacketsConnectionThreshold", 1000), 1, 1_000_000);
+        _logEachSentPacket = configuration.GetValue("Networking:LogEachSentPacket", true);
     }
 
     public static void RecordSent(ReadOnlySpan<byte> packetBytes, ILogger logger)
@@ -120,7 +119,7 @@ internal static class PacketSendStats
         SentBytesByPacket.Clear();
 
         Array.Sort(snapshot, static (a, b) => b.Value.CompareTo(a.Value));
-        var take = Math.Min(_topN, snapshot.Length);
+        var take = Math.Min(_top, snapshot.Length);
 
         if (take <= 0)
         {
