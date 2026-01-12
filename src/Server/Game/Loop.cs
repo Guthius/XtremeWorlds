@@ -164,10 +164,10 @@ public static class Loop
             {
                 SetStage("NpcWalk", tick);
                 // NPC pixel step progression (1px per tick) independent of player loop
-                MapNpc.ProcessActiveNpcMovement();
+                MapNpc.OnMove();
 
                 // Event pixel step progression (1px per tick) like NPCs
-                Server.Event.ProcessActiveEventMovement();
+                Server.Event.OnMove();
 
                 tmrNpcWalk = General.GetTime() + 5;
             }

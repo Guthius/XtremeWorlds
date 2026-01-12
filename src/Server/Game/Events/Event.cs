@@ -385,7 +385,7 @@ namespace Server
         /// Advances active event movement by 1px per tick; when a tile step completes (32px),
         /// commits the tile coordinate and sends SEventDir to stop client movement.
         /// </summary>
-        public static void ProcessActiveEventMovement()
+        public static void OnMove()
         {
             foreach (var kvp in ActiveMoves)
             {

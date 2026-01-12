@@ -385,7 +385,7 @@ namespace Server
         /// Advances active NPC pixel movement. Called frequently (e.g., every walk tick) from the main loop.
         /// Sends an SNpcDir packet when a tile step is completed to stop client movement exactly on tile.
         /// </summary>
-        public static void ProcessActiveNpcMovement()
+        public static void OnMove()
         {
             const int TileSize = 32;
             for (int map = 0; map < Core.Globals.Variables.MaxMaps; map++)
