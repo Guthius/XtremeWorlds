@@ -169,231 +169,205 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
     private static async ValueTask Packet_Login(GameSession session, ReadOnlyMemory<byte> bytes)
     {
-        try
+        var reader = new PacketReader(bytes);
+
+        if (NetworkConfig.IsPlaying(session.Id))
         {
-            var reader = new PacketReader(bytes);
+            NetworkSend.SendAlertMessage(session, SystemMessage.Connection, Menu.Login);
+            return;
+        }
 
-            if (NetworkConfig.IsPlaying(session.Id))
+        if (NetworkConfig.IsLoggedIn(session.Id))
+        {
+            return;
+        }
+
+        if (General.GetShutDownTimer != null && General.GetShutDownTimer.IsRunning)
+        {
+            NetworkSend.SendAlertMessage(session, SystemMessage.ServerMaintenance, Menu.Login);
+            return;
+        }
+
+        var login = System.Text.Encoding.UTF8.GetString(session.Decrypt(reader.ReadBytes().ToArray())).ToLower().Replace("\0", "");
+        var password = System.Text.Encoding.UTF8.GetString(session.Decrypt(reader.ReadBytes().ToArray())).Replace("\0", "");
+
+        // Read the remaining payload before any await; PacketReader cannot cross await boundaries.
+        var clientVersion = System.Text.Encoding.UTF8.GetString(session.Decrypt(reader.ReadBytes().ToArray()));
+
+        // If this account is already connected, take over the session by disconnecting the old one.
+        // This prevents "stuck logged in" states from blocking re-login.
+        var existingPlayerId = NetworkConfig.FindConnectedPlayerIdByLogin(login);
+
+        if (existingPlayerId == -1)
+        {
+            foreach (PlayerBase player in PlayerBase.Instance)
             {
-                NetworkSend.SendAlertMessage(session, SystemMessage.Connection, Menu.Login);
-                return;
-            }
+                if (player is null || player.Name is null)
+                    continue;
 
-            if (NetworkConfig.IsLoggedIn(session.Id))
-            {
-                return;
-            }
-
-            if (General.GetShutDownTimer != null && General.GetShutDownTimer.IsRunning)
-            {
-                NetworkSend.SendAlertMessage(session, SystemMessage.ServerMaintenance, Menu.Login);
-                return;
-            }
-
-            var login = System.Text.Encoding.UTF8.GetString(session.Decrypt(reader.ReadBytes().ToArray())).ToLower().Replace("\0", "");
-            var password = System.Text.Encoding.UTF8.GetString(session.Decrypt(reader.ReadBytes().ToArray())).Replace("\0", "");
-
-            // Read the remaining payload before any await; PacketReader cannot cross await boundaries.
-            var clientVersion = System.Text.Encoding.UTF8.GetString(session.Decrypt(reader.ReadBytes().ToArray()));
-
-            // If this account is already connected, take over the session by disconnecting the old one.
-            // This prevents "stuck logged in" states from blocking re-login.
-            var existingPlayerId = NetworkConfig.FindConnectedPlayerIdByLogin(login);
-
-            if (existingPlayerId == -1)
-            {
-                foreach (PlayerBase player in PlayerBase.Instance)
+                if (player.Name.Equals(login, StringComparison.CurrentCultureIgnoreCase))
                 {
-                    if (player is null || player.Name is null)
-                        continue;
-
-                    if (player.Name.Equals(login, StringComparison.CurrentCultureIgnoreCase))
-                    {
-                        existingPlayerId = PlayerBase.Instance.IndexOf(player);
-                        break;
-                    }
+                    existingPlayerId = PlayerBase.Instance.IndexOf(player);
+                    break;
                 }
             }
-
-            if (existingPlayerId > 0 && existingPlayerId != session.Id)
-            {
-                General.Logger.LogInformation(
-                    "Login takeover for {AccountName}: disconnecting existing session {ExistingId} in favor of {NewId}",
-                    login,
-                    existingPlayerId,
-                    session.Id);
-
-                // Best-effort notify then disconnect.
-                await Server.Player.OnExit(existingPlayerId);
-            }
-
-            // Get the current executing assembly
-            var assembly = Assembly.GetExecutingAssembly();
-
-            // Retrieve the version information
-            var serverVersion = assembly.GetName().Version?.ToString();
-
-            // Check versions
-            if (clientVersion != serverVersion)
-            {
-                NetworkSend.SendAlertMessage(session, SystemMessage.ClientOutdated, Menu.Login);
-                return;
-            }
-
-            if (login.Length > Core.Globals.Variables.NameLength | login.Length < Core.Globals.Variables.MinimumNameLength)
-            {
-                NetworkSend.SendAlertMessage(session, SystemMessage.NameLengthInvalid);
-                return;
-            }
-
-            if (NetworkConfig.IsMultiLogin(session.Id, login))
-            {
-                NetworkSend.SendAlertMessage(session, SystemMessage.MultipleAccountsNotAllowed, Menu.Login);
-                return;
-            }
-
-            Account.EnsureSize(session.Id + 1);
-            Account.Instance[session.Id].Login = login;
-            await Account.OnLoadAsync(session.Id, new CancellationToken());
-
-            if (Account.Instance[session.Id].Login != login)
-            {
-                NetworkSend.SendAlertMessage(session, SystemMessage.Login, Menu.Login);
-                return;
-            }
-        
-            if (GetPlayerPassword(session.Id) != password)
-            {
-                NetworkSend.SendAlertMessage(session, SystemMessage.WrongPassword, Menu.Login);
-                return;
-            }
-
-            if (Database.IsBanned(session.Id, session.Channel.IpAddress))
-            {
-                NetworkSend.SendAlertMessage(session, SystemMessage.Banned, Menu.Login);
-                return;
-            }
-
-            if (GetAccountLogin(session.Id) == "")
-            {
-                NetworkSend.SendAlertMessage(session, SystemMessage.DatabaseError, Menu.Login);
-                return;
-            }
-
-            General.Logger.LogInformation("{AccountName} has logged in from {IpAddress}",
-                GetAccountLogin(session.Id), session.Channel.IpAddress);
-
-            PlayerService.Instance.OnAdd(session.Id, session.Channel);
-            NetworkSend.SendVariables(session);
-            NetworkSend.SendPlayerCharacters(session);
-            NetworkSend.SendJobs(session);
         }
-        catch (System.Security.Cryptography.CryptographicException ex)
+
+        if (existingPlayerId > 0 && existingPlayerId != session.Id)
         {
-            General.Logger.LogWarning(ex, "Login decrypt failed for {IpAddress} (id={SessionId})", session.Channel.IpAddress, session.Id);
-            NetworkSend.SendAlertMessage(session, SystemMessage.Connection, Menu.Login);
+            General.Logger.LogInformation(
+                "Login takeover for {AccountName}: disconnecting existing session {ExistingId} in favor of {NewId}",
+                login,
+                existingPlayerId,
+                session.Id);
+
+            // Best-effort notify then disconnect.
+            await Server.Player.OnExit(existingPlayerId);
         }
-        catch (Exception ex)
+
+        // Get the current executing assembly
+        var assembly = Assembly.GetExecutingAssembly();
+
+        // Retrieve the version information
+        var serverVersion = assembly.GetName().Version?.ToString();
+
+        // Check versions
+        if (clientVersion != serverVersion)
         {
-            General.Logger.LogError(ex, "Unhandled error in login handler for {IpAddress} (id={SessionId})", session.Channel.IpAddress, session.Id);
-            NetworkSend.SendAlertMessage(session, SystemMessage.Connection, Menu.Login);
+            NetworkSend.SendAlertMessage(session, SystemMessage.ClientOutdated, Menu.Login);
+            return;
         }
+
+        if (login.Length > Core.Globals.Variables.NameLength | login.Length < Core.Globals.Variables.MinimumNameLength)
+        {
+            NetworkSend.SendAlertMessage(session, SystemMessage.NameLengthInvalid);
+            return;
+        }
+
+        if (NetworkConfig.IsMultiLogin(session.Id, login))
+        {
+            NetworkSend.SendAlertMessage(session, SystemMessage.MultipleAccountsNotAllowed, Menu.Login);
+            return;
+        }
+
+        Account.EnsureSize(session.Id + 1);
+        Account.Instance[session.Id].Login = login;
+        await Account.OnLoadAsync(session.Id, new CancellationToken());
+
+        if (Account.Instance[session.Id].Login != login)
+        {
+            NetworkSend.SendAlertMessage(session, SystemMessage.Login, Menu.Login);
+            return;
+        }
+    
+        if (GetPlayerPassword(session.Id) != password)
+        {
+            NetworkSend.SendAlertMessage(session, SystemMessage.WrongPassword, Menu.Login);
+            return;
+        }
+
+        if (Database.IsBanned(session.Id, session.Channel.IpAddress))
+        {
+            NetworkSend.SendAlertMessage(session, SystemMessage.Banned, Menu.Login);
+            return;
+        }
+
+        if (GetAccountLogin(session.Id) == "")
+        {
+            NetworkSend.SendAlertMessage(session, SystemMessage.DatabaseError, Menu.Login);
+            return;
+        }
+
+        General.Logger.LogInformation("{AccountName} has logged in from {IpAddress}",
+            GetAccountLogin(session.Id), session.Channel.IpAddress);
+
+        PlayerService.Instance.OnAdd(session.Id, session.Channel);
+        NetworkSend.SendVariables(session);
+        NetworkSend.SendPlayerCharacters(session);
+        NetworkSend.SendJobs(session);
     }
 
     private static async ValueTask Packet_Register(GameSession session, ReadOnlyMemory<byte> bytes)
     {
-        try
+        var buffer = new PacketReader(bytes);
+
+        if (NetworkConfig.IsPlaying(session.Id) ||
+            NetworkConfig.IsLoggedIn(session.Id))
         {
-            var buffer = new PacketReader(bytes);
-
-            if (NetworkConfig.IsPlaying(session.Id) ||
-                NetworkConfig.IsLoggedIn(session.Id))
-            {
-                return;
-            }
-
-            Account.EnsureSize(session.Id + 1);
-
-            // Check if its banned
-            // Cut off last portion of ip
-            if (Database.IsBanned(session.Id, session.Channel.IpAddress))
-            {
-                NetworkSend.SendAlertMessage(session, SystemMessage.Banned, Menu.Register);
-                return;
-            }
-
-            if (General.GetShutDownTimer is { IsRunning: true })
-            {
-                NetworkSend.SendAlertMessage(session, SystemMessage.ServerMaintenance, Menu.Register);
-                return;
-            }
-
-            var usernameBytes = buffer.ReadBytes().ToArray();
-            var login = System.Text.Encoding.UTF8.GetString(session.Decrypt(usernameBytes)).ToLower().Replace("\0", "");
-
-            var passwordBytes = buffer.ReadBytes().ToArray();
-            var password = System.Text.Encoding.UTF8.GetString(session.Decrypt(passwordBytes)).Replace("\0", "");
-
-            // Get the current executing assembly
-            var assembly = Assembly.GetExecutingAssembly();
-
-            // Retrieve the version information
-            var clientVersionBytes = buffer.ReadBytes().ToArray();
-            var serverVersion = assembly.GetName().Version?.ToString();
-            var clientVersion = System.Text.Encoding.UTF8.GetString(session.Decrypt(clientVersionBytes));
-
-            // Check versions
-            if (clientVersion != serverVersion)
-            {
-                NetworkSend.SendAlertMessage(session, SystemMessage.ClientOutdated, Menu.Register);
-                return;
-            }
-
-            var x = General.IsValidLogin(login);
-
-            switch (x) // Check if the username is valid
-            {
-                case -1:
-                    NetworkSend.SendAlertMessage(session, SystemMessage.NameContainsIllegalCharacters, Menu.Register);
-                    return;
-
-                case 0:
-                    NetworkSend.SendAlertMessage(session, SystemMessage.NameLengthInvalid, Menu.Register);
-                    return;
-            }
-
-            if (NetworkConfig.IsMultiLogin(session.Id, login))
-            {
-                NetworkSend.SendAlertMessage(session, SystemMessage.MultipleAccountsNotAllowed, Menu.Register);
-                return;
-            }
-
-            var userData = Database.SelectRowByColumn("id", Database.GetStringHash(login), "account", "data");
-            if (userData is not null)
-            {
-                NetworkSend.SendAlertMessage(session, SystemMessage.NameTaken, Menu.Register);
-                return;
-            }
-        
-            Account.Instance[session.Id].Login = login;
-            Account.Instance[session.Id].Password = password;
-
-            await Account.OnSave(session.Id).ConfigureAwait(false);
-
-            // send them to the character portal
-            NetworkSend.SendPlayerCharacters(session);
-            NetworkSend.SendJobs(session);
+            return;
         }
-        catch (System.Security.Cryptography.CryptographicException ex)
+
+        Account.EnsureSize(session.Id + 1);
+
+        // Check if its banned
+        // Cut off last portion of ip
+        if (Database.IsBanned(session.Id, session.Channel.IpAddress))
         {
-            General.Logger.LogWarning(ex, "Register decrypt failed for {IpAddress} (id={SessionId})", session.Channel.IpAddress, session.Id);
-            NetworkSend.SendAlertMessage(session, SystemMessage.Connection, Menu.Register);
+            NetworkSend.SendAlertMessage(session, SystemMessage.Banned, Menu.Register);
+            return;
         }
-        catch (Exception ex)
+
+        if (General.GetShutDownTimer is { IsRunning: true })
         {
-            General.Logger.LogError(ex, "Unhandled error in register handler for {IpAddress} (id={SessionId})", session.Channel.IpAddress, session.Id);
-            NetworkSend.SendAlertMessage(session, SystemMessage.Connection, Menu.Register);
+            NetworkSend.SendAlertMessage(session, SystemMessage.ServerMaintenance, Menu.Register);
+            return;
         }
+
+        var usernameBytes = buffer.ReadBytes().ToArray();
+        var login = System.Text.Encoding.UTF8.GetString(session.Decrypt(usernameBytes)).ToLower().Replace("\0", "");
+
+        var passwordBytes = buffer.ReadBytes().ToArray();
+        var password = System.Text.Encoding.UTF8.GetString(session.Decrypt(passwordBytes)).Replace("\0", "");
+
+        // Get the current executing assembly
+        var assembly = Assembly.GetExecutingAssembly();
+
+        // Retrieve the version information
+        var clientVersionBytes = buffer.ReadBytes().ToArray();
+        var serverVersion = assembly.GetName().Version?.ToString();
+        var clientVersion = System.Text.Encoding.UTF8.GetString(session.Decrypt(clientVersionBytes));
+
+        // Check versions
+        if (clientVersion != serverVersion)
+        {
+            NetworkSend.SendAlertMessage(session, SystemMessage.ClientOutdated, Menu.Register);
+            return;
+        }
+
+        var x = General.IsValidLogin(login);
+
+        switch (x) // Check if the username is valid
+        {
+            case -1:
+                NetworkSend.SendAlertMessage(session, SystemMessage.NameContainsIllegalCharacters, Menu.Register);
+                return;
+
+            case 0:
+                NetworkSend.SendAlertMessage(session, SystemMessage.NameLengthInvalid, Menu.Register);
+                return;
+        }
+
+        if (NetworkConfig.IsMultiLogin(session.Id, login))
+        {
+            NetworkSend.SendAlertMessage(session, SystemMessage.MultipleAccountsNotAllowed, Menu.Register);
+            return;
+        }
+
+        var userData = Database.SelectRowByColumn("id", Database.GetStringHash(login), "account", "data");
+        if (userData is not null)
+        {
+            NetworkSend.SendAlertMessage(session, SystemMessage.NameTaken, Menu.Register);
+            return;
+        }
+    
+        Account.Instance[session.Id].Login = login;
+        Account.Instance[session.Id].Password = password;
+
+        await Account.OnSave(session.Id).ConfigureAwait(false);
+
+        // send them to the character portal
+        NetworkSend.SendPlayerCharacters(session);
+        NetworkSend.SendJobs(session);
     }
 
     private static async ValueTask Packet_AddChar(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -425,12 +399,12 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             // Check if the username is valid
             if (x == -1)
             {
-                NetworkSend.SendAlertMessage(session, SystemMessage.NameContainsIllegalCharacters, Menu.Register);
+                NetworkSend.SendAlertMessage(session, SystemMessage.NameContainsIllegalCharacters, Menu.Login);
                 return;
             }
             else if (x == 0)
             {
-                NetworkSend.SendAlertMessage(session, SystemMessage.NameLengthInvalid, Menu.Register);
+                NetworkSend.SendAlertMessage(session, SystemMessage.NameLengthInvalid, Menu.Login);
                 return;
             }
 
