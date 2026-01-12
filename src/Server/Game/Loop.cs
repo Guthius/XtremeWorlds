@@ -654,9 +654,9 @@ public static class Loop
                                 {
                                     if (entity.Id >= 0 && entity.Id < Variables.MaxMapNpcs)
                                     {
-                                        ref var baseNpcClr = ref MapNpc.Instance[map, entity.Id];
-                                        baseNpcClr.TargetType = 0;
-                                        baseNpcClr.Target = -1;
+                                        ref var npc = ref MapNpc.Instance[map, entity.Id];
+                                        npc.TargetType = 0;
+                                        npc.Target = -1;
                                     }
                                 }
                             }
@@ -791,13 +791,13 @@ public static class Loop
                                 {
                                     if (entity.Id >= 0 && entity.Id < Variables.MaxMapNpcs)
                                     {
-                                        ref var baseNpcClr = ref MapNpc.Instance[map, entity.Id];
-                                        baseNpcClr.Target = -1;
-                                        baseNpcClr.TargetType = 0;
-                                        baseNpcClr.Attacking = 0;
-                                        baseNpcClr.AttackTimer = 0;
-                                        baseNpcClr.SkillBuffer = -1;
-                                        baseNpcClr.SkillBufferTimer = 0;
+                                        ref var npc = ref MapNpc.Instance[map, entity.Id];
+                                        npc.Target = -1;
+                                        npc.TargetType = 0;
+                                        npc.Attacking = 0;
+                                        npc.AttackTimer = 0;
+                                        npc.SkillBuffer = -1;
+                                        npc.SkillBufferTimer = 0;
                                     }
                                 }
                             }
@@ -811,13 +811,13 @@ public static class Loop
                             {
                                 if (entity.Id >= 0 && entity.Id < Variables.MaxMapNpcs)
                                 {
-                                    ref var baseNpcClr = ref MapNpc.Instance[map, entity.Id];
-                                    baseNpcClr.Target = -1;
-                                    baseNpcClr.TargetType = 0;
-                                    baseNpcClr.Attacking = 0;
-                                    baseNpcClr.AttackTimer = 0;
-                                    baseNpcClr.SkillBuffer = -1;
-                                    baseNpcClr.SkillBufferTimer = 0;
+                                    ref var npc = ref MapNpc.Instance[map, entity.Id];
+                                    npc.Target = -1;
+                                    npc.TargetType = 0;
+                                    npc.Attacking = 0;
+                                    npc.AttackTimer = 0;
+                                    npc.SkillBuffer = -1;
+                                    npc.SkillBufferTimer = 0;
                                 }
                             }
                         }
