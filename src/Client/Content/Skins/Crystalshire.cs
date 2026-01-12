@@ -328,7 +328,7 @@ public class Crystalshire
                 GameState.MapResizePending = true;
 
                 // Send map and close
-                Editors.MapEditorSend();
+                WinMapEditor.OnSend();
                 WindowManager.HideWindow("winMapEditor");
             };
         }
@@ -336,7 +336,7 @@ public class Crystalshire
         // Discard: cancel map edit and close
         if (WindowManager.TryGetControl("winMapEditor", "btnDiscard", out var btnDiscard))
         {
-            btnDiscard.CallBack[(int)ControlState.MouseDown] = () => { Editors.MapEditorCancel(); WindowManager.HideWindow("winMapEditor"); };
+            btnDiscard.CallBack[(int)ControlState.MouseDown] = () => { WinMapEditor.OnCancel(); WindowManager.HideWindow("winMapEditor"); };
         }
 
         // Layer buttons: update current layer in GameState
@@ -389,7 +389,7 @@ public class Crystalshire
                 }
                 else
                 {
-                    Editors.MapEditorClearLayer((MapLayer)GameState.CurLayer);
+                    WinMapEditor.OnClear((MapLayer)GameState.CurLayer);
                 }
             };
 
@@ -407,11 +407,11 @@ public class Crystalshire
         if (WindowManager.TryGetControl("winMapEditor", "btnFillLayer", out var btnFillLayer))
             btnFillLayer.CallBack[(int)ControlState.MouseDown] = () => { WinMapEditor.OnFillLayerClick(); };
         if (WindowManager.TryGetControl("winMapEditor", "btnClearLayer", out var btnClearLayer))
-            btnClearLayer.CallBack[(int)ControlState.MouseDown] = () => { Editors.MapEditorClearLayer((MapLayer)GameState.CurLayer); };
+            btnClearLayer.CallBack[(int)ControlState.MouseDown] = () => { WinMapEditor.OnClear((MapLayer)GameState.CurLayer); };
         if (WindowManager.TryGetControl("winMapEditor", "btnCopyMap", out var btnCopy))
-            btnCopy.CallBack[(int)ControlState.MouseDown] = () => { Editors.MapEditorCopyMap(); };
+            btnCopy.CallBack[(int)ControlState.MouseDown] = () => { WinMapEditor.OnCopy(); };
         if (WindowManager.TryGetControl("winMapEditor", "btnPasteMap", out var btnPaste))
-            btnPaste.CallBack[(int)ControlState.MouseDown] = () => { Editors.MapEditorPasteMap(); };
+            btnPaste.CallBack[(int)ControlState.MouseDown] = () => { WinMapEditor.OnPaste(); };
         if (WindowManager.TryGetControl("winMapEditor", "btnDeleteMap", out var btnDeleteMap))
             btnDeleteMap.CallBack[(int)ControlState.MouseDown] = () =>
             {
@@ -946,7 +946,7 @@ public class Crystalshire
                     int y = int.TryParse(tby.Text?.Trim(), out var iy) ? iy : 0;
                     x = Math.Max(0, x); y = Math.Max(0, y);
                     GameState.EditorTileX = x; GameState.EditorTileY = y;
-                    Editors.MapEditorChooseTile(x * Constants.TileSize, y * Constants.TileSize);
+                    WinMapEditor.OnSelect(x * Constants.TileSize, y * Constants.TileSize);
                 }
             };
 
@@ -3947,20 +3947,6 @@ public class Crystalshire
 
         BindIntText("txtCommonEventData1", v => Skill.Instance[WinSkillEditor.SelectedIndex].CommonEventData1 = v);
         BindIntText("txtCommonEventData2", v => Skill.Instance[WinSkillEditor.SelectedIndex].CommonEventData2 = v);
-
-        // Move speed multiplier (float)
-        static float ParseFloatOr(string s, float fallback)
-        {
-            if (string.IsNullOrWhiteSpace(s)) return fallback;
-            s = s.Trim();
-            if (float.TryParse(s, System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowLeadingSign, System.Globalization.CultureInfo.InvariantCulture, out var v))
-                return v;
-            if (float.TryParse(s, System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowLeadingSign, System.Globalization.CultureInfo.CurrentCulture, out v))
-                return v;
-            if (float.TryParse(s.Replace(',', '.'), System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowLeadingSign, System.Globalization.CultureInfo.InvariantCulture, out v))
-                return v;
-            return fallback;
-        }
 
         if (WindowManager.TryGetControl("winSkillEditor", "txtMoveSpeedMultiplier", out var msmCtrl) && msmCtrl is TextBox tbMs)
         {
