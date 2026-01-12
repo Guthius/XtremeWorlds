@@ -1190,11 +1190,7 @@ public class Script
             NetworkSend.SendPlayerMessage(playerId, deathMessage, (int)ColorName.BrightRed);
         }
 
-        var deathPacket = new Core.Net.PacketWriter();
-        deathPacket.WriteInt32((int)ServerPackets.SPlayerDead);
-        deathPacket.WriteInt32(DeathSpawnTimeMs);
-        deathPacket.WriteInt32(playerId);
-        PlayerService.Instance.SendDataTo(playerId, deathPacket.GetBytes());
+        NetworkSend.SendPlayerDeath(playerId, DeathSpawnTimeMs);
 
         System.Threading.Tasks.Task.Run(async () =>
         {
@@ -1273,12 +1269,7 @@ public class Script
             NetworkSend.SendGlobalMessage(GetPlayerName(target.Id) + " was slain by " + GetEntityName(attacker) + ".");
 
             // Hide the Player on their client immediately (do not broadcast to map)
-            var deathPacket = new Core.Net.PacketWriter();
-            var deathTimerMs = DeathSpawnTimeMs;
-            deathPacket.WriteInt32((int)ServerPackets.SPlayerDead);
-            deathPacket.WriteInt32(deathTimerMs);
-            deathPacket.WriteInt32(target.Id);
-            PlayerService.Instance.SendDataTo(target.Id, deathPacket.GetBytes());
+            NetworkSend.SendPlayerDeath(target.Id, DeathSpawnTimeMs);
 
             // After timer expires: perform the actual death warp and then release hold
             System.Threading.Tasks.Task.Run(async () =>

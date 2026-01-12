@@ -2010,4 +2010,12 @@ public static class NetworkSend
 
         NetworkConfig.SendDataToMapBut(playerId, map, packet.GetBytes());
     }
-}
+
+    public static void SendPlayerDeath(int playerId, int deathTimer)
+    {
+        var deathPacket = new Core.Net.PacketWriter();
+        deathPacket.WriteEnum(ServerPackets.SPlayerDead);
+        deathPacket.WriteInt32(deathTimer);
+        deathPacket.WriteInt32(playerId);
+        PlayerService.Instance.SendDataTo(playerId, deathPacket.GetBytes());
+}`
