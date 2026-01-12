@@ -164,7 +164,7 @@ namespace Server
             }
 
             MapResource.Instance[map].ResourceData[resourceNum].State = 0; // Cut
-            MapResource.Instance[map].ResourceData[resourceNum].Timer = General.GetTimeMs();
+            MapResource.Instance[map].ResourceData[resourceNum].Timer = General.GetTime();
 
             NetworkSend.SendMapResourceToMap(map);
 

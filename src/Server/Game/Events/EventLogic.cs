@@ -321,7 +321,7 @@ namespace Server
                             instance.X = Server.Map.Instance[map].Event[id].X;
                             instance.Y = Server.Map.Instance[map].Event[id].Y;
                             instance.MoveRouteStep = 0;
-                            instance.MoveTimer = General.GetTimeMs();
+                            instance.MoveTimer = General.GetTime();
 
                             // If the event despawned mid-step, clear any active step state.
                             Event.CancelMove(map, x, i, false);
@@ -400,7 +400,7 @@ namespace Server
                                 Event.TempEventMap[map].Event[id].Y = Server.Map.Instance[map].Event[id].Y;
                                 Event.TempEventMap[map].Event[id].Dir = instance.Dir;
                                 Event.TempEventMap[map].Event[id].MoveRouteStep = 0;
-                                Event.TempEventMap[map].Event[id].MoveTimer = General.GetTimeMs();
+                                Event.TempEventMap[map].Event[id].MoveTimer = General.GetTime();
 
                                 Event.CancelMove(map, id, 0, true);
                             }
@@ -454,7 +454,7 @@ namespace Server
                     if (Event.IsMoving(i, x, 0, true)) continue;
 
                     // Check if it's time to process movement.
-                    if (Event.TempEventMap[i].Event[x].MoveTimer > General.GetTimeMs()) continue;
+                    if (Event.TempEventMap[i].Event[x].MoveTimer > General.GetTime()) continue;
 
                     ref var globalEvent = ref Event.TempEventMap[i].Event[x];
 
@@ -705,9 +705,9 @@ namespace Server
                                             break;
                                         }
 
-                                        case 10: instance.MoveTimer = General.GetTimeMs() + 100; break;
-                                        case 11: instance.MoveTimer = General.GetTimeMs() + 500; break;
-                                        case 12: instance.MoveTimer = General.GetTimeMs() + 1000; break;
+                                        case 10: instance.MoveTimer = General.GetTime() + 100; break;
+                                        case 11: instance.MoveTimer = General.GetTime() + 500; break;
+                                        case 12: instance.MoveTimer = General.GetTime() + 1000; break;
 
                                         case 13: Event.Dir(playerId, map, eventId, (byte) Direction.Up, isGlobal); break;
                                         case 14: Event.Dir(playerId, map, eventId, (byte) Direction.Down, isGlobal); break;
@@ -901,7 +901,7 @@ namespace Server
                     }
 
                     // Set the next move timer based on MoveFreq.
-                    globalEvent.MoveTimer = General.GetTimeMs() + globalEvent.MoveFreq switch
+                    globalEvent.MoveTimer = General.GetTime() + globalEvent.MoveFreq switch
                     {
                         0 => 4000,
                         1 => 2000,
@@ -959,7 +959,7 @@ namespace Server
                         if (Event.IsMoving(map, x, i, false)) continue;
 
                         // Check move timer.
-                        if (localEvent.MoveTimer > General.GetTimeMs()) continue;
+                        if (localEvent.MoveTimer > General.GetTime()) continue;
 
                         // Process movement based on MoveType.
                         switch (localEvent.MoveType)
@@ -1124,7 +1124,7 @@ namespace Server
                                                                 // Start event processing.
                                                                 ref var eventProcessing = ref Data.TempPlayer[i].EventProcessing[eventId]; // Use EventId (local index)
                                                                 eventProcessing.Active = 1;
-                                                                eventProcessing.ActionTimer = General.GetTimeMs();
+                                                                eventProcessing.ActionTimer = General.GetTime();
                                                                 eventProcessing.CurList = 0;
                                                                 eventProcessing.CurSlot = 0;
                                                                 eventProcessing.EventId = mapEventId2; // Map event ID
@@ -1217,9 +1217,9 @@ namespace Server
 
                                                 break;
                                             }
-                                            case 10: instance.MoveTimer = General.GetTimeMs() + 100; break;
-                                            case 11: instance.MoveTimer = General.GetTimeMs() + 500; break;
-                                            case 12: instance.MoveTimer = General.GetTimeMs() + 1000; break;
+                                            case 10: instance.MoveTimer = General.GetTime() + 100; break;
+                                            case 11: instance.MoveTimer = General.GetTime() + 500; break;
+                                            case 12: instance.MoveTimer = General.GetTime() + 1000; break;
 
                                             case 13: Event.Dir(i, map, eventId, (byte) Direction.Up, isGlobal); break;
                                             case 14: Event.Dir(i, map, eventId, (byte) Direction.Down, isGlobal); break;
@@ -1404,7 +1404,7 @@ namespace Server
                         }
 
                         // Set next move timer based on MoveFreq.
-                        localEvent.MoveTimer = General.GetTimeMs() + localEvent.MoveFreq switch
+                        localEvent.MoveTimer = General.GetTime() + localEvent.MoveFreq switch
                         {
                             0 => 4000,
                             1 => 2000,
@@ -1421,7 +1421,6 @@ namespace Server
                 }
             });
         }
-
 
         public static void ProcessEventCommands()
         {
@@ -1464,7 +1463,7 @@ namespace Server
                                 {
                                     ref var eventProcessing = ref Data.TempPlayer[i].EventProcessing[eventPage.EventId]; // And here.
                                     eventProcessing.Active = 1;
-                                    eventProcessing.ActionTimer = General.GetTimeMs();
+                                    eventProcessing.ActionTimer = General.GetTime();
                                     eventProcessing.CurList = 0;
                                     eventProcessing.CurSlot = 0;
                                     eventProcessing.EventId = eventPage.EventId;
@@ -1559,7 +1558,7 @@ namespace Server
                             }
                         }
 
-                        if (instance1.WaitingForResponse == 0 && instance1.ActionTimer <= General.GetTimeMs())
+                        if (instance1.WaitingForResponse == 0 && instance1.ActionTimer <= General.GetTime())
                         {
                             // Process event commands until a wait, branch, or end condition is encountered.
                             bool restartlist = true;
@@ -2223,7 +2222,7 @@ namespace Server
                                             break;
 
                                         case (byte) EventCommand.Wait:
-                                            instance1.ActionTimer = General.GetTimeMs() + command.Data1;
+                                            instance1.ActionTimer = General.GetTime() + command.Data1;
                                             break;
 
                                         case (byte) EventCommand.ShowPicture:
@@ -3049,7 +3048,7 @@ namespace Server
                 ref var eventProcessing = ref Data.TempPlayer[playerIndex].EventProcessing[eventPage.EventId];
 
                 eventProcessing.Active = 1;
-                eventProcessing.ActionTimer = General.GetTimeMs();
+                eventProcessing.ActionTimer = General.GetTime();
                 eventProcessing.CurList = 0;
                 eventProcessing.CurSlot = 0;
                 eventProcessing.EventId = eventPage.EventId;

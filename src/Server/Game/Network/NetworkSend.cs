@@ -880,7 +880,7 @@ public static class NetworkSend
             mult = Data.TempPlayer[positionPlayerId].MoveSpeedMultiplier;
             if (mult <= 0) mult = 1.0f;
             var expiry = Data.TempPlayer[positionPlayerId].MoveSpeedMultiplierTimer;
-            if (expiry > 0 && expiry <= General.GetTimeMs())
+            if (expiry > 0 && expiry <= General.GetTime())
             {
                 Data.TempPlayer[positionPlayerId].MoveSpeedMultiplier = 1.0f;
                 Data.TempPlayer[positionPlayerId].MoveSpeedMultiplierTimer = 0;
@@ -910,7 +910,7 @@ public static class NetworkSend
             mult = Data.TempPlayer[playerId].MoveSpeedMultiplier;
             if (mult <= 0) mult = 1.0f;
             var expiry = Data.TempPlayer[playerId].MoveSpeedMultiplierTimer;
-            if (expiry > 0 && expiry <= General.GetTimeMs())
+            if (expiry > 0 && expiry <= General.GetTime())
             {
                 Data.TempPlayer[playerId].MoveSpeedMultiplier = 1.0f;
                 Data.TempPlayer[playerId].MoveSpeedMultiplierTimer = 0;

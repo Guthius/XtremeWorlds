@@ -202,10 +202,10 @@ public class Projectile : ProjectileBase, IAsyncData
         if (mapProjectileNum == -1) return;
         int projectileNum = itemNum >= 0 ? Item.Instance[itemNum].Projectile : -1;
         if (projectileNum < 0) return;
-        if (Data.TempPlayer[playerId].ProjectileTimer > General.GetTimeMs()) return;
+        if (Data.TempPlayer[playerId].ProjectileTimer > General.GetTime()) return;
 
         ref var mp = ref Data.MapProjectile[map, mapProjectileNum];
-        Data.TempPlayer[playerId].ProjectileTimer = General.GetTimeMs() + Item.Instance[itemNum].Speed;
+        Data.TempPlayer[playerId].ProjectileTimer = General.GetTime() + Item.Instance[itemNum].Speed;
         mp.Index = projectileNum;
         mp.Owner = playerId;
         mp.OwnerType = (byte)TargetType.Player;
@@ -224,8 +224,8 @@ public class Projectile : ProjectileBase, IAsyncData
         mp.Y = GetPlayerRawY(playerId);
         mp.Vx = vx; mp.Vy = vy; mp.FreeAim = 1;
         mp.AccX = 0; mp.AccY = 0; mp.Range = 0;
-        mp.TravelTime = General.GetTimeMs() + Math.Max(1, Projectile.Instance[projectileNum].Speed);
-        mp.Timer = General.GetTimeMs() + 60000;
+        mp.TravelTime = General.GetTime() + Math.Max(1, Projectile.Instance[projectileNum].Speed);
+        mp.Timer = General.GetTime() + 60000;
         NetworkSend.SendProjectileToMap(map, mapProjectileNum);
     }
 
@@ -241,10 +241,10 @@ public class Projectile : ProjectileBase, IAsyncData
         if (mapProjectileNum == -1) return;
         int index = itemNum >= 0 ? Item.Instance[itemNum].Projectile : -1;
         if (index < 0) return;
-        if (Data.TempPlayer[playerId].ProjectileTimer > General.GetTimeMs()) return;
+        if (Data.TempPlayer[playerId].ProjectileTimer > General.GetTime()) return;
 
         ref var mp = ref Data.MapProjectile[map, mapProjectileNum];
-        Data.TempPlayer[playerId].ProjectileTimer = General.GetTimeMs() + Item.Instance[itemNum].Speed;
+        Data.TempPlayer[playerId].ProjectileTimer = General.GetTime() + Item.Instance[itemNum].Speed;
         mp.Index = index;
         mp.Owner = playerId;
         mp.OwnerType = (byte)TargetType.Player;
@@ -263,8 +263,8 @@ public class Projectile : ProjectileBase, IAsyncData
         mp.Vx = vx; mp.Vy = vy; mp.FreeAim = 1; mp.SkillId = -1;
         mp.AccX = 0; mp.AccY = 0; mp.Range = 0;
         mp.DestX = destX; mp.DestY = destY;
-        mp.TravelTime = General.GetTimeMs() + Math.Max(1, Projectile.Instance[index].Speed);
-        mp.Timer = General.GetTimeMs() + 60000;
+        mp.TravelTime = General.GetTime() + Math.Max(1, Projectile.Instance[index].Speed);
+        mp.Timer = General.GetTime() + 60000;
         NetworkSend.SendProjectileToMap(map, mapProjectileNum);
     }
 
@@ -293,7 +293,7 @@ public class Projectile : ProjectileBase, IAsyncData
         }
 
         // Respect cooldown unless explicitly suppressed (multi-direction batch)
-        if (!suppressCooldown && Data.TempPlayer[playerId].ProjectileTimer > General.GetTimeMs())
+        if (!suppressCooldown && Data.TempPlayer[playerId].ProjectileTimer > General.GetTime())
         {
             return;
         }
@@ -304,7 +304,7 @@ public class Projectile : ProjectileBase, IAsyncData
         if (!suppressCooldown)
         {
             int cooldownMs = Projectile.Instance[projectile].Speed;
-            Data.TempPlayer[playerId].ProjectileTimer = General.GetTimeMs() + cooldownMs;
+            Data.TempPlayer[playerId].ProjectileTimer = General.GetTime() + cooldownMs;
         }
         mapProjectile.Index = projectile;
         mapProjectile.Owner = playerId;
@@ -314,8 +314,8 @@ public class Projectile : ProjectileBase, IAsyncData
         mapProjectile.Y = GetPlayerRawY(playerId);
         mapProjectile.SkillId = skillNum;
         mapProjectile.Range = 0;
-        mapProjectile.TravelTime = General.GetTimeMs() + Math.Max(1, Projectile.Instance[projectile].Speed);
-        mapProjectile.Timer = General.GetTimeMs() + 60000;
+        mapProjectile.TravelTime = General.GetTime() + Math.Max(1, Projectile.Instance[projectile].Speed);
+        mapProjectile.Timer = General.GetTime() + 60000;
 
         NetworkSend.SendProjectileToMap(map, mapProjectileNum);
     }
@@ -360,15 +360,15 @@ public class Projectile : ProjectileBase, IAsyncData
         mapProjectile.Y = MapNpc.Instance[map, mapNpcNum].Y;
         mapProjectile.SkillId = skill;
         mapProjectile.Range = 0;
-        mapProjectile.TravelTime = General.GetTimeMs() + Math.Max(1, Projectile.Instance[projectile].Speed);
-        mapProjectile.Timer = General.GetTimeMs() + 60000;
+        mapProjectile.TravelTime = General.GetTime() + Math.Max(1, Projectile.Instance[projectile].Speed);
+        mapProjectile.Timer = General.GetTime() + 60000;
 
         NetworkSend.SendProjectileToMap(map, index);
     }
 
     public static void OnUpdate()
     {
-        int now = General.GetTimeMs();
+        int now = General.GetTime();
         for (int map = 0; map < Core.Globals.Variables.MaxMaps; map++)
         {
             if (map < 0 || map >= Server.Map.Instance.Count || Server.Map.Instance[map] == null || Server.Map.Instance[map].Tile == null)

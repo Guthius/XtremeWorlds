@@ -44,7 +44,7 @@ public static class General
     public static Stopwatch GetShutDownTimer { get; } = new();
     public static RandomUtility GetRandom { get; } = new();
 
-    public static int GetTimeMs() => (int)MyStopwatch.ElapsedMilliseconds;
+    public static int GetTime() => (int)MyStopwatch.ElapsedMilliseconds;
 
     private static string GetLocalIpAddress()
     {
@@ -88,7 +88,7 @@ public static class General
     private static async System.Threading.Tasks.Task ServerStartAsync(IConfiguration configuration)
     {
         MyStopwatch.Start();
-        var startTime = GetTimeMs();
+        var startTime = GetTime();
 
         await InitializeCoreComponentsAsync(configuration);
         await LoadGameDataAsync();
@@ -352,7 +352,7 @@ public static class General
         ];
 
         foreach (var line in banner) Console.WriteLine(line);
-        Console.WriteLine($"Initialization complete. Server loaded in {GetTimeMs() - startTime}ms.");
+        Console.WriteLine($"Initialization complete. Server loaded in {GetTime() - startTime}ms.");
         Console.WriteLine("Use /help for available commands.");
     }
 

@@ -659,7 +659,7 @@ public class Player : PlayerBase
 
         // Throttle movement broadcasts: clients already have direction/move speed and can smoothly step.
         // Send immediately on movement start, on warp-triggered transitions, periodically, and on tile boundaries.
-        var now = General.GetTimeMs();
+        var now = General.GetTime();
         var last = (playerId >= 0 && playerId < LastPlayerXYBroadcastMs.Length) ? LastPlayerXYBroadcastMs[playerId] : 0;
         var onTileBoundary = (GetPlayerRawX(playerId) % Constants.TileSize == 0) && (GetPlayerRawY(playerId) % Constants.TileSize == 0);
         var shouldSend = !wasMoving || expectingWarp || didWarp || onTileBoundary || now - last >= 100;
@@ -1072,21 +1072,20 @@ public class Player : PlayerBase
         if (slot != -1)
         {
             var map = GetPlayerMap(playerId);
-
-            var itemTemplate = Item.Instance[itemId];
+            var item = Item.Instance[itemId];
             ref var mapItem = ref MapItem.Instance[map, slot];
 
             mapItem.Num = itemId;
             mapItem.X = GetPlayerX(playerId);
             mapItem.Y = GetPlayerY(playerId);
             mapItem.PlayerName = GetPlayerName(playerId);
-            mapItem.PlayerTimer = General.GetTimeMs() + Script.Instance?.ItemSpawnTimeMs();
-            mapItem.DespawnTimer = General.GetTimeMs() + Script.Instance?.ItemDespawnTimeMs();
+            mapItem.PlayerTimer = General.GetTime() + Script.Instance?.ItemSpawnTime();
+            mapItem.DespawnTimer = General.GetTime() + Script.Instance?.ItemDespawnTime();
             mapItem.CanDespawn = true;
 
             try
             {
-                Script.Instance?.OnDrop(playerId, slot, inv, amount, map, itemTemplate, itemId);
+                Script.Instance?.OnDrop(playerId, slot, inv, amount, map, item, itemId);
             }
             catch (Exception ex)
             {

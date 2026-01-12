@@ -219,7 +219,7 @@ namespace Server
 
             ref var processing = ref Data.TempPlayer[index].EventProcessing[eventId];
             processing.Active = 1;
-            processing.ActionTimer = General.GetTimeMs();
+            processing.ActionTimer = General.GetTime();
             processing.CurList = 0;
             processing.CurSlot = 0;
             processing.EventId = eventId;
@@ -755,7 +755,7 @@ namespace Server
                 {
                     // Any reply means "continue".
                     proc.WaitingForResponse = 0;
-                    proc.ActionTimer = General.GetTimeMs();
+                    proc.ActionTimer = General.GetTime();
                     break;
                 }
 
@@ -764,7 +764,7 @@ namespace Server
                     if (reply is >= 1 and <= 4)
                     {
                         UpdateEventProcessing(index, i, reply, cmd);
-                        proc.ActionTimer = General.GetTimeMs();
+                        proc.ActionTimer = General.GetTime();
                     }
                     else
                     {

@@ -27,7 +27,7 @@ public static class Loop
         while (true)
         {
             // Update our current tick value.
-            var tick = General.GetTimeMs();
+            var tick = General.GetTime();
 
             await General.CheckShutDownCountDownAsync();
 
@@ -36,7 +36,7 @@ public static class Loop
                 // Update all our available events.
                 EventLogic.UpdateEventLogic();
 
-                tmr25 = General.GetTimeMs() + 25;
+                tmr25 = General.GetTime() + 25;
             }
 
             if (tick > tmrPlayerWalk)
@@ -142,7 +142,7 @@ public static class Loop
                 }
 
                 // Player walk tick interval
-                tmrPlayerWalk = General.GetTimeMs() + 5;
+                tmrPlayerWalk = General.GetTime() + 5;
             }
 
             if (tick > tmrNpcWalk)
@@ -153,14 +153,14 @@ public static class Loop
                 // Event pixel step progression (1px per tick) like NPCs
                 Server.Event.ProcessActiveEventMovement();
 
-                tmrNpcWalk = General.GetTimeMs() + 5;
+                tmrNpcWalk = General.GetTime() + 5;
             }
 
             if (tick > tmrProj)
             {
                 // Server-side projectile pixel movement and sparse map broadcasts
                 Projectile.OnUpdate();
-                tmrProj = General.GetTimeMs() + 5;
+                tmrProj = General.GetTime() + 5;
             }
 
             if (tick > tmr3600000)
@@ -174,7 +174,7 @@ public static class Loop
                     General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(Loop));
                 }
 
-                tmr3600000 = General.GetTimeMs() + 3600000;
+                tmr3600000 = General.GetTime() + 3600000;
             }
 
             if (tick > tmr60000)
@@ -188,7 +188,7 @@ public static class Loop
                     General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(Loop));
                 }
 
-                tmr60000 = General.GetTimeMs() + 60000;
+                tmr60000 = General.GetTime() + 60000;
             }
 
             if (tick > tmr1000)
@@ -219,7 +219,7 @@ public static class Loop
                 }
 
                 // Move the timer up 1000ms.
-                tmr1000 = General.GetTimeMs() + 1000;
+                tmr1000 = General.GetTime() + 1000;
             }
 
             if (tick > tmr500)
@@ -227,21 +227,21 @@ public static class Loop
                 UpdateMapAi();
 
                 // Move the timer up 500ms.
-                tmr500 = General.GetTimeMs() + 500;
+                tmr500 = General.GetTime() + 500;
             }
 
             // Checks to spawn map items every 1 minute
             if (tick > lastUpdateMapSpawnItems)
             {
                 UpdateMapSpawnItems();
-                lastUpdateMapSpawnItems = General.GetTimeMs() + 60000;
+                lastUpdateMapSpawnItems = General.GetTime() + 60000;
             }
 
             // Checks to save players every 5 minutes
             if (tick > lastUpdateSavePlayers)
             {
                 await UpdateSavePlayers();
-                lastUpdateSavePlayers = General.GetTimeMs() + 300000;
+                lastUpdateSavePlayers = General.GetTime() + 300000;
             }
 
             try
@@ -351,7 +351,7 @@ public static class Loop
             }
         }
 
-        long tickCount = General.GetTimeMs();
+        long tickCount = General.GetTime();
 
         for (int x = 0; x < entities.Count; x++)
         {
@@ -361,7 +361,7 @@ public static class Loop
             var map = entity.Map;
 
             // Resolve completed skill buffers for both players and npcs
-            long nowMsBuff = General.GetTimeMs();
+            long nowMsBuff = General.GetTime();
             if (entity.Type == Core.Globals.Entity.EntityType.Player)
             {
                 int slot = (int)Data.TempPlayer[entity.Id].SkillBuffer;
@@ -539,7 +539,7 @@ public static class Loop
                                     var skills = Npc.Instance[entity.Num].Skill;
                                     if (skills != null)
                                     {
-                                        long nowMs = General.GetTimeMs();
+                                        long nowMs = General.GetTime();
                                         int dist = Math.Max(Math.Abs(ex - px), Math.Abs(ey - py));
                                         for (int slot = 0; slot < Core.Globals.Variables.MaxNpcSkills && slot < skills.Length; slot++)
                                         {
@@ -608,7 +608,7 @@ public static class Loop
                                         var skills2 = Npc.Instance[entity.Num].Skill;
                                         if (skills2 != null)
                                         {
-                                            long nowMs2 = General.GetTimeMs();
+                                            long nowMs2 = General.GetTime();
                                             int dist2 = Math.Max(Math.Abs(ex - tx), Math.Abs(ey - ty));
                                             for (int slot2 = 0; slot2 < Core.Globals.Variables.MaxNpcSkills && slot2 < skills2.Length; slot2++)
                                             {
@@ -654,7 +654,7 @@ public static class Loop
                 if (vitals != null && vitals[(byte)Core.Globals.Vital.Health] < 0 && entity.SpawnWait > 0)
                 {
                     entity.Num = 0;
-                    entity.SpawnWait = General.GetTimeMs();
+                    entity.SpawnWait = General.GetTime();
                     vitals[(byte)Core.Globals.Vital.Health] = 0;
                 }
 #pragma warning restore CS8602
@@ -676,7 +676,7 @@ public static class Loop
         }
 
         // ----- NPC Movement (Chase + Wander) -----
-        var nowMove = General.GetTimeMs();
+        var nowMove = General.GetTime();
         foreach (var e in entities)
         {
             if (e == null) continue;
@@ -781,7 +781,7 @@ public static class Loop
             }
         }
 
-        var now = General.GetTimeMs();
+        var now = General.GetTime();
         var itemCount = Variables.MaxMapItems;
 
         for (int map = 0; map < mapCount; map++)

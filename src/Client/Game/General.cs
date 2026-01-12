@@ -396,7 +396,7 @@ namespace Client
 
             var bank = Bank.Instance[GameState.MyIndex];
 
-            var slotCount = Math.Min((int)Variables.MaxBank, bank.Item.Length);
+            var slotCount = Math.Min(Variables.MaxBank, bank.Item.Length);
             for (var i = 0; i < slotCount; i++)
             {
                 if (bank.Item[i].Num < 0)

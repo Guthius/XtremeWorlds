@@ -39,29 +39,23 @@ public class Script
     private static bool[] _isUsingItem = new bool[Variables.MaxPlayers];
     private static bool[] _isEquippingItem = new bool[Variables.MaxPlayers];
     private static bool[] _isUnequippingItem = new bool[Variables.MaxPlayers];
-
-    private const int DoorResetMs = 30000;
+    private const int DoorReset = 30000; // 30 seconds
     private static readonly object _doorResetLock = new();
     private static readonly Dictionary<(int map, int x, int y), long> _doorResetExpiryByTile = new();
 
     // Timers for periodic regeneration
     private static long _lastNpcRegen;
     private static long _lastPlayerRegen;
-    private const int NpcRegenIntervalMs = 10000; // 10 seconds like legacy
-    private const int PlayerRegenIntervalMs = 10000; // 10 seconds like legacy
-    private const int BaseAttackSpeedMs = 1000; // fallback when no weapon speed
-    private const int DeathSpawnTimeMs = 60000; // 1 minute
-    private const long ItemSpawnTime = 30000L; // 30 seconds
-    private const long ItemDespawnTime = 90000L; // 1:30 seconds
-    private const byte StatPerLevel = 5;
-
-    // When a buffered cast is executing, we defer chain-on-hit until after FinalizeCast()
-    // so costs/cooldowns resolve before the chain skill fires.
+    public static int NpcRegenInterval = 10000; // 10 seconds
+    public static int PlayerRegenInterval = 10000; // 10 seconds
+    public static int BaseAttackSpeed = 1000; // fallback when no weapon speed
+    public static int DeathSpawnTime = 60000; // 1 minute
+    public static long ItemSpawnTime = 30000L; // 30 seconds
+    public static long ItemDespawnTime = 90000L; // 1:30 seconds
+    public static byte StatPerLevel = 5;
     private readonly List<(int skillId, Entity target)> _queuedChainOnHit = new();
     private (Core.Globals.Entity.EntityType type, int id, int map)? _activeCastChainCaster;
     private int _activeCastChainSkillId = -1;
-
-    // Mutable script-driven limits (initialized from engine defaults)
     public static byte MaxLevel = Variables.MaxLevel;
     public static int MaxAnimations = Variables.MaxAnimations;
     public static byte MaxBank = Variables.MaxBank;
@@ -161,16 +155,6 @@ public class Script
         Variables.Welcome = Welcome;
         Variables.Website = Website;
     }
-    
-    public long ItemDespawnTimeMs()
-    {
-        return ItemDespawnTime;
-    }
-
-    public long ItemSpawnTimeMs()
-    {
-        return ItemSpawnTime;
-    }
 
     public int GetPlayerMaxLevel()
     {
@@ -234,16 +218,16 @@ public class Script
         // the correct timer when relogging the same dead character.
         if (Server.Player.Instance[index].Dead)
         {
-            var now = (int)General.GetTimeMs();
-            var remainingMs = Server.Player.Instance[index].DeathTimer - now;
-            if (remainingMs <= 0)
+            var now = (int)General.GetTime();
+            var remaining = Server.Player.Instance[index].DeathTimer - now;
+            if (remaining <= 0)
             {
                 // Timer already expired while offline; finish the respawn immediately.
                 OnDeath(index);
             }
             else
             {
-                NetworkSend.SendPlayerDeath(index, remainingMs);
+                NetworkSend.SendPlayerDeath(index, remaining);
             }
         }
 
@@ -328,7 +312,7 @@ public class Script
         MapItem.Instance[map, mapSlot].Value = 0;
         NetworkSend.SendMapItemToAll(map, mapSlot);
         NetworkSend.SendInventoryUpdate(index, invSlot);
-        NetworkSend.SendActionMessage(GetPlayerMap(index), msg, (int)ColorName.White, (byte)ActionMessageType.Static, GetPlayerX(index) * 32, GetPlayerY(index) * 32);
+        NetworkSend.SendActionMessage(GetPlayerMap(index), msg, (int)ColorName.White, (byte)ActionMessageType.Static, GetPlayerX(index) * Variables.TileSize, GetPlayerY(index) * Variables.TileSize);
 
         // Unlock pickup for this Player
         _isPickingUp[index] = false;
@@ -392,7 +376,7 @@ public class Script
                         {
                             case (byte)ConsumableEffect.RestoresHealth:
                                 {
-                                    NetworkSend.SendActionMessage(GetPlayerMap(index), "+" + Item.Instance[item].Data1, (int)ColorName.BrightGreen, (byte)ActionMessageType.Scroll, GetPlayerX(index) * 32, GetPlayerY(index) * 32);
+                                    NetworkSend.SendActionMessage(GetPlayerMap(index), "+" + Item.Instance[item].Data1, (int)ColorName.BrightGreen, (byte)ActionMessageType.Scroll, GetPlayerX(index) * Variables.TileSize, GetPlayerY(index) * Variables.TileSize);
                                     NetworkSend.SendAnimation(GetPlayerMap(index), Item.Instance[item].Animation, 0, 0, (byte)TargetType.Player, index);
                                     SetPlayerVital(index, Core.Globals.Vital.Health, GetPlayerVital(index, Core.Globals.Vital.Health) + Item.Instance[item].Data1);
                                     TakeInv(index, item, 1);
@@ -402,7 +386,7 @@ public class Script
 
                             case (byte)ConsumableEffect.RestoresMana:
                                 {
-                                    NetworkSend.SendActionMessage(GetPlayerMap(index), "+" + Item.Instance[item].Data1, (int)ColorName.BrightBlue, (byte)ActionMessageType.Scroll, GetPlayerX(index) * 32, GetPlayerY(index) * 32);
+                                    NetworkSend.SendActionMessage(GetPlayerMap(index), "+" + Item.Instance[item].Data1, (int)ColorName.BrightBlue, (byte)ActionMessageType.Scroll, GetPlayerX(index) * Variables.TileSize, GetPlayerY(index) * Variables.TileSize);
                                     NetworkSend.SendAnimation(GetPlayerMap(index), Item.Instance[item].Animation, 0, 0, (byte)TargetType.Player, index);
                                     SetPlayerVital(index, Core.Globals.Vital.Stamina, GetPlayerVital(index, Core.Globals.Vital.Stamina) + Item.Instance[item].Data1);
                                     TakeInv(index, item, 1);
@@ -619,7 +603,7 @@ public class Script
 
     private static void ScheduleDoorReset(int map, int x, int y)
     {
-        var expiry = General.GetTimeMs() + DoorResetMs;
+        var expiry = General.GetTime() + DoorReset;
         lock (_doorResetLock)
         {
             _doorResetExpiryByTile[(map, x, y)] = expiry;
@@ -627,7 +611,7 @@ public class Script
 
         _ = System.Threading.Tasks.Task.Run(async () =>
         {
-            await System.Threading.Tasks.Task.Delay(DoorResetMs).ConfigureAwait(false);
+            await System.Threading.Tasks.Task.Delay(DoorReset).ConfigureAwait(false);
 
             long expectedExpiry;
             lock (_doorResetLock)
@@ -983,7 +967,7 @@ public class Script
         if (skill < 0 || skill >= Skill.Instance.Count) return;
 
         // Cooldown check
-        long now = General.GetTimeMs();
+        long now = General.GetTime();
         if (Data.TempPlayer[player].SkillCd != null && skillSlot < Data.TempPlayer[player].SkillCd.Length)
         {
             var cdExpiry = Data.TempPlayer[player].SkillCd[skillSlot];
@@ -1098,7 +1082,7 @@ public class Script
                 // plural
                 NetworkSend.SendGlobalMessage(GetPlayerName(index) + " has gained " + count + " levels!");
             }
-            NetworkSend.SendActionMessage(GetPlayerMap(index), "Level Up", (int)ColorName.Yellow, 1, GetPlayerX(index) * 32, GetPlayerY(index) * 32);
+            NetworkSend.SendActionMessage(GetPlayerMap(index), "Level Up", (int)ColorName.Yellow, 1, GetPlayerX(index) * Variables.TileSize, GetPlayerY(index) * Variables.TileSize);
             NetworkSend.SendExperience(index);
             NetworkSend.SendPlayerData(index);
         }
@@ -1106,9 +1090,9 @@ public class Script
 
     public void RegenVitals()
     {
-        long now = General.GetTimeMs();
-        bool doNpc = now - _lastNpcRegen >= NpcRegenIntervalMs;
-        bool doPlayer = now - _lastPlayerRegen >= PlayerRegenIntervalMs;
+        long now = General.GetTime();
+        bool doNpc = now - _lastNpcRegen >= NpcRegenInterval;
+        bool doPlayer = now - _lastPlayerRegen >= PlayerRegenInterval;
         if (!doNpc && !doPlayer) return;
 
         if (doNpc) _lastNpcRegen = now;
@@ -1210,14 +1194,14 @@ public class Script
         }
 
         // Record a per-character respawn deadline.
-        var now = (int)General.GetTimeMs();
-        Server.Player.Instance[playerId].DeathTimer = now + DeathSpawnTimeMs;
+        var now = (int)General.GetTime();
+        Server.Player.Instance[playerId].DeathTimer = now + DeathSpawnTime;
 
-        NetworkSend.SendPlayerDeath(playerId, DeathSpawnTimeMs);
+        NetworkSend.SendPlayerDeath(playerId, DeathSpawnTime);
 
         System.Threading.Tasks.Task.Run(async () =>
         {
-            await System.Threading.Tasks.Task.Delay(DeathSpawnTimeMs);
+            await System.Threading.Tasks.Task.Delay(DeathSpawnTime);
             if (IsPlaying(playerId) && Server.Player.Instance[playerId].Dead)
             {
                 OnDeath(playerId);
@@ -1292,16 +1276,16 @@ public class Script
             NetworkSend.SendGlobalMessage(GetPlayerName(target.Id) + " was slain by " + GetEntityName(attacker) + ".");
 
             // Record a per-character respawn deadline.
-            var now = (int)General.GetTimeMs();
-            Server.Player.Instance[target.Id].DeathTimer = now + DeathSpawnTimeMs;
+            var now = (int)General.GetTime();
+            Server.Player.Instance[target.Id].DeathTimer = now + DeathSpawnTime;
 
             // Hide the Player on their client immediately (do not broadcast to map)
-            NetworkSend.SendPlayerDeath(target.Id, DeathSpawnTimeMs);
+            NetworkSend.SendPlayerDeath(target.Id, DeathSpawnTime);
 
             // After timer expires: perform the actual death warp and then release hold
             System.Threading.Tasks.Task.Run(async () =>
             {
-                await System.Threading.Tasks.Task.Delay(DeathSpawnTimeMs);
+                await System.Threading.Tasks.Task.Delay(DeathSpawnTime);
                 if (IsPlaying(target.Id) && Server.Player.Instance[target.Id].Dead)
                 {
                     OnDeath(target.Id);
@@ -1320,8 +1304,8 @@ public class Script
 
                 // Mark dead & schedule respawn with a 60-second countdown via action messages
                 ref var mapNpc = ref MapNpc.Instance[map, npc];
-                var deathTimerMs = DeathSpawnTimeMs;
-                var currentTime = General.GetTimeMs();
+                var deathTimer = DeathSpawnTime;
+                var currentTime = General.GetTime();
                 
                 // Store original NPC number for respawn and set to dead state
                 int originalNpcNum = mapNpc.Num;
@@ -1346,10 +1330,10 @@ public class Script
                 }
 
                 mapNpc.Num = -1; // regular dead
-                mapNpc.SpawnWait = currentTime + deathTimerMs; // respawn time
+                mapNpc.SpawnWait = currentTime + deathTimer; // respawn time
                 mapNpc.Vital[(int)Core.Globals.Vital.Health] = 0;
 
-                NetworkSend.SendNpcDeath(map, npc, deathTimerMs);
+                NetworkSend.SendNpcDeath(map, npc, deathTimer);
 
                 // clear this npc's own target
                 mapNpc.Target = -1;
@@ -1440,7 +1424,7 @@ public class Script
         {
             return false; // PvP not allowed on this map
         }
-        var now = General.GetTimeMs();
+        var now = General.GetTime();
         var cd = GetAttackSpeed(attacker, skillId);
         if (attacker.AttackTimer + cd > now) return false;
 
@@ -1721,10 +1705,10 @@ public class Script
             var weaponId = GetEquippedItemId(attacker, Equipment.Weapon);
             if (weaponId >= 0)
             {
-                return Item.Instance[weaponId].Speed > 0 ? Item.Instance[weaponId].Speed : BaseAttackSpeedMs;
+                return Item.Instance[weaponId].Speed > 0 ? Item.Instance[weaponId].Speed : BaseAttackSpeed;
             }
         }
-        return BaseAttackSpeedMs;
+        return BaseAttackSpeed;
     }
 
     // Public helper to enforce per-attacker cooldown based on attack speed.
@@ -1732,7 +1716,7 @@ public class Script
     public bool TryConsumeAttackCooldown(Entity attacker, int? skillId = null)
     {
         if (attacker == null) return false;
-        var now = General.GetTimeMs();
+        var now = General.GetTime();
         var cd = GetAttackSpeed(attacker, skillId);
         if (attacker.AttackTimer + cd > now)
         {
@@ -2020,7 +2004,7 @@ public class Script
                 // (Duration == 0 => no persistent speed effect)
                 if (Math.Abs(mult - 1.0f) > 0.0001f && Skill.Instance[skill].Duration > 0)
                 {
-                    var now = General.GetTimeMs();
+                    var now = General.GetTime();
                     Data.TempPlayer[entity.Id].MoveSpeedMultiplier = mult;
                     Data.TempPlayer[entity.Id].MoveSpeedMultiplierTimer = now + Skill.Instance[skill].Duration * 1000;
                 }
@@ -2114,7 +2098,7 @@ public class Script
             var projNum = Skill.Instance[skillId].Projectile;
             if (projNum >= 0)
             {
-                Data.TempPlayer[caster.Id].ProjectileTimer = General.GetTimeMs() + Math.Max(0, Projectile.Instance[projNum].Speed);
+                Data.TempPlayer[caster.Id].ProjectileTimer = General.GetTime() + Math.Max(0, Projectile.Instance[projNum].Speed);
             }
         }
     }
@@ -2376,7 +2360,7 @@ public class Script
             int pid = caster.Id;
             if (Data.TempPlayer[pid].SkillCd != null && PlayerSkillSlot < Data.TempPlayer[pid].SkillCd.Length)
             {
-                Data.TempPlayer[pid].SkillCd[PlayerSkillSlot] = General.GetTimeMs() + skill.CdTime * 1000;
+                Data.TempPlayer[pid].SkillCd[PlayerSkillSlot] = General.GetTime() + skill.CdTime * 1000;
                 NetworkSend.SendSkillCooldown(pid, PlayerSkillSlot);
             }
         }
@@ -2393,7 +2377,7 @@ public class Script
                     {
                         if (npcTemplate.Skill[slot] == skillId)
                         {
-                            npc.SkillCd[slot] = General.GetTimeMs() + skill.CdTime * 1000;
+                            npc.SkillCd[slot] = General.GetTime() + skill.CdTime * 1000;
                             break;
                         }
                     }
@@ -2604,8 +2588,8 @@ public class Script
                 if (!occ)
                 {
                     // Move Player by setting raw coordinates
-                    SetPlayerX(target.Id, nx * 32);
-                    SetPlayerY(target.Id, ny * 32);
+                    SetPlayerX(target.Id, nx * Variables.TileSize);
+                    SetPlayerY(target.Id, ny * Variables.TileSize);
                     NetworkSend.SendPlayerXYToMap(target.Id);
                 }
                 else break;
@@ -2616,12 +2600,12 @@ public class Script
                 for (int mi = 0; mi < Core.Globals.Variables.MaxMapNpcs; mi++)
                 {
                     if (mi == target.Id) continue;
-                    if (MapNpc.Instance[map, mi].Num >= 0 && MapNpc.Instance[map, mi].X / 32 == nx && MapNpc.Instance[map, mi].Y / 32 == ny) { occ = true; break; }
+                    if (MapNpc.Instance[map, mi].Num >= 0 && MapNpc.Instance[map, mi].X / Variables.TileSize == nx && MapNpc.Instance[map, mi].Y / Variables.TileSize == ny) { occ = true; break; }
                 }
                 if (!occ)
                 {
-                    MapNpc.Instance[map, target.Id].X = nx * 32;
-                    MapNpc.Instance[map, target.Id].Y = ny * 32;
+                    MapNpc.Instance[map, target.Id].X = nx * Variables.TileSize;
+                    MapNpc.Instance[map, target.Id].Y = ny * Variables.TileSize;
                     // Notify clients by sending SNpcDir (keeps anim simple) and vitals/position via SMapNpcData on next sync
                     var stopPacket = new Core.Net.PacketWriter(9);
                     stopPacket.WriteEnum(ServerPackets.SNpcDir);
