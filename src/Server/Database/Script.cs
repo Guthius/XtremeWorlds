@@ -238,8 +238,12 @@ public class Script
         NetworkSend.SendPlaySound(index, "Bell.ogg", GetPlayerX(index), GetPlayerY(index));
     }
 
-    public void OnDrop(int index, int mapSlot, int invSlot, int amount, int map, Item item, int id)
+    public void OnDrop(int index, int invSlot, int amount)
     {
+        var item = Item.Instance[GetPlayerInv(index, invSlot)];
+        var map = GetPlayerMap(index);
+        var id = GetPlayerInv(index, invSlot);
+
         // Determine if the item is currency or stackable
         if (item.Type == (byte)ItemCategory.Currency || item.Stackable == 1)
         {
@@ -273,7 +277,7 @@ public class Script
         Server.MapItem.OnSpawn(id, amount, map, GetPlayerX(index), GetPlayerY(index));
     }
 
-    public void MapGetItem(int index, int map, int mapSlot, int invSlot)
+    public void OnPickup(int index, int map, int mapSlot, int invSlot)
     {
         // Prevent double pickup: if already picking up, ignore
         if (_isPickingUp[index])
@@ -318,7 +322,7 @@ public class Script
         _isPickingUp[index] = false;
     }
 
-    public void UnEquipItem(int index, int item, int eqSlot, int invSlot)
+    public void OnUnEquip(int index, int item, int eqSlot, int invSlot)
     {
         // Prevent re-entrant unequip actions for this Player
         if (_isUnequippingItem[index])
@@ -349,7 +353,7 @@ public class Script
         }
     }
 
-    public void UseItem(int index, int item, int invNum)
+    public void OnUse(int index, int item, int inv)
     {
         // Prevent re-entrant item usage for a single Player (e.g., rapid packet spam)
         if (_isUsingItem[index])
@@ -366,7 +370,7 @@ public class Script
             {
                 case (byte)ItemCategory.Equipment:
                     {
-                        EquipItem(index, item, invNum);
+                        EquipItem(index, item, inv);
                         break;
                     }
 
@@ -444,7 +448,7 @@ public class Script
                 case (byte)ItemCategory.Event:
                     {
                         // Trigger item-driven common event using item's SubType/Data1/Data2
-                        CommonEvent(index, item, invNum);
+                        CommonEvent(index, item, inv);
                         break;
                     }
 
@@ -461,7 +465,7 @@ public class Script
         }
     }
 
-    private void CommonEvent(int index, int item, int invNum, int skill = -1)
+    private void CommonEvent(int index, int item, int inv, int skill = -1)
     {
         if (skill >= 0)
         {
@@ -489,7 +493,7 @@ public class Script
 
             if (triggerType == (byte)CommonEventTrigger.Key)
             {
-                TryUseKeyOnFacingTile(index, itemId, invNum);
+                TryUseKeyOnFacingTile(index, itemId, inv);
                 return;
             }
 
@@ -703,13 +707,10 @@ public class Script
                 break;
 
             case (byte)CommonEventTrigger.Key:
-                // Skills can act as keys by setting Skill.CommonEventType to (Key + 1).
-                // invNum = -1 means don't consume an inventory item.
                 TryUseKeyOnFacingTile(playerId, -1, -1);
                 break;
 
             case (byte)CommonEventTrigger.Script:
-                // Minimal sample custom scripts
                 if (data1 == 0)
                     NetworkSend.SendPlayerMessage(playerId, "You feel a strange sensation...", (int)ColorName.BrightCyan);
                 else
@@ -718,7 +719,7 @@ public class Script
         }
     }
         
-    private void EquipItem(int index, int item, int invNum)
+    private void EquipItem(int index, int item, int inv)
     {
         if (_isEquippingItem[index])
             return;
@@ -731,7 +732,7 @@ public class Script
             Equipment eqType = (Equipment)Item.Instance[item].SubType;
             if (Item.Instance[item].BindType == 2)
             {
-                Server.Player.Instance[index].Inventory[invNum].Bound = 2;
+                Server.Player.Instance[index].Inventory[inv].Bound = 2;
             }
 
             if (GetPlayerPaperdoll(index, eqType) >= 0)
@@ -739,7 +740,7 @@ public class Script
                 tempItem = GetPlayerPaperdoll(index, eqType);
             }
             SetPlayerPaperdoll(index, item, eqType);
-            Server.Player.Instance[index].Paperdoll[(byte)eqType].Bound = Server.Player.Instance[index].Inventory[invNum].Bound;
+            Server.Player.Instance[index].Paperdoll[(byte)eqType].Bound = Server.Player.Instance[index].Inventory[inv].Bound;
             NetworkSend.SendPlayerMessage(index, "You equip " + GameLogic.CheckGrammar(Item.Instance[item].Name), (int)ColorName.BrightGreen);
             TakeInv(index, item, 1);
             if (tempItem >= 0)

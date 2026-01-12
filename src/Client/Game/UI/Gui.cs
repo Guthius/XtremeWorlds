@@ -41,6 +41,33 @@ public class WindowManager
     private static bool _dragLockedByPress;
     public static bool IsWindowActive => _isSelected;
 
+    private static bool IsMouseOverWindowOrControl(Window window)
+    {
+        // Normal window bounds
+        if (GameState.CurMouseX >= window.X && GameState.CurMouseX <= window.X + window.Width &&
+            GameState.CurMouseY >= window.Y && GameState.CurMouseY <= window.Y + window.Height)
+        {
+            return true;
+        }
+
+        // Some skins place controls (e.g., close button) slightly outside the window bounds.
+        // Treat those as part of the window for hit-testing.
+        foreach (var c in window.Controls)
+        {
+            if (!c.Visible) continue;
+
+            int left = window.X + c.X;
+            int top = window.Y + c.Y;
+            if (GameState.CurMouseX >= left && GameState.CurMouseX <= left + c.Width &&
+                GameState.CurMouseY >= top && GameState.CurMouseY <= top + c.Height)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static void UpdateZOrder(long windowIndex, bool forced = false)
     {
         var window = Windows[windowIndex];
@@ -842,6 +869,9 @@ public class WindowManager
         Window? curWindow = null;
         var curControl = -1;
 
+        // Modal behaviour: if the dialogue is visible, it should keep focus and block input behind it.
+        var dialogueVisible = TryGetWindow("winDialogue", out var dlg) && dlg is not null && dlg.Visible;
+
         // If an item/skill is being dragged, keep the drag box under the cursor and
         // allow dropping on mouse-up anywhere (not just over winDragBox).
         if (DragBox.Type != DraggablePartType.None)
@@ -891,8 +921,12 @@ public class WindowManager
                 foreach (var w in Windows.Values)
                 {
                     if (!w.Visible) continue;
-                    if (GameState.CurMouseX >= w.X && GameState.CurMouseX <= w.X + w.Width &&
-                        GameState.CurMouseY >= w.Y && GameState.CurMouseY <= w.Y + w.Height)
+                    if (dialogueVisible && !string.Equals(w.Name, "winDialogue", StringComparison.OrdinalIgnoreCase) &&
+                        !string.Equals(w.Name, "winDragBox", StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+                    if (IsMouseOverWindowOrControl(w))
                     {
                         if (clickedWindow is null || w.ZOrder > clickedWindow.ZOrder)
                         {
@@ -929,15 +963,18 @@ public class WindowManager
                     continue;
                 }
 
+                if (dialogueVisible && !string.Equals(window.Name, "winDialogue", StringComparison.OrdinalIgnoreCase) &&
+                    !string.Equals(window.Name, "winDragBox", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
                 if (window.State != ControlState.MouseDown)
                 {
                     window.State = ControlState.Normal;
                 }
 
-                if (GameState.CurMouseX >= window.X &&
-                    GameState.CurMouseX <= window.Width + window.X &&
-                    GameState.CurMouseY >= window.Y &&
-                    GameState.CurMouseY <= window.Height + window.Y)
+                if (IsMouseOverWindowOrControl(window))
                 {
                     // Handle combo menu logic
                     if (window.Design[0] == Design.ComboMenu)
@@ -1030,6 +1067,12 @@ public class WindowManager
             if (curWindow is not null)
             {
                 _isSelected = true;
+
+                if (dialogueVisible && dlg is not null)
+                {
+                    // Keep the dialogue as the active window while it is visible.
+                    ActiveWindow = dlg;
+                }
 
                 // Handle the active window's callback
                 var callBack = curWindow.CallBack[(int)entState];
@@ -1305,10 +1348,7 @@ public class WindowManager
                 continue;
             }
 
-            if (GameState.CurMouseX >= window.X &&
-                GameState.CurMouseX <= window.X + window.Width &&
-                GameState.CurMouseY >= window.Y &&
-                GameState.CurMouseY <= window.Y + window.Height)
+            if (IsMouseOverWindowOrControl(window))
             {
                 return true;
             }

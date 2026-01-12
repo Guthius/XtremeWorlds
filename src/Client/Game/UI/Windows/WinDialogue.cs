@@ -30,6 +30,12 @@ public class WinDialogue
             case DialogueStyle.YesNo:
                 GameLogic.DialogueHandler(3L);
                 break;
+
+            case DialogueStyle.Input:
+                // Cancel input prompts (e.g., drop amount) without performing the action.
+                GameLogic.CloseDialogue();
+                GameState.Dialogue = (DialogueType)0;
+                break;
         }
     }
 }

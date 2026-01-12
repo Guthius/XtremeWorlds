@@ -1127,6 +1127,12 @@ namespace Client
 
             // Show window
             WindowManager.ShowWindow("winDialogue", true);
+
+            // Ensure text input prompts reliably focus the textbox.
+            if (style == DialogueStyle.Input)
+            {
+                WindowManager.SetActiveControl(dlg, "txtInput");
+            }
         }
 
         public static void DialogueHandler(long index)

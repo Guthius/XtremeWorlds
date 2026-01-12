@@ -457,16 +457,33 @@ public class WinDragBox
         switch (WindowManager.DragBox.Origin)
         {
             case PartOrigin.Inventory:
-                if (Item.Instance[GetPlayerInv(GameState.MyIndex, WindowManager.DragBox.Slot)].Type != (byte) ItemCategory.Currency)
                 {
-                    Sender.SendDropItem(WindowManager.DragBox.Slot, GetPlayerInv(GameState.MyIndex, WindowManager.DragBox.Slot));
-                }
-                else
-                {
-                    GameLogic.Dialogue("Drop Item", "Please choose how many to drop.", "", DialogueType.DropItem, DialogueStyle.Input, WindowManager.DragBox.Slot);
-                }
+                    var invSlot = WindowManager.DragBox.Slot;
+                    var item = GetPlayerInv(GameState.MyIndex, invSlot);
+                    if (item < 0 || item >= Item.Instance.Count)
+                    {
+                        break;
+                    }
 
-                break;
+                    var isCurrency = Item.Instance[item].Type == (byte)ItemCategory.Currency;
+                    var isStackable = Item.Instance[item].Stackable == 1;
+                    if (isCurrency || isStackable)
+                    {
+                        GameLogic.Dialogue(
+                            "Drop Item",
+                            "Please choose how many to drop.",
+                            "",
+                            DialogueType.DropItem,
+                            DialogueStyle.Input,
+                            invSlot);
+                    }
+                    else
+                    {
+                        Sender.SendDropItem(invSlot, 1);
+                    }
+
+                    break;
+                }
 
             case PartOrigin.SkillTree:
                 Sender.SendForgetSkill(WindowManager.DragBox.Slot);

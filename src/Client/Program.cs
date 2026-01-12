@@ -1300,6 +1300,11 @@ namespace Client
         // Handles the hotbar key presses using KeyboardState
         private static void HandleHotbarInput()
         {
+            if (IsWindowVisible("winDialogue"))
+            {
+                return;
+            }
+
             if (GameState.InSmallChat)
             {
                 // Iterate through hotbar slots and check for corresponding keys
@@ -1591,6 +1596,65 @@ namespace Client
                 {
                     if (GameState.PlayerData)
                     {
+                        // UI right-click actions (inventory drop, character unequip, hotbar clear)
+                        // must be hit-tested in GUI-space.
+                        {
+                            var prevMouseX = GameState.CurMouseX;
+                            var prevMouseY = GameState.CurMouseY;
+
+                            GameState.CurMouseX = GameState.CurMouseXGui;
+                            GameState.CurMouseY = GameState.CurMouseYGui;
+
+                            if (WindowManager.TryGetWindow("winCharacter", out var winCharacter))
+                            {
+                                var eqSlot = General.IsEq(winCharacter!.X, winCharacter!.Y);
+                                if (eqSlot >= 0)
+                                {
+                                    GameState.CurMouseX = prevMouseX;
+                                    GameState.CurMouseY = prevMouseY;
+                                    Sender.SendUnequip(eqSlot);
+                                    return;
+                                }
+                            }
+
+                            if (WindowManager.TryGetWindow("winInventory", out var winInventory))
+                            {
+                                var invSlot = General.IsInv(winInventory!.X, winInventory!.Y);
+                                if (invSlot >= 0)
+                                {
+                                    var itemNum = GetPlayerInv(GameState.MyIndex, invSlot);
+                                    if (itemNum >= 0 && itemNum < Item.Instance.Count)
+                                    {
+                                        var isCurrency = Item.Instance[itemNum].Type == (byte)ItemCategory.Currency;
+                                        var isStackable = Item.Instance[itemNum].Stackable == 1;
+
+                                        GameState.CurMouseX = prevMouseX;
+                                        GameState.CurMouseY = prevMouseY;
+
+                                        if (isCurrency || isStackable)
+                                        {
+                                            GameLogic.Dialogue(
+                                                "Drop Item",
+                                                "Please choose how many to drop.",
+                                                "",
+                                                DialogueType.DropItem,
+                                                DialogueStyle.Input,
+                                                invSlot);
+                                        }
+                                        else
+                                        {
+                                            Sender.SendDropItem(invSlot, 1);
+                                        }
+
+                                        return;
+                                    }
+                                }
+                            }
+
+                            GameState.CurMouseX = prevMouseX;
+                            GameState.CurMouseY = prevMouseY;
+                        }
+
                         int slot = -1;
                         if (WindowManager.TryGetWindow("winHotbar", out var winHotbar))
                         {

@@ -3348,7 +3348,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
         try
         {
-            Script.Instance?.MapDropItem(session.Id, inv, amount);
+            Script.Instance?.OnDrop(session.Id, inv, amount);
         }
         catch (Exception ex)
         {
