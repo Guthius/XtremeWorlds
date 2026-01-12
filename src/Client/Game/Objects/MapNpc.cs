@@ -79,6 +79,8 @@ namespace Client
             }
             var drawX = baseScreenX + (Constants.TileSize - textWidth) / 2;
 
+            if (npc < 0 || npc >= Npc.Instance.Count)
+                return;
             int sprite = Npc.Instance[npc].Sprite;
             if (sprite <= 0 || sprite > GameState.NumCharacters)
             {
