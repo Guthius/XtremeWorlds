@@ -770,7 +770,7 @@ namespace Client
                 _elapsedTime = TimeSpan.Zero;
             }
 
-            Loop.Game();
+            Loop.OnStart();
 
             base.Update(gameTime);
         }

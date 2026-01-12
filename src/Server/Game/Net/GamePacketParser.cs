@@ -3011,7 +3011,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
         File.WriteAllText(path, script, Encoding.UTF8);
 
-        _ = Script.OnLoadAsync(session.Id);
+        _ = Script.OnLoad(session.Id);
     }
 
     public static void Packet_RequestProjectile(GameSession session, ReadOnlyMemory<byte> bytes)

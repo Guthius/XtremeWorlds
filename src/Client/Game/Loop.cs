@@ -53,7 +53,7 @@ namespace Client
             Audio.PlayMusic(Client.Map.Instance[mapId].Music);
         }
 
-        public static void Game()
+        public static void OnStart()
         {
             _tick = General.GetTickCount();
             GameState.ElapsedTime = _tick - _frameTime; // Set the time difference for time-based movement

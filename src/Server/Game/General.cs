@@ -65,40 +65,40 @@ public static class General
         return Regex.IsMatch(login, @"^[a-zA-Z0-9_ ]+$") ? 1 : -1;
     }
 
-    public static async System.Threading.Tasks.Task InitServerAsync(IConfiguration configuration)
+    public static async System.Threading.Tasks.Task InitServer(IConfiguration configuration)
     {
         if (!Debugger.IsAttached)
         {
             try
             {
-                await ServerStartAsync(configuration);
+                await ServerStart(configuration);
             }
             catch (Exception ex)
             {
                 Logger.LogCritical(ex, "Server initialization failed");
-                await HandleCriticalErrorAsync(ex);
+                await HandleCriticalError(ex);
             }
         }
         else
         {
-            await ServerStartAsync(configuration);
+            await ServerStart(configuration);
         }
     }
 
-    private static async System.Threading.Tasks.Task ServerStartAsync(IConfiguration configuration)
+    private static async System.Threading.Tasks.Task ServerStart(IConfiguration configuration)
     {
         MyStopwatch.Start();
         var startTime = GetTime();
 
-        await InitializeCoreComponentsAsync(configuration);
-        await LoadGameDataAsync();
-        await StartGameLoopAsync(startTime);
+        await InitializeCoreComponents(configuration);
+        await LoadGameData();
+        await StartGameLoop(startTime);
     }
 
-    private static async System.Threading.Tasks.Task InitializeCoreComponentsAsync(IConfiguration configuration)
+    private static async System.Threading.Tasks.Task InitializeCoreComponents(IConfiguration configuration)
     {
-        await System.Threading.Tasks.Task.WhenAll(LoadConfigurationAsync(), InitializeNetworkAsync(), InitializeChatSystemAsync());
-        await InitializeDatabaseWithRetryAsync(configuration);
+        await System.Threading.Tasks.Task.WhenAll(LoadConfiguration(), InitializeNetwork(), InitializeChatSystem());
+        await InitializeDatabaseWithRetry(configuration);
     }
 
     public static void InitalizeCoreData()
@@ -132,14 +132,14 @@ public static class General
         Event.TempEventMap = new GlobalEvents[Variables.MaxMaps];
     }
 
-    private static async System.Threading.Tasks.Task LoadGameDataAsync()
+    private static async System.Threading.Tasks.Task LoadGameData()
     {
         var stopwatch = Stopwatch.StartNew();
-        await Script.OnLoadAsync(0);           
+        await Script.OnLoad(0);           
         Logger.LogInformation($"Game data loaded in {stopwatch.ElapsedMilliseconds}ms");
     }
 
-    private static async System.Threading.Tasks.Task StartGameLoopAsync(int startTime)
+    private static async System.Threading.Tasks.Task StartGameLoop(int startTime)
     {
         InitializeSaveTimer();
         DisplayServerBanner(startTime);
@@ -149,19 +149,18 @@ public static class General
         {
             try
             {
-                await Loop.ServerAsync();
+                await Loop.OnStart();
             }
             catch (Exception ex)
             {
                 Logger.LogCritical(ex, "Server loop crashed");
-                await HandleCriticalErrorAsync(ex);
+                await HandleCriticalError(ex);
             }
         }
         else
         {
-            await Loop.ServerAsync();
+            await Loop.OnStart();
         }
-
     }
 
     private static async System.Threading.Tasks.Task DestroyServerAsync()
@@ -192,7 +191,7 @@ public static class General
         Environment.Exit(0);
     }
 
-    private static async System.Threading.Tasks.Task LoadConfigurationAsync()
+    private static async System.Threading.Tasks.Task LoadConfiguration()
     {
         await System.Threading.Tasks.Task.Run(() =>
         {
@@ -212,12 +211,12 @@ public static class General
             throw new InvalidOperationException("Invalid Port number in configuration");
     }
 
-    private static System.Threading.Tasks.Task InitializeNetworkAsync()
+    private static System.Threading.Tasks.Task InitializeNetwork()
     {
         return System.Threading.Tasks.Task.CompletedTask;
     }
 
-    private static async System.Threading.Tasks.Task InitializeDatabaseWithRetryAsync(IConfiguration configuration)
+    private static async System.Threading.Tasks.Task InitializeDatabaseWithRetry(IConfiguration configuration)
     {
         var maxRetries = configuration.GetValue("Database:MaxRetries", 3);
         var retryDelayMs = configuration.GetValue("Database:RetryDelayMs", 1000);
@@ -421,7 +420,7 @@ public static class General
         Logger.LogInformation("Server announcement sent.");
     }
 
-    private static System.Threading.Tasks.Task InitializeChatSystemAsync()
+    private static System.Threading.Tasks.Task InitializeChatSystem()
     {
         Logger.LogInformation("Chat system initialized.");
         // Additional initialization logic can be added here if needed
@@ -805,7 +804,7 @@ public static class General
         }
     }
         
-    private static async System.Threading.Tasks.Task HandleCriticalErrorAsync(Exception ex)
+    private static async System.Threading.Tasks.Task HandleCriticalError(Exception ex)
     {
         await BackupDatabaseAsync();
         Logger.LogCritical(ex, "Critical error occurred. Initiating emergency shutdown");
@@ -813,7 +812,7 @@ public static class General
         await DestroyServerAsync();
     }
 
-    public static async System.Threading.Tasks.Task CheckShutDownCountDownAsync()
+    public static async System.Threading.Tasks.Task CheckShutDownCountDown()
     {
         if (GetShutDownTimer.ElapsedTicks <= 0) return;
 

@@ -11,7 +11,7 @@ public static class Loop
 {
     private static readonly double[] PlayerMoveRemainder = new double[Core.Globals.Variables.MaxPlayers];
 
-    public static async System.Threading.Tasks.Task ServerAsync()
+    public static async System.Threading.Tasks.Task OnStart()
     {
         var tmr25 = 0;
         var tmr500 = 0;
@@ -29,7 +29,7 @@ public static class Loop
             // Update our current tick value.
             var tick = General.GetTime();
 
-            await General.CheckShutDownCountDownAsync();
+            await General.CheckShutDownCountDown();
 
             if (tick > tmr25)
             {

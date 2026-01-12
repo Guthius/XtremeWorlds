@@ -17,7 +17,7 @@ public sealed class GameService(
         
         Database.ConnectionString = configuration.GetValue<string>("Database:ConnectionString") ?? throw new InvalidOperationException("Database connection string not found in configuration");
         
-        await General.InitServerAsync(configuration);
+        await General.InitServer(configuration);
 
         foreach (var player in playerService.Players)
         {
