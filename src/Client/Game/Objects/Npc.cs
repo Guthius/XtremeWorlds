@@ -138,7 +138,7 @@ namespace Client
         /// <summary>
         /// Processes one NPC by index (from a legacy double), moving by 1 pixel per tick.
         /// </summary>
-        public static void OnMove(double mapNpcNum) => OnMove((int)mapNpcNum, 1);
+        public static void OnMove(double npc) => OnMove((int)npc, 1);
 
         /// <summary>
         /// Processes one NPC by index, moving by a configurable number of pixels per tick.

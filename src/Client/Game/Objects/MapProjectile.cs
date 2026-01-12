@@ -39,7 +39,7 @@ namespace Client
             }
 
             // Defensive: ensure player index and map index are valid before indexing map projectile array
-            if (GameState.MyIndex < 0 || GameState.MyIndex > Variables.MaxPlayers)
+            if (GameState.MyIndex < 0 || GameState.MyIndex >= Variables.MaxPlayers)
             {
                 return;
             }

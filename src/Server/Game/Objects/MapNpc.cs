@@ -44,11 +44,11 @@ namespace Server
         {
             await Task.WhenAll(Enumerable
                 .Range(0, Core.Globals.Variables.MaxMapNpcs)
-                .Select(mapNpcNum => Task.Run(() =>
-                    OnSpawn(mapNpcNum, map))));
+                .Select(npc => Task.Run(() =>
+                    OnSpawn(npc, map))));
         }
 
-        public static void OnSpawn(int mapNpcNum, int map)
+        public static void OnSpawn(int npc, int map)
         {
             var spawned = false;
 
@@ -63,49 +63,49 @@ namespace Server
                 return;
             }
 
-            var npcNum = Server.Map.Instance[map].Npc[mapNpcNum];
+            var npcNum = Server.Map.Instance[map].Npc[npc];
             
             // Validate slot and npc index; allow slot 0
-            if (mapNpcNum < 0 || mapNpcNum >= Core.Globals.Variables.MaxMapNpcs || npcNum < 0 || npcNum >= Core.Globals.Variables.MaxNpcs)
+            if (npc < 0 || npc >= Core.Globals.Variables.MaxMapNpcs || npcNum < 0 || npcNum >= Core.Globals.Variables.MaxNpcs)
             {
                 return;
             }
 
             if (Npc.Instance[npcNum].SpawnTime != (byte) Clock.Instance.TimeOfDay && Npc.Instance[npcNum].SpawnTime != 0)
             {
-                MapNpc.Clear(mapNpcNum, map);
+                MapNpc.Clear(npc, map);
 
                 NetworkSend.SendMapNpcsToMap(map);
 
                 return;
             }
 
-            Instance[map, mapNpcNum].Num = npcNum;
-            Instance[map, mapNpcNum].Target = 0;
-            Instance[map, mapNpcNum].TargetType = 0;
-            Instance[map, mapNpcNum].DeathTimer = 0;
+            Instance[map, npc].Num = npcNum;
+            Instance[map, npc].Target = 0;
+            Instance[map, npc].TargetType = 0;
+            Instance[map, npc].DeathTimer = 0;
 
             var vitals = Enum.GetValues<Vital>();
             foreach (var vital in vitals)
             {
-                Instance[map, mapNpcNum].Vital[(int) vital] = GameLogic.GetNpcMaxVital(npcNum, vital);
+                Instance[map, npc].Vital[(int) vital] = GameLogic.GetNpcMaxVital(npcNum, vital);
             }
             
-            Instance[map, mapNpcNum].Dir = (byte) (Random.Shared.NextDouble() * 4f);
+            Instance[map, npc].Dir = (byte) (Random.Shared.NextDouble() * 4f);
 
             for (var x = 0; x < Server.Map.Instance[map].MaxX; x++)
             {
                 for (var y = 0; y < Server.Map.Instance[map].MaxY; y++)
                 {
                     var tile = Server.Map.Instance[map].Tile[x, y];
-                    bool isPrimaryMatch = tile.Type == TileType.NpcSpawn && tile.Data1 == mapNpcNum;
-                    bool isSecondaryMatch = tile.Type2 == TileType.NpcSpawn && tile.Data1_2 == mapNpcNum;
+                    bool isPrimaryMatch = tile.Type == TileType.NpcSpawn && tile.Data1 == npc;
+                    bool isSecondaryMatch = tile.Type2 == TileType.NpcSpawn && tile.Data1_2 == npc;
                     if (!isPrimaryMatch && !isSecondaryMatch)
                         continue;
 
-                    Instance[map, mapNpcNum].X = x * 32;
-                    Instance[map, mapNpcNum].Y = y * 32;
-                    Instance[map, mapNpcNum].Dir = (byte)(isPrimaryMatch ? tile.Data2 : tile.Data2_2);
+                    Instance[map, npc].X = x * Variables.TileSize;
+                    Instance[map, npc].Y = y * Variables.TileSize;
+                    Instance[map, npc].Dir = (byte)(isPrimaryMatch ? tile.Data2 : tile.Data2_2);
 
                     spawned = true;
                     break;
@@ -126,8 +126,8 @@ namespace Server
 
                     if (TileIsOpen(map, x, y))
                     {
-                        Instance[map, mapNpcNum].X = x * 32;
-                        Instance[map, mapNpcNum].Y = y * 32;
+                        Instance[map, npc].X = x * Variables.TileSize;
+                        Instance[map, npc].Y = y * Variables.TileSize;
 
                         spawned = true;
                         break;
@@ -149,8 +149,8 @@ namespace Server
                             continue;
                         }
 
-                        Instance[map, mapNpcNum].X = x * 32;
-                        Instance[map, mapNpcNum].Y = y * 32;
+                        Instance[map, npc].X = x * Variables.TileSize;
+                        Instance[map, npc].Y = y * Variables.TileSize;
 
                         spawned = true;
                     }
@@ -169,26 +169,10 @@ namespace Server
                     General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(OnSpawn));
                 }
 
-                var packet = new PacketWriter();
-
-                packet.WriteInt32((int) ServerPackets.SSpawnNpc);
-                packet.WriteInt32(mapNpcNum);
-                packet.WriteInt32(Instance[map, mapNpcNum].Num);
-                packet.WriteInt32(Instance[map, mapNpcNum].X);
-                packet.WriteInt32(Instance[map, mapNpcNum].Y);
-                packet.WriteByte(Instance[map, mapNpcNum].Dir);
-                packet.WriteInt32(Instance[map, mapNpcNum].DeathTimer);
-
-                var vitalCount = Enum.GetValues<Vital>().Length;
-                for (var i = 0; i < vitalCount; i++)
-                {
-                    packet.WriteInt32(Instance[map, mapNpcNum].Vital[i]);
-                }
-
-                NetworkConfig.SendDataToMap(map, packet.GetBytes());
+                NetworkSend.SendNpcSpawn(map, npc);
             }
 
-            NetworkSend.SendMapNpcVitals(map, (byte) mapNpcNum);
+            NetworkSend.SendMapNpcVitals(map, npc);
         }
 
         public static bool TileIsOpen(int map, int x, int y)
@@ -353,30 +337,30 @@ namespace Server
             return true;
         }
 
-        public static void OnMove(int map, int mapNpcNum, byte dir, int movement)
+        public static void OnMove(int map, int npc, byte dir, int movement)
         {
             var count = System.Enum.GetValues(typeof(MovementState)).Length;
             int count2 = System.Enum.GetValues(typeof(Direction)).Length;
-            if (map < 0 || map >= Core.Globals.Variables.MaxMaps || mapNpcNum < 0 || mapNpcNum >= Core.Globals.Variables.MaxMapNpcs || dir > count2 || movement < 0 || movement > count)
+            if (map < 0 || map >= Core.Globals.Variables.MaxMaps || npc < 0 || npc >= Core.Globals.Variables.MaxMapNpcs || dir > count2 || movement < 0 || movement > count)
             {
                 return;
             }
             // If already walking mid-step, ignore duplicate start.
-            if (Instance[map, mapNpcNum].Moving == (byte)MovementState.Walking && _stepRemaining[map, mapNpcNum] > 0)
+            if (Instance[map, npc].Moving == (byte)MovementState.Walking && _stepRemaining[map, npc] > 0)
                 return;
 
             // Begin a new tile movement: set dir, movement state, step counter (32px)
-            Instance[map, mapNpcNum].Dir = dir;
-            Instance[map, mapNpcNum].Moving = (byte)MovementState.Walking;
-            _stepRemaining[map, mapNpcNum] = 32; // pixels to travel
+            Instance[map, npc].Dir = dir;
+            Instance[map, npc].Moving = (byte)MovementState.Walking;
+            _stepRemaining[map, npc] = 32; // pixels to travel
 
             // Send start-of-move packet (position unchanged); client will animate pixel stepping locally.
             var buffer = new PacketWriter(4);
             buffer.WriteEnum(ServerPackets.SNpcMove);
-            buffer.WriteInt32(mapNpcNum);
-            buffer.WriteInt32(Instance[map, mapNpcNum].X);
-            buffer.WriteInt32(Instance[map, mapNpcNum].Y);
-            buffer.WriteByte(Instance[map, mapNpcNum].Dir);
+            buffer.WriteInt32(npc);
+            buffer.WriteInt32(Instance[map, npc].X);
+            buffer.WriteInt32(Instance[map, npc].Y);
+            buffer.WriteByte(Instance[map, npc].Dir);
             buffer.WriteByte((byte)MovementState.Walking);
             NetworkConfig.SendDataToMap(map, buffer.GetBytes());
         }
@@ -433,20 +417,20 @@ namespace Server
             }
         }
 
-        public static void NpcDir(int map, int mapNpcNum, byte dir)
+        public static void NpcDir(int map, int npc, byte dir)
         {
             int count = System.Enum.GetValues(typeof(Direction)).Length;
-            if (map < 0 || map >= Core.Globals.Variables.MaxMaps || mapNpcNum < 0 || mapNpcNum >= Core.Globals.Variables.MaxMapNpcs || dir > count)
+            if (map < 0 || map >= Core.Globals.Variables.MaxMaps || npc < 0 || npc >= Core.Globals.Variables.MaxMapNpcs || dir > count)
             {
                 return;
             }
 
-            Instance[map, mapNpcNum].Dir = dir;
+            Instance[map, npc].Dir = dir;
 
             var packet = new PacketWriter(9);
 
             packet.WriteEnum(ServerPackets.SNpcDir);
-            packet.WriteInt32(mapNpcNum);
+            packet.WriteInt32(npc);
             packet.WriteByte(dir);
 
             NetworkConfig.SendDataToMap(map, packet.GetBytes());
@@ -455,56 +439,57 @@ namespace Server
         /// <summary>
         /// Replace the NPC's route with the provided sequence of directions.
         /// </summary>
-        public static void SetRoute(int map, int mapNpcNum, System.Collections.Generic.IEnumerable<byte> directions)
+        public static void SetRoute(int map, int npc, System.Collections.Generic.IEnumerable<byte> directions)
         {
-            if (map < 0 || map >= Core.Globals.Variables.MaxMaps || mapNpcNum < 0 || mapNpcNum >= Core.Globals.Variables.MaxMapNpcs) return;
+            if (map < 0 || map >= Core.Globals.Variables.MaxMaps || npc < 0 || npc >= Core.Globals.Variables.MaxMapNpcs) return;
             var q = new System.Collections.Generic.Queue<byte>();
             foreach (var d in directions) q.Enqueue(d);
-            _route[map, mapNpcNum] = q;
+            _route[map, npc] = q;
         }
 
         /// <summary>
         /// Clears any planned route for the NPC.
         /// </summary>
-        public static void ClearRoute(int map, int mapNpcNum)
+        public static void ClearRoute(int map, int npc)
         {
-            if (map < 0 || map >= Core.Globals.Variables.MaxMaps || mapNpcNum < 0 || mapNpcNum >= Core.Globals.Variables.MaxMapNpcs) return;
-            _route[map, mapNpcNum] = null;
+            if (map < 0 || map >= Core.Globals.Variables.MaxMaps || npc < 0 || npc >= Core.Globals.Variables.MaxMapNpcs) return;
+            _route[map, npc] = null;
         }
 
         /// <summary>
         /// If there is a pending route and the NPC is not currently mid-step, dequeue the next step and start moving.
         /// </summary>
-        public static bool TryStartNextStepNow(int map, int mapNpcNum)
+        public static bool TryStartNextStepNow(int map, int npc)
         {
-            if (map < 0 || map >= Core.Globals.Variables.MaxMaps || mapNpcNum < 0 || mapNpcNum >= Core.Globals.Variables.MaxMapNpcs) return false;
-            ref var npc = ref Instance[map, mapNpcNum];
-            if (npc.Moving == (byte)MovementState.Walking && _stepRemaining[map, mapNpcNum] > 0) return false;
-            return TryDequeueNextStep(map, mapNpcNum);
+            if (map < 0 || map >= Core.Globals.Variables.MaxMaps || npc < 0 || npc >= Core.Globals.Variables.MaxMapNpcs) return false;
+            ref var mapNpc = ref Instance[map, npc];
+            if (mapNpc.Moving == (byte)MovementState.Walking && _stepRemaining[map, npc] > 0) return false;
+            return TryDequeueNextStep(map, npc);
         }
 
         /// <summary>
         /// Pops the next planned direction and begins a new tile step if possible.
         /// </summary>
-        private static bool TryDequeueNextStep(int map, int mapNpcNum)
+        private static bool TryDequeueNextStep(int map, int npc)
         {
-            var route = _route[map, mapNpcNum];
+            var route = _route[map, npc];
             if (route == null || route.Count == 0) return false;
+            
             // Validate and attempt the next step
             var nextDir = route.Peek();
-            if (CanMove(map, mapNpcNum, nextDir))
+            if (CanMove(map, npc, nextDir))
             {
                 route.Dequeue();
-                OnMove(map, mapNpcNum, nextDir, (int)MovementState.Walking);
+                OnMove(map, npc, nextDir, (int)MovementState.Walking);
                 // If route is finished after this step, clear it now; ProcessActiveNpcMovement will send stop when the step ends.
                 if (route.Count == 0)
                 {
-                    _route[map, mapNpcNum] = null;
+                    _route[map, npc] = null;
                 }
                 return true;
             }
             // Cannot move as planned; drop the route so callers can recompute.
-            _route[map, mapNpcNum] = null;
+            _route[map, npc] = null;
             return false;
         }
     }

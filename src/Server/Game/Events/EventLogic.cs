@@ -2568,14 +2568,14 @@ namespace Server
         }
 
         // Replace FindNpcPath with an A* pathfinding implementation
-        public static int FindNpcPath(int map, double mapNpcNum, int targetx, int targety)
+        public static int FindNpcPath(int map, double npc, int targetx, int targety)
         {
             // Validate map and NPC
-            if (map < 0 || map >= Server.Map.Instance.Count || mapNpcNum < 0 || mapNpcNum >= Core.Globals.Variables.MaxMapNpcs)
+            if (map < 0 || map >= Server.Map.Instance.Count || npc < 0 || npc >= Core.Globals.Variables.MaxMapNpcs)
                 return 4;
 
-            int startX = MapNpc.Instance[map, (int)mapNpcNum].X;
-            int startY = MapNpc.Instance[map, (int)mapNpcNum].Y;
+            int startX = MapNpc.Instance[map, (int)npc].X;
+            int startY = MapNpc.Instance[map, (int)npc].Y;
             int goalX = targetx < 0 ? 0 : targetx;
             int goalY = targety < 0 ? 0 : targety;
 

@@ -650,10 +650,10 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         var packetReader = new PacketReader(data);
 
         var timer = packetReader.ReadInt32(); // milliseconds until respawn
-        var mapNpcNum = packetReader.ReadInt32();
+        var npc = packetReader.ReadInt32();
 
         // Keep the corpse visible until the timer expires.
-        ref var mapNpc = ref MapNpc.Instance[mapNpcNum];
+        ref var mapNpc = ref MapNpc.Instance[npc];
         mapNpc.DeathTimer = Client.General.GetTickCount() + timer;
         mapNpc.Attacking = 0;
         mapNpc.AttackTimer = 0;

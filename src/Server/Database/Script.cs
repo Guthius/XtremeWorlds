@@ -2478,11 +2478,11 @@ public class Script
         {
             if (target.Num >= 0 && target.Num < Npc.Instance.Count)
             {
-                var mapNpcNum = target.Id; // id is map npc index
-                var hpIndex = (int)Core.Globals.Vital.Health;
-                var current = MapNpc.Instance[map, mapNpcNum].Vital[hpIndex];
+                var npc = target.Id; // id is map npc index
+                var hp = (int)Core.Globals.Vital.Health;
+                var current = MapNpc.Instance[map, npc].Vital[hp];
                 var newHp = Math.Max(0, current - final);
-                MapNpc.Instance[map, mapNpcNum].Vital[hpIndex] = newHp;
+                MapNpc.Instance[map, npc].Vital[hp] = newHp;
                 NetworkSend.SendActionMessage(map, "-" + final, (int)ColorName.BrightRed, 1, tx, ty);
                 if (newHp > 0)
                 {
@@ -2624,10 +2624,10 @@ public class Script
         }
     }
 
-    private void DropNpcLoot(int map, int mapNpcNum)
+    private void DropNpcLoot(int map, int npc)
     {
         if (map < 0 || map >= Core.Globals.Variables.MaxMaps) return;
-        ref var mapNpc = ref MapNpc.Instance[map, mapNpcNum];
+        ref var mapNpc = ref MapNpc.Instance[map, npc];
         var npcNum = mapNpc.Num;
         if (npcNum < 0 || npcNum >= Npc.Instance.Count) return;
         // Simple single-roll logic similar to legacy: choose one drop slot 0-4

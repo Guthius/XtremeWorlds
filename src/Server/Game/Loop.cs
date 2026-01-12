@@ -703,6 +703,21 @@ public static class Loop
                         {
                             entity.Target = -1;
                             entity.TargetType = 0;
+
+                            // If the target player is no longer playing/on this map, clear the base MapNpc target too.
+                            if (entity.Type == Core.Globals.Entity.EntityType.Npc && map >= 0 && map < Variables.MaxMaps)
+                            {
+                                if (entity.Id >= 0 && entity.Id < Variables.MaxMapNpcs)
+                                {
+                                    ref var npc = ref MapNpc.Instance[map, entity.Id];
+                                    npc.Target = -1;
+                                    npc.TargetType = 0;
+                                    npc.Attacking = 0;
+                                    npc.AttackTimer = 0;
+                                    npc.SkillBuffer = -1;
+                                    npc.SkillBufferTimer = 0;
+                                }
+                            }
                         }
                     }
                     else if (entity.TargetType == (byte)TargetType.Npc)
@@ -771,12 +786,40 @@ public static class Loop
                             {
                                 entity.Target = -1;
                                 entity.TargetType = 0;
+
+                                if (entity.Type == Core.Globals.Entity.EntityType.Npc && map >= 0 && map < Variables.MaxMaps)
+                                {
+                                    if (entity.Id >= 0 && entity.Id < Variables.MaxMapNpcs)
+                                    {
+                                        ref var baseNpcClr = ref MapNpc.Instance[map, entity.Id];
+                                        baseNpcClr.Target = -1;
+                                        baseNpcClr.TargetType = 0;
+                                        baseNpcClr.Attacking = 0;
+                                        baseNpcClr.AttackTimer = 0;
+                                        baseNpcClr.SkillBuffer = -1;
+                                        baseNpcClr.SkillBufferTimer = 0;
+                                    }
+                                }
                             }
                         }
                         else
                         {
                             entity.Target = -1;
                             entity.TargetType = 0;
+
+                            if (entity.Type == Core.Globals.Entity.EntityType.Npc && map >= 0 && map < Variables.MaxMaps)
+                            {
+                                if (entity.Id >= 0 && entity.Id < Variables.MaxMapNpcs)
+                                {
+                                    ref var baseNpcClr = ref MapNpc.Instance[map, entity.Id];
+                                    baseNpcClr.Target = -1;
+                                    baseNpcClr.TargetType = 0;
+                                    baseNpcClr.Attacking = 0;
+                                    baseNpcClr.AttackTimer = 0;
+                                    baseNpcClr.SkillBuffer = -1;
+                                    baseNpcClr.SkillBufferTimer = 0;
+                                }
+                            }
                         }
                     }
                 }

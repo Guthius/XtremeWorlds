@@ -1377,6 +1377,17 @@ public class Player : PlayerBase
 
     public static async System.Threading.Tasks.Task OnExit(int playerId)
     {
+        // Capture map before any cleanup resets player state.
+        var oldMap = 0;
+        try
+        {
+            oldMap = GetPlayerMap(playerId);
+        }
+        catch
+        {
+            oldMap = 0;
+        }
+
         try
         {
             General.Logger.LogInformation("{AccountName} | {PlayerName} has stopped playing {GameName}",
@@ -1404,6 +1415,31 @@ public class Player : PlayerBase
         }
         finally
         {
+            // If NPCs were targeting this player, clear their targets immediately so they can retarget.
+            try
+            {
+                if (oldMap > 0 && oldMap < Core.Globals.Variables.MaxMaps)
+                {
+                    for (var i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
+                    {
+                        ref var npc = ref Server.MapNpc.Instance[oldMap, i];
+                        if (npc.TargetType == (byte)TargetType.Player && npc.Target == playerId)
+                        {
+                            npc.TargetType = 0;
+                            npc.Target = -1;
+                            npc.Attacking = 0;
+                            npc.AttackTimer = 0;
+                            npc.SkillBuffer = -1;
+                            npc.SkillBufferTimer = 0;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                General.Logger.LogError(ex, "Error clearing NPC targets for exiting playerId={PlayerId}", playerId);
+            }
+
             try
             {
                 Account.OnClear(playerId);

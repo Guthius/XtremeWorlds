@@ -39,33 +39,33 @@ namespace Client
             instance.Y = 0;
         }
 
-        public static void OnDrawName(int mapNpcNum)
+        public static void OnDrawName(int npc)
         {
             int textY;
             var color = default(Color);
             var backColor = default(Color);
 
-            int npc = MapNpc.Instance[mapNpcNum].Num;
+            int mapNpc = MapNpc.Instance[npc].Num;
 
-            if (npc < 0 || npc > Variables.MaxNpcs) return;
+            if (mapNpc < 0 || mapNpc > Variables.MaxNpcs) return;
             if (EditorType.Map == GameState.MyEditorType) return;
 
-            if (Npc.Instance.Count <= npc)
+            if (Npc.Instance.Count <= mapNpc)
                 return;
-            switch (Npc.Instance[npc].Behavior)
+            switch (Npc.Instance[mapNpc].Behavior)
             {
                 case 0: color = Color.Red; backColor = Color.Black; break;
                 case 1: color = Color.Green; backColor = Color.Black; break;
                 case 2: color = Color.Yellow; backColor = Color.Black; break;
             }
 
-            var remaining = (MapNpc.Instance[mapNpcNum].DeathTimer - General.GetTickCount()) / 1000;
+            var remaining = (MapNpc.Instance[mapNpc].DeathTimer - General.GetTickCount()) / 1000;
             if (remaining < 0) remaining = 0;
 
-            var name = remaining > 0 ? $"{remaining}..." : Npc.Instance[npc].Name;
+            var name = remaining > 0 ? $"{remaining}..." : Npc.Instance[mapNpc].Name;
 
-            int baseWorldX = MapNpc.Instance[mapNpcNum].X;
-            int baseWorldY = MapNpc.Instance[mapNpcNum].Y;
+            int baseWorldX = MapNpc.Instance[mapNpc].X;
+            int baseWorldY = MapNpc.Instance[mapNpc].Y;
             
             if (name == null) return;
 
@@ -79,9 +79,9 @@ namespace Client
             }
             var drawX = baseScreenX + (Constants.TileSize - textWidth) / 2;
 
-            if (npc < 0 || npc >= Npc.Instance.Count)
+            if (mapNpc < 0 || mapNpc >= Npc.Instance.Count)
                 return;
-            int sprite = Npc.Instance[npc].Sprite;
+            int sprite = Npc.Instance[mapNpc].Sprite;
             if (sprite <= 0 || sprite > GameState.NumCharacters)
             {
                 // No valid graphic: render just above feet similar to player fallback

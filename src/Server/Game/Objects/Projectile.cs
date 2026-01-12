@@ -274,7 +274,7 @@ public class Projectile : ProjectileBase, IAsyncData
         var mapProjectileNum = -1;
         for (var i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
         {
-            if (Data.MapProjectile[map, i].Index < 0)
+            if (Data.MapProjectile[map, i].Owner <= 0)
             {
                 mapProjectileNum = i;
                 break;
@@ -320,7 +320,7 @@ public class Projectile : ProjectileBase, IAsyncData
         NetworkSend.SendProjectileToMap(map, mapProjectileNum);
     }
 
-    public static void OnNpcProjectile(int map, int mapNpcNum, int skill, int dir = -1)
+    public static void OnNpcProjectile(int map, int npc, int skill, int dir = -1)
     {
         // Find free map projectile slot
         var index = -1;
@@ -347,17 +347,17 @@ public class Projectile : ProjectileBase, IAsyncData
 
         // Validate npc is present on map
         if (map < 0 || map >= Core.Globals.Variables.MaxMaps) return;
-        if (mapNpcNum < 0 || mapNpcNum >= Core.Globals.Variables.MaxMapNpcs) return;
-        if (MapNpc.Instance[map, mapNpcNum].Num < 0) return;
+        if (npc < 0 || npc >= Core.Globals.Variables.MaxMapNpcs) return;
+        if (MapNpc.Instance[map, npc].Num < 0) return;
 
         ref var mapProjectile = ref Data.MapProjectile[map, index];
 
         mapProjectile.Index = projectile;
-        mapProjectile.Owner = mapNpcNum;
+        mapProjectile.Owner = npc;
         mapProjectile.OwnerType = (byte) TargetType.Npc;
-        mapProjectile.Dir = dir >= 0 ? (byte) dir : MapNpc.Instance[map, mapNpcNum].Dir;
-        mapProjectile.X = MapNpc.Instance[map, mapNpcNum].X;
-        mapProjectile.Y = MapNpc.Instance[map, mapNpcNum].Y;
+        mapProjectile.Dir = dir >= 0 ? (byte) dir : MapNpc.Instance[map, npc].Dir;
+        mapProjectile.X = MapNpc.Instance[map, npc].X;
+        mapProjectile.Y = MapNpc.Instance[map, npc].Y;
         mapProjectile.SkillId = skill;
         mapProjectile.Range = 0;
         mapProjectile.TravelTime = General.GetTime() + Math.Max(1, Projectile.Instance[projectile].Speed);
@@ -369,16 +369,16 @@ public class Projectile : ProjectileBase, IAsyncData
     public static void OnUpdate()
     {
         int now = General.GetTime();
-        for (int map = 0; map < Core.Globals.Variables.MaxMaps; map++)
+        for (int x = 0; x < Core.Globals.Variables.MaxMaps; x++)
         {
-            if (map < 0 || map >= Server.Map.Instance.Count || Server.Map.Instance[map] == null || Server.Map.Instance[map].Tile == null)
+            if (x < 0 || x >= Server.Map.Instance.Count || Server.Map.Instance[x] == null || Server.Map.Instance[x].Tile == null)
             {
                 // Map not initialized; clear any stray projectiles for this map defensively.
                 for (int i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
                 {
-                    if (Data.MapProjectile[map, i].Index >= 0)
+                    if (Data.MapProjectile[x, i].Index >= 0)
                     {
-                        MapProjectile.OnClear(map, i);
+                        MapProjectile.OnClear(x, i);
                     }
                 }
                 continue;
@@ -386,304 +386,275 @@ public class Projectile : ProjectileBase, IAsyncData
 
             for (int i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
             {
-                ref var mp = ref Data.MapProjectile[map, i];
+                ref var mp = ref Data.MapProjectile[x, i];
                 // Skip empty slots
-                if (mp.Index < 0) continue;
+                if (mp.Owner <= 0) continue;
 
                 // Expire long-running projectiles defensively
                 if (mp.Timer > 0 && now > mp.Timer)
                 {
-                    MapProjectile.OnClear(map, i);
+                    MapProjectile.OnClear(x, i);
                     continue;
                 }
 
                 var index = mp.Index;
                 if (!TryGetProjectileSlot(index, out var speed, out var range, out var damage, out var animation))
                 {
-                    MapProjectile.OnClear(map, i);
+                    MapProjectile.OnClear(x, i);
                     continue;
                 }
 
-                int stepMs = Math.Max(1, speed);
+                var interval = Math.Max(1, speed);
                 bool moved = false;
                 int prevTileX = mp.X / Constants.TileSize;
                 int prevTileY = mp.Y / Constants.TileSize;
 
-                // Safety: prevent pathological catch-up loops if TravelTime is far in the past (or overflowed).
-                // Each loop advances 1 pixel; without a cap, a single bad projectile can stall the whole server.
-                const int MaxCatchUpStepsPerProjectile = 4096;
-                var catchUpSteps = 0;
-
-                // If we're extremely behind, clear the projectile immediately.
-                // This prioritizes server liveness over simulating a wildly overdue projectile.
-                if (mp.TravelTime != 0 && now - mp.TravelTime > stepMs * MaxCatchUpStepsPerProjectile)
+                // Travel time should only process once per update call.
+                // If we're behind, we move a single step and reschedule relative to now.
+                if (mp.TravelTime <= 0)
                 {
-                    General.Logger.LogWarning(
-                        "Projectile catch-up too large; clearing projectile. map={Map} slot={Slot} idx={Index} now={Now} travelTime={TravelTime} stepMs={StepMs} freeAim={FreeAim} vx={Vx} vy={Vy} accX={AccX} accY={AccY}",
-                        map,
-                        i,
-                        mp.Index,
-                        now,
-                        mp.TravelTime,
-                        stepMs,
-                        mp.FreeAim,
-                        mp.Vx,
-                        mp.Vy,
-                        mp.AccX,
-                        mp.AccY
-                    );
+                    mp.TravelTime = now + interval;
+                }
 
-                    MapProjectile.OnClear(map, i);
+                if (now <= mp.TravelTime)
+                {
                     continue;
                 }
 
-                while (now > mp.TravelTime)
+                // We move in discrete ticks. Each tick advances `intervalMs` pixels and is scheduled every `intervalMs` ms.
+                // This makes speed=5 mean 5px per 5ms.
+                var overDue = now - mp.TravelTime;
+                var ticks = 1 + (overDue / interval);
+                if (ticks > 50)
                 {
-                    if (++catchUpSteps > MaxCatchUpStepsPerProjectile)
-                    {
-                        General.Logger.LogWarning(
-                            "Projectile update exceeded catch-up cap; clearing projectile. map={Map} slot={Slot} idx={Index} now={Now} travelTime={TravelTime} stepMs={StepMs} freeAim={FreeAim} vx={Vx} vy={Vy} accX={AccX} accY={AccY}",
-                            map,
-                            i,
-                            mp.Index,
-                            now,
-                            mp.TravelTime,
-                            stepMs,
-                            mp.FreeAim,
-                            mp.Vx,
-                            mp.Vy,
-                            mp.AccX,
-                            mp.AccY
-                        );
+                    // Avoid pathological catch-up spirals if the server is paused/stalled.
+                    ticks = 50;
+                }
 
-                        MapProjectile.OnClear(map, i);
-                        moved = false;
-                        break;
+                var dtMs = ticks * interval;
+                mp.TravelTime += dtMs;
+
+                if (mp.FreeAim == 1)
+                {
+                    // accumulate thousandths, step whole pixels
+                    mp.AccX += mp.Vx * dtMs;
+                    mp.AccY += mp.Vy * dtMs;
+
+                    // Fast-path integer division instead of unbounded while loops.
+                    // Division truncates toward zero; remainder stays within (-1000, 1000).
+                    var dx = mp.AccX / 1000;
+                    if (dx != 0)
+                    {
+                        mp.X += dx;
+                        mp.AccX -= dx * 1000;
                     }
 
-                    if (mp.FreeAim == 1)
+                    var dy = mp.AccY / 1000;
+                    if (dy != 0)
                     {
-                        // accumulate thousandths, step whole pixels
-                        mp.AccX += mp.Vx;
-                        mp.AccY += mp.Vy;
-
-                        // Fast-path integer division instead of unbounded while loops.
-                        // Division truncates toward zero; remainder stays within (-1000, 1000).
-                        var dx = mp.AccX / 1000;
-                        if (dx != 0)
-                        {
-                            mp.X += dx;
-                            mp.AccX -= dx * 1000;
-                        }
-
-                        var dy = mp.AccY / 1000;
-                        if (dy != 0)
-                        {
-                            mp.Y += dy;
-                            mp.AccY -= dy * 1000;
-                        }
-                    }
-                    else
-                    {
-                        // Always move in true 8 directions for projectiles, independent of sprite direction count
-                        switch (mp.Dir)
-                        {
-                            case (byte)Direction.Up: mp.Y -= 1; break;
-                            case (byte)Direction.Down: mp.Y += 1; break;
-                            case (byte)Direction.Left: mp.X -= 1; break;
-                            case (byte)Direction.Right: mp.X += 1; break;
-                            case (byte)Direction.UpRight: mp.Y -= 1; mp.X += 1; break;
-                            case (byte)Direction.UpLeft: mp.Y -= 1; mp.X -= 1; break;
-                            case (byte)Direction.DownRight: mp.Y += 1; mp.X += 1; break;
-                            case (byte)Direction.DownLeft: mp.Y += 1; mp.X -= 1; break;
-                        }
+                        mp.Y += dy;
+                        mp.AccY -= dy * 1000;
                     }
 
-                    mp.TravelTime += stepMs;
-                    mp.Range += 1; // pixels traveled
-                    moved = true;
-
-                    // If we have a destination (mouse target), stop when reached/passed
-                    if (mp.FreeAim == 1 && (mp.DestX != 0 || mp.DestY != 0))
+                    // Range is tracked in pixels.
+                    mp.Range += (byte)Math.Clamp(Math.Max(Math.Abs(dx), Math.Abs(dy)), 0, 255);
+                }
+                else
+                {
+                    var movePixels = (int)Math.Clamp(dtMs, 1, int.MaxValue);
+                    // Always move in true 8 directions for projectiles, independent of sprite direction count
+                    switch (mp.Dir)
                     {
-                        bool stopX = (mp.Vx >= 0 && mp.X >= mp.DestX) || (mp.Vx <= 0 && mp.X <= mp.DestX) || mp.Vx == 0;
-                        bool stopY = (mp.Vy >= 0 && mp.Y >= mp.DestY) || (mp.Vy <= 0 && mp.Y <= mp.DestY) || mp.Vy == 0;
-                        if (stopX && stopY)
-                        {
-                            // Snap to destination tile center rim if desired; for now, snap to Dest
-                            mp.X = mp.DestX; mp.Y = mp.DestY;
-                            if (animation >= 0)
-                            {
-                                int tx = Math.Clamp(mp.X / Constants.TileSize, 0, Server.Map.Instance[map].MaxX - 1);
-                                int ty = Math.Clamp(mp.Y / Constants.TileSize, 0, Server.Map.Instance[map].MaxY - 1);
-                                NetworkSend.SendAnimation(map, animation, tx, ty);
-                                // Try to apply attack on expire at destination
-                                OnAttack(map, ref mp, tx, ty, index);
-                            }
-                            MapProjectile.OnClear(map, i);
-                            moved = false;
-                            break;
-                        }
+                        case (byte)Direction.Up: mp.Y -= movePixels; break;
+                        case (byte)Direction.Down: mp.Y += movePixels; break;
+                        case (byte)Direction.Left: mp.X -= movePixels; break;
+                        case (byte)Direction.Right: mp.X += movePixels; break;
+                        case (byte)Direction.UpRight: mp.Y -= movePixels; mp.X += movePixels; break;
+                        case (byte)Direction.UpLeft: mp.Y -= movePixels; mp.X -= movePixels; break;
+                        case (byte)Direction.DownRight: mp.Y += movePixels; mp.X += movePixels; break;
+                        case (byte)Direction.DownLeft: mp.Y += movePixels; mp.X -= movePixels; break;
                     }
 
-                    // Range check (Range in tiles in DB, convert to pixels)
-                    if (mp.Range >= (range + 1) * 32)
+                    // Range is tracked in pixels.
+                    mp.Range = (byte)Math.Clamp(mp.Range + movePixels, 0, 255);
+                }
+
+                moved = true;
+
+                // If we have a destination (mouse target), stop when reached/passed
+                if (mp.FreeAim == 1 && (mp.DestX != 0 || mp.DestY != 0))
+                {
+                    bool stopX = (mp.Vx >= 0 && mp.X >= mp.DestX) || (mp.Vx <= 0 && mp.X <= mp.DestX) || mp.Vx == 0;
+                    bool stopY = (mp.Vy >= 0 && mp.Y >= mp.DestY) || (mp.Vy <= 0 && mp.Y <= mp.DestY) || mp.Vy == 0;
+                    if (stopX && stopY)
                     {
-                        // Play hit/expire animation at the last tile location if configured
+                        // Snap to destination tile center rim if desired; for now, snap to Dest
+                        mp.X = mp.DestX; mp.Y = mp.DestY;
                         if (animation >= 0)
                         {
-                            int tx = Math.Clamp(prevTileX, 0, Server.Map.Instance[map].MaxX - 1);
-                            int ty = Math.Clamp(prevTileY, 0, Server.Map.Instance[map].MaxY - 1);
-                            NetworkSend.SendAnimation(map, animation, tx, ty);
-                            OnAttack(map, ref mp, tx, ty, index);
+                            int tx = Math.Clamp(mp.X / Constants.TileSize, 0, Server.Map.Instance[x].MaxX - 1);
+                            int ty = Math.Clamp(mp.Y / Constants.TileSize, 0, Server.Map.Instance[x].MaxY - 1);
+                            NetworkSend.SendAnimation(x, animation, tx, ty);
+                            // Try to apply attack on expire at destination
+                            OnAttack(x, ref mp, tx, ty, index);
                         }
-                        MapProjectile.OnClear(map, i);
-                        moved = false;
-                        break;
+                        MapProjectile.OnClear(x, i);
+                        continue;
                     }
+                }
 
-                    // Bounds check
-                    int tileX = Math.Clamp(mp.X / Constants.TileSize, 0, Math.Max(0, Server.Map.Instance[map].MaxX - 1));
-                    int tileY = Math.Clamp(mp.Y / Constants.TileSize, 0, Math.Max(0, Server.Map.Instance[map].MaxY - 1));
-                    if (tileX < 0 || tileY < 0 || tileX >= Server.Map.Instance[map].MaxX || tileY >= Server.Map.Instance[map].MaxY)
+                // Range check (Range in tiles in DB, convert to pixels)
+                if (mp.Range >= (range + 1) * 32)
+                {
+                    // Play hit/expire animation at the last tile location if configured
+                    if (animation >= 0)
                     {
-                        if (animation >= 0)
-                        {
-                            if (Server.Map.Instance[map].MaxX > 0 && Server.Map.Instance[map].MaxY > 0)
-                            {
-                                int tx = Math.Clamp(prevTileX, 0, Server.Map.Instance[map].MaxX - 1);
-                                int ty = Math.Clamp(prevTileY, 0, Server.Map.Instance[map].MaxY - 1);
-                                NetworkSend.SendAnimation(map, animation, tx, ty);
-                                OnAttack(map, ref mp, tx, ty, index);
-                            }
-                        }
-                        MapProjectile.OnClear(map, i);
-                        moved = false;
-                        break;
+                        int tx = Math.Clamp(prevTileX, 0, Server.Map.Instance[x].MaxX - 1);
+                        int ty = Math.Clamp(prevTileY, 0, Server.Map.Instance[x].MaxY - 1);
+                        NetworkSend.SendAnimation(x, animation, tx, ty);
+                        OnAttack(x, ref mp, tx, ty, index);
                     }
+                    MapProjectile.OnClear(x, i);
+                    continue;
+                }
 
-                    // Tile collision
-                    if (Server.Map.Instance[map].Tile[tileX, tileY].Type == TileType.Blocked || Server.Map.Instance[map].Tile[tileX, tileY].Type2 == TileType.Blocked)
+                // Bounds check
+                int tileX = Math.Clamp(mp.X / Constants.TileSize, 0, Math.Max(0, Server.Map.Instance[x].MaxX - 1));
+                int tileY = Math.Clamp(mp.Y / Constants.TileSize, 0, Math.Max(0, Server.Map.Instance[x].MaxY - 1));
+                if (tileX < 0 || tileY < 0 || tileX >= Server.Map.Instance[x].MaxX || tileY >= Server.Map.Instance[x].MaxY)
+                {
+                    if (animation >= 0)
                     {
-                        if (animation >= 0)
+                        if (Server.Map.Instance[x].MaxX > 0 && Server.Map.Instance[x].MaxY > 0)
                         {
-                            NetworkSend.SendAnimation(map, animation, tileX, tileY);
-                            OnAttack(map, ref mp, tileX, tileY, index);
-                        }
-                        
-                        MapProjectile.OnClear(map, i);
-                        moved = false;
-                        break;
-                    }
-
-                    // Entity collisions (simple tile match)
-                    bool hit = false;
-                    Entity attackerEntity = null;
-                    Entity targetEntity = null;
-
-                    // Players
-                    var players = PlayerService.Instance.Players.ToArray();
-                    foreach (var p in players)
-                    {
-                        if (p == null)
-                            continue;
-
-                        if (!NetworkConfig.IsPlaying(p.Id)) continue;
-                        if (GetPlayerMap(p.Id) != map) continue;
-                        if (GetPlayerX(p.Id) == tileX && GetPlayerY(p.Id) == tileY)
-                        {
-                            // Don't hit owner player
-                            if (!(mp.OwnerType == (byte)TargetType.Player && mp.Owner == p.Id))
-                            {
-                                hit = true;
-                                attackerEntity = Core.Globals.Entity.FromPlayer(mp.Owner, Player.Instance[mp.Owner]);
-                                targetEntity = Core.Globals.Entity.FromPlayer(p.Id, Player.Instance[p.Id]);
-                            }
-                            break;
+                            int tx = Math.Clamp(prevTileX, 0, Server.Map.Instance[x].MaxX - 1);
+                            int ty = Math.Clamp(prevTileY, 0, Server.Map.Instance[x].MaxY - 1);
+                            NetworkSend.SendAnimation(x, animation, tx, ty);
+                            OnAttack(x, ref mp, tx, ty, index);
                         }
                     }
+                    MapProjectile.OnClear(x, i);
+                    continue;
+                }
 
-                    if (hit)
+                // Tile collision
+                if (Server.Map.Instance[x].Tile[tileX, tileY].Type == TileType.Blocked || Server.Map.Instance[x].Tile[tileX, tileY].Type2 == TileType.Blocked)
+                {
+                    if (animation >= 0)
                     {
-                        if (animation >= 0)
-                        {
-                            NetworkSend.SendAnimation(map, animation, tileX, tileY);
-                        }
-
-                        try
-                        {
-                            if (mp.SkillId >= 0)
-                            {
-                                // skill-based projectile: resolve as targeted skill
-                                Script.Instance?.CastSkill(map, attackerEntity, mp.SkillId, -1);
-                            }
-                            else
-                            {
-                                // item/weapon projectile: basic damage
-                                Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, damage, true);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(OnUpdate));
-                        }
-                        MapProjectile.OnClear(map, i);
-                        moved = false;
-                        break;
-                    }
-
-                    // Npcs
-                    for (int n = 0; n < Core.Globals.Variables.MaxMapNpcs; n++)
-                    {
-                        ref var mn = ref MapNpc.Instance[map, n];
-                        if (mn.Num < 0) continue;
-                        if (mn.X == tileX && mn.Y == tileY)
-                        {
-                            // Don't hit owner npc
-                            if (!(mp.OwnerType == (byte)TargetType.Npc && mp.Owner == n))
-                            {
-                                hit = true;
-                                if (mp.OwnerType == (byte)TargetType.Player)
-                                    attackerEntity = Core.Globals.Entity.FromPlayer(mp.Owner, Player.Instance[mp.Owner]);
-                                else
-                                    attackerEntity = Core.Globals.Entity.FromNpc(mp.Owner, MapNpc.Instance[map, mp.Owner]);
-                                targetEntity = Core.Globals.Entity.FromNpc(n, mn);
-                            }
-                            break;
-                        }
+                        NetworkSend.SendAnimation(x, animation, tileX, tileY);
+                        OnAttack(x, ref mp, tileX, tileY, index);
                     }
                     
-                    if (hit)
-                    {
-                        if (animation >= 0)
-                        {
-                            NetworkSend.SendAnimation(map, animation, tileX, tileY);
-                        }
+                    MapProjectile.OnClear(x, i);
+                    continue;
+                }
 
-                        try
+                // Entity collisions (simple tile match)
+                bool hit = false;
+                Entity attackerEntity = null;
+                Entity targetEntity = null;
+
+                // Players
+                var players = PlayerService.Instance.Players.ToArray();
+                foreach (var p in players)
+                {
+                    if (p == null)
+                        continue;
+
+                    if (!NetworkConfig.IsPlaying(p.Id)) continue;
+                    if (GetPlayerMap(p.Id) != x) continue;
+                    if (GetPlayerX(p.Id) == tileX && GetPlayerY(p.Id) == tileY)
+                    {
+                        // Don't hit owner player
+                        if (!(mp.OwnerType == (byte)TargetType.Player && mp.Owner == p.Id))
                         {
-                            if (mp.SkillId >= 0)
-                            {
-                                Script.Instance?.AttemptAttack(attackerEntity, targetEntity, mp.SkillId);
-                            }
-                            else
-                            {
-                                Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, damage, true);
-                            }
+                            hit = true;
+                            attackerEntity = Core.Globals.Entity.FromPlayer(mp.Owner, Player.Instance[mp.Owner]);
+                            targetEntity = Core.Globals.Entity.FromPlayer(p.Id, Player.Instance[p.Id]);
                         }
-                        catch (Exception ex)
-                        {
-                            General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(OnUpdate));
-                        }
-                        MapProjectile.OnClear(map, i);
-                        moved = false;
                         break;
                     }
+                }
+
+                if (hit)
+                {
+                    if (animation >= 0)
+                    {
+                        NetworkSend.SendAnimation(x, animation, tileX, tileY);
+                    }
+
+                    try
+                    {
+                        if (mp.SkillId >= 0)
+                        {
+                            // skill-based projectile: resolve as targeted skill
+                            Script.Instance?.CastSkill(x, attackerEntity, mp.SkillId, -1);
+                        }
+                        else
+                        {
+                            // item/weapon projectile: basic damage
+                            Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, damage, true);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(OnUpdate));
+                    }
+                    MapProjectile.OnClear(x, i);
+                    continue;
+                }
+
+                // Npcs
+                for (int n = 0; n < Core.Globals.Variables.MaxMapNpcs; n++)
+                {
+                    ref var mn = ref MapNpc.Instance[x, n];
+                    if (mn.Num < 0) continue;
+                    if (mn.X == tileX && mn.Y == tileY)
+                    {
+                        // Don't hit owner npc
+                        if (!(mp.OwnerType == (byte)TargetType.Npc && mp.Owner == n))
+                        {
+                            hit = true;
+                            if (mp.OwnerType == (byte)TargetType.Player)
+                                attackerEntity = Core.Globals.Entity.FromPlayer(mp.Owner, Player.Instance[mp.Owner]);
+                            else
+                                attackerEntity = Core.Globals.Entity.FromNpc(mp.Owner, MapNpc.Instance[x, mp.Owner]);
+                            targetEntity = Core.Globals.Entity.FromNpc(n, mn);
+                        }
+                        break;
+                    }
+                }
+                
+                if (hit)
+                {
+                    if (animation >= 0)
+                    {
+                        NetworkSend.SendAnimation(x, animation, tileX, tileY);
+                    }
+
+                    try
+                    {
+                        if (mp.SkillId >= 0)
+                        {
+                            Script.Instance?.AttemptAttack(attackerEntity, targetEntity, mp.SkillId);
+                        }
+                        else
+                        {
+                            Script.Instance?.AttemptAttack(attackerEntity, targetEntity, null, damage, true);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(OnUpdate));
+                    }
+                    MapProjectile.OnClear(x, i);
+                    continue;
                 }
 
                 if (!moved) continue;
 
-                NetworkSend.SendProjectileToMap(map, i);
+                NetworkSend.SendProjectileToMap(x, i);
             }
         }
     }

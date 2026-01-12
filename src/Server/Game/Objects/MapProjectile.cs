@@ -11,7 +11,7 @@ namespace Server
         public static void OnClear(int map, int mapProjectileNum)
         {
             ref var mp = ref Data.MapProjectile[map, mapProjectileNum];
-            mp.Index = -1;
+            mp.Index = 0;
             mp.Owner = 0;
             mp.OwnerType = 0;
             mp.X = 0;

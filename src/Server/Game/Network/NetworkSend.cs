@@ -1895,16 +1895,16 @@ public static class NetworkSend
 
         packet.WriteEnum(ServerPackets.SMapNpcData);
 
-        for (var mapNpcNum = 0; mapNpcNum < Core.Globals.Variables.MaxMapNpcs; mapNpcNum++)
+        for (var i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
         {
-            packet.WriteInt32(MapNpc.Instance[map, mapNpcNum].Num);
-            packet.WriteInt32(MapNpc.Instance[map, mapNpcNum].X);
-            packet.WriteInt32(MapNpc.Instance[map, mapNpcNum].Y);
-            packet.WriteByte(MapNpc.Instance[map, mapNpcNum].Dir);
+            packet.WriteInt32(MapNpc.Instance[map, i].Num);
+            packet.WriteInt32(MapNpc.Instance[map, i].X);
+            packet.WriteInt32(MapNpc.Instance[map, i].Y);
+            packet.WriteByte(MapNpc.Instance[map, i].Dir);
 
             // Remaining ms until respawn (0 if alive)
             var remaining = 0;
-            var expiry = MapNpc.Instance[map, mapNpcNum].DeathTimer;
+            var expiry = MapNpc.Instance[map, i].DeathTimer;
             if (expiry > 0)
             {
                 var now = General.GetTime();
@@ -1926,16 +1926,16 @@ public static class NetworkSend
 
         packet.WriteEnum(ServerPackets.SMapNpcData);
 
-        for (var mapNpcNum = 0; mapNpcNum < Core.Globals.Variables.MaxMapNpcs; mapNpcNum++)
+        for (var i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
         {
-            packet.WriteInt32(MapNpc.Instance[map, mapNpcNum].Num);
-            packet.WriteInt32(MapNpc.Instance[map, mapNpcNum].X);
-            packet.WriteInt32(MapNpc.Instance[map, mapNpcNum].Y);
-            packet.WriteByte(MapNpc.Instance[map, mapNpcNum].Dir);
+            packet.WriteInt32(MapNpc.Instance[map, i].Num);
+            packet.WriteInt32(MapNpc.Instance[map, i].X);
+            packet.WriteInt32(MapNpc.Instance[map, i].Y);
+            packet.WriteByte(MapNpc.Instance[map, i].Dir);
 
             // Remaining ms until respawn (0 if alive)
             var remaining = 0;
-            var expiry = MapNpc.Instance[map, mapNpcNum].DeathTimer;
+            var expiry = MapNpc.Instance[map, i].DeathTimer;
             if (expiry > 0)
             {
                 var now = General.GetTime();
@@ -2030,17 +2030,17 @@ public static class NetworkSend
         packet.WriteInt32(npc.CommonEventData2);
     }
 
-    public static void SendMapNpcVitals(int map, byte mapNpcNum)
+    public static void SendMapNpcVitals(int map, int npc)
     {
         var packet = new PacketWriter(4);
 
         packet.WriteEnum(ServerPackets.SMapNpcVitals);
-        packet.WriteInt32((int)mapNpcNum);
+        packet.WriteInt32(npc);
 
         var vitalCount = Enum.GetValues<Vital>().Length;
         for (var i = 0; i < vitalCount; i++)
         {
-            packet.WriteInt32(MapNpc.Instance[map, mapNpcNum].Vital[i]);
+            packet.WriteInt32(MapNpc.Instance[map, npc].Vital[i]);
         }
 
         NetworkConfig.SendDataToMap(map, packet.GetBytes());
@@ -2071,6 +2071,27 @@ public static class NetworkSend
         packet.WriteEnum(ServerPackets.SNpcDead);
         packet.WriteInt32(deathTimer);
         packet.WriteInt32(npc);
+        NetworkConfig.SendDataToMap(map, packet.GetBytes());
+    }
+
+    public static void SendNpcSpawn(int map, int npc)
+    {
+        var packet = new PacketWriter();
+
+        packet.WriteEnum(ServerPackets.SSpawnNpc);
+        packet.WriteInt32(npc);
+        packet.WriteInt32(MapNpc.Instance[map, npc].Num);
+        packet.WriteInt32(MapNpc.Instance[map, npc].X);
+        packet.WriteInt32(MapNpc.Instance[map, npc].Y);
+        packet.WriteByte(MapNpc.Instance[map, npc].Dir);
+        packet.WriteInt32(MapNpc.Instance[map, npc].DeathTimer);
+
+        var vitalCount = Enum.GetValues<Vital>().Length;
+        for (var i = 0; i < vitalCount; i++)
+        {
+            packet.WriteInt32(MapNpc.Instance[map, npc].Vital[i]);
+        }
+
         NetworkConfig.SendDataToMap(map, packet.GetBytes());
     }
 }
