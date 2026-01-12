@@ -523,9 +523,10 @@ namespace Client
             // After drawing to RenderTarget, reset to back buffer for composition
             GraphicsDevice.SetRenderTarget(null);
 
+            // --- Render GUI to guiRenderTarget (not zoomed) ---
+            // Only render UI when we're not loading/getting map; during map load we intentionally draw nothing.
             if (!GameState.GettingMap && !GameState.IsLoading)
             {
-                // --- Render GUI to guiRenderTarget (not zoomed) ---
                 if (_guiRenderTarget == null || _guiRenderTarget.Width != nativeWidth || _guiRenderTarget.Height != nativeHeight)
                 {
                     _guiRenderTarget?.Dispose();
@@ -570,29 +571,33 @@ namespace Client
 
                 // After drawing to _guiRenderTarget, reset to back buffer
                 GraphicsDevice.SetRenderTarget(null);
+            }
 
-                int backBufferWidth = GraphicsDevice.PresentationParameters.BackBufferWidth;
-                int backBufferHeight = GraphicsDevice.PresentationParameters.BackBufferHeight;
-                bool isFullscreenNow2 = Graphics?.IsFullScreen ?? false;
-                var viewportRect = ComputeViewportRect(backBufferWidth, backBufferHeight, nativeWidth, nativeHeight, isFullscreenNow2);
+            // Always composite to the back buffer so we don't leave the previous frame on screen.
+            // When GettingMap=true, RenderTarget is cleared to black above, so the game won't be drawn.
+            int backBufferWidth = GraphicsDevice.PresentationParameters.BackBufferWidth;
+            int backBufferHeight = GraphicsDevice.PresentationParameters.BackBufferHeight;
+            bool isFullscreenNow2 = Graphics?.IsFullScreen ?? false;
+            var viewportRect = ComputeViewportRect(backBufferWidth, backBufferHeight, nativeWidth, nativeHeight, isFullscreenNow2);
 
-                // Update smoothed pivot and compute destination rects (world uses zoomedRect, GUI uses viewportRect)
-                UpdateSmoothedPivot(nativeWidth, nativeHeight);
-                float zoomNow = GameState.CameraZoom <= 0 ? 1.0f : GameState.CameraZoom;
-                var zoomedRect = ComputeZoomedDestRect(viewportRect, nativeWidth, nativeHeight, zoomNow);
+            // Update smoothed pivot and compute destination rects (world uses zoomedRect, GUI uses viewportRect)
+            UpdateSmoothedPivot(nativeWidth, nativeHeight);
+            float zoomNow = GameState.CameraZoom <= 0 ? 1.0f : GameState.CameraZoom;
+            var zoomedRect = ComputeZoomedDestRect(viewportRect, nativeWidth, nativeHeight, zoomNow);
 
-                using (var targetBatch = new SpriteBatch(GraphicsDevice))
-                {
-                    targetBatch.Begin( SpriteSortMode.Deferred, BlendState.NonPremultiplied);
-                    // Draw the game/menu with zoom
-                    if (RenderTarget != null)
-                        targetBatch.Draw(RenderTarget, zoomedRect, Color.White);
+            using (var targetBatch = new SpriteBatch(GraphicsDevice))
+            {
+                targetBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
 
-                    // Draw GUI un-zoomed to the viewport
-                    if (_guiRenderTarget != null)
-                        targetBatch.Draw(_guiRenderTarget, viewportRect, Color.White);
-                    targetBatch.End();
-                }
+                // Draw the game/menu with zoom (this will be black while GettingMap/IsLoading)
+                if (RenderTarget != null)
+                    targetBatch.Draw(RenderTarget, zoomedRect, Color.White);
+
+                // Draw GUI un-zoomed to the viewport only when active
+                if (!GameState.GettingMap && !GameState.IsLoading && _guiRenderTarget != null)
+                    targetBatch.Draw(_guiRenderTarget, viewportRect, Color.White);
+
+                targetBatch.End();
             }
 
             base.Draw(gameTime);
