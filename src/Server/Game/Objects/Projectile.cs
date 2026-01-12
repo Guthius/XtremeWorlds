@@ -408,18 +408,80 @@ public class Projectile : ProjectileBase, IAsyncData
                 bool moved = false;
                 int prevTileX = mp.X / Constants.TileSize;
                 int prevTileY = mp.Y / Constants.TileSize;
-                
+
+                // Safety: prevent pathological catch-up loops if TravelTime is far in the past (or overflowed).
+                // Each loop advances 1 pixel; without a cap, a single bad projectile can stall the whole server.
+                const int MaxCatchUpStepsPerProjectile = 4096;
+                var catchUpSteps = 0;
+
+                // If we're extremely behind, clear the projectile immediately.
+                // This prioritizes server liveness over simulating a wildly overdue projectile.
+                if (mp.TravelTime != 0 && now - mp.TravelTime > stepMs * MaxCatchUpStepsPerProjectile)
+                {
+                    General.Logger.LogWarning(
+                        "Projectile catch-up too large; clearing projectile. map={Map} slot={Slot} idx={Index} now={Now} travelTime={TravelTime} stepMs={StepMs} freeAim={FreeAim} vx={Vx} vy={Vy} accX={AccX} accY={AccY}",
+                        map,
+                        i,
+                        mp.Index,
+                        now,
+                        mp.TravelTime,
+                        stepMs,
+                        mp.FreeAim,
+                        mp.Vx,
+                        mp.Vy,
+                        mp.AccX,
+                        mp.AccY
+                    );
+
+                    MapProjectile.OnClear(map, i);
+                    continue;
+                }
+
                 while (now > mp.TravelTime)
                 {
+                    if (++catchUpSteps > MaxCatchUpStepsPerProjectile)
+                    {
+                        General.Logger.LogWarning(
+                            "Projectile update exceeded catch-up cap; clearing projectile. map={Map} slot={Slot} idx={Index} now={Now} travelTime={TravelTime} stepMs={StepMs} freeAim={FreeAim} vx={Vx} vy={Vy} accX={AccX} accY={AccY}",
+                            map,
+                            i,
+                            mp.Index,
+                            now,
+                            mp.TravelTime,
+                            stepMs,
+                            mp.FreeAim,
+                            mp.Vx,
+                            mp.Vy,
+                            mp.AccX,
+                            mp.AccY
+                        );
+
+                        MapProjectile.OnClear(map, i);
+                        moved = false;
+                        break;
+                    }
+
                     if (mp.FreeAim == 1)
                     {
                         // accumulate thousandths, step whole pixels
                         mp.AccX += mp.Vx;
                         mp.AccY += mp.Vy;
-                        while (mp.AccX >= 1000) { mp.X += 1; mp.AccX -= 1000; }
-                        while (mp.AccX <= -1000) { mp.X -= 1; mp.AccX += 1000; }
-                        while (mp.AccY >= 1000) { mp.Y += 1; mp.AccY -= 1000; }
-                        while (mp.AccY <= -1000) { mp.Y -= 1; mp.AccY += 1000; }
+
+                        // Fast-path integer division instead of unbounded while loops.
+                        // Division truncates toward zero; remainder stays within (-1000, 1000).
+                        var dx = mp.AccX / 1000;
+                        if (dx != 0)
+                        {
+                            mp.X += dx;
+                            mp.AccX -= dx * 1000;
+                        }
+
+                        var dy = mp.AccY / 1000;
+                        if (dy != 0)
+                        {
+                            mp.Y += dy;
+                            mp.AccY -= dy * 1000;
+                        }
                     }
                     else
                     {

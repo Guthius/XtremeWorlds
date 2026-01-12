@@ -9,11 +9,20 @@ public abstract class PacketParser<TPacketId, TSession> where TPacketId : Enum
     private const uint CompressionFlag = 1u << 31;
     private const int MaxPacketSize = 64 * 1024 * 1024; // Must be <= GameSession MaxBufferSize
 
-    private readonly Dictionary<int, Action<TSession, ReadOnlyMemory<byte>>> _handlers = [];
+    private readonly Dictionary<int, Func<TSession, ReadOnlyMemory<byte>, ValueTask>> _handlers = [];
+
+    protected void Bind(TPacketId packetId, Func<TSession, ReadOnlyMemory<byte>, ValueTask> handler)
+    {
+        _handlers[Convert.ToInt32(packetId)] = handler;
+    }
 
     protected void Bind(TPacketId packetId, Action<TSession, ReadOnlyMemory<byte>> handler)
     {
-        _handlers[Convert.ToInt32(packetId)] = handler;
+        _handlers[Convert.ToInt32(packetId)] = (session, bytes) =>
+        {
+            handler(session, bytes);
+            return ValueTask.CompletedTask;
+        };
     }
 
     /// <summary>
@@ -22,12 +31,14 @@ public abstract class PacketParser<TPacketId, TSession> where TPacketId : Enum
     /// </summary>
     protected virtual bool ValidateSession(TSession session) => true;
 
-    public int Parse(TSession session, ReadOnlyMemory<byte> bytes)
+    public async ValueTask<int> Parse(TSession session, ReadOnlyMemory<byte> bytes, CancellationToken cancellationToken = default)
     {
         var totalNumberOfBytes = bytes.Length;
 
         while (bytes.Length >= 4)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var packetSize = BitConverter.ToInt32(bytes.Span);
 
             // Defensive: invalid sizes indicate stream corruption or a bad client.
@@ -47,7 +58,7 @@ public abstract class PacketParser<TPacketId, TSession> where TPacketId : Enum
                 continue;
             }
 
-            Handle(session, bytes[..packetSize]);
+            await Handle(session, bytes[..packetSize]).ConfigureAwait(false);
 
             bytes = bytes[packetSize..];
         }
@@ -58,7 +69,7 @@ public abstract class PacketParser<TPacketId, TSession> where TPacketId : Enum
         return bytesProcessed;
     }
 
-    private void Handle(TSession session, ReadOnlyMemory<byte> bytes)
+    private async ValueTask Handle(TSession session, ReadOnlyMemory<byte> bytes)
     {
         if (bytes.Length < 4)
         {
@@ -91,13 +102,13 @@ public abstract class PacketParser<TPacketId, TSession> where TPacketId : Enum
 
         if (compressed)
         {
-            HandleCompressed(session, packetData, packetId, handler);
+            await HandleCompressed(session, packetData, packetId, handler).ConfigureAwait(false);
             return;
         }
 
         try
         {
-            handler(session, packetData);
+            await handler(session, packetData).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -105,7 +116,7 @@ public abstract class PacketParser<TPacketId, TSession> where TPacketId : Enum
         }
     }
 
-    private void HandleCompressed(TSession session, ReadOnlyMemory<byte> bytes, int packetId, Action<TSession, ReadOnlyMemory<byte>> handler)
+    private async ValueTask HandleCompressed(TSession session, ReadOnlyMemory<byte> bytes, int packetId, Func<TSession, ReadOnlyMemory<byte>, ValueTask> handler)
     {
         if (bytes.Length < 4)
         {
@@ -126,7 +137,7 @@ public abstract class PacketParser<TPacketId, TSession> where TPacketId : Enum
 
         try
         {
-            handler(session, buffer.AsMemory());
+            await handler(session, buffer.AsMemory()).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

@@ -162,11 +162,12 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Bind(Packets.ClientPackets.CCancelCast, Packet_CancelCast);
     }
 
-    private static void Packet_Ping(GameSession session, ReadOnlyMemory<byte> bytes)
+    private static ValueTask Packet_Ping(GameSession session, ReadOnlyMemory<byte> bytes)
     {
+        return ValueTask.CompletedTask;
     }
 
-    private static async void Packet_Login(GameSession session, ReadOnlyMemory<byte> bytes)
+    private static async ValueTask Packet_Login(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         try
         {
@@ -299,7 +300,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
     }
 
-    private static void Packet_Register(GameSession session, ReadOnlyMemory<byte> bytes)
+    private static async ValueTask Packet_Register(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         try
         {
@@ -311,10 +312,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
                 return;
             }
 
-            // Ensure we have per-session storage before indexing Account.Instance.
             Account.EnsureSize(session.Id + 1);
 
-            // check if its banned
+            // Check if its banned
             // Cut off last portion of ip
             if (Database.IsBanned(session.Id, session.Channel.IpAddress))
             {
@@ -378,7 +378,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             Account.Instance[session.Id].Login = login;
             Account.Instance[session.Id].Password = password;
 
-            Account.OnSave(session.Id).Wait();
+            await Account.OnSave(session.Id).ConfigureAwait(false);
 
             // send them to the character portal
             NetworkSend.SendPlayerCharacters(session);
@@ -396,7 +396,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
     }
 
-    private static void Packet_AddChar(GameSession session, ReadOnlyMemory<byte> bytes)
+    private static async ValueTask Packet_AddChar(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         string name;
         byte slot;
@@ -463,7 +463,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
             // Everything went ok, add the character
             Database.CharacterList?.Add(name);
-            Database.AddChar(session.Id, slot, name, (byte)sex, (byte)job, sprite).Wait();
+            await Database.AddChar(session.Id, slot, name, (byte)sex, (byte)job, sprite).ConfigureAwait(false);
 
             PlayerBase.Instance[session.Id] = Account.Instance[session.Id].Player[slot];
 
@@ -472,7 +472,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
     }
 
-    private static void Packet_UseChar(GameSession session, ReadOnlyMemory<byte> bytes)
+    private static async ValueTask Packet_UseChar(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var reader = new PacketReader(bytes);
 
@@ -502,7 +502,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
     }
 
-    private static async void Packet_DelChar(GameSession session, ReadOnlyMemory<byte> bytes)
+    private static async ValueTask Packet_DelChar(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -528,7 +528,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
     }
 
-    private static void Packet_Logout(GameSession session, ReadOnlyMemory<byte> bytes)
+    private static async ValueTask Packet_Logout(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         if (!NetworkConfig.IsPlaying(session.Id))
         {
@@ -537,12 +537,10 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
         NetworkSend.SendLeftGame(session.Id);
 
-        var task = Server.Player.OnExit(session.Id);
-
-        task.Wait();
+        await Server.Player.OnExit(session.Id).ConfigureAwait(false);
     }
 
-    private static void Packet_SayMessage(GameSession session, ReadOnlyMemory<byte> bytes)
+    private static async ValueTask Packet_SayMessage(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -554,7 +552,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendChatBubble(GetPlayerMap(session.Id), session.Id, (int)TargetType.Player, msg, (int)ColorName.White);
     }
 
-    private static void Packet_BroadCastMsg(GameSession session, ReadOnlyMemory<byte> bytes)
+    private static async ValueTask Packet_BroadCastMsg(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -566,21 +564,21 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Console.WriteLine(s);
     }
 
-    public static void Packet_PlayerMsg(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_PlayerMsg(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
-        var otherPlayer = buffer.ReadString();
+        var name = buffer.ReadString();
         var msg = buffer.ReadString();
 
-        var otherPlayerIndex = GameLogic.FindPlayer(otherPlayer);
-        if (otherPlayerIndex != session.Id)
+        var otherPlayerId = GameLogic.FindPlayer(name);
+        if (otherPlayerId != session.Id)
         {
-            if (otherPlayerIndex >= 0)
+            if (otherPlayerId >= 0)
             {
-                Log.Add(GetPlayerName(session.Id) + " tells " + GetPlayerName(session.Id) + ", '" + msg + "'", Constant.PlayerLog);
-                NetworkSend.SendPlayerMessage(otherPlayerIndex, GetPlayerName(session.Id) + " tells you, '" + msg + "'", (int)ColorName.Pink);
-                NetworkSend.SendPlayerMessage(session.Id, "You tell " + GetPlayerName(otherPlayerIndex) + ", '" + msg + "'", (int)ColorName.Pink);
+                Log.Add(GetPlayerName(session.Id) + " tells " + GetPlayerName(otherPlayerId) + ", '" + msg + "'", Constant.PlayerLog);
+                NetworkSend.SendPlayerMessage(otherPlayerId, GetPlayerName(session.Id) + " tells you, '" + msg + "'", (int)ColorName.Pink);
+                NetworkSend.SendPlayerMessage(session.Id, "You tell " + GetPlayerName(otherPlayerId) + ", '" + msg + "'", (int)ColorName.Pink);
             }
             else
             {
@@ -593,7 +591,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
     }
 
-    private static void Packet_SendAdminMessage(GameSession session, ReadOnlyMemory<byte> bytes)
+    private static async ValueTask Packet_SendAdminMessage(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var s = default(string);
         var buffer = new PacketReader(bytes);
@@ -605,7 +603,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Console.WriteLine(s);
     }
 
-    private static void Packet_PlayerMove(GameSession session, ReadOnlyMemory<byte> bytes)
+    private static async ValueTask Packet_PlayerMove(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -645,7 +643,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
     }
 
-    private static void Packet_CancelCast(GameSession session, ReadOnlyMemory<byte> bytes)
+    private static async ValueTask Packet_CancelCast(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         // Client intends to cancel current cast/buffer (e.g., Escape). Server is authoritative.
         if (Data.TempPlayer[session.Id].SkillBuffer >= 0)
@@ -656,7 +654,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
     }
 
-    public static void Packet_StopPlayerMove(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_StopPlayerMove(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -670,7 +668,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendPlayerXYToMap(session.Id);
     }
 
-    public static void Packet_PlayerDirection(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_PlayerDirection(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -695,7 +693,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkConfig.SendDataToMapBut(session.Id, GetPlayerMap(session.Id), packetWriter.GetBytes());
     }
 
-    public static void Packet_UseItem(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_UseItem(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -704,7 +702,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Server.Player.UseItem(session.Id, inv);
     }
 
-    public static void Packet_Attack(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_Attack(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var x = 0;
         var y = 0;
@@ -882,7 +880,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
     }
 
-    public static void Packet_MouseAttack(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_MouseAttack(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -900,7 +898,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         if (item < 0 || Item.Instance[item].Projectile < 0)
         {
             // fallback: trigger normal attack if no projectile
-            Packet_Attack(session, ReadOnlyMemory<byte>.Empty);
+            await Packet_Attack(session, ReadOnlyMemory<byte>.Empty).ConfigureAwait(false);
             return;
         }
 
@@ -955,7 +953,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendPlayerAttack(session.Id);
     }
 
-    public static void Packet_PlayerInfo(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_PlayerInfo(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         int n;
         var buffer = new PacketReader(bytes);
@@ -990,7 +988,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
     }
 
-    public static void Packet_WarpMeTo(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_WarpMeTo(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -1021,7 +1019,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
     }
 
-    public static void Packet_WarpToMe(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_WarpToMe(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -1053,7 +1051,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
     }
 
-    public static void Packet_WarpTo(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_WarpTo(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -1073,7 +1071,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Log.Add(GetPlayerName(session.Id) + " warped to map #" + n + ".", Constant.AdminLog);
     }
 
-    public static void Packet_SetSprite(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_SetSprite(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -1088,7 +1086,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendPlayerData(session.Id);
     }
 
-    public static void Packet_GetStats(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_GetStats(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         NetworkSend.SendPlayerMessage(session.Id, "Stats: " + GetPlayerName(session.Id), (int)ColorName.Yellow);
         NetworkSend.SendPlayerMessage(session.Id, "Level: " + GetPlayerLevel(session.Id) + "  Exp: " + GetPlayerExperience(session.Id) + "/" + Script.Instance?.GetPlayerNextLevel(session.Id), (int)ColorName.Yellow);
@@ -1109,7 +1107,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendPlayerMessage(session.Id, "Critical Hit Chance: " + n + "% Critical Cast Chance: " + n2 + "%, Block Chance: " + i + "%", (int)ColorName.Yellow);
     }
 
-    public static void Packet_RequestNewMap(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_RequestNewMap(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
         var dir = buffer.ReadInt32();
@@ -1117,7 +1115,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Server.Player.OnMove(session.Id, dir, 1, true);
     }
 
-    public static void Packet_MapData(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_MapData(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         int x;
         int y;
@@ -1360,8 +1358,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
         // Save the map
         Map.OnSave(map);
-        MapNpc.OnSpawn(map).GetAwaiter().GetResult();
-        EventLogic.SpawnGlobalEvents(map).GetAwaiter().GetResult();
+        await MapNpc.OnSpawn(map).ConfigureAwait(false);
+        await EventLogic.SpawnGlobalEvents(map).ConfigureAwait(false);
 
         foreach (var i in PlayerService.Instance.PlayerIds)
         {
@@ -1396,7 +1394,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
     }
 
-    private static void Packet_NeedMap(GameSession session, ReadOnlyMemory<byte> bytes)
+    private static async ValueTask Packet_NeedMap(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -1431,7 +1429,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Data.TempPlayer[session.Id].GettingMap = false;
     }
 
-    public static void Packet_RespawnMap(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_RespawnMap(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         int i;
         var buffer = new PacketReader(bytes);
@@ -1462,7 +1460,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Log.Add(GetPlayerName(session.Id) + " has respawned map #" + GetPlayerMap(session.Id), Constant.AdminLog);
     }
 
-    public static void Packet_MapReport(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_MapReport(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         // Prevent hacking
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Mapper)
@@ -1471,7 +1469,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendMapReport(session.Id);
     }
 
-    public static void Packet_KickPlayer(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_KickPlayer(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -1510,7 +1508,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
     }
 
-    public static void Packet_Banlist(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_Banlist(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         // Prevent hacking
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Moderator)
@@ -1521,7 +1519,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendPlayerMessage(session.Id, "Command /banlist is not available.", (int)ColorName.Yellow);
     }
 
-    public static void Packet_DestroyBans(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_DestroyBans(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         // Prevent hacking
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Owner)
@@ -1535,7 +1533,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendPlayerMessage(session.Id, "Ban list destroyed.", (int)ColorName.BrightGreen);
     }
 
-    public static void Packet_BanPlayer(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_BanPlayer(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -1570,7 +1568,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
     }
 
-    private static void Packet_RequestEditMap(GameSession session, ReadOnlyMemory<byte> bytes)
+    private static async ValueTask Packet_RequestEditMap(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         // Prevent hacking
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Mapper)
@@ -1604,7 +1602,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         PlayerService.Instance.SendDataTo(session.Id, packetWriter.GetBytes());
     }
 
-    public static void Packet_RequestEditShop(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_RequestEditShop(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         // Prevent hacking
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
@@ -1633,7 +1631,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         PlayerService.Instance.SendDataTo(session.Id, packetWriter.GetBytes());
     }
 
-    public static void Packet_SaveShop(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_SaveShop(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -1665,7 +1663,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Log.Add(GetAccountLogin(session.Id) + " saving shop #" + shop + ".", Constant.AdminLog);
     }
 
-    public static void Packet_RequestEditSkill(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_RequestEditSkill(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         // Prevent hacking
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
@@ -1696,7 +1694,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         PlayerService.Instance.SendDataTo(session.Id, packetWriter.GetBytes());
     }
 
-    public static void Packet_SaveSkill(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_SaveSkill(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -1756,7 +1754,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Log.Add(GetAccountLogin(session.Id) + " saved Skill #" + skill + ".", Constant.AdminLog);
     }
 
-    public static void Packet_SetAccess(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_SetAccess(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -1806,12 +1804,12 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
     }
 
-    public static void Packet_WhosOnline(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_WhosOnline(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         NetworkSend.SendWhosOnline(session.Id);
     }
 
-    public static void Packet_SetMotd(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_SetMotd(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -1826,7 +1824,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Log.Add(GetPlayerName(session.Id) + " changed welcome to: " + Variables.Welcome, Constant.AdminLog);
     }
 
-    public static void Packet_PlayerSearch(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_PlayerSearch(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -1963,12 +1961,12 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
     }
 
-    public static void Packet_Skills(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_Skills(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         NetworkSend.SendPlayerSkills(session.Id);
     }
 
-    public static void Packet_Cast(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_Cast(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -1985,7 +1983,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
     }
 
-    public static void Packet_SwapInvSlots(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_SwapInvSlots(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -1999,7 +1997,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Server.Player.PlayerSwitchInvSlots(session.Id, (int)oldSlot, (int)newSlot);
     }
 
-    public static void Packet_SwapSkillSlots(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_SwapSkillSlots(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -2014,7 +2012,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Server.Player.PlayerSwitchSkillSlots(session.Id, (int)oldSlot, (int)newSlot);
     }
 
-    public static void Packet_CheckPing(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_CheckPing(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var packetWriter = new PacketWriter(4);
 
@@ -2023,7 +2021,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         PlayerService.Instance.SendDataTo(session.Id, packetWriter.GetBytes());
     }
 
-    public static void Packet_UnEquip(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_UnEquip(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
         int eqSlot = buffer.ReadInt32();
@@ -2031,12 +2029,12 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Server.Player.RemoveEquipment(session.Id, eqSlot, m);
     }
 
-    public static void Packet_RequestPlayerData(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_RequestPlayerData(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         NetworkSend.SendPlayerData(session.Id);
     }
 
-    public static void Packet_RequestNpc(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_RequestNpc(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -2048,7 +2046,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendUpdateNpcTo(session.Id, n);
     }
 
-    public static void Packet_SpawnItem(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_SpawnItem(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -2062,7 +2060,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         MapItem.OnSpawn(tmpItem, tmpAmount, GetPlayerMap(session.Id), GetPlayerX(session.Id), GetPlayerY(session.Id));
     }
 
-    public static void Packet_TrainStat(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_TrainStat(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -2083,7 +2081,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
     }
 
-    public static void Packet_RequestSkill(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_RequestSkill(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -2095,7 +2093,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendUpdateSkillTo(session.Id, n);
     }
 
-    public static void Packet_RequestShop(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_RequestShop(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -2107,7 +2105,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendUpdateShopTo(session.Id, n);
     }
 
-    public static void Packet_RequestLevelUp(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_RequestLevelUp(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         // Prevent hacking
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
@@ -2117,7 +2115,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Server.Player.OnLevel(session.Id);
     }
 
-    public static void Packet_ForgetSkill(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_ForgetSkill(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -2145,12 +2143,12 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendPlayerSkills(session.Id);
     }
 
-    public static void Packet_CloseShop(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_CloseShop(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         Data.TempPlayer[session.Id].InShop = -1;
     }
 
-    public static void Packet_BuyItem(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_BuyItem(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -2187,7 +2185,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.ResetShopAction();
     }
 
-    public static void Packet_SellItem(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_SellItem(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -2231,7 +2229,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.ResetShopAction();
     }
 
-    public static void Packet_ChangeBankSlots(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_ChangeBankSlots(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -2241,7 +2239,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Server.Player.PlayerSwitchBankSlots(session.Id, oldslot, newslot);
     }
 
-    public static void Packet_DepositItem(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_DepositItem(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -2251,7 +2249,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Server.Player.GiveBank(session.Id, invslot, amount);
     }
 
-    public static void Packet_WithdrawItem(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_WithdrawItem(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -2261,12 +2259,12 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Server.Player.TakeBank(session.Id, bankSlot, amount);
     }
 
-    public static void Packet_CloseBank(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_CloseBank(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         Data.TempPlayer[session.Id].InBank = false;
     }
 
-    public static void Packet_AdminWarp(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_AdminWarp(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -2295,7 +2293,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
     }
 
-    public static void Packet_TradeInvite(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_TradeInvite(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -2324,7 +2322,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendTradeInvite(tradeTarget, session.Id);
     }
 
-    public static void Packet_HandleTradeInvite(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_HandleTradeInvite(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -2383,12 +2381,12 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
     }
 
-    public static void Packet_TradeInviteDecline(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_TradeInviteDecline(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         Data.TempPlayer[session.Id].TradeRequest = -1;
     }
 
-    public static void Packet_AcceptTrade(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_AcceptTrade(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         int item;
         int i;
@@ -2485,7 +2483,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendCloseTrade(tradeTarget);
     }
 
-    public static void Packet_DeclineTrade(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_DeclineTrade(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var tradeTarget = (int)Data.TempPlayer[session.Id].InTrade;
         var hasValidTarget = tradeTarget >= 0 && tradeTarget < Core.Globals.Variables.MaxPlayers;
@@ -2514,7 +2512,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
     }
 
-    public static void Packet_TradeItem(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_TradeItem(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var emptyslot = default(int);
         int i;
@@ -2614,7 +2612,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendTradeUpdate((int)Data.TempPlayer[session.Id].InTrade, 1);
     }
 
-    public static void Packet_UntradeItem(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_UntradeItem(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -2647,12 +2645,14 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         if (index > 0 & NetworkConfig.IsPlaying(index))
         {
             NetworkSend.SendGlobalMessage(GetAccountLogin(index) + "/" + GetPlayerName(index) + " has been booted for (" + reason + ")");
-            var task = Server.Player.OnExit(index);
-            task.Wait();
+            _ = Server.Player.OnExit(index).ContinueWith(
+                t => General.Logger.LogError(t.Exception, "Unhandled error during forced logout"),
+                TaskContinuationOptions.OnlyOnFaulted
+            );
         }
     }
 
-    public static void Packet_Admin(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_Admin(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         // Prevent hacking
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Moderator)
@@ -2661,7 +2661,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendAdminPanel(session.Id);
     }
 
-    public static void Packet_SetHotbarSlot(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_SetHotbarSlot(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -2698,7 +2698,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendHotbar(session.Id);
     }
 
-    public static void Packet_DeleteHotbarSlot(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_DeleteHotbarSlot(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -2714,7 +2714,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendHotbar(session.Id);
     }
 
-    public static void Packet_UseHotbarSlot(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_UseHotbarSlot(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -2765,7 +2765,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendHotbar(session.Id);
     }
 
-    public static void Packet_SkillLearn(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_SkillLearn(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -2785,7 +2785,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
     }
 
-    public static void Packet_RequestEditJob(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_RequestEditJob(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         // Prevent hacking
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
@@ -2810,7 +2810,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Data.TempPlayer[session.Id].Editor = EditorType.Job;        
     }
 
-    public static void Packet_SaveJob(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_SaveJob(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         int x;
         var buffer = new PacketReader(bytes);
@@ -2853,7 +2853,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendJobToAll(session.Id);
     }
 
-    private static void Packet_Emote(GameSession session, ReadOnlyMemory<byte> bytes)
+    private static async ValueTask Packet_Emote(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -2862,7 +2862,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendEmote(session.Id, emote);
     }
 
-    private static void Packet_CloseEditor(GameSession session, ReadOnlyMemory<byte> bytes)
+    private static async ValueTask Packet_CloseEditor(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         // Prevent hacking
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Mapper)
@@ -2875,7 +2875,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
     }
 
 
-    public static void Packet_RequestEditMoral(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_RequestEditMoral(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
         {
@@ -2901,7 +2901,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         PlayerService.Instance.SendDataTo(session.Id, packet.GetBytes());
     }
 
-    public static void Packet_SaveMoral(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_SaveMoral(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var packetReader = new PacketReader(bytes);
 
@@ -2939,12 +2939,12 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendMorals(session.Id);
     }
 
-    public static void Packet_RequestMoral(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_RequestMoral(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         NetworkSend.SendMorals(session.Id);
     }
 
-    public static void Packet_RequestEditScript(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_RequestEditScript(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Owner)
         {
@@ -2990,7 +2990,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         session.Channel.Send(packetWriter.GetBytes());
     }
 
-    public static void Packet_SaveScript(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_SaveScript(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var packetReader = new PacketReader(bytes);
 
@@ -3014,7 +3014,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         _ = Script.OnLoad(session.Id);
     }
 
-    public static void Packet_RequestProjectile(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_RequestProjectile(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var packetReader = new PacketReader(bytes);
 
@@ -3023,7 +3023,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendUpdateProjectileTo(session.Id, projectile);
     }
 
-    public static void Packet_ClearProjectile(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_ClearProjectile(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var packetReader = new PacketReader(bytes);
 
@@ -3037,7 +3037,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         MapProjectile.OnClear(map, projectile);
     }
 
-    public static void Packet_RequestEditProjectile(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_RequestEditProjectile(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
         {
@@ -3064,7 +3064,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendAnimations(session.Id);
     }
 
-    public static void Packet_SaveProjectile(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_SaveProjectile(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var packetReader = new PacketReader(bytes);
 
@@ -3094,7 +3094,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendUpdateProjectileToAll(index);
     }
 
-    public static void Packet_RequestEditResource(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_RequestEditResource(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
         {
@@ -3123,7 +3123,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         PlayerService.Instance.SendDataTo(session.Id, packet.GetBytes());
     }
 
-    public static void Packet_SaveResource(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_SaveResource(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var packetReader = new PacketReader(bytes);
 
@@ -3166,7 +3166,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendUpdateResourceToAll(index);
     }
 
-    public static void Packet_RequestResource(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_RequestResource(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var packetReader = new PacketReader(bytes);
 
@@ -3179,7 +3179,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendUpdateResourceTo(session.Id, index);
     }
 
-    public static void Packet_RequestItem(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_RequestItem(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var packetReader = new PacketReader(bytes);
 
@@ -3192,7 +3192,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendUpdateItemTo(session.Id, index);
     }
 
-    public static void Packet_RequestEditItem(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_RequestEditItem(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Mapper)
         {
@@ -3221,7 +3221,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendItems(session.Id);
     }
 
-    public static void Packet_SaveItem(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_SaveItem(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var packetReader = new PacketReader(bytes);
 
@@ -3285,12 +3285,12 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendUpdateItemToAll(index);
     }
 
-    public static void Packet_GetItem(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_GetItem(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         Server.Player.OnGetItem(session.Id);
     }
 
-    public static void Packet_DropItem(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_DropItem(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
@@ -3331,7 +3331,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
     }
 
-    public static void Packet_RequestEditAnimation(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_RequestEditAnimation(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
         {
@@ -3357,7 +3357,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendAnimations(session.Id);
     }
 
-    public static void Packet_SaveAnimation(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_SaveAnimation(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var packetReader = new PacketReader(bytes);
 
@@ -3402,7 +3402,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendUpdateAnimationToAll(index);
     }
 
-    public static void Packet_RequestAnimation(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_RequestAnimation(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var packetReader = new PacketReader(bytes);
 
@@ -3415,7 +3415,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendUpdateAnimationTo(session.Id, animation);
     }
 
-    public static void Packet_Event(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_Event(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
         var localEventIndex = buffer.ReadInt32();
@@ -3434,9 +3434,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         EventLogic.TriggerEvent(session.Id, mapEventId, 0, GetPlayerX(session.Id), GetPlayerY(session.Id));
     }
 
-    public static void Packet_RequestSwitchesAndVariables(GameSession session, ReadOnlyMemory<byte> bytes) => NetworkSend.SendSwitchesAndVariables(session.Id);
+    public static async ValueTask Packet_RequestSwitchesAndVariables(GameSession session, ReadOnlyMemory<byte> bytes) => NetworkSend.SendSwitchesAndVariables(session.Id);
 
-    public static void Packet_SwitchesAndVariables(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_SwitchesAndVariables(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
         for (var i = 0; i < Core.Globals.Variables.MaxSwitches; i++) Event.Switches[i] = buffer.ReadString();
@@ -3447,7 +3447,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.SendSwitchesAndVariables(0, true);
     }
 
-    public static void Packet_EventChatReply(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_EventChatReply(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
         int eventId = buffer.ReadInt32(), pageId = buffer.ReadInt32(), reply = buffer.ReadInt32();
@@ -3463,7 +3463,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
     }
 
 
-    public static void Packet_PartyRquest(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_PartyRquest(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         // Prevent partying with self
         if (Data.TempPlayer[session.Id].Target == session.Id)
@@ -3481,29 +3481,29 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Party.OnInvite(session.Id, Data.TempPlayer[session.Id].Target);
     }
 
-    public static void Packet_AcceptParty(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_AcceptParty(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         Party.OnAccept(Data.TempPlayer[session.Id].PartyInvite, session.Id);
     }
 
-    public static void Packet_DeclineParty(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_DeclineParty(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         Party.OnDecline(Data.TempPlayer[session.Id].PartyInvite, session.Id);
     }
 
-    public static void Packet_LeaveParty(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_LeaveParty(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         Party.OnLeave(session.Id);
     }
 
-    public static void Packet_PartyChatMsg(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_PartyChatMsg(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var buffer = new PacketReader(bytes);
 
         Party.OnMessage(session.Id, buffer.ReadString());
     }
 
-    public static void Packet_RequestEditNpc(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_RequestEditNpc(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
         {
@@ -3533,7 +3533,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         PlayerService.Instance.SendDataTo(session.Id, packet.GetBytes());
     }
 
-    public static void Packet_SaveNpc(GameSession session, ReadOnlyMemory<byte> bytes)
+    public static async ValueTask Packet_SaveNpc(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         var packetReader = new PacketReader(bytes);
 

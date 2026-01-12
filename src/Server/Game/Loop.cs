@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using Core;
 using Core.Globals;
 using Microsoft.Extensions.Logging;
@@ -10,6 +11,14 @@ namespace Server;
 public static class Loop
 {
     private static readonly double[] PlayerMoveRemainder = new double[Core.Globals.Variables.MaxPlayers];
+
+    private static long _lastHeartbeat;
+    private static long _stageStarted;
+    private static volatile string _stage = "init";
+
+    private static int _watchdogStarted;
+    private static int _savePlayersRunning;
+    private static long _savePlayersStartedMs;
 
     public static async System.Threading.Tasks.Task OnStart()
     {
@@ -24,16 +33,21 @@ public static class Loop
         var lastUpdateSavePlayers = 0;
         var lastUpdateMapSpawnItems = 0;
 
+        StartWatchdog();
+
         while (true)
         {
             // Update our current tick value.
             var tick = General.GetTime();
+            Volatile.Write(ref _lastHeartbeat, tick);
 
+            SetStage("CheckShutdown", tick);
             await General.CheckShutDownCountDown();
 
             if (tick > tmr25)
             {
                 // Update all our available events.
+                SetStage("EventLogic", tick);
                 EventLogic.UpdateEventLogic();
 
                 tmr25 = General.GetTime() + 25;
@@ -41,6 +55,7 @@ public static class Loop
 
             if (tick > tmrPlayerWalk)
             {
+                SetStage("PlayerWalk", tick);
                 foreach (var player in PlayerService.Instance.Players)
                 {
                     var id = player.Id;
@@ -147,6 +162,7 @@ public static class Loop
 
             if (tick > tmrNpcWalk)
             {
+                SetStage("NpcWalk", tick);
                 // NPC pixel step progression (1px per tick) independent of player loop
                 MapNpc.ProcessActiveNpcMovement();
 
@@ -158,6 +174,7 @@ public static class Loop
 
             if (tick > tmrProj)
             {
+                SetStage("Projectiles", tick);
                 // Server-side projectile pixel movement and sparse map broadcasts
                 Projectile.OnUpdate();
                 tmrProj = General.GetTime() + 5;
@@ -167,6 +184,7 @@ public static class Loop
             {
                 try
                 {
+                    SetStage("ScriptHour", tick);
                     Script.Instance?.ServerHour();
                 }
                 catch (Exception ex)
@@ -181,6 +199,7 @@ public static class Loop
             {
                 try
                 {
+                    SetStage("ScriptMinute", tick);
                     Script.Instance?.ServerMinute();
                 }
                 catch (Exception ex)
@@ -195,6 +214,7 @@ public static class Loop
             {
                 try
                 {
+                    SetStage("ScriptSecond", tick);
                     Script.Instance?.ServerSecond();
                 }
                 catch (Exception ex)
@@ -202,6 +222,7 @@ public static class Loop
                     General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(Loop));
                 }
 
+                SetStage("Clock", tick);
                 Clock.Instance.Tick();
 
                 // Expire any temporary move speed multipliers (even if players are idle).
@@ -224,7 +245,15 @@ public static class Loop
 
             if (tick > tmr500)
             {
-                UpdateMapAi();
+                SetStage("MapAi", tick);
+                try
+                {
+                    UpdateMapAi();
+                }
+                catch (Exception ex)
+                {
+                    General.Logger.LogError(ex, "Unhandled error in {MethodName}", nameof(UpdateMapAi));
+                }
 
                 // Move the timer up 500ms.
                 tmr500 = General.GetTime() + 500;
@@ -233,19 +262,29 @@ public static class Loop
             // Checks to spawn map items every 1 minute
             if (tick > lastUpdateMapSpawnItems)
             {
-                UpdateMapSpawnItems();
+                SetStage("MapSpawnItems", tick);
+                try
+                {
+                    UpdateMapSpawnItems();
+                }
+                catch (Exception ex)
+                {
+                    General.Logger.LogError(ex, "Unhandled error in {MethodName}", nameof(UpdateMapSpawnItems));
+                }
                 lastUpdateMapSpawnItems = General.GetTime() + 60000;
             }
 
             // Checks to save players every 5 minutes
             if (tick > lastUpdateSavePlayers)
             {
-                await UpdateSavePlayers();
+                SetStage("SavePlayersSchedule", tick);
+                StartSavePlayersJob();
                 lastUpdateSavePlayers = General.GetTime() + 300000;
             }
 
             try
             {
+                SetStage("ScriptLoop", tick);
                 Script.Instance?.Loop();
             }
             catch (Exception ex)
@@ -253,8 +292,102 @@ public static class Loop
                 General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(Loop));
             }
 
+            SetStage("Delay", tick);
             await Task.Delay(1);
         }
+    }
+
+    private static void SetStage(string stage, long nowMs)
+    {
+        if (!string.Equals(_stage, stage, StringComparison.Ordinal))
+        {
+            _stage = stage;
+            Volatile.Write(ref _stageStarted, nowMs);
+        }
+    }
+
+    private static void StartWatchdog()
+    {
+        if (Interlocked.Exchange(ref _watchdogStarted, 1) == 1)
+        {
+            return;
+        }
+
+        var thread = new Thread(() =>
+        {
+            // If the loop blocks (DB, deadlock, infinite loop), this thread still logs where it last was.
+            while (true)
+            {
+                Thread.Sleep(5000);
+
+                var now = General.GetTime();
+                var hb = Volatile.Read(ref _lastHeartbeat);
+                if (hb <= 0)
+                {
+                    continue;
+                }
+
+                var stalledMs = now - hb;
+                if (stalledMs < 10000)
+                {
+                    continue;
+                }
+
+                var stage = _stage;
+                var stageForMs = now - Volatile.Read(ref _stageStarted);
+                var saveRunning = Volatile.Read(ref _savePlayersRunning) == 1;
+                var saveForMs = saveRunning ? now - Volatile.Read(ref _savePlayersStartedMs) : 0;
+
+                General.Logger.LogWarning(
+                    "Game loop heartbeat stalled for {StalledMs}ms. Stage={Stage} (for {StageForMs}ms). SavePlayersRunning={SaveRunning} (for {SaveForMs}ms).",
+                    stalledMs,
+                    stage,
+                    stageForMs,
+                    saveRunning,
+                    saveForMs
+                );
+            }
+        })
+        {
+            IsBackground = true,
+            Name = "ServerLoopWatchdog"
+        };
+
+        thread.Start();
+    }
+
+    private static void StartSavePlayersJob()
+    {
+        var now = General.GetTime();
+
+        if (Interlocked.Exchange(ref _savePlayersRunning, 1) == 1)
+        {
+            // Don't overlap saves; just log if it looks stuck.
+            var runningForMs = now - Volatile.Read(ref _savePlayersStartedMs);
+            if (runningForMs > 600000)
+            {
+                General.Logger.LogWarning("SavePlayers job still running after {RunningForMs}ms.", runningForMs);
+            }
+
+            return;
+        }
+
+        Volatile.Write(ref _savePlayersStartedMs, now);
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await UpdateSavePlayers().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                General.Logger.LogError(ex, "Unhandled error while saving players.");
+            }
+            finally
+            {
+                Interlocked.Exchange(ref _savePlayersRunning, 0);
+            }
+        });
     }
 
     private static async Task UpdateSavePlayers()
@@ -269,7 +402,7 @@ public static class Loop
 
         foreach (var player in players)
         {
-            await Account.OnSave(player.Id);
+            await Account.OnSave(player.Id).ConfigureAwait(false);
         }
     }
 

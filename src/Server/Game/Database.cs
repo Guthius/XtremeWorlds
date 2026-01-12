@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Npgsql;
 using NpgsqlTypes;
+using Microsoft.Extensions.Logging;
 using Server.Game;
 using System.Security.Cryptography;
 using System.Text;
@@ -734,7 +735,9 @@ public static class Database
         Log.Add(ip, "banlist.txt");
         NetworkSend.SendGlobalMessage(GetPlayerName(banPlayerIndex) + " has been banned from " + SettingsManager.Instance.GameName + " by " + GetPlayerName(bannedByIndex) + "!");
         Log.Add(GetPlayerName(bannedByIndex) + " has banned " + GetPlayerName(banPlayerIndex) + ".", Constant.AdminLog);
-        var task = Player.OnExit(banPlayerIndex);
-        task.Wait();
+        _ = Player.OnExit(banPlayerIndex).ContinueWith(
+            t => General.Logger.LogError(t.Exception, "Unhandled error during forced logout"),
+            TaskContinuationOptions.OnlyOnFaulted
+        );
     }
 }

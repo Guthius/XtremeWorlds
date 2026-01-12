@@ -24,14 +24,21 @@ public sealed class GameNetworkService : NetworkService<GameSession>
     {
         try
         {
-            session.Parse(bytes);
+            // Cannot await with ReadOnlySpan<byte> parameter; copy to heap memory first.
+            var data = bytes.ToArray();
+            var task = session.ParseAsync(data, cancellationToken).AsTask();
+            _ = task.ContinueWith(t =>
+            {
+                Console.WriteLine($"Parse error from {session.Channel.IpAddress} (id={session.Id}): {t.Exception?.GetBaseException().Message}");
+                session.Channel.Close();
+            }, TaskContinuationOptions.OnlyOnFaulted);
+            return task;
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Parse error from {session.Channel.IpAddress} (id={session.Id}): {ex.Message}");
             session.Channel.Close();
+            return Task.CompletedTask;
         }
-
-        return Task.CompletedTask;
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace Client.Net;
 
@@ -8,9 +9,18 @@ public abstract class PacketParser<TPacketId> where TPacketId : Enum
 {
     private const uint CompressionFlag = 1u << 31;
 
-    private readonly Dictionary<int, Action<ReadOnlyMemory<byte>>> _handlers = [];
+    private readonly Dictionary<int, Func<ReadOnlyMemory<byte>, ValueTask>> _handlers = [];
 
     protected void Bind(TPacketId packetId, Action<ReadOnlyMemory<byte>> handler)
+    {
+        Bind(packetId, data =>
+        {
+            handler(data);
+            return ValueTask.CompletedTask;
+        });
+    }
+
+    protected void Bind(TPacketId packetId, Func<ReadOnlyMemory<byte>, ValueTask> handler)
     {
         _handlers[Convert.ToInt32(packetId)] = handler;
     }
@@ -78,7 +88,7 @@ public abstract class PacketParser<TPacketId> where TPacketId : Enum
                 return;
             }
 
-            handler(packetData);
+            handler(packetData).GetAwaiter().GetResult();
         }
         catch (Exception ex)
         {
@@ -87,7 +97,7 @@ public abstract class PacketParser<TPacketId> where TPacketId : Enum
         }
     }
 
-    private static void HandleCompressed(ReadOnlyMemory<byte> bytes, Action<ReadOnlyMemory<byte>> handler)
+    private static void HandleCompressed(ReadOnlyMemory<byte> bytes, Func<ReadOnlyMemory<byte>, ValueTask> handler)
     {
         if (bytes.Length < 4)
         {
@@ -106,7 +116,7 @@ public abstract class PacketParser<TPacketId> where TPacketId : Enum
             return;
         }
 
-        handler(buffer.AsMemory());
+        handler(buffer.AsMemory()).GetAwaiter().GetResult();
     }
 
     private static bool IsCompressed(int packetId)

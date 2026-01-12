@@ -125,7 +125,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Bind(Packets.ServerPackets.SMoralEditor, Packet_EditMoral);
     }
 
-    private static void Packet_Aes(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_Aes(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 
@@ -139,7 +139,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         General.AesIV = iv;
     }
 
-    private static void Packet_Variables(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_Variables(ReadOnlyMemory<byte> data)
     {
         var r = new PacketReader(data);
 
@@ -192,7 +192,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         General.ClearGameData();  
     }
 
-    private static void Packet_AlertMessage(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_AlertMessage(ReadOnlyMemory<byte> data)
     {
         var buffer = new PacketReader(data);
 
@@ -241,7 +241,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         GameLogic.DialogueAlert(dialogue);
     }
 
-    private static void Packet_LoginOk(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_LoginOk(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 
@@ -262,7 +262,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         try { Event.HoldPlayer = false; } catch { }
     }
 
-    public static void Packet_PlayerCharacters(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_PlayerCharacters(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 
@@ -337,7 +337,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    public static void Packet_JobData(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_JobData(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
         Job.Instance.Clear();
@@ -390,7 +390,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    public static void Packet_UpdateJob(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_UpdateJob(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
         var n = packetReader.ReadInt32();
@@ -444,7 +444,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    private static void Packet_InGame(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_InGame(ReadOnlyMemory<byte> data)
     {
         GameState.InMenu = false;
         GameState.InGame = true;
@@ -465,7 +465,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         General.GameInit();
     }
 
-    private static void Packet_Inventory(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_Inventory(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 
@@ -485,7 +485,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         GameLogic.SetGoldLabel();
     }
 
-    private static void Packet_InventoryUpdate(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_InventoryUpdate(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
         var invSlot = packetReader.ReadInt32();
@@ -501,7 +501,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         GameLogic.SetGoldLabel();
     }
 
-    private static void Packet_PlayerWornEquipment(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_PlayerWornEquipment(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
         var equipmentCount = Enum.GetValues<Equipment>().Length;
@@ -515,7 +515,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    private static void Packet_NpcMove(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_NpcMove(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 
@@ -536,7 +536,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Client.Npc.StartStep(npc, x, y, dir);
     }
 
-    private static void Packet_NpcDir(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_NpcDir(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
         var npc = packetReader.ReadInt32();
@@ -554,7 +554,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Client.Npc.MarkMoveStop(npc);
     }
 
-    private static void Packet_Attack(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_Attack(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 
@@ -564,7 +564,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Player.Instance[index].AttackTimer = General.GetTickCount();
     }
 
-    private static void Packet_NpcAttack(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_NpcAttack(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
         var npc = packetReader.ReadInt32();
@@ -573,7 +573,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         MapNpc.Instance[npc].AttackTimer = General.GetTickCount();
     }
 
-    private static void Packet_GlobalMessage(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_GlobalMessage(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
         var message = packetReader.ReadString();
@@ -581,7 +581,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         TextRenderer.AddText(message, (int) ColorName.Yellow, channel: (byte) ChatChannel.Broadcast);
     }
 
-    private static void Packet_SendMapMessage(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_SendMapMessage(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
         var message = packetReader.ReadString();
@@ -589,7 +589,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         TextRenderer.AddText(message, (int) ColorName.White, channel: (byte) ChatChannel.Map);
     }
 
-    private static void Packet_SendAdminMessage(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_SendAdminMessage(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
         var message = packetReader.ReadString();
@@ -597,7 +597,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         TextRenderer.AddText(message, (int) ColorName.BrightCyan, channel: (byte) ChatChannel.Broadcast);
     }
 
-    private static void Packet_PlayerMsg(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_PlayerMsg(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 
@@ -607,7 +607,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         TextRenderer.AddText(message, color, channel: (byte) ChatChannel.Private);
     }
 
-    private static void Packet_SpawnItem(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_SpawnItem(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
         var item = packetReader.ReadInt32();
@@ -620,7 +620,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         mapItem.Y = packetReader.ReadInt32();
     }
 
-    private static void Packet_SpawnNpc(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_SpawnNpc(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 
@@ -645,7 +645,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         mapNpc.Moving = 0;
     }
 
-    private static void Packet_NpcDead(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_NpcDead(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 
@@ -660,7 +660,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         mapNpc.Moving = 0;
     }
 
-    private static void Packet_PlayerDead(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_PlayerDead(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
         var timer = packetReader.ReadInt32(); // milliseconds until respawn
@@ -668,7 +668,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Player.Instance[packetReader.ReadInt32()].DeathTimer = Client.General.GetTickCount() + timer;
     }
 
-    private static void Packet_UpdateNpc(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_UpdateNpc(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 
@@ -740,7 +740,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    private static void Packet_UpdateSkill(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_UpdateSkill(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 
@@ -802,7 +802,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    private static void Packet_Skills(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_Skills(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 
@@ -816,20 +816,20 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    private static void Packet_LeftMap(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_LeftMap(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 
         Player.OnClear(packetReader.ReadInt32());
     }
 
-    private static void Packet_Ping(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_Ping(ReadOnlyMemory<byte> data)
     {
         GameState.PingEnd = General.GetTickCount();
         GameState.Ping = GameState.PingEnd - GameState.PingStart;
     }
 
-    private static void Packet_ActionMessage(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_ActionMessage(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 
@@ -843,7 +843,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         GameLogic.CreateActionMessage(message, color, (byte) tmpType, x, y);
     }
 
-    private static void Packet_Blood(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_Blood(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 
@@ -866,7 +866,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         blood.Timer = General.GetTickCount();
     }
 
-    private static void Packet_NpcVitals(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_NpcVitals(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 
@@ -879,7 +879,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    private static void Packet_Cooldown(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_Cooldown(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 
@@ -890,13 +890,13 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    private static void Packet_ClearSkillBuffer(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_ClearSkillBuffer(ReadOnlyMemory<byte> data)
     {
         GameState.SkillBuffer = -1;
         GameState.SkillBufferTimer = 0;
     }
 
-    private static void Packet_StartSkillBuffer(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_StartSkillBuffer(ReadOnlyMemory<byte> data)
     {
         var reader = new PacketReader(data);
         int slot = reader.ReadInt32();
@@ -904,7 +904,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         GameState.SkillBufferTimer = General.GetTickCount(); // could offset with serverStart if clock sync later
     }
 
-    private static void Packet_SayMessage(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_SayMessage(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 
@@ -941,14 +941,14 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         TextRenderer.AddText(header + " " + name + ": " + message, color, channel: channelType);
     }
 
-    private static void Packet_Stunned(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_Stunned(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 
         GameState.StunDuration = packetReader.ReadInt32();
     }
 
-    private static void Packet_MapWornEquipment(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_MapWornEquipment(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
         var player = packetReader.ReadInt32();
@@ -962,7 +962,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    private static void Packet_Target(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_Target(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 
@@ -970,7 +970,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         GameState.MyTargetType = packetReader.ReadInt32();
     }
 
-    private static void Packet_MapReport(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_MapReport(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 
@@ -982,23 +982,23 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         GameState.InitMapReport = true;
     }
 
-    private static void Packet_Admin(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_Admin(ReadOnlyMemory<byte> data)
     {
         GameState.InitAdminForm = true;
     }
 
-    private static void Packet_Critical(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_Critical(ReadOnlyMemory<byte> data)
     {
         GameState.ShakeTimerEnabled = true;
         GameState.ShakeTimer = General.GetTickCount();
     }
 
-    private static void Packet_RClick(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_RClick(ReadOnlyMemory<byte> data)
     {
 
     }
 
-    private static void Packet_Emote(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_Emote(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 
@@ -1010,7 +1010,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         player.EmoteTimer = General.GetTickCount() + 5000;
     }
 
-    private static void Packet_ChatBubble(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_ChatBubble(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 
@@ -1021,32 +1021,32 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             color: packetReader.ReadInt32());
     }
 
-    private static void Packet_LeftGame(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_LeftGame(ReadOnlyMemory<byte> data)
     {
         GameLogic.LogoutGame();
     }
 
-    private static void Packet_AnimationEditor(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_AnimationEditor(ReadOnlyMemory<byte> data)
     {
         GameState.InitAnimationEditor = true;
     }
 
-    private static void Packet_JobEditor(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_JobEditor(ReadOnlyMemory<byte> data)
     {
         GameState.InitJobEditor = true;
     }
 
-    public static void Packet_EditItem(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_EditItem(ReadOnlyMemory<byte> data)
     {
         GameState.InitItemEditor = true;
     }
 
-    private static void Packet_NpcEditor(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_NpcEditor(ReadOnlyMemory<byte> data)
     {
         GameState.InitNpcEditor = true;
     }
 
-    private static void Packet_ResourceEditor(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_ResourceEditor(ReadOnlyMemory<byte> data)
     {
         GameState.InitResourceEditor = true;
     }
@@ -1056,17 +1056,17 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         GameState.InitProjectileEditor = true;
     }
 
-    private static void Packet_EditShop(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_EditShop(ReadOnlyMemory<byte> data)
     {
         GameState.InitShopEditor = true;
     }
 
-    private static void Packet_EditSkill(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_EditSkill(ReadOnlyMemory<byte> data)
     {
         GameState.InitSkillEditor = true;
     }
 
-    private static void Packet_Clock(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_Clock(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 
@@ -1074,7 +1074,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Clock.Instance.Time = new DateTime(BitConverter.ToInt64(packetReader.ReadBytes().ToArray(), 0));
     }
 
-    private static void Packet_Time(ReadOnlyMemory<byte> data)
+    private static async ValueTask Packet_Time(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 
@@ -1100,7 +1100,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    public static void Packet_Hotbar(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_Hotbar(ReadOnlyMemory<byte> data)
     {
         var buffer = new PacketReader(data);
 
@@ -1123,12 +1123,12 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    public static void Packet_EditMoral(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_EditMoral(ReadOnlyMemory<byte> data)
     {
         GameState.InitMoralEditor = true;
     }
 
-    public static void Packet_UpdateMoral(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_UpdateMoral(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 
@@ -1167,7 +1167,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    public static void Packet_UpdateItem(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_UpdateItem(ReadOnlyMemory<byte> data)
     {
         int n;
         int i;
@@ -1243,7 +1243,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    public static void Packet_UpdateAnimation(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_UpdateAnimation(ReadOnlyMemory<byte> data)
     {
         int n;
         int i;
@@ -1285,7 +1285,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    public static void Packet_Animation(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_Animation(ReadOnlyMemory<byte> data)
     {
         var buffer = new PacketReader(data);
 
@@ -1315,7 +1315,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     }
 
 
-    public static void Packet_MapResource(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_MapResource(ReadOnlyMemory<byte> data)
     {
         int i;
         var buffer = new PacketReader(data);
@@ -1336,7 +1336,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    public static void Packet_UpdateResource(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_UpdateResource(ReadOnlyMemory<byte> data)
     {
         int n;
         var buffer = new PacketReader(data);
@@ -1382,7 +1382,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    public static void Packet_OpenShop(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_OpenShop(ReadOnlyMemory<byte> data)
     {
         int shopNum;
         var buffer = new PacketReader(data);
@@ -1392,12 +1392,12 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         GameLogic.OpenShop(shopNum);
     }
 
-    public static void Packet_ResetShopAction(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_ResetShopAction(ReadOnlyMemory<byte> data)
     {
         GameState.ShopAction = 0;
     }
 
-    public static void Packet_UpdateShop(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_UpdateShop(ReadOnlyMemory<byte> data)
     {
         int n;
         var buffer = new PacketReader(data);
@@ -1434,7 +1434,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    public static void Packet_TradeInvite(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_TradeInvite(ReadOnlyMemory<byte> data)
     {
         int requester;
         var buffer = new PacketReader(data);
@@ -1443,7 +1443,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         GameLogic.Dialogue("Trade Invite", string.Format(LocalesManager.Get("Request"), Player.Instance[requester].Name), "", (byte)DialogueType.Trade, DialogueStyle.YesNo);
     }
 
-    public static void Packet_Trade(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_Trade(ReadOnlyMemory<byte> data)
     {
         var buffer = new PacketReader(data);
 
@@ -1452,12 +1452,12 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         GameLogic.ShowTrade();
     }
 
-    public static void Packet_CloseTrade(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_CloseTrade(ReadOnlyMemory<byte> data)
     {
         Trade.OnClose();
     }
 
-    public static void Packet_TradeUpdate(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_TradeUpdate(ReadOnlyMemory<byte> data)
     {
         int datatype;
         var buffer = new PacketReader(data);
@@ -1492,7 +1492,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    public static void Packet_TradeStatus(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_TradeStatus(ReadOnlyMemory<byte> data)
     {
         int tradestatus;
         var buffer = new PacketReader(data);
@@ -1525,7 +1525,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     }
 
 
-    public static void Packet_PlayerHP(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_PlayerHP(ReadOnlyMemory<byte> data)
     {
         var buffer = new PacketReader(data);
 
@@ -1545,7 +1545,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         WinCharacter.Update();
     }
 
-    public static void Packet_PlayerMP(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_PlayerMP(ReadOnlyMemory<byte> data)
     {
         var buffer = new PacketReader(data);
 
@@ -1565,7 +1565,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         WinCharacter.Update();
     }
 
-    public static void Packet_PlayerSP(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_PlayerSP(ReadOnlyMemory<byte> data)
     {
         var buffer = new PacketReader(data);
 
@@ -1585,7 +1585,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         WinCharacter.Update();
     }
 
-    public static void Packet_PlayerStats(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_PlayerStats(ReadOnlyMemory<byte> data)
     {
         int i;
         int index;
@@ -1598,7 +1598,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             SetPlayerStat(index, (Stat)i, buffer.ReadInt32());
     }
 
-    public static void Packet_PlayerData(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_PlayerData(ReadOnlyMemory<byte> data)
     {
         int i;
         int x;
@@ -1679,7 +1679,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    public static void Packet_StopPlayerMove(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_StopPlayerMove(ReadOnlyMemory<byte> data)
     {
         int i;
         var buffer = new PacketReader(data);
@@ -1695,7 +1695,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Player.Instance[i].IsMoving = false; // ensure per-pixel movement halts client-side
     }
 
-    public static void Packet_PlayerDir(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_PlayerDir(ReadOnlyMemory<byte> data)
     {
         int dir;
         int i;
@@ -1714,7 +1714,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    public static void Packet_PlayerExp(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_PlayerExp(ReadOnlyMemory<byte> data)
     {
         int index;
         int tnl;
@@ -1750,7 +1750,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    public static void Packet_PlayerXY(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_PlayerXY(ReadOnlyMemory<byte> data)
     {
         int x;
         int y;
@@ -1797,7 +1797,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     }
 
 
-    public static void Packet_CheckMap(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_CheckMap(ReadOnlyMemory<byte> data)
     {
         int x;
         int y;
@@ -1845,7 +1845,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Network.Send(packetWriter);
     }
 
-    public static void Packet_MapData(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_MapData(ReadOnlyMemory<byte> data)
     {
         int x;
         int y;
@@ -2202,7 +2202,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         GameState.CanMoveNow = true;
     }
 
-    public static void Packet_MapItemData(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_MapItemData(ReadOnlyMemory<byte> data)
     {
         int i;
         var buffer = new PacketReader(data);
@@ -2216,7 +2216,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
     }
 
-    public static void Packet_MapItemsData(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_MapItemsData(ReadOnlyMemory<byte> data)
     {
         var buffer = new PacketReader(data);
 
@@ -2231,7 +2231,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
     }
 
-    public static void Packet_MapNpcData(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_MapNpcData(ReadOnlyMemory<byte> data)
     {
         int i;
         var buffer = new PacketReader(data);
@@ -2250,7 +2250,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    public static void Packet_MapNpcUpdate(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_MapNpcUpdate(ReadOnlyMemory<byte> data)
     {
         int npcNum;
         var buffer = new PacketReader(data);
@@ -2264,7 +2264,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         instance.Dir = buffer.ReadByte();
     }
 
-    public static void Packet_EditMap(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_EditMap(ReadOnlyMemory<byte> data)
     {
         var buffer = new PacketReader(data);
         GameState.InitMapEditor = true;
@@ -2280,7 +2280,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    public static void Packet_SpawnEvent(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_SpawnEvent(ReadOnlyMemory<byte> data)
     {
         int id;
         var buffer = new PacketReader(data);
@@ -2318,7 +2318,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    public static void Packet_EventMove(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_EventMove(ReadOnlyMemory<byte> data)
     {
         int id;
         int x;
@@ -2354,7 +2354,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     
     }
 
-    public static void Packet_EventDir(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_EventDir(ReadOnlyMemory<byte> data)
     {
         int i;
         byte dir;
@@ -2377,7 +2377,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    public static void Packet_SwitchesAndVariables(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_SwitchesAndVariables(ReadOnlyMemory<byte> data)
     {
         int i;
         var buffer = new PacketReader(data);
@@ -2389,7 +2389,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             Event.Variables[i] = buffer.ReadString();
     }
 
-    public static void Packet_MapEventData(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_MapEventData(ReadOnlyMemory<byte> data)
     {
         int i;
         int x;
@@ -2533,7 +2533,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    public static void Packet_EventChat(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_EventChat(ReadOnlyMemory<byte> data)
     {
         int i;
         int choices;
@@ -2574,19 +2574,19 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         WinEventChat.Show();
     }
 
-    public static void Packet_EventStart(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_EventStart(ReadOnlyMemory<byte> data)
     {
         Event.InEvent = true;
     }
 
-    public static void Packet_EventEnd(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_EventEnd(ReadOnlyMemory<byte> data)
     {
         Event.InEvent = false;
 
         WinEventChat.OnEventEnded();
     }
 
-    public static void Packet_Picture(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_Picture(ReadOnlyMemory<byte> data)
     {
         var buffer = new PacketReader(data);
         int picIndex;
@@ -2619,14 +2619,14 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Event.Picture.YOffset = (byte)yOffset;
     }
 
-    public static void Packet_HidePicture(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_HidePicture(ReadOnlyMemory<byte> data)
     {
         var buffer = new PacketReader(data);
 
         Event.Picture = default;
     }
 
-    public static void Packet_HoldPlayer(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_HoldPlayer(ReadOnlyMemory<byte> data)
     {
         var buffer = new PacketReader(data);
         if (buffer.ReadInt32() == 0)
@@ -2639,7 +2639,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    public static void Packet_PlayBGM(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_PlayBGM(ReadOnlyMemory<byte> data)
     {
         string music;
         var buffer = new PacketReader(data);
@@ -2648,13 +2648,13 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Music = music;
     }
 
-    public static void Packet_FadeOutBGM(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_FadeOutBGM(ReadOnlyMemory<byte> data)
     {
         Audio.CurrentMusic = "";
         Audio.FadeOutSwitch = true;
     }
 
-    public static void Packet_PlaySound(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_PlaySound(ReadOnlyMemory<byte> data)
     {
         string sound;
         var buffer = new PacketReader(data);
@@ -2668,12 +2668,12 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         Audio.PlaySound(sound, x, y);
     }
 
-    public static void Packet_StopSound(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_StopSound(ReadOnlyMemory<byte> data)
     {
         Audio.StopSound();
     }
 
-    public static void Packet_SpecialEffect(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_SpecialEffect(ReadOnlyMemory<byte> data)
     {
         int effectType;
         var buffer = new PacketReader(data);
@@ -2725,7 +2725,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    public static void Packet_UpdateProjectile(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_UpdateProjectile(ReadOnlyMemory<byte> data)
     {
         int n;
         var buffer = new PacketReader(data);
@@ -2761,7 +2761,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    public static void Packet_MapProjectile(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_MapProjectile(ReadOnlyMemory<byte> data)
     {
         var buffer = new PacketReader(data);
         int i = buffer.ReadInt32();
@@ -2783,7 +2783,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         }
     }
 
-    public static void Packet_PartyInvite(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_PartyInvite(ReadOnlyMemory<byte> data)
     {
         string name;
         var buffer = new PacketReader(data);
@@ -2792,7 +2792,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         GameLogic.Dialogue("Party Invite", name + " has invited you to a party.", "Would you like to join?", DialogueType.PartyInvite, DialogueStyle.YesNo);
     }
 
-    public static void Packet_PartyUpdate(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_PartyUpdate(ReadOnlyMemory<byte> data)
     {
         int i;
         int inParty;
@@ -2818,7 +2818,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         WinParty.Update();
     }
 
-    public static void Packet_PartyVitals(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_PartyVitals(ReadOnlyMemory<byte> data)
     {
         int playerNum;
         var partyindex = -1;
@@ -2849,7 +2849,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     }
 
 
-    public static void Packet_OpenBank(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_OpenBank(ReadOnlyMemory<byte> data)
     {
         int i;
         var buffer = new PacketReader(data);
@@ -2875,7 +2875,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     }
 
 
-    public static void Packet_EditScript(ReadOnlyMemory<byte> data)
+    public static async ValueTask Packet_EditScript(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
 

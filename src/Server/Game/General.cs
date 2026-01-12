@@ -554,8 +554,7 @@ public static class General
             case "/ban":
             {
                 Account.Instance[player].Banned = true;
-                var task = Player.OnExit(player);
-                task.Wait();
+                await Player.OnExit(player);
                 Console.WriteLine($"Player {GetPlayerName(player)} has been banned by the server.");
                         
                 break;

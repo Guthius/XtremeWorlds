@@ -55,7 +55,7 @@ public sealed class GameSession(int id, INetworkChannel channel, GameSessionMana
         }
     }
     
-    public void Parse(ReadOnlySpan<byte> bytes)
+    public async ValueTask ParseAsync(ReadOnlyMemory<byte> bytes, CancellationToken cancellationToken = default)
     {
         if (bytes.Length <= 0)
             return;
@@ -73,7 +73,7 @@ public sealed class GameSession(int id, INetworkChannel channel, GameSessionMana
             Array.Resize(ref _buffer, newCapacity);
         }
 
-        bytes.CopyTo(_buffer.AsSpan(_bufferOffset));
+        bytes.Span.CopyTo(_buffer.AsSpan(_bufferOffset));
 
         _bufferOffset += bytes.Length;
         if (_bufferOffset == 0)
@@ -81,7 +81,7 @@ public sealed class GameSession(int id, INetworkChannel channel, GameSessionMana
             return;
         }
 
-        var consumed = _parser.Parse(this, _buffer.AsMemory(0, _bufferOffset));
+        var consumed = await _parser.Parse(this, _buffer.AsMemory(0, _bufferOffset), cancellationToken).ConfigureAwait(false);
         if (consumed == 0)
         {
             return;
