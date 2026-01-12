@@ -632,7 +632,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         mapNpc.X = packetReader.ReadInt32();
         mapNpc.Y = packetReader.ReadInt32();
         mapNpc.Dir = packetReader.ReadByte();
-        mapNpc.DeathTimer = packetReader.ReadInt32();
+        // Server sends remaining ms until respawn (0 if alive)
+        var deathTimer = packetReader.ReadInt32();
+        mapNpc.DeathTimer = deathTimer > 0 ? Client.General.GetTickCount() + deathTimer : 0;
 
         var vitalCount = Enum.GetValues<Vital>().Length;
         for (npc = 0; npc < vitalCount; npc++)
@@ -650,8 +652,12 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         var timer = packetReader.ReadInt32(); // milliseconds until respawn
         var mapNpcNum = packetReader.ReadInt32();
 
-        MapNpc.Instance[mapNpcNum].DeathTimer = Client.General.GetTickCount() + timer;
-        MapNpc.OnClear(mapNpcNum);
+        // Keep the corpse visible until the timer expires.
+        ref var mapNpc = ref MapNpc.Instance[mapNpcNum];
+        mapNpc.DeathTimer = Client.General.GetTickCount() + timer;
+        mapNpc.Attacking = 0;
+        mapNpc.AttackTimer = 0;
+        mapNpc.Moving = 0;
     }
 
     private static void Packet_PlayerDead(ReadOnlyMemory<byte> data)
@@ -2237,6 +2243,10 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             instance.X = buffer.ReadInt32();
             instance.Y = buffer.ReadInt32();
             instance.Dir = buffer.ReadByte();
+
+            // Server sends remaining ms until respawn (0 if alive)
+            var deathTimer = buffer.ReadInt32();
+            instance.DeathTimer = deathTimer > 0 ? Client.General.GetTickCount() + deathTimer : 0;
         }
     }
 

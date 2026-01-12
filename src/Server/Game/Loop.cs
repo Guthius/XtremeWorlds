@@ -660,14 +660,29 @@ public static class Loop
 #pragma warning restore CS8602
 
 #pragma warning disable CS8602
-                // Handle npc respawn logic (no special death window state)
+                // Handle npc respawn logic.
                 if (entity.Type == Core.Globals.Entity.EntityType.Npc)
                 {
-                    if (entity.Num == -1 && entity.SpawnSecs > 0)
+                    // Dead NPCs are represented by a non-zero DeathTimer (absolute server ms).
+                    // Once expired, respawn and clear the corpse.
+                    if (map >= 0 && map < Server.Map.Instance.Count && x >= 0 && x < Variables.MaxMapNpcs)
                     {
-                        if (tickCount > entity.SpawnWait && map >= 0 && map < Server.Map.Instance.Count)
+                        ref var baseNpc = ref MapNpc.Instance[map, x];
+
+                        // Skip all AI/updates while dead (corpse window).
+                        if (baseNpc.DeathTimer > 0 && tickCount <= baseNpc.DeathTimer)
                         {
-                            Server.MapNpc.OnSpawn(x, map);
+                            // Do nothing; corpse remains.
+                        }
+                        else
+                        {
+                            if (baseNpc.DeathTimer > 0 && tickCount > baseNpc.DeathTimer)
+                            {
+                                // Clear corpse state and respawn.
+                                baseNpc.DeathTimer = 0;
+                                baseNpc.SpawnWait = tickCount > int.MaxValue ? int.MaxValue : (int)tickCount;
+                                Server.MapNpc.OnSpawn(x, map);
+                            }
                         }
                     }
                 }
@@ -688,6 +703,12 @@ public static class Loop
             if (npcIndex < 0 || npcIndex >= Variables.MaxMapNpcs) continue;
 
             ref var baseNpc = ref MapNpc.Instance[map, npcIndex];
+
+            // Corpse window: NPC stays visible but does not move/act.
+            if (baseNpc.DeathTimer > 0 && baseNpc.DeathTimer > nowMove)
+            {
+                continue;
+            }
 
             // Skip if stunned
             if (baseNpc.StunDuration > 0) continue;

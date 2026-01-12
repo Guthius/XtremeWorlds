@@ -1425,6 +1425,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
         NetworkSend.SendJoinMap(session.Id);
 
+        // Ensure the joining client receives current NPC death timers (corpse countdowns).
+        NetworkSend.SendMapNpcsToPlayer(session.Id, GetPlayerMap(session.Id));
+
         Data.TempPlayer[session.Id].GettingMap = false;
     }
 

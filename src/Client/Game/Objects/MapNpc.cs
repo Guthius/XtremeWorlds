@@ -59,7 +59,7 @@ namespace Client
                 case 2: color = Color.Yellow; backColor = Color.Black; break;
             }
 
-            var remaining = MapNpc.Instance[mapNpcNum].DeathTimer - General.GetTickCount() / 1000;
+            var remaining = (MapNpc.Instance[mapNpcNum].DeathTimer - General.GetTickCount()) / 1000;
             if (remaining < 0) remaining = 0;
 
             var name = remaining > 0 ? $"{remaining}..." : Npc.Instance[npc].Name;

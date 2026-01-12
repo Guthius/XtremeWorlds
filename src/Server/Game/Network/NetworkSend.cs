@@ -1901,9 +1901,54 @@ public static class NetworkSend
             packet.WriteInt32(MapNpc.Instance[map, mapNpcNum].X);
             packet.WriteInt32(MapNpc.Instance[map, mapNpcNum].Y);
             packet.WriteByte(MapNpc.Instance[map, mapNpcNum].Dir);
+
+            // Remaining ms until respawn (0 if alive)
+            var remaining = 0;
+            var expiry = MapNpc.Instance[map, mapNpcNum].DeathTimer;
+            if (expiry > 0)
+            {
+                var now = General.GetTime();
+                var ms = expiry - now;
+                if (ms > 0 && ms <= int.MaxValue)
+                {
+                    remaining = (int)ms;
+                }
+            }
+            packet.WriteInt32(remaining);
         }
 
         NetworkConfig.SendDataToMap(map, packet.GetBytes());
+    }
+
+    public static void SendMapNpcsToPlayer(int playerId, int map)
+    {
+        var packet = new PacketWriter();
+
+        packet.WriteEnum(ServerPackets.SMapNpcData);
+
+        for (var mapNpcNum = 0; mapNpcNum < Core.Globals.Variables.MaxMapNpcs; mapNpcNum++)
+        {
+            packet.WriteInt32(MapNpc.Instance[map, mapNpcNum].Num);
+            packet.WriteInt32(MapNpc.Instance[map, mapNpcNum].X);
+            packet.WriteInt32(MapNpc.Instance[map, mapNpcNum].Y);
+            packet.WriteByte(MapNpc.Instance[map, mapNpcNum].Dir);
+
+            // Remaining ms until respawn (0 if alive)
+            var remaining = 0;
+            var expiry = MapNpc.Instance[map, mapNpcNum].DeathTimer;
+            if (expiry > 0)
+            {
+                var now = General.GetTime();
+                var ms = expiry - now;
+                if (ms > 0 && ms <= int.MaxValue)
+                {
+                    remaining = (int)ms;
+                }
+            }
+            packet.WriteInt32(remaining);
+        }
+
+        PlayerService.Instance.SendDataTo(playerId, packet.GetBytes());
     }
 
 

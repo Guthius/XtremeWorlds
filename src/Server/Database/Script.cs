@@ -1329,9 +1329,15 @@ public class Script
                     }
                 }
 
-                mapNpc.Num = -1; // regular dead
-                mapNpc.SpawnWait = currentTime + deathTimer; // respawn time
+                // Keep the NPC number so the corpse stays visible client-side.
+                // Use DeathTimer as an absolute expiry timestamp (ms) on the server.
                 mapNpc.Vital[(int)Core.Globals.Vital.Health] = 0;
+                mapNpc.Attacking = 0;
+                mapNpc.AttackTimer = 0;
+                mapNpc.Moving = 0;
+                mapNpc.Steps = 0;
+                mapNpc.DeathTimer = currentTime + deathTimer;
+                mapNpc.SpawnWait = mapNpc.DeathTimer; // respawn time
 
                 NetworkSend.SendNpcDeath(map, npc, deathTimer);
 
