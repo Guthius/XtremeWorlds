@@ -1989,7 +1989,7 @@ public static class NetworkSend
     {
         var packet = new PacketWriter(4);
 
-        packet.WriteInt32((int)ServerPackets.SMapNpcVitals);
+        packet.WriteEnum(ServerPackets.SMapNpcVitals);
         packet.WriteInt32((int)mapNpcNum);
 
         var vitalCount = Enum.GetValues<Vital>().Length;
@@ -2013,10 +2013,19 @@ public static class NetworkSend
 
     public static void SendPlayerDeath(int playerId, int deathTimer)
     {
-        var deathPacket = new Core.Net.PacketWriter();
-        deathPacket.WriteEnum(ServerPackets.SPlayerDead);
-        deathPacket.WriteInt32(deathTimer);
-        deathPacket.WriteInt32(playerId);
-        PlayerService.Instance.SendDataTo(playerId, deathPacket.GetBytes());
+        var packet = new Core.Net.PacketWriter();
+        packet.WriteEnum(ServerPackets.SPlayerDead);
+        packet.WriteInt32(deathTimer);
+        packet.WriteInt32(playerId);
+        PlayerService.Instance.SendDataTo(playerId, packet.GetBytes());
+    }
+
+    public static void SendNpcDeath(int map, int npc, int deathTimer)
+    {
+        var packet = new PacketWriter(8);
+        packet.WriteEnum(ServerPackets.SNpcDead);
+        packet.WriteInt32(deathTimer);
+        packet.WriteInt32(npc);
+        NetworkConfig.SendDataToMap(map, packet.GetBytes());
     }
 }

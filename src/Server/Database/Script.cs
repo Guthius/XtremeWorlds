@@ -1312,16 +1312,16 @@ public class Script
         else if (target.Type == Entity.EntityType.Npc)
         {
             var map = target.Map;
-            var mapNpcNum = target.Id;
-            if (map >= 0 && map < Core.Globals.Variables.MaxMaps && mapNpcNum >= 0 && mapNpcNum < Core.Globals.Variables.MaxMapNpcs)
+            var npc = target.Id;
+            if (map >= 0 && map < Core.Globals.Variables.MaxMaps && npc >= 0 && npc < Core.Globals.Variables.MaxMapNpcs)
             {
                 // Loot
-                DropNpcLoot(map, mapNpcNum);
+                DropNpcLoot(map, npc);
 
                 // Mark dead & schedule respawn with a 60-second countdown via action messages
-                ref var mapNpc = ref MapNpc.Instance[map, mapNpcNum];
+                ref var mapNpc = ref MapNpc.Instance[map, npc];
                 var deathTimerMs = DeathSpawnTimeMs;
-                var currentTime = (int)General.GetTimeMs();
+                var currentTime = General.GetTimeMs();
                 
                 // Store original NPC number for respawn and set to dead state
                 int originalNpcNum = mapNpc.Num;
@@ -1349,12 +1349,7 @@ public class Script
                 mapNpc.SpawnWait = currentTime + deathTimerMs; // respawn time
                 mapNpc.Vital[(int)Core.Globals.Vital.Health] = 0;
 
-                // Hide this single NPC on clients (send slot index as payload)
-                var deathPacket = new Core.Net.PacketWriter();
-                deathPacket.WriteInt32((int)ServerPackets.SNpcDead);
-                deathPacket.WriteInt32(deathTimerMs);
-                deathPacket.WriteInt32(mapNpcNum);
-                NetworkConfig.SendDataToMap(map, deathPacket.GetBytes());
+                NetworkSend.SendNpcDeath(map, npc, deathTimerMs);
 
                 // clear this npc's own target
                 mapNpc.Target = -1;
@@ -1362,7 +1357,7 @@ public class Script
 
                 for (int i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
                 {
-                    if (MapNpc.Instance[map, i].TargetType == (byte)TargetType.Npc && MapNpc.Instance[map, i].Target == mapNpcNum)
+                    if (MapNpc.Instance[map, i].TargetType == (byte)TargetType.Npc && MapNpc.Instance[map, i].Target == npc)
                     {
                         MapNpc.Instance[map, i].TargetType = 0;
                         MapNpc.Instance[map, i].Target = -1;
@@ -1375,7 +1370,7 @@ public class Script
                     {
                         if (GetPlayerMap(Player.Id) == map)
                         {
-                            if (Data.TempPlayer[Player.Id].TargetType == (byte)TargetType.Npc && Data.TempPlayer[Player.Id].Target == mapNpcNum)
+                            if (Data.TempPlayer[Player.Id].TargetType == (byte)TargetType.Npc && Data.TempPlayer[Player.Id].Target == npc)
                             {
                                 Data.TempPlayer[Player.Id].TargetType = 0;
                                 Data.TempPlayer[Player.Id].Target = -1;
