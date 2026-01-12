@@ -104,7 +104,7 @@ public sealed class PacketWriter(int capacity = PacketWriter.InitialCapacity)
     {
         using var memoryStream = new MemoryStream();
 
-        using (var gzipStream = new GZipStream(memoryStream, CompressionMode.Compress))
+        using (var gzipStream = new GZipStream(memoryStream, CompressionLevel.Fastest))
         {
             gzipStream.Write(src, offset, count);
         }
