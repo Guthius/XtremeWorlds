@@ -2018,4 +2018,5 @@ public static class NetworkSend
         deathPacket.WriteInt32(deathTimer);
         deathPacket.WriteInt32(playerId);
         PlayerService.Instance.SendDataTo(playerId, deathPacket.GetBytes());
-}`
+    }
+}
