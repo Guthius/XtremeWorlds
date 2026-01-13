@@ -1468,17 +1468,17 @@ namespace Client
             return -1;
         }
 
-        public static void ShowInvDesc(int x, int y, int inv)
+        public static void ShowInvDesc(int x, int y, int invSlot)
         {
             // reserved for future use
 
-            if (inv < 0L | inv > Core.Globals.Variables.MaxInventory)
+            if (invSlot < 0L | invSlot > Core.Globals.Variables.MaxInventory)
                 return;
 
             // show
-            if (GetPlayerInv(GameState.MyIndex, inv) >= 0)
+            if (GetPlayerInv(GameState.MyIndex, invSlot) >= 0)
             {
-                ShowItemDesc(x, y, GetPlayerInv(GameState.MyIndex, inv), inv);
+                ShowItemDesc(x, y, GetPlayerInv(GameState.MyIndex, invSlot), invSlot);
             }
         }
 

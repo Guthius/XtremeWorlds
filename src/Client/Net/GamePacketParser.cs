@@ -488,14 +488,14 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     private static async ValueTask Packet_InventoryUpdate(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
-        var invSlot = packetReader.ReadInt32();
+        var inv = packetReader.ReadInt32();
         var item = packetReader.ReadInt32();
         var amount = packetReader.ReadInt32();
 
-        if (invSlot >= 0 && invSlot < Variables.MaxInventory && GameState.MyIndex >= 0)
+        if (inv >= 0 && inv < Variables.MaxInventory && GameState.MyIndex >= 0)
         {
-            SetInv(GameState.MyIndex, invSlot, item);
-            SetInvValue(GameState.MyIndex, invSlot, amount);
+            SetInv(GameState.MyIndex, inv, item);
+            SetInvValue(GameState.MyIndex, inv, amount);
         }
 
         GameLogic.SetGoldLabel();

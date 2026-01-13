@@ -432,28 +432,28 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendDropItem(int inv, int amount)
+    public static void SendDropItem(int invSlot, int amount)
     {
         if (GameState.InBank || GameState.InShop >= 0)
         {
             return;
         }
 
-        if (inv < 0 || inv > Variables.MaxInventory)
+        if (invSlot < 0 || invSlot > Variables.MaxInventory)
         {
             return;
         }
 
-        if (Player.Instance[GameState.MyIndex].Inventory[inv].Num < 0 ||
-            Player.Instance[GameState.MyIndex].Inventory[inv].Num > Core.Globals.Variables.MaxItems)
+        if (Player.Instance[GameState.MyIndex].Inventory[invSlot].Num < 0 ||
+            Player.Instance[GameState.MyIndex].Inventory[invSlot].Num > Core.Globals.Variables.MaxItems)
         {
             return;
         }
 
-        if (Item.Instance[GetPlayerInv(GameState.MyIndex, inv)].Type == (byte) ItemCategory.Currency ||
-            Item.Instance[GetPlayerInv(GameState.MyIndex, inv)].Stackable == 1)
+        if (Item.Instance[GetPlayerInv(GameState.MyIndex, invSlot)].Type == (byte) ItemCategory.Currency ||
+            Item.Instance[GetPlayerInv(GameState.MyIndex, invSlot)].Stackable == 1)
         {
-            if (amount < 0 || amount > Player.Instance[GameState.MyIndex].Inventory[inv].Value)
+            if (amount < 0 || amount > Player.Instance[GameState.MyIndex].Inventory[invSlot].Value)
             {
                 return;
             }
@@ -462,7 +462,7 @@ public static class Sender
         var packetWriter = new PacketWriter(12);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CMapDropItem);
-        packetWriter.WriteInt32(inv);
+        packetWriter.WriteInt32(invSlot);
         packetWriter.WriteInt32(amount);
 
         Network.Send(packetWriter);

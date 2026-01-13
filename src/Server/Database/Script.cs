@@ -353,7 +353,7 @@ public class Script
         }
     }
 
-    public void OnUse(int index, int item, int inv)
+    public void OnUse(int index, int item, int invSlot)
     {
         // Prevent re-entrant item usage for a single Player (e.g., rapid packet spam)
         if (_isUsingItem[index])
@@ -370,7 +370,7 @@ public class Script
             {
                 case (byte)ItemCategory.Equipment:
                     {
-                        EquipItem(index, item, inv);
+                        EquipItem(index, item, invSlot);
                         break;
                     }
 
@@ -448,7 +448,7 @@ public class Script
                 case (byte)ItemCategory.Event:
                     {
                         // Trigger item-driven common event using item's SubType/Data1/Data2
-                        CommonEvent(index, item, inv);
+                        CommonEvent(index, item, invSlot);
                         break;
                     }
 
@@ -465,7 +465,7 @@ public class Script
         }
     }
 
-    private void CommonEvent(int index, int item, int inv, int skill = -1)
+    private void CommonEvent(int index, int item, int invSlot, int skill = -1)
     {
         if (skill >= 0)
         {
@@ -493,7 +493,7 @@ public class Script
 
             if (triggerType == (byte)CommonEventTrigger.Key)
             {
-                TryUseKeyOnFacingTile(index, itemId, inv);
+                TryUseKeyOnFacingTile(index, itemId, invSlot);
                 return;
             }
 
@@ -519,7 +519,7 @@ public class Script
         CommonEvent(index, item, -1, skill);
     }
 
-    private static void TryUseKeyOnFacingTile(int playerId, int key, int inv)
+    private static void TryUseKeyOnFacingTile(int playerId, int key, int invSlot)
     {
         var map = GetPlayerMap(playerId);
         if (map < 0 || map >= Server.Map.Instance.Count)
@@ -576,10 +576,10 @@ public class Script
         tile.DirBlock = 0;
 
         // Consume the key only when it successfully unlocks something.
-        if (inv >= 0)
+        if (invSlot >= 0)
         {
-            Server.Player.TakeInvSlot(playerId, inv, 1);
-            NetworkSend.SendInventoryUpdate(playerId, inv);
+            Server.Player.TakeInvSlot(playerId, invSlot, 1);
+            NetworkSend.SendInventoryUpdate(playerId, invSlot);
         }
 
         // Broadcast updated map so clients see the tile become unblocked/open.
@@ -719,7 +719,7 @@ public class Script
         }
     }
         
-    private void EquipItem(int index, int item, int inv)
+    private void EquipItem(int index, int item, int invSlot)
     {
         if (_isEquippingItem[index])
             return;
@@ -732,7 +732,7 @@ public class Script
             Equipment eqType = (Equipment)Item.Instance[item].SubType;
             if (Item.Instance[item].BindType == 2)
             {
-                Server.Player.Instance[index].Inventory[inv].Bound = 2;
+                Server.Player.Instance[index].Inventory[invSlot].Bound = 2;
             }
 
             if (GetPlayerPaperdoll(index, eqType) >= 0)
@@ -740,7 +740,7 @@ public class Script
                 tempItem = GetPlayerPaperdoll(index, eqType);
             }
             SetPlayerPaperdoll(index, item, eqType);
-            Server.Player.Instance[index].Paperdoll[(byte)eqType].Bound = Server.Player.Instance[index].Inventory[inv].Bound;
+            Server.Player.Instance[index].Paperdoll[(byte)eqType].Bound = Server.Player.Instance[index].Inventory[invSlot].Bound;
             NetworkSend.SendPlayerMessage(index, "You equip " + GameLogic.CheckGrammar(Item.Instance[item].Name), (int)ColorName.BrightGreen);
             TakeInv(index, item, 1);
             if (tempItem >= 0)

@@ -1025,9 +1025,9 @@ public class Player : PlayerBase
         return true;
     }
 
-    public static void OnDrop(int playerId, int inv, int amount)
+    public static void OnDrop(int playerId, int invSlot, int amount)
     {
-        if (!NetworkConfig.IsPlaying(playerId) || inv < 0 || inv > Core.Globals.Variables.MaxInventory)
+        if (!NetworkConfig.IsPlaying(playerId) || invSlot < 0 || invSlot > Core.Globals.Variables.MaxInventory)
         {
             return;
         }
@@ -1046,13 +1046,13 @@ public class Player : PlayerBase
             return;
         }
 
-        if (Player.Instance[playerId].Inventory[inv].Bound > 0)
+        if (Player.Instance[playerId].Inventory[invSlot].Bound > 0)
         {
             NetworkSend.SendPlayerMessage(playerId, "You can't drop soulbound items!", (int) ColorName.BrightRed);
             return;
         }
 
-        var itemId = GetPlayerInv(playerId, inv);
+        var itemId = GetPlayerInv(playerId, invSlot);
         if (itemId < 0 || itemId >= Core.Globals.Variables.MaxItems)
         {
             return;
@@ -1075,7 +1075,7 @@ public class Player : PlayerBase
 
             try
             {
-                Script.Instance?.OnDrop(playerId, slot, inv, amount, map, item, itemId);
+                Script.Instance?.OnDrop(playerId, slot, invSlot, amount, map, item, itemId);
             }
             catch (Exception ex)
             {
@@ -1178,14 +1178,14 @@ public class Player : PlayerBase
         return false;
     }
 
-    public static void UseItem(int playerId, int inv)
+    public static void UseItem(int playerId, int invSlot)
     {
-        if (inv < 0 || inv >= Core.Globals.Variables.MaxInventory)
+        if (invSlot < 0 || invSlot >= Core.Globals.Variables.MaxInventory)
         {
             return;
         }
 
-        var item = GetPlayerInv(playerId, inv);
+        var item = GetPlayerInv(playerId, invSlot);
         if (item < 0 || item >= Core.Globals.Variables.MaxItems)
         {
             return;
@@ -1198,7 +1198,7 @@ public class Player : PlayerBase
 
         try
         {
-            Script.Instance?.UseItem(playerId, item, inv);
+            Script.Instance?.UseItem(playerId, item, invSlot);
         }
         catch (Exception ex)
         {

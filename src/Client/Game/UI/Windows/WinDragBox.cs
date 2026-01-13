@@ -340,26 +340,26 @@ public class WinDragBox
             return -1;
         }
 
-        int invSlot;
+        int inv;
         int item;
         if (origin == PartOrigin.Inventory)
         {
-            invSlot = WindowManager.DragBox.Slot;
-            if (invSlot < 0 || invSlot >= Variables.MaxInventory)
+            inv = WindowManager.DragBox.Slot;
+            if (inv < 0 || inv >= Variables.MaxInventory)
             {
                 return;
             }
 
-            item = GetPlayerInv(GameState.MyIndex, invSlot);
+            item = GetPlayerInv(GameState.MyIndex, inv);
         }
         else
         {
             // Hotbar drags store item id in Value; we must resolve it to an inventory slot to equip.
             item = WindowManager.DragBox.Value;
-            invSlot = FindInventorySlotForItem(item);
+            inv = FindInventorySlotForItem(item);
         }
 
-        if (invSlot < 0 || invSlot >= Variables.MaxInventory)
+        if (inv < 0 || inv >= Variables.MaxInventory)
         {
             return;
         }
@@ -400,7 +400,7 @@ public class WinDragBox
                 return;
             }
 
-            Sender.SendUseItem(invSlot);
+            Sender.SendUseItem(inv);
             return;
         }
     }
@@ -458,8 +458,8 @@ public class WinDragBox
         {
             case PartOrigin.Inventory:
                 {
-                    var invSlot = WindowManager.DragBox.Slot;
-                    var item = GetPlayerInv(GameState.MyIndex, invSlot);
+                    var inv = WindowManager.DragBox.Slot;
+                    var item = GetPlayerInv(GameState.MyIndex, inv);
                     if (item < 0 || item >= Item.Instance.Count)
                     {
                         break;
@@ -475,11 +475,11 @@ public class WinDragBox
                             "",
                             DialogueType.DropItem,
                             DialogueStyle.Input,
-                            invSlot);
+                            inv);
                     }
                     else
                     {
-                        Sender.SendDropItem(invSlot, 1);
+                        Sender.SendDropItem(inv, 1);
                     }
 
                     break;
@@ -518,8 +518,8 @@ public class WinDragBox
             return;
         }
 
-        var invSlot = WindowManager.DragBox.Slot;
-        if (invSlot < 0 || invSlot >= Variables.MaxInventory)
+        var inv = WindowManager.DragBox.Slot;
+        if (inv < 0 || inv >= Variables.MaxInventory)
         {
             return;
         }
@@ -527,7 +527,7 @@ public class WinDragBox
         // Match the same offer rules as the old inventory double-click trade behavior.
         for (var i = 0; i < Variables.MaxInventory; i++)
         {
-            if (Data.TradeYourOffer[i].Num != invSlot)
+            if (Data.TradeYourOffer[i].Num != inv)
             {
                 continue;
             }
@@ -543,7 +543,7 @@ public class WinDragBox
             }
         }
 
-        if (Item.Instance[GetPlayerInv(GameState.MyIndex, invSlot)].Type == (byte)ItemCategory.Currency)
+        if (Item.Instance[GetPlayerInv(GameState.MyIndex, inv)].Type == (byte)ItemCategory.Currency)
         {
             GameLogic.Dialogue(
                 "Select Amount",
@@ -551,11 +551,11 @@ public class WinDragBox
                 "",
                 DialogueType.TradeAmount,
                 DialogueStyle.Input,
-                invSlot);
+                inv);
 
             return;
         }
 
-        Sender.SendTradeItem(invSlot, 0);
+        Sender.SendTradeItem(inv, 0);
     }
 }
