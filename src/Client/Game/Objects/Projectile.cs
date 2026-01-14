@@ -22,7 +22,7 @@ namespace Client
             if (!IsStreaming[index])
             {
                 IsStreaming[index] = true;
-                Sender.SendRequestProjectile(index);
+                Sender.RequestProjectile(index);
             }
         }
 

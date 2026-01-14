@@ -14,11 +14,11 @@ namespace Client
 
         public static void OnStream(int index)
         {
-            if (index < 0 || index >= Variables.MaxMorals) return;
+            if (index < 0 || index >= Core.Globals.Variables.MaxMorals) return;
             if (!IsStreaming[index])
             {
                 IsStreaming[index] = true;
-                Sender.SendRequestMoral(index);
+                Sender.RequestMoral(index);
             }
         }
 

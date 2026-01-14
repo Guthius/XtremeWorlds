@@ -1045,7 +1045,7 @@ namespace Server
             foreach (var i in PlayerService.Instance.PlayerIds)
             {
                 if (NetworkConfig.IsPlaying(i) && GetPlayerMap(i) == map)
-                    NetworkSend.SendSpecialEffect(i, EffectTypeWeather, weatherType, intensity);
+                    NetworkSend.SpecialEffect(i, EffectTypeWeather, weatherType, intensity);
             }
         }
 

@@ -4,8 +4,8 @@ namespace Core.Objects
 {
     public class ProjectileBase
     {
-        public static bool[] IsStreaming = new bool[Variables.MaxProjectiles];
-        public static bool[] IsChanged = new bool[Variables.MaxProjectiles];
+        public static bool[] IsStreaming = new bool[Core.Globals.Variables.MaxProjectiles];
+        public static bool[] IsChanged = new bool[Core.Globals.Variables.MaxProjectiles];
 
         public string Name;
         public int Sprite;
@@ -23,8 +23,8 @@ namespace Core.Objects
 
         public static void OnClearChanged()
         {
-            IsChanged = new bool[Variables.MaxProjectiles];
-            IsStreaming = new bool[Variables.MaxProjectiles];
+            IsChanged = new bool[Core.Globals.Variables.MaxProjectiles];
+            IsStreaming = new bool[Core.Globals.Variables.MaxProjectiles];
         }
 
         public static void OnClear(int index)

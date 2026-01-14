@@ -15,9 +15,9 @@ public static class Sender
     private static readonly int StatCount = Enum.GetValues<Stat>().Length;
 
     private const int HotbarUseThrottle = 250;
-    private static readonly int[] LastHotbarUseTick = new int[Variables.MaxHotbar];
+    private static readonly int[] LastHotbarUseTick = new int[Core.Globals.Variables.MaxHotbar];
 
-    public static void SendAddChar(string name, int sex, int job)
+    public static void AddChar(string name, int sex, int job)
     {
         var packetWriter = new PacketWriter();
 
@@ -30,7 +30,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendUseChar(byte slot)
+    public static void UseChar(byte slot)
     {
         var packetWriter = new PacketWriter(5);
 
@@ -40,7 +40,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendDelChar(byte slot)
+    public static void DelChar(byte slot)
     {
         var packetWriter = new PacketWriter(5);
 
@@ -50,7 +50,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendLogout()
+    public static void Logout()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -82,7 +82,7 @@ public static class Sender
         return Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? string.Empty;
     }
 
-    public static void SendLogin(string username, string password)
+    public static void Login(string username, string password)
     {
         var packetWriter = new PacketWriter();
 
@@ -94,7 +94,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendRegister(string username, string password)
+    public static void Register(string username, string password)
     {
         var usernameBytes = Encrypt(Encoding.UTF8.GetBytes(username));
         var passwordBytes = Encrypt(Encoding.UTF8.GetBytes(password));
@@ -121,7 +121,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendPlayerMove()
+    public static void PlayerMove()
     {
         var packetWriter = new PacketWriter(14);
 
@@ -134,7 +134,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendStopPlayerMove()
+    public static void StopPlayerMove()
     {
         var packetWriter = new PacketWriter(5);
 
@@ -144,24 +144,24 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendCancelCast()
+    public static void CancelCast()
     {
         var packetWriter = new PacketWriter(4);
         packetWriter.WriteEnum(Packets.ClientPackets.CCancelCast);
         Network.Send(packetWriter);
     }
 
-    public static void SayMsg(string text)
+    public static void SayMessage(string text)
     {
         var packetWriter = new PacketWriter();
 
-        packetWriter.WriteEnum(Packets.ClientPackets.CSayMsg);
+        packetWriter.WriteEnum(Core.Net.Packets.ClientPackets.CSayMessage);
         packetWriter.WriteString(text);
 
         Network.Send(packetWriter);
     }
 
-    public static void SendKick(string name)
+    public static void Kick(string name)
     {
         var packetWriter = new PacketWriter();
 
@@ -171,7 +171,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendBan(string name)
+    public static void Ban(string name)
     {
         var packetWriter = new PacketWriter();
 
@@ -211,7 +211,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendRequestLevelUp()
+    public static void RequestLevelUp()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -220,7 +220,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendEventChatReply(int eventId, int pageId, int reply)
+    public static void EventChatReply(int eventId, int pageId, int reply)
     {
         var packetWriter = new PacketWriter(16);
 
@@ -232,7 +232,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendSpawnItem(int index, int amount)
+    public static void SpawnItem(int index, int amount)
     {
         var packetWriter = new PacketWriter(12);
 
@@ -243,7 +243,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendSetSprite(int index)
+    public static void SetSprite(int index)
     {
         var packetWriter = new PacketWriter(8);
 
@@ -253,7 +253,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendSetAccess(string name, byte access)
+    public static void SetAccess(string name, byte access)
     {
         var packetWriter = new PacketWriter();
 
@@ -264,7 +264,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendAttack()
+    public static void Attack()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -273,7 +273,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendMouseAttack(int worldPixelX, int worldPixelY)
+    public static void MouseAttack(int worldPixelX, int worldPixelY)
     {
         var packetWriter = new PacketWriter(12);
         packetWriter.WriteEnum(Packets.ClientPackets.CMouseAttack);
@@ -282,7 +282,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendPlayerDir()
+    public static void PlayerDir()
     {
         var packetWriter = new PacketWriter(8);
 
@@ -292,7 +292,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendRequestNpc(int index)
+    public static void RequestNpc(int index)
     {
         var packetWriter = new PacketWriter();
 
@@ -302,7 +302,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendRequestSkill(int skillNum)
+    public static void RequestSkill(int skillNum)
     {
         var packetWriter = new PacketWriter(8);
 
@@ -312,7 +312,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendTrainStat(int stat)
+    public static void TrainStat(int stat)
     {
         var packetWriter = new PacketWriter(8);
 
@@ -343,7 +343,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendAdminMessage(string text)
+    public static void AdminMessage(string text)
     {
         var packetWriter = new PacketWriter();
 
@@ -353,7 +353,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendWhosOnline()
+    public static void WhosOnline()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -362,7 +362,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendPlayerInfo(string name)
+    public static void PlayerInfo(string name)
     {
         var packetWriter = new PacketWriter();
 
@@ -372,7 +372,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendMotdChange(string message)
+    public static void MotdChange(string message)
     {
         var packetWriter = new PacketWriter();
 
@@ -382,7 +382,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendBanList()
+    public static void BanList()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -391,7 +391,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendBanDestroy()
+    public static void BanDestroy()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -400,7 +400,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendChangeInvSlots(int oldSlot, int newSlot)
+    public static void ChangeInvSlots(int oldSlot, int newSlot)
     {
         var buffer = new PacketWriter(4);
 
@@ -411,7 +411,7 @@ public static class Sender
         Network.Send(buffer);
     }
 
-    public static void SendChangeSkillSlots(int oldSlot, int newSlot)
+    public static void ChangeSkillSlots(int oldSlot, int newSlot)
     {
         var packetWriter = new PacketWriter(12);
 
@@ -422,7 +422,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendUseItem(int index)
+    public static void UseItem(int index)
     {
         var packetWriter = new PacketWriter(8);
 
@@ -432,14 +432,14 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendDropItem(int invSlot, int amount)
+    public static void DropItem(int invSlot, int amount)
     {
         if (GameState.InBank || GameState.InShop >= 0)
         {
             return;
         }
 
-        if (invSlot < 0 || invSlot > Variables.MaxInventory)
+        if (invSlot < 0 || invSlot > Core.Globals.Variables.MaxInventory)
         {
             return;
         }
@@ -468,7 +468,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendPlayerSearch(int curX, int curY, byte rClick)
+    public static void PlayerSearch(int curX, int curY, byte rClick)
     {
         if (!GameLogic.IsInBounds())
         {
@@ -485,7 +485,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendAdminWarp(int x, int y)
+    public static void AdminWarp(int x, int y)
     {
         var packetWriter = new PacketWriter(12);
 
@@ -496,7 +496,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendUnequip(int index)
+    public static void Unequip(int index)
     {
         var packetWriter = new PacketWriter(8);
 
@@ -505,10 +505,10 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendForgetSkill(int index)
+    public static void ForgetSkill(int index)
     {
         // Check for subscript out of range
-        if (index < 0 || index > Variables.MaxPlayerSkills)
+        if (index < 0 || index > Core.Globals.Variables.MaxPlayerSkills)
         {
             return;
         }
@@ -541,7 +541,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendRequestMapReport()
+    public static void RequestMapReport()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -550,7 +550,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendRequestAdmin()
+    public static void RequestAdmin()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -559,7 +559,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendUseEmote(int index)
+    public static void UseEmote(int index)
     {
         var packetWriter = new PacketWriter(8);
 
@@ -569,7 +569,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendRequestEditResource()
+    public static void RequestEditResource()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -578,7 +578,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendSaveResource(int index)
+    public static void SaveResource(int index)
     {
         var packetWriter = new PacketWriter();
 
@@ -605,7 +605,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendRequestEditNpc()
+    public static void RequestEditNpc()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -614,7 +614,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendSaveNpc(int index)
+    public static void SaveNpc(int index)
     {
         var packetWriter = new PacketWriter();
 
@@ -631,7 +631,7 @@ public static class Sender
         packetWriter.WriteString(npc.AttackSay);
         packetWriter.WriteByte(npc.Behavior);
 
-        for (var i = 0; i < Variables.MaxDropItems; i++)
+        for (var i = 0; i < Core.Globals.Variables.MaxDropItems; i++)
         {
             packetWriter.WriteInt32(npc.DropChance[i]);
             packetWriter.WriteInt32(npc.DropItem[i]);
@@ -652,7 +652,7 @@ public static class Sender
             packetWriter.WriteByte(npc.Stat[i]);
         }
 
-        for (var i = 0; i < Variables.MaxNpcSkills; i++)
+        for (var i = 0; i < Core.Globals.Variables.MaxNpcSkills; i++)
         {
             packetWriter.WriteByte(npc.Skill[i]);
         }
@@ -671,7 +671,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendRequestEditSkill()
+    public static void RequestEditSkill()
     {
         var packetWriter = new PacketWriter();
 
@@ -680,7 +680,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendSaveSkill(int index)
+    public static void SaveSkill(int index)
     {
         var packetWriter = new PacketWriter(4);
 
@@ -727,7 +727,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendSaveShop(int index)
+    public static void SaveShop(int index)
     {
         var packetWriter = new PacketWriter();
 
@@ -744,7 +744,7 @@ public static class Sender
         packetWriter.WriteInt32(Shop.Instance[index].BuyRate);
         packetWriter.WriteString(Shop.Instance[index].Name);
 
-        for (var i = 0; i < Variables.MaxTrades; i++)
+        for (var i = 0; i < Core.Globals.Variables.MaxTrades; i++)
         {
             packetWriter.WriteInt32(Shop.Instance[index].TradeItem[i].CostItem);
             packetWriter.WriteInt32(Shop.Instance[index].TradeItem[i].CostValue);
@@ -755,7 +755,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendRequestEditShop()
+    public static void RequestEditShop()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -764,7 +764,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendSaveAnimation(int index)
+    public static void SaveAnimation(int index)
     {
         var packetWriter = new PacketWriter();
 
@@ -797,7 +797,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendRequestEditAnimation()
+    public static void RequestEditAnimation()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -806,7 +806,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendRequestEditJob()
+    public static void RequestEditJob()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -815,7 +815,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendSaveJob(int index)
+    public static void SaveJob(int index)
     {
         var packetWriter = new PacketWriter();
 
@@ -830,13 +830,13 @@ public static class Sender
             packetWriter.WriteInt32(Job.Instance[index].Stat[i]);
         }
 
-        for (var i = 0; i < Variables.MaxStartItems; i++)
+        for (var i = 0; i < Core.Globals.Variables.MaxStartItems; i++)
         {
             packetWriter.WriteInt32(Job.Instance[index].StartItem[i]);
             packetWriter.WriteInt32(Job.Instance[index].StartValue[i]);
         }
 
-        for (var i = 0; i < Variables.MaxStartSkills; i++)
+        for (var i = 0; i < Core.Globals.Variables.MaxStartSkills; i++)
         {
             packetWriter.WriteInt32(Job.Instance[index].StartSkill[i]);
         }
@@ -850,7 +850,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendSaveItem(int index)
+    public static void SaveItem(int index)
     {
         var packetWriter = new PacketWriter();
 
@@ -901,7 +901,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendRequestEditItem()
+    public static void RequestEditItem()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -910,7 +910,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendCloseEditor()
+    public static void CloseEditor()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -919,7 +919,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendSetHotbarSlot(int type, int newSlot, int oldSlot, int index)
+    public static void SetHotbarSlot(int type, int newSlot, int oldSlot, int index)
     {
         var packetWriter = new PacketWriter(20);
 
@@ -931,7 +931,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendDeleteHotbar(int index)
+    public static void DeleteHotbar(int index)
     {
         var packetWriter = new PacketWriter(8);
 
@@ -941,9 +941,9 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendUseHotbarSlot(int index)
+    public static void UseHotbarSlot(int index)
     {
-        if (index < 0 || index >= Variables.MaxHotbar)
+        if (index < 0 || index >= Core.Globals.Variables.MaxHotbar)
         {
             return;
         }
@@ -965,7 +965,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendLearnSkill(int index)
+    public static void LearnSkill(int index)
     {
         var packetWriter = new PacketWriter(8);
 
@@ -975,7 +975,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendCast(int index)
+    public static void Cast(int index)
     {
         var packetWriter = new PacketWriter(8);
 
@@ -985,7 +985,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendRequestMoral(int index)
+    public static void RequestMoral(int index)
     {
         var packetWriter = new PacketWriter(8);
 
@@ -995,7 +995,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendRequestEditMoral()
+    public static void RequestEditMoral()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -1004,7 +1004,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendSaveMoral(int index)
+    public static void SaveMoral(int index)
     {
         var moral = Moral.Instance[index];
 
@@ -1027,7 +1027,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendCloseShop()
+    public static void CloseShop()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -1036,7 +1036,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendRequestEditScript(int index)
+    public static void RequestEditScript(int index)
     {
         var packetWriter = new PacketWriter(8);
 
@@ -1046,7 +1046,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendSaveScript()
+    public static void SaveScript()
     {
         var packetWriter = new PacketWriter();
 
@@ -1056,7 +1056,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendRequestItem(int index)
+    public static void RequestItem(int index)
     {
         var packetWriter = new PacketWriter(8);
 
@@ -1066,7 +1066,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendRequestShop(int index)
+    public static void RequestShop(int index)
     {
         var packetWriter = new PacketWriter(8);
 
@@ -1076,7 +1076,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendBuyItem(int index)
+    public static void BuyItem(int index)
     {
         var packetWriter = new PacketWriter(8);
 
@@ -1086,7 +1086,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendSellItem(int index)
+    public static void SellItem(int index)
     {
         var packetWriter = new PacketWriter(8);
 
@@ -1096,7 +1096,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendRequestAnimation(int index)
+    public static void RequestAnimation(int index)
     {
         var packetWriter = new PacketWriter(8);
 
@@ -1106,7 +1106,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendRequestResource(int resourceNum)
+    public static void RequestResource(int resourceNum)
     {
         var packetWriter = new PacketWriter(8);
 
@@ -1117,7 +1117,7 @@ public static class Sender
     }
 
 
-    public static void SendAcceptTrade()
+    public static void AcceptTrade()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -1126,7 +1126,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendDeclineTrade()
+    public static void DeclineTrade()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -1135,7 +1135,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendTradeRequest(string name)
+    public static void TradeRequest(string name)
     {
         var packetWriter = new PacketWriter();
 
@@ -1146,7 +1146,7 @@ public static class Sender
 
     }
 
-    public static void SendHandleTradeInvite(int index)
+    public static void HandleTradeInvite(int index)
     {
         var packetWriter = new PacketWriter(8);
 
@@ -1156,7 +1156,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendTradeItem(int index, int amount)
+    public static void TradeItem(int index, int amount)
     {
         var packetWriter = new PacketWriter(12);
 
@@ -1167,7 +1167,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendUntradeItem(int index)
+    public static void UntradeItem(int index)
     {
         var packetWriter = new PacketWriter(8);
 
@@ -1177,7 +1177,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendPlayerRequestNewMap()
+    public static void PlayerRequestNewMap()
     {
         if (GameState.GettingMap)
         {
@@ -1195,7 +1195,7 @@ public static class Sender
         GameState.CanMoveNow = false;
     }
 
-    public static void SendRequestEditMap()
+    public static void RequestEditMap()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -1204,7 +1204,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendMap()
+    public static void Map()
     {
         int x;
         int y;
@@ -1249,7 +1249,7 @@ public static class Sender
         packetWriter.WriteSingle(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MinZoom);
         packetWriter.WriteSingle(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxZoom);
 
-        for (i = 0; i < Variables.MaxMapNpcs; i++)
+        for (i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
         {
             packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[i]);
         }
@@ -1410,7 +1410,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendMapRespawn()
+    public static void MapRespawn()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -1419,7 +1419,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendRespawnNow()
+    public static void RespawnNow()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -1429,7 +1429,7 @@ public static class Sender
     }
 
 
-    public static void SendRequestSwitchesAndVariables()
+    public static void RequestSwitchesAndVariables()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -1438,7 +1438,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendSwitchesAndVariables()
+    public static void SwitchesAndVariables()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -1458,7 +1458,7 @@ public static class Sender
     }
 
 
-    public static void SendPartyRequest(string name)
+    public static void PartyRequest(string name)
     {
         var packetWriter = new PacketWriter();
 
@@ -1468,7 +1468,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendAcceptParty()
+    public static void AcceptParty()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -1477,7 +1477,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendDeclineParty()
+    public static void DeclineParty()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -1486,7 +1486,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendLeaveParty()
+    public static void LeaveParty()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -1495,7 +1495,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendPartyChatMsg(string text)
+    public static void PartyChatMsg(string text)
     {
         var packetWriter = new PacketWriter();
 
@@ -1505,7 +1505,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendDepositItem(int index, int amount)
+    public static void DepositItem(int index, int amount)
     {
         var packetWriter = new PacketWriter(12);
 
@@ -1516,7 +1516,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendWithdrawItem(byte index, int amount)
+    public static void WithdrawItem(byte index, int amount)
     {
         var packetWriter = new PacketWriter(9);
 
@@ -1527,7 +1527,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendChangeBankSlots(int oldSlot, int newSlot)
+    public static void ChangeBankSlots(int oldSlot, int newSlot)
     {
         var packetWriter = new PacketWriter(12);
 
@@ -1538,7 +1538,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendCloseBank()
+    public static void CloseBank()
     {
         if (WindowManager.Windows[WindowManager.GetWindow("winBank")].Visible == true)
         {
@@ -1555,7 +1555,7 @@ public static class Sender
         GameState.InBank = false;
     }
 
-    public static void SendRequestEditProjectiles()
+    public static void RequestEditProjectiles()
     {
         var packetWriter = new PacketWriter(4);
 
@@ -1564,7 +1564,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendSaveProjectile(int index)
+    public static void SaveProjectile(int index)
     {
         var packetWriter = new PacketWriter();
 
@@ -1580,7 +1580,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendRequestProjectile(int index)
+    public static void RequestProjectile(int index)
     {
         var packetWriter = new PacketWriter(8);
 
@@ -1590,7 +1590,7 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void SendClearProjectile(int index, int collisionindex, int collisionType, int collisionZone)
+    public static void ClearProjectile(int index, int collisionindex, int collisionType, int collisionZone)
     {
         var packetWriter = new PacketWriter(20);
 

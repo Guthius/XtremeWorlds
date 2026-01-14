@@ -126,7 +126,7 @@ public class WinItemEditor
         list.Clear();
         // Always show the full index range so the editor list is never empty,
         // even if item data is still streaming from the server.
-        for (int i = 0; i < Variables.MaxItems; i++)
+        for (int i = 0; i < Core.Globals.Variables.MaxItems; i++)
         {
             string name = "None";
             if (Item.Instance.Count > i)
@@ -169,7 +169,7 @@ public class WinItemEditor
         if (WindowManager.TryGetControl("winItemEditor", "cmbLevel", out var lvlComboCtrl) && lvlComboCtrl is ComboBox cmbLevel)
         {
             cmbLevel.Items.Clear();
-            for (int i = 1; i <= Variables.MaxLevel; i++)
+            for (int i = 1; i <= Core.Globals.Variables.MaxLevel; i++)
                 cmbLevel.Items.Add(i.ToString());
         }
 
@@ -186,7 +186,7 @@ public class WinItemEditor
         if (WindowManager.TryGetControl("winItemEditor", "cmbAnimation", out var animCtrl) && animCtrl is ComboBox cmbAnim)
         {
             cmbAnim.Items.Clear();
-            for (int i = 0; i < Variables.MaxAnimations; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxAnimations; i++)
             {
                 string name = "None";
                 if (Animation.Instance.Count > i)
@@ -207,7 +207,7 @@ public class WinItemEditor
         if (WindowManager.TryGetControl("winItemEditor", "cmbJobReq", out var jobCtrl) && jobCtrl is ComboBox cmbJob)
         {
             cmbJob.Items.Clear();
-            for (int i = 0; i < Variables.MaxJobs; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxJobs; i++)
             {
                 string name = "None";
                 if (Job.Instance.Count > i)
@@ -232,7 +232,7 @@ public class WinItemEditor
         {
             cmbTool.Items.Clear();
             cmbTool.Items.Add("None");
-            for (int i = 0; i < Variables.MaxResources; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxResources; i++)
             {
                 string name = "None";
                 if (Resource.Instance.Count > i)
@@ -254,7 +254,7 @@ public class WinItemEditor
         {
             cmbSkill.Items.Clear();
             cmbSkill.Items.Add("None");
-            for (int i = 0; i < Variables.MaxSkills; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxSkills; i++)
             {
                 string name = "None";
                 if (Skill.Instance.Count > i)
@@ -270,7 +270,7 @@ public class WinItemEditor
         {
             cmbProj.Items.Clear();
             cmbProj.Items.Add("None");
-            for (int i = 0; i < Variables.MaxProjectiles; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
             {
                 string name = "None";
                 if (Projectile.Instance.Count > i)
@@ -295,7 +295,7 @@ public class WinItemEditor
         {
             cmbAmmo.Items.Clear();
             cmbAmmo.Items.Add("None");
-            for (int i = 0; i < Variables.MaxItems; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxItems; i++)
             {
                 string name = "None";
                 if (Item.Instance.Count > i)
@@ -504,32 +504,32 @@ public class WinItemEditor
 
         if (WindowManager.TryGetControl("winItemEditor", "sldStr", out var aStrCtrl) && aStrCtrl is ScrollBar sldAStr)
         {
-            sldAStr.Min = -Variables.MaxStats;
-            sldAStr.Max = Variables.MaxStats;
+            sldAStr.Min = -Core.Globals.Variables.MaxStats;
+            sldAStr.Max = Core.Globals.Variables.MaxStats;
             sldAStr.Value = Math.Clamp(item.AddStat[(int)Stat.Strength], sldAStr.Min, sldAStr.Max);
         }
         if (WindowManager.TryGetControl("winItemEditor", "sldVit", out var aVitCtrl) && aVitCtrl is ScrollBar sldAVit)
         {
-            sldAVit.Min = -Variables.MaxStats;
-            sldAVit.Max = Variables.MaxStats;
+            sldAVit.Min = -Core.Globals.Variables.MaxStats;
+            sldAVit.Max = Core.Globals.Variables.MaxStats;
             sldAVit.Value = Math.Clamp(item.AddStat[(int)Stat.Vitality], sldAVit.Min, sldAVit.Max);
         }
         if (WindowManager.TryGetControl("winItemEditor", "sldLuck", out var aLuckCtrl) && aLuckCtrl is ScrollBar sldALuck)
         {
-            sldALuck.Min = -Variables.MaxStats;
-            sldALuck.Max = Variables.MaxStats;
+            sldALuck.Min = -Core.Globals.Variables.MaxStats;
+            sldALuck.Max = Core.Globals.Variables.MaxStats;
             sldALuck.Value = Math.Clamp(item.AddStat[(int)Stat.Luck], sldALuck.Min, sldALuck.Max);
         }
         if (WindowManager.TryGetControl("winItemEditor", "sldInt", out var aIntCtrl) && aIntCtrl is ScrollBar sldAInt)
         {
-            sldAInt.Min = -Variables.MaxStats;
-            sldAInt.Max = Variables.MaxStats;
+            sldAInt.Min = -Core.Globals.Variables.MaxStats;
+            sldAInt.Max = Core.Globals.Variables.MaxStats;
             sldAInt.Value = Math.Clamp(item.AddStat[(int)Stat.Intelligence], sldAInt.Min, sldAInt.Max);
         }
         if (WindowManager.TryGetControl("winItemEditor", "sldSpr", out var aSprCtrl) && aSprCtrl is ScrollBar sldASpr)
         {
-            sldASpr.Min = -Variables.MaxStats;
-            sldASpr.Max = Variables.MaxStats;
+            sldASpr.Min = -Core.Globals.Variables.MaxStats;
+            sldASpr.Max = Core.Globals.Variables.MaxStats;
             sldASpr.Value = Math.Clamp(item.AddStat[(int)Stat.Spirit], sldASpr.Min, sldASpr.Max);
         }
 
@@ -570,37 +570,37 @@ public class WinItemEditor
         if (WindowManager.TryGetControl("winItemEditor", "sldReqLevel", out var rLvlCtrl) && rLvlCtrl is ScrollBar sldReqLevel)
         {
             sldReqLevel.Min = 1;
-            sldReqLevel.Max = Variables.MaxLevel;
+            sldReqLevel.Max = Core.Globals.Variables.MaxLevel;
             sldReqLevel.Value = Math.Clamp(item.LevelReq, sldReqLevel.Min, sldReqLevel.Max);
         }
         if (WindowManager.TryGetControl("winItemEditor", "sldReqStr", out var rStrCtrl) && rStrCtrl is ScrollBar sldReqStr)
         {
             sldReqStr.Min = 0;
-            sldReqStr.Max = Variables.MaxStats;
+            sldReqStr.Max = Core.Globals.Variables.MaxStats;
             sldReqStr.Value = Math.Clamp(item.StatReq[(int)Stat.Strength], sldReqStr.Min, sldReqStr.Max);
         }
         if (WindowManager.TryGetControl("winItemEditor", "sldReqVit", out var rVitCtrl) && rVitCtrl is ScrollBar sldReqVit)
         {
             sldReqVit.Min = 0;
-            sldReqVit.Max = Variables.MaxStats;
+            sldReqVit.Max = Core.Globals.Variables.MaxStats;
             sldReqVit.Value = Math.Clamp(item.StatReq[(int)Stat.Vitality], sldReqVit.Min, sldReqVit.Max);
         }
         if (WindowManager.TryGetControl("winItemEditor", "sldReqLuck", out var rLuckCtrl) && rLuckCtrl is ScrollBar sldReqLuck)
         {
             sldReqLuck.Min = 0;
-            sldReqLuck.Max = Variables.MaxStats;
+            sldReqLuck.Max = Core.Globals.Variables.MaxStats;
             sldReqLuck.Value = Math.Clamp(item.StatReq[(int)Stat.Luck], sldReqLuck.Min, sldReqLuck.Max);
         }
         if (WindowManager.TryGetControl("winItemEditor", "sldReqInt", out var rIntCtrl) && rIntCtrl is ScrollBar sldReqInt)
         {
             sldReqInt.Min = 0;
-            sldReqInt.Max = Variables.MaxStats;
+            sldReqInt.Max = Core.Globals.Variables.MaxStats;
             sldReqInt.Value = Math.Clamp(item.StatReq[(int)Stat.Intelligence], sldReqInt.Min, sldReqInt.Max);
         }
         if (WindowManager.TryGetControl("winItemEditor", "sldReqSpr", out var rSprCtrl) && rSprCtrl is ScrollBar sldReqSpr)
         {
             sldReqSpr.Min = 0;
-            sldReqSpr.Max = Variables.MaxStats;
+            sldReqSpr.Max = Core.Globals.Variables.MaxStats;
             sldReqSpr.Value = Math.Clamp(item.StatReq[(int)Stat.Spirit], sldReqSpr.Min, sldReqSpr.Max);
         }
 
@@ -730,7 +730,7 @@ public class WinItemEditor
     {
         if (GameState.MyIndex > 0)
         {
-            Sender.SendSpawnItem(GameState.EditorIndex, 1);
+            Sender.SpawnItem(GameState.EditorIndex, 1);
         }
     }
 

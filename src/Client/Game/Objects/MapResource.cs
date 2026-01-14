@@ -8,7 +8,7 @@ namespace Core.Objects
 {
     public class MapResource : IData
     {
-        public static MapResourceCacheData[] Instance { get; private set; } = new MapResourceCacheData[Variables.MaxResources];
+        public static MapResourceCacheData[] Instance { get; private set; } = new MapResourceCacheData[Core.Globals.Variables.MaxResources];
 
         public static void OnClear(int index)
         {

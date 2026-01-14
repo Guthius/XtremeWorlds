@@ -159,7 +159,7 @@ namespace Client
                 // check if we need to end the CD icon
                 if (GameState.NumSkills > 0)
                 {
-                    for (_i = 0; _i < Variables.MaxPlayerSkills; _i++)
+                    for (_i = 0; _i < Core.Globals.Variables.MaxPlayerSkills; _i++)
                     {
                         if (Player.Instance.Count <= GameState.MyIndex) break;
                         if (Skill.Instance.Count <= Player.Instance[GameState.MyIndex].Skill[_i].Num) break;
@@ -238,7 +238,7 @@ namespace Client
                     }
 
                     // Process npc movements
-                    for (_i = 0; _i < Variables.MaxMapNpcs; _i++)
+                    for (_i = 0; _i < Core.Globals.Variables.MaxMapNpcs; _i++)
                     {
                         Npc.OnMove(_i);
                         
@@ -351,7 +351,7 @@ namespace Client
                     GameLogic.SetBarWidth(ref GameState.BarWidthGuiHPMax, ref GameState.BarWidthGuiHP);
                     GameLogic.SetBarWidth(ref GameState.BarWidthGuiMPMax, ref GameState.BarWidthGuiMP);
                     GameLogic.SetBarWidth(ref GameState.BarWidthGuiExpMax, ref GameState.BarWidthGuiExp);
-                    for (_i = 0; _i < Variables.MaxMapNpcs; _i++)
+                    for (_i = 0; _i < Core.Globals.Variables.MaxMapNpcs; _i++)
                     {
                         if (MapNpc.Instance[_i].Num >= 0)
                         {
@@ -383,7 +383,7 @@ namespace Client
                         unchecked { Player.Instance[i].Steps++; } // byte wraps automatically
                     }
 
-                    for (int i = 0; i < Variables.MaxMapNpcs; i++)
+                    for (int i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
                     {
                         if (MapNpc.Instance[i].Num >= 0)
                         {
@@ -483,7 +483,7 @@ namespace Client
 
             if (GameState.InitAdminForm)
             {
-                Sender.SendRequestMapReport();
+                Sender.RequestMapReport();
                 WindowManager.ShowWindow("winAdmin");
                 GameState.AdminPanel = true;
 

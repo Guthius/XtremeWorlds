@@ -6,8 +6,8 @@ namespace Core.Objects
 {
     public class ItemBase
     {
-        public static bool[] IsStreaming { get; set; } = new bool[Variables.MaxItems];
-        public static bool[] IsChanged { get; set; } = new bool[Variables.MaxItems];
+        public static bool[] IsStreaming { get; set; } = new bool[Core.Globals.Variables.MaxItems];
+        public static bool[] IsChanged { get; set; } = new bool[Core.Globals.Variables.MaxItems];
 
         public ItemBase()
         {
@@ -62,8 +62,8 @@ namespace Core.Objects
 
         public static void OnClearChanged()
         {
-            IsChanged = new bool[Variables.MaxItems];
-            IsStreaming = new bool[Variables.MaxItems];
+            IsChanged = new bool[Core.Globals.Variables.MaxItems];
+            IsStreaming = new bool[Core.Globals.Variables.MaxItems];
         }
 
         public static void OnClear()

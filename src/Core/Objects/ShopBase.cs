@@ -4,8 +4,8 @@ namespace Core.Objects;
 
 public class ShopBase
 {
-    public static bool[] IsStreaming { get; set; } = new bool[Variables.MaxShops];
-    public static bool[] IsChanged { get; set; } = new bool[Variables.MaxShops];
+    public static bool[] IsStreaming { get; set; } = new bool[Core.Globals.Variables.MaxShops];
+    public static bool[] IsChanged { get; set; } = new bool[Core.Globals.Variables.MaxShops];
 
     public string Name { get; set; } = "";
     public int BuyRate { get; set; }
@@ -15,8 +15,8 @@ public class ShopBase
 
     public ShopBase()
     {
-        TradeItem = new Core.Globals.Type.TradeItem[Variables.MaxTrades];
-        for (var i = 0; i < Variables.MaxTrades; i++)
+        TradeItem = new Core.Globals.Type.TradeItem[Core.Globals.Variables.MaxTrades];
+        for (var i = 0; i < Core.Globals.Variables.MaxTrades; i++)
         {
             TradeItem[i].Item = -1;
             TradeItem[i].CostItem = -1;
@@ -25,8 +25,8 @@ public class ShopBase
 
     public static void OnClearChanged()
     {
-        IsChanged = new bool[Variables.MaxShops];
-        IsStreaming = new bool[Variables.MaxShops];
+        IsChanged = new bool[Core.Globals.Variables.MaxShops];
+        IsStreaming = new bool[Core.Globals.Variables.MaxShops];
     }
 
     public static void OnClear(int index)
@@ -39,7 +39,7 @@ public class ShopBase
 
     public static void OnClear()
     {
-        for (var i = 0; i < Variables.MaxShops; i++)
+        for (var i = 0; i < Core.Globals.Variables.MaxShops; i++)
             OnClear(i);
     }
 }

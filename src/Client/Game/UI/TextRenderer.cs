@@ -15,9 +15,9 @@ public static class TextRenderer
     public static readonly Dictionary<Core.Globals.BitmapFont, BitmapFont> BitmapFonts = new();
 
     // Style toggles (mage style disabled for cleaner look)
-    public static bool UseMageStyle = false;          // Disabled
-    public static float MageGlowStrength = 0.08f;     // Unused now
-    public static float MageScaleBoost = 1.02f;       // Unused now
+    public static bool UseMageStyle = false;
+    public static float MageGlowStrength = 0.08f;
+    public static float MageScaleBoost = 1.02f;
 
     public class BitmapFont
     {

@@ -150,7 +150,7 @@ public class WinDragBox
             case PartOrigin.Bank:
                 if (WindowManager.DragBox.Type == DraggablePartType.Item)
                 {
-                    for (var slot = 0; slot <= Variables.MaxBank; slot++)
+                    for (var slot = 0; slot <= Core.Globals.Variables.MaxBank; slot++)
                     {
                         Type.Rect rect;
 
@@ -172,7 +172,7 @@ public class WinDragBox
                             continue;
                         }
 
-                        Sender.SendChangeBankSlots(WindowManager.DragBox.Slot, slot);
+                        Sender.ChangeBankSlots(WindowManager.DragBox.Slot, slot);
                         break;
                     }
                 }
@@ -184,7 +184,7 @@ public class WinDragBox
                 {
                     if (Item.Instance[GetPlayerInv(GameState.MyIndex, WindowManager.DragBox.Slot)].Type != (byte) ItemCategory.Currency)
                     {
-                        Sender.SendDepositItem(WindowManager.DragBox.Slot, 1);
+                        Sender.DepositItem(WindowManager.DragBox.Slot, 1);
                     }
                     else
                     {
@@ -203,7 +203,7 @@ public class WinDragBox
             case PartOrigin.Inventory:
                 if (WindowManager.DragBox.Type == DraggablePartType.Item)
                 {
-                    for (var slot = 0; slot < Variables.MaxInventory; slot++)
+                    for (var slot = 0; slot < Core.Globals.Variables.MaxInventory; slot++)
                     {
                         Type.Rect rect;
 
@@ -222,7 +222,7 @@ public class WinDragBox
 
                         if (WindowManager.DragBox.Slot != slot)
                         {
-                            Sender.SendChangeInvSlots(WindowManager.DragBox.Slot, slot);
+                            Sender.ChangeInvSlots(WindowManager.DragBox.Slot, slot);
                         }
 
                         break;
@@ -234,7 +234,7 @@ public class WinDragBox
             case PartOrigin.Character:
                 if (WindowManager.DragBox.Type == DraggablePartType.Item)
                 {
-                    for (var slot = 0; slot < Variables.MaxInventory; slot++)
+                    for (var slot = 0; slot < Core.Globals.Variables.MaxInventory; slot++)
                     {
                         Type.Rect rect;
 
@@ -251,7 +251,7 @@ public class WinDragBox
                             continue;
                         }
 
-                        Sender.SendUnequip(WindowManager.DragBox.Slot);
+                        Sender.Unequip(WindowManager.DragBox.Slot);
                         break;
                     }
                 }
@@ -263,7 +263,7 @@ public class WinDragBox
                 {
                     if (Item.Instance[GetBank(GameState.MyIndex, (byte) WindowManager.DragBox.Slot)].Type != (byte) ItemCategory.Currency)
                     {
-                        Sender.SendWithdrawItem((byte) WindowManager.DragBox.Slot, 0);
+                        Sender.WithdrawItem((byte) WindowManager.DragBox.Slot, 0);
                     }
                     else
                     {
@@ -283,7 +283,7 @@ public class WinDragBox
             return;
         }
 
-        for (var slot = 0; slot < Variables.MaxPlayerSkills; slot++)
+        for (var slot = 0; slot < Core.Globals.Variables.MaxPlayerSkills; slot++)
         {
             Type.Rect rect;
 
@@ -302,7 +302,7 @@ public class WinDragBox
 
             if (WindowManager.DragBox.Slot != slot)
             {
-                Sender.SendChangeSkillSlots(WindowManager.DragBox.Slot, slot);
+                Sender.ChangeSkillSlots(WindowManager.DragBox.Slot, slot);
             }
 
             break;
@@ -329,7 +329,7 @@ public class WinDragBox
                 return -1;
             }
 
-            for (var slot = 0; slot < Variables.MaxInventory; slot++)
+            for (var slot = 0; slot < Core.Globals.Variables.MaxInventory; slot++)
             {
                 if (GetPlayerInv(GameState.MyIndex, slot) == itemNum)
                 {
@@ -345,7 +345,7 @@ public class WinDragBox
         if (origin == PartOrigin.Inventory)
         {
             inv = WindowManager.DragBox.Slot;
-            if (inv < 0 || inv >= Variables.MaxInventory)
+            if (inv < 0 || inv >= Core.Globals.Variables.MaxInventory)
             {
                 return;
             }
@@ -359,7 +359,7 @@ public class WinDragBox
             inv = FindInventorySlotForItem(item);
         }
 
-        if (inv < 0 || inv >= Variables.MaxInventory)
+        if (inv < 0 || inv >= Core.Globals.Variables.MaxInventory)
         {
             return;
         }
@@ -400,7 +400,7 @@ public class WinDragBox
                 return;
             }
 
-            Sender.SendUseItem(inv);
+            Sender.UseItem(inv);
             return;
         }
     }
@@ -413,7 +413,7 @@ public class WinDragBox
             return;
         }
 
-        for (var slot = 0; slot < Variables.MaxHotbar; slot++)
+        for (var slot = 0; slot < Core.Globals.Variables.MaxHotbar; slot++)
         {
             Type.Rect rect;
 
@@ -435,17 +435,17 @@ public class WinDragBox
                 switch (WindowManager.DragBox.Type)
                 {
                     case DraggablePartType.Item:
-                        Sender.SendSetHotbarSlot((int) PartOrigin.Inventory, slot, WindowManager.DragBox.Slot, WindowManager.DragBox.Value);
+                        Sender.SetHotbarSlot((int) PartOrigin.Inventory, slot, WindowManager.DragBox.Slot, WindowManager.DragBox.Value);
                         break;
 
                     case DraggablePartType.Skill:
-                        Sender.SendSetHotbarSlot((int) PartOrigin.SkillTree, slot, WindowManager.DragBox.Slot, WindowManager.DragBox.Value);
+                        Sender.SetHotbarSlot((int) PartOrigin.SkillTree, slot, WindowManager.DragBox.Slot, WindowManager.DragBox.Value);
                         break;
                 }
             }
             else if (WindowManager.DragBox.Slot != slot)
             {
-                Sender.SendSetHotbarSlot((int) PartOrigin.Hotbar, slot, WindowManager.DragBox.Slot, WindowManager.DragBox.Value);
+                Sender.SetHotbarSlot((int) PartOrigin.Hotbar, slot, WindowManager.DragBox.Slot, WindowManager.DragBox.Value);
             }
 
             break;
@@ -479,18 +479,18 @@ public class WinDragBox
                     }
                     else
                     {
-                        Sender.SendDropItem(inv, 1);
+                        Sender.DropItem(inv, 1);
                     }
 
                     break;
                 }
 
             case PartOrigin.SkillTree:
-                Sender.SendForgetSkill(WindowManager.DragBox.Slot);
+                Sender.ForgetSkill(WindowManager.DragBox.Slot);
                 break;
 
             case PartOrigin.Hotbar:
-                Sender.SendDeleteHotbar(WindowManager.DragBox.Slot);
+                Sender.DeleteHotbar(WindowManager.DragBox.Slot);
                 break;
         }
     }
@@ -519,13 +519,13 @@ public class WinDragBox
         }
 
         var inv = WindowManager.DragBox.Slot;
-        if (inv < 0 || inv >= Variables.MaxInventory)
+        if (inv < 0 || inv >= Core.Globals.Variables.MaxInventory)
         {
             return;
         }
 
         // Match the same offer rules as the old inventory double-click trade behavior.
-        for (var i = 0; i < Variables.MaxInventory; i++)
+        for (var i = 0; i < Core.Globals.Variables.MaxInventory; i++)
         {
             if (Data.TradeYourOffer[i].Num != inv)
             {
@@ -556,6 +556,6 @@ public class WinDragBox
             return;
         }
 
-        Sender.SendTradeItem(inv, 0);
+        Sender.TradeItem(inv, 0);
     }
 }

@@ -13,7 +13,7 @@ public static class GameLogic
 
     public static int GetNpcMaxVital(double npcNum, Vital vital)
     {
-        if (npcNum < 0 || npcNum > Variables.MaxNpcs)
+        if (npcNum < 0 || npcNum > Core.Globals.Variables.MaxNpcs)
         {
             return 0;
         }

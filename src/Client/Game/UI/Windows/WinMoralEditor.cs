@@ -28,7 +28,7 @@ public class WinMoralEditor
         if (win is null) return;
         int relY = GameClient.CurrentMouseState.Y - (win.Y + list.Y);
         int index = list.GetItemIndexAtPosition(relY);
-        if (index < 0 || index >= Variables.MaxMorals) return;
+        if (index < 0 || index >= Core.Globals.Variables.MaxMorals) return;
         SelectedIndex = index;
         GameState.EditorIndex = index;
         list.SelectedIndex = index;
@@ -38,7 +38,7 @@ public class WinMoralEditor
 
     public static void OnLoad(int id)
     {
-        if (id < 0 || id >= Variables.MaxMorals) return;
+        if (id < 0 || id >= Core.Globals.Variables.MaxMorals) return;
         SelectedIndex = id;
         GameState.EditorIndex = id;
         var m = Moral.Instance[id];
@@ -81,7 +81,7 @@ public class WinMoralEditor
         {
             int sel = SelectedIndex;
             lst.Items.Clear();
-            for (int i = 0; i < Variables.MaxMorals; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxMorals; i++)
             {
                 var name = Moral.Instance[i].Name ?? string.Empty;
                 lst.Items.Add($"{i + 1}: {name}");
@@ -95,7 +95,7 @@ public class WinMoralEditor
     // Toggle Copy -> Paste on subsequent clicks. Paste overwrites current SelectedIndex.
     public static void OnCopyOrPaste()
     {
-        if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxMorals) return;
+        if (SelectedIndex < 0 || SelectedIndex >= Core.Globals.Variables.MaxMorals) return;
         if (_history is null)
         {
             var s = Moral.Instance[SelectedIndex];

@@ -15,7 +15,7 @@ public class WinShop
             return;
         }
 
-        if (GameState.InShop < 0 || GameState.InShop > Variables.MaxShops)
+        if (GameState.InShop < 0 || GameState.InShop > Core.Globals.Variables.MaxShops)
         {
             return;
         }
@@ -151,12 +151,12 @@ public class WinShop
 
     public static void OnBuy()
     {
-        Sender.SendBuyItem(GameState.ShopSelectedSlot);
+        Sender.BuyItem(GameState.ShopSelectedSlot);
     }
 
     public static void OnSell()
     {
-        Sender.SendSellItem(GameState.ShopSelectedSlot);
+        Sender.SellItem(GameState.ShopSelectedSlot);
     }
 
     public static void OnMouseDown()
@@ -201,7 +201,7 @@ public class WinShop
             return;
         }
 
-        if (GameState.InShop < 0 || GameState.InShop > Variables.MaxShops)
+        if (GameState.InShop < 0 || GameState.InShop > Core.Globals.Variables.MaxShops)
         {
             return;
         }
@@ -219,14 +219,14 @@ public class WinShop
         {
             if (GetPlayerInv(GameState.MyIndex, slot) >= 0)
             {
-                Sender.SendSellItem(slot);
+                Sender.SellItem(slot);
             }
         }
         else
         {
             if (Shop.Instance[GameState.InShop].TradeItem[slot].Item >= 0)
             {
-                Sender.SendBuyItem(slot);
+                Sender.BuyItem(slot);
             }
         }
 
@@ -247,7 +247,7 @@ public class WinShop
             return;
         }
 
-        if (GameState.InShop < 0 || GameState.InShop > Variables.MaxShops)
+        if (GameState.InShop < 0 || GameState.InShop > Core.Globals.Variables.MaxShops)
         {
             return;
         }
@@ -373,7 +373,7 @@ public class WinShop
         // NOTE: Buying grid previously had X/Y swapped (using winShop.Y for X and winShop.X for Y) which caused
         // the selection highlight and icons to render in incorrect positions after toggling buying mode.
         // Align with DrawSelling logic: left uses window X, top uses window Y.
-        for (var i = 0; i < Variables.MaxTrades; i++)
+        for (var i = 0; i < Core.Globals.Variables.MaxTrades; i++)
         {
             var top = winShop.Y + GameState.ShopTop + (GameState.ShopOffsetY + 32) * (i / GameState.ShopColumns);
             var left = winShop.X + GameState.ShopLeft + (GameState.ShopOffsetX + 32) * (i % GameState.ShopColumns);
@@ -405,7 +405,7 @@ public class WinShop
 
     private static void DrawSelling(Window winShop)
     {
-        for (var i = 0; i < Variables.MaxTrades; i++)
+        for (var i = 0; i < Core.Globals.Variables.MaxTrades; i++)
         {
             var top = winShop.Y + GameState.ShopTop + (GameState.ShopOffsetY + 32) * (i / GameState.ShopColumns);
             var left = winShop.X + GameState.ShopLeft + (GameState.ShopOffsetX + 32) * (i % GameState.ShopColumns);
@@ -418,7 +418,7 @@ public class WinShop
             }
 
             var item = GetPlayerInv(GameState.MyIndex, i);
-            if (item < 0 || item >= Variables.MaxItems)
+            if (item < 0 || item >= Core.Globals.Variables.MaxItems)
             {
                 continue;
             }

@@ -33,13 +33,13 @@ namespace Client
             int sprite;
 
             // Defensive: ensure projectile index within bounds
-            if (projectileNum < 0 || projectileNum >= Variables.MaxProjectiles)
+            if (projectileNum < 0 || projectileNum >= Core.Globals.Variables.MaxProjectiles)
             {
                 return;
             }
 
             // Defensive: ensure player index and map index are valid before indexing map projectile array
-            if (GameState.MyIndex < 0 || GameState.MyIndex >= Variables.MaxPlayers)
+            if (GameState.MyIndex < 0 || GameState.MyIndex >= Core.Globals.Variables.MaxPlayers)
             {
                 return;
             }

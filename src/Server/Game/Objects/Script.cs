@@ -36,7 +36,7 @@ public static class Script
 
         if (string.IsNullOrWhiteSpace(script))
         {
-            NetworkSend.SendPlayerMessage(playerId, "No script code found to compile.", (int) ColorName.BrightRed);
+            NetworkSend.PlayerMessage(playerId, "No script code found to compile.", (int) ColorName.BrightRed);
             General.Logger.LogWarning("No script code found to compile");
             return;
         }
@@ -70,7 +70,7 @@ public static class Script
                 {
                     if (IsPlaying(i))
                     {
-                        NetworkSend.SendAlertMessage(i, SystemMessage.ServerMaintenance, Menu.Login);    
+                        NetworkSend.AlertMessage(i, SystemMessage.ServerMaintenance, Menu.Login);    
                     }
                 }
                 
@@ -83,7 +83,7 @@ public static class Script
         {
             if (playerId > 0)
             {
-                NetworkSend.SendPlayerMessage(playerId, ex.Message, (int) ColorName.BrightRed);
+                NetworkSend.PlayerMessage(playerId, ex.Message, (int) ColorName.BrightRed);
             }
 
             General.Logger.LogError(ex, "[Script] Failed to load script");

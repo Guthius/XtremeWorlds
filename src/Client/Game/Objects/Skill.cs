@@ -13,11 +13,11 @@ namespace Client
     {        
         public static void OnStream(int index)
         {
-            if (index < 0 || index >= Variables.MaxSkills) return;
+            if (index < 0 || index >= Core.Globals.Variables.MaxSkills) return;
             if (!IsStreaming[index])
             {
                 IsStreaming[index] = true;
-                Sender.SendRequestSkill(index);
+                Sender.RequestSkill(index);
             }
         }
     }

@@ -23,14 +23,14 @@ namespace Client
     public class Npc : NpcBase, IStreamable
     {
         // Client-side prediction helpers: track remaining pixels and destination for current tile step.
-        private static readonly int[] RemainingPixels = new int[Variables.MaxMapNpcs];
-        private static readonly int[] DestX = new int[Variables.MaxMapNpcs];
-        private static readonly int[] DestY = new int[Variables.MaxMapNpcs];
+        private static readonly int[] RemainingPixels = new int[Core.Globals.Variables.MaxMapNpcs];
+        private static readonly int[] DestX = new int[Core.Globals.Variables.MaxMapNpcs];
+        private static readonly int[] DestY = new int[Core.Globals.Variables.MaxMapNpcs];
 
         // Run animation finishing support: after movement stops, keep rendering the run segment
         // until the current cycle completes (based on Steps and 250ms cadence).
-        private static readonly long[] StopTick = new long[Variables.MaxMapNpcs];
-        private static readonly long[] FinishUntil = new long[Variables.MaxMapNpcs];
+        private static readonly long[] StopTick = new long[Core.Globals.Variables.MaxMapNpcs];
+        private static readonly long[] FinishUntil = new long[Core.Globals.Variables.MaxMapNpcs];
         private const int StepsCadenceMs = 250; // matches Loop.cs _tmr250 cadence
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace Client
         /// </summary>
         public static void MarkMoveStart(int index)
         {
-            if (index < 0 || index >= Variables.MaxMapNpcs) return;
+            if (index < 0 || index >= Core.Globals.Variables.MaxMapNpcs) return;
             StopTick[index] = 0;
             FinishUntil[index] = 0;
         }
@@ -49,7 +49,7 @@ namespace Client
         /// </summary>
         public static void StartStep(int index, int startX, int startY, byte dir)
         {
-            if (index < 0 || index >= Variables.MaxMapNpcs) return;
+            if (index < 0 || index >= Core.Globals.Variables.MaxMapNpcs) return;
             // Reset finish-tail
             StopTick[index] = 0;
             FinishUntil[index] = 0;
@@ -65,7 +65,7 @@ namespace Client
         /// </summary>
         public static void MarkMoveStop(int index)
         {
-            if (index < 0 || index >= Variables.MaxMapNpcs) return;
+            if (index < 0 || index >= Core.Globals.Variables.MaxMapNpcs) return;
             StopTick[index] = General.GetTickCount();
             FinishUntil[index] = 0; // will be set on first ShouldRenderRun call
         }
@@ -75,7 +75,7 @@ namespace Client
         /// </summary>
         public static void SnapToDest(int index)
         {
-            if (index < 0 || index >= Variables.MaxMapNpcs) return;
+            if (index < 0 || index >= Core.Globals.Variables.MaxMapNpcs) return;
             if (MapNpc.Instance == null) return;
             ref var npc = ref MapNpc.Instance[index];
             if (RemainingPixels[index] > 0)
@@ -96,7 +96,7 @@ namespace Client
         /// <param name="steps">Current Steps counter for this NPC</param>
         public static bool ShouldRenderRun(int index, int runFrames, long tick, int steps)
         {
-            if (index < 0 || index >= Variables.MaxMapNpcs) return false;
+            if (index < 0 || index >= Core.Globals.Variables.MaxMapNpcs) return false;
             if (runFrames <= 1) return false; // nothing to finish
             if (MapNpc.Instance[index].Moving != 0) return false; // currently moving, not finishing
 
@@ -147,7 +147,7 @@ namespace Client
         /// <param name="pixelsPerTick">How many pixels to move this tick (>=1).</param>
         public static void OnMove(int index, int pixelsPerTick)
         {
-            if (index < 0 || index >= Variables.MaxMapNpcs) return;
+            if (index < 0 || index >= Core.Globals.Variables.MaxMapNpcs) return;
             if (MapNpc.Instance == null) return;
 
             ref var npc = ref MapNpc.Instance[index];
@@ -224,7 +224,7 @@ namespace Client
         /// </summary>
         public static void ProcessAll()
         {
-            for (int i = 0; i < Variables.MaxMapNpcs; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
                 OnMove(i, 1);
         }
 
@@ -234,7 +234,7 @@ namespace Client
         public static void ProcessAll(int pixelsPerTick)
         {
             var step = Math.Max(1, pixelsPerTick);
-            for (int i = 0; i < Variables.MaxMapNpcs; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
                 OnMove(i, step);
         }
 
@@ -257,11 +257,11 @@ namespace Client
 
         public static void OnStream(int index)
         {
-            if (index < 0 || index >= Variables.MaxNpcs) return;
+            if (index < 0 || index >= Core.Globals.Variables.MaxNpcs) return;
             if (!IsStreaming[index])
             {
                 IsStreaming[index] = true;
-                Sender.SendRequestNpc(index);
+                Sender.RequestNpc(index);
             }
         }
     }

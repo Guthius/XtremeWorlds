@@ -206,7 +206,7 @@ public class WinJobs
             return;
         }
 
-        if (GameState.NewCharJob >= Variables.MaxJobs - 1 || string.IsNullOrEmpty(Job.Instance[GameState.NewCharJob].Desc) & GameState.NewCharJob >= Variables.MaxJobs)
+        if (GameState.NewCharJob >= Core.Globals.Variables.MaxJobs - 1 || string.IsNullOrEmpty(Job.Instance[GameState.NewCharJob].Desc) & GameState.NewCharJob >= Core.Globals.Variables.MaxJobs)
         {
             return;
         }

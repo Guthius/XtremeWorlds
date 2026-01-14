@@ -50,7 +50,7 @@ public class WinCharacter
 
     public static void OnDrawCharacter()
     {
-        if (GameState.MyIndex < 0 || GameState.MyIndex > Variables.MaxPlayers)
+        if (GameState.MyIndex < 0 || GameState.MyIndex > Core.Globals.Variables.MaxPlayers)
         {
             return;
         }
@@ -111,7 +111,7 @@ public class WinCharacter
         var slot = General.IsEq(winCharacter.X, winCharacter.Y);
         if (slot >= 0)
         {
-            Sender.SendUnequip(slot);
+            Sender.Unequip(slot);
         }
 
         OnMouseMove();
@@ -201,26 +201,26 @@ public class WinCharacter
 
     public static void OnSpendPoint1()
     {
-        Sender.SendTrainStat(0);
+        Sender.TrainStat(0);
     }
 
     public static void OnSpendPoint2()
     {
-        Sender.SendTrainStat(1);
+        Sender.TrainStat(1);
     }
 
     public static void OnSpendPoint3()
     {
-        Sender.SendTrainStat(2);
+        Sender.TrainStat(2);
     }
 
     public static void OnSpendPoint4()
     {
-        Sender.SendTrainStat(3);
+        Sender.TrainStat(3);
     }
 
     public static void OnSpendPoint5()
     {
-        Sender.SendTrainStat(4);
+        Sender.TrainStat(4);
     }
 }

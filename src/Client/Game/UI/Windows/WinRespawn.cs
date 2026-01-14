@@ -18,6 +18,6 @@ public class WinRespawn
             return;
         }
 
-        Sender.SendRespawnNow();
+        Sender.RespawnNow();
     }
 }

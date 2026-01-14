@@ -31,7 +31,7 @@ public class WinLogin
 
         if (Network.IsConnected)
         {
-            Sender.SendLogin(username, password);
+            Sender.Login(username, password);
         }
         else
         {

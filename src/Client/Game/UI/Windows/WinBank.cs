@@ -9,7 +9,7 @@ public class WinBank
 {
     public static void OnDraw()
     {
-        if (GameState.MyIndex < 0 || GameState.MyIndex > Variables.MaxPlayers)
+        if (GameState.MyIndex < 0 || GameState.MyIndex > Core.Globals.Variables.MaxPlayers)
         {
             return;
         }
@@ -54,7 +54,7 @@ public class WinBank
             y += 76;
         }
 
-        for (var slot = 0; slot < Variables.MaxBank; slot++)
+        for (var slot = 0; slot < Core.Globals.Variables.MaxBank; slot++)
         {
             var item = GetBank(GameState.MyIndex, slot);
             if (item < 0 || item >= Core.Globals.Variables.MaxItems)
@@ -185,7 +185,7 @@ public class WinBank
         var slot = General.IsBank(winBank.X, winBank.Y);
         if (slot >= 0)
         {
-            Sender.SendWithdrawItem((byte)slot, GetBankValue(GameState.MyIndex, slot));
+            Sender.WithdrawItem((byte)slot, GetBankValue(GameState.MyIndex, slot));
 
             return;
         }
@@ -203,7 +203,7 @@ public class WinBank
 
         if (winBank.Visible)
         {
-            Sender.SendCloseBank();
+            Sender.CloseBank();
         }
     }
 }

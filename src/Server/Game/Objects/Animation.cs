@@ -54,13 +54,13 @@ public class Animation : AnimationBase, IAsyncData
 
     public static Task OnLoadAllAsync()
     {
-        EnsureSize(Variables.MaxAnimations);
-        return Parallel.ForEachAsync(Enumerable.Range(0, Variables.MaxAnimations), OnLoadAsync);
+        EnsureSize(Core.Globals.Variables.MaxAnimations);
+        return Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxAnimations), OnLoadAsync);
     }
 
     public static async ValueTask OnLoadAsync(int index, CancellationToken cancellationToken)
     {
-        EnsureSize(Variables.MaxAnimations);
+        EnsureSize(Core.Globals.Variables.MaxAnimations);
         var data = await Database.SelectRowAsync(index, "animation", "data");
         if (data is null)
         {

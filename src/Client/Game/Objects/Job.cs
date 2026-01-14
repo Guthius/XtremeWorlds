@@ -13,10 +13,10 @@ namespace Client
         #region Database
         public static void OnStream(int index)
         {
-            if (index < 0 || index >= Variables.MaxJobs) return;
+            if (index < 0 || index >= Core.Globals.Variables.MaxJobs) return;
             if (Job.Instance.Count <= index)
             {
-                //Sender.SendRequestJob(index);
+                //Sender.RequestJob(index);
             }
         }
         #endregion

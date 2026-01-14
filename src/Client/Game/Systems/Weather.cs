@@ -23,11 +23,11 @@ namespace Client
                     Audio.PlayWeatherSound("Rain.ogg", true);
                 }
 
-                x = GameLogic.Rand(1, Variables.MaxWeatherParticles - GameState.CurrentWeatherIntensity);
+                x = GameLogic.Rand(1, Core.Globals.Variables.MaxWeatherParticles - GameState.CurrentWeatherIntensity);
                 if (x == 1)
                 {
                     // Add a new particle
-                    for (i = 0; i < Variables.MaxWeatherParticles; i++)
+                    for (i = 0; i < Core.Globals.Variables.MaxWeatherParticles; i++)
                     {
                         if (GameState.WeatherParticle[i].InUse == 0)
                         {
@@ -66,7 +66,7 @@ namespace Client
                 }
             }
 
-            for (i = 0; i < Variables.MaxWeatherParticles; i++)
+            for (i = 0; i < Core.Globals.Variables.MaxWeatherParticles; i++)
             {
                 if (GameState.WeatherParticle[i].InUse == 1)
                 {
@@ -89,7 +89,7 @@ namespace Client
             int i;
             int spriteLeft;
 
-            for (i = 0; i < Variables.MaxWeatherParticles; i++)
+            for (i = 0; i < Core.Globals.Variables.MaxWeatherParticles; i++)
             {
                 if (Conversions.ToBoolean(GameState.WeatherParticle[i].InUse))
                 {

@@ -10,23 +10,23 @@ public static class Party
     {
         Data.Party[partyNum].Leader = -1;
         Data.Party[partyNum].MemberCount = 0;
-        Data.Party[partyNum].Member = new int[Variables.MaxPartyMembers];
+        Data.Party[partyNum].Member = new int[Core.Globals.Variables.MaxPartyMembers];
     }
 
     public static void OnMessage(int partyNum, string msg)
     {
-        for (var i = 0; i < Variables.MaxPartyMembers; i++)
+        for (var i = 0; i < Core.Globals.Variables.MaxPartyMembers; i++)
         {
             if (Data.Party[partyNum].Member[i] >= 0)
             {
-                NetworkSend.SendPlayerMessage(Data.Party[partyNum].Member[i], msg, (int)ColorName.BrightBlue);
+                NetworkSend.PlayerMessage(Data.Party[partyNum].Member[i], msg, (int)ColorName.BrightBlue);
             }
         }
     }
 
     private static void OnRemove(int index, int partyNum)
     {
-        for (var i = 0; i < Variables.MaxPartyMembers; i++)
+        for (var i = 0; i < Core.Globals.Variables.MaxPartyMembers; i++)
         {
             if (Data.Party[partyNum].Member[i] == index)
             {
@@ -38,8 +38,8 @@ public static class Party
         }
 
         OnCount(partyNum);
-        NetworkSend.SendPartyUpdate(partyNum);
-        NetworkSend.SendPartyUpdateTo(index);
+        NetworkSend.PartyUpdate(partyNum);
+        NetworkSend.PartyUpdateTo(index);
     }
 
     public static void OnLeave(int index)
@@ -59,7 +59,7 @@ public static class Party
                 if (Data.Party[partyNum].Leader == index)
                 {
                     // set next person down as leader
-                    for (i = 0; i < Variables.MaxPartyMembers; i++)
+                    for (i = 0; i < Core.Globals.Variables.MaxPartyMembers; i++)
                     {
                         if (Data.Party[partyNum].Member[i] >= 0 & Data.Party[partyNum].Member[i] != index)
                         {
@@ -89,7 +89,7 @@ public static class Party
                 OnRemove(Data.Party[partyNum].Leader, partyNum);
 
                 // clear out everyone's party
-                for (i = 0; i < Variables.MaxPartyMembers; i++)
+                for (i = 0; i < Core.Globals.Variables.MaxPartyMembers; i++)
                 {
                     index = Data.Party[partyNum].Member[i];
                     // player exist?
@@ -111,7 +111,7 @@ public static class Party
         if (Data.TempPlayer[target].PartyInvite >= 0 | Data.TempPlayer[target].TradeRequest >= 0)
         {
             // they've already got a request for trade/party
-            NetworkSend.SendPlayerMessage(index, "This player is busy.", (int)ColorName.BrightRed);
+            NetworkSend.PlayerMessage(index, "This player is busy.", (int)ColorName.BrightRed);
             return;
         }
 
@@ -119,7 +119,7 @@ public static class Party
         if (Data.TempPlayer[target].InParty >= 0)
         {
             // they're already in a party
-            NetworkSend.SendPlayerMessage(index, "This player is already in a party.", (int)ColorName.BrightRed);
+            NetworkSend.PlayerMessage(index, "This player is already in a party.", (int)ColorName.BrightRed);
             return;
         }
 
@@ -131,41 +131,41 @@ public static class Party
             if (Data.Party[partyNum].Leader == index)
             {
                 // got a blank slot?
-                var count = Variables.MaxPartyMembers;
+                var count = Core.Globals.Variables.MaxPartyMembers;
                 for (var i = 0; i < count; i++)
                 {
                     if (Data.Party[partyNum].Member[i] == -1)
                     {
                         // send the invitation
-                        NetworkSend.SendPartyInvite(target, index);
+                        NetworkSend.PartyInvite(target, index);
 
                         // set the invite target
                         Data.TempPlayer[target].PartyInvite = index;
 
                         // let them know
-                        NetworkSend.SendPlayerMessage(index, "Party invitation sent.", (int)ColorName.Pink);
+                        NetworkSend.PlayerMessage(index, "Party invitation sent.", (int)ColorName.Pink);
                         return;
                     }
                 }
 
                 // no room
-                NetworkSend.SendPlayerMessage(index, "Party is full.", (int)ColorName.BrightRed);
+                NetworkSend.PlayerMessage(index, "Party is full.", (int)ColorName.BrightRed);
                 return;
             }
 
             // not the leader
-            NetworkSend.SendPlayerMessage(index, "You are not the party leader.", (int)ColorName.BrightRed);
+            NetworkSend.PlayerMessage(index, "You are not the party leader.", (int)ColorName.BrightRed);
             return;
         }
 
         // not in a party - doesn't matter!
-        NetworkSend.SendPartyInvite(target, index);
+        NetworkSend.PartyInvite(target, index);
 
         // set the invite target
         Data.TempPlayer[target].PartyInvite = index;
 
         // let them know
-        NetworkSend.SendPlayerMessage(index, "Party invitation sent.", (int)ColorName.Pink);
+        NetworkSend.PlayerMessage(index, "Party invitation sent.", (int)ColorName.Pink);
     }
 
     public static void OnAccept(int index, int target)
@@ -179,7 +179,7 @@ public static class Party
             // get the partynumber
             partyNum = Data.TempPlayer[index].InParty;
             // got a blank slot?
-            for (i = 0; i < Variables.MaxPartyMembers; i++)
+            for (i = 0; i < Core.Globals.Variables.MaxPartyMembers; i++)
             {
                 if (Data.Party[partyNum].Member[i] == -1)
                 {
@@ -190,8 +190,8 @@ public static class Party
                     OnCount(partyNum);
 
                     // send update to all - including new player
-                    NetworkSend.SendPartyUpdate(partyNum);
-                    NetworkSend.SendPartyVitals(partyNum, target);
+                    NetworkSend.PartyUpdate(partyNum);
+                    NetworkSend.PartyVitals(partyNum, target);
 
                     // let everyone know they've joined
                     OnMessage(partyNum, string.Format("{0} has joined the party.", GetPlayerName(target)));
@@ -203,13 +203,13 @@ public static class Party
             }
 
             // no empty slots - let them know
-            NetworkSend.SendPlayerMessage(index, "Party is full.", (int)ColorName.BrightRed);
-            NetworkSend.SendPlayerMessage(target, "Party is full.", (int)ColorName.BrightRed);
+            NetworkSend.PlayerMessage(index, "Party is full.", (int)ColorName.BrightRed);
+            NetworkSend.PlayerMessage(target, "Party is full.", (int)ColorName.BrightRed);
             return;
         }
 
         // not in a party. Create one with the new person.
-        for (i = 0; i < Variables.MaxParty; i++)
+        for (i = 0; i < Core.Globals.Variables.MaxParty; i++)
         {
             // find blank party
             if (!(Data.Party[i].Leader > -1))
@@ -225,9 +225,9 @@ public static class Party
         Data.Party[partyNum].Member[0] = index;
         Data.Party[partyNum].Member[1] = target;
 
-        NetworkSend.SendPartyUpdate(partyNum);
-        NetworkSend.SendPartyVitals(partyNum, index);
-        NetworkSend.SendPartyVitals(partyNum, target);
+        NetworkSend.PartyUpdate(partyNum);
+        NetworkSend.PartyVitals(partyNum, index);
+        NetworkSend.PartyVitals(partyNum, target);
 
         // let them know it's created
         OnMessage(partyNum, "Party created.");
@@ -243,9 +243,9 @@ public static class Party
 
     public static void OnDecline(int index, int target)
     {
-        NetworkSend.SendPlayerMessage(index, string.Format("{0} has declined to join your party.", GetPlayerName(target)),
+        NetworkSend.PlayerMessage(index, string.Format("{0} has declined to join your party.", GetPlayerName(target)),
             (int)ColorName.BrightRed);
-        NetworkSend.SendPlayerMessage(target, "You declined to join the party.", (int)ColorName.Yellow);
+        NetworkSend.PlayerMessage(target, "You declined to join the party.", (int)ColorName.Yellow);
 
         // clear the invitation
         Data.TempPlayer[target].PartyInvite = -1;
@@ -257,7 +257,7 @@ public static class Party
         var highindex = 0;
 
         // find the high index
-        for (i = Variables.MaxPartyMembers - 1; i >= 0; i -= 1)
+        for (i = Core.Globals.Variables.MaxPartyMembers - 1; i >= 0; i -= 1)
         {
             if (Data.Party[partyNum].Member[i] >= 0)
             {
@@ -267,7 +267,7 @@ public static class Party
         }
 
         // count the members
-        for (i = 0; i < Variables.MaxPartyMembers; i++)
+        for (i = 0; i < Core.Globals.Variables.MaxPartyMembers; i++)
         {
             // we've got a blank member
             if (Data.Party[partyNum].Member[i] == -1)
@@ -276,7 +276,7 @@ public static class Party
                 if (i < highindex)
                 {
                     // move everyone down a slot
-                    var count1 = Variables.MaxPartyMembers - 1;
+                    var count1 = Core.Globals.Variables.MaxPartyMembers - 1;
                     for (var x = i; x < (int)count1; x++)
                     {
                         Data.Party[partyNum].Member[x] = Data.Party[partyNum].Member[x + 1];
@@ -292,11 +292,11 @@ public static class Party
             }
 
             // check if we've reached the max party members
-            if (i == Variables.MaxPartyMembers - 1)
+            if (i == Core.Globals.Variables.MaxPartyMembers - 1)
             {
                 if (highindex == i)
                 {
-                    Data.Party[partyNum].MemberCount = Variables.MaxPartyMembers;
+                    Data.Party[partyNum].MemberCount = Core.Globals.Variables.MaxPartyMembers;
                     return;
                 }
             }
@@ -319,12 +319,12 @@ public static class Party
         {
             // no party - keep exp for self
             SetPlayerExperience(index, GetPlayerExperience(index) + exp);
-            NetworkSend.SendExperience(index);
+            NetworkSend.Experience(index);
             return;
         }
 
         // check members in others maps
-        var count = Variables.MaxPartyMembers;
+        var count = Core.Globals.Variables.MaxPartyMembers;
         for (i = 0; i < count; i++)
         {
             tmpindex = Data.Party[partyNum].Member[i];
@@ -353,7 +353,7 @@ public static class Party
         }
 
         // loop through and give everyone exp
-        var count2 = Variables.MaxPartyMembers;
+        var count2 = Core.Globals.Variables.MaxPartyMembers;
         for (i = 0; i < count2; i++)
         {
             tmpindex = Data.Party[partyNum].Member[i];
@@ -399,7 +399,7 @@ public static class Party
     public static bool IsPlayerInParty(int index)
     {
         bool isPlayerInParty = false;
-        if (index < 0 | index >= Variables.MaxPlayers | !Data.TempPlayer[index].InGame)
+        if (index < 0 | index >= Core.Globals.Variables.MaxPlayers | !Data.TempPlayer[index].InGame)
             return isPlayerInParty;
 
         if (Data.TempPlayer[index].InParty >= 0)
@@ -410,7 +410,7 @@ public static class Party
     public static int GetPlayerParty(int index)
     {
         int getPlayerParty = 0;
-        if (index < 0 | index >= Variables.MaxPlayers | !Data.TempPlayer[index].InGame)
+        if (index < 0 | index >= Core.Globals.Variables.MaxPlayers | !Data.TempPlayer[index].InGame)
             return getPlayerParty;
         getPlayerParty = Data.TempPlayer[index].InParty;
         return getPlayerParty;

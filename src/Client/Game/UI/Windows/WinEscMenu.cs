@@ -24,7 +24,7 @@ public class WinEscMenu
         WindowManager.HideWindows();
 
         WindowManager.ShowWindow("winLogin");
-        Sender.SendLogout();
+        Sender.Logout();
     }
 
     public static void OnExitClick()

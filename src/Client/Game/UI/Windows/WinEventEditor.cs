@@ -199,7 +199,7 @@ public static class WinEventEditor
             Client.Event.EventEditorInit();
 
             // Ensure we have up-to-date variable/switch names for pickers + rename UI.
-            Client.Net.Sender.SendRequestSwitchesAndVariables();
+            Client.Net.Sender.RequestSwitchesAndVariables();
 
             // Snapshot original event for Cancel
             _history = Client.Event.Instance;
@@ -471,7 +471,7 @@ public static class WinEventEditor
         list.Items.Clear();
         _varSwitchIndexMap.Clear();
 
-        int count = mode == 0 ? Variables.MaxSwitches : Variables.MaxVariables;
+        int count = mode == 0 ? Core.Globals.Variables.MaxSwitches : Core.Globals.Variables.MaxVariables;
         for (int i = 0; i < count; i++)
         {
             string name = mode == 0
@@ -609,7 +609,7 @@ public static class WinEventEditor
             Client.Event.Variables[id] = trimmed;
         }
 
-        Client.Net.Sender.SendSwitchesAndVariables();
+        Client.Net.Sender.SwitchesAndVariables();
         RefreshVarSwitchList();
 
         // Restore selection to the renamed id if present.
@@ -1298,23 +1298,23 @@ public static class WinEventEditor
                 break;
             case EventCommand.OpenShop:
                 pick1Label = "Shop";
-                pick1Items = BuildIndexItems(Variables.MaxShops, i => i >= 0 && i < Shop.Instance.Count ? Shop.Instance[i].Name : null);
+                pick1Items = BuildIndexItems(Core.Globals.Variables.MaxShops, i => i >= 0 && i < Shop.Instance.Count ? Shop.Instance[i].Name : null);
                 break;
             case EventCommand.PlayAnimation:
                 pick1Label = "Animation";
-                pick1Items = BuildIndexItems(Variables.MaxAnimations, i => i >= 0 && i < AnimationBase.Instance.Count ? AnimationBase.Instance[i].Name : null);
+                pick1Items = BuildIndexItems(Core.Globals.Variables.MaxAnimations, i => i >= 0 && i < AnimationBase.Instance.Count ? AnimationBase.Instance[i].Name : null);
                 break;
             case EventCommand.ChangeItems:
                 pick1Label = "Item";
-                pick1Items = BuildIndexItems(Variables.MaxItems, i => i >= 0 && i < ItemBase.Instance.Count ? ItemBase.Instance[i].Name : null);
+                pick1Items = BuildIndexItems(Core.Globals.Variables.MaxItems, i => i >= 0 && i < ItemBase.Instance.Count ? ItemBase.Instance[i].Name : null);
                 break;
             case EventCommand.ChangeSkills:
                 pick1Label = "Skill";
-                pick1Items = BuildIndexItems(Variables.MaxSkills, i => i >= 0 && i < SkillBase.Instance.Count ? SkillBase.Instance[i].Name : null);
+                pick1Items = BuildIndexItems(Core.Globals.Variables.MaxSkills, i => i >= 0 && i < SkillBase.Instance.Count ? SkillBase.Instance[i].Name : null);
                 break;
             case EventCommand.ChangeJob:
                 pick1Label = "Job";
-                pick1Items = BuildIndexItems(Variables.MaxJobs, i => i >= 0 && i < JobBase.Instance.Count ? JobBase.Instance[i].Name : null);
+                pick1Items = BuildIndexItems(Core.Globals.Variables.MaxJobs, i => i >= 0 && i < JobBase.Instance.Count ? JobBase.Instance[i].Name : null);
                 break;
 
             case EventCommand.ChangeSex:
@@ -1370,7 +1370,7 @@ public static class WinEventEditor
             case EventCommand.Variable:
                 pick1Label = "Variable";
                 pick1Target = "txtCmdData1";
-                pick1Items = BuildIndexItems(Variables.MaxVariables, i => $"{i}");
+                pick1Items = BuildIndexItems(Core.Globals.Variables.MaxVariables, i => $"{i}");
 
                 pick2Label = "Value";
                 pick2Target = "txtCmdData2";
@@ -1387,7 +1387,7 @@ public static class WinEventEditor
             case EventCommand.Switch:
                 pick1Label = "Switch";
                 pick1Target = "txtCmdData1";
-                pick1Items = BuildIndexItems(Variables.MaxSwitches, i => $"{i}");
+                pick1Items = BuildIndexItems(Core.Globals.Variables.MaxSwitches, i => $"{i}");
 
                 pick2Label = "Value";
                 pick2Target = "txtCmdData2";
@@ -1455,21 +1455,21 @@ public static class WinEventEditor
                         pick2Label = "Item";
                         pick2Target = "txtCmdData2";
                         pick2CurrentValue = cmd.ConditionalBranch.Data1;
-                        pick2Items = BuildIndexItems(Variables.MaxItems, i => i >= 0 && i < ItemBase.Instance.Count ? ItemBase.Instance[i].Name : null);
+                        pick2Items = BuildIndexItems(Core.Globals.Variables.MaxItems, i => i >= 0 && i < ItemBase.Instance.Count ? ItemBase.Instance[i].Name : null);
                         break;
 
                     case 3: // Job
                         pick2Label = "Job";
                         pick2Target = "txtCmdData2";
                         pick2CurrentValue = cmd.ConditionalBranch.Data1;
-                        pick2Items = BuildIndexItems(Variables.MaxJobs, i => i >= 0 && i < JobBase.Instance.Count ? JobBase.Instance[i].Name : null);
+                        pick2Items = BuildIndexItems(Core.Globals.Variables.MaxJobs, i => i >= 0 && i < JobBase.Instance.Count ? JobBase.Instance[i].Name : null);
                         break;
 
                     case 4: // Skill
                         pick2Label = "Skill";
                         pick2Target = "txtCmdData2";
                         pick2CurrentValue = cmd.ConditionalBranch.Data1;
-                        pick2Items = BuildIndexItems(Variables.MaxSkills, i => i >= 0 && i < SkillBase.Instance.Count ? SkillBase.Instance[i].Name : null);
+                        pick2Items = BuildIndexItems(Core.Globals.Variables.MaxSkills, i => i >= 0 && i < SkillBase.Instance.Count ? SkillBase.Instance[i].Name : null);
                         break;
 
                     case 0: // Variable
@@ -1884,7 +1884,7 @@ public static class WinEventEditor
             {
                 cmbSwitchIndex.Items.Clear();
                 var items = BuildIndexItems(
-                    Variables.MaxSwitches,
+                    Core.Globals.Variables.MaxSwitches,
                     i => i >= 0 && Client.Event.Switches != null && i < Client.Event.Switches.Length ? Client.Event.Switches[i] : null);
                 for (int i = 0; i < items.Length; i++)
                     cmbSwitchIndex.Items.Add(items[i].name);
@@ -1897,7 +1897,7 @@ public static class WinEventEditor
             {
                 cmbVariableIndex.Items.Clear();
                 var items = BuildIndexItems(
-                    Variables.MaxVariables,
+                    Core.Globals.Variables.MaxVariables,
                     i => i >= 0 && Client.Event.Variables != null && i < Client.Event.Variables.Length ? Client.Event.Variables[i] : null);
                 for (int i = 0; i < items.Length; i++)
                     cmbVariableIndex.Items.Add(items[i].name);
@@ -1909,7 +1909,7 @@ public static class WinEventEditor
             if (cmbHasItemIndex.Items.Count == 0)
             {
                 cmbHasItemIndex.Items.Clear();
-                var items = BuildIndexItems(Variables.MaxItems, i => i >= 0 && i < ItemBase.Instance.Count ? ItemBase.Instance[i].Name : null);
+                var items = BuildIndexItems(Core.Globals.Variables.MaxItems, i => i >= 0 && i < ItemBase.Instance.Count ? ItemBase.Instance[i].Name : null);
                 for (int i = 0; i < items.Length; i++)
                     cmbHasItemIndex.Items.Add(items[i].name);
             }

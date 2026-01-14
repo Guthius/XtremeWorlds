@@ -167,7 +167,7 @@ namespace Client
 
                 if (Strings.Len(chatText) > 0)
                 {
-                    Sender.SendAdminMessage(chatText);
+                    Sender.AdminMessage(chatText);
                 }
 
                 if (WindowManager.TryGetControl("winChat", "txtChat", out var chatCtrl3)) chatCtrl3!.Text = "";
@@ -195,7 +195,7 @@ namespace Client
 
                 if (Strings.Len(chatText) > 0)
                 {
-                    Sender.SendPartyChatMsg(chatText);
+                    Sender.PartyChatMsg(chatText);
                 }
 
                 if (WindowManager.TryGetControl("winChat", "txtChat", out var chatCtrl5)) chatCtrl5!.Text = "";
@@ -255,7 +255,7 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Sender.SendUseEmote(emote);
+                            Sender.UseEmote(emote);
                             break;
                         }
 
@@ -276,7 +276,7 @@ namespace Client
                             {
                                 if (GameState.MyTargetType == (int)TargetType.Player)
                                 {
-                                    Sender.SendPlayerInfo(GetPlayerName(GameState.MyTarget));
+                                    Sender.PlayerInfo(GetPlayerName(GameState.MyTarget));
                                     goto Continue1;
                                 }
                             }
@@ -288,21 +288,21 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Sender.SendPlayerInfo(command[1]);
+                            Sender.PlayerInfo(command[1]);
                             break;
                         }
 
                     // Whos Online
                     case "/who":
                         {
-                            Sender.SendWhosOnline();
+                            Sender.WhosOnline();
                             break;
                         }
 
                     // Requets level up
                     case "/levelup":
                         {
-                            Sender.SendRequestLevelUp();
+                            Sender.RequestLevelUp();
                             break;
                         }
 
@@ -332,7 +332,7 @@ namespace Client
                             {
                                 if (GameState.MyTargetType == (int)TargetType.Player)
                                 {
-                                    Sender.SendPartyRequest(GetPlayerName(GameState.MyTarget));
+                                    Sender.PartyRequest(GetPlayerName(GameState.MyTarget));
                                     goto Continue1;
                                 }
                             }
@@ -344,21 +344,21 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Sender.SendPartyRequest(command[1]);
+                            Sender.PartyRequest(command[1]);
                             break;
                         }
 
                     // Join party
                     case "/join":
                         {
-                            Sender.SendAcceptParty();
+                            Sender.AcceptParty();
                             break;
                         }
 
                     // Leave party
                     case "/leave":
                         {
-                            Sender.SendLeaveParty();
+                            Sender.LeaveParty();
                             break;
                         }
 
@@ -369,7 +369,7 @@ namespace Client
                             {
                                 if (GameState.MyTargetType == (int)TargetType.Player)
                                 {
-                                    Sender.SendTradeRequest(GetPlayerName(GameState.MyTarget));
+                                    Sender.TradeRequest(GetPlayerName(GameState.MyTarget));
                                     goto Continue1;
                                 }
                             }
@@ -381,7 +381,7 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Sender.SendTradeRequest(command[1]);
+                            Sender.TradeRequest(command[1]);
                             break;
                         }
 
@@ -404,7 +404,7 @@ namespace Client
 
                     case "/acp":
                         {
-                            Sender.SendRequestAdmin();
+                            Sender.RequestAdmin();
                             break;
                         }
 
@@ -424,7 +424,7 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Sender.SendKick(command[1]);
+                            Sender.Kick(command[1]);
                             break;
                         }
 
@@ -500,7 +500,7 @@ namespace Client
                             }
 
                             // Check to make sure its a valid map #
-                            if (n >= 0 & n < Variables.MaxMaps)
+                            if (n >= 0 & n < Core.Globals.Variables.MaxMaps)
                             {
                                 Sender.WarpTo(n);
                             }
@@ -528,7 +528,7 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Sender.SendSetSprite(sprite);
+                            Sender.SetSprite(sprite);
                             break;
                         }
 
@@ -542,7 +542,7 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Sender.SendRequestMapReport();
+                            Sender.RequestMapReport();
                             break;
                         }
 
@@ -556,7 +556,7 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Sender.SendMapRespawn();
+                            Sender.MapRespawn();
                             break;
                         }
 
@@ -573,7 +573,7 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Sender.SendRespawnNow();
+                            Sender.RespawnNow();
                             break;
                         }
 
@@ -586,7 +586,7 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Sender.SendRequestEditMap();
+                            Sender.RequestEditMap();
                             break;
                         }
 
@@ -597,7 +597,7 @@ namespace Client
                                 TextRenderer.AddText(LocalesManager.Get("AccessDenied"), (int)ColorName.BrightRed);
                             }
 
-                            Sender.SendRequestEditScript(0);
+                            Sender.RequestEditScript(0);
                             break;
                         }
 
@@ -618,7 +618,7 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Sender.SendMotdChange(Strings.Right(chatText, Strings.Len(chatText) - 5));
+                            Sender.MotdChange(Strings.Right(chatText, Strings.Len(chatText) - 5));
                             break;
                         }
 
@@ -632,7 +632,7 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Sender.SendBanList();
+                            Sender.BanList();
                             break;
                         }
 
@@ -652,7 +652,7 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Sender.SendBan(command[1]);
+                            Sender.Ban(command[1]);
                             break;
                         }
 
@@ -667,7 +667,7 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Sender.SendBanDestroy();
+                            Sender.BanDestroy();
                             break;
                         }
 
@@ -686,7 +686,7 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Sender.SendSetAccess(command[1], (byte)access);
+                            Sender.SetAccess(command[1], (byte)access);
                             break;
                         }
 
@@ -700,7 +700,7 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Sender.SendRequestEditResource();
+                            Sender.RequestEditResource();
                             break;
                         }
 
@@ -713,7 +713,7 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Sender.SendRequestEditAnimation();
+                            Sender.RequestEditAnimation();
                             break;
                         }
 
@@ -726,7 +726,7 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Sender.SendRequestEditItem();
+                            Sender.RequestEditItem();
                             break;
                         }
 
@@ -739,7 +739,7 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Sender.SendRequestEditProjectiles();
+                            Sender.RequestEditProjectiles();
                             break;
                         }
 
@@ -752,7 +752,7 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Sender.SendRequestEditNpc();
+                            Sender.RequestEditNpc();
                             break;
                         }
 
@@ -765,7 +765,7 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Sender.SendRequestEditJob();
+                            Sender.RequestEditJob();
                             break;
                         }
 
@@ -778,7 +778,7 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Sender.SendRequestEditSkill();
+                            Sender.RequestEditSkill();
                             break;
                         }
 
@@ -790,7 +790,7 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Sender.SendRequestEditShop();
+                            Sender.RequestEditShop();
                             break;
                         }
 
@@ -802,7 +802,7 @@ namespace Client
                                 goto Continue1;
                             }
 
-                            Sender.SendRequestEditMoral();
+                            Sender.RequestEditMoral();
                             break;
                         }
 
@@ -823,7 +823,7 @@ namespace Client
             {
                 if (!string.IsNullOrEmpty(chatText))
                 {
-                    Sender.SayMsg(chatText);
+                    Client.Net.Sender.SayMessage(chatText);
                 }
             }
 
@@ -864,7 +864,7 @@ namespace Client
             }
         }
 
-        public static void AddChatBubble(int target, byte targetType, string msg, int color)
+        public static void AddChatBubble(int target, byte targetType, string message, int color)
         {
             int i;
             int index;
@@ -900,7 +900,7 @@ namespace Client
                 ref var instance = ref Data.ChatBubble[index];
                 instance.Target = target;
                 instance.TargetType = targetType;
-                instance.Msg = msg;
+                instance.Msg = message;
                 instance.Color = color;
                 instance.Timer = General.GetTickCount();
                 instance.Active = true;
@@ -1153,28 +1153,28 @@ namespace Client
                     case DialogueType.TradeAmount:
                         {
                             value = (long)Math.Round(Conversion.Val(diaInput));
-                            Sender.SendTradeItem((int)GameState.DiaData1, (int)value);
+                            Sender.TradeItem((int)GameState.DiaData1, (int)value);
                             break;
                         }
 
                     case DialogueType.DepositItem:
                         {
                             value = (long)Math.Round(Conversion.Val(diaInput));
-                            Sender.SendDepositItem((int)GameState.DiaData1, (int)value);
+                            Sender.DepositItem((int)GameState.DiaData1, (int)value);
                             break;
                         }
 
                     case DialogueType.WithdrawItem:
                         {
                             value = (long)Math.Round(Conversion.Val(diaInput));
-                            Sender.SendWithdrawItem((byte)(int)GameState.DiaData1, (int)value);
+                            Sender.WithdrawItem((byte)(int)GameState.DiaData1, (int)value);
                             break;
                         }
 
                     case DialogueType.DropItem:
                         {
                             value = (long)Math.Round(Conversion.Val(diaInput));
-                            Sender.SendDropItem((int)GameState.DiaData1, (int)value);
+                            Sender.DropItem((int)GameState.DiaData1, (int)value);
                             break;
                         }
 
@@ -1202,19 +1202,19 @@ namespace Client
                 {
                     case DialogueType.Trade:
                         {
-                            Sender.SendHandleTradeInvite(1);
+                            Sender.HandleTradeInvite(1);
                             break;
                         }
 
                     case DialogueType.ForgetSkill:
                         {
-                            Sender.SendForgetSkill((int)GameState.DiaData1);
+                            Sender.ForgetSkill((int)GameState.DiaData1);
                             break;
                         }
 
                     case DialogueType.PartyInvite:
                         {
-                            Sender.SendAcceptParty();
+                            Sender.AcceptParty();
                             break;
                         }
 
@@ -1226,7 +1226,7 @@ namespace Client
 
                     case DialogueType.DeleteCharacter:
                         {
-                            Sender.SendDelChar((byte)GameState.DiaData1);
+                            Sender.DelChar((byte)GameState.DiaData1);
                             break;
                         }
 
@@ -1375,13 +1375,13 @@ namespace Client
                 {
                     case DialogueType.Trade:
                         {
-                            Sender.SendHandleTradeInvite(0);
+                            Sender.HandleTradeInvite(0);
                             break;
                         }
 
                     case DialogueType.PartyInvite:
                         {
-                            Sender.SendDeclineParty();
+                            Sender.DeclineParty();
                             break;
                         }
                 }
@@ -1406,7 +1406,7 @@ namespace Client
         {
             if (Network.IsConnected == true)
             {
-                Sender.SendAddChar(name, sex, job);
+                Sender.AddChar(name, sex, job);
             }
             else
             {
@@ -1444,7 +1444,7 @@ namespace Client
 
         public static int IsHotbar(long startX, long startY)
         {
-            for (var i = 0; i < Variables.MaxHotbar; i++)
+            for (var i = 0; i < Core.Globals.Variables.MaxHotbar; i++)
             {
                 Rectangle rec;
                 
@@ -1793,7 +1793,7 @@ namespace Client
             string sUse = string.Empty;
             int tmpWidth = 0;
 
-            if (skill < 0 || skill > Variables.MaxSkills)
+            if (skill < 0 || skill > Core.Globals.Variables.MaxSkills)
                 return;
 
             // set globals
@@ -2189,7 +2189,7 @@ namespace Client
             long i;
             var amount = default(long);
 
-            for (i = 0L; i < Variables.MaxInventory; i++)
+            for (i = 0L; i < Core.Globals.Variables.MaxInventory; i++)
             {
                 if (GetPlayerInv(GameState.MyIndex, (int)i) == 1)
                 {

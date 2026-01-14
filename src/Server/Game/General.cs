@@ -103,17 +103,17 @@ public static class General
 
     public static void InitalizeCoreData()
     {
-        for (var i = 0; i < Variables.MaxMaps; i++)
+        for (var i = 0; i < Core.Globals.Variables.MaxMaps; i++)
         {
-            for (var x = 0; x < Variables.MaxMapNpcs; x++)
+            for (var x = 0; x < Core.Globals.Variables.MaxMapNpcs; x++)
             {
                 MapNpc.Instance[i, x].Vital = new int[Enum.GetValues(typeof(Vital)).Length];
-                MapNpc.Instance[i, x].SkillCd = new int[Variables.MaxNpcSkills];
+                MapNpc.Instance[i, x].SkillCd = new int[Core.Globals.Variables.MaxNpcSkills];
                 MapNpc.Instance[i, x].Num = -1;
                 MapNpc.Instance[i, x].SkillBuffer = -1;
             }
 
-            for (var x = 0; x < Variables.MaxMapItems; x++)
+            for (var x = 0; x < Core.Globals.Variables.MaxMapItems; x++)
             {
                 MapItem.Instance[i, x].Num = -1;
             }
@@ -124,12 +124,12 @@ public static class General
             Account.OnClear(i);
         }
 
-        for (var i = 0; i < Variables.MaxPartyMembers; i++)
+        for (var i = 0; i < Core.Globals.Variables.MaxPartyMembers; i++)
         {
             Party.OnClear(i);
         }
 
-        Event.TempEventMap = new GlobalEvents[Variables.MaxMaps];
+        Event.TempEventMap = new GlobalEvents[Core.Globals.Variables.MaxMaps];
     }
 
     private static async System.Threading.Tasks.Task LoadGameData()
@@ -176,9 +176,9 @@ public static class General
 
         try
         {
-            await Parallel.ForEachAsync(Enumerable.Range(0, Variables.MaxPlayers), Cts.Token, async (i, _) =>
+            await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxPlayers), Cts.Token, async (i, _) =>
             {
-                NetworkSend.SendLeftGame(i);
+                NetworkSend.LeftGame(i);
                 await Player.OnExit(i);
             });
         }
@@ -261,7 +261,7 @@ public static class General
             await semaphore.WaitAsync(Cts.Token);
             try
             {
-                for (var i = 0; i < Variables.MaxCharacters; i++)
+                for (var i = 0; i < Core.Globals.Variables.MaxCharacters; i++)
                 {
                     var data = await Database.SelectRowByColumnAsync("id", id, "account", $"character{i + 1}");
                     if (data != null)
@@ -411,10 +411,10 @@ public static class General
 
     private static async System.Threading.Tasks.Task SendServerAnnouncementAsync(string message)
     {
-        await Parallel.ForEachAsync(Enumerable.Range(0, Variables.MaxPlayers), Cts.Token, (i, _) =>
+        await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxPlayers), Cts.Token, (i, _) =>
         {
             if (NetworkConfig.IsPlaying(i))
-                NetworkSend.SendPlayerMessage(i, message, (int)ColorName.Yellow);
+                NetworkSend.PlayerMessage(i, message, (int)ColorName.Yellow);
             return new ValueTask();
         });
         Logger.LogInformation("Server announcement sent.");
@@ -473,7 +473,7 @@ public static class General
                 {
                     GetShutDownTimer.Stop();
                     Console.WriteLine("Server shutdown has been cancelled!");
-                    NetworkSend.SendGlobalMessage("Server shutdown has been cancelled!");
+                    NetworkSend.GlobalMessage("Server shutdown has been cancelled!");
                 }
                 else
                 {
@@ -487,7 +487,7 @@ public static class General
                     }
 
                     Console.WriteLine("Server shutdown in " + Variables.ServerShutdown + " seconds!");
-                    NetworkSend.SendGlobalMessage("Server shutdown in " + Variables.ServerShutdown + " seconds!");
+                    NetworkSend.GlobalMessage("Server shutdown in " + Variables.ServerShutdown + " seconds!");
                 }
                 break;
             }
@@ -510,37 +510,37 @@ public static class General
                 {
                     case (byte)AccessLevel.Player:
                         SetPlayerAccess(player, access);
-                        NetworkSend.SendPlayerData(player);
+                        NetworkSend.PlayerData(player);
                         await Account.OnSave(player);
-                        NetworkSend.SendPlayerMessage(player, "Your access has been set to Player!", (int)ColorName.Yellow);
+                        NetworkSend.PlayerMessage(player, "Your access has been set to Player!", (int)ColorName.Yellow);
                         Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(player));
                         break;
                     case (byte)AccessLevel.Moderator:
                         SetPlayerAccess(player, access);
-                        NetworkSend.SendPlayerData(player);
+                        NetworkSend.PlayerData(player);
                         await Account.OnSave(player);
-                        NetworkSend.SendPlayerMessage(player, "Your access has been set to Moderator!", (int)ColorName.Yellow);
+                        NetworkSend.PlayerMessage(player, "Your access has been set to Moderator!", (int)ColorName.Yellow);
                         Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(player));
                         break;
                     case (byte)AccessLevel.Mapper:
                         SetPlayerAccess(player, access);
-                        NetworkSend.SendPlayerData(player);
+                        NetworkSend.PlayerData(player);
                         await Account.OnSave(player);
-                        NetworkSend.SendPlayerMessage(player, "Your access has been set to Mapper!", (int)ColorName.Yellow);
+                        NetworkSend.PlayerMessage(player, "Your access has been set to Mapper!", (int)ColorName.Yellow);
                         Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(player));
                         break;
                     case (byte)AccessLevel.Developer:
                         SetPlayerAccess(player, access);
-                        NetworkSend.SendPlayerData(player);
+                        NetworkSend.PlayerData(player);
                         await Account.OnSave(player);
-                        NetworkSend.SendPlayerMessage(player, "Your access has been set to Developer!", (int)ColorName.Yellow);
+                        NetworkSend.PlayerMessage(player, "Your access has been set to Developer!", (int)ColorName.Yellow);
                         Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(player));
                         break;
                     case (byte)AccessLevel.Owner:
                         SetPlayerAccess(player, access);
-                        NetworkSend.SendPlayerData(player);
+                        NetworkSend.PlayerData(player);
                         await Account.OnSave(player);
-                        NetworkSend.SendPlayerMessage(player, "Your access has been set to Owner!", (int)ColorName.Yellow);
+                        NetworkSend.PlayerMessage(player, "Your access has been set to Owner!", (int)ColorName.Yellow);
                         Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(player));
                         break;
                     default:
@@ -588,19 +588,19 @@ public static class General
 
             if (x < 0 || x >= Server.Map.Instance[player.Map].MaxX || y < 0 || y >= Server.Map.Instance[player.Map].MaxY)
             {
-                NetworkSend.SendPlayerMessage(playerIndex, "Invalid coordinates for teleportation.", (int)ColorName.BrightRed);
+                NetworkSend.PlayerMessage(playerIndex, "Invalid coordinates for teleportation.", (int)ColorName.BrightRed);
                 return System.Threading.Tasks.Task.CompletedTask;
             }
 
             player.X = x;
             player.Y = y;
-            NetworkSend.SendPlayerXYToMap(playerIndex);
+            NetworkSend.PlayerXYToMap(playerIndex);
             Logger.LogInformation($"Player {playerIndex} teleported to ({x}, {y})");
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, $"Failed to teleport player {playerIndex}");
-            NetworkSend.SendPlayerMessage(playerIndex, "Teleport failed.", (int)ColorName.BrightRed);
+            NetworkSend.PlayerMessage(playerIndex, "Teleport failed.", (int)ColorName.BrightRed);
         }
         return System.Threading.Tasks.Task.CompletedTask;
     }
@@ -611,20 +611,20 @@ public static class General
         {
             if (NetworkConfig.IsPlaying(playerIndex))
             {
-                NetworkSend.SendLeftGame(playerIndex);
+                NetworkSend.LeftGame(playerIndex);
                 await Player.OnExit(playerIndex);
                 Logger.LogInformation($"Player {playerIndex} kicked by server!");
-                NetworkSend.SendPlayerMessage(playerIndex, $"Player {playerIndex} has been kicked.", (int)ColorName.BrightGreen);
+                NetworkSend.PlayerMessage(playerIndex, $"Player {playerIndex} has been kicked.", (int)ColorName.BrightGreen);
             }
             else
             {
-                NetworkSend.SendPlayerMessage(playerIndex, "Target player is not online.", (int)ColorName.BrightRed);
+                NetworkSend.PlayerMessage(playerIndex, "Target player is not online.", (int)ColorName.BrightRed);
             }
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, $"Failed to kick player {playerIndex}");
-            NetworkSend.SendPlayerMessage(playerIndex, "Kick operation failed.", (int)ColorName.BrightRed);
+            NetworkSend.PlayerMessage(playerIndex, "Kick operation failed.", (int)ColorName.BrightRed);
         }
     }
 
@@ -634,7 +634,7 @@ public static class General
         {
             if (!await IsAdminAsync(playerIndex))
             {
-                NetworkSend.SendPlayerMessage(playerIndex, "You are not authorized to broadcast.", (int)ColorName.BrightRed);
+                NetworkSend.PlayerMessage(playerIndex, "You are not authorized to broadcast.", (int)ColorName.BrightRed);
                 return;
             }
 
@@ -644,7 +644,7 @@ public static class General
         catch (Exception ex)
         {
             Logger.LogError(ex, "Broadcast failed");
-            NetworkSend.SendPlayerMessage(playerIndex, "Broadcast failed.", (int)ColorName.BrightRed);
+            NetworkSend.PlayerMessage(playerIndex, "Broadcast failed.", (int)ColorName.BrightRed);
         }
     }
 
@@ -655,12 +655,12 @@ public static class General
             var status = $"Players Online: {CountPlayersOnline()}\n" +
                          $"Uptime: {MyStopwatch.Elapsed}\n" +
                          $"Errors: {Global.ErrorCount}";
-            NetworkSend.SendPlayerMessage(playerIndex, status, (int)ColorName.BrightGreen);
+            NetworkSend.PlayerMessage(playerIndex, status, (int)ColorName.BrightGreen);
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to send server status");
-            NetworkSend.SendPlayerMessage(playerIndex, "Unable to retrieve server status.", (int)ColorName.BrightRed);
+            NetworkSend.PlayerMessage(playerIndex, "Unable to retrieve server status.", (int)ColorName.BrightRed);
         }
         return System.Threading.Tasks.Task.CompletedTask;
     }
@@ -691,7 +691,7 @@ public static class General
             var targetIndex = await FindPlayerByNameAsync(targetName);
             if (targetIndex == -1)
             {
-                NetworkSend.SendPlayerMessage(senderIndex, $"Player '{targetName}' not found.", (int)ColorName.BrightRed);
+                NetworkSend.PlayerMessage(senderIndex, $"Player '{targetName}' not found.", (int)ColorName.BrightRed);
                 return;
             }
 
@@ -701,7 +701,7 @@ public static class General
         catch (Exception ex)
         {
             Logger.LogError(ex, $"Failed to send whisper from {senderIndex} to {targetName}");
-            NetworkSend.SendPlayerMessage(senderIndex, "Failed to send whisper.", (int)ColorName.BrightRed);
+            NetworkSend.PlayerMessage(senderIndex, "Failed to send whisper.", (int)ColorName.BrightRed);
         }
     }
 
@@ -710,13 +710,13 @@ public static class General
         try
         {
             await Account.OnSave(playerIndex); // Assuming this method exists
-            NetworkSend.SendPlayerMessage(playerIndex, "Your data has been saved.", (int)ColorName.BrightGreen);
+            NetworkSend.PlayerMessage(playerIndex, "Your data has been saved.", (int)ColorName.BrightGreen);
             Logger.LogInformation($"Player {playerIndex} data saved manually.");
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, $"Failed to save data for player {playerIndex}");
-            NetworkSend.SendPlayerMessage(playerIndex, "Failed to save data.", (int)ColorName.BrightRed);
+            NetworkSend.PlayerMessage(playerIndex, "Failed to save data.", (int)ColorName.BrightRed);
         }
     }
 
@@ -738,31 +738,31 @@ public static class General
         {
             if (string.IsNullOrWhiteSpace(message) || message.Length > 200) // Basic filtering
             {
-                NetworkSend.SendPlayerMessage(senderIndex, "Invalid message.", (int)ColorName.BrightRed);
+                NetworkSend.PlayerMessage(senderIndex, "Invalid message.", (int)ColorName.BrightRed);
                 return;
             }
 
             if (channel.StartsWith("private:"))
             {
                 var targetIndex = int.Parse(channel.Split(':')[1]);
-                NetworkSend.SendPlayerMessage(targetIndex, $"[From {Player.Instance[senderIndex].Name}] {message}", (int)color);
-                NetworkSend.SendPlayerMessage(senderIndex, $"[To {Player.Instance[targetIndex].Name}] {message}", (int)color);
+                NetworkSend.PlayerMessage(targetIndex, $"[From {Player.Instance[senderIndex].Name}] {message}", (int)color);
+                NetworkSend.PlayerMessage(senderIndex, $"[To {Player.Instance[targetIndex].Name}] {message}", (int)color);
             }
             else if (channel == "party" && Data.TempPlayer[senderIndex].InParty != 0)
             {
-                await Parallel.ForEachAsync(Enumerable.Range(0, Variables.MaxPlayers), Cts.Token, (i, _) =>
+                await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxPlayers), Cts.Token, (i, _) =>
                 {
                     if (NetworkConfig.IsPlaying(i) && Data.TempPlayer[i].InParty == Data.TempPlayer[senderIndex].InParty)
-                        NetworkSend.SendPlayerMessage(i, $"[Party] {Player.Instance[senderIndex].Name}: {message}", (int)color);
+                        NetworkSend.PlayerMessage(i, $"[Party] {Player.Instance[senderIndex].Name}: {message}", (int)color);
                     return new ValueTask();
                 });
             }
             else if (channel == "global")
             {
-                await Parallel.ForEachAsync(Enumerable.Range(0, Variables.MaxPlayers), Cts.Token, (i, _) =>
+                await Parallel.ForEachAsync(Enumerable.Range(0, Core.Globals.Variables.MaxPlayers), Cts.Token, (i, _) =>
                 {
                     if (NetworkConfig.IsPlaying(i))
-                        NetworkSend.SendPlayerMessage(i, message, (int)color);
+                        NetworkSend.PlayerMessage(i, message, (int)color);
                     return new ValueTask();
                 });
             }
@@ -770,7 +770,7 @@ public static class General
         catch (Exception ex)
         {
             Logger.LogError(ex, $"Failed to send chat message from {senderIndex} to {channel}");
-            NetworkSend.SendPlayerMessage(senderIndex, "Failed to send message.", (int)ColorName.BrightRed);
+            NetworkSend.PlayerMessage(senderIndex, "Failed to send message.", (int)ColorName.BrightRed);
         }
     }
 
@@ -789,7 +789,7 @@ public static class General
 
             var backups = Directory.GetFiles(backupDir, "backup_*.bak")
                 .OrderByDescending(f => f)
-                .Skip(Variables.MaxBackups)
+                .Skip(Core.Globals.Variables.MaxBackups)
                 .ToList();
             foreach (var oldBackup in backups)
             {
@@ -820,7 +820,7 @@ public static class General
         {
             if (Variables.ServerShutdown - time <= 10)
             {
-                NetworkSend.SendGlobalMessage($"Server shutdown in {Variables.ServerShutdown - time} seconds!");
+                NetworkSend.GlobalMessage($"Server shutdown in {Variables.ServerShutdown - time} seconds!");
                 Console.WriteLine($"Server shutdown in {Variables.ServerShutdown - time} seconds!");
                 if (Variables.ServerShutdown - time <= 1)
                 {

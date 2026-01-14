@@ -37,12 +37,12 @@ namespace Client
 
             GameState.CurrentEvents = 0;
 
-            for (int i = 0; i < Variables.MaxMapNpcs; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
             {
                 MapNpc.OnClear(i);
             }
 
-            for (int i = 0; i < Variables.MaxMapItems; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxMapItems; i++)
             {
                 MapItem.OnClear(i);
             }
@@ -94,20 +94,20 @@ namespace Client
         public static Sex NewCnarGender;
 
         // Characters
-        public static string?[] CharName = new string?[Variables.MaxCharacters];
-        public static long[] Charactersprite = new long[(Variables.MaxCharacters)];
-        public static long[] CharAccess = new long[(Variables.MaxCharacters)];
-        public static long[] CharJob = new long[(Variables.MaxCharacters)];
-        public static long[,] CharEq = new long[Variables.MaxCharacters, Enum.GetValues<Equipment>().Length];
+        public static string?[] CharName = new string?[Core.Globals.Variables.MaxCharacters];
+        public static long[] Charactersprite = new long[(Core.Globals.Variables.MaxCharacters)];
+        public static long[] CharAccess = new long[(Core.Globals.Variables.MaxCharacters)];
+        public static long[] CharJob = new long[(Core.Globals.Variables.MaxCharacters)];
+        public static long[,] CharEq = new long[Core.Globals.Variables.MaxCharacters, Enum.GetValues<Equipment>().Length];
         public static byte Char;
 
         // elastic bars
-        public static int[] BarWidthNpcHP = new int[Variables.MaxMapNpcs];
-        public static int[] BarWidthPlayerHP = new int[Variables.MaxPlayers];
-        public static int[] BarWidthPlayerMP = new int[Variables.MaxPlayers];
-        public static int[] BarWidthNpcHPMax = new int[Variables.MaxMapNpcs];
-        public static int[] BarWidthPlayerHPMax = new int[Variables.MaxPlayers];
-        public static int[] BarWidthPlayerMPMax = new int[Variables.MaxPlayers];
+        public static int[] BarWidthNpcHP = new int[Core.Globals.Variables.MaxMapNpcs];
+        public static int[] BarWidthPlayerHP = new int[Core.Globals.Variables.MaxPlayers];
+        public static int[] BarWidthPlayerMP = new int[Core.Globals.Variables.MaxPlayers];
+        public static int[] BarWidthNpcHPMax = new int[Core.Globals.Variables.MaxMapNpcs];
+        public static int[] BarWidthPlayerHPMax = new int[Core.Globals.Variables.MaxPlayers];
+        public static int[] BarWidthPlayerMPMax = new int[Core.Globals.Variables.MaxPlayers];
         public static int BarWidthGuiHP;
         public static int BarWidthGuiMP;
         public static int BarWidthGuiSP;
@@ -137,7 +137,7 @@ namespace Client
 
         public static string? ChatShowLine;
 
-        public static string?[] MapNames = new string?[Variables.MaxMaps];
+        public static string?[] MapNames = new string?[Core.Globals.Variables.MaxMaps];
 
         // chat
         public static bool InSmallChat;
@@ -434,7 +434,7 @@ namespace Client
         public static int ResourceIndex;
         public static bool ResourcesInit;
 
-        public static Type.WeatherParticle[] WeatherParticle = new Type.WeatherParticle[Variables.MaxWeatherParticles];
+        public static Type.WeatherParticle[] WeatherParticle = new Type.WeatherParticle[Core.Globals.Variables.MaxWeatherParticles];
 
         public static int FogOffsetX;
         public static int FogOffsetY;

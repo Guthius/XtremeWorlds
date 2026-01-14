@@ -36,7 +36,7 @@ namespace Core.Objects
 
         public static void OnClear()
         {
-            for (int i = 0; i < Variables.MaxBank; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxBank; i++)
                 OnClear(i);
         }
 

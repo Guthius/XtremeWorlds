@@ -58,7 +58,7 @@ namespace Client.Game.UI.Windows
             if (win is null) return;
             int relY = GameState.CurMouseY - (win.Y + list.Y);
             int index = list.GetItemIndexAtPosition(relY);
-            if (index < 0 || index >= Variables.MaxAnimations) return;
+            if (index < 0 || index >= Core.Globals.Variables.MaxAnimations) return;
 
             SelectedIndex = index;
             GameState.EditorIndex = index;
@@ -178,7 +178,7 @@ namespace Client.Game.UI.Windows
         {
             // Prompt for destination and copy current animation (deep copy arrays)
             int src = GameState.EditorIndex;
-            if (src < 0 || src >= Variables.MaxAnimations) return;
+            if (src < 0 || src >= Core.Globals.Variables.MaxAnimations) return;
 
             var a = Animation.Instance[src];
             var n = a;
@@ -188,7 +188,7 @@ namespace Client.Game.UI.Windows
             if (a.LoopTime != null) n.LoopTime = (int[])a.LoopTime.Clone();
 
             int def = src + 1;
-            var oneBased = Editors.PromptIndex(null, "Paste Animation", $"Paste animation into index (1..{Variables.MaxAnimations}):", 1, Variables.MaxAnimations, def);
+            var oneBased = Editors.PromptIndex(null, "Paste Animation", $"Paste animation into index (1..{Core.Globals.Variables.MaxAnimations}):", 1, Core.Globals.Variables.MaxAnimations, def);
             if (oneBased == null) return;
             int dst = oneBased.Value - 1;
 

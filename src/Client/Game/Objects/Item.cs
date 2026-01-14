@@ -17,7 +17,7 @@ namespace Client
             if (!IsStreaming[index])
             {
                 IsStreaming[index] = true;
-                Sender.SendRequestItem(index);
+                Sender.RequestItem(index);
             }
         }
         #endregion

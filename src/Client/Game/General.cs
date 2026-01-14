@@ -255,7 +255,7 @@ namespace Client
             {
                 if (GetPlayerAccess(GameState.MyIndex) > 0)
                 {
-                    Sender.SendRequestAdmin();
+                    Sender.RequestAdmin();
                 }
             }
         }
@@ -339,7 +339,7 @@ namespace Client
             if (player.Inventory == null)
                 return -1;
 
-            var slotCount = Math.Min((int)Variables.MaxInventory, player.Inventory.Length);
+            var slotCount = Math.Min((int)Core.Globals.Variables.MaxInventory, player.Inventory.Length);
             for (var i = 0; i < slotCount; i++)
             {
                 if (player.Inventory[i].Num < 0)
@@ -368,7 +368,7 @@ namespace Client
             Type.Rect tempRec;
             int i;
 
-            for (i = 0; i < Variables.MaxPlayerSkills; i++)
+            for (i = 0; i < Core.Globals.Variables.MaxPlayerSkills; i++)
             {
                 if (Player.Instance[GameState.MyIndex].Skill[(int) i].Num >= 0)
                 {
@@ -396,7 +396,7 @@ namespace Client
 
             var bank = Bank.Instance[GameState.MyIndex];
 
-            var slotCount = Math.Min(Variables.MaxBank, bank.Item.Length);
+            var slotCount = Math.Min(Core.Globals.Variables.MaxBank, bank.Item.Length);
             for (var i = 0; i < slotCount; i++)
             {
                 if (bank.Item[i].Num < 0)
@@ -434,7 +434,7 @@ namespace Client
 
             Type.Rect tempRec;
 
-            for (var i = 0; i < Variables.MaxTrades; i++)
+            for (var i = 0; i < Core.Globals.Variables.MaxTrades; i++)
             {
                 tempRec.Top = startY + GameState.ShopTop + (GameState.ShopOffsetY + Constants.TileSize) * (i / GameState.ShopColumns);
                 tempRec.Bottom = tempRec.Top + Constants.TileSize;
@@ -455,7 +455,7 @@ namespace Client
         {
             Type.Rect tempRec;
 
-            var slotCount = (int)Variables.MaxInventory;
+            var slotCount = (int)Core.Globals.Variables.MaxInventory;
             slotCount = Math.Min(slotCount, Data.TradeYourOffer.Length);
             slotCount = Math.Min(slotCount, Data.TradeTheirOffer.Length);
 

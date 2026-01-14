@@ -115,7 +115,7 @@ namespace Client
             {
                 case (byte)TargetType.Player:
                     {
-                        if (lockindex >= 0 && lockindex < Variables.MaxPlayers &&
+                        if (lockindex >= 0 && lockindex < Core.Globals.Variables.MaxPlayers &&
                             IsPlaying(lockindex) && GetPlayerMap(lockindex) == GetPlayerMap(GameState.MyIndex))
                         {
                             x = (int)Math.Round(GetPlayerX(lockindex) + 16 - width / 2d);

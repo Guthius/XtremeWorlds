@@ -8,7 +8,7 @@ public class WinSkills
 {
     public static void OnDraw()
     {
-        if (GameState.MyIndex < 0 || GameState.MyIndex >= Variables.MaxPlayers)
+        if (GameState.MyIndex < 0 || GameState.MyIndex >= Core.Globals.Variables.MaxPlayers)
         {
             return;
         }
@@ -51,10 +51,10 @@ public class WinSkills
             y += 76;
         }
 
-        for (var slot = 0; slot < Variables.MaxPlayerSkills; slot++)
+        for (var slot = 0; slot < Core.Globals.Variables.MaxPlayerSkills; slot++)
         {
             var skill = Player.Instance[GameState.MyIndex].Skill[slot].Num;
-            if (skill < 0 || skill >= Variables.MaxSkills)
+            if (skill < 0 || skill >= Core.Globals.Variables.MaxSkills)
             {
                 continue;
             }

@@ -234,7 +234,7 @@ public static class Loop
                     {
                         Data.TempPlayer[id].MoveSpeedMultiplier = 1.0f;
                         Data.TempPlayer[id].MoveSpeedMultiplierTimer = 0;
-                        NetworkSend.SendPlayerXYToMap(id);
+                        NetworkSend.PlayerXYToMap(id);
                     }
                 }
 
@@ -411,16 +411,16 @@ public static class Loop
         // // This is used for respawning map items //
         // ///////////////////////////////////////////
 
-        var mapCount = Math.Min(Variables.MaxMaps, Server.Map.Instance.Count);
+        var mapCount = Math.Min(Core.Globals.Variables.MaxMaps, Server.Map.Instance.Count);
         for (var map = 0; map < mapCount; map++)
         {
-            for (var mapItem = 0; mapItem < Variables.MaxMapItems; mapItem++)
+            for (var mapItem = 0; mapItem < Core.Globals.Variables.MaxMapItems; mapItem++)
             {
                 MapItem.OnClear(mapItem, map);
             }
 
             MapItem.Spawn(map);
-            NetworkSend.SendMapItemsToAll(map);
+            NetworkSend.MapItemsToAll(map);
         }
     }
 
@@ -430,7 +430,7 @@ public static class Loop
         Entity.Instances.Clear();
 
         var entities = Entity.Instances;
-        var mapCount = Math.Min(Variables.MaxMaps, Server.Map.Instance.Count);
+        var mapCount = Math.Min(Core.Globals.Variables.MaxMaps, Server.Map.Instance.Count);
         if (mapCount <= 0)
         {
             return;
@@ -440,7 +440,7 @@ public static class Loop
         for (var map = 0; map < mapCount; map++)
         {
             // Add Npcs
-            for (var i = 0; i < Variables.MaxMapNpcs; i++)
+            for (var i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
             {
                 var npc = Entity.FromNpc(i, MapNpc.Instance[map, i]);
                 if (npc.Num < 0)
@@ -509,7 +509,7 @@ public static class Loop
                         // clear buffer
                         Data.TempPlayer[entity.Id].SkillBuffer = -1;
                         Data.TempPlayer[entity.Id].SkillBufferTimer = 0;
-                        NetworkSend.SendClearSkillBuffer(entity.Id);
+                        NetworkSend.ClearSkillBuffer(entity.Id);
                     }
                 }
             }
@@ -525,9 +525,9 @@ public static class Loop
                         // clear snapshot & underlying map npc buffer
                         entity.SkillBuffer = -1;
                         entity.SkillBufferTimer = 0;
-                        if (map >= 0 && map < Variables.MaxMaps)
+                        if (map >= 0 && map < Core.Globals.Variables.MaxMaps)
                         {
-                            if (entity.Id >= 0 && entity.Id < Variables.MaxMapNpcs)
+                            if (entity.Id >= 0 && entity.Id < Core.Globals.Variables.MaxMapNpcs)
                             {
                                 ref var npc = ref MapNpc.Instance[map, entity.Id];
                                 npc.SkillBuffer = -1;
@@ -569,14 +569,14 @@ public static class Loop
                                         {
                                             if (!string.IsNullOrEmpty(entity.AttackSay))
                                             {
-                                                NetworkSend.SendPlayerMessage(player.Id, GameLogic.CheckGrammar(entity.Name, 1) + " says, '" + entity.AttackSay + "' to you.", (int)ColorName.Yellow);
+                                                NetworkSend.PlayerMessage(player.Id, GameLogic.CheckGrammar(entity.Name, 1) + " says, '" + entity.AttackSay + "' to you.", (int)ColorName.Yellow);
                                             }
                                             entity.TargetType = (byte)TargetType.Player;
                                             entity.Target = player.Id;
                                             // Persist target into base map data for movement logic
-                                            if (map >= 0 && map < Variables.MaxMaps)
+                                            if (map >= 0 && map < Core.Globals.Variables.MaxMaps)
                                             {
-                                                if (entity.Id >= 0 && entity.Id < Variables.MaxMapNpcs)
+                                                if (entity.Id >= 0 && entity.Id < Core.Globals.Variables.MaxMapNpcs)
                                                 {
                                                     ref var mapNpc = ref MapNpc.Instance[map, entity.Id];
                                                     mapNpc.TargetType = entity.TargetType;
@@ -614,9 +614,9 @@ public static class Loop
                                         {
                                             entity.TargetType = (byte)TargetType.Npc;
                                             entity.Target = i;
-                                            if (map >= 0 && map < Variables.MaxMaps)
+                                            if (map >= 0 && map < Core.Globals.Variables.MaxMaps)
                                             {
-                                                if (entity.Id >= 0 && entity.Id < Variables.MaxMapNpcs)
+                                                if (entity.Id >= 0 && entity.Id < Core.Globals.Variables.MaxMapNpcs)
                                                 {
                                                     ref var mapNpc = ref MapNpc.Instance[map, entity.Id];
                                                     mapNpc.TargetType = entity.TargetType;
@@ -645,9 +645,9 @@ public static class Loop
                                 entity.TargetType = 0;
 
                                 // If the target player is dead, clear the base MapNpc target too.
-                                if (entity.Type == Core.Globals.Entity.EntityType.Npc && map >= 0 && map < Variables.MaxMaps)
+                                if (entity.Type == Core.Globals.Entity.EntityType.Npc && map >= 0 && map < Core.Globals.Variables.MaxMaps)
                                 {
-                                    if (entity.Id >= 0 && entity.Id < Variables.MaxMapNpcs)
+                                    if (entity.Id >= 0 && entity.Id < Core.Globals.Variables.MaxMapNpcs)
                                     {
                                         ref var npc = ref MapNpc.Instance[map, entity.Id];
                                         npc.Target = -1;
@@ -672,9 +672,9 @@ public static class Loop
                                     entity.Target = -1;
                                     entity.TargetType = 0;
                                     // reflect to base map npc if this is an NPC snapshot
-                                    if (entity.Type == Core.Globals.Entity.EntityType.Npc && map >= 0 && map < Variables.MaxMaps)
+                                    if (entity.Type == Core.Globals.Entity.EntityType.Npc && map >= 0 && map < Core.Globals.Variables.MaxMaps)
                                     {
-                                        if (entity.Id >= 0 && entity.Id < Variables.MaxMapNpcs)
+                                        if (entity.Id >= 0 && entity.Id < Core.Globals.Variables.MaxMapNpcs)
                                         {
                                             ref var npc = ref MapNpc.Instance[map, entity.Id];
                                             npc.TargetType = 0;
@@ -702,8 +702,8 @@ public static class Loop
                                                 var sk = Skill.Instance[sid];
                                                 bool inRange = sk.Range == 0 ? (sk.IsAoE || dist <= 1) : dist <= sk.Range;
                                                 if (!inRange) continue;
-                                                if (map < 0 || map >= Variables.MaxMaps) break;
-                                                if (entity.Id < 0 || entity.Id >= Variables.MaxMapNpcs) break;
+                                                if (map < 0 || map >= Core.Globals.Variables.MaxMaps) break;
+                                                if (entity.Id < 0 || entity.Id >= Core.Globals.Variables.MaxMapNpcs) break;
                                                 ref var baseNpc = ref MapNpc.Instance[map, entity.Id];
                                                 bool cdReady = baseNpc.SkillCd == null || slot >= baseNpc.SkillCd.Length || baseNpc.SkillCd[slot] <= nowMs;
                                                 if (!cdReady) continue;
@@ -728,9 +728,9 @@ public static class Loop
                             entity.TargetType = 0;
 
                             // If the target player is no longer playing/on this map, clear the base MapNpc target too.
-                            if (entity.Type == Core.Globals.Entity.EntityType.Npc && map >= 0 && map < Variables.MaxMaps)
+                            if (entity.Type == Core.Globals.Entity.EntityType.Npc && map >= 0 && map < Core.Globals.Variables.MaxMaps)
                             {
-                                if (entity.Id >= 0 && entity.Id < Variables.MaxMapNpcs)
+                                if (entity.Id >= 0 && entity.Id < Core.Globals.Variables.MaxMapNpcs)
                                 {
                                     ref var npc = ref MapNpc.Instance[map, entity.Id];
                                     npc.Target = -1;
@@ -752,14 +752,14 @@ public static class Loop
                             if (targetEntity != null && targetEntity.Type == Core.Globals.Entity.EntityType.Npc && targetEntity.Map == map && targetEntity.Num >= 0)
                             {
                                 // Clear target if target NPC is dead (corpse window)
-                                if (map >= 0 && map < Variables.MaxMaps && targetEntity.Id >= 0 && targetEntity.Id < Variables.MaxMapNpcs)
+                                if (map >= 0 && map < Core.Globals.Variables.MaxMaps && targetEntity.Id >= 0 && targetEntity.Id < Core.Globals.Variables.MaxMapNpcs)
                                 {
                                     var expiry = MapNpc.Instance[map, targetEntity.Id].DeathTimer;
                                     if (expiry > 0 && expiry > General.GetTime())
                                     {
                                         entity.Target = -1;
                                         entity.TargetType = 0;
-                                        if (entity.Type == Core.Globals.Entity.EntityType.Npc && entity.Id >= 0 && entity.Id < Variables.MaxMapNpcs)
+                                        if (entity.Type == Core.Globals.Entity.EntityType.Npc && entity.Id >= 0 && entity.Id < Core.Globals.Variables.MaxMapNpcs)
                                         {
                                             ref var npc = ref MapNpc.Instance[map, entity.Id];
                                             npc.Target = -1;
@@ -782,9 +782,9 @@ public static class Loop
                                 {
                                     entity.Target = -1;
                                     entity.TargetType = 0;
-                                    if (entity.Type == Core.Globals.Entity.EntityType.Npc && map >= 0 && map < Variables.MaxMaps)
+                                    if (entity.Type == Core.Globals.Entity.EntityType.Npc && map >= 0 && map < Core.Globals.Variables.MaxMaps)
                                     {
-                                        if (entity.Id >= 0 && entity.Id < Variables.MaxMapNpcs)
+                                        if (entity.Id >= 0 && entity.Id < Core.Globals.Variables.MaxMapNpcs)
                                         {
                                             ref var baseNpc = ref MapNpc.Instance[map, entity.Id];
                                             baseNpc.TargetType = 0;
@@ -809,8 +809,8 @@ public static class Loop
                                                 var sk2 = Skill.Instance[sid2];
                                                 bool inRange2 = sk2.Range == 0 ? (sk2.IsAoE || dist2 <= 1) : dist2 <= sk2.Range;
                                                 if (!inRange2) continue;
-                                                if (map < 0 || map >= Variables.MaxMaps) break;
-                                                if (entity.Id < 0 || entity.Id >= Variables.MaxMapNpcs) break;
+                                                if (map < 0 || map >= Core.Globals.Variables.MaxMaps) break;
+                                                if (entity.Id < 0 || entity.Id >= Core.Globals.Variables.MaxMapNpcs) break;
                                                 ref var baseNpc2 = ref MapNpc.Instance[map, entity.Id];
                                                 bool cdReady2 = baseNpc2.SkillCd == null || slot2 >= baseNpc2.SkillCd.Length || baseNpc2.SkillCd[slot2] <= nowMs2;
                                                 if (!cdReady2) continue;
@@ -832,9 +832,9 @@ public static class Loop
                                 entity.Target = -1;
                                 entity.TargetType = 0;
 
-                                if (entity.Type == Core.Globals.Entity.EntityType.Npc && map >= 0 && map < Variables.MaxMaps)
+                                if (entity.Type == Core.Globals.Entity.EntityType.Npc && map >= 0 && map < Core.Globals.Variables.MaxMaps)
                                 {
-                                    if (entity.Id >= 0 && entity.Id < Variables.MaxMapNpcs)
+                                    if (entity.Id >= 0 && entity.Id < Core.Globals.Variables.MaxMapNpcs)
                                     {
                                         ref var npc = ref MapNpc.Instance[map, entity.Id];
                                         npc.Target = -1;
@@ -852,9 +852,9 @@ public static class Loop
                             entity.Target = -1;
                             entity.TargetType = 0;
 
-                            if (entity.Type == Core.Globals.Entity.EntityType.Npc && map >= 0 && map < Variables.MaxMaps)
+                            if (entity.Type == Core.Globals.Entity.EntityType.Npc && map >= 0 && map < Core.Globals.Variables.MaxMaps)
                             {
-                                if (entity.Id >= 0 && entity.Id < Variables.MaxMapNpcs)
+                                if (entity.Id >= 0 && entity.Id < Core.Globals.Variables.MaxMapNpcs)
                                 {
                                     ref var npc = ref MapNpc.Instance[map, entity.Id];
                                     npc.Target = -1;
@@ -887,7 +887,7 @@ public static class Loop
                 {
                     // Dead NPCs are represented by a non-zero DeathTimer (absolute server ms).
                     // Once expired, respawn and clear the corpse.
-                    if (map >= 0 && map < Server.Map.Instance.Count && x >= 0 && x < Variables.MaxMapNpcs)
+                    if (map >= 0 && map < Server.Map.Instance.Count && x >= 0 && x < Core.Globals.Variables.MaxMapNpcs)
                     {
                         ref var baseNpc = ref MapNpc.Instance[map, x];
 
@@ -921,8 +921,8 @@ public static class Loop
             if (e.Num < 0) continue;
             var npcIndex = e.Id; // Index into MapNpc.Instance[map, slot]
             var map = e.Map;
-            if (map < 0 || map >= Variables.MaxMaps) continue;
-            if (npcIndex < 0 || npcIndex >= Variables.MaxMapNpcs) continue;
+            if (map < 0 || map >= Core.Globals.Variables.MaxMaps) continue;
+            if (npcIndex < 0 || npcIndex >= Core.Globals.Variables.MaxMapNpcs) continue;
 
             ref var baseNpc = ref MapNpc.Instance[map, npcIndex];
 
@@ -961,7 +961,7 @@ public static class Loop
             else if (baseNpc.TargetType == (byte)TargetType.Npc && baseNpc.Target >= 0)
             {
                 int targetSlot = baseNpc.Target;
-                if (targetSlot >= 0 && targetSlot < Variables.MaxMapNpcs && MapNpc.Instance[map, targetSlot].Num >= 0)
+                if (targetSlot >= 0 && targetSlot < Core.Globals.Variables.MaxMapNpcs && MapNpc.Instance[map, targetSlot].Num >= 0)
                 {
                     int sxR = baseNpc.X / Constants.TileSize;
                     int syR = baseNpc.Y / Constants.TileSize;
@@ -993,7 +993,7 @@ public static class Loop
             else if (baseNpc.TargetType == (byte)TargetType.Npc && baseNpc.Target >= 0)
             {
                 int targetSlot = baseNpc.Target;
-                if (targetSlot >= 0 && targetSlot < Variables.MaxMapNpcs && MapNpc.Instance[map, targetSlot].Num >= 0)
+                if (targetSlot >= 0 && targetSlot < Core.Globals.Variables.MaxMapNpcs && MapNpc.Instance[map, targetSlot].Num >= 0)
                 {
                     int sx = baseNpc.X / Constants.TileSize;
                     int sy = baseNpc.Y / Constants.TileSize;
@@ -1025,7 +1025,7 @@ public static class Loop
         }
 
         var now = General.GetTime();
-        var itemCount = Variables.MaxMapItems;
+        var itemCount = Core.Globals.Variables.MaxMapItems;
 
         for (int map = 0; map < mapCount; map++)
         {
@@ -1039,13 +1039,13 @@ public static class Loop
                     {
                         item.PlayerName = "";
                         item.PlayerTimer = 0;
-                        NetworkSend.SendMapItemToAll(map, i);
+                        NetworkSend.MapItemToAll(map, i);
                     }
 
                     if (item.CanDespawn && item.DespawnTimer < now)
                     {
                         MapItem.OnClear(i, map);
-                        NetworkSend.SendMapItemToAll(map, i);
+                        NetworkSend.MapItemToAll(map, i);
                     }
                 }
             }
@@ -1075,7 +1075,7 @@ public static class Loop
                                     resData.Timer = now;
                                     resData.State = 0;
                                     resData.Health = (byte)Resource.Instance[resourceindex].Health;
-                                    NetworkSend.SendMapResourceToMap(map);
+                                    NetworkSend.MapResourceToMap(map);
                                 }
                             }
                         }

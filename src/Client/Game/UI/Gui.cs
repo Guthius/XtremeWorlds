@@ -1580,7 +1580,7 @@ public class WindowManager
         var yo = winTrade!.Y + picYour!.Y;
 
         // your items
-        for (var i = 0; i < Variables.MaxInventory; i++)
+        for (var i = 0; i < Core.Globals.Variables.MaxInventory; i++)
         {
             if (Data.TradeYourOffer[i].Num >= 0)
             {
@@ -1648,7 +1648,7 @@ public class WindowManager
         var yo = winTrade!.Y + picTheir!.Y;
 
         // their items
-        for (var i = 0; i < Variables.MaxInventory; i++)
+        for (var i = 0; i < Core.Globals.Variables.MaxInventory; i++)
         {
             long item = Data.TradeTheirOffer[i].Num;
             if (item >= 0 & item < Core.Globals.Variables.MaxItems)

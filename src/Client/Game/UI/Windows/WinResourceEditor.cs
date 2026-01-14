@@ -33,7 +33,7 @@ public class WinResourceEditor
         if (win is null) return;
         int relY = GameClient.CurrentMouseState.Y - (win.Y + list.Y);
         int index = list.GetItemIndexAtPosition(relY);
-        if (index < 0 || index >= Variables.MaxResources) return;
+        if (index < 0 || index >= Core.Globals.Variables.MaxResources) return;
         SelectedIndex = index;
         GameState.EditorIndex = index;
         list.SelectedIndex = index;
@@ -43,7 +43,7 @@ public class WinResourceEditor
 
     public static void OnLoad(int id)
     {
-        if (id < 0 || id >= Variables.MaxResources) return;
+        if (id < 0 || id >= Core.Globals.Variables.MaxResources) return;
         SelectedIndex = id;
         GameState.EditorIndex = id;
         var r = Resource.Instance[id];
@@ -89,7 +89,7 @@ public class WinResourceEditor
         {
             if (cmbAnim.Items.Count == 0)
             {
-                for (int i = 0; i < Variables.MaxAnimations; i++)
+                for (int i = 0; i < Core.Globals.Variables.MaxAnimations; i++)
                 {
                     var nm = Animation.Instance[i].Name ?? string.Empty;
                     cmbAnim.Items.Add($"{i + 1}: {nm}");
@@ -108,7 +108,7 @@ public class WinResourceEditor
                     lbl.Text = Math.Clamp(value, min, max).ToString();
             }
         }
-        SetBar("sldLvlReq", "lblLvlReqVal", r.LvlRequired, 0, Variables.MaxLevel);
+        SetBar("sldLvlReq", "lblLvlReqVal", r.LvlRequired, 0, Core.Globals.Variables.MaxLevel);
         SetBar("sldNormalPic", "lblNormalPicVal", r.ResourceImage, 0, GameState.NumResources);
         SetBar("sldExhaustedPic", "lblExhaustedPicVal", r.ExhaustedImage, 0, GameState.NumResources);
 
@@ -138,7 +138,7 @@ public class WinResourceEditor
         {
             int sel = SelectedIndex;
             lst.Items.Clear();
-            for (int i = 0; i < Variables.MaxResources; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxResources; i++)
             {
                 var name = Resource.Instance[i].Name ?? string.Empty;
                 lst.Items.Add($"{i + 1}: {name}");
@@ -152,7 +152,7 @@ public class WinResourceEditor
     // Toggle Copy -> Paste on subsequent clicks. Paste overwrites current SelectedIndex.
     public static void OnCopyOrPaste()
     {
-        if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxResources) return;
+        if (SelectedIndex < 0 || SelectedIndex >= Core.Globals.Variables.MaxResources) return;
         if (_history is null)
         {
             var s = Resource.Instance[SelectedIndex];

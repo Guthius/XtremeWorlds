@@ -317,7 +317,7 @@ public static class Commands
     {
         if (!ValidPlayerIndex(index)) return;
         if (points < 0) points = 0;
-        if (points > Variables.MaxPoints) points = Variables.MaxPoints;
+        if (points > Core.Globals.Variables.MaxPoints) points = Core.Globals.Variables.MaxPoints;
         PlayerBase.Instance[index].Points = points;
     }
 
@@ -386,7 +386,7 @@ public static class Commands
     {
         if (!ValidPlayerIndex(index)) return;
         if (level < 0) level = 0;
-        if (level > Variables.MaxLevel) level = Variables.MaxLevel;
+        if (level > Core.Globals.Variables.MaxLevel) level = Core.Globals.Variables.MaxLevel;
         PlayerBase.Instance[index].Level = (byte)level;
     }
 
@@ -427,7 +427,7 @@ public static class Commands
 
     public static int FindOpenSkill(int index)
     {
-        for (var slot = 0; slot < Variables.MaxPlayerSkills; slot++)
+        for (var slot = 0; slot < Core.Globals.Variables.MaxPlayerSkills; slot++)
         {
             if (GetPlayerSkill(index, slot) == -1)
             {
@@ -448,7 +448,7 @@ public static class Commands
 
     public static bool HasSkill(int index, double skillNum)
     {
-        for (var slot = 0; slot < Variables.MaxPlayerSkills; slot++)
+        for (var slot = 0; slot < Core.Globals.Variables.MaxPlayerSkills; slot++)
         {
             if (GetPlayerSkill(index, slot) == skillNum)
             {

@@ -54,14 +54,14 @@ namespace Core.Objects
             Name = "";
             Music = "";
             Tileset = 1;
-            MaxX = Variables.MaxMapX;
-            MaxY = Variables.MaxMapY;
+            MaxX = Core.Globals.Variables.MaxMapX;
+            MaxY = Core.Globals.Variables.MaxMapY;
 
             // Defaults match existing clamp behavior.
             MinZoom = 0.5f;
             MaxZoom = 2.0f;
 
-            Npc = new int[Variables.MaxMapNpcs];
+            Npc = new int[Core.Globals.Variables.MaxMapNpcs];
             for (var i = 0; i < Npc.Length; i++)
             {
                 Npc[i] = -1;

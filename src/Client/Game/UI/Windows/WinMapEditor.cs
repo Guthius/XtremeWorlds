@@ -96,7 +96,7 @@ public class WinMapEditor
         GameState.MyEditorType = EditorType.None;
         GameState.GettingMap = true;
 
-        Sender.SendCloseEditor();
+        Sender.CloseEditor();
 
         // show gui
         WindowManager.ShowWindow("winHotbar", resetPosition: false);
@@ -120,7 +120,7 @@ public class WinMapEditor
         }
 
         // Send the edited map to the server
-        Sender.SendMap();
+        Sender.Map();
 
         GameState.MyEditorType = EditorType.None;
         // Request the refreshed map data immediately so we don't linger on a black screen
@@ -134,7 +134,7 @@ public class WinMapEditor
         catch { }
 
         GameState.GettingMap = true;
-        Sender.SendCloseEditor();
+        Sender.CloseEditor();
 
         // show gui
         WindowManager.ShowWindow("winHotbar", resetPosition: false);
@@ -1051,7 +1051,7 @@ public class WinMapEditor
             cmbMoral.Value = Math.Clamp(map.Moral, 0, Math.Max(0, cmbMoral.Items.Count - 1));
 
         // Links
-        int maxMaps = Variables.MaxMaps - 1;
+        int maxMaps = Core.Globals.Variables.MaxMaps - 1;
         if (WindowManager.TryGetControl("winMapEditor", "txtUp", out var txtUp))
             txtUp.Text = map.Up.ToString();
         if (WindowManager.TryGetControl("winMapEditor", "txtDown", out var txtDown))

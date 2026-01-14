@@ -29,7 +29,7 @@ namespace Server
             mp.TravelTime = 0;
             mp.Timer = 0;
 
-            NetworkSend.SendProjectileToMap(map, mapProjectileNum);
+            NetworkSend.ProjectileToMap(map, mapProjectileNum);
         }
 
         public static void OnClear(int index)

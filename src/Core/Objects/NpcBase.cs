@@ -4,20 +4,20 @@ namespace Core.Objects;
 
 public class NpcBase
 {
-    public static bool[] IsStreaming { get; set; } = new bool[Variables.MaxNpcs];
-    public static bool[] IsChanged { get; set; } = new bool[Variables.MaxNpcs];
+    public static bool[] IsStreaming { get; set; } = new bool[Core.Globals.Variables.MaxNpcs];
+    public static bool[] IsChanged { get; set; } = new bool[Core.Globals.Variables.MaxNpcs];
 
     public NpcBase()
     {
         Name = string.Empty;
         AttackSay = string.Empty;
 
-        DropChance = new int[Variables.MaxDropItems];
-        DropItem = new int[Variables.MaxDropItems];
-        DropItemValue = new int[Variables.MaxDropItems];
+        DropChance = new int[Core.Globals.Variables.MaxDropItems];
+        DropItem = new int[Core.Globals.Variables.MaxDropItems];
+        DropItemValue = new int[Core.Globals.Variables.MaxDropItems];
 
         Stat = new byte[Enum.GetNames(typeof(Stat)).Length];
-        Skill = new byte[Variables.MaxNpcSkills];
+        Skill = new byte[Core.Globals.Variables.MaxNpcSkills];
     }
 
     public string Name { get; set; }
@@ -66,8 +66,8 @@ public class NpcBase
 
     public static void OnClearChanged()
     {
-        IsChanged = new bool[Variables.MaxNpcs];
-        IsStreaming = new bool[Variables.MaxNpcs];
+        IsChanged = new bool[Core.Globals.Variables.MaxNpcs];
+        IsStreaming = new bool[Core.Globals.Variables.MaxNpcs];
     }
 
     public static void OnClear()

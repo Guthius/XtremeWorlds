@@ -4,8 +4,8 @@ namespace Core.Objects;
 
 public class SkillBase
 {
-    public static bool[] IsStreaming { get; set; } = new bool[Variables.MaxSkills];
-    public static bool[] IsChanged { get; set; } = new bool[Variables.MaxSkills];
+    public static bool[] IsStreaming { get; set; } = new bool[Core.Globals.Variables.MaxSkills];
+    public static bool[] IsChanged { get; set; } = new bool[Core.Globals.Variables.MaxSkills];
 
     public SkillBase()
     {
@@ -66,13 +66,13 @@ public class SkillBase
 
     public static void OnClearChanged()
     {
-        IsChanged = new bool[Variables.MaxSkills];
-        IsStreaming = new bool[Variables.MaxSkills];
+        IsChanged = new bool[Core.Globals.Variables.MaxSkills];
+        IsStreaming = new bool[Core.Globals.Variables.MaxSkills];
     }
 
     public static void OnClear()
     {
-        for (var i = 0; i < Variables.MaxSkills; i++)
+        for (var i = 0; i < Core.Globals.Variables.MaxSkills; i++)
             OnClear(i);
     }
 

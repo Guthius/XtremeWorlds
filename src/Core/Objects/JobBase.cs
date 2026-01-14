@@ -4,14 +4,14 @@ namespace Core.Objects
 {
     public class JobBase
     { 
-        public static bool[] IsChanged { get; set; } = new bool[Variables.MaxJobs];
+        public static bool[] IsChanged { get; set; } = new bool[Core.Globals.Variables.MaxJobs];
 
         public JobBase()
         {
             Stat = new int[Enum.GetNames(typeof(Stat)).Length];
-            StartItem = new int[Variables.MaxStartItems];
-            StartValue = new int[Variables.MaxStartItems];
-            StartSkill = new int[Variables.MaxStartSkills];
+            StartItem = new int[Core.Globals.Variables.MaxStartItems];
+            StartValue = new int[Core.Globals.Variables.MaxStartItems];
+            StartSkill = new int[Core.Globals.Variables.MaxStartSkills];
 
             Name = "";
             Desc = "";
@@ -57,7 +57,7 @@ namespace Core.Objects
 
         public static void OnClearChanged()
         {
-            for (int i = 0; i < Variables.MaxJobs; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxJobs; i++)
                 IsChanged[i] = false;
         }
 

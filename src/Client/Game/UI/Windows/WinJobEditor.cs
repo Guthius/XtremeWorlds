@@ -25,7 +25,7 @@ namespace Client.Game.UI.Windows
         public static void OnDrawMaleSprite()
         {
             int idx = SelectedIndex;
-            if (idx < 0 || idx >= Variables.MaxJobs) return;
+            if (idx < 0 || idx >= Core.Globals.Variables.MaxJobs) return;
             var job = Job.Instance[idx];
             int sprite = job?.MaleSprite ?? 0;
             DrawSpritePreview("picMale", sprite);
@@ -33,7 +33,7 @@ namespace Client.Game.UI.Windows
         public static void OnDrawFemaleSprite()
         {
             int idx = SelectedIndex;
-            if (idx < 0 || idx >= Variables.MaxJobs) return;
+            if (idx < 0 || idx >= Core.Globals.Variables.MaxJobs) return;
             var job = Job.Instance[idx];
             int sprite = job?.FemaleSprite ?? 0;
             DrawSpritePreview("picFemale", sprite);
@@ -114,7 +114,7 @@ namespace Client.Game.UI.Windows
                 int prev = cmbSkill.Value;
                 cmbSkill.Items.Clear();
                 cmbSkill.Items.Add("None");
-                int max = Variables.MaxSkills;
+                int max = Core.Globals.Variables.MaxSkills;
                 var skills = Skill.Instance;
                 int loaded = skills?.Count ?? 0;
                 for (int i = 0; i < max; i++)
@@ -139,7 +139,7 @@ namespace Client.Game.UI.Windows
             if (win is null) return;
             int relY = GameState.CurMouseY - (win.Y + ctrl.Y);
             int index = list.GetItemIndexAtPosition(relY);
-            if (index < 0 || index >= Variables.MaxJobs) return;
+            if (index < 0 || index >= Core.Globals.Variables.MaxJobs) return;
             SelectedIndex = index;
             GameState.EditorIndex = index;
             list.SelectedIndex = index;
@@ -156,7 +156,7 @@ namespace Client.Game.UI.Windows
             int prevScroll = list.ScrollOffset;
 
             list.Clear();
-            for (int i = 0; i < Variables.MaxJobs; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxJobs; i++)
             {
                 var job = Job.Instance[i];
                 string name = job?.Name?.Trim() ?? string.Empty;
@@ -182,7 +182,7 @@ namespace Client.Game.UI.Windows
 
         public static void OnLoad(int index)
         {
-            if (index < 0 || index >= Variables.MaxJobs) return;
+            if (index < 0 || index >= Core.Globals.Variables.MaxJobs) return;
             var job = Job.Instance[index];
             if (job is null) return;
 
@@ -231,7 +231,7 @@ namespace Client.Game.UI.Windows
             if (WindowManager.TryGetControl("winJobEditor", "lstStartItems", out var liCtrl) && liCtrl is ListBox lstItems)
             {
                 lstItems.Clear();
-                for (int i = 0; i < Variables.MaxStartItems; i++)
+                for (int i = 0; i < Core.Globals.Variables.MaxStartItems; i++)
                 {
                     int id = job.StartItem[i];
                     int amt = job.StartValue[i];
@@ -245,10 +245,10 @@ namespace Client.Game.UI.Windows
             if (WindowManager.TryGetControl("winJobEditor", "lstStartSkills", out var lsCtrl) && lsCtrl is ListBox lstSkills)
             {
                 lstSkills.Clear();
-                for (int i = 0; i < Variables.MaxStartSkills; i++)
+                for (int i = 0; i < Core.Globals.Variables.MaxStartSkills; i++)
                 {
                     int sid = job.StartSkill[i];
-                    string sname = sid >= 0 && sid < Variables.MaxSkills ? Skill.Instance[sid].Name : "(None)";
+                    string sname = sid >= 0 && sid < Core.Globals.Variables.MaxSkills ? Skill.Instance[sid].Name : "(None)";
                     lstSkills.AddItem($"{i + 1}: {sname}");
                 }
                 lstSkills.SelectedIndex = 0;
@@ -269,7 +269,7 @@ namespace Client.Game.UI.Windows
 
         public static void OnCopyOrPaste()
         {
-            if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxJobs) return;
+            if (SelectedIndex < 0 || SelectedIndex >= Core.Globals.Variables.MaxJobs) return;
             if (_history is null)
             {
                 var s = Job.Instance[SelectedIndex];

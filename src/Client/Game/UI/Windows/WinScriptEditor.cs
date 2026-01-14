@@ -53,7 +53,7 @@ public class WinScriptEditor
         try
         {
             Data.Script.Code = File.ReadAllLines(Script.TempFile);
-            Sender.SendSaveScript();
+            Sender.SaveScript();
         }
         catch (Exception ex)
         {

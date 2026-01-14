@@ -56,10 +56,10 @@ namespace Server
 
             int index = Instance.Count;
             if (Data.TempPlayer == null)
-                Data.TempPlayer = new Core.Globals.Type.TempPlayer[Variables.MaxPlayers];
+                Data.TempPlayer = new Core.Globals.Type.TempPlayer[Core.Globals.Variables.MaxPlayers];
 
-            Data.TempPlayer[index].SkillCd = new int[Variables.MaxPlayerSkills];
-            Data.TempPlayer[index].TradeOffer = new Core.Globals.Type.Item[Variables.MaxInventory];
+            Data.TempPlayer[index].SkillCd = new int[Core.Globals.Variables.MaxPlayerSkills];
+            Data.TempPlayer[index].TradeOffer = new Core.Globals.Type.Item[Core.Globals.Variables.MaxInventory];
             Data.TempPlayer[index].Editor = EditorType.None;
             Data.TempPlayer[index].SkillBuffer = -1;
             Data.TempPlayer[index].InShop = -1;

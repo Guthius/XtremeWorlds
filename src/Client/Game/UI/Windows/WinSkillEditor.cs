@@ -33,7 +33,7 @@ public class WinSkillEditor
         int prevScroll = list.ScrollOffset;
 
         list.Clear();
-        for (int i = 0; i < Variables.MaxSkills; i++)
+        for (int i = 0; i < Core.Globals.Variables.MaxSkills; i++)
         {
             string name = Strings.Trim(Skill.Instance[i].Name);
             if (string.IsNullOrWhiteSpace(name)) name = "None";
@@ -73,7 +73,7 @@ public class WinSkillEditor
         if (WindowManager.TryGetControl("winSkillEditor", "cmbAnimation", out var animCtrl) && animCtrl is ComboBox cmbAnim)
         {
             cmbAnim.Items.Clear();
-            for (int i = 0; i < Variables.MaxAnimations; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxAnimations; i++)
             {
                 var raw = Animation.Instance[i].Name ?? string.Empty;
                 var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
@@ -86,7 +86,7 @@ public class WinSkillEditor
         {
             cmbChain.Items.Clear();
             cmbChain.Items.Add("None");
-            for (int i = 0; i < Variables.MaxSkills; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxSkills; i++)
             {
                 var raw = Skill.Instance[i].Name ?? string.Empty;
                 var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
@@ -99,7 +99,7 @@ public class WinSkillEditor
         {
             cmbProj.Items.Clear();
             cmbProj.Items.Add("None");
-            for (int i = 0; i < Variables.MaxProjectiles; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
                 cmbProj.Items.Add($"{i + 1}: {Projectile.Instance[i].Name}");
         }
 
@@ -135,7 +135,7 @@ public class WinSkillEditor
         if (win is null) return;
         int relY = GameState.CurMouseY - (win.Y + ctrl.Y);
         int index = list.GetItemIndexAtPosition(relY);
-        if (index < 0 || index >= Variables.MaxSkills) return;
+        if (index < 0 || index >= Core.Globals.Variables.MaxSkills) return;
         SelectedIndex = index;
         GameState.EditorIndex = index;
         list.SelectedIndex = index;
@@ -145,7 +145,7 @@ public class WinSkillEditor
 
     public static void OnLoad(int index)
     {
-        if (index < 0 || index >= Variables.MaxSkills) return;
+        if (index < 0 || index >= Core.Globals.Variables.MaxSkills) return;
         SelectedIndex = index;
         GameState.EditorIndex = index;
         var s = Skill.Instance[index];
@@ -293,7 +293,7 @@ public class WinSkillEditor
         var win = WindowManager.GetWindowByName("winSkillEditor");
         if (win is null) return;
 
-        if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxSkills) return;
+        if (SelectedIndex < 0 || SelectedIndex >= Core.Globals.Variables.MaxSkills) return;
         var s = Skill.Instance[SelectedIndex];
 
         if (s.Icon < 1 || s.Icon > GameState.NumSkills) return;
@@ -317,7 +317,7 @@ public class WinSkillEditor
         var win = WindowManager.GetWindowByName("winSkillEditor");
         if (win is null) return;
 
-        if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxSkills) return;
+        if (SelectedIndex < 0 || SelectedIndex >= Core.Globals.Variables.MaxSkills) return;
         if (Skill.Instance.Count <= SelectedIndex) return;
         var s = Skill.Instance[SelectedIndex];
 
@@ -342,7 +342,7 @@ public class WinSkillEditor
 
     public static void OnCopyOrPaste()
     {
-        if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxSkills) return;
+        if (SelectedIndex < 0 || SelectedIndex >= Core.Globals.Variables.MaxSkills) return;
 
         if (_history is null)
         {
@@ -383,7 +383,7 @@ public class WinSkillEditor
     public static void OnLearn()
     {
         int i = SelectedIndex;
-        if (i < 0 || i >= Variables.MaxSkills) return;
-        Sender.SendLearnSkill(i);
+        if (i < 0 || i >= Core.Globals.Variables.MaxSkills) return;
+        Sender.LearnSkill(i);
     }
 }

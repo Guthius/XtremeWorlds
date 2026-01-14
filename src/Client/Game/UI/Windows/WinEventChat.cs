@@ -145,7 +145,7 @@ public static class WinEventChat
 
     private static void SendReply(int reply)
     {
-        Sender.SendEventChatReply(Client.Event.EventReplyId, Client.Event.EventReplyPage, reply);
+        Sender.EventChatReply(Client.Event.EventReplyId, Client.Event.EventReplyPage, reply);
 
         // Hide the modal event prompt immediately; server may send another prompt.
         WindowManager.HideWindow("winEventChat");

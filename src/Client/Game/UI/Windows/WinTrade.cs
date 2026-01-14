@@ -69,12 +69,12 @@ public class WinTrade
     {
         WindowManager.HideWindow("winTrade");
 
-        Sender.SendDeclineTrade();
+        Sender.DeclineTrade();
     }
 
     public static void OnAccept()
     {
-        Sender.SendAcceptTrade();
+        Sender.AcceptTrade();
     }
 
     public static void OnYourTradeClick()
@@ -102,7 +102,7 @@ public class WinTrade
                 return;
             }
 
-            Sender.SendUntradeItem(slot);
+            Sender.UntradeItem(slot);
         }
 
         OnYourTradeMouseMove();

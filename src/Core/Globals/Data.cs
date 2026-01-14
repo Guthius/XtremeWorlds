@@ -5,18 +5,18 @@ namespace Core.Globals;
 public static class Data
 {
     public static Tile[,]? TempTile;
-    public static TempPlayer[] TempPlayer = new TempPlayer[Variables.MaxPlayers];
-    public static MapProjectile[,] MapProjectile = new MapProjectile[Variables.MaxMaps, Variables.MaxProjectiles];
-    public static Item[] TradeYourOffer = new Item[Variables.MaxInventory];
-    public static Item[] TradeTheirOffer = new Item[Variables.MaxInventory];
-    public static Party[] Party = new Party[Variables.MaxParty];
+    public static TempPlayer[] TempPlayer = new TempPlayer[Core.Globals.Variables.MaxPlayers];
+    public static MapProjectile[,] MapProjectile = new MapProjectile[Core.Globals.Variables.MaxMaps, Core.Globals.Variables.MaxProjectiles];
+    public static Item[] TradeYourOffer = new Item[Core.Globals.Variables.MaxInventory];
+    public static Item[] TradeTheirOffer = new Item[Core.Globals.Variables.MaxInventory];
+    public static Party[] Party = new Party[Core.Globals.Variables.MaxParty];
     public static Party MyParty;
     public static ChatBubble[] ChatBubble = new ChatBubble[byte.MaxValue];
     public static Script Script = new();
 
-    public static Quest[] Quests = new Quest[Variables.MaxQuests];
-    public static Event[] Events = new Event[Variables.MaxEvents];
-    public static Guild[] Guilds = new Guild[Variables.MaxGuilds];
+    public static Quest[] Quests = new Quest[Core.Globals.Variables.MaxQuests];
+    public static Event[] Events = new Event[Core.Globals.Variables.MaxEvents];
+    public static Guild[] Guilds = new Guild[Core.Globals.Variables.MaxGuilds];
     public static Weather Weather = new();
 
     public static ActionMessage[] ActionMessage = new ActionMessage[byte.MaxValue];

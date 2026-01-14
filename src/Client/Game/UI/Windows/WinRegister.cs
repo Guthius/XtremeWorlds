@@ -41,7 +41,7 @@ public class WinRegister
             return;
         }
 
-        Sender.SendRegister(username, password1);
+        Sender.Register(username, password1);
     }
 
     public static void OnClose()

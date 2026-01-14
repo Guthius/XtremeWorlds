@@ -14,7 +14,7 @@ namespace Client
     {
         public static void OnClose()
         {
-            Sender.SendCloseShop();
+            Sender.CloseShop();
             WindowManager.HideWindow(WindowManager.GetWindow("winShop"));
             WindowManager.HideWindow(WindowManager.GetWindow("winDescription"));
             GameState.ShopSelectedSlot = 0;
@@ -31,7 +31,7 @@ namespace Client
             if (!IsStreaming[index])
             {
                 IsStreaming[index] = true;
-                Sender.SendRequestShop(index);
+                Sender.RequestShop(index);
             }
             
         }

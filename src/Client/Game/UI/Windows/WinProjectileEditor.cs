@@ -32,7 +32,7 @@ public class WinProjectileEditor
         int prevScroll = list.ScrollOffset;
 
         list.Clear();
-        for (int i = 0; i < Variables.MaxProjectiles; i++)
+        for (int i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
         {
             string name = Strings.Trim(Projectile.Instance[i].Name);
             if (string.IsNullOrWhiteSpace(name)) name = "None";
@@ -63,7 +63,7 @@ public class WinProjectileEditor
 
             // Always add a full set of choices so the combo is usable even if
             // animation data isn't loaded yet (names will show as "None").
-            for (int i = 0; i < Variables.MaxAnimations; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxAnimations; i++)
             {
                 string raw = i < Animation.Instance.Count ? (Animation.Instance[i].Name ?? string.Empty) : string.Empty;
                 var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
@@ -79,7 +79,7 @@ public class WinProjectileEditor
         if (win is null) return;
         int relY = GameState.CurMouseY - (win.Y + list.Y);
         int index = list.GetItemIndexAtPosition(relY);
-        if (index < 0 || index >= Variables.MaxProjectiles) return;
+        if (index < 0 || index >= Core.Globals.Variables.MaxProjectiles) return;
         SelectedIndex = index;
         GameState.EditorIndex = index;
         list.SelectedIndex = index;
@@ -89,7 +89,7 @@ public class WinProjectileEditor
 
     public static void OnLoad(int index)
     {
-        if (index < 0 || index >= Variables.MaxProjectiles) return;
+        if (index < 0 || index >= Core.Globals.Variables.MaxProjectiles) return;
         SelectedIndex = index;
         GameState.EditorIndex = index;
         var p = Projectile.Instance[index];
@@ -131,7 +131,7 @@ public class WinProjectileEditor
 
     public static void OnCopyOrPaste()
     {
-        if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxProjectiles) return;
+        if (SelectedIndex < 0 || SelectedIndex >= Core.Globals.Variables.MaxProjectiles) return;
         if (_history is null)
         {
             _history = (Projectile)Projectile.Instance[SelectedIndex];
@@ -161,7 +161,7 @@ public class WinProjectileEditor
     public static void OnDelete()
     {
         Projectile.OnClear(GameState.EditorIndex);
-        if (SelectedIndex >= 0 && SelectedIndex < Variables.MaxProjectiles)
+        if (SelectedIndex >= 0 && SelectedIndex < Core.Globals.Variables.MaxProjectiles)
             Projectile.IsChanged[SelectedIndex] = true;
         OnLoad(GameState.EditorIndex);
         RefreshList();
@@ -174,7 +174,7 @@ public class WinProjectileEditor
         var win = WindowManager.GetWindowByName("winProjectileEditor");
         if (win is null) return;
         if (!WindowManager.TryGetControl("winProjectileEditor", "picSprite", out var ctrl) || ctrl is not PictureBox pic) return;
-        if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxProjectiles) return;
+        if (SelectedIndex < 0 || SelectedIndex >= Core.Globals.Variables.MaxProjectiles) return;
         var pr = Projectile.Instance[SelectedIndex];
         int spriteIndex = pr.Sprite;
         if (spriteIndex < 1 || spriteIndex > GameState.NumProjectiles) return;

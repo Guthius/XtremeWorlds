@@ -74,7 +74,7 @@ namespace Server
             {
                 MapNpc.Clear(npc, map);
 
-                NetworkSend.SendMapNpcsToMap(map);
+                NetworkSend.MapNpcsToMap(map);
 
                 return;
             }
@@ -168,10 +168,10 @@ namespace Server
                     General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(OnSpawn));
                 }
 
-                NetworkSend.SendNpcSpawn(map, npc);
+                NetworkSend.NpcSpawn(map, npc);
             }
 
-            NetworkSend.SendMapNpcVitals(map, npc);
+            NetworkSend.MapNpcVitals(map, npc);
         }
 
         public static bool TileIsOpen(int map, int x, int y)

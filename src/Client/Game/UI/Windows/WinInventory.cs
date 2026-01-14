@@ -9,7 +9,7 @@ public class WinInventory
 {
     public static void OnDraw()
     {
-        if (GameState.MyIndex < 0 || GameState.MyIndex > Variables.MaxPlayers)
+        if (GameState.MyIndex < 0 || GameState.MyIndex > Core.Globals.Variables.MaxPlayers)
         {
             return;
         }
@@ -57,7 +57,7 @@ public class WinInventory
 
         var skipItem = false;
 
-        for (var slot = 0; slot < Variables.MaxInventory; slot++)
+        for (var slot = 0; slot < Core.Globals.Variables.MaxInventory; slot++)
         {
             var item = GetPlayerInv(GameState.MyIndex, slot);
             if (item < 0 || item >= Core.Globals.Variables.MaxItems)
@@ -89,7 +89,7 @@ public class WinInventory
             var amountModifier = 0;
             if (Trade.InTrade > 0)
             {
-                for (var tradeSlot = 0; tradeSlot < Variables.MaxInventory; tradeSlot++)
+                for (var tradeSlot = 0; tradeSlot < Core.Globals.Variables.MaxInventory; tradeSlot++)
                 {
                     if (Data.TradeYourOffer[tradeSlot].Num < 0)
                     {
@@ -187,7 +187,7 @@ public class WinInventory
         var slot = General.IsInv(winInventory.X, winInventory.Y);
         if (slot >= 0)
         {
-            Sender.SendUseItem(slot);
+            Sender.UseItem(slot);
         }
 
         OnMouseMove();
@@ -221,7 +221,7 @@ public class WinInventory
 
         if (Trade.InTrade > 0)
         {
-            for (var i = 0; i < Variables.MaxInventory; i++)
+            for (var i = 0; i < Core.Globals.Variables.MaxInventory; i++)
             {
                 if (Data.TradeYourOffer[i].Num != slot)
                 {

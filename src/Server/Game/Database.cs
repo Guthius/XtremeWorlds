@@ -28,7 +28,7 @@ public static class Database
 
     private static readonly int StatCount = Enum.GetValues<Stat>().Length;
 
-    private static readonly SemaphoreSlim ConnectionSemaphore = new(Variables.MaxSqlClients, Variables.MaxSqlClients);
+    private static readonly SemaphoreSlim ConnectionSemaphore = new(Core.Globals.Variables.MaxSqlClients, Core.Globals.Variables.MaxSqlClients);
 
     public static string ConnectionString { get; set; } = string.Empty;
 
@@ -105,7 +105,7 @@ public static class Database
             var dataTable = "id SERIAL PRIMARY KEY, data jsonb";
             var playerTable = "id BIGINT PRIMARY KEY, data jsonb, bank jsonb";
 
-            for (int i = 1, count = Variables.MaxCharacters; i <= count; i++)
+            for (int i = 1, count = Core.Globals.Variables.MaxCharacters; i <= count; i++)
                 playerTable += $", character{i} jsonb";
 
             var tableNames = new[] { "job", "item", "map", "npc", "shop", "skill", "resource", "animation", "projectile", "moral" };
@@ -619,7 +619,7 @@ public static class Database
             }
 
             // set starter items
-            for (n = 0; n < Variables.MaxStartItems; n++)
+            for (n = 0; n < Core.Globals.Variables.MaxStartItems; n++)
             {
                 if (Job.Instance[job].StartItem[n] >= 0)
                 {
@@ -629,7 +629,7 @@ public static class Database
             }
 
             // set start skills
-            for (n = 0; n < Variables.MaxStartSkills; n++)
+            for (n = 0; n < Core.Globals.Variables.MaxStartSkills; n++)
             {
                 if (Job.Instance[job].StartSkill[n] >= 0)
                 {
@@ -733,7 +733,7 @@ public static class Database
 
         ip = ip.Substring(0, i);
         Log.Add(ip, "banlist.txt");
-        NetworkSend.SendGlobalMessage(GetPlayerName(banPlayerIndex) + " has been banned from " + SettingsManager.Instance.GameName + " by " + GetPlayerName(bannedByIndex) + "!");
+        NetworkSend.GlobalMessage(GetPlayerName(banPlayerIndex) + " has been banned from " + SettingsManager.Instance.GameName + " by " + GetPlayerName(bannedByIndex) + "!");
         Log.Add(GetPlayerName(bannedByIndex) + " has banned " + GetPlayerName(banPlayerIndex) + ".", Constant.AdminLog);
         _ = Player.OnExit(banPlayerIndex).ContinueWith(
             t => General.Logger.LogError(t.Exception, "Unhandled error during forced logout"),

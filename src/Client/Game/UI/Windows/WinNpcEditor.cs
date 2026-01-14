@@ -30,7 +30,7 @@ public class WinNpcEditor
         int prevScroll = lst.ScrollOffset;
 
         lst.Clear();
-        for (int i = 0; i < Variables.MaxNpcs; i++)
+        for (int i = 0; i < Core.Globals.Variables.MaxNpcs; i++)
         {
             string name = (i < Npc.Instance.Count ? Strings.Trim(Npc.Instance[i].Name) : string.Empty);
             if (string.IsNullOrWhiteSpace(name)) name = "None";
@@ -61,7 +61,7 @@ public class WinNpcEditor
         var win = WindowManager.GetWindowByName("winNpcEditor");
         if (win is null) return;
 
-        if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxNpcs) return;
+        if (SelectedIndex < 0 || SelectedIndex >= Core.Globals.Variables.MaxNpcs) return;
         if (SelectedIndex < 0 || SelectedIndex >= Npc.Instance.Count) return;
         var npc = Npc.Instance[SelectedIndex];
 
@@ -100,7 +100,7 @@ public class WinNpcEditor
         if (WindowManager.TryGetControl("winNpcEditor", "cmbAnimation", out var animCtrl) && animCtrl is ComboBox cmbAnim)
         {
             cmbAnim.Items.Clear();
-            for (int i = 0; i < Variables.MaxAnimations; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxAnimations; i++)
             {
                 var raw = Animation.Instance[i].Name ?? string.Empty;
                 var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
@@ -114,7 +114,7 @@ public class WinNpcEditor
             if (WindowManager.TryGetControl("winNpcEditor", ctrlName, out var skillCtrl) && skillCtrl is ComboBox cmb)
             {
                 cmb.Items.Clear();
-                for (int i = 0; i < Variables.MaxSkills; i++)
+                for (int i = 0; i < Core.Globals.Variables.MaxSkills; i++)
                 {
                     var raw = Skill.Instance[i].Name ?? string.Empty;
                     var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
@@ -140,12 +140,12 @@ public class WinNpcEditor
 
         FillEventNames(
             "cmbDeathSwitch",
-            Variables.MaxSwitches,
+            Core.Globals.Variables.MaxSwitches,
             i => i >= 0 && i < Client.Event.Switches.Length ? Client.Event.Switches[i] : string.Empty);
 
         FillEventNames(
             "cmbDeathVariable",
-            Variables.MaxVariables,
+            Core.Globals.Variables.MaxVariables,
             i => i >= 0 && i < Client.Event.Variables.Length ? Client.Event.Variables[i] : string.Empty);
         FillSkills("cmbSkill1");
         FillSkills("cmbSkill2");
@@ -218,7 +218,7 @@ public class WinNpcEditor
     // Load selected NPC data into UI controls.
     public static void OnLoad(int index)
     {
-        if (index < 0 || index >= Variables.MaxNpcs) return;
+        if (index < 0 || index >= Core.Globals.Variables.MaxNpcs) return;
         if (index < 0 || index >= Npc.Instance.Count) return;
         IsLoading = true;
         SelectedIndex = index;
@@ -273,7 +273,7 @@ public class WinNpcEditor
         }
         if (WindowManager.TryGetControl("winNpcEditor", "sldLevel", out var lvlSldCtrl) && lvlSldCtrl is ScrollBar sbLevel)
         {
-            sbLevel.Max = Math.Clamp((int)Variables.MaxLevel, 0, 255);
+            sbLevel.Max = Math.Clamp((int)Core.Globals.Variables.MaxLevel, 0, 255);
             sbLevel.Value = Math.Clamp((int)npc.Level, sbLevel.Min, sbLevel.Max);
         }
         if (WindowManager.TryGetControl("winNpcEditor", "txtDamage", out var dmgCtrl) && dmgCtrl is TextBox txtDmg)
@@ -387,7 +387,7 @@ public class WinNpcEditor
         if (win is null) return;
         int relY = GameState.CurMouseY - (win.Y + ctrl.Y);
         int index = list.GetItemIndexAtPosition(relY);
-        if (index < 0 || index >= Variables.MaxNpcs) return;
+        if (index < 0 || index >= Core.Globals.Variables.MaxNpcs) return;
         SelectedIndex = index;
         list.SelectedIndex = index;
         list.EnsureVisible(index);
@@ -397,7 +397,7 @@ public class WinNpcEditor
 
     public static void OnCopyOrPaste()
     {
-        if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxNpcs) return;
+        if (SelectedIndex < 0 || SelectedIndex >= Core.Globals.Variables.MaxNpcs) return;
         if (_history is null)
         {
             // Copy current NPC (deep copy for arrays)

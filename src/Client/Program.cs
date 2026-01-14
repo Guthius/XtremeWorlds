@@ -1052,7 +1052,7 @@ namespace Client
                 {
                     GameState.SkillBuffer = -1;
                     GameState.SkillBufferTimer = 0;
-                    Sender.SendCancelCast();
+                    Sender.CancelCast();
                     return;
                 }
 
@@ -1087,7 +1087,7 @@ namespace Client
                     // Notify server to toggle/clear the same tile
                     if (clearTileX.HasValue && clearTileY.HasValue)
                     {
-                        Sender.SendPlayerSearch(clearTileX.Value, clearTileY.Value, 0);
+                        Sender.PlayerSearch(clearTileX.Value, clearTileY.Value, 0);
                     }
 
                     // If we just cleared a target, stop here (don’t open/close menus this press)
@@ -1130,13 +1130,13 @@ namespace Client
 
                 if (IsWindowVisible("winBank"))
                 {
-                    Sender.SendCloseBank();
+                    Sender.CloseBank();
                     return;
                 }
 
                 if (IsWindowVisible("winTrade"))
                 {
-                    Sender.SendDeclineTrade();
+                    Sender.DeclineTrade();
                     return;
                 }
 
@@ -1179,7 +1179,7 @@ namespace Client
 
             if (CurrentKeyboardState.IsKeyDown(Keys.Insert))
             {
-                Sender.SendRequestAdmin();
+                Sender.RequestAdmin();
             }
 
             HandleMouseInputs();
@@ -1308,12 +1308,12 @@ namespace Client
             if (GameState.InSmallChat)
             {
                 // Iterate through hotbar slots and check for corresponding keys
-                for (int i = 0; i < Variables.MaxHotbar; i++)
+                for (int i = 0; i < Core.Globals.Variables.MaxHotbar; i++)
                 {
                     // Check if the corresponding hotbar key is pressed
                     if (IsKeyStateActive((Keys)((int)Keys.D0 + (i + 1))))
                     {
-                        Sender.SendUseHotbarSlot(i);
+                        Sender.UseHotbarSlot(i);
                         return; // Exit once the matching slot is used
                     }
                 }
@@ -1586,7 +1586,7 @@ namespace Client
                 {
                     if (IsMouseButtonDown(MouseButton.Left))
                     {
-                        Sender.SendPlayerSearch(GameState.CurXGame, GameState.CurYGame, 0);
+                        Sender.PlayerSearch(GameState.CurXGame, GameState.CurYGame, 0);
                         _lastSearchTime = DateTime.Now;
                     }
                 }
@@ -1612,7 +1612,7 @@ namespace Client
                                 {
                                     GameState.CurMouseX = prevMouseX;
                                     GameState.CurMouseY = prevMouseY;
-                                    Sender.SendUnequip(eqSlot);
+                                    Sender.Unequip(eqSlot);
                                     return;
                                 }
                             }
@@ -1643,7 +1643,7 @@ namespace Client
                                         }
                                         else
                                         {
-                                            Sender.SendDropItem(invSlot, 1);
+                                            Sender.DropItem(invSlot, 1);
                                         }
 
                                         return;
@@ -1674,7 +1674,7 @@ namespace Client
 
                         if (slot >= 0L)
                         {
-                            Sender.SendDeleteHotbar(slot);
+                            Sender.DeleteHotbar(slot);
                             return;
                         }
 
@@ -1683,7 +1683,7 @@ namespace Client
                             // Admin warp if Shift is held and the player has moderator access
                             if (GetPlayerAccess(GameState.MyIndex) >= (int) AccessLevel.Moderator)
                             {
-                                Sender.SendAdminWarp(GameState.CurXGame, GameState.CurYGame);
+                                Sender.AdminWarp(GameState.CurXGame, GameState.CurYGame);
                             }
                         }
                         else
@@ -1721,7 +1721,7 @@ namespace Client
             }
 
             // Perform player search at the current cursor position (game-space)
-            Sender.SendPlayerSearch(GameState.CurXGame, GameState.CurYGame, 1);
+            Sender.PlayerSearch(GameState.CurXGame, GameState.CurYGame, 1);
         }
 
 
@@ -2102,7 +2102,7 @@ namespace Client
                 return;
 
             // render Npc health bars
-            for (i = 0L; i < Variables.MaxMapNpcs; i++)
+            for (i = 0L; i < Core.Globals.Variables.MaxMapNpcs; i++)
             {
                 npc = (long) MapNpc.Instance[(int) i].Num;
                 // exists?
@@ -2633,7 +2633,7 @@ namespace Client
             // Draw out the items
             if (GameState.NumItems > 0)
             {
-                for (i = 0; i < Variables.MaxMapItems; i++)
+                for (i = 0; i < Core.Globals.Variables.MaxMapItems; i++)
                 {
                     MapItem.OnDraw(i);
                 }
@@ -2658,7 +2658,7 @@ namespace Client
                 if (GameState.NumCharacters > 0)
                 {
                     // Npcs
-                    for (i = 0; i < Variables.MaxMapNpcs; i++)
+                    for (i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
                     {
                         if (Math.Floor((decimal) MapNpc.Instance[i].Y / Constants.TileSize) == y)
                         {
@@ -2790,7 +2790,7 @@ namespace Client
             {
                 if (map >= 0 && map < Core.Globals.Data.MapProjectile.GetLength(0))
                 {
-                    for (i = 0; i < Variables.MaxProjectiles; i++)
+                    for (i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
                     {
                         if (Core.Globals.Data.MapProjectile[map, i].Index >= 0)
                         {
@@ -2878,7 +2878,7 @@ namespace Client
                 }
             }
 
-            for (i = 0; i < Variables.MaxMapNpcs; i++)
+            for (i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
             {
                 MapNpc.OnDrawName(i);
             }
@@ -3040,7 +3040,7 @@ namespace Client
             // Notify server if we have the tile
             if (tileX >= 0 && tileY >= 0)
             {
-                Sender.SendPlayerSearch(tileX, tileY, 0);
+                Sender.PlayerSearch(tileX, tileY, 0);
             }
         }
 

@@ -85,7 +85,7 @@ public class Player : PlayerBase
         Data.TempPlayer[session.Id].MoveSpeedMultiplierTimer = 0;
 
         // Send an ok to client to start receiving in game data
-        NetworkSend.SendLoginOk(session.Id);
+        NetworkSend.LoginOk(session.Id);
 
         OnJoin(session.Id);
 
@@ -151,7 +151,7 @@ public class Player : PlayerBase
         Data.TempPlayer[playerId].Target = -1;
         Data.TempPlayer[playerId].TargetType = 0;
 
-        NetworkSend.SendTarget(playerId, 0, 0);
+        NetworkSend.Target(playerId, 0, 0);
         if (changingMaps)
         {
             try
@@ -163,7 +163,7 @@ public class Player : PlayerBase
                 General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(OnWarp));
             }
 
-            NetworkSend.SendLeaveMap(playerId, oldMap);   
+            NetworkSend.LeaveMap(playerId, oldMap);   
         }
 
         SetPlayerMap(playerId, map);
@@ -171,7 +171,7 @@ public class Player : PlayerBase
         SetPlayerY(playerId, y);
         SetPlayerDir(playerId, dir);
 
-        NetworkSend.SendPlayerXY(playerId);
+        NetworkSend.PlayerXY(playerId);
 
         // Send equipment of all people on new map
         if (GameLogic.GetTotalMapPlayers(map) > 0)
@@ -180,7 +180,7 @@ public class Player : PlayerBase
             {
                 if (GetPlayerMap(otherPlayerId) == map)
                 {
-                    NetworkSend.SendMapEquipmentTo(otherPlayerId, playerId);
+                    NetworkSend.MapEquipmentTo(otherPlayerId, playerId);
                 }
             }
         }
@@ -211,7 +211,7 @@ public class Player : PlayerBase
 
             Data.TempPlayer[playerId].GettingMap = true;
 
-            NetworkSend.SendUpdateMoralTo(playerId, Server.Map.Instance[map].Moral);
+            NetworkSend.UpdateMoralTo(playerId, Server.Map.Instance[map].Moral);
 
             var packet = new PacketWriter(12);
 
@@ -251,14 +251,14 @@ public class Player : PlayerBase
         // Prevent player from moving if they have casted a skill
         if (Data.TempPlayer[playerId].SkillBuffer >= 0)
         {
-            NetworkSend.SendPlayerXY(playerId);
+            NetworkSend.PlayerXY(playerId);
             return;
         }
 
         // if stunned, stop them moving
         if (Data.TempPlayer[playerId].StunDuration > 0)
         {
-            NetworkSend.SendPlayerXY(playerId);
+            NetworkSend.PlayerXY(playerId);
             return;
         }
 
@@ -271,7 +271,7 @@ public class Player : PlayerBase
         if (map < 0 || map >= mapCount)
         {
             General.Logger.LogWarning("OnMove rejected: invalid map index {Map} (Map.Instance.Count={Count}) for player {PlayerId}", map, mapCount, playerId);
-            NetworkSend.SendPlayerXY(playerId);
+            NetworkSend.PlayerXY(playerId);
             return;
         }
 
@@ -279,7 +279,7 @@ public class Player : PlayerBase
         if (mapData.Tile == null || mapData.MaxX <= 0 || mapData.MaxY <= 0)
         {
             General.Logger.LogWarning("OnMove rejected: map {Map} has no tile data or invalid bounds (MaxX={MaxX}, MaxY={MaxY}) for player {PlayerId}", map, mapData.MaxX, mapData.MaxY, playerId);
-            NetworkSend.SendPlayerXY(playerId);
+            NetworkSend.PlayerXY(playerId);
             return;
         }
 
@@ -288,7 +288,7 @@ public class Player : PlayerBase
         if (playerX < 0 || playerY < 0 || playerX >= mapData.MaxX || playerY >= mapData.MaxY)
         {
             General.Logger.LogWarning("OnMove rejected: out-of-bounds position x={X}, y={Y} on map {Map} (MaxX={MaxX}, MaxY={MaxY}) for player {PlayerId}", playerX, playerY, map, mapData.MaxX, mapData.MaxY, playerId);
-            NetworkSend.SendPlayerXY(playerId);
+            NetworkSend.PlayerXY(playerId);
             return;
         }
 
@@ -299,7 +299,7 @@ public class Player : PlayerBase
                 {
                     if (IsTileBlocked(playerId, map, GetPlayerX(playerId), GetPlayerY(playerId) - 1, Direction.Up))
                     {
-                        NetworkSend.SendPlayerXY(playerId);
+                        NetworkSend.PlayerXY(playerId);
                         return;
                     }
 
@@ -314,7 +314,7 @@ public class Player : PlayerBase
                         if (upMap < 0 || upMap >= Server.Map.Instance.Count)
                         {
                             General.Logger.LogWarning("OnMove warp rejected: invalid Up map index {WarpMap} from map {Map} for player {PlayerId}", upMap, map, playerId);
-                            NetworkSend.SendPlayerXY(playerId);
+                            NetworkSend.PlayerXY(playerId);
                             break;
                         }
 
@@ -333,7 +333,7 @@ public class Player : PlayerBase
                 {
                     if (IsTileBlocked(playerId, map, GetPlayerX(playerId), GetPlayerY(playerId) + 1, Direction.Down))
                     {
-                        NetworkSend.SendPlayerXY(playerId);
+                        NetworkSend.PlayerXY(playerId);
                         return;
                     }
 
@@ -359,7 +359,7 @@ public class Player : PlayerBase
                 {
                     if (IsTileBlocked(playerId, map, GetPlayerX(playerId) - 1, GetPlayerY(playerId), Direction.Left))
                     {
-                        NetworkSend.SendPlayerXY(playerId);
+                        NetworkSend.PlayerXY(playerId);
                         return;
                     }
 
@@ -375,7 +375,7 @@ public class Player : PlayerBase
                         if (leftMap < 0 || leftMap >= Server.Map.Instance.Count)
                         {
                             General.Logger.LogWarning("OnMove warp rejected: invalid Left map index {WarpMap} from map {Map} for player {PlayerId}", leftMap, map, playerId);
-                            NetworkSend.SendPlayerXY(playerId);
+                            NetworkSend.PlayerXY(playerId);
                             break;
                         }
 
@@ -395,7 +395,7 @@ public class Player : PlayerBase
                 {
                     if (IsTileBlocked(playerId, map, GetPlayerX(playerId) + 1, GetPlayerY(playerId), Direction.Right))
                     {
-                        NetworkSend.SendPlayerXY(playerId);
+                        NetworkSend.PlayerXY(playerId);
                         return;
                     }
 
@@ -421,7 +421,7 @@ public class Player : PlayerBase
                 {
                     if (IsTileBlocked(playerId, map, GetPlayerX(playerId) + 1, GetPlayerY(playerId) - 1, Direction.UpRight))
                     {
-                        NetworkSend.SendPlayerXY(playerId);
+                        NetworkSend.PlayerXY(playerId);
                         return;
                     }
 
@@ -438,7 +438,7 @@ public class Player : PlayerBase
                 {
                     if (IsTileBlocked(playerId, map, GetPlayerX(playerId) - 1, GetPlayerY(playerId) - 1, Direction.UpLeft))
                     {
-                        NetworkSend.SendPlayerXY(playerId);
+                        NetworkSend.PlayerXY(playerId);
                         return;
                     }
 
@@ -455,7 +455,7 @@ public class Player : PlayerBase
                 {
                     if (IsTileBlocked(playerId, map, GetPlayerX(playerId) + 1, GetPlayerY(playerId) + 1, Direction.DownRight))
                     {
-                        NetworkSend.SendPlayerXY(playerId);
+                        NetworkSend.PlayerXY(playerId);
                         return;
                     }
 
@@ -472,7 +472,7 @@ public class Player : PlayerBase
                 {
                     if (IsTileBlocked(playerId, map, GetPlayerX(playerId) - 1, GetPlayerY(playerId) + 1, Direction.DownLeft))
                     {
-                        NetworkSend.SendPlayerXY(playerId);
+                        NetworkSend.PlayerXY(playerId);
                         return;
                     }
 
@@ -551,7 +551,7 @@ public class Player : PlayerBase
             {
                 if (x < Shop.Instance.Count && Shop.Instance[x].Name.Length > 0)
                 {
-                    NetworkSend.SendOpenShop(playerId, x);
+                    NetworkSend.OpenShop(playerId, x);
                     
                     Data.TempPlayer[playerId].InShop = x;
                 }
@@ -560,7 +560,7 @@ public class Player : PlayerBase
             // Check to see if the tile is a bank, and if so send bank
             if (tile.Type == TileType.Bank || tile.Type2 == TileType.Bank)
             {
-                NetworkSend.SendBank(playerId);
+                NetworkSend.Bank(playerId);
                 
                 Data.TempPlayer[playerId].InBank = true;
                 
@@ -592,10 +592,10 @@ public class Player : PlayerBase
                         Core.Globals.Vital.Mana => (int)ColorName.BrightBlue,
                         _ => (int)ColorName.Yellow
                     };
-                    NetworkSend.SendActionMessage(GetPlayerMap(playerId), "+" + healAmount, color, (byte)ActionMessageType.Scroll, GetPlayerX(playerId) * 32, GetPlayerY(playerId) * 32, 1);
+                    NetworkSend.ActionMessage(GetPlayerMap(playerId), "+" + healAmount, color, (byte)ActionMessageType.Scroll, GetPlayerX(playerId) * 32, GetPlayerY(playerId) * 32, 1);
                     SetPlayerVital(playerId, hv, Math.Min(GetPlayerVital(playerId, hv) + healAmount, GetPlayerMaxVital(playerId, hv)));
-                    NetworkSend.SendPlayerMessage(playerId, "You feel rejuvenating forces coursing through your body.", (int)ColorName.BrightGreen);
-                    NetworkSend.SendVital(playerId, hv);
+                    NetworkSend.PlayerMessage(playerId, "You feel rejuvenating forces coursing through your body.", (int)ColorName.BrightGreen);
+                    NetworkSend.Vital(playerId, hv);
                 }
                 moved = true; // stepping onto a heal tile counts as a valid move
             }
@@ -616,7 +616,7 @@ public class Player : PlayerBase
             if (trapAmount > 0)
             {
                 var tv = (Vital)trapVital;
-                NetworkSend.SendActionMessage(GetPlayerMap(playerId), "-" + trapAmount, (int)ColorName.BrightRed, (byte)ActionMessageType.Scroll, GetPlayerX(playerId) * 32, GetPlayerY(playerId) * 32, 1);
+                NetworkSend.ActionMessage(GetPlayerMap(playerId), "-" + trapAmount, (int)ColorName.BrightRed, (byte)ActionMessageType.Scroll, GetPlayerX(playerId) * 32, GetPlayerY(playerId) * 32, 1);
                 if (tv == Core.Globals.Vital.Health && GetPlayerVital(playerId, Core.Globals.Vital.Health) - trapAmount <= 0)
                 {
                     OnKill(playerId);
@@ -625,8 +625,8 @@ public class Player : PlayerBase
                 else
                 {
                     SetPlayerVital(playerId, tv, Math.Max(0, GetPlayerVital(playerId, tv) - trapAmount));
-                    NetworkSend.SendPlayerMessage(playerId, "You've been injured by a trap.", (int)ColorName.BrightRed);
-                    NetworkSend.SendVital(playerId, tv);
+                    NetworkSend.PlayerMessage(playerId, "You've been injured by a trap.", (int)ColorName.BrightRed);
+                    NetworkSend.Vital(playerId, tv);
                 }
                 moved = true;
             }
@@ -651,7 +651,7 @@ public class Player : PlayerBase
         {
             if (playerId >= 0 && playerId < LastPlayerXYBroadcastMs.Length)
                 LastPlayerXYBroadcastMs[playerId] = now;
-            NetworkSend.SendPlayerXYToMap(playerId);
+            NetworkSend.PlayerXYToMap(playerId);
         }
 
         try
@@ -852,13 +852,13 @@ public class Player : PlayerBase
 
         if (!Moral.Instance[Server.Map.Instance[map].Moral].CanPickupItem)
         {
-            NetworkSend.SendPlayerMessage(playerId, "You can't pickup items here!", (int) ColorName.BrightRed);
+            NetworkSend.PlayerMessage(playerId, "You can't pickup items here!", (int) ColorName.BrightRed);
             return false;
         }
 
         if (Player.Instance[playerId].Dead)
         {
-            NetworkSend.SendPlayerMessage(playerId, "You can't pick up items while dead.", (int) ColorName.BrightRed);
+            NetworkSend.PlayerMessage(playerId, "You can't pick up items while dead.", (int) ColorName.BrightRed);
             return false;
         }
 
@@ -891,7 +891,7 @@ public class Player : PlayerBase
                 var slot = Player.FindOpenInvSlot(playerId, MapItem.Instance[map, i].Num);
                 if (slot == -1)
                 {
-                    NetworkSend.SendPlayerMessage(playerId, "Your inventory is full.", (int)ColorName.BrightRed);
+                    NetworkSend.PlayerMessage(playerId, "Your inventory is full.", (int)ColorName.BrightRed);
                     break;
                 }
 
@@ -973,7 +973,7 @@ public class Player : PlayerBase
                 {
                     SetInvValue(playerId, invSlot, GetPlayerInvValue(playerId, invSlot) - val);
 
-                    NetworkSend.SendInventoryUpdate(playerId, invSlot);
+                    NetworkSend.InventoryUpdate(playerId, invSlot);
                 }
             }
             else
@@ -989,7 +989,7 @@ public class Player : PlayerBase
             SetInv(playerId, invSlot, -1);
             SetInvValue(playerId, invSlot, 0);
 
-            NetworkSend.SendInventoryUpdate(playerId, invSlot);
+            NetworkSend.InventoryUpdate(playerId, invSlot);
 
             return true;
         }
@@ -1007,7 +1007,7 @@ public class Player : PlayerBase
         var slot = FindOpenInvSlot(playerId, id);
         if (slot == -1)
         {
-            NetworkSend.SendPlayerMessage(playerId, "Your inventory is full.", (int) ColorName.BrightRed);
+            NetworkSend.PlayerMessage(playerId, "Your inventory is full.", (int) ColorName.BrightRed);
             return false;
         }
 
@@ -1019,7 +1019,7 @@ public class Player : PlayerBase
 
         if (sendUpdate)
         {
-            NetworkSend.SendInventoryUpdate(playerId, slot);
+            NetworkSend.InventoryUpdate(playerId, slot);
         }
 
         return true;
@@ -1042,13 +1042,13 @@ public class Player : PlayerBase
 
         if (!Moral.Instance[Server.Map.Instance[GetPlayerMap(playerId)].Moral].CanDropItem)
         {
-            NetworkSend.SendPlayerMessage(playerId, "You can't drop items here!", (int) ColorName.BrightRed);
+            NetworkSend.PlayerMessage(playerId, "You can't drop items here!", (int) ColorName.BrightRed);
             return;
         }
 
         if (Player.Instance[playerId].Inventory[invSlot].Bound > 0)
         {
-            NetworkSend.SendPlayerMessage(playerId, "You can't drop soulbound items!", (int) ColorName.BrightRed);
+            NetworkSend.PlayerMessage(playerId, "You can't drop soulbound items!", (int) ColorName.BrightRed);
             return;
         }
 
@@ -1084,7 +1084,7 @@ public class Player : PlayerBase
         }
         else
         {
-            NetworkSend.SendPlayerMessage(playerId, "Too many items already on the ground.", (int) ColorName.Yellow);
+            NetworkSend.PlayerMessage(playerId, "Too many items already on the ground.", (int) ColorName.Yellow);
         }
     }
 
@@ -1134,7 +1134,7 @@ public class Player : PlayerBase
         {
             if (!Moral.Instance[Server.Map.Instance[GetPlayerMap(playerId)].Moral].CanUseItem)
             {
-                NetworkSend.SendPlayerMessage(playerId, "You can't use items with this moral!", (int) ColorName.BrightRed);
+                NetworkSend.PlayerMessage(playerId, "You can't use items with this moral!", (int) ColorName.BrightRed);
                 return false;
             }
         }
@@ -1147,25 +1147,25 @@ public class Player : PlayerBase
                 continue;
             }
 
-            NetworkSend.SendPlayerMessage(playerId, "You do not meet the stat requirements to use this item.", (int) ColorName.BrightRed);
+            NetworkSend.PlayerMessage(playerId, "You do not meet the stat requirements to use this item.", (int) ColorName.BrightRed);
             return false;
         }
 
         if (Item.Instance[itemNum].LevelReq > GetPlayerLevel(playerId))
         {
-            NetworkSend.SendPlayerMessage(playerId, "You do not meet the level requirements to use this item.", (int) ColorName.BrightRed);
+            NetworkSend.PlayerMessage(playerId, "You do not meet the level requirements to use this item.", (int) ColorName.BrightRed);
             return false;
         }
 
         if (Item.Instance[itemNum].JobReq != -1 && Item.Instance[itemNum].JobReq != GetPlayerJob(playerId))
         {
-            NetworkSend.SendPlayerMessage(playerId, "You do not meet the job requirements to use this item.", (int) ColorName.BrightRed);
+            NetworkSend.PlayerMessage(playerId, "You do not meet the job requirements to use this item.", (int) ColorName.BrightRed);
             return false;
         }
 
         if (GetPlayerAccess(playerId) < Item.Instance[itemNum].AccessReq)
         {
-            NetworkSend.SendPlayerMessage(playerId, "You do not meet the access requirement to equip this item.", (int) ColorName.BrightRed);
+            NetworkSend.PlayerMessage(playerId, "You do not meet the access requirement to equip this item.", (int) ColorName.BrightRed);
             return false;
         }
 
@@ -1174,7 +1174,7 @@ public class Player : PlayerBase
             return true;
         }
 
-        NetworkSend.SendPlayerMessage(playerId, "You can't use items while in a bank, shop, or trade!", (int) ColorName.BrightRed);
+        NetworkSend.PlayerMessage(playerId, "You can't use items while in a bank, shop, or trade!", (int) ColorName.BrightRed);
         return false;
     }
 
@@ -1255,7 +1255,7 @@ public class Player : PlayerBase
             Player.Instance[playerId].Inventory[newSlot].Bound = oldBound;
         }
 
-        NetworkSend.SendInventory(playerId);
+        NetworkSend.Inventory(playerId);
     }
 
     public static void PlayerSwitchSkillSlots(int playerId, int oldSlot, int newSlot)
@@ -1295,7 +1295,7 @@ public class Player : PlayerBase
             SetPlayerSkillCd(playerId, oldSlot, newValue);
         }
 
-        NetworkSend.SendPlayerSkills(playerId);
+        NetworkSend.PlayerSkills(playerId);
     }
 
     public static void OnCheckEquipment(int playerId)
@@ -1348,7 +1348,7 @@ public class Player : PlayerBase
         }
         else
         {
-            NetworkSend.SendPlayerMessage(playerId, "Your inventory is full.", (int)ColorName.BrightRed);
+            NetworkSend.PlayerMessage(playerId, "Your inventory is full.", (int)ColorName.BrightRed);
         }
     }
 
@@ -1539,7 +1539,7 @@ public class Player : PlayerBase
             TakeInv(playerId, GetPlayerInv(playerId, invSlot), 0);
         }
 
-        NetworkSend.SendBank(playerId);
+        NetworkSend.Bank(playerId);
     }
 
     public static int GetBank(int playerId, int bankSlot)
@@ -1642,7 +1642,7 @@ public class Player : PlayerBase
             }
         }
 
-        NetworkSend.SendBank(playerId);
+        NetworkSend.Bank(playerId);
     }
 
     public static void PlayerSwitchBankSlots(int playerId, int oldSlot, int newSlot)
@@ -1667,6 +1667,6 @@ public class Player : PlayerBase
         SetBankValue(playerId, oldSlot, newValue);
         Bank.Instance[playerId].Item[oldSlot].Bound = newBound;
 
-        NetworkSend.SendBank(playerId);
+        NetworkSend.Bank(playerId);
     }
 }

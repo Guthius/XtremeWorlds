@@ -30,7 +30,7 @@ public class WinShopEditor
         if (win is null) return;
         int relY = GameState.CurMouseY - (win.Y + ctrl.Y);
         int index = list.GetItemIndexAtPosition(relY);
-        if (index < 0 || index >= Variables.MaxShops) return;
+        if (index < 0 || index >= Core.Globals.Variables.MaxShops) return;
         SelectedIndex = index;
         GameState.EditorIndex = index;
         list.SelectedIndex = index;
@@ -45,7 +45,7 @@ public class WinShopEditor
         if (win is null) return;
         int relY = GameState.CurMouseY - (win.Y + ctrl.Y);
         int index = list.GetItemIndexAtPosition(relY);
-        if (index < 0 || index >= Variables.MaxTrades) return;
+        if (index < 0 || index >= Core.Globals.Variables.MaxTrades) return;
         list.SelectedIndex = index;
         list.EnsureVisible(index);
         LoadTradeFieldsForSelected();
@@ -55,7 +55,7 @@ public class WinShopEditor
     {
         if (!WindowManager.TryGetControl("winShopEditor", "lstTradeItem", out var ctrl) || ctrl is not ListBox lst) return;
         int id = lst.SelectedIndex;
-        if (id < 0 || SelectedIndex < 0 || SelectedIndex >= Variables.MaxShops) return;
+        if (id < 0 || SelectedIndex < 0 || SelectedIndex >= Core.Globals.Variables.MaxShops) return;
         ref var trade = ref Shop.Instance[SelectedIndex].TradeItem[id];
         if (WindowManager.TryGetControl("winShopEditor", "cmbItem", out var itCtrl) && itCtrl is ComboBox ci)
             ci.Value = Math.Clamp(trade.Item, 0, Math.Max(0, ci.Items.Count - 1));
@@ -76,7 +76,7 @@ public class WinShopEditor
         int prevScroll = list.ScrollOffset;
 
         list.Clear();
-        for (int i = 0; i < Variables.MaxShops; i++)
+        for (int i = 0; i < Core.Globals.Variables.MaxShops; i++)
         {
             string name = Strings.Trim(Shop.Instance[i].Name);
             if (string.IsNullOrWhiteSpace(name)) name = "None";
@@ -129,7 +129,7 @@ public class WinShopEditor
 
     public static void OnLoad(int index)
     {
-        if (index < 0 || index >= Variables.MaxShops) return;
+        if (index < 0 || index >= Core.Globals.Variables.MaxShops) return;
         SelectedIndex = index;
         GameState.EditorIndex = index;
         var shop = Shop.Instance[index];
@@ -142,7 +142,7 @@ public class WinShopEditor
         if (WindowManager.TryGetControl("winShopEditor", "lstTradeItem", out var tradeCtrl) && tradeCtrl is ListBox tradeList)
         {
             tradeList.Clear();
-            for (int i = 0; i < Variables.MaxTrades; i++)
+            for (int i = 0; i < Core.Globals.Variables.MaxTrades; i++)
             {
                 ref var t = ref shop.TradeItem[i];
                 string itemName = t.Item >= 0 ? Item.Instance[t.Item].Name : "None";
@@ -174,7 +174,7 @@ public class WinShopEditor
     // Toggle Copy -> Paste on subsequent clicks. Paste overwrites current SelectedIndex.
     public static void OnCopyOrPaste()
     {
-        if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxShops) return;
+        if (SelectedIndex < 0 || SelectedIndex >= Core.Globals.Variables.MaxShops) return;
         if (_history is null)
         {
             // Copy current Shop (deep copy for arrays)
@@ -212,10 +212,10 @@ public class WinShopEditor
 
     public static void OnDelete()
     {
-        if (SelectedIndex < 0 || SelectedIndex >= Variables.MaxShops) return;
+        if (SelectedIndex < 0 || SelectedIndex >= Core.Globals.Variables.MaxShops) return;
         if (!WindowManager.TryGetControl("winShopEditor", "lstTradeItem", out var tradeListCtrl) || tradeListCtrl is not ListBox lst) return;
         int id = lst.SelectedIndex;
-        if (id < 0 || id >= Variables.MaxTrades) return;
+        if (id < 0 || id >= Core.Globals.Variables.MaxTrades) return;
         ref var trade = ref Shop.Instance[SelectedIndex].TradeItem[id];
         trade.Item = -1; trade.ItemValue = 0; trade.CostItem = -1; trade.CostValue = 0;
         Shop.IsChanged[SelectedIndex] = true;

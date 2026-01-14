@@ -10,7 +10,7 @@ public class WinHotBar
 {
     public static void OnDraw()
     {
-        if (GameState.MyIndex < 0 || GameState.MyIndex > Variables.MaxPlayers)
+        if (GameState.MyIndex < 0 || GameState.MyIndex > Core.Globals.Variables.MaxPlayers)
         {
             return;
         }
@@ -31,12 +31,12 @@ public class WinHotBar
         GameClient.RenderTexture(ref argPath, winHotbar.X - 1, winHotbar.Y + 3, 0, 0, 11, 26, 11, 26);
         GameClient.RenderTexture(ref argPath, winHotbar.X + 407, winHotbar.Y + 3, 0, 0, 11, 26, 11, 26);
 
-        for (var slot = 0; slot < Variables.MaxHotbar; slot++)
+        for (var slot = 0; slot < Core.Globals.Variables.MaxHotbar; slot++)
         {
             var x = winHotbar.X + GameState.HotbarLeft + slot * GameState.HotbarOffsetX;
             var y = winHotbar.Y + GameState.HotbarTop;
 
-            if (slot != Variables.MaxHotbar - 1)
+            if (slot != Core.Globals.Variables.MaxHotbar - 1)
             {
                 var argPath2 = Path.Combine(DataPath.Gui, "32");
 
@@ -85,7 +85,7 @@ public class WinHotBar
         // Right-click: remove hotbar slot
         if (slot >= 0 && GameClient.IsMouseButtonDown(MouseButton.Right))
         {
-            Sender.SendDeleteHotbar(slot);
+            Sender.DeleteHotbar(slot);
             return;
         }
 
@@ -131,7 +131,7 @@ public class WinHotBar
         var slot = GameLogic.IsHotbar(winHotbar.X, winHotbar.Y);
         if (slot >= 0)
         {
-            Sender.SendUseHotbarSlot(slot);
+            Sender.UseHotbarSlot(slot);
         }
 
         OnMouseMove();
@@ -232,7 +232,7 @@ public class WinHotBar
 
         GameClient.RenderTexture(ref path, x, y, 0, 0, 32, 32, 32, 32);
 
-        for (var i = 0; i < Variables.MaxPlayerSkills; i++)
+        for (var i = 0; i < Core.Globals.Variables.MaxPlayerSkills; i++)
         {
             if (GetPlayerSkill(GameState.MyIndex, i) < 0 ||
                 GetPlayerSkill(GameState.MyIndex, i) != skill ||

@@ -16,7 +16,7 @@ namespace Client
 {
     public class MapNpc : IData
     {
-        public static MapNpcData[] Instance { get; } = new MapNpcData[Variables.MaxMapNpcs];
+        public static MapNpcData[] Instance { get; } = new MapNpcData[Core.Globals.Variables.MaxMapNpcs];
         public static void OnClear(int index)
         {
             ref var instance = ref MapNpc.Instance[index];
@@ -47,7 +47,7 @@ namespace Client
 
             int mapNpc = MapNpc.Instance[npc].Num;
 
-            if (mapNpc < 0 || mapNpc > Variables.MaxNpcs) return;
+            if (mapNpc < 0 || mapNpc > Core.Globals.Variables.MaxNpcs) return;
             if (EditorType.Map == GameState.MyEditorType) return;
 
             if (Npc.Instance.Count <= mapNpc)
@@ -137,7 +137,7 @@ namespace Client
 
             // Check if Npc exists
             if (MapNpc.Instance[npc].Num < 0 ||
-                MapNpc.Instance[npc].Num > Variables.MaxNpcs)
+                MapNpc.Instance[npc].Num > Core.Globals.Variables.MaxNpcs)
                 return;
 
             if (EditorType.Map == GameState.MyEditorType)
@@ -159,7 +159,7 @@ namespace Client
             Npc.OnStream(MapNpc.Instance[npc].Num);
 
             if (MapNpc.Instance[npc].Num < 0 ||
-                MapNpc.Instance[npc].Num > Variables.MaxNpcs)
+                MapNpc.Instance[npc].Num > Core.Globals.Variables.MaxNpcs)
                 return;
 
             if (Npc.Instance.Count <= MapNpc.Instance[npc].Num)

@@ -67,7 +67,7 @@ namespace Client
                     // (Server uses this to set Moving + validate XY; spamming each tick is unnecessary.)
                     if (General.GetTickCount() > _lastMovePacketTime + 50)
                     {
-                        Sender.SendPlayerMove();
+                        Sender.PlayerMove();
                         _lastMovePacketTime = General.GetTickCount();
                     }
                 }
@@ -120,12 +120,12 @@ namespace Client
                     Player.Instance[GameState.MyIndex].Dir = (byte)newDir;
                     if (sendIfChanged)
                     {
-                        Sender.SendPlayerDir();
+                        Sender.PlayerDir();
                     }
                 }
                 else if (!sendIfChanged)
                 {
-                    Sender.SendPlayerDir();
+                    Sender.PlayerDir();
                 }
             }
         }
@@ -179,7 +179,7 @@ namespace Client
             if (Player.Instance[index].Dir != newDir)
             {
                 Player.Instance[index].Dir = (byte)newDir;
-                Sender.SendPlayerDir();
+                Sender.PlayerDir();
             }
         }
 
@@ -195,7 +195,7 @@ namespace Client
             {
                 if (Player.Instance[GameState.MyIndex].IsMoving)
                 {
-                    Sender.SendStopPlayerMove();
+                    Sender.StopPlayerMove();
                     Player.Instance[GameState.MyIndex].IsMoving = false;
                 }
                 // Always ensure numeric Moving flag (animation driver) is cleared whenever no movement keys are down
@@ -243,7 +243,7 @@ namespace Client
                 var now = General.GetTickCount();
                 if (now > _lastCancelCastPacketTime + 250)
                 {
-                    Sender.SendCancelCast();
+                    Sender.CancelCast();
                     _lastCancelCastPacketTime = now;
                 }
             }
@@ -272,7 +272,7 @@ namespace Client
 
             if (Trade.InTrade > 0)
             {
-                Sender.SendDeclineTrade();
+                Sender.DeclineTrade();
             }
 
             if (GameState.InShop >= 0)
@@ -282,7 +282,7 @@ namespace Client
 
             if (GameState.InBank)
             {
-                Sender.SendCloseBank();
+                Sender.CloseBank();
             }
 
             d = GetPlayerDir(GameState.MyIndex);
@@ -466,7 +466,7 @@ namespace Client
                     {
                         if (d != (int) Direction.Up)
                         {
-                            Sender.SendPlayerDir();
+                            Sender.PlayerDir();
                         }
 
                         return canMove;
@@ -474,7 +474,7 @@ namespace Client
                 }
                 else if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Up > 0)
                 {
-                    Sender.SendPlayerRequestNewMap();
+                    Sender.PlayerRequestNewMap();
                     return canMove;
                 }
             }
@@ -488,7 +488,7 @@ namespace Client
                     {
                         if (d != (int) Direction.Down)
                         {
-                            Sender.SendPlayerDir();
+                            Sender.PlayerDir();
                         }
 
                         return canMove;
@@ -496,7 +496,7 @@ namespace Client
                 }
                 else if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Down > 0)
                 {
-                    Sender.SendPlayerRequestNewMap();
+                    Sender.PlayerRequestNewMap();
                     return canMove;
                 }
             }
@@ -510,7 +510,7 @@ namespace Client
                     {
                         if (d != (int) Direction.Left)
                         {
-                            Sender.SendPlayerDir();
+                            Sender.PlayerDir();
                         }
 
                         return canMove;
@@ -518,7 +518,7 @@ namespace Client
                 }
                 else if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Left > 0)
                 {
-                    Sender.SendPlayerRequestNewMap();
+                    Sender.PlayerRequestNewMap();
                     return canMove;
                 }
             }
@@ -532,7 +532,7 @@ namespace Client
                     {
                         if (d != (int) Direction.Right)
                         {
-                            Sender.SendPlayerDir();
+                            Sender.PlayerDir();
                         }
 
                         return canMove;
@@ -540,7 +540,7 @@ namespace Client
                 }
                 else if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Right > 0)
                 {
-                    Sender.SendPlayerRequestNewMap();
+                    Sender.PlayerRequestNewMap();
                     return canMove;
                 }
             }
@@ -555,7 +555,7 @@ namespace Client
                     {
                         if (d != (int)Direction.UpRight)
                         {
-                            Sender.SendPlayerDir();
+                            Sender.PlayerDir();
                         }
 
                         return canMove;
@@ -563,7 +563,7 @@ namespace Client
                 }
                 else if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Up > 0 & Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Right > 0)
                 {
-                    Sender.SendPlayerRequestNewMap();
+                    Sender.PlayerRequestNewMap();
                     return canMove;
                 }
             }
@@ -576,7 +576,7 @@ namespace Client
                     {
                         if (d != (int) Direction.UpLeft)
                         {
-                            Sender.SendPlayerDir();
+                            Sender.PlayerDir();
                         }
 
                         return canMove;
@@ -584,7 +584,7 @@ namespace Client
                 }
                 else if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Up > 0 & Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Left > 0)
                 {
-                    Sender.SendPlayerRequestNewMap();
+                    Sender.PlayerRequestNewMap();
                     return canMove;
                 }
             }
@@ -597,7 +597,7 @@ namespace Client
                     {
                         if (d != (int) Direction.DownRight)
                         {
-                            Sender.SendPlayerDir();
+                            Sender.PlayerDir();
                         }
 
                         return canMove;
@@ -605,7 +605,7 @@ namespace Client
                 }
                 else if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Down > 0 & Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Right > 0)
                 {
-                    Sender.SendPlayerRequestNewMap();
+                    Sender.PlayerRequestNewMap();
                     return canMove;
                 }
             }
@@ -618,7 +618,7 @@ namespace Client
                     {
                         if (d != (int) Direction.DownLeft)
                         {
-                            Sender.SendPlayerDir();
+                            Sender.PlayerDir();
                         }
 
                         return canMove;
@@ -626,7 +626,7 @@ namespace Client
                 }
                 else if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Down > 0 & Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Left > 0)
                 {
-                    Sender.SendPlayerRequestNewMap();
+                    Sender.PlayerRequestNewMap();
                     return canMove;
                 }
             }
@@ -948,11 +948,11 @@ namespace Client
                             // Compute world pixel coordinates of mouse relative to map origin
                             int worldX = (int)GameState.Camera.Left + GameState.CurMouseXGame;
                             int worldY = (int)GameState.Camera.Top + GameState.CurMouseYGame;
-                            Sender.SendMouseAttack(worldX, worldY);
+                            Sender.MouseAttack(worldX, worldY);
                         }
                         else
                         {
-                            Sender.SendAttack();
+                            Sender.Attack();
                         }
                     }
                 }
@@ -1091,7 +1091,7 @@ namespace Client
                         {
                             if (Moral.Instance[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Moral].CanCast)
                             {
-                                Sender.SendCast(skillSlot);
+                                Sender.Cast(skillSlot);
                             }
                             else
                             {

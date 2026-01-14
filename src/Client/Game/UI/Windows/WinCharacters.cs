@@ -9,17 +9,17 @@ public class WinCharacters
 {
     public static void OnSelectCharacter1Click()
     {
-        Sender.SendUseChar(0);
+        Sender.UseChar(0);
     }
 
     public static void OnSelectCharacter2Click()
     {
-        Sender.SendUseChar(1);
+        Sender.UseChar(1);
     }
 
     public static void OnSelectCharacter3Click()
     {
-        Sender.SendUseChar(2);
+        Sender.UseChar(2);
     }
 
     private static void TryDeleteCharacter(int slot)
@@ -83,7 +83,7 @@ public class WinCharacters
             return;
         }
 
-        for (var i = 0; i < Variables.MaxCharacters; i++)
+        for (var i = 0; i < Core.Globals.Variables.MaxCharacters; i++)
         {
             if (string.IsNullOrEmpty(GameState.CharName[i]))
             {
