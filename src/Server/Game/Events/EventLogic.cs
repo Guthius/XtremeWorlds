@@ -2974,32 +2974,32 @@ namespace Server
             PlayerService.Instance.SendDataTo(index, buffer.GetBytes());
         }
 
-        public static bool TriggerEvent(int playerIndex, int eventId, byte triggerType, int targetX, int targetY)
+        public static bool TriggerEvent(int player, int eventId, byte triggerType, int targetX, int targetY)
         {
             // 1. Validate player and map
-            if (playerIndex < 0)
+            if (player < 0)
                 return false;
 
-            int map = GetPlayerMap(playerIndex);
+            int map = GetPlayerMap(player);
             if (map < 0 || map >= Server.Map.Instance.Count)
                 return false;
 
             // 2. Find the relevant event for the player
-            var eventMap = Data.TempPlayer[playerIndex].EventMap;
-            int localEventIndex = -1;
+            var eventMap = Data.TempPlayer[player].EventMap;
+            int localEvent = -1;
             for (int slot = 1; slot <= eventMap.CurrentEvents; slot++)
             {
                 if (eventMap.EventPages[slot].EventId == eventId)
                 {
-                    localEventIndex = slot;
+                    localEvent = slot;
                     break;
                 }
             }
 
-            if (localEventIndex == -1)
+            if (localEvent == -1)
                 return false; // Event not found
 
-            ref var eventPage = ref eventMap.EventPages[localEventIndex];
+            ref var eventPage = ref eventMap.EventPages[localEvent];
             var mapEvent = Server.Map.Instance[map].Event[eventPage.EventId];
             var page = mapEvent.Pages[eventPage.PageId];
 
@@ -3010,11 +3010,11 @@ namespace Server
             // 4. Determine the target tile based on trigger type.
             // Action Button (0): trigger the tile in front of the player.
             // Player Touch (1): trigger the tile the player is on.
-            var playerX = GetPlayerX(playerIndex);
-            var playerY = GetPlayerY(playerIndex);
+            var playerX = GetPlayerX(player);
+            var playerY = GetPlayerY(player);
             if (triggerType == 0)
             {
-                (int x, int y)? offset = GetOffsetByDirection(GetPlayerDir(playerIndex), playerX, playerY, Server.Map.Instance[map]);
+                (int x, int y)? offset = GetOffsetByDirection(GetPlayerDir(player), playerX, playerY, Server.Map.Instance[map]);
                 if (offset == null)
                     return false;
 
@@ -3045,7 +3045,7 @@ namespace Server
             // 6. Begin event processing if applicable
             if (page.CommandListCount > 0)
             {
-                ref var eventProcessing = ref Data.TempPlayer[playerIndex].EventProcessing[eventPage.EventId];
+                ref var eventProcessing = ref Data.TempPlayer[player].EventProcessing[eventPage.EventId];
 
                 eventProcessing.Active = 1;
                 eventProcessing.ActionTimer = General.GetTime();

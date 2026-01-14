@@ -1243,6 +1243,7 @@ public static class WinEventEditor
                 pick1Target = "txtCmdData1";
                 pick1Items =
                 [
+                    ((int)TargetType.None, "None"),
                     ((int)TargetType.Player, "Player"),
                     ((int)TargetType.Npc, "Npc"),
                     ((int)TargetType.Event, "Event"),
@@ -1255,7 +1256,7 @@ public static class WinEventEditor
                 {
                     pick2Label = "Npc";
                     pick2Target = "txtCmdData2";
-                    pick2Items = BuildIndexItems(
+                    var npcItems = BuildIndexItems(
                         hasPlayerMap && Client.Map.Instance[playerMap].Npc != null ? Client.Map.Instance[playerMap].Npc.Length : 0,
                         slot =>
                         {
@@ -1279,7 +1280,7 @@ public static class WinEventEditor
                 {
                     pick2Label = "Event";
                     pick2Target = "txtCmdData2";
-                    pick2Items = BuildIndexItems(
+                    var evtItems = BuildIndexItems(
                         hasPlayerMap && Client.Map.Instance[playerMap].Event != null ? Client.Map.Instance[playerMap].Event.Length : 0,
                         i =>
                         {
@@ -1294,6 +1295,11 @@ public static class WinEventEditor
                             name = string.IsNullOrWhiteSpace(name) ? "None" : name.Trim();
                             return name;
                         });
+
+                    pick2Items = new (int value, string name)[evtItems.Length + 1];
+                    pick2Items[0] = (-1, "None");
+                    Array.Copy(evtItems, 0, pick2Items, 1, evtItems.Length);
+                    pick2CurrentValue = cmd.Data2;
                 }
                 break;
             case EventCommand.OpenShop:
