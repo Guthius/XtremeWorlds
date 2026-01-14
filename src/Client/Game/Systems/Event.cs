@@ -752,7 +752,6 @@ namespace Client
                 // Skip event if there are no pages
                 if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].PageCount <= 0)
                 {
-                    GameClient.DrawOutlineRectangle(GameLogic.ConvertMapX(worldX), GameLogic.ConvertMapY(worldY), Constants.TileSize, Constants.TileSize, Color.Blue, 0.6f);
                     continue;
                 }
 
@@ -783,8 +782,6 @@ namespace Client
 
                     default:
                     {
-                        // Draw fallback outline if the graphic type is unknown
-                        GameClient.DrawOutlineRectangle(GameLogic.ConvertMapX(worldX), GameLogic.ConvertMapY(worldY), Constants.TileSize, Constants.TileSize, Color.Blue, 0.6f);
                         break;
                     }
                 }

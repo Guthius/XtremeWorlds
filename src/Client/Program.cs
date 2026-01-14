@@ -2560,8 +2560,7 @@ namespace Client
             }
             else
             {
-                // Draw fallback outline if the tileset graphic is invalid
-                DrawOutlineRectangle(x, y, Constants.TileSize, Constants.TileSize, Color.Blue, 0.6f);
+                // No fallback outline: invalid tileset graphics should not draw a debug-looking square.
             }
         }
 
