@@ -47,11 +47,11 @@
     <TextBox Name="txtSpirit" Position="176, 92" Size="40, 20" Design="TextWhite"/>
 
     <Label Name="lblMaleSprite" Text="Male Sprite" Position="340, 20" Size="80, 16"/>
-    <ScrollBar Name="sldMaleSprite" Position="432, 22" Size="110, 12" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+    <ScrollBar Name="sldMaleSprite" Position="442, 22" Size="100, 12" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
     <PictureBox Name="picMale" Position="630, 16" Size="64, 64" Design="TextBlack"/>
 
     <Label Name="lblFemaleSprite" Text="Female Sprite" Position="340, 56" Size="96, 16"/>
-    <ScrollBar Name="sldFemaleSprite" Position="432, 58" Size="110, 12" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+    <ScrollBar Name="sldFemaleSprite" Position="442, 58" Size="100, 12" Min="0" Max="0" Value="0" Orientation="Horizontal" ThumbSize="16"/>
     <PictureBox Name="picFemale" Position="560, 16" Size="64, 64" Design="TextBlack"/>
   </GroupBox>
 
