@@ -16,36 +16,36 @@
     <!-- Core fields -->
     <Label Name="lblName" Text="Name" Position="12, 20" Size="70, 16"/>
     <TextBox Name="txtName" Position="90, 18" Size="200, 18" Design="TextWhite"/>
-    <Label Name="lblAttackSay" Text="Attack Say" Position="12, 44" Size="70, 16"/>
+    <Label Name="lblAttackSay" Text="Attack Say" Position="12, 44" Size="120, 16"/>
     <TextBox Name="txtAttackSay" Position="90, 42" Size="200, 18" Design="TextWhite"/>
-    <Label Name="lblBehavior" Text="Behavior" Position="12, 70" Size="70, 16"/>
+    <Label Name="lblBehavior" Text="Behavior" Position="12, 70" Size="80, 16"/>
     <ComboBox Name="cmbBehavior" Position="90, 68" Size="200, 18"/>
     <Label Name="lblSpawnPeriod" Text="Spawn" Position="12, 94" Size="70, 16"/>
     <ComboBox Name="cmbSpawnPeriod" Position="90, 92" Size="200, 18"/>
-    <Label Name="lblAnimation" Text="Animation" Position="12, 118" Size="80, 16"/>
-    <ComboBox Name="cmbAnimation" Position="90, 116" Size="200, 18"/>
+    <Label Name="lblAnimation" Text="Animation" Position="12, 118" Size="90, 16"/>
+    <ComboBox Name="cmbAnimation" Position="90, 116" Size="180, 18"/>
     <Label Name="lblFaction" Text="Faction" Position="12, 142" Size="70, 16"/>
-    <ComboBox Name="cmbFaction" Position="90, 140" Size="200, 18"/>
+    <ComboBox Name="cmbFaction" Position="90, 140" Size="180, 18"/>
 
     <!-- Sprite preview -->
     <PictureBox Name="picSprite" Position="530, 12" Size="64, 64" Design="TextBlack"/>
-    <Label Name="lblSprite" Text="Sprite" Position="292, 28" Size="70, 16"/>
+    <Label Name="lblSprite" Text="Sprite" Position="294, 28" Size="70, 16"/>
     <ScrollBar Name="sldSprite" Position="370, 30" Size="140, 12" Min="0" Max="1" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 
     <!-- Death tracking -->
-    <Label Name="lblDeathSwitch" Text="Death Switch" Position="292, 90" Size="100, 16"/>
+    <Label Name="lblDeathSwitch" Text="Death Switch" Position="294, 90" Size="120, 16"/>
     <ComboBox Name="cmbDeathSwitch" Position="392, 88" Size="160, 18"/>
     <TextBox Name="txtDeathSwitchValue" Position="552, 88" Size="42, 18" Design="TextWhite"/>
-    <Label Name="lblDeathVariable" Text="Death Variable" Position="292, 114" Size="100, 16"/>
+    <Label Name="lblDeathVariable" Text="Death Variable" Position="294, 114" Size="150, 16"/>
     <ComboBox Name="cmbDeathVariable" Position="392, 112" Size="160, 18"/>
     <TextBox Name="txtDeathVariableValue" Position="552, 112" Size="42, 18" Design="TextWhite"/>
 
     <!-- Common event trigger -->
-    <Label Name="lblCommonEvent" Text="Event" Position="292, 148" Size="80, 16"/>
+    <Label Name="lblCommonEvent" Text="Event" Position="294, 148" Size="80, 16"/>
     <ComboBox Name="cmbCommonEventType" Position="392, 146" Size="206, 18"/>
-    <Label Name="lblCommonEventData1" Text="Data 1" Position="292, 172" Size="80, 16"/>
+    <Label Name="lblCommonEventData1" Text="Data 1" Position="294, 172" Size="80, 16"/>
     <TextBox Name="txtCommonEventData1" Position="392, 170" Size="206, 18" Design="TextWhite"/>
-    <Label Name="lblCommonEventData2" Text="Data 2" Position="292, 196" Size="80, 16"/>
+    <Label Name="lblCommonEventData2" Text="Data 2" Position="294, 196" Size="80, 16"/>
     <TextBox Name="txtCommonEventData2" Position="392, 194" Size="206, 18" Design="TextWhite"/>
 
     <!-- Stats -->
