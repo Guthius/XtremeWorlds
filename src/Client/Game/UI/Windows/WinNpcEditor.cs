@@ -273,7 +273,8 @@ public class WinNpcEditor
         }
         if (WindowManager.TryGetControl("winNpcEditor", "sldLevel", out var lvlSldCtrl) && lvlSldCtrl is ScrollBar sbLevel)
         {
-            sbLevel.Max = Math.Clamp((int)Core.Globals.Variables.MaxLevel, 0, 255);
+            sbLevel.Min = 1;
+            sbLevel.Max = Math.Clamp((int)Core.Globals.Variables.MaxLevel, sbLevel.Min, 255);
             sbLevel.Value = Math.Clamp((int)npc.Level, sbLevel.Min, sbLevel.Max);
         }
         if (WindowManager.TryGetControl("winNpcEditor", "txtDamage", out var dmgCtrl) && dmgCtrl is TextBox txtDmg)
