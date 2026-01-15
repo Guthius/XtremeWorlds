@@ -1243,7 +1243,7 @@ public static class Sender
         packetWriter.WriteByte(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Brightness);
         packetWriter.WriteBoolean(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].NoRespawn);
         packetWriter.WriteBoolean(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Indoors);
-        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Shop);
+        packetWriter.WriteInt32(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Shop - 1);
 
         // Per-map camera zoom bounds
         packetWriter.WriteSingle(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MinZoom);

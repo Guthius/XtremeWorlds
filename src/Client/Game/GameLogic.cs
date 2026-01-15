@@ -2032,15 +2032,15 @@ namespace Client
 
         public static void OpenShop(long shopNum)
         {
-            var shopIndex = (int)shopNum;
-            if (shopIndex < 0 || shopIndex >= Shop.Instance.Count)
+            var shop = (int)shopNum;
+            if (shop < 0 || shop >= Shop.Instance.Count)
             {
                 GameState.InShop = -1;
                 return;
             }
 
             // set globals
-            GameState.InShop = shopIndex;
+            GameState.InShop = shop;
             GameState.ShopSelectedSlot = 0;
             GameState.ShopSelectedItem = Shop.Instance[GameState.InShop].TradeItem.Length > 0
                 ? Shop.Instance[GameState.InShop].TradeItem[0].Item

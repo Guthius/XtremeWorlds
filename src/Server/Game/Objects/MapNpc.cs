@@ -22,7 +22,7 @@ namespace Server
         // Planned multi-tile movement route (as directions) per npc on each map.
         private static readonly System.Collections.Generic.Queue<byte>?[,] _route = new System.Collections.Generic.Queue<byte>?[Core.Globals.Variables.MaxMaps, Core.Globals.Variables.MaxMapNpcs];
 
-        public static void Clear(int index, int map)
+        public static void OnClear(int index, int map)
         {
             var count = Enum.GetValues(typeof(Vital)).Length;
             Instance[map, index].Vital = new int[count];
@@ -72,7 +72,7 @@ namespace Server
 
             if (Npc.Instance[npcNum].SpawnTime != (byte) Clock.Instance.TimeOfDay && Npc.Instance[npcNum].SpawnTime != 0)
             {
-                MapNpc.Clear(npc, map);
+                MapNpc.OnClear(npc, map);
 
                 NetworkSend.MapNpcsToMap(map);
 

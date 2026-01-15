@@ -1201,7 +1201,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
         for (x = 0; x < Core.Globals.Variables.MaxMapNpcs; x++)
         {
-            MapNpc.Clear(x, map);
+            MapNpc.OnClear(x, map);
             Server.Map.Instance[map].Npc[x] = packetReader.ReadInt32();
         }
 
