@@ -297,13 +297,6 @@ namespace Client
                             break;
                         }
 
-                    // Request stats
-                    case "/stats":
-                        var packetWriter = new PacketWriter(4);
-                        packetWriter.WriteEnum(Packets.ClientPackets.CGetStats);
-                        Network.Send(packetWriter);
-                        break;
-
                     case "/party":
                         {
                             if (GameState.MyTarget >= 0)
