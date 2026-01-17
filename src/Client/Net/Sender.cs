@@ -362,16 +362,6 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void PlayerInfo(string name)
-    {
-        var packetWriter = new PacketWriter();
-
-        packetWriter.WriteEnum(Packets.ClientPackets.CPlayerInfoRequest);
-        packetWriter.WriteString(name);
-
-        Network.Send(packetWriter);
-    }
-
     public static void MotdChange(string message)
     {
         var packetWriter = new PacketWriter();

@@ -270,28 +270,6 @@ namespace Client
                             break;
                         }
 
-                    case "/info":
-                        {
-                            if (GameState.MyTarget >= 0)
-                            {
-                                if (GameState.MyTargetType == (int)TargetType.Player)
-                                {
-                                    Sender.PlayerInfo(GetPlayerName(GameState.MyTarget));
-                                    goto Continue1;
-                                }
-                            }
-
-                            // Checks to make sure we have more than one string in the array
-                            if (Information.UBound(command) < 1 || Information.IsNumeric(command[1]))
-                            {
-                                TextRenderer.AddText(LocalesManager.Get("Info"), (int)ColorName.Yellow);
-                                goto Continue1;
-                            }
-
-                            Sender.PlayerInfo(command[1]);
-                            break;
-                        }
-
                     // Whos Online
                     case "/who":
                         {

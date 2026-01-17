@@ -19,7 +19,6 @@ public static class GamePacketId
         CPlayerDir,
         CUseItem,
         CAttack,
-        CPlayerInfoRequest,
         CWarpMeTo,
         CWarpToMe,
         CWarpTo,

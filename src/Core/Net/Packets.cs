@@ -21,7 +21,6 @@ public static class Packets
         CPlayerDir,
         CUseItem,
         CAttack,
-        CPlayerInfoRequest,
         CWarpMeTo,
         CWarpToMe,
         CWarpTo,

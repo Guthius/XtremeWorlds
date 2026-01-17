@@ -53,7 +53,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Bind(Packets.ClientPackets.CUseItem, UseItem);
         Bind(Packets.ClientPackets.CAttack, Attack);
         Bind(Packets.ClientPackets.CMouseAttack, MouseAttack);
-        Bind(Packets.ClientPackets.CPlayerInfoRequest, PlayerInfo);
         Bind(Packets.ClientPackets.CWarpMeTo, WarpMeTo);
         Bind(Packets.ClientPackets.CWarpToMe, WarpToMe);
         Bind(Packets.ClientPackets.CWarpTo, WarpTo);
@@ -977,41 +976,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         // Fire with free-aim using helper and stop at target
         Server.Projectile.OnFreeAim(session.Id, vx, vy, item, targetX, targetY);
         NetworkSend.PlayerAttack(session.Id);
-    }
-
-    public static async ValueTask PlayerInfo(GameSession session, ReadOnlyMemory<byte> bytes)
-    {
-        int n;
-        var buffer = new PacketReader(bytes);
-
-        var name = buffer.ReadString();
-        var i = GameLogic.FindPlayer(name);
-
-        if (i >= 0)
-        {
-            NetworkSend.PlayerMessage(session.Id, "Account:  " + GetAccountLogin(i) + ", Name: " + GetPlayerName(i), (int)ColorName.Yellow);
-
-            if (GetPlayerAccess(session.Id) > (byte)AccessLevel.Moderator)
-            {
-                NetworkSend.PlayerMessage(session.Id, " Stats for " + GetPlayerName(i) + " ", (int)ColorName.Yellow);
-                NetworkSend.PlayerMessage(session.Id, "Level: " + GetPlayerLevel(i) + "  Exp: " + GetPlayerExperience(i) + "/" + Script.Instance?.GetPlayerNextLevel(i), (int)ColorName.Yellow);
-                NetworkSend.PlayerMessage(session.Id, "HP: " + GetPlayerVital(i, Core.Globals.Vital.Health) + "/" + Script.Instance?.GetPlayerMaxVital(i, Core.Globals.Vital.Health) + "  MP: " + GetPlayerVital(i, Core.Globals.Vital.Stamina) + "/" + Script.Instance?.GetPlayerMaxVital(i, Core.Globals.Vital.Stamina) + "  SP: " + GetPlayerVital(i, Core.Globals.Vital.Stamina) + "/" + Script.Instance?.GetPlayerMaxVital(i, Core.Globals.Vital.Stamina), (int)ColorName.Yellow);
-                NetworkSend.PlayerMessage(session.Id, "Strength: " + GetPlayerStat(i, Stat.Strength) + "  Defense: " + GetPlayerStat(i, Stat.Luck) + "  Magic: " + GetPlayerStat(i, Stat.Intelligence) + "  Speed: " + GetPlayerStat(i, Stat.Spirit), (int)ColorName.Yellow);
-                n = GetPlayerStat(i, Stat.Strength) / 2 + GetPlayerLevel(i) / 2;
-                i = GetPlayerStat(i, Stat.Luck) / 2 + GetPlayerLevel(i) / 2;
-
-                if (n > 100)
-                    n = 100;
-
-                if (i > 100)
-                    i = 100;
-                NetworkSend.PlayerMessage(session.Id, "Critical Hit Chance: " + n + "%, Block Chance: " + i + "%", (int)ColorName.Yellow);
-            }
-        }
-        else
-        {
-            NetworkSend.PlayerMessage(session.Id, "Player is not online.", (int)ColorName.BrightRed);
-        }
     }
 
     public static async ValueTask WarpMeTo(GameSession session, ReadOnlyMemory<byte> bytes)
