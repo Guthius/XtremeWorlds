@@ -512,7 +512,7 @@ public class Crystalshire
         {
             // Show only relevant attribute configuration controls per selection (mirror Eto behavior)
             bool showWarp = id == 1; // Warp
-            string[] warpCtrls = new[] { "lblWarp", "lblWarpMap", "sldMapWarp", "lblWarpX", "sldMapWarpX", "lblWarpY", "sldMapWarpY", "btnMapWarp" }; ;
+            string[] warpCtrls = new[] { "lblWarp", "lblWarpMap", "cmbMapWarp", "lblWarpX", "cmbMapWarpX", "lblWarpY", "cmbMapWarpY", "btnMapWarp" }; ;
             foreach (var n in warpCtrls)
             {
                 if (WindowManager.TryGetControl("winMapEditor", n, out var c)) c.Visible = showWarp;
@@ -520,46 +520,66 @@ public class Crystalshire
 
             if (showWarp)
             {
-                void SetWarpLabel(string name, string caption, int value)
-                {
-                    if (WindowManager.TryGetControl("winMapEditor", name, out var l)) l.Text = $"{caption}: {value}";
-                }
+                int maxMaps = Math.Max(0, Core.Globals.Variables.MaxMaps);
 
-                if (WindowManager.TryGetControl("winMapEditor", "sldMapWarp", out var wMapCtrl) && wMapCtrl is Client.Game.UI.Controls.ScrollBar sbMap)
+                if (WindowManager.TryGetControl("winMapEditor", "cmbMapWarp", out var wMapCtrl) && wMapCtrl is ComboBox cmbMap)
                 {
-                    sbMap.Min = 1;
-                    sbMap.Max = Core.Globals.Variables.MaxMaps;
-                    wMapCtrl.Value = Math.Clamp(wMapCtrl.Value, sbMap.Min, sbMap.Max);
-                    if (wMapCtrl.Value < 1) wMapCtrl.Value = 1;
-                    SetWarpLabel("lblWarpMap", "Map", wMapCtrl.Value);
-                    sbMap.CallBack[(int)ControlState.MouseMove] = () =>
+                    // Keep the map list in sync with MapReport (same format as Admin: "1: Name")
+                    if (cmbMap.Items.Count != maxMaps)
                     {
-                        wMapCtrl.Value = Math.Clamp(wMapCtrl.Value, sbMap.Min, sbMap.Max);
-                        SetWarpLabel("lblWarpMap", "Map", wMapCtrl.Value);
+                        cmbMap.Items.Clear();
+                        for (int i = 0; i < maxMaps; i++)
+                        {
+                            var raw = (i >= 0 && i < GameState.MapNames.Length) ? (GameState.MapNames[i] ?? string.Empty) : string.Empty;
+                            var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
+                            cmbMap.Items.Add($"{i + 1}: {name}");
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < maxMaps; i++)
+                        {
+                            var raw = (i >= 0 && i < GameState.MapNames.Length) ? (GameState.MapNames[i] ?? string.Empty) : string.Empty;
+                            var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
+                            var desired = $"{i + 1}: {name}";
+                            if (!string.Equals(cmbMap.Items[i], desired, StringComparison.Ordinal))
+                                cmbMap.Items[i] = desired;
+                        }
+                    }
+
+                    // Sync selection from editor state (0-based map id)
+                    if (maxMaps > 0)
+                        cmbMap.Value = Math.Clamp(GameState.EditorWarpMap, 0, maxMaps - 1);
+                    else
+                        cmbMap.Value = 0;
+
+                    cmbMap.CallBack[(int)ControlState.MouseMove] = () =>
+                    {
+                        if (maxMaps > 0)
+                            cmbMap.Value = Math.Clamp(cmbMap.Value, 0, maxMaps - 1);
+                        else
+                            cmbMap.Value = 0;
+
                     };
                 }
 
-                if (WindowManager.TryGetControl("winMapEditor", "sldMapWarpX", out var wXCtrl) && wXCtrl is Client.Game.UI.Controls.ScrollBar sbX)
+                if (WindowManager.TryGetControl("winMapEditor", "cmbMapWarpX", out var wXCtrl) && wXCtrl is Client.Game.UI.Controls.ScrollBar sbX)
                 {
                     sbX.Min = 0; sbX.Max = Math.Max(0, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX - 1);
-                    wXCtrl.Value = Math.Clamp(wXCtrl.Value, sbX.Min, sbX.Max);
-                    SetWarpLabel("lblWarpX", "X", wXCtrl.Value);
+                    wXCtrl.Value = Math.Clamp(GameState.EditorWarpX, sbX.Min, sbX.Max);
                     sbX.CallBack[(int)ControlState.MouseMove] = () =>
                     {
                         wXCtrl.Value = Math.Clamp(wXCtrl.Value, sbX.Min, sbX.Max);
-                        SetWarpLabel("lblWarpX", "X", wXCtrl.Value);
                     };
                 }
 
-                if (WindowManager.TryGetControl("winMapEditor", "sldMapWarpY", out var wYCtrl) && wYCtrl is Client.Game.UI.Controls.ScrollBar sbY)
+                if (WindowManager.TryGetControl("winMapEditor", "cmbMapWarpY", out var wYCtrl) && wYCtrl is Client.Game.UI.Controls.ScrollBar sbY)
                 {
                     sbY.Min = 0; sbY.Max = Math.Max(0, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY - 1);
-                    wYCtrl.Value = Math.Clamp(wYCtrl.Value, sbY.Min, sbY.Max);
-                    SetWarpLabel("lblWarpY", "Y", wYCtrl.Value);
+                    wYCtrl.Value = Math.Clamp(GameState.EditorWarpY, sbY.Min, sbY.Max);
                     sbY.CallBack[(int)ControlState.MouseMove] = () =>
                     {
                         wYCtrl.Value = Math.Clamp(wYCtrl.Value, sbY.Min, sbY.Max);
-                        SetWarpLabel("lblWarpY", "Y", wYCtrl.Value);
                     };
                 }
 
@@ -567,20 +587,15 @@ public class Crystalshire
                 {
                     btnMapWarp.CallBack[(int)ControlState.MouseDown] = () =>
                     {
-                        if (WindowManager.TryGetControl("winAdmin", "lstMaps", out var listCtrl) && listCtrl is ListBox lst)
-                        {
-                            var lines = (lst.Text).Split('\n');
-                            if (lines.Length == 0) return;
-                            var start = Math.Clamp(lst.Value, 0, Math.Max(0, lines.Length - 1));
-                            var line = lines[start];
-                            if (string.IsNullOrWhiteSpace(line)) return;
-                            var colon = line.IndexOf(':');
-                            if (colon > 0 && int.TryParse(line.AsSpan(0, colon), out var map))
-                            {
-                                var target = Math.Max(0, map - 1); // convert 1-based display to 0-based map id
-                                Sender.WarpTo(target);
-                            }
-                        }
+                        // Apply current UI selections to editor state used when painting Warp attributes.
+                        if (maxMaps > 0 && WindowManager.TryGetControl("winMapEditor", "cmbMapWarp", out var mapCtrl) && mapCtrl is ComboBox cmb)
+                            GameState.EditorWarpMap = Math.Clamp(cmb.Value, 0, maxMaps - 1);
+
+                        if (WindowManager.TryGetControl("winMapEditor", "cmbMapWarpX", out var xCtrl))
+                            GameState.EditorWarpX = Math.Max(0, xCtrl.Value);
+
+                        if (WindowManager.TryGetControl("winMapEditor", "cmbMapWarpY", out var yCtrl))
+                            GameState.EditorWarpY = Math.Max(0, yCtrl.Value);
                     };
                 }
             }
