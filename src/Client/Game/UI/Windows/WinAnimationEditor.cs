@@ -139,7 +139,13 @@ namespace Client.Game.UI.Windows
             {
                 // Find index by text match
                 int sel = 0;
-                var current = a.Sound ?? string.Empty;
+                var current = (a.Sound ?? string.Empty).Trim();
+                // If empty, keep selection at 0 ("None")
+                if (string.IsNullOrWhiteSpace(current))
+                {
+                    cmbSound.Value = 0;
+                    return;
+                }
                 for (int i = 0; i < cmbSound.Items.Count; i++)
                 {
                     var item = cmbSound.Items[i] ?? string.Empty;

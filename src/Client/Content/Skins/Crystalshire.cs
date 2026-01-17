@@ -3526,6 +3526,7 @@ public class Crystalshire
             if (cmbSound.Items.Count == 0)
             {
                 cmbSound.Items.Clear();
+                cmbSound.Items.Add("None");
                 General.CacheSound();
                 for (int i = 0; i < Audio.SoundCache.Length; i++)
                 {
@@ -3538,7 +3539,11 @@ public class Crystalshire
             {
                 int id = WinAnimationEditor.SelectedIndex; if (id < 0 || id >= Animation.Instance.Count) return;
                 string text = cmbSound.Value >= 0 && cmbSound.Value < cmbSound.Items.Count ? cmbSound.Items[cmbSound.Value] : string.Empty;
-                Animation.Instance[id].Sound = text ?? string.Empty;
+                // "None" is stored as empty string.
+                if (string.Equals(text, "None", StringComparison.OrdinalIgnoreCase))
+                    Animation.Instance[id].Sound = string.Empty;
+                else
+                    Animation.Instance[id].Sound = text ?? string.Empty;
             };
         }
 
@@ -3586,8 +3591,8 @@ public class Crystalshire
         if (WindowManager.TryGetControl("winAnimationEditor", "btnCopy", out var btnCopy) && btnCopy is Button bcp)
             bcp.CallBack[(int)ControlState.MouseDown] = WinAnimationEditor.OnCopy;
 
-        // Previews draw
-        void DrawPreview(string barSpriteName, string barFramesName, string picName)
+        // Previews draw (animated)
+        void DrawPreview(string barSpriteName, string barFramesName, string barLoopTimeName, string picName)
         {
             if (WindowManager.TryGetControl("winAnimationEditor", picName, out var pc) && pc is PictureBox pic)
             {
@@ -3595,7 +3600,6 @@ public class Crystalshire
                 {
                     var win = WindowManager.GetWindowByName("winAnimationEditor"); if (win is null) return;
                     int id = WinAnimationEditor.SelectedIndex; if (id < 0 || id >= Animation.Instance.Count) return;
-                    var a = Animation.Instance[id];
 
                     int sprite = 0;
                     if (WindowManager.TryGetControl("winAnimationEditor", barSpriteName, out var sc) && sc is ScrollBar sbSprite)
@@ -3611,23 +3615,50 @@ public class Crystalshire
                     if (WindowManager.TryGetControl("winAnimationEditor", barFramesName, out var fc) && fc is ScrollBar sbFrames)
                         columns = Math.Max(0, sbFrames.Value);
 
-                    int fw = columns > 0 ? Math.Max(1, tex.Width / columns) : tex.Width;
-                    int inferredRows = fw > 0 ? tex.Height / fw : 0;
-                    int fh = columns > 0 ? (inferredRows > 0 ? fw : tex.Height) : tex.Height;
+                    if (columns <= 0) return;
 
-                    if (fw > pic.Width) fw = columns > 0 ? pic.Width / columns : 0;
-                    if (fh > pic.Height) fh = pic.Height;
+                    int loopTime = 200;
+                    if (WindowManager.TryGetControl("winAnimationEditor", barLoopTimeName, out var lt) && lt is ScrollBar sbLoop)
+                        loopTime = Math.Max(1, sbLoop.Value);
 
-                    int drawX = win.X + pic.X + (pic.Width - fw) / 2;
-                    int drawY = win.Y + pic.Y + (pic.Height - fh) / 2;
+                    // Match MapAnimation frame sizing logic
+                    int totalWidth = tex.Width;
+                    int totalHeight = tex.Height;
+                    int frameWidth = (int)Math.Round(totalWidth / (double)columns);
+                    if (frameWidth <= 0) return;
 
-                    GameClient.RenderTexture(ref path, drawX, drawY, 0, 0, fw, fh, fw, fh);
+                    int rows = Math.Max(1, (int)Math.Round(totalHeight / (double)frameWidth));
+                    int frameHeight = rows > 0 ? (int)Math.Round(totalHeight / (double)rows) : 0;
+                    if (frameHeight <= 0) return;
+
+                    int frameCount = Math.Max(1, rows * columns);
+
+                    long tick = General.GetTickCount();
+                    long step = tick / Math.Max(1, loopTime);
+                    int zeroIndex = (int)(step % frameCount);
+                    int col = zeroIndex % columns;
+                    int row = zeroIndex / columns;
+
+                    int srcX = col * frameWidth;
+                    int srcY = row * frameHeight;
+
+                    // Only draw if a full frame fits inside the preview box (no scaling).
+                    if (frameWidth > pic.Width || frameHeight > pic.Height)
+                        return;
+
+                    int dw = frameWidth;
+                    int dh = frameHeight;
+
+                    int drawX = win.X + pic.X + (pic.Width - dw) / 2;
+                    int drawY = win.Y + pic.Y + (pic.Height - dh) / 2;
+
+                    GameClient.RenderTexture(ref path, drawX, drawY, srcX, srcY, frameWidth, frameHeight, dw, dh);
                 };
             }
         }
 
-        DrawPreview("nudSprite0", "nudFrameCount0", "picSprite0");
-        DrawPreview("nudSprite1", "nudFrameCount1", "picSprite1");
+        DrawPreview("nudSprite0", "nudFrameCount0", "nudLoopTime0", "picSprite0");
+        DrawPreview("nudSprite1", "nudFrameCount1", "nudLoopTime1", "picSprite1");
     }
 
     public void UpdateWindow_SkillEditor()
