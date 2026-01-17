@@ -673,7 +673,7 @@ namespace Client
             {
                 textWidth = (int)Math.Round(textWidth * TextRenderer.BaseScale);
             }
-            var drawX = baseWorldX + (Constants.TileSize - textWidth) / 2;
+            var drawX = baseWorldX + 2 + (Constants.TileSize - textWidth) / 2;
 
             if (Data.MapEvents[index].GraphicType == 1)
             {

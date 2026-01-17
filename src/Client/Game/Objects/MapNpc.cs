@@ -77,7 +77,7 @@ namespace Client
             {
                 textWidth = (int)Math.Round(textWidth * TextRenderer.BaseScale);
             }
-            var drawX = baseScreenX + (Constants.TileSize - textWidth) / 2;
+            var drawX = baseScreenX + 2 + (Constants.TileSize - textWidth) / 2;
 
             if (mapNpc < 0 || mapNpc >= Npc.Instance.Count)
                 return;

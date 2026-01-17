@@ -1173,7 +1173,7 @@ namespace Client
             {
                 textWidth = (int)Math.Round(textWidth * TextRenderer.BaseScale);
             }
-            var drawX = playerScreenX + (Constants.TileSize - textWidth) / 2;
+            var drawX = playerScreenX + 2 + (Constants.TileSize - textWidth) / 2;
 
             // Y position: mirror NPC/event logic using sprite graphics when available
             int textY;
