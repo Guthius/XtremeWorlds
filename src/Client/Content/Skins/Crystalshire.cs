@@ -512,7 +512,7 @@ public class Crystalshire
         {
             // Show only relevant attribute configuration controls per selection (mirror Eto behavior)
             bool showWarp = id == 1; // Warp
-            string[] warpCtrls = new[] { "lblWarp", "lblWarpMap", "cmbMapWarp", "lblWarpX", "cmbMapWarpX", "lblWarpY", "cmbMapWarpY", "btnMapWarp" }; ;
+            string[] warpCtrls = new[] { "lblWarp", "lblWarpMap", "cmbMapWarp", "lblWarpX", "sldMapWarpX", "lblWarpY", "sldMapWarpY", "btnMapWarp" }; ;
             foreach (var n in warpCtrls)
             {
                 if (WindowManager.TryGetControl("winMapEditor", n, out var c)) c.Visible = showWarp;
@@ -563,7 +563,7 @@ public class Crystalshire
                     };
                 }
 
-                if (WindowManager.TryGetControl("winMapEditor", "cmbMapWarpX", out var wXCtrl) && wXCtrl is Client.Game.UI.Controls.ScrollBar sbX)
+                if (WindowManager.TryGetControl("winMapEditor", "sldMapWarpX", out var wXCtrl) && wXCtrl is Client.Game.UI.Controls.ScrollBar sbX)
                 {
                     sbX.Min = 0; sbX.Max = Math.Max(0, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX - 1);
                     wXCtrl.Value = Math.Clamp(GameState.EditorWarpX, sbX.Min, sbX.Max);
@@ -591,10 +591,10 @@ public class Crystalshire
                         if (maxMaps > 0 && WindowManager.TryGetControl("winMapEditor", "cmbMapWarp", out var mapCtrl) && mapCtrl is ComboBox cmb)
                             GameState.EditorWarpMap = Math.Clamp(cmb.Value, 0, maxMaps - 1);
 
-                        if (WindowManager.TryGetControl("winMapEditor", "cmbMapWarpX", out var xCtrl))
+                        if (WindowManager.TryGetControl("winMapEditor", "sldMapWarpX", out var xCtrl))
                             GameState.EditorWarpX = Math.Max(0, xCtrl.Value);
 
-                        if (WindowManager.TryGetControl("winMapEditor", "cmbMapWarpY", out var yCtrl))
+                        if (WindowManager.TryGetControl("winMapEditor", "sldMapWarpY", out var yCtrl))
                             GameState.EditorWarpY = Math.Max(0, yCtrl.Value);
                     };
                 }

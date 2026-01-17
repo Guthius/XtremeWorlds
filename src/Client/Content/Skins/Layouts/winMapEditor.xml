@@ -31,9 +31,9 @@
     <Label Name="lblWarpMap" Text="Map" Position="20,148" Size="36,16"/>
     <ComboBox Name="cmbMapWarp" Position="60,150" Size="200,18"/>
     <Label Name="lblWarpX" Text="X" Position="260,148" Size="20,16"/>
-    <ScrollBar Name="cmbMapWarpX" Position="280,150" Size="200,12" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+    <ScrollBar Name="sldMapWarpX" Position="280,150" Size="200,12" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
     <Label Name="lblWarpY" Text="Y" Position="480,148" Size="20,16"/>
-    <ScrollBar Name="cmbMapWarpY" Position="500,150" Size="200,12" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+    <ScrollBar Name="sldMapWarpY" Position="500,150" Size="200,12" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
     <Button Name="btnMapWarp" Text="OK" Position="720,146" Size="60,18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
     <Label Name="lblItem" Text="Item" Position="20,126" Size="60,16"/>
     <ComboBox Name="cmbMapItem" Position="84,124" Size="300,18"/>
