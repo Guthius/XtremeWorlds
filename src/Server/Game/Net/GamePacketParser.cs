@@ -314,12 +314,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             return;
         }
 
-        var usernameBytes = buffer.ReadBytes().ToArray();
-        var login = System.Text.Encoding.UTF8.GetString(session.Decrypt(usernameBytes)).ToLower().Replace("\0", "");
+        var login = System.Text.Encoding.UTF8.GetString(session.Decrypt(buffer.ReadBytes().ToArray())).ToLower().Replace("\0", "");
 
-        var passwordBytes = buffer.ReadBytes().ToArray();
-        var password = System.Text.Encoding.UTF8.GetString(session.Decrypt(passwordBytes)).Replace("\0", "");
-
+        var password = System.Text.Encoding.UTF8.GetString(session.Decrypt(buffer.ReadBytes().ToArray())).Replace("\0", "");
         // Get the current executing assembly
         var assembly = Assembly.GetExecutingAssembly();
 
