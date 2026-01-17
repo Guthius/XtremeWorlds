@@ -29,8 +29,8 @@
 
     <!-- Sprite preview -->
     <PictureBox Name="picSprite" Position="530, 12" Size="64, 64" Design="TextBlack"/>
-    <Label Name="lblSprite" Text="Sprite" Position="294, 28" Size="70, 16"/>
-    <ScrollBar Name="sldSprite" Position="370, 30" Size="140, 12" Min="0" Max="1" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+    <Label Name="lblSprite" Text="Sprite" Position="294, 20" Size="70, 16"/>
+    <ScrollBar Name="sldSprite" Position="370, 20" Size="140, 12" Min="0" Max="1" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 
     <!-- Death tracking -->
     <Label Name="lblDeathSwitch" Text="Death Switch" Position="294, 90" Size="120, 16"/>
