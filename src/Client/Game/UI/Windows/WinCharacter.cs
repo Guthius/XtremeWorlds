@@ -9,7 +9,7 @@ public class WinCharacter
 {
     private static readonly Equipment[] EquipmentTypes = Enum.GetValues<Equipment>();
 
-    public static void Update()
+    public static void OnUpdate()
     {
         if (GameState.MyIndex < 0 || GameState.MyIndex >= Player.Instance.Count)
         {

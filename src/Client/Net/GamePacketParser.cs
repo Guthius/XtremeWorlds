@@ -1555,7 +1555,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             GameState.BarWidthGuiHPMax = 0;
         }
 
-        WinCharacter.Update();
+        WinCharacter.OnUpdate();
     }
 
     public static async ValueTask PlayerMP(ReadOnlyMemory<byte> data)
@@ -1575,7 +1575,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             GameState.BarWidthGuiMPMax = 0;
         }
 
-        WinCharacter.Update();
+        WinCharacter.OnUpdate();
     }
 
     public static async ValueTask PlayerSP(ReadOnlyMemory<byte> data)
@@ -1595,7 +1595,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             GameState.BarWidthGuiSPMax = 0;
         }
 
-        WinCharacter.Update();
+        WinCharacter.OnUpdate();
     }
 
     public static async ValueTask PlayerStats(ReadOnlyMemory<byte> data)
@@ -1667,7 +1667,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
                 instance.Controls[WindowManager.GetControl("winCharacter", "lblJob2")].Text = Job.Instance[GetPlayerJob(GameState.MyIndex)].Name;
                 instance.Controls[WindowManager.GetControl("winCharacter", "lblLevel2")].Text = GetPlayerLevel(GameState.MyIndex).ToString();
                 instance.Controls[WindowManager.GetControl("winCharacter", "lblGuild2")].Text = "None";
-                WinCharacter.Update();
+                WinCharacter.OnUpdate();
 
                 // stats
                 for (x = 0; x < statCount; x++)
@@ -1759,7 +1759,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         // Update GUI if local player index is valid
         if (GameState.MyIndex >= 0 && GameState.MyIndex < Player.Instance.Count)
         {
-            WinCharacter.Update();
+            WinCharacter.OnUpdate();
         }
     }
 
