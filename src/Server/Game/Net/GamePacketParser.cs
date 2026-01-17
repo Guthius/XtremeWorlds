@@ -412,7 +412,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             // Check if name is already in use
             if (Database.CharacterList?.Contains(name) == true)
             {
-                NetworkSend.AlertMessage(session, SystemMessage.NameTaken, Menu.NewCharacter);
+                NetworkSend.AlertMessage(session, SystemMessage.NameTaken, Menu.Login);
                 return;
             }
 
