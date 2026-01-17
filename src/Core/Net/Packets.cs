@@ -25,7 +25,6 @@ public static class Packets
         CWarpToMe,
         CWarpTo,
         CSetSprite,
-        CGetStats,
         CRequestNewMap,
         CNeedMap,
         CMapGetItem,

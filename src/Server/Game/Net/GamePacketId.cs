@@ -23,7 +23,6 @@ public static class GamePacketId
         CWarpToMe,
         CWarpTo,
         CSetSprite,
-        CGetStats,
         CRequestNewMap,
         CNeedMap,
         CMapGetItem,

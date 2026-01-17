@@ -57,7 +57,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Bind(Packets.ClientPackets.CWarpToMe, WarpToMe);
         Bind(Packets.ClientPackets.CWarpTo, WarpTo);
         Bind(Packets.ClientPackets.CSetSprite, SetSprite);
-        Bind(Packets.ClientPackets.CGetStats, GetStats);
         Bind(Packets.ClientPackets.CRequestNewMap, RequestNewMap);
         Bind(Packets.ClientPackets.CSaveMap, MapData);
         Bind(Packets.ClientPackets.CNeedMap, NeedMap);
@@ -1074,27 +1073,6 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
         SetPlayerSprite(session.Id, n);
         NetworkSend.PlayerData(session.Id);
-    }
-
-    public static async ValueTask GetStats(GameSession session, ReadOnlyMemory<byte> bytes)
-    {
-        NetworkSend.PlayerMessage(session.Id, "Stats: " + GetPlayerName(session.Id), (int)ColorName.Yellow);
-        NetworkSend.PlayerMessage(session.Id, "Level: " + GetPlayerLevel(session.Id) + "  Exp: " + GetPlayerExperience(session.Id) + "/" + Script.Instance?.GetPlayerNextLevel(session.Id), (int)ColorName.Yellow);
-        NetworkSend.PlayerMessage(session.Id, "HP: " + GetPlayerVital(session.Id, Core.Globals.Vital.Health) + "/" + Script.Instance?.GetPlayerMaxVital(session.Id, Core.Globals.Vital.Health) + "  MP: " + GetPlayerVital(session.Id, Core.Globals.Vital.Stamina) + "/" + Script.Instance?.GetPlayerMaxVital(session.Id, Core.Globals.Vital.Stamina) + "  SP: " + GetPlayerVital(session.Id, Core.Globals.Vital.Stamina) + "/" + Script.Instance?.GetPlayerMaxVital(session.Id, Core.Globals.Vital.Stamina), (int)ColorName.Yellow);
-        NetworkSend.PlayerMessage(session.Id, "STR: " + GetPlayerStat(session.Id, Stat.Strength) + "  DEF: " + GetPlayerStat(session.Id, Stat.Luck) + "  MAGI: " + GetPlayerStat(session.Id, Stat.Intelligence) + "  Speed: " + GetPlayerStat(session.Id, Stat.Spirit), (int)ColorName.Yellow);
-        var n = GetPlayerStat(session.Id, Stat.Strength) / 2;
-        var n2 = GetPlayerStat(session.Id, Stat.Intelligence) / 2;
-        var i = GetPlayerStat(session.Id, Stat.Vitality) / 5;
-
-        if (n > 100)
-            n = 100;
-
-        if (n2 > 100)
-            n2 = 100;
-
-        if (i > 100)
-            i = 100;
-        NetworkSend.PlayerMessage(session.Id, "Critical Hit Chance: " + n + "% Critical Cast Chance: " + n2 + "%, Block Chance: " + i + "%", (int)ColorName.Yellow);
     }
 
     public static async ValueTask RequestNewMap(GameSession session, ReadOnlyMemory<byte> bytes)
