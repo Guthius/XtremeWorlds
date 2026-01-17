@@ -34,7 +34,7 @@ public sealed class Button : Control
                 var path = Path.Combine(DataPath.Items, Icon.ToString());
 
                 GameClient.RenderTexture(ref path,
-                    X + x + XOffset,
+                    X + x + XOffset - 2,
                     Y + y + YOffset, 0, 0,
                     gfxInfo.Width, gfxInfo.Height,
                     gfxInfo.Width, gfxInfo.Height);
