@@ -126,17 +126,17 @@
   <Quest Key="Kill" Value="Defeat {0}/{1} Players In Battle." />
   <Quest Key="Gather" Value="Gather {0}/{1} {2}." />
   <Quest Key="Fetch" Value="Fetch {0} X {1} from {2}." />
-  <Character Key="PName" Value="Name: " />
-  <Character Key="JobType" Value="Job: " />
-  <Character Key="Level" Value="Lv: " />
-  <Character Key="Exp" Value="Exp: " />
-  <Character Key="Stats" Value="Stats:" />
-  <Character Key="Strength" Value="Strength: " />
-  <Character Key="Endurance" Value="Endurance: " />
-  <Character Key="Vitality" Value="Vitality: " />
-  <Character Key="Intelligence" Value="Intelligence: " />
-  <Character Key="Luck" Value="Luck: " />
-  <Character Key="Spirit" Value="Spirit: " />
-  <Character Key="Points" Value="Points Available: " />
-  <Character Key="Skill" Value="Skills:" />
+  <Character Key="Name" Value="Name" />
+  <Character Key="JobType" Value="Job" />
+  <Character Key="Level" Value="Lv" />
+  <Character Key="Exp" Value="Exp" />
+  <Character Key="Stats" Value="Stats" />
+  <Character Key="Strength" Value="Strength" />
+  <Character Key="Endurance" Value="Endurance" />
+  <Character Key="Vitality" Value="Vitality" />
+  <Character Key="Intelligence" Value="Intelligence" />
+  <Character Key="Luck" Value="Luck" />
+  <Character Key="Spirit" Value="Spirit" />
+  <Character Key="Points" Value="Points Available" />
+  <Character Key="Skill" Value="Skills" />
 </Locales>

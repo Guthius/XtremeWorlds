@@ -230,19 +230,19 @@ public sealed class LocaleData
             ],
             Character =
             [
-                new LocaleItem("PName", "Name: "),
-                new LocaleItem("JobType", "Job: "),
-                new LocaleItem("Level", "Lv: "),
-                new LocaleItem("Exp", "Exp: "),
-                new LocaleItem("Stats", "Stats:"),
-                new LocaleItem("Strength", "Strength: "),
-                new LocaleItem("Endurance", "Endurance: "),
-                new LocaleItem("Vitality", "Vitality: "),
-                new LocaleItem("Intelligence", "Intelligence: "),
-                new LocaleItem("Luck", "Luck: "),
-                new LocaleItem("Spirit", "Spirit: "),
-                new LocaleItem("Points", "Points Available: "),
-                new LocaleItem("Skill", "Skills:")
+                new LocaleItem("Name", "Name"),
+                new LocaleItem("JobType", "Job"),
+                new LocaleItem("Level", "Lv"),
+                new LocaleItem("Exp", "Exp"),
+                new LocaleItem("Stats", "Stats"),
+                new LocaleItem("Strength", "Strength"),
+                new LocaleItem("Endurance", "Endurance"),
+                new LocaleItem("Vitality", "Vitality"),
+                new LocaleItem("Intelligence", "Intelligence"),
+                new LocaleItem("Luck", "Luck"),
+                new LocaleItem("Spirit", "Spirit"),
+                new LocaleItem("Points", "Points Available"),
+                new LocaleItem("Skill", "Skills")
             ]
         };
     }
