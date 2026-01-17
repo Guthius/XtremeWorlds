@@ -321,9 +321,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         var assembly = Assembly.GetExecutingAssembly();
 
         // Retrieve the version information
-        var clientVersionBytes = buffer.ReadBytes().ToArray();
         var serverVersion = assembly.GetName().Version?.ToString();
-        var clientVersion = System.Text.Encoding.UTF8.GetString(session.Decrypt(clientVersionBytes));
+        var clientVersion = System.Text.Encoding.UTF8.GetString(session.Decrypt(buffer.ReadBytes().ToArray()));
 
         // Check versions
         if (clientVersion != serverVersion)
