@@ -234,7 +234,7 @@ public sealed class LocaleData
                 new LocaleItem("JobType", "Job: "),
                 new LocaleItem("Level", "Lv: "),
                 new LocaleItem("Exp", "Exp: "),
-                new LocaleItem("StatsLabel", "Stats:"),
+                new LocaleItem("Stats", "Stats:"),
                 new LocaleItem("Strength", "Strength: "),
                 new LocaleItem("Endurance", "Endurance: "),
                 new LocaleItem("Vitality", "Vitality: "),

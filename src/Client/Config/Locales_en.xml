@@ -130,7 +130,7 @@
   <Character Key="JobType" Value="Job: " />
   <Character Key="Level" Value="Lv: " />
   <Character Key="Exp" Value="Exp: " />
-  <Character Key="StatsLabel" Value="Stats:" />
+  <Character Key="Stats" Value="Stats:" />
   <Character Key="Strength" Value="Strength: " />
   <Character Key="Endurance" Value="Endurance: " />
   <Character Key="Vitality" Value="Vitality: " />

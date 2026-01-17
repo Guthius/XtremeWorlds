@@ -31,7 +31,7 @@
 		<Label Name="lblRewardItem" Text="Reward" Position="8, 100" Size="100, 16"/>
 		<ComboBox Name="cmbRewardItem" Position="84,96" Size="180,20"/>
 
-		<Label Name="lblRewardExp" Text="Experience" Position="272, 96" Size="100, 16"/>
+		<Label Name="lblRewardExp" Text="Exp" Position="272, 96" Size="100, 16"/>
 		<TextBox Name="txtRewardExp" Position="368,96" Size="156, 16" Min="0" Max="1000000" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 
 		<!-- Tool / Animation -->
