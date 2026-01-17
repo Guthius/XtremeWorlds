@@ -11,17 +11,12 @@ public static class GameLogic
         return PlayerService.Instance.PlayerIds.Count(i => GetPlayerMap(i) == map);
     }
 
-    public static int GetNpcMaxVital(double npcNum, Vital vital)
+    public static int GetNpcMaxVital(double npc, Vital vital)
     {
-        if (npcNum < 0 || npcNum > Core.Globals.Variables.MaxNpcs)
-        {
-            return 0;
-        }
-
         return vital switch
         {
-            Core.Globals.Vital.Health => Npc.Instance[(int)npcNum].Hp,
-            Core.Globals.Vital.Stamina => Npc.Instance[(int)npcNum].Stat[(byte)Stat.Intelligence] * 2,
+            Core.Globals.Vital.Health => Npc.Instance[(int)npc].Hp,
+            Core.Globals.Vital.Stamina => Npc.Instance[(int)npc].Stat[(byte)Stat.Intelligence] * 2,
             _ => 0
         };
     }

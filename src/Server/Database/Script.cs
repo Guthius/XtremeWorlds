@@ -2704,53 +2704,36 @@ public class Script
 
     public int GetPlayerMaxHP(int index)
     {
-        if (index < 0 || index >= Server.Player.Instance.Count) return 1;
-
-        int str = GetPlayerStat(index, Stat.Strength);
+        int vit = GetPlayerStat(index, Stat.Vitality);
         int job = GetPlayerJob(index);
+        int stat = Job.Instance[job].Stat[(int)Stat.Vitality];
+        long val = (long)(1 + (vit / 2) + stat) * 2L;
 
-        int baseJobStr = 0;
-        if (job >= 0 && job < Job.Instance.Count)
-            baseJobStr = Job.Instance[job].Stat[(int)Stat.Strength];
-
-        long val = (long)(1 + (str / 2) + baseJobStr) * 2L;
         return (int)Math.Max(1, Math.Min(int.MaxValue, val));
     }
 
     public int GetPlayerMaxMP(int index)
     {
-        if (index < 0 || index >= Server.Player.Instance.Count) return 1;
-
-        int magi = GetPlayerStat(index, Stat.Intelligence);
+        int @int = GetPlayerStat(index, Stat.Intelligence);
         int job = GetPlayerJob(index);
+        int stat = Job.Instance[job].Stat[(int)Stat.Intelligence];
+        long val = (1 + (@int / 2) + stat) * 2L;
 
-        int basejobInt = 0;
-        if (job >= 0 && job < Job.Instance.Count)
-            basejobInt = Job.Instance[job].Stat[(int)Stat.Intelligence];
-
-        long val = (long)(1 + (magi / 2) + basejobInt) * 2L;
         return (int)Math.Max(1, Math.Min(int.MaxValue, val));
     }
 
     public int GetPlayerMaxSP(int index)
     {
-        if (index < 0 || index >= Server.Player.Instance.Count) return 1;
-
-        int speed = GetPlayerStat(index, Stat.Spirit); // current codebase maps “Speed” to Stat.Spirit
+        int spirit = GetPlayerStat(index, Stat.Spirit);
         int job = GetPlayerJob(index);
+        int stat = Job.Instance[job].Stat[(int)Stat.Spirit];
+        long val = (1 + (spirit / 2) + stat) * 2L;
 
-        int baseJobSpirit = 0;
-        if (job >= 0 && job < Job.Instance.Count)
-            baseJobSpirit = Job.Instance[job].Stat[(int)Stat.Spirit]; // base “Speed” on Stat.Spirit
-
-        long val = (long)(1 + (speed / 2) + baseJobSpirit) * 2L;
         return (int)Math.Max(1, Math.Min(int.MaxValue, val));
     }
 
     public int GetPlayerPointsPerLevel(int index)
     {
-        if (index < 0 || index >= Server.Player.Instance.Count) return 0;
-
         return StatPerLevel;
     }
 
@@ -2768,7 +2751,7 @@ public class Script
                 return GetPlayerMaxSP(index);
                 
             default:
-                return 1;
+                return 0;
         }
     }
 }
