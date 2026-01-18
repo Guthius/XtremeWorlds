@@ -14,42 +14,6 @@ public static class UIScript
 {
     public static dynamic? Instance { get; private set; }
 
-    private static string UserLogsDir
-    {
-        get
-        {
-            // Never write logs into the .app bundle; users often move it to /Applications (read-only).
-            // Use a per-user writable location instead.
-            var baseDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            if (string.IsNullOrWhiteSpace(baseDir))
-            {
-                baseDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            }
-
-            if (string.IsNullOrWhiteSpace(baseDir))
-            {
-                baseDir = Path.GetTempPath();
-            }
-
-            return Path.Combine(baseDir, "XtremeWorlds", "Logs");
-        }
-    }
-
-    private static void Log(string message)
-    {
-        try
-        {
-            Directory.CreateDirectory(UserLogsDir);
-            File.AppendAllText(Path.Combine(UserLogsDir, "uiscript.log"), $"{DateTime.Now:O} {message}{Environment.NewLine}");
-        }
-        catch
-        {
-            // Best-effort logging only.
-        }
-
-        Console.WriteLine(message);
-    }
-
     private static IEnumerable<MetadataReference> GetDomainReferences()
     {
         foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
@@ -98,7 +62,7 @@ public static class UIScript
                 .Select(d => d.ToString())
                 .ToArray();
 
-            Log("[UIScript] Roslyn compile errors:\n" + string.Join("\n", errors));
+            Console.WriteLine("[UIScript] Roslyn compile errors:\n" + string.Join("\n", errors));
             return null;
         }
 
@@ -118,7 +82,7 @@ public static class UIScript
 
         if (uiType is null)
         {
-            Log("[UIScript] Compiled UI script assembly contained no suitable type to instantiate.");
+            Console.WriteLine("[UIScript] Compiled UI script assembly contained no suitable type to instantiate.");
             return null;
         }
 
@@ -130,7 +94,7 @@ public static class UIScript
         var path = Path.Combine(DataPath.Skins, SettingsManager.Instance.Skin + ".cs");
         if (!File.Exists(path))
         {
-            Log($"[UIScript] Script not found: {path}");
+            Console.WriteLine($"[UIScript] Script not found: {path}");
             return;
         }
 
@@ -143,23 +107,23 @@ public static class UIScript
             if (instance is not null)
             {
                 Instance = instance;
-                Log($"[UIScript] Loaded UI script '{preferredTypeName}' from: {path}");
+                Console.WriteLine($"[UIScript] Loaded UI script '{preferredTypeName}' from: {path}");
                 return;
             }
 
-            Log("[UIScript] UI script load returned null instance.");
+            Console.WriteLine("[UIScript] UI script load returned null instance.");
         }
         catch (Exception ex)
         {
-            Log("[UIScript] Failed to load UI script.");
-            Log($"[UIScript] BaseDirectory: {AppContext.BaseDirectory}");
-            Log($"[UIScript] DataPath.Asset: {DataPath.Asset}");
-            Log($"[UIScript] DataPath.Skins: {DataPath.Skins}");
-            Log($"[UIScript] Script path: {path}");
-            Log($"[UIScript] Script exists: {File.Exists(path)}");
-            Log($"[UIScript] DOTNET_ROOT: {Environment.GetEnvironmentVariable("DOTNET_ROOT")}");
-            Log($"[UIScript] DOTNET_MULTILEVEL_LOOKUP: {Environment.GetEnvironmentVariable("DOTNET_MULTILEVEL_LOOKUP")}");
-            Log(ex.ToString());
+            Console.WriteLine("[UIScript] Failed to load UI script.");
+            Console.WriteLine($"[UIScript] BaseDirectory: {AppContext.BaseDirectory}");
+            Console.WriteLine($"[UIScript] DataPath.Asset: {DataPath.Asset}");
+            Console.WriteLine($"[UIScript] DataPath.Skins: {DataPath.Skins}");
+            Console.WriteLine($"[UIScript] Script path: {path}");
+            Console.WriteLine($"[UIScript] Script exists: {File.Exists(path)}");
+            Console.WriteLine($"[UIScript] DOTNET_ROOT: {Environment.GetEnvironmentVariable("DOTNET_ROOT")}");
+            Console.WriteLine($"[UIScript] DOTNET_MULTILEVEL_LOOKUP: {Environment.GetEnvironmentVariable("DOTNET_MULTILEVEL_LOOKUP")}");
+            Console.WriteLine(ex.ToString());
         }
     }
 }
