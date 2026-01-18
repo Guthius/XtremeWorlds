@@ -15,6 +15,40 @@ namespace Client.Game.UI;
 
 public class WindowManager
 {
+    private static string UserLogsDir
+    {
+        get
+        {
+            var baseDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            if (string.IsNullOrWhiteSpace(baseDir))
+            {
+                baseDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            }
+
+            if (string.IsNullOrWhiteSpace(baseDir))
+            {
+                baseDir = Path.GetTempPath();
+            }
+
+            return Path.Combine(baseDir, "XtremeWorlds", "Logs");
+        }
+    }
+
+    private static void LogUi(string message)
+    {
+        try
+        {
+            Directory.CreateDirectory(UserLogsDir);
+            File.AppendAllText(Path.Combine(UserLogsDir, "ui.log"), $"{DateTime.Now:O} {message}{Environment.NewLine}");
+        }
+        catch
+        {
+            // Best-effort.
+        }
+
+        Console.WriteLine(message);
+    }
+
     // GUI
     public static ConcurrentDictionary<long, Window> Windows { get; private set; } = new();
     public static Window? ActiveWindow { get; set; }
@@ -812,7 +846,7 @@ public class WindowManager
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"UI script error in {name}: {ex}");
+                    LogUi($"UI script error in {name}: {ex}");
                 }
             }
 
