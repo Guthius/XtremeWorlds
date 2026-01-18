@@ -14,6 +14,7 @@ public static class UIScript
         var path = Path.Combine(DataPath.Skins, SettingsManager.Instance.Skin + ".cs");
         if (!File.Exists(path))
         {
+            Console.WriteLine($"[UIScript] Script not found: {path}");
             return;
         }
 
@@ -36,7 +37,15 @@ public static class UIScript
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            Console.WriteLine("[UIScript] Failed to load UI script.");
+            Console.WriteLine($"[UIScript] BaseDirectory: {AppContext.BaseDirectory}");
+            Console.WriteLine($"[UIScript] DataPath.Asset: {DataPath.Asset}");
+            Console.WriteLine($"[UIScript] DataPath.Skins: {DataPath.Skins}");
+            Console.WriteLine($"[UIScript] Script path: {path}");
+            Console.WriteLine($"[UIScript] Script exists: {File.Exists(path)}");
+            Console.WriteLine($"[UIScript] DOTNET_ROOT: {Environment.GetEnvironmentVariable("DOTNET_ROOT")}");
+            Console.WriteLine($"[UIScript] DOTNET_MULTILEVEL_LOOKUP: {Environment.GetEnvironmentVariable("DOTNET_MULTILEVEL_LOOKUP")}");
+            Console.WriteLine(ex);
         }
     }
 }
