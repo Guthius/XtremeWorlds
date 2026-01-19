@@ -92,7 +92,9 @@ jobs:
         if: ${{ runner.os == 'Linux' }}
         run: |
           cd publish
-          zip -r ../xtremeworlds-linux-${GITHUB_REF_NAME}.zip Client Server
+          zip -r ./Client.zip Client
+          zip -r ./Server.zip Server
+          zip -r ./xtremeworlds-linux-${GITHUB_REF_NAME}.zip ./Client.zip ./Server.zip
           cd ..
 
       - name: Upload Zip on Linux
@@ -110,7 +112,7 @@ jobs:
           cd publish
           Compress-Archive -Path Client -DestinationPath ./Client.zip
           Compress-Archive -Path Server -DestinationPath ./Server.zip
-          Compress-Archive -Path ./Client.zip,./Server.zip -DestinationPath ../xtremeworlds-windows-${env:GITHUB_REF_NAME}.zip
+          Compress-Archive -Path ./Client.zip, ./Server.zip -DestinationPath ../xtremeworlds-windows-${env:GITHUB_REF_NAME}.zip
           rm ./Client.zip,./Server.zip
           cd ..
 
