@@ -16,6 +16,30 @@ namespace Client.Game.UI;
 public static class UIScript
 {
     public static dynamic? Instance { get; private set; }
+    private static bool IsManagedAssemblyFile(string path)
+    {
+        // Roslyn MetadataReference requires managed metadata. The Windows distribution
+        // directory contains many native DLLs (SDL3.dll, hostfxr.dll, etc) that must
+        // be ignored here.
+        try
+        {
+            AssemblyName.GetAssemblyName(path);
+            return true;
+        }
+        catch (BadImageFormatException)
+        {
+            return false;
+        }
+        catch (FileLoadException)
+        {
+            return false;
+        }
+        catch
+        {
+            // If we can't conclusively validate it, don't risk breaking compilation.
+            return false;
+        }
+    }
 
     private static List<MetadataReference> GetReferences()
     {
@@ -119,16 +143,35 @@ public static class UIScript
         Log.Add($"Roslyn reference path count: {refs.Count} (BaseDirectory='{baseDirForLog}', Resources='{resourcesDirForLog}')", "uiscript.log");
 
         var references = new List<MetadataReference>(refs.Count);
+        int skippedNonManaged = 0;
+        int skippedMissing = 0;
         foreach (var path in refs)
         {
             try
             {
+                if (!File.Exists(path))
+                {
+                    skippedMissing++;
+                    continue;
+                }
+
+                if (!IsManagedAssemblyFile(path))
+                {
+                    skippedNonManaged++;
+                    continue;
+                }
+
                 references.Add(MetadataReference.CreateFromFile(path));
             }
             catch (Exception ex)
             {
                 Log.Add($"Skipping reference '{path}': {ex.GetType().Name}: {ex.Message}", "uiscript.log");
             }
+        }
+
+        if (skippedMissing > 0 || skippedNonManaged > 0)
+        {
+            Log.Add($"Skipped references: missing={skippedMissing}, nonManaged={skippedNonManaged}", "uiscript.log");
         }
 
         Log.Add($"Roslyn metadata reference count: {references.Count}", "uiscript.log");
