@@ -823,15 +823,15 @@ namespace Client
 
             // Update per‑pixel offsets based on direction.
             int job = GetPlayerJob(index);
-            double jobSpeed = 1.0;
+            double speed = 1.0;
             if (job >= 0 && job < Client.Job.Instance.Count)
-                jobSpeed = Client.Job.Instance[job].MoveSpeed;
+                speed = Client.Job.Instance[job].MoveSpeed;
 
-            if (jobSpeed <= 0) jobSpeed = 1.0;
+            if (speed <= 0) speed = 1.0;
 
             // Walking is intentionally slower than running.
             if (Player.Instance[index].Moving == (byte)MovementState.Walking)
-                jobSpeed *= 0.5;
+                speed *= 0.5;
 
             // Skill-based movement modifier (replicated from server via SPlayerXY).
             double mult = 1.0;
@@ -841,7 +841,7 @@ namespace Client
                 if (mult <= 0) mult = 1.0;
             }
 
-            jobSpeed *= mult;
+            speed *= mult;
 
             // Equipped items can modify movement speed.
             // Item.MoveSpeedBonus is additive to the multiplier (e.g. 0.10 = +10%).
@@ -858,12 +858,12 @@ namespace Client
 
             var equipMult = 1.0 + equipBonus;
             if (equipMult <= 0) equipMult = 0.01;
-            jobSpeed *= equipMult;
+            speed *= equipMult;
 
             // Clamp to keep stepping stable even if data is invalid.
-            jobSpeed = Math.Clamp(jobSpeed, 0.01, 32.0);
+            speed = Math.Clamp(speed, 0.01, 32.0);
 
-            _moveRemainder[index] += jobSpeed;
+            _moveRemainder[index] += speed;
             int steps = (int)Math.Floor(_moveRemainder[index]);
             if (steps <= 0) return;
             _moveRemainder[index] -= steps;
