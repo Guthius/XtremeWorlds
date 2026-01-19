@@ -36,9 +36,9 @@ public class Script
 {
     // Add a per-Player pickup lock
     private static bool[] _isPickingUp = new bool[Core.Globals.Variables.MaxPlayers];
-    private static bool[] _isUsingItem = new bool[Core.Globals.Variables.MaxPlayers];
-    private static bool[] _isEquippingItem = new bool[Core.Globals.Variables.MaxPlayers];
-    private static bool[] _isUnequippingItem = new bool[Core.Globals.Variables.MaxPlayers];
+    private static bool[] _isUsing = new bool[Core.Globals.Variables.MaxPlayers];
+    private static bool[] _isEquipable = new bool[Core.Globals.Variables.MaxPlayers];
+    private static bool[] _isUnEquipable = new bool[Core.Globals.Variables.MaxPlayers];
     private const int DoorReset = 30000; // 30 seconds
     private static readonly object _doorResetLock = new();
     private static readonly Dictionary<(int map, int x, int y), long> _doorResetExpiryByTile = new();
@@ -325,10 +325,10 @@ public class Script
     public void OnUnEquip(int index, int item, int eqSlot, int invSlot)
     {
         // Prevent re-entrant unequip actions for this Player
-        if (_isUnequippingItem[index])
+        if (_isUnEquipable[index])
             return;
 
-        _isUnequippingItem[index] = true;
+        _isUnEquipable[index] = true;
         try
         {
             SetInv(index, invSlot, Server.Player.Instance[index].Paperdoll[eqSlot].Num);
@@ -349,17 +349,17 @@ public class Script
         }
         finally
         {
-            _isUnequippingItem[index] = false;
+            _isUnEquipable[index] = false;
         }
     }
 
     public void OnUse(int index, int item, int invSlot)
     {
         // Prevent re-entrant item usage for a single Player (e.g., rapid packet spam)
-        if (_isUsingItem[index])
+        if (_isUsing[index])
             return;
 
-        _isUsingItem[index] = true;
+        _isUsing[index] = true;
         try
         {            
             var tempdata = new int[Enum.GetValues(typeof(Stat)).Length + 4];
@@ -370,7 +370,7 @@ public class Script
             {
                 case (byte)ItemCategory.Equipment:
                     {
-                        EquipItem(index, item, invSlot);
+                        OnEquip(index, item, invSlot);
                         break;
                     }
 
@@ -454,14 +454,14 @@ public class Script
 
                 case (byte)ItemCategory.Skill:
                     {
-                        LearnSkill(index, item);
+                        OnLearn(index, item);
                         break;
                     }
             }
         }
         finally
         {
-            _isUsingItem[index] = false;
+            _isUsing[index] = false;
         }
     }
 
@@ -719,12 +719,12 @@ public class Script
         }
     }
         
-    private void EquipItem(int index, int item, int invSlot)
+    private void OnEquip(int index, int item, int invSlot)
     {
-        if (_isEquippingItem[index])
+        if (_isEquipable[index])
             return;
 
-        _isEquippingItem[index] = true;
+        _isEquipable[index] = true;
         try
         {
             int tempItem = -1;
@@ -756,11 +756,11 @@ public class Script
         }
         finally
         {
-            _isEquippingItem[index] = false;
+            _isEquipable[index] = false;
         }
     }
 
-    public void LearnSkill(int index, int item, int skill = -1)
+    public void OnLearn(int index, int item, int skill = -1)
     {
         int n;
         int i;
@@ -1767,7 +1767,7 @@ public class Script
             var weaponId = GetEquippedItemId(attacker, Equipment.Weapon);
             if (weaponId >= 0)
             {
-                return Item.Instance[weaponId].Speed > 0 ? Item.Instance[weaponId].Speed : BaseAttackSpeed;
+                return Item.Instance[weaponId].AttackSpeed > 0 ? Item.Instance[weaponId].AttackSpeed : BaseAttackSpeed;
             }
         }
         return BaseAttackSpeed;

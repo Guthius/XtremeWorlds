@@ -203,7 +203,7 @@ namespace Client.Game.UI.Windows
             // Base stats
             if (job.Stat != null)
             {
-                if (WindowManager.TryGetControl("winJobEditor", "txtStr", out var st) && st is TextBox tbStr)
+                if (WindowManager.TryGetControl("winJobEditor", "txtStrength", out var st) && st is TextBox tbStr)
                     tbStr.Text = job.Stat[(int)Stat.Strength].ToString();
                 if (WindowManager.TryGetControl("winJobEditor", "txtVit", out var vt) && vt is TextBox tbVit)
                     tbVit.Text = job.Stat[(int)Stat.Vitality].ToString();

@@ -1844,6 +1844,29 @@ public class Crystalshire
             }
         }
 
+        // Float binder
+        void BindFloatText(string name, Action<float> apply, float min, float max)
+        {
+            if (WindowManager.TryGetControl("winItemEditor", name, out var c) && c is TextBox tb)
+            {
+                tb.Enabled = true;
+                tb.CallBack[(int)ControlState.KeyUp] = () =>
+                {
+                    var s = tb.Text?.Trim() ?? string.Empty;
+                    float v;
+                    if (!float.TryParse(s, System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowLeadingSign, System.Globalization.CultureInfo.InvariantCulture, out v)
+                        && !float.TryParse(s, System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowLeadingSign, System.Globalization.CultureInfo.CurrentCulture, out v)
+                        && !float.TryParse(s.Replace(',', '.'), System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowLeadingSign, System.Globalization.CultureInfo.InvariantCulture, out v))
+                    {
+                        v = 0f;
+                    }
+
+                    v = Math.Clamp(v, min, max);
+                    apply(v);
+                };
+            }
+        }
+
         // Basics
         if (WindowManager.TryGetControl("winItemEditor", "txtDesc", out var descCtrl) && descCtrl is TextBox txtDesc)
         {
@@ -1931,13 +1954,13 @@ public class Crystalshire
             };
         }
 
-        if (WindowManager.TryGetControl("winItemEditor", "sldSpeed", out var spdCtrl) && spdCtrl is Client.Game.UI.Controls.ScrollBar sldSpeed)
+        if (WindowManager.TryGetControl("winItemEditor", "sldAttackSpeed", out var spdCtrl) && spdCtrl is Client.Game.UI.Controls.ScrollBar sldAttackSpeed)
         {
-            sldSpeed.CallBack[(int)ControlState.MouseMove] = () =>
+            sldAttackSpeed.CallBack[(int)ControlState.MouseMove] = () =>
             {
                 if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Item.Instance.Count)
                 {
-                    Item.Instance[WinItemEditor.SelectedIndex].Speed = sldSpeed.Value;
+                    Item.Instance[WinItemEditor.SelectedIndex].AttackSpeed = sldAttackSpeed.Value;
                     Item.IsChanged[WinItemEditor.SelectedIndex] = true;
                 }
             };
@@ -2000,10 +2023,20 @@ public class Crystalshire
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
-                Item.Instance[WinItemEditor.SelectedIndex].Speed = v;
+                Item.Instance[WinItemEditor.SelectedIndex].AttackSpeed = v;
                 Item.IsChanged[WinItemEditor.SelectedIndex] = true;
             }
         }, 0, 100000000);
+
+        // Movement speed bonus (additive to movement multiplier; e.g. 0.10 = +10%).
+        BindFloatText("txtMoveSpeed", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Item.Instance[WinItemEditor.SelectedIndex].MovementSpeed = v;
+                Item.IsChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        }, -32.0f, 32.0f);
 
         // Event id / value reuse Data1 / Data2
         BindIntText("txtEventId", v =>
@@ -2990,7 +3023,7 @@ public class Crystalshire
         }, -32.0f, 32.0f);
 
         // Base stats
-        BindIntText("txtStr", v => {
+        BindIntText("txtStrength", v => {
             int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return;
             Job.Instance[id].Stat[(int)Stat.Strength] = v;
             Job.IsChanged[id] = true;
@@ -3438,7 +3471,7 @@ public class Crystalshire
             }
         }
         BindBar("sldRange", "lblRangeVal", v => Projectile.Instance[WinProjectileEditor.SelectedIndex].Range = (byte)v, 0, 255);
-        BindBar("sldSpeed", "lblSpeedVal", v => Projectile.Instance[WinProjectileEditor.SelectedIndex].Speed = v, 0, 1000);
+        BindBar("sldAttackSpeed", "lblSpeedVal", v => Projectile.Instance[WinProjectileEditor.SelectedIndex].Speed = v, 0, 1000);
         BindBar("sldDamage", "lblDamageVal", v => Projectile.Instance[WinProjectileEditor.SelectedIndex].Damage = v, 0, 100000);
 
         // Animation combo (0=None then +1 offset)
@@ -4001,7 +4034,7 @@ public class Crystalshire
         BindIntText("txtCommonEventData1", v => Skill.Instance[WinSkillEditor.SelectedIndex].CommonEventData1 = v);
         BindIntText("txtCommonEventData2", v => Skill.Instance[WinSkillEditor.SelectedIndex].CommonEventData2 = v);
 
-        if (WindowManager.TryGetControl("winSkillEditor", "txtMoveSpeedMultiplier", out var msmCtrl) && msmCtrl is TextBox tbMs)
+        if (WindowManager.TryGetControl("winSkillEditor", "txtMoveSpeed", out var msmCtrl) && msmCtrl is TextBox tbMs)
         {
             tbMs.CallBack[(int)ControlState.KeyUp] = () =>
             {

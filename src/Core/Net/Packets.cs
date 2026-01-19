@@ -45,7 +45,7 @@ public static class Packets
         CSwapSkillSlots,
 
         CCheckPing,
-        CUnequip,
+        CUnEquip,
         CRequestPlayerData,
         CRequestItem,
         CRequestNpc,

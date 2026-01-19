@@ -73,11 +73,11 @@ public static class Loop
                     if (basePlayer.Moving > 0)
                     {
                         int jobId = basePlayer.Job;
-                        double jobSpeed = 1.0;
+                        double speed = 1.0;
                         if (jobId >= 0 && jobId < Job.Instance.Count)
-                            jobSpeed = Job.Instance[jobId].MoveSpeed;
+                            speed = Job.Instance[jobId].MoveSpeed;
 
-                        if (jobSpeed == 0) jobSpeed = 1.0;
+                        if (speed == 0) speed = 1.0;
 
                         // Skill-based movement modifier (temporary).
                         // Expiry is checked against current tick time.
@@ -96,13 +96,29 @@ public static class Loop
 
                         // Walking is intentionally slower than running.
                         if (basePlayer.Moving == (byte)MovementState.Walking)
-                            jobSpeed *= 0.5;
+                            speed *= 0.5;
 
-                        jobSpeed *= mult;
+                        speed *= mult;
+
+                        // Equipped items can modify movement speed.
+                        // Item.MoveSpeedBonus is additive to the multiplier (e.g. 0.10 = +10%).
+                        double equipBonus = 0.0;
+                        var eqCount = Enum.GetNames(typeof(Equipment)).Length;
+                        for (int eq = 0; eq < eqCount; eq++)
+                        {
+                            var itemId = GetPlayerPaperdoll(id, (Equipment)eq);
+                            if (itemId >= 0 && itemId < Item.Instance.Count)
+                            {
+                                equipBonus += Item.Instance[itemId].MovementSpeed;
+                            }
+                        }
+
+                        var equipMult = 1.0f + (float)equipBonus;
+                        speed *= equipMult;
 
                         // Fractional speeds accumulate across ticks.
                         if (id >= 0 && id < PlayerMoveRemainder.Length)
-                            PlayerMoveRemainder[id] += jobSpeed;
+                            PlayerMoveRemainder[id] += speed;
 
                         int steps = 0;
                         if (id >= 0 && id < PlayerMoveRemainder.Length)

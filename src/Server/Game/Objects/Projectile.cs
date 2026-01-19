@@ -205,7 +205,7 @@ public class Projectile : ProjectileBase, IAsyncData
         if (Data.TempPlayer[playerId].ProjectileTimer > General.GetTime()) return;
 
         ref var mp = ref Data.MapProjectile[map, mapProjectileNum];
-        Data.TempPlayer[playerId].ProjectileTimer = General.GetTime() + Item.Instance[itemNum].Speed;
+        Data.TempPlayer[playerId].ProjectileTimer = General.GetTime() + Item.Instance[itemNum].AttackSpeed;
         mp.Index = projectileNum;
         mp.Owner = playerId;
         mp.OwnerType = (byte)TargetType.Player;
@@ -244,10 +244,11 @@ public class Projectile : ProjectileBase, IAsyncData
         if (Data.TempPlayer[playerId].ProjectileTimer > General.GetTime()) return;
 
         ref var mp = ref Data.MapProjectile[map, mapProjectileNum];
-        Data.TempPlayer[playerId].ProjectileTimer = General.GetTime() + Item.Instance[itemNum].Speed;
+        Data.TempPlayer[playerId].ProjectileTimer = General.GetTime() + Item.Instance[itemNum].AttackSpeed;
         mp.Index = index;
         mp.Owner = playerId;
         mp.OwnerType = (byte)TargetType.Player;
+        
         // Angle purely for 8-dir visual; movement is driven by vx/vy
         double ang = Math.Atan2(vy, vx) * 180.0 / Math.PI;
         if (ang > -22.5 && ang <= 22.5) mp.Dir = (byte)Direction.Right;

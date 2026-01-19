@@ -843,6 +843,23 @@ namespace Client
 
             jobSpeed *= mult;
 
+            // Equipped items can modify movement speed.
+            // Item.MoveSpeedBonus is additive to the multiplier (e.g. 0.10 = +10%).
+            double equipBonus = 0.0;
+            var eqCount = Enum.GetNames(typeof(Equipment)).Length;
+            for (int eq = 0; eq < eqCount; eq++)
+            {
+                var itemId = GetPlayerPaperdoll(index, (Equipment)eq);
+                if (itemId >= 0 && itemId < Item.Instance.Count)
+                {
+                    equipBonus += Item.Instance[itemId].MovementSpeed;
+                }
+            }
+
+            var equipMult = 1.0 + equipBonus;
+            if (equipMult <= 0) equipMult = 0.01;
+            jobSpeed *= equipMult;
+
             // Clamp to keep stepping stable even if data is invalid.
             jobSpeed = Math.Clamp(jobSpeed, 0.01, 32.0);
 
@@ -924,7 +941,7 @@ namespace Client
                 // speed from weapon
                 if (GetPlayerPaperdoll(GameState.MyIndex, Equipment.Weapon) >= 0)
                 {
-                    attackSpeed = Item.Instance[GetPlayerPaperdoll(GameState.MyIndex, Equipment.Weapon)].Speed * 1000;
+                    attackSpeed = Item.Instance[GetPlayerPaperdoll(GameState.MyIndex, Equipment.Weapon)].AttackSpeed * 1000;
                 }
                 else
                 {
@@ -1242,7 +1259,7 @@ namespace Client
             // Derive attack speed duration (ms). If stored as seconds, multiply here; if already ms, keep as-is.
             if (GetPlayerPaperdoll(index, Equipment.Weapon) >= 0)
             {
-                attackSpeed = Item.Instance[GetPlayerPaperdoll(index, Equipment.Weapon)].Speed;
+                attackSpeed = Item.Instance[GetPlayerPaperdoll(index, Equipment.Weapon)].AttackSpeed;
                 if (attackSpeed < 50) attackSpeed *= 1000; // heuristic: treat tiny values as seconds, convert to ms
             }
             else

@@ -109,10 +109,10 @@ public class WinProjectileEditor
             sldRange.Min = 0; sldRange.Max = 255; sldRange.Value = Math.Clamp(p.Range, sldRange.Min, sldRange.Max);
             if (WindowManager.TryGetControl("winProjectileEditor", "lblRangeVal", out var lblR) && lblR is Label lr) lr.Text = sldRange.Value.ToString();
         }
-        if (WindowManager.TryGetControl("winProjectileEditor", "sldSpeed", out var speedCtrl) && speedCtrl is ScrollBar sldSpeed)
+        if (WindowManager.TryGetControl("winProjectileEditor", "sldAttackSpeed", out var speedCtrl) && speedCtrl is ScrollBar sldAttackSpeed)
         {
-            sldSpeed.Min = 0; sldSpeed.Max = 1000; sldSpeed.Value = Math.Clamp(p.Speed, sldSpeed.Min, sldSpeed.Max);
-            if (WindowManager.TryGetControl("winProjectileEditor", "lblSpeedVal", out var lblS) && lblS is Label ls) ls.Text = sldSpeed.Value.ToString();
+            sldAttackSpeed.Min = 0; sldAttackSpeed.Max = 1000; sldAttackSpeed.Value = Math.Clamp(p.Speed, sldAttackSpeed.Min, sldAttackSpeed.Max);
+            if (WindowManager.TryGetControl("winProjectileEditor", "lblSpeedVal", out var lblS) && lblS is Label ls) ls.Text = sldAttackSpeed.Value.ToString();
         }
         if (WindowManager.TryGetControl("winProjectileEditor", "sldDamage", out var dmgCtrl) && dmgCtrl is ScrollBar sldDamage)
         {

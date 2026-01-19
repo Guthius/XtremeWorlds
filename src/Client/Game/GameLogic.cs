@@ -1674,7 +1674,7 @@ namespace Client
                         if (Item.Instance[(int)item].SubType == (byte)Equipment.Weapon)
                         {
                             AddDescInfo("Damage: " + Item.Instance[(int)item].Data2, Microsoft.Xna.Framework.Color.White);
-                            AddDescInfo("Speed: " + Item.Instance[(int)item].Speed / 1000d + "s", Microsoft.Xna.Framework.Color.White);
+                            AddDescInfo("Speed: " + Item.Instance[(int)item].AttackSpeed / 1000d + "s", Microsoft.Xna.Framework.Color.White);
                         }
                         else if (Item.Instance[(int)item].Data2 > 0)
                         {

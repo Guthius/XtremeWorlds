@@ -902,7 +902,7 @@ public class Player : PlayerBase
 
                 try
                 {
-                    Script.Instance?.MapGetItem(playerId, map, i, slot);
+                    Script.Instance?.OnPickup(playerId, map, i, slot);
                 }
                 catch (Exception ex)
                 {
@@ -1128,7 +1128,7 @@ public class Player : PlayerBase
         return true;
     }
 
-    public static bool CanUseItem(int playerId, int itemNum)
+    public static bool IsUsable(int playerId, int itemNum)
     {
         if (Server.Map.Instance[GetPlayerMap(playerId)].Moral >= 0)
         {
@@ -1191,14 +1191,14 @@ public class Player : PlayerBase
             return;
         }
 
-        if (!CanUseItem(playerId, item))
+        if (!IsUsable(playerId, item))
         {
             return;
         }
 
         try
         {
-            Script.Instance?.UseItem(playerId, item, invSlot);
+            Script.Instance?.OnUse(playerId, item, invSlot);
         }
         catch (Exception ex)
         {
@@ -1339,7 +1339,7 @@ public class Player : PlayerBase
         {
             try
             {
-                Script.Instance?.UnEquipItem(playerId, item, eqSlot, invSlot);
+                Script.Instance?.OnUnEquip(playerId, item, eqSlot, invSlot);
             }
             catch (Exception ex)
             {

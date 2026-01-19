@@ -493,7 +493,11 @@ public class WinItemEditor
         }
         if (WindowManager.TryGetControl("winItemEditor", "txtSpeed", out var spdText) && spdText is TextBox txtSpd)
         {
-            txtSpd.Text = item.Speed.ToString();
+            txtSpd.Text = item.AttackSpeed.ToString();
+        }
+        if (WindowManager.TryGetControl("winItemEditor", "txtMoveSpeed", out var msText) && msText is TextBox txtMs)
+        {
+            txtMs.Text = item.MovementSpeed.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
         }
         if (WindowManager.TryGetControl("winItemEditor", "chkKnockback", out var kbCtrl2) && kbCtrl2 is CheckBox chkKb)
             chkKb.Value = item.KnockBack != 0 ? 1 : 0;

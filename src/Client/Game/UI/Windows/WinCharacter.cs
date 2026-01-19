@@ -111,7 +111,7 @@ public class WinCharacter
         var slot = General.IsEq(winCharacter.X, winCharacter.Y);
         if (slot >= 0)
         {
-            Sender.Unequip(slot);
+            Sender.UnEquip(slot);
         }
 
         OnMouseMove();

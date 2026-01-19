@@ -1578,7 +1578,8 @@ public static class NetworkSend
         packet.WriteInt32(item.Icon);
         packet.WriteInt32(item.Price);
         packet.WriteByte(item.Rarity);
-        packet.WriteInt32(item.Speed);
+        packet.WriteInt32(item.AttackSpeed);
+        packet.WriteSingle(item.MovementSpeed);
         packet.WriteByte(item.Stackable);
         packet.WriteString(item.Description);
 

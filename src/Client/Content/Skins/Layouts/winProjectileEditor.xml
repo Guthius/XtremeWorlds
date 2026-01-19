@@ -29,7 +29,7 @@
 
 		<!-- Speed -->
 		<Label Name="lblSpeed" Text="Speed" Position="8,120" Size="80,18"/>
-		<ScrollBar Name="sldSpeed" Position="80,120" Size="180,14" Min="0" Max="1000" Value="0" Orientation="Horizontal" ThumbSize="16"/>
+		<ScrollBar Name="sldAttackSpeed" Position="80,120" Size="180,14" Min="0" Max="1000" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 		<Label Name="lblSpeedVal" Text="0" Position="268,118" Size="60,18"/>
 
 		<!-- Damage -->

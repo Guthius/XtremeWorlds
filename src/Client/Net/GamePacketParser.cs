@@ -1211,7 +1211,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         item.Icon = buffer.ReadInt32();
         item.Price = buffer.ReadInt32();
         item.Rarity = buffer.ReadByte();
-        item.Speed = buffer.ReadInt32();
+        item.AttackSpeed = buffer.ReadInt32();
+        item.MovementSpeed = buffer.ReadSingle();
 
         item.Stackable = buffer.ReadByte();
         item.Description = buffer.ReadString();

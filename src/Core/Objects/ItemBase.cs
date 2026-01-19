@@ -38,7 +38,8 @@ namespace Core.Objects
         public int Price;
         public int[] AddStat;
         public byte Rarity;
-        public int Speed;
+        public int AttackSpeed;
+        public float MovementSpeed;
         public byte BindType;
         public int[] StatReq;
         public int Animation;

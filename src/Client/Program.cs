@@ -1612,7 +1612,7 @@ namespace Client
                                 {
                                     GameState.CurMouseX = prevMouseX;
                                     GameState.CurMouseY = prevMouseY;
-                                    Sender.Unequip(eqSlot);
+                                    Sender.UnEquip(eqSlot);
                                     return;
                                 }
                             }

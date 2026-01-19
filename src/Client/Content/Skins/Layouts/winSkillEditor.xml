@@ -74,7 +74,7 @@
 		<TextBox Name="txtCommonEventData2" Position="480,186" Size="160,22" Design="TextWhite"/>
 
 		<Label Name="lblMoveSpeedMultiplier" Text="Move Speed" Position="370,212" Size="120,18"/>
-		<TextBox Name="txtMoveSpeedMultiplier" Position="480,210" Size="160,22" Design="TextWhite"/>
+		<TextBox Name="txtMoveSpeed" Position="480,210" Size="160,22" Design="TextWhite"/>
 
 		<Label Name="lblIcon" Text="Icon" Position="370,242" Size="90,18"/>
 		<PictureBox Name="picIcon" Position="480,238" Size="32,32" Design="TextBlack"/>

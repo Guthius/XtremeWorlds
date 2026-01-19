@@ -29,6 +29,8 @@
         <Label Name="lblDamage" Text="Damage" Position="232, 12" Size="80, 16"/>
         <TextBox Name="txtDamage" Position="292, 10" Size="120, 20" Design="TextWhite"/>
         <CheckBox Name="chkKnockback" Text="Knockback" Position="432, 10" Size="120, 20"/>
+        <Label Name="lblMoveSpeed" Text="Move Speed" Position="560, 12" Size="80, 16"/>
+        <TextBox Name="txtMoveSpeed" Position="640, 10" Size="120, 20" Design="TextWhite"/>
         <Label Name="lblTool" Text="Tool" Position="8, 40" Size="60, 16"/>
         <ComboBox Name="cmbTool" Position="100, 38" Size="160, 18"/>
         <Label Name="lblKnockbackTiles" Text="Distance" Position="272, 40" Size="80, 16"/>

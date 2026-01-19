@@ -80,7 +80,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Bind(Packets.ClientPackets.CSwapSkillSlots, SwapSkillSlots);
 
         Bind(Packets.ClientPackets.CCheckPing, CheckPing);
-        Bind(Packets.ClientPackets.CUnequip, UnEquip);
+        Bind(Packets.ClientPackets.CUnEquip, UnEquip);
         Bind(Packets.ClientPackets.CRequestPlayerData, RequestPlayerData);
         Bind(Packets.ClientPackets.CRequestItem, RequestItem);
         Bind(Packets.ClientPackets.CRequestNpc, RequestNpc);
@@ -3240,7 +3240,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Item.Instance[index].Icon = packetReader.ReadInt32();
         Item.Instance[index].Price = packetReader.ReadInt32();
         Item.Instance[index].Rarity = packetReader.ReadByte();
-        Item.Instance[index].Speed = packetReader.ReadInt32();
+        Item.Instance[index].AttackSpeed = packetReader.ReadInt32();
+        Item.Instance[index].MovementSpeed = packetReader.ReadSingle();
         Item.Instance[index].Stackable = packetReader.ReadByte();
         Item.Instance[index].Description = packetReader.ReadString();
 

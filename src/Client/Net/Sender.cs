@@ -486,11 +486,11 @@ public static class Sender
         Network.Send(packetWriter);
     }
 
-    public static void Unequip(int index)
+    public static void UnEquip(int index)
     {
         var packetWriter = new PacketWriter(8);
 
-        packetWriter.WriteEnum(Packets.ClientPackets.CUnequip);
+        packetWriter.WriteEnum(Packets.ClientPackets.CUnEquip);
         packetWriter.WriteInt32(index);
         Network.Send(packetWriter);
     }
@@ -866,7 +866,8 @@ public static class Sender
         packetWriter.WriteInt32(Item.Instance[index].Icon);
         packetWriter.WriteInt32(Item.Instance[index].Price);
         packetWriter.WriteByte(Item.Instance[index].Rarity);
-        packetWriter.WriteInt32(Item.Instance[index].Speed);
+        packetWriter.WriteInt32(Item.Instance[index].AttackSpeed);
+        packetWriter.WriteSingle(Item.Instance[index].MovementSpeed);
 
         packetWriter.WriteByte(Item.Instance[index].Stackable);
         packetWriter.WriteString(Item.Instance[index].Description);

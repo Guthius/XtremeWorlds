@@ -251,7 +251,7 @@ public class WinDragBox
                             continue;
                         }
 
-                        Sender.Unequip(WindowManager.DragBox.Slot);
+                        Sender.UnEquip(WindowManager.DragBox.Slot);
                         break;
                     }
                 }
