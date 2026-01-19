@@ -15,41 +15,19 @@ public static class UIScript
 {
     public static dynamic? Instance { get; private set; }
 
-    private static string UserLogsDir
-    {
-        get
-        {
-            // Never rely on writing into the .app bundle; it may live in /Applications (read-only).
-            var baseDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            if (string.IsNullOrWhiteSpace(baseDir))
-            {
-                baseDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            }
-
-            if (string.IsNullOrWhiteSpace(baseDir))
-            {
-                baseDir = Path.GetTempPath();
-            }
-
-            return Path.Combine(baseDir, "XtremeWorlds", "Logs");
-        }
-    }
-
-    private static string TempLogsDir => Path.Combine(Path.GetTempPath(), "XtremeWorlds", "Logs");
-
     private static void Log(string message)
     {
         try
         {
-            Directory.CreateDirectory(UserLogsDir);
-            File.AppendAllText(Path.Combine(UserLogsDir, "uiscript.log"), $"{DateTime.Now:O} {message}{Environment.NewLine}");
+            Directory.CreateDirectory(AppContext.BaseDirectory + "Logs");
+            File.AppendAllText(Path.Combine(AppContext.BaseDirectory, "Logs", "uiscript.log"), $"{DateTime.Now:O} {message}{Environment.NewLine}");
         }
         catch
         {
             try
             {
-                Directory.CreateDirectory(TempLogsDir);
-                File.AppendAllText(Path.Combine(TempLogsDir, "uiscript.log"), $"{DateTime.Now:O} {message}{Environment.NewLine}");
+                Directory.CreateDirectory(AppContext.BaseDirectory + "Logs");
+                File.AppendAllText(Path.Combine(AppContext.BaseDirectory, "Logs", "uiscript.log"), $"{DateTime.Now:O} {message}{Environment.NewLine}");
             }
             catch
             {

@@ -131,7 +131,6 @@ public static class General
 
         Event.TempEventMap = new GlobalEvents[Core.Globals.Variables.MaxMaps];
     }
-
     private static async System.Threading.Tasks.Task LoadGameData()
     {
         var stopwatch = Stopwatch.StartNew();
