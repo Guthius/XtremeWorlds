@@ -8,34 +8,14 @@ using System.Linq;
 using System.Reflection;
 using System.IO;
 using System.Runtime.InteropServices;
+using Core.Common;
+using CSScriptLib;
 
 namespace Client.Game.UI;
 
 public static class UIScript
 {
     public static dynamic? Instance { get; private set; }
-
-    private static void Log(string message)
-    {
-        try
-        {
-            Directory.CreateDirectory(AppContext.BaseDirectory + "Logs");
-            File.AppendAllText(Path.Combine(AppContext.BaseDirectory, "Logs", "uiscript.log"), $"{DateTime.Now:O} {message}{Environment.NewLine}");
-        }
-        catch
-        {
-            try
-            {
-                Directory.CreateDirectory(AppContext.BaseDirectory + "Logs");
-                File.AppendAllText(Path.Combine(AppContext.BaseDirectory, "Logs", "uiscript.log"), $"{DateTime.Now:O} {message}{Environment.NewLine}");
-            }
-            catch
-            {
-            }
-        }
-
-        Console.WriteLine(message);
-    }
 
     private static List<MetadataReference> GetReferences()
     {
@@ -136,7 +116,7 @@ public static class UIScript
             refs.Add(loc);
         }
 
-        Log($"[UIScript] Roslyn reference path count: {refs.Count} (BaseDirectory='{baseDirForLog}', Resources='{resourcesDirForLog}')");
+        Log.Add($"Roslyn reference path count: {refs.Count} (BaseDirectory='{baseDirForLog}', Resources='{resourcesDirForLog}')", "uiscript.log");
 
         var references = new List<MetadataReference>(refs.Count);
         foreach (var path in refs)
@@ -147,11 +127,11 @@ public static class UIScript
             }
             catch (Exception ex)
             {
-                Log($"[UIScript] Skipping reference '{path}': {ex.GetType().Name}: {ex.Message}");
+                Log.Add($"Skipping reference '{path}': {ex.GetType().Name}: {ex.Message}", "uiscript.log");
             }
         }
 
-        Log($"[UIScript] Roslyn metadata reference count: {references.Count}");
+        Log.Add($"Roslyn metadata reference count: {references.Count}", "uiscript.log");
         return references;
     }
 
@@ -177,7 +157,7 @@ public static class UIScript
                 .Select(d => d.ToString())
                 .ToArray();
 
-            Log("[UIScript] Roslyn compile errors:\n" + string.Join("\n", errors));
+            Log.Add("Roslyn compile errors:\n" + string.Join("\n", errors), "uiscript.log");
             return null;
         }
 
@@ -197,7 +177,7 @@ public static class UIScript
 
         if (uiType is null)
         {
-            Log("[UIScript] Compiled UI script assembly contained no suitable type to instantiate.");
+            Log.Add("Compiled UI script assembly contained no suitable type to instantiate.", "uiscript.log");
             return null;
         }
 
@@ -209,7 +189,7 @@ public static class UIScript
         var path = Path.Combine(DataPath.Skins, SettingsManager.Instance.Skin + ".cs");
         if (!File.Exists(path))
         {
-            Log($"[UIScript] Script not found: {path}");
+            Log.Add($"Script not found: {path}", "uiscript.log");
             return;
         }
 
@@ -222,23 +202,23 @@ public static class UIScript
             if (instance is not null)
             {
                 Instance = instance;
-                Log($"[UIScript] Loaded UI script '{preferredTypeName}' from: {path}");
+                Log.Add($"Loaded UI script '{preferredTypeName}' from: {path}", "uiscript.log");
                 return;
             }
 
-            Log("[UIScript] UI script load returned null instance.");
+            Log.Add("UI script load returned null instance.", "uiscript.log");
         }
         catch (Exception ex)
         {
-            Log("[UIScript] Failed to load UI script.");
-            Log($"[UIScript] BaseDirectory: {AppContext.BaseDirectory}");
-            Log($"[UIScript] DataPath.Asset: {DataPath.Asset}");
-            Log($"[UIScript] DataPath.Skins: {DataPath.Skins}");
-            Log($"[UIScript] Script path: {path}");
-            Log($"[UIScript] Script exists: {File.Exists(path)}");
-            Log($"[UIScript] DOTNET_ROOT: {Environment.GetEnvironmentVariable("DOTNET_ROOT")}");
-            Log($"[UIScript] DOTNET_MULTILEVEL_LOOKUP: {Environment.GetEnvironmentVariable("DOTNET_MULTILEVEL_LOOKUP")}");
-            Log(ex.ToString());
+            Log.Add("Failed to load UI script.", "uiscript.log");
+            Log.Add($"BaseDirectory: {AppContext.BaseDirectory}", "uiscript.log");
+            Log.Add($"DataPath.Asset: {DataPath.Asset}", "uiscript.log");
+            Log.Add($"DataPath.Skins: {DataPath.Skins}", "uiscript.log");
+            Log.Add($"Script path: {path}", "uiscript.log");
+            Log.Add($"Script exists: {File.Exists(path)}", "uiscript.log");
+            Log.Add($"DOTNET_ROOT: {Environment.GetEnvironmentVariable("DOTNET_ROOT")}", "uiscript.log");
+            Log.Add($"DOTNET_MULTILEVEL_LOOKUP: {Environment.GetEnvironmentVariable("DOTNET_MULTILEVEL_LOOKUP")}", "uiscript.log");
+            Log.Add(ex.ToString(), "uiscript.log");
         }
     }
 }
