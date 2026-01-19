@@ -194,8 +194,8 @@ namespace Client
             // forward to Cocca.OnExit so the host window/app can react appropriately.
             Exiting += (s, e) =>
             {
-                try { Network.Stop(); } catch { }
-                try { Cocca.OnExit(); } catch { }
+                Network.Stop();
+                Cocca.OnExit();
             };
         }
 
@@ -214,7 +214,7 @@ namespace Client
             {
                 Graphics.PreferredBackBufferWidth = bounds.Width;
                 Graphics.PreferredBackBufferHeight = bounds.Height;
-                try { Graphics.ApplyChanges(); } catch { }
+                Graphics.ApplyChanges();
             }
         }
 

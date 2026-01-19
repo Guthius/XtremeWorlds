@@ -2411,6 +2411,12 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         int w;
         var buffer = new PacketReader(data);
 
+        for (int n = 0; n <= GetPlayerMap(GameState.MyIndex); n++)
+        {
+            if (Client.Map.Instance.Count <= n)
+                Client.Map.Instance.Add(new Map());
+        }
+
         Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount = buffer.ReadInt32();
 
         if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount > 0)
