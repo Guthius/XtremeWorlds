@@ -335,7 +335,7 @@ public class Script
             Server.Player.Instance[index].Inventory[invSlot].Bound = Server.Player.Instance[index].Paperdoll[eqSlot].Bound;
             SetInvValue(index, invSlot, 1);
 
-            NetworkSend.PlayerMessage(index, "You unequip " + GameLogic.CheckGrammar(Item.Instance[GetPlayerPaperdoll(index, (Equipment)eqSlot)].Name), (int)ColorName.Yellow);
+            NetworkSend.PlayerMessage(index, "You unequip " + GameLogic.CheckGrammar(Item.Instance[GetPlayerPaperdoll(index, (Equipment)eqSlot)].Name) + ".", (int)ColorName.Yellow);
 
             // remove equipment
             SetPlayerPaperdoll(index, -1, (Equipment)eqSlot);
