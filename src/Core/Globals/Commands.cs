@@ -459,7 +459,7 @@ public static class Commands
         return false;
     }
 
-    public static void SetPlayerSkill(int index, int skillslot, int skillNum)
+    public static void SetSkill(int index, int skillslot, int skillNum)
     {
         if (!ValidPlayerIndex(index)) return;
         var p = PlayerBase.Instance[index];

@@ -825,7 +825,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             var skill = packetReader.ReadInt32();
             if (GameState.MyIndex >= 0 && i >= 0 && i < Core.Globals.Variables.MaxPlayerSkills)
             {
-                SetPlayerSkill(GameState.MyIndex, i, skill);
+                SetSkill(GameState.MyIndex, i, skill);
             }
         }
     }

@@ -794,7 +794,7 @@ public class Script
                     // Make sure they dont already have the skill
                     if (!HasSkill(index, n))
                     {
-                        SetPlayerSkill(index, i, n);
+                        SetSkill(index, i, n);
                         if (item >= 0)
                         {
                             NetworkSend.PlayAnimation(GetPlayerMap(index), Item.Instance[item].Animation, 0, 0, (byte)TargetType.Player, index);

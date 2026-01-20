@@ -1966,7 +1966,7 @@ namespace Server
                                             {
                                                 if (FindOpenSkill(i) >= 0 && !HasSkill(i, command.Data1))
                                                 {
-                                                    SetPlayerSkill(i, FindOpenSkill(i), command.Data1);
+                                                    SetSkill(i, FindOpenSkill(i), command.Data1);
                                                 }
                                             }
                                             else if (command.Data2 == 1) // Forget
@@ -1975,7 +1975,7 @@ namespace Server
                                                 {
                                                     if (Player.Instance[i].Skill[p].Num == command.Data1)
                                                     {
-                                                        SetPlayerSkill(i, p, 0);
+                                                        SetSkill(i, p, 0);
                                                     }
                                                 }
                                             }

@@ -1274,24 +1274,24 @@ public class Player : PlayerBase
         {
             if (oldSkill == newSkill & Item.Instance[newSkill].Stackable == 1) // Same item, if we can stack it, lets do that :P
             {
-                SetPlayerSkill(playerId, newSlot, newSkill);
+                SetSkill(playerId, newSlot, newSkill);
                 SetPlayerSkillCd(playerId, newSlot, newValue);
-                SetPlayerSkill(playerId, oldSlot, 0);
+                SetSkill(playerId, oldSlot, 0);
                 SetPlayerSkillCd(playerId, oldSlot, 0);
             }
             else
             {
-                SetPlayerSkill(playerId, newSlot, oldSkill);
+                SetSkill(playerId, newSlot, oldSkill);
                 SetPlayerSkillCd(playerId, newSlot, oldValue);
-                SetPlayerSkill(playerId, oldSlot, newSkill);
+                SetSkill(playerId, oldSlot, newSkill);
                 SetPlayerSkillCd(playerId, oldSlot, newValue);
             }
         }
         else
         {
-            SetPlayerSkill(playerId, newSlot, oldSkill);
+            SetSkill(playerId, newSlot, oldSkill);
             SetPlayerSkillCd(playerId, newSlot, oldValue);
-            SetPlayerSkill(playerId, oldSlot, newSkill);
+            SetSkill(playerId, oldSlot, newSkill);
             SetPlayerSkillCd(playerId, oldSlot, newValue);
         }
 
