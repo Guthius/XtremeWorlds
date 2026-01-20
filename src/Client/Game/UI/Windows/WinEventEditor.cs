@@ -1337,7 +1337,7 @@ public static class WinEventEditor
 
             case EventCommand.SetAccessLevel:
                 pick1Label = "Access";
-                pick1Items = BuildEnumItems<AccessLevel>();
+                pick1Items = BuildEnumItems<Access>();
                 break;
 
             case EventCommand.SpawnNpc:

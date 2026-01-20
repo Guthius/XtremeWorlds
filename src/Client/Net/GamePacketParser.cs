@@ -922,7 +922,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         var packetReader = new PacketReader(data);
 
         var name = packetReader.ReadString();
-        var access = (AccessLevel) packetReader.ReadInt32();
+        var access = (Access) packetReader.ReadInt32();
         var pk = packetReader.ReadBoolean();
         var message = packetReader.ReadString();
         var header = packetReader.ReadString();
@@ -930,11 +930,11 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         // Check access level
         var color = access switch
         {
-            AccessLevel.Player => (byte) ColorName.White,
-            AccessLevel.Moderator => (byte) ColorName.Cyan,
-            AccessLevel.Mapper => (byte) ColorName.Green,
-            AccessLevel.Developer => (byte) ColorName.BrightBlue,
-            AccessLevel.Owner => (byte) ColorName.Yellow,
+            Access.Player => (byte) ColorName.White,
+            Access.Moderator => (byte) ColorName.Cyan,
+            Access.Mapper => (byte) ColorName.Green,
+            Access.Developer => (byte) ColorName.BrightBlue,
+            Access.Owner => (byte) ColorName.Yellow,
             _ => (byte) ColorName.White
         };
 

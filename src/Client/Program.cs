@@ -1681,7 +1681,7 @@ namespace Client
                         if (GameState.VbKeyShift == true)
                         {
                             // Admin warp if Shift is held and the player has moderator access
-                            if (GetPlayerAccess(GameState.MyIndex) >= (int) AccessLevel.Moderator)
+                            if (GetPlayerAccess(GameState.MyIndex) >= (int) Access.Moderator)
                             {
                                 Sender.AdminWarp(GameState.CurXGame, GameState.CurYGame);
                             }

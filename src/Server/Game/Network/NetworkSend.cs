@@ -525,7 +525,7 @@ public static class NetworkSend
 
     public static void WhosOnline(int playerId)
     {
-        if (GetPlayerAccess(playerId) < (int)AccessLevel.Moderator)
+        if (GetPlayerAccess(playerId) < (int)Access.Moderator)
         {
             return;
         }
@@ -941,7 +941,7 @@ public static class NetworkSend
 
         foreach (var playerId in PlayerService.Instance.PlayerIds)
         {
-            if (GetPlayerAccess(playerId) >= (int)AccessLevel.Moderator)
+            if (GetPlayerAccess(playerId) >= (int)Access.Moderator)
             {
                 PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
             }

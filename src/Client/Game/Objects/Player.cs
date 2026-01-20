@@ -1163,11 +1163,11 @@ namespace Client
             {
                 switch (GetPlayerAccess(index))
                 {
-                    case (int)AccessLevel.Player: color = Color.White; backColor = Color.Black; break;
-                    case (int)AccessLevel.Moderator: color = Color.Cyan; backColor = Color.White; break;
-                    case (int)AccessLevel.Mapper: color = Color.Green; backColor = Color.Black; break;
-                    case (int)AccessLevel.Developer: color = Color.Blue; backColor = Color.Black; break;
-                    case (int)AccessLevel.Owner: color = Color.Yellow; backColor = Color.Black; break;
+                    case (int)Core.Globals.Access.Player: color = Color.White; backColor = Color.Black; break;
+                    case (int)Core.Globals.Access.Moderator: color = Color.Cyan; backColor = Color.White; break;
+                    case (int)Core.Globals.Access.Mapper: color = Color.Green; backColor = Color.Black; break;
+                    case (int)Core.Globals.Access.Developer: color = Color.Blue; backColor = Color.Black; break;
+                    case (int)Core.Globals.Access.Owner: color = Color.Yellow; backColor = Color.Black; break;
                 }
             }
             else

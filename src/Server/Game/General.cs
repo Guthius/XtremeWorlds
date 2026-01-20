@@ -507,35 +507,35 @@ public static class General
 
                 switch (access)
                 {
-                    case (byte)AccessLevel.Player:
+                    case (byte)Access.Player:
                         SetPlayerAccess(player, access);
                         NetworkSend.PlayerData(player);
                         await Account.OnSave(player);
                         NetworkSend.PlayerMessage(player, "Your access has been set to Player!", (int)ColorName.Yellow);
                         Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(player));
                         break;
-                    case (byte)AccessLevel.Moderator:
+                    case (byte)Access.Moderator:
                         SetPlayerAccess(player, access);
                         NetworkSend.PlayerData(player);
                         await Account.OnSave(player);
                         NetworkSend.PlayerMessage(player, "Your access has been set to Moderator!", (int)ColorName.Yellow);
                         Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(player));
                         break;
-                    case (byte)AccessLevel.Mapper:
+                    case (byte)Access.Mapper:
                         SetPlayerAccess(player, access);
                         NetworkSend.PlayerData(player);
                         await Account.OnSave(player);
                         NetworkSend.PlayerMessage(player, "Your access has been set to Mapper!", (int)ColorName.Yellow);
                         Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(player));
                         break;
-                    case (byte)AccessLevel.Developer:
+                    case (byte)Access.Developer:
                         SetPlayerAccess(player, access);
                         NetworkSend.PlayerData(player);
                         await Account.OnSave(player);
                         NetworkSend.PlayerMessage(player, "Your access has been set to Developer!", (int)ColorName.Yellow);
                         Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(player));
                         break;
-                    case (byte)AccessLevel.Owner:
+                    case (byte)Access.Owner:
                         SetPlayerAccess(player, access);
                         NetworkSend.PlayerData(player);
                         await Account.OnSave(player);

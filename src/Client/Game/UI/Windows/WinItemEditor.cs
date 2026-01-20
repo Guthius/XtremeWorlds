@@ -220,7 +220,7 @@ public class WinItemEditor
         if (WindowManager.TryGetControl("winItemEditor", "cmbAccessReq", out var accCtrl) && accCtrl is ComboBox cmbAcc)
         {
             cmbAcc.Items.Clear();
-            foreach (var name in Enum.GetNames(typeof(AccessLevel)))
+            foreach (var name in Enum.GetNames(typeof(Access)))
             {
                 string display = System.Text.RegularExpressions.Regex.Replace(name, "(?<!^)([A-Z])", " $1");
                 cmbAcc.Items.Add(display);

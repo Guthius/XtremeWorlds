@@ -360,7 +360,7 @@ namespace Client
                     // Admin Help
                     case "/admin":
                         {
-                            if (GetPlayerAccess(GameState.MyIndex) < (int)AccessLevel.Moderator)
+                            if (GetPlayerAccess(GameState.MyIndex) < (int)Access.Moderator)
                             {
                                 TextRenderer.AddText(LocalesManager.Get("AccessDenied"), (int)ColorName.BrightRed);
                                 goto Continue1;
@@ -383,7 +383,7 @@ namespace Client
                     case "/kick":
                         {
 
-                            if (GetPlayerAccess(GameState.MyIndex) < (int)AccessLevel.Moderator)
+                            if (GetPlayerAccess(GameState.MyIndex) < (int)Access.Moderator)
                             {
                                 TextRenderer.AddText(LocalesManager.Get("AccessAlert"), (int)ColorName.BrightRed);
                                 goto Continue1;
@@ -404,7 +404,7 @@ namespace Client
                     case "/loc":
                         {
 
-                            if (GetPlayerAccess(GameState.MyIndex) < (int)AccessLevel.Mapper)
+                            if (GetPlayerAccess(GameState.MyIndex) < (int)Access.Mapper)
                             {
                                 TextRenderer.AddText(LocalesManager.Get("AccessDenied"), (int)ColorName.BrightRed);
                                 goto Continue1;
@@ -418,7 +418,7 @@ namespace Client
                     case "/warpmeto":
                         {
 
-                            if (GetPlayerAccess(GameState.MyIndex) < (int)AccessLevel.Mapper)
+                            if (GetPlayerAccess(GameState.MyIndex) < (int)Access.Mapper)
                             {
                                 TextRenderer.AddText(LocalesManager.Get("AccessDenied"), (int)ColorName.BrightRed);
                                 goto Continue1;
@@ -438,7 +438,7 @@ namespace Client
                     case "/warptome":
                         {
 
-                            if (GetPlayerAccess(GameState.MyIndex) < (int)AccessLevel.Mapper)
+                            if (GetPlayerAccess(GameState.MyIndex) < (int)Access.Mapper)
                             {
                                 TextRenderer.AddText(LocalesManager.Get("AccessDenied"), (int)ColorName.BrightRed);
                                 goto Continue1;
@@ -458,7 +458,7 @@ namespace Client
                     case "/warpto":
                         {
 
-                            if (GetPlayerAccess(GameState.MyIndex) < (int)AccessLevel.Mapper)
+                            if (GetPlayerAccess(GameState.MyIndex) < (int)Access.Mapper)
                             {
                                 TextRenderer.AddText(LocalesManager.Get("AccessDenied"), (int)ColorName.BrightRed);
                                 goto Continue1;
@@ -487,7 +487,7 @@ namespace Client
                     case "/sprite":
                         {
 
-                            if (GetPlayerAccess(GameState.MyIndex) < (int)AccessLevel.Mapper)
+                            if (GetPlayerAccess(GameState.MyIndex) < (int)Access.Mapper)
                             {
                                 TextRenderer.AddText(LocalesManager.Get("AccessDenied"), (int)ColorName.BrightRed);
                                 goto Continue1;
@@ -507,7 +507,7 @@ namespace Client
                     case "/mapreport":
                         {
 
-                            if (GetPlayerAccess(GameState.MyIndex) < (int)AccessLevel.Mapper)
+                            if (GetPlayerAccess(GameState.MyIndex) < (int)Access.Mapper)
                             {
                                 TextRenderer.AddText(LocalesManager.Get("AccessDenied"), (int)ColorName.BrightRed);
                                 goto Continue1;
@@ -521,7 +521,7 @@ namespace Client
                     case "/respawn":
                         {
 
-                            if (GetPlayerAccess(GameState.MyIndex) < (int)AccessLevel.Mapper)
+                            if (GetPlayerAccess(GameState.MyIndex) < (int)Access.Mapper)
                             {
                                 TextRenderer.AddText(LocalesManager.Get("AccessDenied"), (int)ColorName.BrightRed);
                                 goto Continue1;
@@ -551,7 +551,7 @@ namespace Client
                     case "/editmap":
                         {
 
-                            if (GetPlayerAccess(GameState.MyIndex) < (int)AccessLevel.Mapper)
+                            if (GetPlayerAccess(GameState.MyIndex) < (int)Access.Mapper)
                             {
                                 TextRenderer.AddText(LocalesManager.Get("AccessDenied"), (int)ColorName.BrightRed);
                                 goto Continue1;
@@ -563,7 +563,7 @@ namespace Client
 
                     case "/editscript":
                         {
-                            if (GetPlayerAccess(GameState.MyIndex) < (int)AccessLevel.Owner)
+                            if (GetPlayerAccess(GameState.MyIndex) < (int)Access.Owner)
                             {
                                 TextRenderer.AddText(LocalesManager.Get("AccessDenied"), (int)ColorName.BrightRed);
                             }
@@ -577,7 +577,7 @@ namespace Client
                     case "/welcome":
                         {
 
-                            if (GetPlayerAccess(GameState.MyIndex) < (int)AccessLevel.Moderator)
+                            if (GetPlayerAccess(GameState.MyIndex) < (int)Access.Moderator)
                             {
                                 TextRenderer.AddText(LocalesManager.Get("AccessDenied"), (int)ColorName.BrightRed);
                                 goto Continue1;
@@ -597,7 +597,7 @@ namespace Client
                     case "/banlist":
                         {
 
-                            if (GetPlayerAccess(GameState.MyIndex) < (int)AccessLevel.Moderator)
+                            if (GetPlayerAccess(GameState.MyIndex) < (int)Access.Moderator)
                             {
                                 TextRenderer.AddText(LocalesManager.Get("AccessDenied"), (int)ColorName.BrightRed);
                                 goto Continue1;
@@ -611,7 +611,7 @@ namespace Client
                     case "/ban":
                         {
 
-                            if (GetPlayerAccess(GameState.MyIndex) < (int)AccessLevel.Moderator)
+                            if (GetPlayerAccess(GameState.MyIndex) < (int)Access.Moderator)
                             {
                                 TextRenderer.AddText(LocalesManager.Get("AccessDenied"), (int)ColorName.BrightRed);
                                 goto Continue1;
@@ -632,7 +632,7 @@ namespace Client
                     case "/bandestroy":
                         {
 
-                            if (GetPlayerAccess(GameState.MyIndex) < (int)AccessLevel.Owner)
+                            if (GetPlayerAccess(GameState.MyIndex) < (int)Access.Owner)
                             {
                                 TextRenderer.AddText(LocalesManager.Get("AccessDenied"), (int)ColorName.BrightRed);
                                 goto Continue1;
@@ -645,7 +645,7 @@ namespace Client
                     case "/access":
                         {
 
-                            if (GetPlayerAccess(GameState.MyIndex) < (int)AccessLevel.Owner)
+                            if (GetPlayerAccess(GameState.MyIndex) < (int)Access.Owner)
                             {
                                 TextRenderer.AddText(LocalesManager.Get("AccessDenied"), (int)ColorName.BrightRed);
                                 goto Continue1;
@@ -665,7 +665,7 @@ namespace Client
                     case "/editresource":
                         {
 
-                            if (GetPlayerAccess(GameState.MyIndex) < (int)AccessLevel.Developer)
+                            if (GetPlayerAccess(GameState.MyIndex) < (int)Access.Developer)
                             {
                                 TextRenderer.AddText(LocalesManager.Get("AccessDenied"), (int)ColorName.BrightRed);
                                 goto Continue1;
@@ -678,7 +678,7 @@ namespace Client
                     case "/editanimation":
                         {
 
-                            if (GetPlayerAccess(GameState.MyIndex) < (int)AccessLevel.Developer)
+                            if (GetPlayerAccess(GameState.MyIndex) < (int)Access.Developer)
                             {
                                 TextRenderer.AddText(LocalesManager.Get("AccessDenied"), (int)ColorName.BrightRed);
                                 goto Continue1;
@@ -691,7 +691,7 @@ namespace Client
                     case "/edititem":
                         {
 
-                            if (GetPlayerAccess(GameState.MyIndex) < (int)AccessLevel.Developer)
+                            if (GetPlayerAccess(GameState.MyIndex) < (int)Access.Developer)
                             {
                                 TextRenderer.AddText(LocalesManager.Get("AccessDenied"), (int)ColorName.BrightRed);
                                 goto Continue1;
@@ -704,7 +704,7 @@ namespace Client
                     case "/editprojectile":
                         {
 
-                            if (GetPlayerAccess(GameState.MyIndex) < (int)AccessLevel.Developer)
+                            if (GetPlayerAccess(GameState.MyIndex) < (int)Access.Developer)
                             {
                                 TextRenderer.AddText(LocalesManager.Get("AccessDenied"), (int)ColorName.BrightRed);
                                 goto Continue1;
@@ -717,7 +717,7 @@ namespace Client
                     case "/editnpc":
                         {
 
-                            if (GetPlayerAccess(GameState.MyIndex) < (int)AccessLevel.Developer)
+                            if (GetPlayerAccess(GameState.MyIndex) < (int)Access.Developer)
                             {
                                 TextRenderer.AddText(LocalesManager.Get("AccessDenied"), (int)ColorName.BrightRed);
                                 goto Continue1;
@@ -730,7 +730,7 @@ namespace Client
                     case "/editjob":
                         {
 
-                            if (GetPlayerAccess(GameState.MyIndex) < (int)AccessLevel.Developer)
+                            if (GetPlayerAccess(GameState.MyIndex) < (int)Access.Developer)
                             {
                                 TextRenderer.AddText(LocalesManager.Get("AccessDenied"), (int)ColorName.BrightRed);
                                 goto Continue1;
@@ -743,7 +743,7 @@ namespace Client
                     case "/editskill":
                         {
 
-                            if (GetPlayerAccess(GameState.MyIndex) < (int)AccessLevel.Developer)
+                            if (GetPlayerAccess(GameState.MyIndex) < (int)Access.Developer)
                             {
                                 TextRenderer.AddText(LocalesManager.Get("AccessDenied"), (int)ColorName.BrightRed);
                                 goto Continue1;
@@ -755,7 +755,7 @@ namespace Client
 
                     case "/editshop":
                         {
-                            if (GetPlayerAccess(GameState.MyIndex) < (int)AccessLevel.Developer)
+                            if (GetPlayerAccess(GameState.MyIndex) < (int)Access.Developer)
                             {
                                 TextRenderer.AddText(LocalesManager.Get("AccessDenied"), (int)ColorName.BrightRed);
                                 goto Continue1;
@@ -767,7 +767,7 @@ namespace Client
 
                     case "/editmoral":
                         {
-                            if (GetPlayerAccess(GameState.MyIndex) < (int)AccessLevel.Developer)
+                            if (GetPlayerAccess(GameState.MyIndex) < (int)Access.Developer)
                             {
                                 TextRenderer.AddText(LocalesManager.Get("AccessDenied"), (int)ColorName.BrightRed);
                                 goto Continue1;

@@ -145,7 +145,7 @@ public enum MovementState : byte
 /// <summary>
 /// Defines user access levels or permissions.
 /// </summary>
-public enum AccessLevel : byte
+public enum Access : byte
 {
     None,
     Player,

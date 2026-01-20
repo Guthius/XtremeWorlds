@@ -654,7 +654,7 @@ public static class Database
             }
 
             if (Database.CharacterList?.Count == 1)
-                SetPlayerAccess(index, (int)AccessLevel.Owner);
+                SetPlayerAccess(index, (int)Access.Owner);
             
             await Account.OnSave(index);
         }

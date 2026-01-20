@@ -105,7 +105,7 @@ namespace Core.Objects
         public PlayerBase()
         {
             Name = "";
-            Access = (byte)AccessLevel.Player;
+            Access = (byte)Globals.Access.Player;
             Vital = new int[Enum.GetNames(typeof(Vital)).Length];
             MaxVital = new int[Enum.GetNames(typeof(Vital)).Length];
             Stat = new int[Enum.GetNames(typeof(Stat)).Length];

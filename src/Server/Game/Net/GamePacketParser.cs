@@ -982,7 +982,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         var buffer = new PacketReader(bytes);
 
         // Prevent hacking
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Mapper)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Mapper)
             return;
 
         // The player
@@ -1013,7 +1013,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         var buffer = new PacketReader(bytes);
 
         // Prevent hacking
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Mapper)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Mapper)
             return;
 
         // The player
@@ -1045,7 +1045,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         var buffer = new PacketReader(bytes);
 
         // Prevent hacking
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Mapper)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Mapper)
             return;
 
         // The map
@@ -1065,7 +1065,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         var buffer = new PacketReader(bytes);
 
         // Prevent hacking
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Mapper)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Mapper)
             return;
 
         // The sprite
@@ -1088,7 +1088,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         int x;
         int y;
 
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Mapper)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Mapper)
         {
             return;
         }
@@ -1403,7 +1403,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         var buffer = new PacketReader(bytes);
 
         // Prevent hacking
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Mapper)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Mapper)
             return;
 
         // Clear out it all
@@ -1431,7 +1431,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
     public static async ValueTask MapReport(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         // Prevent hacking
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Mapper)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Mapper)
             return;
 
         NetworkSend.MapReport(session.Id);
@@ -1442,7 +1442,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         var buffer = new PacketReader(bytes);
 
         // Prevent hacking
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Moderator)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Moderator)
         {
             return;
         }
@@ -1479,7 +1479,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
     public static async ValueTask Banlist(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         // Prevent hacking
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Moderator)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Moderator)
         {
             return;
         }
@@ -1490,7 +1490,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
     public static async ValueTask DestroyBans(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         // Prevent hacking
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Owner)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Owner)
             return;
 
         var filename = System.IO.Path.Combine(DataPath.Database, "banlist.txt");
@@ -1506,7 +1506,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         var buffer = new PacketReader(bytes);
 
         // Prevent hacking
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Moderator)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Moderator)
             return;
 
         // The player session.Id
@@ -1539,7 +1539,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
     private static async ValueTask RequestEditMap(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         // Prevent hacking
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Mapper)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Mapper)
         {
             NetworkSend.PlayerMessage(session.Id, "Invalid access level.", (int)ColorName.BrightRed);
             return;
@@ -1573,7 +1573,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
     public static async ValueTask RequestEditShop(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         // Prevent hacking
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Developer)
         {
             NetworkSend.PlayerMessage(session.Id, "Invalid access level.", (int)ColorName.BrightRed);
             return;
@@ -1604,7 +1604,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         var buffer = new PacketReader(bytes);
 
         // Prevent hacking
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Developer)
             return;
 
         var shop = buffer.ReadInt32();
@@ -1634,7 +1634,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
     public static async ValueTask RequestEditSkill(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         // Prevent hacking
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Developer)
         {
             NetworkSend.PlayerMessage(session.Id, "Invalid access level.", (int)ColorName.BrightRed);
             return;
@@ -1727,7 +1727,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         var buffer = new PacketReader(bytes);
 
         // Prevent hacking
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Owner)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Owner)
             return;
 
         // The session.Id
@@ -1737,7 +1737,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         var i = buffer.ReadByte();
 
         // Check for invalid access level
-        if (i >= (int)AccessLevel.Player && i <= (int)AccessLevel.Owner)
+        if (i >= (int)Access.Player && i <= (int)Access.Owner)
         {
             // Check if player is on
             if (n >= 0)
@@ -1752,7 +1752,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
                     }
                 }
 
-                if (GetPlayerAccess(n) == (int)AccessLevel.Player && i > (int)AccessLevel.Player)
+                if (GetPlayerAccess(n) == (int)Access.Player && i > (int)Access.Player)
                 {
                     NetworkSend.GlobalMessage(GetPlayerName(n) + " has been blessed with administrative access.");
                 }
@@ -1782,7 +1782,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         var buffer = new PacketReader(bytes);
 
         // Prevent hacking
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Mapper)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Mapper)
             return;
 
         Variables.Welcome = buffer.ReadString();
@@ -2022,7 +2022,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         var tmpItem = buffer.ReadInt32();
         var tmpAmount = buffer.ReadInt32();
 
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Developer)
             return;
 
         MapItem.OnSpawn(tmpItem, tmpAmount, GetMap(session.Id), GetPlayerX(session.Id), GetPlayerY(session.Id));
@@ -2076,7 +2076,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
     public static async ValueTask RequestLevelUp(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         // Prevent hacking
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Developer)
             return;
 
         SetPlayerExperience(session.Id, Script.Instance?.GetPlayerNextLevel(session.Id));
@@ -2249,7 +2249,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         x *= 32;
         y *= 32;
 
-        if (GetPlayerAccess(session.Id) >= (byte)AccessLevel.Mapper)
+        if (GetPlayerAccess(session.Id) >= (byte)Access.Mapper)
         {
             PlayerBase.Instance[session.Id].IsMoving = false;
 
@@ -2623,7 +2623,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
     public static async ValueTask Admin(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         // Prevent hacking
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Moderator)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Moderator)
             return;
 
         NetworkSend.AdminPanel(session.Id);
@@ -2753,7 +2753,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         var buffer = new PacketReader(bytes);
 
         // Prevent hacking
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Developer)
             return;
 
         var skill = buffer.ReadInt32();
@@ -2771,7 +2771,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
     public static async ValueTask RequestEditJob(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         // Prevent hacking
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Developer)
         {
             NetworkSend.PlayerMessage(session.Id, "Invalid access level.", (int)ColorName.BrightRed);
             return;
@@ -2799,7 +2799,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         var buffer = new PacketReader(bytes);
 
         // Prevent hacking
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Developer)
             return;
 
         var index = buffer.ReadInt32();
@@ -2848,7 +2848,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
     private static async ValueTask CloseEditor(GameSession session, ReadOnlyMemory<byte> bytes)
     {
         // Prevent hacking
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Mapper)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Mapper)
             return;
 
         if (Data.TempPlayer[session.Id].Editor == EditorType.None)
@@ -2860,7 +2860,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
     public static async ValueTask RequestEditMoral(GameSession session, ReadOnlyMemory<byte> bytes)
     {
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Developer)
         {
             NetworkSend.PlayerMessage(session.Id, "Invalid access level.", (int)ColorName.BrightRed);
             return;
@@ -2888,7 +2888,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
     {
         var packetReader = new PacketReader(bytes);
 
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Developer)
         {
             return;
         }
@@ -2929,7 +2929,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
     public static async ValueTask RequestEditScript(GameSession session, ReadOnlyMemory<byte> bytes)
     {
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Owner)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Owner)
         {
             NetworkSend.PlayerMessage(session.Id, "Invalid access level.", (int)ColorName.BrightRed);
             return;
@@ -2977,7 +2977,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
     {
         var packetReader = new PacketReader(bytes);
 
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Owner)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Owner)
         {
             return;
         }
@@ -3022,7 +3022,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
     public static async ValueTask RequestEditProjectile(GameSession session, ReadOnlyMemory<byte> bytes)
     {
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Developer)
         {
             NetworkSend.PlayerMessage(session.Id, "Invalid access level.", (int)ColorName.BrightRed);
             return;
@@ -3051,7 +3051,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
     {
         var packetReader = new PacketReader(bytes);
 
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Developer)
         {
             return;
         }
@@ -3079,7 +3079,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
     public static async ValueTask RequestEditResource(GameSession session, ReadOnlyMemory<byte> bytes)
     {
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Developer)
         {
             NetworkSend.PlayerMessage(session.Id, "Invalid access level.", (int)ColorName.BrightRed);
             return;
@@ -3110,7 +3110,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
     {
         var packetReader = new PacketReader(bytes);
 
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Developer)
         {
             return;
         }
@@ -3177,7 +3177,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
     public static async ValueTask RequestEditItem(GameSession session, ReadOnlyMemory<byte> bytes)
     {
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Mapper)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Mapper)
         {
             NetworkSend.PlayerMessage(session.Id, "Invalid access level.", (int)ColorName.BrightRed);
             return;
@@ -3208,7 +3208,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
     {
         var packetReader = new PacketReader(bytes);
 
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Developer)
         {
             return;
         }
@@ -3317,7 +3317,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
     public static async ValueTask RequestEditAnimation(GameSession session, ReadOnlyMemory<byte> bytes)
     {
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Developer)
         {
             NetworkSend.PlayerMessage(session.Id, "Invalid access level.", (int)ColorName.BrightRed);
             return;
@@ -3345,7 +3345,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
     {
         var packetReader = new PacketReader(bytes);
 
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Developer)
         {
             return;
         }
@@ -3489,7 +3489,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
     public static async ValueTask RequestEditNpc(GameSession session, ReadOnlyMemory<byte> bytes)
     {
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Developer)
         {
             NetworkSend.PlayerMessage(session.Id, "Invalid access level.", (int)ColorName.BrightRed);
             return;
@@ -3521,7 +3521,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
     {
         var packetReader = new PacketReader(bytes);
 
-        if (GetPlayerAccess(session.Id) < (byte)AccessLevel.Developer)
+        if (GetPlayerAccess(session.Id) < (byte)Access.Developer)
         {
             return;
         }

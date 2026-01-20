@@ -2487,7 +2487,7 @@ public class Crystalshire
 
         // Helpers
         void ShowDenied() => TextRenderer.AddText(LocalesManager.Get("AccessDenied"), (int)ColorName.BrightRed);
-        bool HasAccess(AccessLevel min) => GetPlayerAccess(GameState.MyIndex) >= (int)min;
+        bool HasAccess(Access min) => GetPlayerAccess(GameState.MyIndex) >= (int)min;
         static bool IsNumeric(string s) => int.TryParse(s, out _);
         static int ReadInt(Control c, int fallback = 0) => int.TryParse(c.Text?.Trim(), out var n) ? n : fallback;
 
@@ -2508,7 +2508,7 @@ public class Crystalshire
 
         if (window.GetChild("cmbAccess") is ComboBox cmb)
         {
-            foreach (var name in Enum.GetNames(typeof(AccessLevel)))
+            foreach (var name in Enum.GetNames(typeof(Access)))
             {
                 cmb.Items.Add(name);
             }
@@ -2522,42 +2522,42 @@ public class Crystalshire
         // Wire Moderation actions
         window.GetChild("btnWarpTo").CallBack[(int)ControlState.MouseDown] = () =>
         {
-            if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
+            if (!HasAccess(Access.Mapper)) { ShowDenied(); return; }
             var map = ReadInt(window.GetChild("txtAdminMap")) + 1;
             Sender.WarpTo(map);
         };
 
         window.GetChild("btnBan").CallBack[(int)ControlState.MouseDown] = () =>
         {
-            if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
+            if (!HasAccess(Access.Mapper)) { ShowDenied(); return; }
             var name = txtName.Text?.Trim() ?? string.Empty;
             Sender.Ban(name);
         };
 
         window.GetChild("btnKick").CallBack[(int)ControlState.MouseDown] = () =>
         {
-            if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
+            if (!HasAccess(Access.Mapper)) { ShowDenied(); return; }
             var name = txtName.Text?.Trim() ?? string.Empty;
             Sender.Kick(name);
         };
 
         window.GetChild("btnWarp2Me").CallBack[(int)ControlState.MouseDown] = () =>
         {
-            if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
+            if (!HasAccess(Access.Mapper)) { ShowDenied(); return; }
             var name = txtName.Text?.Trim() ?? string.Empty;
             if (!IsNumeric(name)) Sender.WarpToMe(name);
         };
 
         window.GetChild("btnWarpMe2").CallBack[(int)ControlState.MouseDown] = () =>
         {
-            if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
+            if (!HasAccess(Access.Mapper)) { ShowDenied(); return; }
             var name = txtName.Text?.Trim() ?? string.Empty;
             if (!IsNumeric(name)) Sender.WarpMeTo(name);
         };
 
         window.GetChild("btnSetAccess").CallBack[(int)ControlState.MouseDown] = () =>
         {
-            if (!HasAccess(AccessLevel.Owner)) { ShowDenied(); return; }
+            if (!HasAccess(Access.Owner)) { ShowDenied(); return; }
             var name = txtName.Text?.Trim() ?? string.Empty;
             if (IsNumeric(name)) return;
             if (window.GetChild("cmbAccess") is ComboBox combo && combo.Value >= 0)
@@ -2568,21 +2568,21 @@ public class Crystalshire
 
         window.GetChild("btnSetSprite").CallBack[(int)ControlState.MouseDown] = () =>
         {
-            if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
+            if (!HasAccess(Access.Mapper)) { ShowDenied(); return; }
             var sprite = ReadInt(window.GetChild("txtSprite"));
             Sender.SetSprite(sprite);
         };
 
         window.GetChild("btnLevelUp").CallBack[(int)ControlState.MouseDown] = () =>
         {
-            if (!HasAccess(AccessLevel.Developer)) { ShowDenied(); return; }
+            if (!HasAccess(Access.Developer)) { ShowDenied(); return; }
             Sender.RequestLevelUp();
         };
 
         // Map List / Tools
         window.GetChild("btnMapReport").CallBack[(int)ControlState.MouseDown] = () =>
         {
-            if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
+            if (!HasAccess(Access.Mapper)) { ShowDenied(); return; }
             Sender.RequestMapReport();
         };
 
@@ -2593,7 +2593,7 @@ public class Crystalshire
             // Double-click to warp to selected map
             lstMaps.CallBack[(int)ControlState.DoubleClick] = () =>
             {
-                if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
+                if (!HasAccess(Access.Mapper)) { ShowDenied(); return; }
                 int id = lstMaps.SelectedIndex;
                 if (id < 0 || id >= lstMaps.Items.Count) return;
                 var line = lstMaps.Items[id] ?? string.Empty;
@@ -2611,7 +2611,7 @@ public class Crystalshire
         {
             btnMapWarp2.CallBack[(int)ControlState.MouseDown] = () =>
             {
-                if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
+                if (!HasAccess(Access.Mapper)) { ShowDenied(); return; }
                 if (WindowManager.TryGetControl("winAdmin", "lstMaps", out var listCtrl) && listCtrl is ListBox lst)
                 {
                     string line = string.Empty;
@@ -2640,67 +2640,67 @@ public class Crystalshire
         // Editors
         window.GetChild("btnAnimationEditor").CallBack[(int)ControlState.MouseDown] = () =>
         {
-            if (!HasAccess(AccessLevel.Developer)) { ShowDenied(); return; }
+            if (!HasAccess(Access.Developer)) { ShowDenied(); return; }
             Sender.RequestEditAnimation();
         };
 
         window.GetChild("btnJobEditor").CallBack[(int)ControlState.MouseDown] = () =>
         {
-            if (!HasAccess(AccessLevel.Developer)) { ShowDenied(); return; }
+            if (!HasAccess(Access.Developer)) { ShowDenied(); return; }
             Sender.RequestEditJob();
         };
 
         window.GetChild("btnItemEditor").CallBack[(int)ControlState.MouseDown] = () =>
         {
-            if (!HasAccess(AccessLevel.Developer)) { ShowDenied(); return; }
+            if (!HasAccess(Access.Developer)) { ShowDenied(); return; }
             Sender.RequestEditItem();
         };
 
         window.GetChild("btnMapEditor").CallBack[(int)ControlState.MouseDown] = () =>
         {
-            if (!HasAccess(AccessLevel.Mapper)) { ShowDenied(); return; }
+            if (!HasAccess(Access.Mapper)) { ShowDenied(); return; }
             Sender.RequestEditMap();
         };
 
         window.GetChild("btnNpcEditor").CallBack[(int)ControlState.MouseDown] = () =>
         {
-            if (!HasAccess(AccessLevel.Developer)) { ShowDenied(); return; }
+            if (!HasAccess(Access.Developer)) { ShowDenied(); return; }
             Sender.RequestEditNpc();
         };
 
         window.GetChild("btnProjectiles").CallBack[(int)ControlState.MouseDown] = () =>
         {
-            if (!HasAccess(AccessLevel.Developer)) { ShowDenied(); return; }
+            if (!HasAccess(Access.Developer)) { ShowDenied(); return; }
             Sender.RequestEditProjectiles();
         };
 
         window.GetChild("btnResourceEditor").CallBack[(int)ControlState.MouseDown] = () =>
         {
-            if (!HasAccess(AccessLevel.Developer)) { ShowDenied(); return; }
+            if (!HasAccess(Access.Developer)) { ShowDenied(); return; }
             Sender.RequestEditResource();
         };
 
         window.GetChild("btnShopEditor").CallBack[(int)ControlState.MouseDown] = () =>
         {
-            if (!HasAccess(AccessLevel.Developer)) { ShowDenied(); return; }
+            if (!HasAccess(Access.Developer)) { ShowDenied(); return; }
             Sender.RequestEditShop();
         };
 
         window.GetChild("btnSkillEditor").CallBack[(int)ControlState.MouseDown] = () =>
         {
-            if (!HasAccess(AccessLevel.Developer)) { ShowDenied(); return; }
+            if (!HasAccess(Access.Developer)) { ShowDenied(); return; }
             Sender.RequestEditSkill();
         };
 
         window.GetChild("btnMoralEditor").CallBack[(int)ControlState.MouseDown] = () =>
         {
-            if (!HasAccess(AccessLevel.Developer)) { ShowDenied(); return; }
+            if (!HasAccess(Access.Developer)) { ShowDenied(); return; }
             Sender.RequestEditMoral();
         };
 
         window.GetChild("btnScriptEditor").CallBack[(int)ControlState.MouseDown] = () =>
         {
-            if (!HasAccess(AccessLevel.Owner)) { ShowDenied(); return; }
+            if (!HasAccess(Access.Owner)) { ShowDenied(); return; }
             Sender.RequestEditScript(0);
         };
 
