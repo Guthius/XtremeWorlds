@@ -741,7 +741,7 @@ public class Script
             }
             SetPlayerPaperdoll(index, item, eqType);
             Server.Player.Instance[index].Paperdoll[(byte)eqType].Bound = Server.Player.Instance[index].Inventory[invSlot].Bound;
-            NetworkSend.PlayerMessage(index, "You equip " + GameLogic.CheckGrammar(Item.Instance[item].Name), (int)ColorName.BrightGreen);
+            NetworkSend.PlayerMessage(index, "You equip " + GameLogic.CheckGrammar(Item.Instance[item].Name) + ".", (int)ColorName.BrightGreen);
             TakeInv(index, item, 1);
             if (tempItem >= 0)
             {
