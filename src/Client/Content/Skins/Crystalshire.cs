@@ -3472,7 +3472,25 @@ public class Crystalshire
         }
         BindBar("sldRange", "lblRangeVal", v => Projectile.Instance[WinProjectileEditor.SelectedIndex].Range = (byte)v, 0, 255);
         BindBar("sldAttackSpeed", "lblSpeedVal", v => Projectile.Instance[WinProjectileEditor.SelectedIndex].Speed = v, 0, 1000);
-        BindBar("sldDamage", "lblDamageVal", v => Projectile.Instance[WinProjectileEditor.SelectedIndex].Damage = v, 0, 100000);
+
+        void BindDamageIntText(string name, int min, int max, Action<int> apply)
+        {
+            if (WindowManager.TryGetControl("winProjectileEditor", name, out var ctrl) && ctrl is TextBox tb)
+            {
+                tb.CallBack[(int)ControlState.KeyUp] = () =>
+                {
+                    int id = WinProjectileEditor.SelectedIndex;
+                    if (id < 0 || id >= Core.Globals.Variables.MaxProjectiles) return;
+
+                    if (!int.TryParse(tb.Text, out var v)) return;
+                    v = Math.Clamp(v, min, max);
+                    apply(v);
+                    Projectile.IsChanged[id] = true;
+                };
+            }
+        }
+
+        BindDamageIntText("txtDamage", 0, 100000, v => Projectile.Instance[WinProjectileEditor.SelectedIndex].Damage = v);
 
         // Animation combo (0=None then +1 offset)
         if (WindowManager.TryGetControl("winProjectileEditor", "cmbAnimation", out var animCtrl) && animCtrl is ComboBox cmbAnim)

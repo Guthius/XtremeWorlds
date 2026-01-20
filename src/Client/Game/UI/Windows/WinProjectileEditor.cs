@@ -114,11 +114,8 @@ public class WinProjectileEditor
             sldAttackSpeed.Min = 0; sldAttackSpeed.Max = 1000; sldAttackSpeed.Value = Math.Clamp(p.Speed, sldAttackSpeed.Min, sldAttackSpeed.Max);
             if (WindowManager.TryGetControl("winProjectileEditor", "lblSpeedVal", out var lblS) && lblS is Label ls) ls.Text = sldAttackSpeed.Value.ToString();
         }
-        if (WindowManager.TryGetControl("winProjectileEditor", "sldDamage", out var dmgCtrl) && dmgCtrl is ScrollBar sldDamage)
-        {
-            sldDamage.Min = 0; sldDamage.Max = 100000; sldDamage.Value = Math.Clamp(p.Damage, sldDamage.Min, sldDamage.Max);
-            if (WindowManager.TryGetControl("winProjectileEditor", "lblDamageVal", out var lblD) && lblD is Label ld) ld.Text = sldDamage.Value.ToString();
-        }
+        if (WindowManager.TryGetControl("winProjectileEditor", "txtDamage", out var dmgCtrl) && dmgCtrl is TextBox txtDmg)
+            txtDmg.Text = p.Damage.ToString();
         if (WindowManager.TryGetControl("winProjectileEditor", "cmbAnimation", out var animCtrl) && animCtrl is ComboBox cmbAnim)
         {
             int val = p.Animation < 0 ? 0 : p.Animation + 1; // 0 = None

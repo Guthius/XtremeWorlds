@@ -34,8 +34,7 @@
 
 		<!-- Damage -->
 		<Label Name="lblDamage" Text="Damage" Position="8,152" Size="80,18"/>
-		<ScrollBar Name="sldDamage" Position="80,152" Size="180,14" Min="0" Max="100000" Value="0" Orientation="Horizontal" ThumbSize="16"/>
-		<Label Name="lblDamageVal" Text="0" Position="268,150" Size="80,18"/>
+		<TextBox Name="txtDamage" Position="80,148" Size="180,22" Design="TextWhite"/>
 
 		<!-- Animation -->
 		<Label Name="lblAnimation" Text="Animation" Position="8,180" Size="100,18"/>
