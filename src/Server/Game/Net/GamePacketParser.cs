@@ -2760,7 +2760,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
         try
         {
-            Script.Instance?.LearnSkill(session.Id, -1, skill);
+            Script.Instance?.OnLearn(session.Id, -1, skill);
         }
         catch (Exception ex)
         {

@@ -1849,6 +1849,13 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         // Get revision
         y = buffer.ReadInt32();
 
+        // Critical: update our local player's map immediately so subsequent SMapData is stored
+        // and rendered from the correct map index (SPlayerXY does not include map).
+        if (GameState.MyIndex >= 0 && GameState.MyIndex < Player.Instance.Count)
+        {
+            SetPlayerMap(GameState.MyIndex, x);
+        }
+
         needMap = 1;
 
         var packetWriter = new PacketWriter(8);
