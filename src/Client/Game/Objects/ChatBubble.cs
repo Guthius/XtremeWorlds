@@ -45,7 +45,7 @@ public class ChatBubble : IData
             case (byte) TargetType.Player:
             {
                 // it's a player
-                if (GetPlayerMap(instance.Target) != GetPlayerMap(GameState.MyIndex))
+                if (GetMap(instance.Target) != GetMap(GameState.MyIndex))
                     return;
 
                 // Base anchor previously used for bubble (top of classic 32px frame)
@@ -91,8 +91,8 @@ public class ChatBubble : IData
             case (byte) TargetType.Event:
             {
                 // Event X/Y are stored as tile coordinates
-                x = GameLogic.ConvertMapX(Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[instance.Target].X * Constants.TileSize) + 16;
-                y = GameLogic.ConvertMapY(Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[instance.Target].Y * Constants.TileSize) - 16;
+                x = GameLogic.ConvertMapX(Map.Instance[GetMap(GameState.MyIndex)].Event[instance.Target].X * Constants.TileSize) + 16;
+                y = GameLogic.ConvertMapY(Map.Instance[GetMap(GameState.MyIndex)].Event[instance.Target].Y * Constants.TileSize) - 16;
                 break;
             }
 

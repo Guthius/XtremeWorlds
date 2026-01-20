@@ -178,7 +178,7 @@ namespace Server
         {
             foreach (var playerId in PlayerService.Instance.PlayerIds)
             {
-                if (GetPlayerMap(playerId) == map &&
+                if (GetMap(playerId) == map &&
                     GetPlayerX(playerId) == x &&
                     GetPlayerY(playerId) == y)
                 {
@@ -306,7 +306,7 @@ namespace Server
             // Check for player collision (using tile grid)
             foreach (var playerId in PlayerService.Instance.PlayerIds)
             {
-                if (GetPlayerMap(playerId) == map &&
+                if (GetMap(playerId) == map &&
                     GetPlayerX(playerId) == nextTileX &&
                     GetPlayerY(playerId) == nextTileY)
                 {

@@ -1877,7 +1877,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         GameState.MapData = false;
 
-        for (int n = 0; n <= GetPlayerMap(GameState.MyIndex); n++)
+        for (int n = 0; n <= GetMap(GameState.MyIndex); n++)
         {
             if (Client.Map.Instance.Count <= n)
                 Client.Map.Instance.Add(new Map());
@@ -1886,69 +1886,69 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         if (buffer.ReadInt32() == 1)
         {
             map = buffer.ReadInt32();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Name = buffer.ReadString();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Music = buffer.ReadString();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Revision = buffer.ReadInt32();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Moral = buffer.ReadByte();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tileset = buffer.ReadInt32();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Up = buffer.ReadInt32();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Down = buffer.ReadInt32();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Left = buffer.ReadInt32();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Right = buffer.ReadInt32();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].BootMap = buffer.ReadInt32();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].BootX = buffer.ReadByte();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].BootY = buffer.ReadByte();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX = buffer.ReadByte();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY = buffer.ReadByte();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Weather = buffer.ReadByte();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Fog = buffer.ReadInt32();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].WeatherIntensity = buffer.ReadInt32();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].FogOpacity = buffer.ReadByte();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].FogSpeed = buffer.ReadByte();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTint = buffer.ReadBoolean();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintR = buffer.ReadByte();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintG = buffer.ReadByte();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintB = buffer.ReadByte();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintA = buffer.ReadByte();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Panorama = buffer.ReadByte();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Parallax = buffer.ReadByte();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Brightness = buffer.ReadByte();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].NoRespawn = buffer.ReadBoolean();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Indoors = buffer.ReadBoolean();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Shop = buffer.ReadInt32();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].Name = buffer.ReadString();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].Music = buffer.ReadString();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].Revision = buffer.ReadInt32();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].Moral = buffer.ReadByte();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].Tileset = buffer.ReadInt32();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].Up = buffer.ReadInt32();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].Down = buffer.ReadInt32();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].Left = buffer.ReadInt32();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].Right = buffer.ReadInt32();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].BootMap = buffer.ReadInt32();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].BootX = buffer.ReadByte();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].BootY = buffer.ReadByte();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX = buffer.ReadByte();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY = buffer.ReadByte();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].Weather = buffer.ReadByte();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].Fog = buffer.ReadInt32();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].WeatherIntensity = buffer.ReadInt32();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].FogOpacity = buffer.ReadByte();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].FogSpeed = buffer.ReadByte();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].MapTint = buffer.ReadBoolean();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].MapTintR = buffer.ReadByte();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].MapTintG = buffer.ReadByte();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].MapTintB = buffer.ReadByte();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].MapTintA = buffer.ReadByte();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].Panorama = buffer.ReadByte();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].Parallax = buffer.ReadByte();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].Brightness = buffer.ReadByte();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].NoRespawn = buffer.ReadBoolean();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].Indoors = buffer.ReadBoolean();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].Shop = buffer.ReadInt32();
 
             // Per-map camera zoom bounds
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MinZoom = buffer.ReadSingle();
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxZoom = buffer.ReadSingle();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].MinZoom = buffer.ReadSingle();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].MaxZoom = buffer.ReadSingle();
 
             // Apply min zoom on map load (and keep zoom within bounds)
-            var mapZoomMin = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MinZoom;
-            var mapZoomMax = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxZoom;
+            var mapZoomMin = Client.Map.Instance[GetMap(GameState.MyIndex)].MinZoom;
+            var mapZoomMax = Client.Map.Instance[GetMap(GameState.MyIndex)].MaxZoom;
             if (mapZoomMin <= 0) mapZoomMin = 0.5f;
             if (mapZoomMax <= 0) mapZoomMax = 2.0f;
             if (mapZoomMax < mapZoomMin) mapZoomMax = mapZoomMin;
             GameState.CameraZoom = Math.Clamp(mapZoomMin, mapZoomMin, mapZoomMax);
 
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile = new Core.Globals.Type.Tile[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY];
+            Client.Map.Instance[GetMap(GameState.MyIndex)].Tile = new Core.Globals.Type.Tile[Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX, Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY];
             Data.TileHistory = new Core.Globals.Type.TileHistory[GameState.MaxTileHistory];
 
             for (i = 0; i < GameState.MaxTileHistory; i++)
             {
-                Data.TileHistory[i].Tile = new Core.Globals.Type.Tile[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY];
+                Data.TileHistory[i].Tile = new Core.Globals.Type.Tile[Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX, Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY];
             }
 
             int layerCount = Enum.GetValues(typeof(MapLayer)).Length;
 
             // Initialize Layer arrays for MyMap tiles
-            for (int xx = 0; xx < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX; xx++)
+            for (int xx = 0; xx < Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX; xx++)
             {
-                for (int yy = 0; yy < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY; yy++)
+                for (int yy = 0; yy < Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY; yy++)
                 {
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[xx, yy].Layer = new Core.Globals.Type.Layer[layerCount];
+                    Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[xx, yy].Layer = new Core.Globals.Type.Layer[layerCount];
 
                     for (int l = 0; l < layerCount; l++)
                     {
-                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[xx, yy].Layer[l] = new Core.Globals.Type.Layer
+                        Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[xx, yy].Layer[l] = new Core.Globals.Type.Layer
                         {
                             Tileset = 0,
                             X = 0,
@@ -1973,79 +1973,79 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             }
 
             for (x = 0; x < Core.Globals.Variables.MaxMapNpcs; x++)
-                Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[x] = buffer.ReadInt32();
+                Client.Map.Instance[GetMap(GameState.MyIndex)].Npc[x] = buffer.ReadInt32();
 
-            var count = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
+            var count = (int)Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX;
             for (x = 0; x < count; x++)
             {
-                var count2 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+                var count2 = (int)Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY;
                 for (y = 0; y < count2; y++)
                 {
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data1 = buffer.ReadInt32();
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data2 = buffer.ReadInt32();
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data3 = buffer.ReadInt32();
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data1_2 = buffer.ReadInt32();
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data2_2 = buffer.ReadInt32();
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data3_2 = buffer.ReadInt32();
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].DirBlock = buffer.ReadByte();
+                    Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Data1 = buffer.ReadInt32();
+                    Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Data2 = buffer.ReadInt32();
+                    Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Data3 = buffer.ReadInt32();
+                    Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Data1_2 = buffer.ReadInt32();
+                    Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Data2_2 = buffer.ReadInt32();
+                    Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Data3_2 = buffer.ReadInt32();
+                    Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].DirBlock = buffer.ReadByte();
 
                     for (j = 0; j < GameState.MaxTileHistory; j++)
                     {
-                        Data.TileHistory[j].Tile[x, y].Data1 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data1;
-                        Data.TileHistory[j].Tile[x, y].Data2 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data2;
-                        Data.TileHistory[j].Tile[x, y].Data3 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data3;
-                        Data.TileHistory[j].Tile[x, y].Data1_2 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data1_2;
-                        Data.TileHistory[j].Tile[x, y].Data2_2 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data2_2;
-                        Data.TileHistory[j].Tile[x, y].Data3_2 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data3_2;
-                        Data.TileHistory[j].Tile[x, y].DirBlock = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].DirBlock;
-                        Data.TileHistory[j].Tile[x, y].Type = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Type;
-                        Data.TileHistory[j].Tile[x, y].Type2 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Type2;
+                        Data.TileHistory[j].Tile[x, y].Data1 = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Data1;
+                        Data.TileHistory[j].Tile[x, y].Data2 = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Data2;
+                        Data.TileHistory[j].Tile[x, y].Data3 = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Data3;
+                        Data.TileHistory[j].Tile[x, y].Data1_2 = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Data1_2;
+                        Data.TileHistory[j].Tile[x, y].Data2_2 = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Data2_2;
+                        Data.TileHistory[j].Tile[x, y].Data3_2 = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Data3_2;
+                        Data.TileHistory[j].Tile[x, y].DirBlock = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].DirBlock;
+                        Data.TileHistory[j].Tile[x, y].Type = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Type;
+                        Data.TileHistory[j].Tile[x, y].Type2 = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Type2;
                     }
 
                     for (i = 0; i < layerCount; i++)
                     {
-                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[i].Tileset = buffer.ReadInt32();
-                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[i].X = buffer.ReadInt32();
-                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[i].Y = buffer.ReadInt32();
-                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[i].AutoTile = buffer.ReadByte();
+                        Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[i].Tileset = buffer.ReadInt32();
+                        Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[i].X = buffer.ReadInt32();
+                        Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[i].Y = buffer.ReadInt32();
+                        Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[i].AutoTile = buffer.ReadByte();
 
                         for (j = 0; j < GameState.MaxTileHistory; j++)
                         {
-                            Data.TileHistory[j].Tile[x, y].Layer[i].Tileset = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[i].Tileset;
-                            Data.TileHistory[j].Tile[x, y].Layer[i].X = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[i].X;
-                            Data.TileHistory[j].Tile[x, y].Layer[i].Y = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[i].Y;
-                            Data.TileHistory[j].Tile[x, y].Layer[i].AutoTile = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[i].AutoTile;
+                            Data.TileHistory[j].Tile[x, y].Layer[i].Tileset = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[i].Tileset;
+                            Data.TileHistory[j].Tile[x, y].Layer[i].X = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[i].X;
+                            Data.TileHistory[j].Tile[x, y].Layer[i].Y = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[i].Y;
+                            Data.TileHistory[j].Tile[x, y].Layer[i].AutoTile = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[i].AutoTile;
                         }
                     }
 
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Type = (TileType)buffer.ReadInt32();
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Type2 = (TileType)buffer.ReadInt32();
+                    Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Type = (TileType)buffer.ReadInt32();
+                    Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Type2 = (TileType)buffer.ReadInt32();
                 }
             }
 
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount = buffer.ReadInt32();
+            Client.Map.Instance[GetMap(GameState.MyIndex)].EventCount = buffer.ReadInt32();
 
-            if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount > 0)
+            if (Client.Map.Instance[GetMap(GameState.MyIndex)].EventCount > 0)
             {
-                Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event = new Core.Globals.Type.Event[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount];
-                var count2 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount;
+                Client.Map.Instance[GetMap(GameState.MyIndex)].Event = new Core.Globals.Type.Event[Client.Map.Instance[GetMap(GameState.MyIndex)].EventCount];
+                var count2 = Client.Map.Instance[GetMap(GameState.MyIndex)].EventCount;
                 for (i = 0; i < count2; i++)
                 {               
-                    ref var instance = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i];
+                    ref var instance = ref Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i];
                     instance.Name = buffer.ReadString();
                     instance.Globals = buffer.ReadByte();
                     instance.X = buffer.ReadInt32();
                     instance.Y = buffer.ReadInt32();
                     instance.PageCount = buffer.ReadInt32();
                 
-                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].PageCount > 0)
+                    if (Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].PageCount > 0)
                     {
-                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages = new Core.Globals.Type.EventPage[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].PageCount];
-                        var count3 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].PageCount;
+                        Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages = new Core.Globals.Type.EventPage[Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].PageCount];
+                        var count3 = Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].PageCount;
                         for (x = 0; x < count3; x++)
                         {
                             {
-                                ref var instance1 = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x];
+                                ref var instance1 = ref Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages[x];
                                 instance1.ChkVariable = buffer.ReadInt32();
                                 instance1.VariableIndex = buffer.ReadInt32();
                                 instance1.VariableCondition = buffer.ReadInt32();
@@ -2079,7 +2079,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
                                 if (instance1.MoveRouteCount > 0)
                                 {
-                                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].MoveRoute = new Core.Globals.Type.MoveRoute[instance1.MoveRouteCount];
+                                    Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages[x].MoveRoute = new Core.Globals.Type.MoveRoute[instance1.MoveRouteCount];
                                     var count4 = instance1.MoveRouteCount;
                                     for (y = 0; y < count4; y++)
                                     {
@@ -2102,21 +2102,21 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
                                 instance1.Position = buffer.ReadByte();
                             }
 
-                            if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandListCount > 0)
+                            if (Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages[x].CommandListCount > 0)
                             {
-                                Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList = new Core.Globals.Type.CommandList[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandListCount];
-                                var count5 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandListCount;
+                                Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages[x].CommandList = new Core.Globals.Type.CommandList[Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages[x].CommandListCount];
+                                var count5 = Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages[x].CommandListCount;
                                 for (y = 0; y < count5; y++)
                                 {
-                                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount = buffer.ReadInt32();
-                                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].ParentList = buffer.ReadInt32();
-                                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount > 0)
+                                    Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount = buffer.ReadInt32();
+                                    Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].ParentList = buffer.ReadInt32();
+                                    if (Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount > 0)
                                     {
-                                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].Commands = new Core.Globals.Type.EventCommand[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount];
-                                        for (int z = 0, count6 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount; z < count6; z++)
+                                        Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].Commands = new Core.Globals.Type.EventCommand[Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount];
+                                        for (int z = 0, count6 = Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount; z < count6; z++)
                                         {
                                             {
-                                                ref var instance2 = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].Commands[z];
+                                                ref var instance2 = ref Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].Commands[z];
                                                 instance2.Index = buffer.ReadInt32();
                                                 instance2.Text1 = buffer.ReadString();
                                                 instance2.Text2 = buffer.ReadString();
@@ -2207,15 +2207,15 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         for (i = 0; i < byte.MaxValue; i++)
             GameLogic.ClearActionMessage((byte)i);
 
-        GameState.CurrentWeather = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Weather;
-        GameState.CurrentWeatherIntensity = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].WeatherIntensity;
-        GameState.CurrentFog = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Fog;
-        GameState.CurrentFogSpeed = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].FogSpeed;
-        GameState.CurrentFogOpacity = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].FogOpacity;
-        GameState.CurrentTintR = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintR;
-        GameState.CurrentTintG = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintG;
-        GameState.CurrentTintB = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintB;
-        GameState.CurrentTintA = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintA;
+        GameState.CurrentWeather = Client.Map.Instance[GetMap(GameState.MyIndex)].Weather;
+        GameState.CurrentWeatherIntensity = Client.Map.Instance[GetMap(GameState.MyIndex)].WeatherIntensity;
+        GameState.CurrentFog = Client.Map.Instance[GetMap(GameState.MyIndex)].Fog;
+        GameState.CurrentFogSpeed = Client.Map.Instance[GetMap(GameState.MyIndex)].FogSpeed;
+        GameState.CurrentFogOpacity = Client.Map.Instance[GetMap(GameState.MyIndex)].FogOpacity;
+        GameState.CurrentTintR = Client.Map.Instance[GetMap(GameState.MyIndex)].MapTintR;
+        GameState.CurrentTintG = Client.Map.Instance[GetMap(GameState.MyIndex)].MapTintG;
+        GameState.CurrentTintB = Client.Map.Instance[GetMap(GameState.MyIndex)].MapTintB;
+        GameState.CurrentTintA = Client.Map.Instance[GetMap(GameState.MyIndex)].MapTintA;
 
         GameLogic.UpdateDrawMapName();
 
@@ -2419,34 +2419,34 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         int w;
         var buffer = new PacketReader(data);
 
-        for (int n = 0; n <= GetPlayerMap(GameState.MyIndex); n++)
+        for (int n = 0; n <= GetMap(GameState.MyIndex); n++)
         {
             if (Client.Map.Instance.Count <= n)
                 Client.Map.Instance.Add(new Map());
         }
 
-        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount = buffer.ReadInt32();
+        Client.Map.Instance[GetMap(GameState.MyIndex)].EventCount = buffer.ReadInt32();
 
-        if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount > 0)
+        if (Client.Map.Instance[GetMap(GameState.MyIndex)].EventCount > 0)
         {
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event = new Core.Globals.Type.Event[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount];
-            var count = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount;
+            Client.Map.Instance[GetMap(GameState.MyIndex)].Event = new Core.Globals.Type.Event[Client.Map.Instance[GetMap(GameState.MyIndex)].EventCount];
+            var count = Client.Map.Instance[GetMap(GameState.MyIndex)].EventCount;
             for (i = 0; i < count; i++)
             {                
-                ref var instance = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i];
+                ref var instance = ref Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i];
                 instance.Name = buffer.ReadString();
                 instance.Globals = buffer.ReadByte();
                 instance.X = buffer.ReadInt32();
                 instance.Y = buffer.ReadInt32();
                 instance.PageCount = buffer.ReadInt32();
 
-                if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].PageCount > 0)
+                if (Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].PageCount > 0)
                 {
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages = new Core.Globals.Type.EventPage[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].PageCount];
-                    var count2 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].PageCount;
+                    Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages = new Core.Globals.Type.EventPage[Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].PageCount];
+                    var count2 = Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].PageCount;
                     for (x = 0; x < count2; x++)
                     {
-                        ref var instance1 = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x];
+                        ref var instance1 = ref Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages[x];
                         instance1.ChkVariable = buffer.ReadInt32();
                         instance1.VariableIndex = buffer.ReadInt32();
                         instance1.VariableCondition = buffer.ReadInt32();
@@ -2476,7 +2476,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
                         if (instance1.MoveRouteCount > 0)
                         {
-                            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].MoveRoute = new Core.Globals.Type.MoveRoute[instance1.MoveRouteCount];
+                            Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages[x].MoveRoute = new Core.Globals.Type.MoveRoute[instance1.MoveRouteCount];
                             var count3 = instance1.MoveRouteCount;
                             for (y = 0; y < count3; y++)
                             {
@@ -2498,22 +2498,22 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
                         instance1.CommandListCount = buffer.ReadInt32();
                         instance1.Position = buffer.ReadByte();
 
-                        if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandListCount > 0)
+                        if (Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages[x].CommandListCount > 0)
                         {
-                            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList = new Core.Globals.Type.CommandList[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandListCount];
-                            var count4 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandListCount;
+                            Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages[x].CommandList = new Core.Globals.Type.CommandList[Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages[x].CommandListCount];
+                            var count4 = Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages[x].CommandListCount;
                             for (y = 0; y < count4; y++)
                             {
-                                Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount = buffer.ReadInt32();
-                                Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].ParentList = buffer.ReadInt32();
-                                if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount > 0)
+                                Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount = buffer.ReadInt32();
+                                Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].ParentList = buffer.ReadInt32();
+                                if (Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount > 0)
                                 {
-                                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].Commands = new Core.Globals.Type.EventCommand[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount];
-                                    var count5 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount;
+                                    Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].Commands = new Core.Globals.Type.EventCommand[Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount];
+                                    var count5 = Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].CommandCount;
                                     for (z = 0; z < count5; z++)
                                     {
                                         {
-                                            ref var instance2 = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].Commands[z];
+                                            ref var instance2 = ref Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages[x].CommandList[y].Commands[z];
                                             instance2.Index = buffer.ReadInt32();
                                             instance2.Text1 = buffer.ReadString();
                                             instance2.Text2 = buffer.ReadString();
@@ -2672,7 +2672,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         var buffer = new PacketReader(data);
 
         music = buffer.ReadString();
-        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Music = music;
+        Client.Map.Instance[GetMap(GameState.MyIndex)].Music = music;
     }
 
     public static async ValueTask FadeOutBGM(ReadOnlyMemory<byte> data)
@@ -2742,7 +2742,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
                 }
             case GameState.EffectTypeTint:
                 {
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTint = true;
+                    Client.Map.Instance[GetMap(GameState.MyIndex)].MapTint = true;
                     GameState.CurrentTintR = buffer.ReadInt32();
                     GameState.CurrentTintG = buffer.ReadInt32();
                     GameState.CurrentTintB = buffer.ReadInt32();

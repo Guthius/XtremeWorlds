@@ -53,13 +53,13 @@ namespace Core.Objects
             if (!GameState.MapData)
                 return;
 
-            if (MapResource.Instance[index].X > Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX | MapResource.Instance[index].Y > Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)
+            if (MapResource.Instance[index].X > Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX | MapResource.Instance[index].Y > Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY)
                 return;
 
-            mapResourceNum = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[MapResource.Instance[index].X, MapResource.Instance[index].Y].Data1;
+            mapResourceNum = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[MapResource.Instance[index].X, MapResource.Instance[index].Y].Data1;
 
             if (mapResourceNum == 0)
-                mapResourceNum = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[MapResource.Instance[index].X, MapResource.Instance[index].Y].Data1_2;
+                mapResourceNum = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[MapResource.Instance[index].X, MapResource.Instance[index].Y].Data1_2;
 
             Resource.OnStream(mapResourceNum);
 

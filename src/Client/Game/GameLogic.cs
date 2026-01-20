@@ -22,12 +22,12 @@ namespace Client
         {
             bool isInBounds = false;
 
-            if (Map.Instance.Count <= GetPlayerMap(GameState.MyIndex))
+            if (Map.Instance.Count <= GetMap(GameState.MyIndex))
                 return isInBounds;
                 
-            if (GameState.CurX >= 0 & GameState.CurX <= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX)
+            if (GameState.CurX >= 0 & GameState.CurX <= Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX)
             {
-                if (GameState.CurY >= 0 & GameState.CurY <= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)
+                if (GameState.CurY >= 0 & GameState.CurY <= Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY)
                 {
                     isInBounds = true;
                 }
@@ -826,12 +826,12 @@ namespace Client
 
         public static void UpdateDrawMapName()
         {
-            if (Moral.Instance.Count <= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Moral)
+            if (Moral.Instance.Count <= Client.Map.Instance[GetMap(GameState.MyIndex)].Moral)
                 return;
 
-            if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Moral >= 0)
+            if (Client.Map.Instance[GetMap(GameState.MyIndex)].Moral >= 0)
             {
-                GameState.DrawMapNameColor = GameClient.QbColorToXnaColor(Moral.Instance[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Moral].Color);
+                GameState.DrawMapNameColor = GameClient.QbColorToXnaColor(Moral.Instance[Client.Map.Instance[GetMap(GameState.MyIndex)].Moral].Color);
             }
         }
 
@@ -1205,16 +1205,16 @@ namespace Client
                         {
                             if (GameState.DiaData2 > 0L)
                             {
-                                var count = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
+                                var count = (int)Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX;
                                 for (x = 0; x < count; x++)
                                 {
-                                    var count2 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+                                    var count2 = (int)Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY;
                                     for (y = 0; y < count2; y++)
                                     {
-                                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[(int)GameState.DiaData1].X = (int)GameState.DiaData3;
-                                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[(int)GameState.DiaData1].Y = (int)GameState.DiaData4;
-                                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[(int)GameState.DiaData1].Tileset = (int)GameState.DiaData5;
-                                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[(int)GameState.DiaData1].AutoTile = (byte)GameState.DiaData2;
+                                        Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[(int)GameState.DiaData1].X = (int)GameState.DiaData3;
+                                        Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[(int)GameState.DiaData1].Y = (int)GameState.DiaData4;
+                                        Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[(int)GameState.DiaData1].Tileset = (int)GameState.DiaData5;
+                                        Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[(int)GameState.DiaData1].AutoTile = (byte)GameState.DiaData2;
                                         Autotile.CacheRenderState(x, y, (int)GameState.DiaData1);
                                     }
                                 }
@@ -1224,16 +1224,16 @@ namespace Client
                             }
                             else
                             {
-                                var count = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
+                                var count = (int)Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX;
                                 for (x = 0; x < count; x++)
                                 {
-                                    var count2 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+                                    var count2 = (int)Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY;
                                     for (y = 0; y < count2; y++)
                                     {
-                                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[(int)GameState.DiaData1].X = (int)GameState.DiaData3;
-                                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[(int)GameState.DiaData1].Y = (int)GameState.DiaData4;
-                                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[(int)GameState.DiaData1].Tileset = (int)GameState.DiaData5;
-                                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[(int)GameState.DiaData1].AutoTile = 0;
+                                        Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[(int)GameState.DiaData1].X = (int)GameState.DiaData3;
+                                        Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[(int)GameState.DiaData1].Y = (int)GameState.DiaData4;
+                                        Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[(int)GameState.DiaData1].Tileset = (int)GameState.DiaData5;
+                                        Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[(int)GameState.DiaData1].AutoTile = 0;
                                         Autotile.CacheRenderState(x, y, (int)GameState.DiaData1);
                                     }
                                 }
@@ -1244,14 +1244,14 @@ namespace Client
 
                     case DialogueType.ClearLayer:
                         {
-                            var count = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
+                            var count = (int)Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX;
                             for (x = 0; x < count; x++)
                             {
-                                var count2 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+                                var count2 = (int)Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY;
                                 for (y = 0; y < count2; y++)
                                 {
                                     {
-                                        ref var instance = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y];
+                                        ref var instance = ref Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y];
                                         instance.Layer[(int)GameState.DiaData1].X = 0;
                                         instance.Layer[(int)GameState.DiaData1].Y = 0;
                                         instance.Layer[(int)GameState.DiaData1].Tileset = 0;
@@ -1266,14 +1266,14 @@ namespace Client
 
                     case DialogueType.ClearAttributes:
                         {
-                            var count = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
+                            var count = (int)Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX;
                             for (x = 0; x < count; x++)
                             {
-                                var count2 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+                                var count2 = (int)Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY;
                                 for (y = 0; y < count2; y++)
                                 {
-                                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Type = 0;
-                                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Type2 = 0;
+                                    Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Type = 0;
+                                    Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Type2 = 0;
                                 }
                             }
 
@@ -1298,19 +1298,19 @@ namespace Client
 
                             int attrIndexCached = Math.Clamp((int)GameState.EditorAttribute, 1, 2) - 1; // 0 => primary, 1 => secondary
 
-                            var maxX = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
-                            var maxY = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+                            var maxX = (int)Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX;
+                            var maxY = (int)Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY;
                             for (x = 0; x < maxX; x++)
                             {
                                 for (y = 0; y < maxY; y++)
                                 {
                                     if (attrIndexCached == 0)
                                     {
-                                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Type = resolvedType;
+                                        Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Type = resolvedType;
                                     }
                                     else
                                     {
-                                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Type2 = resolvedType;
+                                        Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Type2 = resolvedType;
                                     }
                                 }
                             }
@@ -1325,13 +1325,13 @@ namespace Client
 
                     case DialogueType.ClearDirBlocks:
                         {
-                            int maxX = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
-                            int maxY = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+                            int maxX = Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX;
+                            int maxY = Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY;
                             for (x = 0; x < maxX; x++)
                             {
                                 for (y = 0; y < maxY; y++)
                                 {
-                                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].DirBlock = 0;
+                                    Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].DirBlock = 0;
                                 }
                             }
                             break;
@@ -2198,7 +2198,7 @@ namespace Client
             if (y < 0)
                 return default;
 
-            var map = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)];
+            var map = Client.Map.Instance[GetMap(GameState.MyIndex)];
             int maxMapX = map.MaxX;
             int maxMapY = map.MaxY;
 
@@ -2214,9 +2214,9 @@ namespace Client
         public static List<Microsoft.Xna.Framework.Vector2> GetCellsInSquare(int xCenter, int yCenter, int distance)
         {
             int xMin = Math.Max(0, xCenter - distance);
-            int xMax = Math.Min(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX, xCenter + distance);
+            int xMax = Math.Min(Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX, xCenter + distance);
             int yMin = Math.Max(0, yCenter - distance);
-            int yMax = Math.Min(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY, yCenter + distance);
+            int yMax = Math.Min(Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY, yCenter + distance);
 
             var cells = new List<Microsoft.Xna.Framework.Vector2>();
             for (int y = yMin, count2 = yMax; y < count2; y++)
@@ -2230,9 +2230,9 @@ namespace Client
         public static List<Microsoft.Xna.Framework.Vector2> GetBorderCellsInSquare(int xCenter, int yCenter, int distance)
         {
             int xMin = Math.Max(0, xCenter - distance);
-            int xMax = Math.Min(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX, xCenter + distance);
+            int xMax = Math.Min(Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX, xCenter + distance);
             int yMin = Math.Max(0, yCenter - distance);
-            int yMax = Math.Min(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY, yCenter + distance);
+            int yMax = Math.Min(Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY, yCenter + distance);
 
             var borderCells = new List<Microsoft.Xna.Framework.Vector2>();
 
@@ -2402,7 +2402,7 @@ namespace Client
 
         private static bool IsTransparent(int x, int y)
         {
-            if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Type == TileType.Blocked | Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Type2 == TileType.Blocked)
+            if (Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Type == TileType.Blocked | Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Type2 == TileType.Blocked)
             {
                 return false;
             }
@@ -2415,7 +2415,7 @@ namespace Client
             int nativeWidth = GameState.ResolutionWidth;
             int nativeHeight = GameState.ResolutionHeight;
 
-            var map = GetPlayerMap(GameState.MyIndex);
+            var map = GetMap(GameState.MyIndex);
             if (map < 0 || map >= Client.Map.Instance.Count)
                 return;
 
@@ -2508,10 +2508,10 @@ namespace Client
             GameState.Camera.Left = (long)Math.Round(GameState.CurrentCameraX);
             GameState.Camera.Top = (long)Math.Round(GameState.CurrentCameraY);
 
-            long StartX = Math.Max(0, Math.Min((long)Math.Floor(GameState.Camera.Left), Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX - 1) / Constants.TileSize);
-            long StartY = Math.Max(0, Math.Min((long)Math.Floor(GameState.Camera.Top), Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY - 1) / Constants.TileSize);
-            long EndX = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
-            long EndY = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+            long StartX = Math.Max(0, Math.Min((long)Math.Floor(GameState.Camera.Left), Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX - 1) / Constants.TileSize);
+            long StartY = Math.Max(0, Math.Min((long)Math.Floor(GameState.Camera.Top), Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY - 1) / Constants.TileSize);
+            long EndX = Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX;
+            long EndY = Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY;
 
             // Update the tile view  
             ref var instance = ref GameState.TileView;

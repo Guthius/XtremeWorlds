@@ -71,7 +71,7 @@ namespace Server
 
         public static void OnUpdate(int playerId, int x, int y)
         {
-            var map = GetPlayerMap(playerId);
+            var map = GetMap(playerId);
 
             if (x < 0 || y < 0 || x >= Server.Map.Instance[map].MaxX || y >= Server.Map.Instance[map].MaxY)
             {

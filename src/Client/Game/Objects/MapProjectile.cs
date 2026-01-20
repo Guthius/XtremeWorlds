@@ -59,10 +59,10 @@ namespace Client
             if (Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, projectileNum].Timer < General.GetTickCount())
                 return;
 
-            if (x > Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX | x < 0)
+            if (x > Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX | x < 0)
                 return;
 
-            if (y > Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY | y < 0)
+            if (y > Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY | y < 0)
                 return;
 
             int projectile = Data.MapProjectile[Player.Instance[GameState.MyIndex].Map, projectileNum].Index;

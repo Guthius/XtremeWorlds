@@ -93,10 +93,10 @@ namespace Client
             bool isModified = false;
 
             // Bounds check for both CurX/CurY and x/y
-            if (GameState.CurX < 0 || GameState.CurY < 0 || GameState.CurX >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX || GameState.CurY >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)
+            if (GameState.CurX < 0 || GameState.CurY < 0 || GameState.CurX >= Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX || GameState.CurY >= Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY)
                 return;
                 
-            if (x < 0 || y < 0 || x >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX || y >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)
+            if (x < 0 || y < 0 || x >= Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX || y >= Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY)
                 return;
 
             if (!GameLogic.IsInBounds())
@@ -131,7 +131,7 @@ namespace Client
                 }
             }
 
-            var instance = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y];
+            var instance = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y];
 
             if (GameClient.IsMouseButtonDown(MouseButton.Left))
             {
@@ -154,7 +154,7 @@ namespace Client
                 // Only allow attribute placement on Attributes tab
                 else if (GameState.MapEditorTab == (int)MapEditorTab.Attributes)
                 {
-                    ref var instance1 = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY];
+                    ref var instance1 = ref Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY];
 
                     if (GameState.OptInfo)
                     {
@@ -162,11 +162,11 @@ namespace Client
                         {
                             if (GameState.EditorAttribute == 1)
                             {
-                                GameLogic.Dialogue("Map Editor", "Info: " + System.Enum.GetName(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY].Type), " Data 1: " + Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY].Data1 + " Data 2: " + Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY].Data2 + " Data 3: " + Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY].Data3, DialogueType.Information, (byte)DialogueStyle.Okay);
+                                GameLogic.Dialogue("Map Editor", "Info: " + System.Enum.GetName(Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY].Type), " Data 1: " + Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY].Data1 + " Data 2: " + Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY].Data2 + " Data 3: " + Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY].Data3, DialogueType.Information, (byte)DialogueStyle.Okay);
                             }
                             else
                             {
-                                GameLogic.Dialogue("Map Editor", "Info: " + System.Enum.GetName(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY].Type2), " Data 1: " + Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY].Data1_2 + " Data 2: " + Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY].Data2_2 + " Data 3: " + Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY].Data3_2, DialogueType.Information, (byte)DialogueStyle.Okay);
+                                GameLogic.Dialogue("Map Editor", "Info: " + System.Enum.GetName(Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY].Type2), " Data 1: " + Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY].Data1_2 + " Data 2: " + Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY].Data2_2 + " Data 3: " + Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY].Data3_2, DialogueType.Information, (byte)DialogueStyle.Okay);
                             }
                         }
                     }
@@ -408,10 +408,10 @@ namespace Client
                             if (y >= GameState.DirArrowY[i] & y <= GameState.DirArrowY[i] + 16)
                             {
                                 // flip the value.
-                                bool localIsDirBlocked() { byte argdir = (byte)i; var dirBlocked = GameLogic.IsDirBlocked(ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY].DirBlock, ref argdir); return dirBlocked; }
+                                bool localIsDirBlocked() { byte argdir = (byte)i; var dirBlocked = GameLogic.IsDirBlocked(ref Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY].DirBlock, ref argdir); return dirBlocked; }
 
                                 byte argdir = (byte)i;
-                                GameLogic.SetDirBlock(ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY].DirBlock, ref argdir, !localIsDirBlocked());
+                                GameLogic.SetDirBlock(ref Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY].DirBlock, ref argdir, !localIsDirBlocked());
                                 break;
                             }
                         }
@@ -454,7 +454,7 @@ namespace Client
                 }
                 else if (GameState.MapEditorTab == (int)MapEditorTab.Attributes)
                 {
-                    ref var instance2 = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY];
+                    ref var instance2 = ref Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY];
                     // clear attribute
                     instance2.Type = 0;
                     instance2.Data1 = 0;
@@ -473,14 +473,14 @@ namespace Client
 
             x = 0;
 
-            for (int x2 = 0, count = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX; x2 < count; x2++)
+            for (int x2 = 0, count = Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX; x2 < count; x2++)
             {
-                for (int y2 = 0, count2 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY; y2 < count2; y2++)
+                for (int y2 = 0, count2 = Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY; y2 < count2; y2++)
                 {
                     // Use Layer.Length instead of MapLayer.Count
-                    for (int i2 = 0, count3 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x2, y2].Layer != null ? Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x2, y2].Layer.Length : 0; i2 < count3; i2++)
+                    for (int i2 = 0, count3 = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x2, y2].Layer != null ? Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x2, y2].Layer.Length : 0; i2 < count3; i2++)
                     {
-                        ref var currentTile = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x2, y2];
+                        ref var currentTile = ref Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x2, y2];
                         ref var historyTile = ref Data.TileHistory![GameState.TileHistoryIndex].Tile[x2, y2];
 
                         // Check Layer array length for both tiles
@@ -630,7 +630,7 @@ namespace Client
                 if (GameState.EditorStampTileset is not null && GameState.EditorStampX is not null && GameState.EditorStampY is not null && GameState.EditorStampAutoTile is not null)
                 {
                     bool anyAutotile = false;
-                    int mapIndex = GetPlayerMap(GameState.MyIndex);
+                    int mapIndex = GetMap(GameState.MyIndex);
                     var map = Client.Map.Instance[mapIndex];
 
                     for (int dy = 0; dy < stampH; dy++)
@@ -673,7 +673,7 @@ namespace Client
 
             if (theAutotile > 0)
             {
-                ref var instance = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y];
+                ref var instance = ref Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y];
                 // set layer
                 instance.Layer[CurLayer].X = newTileX;
                 instance.Layer[CurLayer].Y = newTileY;
@@ -695,7 +695,7 @@ namespace Client
 
             if (!multitile) // single
             {
-                ref var instance1 = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y];
+                ref var instance1 = ref Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y];
                 // set layer
                 instance1.Layer[CurLayer].X = newTileX;
                 instance1.Layer[CurLayer].Y = newTileY;
@@ -720,11 +720,11 @@ namespace Client
                     var count2 = GameState.CurX + GameState.EditorTileWidth;
                     for (x = GameState.CurX; x < count2; x++)
                     {
-                        if (x >= 0 & x < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX)
+                        if (x >= 0 & x < Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX)
                         {
-                            if (y >= 0 & y < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)
+                            if (y >= 0 & y < Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY)
                             {
-                                ref var instance2 = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y];
+                                ref var instance2 = ref Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y];
                                 instance2.Layer[CurLayer].X = newTileX + x2;
                                 instance2.Layer[CurLayer].Y = newTileY + y2;
                                 if (Conversions.ToBoolean(eraseTile))
@@ -787,7 +787,7 @@ namespace Client
             CurLayer = GameState.CurLayer;
 
             {
-                ref var instance = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY];
+                ref var instance = ref Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY];
                 // Set tileset and directly apply the picked tile indices without invoking tileset-offset logic
                 GameState.CurTileset = instance.Layer[CurLayer].Tileset;
                 GameState.EditorTileX = instance.Layer[CurLayer].X;
@@ -823,7 +823,7 @@ namespace Client
         public static void MapEditorEyeDropper(int startX, int startY, int endX, int endY)
         {
             int layer = GameState.CurLayer;
-            int mapIndex = GetPlayerMap(GameState.MyIndex);
+            int mapIndex = GetMap(GameState.MyIndex);
             var map = Client.Map.Instance[mapIndex];
 
             int minX = Math.Min(startX, endX);
@@ -888,13 +888,13 @@ namespace Client
 
             int layerCount = Enum.GetValues(typeof(MapLayer)).Length;
 
-            for (int x = 0, count = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX; x < count; x++)
+            for (int x = 0, count = Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX; x < count; x++)
             {
-                for (int y = 0, count2 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY; y < count2; y++)
+                for (int y = 0, count2 = Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY; y < count2; y++)
                 {
                     for (int i = 0; i < layerCount; i++)
                     {
-                        ref var currentTile = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y];
+                        ref var currentTile = ref Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y];
                         ref var historyTile = ref Data.TileHistory![GameState.TileHistoryIndex].Tile[x, y];
 
                         if (currentTile.Layer == null || currentTile.Layer.Length <= i || historyTile.Layer == null || historyTile.Layer.Length <= i)
@@ -964,13 +964,13 @@ namespace Client
 
             int layerCount = Enum.GetValues(typeof(MapLayer)).Length;
 
-            for (int x = 0, count = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX; x < count; x++)
+            for (int x = 0, count = Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX; x < count; x++)
             {
-                for (int y = 0, count2 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY; y < count2; y++)
+                for (int y = 0, count2 = Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY; y < count2; y++)
                 {
                     for (int i = 0; i < layerCount; i++)
                     {
-                        ref var currentTile = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y];
+                        ref var currentTile = ref Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y];
                         ref var historyTile = ref Data.TileHistory![GameState.TileHistoryIndex].Tile[x, y];
 
                         if (currentTile.Layer == null || currentTile.Layer.Length <= i || historyTile.Layer == null || historyTile.Layer.Length <= i)
@@ -1037,17 +1037,17 @@ namespace Client
             int layerCount = Enum.GetValues(typeof(MapLayer)).Length;
 
             // Always copy (no implicit paste on second click)
-            Data.TempTile = new Type.Tile[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY];
-            GameState.TmpMaxX = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
-            GameState.TmpMaxY = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+            Data.TempTile = new Type.Tile[Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX, Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY];
+            GameState.TmpMaxX = Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX;
+            GameState.TmpMaxY = Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY;
 
-            var count = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
+            var count = (int)Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX;
             for (x = 0; x < count; x++)
             {
-                var count2 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+                var count2 = (int)Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY;
                 for (y = 0; y < count2; y++)
                 {
-                    ref var instance = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y];
+                    ref var instance = ref Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y];
                     Data.TempTile[x, y].Layer = new Type.Layer[layerCount];
 
                     Data.TempTile[x, y].Data1 = instance.Data1;
@@ -1085,17 +1085,17 @@ namespace Client
             int i, x, y;
             int layerCount = Enum.GetValues(typeof(MapLayer)).Length;
 
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX = GameState.TmpMaxX;
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY = GameState.TmpMaxY;
+            Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX = GameState.TmpMaxX;
+            Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY = GameState.TmpMaxY;
 
-            var count2 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
+            var count2 = (int)Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX;
             for (x = 0; x < count2; x++)
             {
-                var count3 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+                var count3 = (int)Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY;
                 for (y = 0; y < count3; y++)
                 {
-                    ref var instance1 = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y];
-                    Array.Resize(ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer, layerCount);
+                    ref var instance1 = ref Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y];
+                    Array.Resize(ref Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer, layerCount);
                     Array.Resize(ref Data.Autotile![x, y].Layer, layerCount);
 
                     instance1.Data1 = Data.TempTile![x, y].Data1;
@@ -1131,23 +1131,23 @@ namespace Client
         /// <param name="tileY">The new Y coordinate to set.</param>
         public static void MapEditorReplaceTile(MapLayer layer, int tileX, int tileY, Core.Globals.Type.Tile oldTile)
         {
-            int maxX = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
-            int maxY = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+            int maxX = Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX;
+            int maxY = Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY;
 
             for (int x = 0; x < maxX; x++)
             {
                 for (int y = 0; y < maxY; y++)
                 {
-                    ref var tile = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y];
+                    ref var tile = ref Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y];
                     if ((int)MapEditorTab.Tiles == GameState.MapEditorTab)
                     {
                         if (tile.Layer[(int)layer].X == oldTile.Layer[(int)layer].X && tile.Layer[(int)layer].Y == oldTile.Layer[(int)layer].Y)
                         {
                             if (GameClient.IsMouseButtonDown(MouseButton.Left))
                             {
-                                tile.Layer[(int)layer].X = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[tileX, tileY].Layer[(int)layer].X;
-                                tile.Layer[(int)layer].Y = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[tileX, tileY].Layer[(int)layer].Y;
-                                tile.Layer[(int)layer].Tileset = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[tileX, tileY].Layer[(int)layer].Tileset;
+                                tile.Layer[(int)layer].X = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[tileX, tileY].Layer[(int)layer].X;
+                                tile.Layer[(int)layer].Y = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[tileX, tileY].Layer[(int)layer].Y;
+                                tile.Layer[(int)layer].Tileset = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[tileX, tileY].Layer[(int)layer].Tileset;
                             }
                             else if (GameClient.IsMouseButtonDown(MouseButton.Right))
                             {
@@ -1170,17 +1170,17 @@ namespace Client
                         {
                             if (GameState.EditorAttribute == 1)
                             {
-                                tile.Data1 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[tileX, tileY].Data1;
-                                tile.Data2 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[tileX, tileY].Data2;
-                                tile.Data3 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[tileX, tileY].Data3;
-                                tile.Type = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[tileX, tileY].Type;
+                                tile.Data1 = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[tileX, tileY].Data1;
+                                tile.Data2 = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[tileX, tileY].Data2;
+                                tile.Data3 = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[tileX, tileY].Data3;
+                                tile.Type = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[tileX, tileY].Type;
                             }
                             else
                             {
-                                tile.Data1_2 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[tileX, tileY].Data1_2;
-                                tile.Data2_2 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[tileX, tileY].Data2_2;
-                                tile.Data3_2 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[tileX, tileY].Data3_2;
-                                tile.Type2 = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[tileX, tileY].Type2;
+                                tile.Data1_2 = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[tileX, tileY].Data1_2;
+                                tile.Data2_2 = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[tileX, tileY].Data2_2;
+                                tile.Data3_2 = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[tileX, tileY].Data3_2;
+                                tile.Type2 = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[tileX, tileY].Type2;
                             }
                         }
 

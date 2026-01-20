@@ -285,15 +285,15 @@ namespace Client
             int count;
             int i;
 
-            count = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount;
+            count = Client.Map.Instance[GetMap(GameState.MyIndex)].EventCount;
             if (count == 0)
                 return;
 
             for (i = 0; i < count; i++)
             {
-                if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].X == X & Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Y == Y)
+                if (Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].X == X & Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Y == Y)
                 {
-                    CopyEvent = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i];
+                    CopyEvent = Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i];
                     return;
                 }
             }
@@ -305,13 +305,13 @@ namespace Client
             int i;
             int EventNum = -1;
 
-            count = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount;
+            count = Client.Map.Instance[GetMap(GameState.MyIndex)].EventCount;
 
             if (count > 0)
             {
                 for (i = 0; i < count; i++)
                 {
-                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].X == x & Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Y == y)
+                    if (Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].X == x & Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Y == y)
                     {
                         EventNum = i;
                     }
@@ -323,15 +323,15 @@ namespace Client
             {
                 AddEvent(x, y, true);
                 // Index of the newly added event is the last valid slot (0-based)
-                EventNum = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount - 1;
+                EventNum = Client.Map.Instance[GetMap(GameState.MyIndex)].EventCount - 1;
             }
 
             // copy it
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[EventNum] = CopyEvent;
+            Client.Map.Instance[GetMap(GameState.MyIndex)].Event[EventNum] = CopyEvent;
 
             // set position
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[EventNum].X = x;
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[EventNum].Y = y;
+            Client.Map.Instance[GetMap(GameState.MyIndex)].Event[EventNum].X = x;
+            Client.Map.Instance[GetMap(GameState.MyIndex)].Event[EventNum].Y = y;
         }
 
         public static void DeleteEvent(int X, int Y)
@@ -339,7 +339,7 @@ namespace Client
             if (GameState.MyEditorType != EditorType.Map)
                 return;
 
-            int mapIndex = GetPlayerMap(GameState.MyIndex);
+            int mapIndex = GetMap(GameState.MyIndex);
             var map = Client.Map.Instance[mapIndex];
 
             int count = map.EventCount;
@@ -393,14 +393,14 @@ namespace Client
             if (Event.InEvent)
                 return;
 
-            count = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount;
+            count = Client.Map.Instance[GetMap(GameState.MyIndex)].EventCount;
 
             // make sure there's not already an event
             if (count > 0)
             {
                 for (i = 0; i < count; i++)
                 {
-                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].X == X & Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Y == Y)
+                    if (Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].X == X & Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Y == Y)
                     {
                         // already an event - edit it
                         if (!cancelLoad)
@@ -424,14 +424,14 @@ namespace Client
                 count++;
             }
 
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount = count;
-            Array.Resize(ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event, count + 1);
+            Client.Map.Instance[GetMap(GameState.MyIndex)].EventCount = count;
+            Array.Resize(ref Client.Map.Instance[GetMap(GameState.MyIndex)].Event, count + 1);
             Array.Resize(ref Data.MapEvents, count + 1);
             // Initialize the newly added event slot (0-based index is count - 1)
             ClearEvent(count - 1);
             // set the new event
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[count - 1].X = X;
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[count - 1].Y = Y;
+            Client.Map.Instance[GetMap(GameState.MyIndex)].Event[count - 1].X = X;
+            Client.Map.Instance[GetMap(GameState.MyIndex)].Event[count - 1].Y = Y;
             // ClearEvent already initialized a single page (PageCount=1),
             // so do NOT add another page here. New events should start with exactly 1 page.
             // load the editor
@@ -445,7 +445,7 @@ namespace Client
 
         public static void ClearEvent(int eventNum)
         {
-            ref var instance = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[eventNum];
+            ref var instance = ref Client.Map.Instance[GetMap(GameState.MyIndex)].Event[eventNum];
             instance.Name = "";
             instance.PageCount = 1;
             instance.Pages = new Type.EventPage[1];
@@ -463,21 +463,21 @@ namespace Client
             EditorId = EventNum;
             
             // Check if Event array is null or EventNum is out of bounds
-            if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event == null || EventNum < 0 || EventNum >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event.Length)
+            if (Client.Map.Instance[GetMap(GameState.MyIndex)].Event == null || EventNum < 0 || EventNum >= Client.Map.Instance[GetMap(GameState.MyIndex)].Event.Length)
             {
                 // Initialize with a default empty event
                 Instance = new Type.Event();
                 return;
             }
             
-            Instance = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[EventNum];
+            Instance = Client.Map.Instance[GetMap(GameState.MyIndex)].Event[EventNum];
         }
 
 
         public static void EventEditorOK()
         {
             // copy the event data from the temp event
-            Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[EditorId] = Instance;
+            Client.Map.Instance[GetMap(GameState.MyIndex)].Event[EditorId] = Instance;
         }
 
         #endregion
@@ -489,7 +489,7 @@ namespace Client
             if (id < 0) return;
             if (Data.MapEvents == null) return;
             if (id >= Data.MapEvents.Length) return;
-            var map = GetPlayerMap(GameState.MyIndex);
+            var map = GetMap(GameState.MyIndex);
             if (map < 0 || map >= Client.Map.Instance.Count) return;
             if (id >= Client.Map.Instance[map].EventCount) return;
 
@@ -735,22 +735,22 @@ namespace Client
 
         public static void OnDraw()
         {
-            if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event == null)
+            if (Client.Map.Instance[GetMap(GameState.MyIndex)].Event == null)
                 return;
 
             // Iterate only actual events to avoid drawing the trailing empty slot
-            int count = Math.Max(0, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].EventCount);
+            int count = Math.Max(0, Client.Map.Instance[GetMap(GameState.MyIndex)].EventCount);
             for (int i = 0; i < count; i++)
             {
-                if (i >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event.Length)
+                if (i >= Client.Map.Instance[GetMap(GameState.MyIndex)].Event.Length)
                     break;
                     
                 // Treat MyMap.Event.X/Y as tile coordinates; compute world pixel coordinates
-                int worldX = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].X * Constants.TileSize;
-                int worldY = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Y * Constants.TileSize;
+                int worldX = Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].X * Constants.TileSize;
+                int worldY = Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Y * Constants.TileSize;
 
                 // Skip event if there are no pages
-                if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].PageCount <= 0)
+                if (Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].PageCount <= 0)
                 {
                     continue;
                 }
@@ -760,7 +760,7 @@ namespace Client
                 int screenY = GameLogic.ConvertMapY(worldY);
 
                 // Render event based on its graphic type
-                switch (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i].Pages[0].GraphicType)
+                switch (Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i].Pages[0].GraphicType)
                 {
                     case 0: // Text Event (draw simple 'E' at the tile origin like other 32x32 textures)
                     {
@@ -770,13 +770,13 @@ namespace Client
 
                     case 1: // Character Graphic
                     {
-                        GameClient.RenderCharacterGraphic(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i], screenX, screenY);
+                        GameClient.RenderCharacterGraphic(Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i], screenX, screenY);
                         break;
                     }
 
                     case 2: // Tileset Graphic
                     {
-                        GameClient.RenderTilesetGraphic(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Event[i], screenX, screenY);
+                        GameClient.RenderTilesetGraphic(Client.Map.Instance[GetMap(GameState.MyIndex)].Event[i], screenX, screenY);
                         break;
                     }
 

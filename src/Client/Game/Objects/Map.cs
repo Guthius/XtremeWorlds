@@ -67,11 +67,11 @@ namespace Client
                 return;
 
             // Ensure x and y are within the bounds of the map
-            if (x < 0 || y < 0 || x >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX || y >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)
+            if (x < 0 || y < 0 || x >= Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX || y >= Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY)
                 return;
 
             // Check for null Layer arrays (cannot check struct for null, but can check Layer property)
-            if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer == null)
+            if (Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer == null)
                 return;
 
             if (Data.Autotile?[x, y].Layer == null)
@@ -89,15 +89,15 @@ namespace Client
                         switch (i)
                         {
                             case (int) MapLayer.Mask:
-                                if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer != null &&
-                                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer.Length > (int) MapLayer.MaskAnimation &&
-                                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[(int) MapLayer.MaskAnimation].Tileset > 0)
+                                if (Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer != null &&
+                                    Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer.Length > (int) MapLayer.MaskAnimation &&
+                                    Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[(int) MapLayer.MaskAnimation].Tileset > 0)
                                     layerIndex = (int) MapLayer.MaskAnimation;
                                 break;
                             case (int) MapLayer.Cover:
-                                if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer != null &&
-                                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer.Length > (int) MapLayer.CoverAnimation &&
-                                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[(int) MapLayer.CoverAnimation].Tileset > 0)
+                                if (Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer != null &&
+                                    Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer.Length > (int) MapLayer.CoverAnimation &&
+                                    Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[(int) MapLayer.CoverAnimation].Tileset > 0)
                                     layerIndex = (int) MapLayer.CoverAnimation;
                                 break;
                         }
@@ -110,18 +110,18 @@ namespace Client
                     }
 
                     // Check if this layer has a valid tileset and array is large enough
-                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer != null &&
-                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer.Length > layerIndex &&
+                    if (Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer != null &&
+                        Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer.Length > layerIndex &&
                         Data.Autotile[x, y].Layer != null &&
                         Data.Autotile[x, y].Layer.Length > layerIndex &&
-                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[layerIndex].Tileset > 0 &&
-                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[layerIndex].Tileset <= GameState.NumTileSets)
+                        Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[layerIndex].Tileset > 0 &&
+                        Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[layerIndex].Tileset <= GameState.NumTileSets)
                     {
                         // Normal rendering state
                         if (Data.Autotile[x, y].Layer[layerIndex].RenderState == GameState.RenderStateNormal)
                         {
-                            rect.X = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[layerIndex].X * Constants.TileSize;
-                            rect.Y = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[layerIndex].Y * Constants.TileSize;
+                            rect.X = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[layerIndex].X * Constants.TileSize;
+                            rect.Y = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[layerIndex].Y * Constants.TileSize;
                             rect.Width = Constants.TileSize;
                             rect.Height = Constants.TileSize;
 
@@ -139,7 +139,7 @@ namespace Client
                             }
 
                             // Render the tile
-                            string argPath = System.IO.Path.Combine(DataPath.Tilesets, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[layerIndex].Tileset.ToString());
+                            string argPath = System.IO.Path.Combine(DataPath.Tilesets, Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[layerIndex].Tileset.ToString());
                             GameClient.RenderTexture(ref argPath, GameLogic.ConvertMapX(x * Constants.TileSize), GameLogic.ConvertMapY(y * Constants.TileSize), rect.X, rect.Y, rect.Width, rect.Height, rect.Width, rect.Height, alpha);
                         }
 
@@ -174,11 +174,11 @@ namespace Client
                 return;
 
             // Ensure x and y are within valid map bounds
-            if (x < 0 || y < 0 || x >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX || y >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)
+            if (x < 0 || y < 0 || x >= Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX || y >= Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY)
                 return;
 
             // Check for null Layer arrays (cannot check struct for null, but can check Layer property)
-            if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer == null)
+            if (Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer == null)
                 return;
 
             if (Data.Autotile?[x, y].Layer == null)
@@ -197,13 +197,13 @@ namespace Client
                         switch (i)
                         {
                             case (int) MapLayer.Fringe:
-                                if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer?.Length > (int) MapLayer.FringeAnimation &&
-                                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[(int) MapLayer.FringeAnimation].Tileset > 0)
+                                if (Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer?.Length > (int) MapLayer.FringeAnimation &&
+                                    Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[(int) MapLayer.FringeAnimation].Tileset > 0)
                                     layerIndex = (int) MapLayer.FringeAnimation;
                                 break;
                             case (int) MapLayer.Roof:
-                                if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer.Length > (int) MapLayer.RoofAnimation &&
-                                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[(int) MapLayer.RoofAnimation].Tileset > 0)
+                                if (Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer.Length > (int) MapLayer.RoofAnimation &&
+                                    Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[(int) MapLayer.RoofAnimation].Tileset > 0)
                                     layerIndex = (int) MapLayer.RoofAnimation;
                                 break;
                         }
@@ -216,18 +216,18 @@ namespace Client
                     }
 
                     // Check if this layer has a valid tileset and array is large enough
-                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer != null &&
-                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer.Length > layerIndex &&
+                    if (Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer != null &&
+                        Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer.Length > layerIndex &&
                         Data.Autotile[x, y].Layer != null &&
                         Data.Autotile[x, y].Layer.Length > layerIndex &&
-                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[layerIndex].Tileset > 0 &&
-                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[layerIndex].Tileset <= GameState.NumTileSets)
+                        Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[layerIndex].Tileset > 0 &&
+                        Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[layerIndex].Tileset <= GameState.NumTileSets)
                     {
                         // Check if the render state is normal and render the tile
                         if (Data.Autotile[x, y].Layer[layerIndex].RenderState == GameState.RenderStateNormal)
                         {
-                            rect.X = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[layerIndex].X * Constants.TileSize;
-                            rect.Y = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[layerIndex].Y * Constants.TileSize;
+                            rect.X = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[layerIndex].X * Constants.TileSize;
+                            rect.Y = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[layerIndex].Y * Constants.TileSize;
                             rect.Width = Constants.TileSize;
                             rect.Height = Constants.TileSize;
 
@@ -245,7 +245,7 @@ namespace Client
                             }
 
                             // Render the tile with the calculated rectangle and transparency
-                            string argPath = System.IO.Path.Combine(DataPath.Tilesets, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[layerIndex].Tileset.ToString());
+                            string argPath = System.IO.Path.Combine(DataPath.Tilesets, Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[layerIndex].Tileset.ToString());
                             GameClient.RenderTexture(ref argPath, GameLogic.ConvertMapX(x * Constants.TileSize), GameLogic.ConvertMapY(y * Constants.TileSize), rect.X, rect.Y, rect.Width, rect.Height, rect.Width, rect.Height, alpha);
                         }
                         // Handle autotile rendering
@@ -270,7 +270,7 @@ namespace Client
         }
         public static void DrawMapTint()
         {
-            if (Conversions.ToInteger(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTint) == 0)
+            if (Conversions.ToInteger(Client.Map.Instance[GetMap(GameState.MyIndex)].MapTint) == 0)
                 return; // Skip if no tint is applied
 
             var tintColor = new Microsoft.Xna.Framework.Color(GameState.CurrentTintR, GameState.CurrentTintG, GameState.CurrentTintB, GameState.CurrentTintA);
@@ -298,7 +298,7 @@ namespace Client
 
         public static void DrawPanorama(int index)
         {
-            if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Indoors)
+            if (Client.Map.Instance[GetMap(GameState.MyIndex)].Indoors)
                 return;
 
             if (index < 1 | index > GameState.NumPanoramas)
@@ -318,7 +318,7 @@ namespace Client
             float horz = 0f;
             float vert = 0f;
 
-            if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Moral == Conversions.ToShort(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Indoors))
+            if (Client.Map.Instance[GetMap(GameState.MyIndex)].Moral == Conversions.ToShort(Client.Map.Instance[GetMap(GameState.MyIndex)].Indoors))
                 return;
 
             if (index < 1 | index > GameState.NumParallax)

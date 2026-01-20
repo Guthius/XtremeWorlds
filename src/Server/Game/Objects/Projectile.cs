@@ -88,7 +88,7 @@ public class Projectile : ProjectileBase, IAsyncData
         foreach (var p in playersSnapshot)
         {
             if (!NetworkConfig.IsPlaying(p.Id)) continue;
-            if (GetPlayerMap(p.Id) != map) continue;
+            if (GetMap(p.Id) != map) continue;
             if (GetPlayerX(p.Id) == tileX && GetPlayerY(p.Id) == tileY)
             {
                 if (!(mp.OwnerType == (byte)TargetType.Player && mp.Owner == p.Id))
@@ -189,7 +189,7 @@ public class Projectile : ProjectileBase, IAsyncData
 
     public static void OnFireFreeAim(int playerId, short vx, short vy, int itemNum)
     {
-        var map = GetPlayerMap(playerId);
+        var map = GetMap(playerId);
         var mapProjectileNum = -1;
         for (var i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
         {
@@ -231,7 +231,7 @@ public class Projectile : ProjectileBase, IAsyncData
 
     public static void OnFreeAim(int playerId, short vx, short vy, int itemNum, int destX, int destY)
     {
-        var map = GetPlayerMap(playerId);
+        var map = GetMap(playerId);
         var mapProjectileNum = -1;
         for (var i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
         {
@@ -271,7 +271,7 @@ public class Projectile : ProjectileBase, IAsyncData
 
     public static void OnShoot(int playerId, int itemNum, int skillNum = -1, int dir = -1, bool suppressCooldown = false)
     {
-        var map = GetPlayerMap(playerId);
+        var map = GetMap(playerId);
         var mapProjectileNum = -1;
         for (var i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
         {
@@ -564,7 +564,7 @@ public class Projectile : ProjectileBase, IAsyncData
                         continue;
 
                     if (!NetworkConfig.IsPlaying(p.Id)) continue;
-                    if (GetPlayerMap(p.Id) != x) continue;
+                    if (GetMap(p.Id) != x) continue;
                     if (GetPlayerX(p.Id) == tileX && GetPlayerY(p.Id) == tileY)
                     {
                         // Don't hit owner player

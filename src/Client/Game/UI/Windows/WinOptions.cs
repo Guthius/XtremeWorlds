@@ -69,7 +69,7 @@ public class WinOptions
             {
                 TextRenderer.AddText("Music tured on.", (int) ColorName.BrightGreen);
 
-                var music = GameState.InGame ? Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Music : SettingsManager.Instance.Music.ToString();
+                var music = GameState.InGame ? Client.Map.Instance[GetMap(GameState.MyIndex)].Music : SettingsManager.Instance.Music.ToString();
                 if (music != "None.")
                 {
                     Audio.PlayMusic(music);

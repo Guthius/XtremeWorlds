@@ -163,7 +163,7 @@ public class WinMapEditor
             if (GameState.EditorStampTileset is not null && GameState.EditorStampX is not null && GameState.EditorStampY is not null && GameState.EditorStampAutoTile is not null)
             {
                 bool anyAutotile = false;
-                int mapIndex = GetPlayerMap(GameState.MyIndex);
+                int mapIndex = GetMap(GameState.MyIndex);
                 var map = Client.Map.Instance[mapIndex];
 
                 for (int dy = 0; dy < stampH; dy++)
@@ -227,7 +227,7 @@ public class WinMapEditor
         var count = GameState.CurY + GameState.EditorTileHeight;
         for (int y3 = GameState.CurY; y3 < count; y3++)
         {
-            if (y3 >= 0 & y3 < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)
+            if (y3 >= 0 & y3 < Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY)
             {
                 y2 = y3 - GameState.CurY;
                 x2 = 0;
@@ -235,11 +235,11 @@ public class WinMapEditor
                 var count2 = GameState.CurX + GameState.EditorTileWidth;
                 for (x = GameState.CurX; x < count2; x++)
                 {
-                    if (x >= 0 & x < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX)
+                    if (x >= 0 & x < Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX)
                     {
-                        if (y3 >= 0 & y3 < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)
+                        if (y3 >= 0 & y3 < Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY)
                         {
-                            ref var instance2 = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y3];
+                            ref var instance2 = ref Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y3];
                             instance2.Layer[CurLayer].X = newTileX + x2;
                             instance2.Layer[CurLayer].Y = newTileY + y2;
                             if (Conversions.ToBoolean(eraseTile))
@@ -302,7 +302,7 @@ public class WinMapEditor
         CurLayer = GameState.CurLayer;
 
         {
-            ref var instance = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY];
+            ref var instance = ref Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[GameState.CurX, GameState.CurY];
             // Set tileset and directly apply the picked tile indices without invoking tileset-offset logic
             GameState.CurTileset = instance.Layer[CurLayer].Tileset;
             GameState.EditorTileX = instance.Layer[CurLayer].X;
@@ -338,7 +338,7 @@ public class WinMapEditor
     public static void OnEyeDropper(int startX, int startY, int endX, int endY)
     {
         int layer = GameState.CurLayer;
-        int mapIndex = GetPlayerMap(GameState.MyIndex);
+        int mapIndex = GetMap(GameState.MyIndex);
         var map = Client.Map.Instance[mapIndex];
 
         int minX = Math.Min(startX, endX);
@@ -403,17 +403,17 @@ public class WinMapEditor
         int layerCount = Enum.GetValues(typeof(MapLayer)).Length;
 
         // Always copy (no implicit paste on second click)
-        Data.TempTile = new Type.Tile[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY];
-        GameState.TmpMaxX = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
-        GameState.TmpMaxY = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+        Data.TempTile = new Type.Tile[Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX, Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY];
+        GameState.TmpMaxX = Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX;
+        GameState.TmpMaxY = Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY;
 
-        var count = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
+        var count = (int)Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX;
         for (x = 0; x < count; x++)
         {
-            var count2 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+            var count2 = (int)Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY;
             for (y = 0; y < count2; y++)
             {
-                ref var instance = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y];
+                ref var instance = ref Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y];
                 Data.TempTile[x, y].Layer = new Type.Layer[layerCount];
 
                 Data.TempTile[x, y].Data1 = instance.Data1;
@@ -451,17 +451,17 @@ public class WinMapEditor
         int i, x, y;
         int layerCount = Enum.GetValues(typeof(MapLayer)).Length;
 
-        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX = GameState.TmpMaxX;
-        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY = GameState.TmpMaxY;
+        Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX = GameState.TmpMaxX;
+        Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY = GameState.TmpMaxY;
 
-        var count2 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
+        var count2 = (int)Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX;
         for (x = 0; x < count2; x++)
         {
-            var count3 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+            var count3 = (int)Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY;
             for (y = 0; y < count3; y++)
             {
-                ref var instance1 = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y];
-                Array.Resize(ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer, layerCount);
+                ref var instance1 = ref Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y];
+                Array.Resize(ref Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer, layerCount);
                 Array.Resize(ref Data.Autotile![x, y].Layer, layerCount);
 
                 instance1.Data1 = Data.TempTile![x, y].Data1;
@@ -497,23 +497,23 @@ public class WinMapEditor
     /// <param name="tileY">The new Y coordinate to set.</param>
     public static void OnReplace(MapLayer layer, int tileX, int tileY, Core.Globals.Type.Tile oldTile)
     {
-        int maxX = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
-        int maxY = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+        int maxX = Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX;
+        int maxY = Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY;
 
         for (int x = 0; x < maxX; x++)
         {
             for (int y = 0; y < maxY; y++)
             {
-                ref var tile = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y];
+                ref var tile = ref Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y];
                 if ((int)MapEditorTab.Tiles == GameState.MapEditorTab)
                 {
                     if (tile.Layer[(int)layer].X == oldTile.Layer[(int)layer].X && tile.Layer[(int)layer].Y == oldTile.Layer[(int)layer].Y)
                     {
                         if (GameClient.IsMouseButtonDown(MouseButton.Left))
                         {
-                            tile.Layer[(int)layer].X = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[tileX, tileY].Layer[(int)layer].X;
-                            tile.Layer[(int)layer].Y = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[tileX, tileY].Layer[(int)layer].Y;
-                            tile.Layer[(int)layer].Tileset = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[tileX, tileY].Layer[(int)layer].Tileset;
+                            tile.Layer[(int)layer].X = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[tileX, tileY].Layer[(int)layer].X;
+                            tile.Layer[(int)layer].Y = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[tileX, tileY].Layer[(int)layer].Y;
+                            tile.Layer[(int)layer].Tileset = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[tileX, tileY].Layer[(int)layer].Tileset;
                         }
                         else if (GameClient.IsMouseButtonDown(MouseButton.Right))
                         {
@@ -557,10 +557,10 @@ public class WinMapEditor
             cmbNpc.CallBack[(int)ControlState.MouseMove] = () =>
             {
                 int slotIndex = NpcSelectedSlot;
-                if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc != null && slotIndex >= 0 && slotIndex < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc.Length)
+                if (Client.Map.Instance[GetMap(GameState.MyIndex)].Npc != null && slotIndex >= 0 && slotIndex < Client.Map.Instance[GetMap(GameState.MyIndex)].Npc.Length)
                 {
                     int npcIndex = cmbNpc.Value - 1; // 0 = None
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[slotIndex] = npcIndex;
+                    Client.Map.Instance[GetMap(GameState.MyIndex)].Npc[slotIndex] = npcIndex;
 
                     if (WindowManager.TryGetControl("winMapEditor", "lstIndex", out var lstIndex) && lstIndex is ListBox lst)
                     {
@@ -596,8 +596,8 @@ public class WinMapEditor
             string name = "None";
             try
             {
-                int npcIndex = (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc != null && slot < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc.Length)
-                    ? Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[slot]
+                int npcIndex = (Client.Map.Instance[GetMap(GameState.MyIndex)].Npc != null && slot < Client.Map.Instance[GetMap(GameState.MyIndex)].Npc.Length)
+                    ? Client.Map.Instance[GetMap(GameState.MyIndex)].Npc[slot]
                     : -1;
 
                 var npcs = Npc.Instance;
@@ -619,7 +619,7 @@ public class WinMapEditor
         byte autotile = (byte)GameState.CurAutotileType;
         byte tileX = (byte)GameState.EditorTileX;
         byte tileY = (byte)GameState.EditorTileY;
-        int tileset = GameState.CurTileset > 0 ? GameState.CurTileset : Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tileset;
+        int tileset = GameState.CurTileset > 0 ? GameState.CurTileset : Client.Map.Instance[GetMap(GameState.MyIndex)].Tileset;
         GameLogic.Dialogue("Map Editor", $"Fill Layer: {layer}", "Are you sure you wish to fill this layer?", DialogueType.FillLayer, DialogueStyle.YesNo, GameState.CurLayer, autotile, tileX, tileY, tileset);
     }
 
@@ -644,7 +644,7 @@ public class WinMapEditor
 
     public static void ResizeMap(byte newMaxX, byte newMaxY, bool updateControls = true)
     {
-        var mapIndex = GetPlayerMap(GameState.MyIndex);
+        var mapIndex = GetMap(GameState.MyIndex);
         if (Client.Map.Instance.Count <= mapIndex)
             return;
 
@@ -738,7 +738,7 @@ public class WinMapEditor
         if (!WindowManager.TryGetControl("winMapEditor", "picTileset", out var ctrl)) return;
 
         int tilesetIndex = GameState.CurTileset;
-        if (tilesetIndex <= 0) tilesetIndex = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tileset;
+        if (tilesetIndex <= 0) tilesetIndex = Client.Map.Instance[GetMap(GameState.MyIndex)].Tileset;
         if (tilesetIndex <= 0) return;
 
         // Build tileset path (extension added by GetGfxInfo / RenderTexture)
@@ -835,7 +835,7 @@ public class WinMapEditor
 
         // Compute current tileset source rect and horizontal centering offset
         int tilesetIndex = GameState.CurTileset;
-        if (tilesetIndex <= 0) tilesetIndex = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tileset;
+        if (tilesetIndex <= 0) tilesetIndex = Client.Map.Instance[GetMap(GameState.MyIndex)].Tileset;
         if (tilesetIndex <= 0) tilesetIndex = 1;
         var path = System.IO.Path.Combine(DataPath.Tilesets, tilesetIndex.ToString());
         var info = GameClient.GetGfxInfo(path);
@@ -912,7 +912,7 @@ public class WinMapEditor
         if (relX < 0 || relY < 0 || relX >= ctrl.Width || relY >= ctrl.Height) return;
 
         int tilesetIndex = GameState.CurTileset;
-        if (tilesetIndex <= 0) tilesetIndex = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tileset;
+        if (tilesetIndex <= 0) tilesetIndex = Client.Map.Instance[GetMap(GameState.MyIndex)].Tileset;
         if (tilesetIndex <= 0) tilesetIndex = 1;
         var path = System.IO.Path.Combine(DataPath.Tilesets, tilesetIndex.ToString());
         var info = GameClient.GetGfxInfo(path);
@@ -973,7 +973,7 @@ public class WinMapEditor
         if (win is null) return;
 
         int tilesetIndex = GameState.CurTileset;
-        if (tilesetIndex <= 0) tilesetIndex = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tileset;
+        if (tilesetIndex <= 0) tilesetIndex = Client.Map.Instance[GetMap(GameState.MyIndex)].Tileset;
         if (tilesetIndex <= 0) return;
 
         var path = System.IO.Path.Combine(DataPath.Tilesets, tilesetIndex.ToString());
@@ -1018,7 +1018,7 @@ public class WinMapEditor
 
     public static void OnLoad()
     {
-        var map = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)];
+        var map = Client.Map.Instance[GetMap(GameState.MyIndex)];
 
         GameState.CurTileset = 1;
         map.Tileset = 1;
@@ -1108,8 +1108,8 @@ public class WinMapEditor
         if (WindowManager.TryGetControl("winMapEditor", "cmbNpcList", out var npcCtrl) && npcCtrl is ComboBox cmbNpc)
         {
             int assigned = -1;
-            if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc != null && index < Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc.Length)
-                assigned = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[index];
+            if (Client.Map.Instance[GetMap(GameState.MyIndex)].Npc != null && index < Client.Map.Instance[GetMap(GameState.MyIndex)].Npc.Length)
+                assigned = Client.Map.Instance[GetMap(GameState.MyIndex)].Npc[index];
             int desired = (assigned >= 0) ? assigned + 1 : 0;
             desired = Math.Clamp(desired, 0, cmbNpc.Items.Count - 1);
             cmbNpc.Value = desired;

@@ -568,7 +568,7 @@ public static class Loop
                         {
                             if (NetworkConfig.IsPlaying(player.Id))
                             {
-                                if (GetPlayerMap(player.Id) == map && entity.TargetType == 0 && GetPlayerAccess(player.Id) <= (byte)AccessLevel.Moderator)
+                                if (GetMap(player.Id) == map && entity.TargetType == 0 && GetPlayerAccess(player.Id) <= (byte)AccessLevel.Moderator)
                                 {
                                     // Detection range
                                     int n = entity.Range;
@@ -653,7 +653,7 @@ public static class Loop
                     if (entity.TargetType == (byte)TargetType.Player)
                     {
                         var pid = entity.Target;
-                        if (NetworkConfig.IsPlaying(pid) && GetPlayerMap(pid) == map)
+                        if (NetworkConfig.IsPlaying(pid) && GetMap(pid) == map)
                         {
                             if (pid < 0 || pid >= Server.Player.Instance.Count || Server.Player.Instance[pid].Dead)
                             {
@@ -961,7 +961,7 @@ public static class Loop
             bool moved = false;
 
             // If target exists but is out of range, clear it before deciding movement
-            if (baseNpc.TargetType == (byte)TargetType.Player && baseNpc.Target >= 0 && NetworkConfig.IsPlaying(baseNpc.Target) && GetPlayerMap(baseNpc.Target) == map)
+            if (baseNpc.TargetType == (byte)TargetType.Player && baseNpc.Target >= 0 && NetworkConfig.IsPlaying(baseNpc.Target) && GetMap(baseNpc.Target) == map)
             {
                 int sxR = baseNpc.X / Constants.TileSize;
                 int syR = baseNpc.Y / Constants.TileSize;
@@ -998,7 +998,7 @@ public static class Loop
             }
 
             // Read target info from persistent npc record
-            if (baseNpc.TargetType == (byte)TargetType.Player && baseNpc.Target >= 0 && NetworkConfig.IsPlaying(baseNpc.Target) && GetPlayerMap(baseNpc.Target) == map)
+            if (baseNpc.TargetType == (byte)TargetType.Player && baseNpc.Target >= 0 && NetworkConfig.IsPlaying(baseNpc.Target) && GetMap(baseNpc.Target) == map)
             {
                 int sx = baseNpc.X / Constants.TileSize;
                 int sy = baseNpc.Y / Constants.TileSize;

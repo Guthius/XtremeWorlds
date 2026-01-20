@@ -24,13 +24,13 @@ namespace Client
 
             for (int i = 0; i < GameState.MaxTileHistory; i++)
             {
-                Data.TileHistory[i].Tile = new Type.Tile[Client.Map.Instance[Commands.GetPlayerMap(GameState.MyIndex)].MaxX, Client.Map.Instance[Commands.GetPlayerMap(GameState.MyIndex)].MaxY];
+                Data.TileHistory[i].Tile = new Type.Tile[Client.Map.Instance[Commands.GetMap(GameState.MyIndex)].MaxX, Client.Map.Instance[Commands.GetMap(GameState.MyIndex)].MaxY];
             }
     
             // Clear map events
-            Data.MapEvents = new Type.MapEvent[Client.Map.Instance[Commands.GetPlayerMap(GameState.MyIndex)].EventCount];
+            Data.MapEvents = new Type.MapEvent[Client.Map.Instance[Commands.GetMap(GameState.MyIndex)].EventCount];
 
-            for (int i = 0, count = Client.Map.Instance[Commands.GetPlayerMap(GameState.MyIndex)].EventCount; i < count; i++)
+            for (int i = 0, count = Client.Map.Instance[Commands.GetMap(GameState.MyIndex)].EventCount; i < count; i++)
             {
                 Data.MapEvents = default;
             }

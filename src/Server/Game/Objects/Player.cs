@@ -136,7 +136,7 @@ public class Player : PlayerBase
         y = Math.Clamp(y, 0, Math.Max(0, mapData.MaxY - 1)) * 32;
 
         // Save old map to send erase player data to
-        var oldMap = GetPlayerMap(playerId);
+        var oldMap = GetMap(playerId);
         var changingMaps = oldMap != map;
 
         // Only reset event state when changing maps (or explicitly resending).
@@ -178,7 +178,7 @@ public class Player : PlayerBase
         {
             foreach (var otherPlayerId in PlayerService.Instance.PlayerIds)
             {
-                if (GetPlayerMap(otherPlayerId) == map)
+                if (GetMap(otherPlayerId) == map)
                 {
                     NetworkSend.MapEquipmentTo(otherPlayerId, playerId);
                 }
@@ -264,7 +264,7 @@ public class Player : PlayerBase
 
         SetPlayerDir(playerId, dir);
         var moved = false;
-        var map = GetPlayerMap(playerId);
+        var map = GetMap(playerId);
 
         // Map data is stored in a list; map id is not a guarantee that the list is populated.
         var mapCount = Server.Map.Instance.Count;
@@ -486,7 +486,7 @@ public class Player : PlayerBase
         }
 
         // Re-evaluate current map after potential warp.
-        var currentMap = GetPlayerMap(playerId);
+        var currentMap = GetMap(playerId);
         if (currentMap >= 0 && currentMap < Server.Map.Instance.Count &&
             Server.Map.Instance[currentMap].Tile != null &&
             GetPlayerX(playerId) >= 0 &&
@@ -592,7 +592,7 @@ public class Player : PlayerBase
                         Core.Globals.Vital.Mana => (int)ColorName.BrightBlue,
                         _ => (int)ColorName.Yellow
                     };
-                    NetworkSend.ActionMessage(GetPlayerMap(playerId), "+" + healAmount, color, (byte)ActionMessageType.Scroll, GetPlayerX(playerId) * 32, GetPlayerY(playerId) * 32, 1);
+                    NetworkSend.ActionMessage(GetMap(playerId), "+" + healAmount, color, (byte)ActionMessageType.Scroll, GetPlayerX(playerId) * 32, GetPlayerY(playerId) * 32, 1);
                     SetPlayerVital(playerId, hv, Math.Min(GetPlayerVital(playerId, hv) + healAmount, GetPlayerMaxVital(playerId, hv)));
                     NetworkSend.PlayerMessage(playerId, "You feel rejuvenating forces coursing through your body.", (int)ColorName.BrightGreen);
                     NetworkSend.Vital(playerId, hv);
@@ -616,7 +616,7 @@ public class Player : PlayerBase
             if (trapAmount > 0)
             {
                 var tv = (Vital)trapVital;
-                NetworkSend.ActionMessage(GetPlayerMap(playerId), "-" + trapAmount, (int)ColorName.BrightRed, (byte)ActionMessageType.Scroll, GetPlayerX(playerId) * 32, GetPlayerY(playerId) * 32, 1);
+                NetworkSend.ActionMessage(GetMap(playerId), "-" + trapAmount, (int)ColorName.BrightRed, (byte)ActionMessageType.Scroll, GetPlayerX(playerId) * 32, GetPlayerY(playerId) * 32, 1);
                 if (tv == Core.Globals.Vital.Health && GetPlayerVital(playerId, Core.Globals.Vital.Health) - trapAmount <= 0)
                 {
                     OnKill(playerId);
@@ -635,7 +635,7 @@ public class Player : PlayerBase
         // They tried to hack
         if (!moved || (expectingWarp && !didWarp))
         {
-            OnWarp(playerId, GetPlayerMap(playerId), GetPlayerX(playerId), GetPlayerY(playerId), (byte) Direction.Down);
+            OnWarp(playerId, GetMap(playerId), GetPlayerX(playerId), GetPlayerY(playerId), (byte) Direction.Down);
         }
 
         var wasMoving = Player.Instance[playerId].IsMoving;
@@ -696,7 +696,7 @@ public class Player : PlayerBase
                     if (otherPlayerId == playerId)
                         continue;
 
-                    if (GetPlayerMap(otherPlayerId) != map)
+                    if (GetMap(otherPlayerId) != map)
                         continue;
 
                     // Players are tracked in pixels and can be mid-step/off-grid.
@@ -848,7 +848,7 @@ public class Player : PlayerBase
 
     public static bool CanPickup(int playerId, int mapItem)
     {
-        var map = GetPlayerMap(playerId);
+        var map = GetMap(playerId);
 
         if (!Moral.Instance[Server.Map.Instance[map].Moral].CanPickupItem)
         {
@@ -873,7 +873,7 @@ public class Player : PlayerBase
 
     public static void OnGetItem(int playerId)
         {
-            var map = GetPlayerMap(playerId);
+            var map = GetMap(playerId);
 
             for (var i = 0; i < Core.Globals.Variables.MaxMapItems; i++)
             {
@@ -1040,7 +1040,7 @@ public class Player : PlayerBase
             return;
         }
 
-        if (!Moral.Instance[Server.Map.Instance[GetPlayerMap(playerId)].Moral].CanDropItem)
+        if (!Moral.Instance[Server.Map.Instance[GetMap(playerId)].Moral].CanDropItem)
         {
             NetworkSend.PlayerMessage(playerId, "You can't drop items here!", (int) ColorName.BrightRed);
             return;
@@ -1058,10 +1058,10 @@ public class Player : PlayerBase
             return;
         }
 
-        var slot = MapItem.FindOpenSlot(GetPlayerMap(playerId));
+        var slot = MapItem.FindOpenSlot(GetMap(playerId));
         if (slot != -1)
         {
-            var map = GetPlayerMap(playerId);
+            var map = GetMap(playerId);
             var item = Item.Instance[itemId];
             ref var mapItem = ref MapItem.Instance[map, slot];
 
@@ -1130,9 +1130,9 @@ public class Player : PlayerBase
 
     public static bool IsUsable(int playerId, int itemNum)
     {
-        if (Server.Map.Instance[GetPlayerMap(playerId)].Moral >= 0)
+        if (Server.Map.Instance[GetMap(playerId)].Moral >= 0)
         {
-            if (!Moral.Instance[Server.Map.Instance[GetPlayerMap(playerId)].Moral].CanUseItem)
+            if (!Moral.Instance[Server.Map.Instance[GetMap(playerId)].Moral].CanUseItem)
             {
                 NetworkSend.PlayerMessage(playerId, "You can't use items with this moral!", (int) ColorName.BrightRed);
                 return false;
@@ -1371,7 +1371,7 @@ public class Player : PlayerBase
         var oldMap = 0;
         try
         {
-            oldMap = GetPlayerMap(playerId);
+            oldMap = GetMap(playerId);
         }
         catch
         {

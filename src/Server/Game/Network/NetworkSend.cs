@@ -314,7 +314,7 @@ public static class NetworkSend
             packetWriter.WriteInt32(GetPlayerPaperdoll(playerId, (Equipment)i));
         }
 
-        NetworkConfig.SendDataToMap(GetPlayerMap(playerId), packetWriter.GetBytes());
+        NetworkConfig.SendDataToMap(GetMap(playerId), packetWriter.GetBytes());
     }
 
     public static void MapEquipmentTo(int equipmentPlayerId, int sendToPlayerId)
@@ -794,16 +794,16 @@ public static class NetworkSend
             }
         }
 
-        if (MapResource.Instance[GetPlayerMap(playerId)].ResourceCount > 0)
+        if (MapResource.Instance[GetMap(playerId)].ResourceCount > 0)
         {
             packetWriter.WriteInt32(1);
-            packetWriter.WriteInt32(MapResource.Instance[GetPlayerMap(playerId)].ResourceCount);
+            packetWriter.WriteInt32(MapResource.Instance[GetMap(playerId)].ResourceCount);
 
-            for (var i = 0; i < MapResource.Instance[GetPlayerMap(playerId)].ResourceCount; i++)
+            for (var i = 0; i < MapResource.Instance[GetMap(playerId)].ResourceCount; i++)
             {
-                packetWriter.WriteByte(MapResource.Instance[GetPlayerMap(playerId)].ResourceData[i].State);
-                packetWriter.WriteInt32(MapResource.Instance[GetPlayerMap(playerId)].ResourceData[i].X);
-                packetWriter.WriteInt32(MapResource.Instance[GetPlayerMap(playerId)].ResourceData[i].Y);
+                packetWriter.WriteByte(MapResource.Instance[GetMap(playerId)].ResourceData[i].State);
+                packetWriter.WriteInt32(MapResource.Instance[GetMap(playerId)].ResourceData[i].X);
+                packetWriter.WriteInt32(MapResource.Instance[GetMap(playerId)].ResourceData[i].Y);
             }
         }
         else
@@ -837,7 +837,7 @@ public static class NetworkSend
         packetWriter.WriteInt32(GetPlayerLevel(playerId));
         packetWriter.WriteInt32(GetPlayerPoints(playerId));
         packetWriter.WriteInt32(GetPlayerSprite(playerId));
-        packetWriter.WriteInt32(GetPlayerMap(playerId));
+        packetWriter.WriteInt32(GetMap(playerId));
         packetWriter.WriteByte(GetPlayerAccess(playerId));
         packetWriter.WriteBoolean(GetPlayerPk(playerId));
 
@@ -919,7 +919,7 @@ public static class NetworkSend
         }
         packetWriter.WriteSingle(mult);
 
-        NetworkConfig.SendDataToMap(GetPlayerMap(playerId), packetWriter.GetBytes());
+        NetworkConfig.SendDataToMap(GetMap(playerId), packetWriter.GetBytes());
     }
 
     public static void MapMessage(int map, string message)
@@ -1001,7 +1001,7 @@ public static class NetworkSend
 
     public static void PlayerData(int playerId)
     {
-        NetworkConfig.SendDataToMap(GetPlayerMap(playerId), GetPlayerDataPacket(playerId));
+        NetworkConfig.SendDataToMap(GetMap(playerId), GetPlayerDataPacket(playerId));
     }
 
     public static void InventoryUpdate(int playerId, int invSlot)
@@ -1264,7 +1264,7 @@ public static class NetworkSend
         packetWriter.WriteInt32(playerId);
         packetWriter.WriteInt32(emote);
 
-        NetworkConfig.SendDataToMap(GetPlayerMap(playerId), packetWriter.GetBytes());
+        NetworkConfig.SendDataToMap(GetMap(playerId), packetWriter.GetBytes());
     }
 
     public static void ChatBubble(int map, int target, int targetType, string message, int color)
@@ -1287,7 +1287,7 @@ public static class NetworkSend
         packetWriter.WriteEnum(ServerPackets.SAttack);
         packetWriter.WriteInt32(playerId);
 
-        NetworkConfig.SendDataToMapBut(playerId, GetPlayerMap(playerId), packetWriter.GetBytes());
+        NetworkConfig.SendDataToMapBut(playerId, GetMap(playerId), packetWriter.GetBytes());
     }
     
     public static void NpcAttack(int map, int npcIndex)
@@ -1783,7 +1783,7 @@ public static class NetworkSend
     {
         var buffer = new PacketWriter(4);
 
-        var map = GetPlayerMap(index);
+        var map = GetMap(index);
 
         buffer.WriteEnum(ServerPackets.SMapEventData);
 

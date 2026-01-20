@@ -734,7 +734,7 @@ namespace Client
 
                     float minZoom = 0.5f;
                     float maxZoom = 2.0f;
-                    int mapIndex = GetPlayerMap(GameState.MyIndex);
+                    int mapIndex = GetMap(GameState.MyIndex);
                     if (mapIndex >= 0 && mapIndex < Client.Map.Instance.Count)
                     {
                         minZoom = Client.Map.Instance[mapIndex].MinZoom;
@@ -1065,7 +1065,7 @@ namespace Client
                     int? clearTileY = null;
                     if (prevTargetType == (int)TargetType.Player)
                     {
-                        if (IsPlaying(prevTarget) && GetPlayerMap(prevTarget) == GetPlayerMap(GameState.MyIndex))
+                        if (IsPlaying(prevTarget) && GetMap(prevTarget) == GetMap(GameState.MyIndex))
                         {
                             clearTileX = GetPlayerX(prevTarget);
                             clearTileY = GetPlayerY(prevTarget);
@@ -1710,7 +1710,7 @@ namespace Client
 
             for (int i = 0; i < Player.Instance.Count; i++)
             {
-                if (IsPlaying(i) && GetPlayerMap(i) == GetPlayerMap(GameState.MyIndex))
+                if (IsPlaying(i) && GetMap(i) == GetMap(GameState.MyIndex))
                 {
                     if (GetPlayerX(i) == GameState.CurXGame && GetPlayerY(i) == GameState.CurYGame)
                     {
@@ -1950,7 +1950,7 @@ namespace Client
                 bool LocalIsDirBlocked()
                 {
                     byte argdir = (byte) i;
-                    var n = GameLogic.IsDirBlocked(ref Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].DirBlock, ref argdir);
+                    var n = GameLogic.IsDirBlocked(ref Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].DirBlock, ref argdir);
                     return n;
                 }
 
@@ -2144,7 +2144,7 @@ namespace Client
             {
                 if (IsPlaying((int) i))
                 {
-                    if (GetPlayerMap((int) i) == GetPlayerMap((int) i))
+                    if (GetMap((int) i) == GetMap((int) i))
                     {
                         if (GetPlayerVital((int) i, Core.Globals.Vital.Health) > 0 &
                             GetPlayerVital((int) i, Core.Globals.Vital.Health) < GetPlayerMaxVital((int) i, Core.Globals.Vital.Health))
@@ -2307,7 +2307,7 @@ namespace Client
         {
             if (SpriteBatch == null) return;
 
-            int map = GetPlayerMap(GameState.MyIndex);
+            int map = GetMap(GameState.MyIndex);
             int x = GameState.CurXGame;
             int y = GameState.CurYGame;
 
@@ -2578,7 +2578,7 @@ namespace Client
             // Auto-cancel target if player is off the current camera viewport (native world rect)
             CancelTargetIfOffCamera();
 
-            var map = GetPlayerMap(GameState.MyIndex);
+            var map = GetMap(GameState.MyIndex);
             if (map < 0 || map >= Client.Map.Instance.Count)
                 return;
 
@@ -2688,7 +2688,7 @@ namespace Client
                     // Players
                     for (i = 0; i < PlayerBase.Instance.Count; i++)
                     {
-                        if (IsPlaying(i) & GetPlayerMap(i) == map)
+                        if (IsPlaying(i) & GetMap(i) == map)
                         {
                             if (GetPlayerY(i) == y)
                             {
@@ -2849,7 +2849,7 @@ namespace Client
 
             for (i = 0; i < Player.Instance.Count; i++)
             {
-                if (IsPlaying(i) & GetPlayerMap(i) == map)
+                if (IsPlaying(i) & GetMap(i) == map)
                 {
                     Player.OnDrawName(i);
                 }
@@ -2983,7 +2983,7 @@ namespace Client
 
             if (GameState.MyTargetType == (int)TargetType.Player)
             {
-                if (!IsPlaying(t) || GetPlayerMap(t) != GetPlayerMap(GameState.MyIndex))
+                if (!IsPlaying(t) || GetMap(t) != GetMap(GameState.MyIndex))
                 {
                     shouldClear = true;
                 }

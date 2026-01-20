@@ -69,7 +69,7 @@ public static class Commands
         return PlayerBase.Instance[index].Job;
     }
 
-    public static int GetPlayerMap(int index)
+    public static int GetMap(int index)
     {
         if (!ValidPlayerIndex(index)) return 0;
         return PlayerBase.Instance[index].Map;

@@ -195,7 +195,7 @@ public class Script
     public void OnJoin(int index)
     {
         // Warp the Player to his saved location
-        OnWarp(index, GetPlayerMap(index), GetPlayerX(index), GetPlayerY(index), (byte)Direction.Down, true);
+        OnWarp(index, GetMap(index), GetPlayerX(index), GetPlayerY(index), (byte)Direction.Down, true);
 
         // Notify everyone that a Player has joined the game.
         NetworkSend.GlobalMessage(string.Format("{0} has joined {1}!", GetPlayerName(index), SettingsManager.Instance.GameName));
@@ -241,7 +241,7 @@ public class Script
     public void OnDrop(int index, int invSlot, int amount)
     {
         var item = Item.Instance[GetPlayerInv(index, invSlot)];
-        var map = GetPlayerMap(index);
+        var map = GetMap(index);
         var id = GetPlayerInv(index, invSlot);
 
         // Determine if the item is currency or stackable
@@ -316,7 +316,7 @@ public class Script
         MapItem.Instance[map, mapSlot].Value = 0;
         NetworkSend.MapItemToAll(map, mapSlot);
         NetworkSend.InventoryUpdate(index, invSlot);
-        NetworkSend.ActionMessage(GetPlayerMap(index), msg, (int)ColorName.White, (byte)ActionMessageType.Static, GetPlayerX(index) * Variables.TileSize, GetPlayerY(index) * Variables.TileSize);
+        NetworkSend.ActionMessage(GetMap(index), msg, (int)ColorName.White, (byte)ActionMessageType.Static, GetPlayerX(index) * Variables.TileSize, GetPlayerY(index) * Variables.TileSize);
 
         // Unlock pickup for this Player
         _isPickingUp[index] = false;
@@ -380,8 +380,8 @@ public class Script
                         {
                             case (byte)ConsumableEffect.RestoresHealth:
                                 {
-                                    NetworkSend.ActionMessage(GetPlayerMap(index), "+" + Item.Instance[item].Data1, (int)ColorName.BrightGreen, (byte)ActionMessageType.Scroll, GetPlayerX(index) * Variables.TileSize, GetPlayerY(index) * Variables.TileSize);
-                                    NetworkSend.PlayAnimation(GetPlayerMap(index), Item.Instance[item].Animation, 0, 0, (byte)TargetType.Player, index);
+                                    NetworkSend.ActionMessage(GetMap(index), "+" + Item.Instance[item].Data1, (int)ColorName.BrightGreen, (byte)ActionMessageType.Scroll, GetPlayerX(index) * Variables.TileSize, GetPlayerY(index) * Variables.TileSize);
+                                    NetworkSend.PlayAnimation(GetMap(index), Item.Instance[item].Animation, 0, 0, (byte)TargetType.Player, index);
                                     SetPlayerVital(index, Core.Globals.Vital.Health, GetPlayerVital(index, Core.Globals.Vital.Health) + Item.Instance[item].Data1);
                                     TakeInv(index, item, 1);
                                     NetworkSend.Vital(index, Core.Globals.Vital.Health);
@@ -390,8 +390,8 @@ public class Script
 
                             case (byte)ConsumableEffect.RestoresMana:
                                 {
-                                    NetworkSend.ActionMessage(GetPlayerMap(index), "+" + Item.Instance[item].Data1, (int)ColorName.BrightBlue, (byte)ActionMessageType.Scroll, GetPlayerX(index) * Variables.TileSize, GetPlayerY(index) * Variables.TileSize);
-                                    NetworkSend.PlayAnimation(GetPlayerMap(index), Item.Instance[item].Animation, 0, 0, (byte)TargetType.Player, index);
+                                    NetworkSend.ActionMessage(GetMap(index), "+" + Item.Instance[item].Data1, (int)ColorName.BrightBlue, (byte)ActionMessageType.Scroll, GetPlayerX(index) * Variables.TileSize, GetPlayerY(index) * Variables.TileSize);
+                                    NetworkSend.PlayAnimation(GetMap(index), Item.Instance[item].Animation, 0, 0, (byte)TargetType.Player, index);
                                     SetPlayerVital(index, Core.Globals.Vital.Stamina, GetPlayerVital(index, Core.Globals.Vital.Stamina) + Item.Instance[item].Data1);
                                     TakeInv(index, item, 1);
                                     NetworkSend.Vital(index, Core.Globals.Vital.Stamina);
@@ -400,7 +400,7 @@ public class Script
 
                             case (byte)ConsumableEffect.RestoresStamina:
                                 {
-                                    NetworkSend.PlayAnimation(GetPlayerMap(index), Item.Instance[item].Animation, 0, 0, (byte)TargetType.Player, index);
+                                    NetworkSend.PlayAnimation(GetMap(index), Item.Instance[item].Animation, 0, 0, (byte)TargetType.Player, index);
                                     SetPlayerVital(index, Core.Globals.Vital.Stamina, GetPlayerVital(index, Core.Globals.Vital.Stamina) + Item.Instance[item].Data1);
                                     TakeInv(index, item, 1);
                                     NetworkSend.Vital(index, Core.Globals.Vital.Stamina);
@@ -409,7 +409,7 @@ public class Script
 
                             case (byte)ConsumableEffect.GrantsExperience:
                                 {
-                                    NetworkSend.PlayAnimation(GetPlayerMap(index), Item.Instance[item].Animation, 0, 0, (byte)TargetType.Player, index);
+                                    NetworkSend.PlayAnimation(GetMap(index), Item.Instance[item].Animation, 0, 0, (byte)TargetType.Player, index);
                                     SetPlayerExperience(index, GetPlayerExperience(index) + Item.Instance[item].Data1);
                                     TakeInv(index, item, 1);
                                     NetworkSend.Experience(index);
@@ -521,7 +521,7 @@ public class Script
 
     private static void TryUseKeyOnFacingTile(int playerId, int key, int invSlot)
     {
-        var map = GetPlayerMap(playerId);
+        var map = GetMap(playerId);
         if (map < 0 || map >= Server.Map.Instance.Count)
         {
             return;
@@ -596,7 +596,7 @@ public class Script
     {
         foreach (var otherPlayerId in PlayerService.Instance.PlayerIds)
         {
-            if (GetPlayerMap(otherPlayerId) != map)
+            if (GetMap(otherPlayerId) != map)
             {
                 continue;
             }
@@ -797,7 +797,7 @@ public class Script
                         SetSkill(index, i, n);
                         if (item >= 0)
                         {
-                            NetworkSend.PlayAnimation(GetPlayerMap(index), Item.Instance[item].Animation, 0, 0, (byte)TargetType.Player, index);
+                            NetworkSend.PlayAnimation(GetMap(index), Item.Instance[item].Animation, 0, 0, (byte)TargetType.Player, index);
                             TakeInv(index, item, 1);
                         }
                         NetworkSend.PlayerMessage(index, "You study the skill carefully.", (int)ColorName.Yellow);
@@ -828,7 +828,7 @@ public class Script
     public void OnMap(int index)
     {
         byte[] data;
-        int map = GetPlayerMap(index);
+        int map = GetMap(index);
 
         // Send all Players on current map to index
         foreach (var Player in PlayerService.Instance.Players)
@@ -837,7 +837,7 @@ public class Script
             {
                 if (Player.Id != index)
                 {
-                    if (GetPlayerMap(Player.Id) == map)
+                    if (GetMap(Player.Id) == map)
                     {
                         data = GetPlayerDataPacket(Player.Id);
                         PlayerService.Instance.SendDataTo(index, data);
@@ -848,7 +848,7 @@ public class Script
             }
         }
 
-        EventLogic.SpawnMapEventsFor(index, GetPlayerMap(index));
+        EventLogic.SpawnMapEventsFor(index, GetMap(index));
 
         // Send index's Player data to everyone on the map including himself
         data = GetPlayerDataPacket(index);
@@ -904,7 +904,7 @@ public class Script
             SetPlayerPk(index, false);
         }
 
-        var instance = Server.Map.Instance[GetPlayerMap(index)];
+        var instance = Server.Map.Instance[GetMap(index)];
 
         // Warp Player away
         SetPlayerDir(index, (byte)Direction.Down);
@@ -920,7 +920,7 @@ public class Script
         {
             if (IsPlaying(Player.Id))
             {
-                if (GetPlayerMap(Player.Id) == GetPlayerMap(index))
+                if (GetMap(Player.Id) == GetMap(index))
                 {
                     if (Data.TempPlayer[Player.Id].TargetType == (byte)TargetType.Player & Data.TempPlayer[Player.Id].Target == index)
                     {
@@ -933,10 +933,10 @@ public class Script
 
         for (int i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
         {
-            if (MapNpc.Instance[GetPlayerMap(index), i].TargetType == (byte)TargetType.Player & MapNpc.Instance[GetPlayerMap(index), i].Target == index)
+            if (MapNpc.Instance[GetMap(index), i].TargetType == (byte)TargetType.Player & MapNpc.Instance[GetMap(index), i].Target == index)
             {
-                MapNpc.Instance[GetPlayerMap(index), i].TargetType = 0;
-                MapNpc.Instance[GetPlayerMap(index), i].Target = -1;
+                MapNpc.Instance[GetMap(index), i].TargetType = 0;
+                MapNpc.Instance[GetMap(index), i].Target = -1;
             }
         }
 
@@ -994,7 +994,7 @@ public class Script
         }
 
         // Moral / map rule check
-        var map = GetPlayerMap(player);
+        var map = GetMap(player);
         if (map < 0 || map >= Server.Map.Instance.Count) return;
 
         var moral = Server.Map.Instance[map].Moral;
@@ -1016,7 +1016,7 @@ public class Script
 
     public int OnKill(int index)
     {
-        if (!Moral.Instance[Server.Map.Instance[GetPlayerMap(index)].Moral].LoseExp)
+        if (!Moral.Instance[Server.Map.Instance[GetMap(index)].Moral].LoseExp)
             return 0;
 
         int exp = GetPlayerExperience(index) / 3;
@@ -1084,7 +1084,7 @@ public class Script
                 // plural
                 NetworkSend.GlobalMessage(GetPlayerName(index) + " has gained " + count + " levels!");
             }
-            NetworkSend.ActionMessage(GetPlayerMap(index), "Level Up", (int)ColorName.Yellow, 1, GetPlayerX(index) * Variables.TileSize, GetPlayerY(index) * Variables.TileSize);
+            NetworkSend.ActionMessage(GetMap(index), "Level Up", (int)ColorName.Yellow, 1, GetPlayerX(index) * Variables.TileSize, GetPlayerY(index) * Variables.TileSize);
             NetworkSend.Experience(index);
             NetworkSend.PlayerData(index);
         }
@@ -1237,14 +1237,14 @@ public class Script
             NetworkSend.Target(deadPlayerId, 0, 0);
         }
 
-        var map = GetPlayerMap(deadPlayerId);
+        var map = GetMap(deadPlayerId);
 
         // Clear other players targeting this player.
         foreach (var otherPlayer in PlayerService.Instance.Players)
         {
             var otherId = otherPlayer.Id;
             if (!NetworkConfig.IsPlaying(otherId)) continue;
-            if (GetPlayerMap(otherId) != map) continue;
+            if (GetMap(otherId) != map) continue;
 
             if (Data.TempPlayer[otherId].TargetType == (byte)TargetType.Player && Data.TempPlayer[otherId].Target == deadPlayerId)
             {
@@ -1286,7 +1286,7 @@ public class Script
 
             ClearTargetsToDeadPlayer(target.Id);
 
-            if (Moral.Instance[Server.Map.Instance[GetPlayerMap(target.Id)].Moral].DropItems)
+            if (Moral.Instance[Server.Map.Instance[GetMap(target.Id)].Moral].DropItems)
             {
                 var equipCount = Enum.GetValues(typeof(Equipment)).Length;
                 
@@ -1295,7 +1295,7 @@ public class Script
                 {
                     if (GetPlayerPaperdoll(target.Id, (Equipment)i) >= 0)
                     {
-                        Server.MapItem.OnSpawn(GetPlayerPaperdoll(target.Id, (Equipment)i), 1, GetPlayerMap(target.Id), GetPlayerX(target.Id), GetPlayerY(target.Id));
+                        Server.MapItem.OnSpawn(GetPlayerPaperdoll(target.Id, (Equipment)i), 1, GetMap(target.Id), GetPlayerX(target.Id), GetPlayerY(target.Id));
                         NetworkSend.PlayerMessage(target.Id, "You have dropped your " + Item.Instance[GetPlayerPaperdoll(target.Id, (Equipment)i)].Name + " upon death.", (int)ColorName.BrightRed);
                         SetPlayerPaperdoll(target.Id, -1, (Equipment)i);
                     }
@@ -1312,7 +1312,7 @@ public class Script
                 {
                     int gain = Math.Max(1, lost);
                     int partyId = Data.TempPlayer[attacker.Id].InParty;
-                    int map = GetPlayerMap(attacker.Id);
+                    int map = GetMap(attacker.Id);
                     if (partyId >= 0)
                     {
                         // Share EXP among party members on the same map
@@ -1413,7 +1413,7 @@ public class Script
                 {
                     if (IsPlaying(Player.Id))
                     {
-                        if (GetPlayerMap(Player.Id) == map)
+                        if (GetMap(Player.Id) == map)
                         {
                             if (Data.TempPlayer[Player.Id].TargetType == (byte)TargetType.Npc && Data.TempPlayer[Player.Id].Target == npc)
                             {
@@ -2103,7 +2103,7 @@ public class Script
         if (entity.TargetType == (byte)TargetType.Player)
         {
             var pid = entity.Target;
-            if (NetworkConfig.IsPlaying(pid) && GetPlayerMap(pid) == map)
+            if (NetworkConfig.IsPlaying(pid) && GetMap(pid) == map)
             {
                 var e = Core.Globals.Entity.FromPlayer(pid, Server.Player.Instance[pid]);
                 e.Map = map;
@@ -2274,7 +2274,7 @@ public class Script
         foreach (var p in PlayerService.Instance.Players)
         {
             if (!NetworkConfig.IsPlaying(p.Id)) continue;
-            if (GetPlayerMap(p.Id) != map) continue;
+            if (GetMap(p.Id) != map) continue;
             if (GetPlayerX(p.Id) == tx && GetPlayerY(p.Id) == ty)
             {
                 var e = Core.Globals.Entity.FromPlayer(p.Id, Server.Player.Instance[p.Id]); e.Map = map; return e;
@@ -2310,7 +2310,7 @@ public class Script
         foreach (var Player in PlayerService.Instance.Players)
         {
             if (!NetworkConfig.IsPlaying(Player.Id)) continue;
-            if (GetPlayerMap(Player.Id) != map) continue;
+            if (GetMap(Player.Id) != map) continue;
             int px = GetPlayerX(Player.Id);
             int py = GetPlayerY(Player.Id);
             if (Math.Abs(px - centerX) <= radius && Math.Abs(py - centerY) <= radius)
@@ -2644,7 +2644,7 @@ public class Script
             {
                 foreach (var pid in PlayerService.Instance.PlayerIds)
                 {
-                    if (pid != target.Id && GetPlayerMap(pid) == map && GetPlayerX(pid) == nx && GetPlayerY(pid) == ny) { occ = true; break; }
+                    if (pid != target.Id && GetMap(pid) == map && GetPlayerX(pid) == nx && GetPlayerY(pid) == ny) { occ = true; break; }
                 }
                 if (!occ)
                 {

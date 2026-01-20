@@ -332,7 +332,7 @@ public static class Party
             {
                 if (PlayerService.Instance.IsConnected(tmpindex) & NetworkConfig.IsPlaying(tmpindex))
                 {
-                    if (GetPlayerMap(tmpindex) != map)
+                    if (GetMap(tmpindex) != map)
                     {
                         loseMemberCount = +1;
                     }
@@ -363,7 +363,7 @@ public static class Party
                 // playing?
                 if (PlayerService.Instance.IsConnected(tmpindex) & NetworkConfig.IsPlaying(tmpindex))
                 {
-                    if (GetPlayerMap(tmpindex) == map)
+                    if (GetMap(tmpindex) == map)
                     {
                         // give them their share
                         SetPlayerExperience(tmpindex, GetPlayerExperience(tmpindex) + expShare);

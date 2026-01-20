@@ -332,12 +332,12 @@ namespace Client
             int y;
             int i;
 
-            Data.Autotile = new Type.Autotile[(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX), (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)];
+            Data.Autotile = new Type.Autotile[(Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX), (Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY)];
 
-            var count = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
+            var count = (int)Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX;
             for (x = 0; x < count; x++)
             {
-                var count2 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+                var count2 = (int)Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY;
                 for (y = 0; y < count2; y++)
                 {
                     int layerCount = System.Enum.GetValues(typeof(MapLayer)).Length;
@@ -648,11 +648,11 @@ namespace Client
             // We also give letters to each subtile for easy rendering tweaks. ;]
             // First, we need to re-size the array
 
-            Data.Autotile = new Type.Autotile[(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX), (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)];
-            var count = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
+            Data.Autotile = new Type.Autotile[(Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX), (Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY)];
+            var count = (int)Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX;
             for (x = 0; x < count; x++)
             {
-                var count3 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+                var count3 = (int)Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY;
                 for (y = 0; y < count3; y++)
                 {
                     int layerCount = System.Enum.GetValues(typeof(MapLayer)).Length;
@@ -732,10 +732,10 @@ namespace Client
             Type.AutoSe[4].X = 48;
             Type.AutoSe[4].Y = 80;
 
-            var count2 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
+            var count2 = (int)Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX;
             for (x = 0; x < count2; x++)
             {
-                var count3 = (int)Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+                var count3 = (int)Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY;
                 for (y = 0; y < count3; y++)
                 {
                     if (Data.Autotile[x, y].Layer == null)
@@ -758,7 +758,7 @@ namespace Client
         {
             int quarterNum;
 
-            if (x < 0 | x >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX | y < 0 | y >= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)
+            if (x < 0 | x >= Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX | y < 0 | y >= Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY)
                 return;
 
             // Ensure autotile layer arrays are initialized before dereferencing to avoid CS8602
@@ -769,7 +769,7 @@ namespace Client
             if (Data.Autotile[x, y].Layer[layerNum].Tile == null)
                 Data.Autotile[x, y].Layer[layerNum].Tile = new Type.Point[5];
 
-            ref var instance = ref Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y];
+            ref var instance = ref Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y];
 
             // check if the tile can be rendered
             if (instance.Layer[layerNum].Tileset <= 0 | instance.Layer[layerNum].Tileset > GameState.NumTileSets)
@@ -790,8 +790,8 @@ namespace Client
                 // cache tileset positioning
                 for (quarterNum = 0; quarterNum <= 4; quarterNum++)
                 {
-                    Data.Autotile[x, y].Layer[layerNum].SrcX[quarterNum] = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[layerNum].X * 32 + Data.Autotile[x, y].Layer[layerNum].Tile[quarterNum].X;
-                    Data.Autotile[x, y].Layer[layerNum].SrcY[quarterNum] = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[layerNum].Y * 32 + Data.Autotile[x, y].Layer[layerNum].Tile[quarterNum].Y;
+                    Data.Autotile[x, y].Layer[layerNum].SrcX[quarterNum] = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[layerNum].X * 32 + Data.Autotile[x, y].Layer[layerNum].Tile[quarterNum].X;
+                    Data.Autotile[x, y].Layer[layerNum].SrcY[quarterNum] = Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[layerNum].Y * 32 + Data.Autotile[x, y].Layer[layerNum].Tile[quarterNum].Y;
                 }
             }
         }
@@ -807,11 +807,11 @@ namespace Client
             // The situations are "inner", "outer", "horizontal", "vertical" and "fill".
             // Exit out if we don't have an autotile
 
-            if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[layerNum].AutoTile == 0)
+            if (Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[layerNum].AutoTile == 0)
                 return;
 
             // Okay, we have autotiling but which one?
-            switch (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[layerNum].AutoTile)
+            switch (Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[layerNum].AutoTile)
             {
                 // Normal or animated - same difference
                 case GameState.AutotileNormal:
@@ -1474,40 +1474,40 @@ namespace Client
                 checkTileMatch = true;
 
                 // if it's off the map then set it as autotile and exit out early
-                if (x2 < 0 | x2 > Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX | y2 < 0 | y2 > Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY)
+                if (x2 < 0 | x2 > Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX | y2 < 0 | y2 > Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY)
                 {
                     checkTileMatch = true;
                     return checkTileMatch;
                 }
 
                 // fakes ALWAYS return true
-                if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x2, y2].Layer[layerNum].AutoTile == GameState.AutotileFake)
+                if (Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x2, y2].Layer[layerNum].AutoTile == GameState.AutotileFake)
                 {
                     checkTileMatch = true;
                     return checkTileMatch;
                 }
 
                 // check neighbour is an autotile
-                if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x2, y2].Layer[layerNum].AutoTile == 0)
+                if (Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x2, y2].Layer[layerNum].AutoTile == 0)
                 {
                     checkTileMatch = false;
                     return checkTileMatch;
                 }
 
                 // check we're a matching
-                if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x1, y1].Layer[layerNum].Tileset != Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x2, y2].Layer[layerNum].Tileset)
+                if (Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x1, y1].Layer[layerNum].Tileset != Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x2, y2].Layer[layerNum].Tileset)
                 {
                     checkTileMatch = false;
                     return checkTileMatch;
                 }
 
                 // check tiles match
-                if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x1, y1].Layer[layerNum].X != Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x2, y2].Layer[layerNum].X)
+                if (Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x1, y1].Layer[layerNum].X != Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x2, y2].Layer[layerNum].X)
                 {
                     checkTileMatch = false;
                     return checkTileMatch;
                 }
-                else if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x1, y1].Layer[layerNum].Y != Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x2, y2].Layer[layerNum].Y)
+                else if (Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x1, y1].Layer[layerNum].Y != Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x2, y2].Layer[layerNum].Y)
                 {
                     checkTileMatch = false;
                     return checkTileMatch;
@@ -1569,7 +1569,7 @@ namespace Client
                 }
             }
 
-            switch (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[layerNum].AutoTile)
+            switch (Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[layerNum].AutoTile)
             {
                 case GameState.AutotileWaterfall:
                     {
@@ -1588,9 +1588,9 @@ namespace Client
                     }
             }
 
-            if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer is null)
+            if (Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer is null)
                 return;
-            string argPath = System.IO.Path.Combine(DataPath.Tilesets, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Layer[layerNum].Tileset.ToString());
+            string argPath = System.IO.Path.Combine(DataPath.Tilesets, Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Layer[layerNum].Tileset.ToString());
             if (Data.Autotile is null)
                 return;
             GameClient.RenderTexture(ref argPath, dX, dY, Data.Autotile[x, y].Layer[layerNum].SrcX[quarterNum] + xOffset, Data.Autotile[x, y].Layer[layerNum].SrcY[quarterNum] + yOffset, 16, 16, 16, 16);

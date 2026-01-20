@@ -1228,7 +1228,7 @@ public static class WinEventEditor
         try { index = (EventCommand)cmd.Index; }
         catch { index = default; }
 
-        int playerMap = Commands.GetPlayerMap(Client.GameState.MyIndex);
+        int playerMap = Commands.GetMap(Client.GameState.MyIndex);
         bool hasPlayerMap = playerMap >= 0 && playerMap < Client.Map.Instance.Count;
 
         switch (index)
@@ -2876,7 +2876,7 @@ public static class WinEventEditor
         {
             // Restore backing map event slot
             var map = Client.GameState.MyIndex >= 0 ? Client.GameState.MyIndex : Client.GameState.MyIndex;
-            int playerMap = Commands.GetPlayerMap(Client.GameState.MyIndex);
+            int playerMap = Commands.GetMap(Client.GameState.MyIndex);
             int eventNum = Client.GameState.EventNum;
 
             if (eventNum >= 0 && Client.Map.Instance[playerMap].Event != null && eventNum < Client.Map.Instance[playerMap].Event.Length)

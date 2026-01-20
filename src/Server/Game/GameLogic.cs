@@ -8,7 +8,7 @@ public static class GameLogic
 {
     public static int GetTotalMapPlayers(int map)
     {
-        return PlayerService.Instance.PlayerIds.Count(i => GetPlayerMap(i) == map);
+        return PlayerService.Instance.PlayerIds.Count(i => GetMap(i) == map);
     }
 
     public static int GetNpcMaxVital(double npc, Vital vital)

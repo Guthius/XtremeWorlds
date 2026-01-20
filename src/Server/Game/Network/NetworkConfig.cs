@@ -80,7 +80,7 @@ public static class NetworkConfig
                 continue;
             }
 
-            if (GetPlayerMap(playerId) == map)
+            if (GetMap(playerId) == map)
             {
                 PlayerService.Instance.SendDataTo(playerId, bytes);
             }
@@ -91,7 +91,7 @@ public static class NetworkConfig
     {
         foreach (var playerId in PlayerService.Instance.PlayerIds)
         {
-            if (!IsPlaying(playerId) || GetPlayerMap(playerId) != map)
+            if (!IsPlaying(playerId) || GetMap(playerId) != map)
             {
                 continue;
             }

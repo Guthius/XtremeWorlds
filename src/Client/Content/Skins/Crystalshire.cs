@@ -212,7 +212,7 @@ public class Crystalshire
 
         static void ClampMapZoomBounds()
         {
-            var mapIndex = GetPlayerMap(GameState.MyIndex);
+            var mapIndex = GetMap(GameState.MyIndex);
             if (mapIndex < 0 || mapIndex >= Client.Map.Instance.Count) return;
 
             var map = Client.Map.Instance[mapIndex];
@@ -266,7 +266,7 @@ public class Crystalshire
         {
             btnSave.CallBack[(int)ControlState.MouseDown] = () =>
             {
-                var mapIndex = GetPlayerMap(GameState.MyIndex);
+                var mapIndex = GetMap(GameState.MyIndex);
                 if (mapIndex < 0 || mapIndex >= Client.Map.Instance.Count) return;
 
                 // Helper readers
@@ -565,7 +565,7 @@ public class Crystalshire
 
                 if (WindowManager.TryGetControl("winMapEditor", "sldMapWarpX", out var wXCtrl) && wXCtrl is Client.Game.UI.Controls.ScrollBar sbX)
                 {
-                    sbX.Min = 0; sbX.Max = Math.Max(0, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX - 1);
+                    sbX.Min = 0; sbX.Max = Math.Max(0, Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX - 1);
                     wXCtrl.Value = Math.Clamp(GameState.EditorWarpX, sbX.Min, sbX.Max);
                     sbX.CallBack[(int)ControlState.MouseMove] = () =>
                     {
@@ -575,7 +575,7 @@ public class Crystalshire
 
                 if (WindowManager.TryGetControl("winMapEditor", "cmbMapWarpY", out var wYCtrl) && wYCtrl is Client.Game.UI.Controls.ScrollBar sbY)
                 {
-                    sbY.Min = 0; sbY.Max = Math.Max(0, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY - 1);
+                    sbY.Min = 0; sbY.Max = Math.Max(0, Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY - 1);
                     wYCtrl.Value = Math.Clamp(GameState.EditorWarpY, sbY.Min, sbY.Max);
                     sbY.CallBack[(int)ControlState.MouseMove] = () =>
                     {
@@ -691,12 +691,12 @@ public class Crystalshire
                 {
                     cmb.Items.Clear();
                     cmb.Items.Add("None");
-                    if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc != null && Npc.Instance != null)
+                    if (Client.Map.Instance[GetMap(GameState.MyIndex)].Npc != null && Npc.Instance != null)
                     {
-                        int max = Math.Min(Core.Globals.Variables.MaxMapNpcs, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc.Length);
+                        int max = Math.Min(Core.Globals.Variables.MaxMapNpcs, Client.Map.Instance[GetMap(GameState.MyIndex)].Npc.Length);
                         for (int slot = 1; slot < max; slot++)
                         {
-                            int npcIndex = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Npc[slot];
+                            int npcIndex = Client.Map.Instance[GetMap(GameState.MyIndex)].Npc[slot];
                             string name = (npcIndex >= 0 && npcIndex < Core.Globals.Variables.MaxNpcs && npcIndex < Npc.Instance.Count) ? (Npc.Instance[npcIndex].Name ?? string.Empty).Trim() : "None";
                             cmb.Items.Add($"{slot}: {name}");
                         }
@@ -918,8 +918,8 @@ public class Crystalshire
 
         void UpdateAutotileLabel() { }
         // Initialize labels on open
-        if (GameState.CurTileset <= 0) GameState.CurTileset = Math.Max(1, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tileset);
-        if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tileset <= 0) Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tileset = GameState.CurTileset;
+        if (GameState.CurTileset <= 0) GameState.CurTileset = Math.Max(1, Client.Map.Instance[GetMap(GameState.MyIndex)].Tileset);
+        if (Client.Map.Instance[GetMap(GameState.MyIndex)].Tileset <= 0) Client.Map.Instance[GetMap(GameState.MyIndex)].Tileset = GameState.CurTileset;
         UpdateAutotileLabel();
 
         // Horizontal tileset scrollbar selects the tileset number
@@ -931,7 +931,7 @@ public class Crystalshire
             sldTileset.CallBack[(int)ControlState.MouseMove] = () =>
             {
                 GameState.CurTileset = Math.Clamp(sldTilesetCtrl.Value, sldTileset.Min, sldTileset.Max);
-                Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tileset = GameState.CurTileset;
+                Client.Map.Instance[GetMap(GameState.MyIndex)].Tileset = GameState.CurTileset;
             };
         }
 
@@ -943,9 +943,9 @@ public class Crystalshire
         }
 
         if (WindowManager.TryGetControl("winMapEditor", "btnTilesetPrev", out var btnTsPrev))
-            btnTsPrev.CallBack[(int)ControlState.MouseDown] = () => { GameState.CurTileset = Math.Max(1, GameState.CurTileset - 1); Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tileset = GameState.CurTileset; };
+            btnTsPrev.CallBack[(int)ControlState.MouseDown] = () => { GameState.CurTileset = Math.Max(1, GameState.CurTileset - 1); Client.Map.Instance[GetMap(GameState.MyIndex)].Tileset = GameState.CurTileset; };
         if (WindowManager.TryGetControl("winMapEditor", "btnTilesetNext", out var btnTsNext))
-            btnTsNext.CallBack[(int)ControlState.MouseDown] = () => { var maxTs = Math.Max(1, GameState.NumTileSets); GameState.CurTileset = Math.Min(maxTs, GameState.CurTileset + 1); Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tileset = GameState.CurTileset; };
+            btnTsNext.CallBack[(int)ControlState.MouseDown] = () => { var maxTs = Math.Max(1, GameState.NumTileSets); GameState.CurTileset = Math.Min(maxTs, GameState.CurTileset + 1); Client.Map.Instance[GetMap(GameState.MyIndex)].Tileset = GameState.CurTileset; };
 
         if (WindowManager.TryGetControl("winMapEditor", "btnAutoPrev", out var btnAutoPrev))
             btnAutoPrev.CallBack[(int)ControlState.MouseDown] = () => { GameState.CurAutotileType = (GameState.CurAutotileType + autotileNames.Length - 1) % autotileNames.Length; UpdateAutotileLabel(); };
@@ -1031,7 +1031,7 @@ public class Crystalshire
             // Name
             if (WindowManager.TryGetControl("winMapEditor", "txtName", out var txtName))
             {
-                txtName.Text = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Name?.Trim() ?? string.Empty;
+                txtName.Text = Client.Map.Instance[GetMap(GameState.MyIndex)].Name?.Trim() ?? string.Empty;
             }
             // Moral list
             if (WindowManager.TryGetControl("winMapEditor", "lstMoral", out var moralCtrl) && moralCtrl is ComboBox lstMoral)
@@ -1043,10 +1043,10 @@ public class Crystalshire
                     var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
                     lstMoral.Items.Add($"{i + 1}: {name}");
                 }
-                lstMoral.Value = Math.Clamp(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Moral, 0, lstMoral.Items.Count - 1);
+                lstMoral.Value = Math.Clamp(Client.Map.Instance[GetMap(GameState.MyIndex)].Moral, 0, lstMoral.Items.Count - 1);
                 lstMoral.CallBack[(int)ControlState.MouseMove] = () =>
                 {
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Moral = (byte)Math.Clamp(lstMoral.Value, 0, Core.Globals.Variables.MaxMorals - 1);
+                    Client.Map.Instance[GetMap(GameState.MyIndex)].Moral = (byte)Math.Clamp(lstMoral.Value, 0, Core.Globals.Variables.MaxMorals - 1);
                 };
             }
 
@@ -1061,11 +1061,11 @@ public class Crystalshire
                     var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
                     lstShop.Items.Add($"{i + 1}: {name}");
                 }
-                var shopIndex = Map.Instance[GetPlayerMap(GameState.MyIndex)].Shop >= 0 ? Map.Instance[GetPlayerMap(GameState.MyIndex)].Shop + 1 : 0;
+                var shopIndex = Map.Instance[GetMap(GameState.MyIndex)].Shop >= 0 ? Map.Instance[GetMap(GameState.MyIndex)].Shop + 1 : 0;
                 lstShop.Value = Math.Clamp(shopIndex, 0, lstShop.Items.Count - 1);
                 lstShop.CallBack[(int)ControlState.MouseMove] = () =>
                 {
-                    Map.Instance[GetPlayerMap(GameState.MyIndex)].Shop = lstShop.Value <= 0 ? -1 : lstShop.Value - 1;
+                    Map.Instance[GetMap(GameState.MyIndex)].Shop = lstShop.Value <= 0 ? -1 : lstShop.Value - 1;
                 };
             }
 
@@ -1082,14 +1082,14 @@ public class Crystalshire
                 }
                 // Select current map music if present
                 int found = 0;
-                if (!string.IsNullOrEmpty(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Music))
+                if (!string.IsNullOrEmpty(Client.Map.Instance[GetMap(GameState.MyIndex)].Music))
                 {
                     for (int i = 0; i < cmbMusic.Items.Count; i++)
                     {
                         var display = cmbMusic.Items[i];
                         var sep = display.IndexOf(": ", StringComparison.Ordinal);
                         var justName = sep >= 0 ? display.Substring(sep + 2) : display;
-                        if (string.Equals(justName, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Music, StringComparison.OrdinalIgnoreCase))
+                        if (string.Equals(justName, Client.Map.Instance[GetMap(GameState.MyIndex)].Music, StringComparison.OrdinalIgnoreCase))
                         {
                             found = i; break;
                         }
@@ -1101,13 +1101,13 @@ public class Crystalshire
                     var id = Math.Clamp(cmbMusic.Value, 0, cmbMusic.Items.Count - 1);
                     if (id <= 0)
                     {
-                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Music = string.Empty;
+                        Client.Map.Instance[GetMap(GameState.MyIndex)].Music = string.Empty;
                     }
                     else
                     {
                         var display = cmbMusic.Items[id];
                         var sep = display.IndexOf(": ", StringComparison.Ordinal);
-                        Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Music = sep >= 0 ? display.Substring(sep + 2) : display;
+                        Client.Map.Instance[GetMap(GameState.MyIndex)].Music = sep >= 0 ? display.Substring(sep + 2) : display;
                     }
                 };
 
@@ -1140,41 +1140,41 @@ public class Crystalshire
             // Settings checkboxes
             if (WindowManager.TryGetControl("winMapEditor", "chkNoMapRespawn", out var chkNoMapRespawn))
             {
-                chkNoMapRespawn.Value = Map.Instance[GetPlayerMap(GameState.MyIndex)].NoRespawn ? 1 : 0;
+                chkNoMapRespawn.Value = Map.Instance[GetMap(GameState.MyIndex)].NoRespawn ? 1 : 0;
                 chkNoMapRespawn.CallBack[(int)ControlState.MouseDown] = () =>
                 {
                     chkNoMapRespawn.Value = chkNoMapRespawn.Value == 0 ? 1 : 0;
-                    Map.Instance[GetPlayerMap(GameState.MyIndex)].NoRespawn = chkNoMapRespawn.Value == 1;
+                    Map.Instance[GetMap(GameState.MyIndex)].NoRespawn = chkNoMapRespawn.Value == 1;
                 };
             }
             if (WindowManager.TryGetControl("winMapEditor", "chkIndoors", out var chkIndoors))
             {
-                chkIndoors.Value = Map.Instance[GetPlayerMap(GameState.MyIndex)].Indoors ? 1 : 0;
+                chkIndoors.Value = Map.Instance[GetMap(GameState.MyIndex)].Indoors ? 1 : 0;
                 chkIndoors.CallBack[(int)ControlState.MouseDown] = () =>
                 {
                     chkIndoors.Value = chkIndoors.Value == 0 ? 1 : 0;
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Indoors = chkIndoors.Value == 1;
+                    Client.Map.Instance[GetMap(GameState.MyIndex)].Indoors = chkIndoors.Value == 1;
                 };
             }
 
             // Links / Boot / Sizes textboxes (load existing values)
-            if (WindowManager.TryGetControl("winMapEditor", "txtUp", out var tUp)) tUp.Text = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Up.ToString();
-            if (WindowManager.TryGetControl("winMapEditor", "txtDown", out var tDown)) tDown.Text = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Down.ToString();
-            if (WindowManager.TryGetControl("winMapEditor", "txtLeft", out var tLeft)) tLeft.Text = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Left.ToString();
-            if (WindowManager.TryGetControl("winMapEditor", "txtRight", out var tRight)) tRight.Text = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Right.ToString();
+            if (WindowManager.TryGetControl("winMapEditor", "txtUp", out var tUp)) tUp.Text = Client.Map.Instance[GetMap(GameState.MyIndex)].Up.ToString();
+            if (WindowManager.TryGetControl("winMapEditor", "txtDown", out var tDown)) tDown.Text = Client.Map.Instance[GetMap(GameState.MyIndex)].Down.ToString();
+            if (WindowManager.TryGetControl("winMapEditor", "txtLeft", out var tLeft)) tLeft.Text = Client.Map.Instance[GetMap(GameState.MyIndex)].Left.ToString();
+            if (WindowManager.TryGetControl("winMapEditor", "txtRight", out var tRight)) tRight.Text = Client.Map.Instance[GetMap(GameState.MyIndex)].Right.ToString();
 
-            if (WindowManager.TryGetControl("winMapEditor", "txtBootMap", out var tBMap)) tBMap.Text = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].BootMap.ToString();
-            if (WindowManager.TryGetControl("winMapEditor", "txtBootX", out var tBX)) tBX.Text = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].BootX.ToString();
-            if (WindowManager.TryGetControl("winMapEditor", "txtBootY", out var tBY)) tBY.Text = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].BootY.ToString();
+            if (WindowManager.TryGetControl("winMapEditor", "txtBootMap", out var tBMap)) tBMap.Text = Client.Map.Instance[GetMap(GameState.MyIndex)].BootMap.ToString();
+            if (WindowManager.TryGetControl("winMapEditor", "txtBootX", out var tBX)) tBX.Text = Client.Map.Instance[GetMap(GameState.MyIndex)].BootX.ToString();
+            if (WindowManager.TryGetControl("winMapEditor", "txtBootY", out var tBY)) tBY.Text = Client.Map.Instance[GetMap(GameState.MyIndex)].BootY.ToString();
 
             if (WindowManager.TryGetControl("winMapEditor", "txtMaxX", out var tMaxX))
             {
-                tMaxX.Text = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX.ToString();
+                tMaxX.Text = Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX.ToString();
                 tMaxX.CallBack[(int)ControlState.KeyUp] = WinMapEditor.QueueResizeFromControls;
             }
             if (WindowManager.TryGetControl("winMapEditor", "txtMaxY", out var tMaxY))
             {
-                tMaxY.Text = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY.ToString();
+                tMaxY.Text = Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY.ToString();
                 tMaxY.CallBack[(int)ControlState.KeyUp] = WinMapEditor.QueueResizeFromControls;
             }
         }
@@ -1195,10 +1195,10 @@ public class Crystalshire
                 cmbWeather.Items.Add("Rain");
                 cmbWeather.Items.Add("Snow");
                 cmbWeather.Items.Add("Storm");
-                cmbWeather.Value = Math.Clamp(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Weather, 0, cmbWeather.Items.Count - 1);
+                cmbWeather.Value = Math.Clamp(Client.Map.Instance[GetMap(GameState.MyIndex)].Weather, 0, cmbWeather.Items.Count - 1);
                 cmbWeather.CallBack[(int)ControlState.MouseMove] = () =>
                 {
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Weather = (byte)Math.Clamp(cmbWeather.Value, 0, 3);
+                    Client.Map.Instance[GetMap(GameState.MyIndex)].Weather = (byte)Math.Clamp(cmbWeather.Value, 0, 3);
                 };
             }
 
@@ -1227,28 +1227,28 @@ public class Crystalshire
             }
 
             // Weather intensity
-            BindSlider("sldIntensity", Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].WeatherIntensity, 0, 100, v => Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].WeatherIntensity = v, "lblIntensity", "Intensity");
+            BindSlider("sldIntensity", Client.Map.Instance[GetMap(GameState.MyIndex)].WeatherIntensity, 0, 100, v => Client.Map.Instance[GetMap(GameState.MyIndex)].WeatherIntensity = v, "lblIntensity", "Intensity");
 
             // Fog
-            BindSlider("sldFog", Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Fog, 0, 100, v => Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Fog = v, "lblFog", "Fog");
-            BindSlider("sldFogOpacity", Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].FogOpacity, 0, 255, v => Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].FogOpacity = (byte)v, "lblFogOpacity", "Opacity");
-            BindSlider("sldFogSpeed", Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].FogSpeed, 0, 255, v => Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].FogSpeed = (byte)v, "lblFogSpeed", "Speed");
+            BindSlider("sldFog", Client.Map.Instance[GetMap(GameState.MyIndex)].Fog, 0, 100, v => Client.Map.Instance[GetMap(GameState.MyIndex)].Fog = v, "lblFog", "Fog");
+            BindSlider("sldFogOpacity", Client.Map.Instance[GetMap(GameState.MyIndex)].FogOpacity, 0, 255, v => Client.Map.Instance[GetMap(GameState.MyIndex)].FogOpacity = (byte)v, "lblFogOpacity", "Opacity");
+            BindSlider("sldFogSpeed", Client.Map.Instance[GetMap(GameState.MyIndex)].FogSpeed, 0, 255, v => Client.Map.Instance[GetMap(GameState.MyIndex)].FogSpeed = (byte)v, "lblFogSpeed", "Speed");
 
             // Tint toggle
             if (WindowManager.TryGetControl("winMapEditor", "chkTint", out var chkTint))
             {
-                chkTint.Value = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTint ? 1 : 0;
+                chkTint.Value = Client.Map.Instance[GetMap(GameState.MyIndex)].MapTint ? 1 : 0;
                 chkTint.CallBack[(int)ControlState.MouseDown] = () =>
                 {
                     chkTint.Value = chkTint.Value == 0 ? 1 : 0;
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTint = chkTint.Value == 1;
+                    Client.Map.Instance[GetMap(GameState.MyIndex)].MapTint = chkTint.Value == 1;
                 };
             }
             // Tint sliders RGBA
-            BindSlider("sldMapRed", Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintR, 0, 255, v => Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintR = (byte)v, "lblTintR", "Red");
-            BindSlider("sldMapGreen", Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintG, 0, 255, v => Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintG = (byte)v, "lblTintG", "Green");
-            BindSlider("sldMapBlue", Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintB, 0, 255, v => Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintB = (byte)v, "lblTintB", "Blue");
-            BindSlider("sldMapAlpha", Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintA, 0, 255, v => Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MapTintA = (byte)v, "lblTintA", "Alpha");
+            BindSlider("sldMapRed", Client.Map.Instance[GetMap(GameState.MyIndex)].MapTintR, 0, 255, v => Client.Map.Instance[GetMap(GameState.MyIndex)].MapTintR = (byte)v, "lblTintR", "Red");
+            BindSlider("sldMapGreen", Client.Map.Instance[GetMap(GameState.MyIndex)].MapTintG, 0, 255, v => Client.Map.Instance[GetMap(GameState.MyIndex)].MapTintG = (byte)v, "lblTintG", "Green");
+            BindSlider("sldMapBlue", Client.Map.Instance[GetMap(GameState.MyIndex)].MapTintB, 0, 255, v => Client.Map.Instance[GetMap(GameState.MyIndex)].MapTintB = (byte)v, "lblTintB", "Blue");
+            BindSlider("sldMapAlpha", Client.Map.Instance[GetMap(GameState.MyIndex)].MapTintA, 0, 255, v => Client.Map.Instance[GetMap(GameState.MyIndex)].MapTintA = (byte)v, "lblTintA", "Alpha");
 
             // Panorama
             if (WindowManager.TryGetControl("winMapEditor", "cmbPanorama", out var panoCtrl) && panoCtrl is ComboBox cmbPanorama)
@@ -1257,10 +1257,10 @@ public class Crystalshire
                 cmbPanorama.Items.Add("None");
                 General.CheckPanoramas();
                 for (int i = 1; i <= GameState.NumPanoramas; i++) cmbPanorama.Items.Add(i.ToString());
-                cmbPanorama.Value = Math.Clamp(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Panorama, 0, cmbPanorama.Items.Count - 1);
+                cmbPanorama.Value = Math.Clamp(Client.Map.Instance[GetMap(GameState.MyIndex)].Panorama, 0, cmbPanorama.Items.Count - 1);
                 cmbPanorama.CallBack[(int)ControlState.MouseMove] = () =>
                 {
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Panorama = (byte)Math.Clamp(cmbPanorama.Value, 0, Math.Max(0, GameState.NumPanoramas));
+                    Client.Map.Instance[GetMap(GameState.MyIndex)].Panorama = (byte)Math.Clamp(cmbPanorama.Value, 0, Math.Max(0, GameState.NumPanoramas));
                 };
             }
 
@@ -1271,15 +1271,15 @@ public class Crystalshire
                 cmbParallax.Items.Add("None");
                 General.CheckParallax();
                 for (int i = 1; i <= GameState.NumParallax; i++) cmbParallax.Items.Add(i.ToString());
-                cmbParallax.Value = Math.Clamp(Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Parallax, 0, cmbParallax.Items.Count - 1);
+                cmbParallax.Value = Math.Clamp(Client.Map.Instance[GetMap(GameState.MyIndex)].Parallax, 0, cmbParallax.Items.Count - 1);
                 cmbParallax.CallBack[(int)ControlState.MouseMove] = () =>
                 {
-                    Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Parallax = (byte)Math.Clamp(cmbParallax.Value, 0, Math.Max(0, GameState.NumParallax));
+                    Client.Map.Instance[GetMap(GameState.MyIndex)].Parallax = (byte)Math.Clamp(cmbParallax.Value, 0, Math.Max(0, GameState.NumParallax));
                 };
             }
 
             // Brightness
-            BindSlider("sldMapBrightness", Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Brightness, 0, 100, v => Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Brightness = (byte)v, "lblBrightness", "Brightness");
+            BindSlider("sldMapBrightness", Client.Map.Instance[GetMap(GameState.MyIndex)].Brightness, 0, 100, v => Client.Map.Instance[GetMap(GameState.MyIndex)].Brightness = (byte)v, "lblBrightness", "Brightness");
         }
 
         // Opacity checkbox on Tiles page: toggles GameState.HideLayers

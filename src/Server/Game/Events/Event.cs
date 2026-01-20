@@ -198,7 +198,7 @@ namespace Server
         {
             foreach (var i in PlayerService.Instance.PlayerIds)
             {
-                if (NetworkConfig.IsPlaying(i) && GetPlayerMap(i) == map && GetPlayerX(i) == x && GetPlayerY(i) == y)
+                if (NetworkConfig.IsPlaying(i) && GetMap(i) == map && GetPlayerX(i) == x && GetPlayerY(i) == y)
                 {
                     if (Server.Map.Instance[map].Event[eventId].Pages[Data.TempPlayer[index].EventMap.EventPages[eventId].PageId].Trigger == 1)
                     {
@@ -733,7 +733,7 @@ namespace Server
 
                 // Resolve the command we were waiting on. CurSlot is advanced after executing the command,
                 // so the "prompt" command is typically at CurSlot-1. Clamp defensively.
-                var map = GetPlayerMap(index);
+                var map = GetMap(index);
                 var commandList = Server.Map.Instance[map].Event[eventId].Pages[pageId].CommandList;
                 if (proc.CurList < 0 || proc.CurList >= commandList.Length)
                 {
@@ -1012,7 +1012,7 @@ namespace Server
         {
             foreach (var i in PlayerService.Instance.PlayerIds)
             {
-                if (NetworkConfig.IsPlaying(i) && GetPlayerMap(i) == ev.map)
+                if (NetworkConfig.IsPlaying(i) && GetMap(i) == ev.map)
                     EventLogic.TriggerEvent(i, ev.EventId, 0, TempEventMap[ev.map].Event[ev.EventId].X, TempEventMap[ev.map].Event[ev.EventId].Y);
             }
 
@@ -1022,7 +1022,7 @@ namespace Server
         // Action-Based Triggers
         public static void TriggerOnPlayerAction(int index, string actionType, int value)
         {
-            var map = GetPlayerMap(index);
+            var map = GetMap(index);
             for (var i = 0; i < Server.Map.Instance[map].EventCount; i++)
             {
                 var page = Server.Map.Instance[map].Event[i].Pages[Data.TempPlayer[index].EventMap.EventPages[i].PageId];
@@ -1044,7 +1044,7 @@ namespace Server
         {
             foreach (var i in PlayerService.Instance.PlayerIds)
             {
-                if (NetworkConfig.IsPlaying(i) && GetPlayerMap(i) == map)
+                if (NetworkConfig.IsPlaying(i) && GetMap(i) == map)
                     NetworkSend.SpecialEffect(i, EffectTypeWeather, weatherType, intensity);
             }
         }

@@ -74,7 +74,7 @@ namespace Server
             {
                 if (Data.TempPlayer[i].EventMap.CurrentEvents > 0 && !Data.TempPlayer[i].GettingMap)
                 {
-                    int map = GetPlayerMap(i);
+                    int map = GetMap(i);
 
                     // Use LINQ to filter and process relevant event pages  
                     var relevantPages = Data.TempPlayer[i].EventMap.EventPages
@@ -174,7 +174,7 @@ namespace Server
                                     packetWriter.WriteInt32(Data.TempPlayer[i].EventMap.CurrentEvents);
                                     packetWriter.WriteInt32(id);
                                     ref var instance = ref Data.TempPlayer[i].EventMap.EventPages[pageNum]; //find actual index of eventpage  
-                                    packetWriter.WriteString(Server.Map.Instance[GetPlayerMap(i)].Event[instance.EventId].Name);
+                                    packetWriter.WriteString(Server.Map.Instance[GetMap(i)].Event[instance.EventId].Name);
                                     packetWriter.WriteByte(instance.Dir);
                                     packetWriter.WriteByte(instance.GraphicType);
                                     packetWriter.WriteInt32(instance.Graphic);
@@ -206,7 +206,7 @@ namespace Server
             // Use Parallel.For for potential performance gains on multi-core systems.
             Parallel.ForEach(PlayerService.Instance.PlayerIds, i =>
             {
-                int map = GetPlayerMap(i);
+                int map = GetMap(i);
 
                 if (Data.TempPlayer[i].EventMap.EventPages != null)
                 {
@@ -620,7 +620,7 @@ namespace Server
                                                 if (Event.IsOneBlockAway(instance.X, instance.Y, GetPlayerX(playerId), GetPlayerY(playerId)))
                                                 {
                                                     // Face the player.
-                                                    Event.Dir(playerId, GetPlayerMap(playerId), eventId, (byte)Event.GetDirToPlayer(playerId, GetPlayerMap(playerId), eventId), false);
+                                                    Event.Dir(playerId, GetMap(playerId), eventId, (byte)Event.GetDirToPlayer(playerId, GetMap(playerId), eventId), false);
                                                     if (instance.IgnoreIfCannotMove == 0)
                                                     {
                                                         instance.MoveRouteStep--;
@@ -929,7 +929,7 @@ namespace Server
                     if (!Data.TempPlayer[i].InGame)
                         return;
 
-                    int map = GetPlayerMap(i);
+                    int map = GetMap(i);
                     if (map < 0 || Server.Map.Instance == null || map >= Server.Map.Instance.Count)
                         return;
                     if (Server.Map.Instance[map].Event == null)
@@ -1492,7 +1492,7 @@ namespace Server
                     if (i < 0 || i >= Data.TempPlayer.Length) return;
                     if (!NetworkConfig.IsPlaying(i) || Data.TempPlayer[i].EventProcessingCount <= 0 || Data.TempPlayer[i].GettingMap) return;
 
-                    int map = GetPlayerMap(i); // Cache map number
+                    int map = GetMap(i); // Cache map number
                     bool restartloop;
                     do
                     {
@@ -1541,14 +1541,14 @@ namespace Server
                                 else // Global event.
                                 {
                                     //check that map still exists
-                                    if (GetPlayerMap(i) < 0 || GetPlayerMap(i) >= Event.TempEventMap.Length)
+                                    if (GetMap(i) < 0 || GetMap(i) >= Event.TempEventMap.Length)
                                         break;
 
                                     //check that event still exists.
-                                    if (instance1.EventMovingId < 0 || instance1.EventMovingId >= Event.TempEventMap[GetPlayerMap(i)].Event.Length)
+                                    if (instance1.EventMovingId < 0 || instance1.EventMovingId >= Event.TempEventMap[GetMap(i)].Event.Length)
                                         break;
 
-                                    if (Event.TempEventMap[GetPlayerMap(i)].Event[instance1.EventMovingId].MoveRouteComplete == 1)
+                                    if (Event.TempEventMap[GetMap(i)].Event[instance1.EventMovingId].MoveRouteComplete == 1)
                                     {
                                         instance1.WaitingForResponse = 0;
                                     }
@@ -2980,7 +2980,7 @@ namespace Server
             if (player < 0)
                 return false;
 
-            int map = GetPlayerMap(player);
+            int map = GetMap(player);
             if (map < 0 || map >= Server.Map.Instance.Count)
                 return false;
 

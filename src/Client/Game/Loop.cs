@@ -47,7 +47,7 @@ namespace Client
             if (GameState.MyIndex < 0 || GameState.MyIndex >= Player.Instance.Count)
                 return;
 
-            var mapId = GetPlayerMap(GameState.MyIndex);
+            var mapId = GetMap(GameState.MyIndex);
             if (mapId < 0 || mapId >= Client.Map.Instance.Count)
                 return;
 
@@ -88,25 +88,25 @@ namespace Client
                     {
                         if (_animationTmr[layer] < _tick)
                         {
-                            if (Map.Instance.Count <= GetPlayerMap(GameState.MyIndex)) continue; // No maps loaded
-                            byte mapMaxX = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxX;
+                            if (Map.Instance.Count <= GetMap(GameState.MyIndex)) continue; // No maps loaded
+                            byte mapMaxX = Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX;
                             for (byte x = 0; x < mapMaxX; x++)
                             {
-                                byte mapMaxY = Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].MaxY;
+                                byte mapMaxY = Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY;
                                 for (byte y = 0; y < mapMaxY; y++)
                                 {
                                     if (GameLogic.IsValidMapPoint(x, y))
                                     {
-                                        if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Type == TileType.Animation)
+                                        if (Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Type == TileType.Animation)
                                         {      
-                                            if (Animation.Instance.Count <= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data1) continue; // No animations loaded                           
-                                            _animationTmr[layer] = _tick + MapAnimation.OnPlay(Animation.Instance[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data1].Sprite[layer], layer, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data1, x, y);
+                                            if (Animation.Instance.Count <= Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Data1) continue; // No animations loaded                           
+                                            _animationTmr[layer] = _tick + MapAnimation.OnPlay(Animation.Instance[Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Data1].Sprite[layer], layer, Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Data1, x, y);
                                         }
 
-                                        if (Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Type2 == TileType.Animation)
+                                        if (Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Type2 == TileType.Animation)
                                         {
-                                            if (Animation.Instance.Count <= Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data1_2) continue; // No animations loaded                           
-                                            _animationTmr[layer] = _tick + MapAnimation.OnPlay(Animation.Instance[Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data1_2].Sprite[layer], layer, Client.Map.Instance[GetPlayerMap(GameState.MyIndex)].Tile[x, y].Data1_2, x, y);
+                                            if (Animation.Instance.Count <= Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Data1_2) continue; // No animations loaded                           
+                                            _animationTmr[layer] = _tick + MapAnimation.OnPlay(Animation.Instance[Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Data1_2].Sprite[layer], layer, Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Data1_2, x, y);
                                         }
                                     }
                                 }
@@ -364,7 +364,7 @@ namespace Client
 
                         for (_i = 0; _i < Player.Instance.Count; _i++)
                         {
-                            if (IsPlaying(_i) & GetPlayerMap(_i) == GetPlayerMap(GameState.MyIndex))
+                            if (IsPlaying(_i) & GetMap(_i) == GetMap(GameState.MyIndex))
                             {
                                 GameLogic.SetBarWidth(ref GameState.BarWidthPlayerHPMax[_i], ref GameState.BarWidthPlayerHP[_i]);
                                 GameLogic.SetBarWidth(ref GameState.BarWidthPlayerMPMax[_i], ref GameState.BarWidthPlayerMP[_i]);
@@ -381,7 +381,7 @@ namespace Client
                         for (int i = 0; i < Player.Instance.Count; i++)
                         {
                             if (!IsPlaying(i)) continue;
-                            if (GetPlayerMap(i) != GetPlayerMap(GameState.MyIndex)) continue;
+                            if (GetMap(i) != GetMap(GameState.MyIndex)) continue;
                             // Always advance Steps (used modulo by idle/run frame counts in draw)
                             unchecked { Player.Instance[i].Steps++; } // byte wraps automatically
                         }
