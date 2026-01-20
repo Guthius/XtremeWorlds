@@ -26,4 +26,34 @@ public static class Data
     public static TileHistory[]? TileHistory;
     public static Autotile[,]? Autotile;
     public static MapEvent[]? MapEvents;
+
+    static Data()
+    {
+        // Ensure map projectile slots start in a known "empty" state.
+        // Index==0 can be a valid projectile definition, so we use -1 as the sentinel.
+        for (var map = 0; map < Core.Globals.Variables.MaxMaps; map++)
+        {
+            for (var i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
+            {
+                ref var mp = ref MapProjectile[map, i];
+                mp.Index = -1;
+                mp.Owner = -1;
+                mp.OwnerType = 0;
+                mp.SkillId = -1;
+                mp.Timer = 0;
+                mp.TravelTime = 0;
+                mp.Range = 0;
+                mp.FreeAim = 0;
+                mp.Vx = 0;
+                mp.Vy = 0;
+                mp.AccX = 0;
+                mp.AccY = 0;
+                mp.DestX = 0;
+                mp.DestY = 0;
+                mp.X = 0;
+                mp.Y = 0;
+                mp.Dir = 0;
+            }
+        }
+    }
 }

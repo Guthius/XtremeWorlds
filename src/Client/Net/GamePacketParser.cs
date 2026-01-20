@@ -796,7 +796,10 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         skill.CommonEventData1 = packetReader.ReadInt32();
         skill.CommonEventData2 = packetReader.ReadInt32();
 
-        skill.MoveSpeedMultiplier = packetReader.ReadSingle();
+        skill.MoveSpeed = packetReader.ReadSingle();
+
+        // Optional trailing fields (backward compatible)
+        skill.MoveCast = packetReader.ReadBoolean();
 
         skill.SpCost = packetReader.ReadInt32();
 
@@ -2806,7 +2809,16 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             instance.Vy = buffer.ReadInt16();
             instance.FreeAim = buffer.ReadByte();
             instance.Range = 0;
-            instance.Timer = General.GetTickCount() + 60000;
+
+            // If server is clearing the slot, don't keep it alive client-side.
+            if (instance.Index < 0)
+            {
+                instance.Timer = 0;
+            }
+            else
+            {
+                instance.Timer = General.GetTickCount() + 60000;
+            }
         }
     }
 

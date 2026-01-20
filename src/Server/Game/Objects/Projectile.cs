@@ -275,7 +275,7 @@ public class Projectile : ProjectileBase, IAsyncData
         var mapProjectileNum = -1;
         for (var i = 0; i < Core.Globals.Variables.MaxProjectiles; i++)
         {
-            if (Data.MapProjectile[map, i].Owner <= 0)
+            if (Data.MapProjectile[map, i].Index < 0)
             {
                 mapProjectileNum = i;
                 break;
@@ -389,7 +389,7 @@ public class Projectile : ProjectileBase, IAsyncData
             {
                 ref var mp = ref Data.MapProjectile[x, i];
                 // Skip empty slots
-                if (mp.Owner <= 0) continue;
+                if (mp.Index < 0) continue;
 
                 // Expire long-running projectiles defensively
                 if (mp.Timer > 0 && now > mp.Timer)

@@ -455,7 +455,9 @@ public static class NetworkSend
         packetWriter.WriteInt32(skill.CommonEventData1);
         packetWriter.WriteInt32(skill.CommonEventData2);
 
-        packetWriter.WriteSingle(skill.MoveSpeedMultiplier);
+        packetWriter.WriteSingle(skill.MoveSpeed);
+
+        packetWriter.WriteBoolean(skill.MoveCast);
 
         packetWriter.WriteInt32(skill.SpCost);
     }

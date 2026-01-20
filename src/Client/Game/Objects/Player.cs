@@ -36,9 +36,6 @@ namespace Client
 
         #region Movement
 
-        private static int _lastMovePacketTime;
-        private static int _lastCancelCastPacketTime;
-
         public static void OnMove()
         {
             // Guard against invalid player or map state
@@ -48,9 +45,6 @@ namespace Client
             int map = GetMap(GameState.MyIndex);
 
             if (map < 0 || map >= Client.Map.Instance.Count)
-                return;
-
-            if (Client.Map.Instance[map].MaxX <= 0 || Client.Map.Instance[map].MaxY <= 0)
                 return;
 
             // Refresh facing based on current key state (diagonals prioritized)
@@ -63,13 +57,7 @@ namespace Client
                 if (started)
                 {
                     Player.Instance[GameState.MyIndex].Moving = (byte)(GameState.VbKeyShift ? MovementState.Walking : MovementState.Running);
-                    // Only send a move packet when we actually start a step.
-                    // (Server uses this to set Moving + validate XY; spamming each tick is unnecessary.)
-                    if (General.GetTickCount() > _lastMovePacketTime + 50)
-                    {
-                        Sender.PlayerMove();
-                        _lastMovePacketTime = General.GetTickCount();
-                    }
+                    Sender.PlayerMove();
                 }
 
                 // Warp detection with bounds checks to avoid out-of-range
@@ -233,18 +221,31 @@ namespace Client
                 return canMove;
             }
 
-            // If a skill cast is buffered, cancel it once (locally + notify server).
+            // If a skill cast is buffered, cancel it once (locally + notify server) only if the skill doesn't allow moving while casting.
             // IMPORTANT: previously this spammed CCancelCast every tick while keys were held.
             if (GameState.SkillBuffer >= 0)
             {
-                GameState.SkillBuffer = -1;
-                GameState.SkillBufferTimer = 0;
+                var shouldCancel = true;
+                var skillSlot = GameState.SkillBuffer;
 
-                var now = General.GetTickCount();
-                if (now > _lastCancelCastPacketTime + 250)
+                if (GameState.MyIndex >= 0 && GameState.MyIndex < Player.Instance.Count)
                 {
+                    if (skillSlot >= 0 && skillSlot < Player.Instance[GameState.MyIndex].Skill.Length)
+                    {
+                        var skillId = Player.Instance[GameState.MyIndex].Skill[skillSlot].Num;
+                        if (skillId >= 0 && skillId < Client.Skill.Instance.Count)
+                        {
+                            shouldCancel = !Client.Skill.Instance[skillId].MoveCast;
+                        }
+                    }
+                }
+
+                if (shouldCancel)
+                {
+                    GameState.SkillBuffer = -1;
+                    GameState.SkillBufferTimer = 0;
+
                     Sender.CancelCast();
-                    _lastCancelCastPacketTime = now;
                 }
             }
 

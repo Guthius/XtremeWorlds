@@ -4022,6 +4022,19 @@ public class Crystalshire
             };
         }
 
+        if (WindowManager.TryGetControl("winSkillEditor", "chkMoveCast", out var mwcCtrl) && mwcCtrl is CheckBox chkMoveCast)
+        {
+            chkMoveCast.CallBack[(int)ControlState.MouseDown] = () =>
+            {
+                int i = WinSkillEditor.SelectedIndex;
+                if (i < 0 || i >= Core.Globals.Variables.MaxSkills || Skill.Instance.Count <= i) return;
+
+                chkMoveCast.Value = chkMoveCast.Value == 0 ? 1 : 0;
+                Skill.Instance[i].MoveCast = chkMoveCast.Value == 1;
+                Skill.IsChanged[i] = true;
+            };
+        }
+
         // Custom Script / Common Event type (0=None, otherwise 1..CommonEventTrigger)
         BindCombo("cmbCommonEventType", v =>
         {
@@ -4064,7 +4077,7 @@ public class Crystalshire
                     float.TryParse(text.Replace(',', '.'), System.Globalization.NumberStyles.Float | System.Globalization.NumberStyles.AllowLeadingSign, System.Globalization.CultureInfo.InvariantCulture, out v))
                 {
                     v = Math.Clamp(v, -32.0f, 32.0f);
-                    Skill.Instance[i].MoveSpeedMultiplier = v;
+                    Skill.Instance[i].MoveSpeed = v;
                     Skill.IsChanged[i] = true;
                 }
             };

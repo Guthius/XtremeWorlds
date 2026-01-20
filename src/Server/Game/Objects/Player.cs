@@ -248,13 +248,6 @@ public class Player : PlayerBase
             return;
         }
 
-        // Prevent player from moving if they have casted a skill
-        if (Data.TempPlayer[playerId].SkillBuffer >= 0)
-        {
-            NetworkSend.PlayerXY(playerId);
-            return;
-        }
-
         // if stunned, stop them moving
         if (Data.TempPlayer[playerId].StunDuration > 0)
         {

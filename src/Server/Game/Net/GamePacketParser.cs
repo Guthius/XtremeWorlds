@@ -658,12 +658,27 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             NetworkSend.PlayerXY(session.Id);
         }
 
-        // Requirement: moving cancels any buffered cast
+        // Requirement: moving cancels the buffered cast only if the skill disallows moving while casting.
         if (Data.TempPlayer[session.Id].SkillBuffer >= 0)
         {
-            Data.TempPlayer[session.Id].SkillBuffer = -1;
-            Data.TempPlayer[session.Id].SkillBufferTimer = 0;
-            NetworkSend.ClearSkillBuffer(session.Id);
+            var skillSlot = (int)Data.TempPlayer[session.Id].SkillBuffer;
+            var shouldCancel = false;
+
+            if (skillSlot >= 0 && PlayerBase.Instance[session.Id].Skill != null && skillSlot < PlayerBase.Instance[session.Id].Skill.Length)
+            {
+                var skillId = PlayerBase.Instance[session.Id].Skill[skillSlot].Num;
+                if (skillId >= 0 && skillId < Skill.Instance.Count)
+                {
+                    shouldCancel = !Skill.Instance[skillId].MoveCast;
+                }
+            }
+
+            if (shouldCancel)
+            {
+                Data.TempPlayer[session.Id].SkillBuffer = -1;
+                Data.TempPlayer[session.Id].SkillBufferTimer = 0;
+                NetworkSend.ClearSkillBuffer(session.Id);
+            }
         }
     }
 
@@ -1711,10 +1726,12 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Skill.Instance[skill].CommonEventData1 = buffer.ReadInt32();
         Skill.Instance[skill].CommonEventData2 = buffer.ReadInt32();
 
-        Skill.Instance[skill].MoveSpeedMultiplier = buffer.ReadSingle();
+        Skill.Instance[skill].MoveSpeed = buffer.ReadSingle();
 
         // Optional trailing fields (backward compatible)
-        Skill.Instance[skill].SpCost = buffer.RemainingBytes >= sizeof(int) ? buffer.ReadInt32() : 0;
+        Skill.Instance[skill].MoveCast = buffer.ReadBoolean();
+
+        Skill.Instance[skill].SpCost = buffer.ReadInt32();
 
         // Save it
         NetworkSend.UpdateSkillToAll(skill);

@@ -2058,7 +2058,7 @@ public class Script
             // Uses Skill.Duration (seconds) for effect lifetime.
             if (entity.Type == Core.Globals.Entity.EntityType.Player)
             {
-                var mult = Skill.Instance[skill].MoveSpeedMultiplier;
+                var mult = Skill.Instance[skill].MoveSpeed;
                 if (mult <= 0) mult = 1.0f;
 
                 // Only treat this as a timed effect if Duration is positive.

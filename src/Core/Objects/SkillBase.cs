@@ -14,7 +14,9 @@ public class SkillBase
         Projectile = -1;
         ChainOnHitSkillId = -1;
 
-        MoveSpeedMultiplier = 1.0f;
+        MoveSpeed = 1.0f;
+
+        MoveCast = false;
     }
 
     public string Name { get; set; }
@@ -52,7 +54,10 @@ public class SkillBase
 
     // Multiplies movement speed while this skill effect is active (typically via Duration).
     // 1.0 = no change, <1 slows, >1 speeds up.
-    public float MoveSpeedMultiplier { get; set; }
+    public float MoveSpeed { get; set; }
+
+    // If true, the caster is allowed to move while this skill is casting.
+    public bool MoveCast { get; set; }
 
     public static List<SkillBase> Instance { get; private set; } = new List<SkillBase>();
 

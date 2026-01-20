@@ -711,7 +711,9 @@ public static class Sender
         packetWriter.WriteInt32(Skill.Instance[index].CommonEventData1);
         packetWriter.WriteInt32(Skill.Instance[index].CommonEventData2);
 
-        packetWriter.WriteSingle(Skill.Instance[index].MoveSpeedMultiplier);
+        packetWriter.WriteSingle(Skill.Instance[index].MoveSpeed);
+
+        packetWriter.WriteBoolean(Skill.Instance[index].MoveCast);
         
         packetWriter.WriteInt32(Skill.Instance[index].SpCost);
         Network.Send(packetWriter);

@@ -67,11 +67,26 @@ public class WinDescription
             return;
         }
 
+        // Prefer aligning description lines to the right panel (where lblJob/lblLevel live)
+        // rather than using a hardcoded X offset.
+        var textCenterX = x + 140;
+        if (WindowManager.TryGetControl("winDescription", "lblJob", out var lblCtrl)
+            || WindowManager.TryGetControl("winDescription", "lblLevel", out lblCtrl))
+        {
+            textCenterX = x + lblCtrl.X + (lblCtrl.Width / 2) - 6;
+        }
+        else if (WindowManager.TryGetControl("winDescription", "picSep", out var sepCtrl))
+        {
+            var rightPanelLeft = sepCtrl.X;
+            var rightPanelWidth = winDescription.Width - rightPanelLeft;
+            textCenterX = x + rightPanelLeft + (rightPanelWidth / 2) - 6;
+        }
+
         var offset = 18;
         for (var i = 0; i < GameState.Description.Length; i++)
         {
             TextRenderer.Render(GameState.Description[i].Caption,
-                x + 140 - TextRenderer.GetTextWidth(GameState.Description[i].Caption) / 2,
+                textCenterX - TextRenderer.GetTextWidth(GameState.Description[i].Caption) / 2,
                 y + offset,
                 GameClient.ToXnaColor(GameState.Description[i].Color),
                 Color.Black, winDescription.Font);
