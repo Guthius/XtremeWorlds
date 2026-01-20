@@ -115,7 +115,7 @@ public static class Commands
         return p.Stat[si];
     }
 
-    public static byte GetPlayerAccess(int index)
+    public static byte GetAccess(int index)
     {
         if (!ValidPlayerIndex(index)) return 0;
         return PlayerBase.Instance[index].Access;

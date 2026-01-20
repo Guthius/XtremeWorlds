@@ -253,7 +253,7 @@ namespace Client
             // Send a request to the server to open the admin menu if the user wants it.
             if (SettingsManager.Instance.OpenAdminPanelOnLogin == true)
             {
-                if (GetPlayerAccess(GameState.MyIndex) > 0)
+                if (GetAccess(GameState.MyIndex) > 0)
                 {
                     Sender.RequestAdmin();
                 }

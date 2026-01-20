@@ -525,7 +525,7 @@ public static class NetworkSend
 
     public static void WhosOnline(int playerId)
     {
-        if (GetPlayerAccess(playerId) < (int)Access.Moderator)
+        if (GetAccess(playerId) < (int)Access.Moderator)
         {
             return;
         }
@@ -838,7 +838,7 @@ public static class NetworkSend
         packetWriter.WriteInt32(GetPlayerPoints(playerId));
         packetWriter.WriteInt32(GetPlayerSprite(playerId));
         packetWriter.WriteInt32(GetMap(playerId));
-        packetWriter.WriteByte(GetPlayerAccess(playerId));
+        packetWriter.WriteByte(GetAccess(playerId));
         packetWriter.WriteBoolean(GetPlayerPk(playerId));
 
         for (var i = 0; i < StatCount; i++)
@@ -941,7 +941,7 @@ public static class NetworkSend
 
         foreach (var playerId in PlayerService.Instance.PlayerIds)
         {
-            if (GetPlayerAccess(playerId) >= (int)Access.Moderator)
+            if (GetAccess(playerId) >= (int)Access.Moderator)
             {
                 PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
             }
@@ -975,7 +975,7 @@ public static class NetworkSend
 
         packetWriter.WriteEnum(ServerPackets.SSayMessage);
         packetWriter.WriteString(GetPlayerName(playerId));
-        packetWriter.WriteInt32((int)GetPlayerAccess(playerId));
+        packetWriter.WriteInt32((int)GetAccess(playerId));
         packetWriter.WriteBoolean(GetPlayerPk(playerId));
         packetWriter.WriteString(message);
         packetWriter.WriteString("[Map]:");
@@ -990,7 +990,7 @@ public static class NetworkSend
 
         packetWriter.WriteEnum(ServerPackets.SSayMessage);
         packetWriter.WriteString(GetPlayerName(playerId));
-        packetWriter.WriteInt32((int)GetPlayerAccess(playerId));
+        packetWriter.WriteInt32((int)GetAccess(playerId));
         packetWriter.WriteBoolean(GetPlayerPk(playerId));
         packetWriter.WriteString(message);
         packetWriter.WriteString("[Global]:");

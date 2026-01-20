@@ -568,7 +568,7 @@ public static class Loop
                         {
                             if (NetworkConfig.IsPlaying(player.Id))
                             {
-                                if (GetMap(player.Id) == map && entity.TargetType == 0 && GetPlayerAccess(player.Id) <= (byte)Access.Moderator)
+                                if (GetMap(player.Id) == map && entity.TargetType == 0 && GetAccess(player.Id) <= (byte)Access.Moderator)
                                 {
                                     // Detection range
                                     int n = entity.Range;

@@ -2487,7 +2487,7 @@ public class Crystalshire
 
         // Helpers
         void ShowDenied() => TextRenderer.AddText(LocalesManager.Get("AccessDenied"), (int)ColorName.BrightRed);
-        bool HasAccess(Access min) => GetPlayerAccess(GameState.MyIndex) >= (int)min;
+        bool HasAccess(Access min) => GetAccess(GameState.MyIndex) >= (int)min;
         static bool IsNumeric(string s) => int.TryParse(s, out _);
         static int ReadInt(Control c, int fallback = 0) => int.TryParse(c.Text?.Trim(), out var n) ? n : fallback;
 

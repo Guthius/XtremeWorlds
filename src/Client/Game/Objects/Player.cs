@@ -1161,7 +1161,7 @@ namespace Client
 
             if (!GetPlayerPk(index))
             {
-                switch (GetPlayerAccess(index))
+                switch (GetAccess(index))
                 {
                     case (int)Core.Globals.Access.Player: color = Color.White; backColor = Color.Black; break;
                     case (int)Core.Globals.Access.Moderator: color = Color.Cyan; backColor = Color.White; break;

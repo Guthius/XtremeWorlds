@@ -1163,7 +1163,7 @@ public class Player : PlayerBase
             return false;
         }
 
-        if (GetPlayerAccess(playerId) < Item.Instance[itemNum].AccessReq)
+        if (GetAccess(playerId) < Item.Instance[itemNum].AccessReq)
         {
             NetworkSend.PlayerMessage(playerId, "You do not meet the access requirement to equip this item.", (int) ColorName.BrightRed);
             return false;
