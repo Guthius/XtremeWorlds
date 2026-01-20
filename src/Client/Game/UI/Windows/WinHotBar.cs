@@ -234,9 +234,9 @@ public class WinHotBar
 
         for (var i = 0; i < Core.Globals.Variables.MaxPlayerSkills; i++)
         {
-            if (GetPlayerSkill(GameState.MyIndex, i) < 0 ||
-                GetPlayerSkill(GameState.MyIndex, i) != skill ||
-                GetPlayerSkillCd(GameState.MyIndex, i) <= 0)
+            if (GetSkill(GameState.MyIndex, i) < 0 ||
+                GetSkill(GameState.MyIndex, i) != skill ||
+                GetSkillCd(GameState.MyIndex, i) <= 0)
             {
                 continue;
             }

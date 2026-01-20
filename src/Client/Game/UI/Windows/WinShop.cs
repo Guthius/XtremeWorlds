@@ -172,7 +172,7 @@ public class WinShop
         {
             if (GameState.ShopIsSelling)
             {
-                if (GetPlayerInv(GameState.MyIndex, slot) >= 0)
+                if (GetInv(GameState.MyIndex, slot) >= 0)
                 {
                     GameState.ShopSelectedSlot = slot;
 
@@ -217,7 +217,7 @@ public class WinShop
 
         if (GameState.ShopIsSelling)
         {
-            if (GetPlayerInv(GameState.MyIndex, slot) >= 0)
+            if (GetInv(GameState.MyIndex, slot) >= 0)
             {
                 Sender.SellItem(slot);
             }
@@ -269,7 +269,7 @@ public class WinShop
 
         var item = !GameState.ShopIsSelling
             ? Shop.Instance[GameState.InShop].TradeItem[slot].Item
-            : GetPlayerInv(GameState.MyIndex, slot);
+            : GetInv(GameState.MyIndex, slot);
 
         if (item == -1)
         {
@@ -339,7 +339,7 @@ public class WinShop
         }
         else
         {
-            GameState.ShopSelectedItem = GetPlayerInv(GameState.MyIndex, GameState.ShopSelectedSlot);
+            GameState.ShopSelectedItem = GetInv(GameState.MyIndex, GameState.ShopSelectedSlot);
 
             if (GameState.ShopSelectedItem >= 0)
             {
@@ -417,7 +417,7 @@ public class WinShop
                 GameClient.RenderTexture(ref selectedSlotTexturePath, left, top, 0, 0, 32, 32, 32, 32);
             }
 
-            var item = GetPlayerInv(GameState.MyIndex, i);
+            var item = GetInv(GameState.MyIndex, i);
             if (item < 0 || item >= Core.Globals.Variables.MaxItems)
             {
                 continue;
@@ -435,7 +435,7 @@ public class WinShop
 
             GameClient.RenderTexture(ref path, left, top, 0, 0, 32, 32, 32, 32);
 
-            if (GetPlayerInvValue(GameState.MyIndex, i) <= 1)
+            if (GetInvValue(GameState.MyIndex, i) <= 1)
             {
                 continue;
             }
@@ -443,7 +443,7 @@ public class WinShop
             var y = top + 20;
             var x = left + 1;
 
-            var amount = GetPlayerInvValue(GameState.MyIndex, i);
+            var amount = GetInvValue(GameState.MyIndex, i);
             var amountColor = TextRenderer.GetColorForAmount(amount);
 
             TextRenderer.Render(GameLogic.ConvertCurrency(amount), x, y, amountColor, amountColor, winShop.Font);

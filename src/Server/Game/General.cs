@@ -508,42 +508,42 @@ public static class General
                 switch (access)
                 {
                     case (byte)Access.Player:
-                        SetPlayerAccess(player, access);
+                        SetAccess(player, access);
                         NetworkSend.PlayerData(player);
                         await Account.OnSave(player);
                         NetworkSend.PlayerMessage(player, "Your access has been set to Player!", (int)ColorName.Yellow);
-                        Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(player));
+                        Console.WriteLine("Successfully set the access level to " + access + " for player " + GetName(player));
                         break;
                     case (byte)Access.Moderator:
-                        SetPlayerAccess(player, access);
+                        SetAccess(player, access);
                         NetworkSend.PlayerData(player);
                         await Account.OnSave(player);
                         NetworkSend.PlayerMessage(player, "Your access has been set to Moderator!", (int)ColorName.Yellow);
-                        Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(player));
+                        Console.WriteLine("Successfully set the access level to " + access + " for player " + GetName(player));
                         break;
                     case (byte)Access.Mapper:
-                        SetPlayerAccess(player, access);
+                        SetAccess(player, access);
                         NetworkSend.PlayerData(player);
                         await Account.OnSave(player);
                         NetworkSend.PlayerMessage(player, "Your access has been set to Mapper!", (int)ColorName.Yellow);
-                        Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(player));
+                        Console.WriteLine("Successfully set the access level to " + access + " for player " + GetName(player));
                         break;
                     case (byte)Access.Developer:
-                        SetPlayerAccess(player, access);
+                        SetAccess(player, access);
                         NetworkSend.PlayerData(player);
                         await Account.OnSave(player);
                         NetworkSend.PlayerMessage(player, "Your access has been set to Developer!", (int)ColorName.Yellow);
-                        Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(player));
+                        Console.WriteLine("Successfully set the access level to " + access + " for player " + GetName(player));
                         break;
                     case (byte)Access.Owner:
-                        SetPlayerAccess(player, access);
+                        SetAccess(player, access);
                         NetworkSend.PlayerData(player);
                         await Account.OnSave(player);
                         NetworkSend.PlayerMessage(player, "Your access has been set to Owner!", (int)ColorName.Yellow);
-                        Console.WriteLine("Successfully set the access level to " + access + " for player " + GetPlayerName(player));
+                        Console.WriteLine("Successfully set the access level to " + access + " for player " + GetName(player));
                         break;
                     default:
-                        Console.WriteLine("Failed to set the access level to " + access + " for player " + GetPlayerName(player));
+                        Console.WriteLine("Failed to set the access level to " + access + " for player " + GetName(player));
                         break;
                             
                 }
@@ -554,7 +554,7 @@ public static class General
             {
                 Account.Instance[player].Banned = true;
                 await Player.OnExit(player);
-                Console.WriteLine($"Player {GetPlayerName(player)} has been banned by the server.");
+                Console.WriteLine($"Player {GetName(player)} has been banned by the server.");
                         
                 break;
             }

@@ -499,7 +499,7 @@ namespace Client
                 // Ensure admin panel shows the current player's name when it opens
                 try
                 {
-                    var playerName = GetPlayerName(GameState.MyIndex);
+                    var playerName = GetName(GameState.MyIndex);
                     var adminWindow = WindowManager.GetWindowByName("winAdmin");
                     if (adminWindow != null)
                     {

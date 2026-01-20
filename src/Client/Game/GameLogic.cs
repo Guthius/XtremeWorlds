@@ -303,7 +303,7 @@ namespace Client
                             {
                                 if (GameState.MyTargetType == (int)TargetType.Player)
                                 {
-                                    Sender.PartyRequest(GetPlayerName(GameState.MyTarget));
+                                    Sender.PartyRequest(GetName(GameState.MyTarget));
                                     goto Continue1;
                                 }
                             }
@@ -340,7 +340,7 @@ namespace Client
                             {
                                 if (GameState.MyTargetType == (int)TargetType.Player)
                                 {
-                                    Sender.TradeRequest(GetPlayerName(GameState.MyTarget));
+                                    Sender.TradeRequest(GetName(GameState.MyTarget));
                                     goto Continue1;
                                 }
                             }
@@ -1447,9 +1447,9 @@ namespace Client
                 return;
 
             // show
-            if (GetPlayerInv(GameState.MyIndex, invSlot) >= 0)
+            if (GetInv(GameState.MyIndex, invSlot) >= 0)
             {
-                ShowItemDesc(x, y, GetPlayerInv(GameState.MyIndex, invSlot), invSlot);
+                ShowItemDesc(x, y, GetInv(GameState.MyIndex, invSlot), invSlot);
             }
         }
 
@@ -1579,7 +1579,7 @@ namespace Client
                 {
                     levelTxt = "Level " + Item.Instance[(int)item].LevelReq;
                     // do we match it?
-                    if (GetPlayerLevel(GameState.MyIndex) >= Item.Instance[(int)item].LevelReq)
+                    if (GetLevel(GameState.MyIndex) >= Item.Instance[(int)item].LevelReq)
                     {
                         color = Microsoft.Xna.Framework.Color.Green;
                     }
@@ -2060,9 +2060,9 @@ namespace Client
                             if (IsPlaying((int)pIndex))
                             {
                                 // get their health
-                                if (GetPlayerVital((int)pIndex, Core.Globals.Vital.Health) > 0 & GetPlayerMaxVital((int)pIndex, Core.Globals.Vital.Health) > 0)
+                                if (GetVital((int)pIndex, Core.Globals.Vital.Health) > 0 & GetMaxVital((int)pIndex, Core.Globals.Vital.Health) > 0)
                                 {
-                                    width = (int)Math.Round(GetPlayerVital((int)pIndex, Core.Globals.Vital.Health) / (double)barWidth / (GetPlayerMaxVital((int)pIndex, Core.Globals.Vital.Health) / (double)barWidth) * barWidth);
+                                    width = (int)Math.Round(GetVital((int)pIndex, Core.Globals.Vital.Health) / (double)barWidth / (GetMaxVital((int)pIndex, Core.Globals.Vital.Health) / (double)barWidth) * barWidth);
                                     instance.Controls[WindowManager.GetControl("winParty", "picBar_HP" + i)].Width = width;
                                 }
                                 else
@@ -2070,9 +2070,9 @@ namespace Client
                                     instance.Controls[WindowManager.GetControl("winParty", "picBar_HP" + i)].Width = 0;
                                 }
                                 // get their spirit
-                                if (GetPlayerVital((int)pIndex, Core.Globals.Vital.Stamina) > 0 & GetPlayerMaxVital((int)pIndex, Core.Globals.Vital.Stamina) > 0)
+                                if (GetVital((int)pIndex, Core.Globals.Vital.Stamina) > 0 & GetMaxVital((int)pIndex, Core.Globals.Vital.Stamina) > 0)
                                 {
-                                    width = (int)Math.Round(GetPlayerVital((int)pIndex, Core.Globals.Vital.Stamina) / (double)barWidth / (GetPlayerMaxVital((int)pIndex, Core.Globals.Vital.Stamina) / (double)barWidth) * barWidth);
+                                    width = (int)Math.Round(GetVital((int)pIndex, Core.Globals.Vital.Stamina) / (double)barWidth / (GetMaxVital((int)pIndex, Core.Globals.Vital.Stamina) / (double)barWidth) * barWidth);
                                     instance.Controls[WindowManager.GetControl("winParty", "picBar_SP" + i)].Width = width;
                                 }
                                 else
@@ -2094,9 +2094,9 @@ namespace Client
             // set the controls up
             {
                 var instance = WindowManager.Windows[WindowManager.GetWindow("winTrade")];
-                instance.Text = "Trading with " + GetPlayerName(Trade.InTrade);
-                instance.Controls[WindowManager.GetControl("winTrade", "lblYourTrade")].Text = GetPlayerName(GameState.MyIndex) + "'s Offer";
-                instance.Controls[WindowManager.GetControl("winTrade", "lblTheirTrade")].Text = GetPlayerName(Trade.InTrade) + "'s Offer";
+                instance.Text = "Trading with " + GetName(Trade.InTrade);
+                instance.Controls[WindowManager.GetControl("winTrade", "lblYourTrade")].Text = GetName(GameState.MyIndex) + "'s Offer";
+                instance.Controls[WindowManager.GetControl("winTrade", "lblTheirTrade")].Text = GetName(Trade.InTrade) + "'s Offer";
                 instance.Controls[WindowManager.GetControl("winTrade", "lblYourValue")].Text = "0g";
                 instance.Controls[WindowManager.GetControl("winTrade", "lblTheirValue")].Text = "0g";
                 instance.Controls[WindowManager.GetControl("winTrade", "lblStatus")].Text = "Choose items to offer.";
@@ -2110,7 +2110,7 @@ namespace Client
                 return;
             WindowManager.Windows[WindowManager.GetWindow("winPlayerMenu")].X = x - 5;
             WindowManager.Windows[WindowManager.GetWindow("winPlayerMenu")].Y = y - 5;
-            WindowManager.Windows[WindowManager.GetWindow("winPlayerMenu")].Controls[WindowManager.GetControl("winPlayerMenu", "btnName")].Text = GetPlayerName((int)GameState.PlayerMenuIndex);
+            WindowManager.Windows[WindowManager.GetWindow("winPlayerMenu")].Controls[WindowManager.GetControl("winPlayerMenu", "btnName")].Text = GetName((int)GameState.PlayerMenuIndex);
             WindowManager.ShowWindow("winRightClickBG");
             WindowManager.ShowWindow("winPlayerMenu");
         }
@@ -2162,9 +2162,9 @@ namespace Client
 
             for (i = 0L; i < Core.Globals.Variables.MaxInventory; i++)
             {
-                if (GetPlayerInv(GameState.MyIndex, (int)i) == 1)
+                if (GetInv(GameState.MyIndex, (int)i) == 1)
                 {
-                    amount = GetPlayerInvValue(GameState.MyIndex, (int)i);
+                    amount = GetInvValue(GameState.MyIndex, (int)i);
                 }
             }
             WindowManager.Windows[WindowManager.GetWindow("winShop")].Controls[WindowManager.GetControl("winShop", "lblGold")].Text = Strings.Format(amount, "#,###,###,###") + "g";
@@ -2434,13 +2434,13 @@ namespace Client
                     int t = GameState.MyTarget;
                     if (IsPlaying(t) && Player.Instance[t].Map == Player.Instance[GameState.MyIndex].Map)
                     {
-                        targetX = GetPlayerRawX(t);
-                        targetY = GetPlayerRawY(t);
+                        targetX = GetRawX(t);
+                        targetY = GetRawY(t);
                     }
                     else
                     {
-                        targetX = GetPlayerRawX(GameState.MyIndex);
-                        targetY = GetPlayerRawY(GameState.MyIndex);
+                        targetX = GetRawX(GameState.MyIndex);
+                        targetY = GetRawY(GameState.MyIndex);
                     }
                 }
                 else if (GameState.MyTargetType == (int)TargetType.Npc)
@@ -2453,20 +2453,20 @@ namespace Client
                     }
                     else
                     {
-                        targetX = GetPlayerRawX(GameState.MyIndex);
-                        targetY = GetPlayerRawY(GameState.MyIndex);
+                        targetX = GetRawX(GameState.MyIndex);
+                        targetY = GetRawY(GameState.MyIndex);
                     }
                 }
                 else
                 {
-                    targetX = GetPlayerRawX(GameState.MyIndex);
-                    targetY = GetPlayerRawY(GameState.MyIndex);
+                    targetX = GetRawX(GameState.MyIndex);
+                    targetY = GetRawY(GameState.MyIndex);
                 }
             }
             else
             {
-                targetX = GetPlayerRawX(GameState.MyIndex);
-                targetY = GetPlayerRawY(GameState.MyIndex);
+                targetX = GetRawX(GameState.MyIndex);
+                targetY = GetRawY(GameState.MyIndex);
             }
 
             // Desired camera top-left so target/player is centered

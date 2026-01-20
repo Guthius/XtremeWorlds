@@ -16,14 +16,14 @@ public class WinPlayerMenu
     {
         OnClose();
         
-        Sender.PartyRequest(GetPlayerName((int) GameState.PlayerMenuIndex));
+        Sender.PartyRequest(GetName((int) GameState.PlayerMenuIndex));
     }
 
     public static void OnTradeRequest()
     {
         OnClose();
         
-        Sender.TradeRequest(GetPlayerName((int) GameState.PlayerMenuIndex));
+        Sender.TradeRequest(GetName((int) GameState.PlayerMenuIndex));
     }
 
     public static void OnGuildInvite()

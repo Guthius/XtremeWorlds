@@ -326,8 +326,8 @@ namespace Client
 
             // Calculate horizontal and vertical offsets based
             // yer position
-            horz = GameLogic.ConvertMapX(GetPlayerX(GameState.MyIndex)) * 2.5f - 50f;
-            vert = GameLogic.ConvertMapY(GetPlayerY(GameState.MyIndex)) * 2.5f - 50f;
+            horz = GameLogic.ConvertMapX(GetX(GameState.MyIndex)) * 2.5f - 50f;
+            vert = GameLogic.ConvertMapY(GetY(GameState.MyIndex)) * 2.5f - 50f;
 
             string argPath = System.IO.Path.Combine(DataPath.Parallax, index.ToString());
             var gfx = GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Parallax, index.ToString()));

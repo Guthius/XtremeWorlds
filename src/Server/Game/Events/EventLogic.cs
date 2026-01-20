@@ -617,7 +617,7 @@ namespace Server
                                             if (!isGlobal) //should never be global.
                                             {
                                                 // Determine if the event is one block away from the player.
-                                                if (Event.IsOneBlockAway(instance.X, instance.Y, GetPlayerX(playerId), GetPlayerY(playerId)))
+                                                if (Event.IsOneBlockAway(instance.X, instance.Y, GetX(playerId), GetY(playerId)))
                                                 {
                                                     // Face the player.
                                                     Event.Dir(playerId, GetMap(playerId), eventId, (byte)Event.GetDirToPlayer(playerId, GetMap(playerId), eventId), false);
@@ -1110,7 +1110,7 @@ namespace Server
                                             {
                                                 if (!isGlobal)
                                                 {
-                                                    if (Event.IsOneBlockAway(instance.X, instance.Y, GetPlayerX(i), GetPlayerY(i)))
+                                                    if (Event.IsOneBlockAway(instance.X, instance.Y, GetX(i), GetY(i)))
                                                     {
                                                         Event.Dir(i, map, eventId, (byte)Event.GetDirToPlayer(i, map, eventId), false);
 
@@ -1844,7 +1844,7 @@ namespace Server
                                                     break;
                                                 case 5: // Level
                                                 {
-                                                    int level = GetPlayerLevel(i);
+                                                    int level = GetLevel(i);
                                                     switch (branch.Data2)
                                                     {
                                                         case 0: conditionMet = level == branch.Data1; break;
@@ -1924,38 +1924,38 @@ namespace Server
                                         }
 
                                         case (byte) EventCommand.RestoreHealth:
-                                            SetPlayerVital(i, Core.Globals.Vital.Health, Script.Instance?.GetPlayerMaxVital(i, Core.Globals.Vital.Health));
+                                            SetVital(i, Core.Globals.Vital.Health, Script.Instance?.GetPlayerMaxVital(i, Core.Globals.Vital.Health));
                                             NetworkSend.Vital(i, Core.Globals.Vital.Health);
                                             break;
 
                                         case (byte) EventCommand.RestoreMana:
-                                            SetPlayerVital(i, Core.Globals.Vital.Mana, Script.Instance?.GetPlayerMaxVital(i, Core.Globals.Vital.Mana));
+                                            SetVital(i, Core.Globals.Vital.Mana, Script.Instance?.GetPlayerMaxVital(i, Core.Globals.Vital.Mana));
                                             NetworkSend.Vital(i, Core.Globals.Vital.Mana);
                                             break;
 
                                         case (byte) EventCommand.RestoreStamina:
-                                            SetPlayerVital(i, Core.Globals.Vital.Stamina, Script.Instance?.GetPlayerMaxVital(i, Core.Globals.Vital.Stamina));
+                                            SetVital(i, Core.Globals.Vital.Stamina, Script.Instance?.GetPlayerMaxVital(i, Core.Globals.Vital.Stamina));
                                             NetworkSend.Vital(i, Core.Globals.Vital.Stamina);
                                             break;
 
                                         case (byte) EventCommand.GiveExperience:
-                                            SetPlayerExperience(i, GetPlayerExperience(i) + command.Data1);
+                                            SetExp(i, GetExp(i) + command.Data1);
                                             Player.OnLevel(i);
                                             break;
 
                                         case (byte) EventCommand.LevelUp:
-                                            SetPlayerExperience(i, Script.Instance?.GetPlayerNextLevel(i));
+                                            SetExp(i, Script.Instance?.GetPlayerNextLevel(i));
                                             Player.OnLevel(i);
                                             break;
 
                                         case (byte) EventCommand.ChangePoints:
-                                            SetPlayerPoints(i, GetPlayerPoints(i) + command.Data1);
+                                            SetPoints(i, GetPoints(i) + command.Data1);
                                             NetworkSend.PlayerData(i);
                                             break;
 
                                         case (byte) EventCommand.ChangeLevel:
-                                            SetPlayerLevel(i, GetPlayerLevel(i) + command.Data1);
-                                            SetPlayerExperience(i, 0);
+                                            SetLevel(i, GetLevel(i) + command.Data1);
+                                            SetExp(i, 0);
                                             NetworkSend.PlayerData(i);
                                             NetworkSend.Experience(i);
                                             break;
@@ -1990,7 +1990,7 @@ namespace Server
                                             break;
 
                                         case (byte) EventCommand.ChangeSprite:
-                                            SetPlayerSprite(i, command.Data1);
+                                            SetSprite(i, command.Data1);
                                             NetworkSend.PlayerData(i);
                                             break;
 
@@ -2060,7 +2060,7 @@ namespace Server
                                             switch (command.Data2)
                                             {
                                                 case 0: // On Player
-                                                    NetworkSend.PlayAnimation(map, command.Data1, GetPlayerX(i), GetPlayerY(i), (byte) TargetType.Player, i);
+                                                    NetworkSend.PlayAnimation(map, command.Data1, GetX(i), GetY(i), (byte) TargetType.Player, i);
                                                     break;
                                                 case 1: // On Event
                                                 {
@@ -2139,7 +2139,7 @@ namespace Server
                                             break;
                                         }
                                         case (byte) EventCommand.SetAccessLevel:
-                                            SetPlayerAccess(i, (byte) command.Data1);
+                                            SetAccess(i, (byte) command.Data1);
                                             NetworkSend.PlayerData(i);
                                             break;
 
@@ -3010,11 +3010,11 @@ namespace Server
             // 4. Determine the target tile based on trigger type.
             // Action Button (0): trigger the tile in front of the player.
             // Player Touch (1): trigger the tile the player is on.
-            var playerX = GetPlayerX(player);
-            var playerY = GetPlayerY(player);
+            var playerX = GetX(player);
+            var playerY = GetY(player);
             if (triggerType == 0)
             {
-                (int x, int y)? offset = GetOffsetByDirection(GetPlayerDir(player), playerX, playerY, Server.Map.Instance[map]);
+                (int x, int y)? offset = GetOffsetByDirection(GetDir(player), playerX, playerY, Server.Map.Instance[map]);
                 if (offset == null)
                     return false;
 

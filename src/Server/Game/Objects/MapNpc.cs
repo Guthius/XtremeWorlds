@@ -179,8 +179,8 @@ namespace Server
             foreach (var playerId in PlayerService.Instance.PlayerIds)
             {
                 if (GetMap(playerId) == map &&
-                    GetPlayerX(playerId) == x &&
-                    GetPlayerY(playerId) == y)
+                    GetX(playerId) == x &&
+                    GetY(playerId) == y)
                 {
                     return false;
                 }
@@ -307,8 +307,8 @@ namespace Server
             foreach (var playerId in PlayerService.Instance.PlayerIds)
             {
                 if (GetMap(playerId) == map &&
-                    GetPlayerX(playerId) == nextTileX &&
-                    GetPlayerY(playerId) == nextTileY)
+                    GetX(playerId) == nextTileX &&
+                    GetY(playerId) == nextTileY)
                 {
                     return false;
                 }

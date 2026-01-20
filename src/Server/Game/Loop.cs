@@ -106,7 +106,7 @@ public static class Loop
                         var eqCount = Enum.GetNames(typeof(Equipment)).Length;
                         for (int eq = 0; eq < eqCount; eq++)
                         {
-                            var itemId = GetPlayerPaperdoll(id, (Equipment)eq);
+                            var itemId = GetPaperdoll(id, (Equipment)eq);
                             if (itemId >= 0 && itemId < Item.Instance.Count)
                             {
                                 equipBonus += Item.Instance[itemId].MovementSpeed;
@@ -574,14 +574,14 @@ public static class Loop
                                     int n = entity.Range;
                                     int ex = entity.X / Constants.TileSize;
                                     int ey = entity.Y / Constants.TileSize;
-                                    int px = GetPlayerX(player.Id);
-                                    int py = GetPlayerY(player.Id);
+                                    int px = GetX(player.Id);
+                                    int py = GetY(player.Id);
                                     int distanceX = Math.Abs(ex - px);
                                     int distanceY = Math.Abs(ey - py);
 
                                     if (distanceX <= n && distanceY <= n)
                                     {
-                                        if (entity.Behavior == (byte)NpcBehavior.AttackOnSight || GetPlayerPk(player.Id))
+                                        if (entity.Behavior == (byte)NpcBehavior.AttackOnSight || GetPk(player.Id))
                                         {
                                             if (!string.IsNullOrEmpty(entity.AttackSay))
                                             {
@@ -680,8 +680,8 @@ public static class Loop
                                 // Clear target if out of chase range
                                 int ex = entity.X / Constants.TileSize;
                                 int ey = entity.Y / Constants.TileSize;
-                                int px = GetPlayerX(pid);
-                                int py = GetPlayerY(pid);
+                                int px = GetX(pid);
+                                int py = GetY(pid);
                                 int r = entity.Range;
                                 if (Math.Abs(ex - px) > r || Math.Abs(ey - py) > r)
                                 {
@@ -965,8 +965,8 @@ public static class Loop
             {
                 int sxR = baseNpc.X / Constants.TileSize;
                 int syR = baseNpc.Y / Constants.TileSize;
-                int txR = GetPlayerX(baseNpc.Target);
-                int tyR = GetPlayerY(baseNpc.Target);
+                int txR = GetX(baseNpc.Target);
+                int tyR = GetY(baseNpc.Target);
                 int rR = Math.Max(0, (int)Npc.Instance[baseNpc.Num].Range);
                 if (Math.Abs(sxR - txR) > rR || Math.Abs(syR - tyR) > rR)
                 {
@@ -1002,8 +1002,8 @@ public static class Loop
             {
                 int sx = baseNpc.X / Constants.TileSize;
                 int sy = baseNpc.Y / Constants.TileSize;
-                int tx = GetPlayerX(baseNpc.Target);
-                int ty = GetPlayerY(baseNpc.Target);
+                int tx = GetX(baseNpc.Target);
+                int ty = GetY(baseNpc.Target);
                 moved = Script.Instance?.TryChase(map, npcIndex, sx, sy, tx, ty);
             }
             else if (baseNpc.TargetType == (byte)TargetType.Npc && baseNpc.Target >= 0)

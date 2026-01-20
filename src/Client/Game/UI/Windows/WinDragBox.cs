@@ -182,7 +182,7 @@ public class WinDragBox
             case PartOrigin.Inventory:
                 if (WindowManager.DragBox.Type == DraggablePartType.Item)
                 {
-                    if (Item.Instance[GetPlayerInv(GameState.MyIndex, WindowManager.DragBox.Slot)].Type != (byte) ItemCategory.Currency)
+                    if (Item.Instance[GetInv(GameState.MyIndex, WindowManager.DragBox.Slot)].Type != (byte) ItemCategory.Currency)
                     {
                         Sender.DepositItem(WindowManager.DragBox.Slot, 1);
                     }
@@ -331,7 +331,7 @@ public class WinDragBox
 
             for (var slot = 0; slot < Core.Globals.Variables.MaxInventory; slot++)
             {
-                if (GetPlayerInv(GameState.MyIndex, slot) == itemNum)
+                if (GetInv(GameState.MyIndex, slot) == itemNum)
                 {
                     return slot;
                 }
@@ -350,7 +350,7 @@ public class WinDragBox
                 return;
             }
 
-            item = GetPlayerInv(GameState.MyIndex, inv);
+            item = GetInv(GameState.MyIndex, inv);
         }
         else
         {
@@ -459,7 +459,7 @@ public class WinDragBox
             case PartOrigin.Inventory:
                 {
                     var inv = WindowManager.DragBox.Slot;
-                    var item = GetPlayerInv(GameState.MyIndex, inv);
+                    var item = GetInv(GameState.MyIndex, inv);
                     if (item < 0 || item >= Item.Instance.Count)
                     {
                         break;
@@ -488,7 +488,7 @@ public class WinDragBox
             case PartOrigin.SkillTree:
                 {
                     var slot = WindowManager.DragBox.Slot;
-                    var skill = GetPlayerSkill(GameState.MyIndex, slot);
+                    var skill = GetSkill(GameState.MyIndex, slot);
                     if (skill < 0 || skill >= Skill.Instance.Count)
                     {
                         break;
@@ -549,18 +549,18 @@ public class WinDragBox
                 continue;
             }
 
-            if (Item.Instance[GetPlayerInv(GameState.MyIndex, Data.TradeYourOffer[i].Num)].Type != (byte)ItemCategory.Currency)
+            if (Item.Instance[GetInv(GameState.MyIndex, Data.TradeYourOffer[i].Num)].Type != (byte)ItemCategory.Currency)
             {
                 return;
             }
 
-            if (Data.TradeYourOffer[i].Value == GetPlayerInvValue(GameState.MyIndex, Data.TradeYourOffer[i].Num))
+            if (Data.TradeYourOffer[i].Value == GetInvValue(GameState.MyIndex, Data.TradeYourOffer[i].Num))
             {
                 return;
             }
         }
 
-        if (Item.Instance[GetPlayerInv(GameState.MyIndex, inv)].Type == (byte)ItemCategory.Currency)
+        if (Item.Instance[GetInv(GameState.MyIndex, inv)].Type == (byte)ItemCategory.Currency)
         {
             GameLogic.Dialogue(
                 "Offer Item",

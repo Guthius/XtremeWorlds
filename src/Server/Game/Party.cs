@@ -64,19 +64,19 @@ public static class Party
                         if (Data.Party[partyNum].Member[i] >= 0 & Data.Party[partyNum].Member[i] != index)
                         {
                             Data.Party[partyNum].Leader = Data.Party[partyNum].Member[i];
-                            OnMessage(partyNum, string.Format("{0} is now the party leader.", GetPlayerName(i)));
+                            OnMessage(partyNum, string.Format("{0} is now the party leader.", GetName(i)));
                             break;
                         }
                     }
 
                     // leave party
-                    OnMessage(partyNum, string.Format("{0} has left the party.", GetPlayerName(index)));
+                    OnMessage(partyNum, string.Format("{0} has left the party.", GetName(index)));
                     OnRemove(index, partyNum);
                 }
                 else
                 {
                     // not the leader, just leave
-                    OnMessage(partyNum, string.Format("{0} has left the party.", GetPlayerName(index)));
+                    OnMessage(partyNum, string.Format("{0} has left the party.", GetName(index)));
                     OnRemove(index, partyNum);
                 }
             }
@@ -194,7 +194,7 @@ public static class Party
                     NetworkSend.PartyVitals(partyNum, target);
 
                     // let everyone know they've joined
-                    OnMessage(partyNum, string.Format("{0} has joined the party.", GetPlayerName(target)));
+                    OnMessage(partyNum, string.Format("{0} has joined the party.", GetName(target)));
 
                     // add them in
                     Data.TempPlayer[target].InParty = (byte)partyNum;
@@ -231,7 +231,7 @@ public static class Party
 
         // let them know it's created
         OnMessage(partyNum, "Party created.");
-        OnMessage(partyNum, string.Format("{0} has joined the party.", GetPlayerName(index)));
+        OnMessage(partyNum, string.Format("{0} has joined the party.", GetName(index)));
 
         // clear the invitation
         Data.TempPlayer[target].PartyInvite = -1;
@@ -243,7 +243,7 @@ public static class Party
 
     public static void OnDecline(int index, int target)
     {
-        NetworkSend.PlayerMessage(index, string.Format("{0} has declined to join your party.", GetPlayerName(target)),
+        NetworkSend.PlayerMessage(index, string.Format("{0} has declined to join your party.", GetName(target)),
             (int)ColorName.BrightRed);
         NetworkSend.PlayerMessage(target, "You declined to join the party.", (int)ColorName.Yellow);
 
@@ -318,7 +318,7 @@ public static class Party
         if (!(exp >= Data.Party[partyNum].MemberCount))
         {
             // no party - keep exp for self
-            SetPlayerExperience(index, GetPlayerExperience(index) + exp);
+            SetExp(index, GetExp(index) + exp);
             NetworkSend.Experience(index);
             return;
         }
@@ -366,7 +366,7 @@ public static class Party
                     if (GetMap(tmpindex) == map)
                     {
                         // give them their share
-                        SetPlayerExperience(tmpindex, GetPlayerExperience(tmpindex) + expShare);
+                        SetExp(tmpindex, GetExp(tmpindex) + expShare);
                     }
                 }
             }
@@ -378,7 +378,7 @@ public static class Party
             tmpindex = Data.Party[partyNum]
                 .Member[(int)Math.Round(General.GetRandom.NextDouble(1d, Data.Party[partyNum].MemberCount))];
             // give the exp
-            SetPlayerExperience(tmpindex, GetPlayerExperience(tmpindex) + leftOver);
+            SetExp(tmpindex, GetExp(tmpindex) + leftOver);
         }
     }
 

@@ -48,11 +48,11 @@ public class WinParty
             }
 
             winParty.GetChild("lblName" + frame).Visible = true;
-            winParty.GetChild("lblName" + frame).Text = GetPlayerName(playerIndex);
+            winParty.GetChild("lblName" + frame).Text = GetName(playerIndex);
             winParty.GetChild("picShadow" + frame).Visible = true;
             winParty.GetChild("picChar" + frame).Visible = true;
             winParty.GetChild("picChar" + frame).Value = playerIndex;
-            winParty.GetChild("picChar" + frame).Image = GetPlayerSprite(playerIndex);
+            winParty.GetChild("picChar" + frame).Image = GetSprite(playerIndex);
             
             for (var x = 0; x <= 4; x++)
             {

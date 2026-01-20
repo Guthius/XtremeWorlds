@@ -296,7 +296,7 @@ namespace Client
                 return calculateSoundVolume;
             }
 
-            if (GameState.InGame && x == GetPlayerX(GameState.MyIndex) && y == GetPlayerY(GameState.MyIndex))
+            if (GameState.InGame && x == GetX(GameState.MyIndex) && y == GetY(GameState.MyIndex))
             {
                 calculateSoundVolume = 1d;
                 calculateSoundVolume *= SettingsManager.Instance.SoundVolume;

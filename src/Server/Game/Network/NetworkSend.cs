@@ -215,7 +215,7 @@ public static class NetworkSend
 
         packetWriter.WriteEnum(ServerPackets.SPlayerExp);
         packetWriter.WriteInt32(playerId);
-        packetWriter.WriteInt32(GetPlayerExperience(playerId));
+        packetWriter.WriteInt32(GetExp(playerId));
         packetWriter.WriteInt32(Script.Instance?.GetPlayerNextLevel(playerId));
 
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
@@ -286,8 +286,8 @@ public static class NetworkSend
 
         for (var i = 0; i < Core.Globals.Variables.MaxInventory; i++)
         {
-            packetWriter.WriteInt32(GetPlayerInv(playerId, i));
-            packetWriter.WriteInt32(GetPlayerInvValue(playerId, i));
+            packetWriter.WriteInt32(GetInv(playerId, i));
+            packetWriter.WriteInt32(GetInvValue(playerId, i));
         }
 
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
@@ -311,7 +311,7 @@ public static class NetworkSend
 
         for (var i = 0; i < EquipmentCount; i++)
         {
-            packetWriter.WriteInt32(GetPlayerPaperdoll(playerId, (Equipment)i));
+            packetWriter.WriteInt32(GetPaperdoll(playerId, (Equipment)i));
         }
 
         NetworkConfig.SendDataToMap(GetMap(playerId), packetWriter.GetBytes());
@@ -326,7 +326,7 @@ public static class NetworkSend
 
         for (var i = 0; i < EquipmentCount; i++)
         {
-            packetWriter.WriteInt32(GetPlayerPaperdoll(equipmentPlayerId, (Equipment)i));
+            packetWriter.WriteInt32(GetPaperdoll(equipmentPlayerId, (Equipment)i));
         }
 
         PlayerService.Instance.SendDataTo(sendToPlayerId, packetWriter.GetBytes());
@@ -469,7 +469,7 @@ public static class NetworkSend
 
         for (var i = 0; i < StatCount; i++)
         {
-            packetWriter.WriteInt32(GetPlayerStat(playerId, (Stat)i));
+            packetWriter.WriteInt32(GetStat(playerId, (Stat)i));
         }
 
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
@@ -502,7 +502,7 @@ public static class NetworkSend
                 break;
         }
 
-        packetWriter.WriteInt32(GetPlayerVital(playerId, vital));
+        packetWriter.WriteInt32(GetVital(playerId, vital));
         packetWriter.WriteInt32(Script.Instance?.GetPlayerMaxVital(playerId, vital));
 
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
@@ -532,7 +532,7 @@ public static class NetworkSend
 
         var playerNames = PlayerService.Instance.PlayerIds
             .Where(otherPlayerId => otherPlayerId != playerId)
-            .Select(GetPlayerName)
+            .Select(GetName)
             .ToArray();
 
         string message;
@@ -556,7 +556,7 @@ public static class NetworkSend
 
         for (var i = 0; i < EquipmentCount; i++)
         {
-            packetWriter.WriteInt32(GetPlayerPaperdoll(playerId, (Equipment)i));
+            packetWriter.WriteInt32(GetPaperdoll(playerId, (Equipment)i));
         }
 
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
@@ -832,25 +832,25 @@ public static class NetworkSend
 
         packetWriter.WriteEnum(ServerPackets.SPlayerData);
         packetWriter.WriteInt32(playerId);
-        packetWriter.WriteString(GetPlayerName(playerId));
+        packetWriter.WriteString(GetName(playerId));
         packetWriter.WriteByte(GetJob(playerId));
-        packetWriter.WriteInt32(GetPlayerLevel(playerId));
-        packetWriter.WriteInt32(GetPlayerPoints(playerId));
-        packetWriter.WriteInt32(GetPlayerSprite(playerId));
+        packetWriter.WriteInt32(GetLevel(playerId));
+        packetWriter.WriteInt32(GetPoints(playerId));
+        packetWriter.WriteInt32(GetSprite(playerId));
         packetWriter.WriteInt32(GetMap(playerId));
         packetWriter.WriteByte(GetAccess(playerId));
-        packetWriter.WriteBoolean(GetPlayerPk(playerId));
+        packetWriter.WriteBoolean(GetPk(playerId));
 
         for (var i = 0; i < StatCount; i++)
         {
-            packetWriter.WriteInt32(GetPlayerStat(playerId, (Stat)i));
+            packetWriter.WriteInt32(GetStat(playerId, (Stat)i));
         }
 
         for (var i = 0; i < ResourceSkillCount; i++)
         {
-            packetWriter.WriteInt32(GetPlayerGatherSkillLevel(playerId, i));
-            packetWriter.WriteInt32(GetPlayerGatherSkillExperience(playerId, i));
-            packetWriter.WriteInt32(GetPlayerGatherSkillMaxExperience(playerId, i));
+            packetWriter.WriteInt32(SetGatherLevel(playerId, i));
+            packetWriter.WriteInt32(GetGatherExp(playerId, i));
+            packetWriter.WriteInt32(GetGatherSkillMaxExp(playerId, i));
         }
 
         return packetWriter.GetBytes();
@@ -867,9 +867,9 @@ public static class NetworkSend
 
         packetWriter.WriteEnum(ServerPackets.SPlayerXY);
         packetWriter.WriteInt32(positionPlayerId);
-        packetWriter.WriteInt32(GetPlayerRawX(positionPlayerId));
-        packetWriter.WriteInt32(GetPlayerRawY(positionPlayerId));
-        packetWriter.WriteByte(GetPlayerDir(positionPlayerId));
+        packetWriter.WriteInt32(GetRawX(positionPlayerId));
+        packetWriter.WriteInt32(GetRawY(positionPlayerId));
+        packetWriter.WriteByte(GetDir(positionPlayerId));
         packetWriter.WriteByte(Player.Instance[positionPlayerId].Moving);
         packetWriter.WriteBoolean(Player.Instance[positionPlayerId].IsMoving);
 
@@ -898,9 +898,9 @@ public static class NetworkSend
 
         packetWriter.WriteEnum(ServerPackets.SPlayerXY);
         packetWriter.WriteInt32(playerId);
-        packetWriter.WriteInt32(GetPlayerRawX(playerId));
-        packetWriter.WriteInt32(GetPlayerRawY(playerId));
-        packetWriter.WriteByte(GetPlayerDir(playerId));
+        packetWriter.WriteInt32(GetRawX(playerId));
+        packetWriter.WriteInt32(GetRawY(playerId));
+        packetWriter.WriteByte(GetDir(playerId));
         packetWriter.WriteByte(Player.Instance[playerId].Moving);
         packetWriter.WriteBoolean(Player.Instance[playerId].IsMoving);
 
@@ -974,9 +974,9 @@ public static class NetworkSend
         var packetWriter = new PacketWriter();
 
         packetWriter.WriteEnum(ServerPackets.SSayMessage);
-        packetWriter.WriteString(GetPlayerName(playerId));
+        packetWriter.WriteString(GetName(playerId));
         packetWriter.WriteInt32((int)GetAccess(playerId));
-        packetWriter.WriteBoolean(GetPlayerPk(playerId));
+        packetWriter.WriteBoolean(GetPk(playerId));
         packetWriter.WriteString(message);
         packetWriter.WriteString("[Map]:");
         packetWriter.WriteInt32(sayColor);
@@ -989,9 +989,9 @@ public static class NetworkSend
         var packetWriter = new PacketWriter();
 
         packetWriter.WriteEnum(ServerPackets.SSayMessage);
-        packetWriter.WriteString(GetPlayerName(playerId));
+        packetWriter.WriteString(GetName(playerId));
         packetWriter.WriteInt32((int)GetAccess(playerId));
-        packetWriter.WriteBoolean(GetPlayerPk(playerId));
+        packetWriter.WriteBoolean(GetPk(playerId));
         packetWriter.WriteString(message);
         packetWriter.WriteString("[Global]:");
         packetWriter.WriteInt32(sayColor);
@@ -1010,8 +1010,8 @@ public static class NetworkSend
 
         packetWriter.WriteEnum(ServerPackets.SInventoryUpdate);
         packetWriter.WriteInt32(invSlot);
-        packetWriter.WriteInt32(GetPlayerInv(playerId, invSlot));
-        packetWriter.WriteInt32(GetPlayerInvValue(playerId, invSlot));
+        packetWriter.WriteInt32(GetInv(playerId, invSlot));
+        packetWriter.WriteInt32(GetInvValue(playerId, invSlot));
 
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
     }
@@ -1100,11 +1100,11 @@ public static class NetworkSend
 
                             if (Item.Instance[Data.TempPlayer[playerId].TradeOffer[i].Num].Type == (int)ItemCategory.Currency || Item.Instance[Data.TempPlayer[playerId].TradeOffer[i].Num].Stackable == 1)
                             {
-                                totalWorth += Item.Instance[GetPlayerInv(playerId, Data.TempPlayer[playerId].TradeOffer[i].Num)].Price * Data.TempPlayer[playerId].TradeOffer[i].Value;
+                                totalWorth += Item.Instance[GetInv(playerId, Data.TempPlayer[playerId].TradeOffer[i].Num)].Price * Data.TempPlayer[playerId].TradeOffer[i].Value;
                             }
                             else
                             {
-                                totalWorth += Item.Instance[GetPlayerInv(playerId, Data.TempPlayer[playerId].TradeOffer[i].Num)].Price;
+                                totalWorth += Item.Instance[GetInv(playerId, Data.TempPlayer[playerId].TradeOffer[i].Num)].Price;
                             }
                         }
                         else
@@ -1124,21 +1124,21 @@ public static class NetworkSend
                     {
                         if (Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num >= 0)
                         {
-                            packetWriter.WriteInt32(GetPlayerInv((int)tradeTarget, Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num));
+                            packetWriter.WriteInt32(GetInv((int)tradeTarget, Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num));
                             packetWriter.WriteInt32(Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Value);
 
-                            if (GetPlayerInv((int)tradeTarget, Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num) < 0)
+                            if (GetInv((int)tradeTarget, Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num) < 0)
                             {
                                 continue;
                             }
 
-                            if (Item.Instance[GetPlayerInv((int)tradeTarget, Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num)].Type == (int)ItemCategory.Currency || Item.Instance[GetPlayerInv((int)tradeTarget, Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num)].Stackable == 1)
+                            if (Item.Instance[GetInv((int)tradeTarget, Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num)].Type == (int)ItemCategory.Currency || Item.Instance[GetInv((int)tradeTarget, Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num)].Stackable == 1)
                             {
-                                totalWorth += Item.Instance[GetPlayerInv((int)tradeTarget, Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num)].Price * Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Value;
+                                totalWorth += Item.Instance[GetInv((int)tradeTarget, Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num)].Price * Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Value;
                             }
                             else
                             {
-                                totalWorth += Item.Instance[GetPlayerInv((int)tradeTarget, Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num)].Price;
+                                totalWorth += Item.Instance[GetInv((int)tradeTarget, Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num)].Price;
                             }
                         }
                         else
@@ -1176,7 +1176,7 @@ public static class NetworkSend
 
         for (var i = 0; i < Core.Globals.Variables.MaxPlayerSkills; i++)
         {
-            packetWriter.WriteInt32(GetPlayerSkill(playerId, i));
+            packetWriter.WriteInt32(GetSkill(playerId, i));
         }
 
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());

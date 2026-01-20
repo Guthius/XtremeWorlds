@@ -555,7 +555,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             return;
         }
 
-        Log.Add("Map #" + GetMap(session.Id) + ": " + GetPlayerName(session.Id) + " says, '" + msg + "'", Constant.PlayerLog);
+        Log.Add("Map #" + GetMap(session.Id) + ": " + GetName(session.Id) + " says, '" + msg + "'", Constant.PlayerLog);
 
         NetworkSend.SayMessage_Map(GetMap(session.Id), session.Id, msg, (int)ColorName.White);
         NetworkSend.ChatBubble(GetMap(session.Id), session.Id, (int)TargetType.Player, msg, (int)ColorName.White);
@@ -572,7 +572,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             return;
         }
 
-        var s = "[Global] " + GetPlayerName(session.Id) + ": " + msg;
+        var s = "[Global] " + GetName(session.Id) + ": " + msg;
         NetworkSend.SayMessage_Global(session.Id, msg, (int)ColorName.White);
         Log.Add(s, Constant.PlayerLog);
         Console.WriteLine(s);
@@ -595,9 +595,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         {
             if (otherPlayerId >= 0)
             {
-                Log.Add(GetPlayerName(session.Id) + " tells " + GetPlayerName(otherPlayerId) + ", '" + msg + "'", Constant.PlayerLog);
-                NetworkSend.PlayerMessage(otherPlayerId, GetPlayerName(session.Id) + " tells you, '" + msg + "'", (int)ColorName.Pink);
-                NetworkSend.PlayerMessage(session.Id, "You tell " + GetPlayerName(otherPlayerId) + ", '" + msg + "'", (int)ColorName.Pink);
+                Log.Add(GetName(session.Id) + " tells " + GetName(otherPlayerId) + ", '" + msg + "'", Constant.PlayerLog);
+                NetworkSend.PlayerMessage(otherPlayerId, GetName(session.Id) + " tells you, '" + msg + "'", (int)ColorName.Pink);
+                NetworkSend.PlayerMessage(session.Id, "You tell " + GetName(otherPlayerId) + ", '" + msg + "'", (int)ColorName.Pink);
             }
             else
             {
@@ -646,13 +646,13 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             return;
         }
 
-        SetPlayerDir(session.Id, dir);
+        SetDir(session.Id, dir);
 
         // Always apply requested movement so the server loop can start stepping.
         // If the client is slightly out of sync, we correct them without broadcasting to the whole map.
         PlayerBase.Instance[session.Id].Moving = movement;
 
-        if (tmpX != GetPlayerRawX(session.Id) || tmpY != GetPlayerRawY(session.Id))
+        if (tmpX != GetRawX(session.Id) || tmpY != GetRawY(session.Id))
         {
             // Desync detected, correct client
             NetworkSend.PlayerXY(session.Id);
@@ -706,13 +706,13 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         if (dir < 0 | dir > dirCount)
             return;
 
-        SetPlayerDir(session.Id, dir);
+        SetDir(session.Id, dir);
 
         var packetWriter = new PacketWriter(12);
 
         packetWriter.WriteEnum(Packets.ServerPackets.SPlayerDir);
         packetWriter.WriteInt32(session.Id);
-        packetWriter.WriteByte(GetPlayerDir(session.Id));
+        packetWriter.WriteByte(GetDir(session.Id));
 
         NetworkConfig.SendDataToMapBut(session.Id, GetMap(session.Id), packetWriter.GetBytes());
     }
@@ -742,109 +742,109 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         NetworkSend.PlayerAttack(session.Id);
 
         // Projectile check
-        if (GetPlayerPaperdoll(session.Id, Equipment.Weapon) >= 0)
+        if (GetPaperdoll(session.Id, Equipment.Weapon) >= 0)
         {
-            if (Item.Instance[GetPlayerPaperdoll(session.Id, Equipment.Weapon)].Projectile >= 0) // Item has a projectile
+            if (Item.Instance[GetPaperdoll(session.Id, Equipment.Weapon)].Projectile >= 0) // Item has a projectile
             {
-                if (Item.Instance[GetPlayerPaperdoll(session.Id, Equipment.Weapon)].Ammo >= 0)
+                if (Item.Instance[GetPaperdoll(session.Id, Equipment.Weapon)].Ammo >= 0)
                 {
-                    if (Server.Player.HasItem(session.Id, Item.Instance[GetPlayerPaperdoll(session.Id, Equipment.Weapon)].Ammo) > 0)
+                    if (Server.Player.HasItem(session.Id, Item.Instance[GetPaperdoll(session.Id, Equipment.Weapon)].Ammo) > 0)
                     {
-                        Server.Player.TakeInv(session.Id, Item.Instance[GetPlayerPaperdoll(session.Id, Equipment.Weapon)].Ammo, 1);
-                        Projectile.OnShoot(session.Id, -1, GetPlayerPaperdoll(session.Id, Equipment.Weapon));
+                        Server.Player.TakeInv(session.Id, Item.Instance[GetPaperdoll(session.Id, Equipment.Weapon)].Ammo, 1);
+                        Projectile.OnShoot(session.Id, -1, GetPaperdoll(session.Id, Equipment.Weapon));
                         return;
                     }
                     else
                     {
-                        NetworkSend.PlayerMessage(session.Id, "Out of " + Item.Instance[Item.Instance[GetPlayerPaperdoll(session.Id, Equipment.Weapon)].Ammo].Name + "!", (int)ColorName.BrightRed);
+                        NetworkSend.PlayerMessage(session.Id, "Out of " + Item.Instance[Item.Instance[GetPaperdoll(session.Id, Equipment.Weapon)].Ammo].Name + "!", (int)ColorName.BrightRed);
                         return;
                     }
                 }
                 else
                 {
-                    Projectile.OnShoot(session.Id, -1, GetPlayerPaperdoll(session.Id, Equipment.Weapon));
+                    Projectile.OnShoot(session.Id, -1, GetPaperdoll(session.Id, Equipment.Weapon));
                     return;
                 }
             }
         }
 
         // Check tradeskills
-        switch (GetPlayerDir(session.Id))
+        switch (GetDir(session.Id))
         {
             case (byte)Direction.Up:
                 {
-                    if (GetPlayerY(session.Id) == 0)
+                    if (GetY(session.Id) == 0)
                         return;
-                    x = GetPlayerX(session.Id);
-                    y = GetPlayerY(session.Id) - 1;
+                    x = GetX(session.Id);
+                    y = GetY(session.Id) - 1;
                     break;
                 }
             case (byte)Direction.Down:
                 {
-                    if (GetPlayerY(session.Id) == Server.Map.Instance[GetMap(session.Id)].MaxY)
+                    if (GetY(session.Id) == Server.Map.Instance[GetMap(session.Id)].MaxY)
                         return;
-                    x = GetPlayerX(session.Id);
-                    y = GetPlayerY(session.Id) + 1;
+                    x = GetX(session.Id);
+                    y = GetY(session.Id) + 1;
                     break;
                 }
             case (byte)Direction.Left:
                 {
-                    if (GetPlayerX(session.Id) == 0)
+                    if (GetX(session.Id) == 0)
                         return;
-                    x = GetPlayerX(session.Id) - 1;
-                    y = GetPlayerY(session.Id);
+                    x = GetX(session.Id) - 1;
+                    y = GetY(session.Id);
                     break;
                 }
             case (byte)Direction.Right:
                 {
-                    if (GetPlayerX(session.Id) == Server.Map.Instance[GetMap(session.Id)].MaxX)
+                    if (GetX(session.Id) == Server.Map.Instance[GetMap(session.Id)].MaxX)
                         return;
-                    x = GetPlayerX(session.Id) + 1;
-                    y = GetPlayerY(session.Id);
+                    x = GetX(session.Id) + 1;
+                    y = GetY(session.Id);
                     break;
                 }
 
             case (byte)Direction.UpRight:
                 {
-                    if (GetPlayerX(session.Id) == Server.Map.Instance[GetMap(session.Id)].MaxX)
+                    if (GetX(session.Id) == Server.Map.Instance[GetMap(session.Id)].MaxX)
                         return;
-                    if (GetPlayerY(session.Id) == 0)
+                    if (GetY(session.Id) == 0)
                         return;
-                    x = GetPlayerX(session.Id) + 1;
-                    y = GetPlayerY(session.Id) - 1;
+                    x = GetX(session.Id) + 1;
+                    y = GetY(session.Id) - 1;
                     break;
                 }
 
             case (byte)Direction.UpLeft:
                 {
-                    if (GetPlayerX(session.Id) == 0)
+                    if (GetX(session.Id) == 0)
                         return;
-                    if (GetPlayerY(session.Id) == 0)
+                    if (GetY(session.Id) == 0)
                         return;
-                    x = GetPlayerX(session.Id) - 1;
-                    y = GetPlayerY(session.Id) - 1;
+                    x = GetX(session.Id) - 1;
+                    y = GetY(session.Id) - 1;
                     break;
                 }
 
             case (byte)Direction.DownRight:
                 {
-                    if (GetPlayerX(session.Id) == Server.Map.Instance[GetMap(session.Id)].MaxX)
+                    if (GetX(session.Id) == Server.Map.Instance[GetMap(session.Id)].MaxX)
                         return;
-                    if (GetPlayerY(session.Id) == Server.Map.Instance[GetMap(session.Id)].MaxY)
+                    if (GetY(session.Id) == Server.Map.Instance[GetMap(session.Id)].MaxY)
                         return;
-                    x = GetPlayerX(session.Id) + 1;
-                    y = GetPlayerY(session.Id) + 1;
+                    x = GetX(session.Id) + 1;
+                    y = GetY(session.Id) + 1;
                     break;
                 }
 
             case (byte)Direction.DownLeft:
                 {
-                    if (GetPlayerX(session.Id) == 0)
+                    if (GetX(session.Id) == 0)
                         return;
-                    if (GetPlayerY(session.Id) == Server.Map.Instance[GetMap(session.Id)].MaxY)
+                    if (GetY(session.Id) == Server.Map.Instance[GetMap(session.Id)].MaxY)
                         return;
-                    x = GetPlayerX(session.Id) - 1;
-                    y = GetPlayerY(session.Id) + 1;
+                    x = GetX(session.Id) - 1;
+                    y = GetY(session.Id) + 1;
                     break;
                 }
         }
@@ -884,7 +884,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
                 if (p.Id == session.Id) continue;
                 if (!NetworkConfig.IsPlaying(p.Id)) continue;
                 if (GetMap(p.Id) != map) continue;
-                if (GetPlayerX(p.Id) == x && GetPlayerY(p.Id) == y)
+                if (GetX(p.Id) == x && GetY(p.Id) == y)
                 {
                     targetEntity = Core.Globals.Entity.FromPlayer(p.Id, PlayerBase.Instance[p.Id]);
                     targetEntity.Map = map;
@@ -918,7 +918,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         if (Data.TempPlayer[session.Id].StunDuration > 0) return;
 
         // Ensure player holds a weapon with projectile or skill casting projectile
-        int item = GetPlayerPaperdoll(session.Id, Equipment.Weapon);
+        int item = GetPaperdoll(session.Id, Equipment.Weapon);
         if (item < 0 || Item.Instance[item].Projectile < 0)
         {
             // fallback: trigger normal attack if no projectile
@@ -956,8 +956,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
 
         // Compute vector from player center to target in pixels
-        int startX = GetPlayerRawX(session.Id);
-        int startY = GetPlayerRawY(session.Id);
+        int startX = GetRawX(session.Id);
+        int startY = GetRawY(session.Id);
         int dx = targetX - startX;
         int dy = targetY - startY;
         if (dx == 0 && dy == 0)
@@ -992,10 +992,10 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         {
             if (n >= 0)
             {
-                Server.Player.OnWarp(session.Id, GetMap(n), GetPlayerX(n), GetPlayerY(n), (byte)Direction.Down);
-                NetworkSend.PlayerMessage(n, GetPlayerName(session.Id) + " has warped to you.", (int)ColorName.Yellow);
-                NetworkSend.PlayerMessage(session.Id, "You have been warped to " + GetPlayerName(n) + ".", (int)ColorName.Yellow);
-                Log.Add(GetPlayerName(session.Id) + " has warped to " + GetPlayerName(n) + ", map #" + GetMap(n) + ".", Constant.AdminLog);
+                Server.Player.OnWarp(session.Id, GetMap(n), GetX(n), GetY(n), (byte)Direction.Down);
+                NetworkSend.PlayerMessage(n, GetName(session.Id) + " has warped to you.", (int)ColorName.Yellow);
+                NetworkSend.PlayerMessage(session.Id, "You have been warped to " + GetName(n) + ".", (int)ColorName.Yellow);
+                Log.Add(GetName(session.Id) + " has warped to " + GetName(n) + ", map #" + GetMap(n) + ".", Constant.AdminLog);
             }
             else
             {
@@ -1024,10 +1024,10 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         {
             if (n >= 0)
             {
-                Server.Player.OnWarp(n, GetMap(session.Id), GetPlayerX(session.Id), GetPlayerY(session.Id), (byte)Direction.Down);
-                NetworkSend.PlayerMessage(n, "You have been summoned by " + GetPlayerName(session.Id) + ".", (int)ColorName.Yellow);
-                NetworkSend.PlayerMessage(session.Id, GetPlayerName(n) + " has been summoned.", (int)ColorName.Yellow);
-                Log.Add(GetPlayerName(session.Id) + " has warped " + GetPlayerName(n) + " to self, map #" + GetMap(session.Id) + ".", Constant.AdminLog);
+                Server.Player.OnWarp(n, GetMap(session.Id), GetX(session.Id), GetY(session.Id), (byte)Direction.Down);
+                NetworkSend.PlayerMessage(n, "You have been summoned by " + GetName(session.Id) + ".", (int)ColorName.Yellow);
+                NetworkSend.PlayerMessage(session.Id, GetName(n) + " has been summoned.", (int)ColorName.Yellow);
+                Log.Add(GetName(session.Id) + " has warped " + GetName(n) + " to self, map #" + GetMap(session.Id) + ".", Constant.AdminLog);
             }
             else
             {
@@ -1055,9 +1055,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         if (n < 0 | n > Core.Globals.Variables.MaxMaps)
             return;
 
-        Server.Player.OnWarp(session.Id, n, GetPlayerX(session.Id), GetPlayerY(session.Id), (byte)Direction.Down);
+        Server.Player.OnWarp(session.Id, n, GetX(session.Id), GetY(session.Id), (byte)Direction.Down);
         NetworkSend.PlayerMessage(session.Id, "You have been warped to map #" + n, (int)ColorName.Yellow);
-        Log.Add(GetPlayerName(session.Id) + " warped to map #" + n + ".", Constant.AdminLog);
+        Log.Add(GetName(session.Id) + " warped to map #" + n + ".", Constant.AdminLog);
     }
 
     public static async ValueTask SetSprite(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -1071,7 +1071,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         // The sprite
         var n = buffer.ReadInt32();
 
-        SetPlayerSprite(session.Id, n);
+        Commands.SetSprite(session.Id, n);
         NetworkSend.PlayerData(session.Id);
     }
 
@@ -1356,7 +1356,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         {
             if (NetworkConfig.IsPlaying(i) & GetMap(i) == map)
             {
-                Server.Player.OnWarp(i, map, GetPlayerX(i), GetPlayerY(i), (byte)Direction.Down);
+                Server.Player.OnWarp(i, map, GetX(i), GetY(i), (byte)Direction.Down);
                 NetworkSend.MapData(i, map, true);
             }
         }
@@ -1425,7 +1425,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
         MapResource.OnUpdate(GetMap(session.Id));
         NetworkSend.PlayerMessage(session.Id, "Map respawned.", (int)ColorName.BrightGreen);
-        Log.Add(GetPlayerName(session.Id) + " has respawned map #" + GetMap(session.Id), Constant.AdminLog);
+        Log.Add(GetName(session.Id) + " has respawned map #" + GetMap(session.Id), Constant.AdminLog);
     }
 
     public static async ValueTask MapReport(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -1456,8 +1456,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             {
                 if (GetAccess(n) < GetAccess(session.Id))
                 {
-                    NetworkSend.GlobalMessage(GetPlayerName(n) + " has been kicked from " + SettingsManager.Instance.GameName + " by " + GetPlayerName(session.Id) + "!");
-                    Log.Add(GetPlayerName(session.Id) + " has kicked " + GetPlayerName(n) + ".", Constant.AdminLog);
+                    NetworkSend.GlobalMessage(GetName(n) + " has been kicked from " + SettingsManager.Instance.GameName + " by " + GetName(session.Id) + "!");
+                    Log.Add(GetName(session.Id) + " has kicked " + GetName(n) + ".", Constant.AdminLog);
                     NetworkSend.AlertMessage(session, SystemMessage.Kicked, Menu.Login);
                 }
                 else
@@ -1754,12 +1754,12 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
                 if (GetAccess(n) == (int)Access.Player && i > (int)Access.Player)
                 {
-                    NetworkSend.GlobalMessage(GetPlayerName(n) + " has been blessed with administrative access.");
+                    NetworkSend.GlobalMessage(GetName(n) + " has been blessed with administrative access.");
                 }
 
-                SetPlayerAccess(n, (byte)i);
+                Commands.SetAccess(n, (byte)i);
                 NetworkSend.PlayerData(n);
-                Log.Add(GetPlayerName(session.Id) + " has modified " + GetPlayerName(n) + "'s access.", Constant.AdminLog);
+                Log.Add(GetName(session.Id) + " has modified " + GetName(n) + "'s access.", Constant.AdminLog);
             }
             else
             {
@@ -1789,7 +1789,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         SettingsManager.Save();
 
         NetworkSend.GlobalMessage("Welcome changed to: " + Variables.Welcome);
-        Log.Add(GetPlayerName(session.Id) + " changed welcome to: " + Variables.Welcome, Constant.AdminLog);
+        Log.Add(GetName(session.Id) + " changed welcome to: " + Variables.Welcome, Constant.AdminLog);
     }
 
     public static async ValueTask PlayerSearch(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -1815,34 +1815,34 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         {
             if (GetMap(session.Id) == GetMap(i))
             {
-                if (GetPlayerX(i) == x)
+                if (GetX(i) == x)
                 {
-                    if (GetPlayerY(i) == y)
+                    if (GetY(i) == y)
                     {
                         // Consider the player
                         if (i != session.Id)
                         {
-                            if (GetPlayerLevel(i) >= GetPlayerLevel(session.Id) + 5)
+                            if (GetLevel(i) >= GetLevel(session.Id) + 5)
                             {
                                 NetworkSend.PlayerMessage(session.Id, "You wouldn't stand a chance.", (int)ColorName.BrightRed);
                             }
 
-                            else if (GetPlayerLevel(i) > GetPlayerLevel(session.Id))
+                            else if (GetLevel(i) > GetLevel(session.Id))
                             {
                                 NetworkSend.PlayerMessage(session.Id, "This one seems to have an advantage over you.", (int)ColorName.Yellow);
                             }
 
-                            else if (GetPlayerLevel(i) == GetPlayerLevel(session.Id))
+                            else if (GetLevel(i) == GetLevel(session.Id))
                             {
                                 NetworkSend.PlayerMessage(session.Id, "This would be an even fight.", (int)ColorName.White);
                             }
 
-                            else if (GetPlayerLevel(session.Id) >= GetPlayerLevel(i) + 5)
+                            else if (GetLevel(session.Id) >= GetLevel(i) + 5)
                             {
                                 NetworkSend.PlayerMessage(session.Id, "You could slaughter that player.", (int)ColorName.BrightBlue);
                             }
 
-                            else if (GetPlayerLevel(session.Id) > GetPlayerLevel(i))
+                            else if (GetLevel(session.Id) > GetLevel(i))
                             {
                                 NetworkSend.PlayerMessage(session.Id, "You would have an advantage over that player.", (int)ColorName.BrightCyan);
                             }
@@ -1862,7 +1862,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
                         if (Data.TempPlayer[session.Id].Target >= 0)
                         {
-                            NetworkSend.PlayerMessage(session.Id, "Your target is now " + GetPlayerName(i) + ".", (int)ColorName.Yellow);
+                            NetworkSend.PlayerMessage(session.Id, "Your target is now " + GetName(i) + ".", (int)ColorName.Yellow);
                         }
 
                         NetworkSend.Target(session.Id, Data.TempPlayer[session.Id].Target, Data.TempPlayer[session.Id].TargetType);
@@ -2025,7 +2025,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         if (GetAccess(session.Id) < (byte)Access.Developer)
             return;
 
-        MapItem.OnSpawn(tmpItem, tmpAmount, GetMap(session.Id), GetPlayerX(session.Id), GetPlayerY(session.Id));
+        MapItem.OnSpawn(tmpItem, tmpAmount, GetMap(session.Id), GetX(session.Id), GetY(session.Id));
     }
 
     public static async ValueTask TrainStat(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -2033,7 +2033,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         var buffer = new PacketReader(bytes);
 
         // check points
-        if (GetPlayerPoints(session.Id) == 0)
+        if (GetPoints(session.Id) == 0)
             return;
 
         // stat
@@ -2079,7 +2079,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         if (GetAccess(session.Id) < (byte)Access.Developer)
             return;
 
-        SetPlayerExperience(session.Id, Script.Instance?.GetPlayerNextLevel(session.Id));
+        SetExp(session.Id, Script.Instance?.GetPlayerNextLevel(session.Id));
         Server.Player.OnLevel(session.Id);
     }
 
@@ -2164,11 +2164,11 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             return;
 
         // has item?
-        if (GetPlayerInv(session.Id, invSlot) < 0 || GetPlayerInv(session.Id, invSlot) > Core.Globals.Variables.MaxItems)
+        if (GetInv(session.Id, invSlot) < 0 || GetInv(session.Id, invSlot) > Core.Globals.Variables.MaxItems)
             return;
 
         // seems to be valid
-        double item = GetPlayerInv(session.Id, invSlot);
+        double item = GetInv(session.Id, invSlot);
         var shop = Data.TempPlayer[session.Id].InShop;
 
         if (shop < 0 || shop > Core.Globals.Variables.MaxShops)
@@ -2254,9 +2254,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             PlayerBase.Instance[session.Id].IsMoving = false;
 
             // Set the information
-            SetPlayerX(session.Id, x);
-            SetPlayerY(session.Id, y);
-            SetPlayerDir(session.Id, (byte)Direction.Down);
+            SetX(session.Id, x);
+            SetY(session.Id, y);
+            SetDir(session.Id, (byte)Direction.Down);
             NetworkSend.PlayerXYToMap(session.Id);
         }
     }
@@ -2284,8 +2284,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Data.TempPlayer[session.Id].TradeRequest = tradeTarget;
         Data.TempPlayer[tradeTarget].TradeRequest = session.Id;
 
-        NetworkSend.PlayerMessage(tradeTarget, GetPlayerName(session.Id) + " has invited you to trade.", (int)ColorName.Yellow);
-        NetworkSend.PlayerMessage(session.Id, "You have invited " + GetPlayerName(tradeTarget) + " to trade.", (int)ColorName.BrightGreen);
+        NetworkSend.PlayerMessage(tradeTarget, GetName(session.Id) + " has invited you to trade.", (int)ColorName.Yellow);
+        NetworkSend.PlayerMessage(session.Id, "You have invited " + GetName(tradeTarget) + " to trade.", (int)ColorName.BrightGreen);
 
         NetworkSend.TradeInvite(tradeTarget, session.Id);
     }
@@ -2303,8 +2303,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
         if (status == 0)
         {
-            NetworkSend.PlayerMessage(tradeTarget, GetPlayerName(session.Id) + " has declined your trade request.", (int)ColorName.BrightRed);
-            NetworkSend.PlayerMessage(session.Id, "You have declined the trade with " + GetPlayerName(tradeTarget) + ".", (int)ColorName.BrightRed);
+            NetworkSend.PlayerMessage(tradeTarget, GetName(session.Id) + " has declined your trade request.", (int)ColorName.BrightRed);
+            NetworkSend.PlayerMessage(session.Id, "You have declined the trade with " + GetName(tradeTarget) + ".", (int)ColorName.BrightRed);
             Data.TempPlayer[session.Id].TradeRequest = -1;
             return;
         }
@@ -2313,8 +2313,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         if (Data.TempPlayer[tradeTarget].TradeRequest == session.Id)
         {
             // let them know they're trading
-            NetworkSend.PlayerMessage(session.Id, "You have accepted " + GetPlayerName(tradeTarget) + "'s trade request.", (int)ColorName.Yellow);
-            NetworkSend.PlayerMessage(tradeTarget, GetPlayerName(session.Id) + " has accepted your trade request.", (int)ColorName.BrightGreen);
+            NetworkSend.PlayerMessage(session.Id, "You have accepted " + GetName(tradeTarget) + "'s trade request.", (int)ColorName.Yellow);
+            NetworkSend.PlayerMessage(tradeTarget, GetName(session.Id) + " has accepted your trade request.", (int)ColorName.BrightGreen);
 
             // clear the tradeRequest server-side
             Data.TempPlayer[session.Id].TradeRequest = -1;
@@ -2397,7 +2397,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             // target
             if (Data.TempPlayer[tradeTarget].TradeOffer[i].Num >= 0)
             {
-                item = GetPlayerInv(tradeTarget, (int)Data.TempPlayer[tradeTarget].TradeOffer[i].Num);
+                item = GetInv(tradeTarget, (int)Data.TempPlayer[tradeTarget].TradeOffer[i].Num);
                 if (item >= 0)
                 {
                     // store temp
@@ -2475,7 +2475,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         if (hasValidTarget)
         {
             Data.TempPlayer[tradeTarget].InTrade = 0;
-            NetworkSend.PlayerMessage(tradeTarget, GetPlayerName(session.Id) + " has declined the trade.", (int)ColorName.BrightRed);
+            NetworkSend.PlayerMessage(tradeTarget, GetName(session.Id) + " has declined the trade.", (int)ColorName.BrightRed);
             NetworkSend.CloseTrade(tradeTarget);
         }
     }
@@ -2492,13 +2492,13 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         if (invSlot < 0 | invSlot > Core.Globals.Variables.MaxInventory)
             return;
 
-        var item = GetPlayerInv(session.Id, invSlot);
+        var item = GetInv(session.Id, invSlot);
 
         if (item < 0 || item > Core.Globals.Variables.MaxItems)
             return;
 
         // make sure they have the amount they offer
-        if (amount < 0 || amount > GetPlayerInvValue(session.Id, invSlot))
+        if (amount < 0 || amount > GetInvValue(session.Id, invSlot))
             return;
 
         if (PlayerBase.Instance[session.Id].Inventory[invSlot].Bound > 0)
@@ -2519,9 +2519,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
                     Data.TempPlayer[session.Id].TradeOffer[i].Value = Data.TempPlayer[session.Id].TradeOffer[i].Value + amount;
 
                     // clamp to limits
-                    if (Data.TempPlayer[session.Id].TradeOffer[i].Value > GetPlayerInvValue(session.Id, invSlot))
+                    if (Data.TempPlayer[session.Id].TradeOffer[i].Value > GetInvValue(session.Id, invSlot))
                     {
-                        Data.TempPlayer[session.Id].TradeOffer[i].Value = GetPlayerInvValue(session.Id, invSlot);
+                        Data.TempPlayer[session.Id].TradeOffer[i].Value = GetInvValue(session.Id, invSlot);
                     }
 
                     // cancel any trade agreement
@@ -2612,7 +2612,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
     {
         if (index > 0 & NetworkConfig.IsPlaying(index))
         {
-            NetworkSend.GlobalMessage(GetAccountLogin(index) + "/" + GetPlayerName(index) + " has been booted for (" + reason + ")");
+            NetworkSend.GlobalMessage(GetAccountLogin(index) + "/" + GetName(index) + " has been booted for (" + reason + ")");
             _ = Server.Player.OnExit(index).ContinueWith(
                 t => General.Logger.LogError(t.Exception, "Unhandled error during forced logout"),
                 TaskContinuationOptions.OnlyOnFaulted
@@ -3291,15 +3291,15 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             return;
         }
 
-        if (GetPlayerInv(session.Id, inv) < 0 || GetPlayerInv(session.Id, inv) > Core.Globals.Variables.MaxItems)
+        if (GetInv(session.Id, inv) < 0 || GetInv(session.Id, inv) > Core.Globals.Variables.MaxItems)
         {
             return;
         }
 
-        if (Item.Instance[GetPlayerInv(session.Id, inv)].Type == (byte)ItemCategory.Currency ||
-            Item.Instance[GetPlayerInv(session.Id, inv)].Stackable == 1)
+        if (Item.Instance[GetInv(session.Id, inv)].Type == (byte)ItemCategory.Currency ||
+            Item.Instance[GetInv(session.Id, inv)].Stackable == 1)
         {
-            if (amount < 0 | amount > GetPlayerInvValue(session.Id, inv))
+            if (amount < 0 | amount > GetInvValue(session.Id, inv))
             {
                 return;
             }
@@ -3415,7 +3415,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         if (mapEventId < 0)
             return;
 
-        EventLogic.TriggerEvent(session.Id, mapEventId, 0, GetPlayerX(session.Id), GetPlayerY(session.Id));
+        EventLogic.TriggerEvent(session.Id, mapEventId, 0, GetX(session.Id), GetY(session.Id));
     }
 
     public static async ValueTask RequestSwitchesAndVariables(GameSession session, ReadOnlyMemory<byte> bytes) => NetworkSend.SwitchesAndVariables(session.Id);

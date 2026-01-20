@@ -116,7 +116,7 @@ public class Entity
             Job = player.Job,
             Sprite = player.Sprite,
             Level = player.Level,
-            Experience = player.Experience,
+            Experience = player.Exp,
             Access = player.Access,
             Vital = player.Vital,
             Stat = player.Stat,

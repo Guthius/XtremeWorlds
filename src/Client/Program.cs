@@ -881,8 +881,8 @@ namespace Client
                 return new Vector2(GameState.ResolutionWidth / 2, GameState.ResolutionHeight / 2);
             if (!GameState.InGame) return new Vector2(GameState.ResolutionWidth / 2, GameState.ResolutionHeight / 2);
             
-            int worldX = GetPlayerRawX(GameState.MyIndex) + Constants.TileSize / 2;
-            int worldY = GetPlayerRawY(GameState.MyIndex) + Constants.TileSize / 2;
+            int worldX = GetRawX(GameState.MyIndex) + Constants.TileSize / 2;
+            int worldY = GetRawY(GameState.MyIndex) + Constants.TileSize / 2;
 
             if (GameState.MyTarget >= 0)
             {
@@ -894,8 +894,8 @@ namespace Client
                         // Same map check
                         if (Player.Instance[t].Map == Player.Instance[GameState.MyIndex].Map)
                         {
-                            worldX = GetPlayerRawX(t) + Constants.TileSize / 2;
-                            worldY = GetPlayerRawY(t) + Constants.TileSize / 2;
+                            worldX = GetRawX(t) + Constants.TileSize / 2;
+                            worldY = GetRawY(t) + Constants.TileSize / 2;
                         }
                     }
                 }
@@ -1067,8 +1067,8 @@ namespace Client
                     {
                         if (IsPlaying(prevTarget) && GetMap(prevTarget) == GetMap(GameState.MyIndex))
                         {
-                            clearTileX = GetPlayerX(prevTarget);
-                            clearTileY = GetPlayerY(prevTarget);
+                            clearTileX = GetX(prevTarget);
+                            clearTileY = GetY(prevTarget);
                         }
                     }
                     else if (prevTargetType == (int)TargetType.Npc)
@@ -1170,7 +1170,7 @@ namespace Client
             {
                 if (Player.Instance.Count >= GameState.MyIndex)
                 {
-                    if (CurrentKeyboardState.IsKeyDown(Keys.Space) || (IsMouseButtonDown(MouseButton.Left) && GameState.CurX == GetPlayerX(GameState.MyIndex) && GameState.CurY == GetPlayerY(GameState.MyIndex)))
+                    if (CurrentKeyboardState.IsKeyDown(Keys.Space) || (IsMouseButtonDown(MouseButton.Left) && GameState.CurX == GetX(GameState.MyIndex) && GameState.CurY == GetY(GameState.MyIndex)))
                     {
                         GameLogic.CheckMapGetItem();
                     }
@@ -1622,7 +1622,7 @@ namespace Client
                                 var invSlot = General.IsInv(winInventory!.X, winInventory!.Y);
                                 if (invSlot >= 0)
                                 {
-                                    var itemNum = GetPlayerInv(GameState.MyIndex, invSlot);
+                                    var itemNum = GetInv(GameState.MyIndex, invSlot);
                                     if (itemNum >= 0 && itemNum < Item.Instance.Count)
                                     {
                                         var isCurrency = Item.Instance[itemNum].Type == (byte)ItemCategory.Currency;
@@ -1656,7 +1656,7 @@ namespace Client
                                 var skillSlot = General.IsSkill(winSkills!.X, winSkills!.Y);
                                 if (skillSlot >= 0)
                                 {
-                                    var skill = GetPlayerSkill(GameState.MyIndex, skillSlot);
+                                    var skill = GetSkill(GameState.MyIndex, skillSlot);
                                     if (skill >= 0 && skill < Skill.Instance.Count)
                                     {
                                         var name = Skill.Instance[skill].Name;
@@ -1738,7 +1738,7 @@ namespace Client
             {
                 if (IsPlaying(i) && GetMap(i) == GetMap(GameState.MyIndex))
                 {
-                    if (GetPlayerX(i) == GameState.CurXGame && GetPlayerY(i) == GameState.CurYGame)
+                    if (GetX(i) == GameState.CurXGame && GetY(i) == GameState.CurYGame)
                     {
                         // Show player menu at GUI mouse position (for UI popups)
                         GameLogic.ShowPlayerMenu(i, mouseXGui, mouseYGui);
@@ -2172,19 +2172,19 @@ namespace Client
                 {
                     if (GetMap((int) i) == GetMap((int) i))
                     {
-                        if (GetPlayerVital((int) i, Core.Globals.Vital.Health) > 0 &
-                            GetPlayerVital((int) i, Core.Globals.Vital.Health) < GetPlayerMaxVital((int) i, Core.Globals.Vital.Health))
+                        if (GetVital((int) i, Core.Globals.Vital.Health) > 0 &
+                            GetVital((int) i, Core.Globals.Vital.Health) < GetMaxVital((int) i, Core.Globals.Vital.Health))
                         {
                             // lock to Player
-                            tmpX = (long) Math.Round(GetPlayerRawX((int) i) +
+                            tmpX = (long) Math.Round(GetRawX((int) i) +
                                 16 - width / 2d);
-                            tmpY = GetPlayerRawY((int) i) + 35;
+                            tmpY = GetRawY((int) i) + 35;
 
                             // calculate the width to fill
                             if (width > 0L)
                                 GameState.BarWidthPlayerHPMax[(int) i] = (int) Math.Round(
-                                    GetPlayerVital((int) i, Core.Globals.Vital.Health) / (double) width /
-                                    (GetPlayerMaxVital((int) i, Core.Globals.Vital.Health) / (double) width) * width);
+                                    GetVital((int) i, Core.Globals.Vital.Health) / (double) width /
+                                    (GetMaxVital((int) i, Core.Globals.Vital.Health) / (double) width) * width);
 
                             // draw bar background
                             top = height * 3L; // HP bar background
@@ -2202,19 +2202,19 @@ namespace Client
                                 (int) GameState.BarWidthPlayerHP[(int) i], (int) height);
                         }
 
-                        if (GetPlayerVital((int) i, Core.Globals.Vital.Stamina) > 0 &
-                            GetPlayerVital((int) i, Core.Globals.Vital.Stamina) < GetPlayerMaxVital((int) i, Core.Globals.Vital.Stamina))
+                        if (GetVital((int) i, Core.Globals.Vital.Stamina) > 0 &
+                            GetVital((int) i, Core.Globals.Vital.Stamina) < GetMaxVital((int) i, Core.Globals.Vital.Stamina))
                         {
                             // lock to Player
-                            tmpX = (long)Math.Round(GetPlayerRawX((int)i) +
+                            tmpX = (long)Math.Round(GetRawX((int)i) +
                                 16 - width / 2d);
-                            tmpY = GetPlayerRawY((int)i) + 35 + height;
+                            tmpY = GetRawY((int)i) + 35 + height;
 
                             // calculate the width to fill
                             if (width > 0)
                                 GameState.BarWidthPlayerMPMax[(int) i] = (int) Math.Round(
-                                    GetPlayerVital((int) i, Core.Globals.Vital.Mana) / (double) width /
-                                    (GetPlayerMaxVital((int) i, Core.Globals.Vital.Mana) / (double) width) * width);
+                                    GetVital((int) i, Core.Globals.Vital.Mana) / (double) width /
+                                    (GetMaxVital((int) i, Core.Globals.Vital.Mana) / (double) width) * width);
 
                             // draw bar background
                             top = height * 3L; // SP bar background
@@ -2242,9 +2242,9 @@ namespace Client
                                             .CastTime > 0)
                                     {
                                         // lock to player
-                                        tmpX = (long)Math.Round(GetPlayerRawX((int)i) + 16 - width / 2d);
+                                        tmpX = (long)Math.Round(GetRawX((int)i) + 16 - width / 2d);
 
-                                        tmpY = GetPlayerRawY((int)i) + 35 + height;
+                                        tmpY = GetRawY((int)i) + 35 + height;
 
                                         // calculate the width to fill
                                         if (width > 0L)
@@ -2716,7 +2716,7 @@ namespace Client
                     {
                         if (IsPlaying(i) & GetMap(i) == map)
                         {
-                            if (GetPlayerY(i) == y)
+                            if (GetY(i) == y)
                             {
                                 Player.OnDraw(i);
                             }
@@ -2939,7 +2939,7 @@ namespace Client
             if (GameState.BLoc)
             {
                 string cur = "Cur X: " + GameState.CurXGame + " Y: " + GameState.CurYGame;
-                string loc = "Loc X: " + GetPlayerX(GameState.MyIndex) + " Y: " + GetPlayerY(GameState.MyIndex);
+                string loc = "Loc X: " + GetX(GameState.MyIndex) + " Y: " + GetY(GameState.MyIndex);
                 string pos = " (Map #" + map + ")";
                 string curMouse = "Mouse X: " + (int)GameState.CurMouseXGame + " Y: " + (int)GameState.CurMouseYGame;
 
@@ -3016,15 +3016,15 @@ namespace Client
                 else
                 {
                     // Compare distance between player and target against the view half-size (zoom-aware)
-                    int px = GetPlayerRawX(GameState.MyIndex) + Constants.TileSize / 2;
-                    int py = GetPlayerRawY(GameState.MyIndex) + Constants.TileSize / 2;
-                    int tx = GetPlayerRawX(t) + Constants.TileSize / 2;
-                    int ty = GetPlayerRawY(t) + Constants.TileSize / 2;
+                    int px = GetRawX(GameState.MyIndex) + Constants.TileSize / 2;
+                    int py = GetRawY(GameState.MyIndex) + Constants.TileSize / 2;
+                    int tx = GetRawX(t) + Constants.TileSize / 2;
+                    int ty = GetRawY(t) + Constants.TileSize / 2;
                     if (Math.Abs(tx - px) >= maxDx || Math.Abs(ty - py) >= maxDy)
                     {
                         shouldClear = true;
-                        tileX = GetPlayerX(t);
-                        tileY = GetPlayerY(t);
+                        tileX = GetX(t);
+                        tileY = GetY(t);
                     }
                 }
             }
@@ -3037,8 +3037,8 @@ namespace Client
                 }
                 else
                 {
-                    int px = GetPlayerRawX(GameState.MyIndex) + Constants.TileSize / 2;
-                    int py = GetPlayerRawY(GameState.MyIndex) + Constants.TileSize / 2;
+                    int px = GetRawX(GameState.MyIndex) + Constants.TileSize / 2;
+                    int py = GetRawY(GameState.MyIndex) + Constants.TileSize / 2;
                     int tx = MapNpc.Instance[n].X + Constants.TileSize / 2;
                     int ty = MapNpc.Instance[n].Y + Constants.TileSize / 2;
                     if (Math.Abs(tx - px) >= maxDx || Math.Abs(ty - py) >= maxDy)

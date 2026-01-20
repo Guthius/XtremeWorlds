@@ -198,7 +198,7 @@ namespace Server
         {
             foreach (var i in PlayerService.Instance.PlayerIds)
             {
-                if (NetworkConfig.IsPlaying(i) && GetMap(i) == map && GetPlayerX(i) == x && GetPlayerY(i) == y)
+                if (NetworkConfig.IsPlaying(i) && GetMap(i) == map && GetX(i) == x && GetY(i) == y)
                 {
                     if (Server.Map.Instance[map].Event[eventId].Pages[Data.TempPlayer[index].EventMap.EventPages[eventId].PageId].Trigger == 1)
                     {
@@ -524,7 +524,7 @@ namespace Server
 
         private static (int px, int py, int ex, int ey, int walkThrough) GetPlayerAndEventPositions(int playerId, int map, int eventId)
         {
-            int px = GetPlayerX(playerId), py = GetPlayerY(playerId);
+            int px = GetX(playerId), py = GetY(playerId);
             var eventPage = Data.TempPlayer[playerId].EventMap.EventPages[eventId];
             return (px, py, eventPage.X, eventPage.Y,
                 Server.Map.Instance[map].Event[eventPage.EventId].Pages[eventPage.PageId].WalkThrough);
@@ -1027,7 +1027,7 @@ namespace Server
             {
                 var page = Server.Map.Instance[map].Event[i].Pages[Data.TempPlayer[index].EventMap.EventPages[i].PageId];
                 if (page.ChkVariable == 1 && page.VariableIndex == GetActionVariableIndex(actionType) && page.VariableCompare == value)
-                    EventLogic.TriggerEvent(index, i, 0, GetPlayerX(index), GetPlayerY(index));
+                    EventLogic.TriggerEvent(index, i, 0, GetX(index), GetY(index));
             }
         }
 

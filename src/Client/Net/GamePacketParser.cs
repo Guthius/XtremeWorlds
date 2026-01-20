@@ -510,7 +510,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         {
             var item = packetReader.ReadInt32();
 
-            SetPlayerPaperdoll(GameState.MyIndex, item, (Equipment)i);
+            SetPaperdoll(GameState.MyIndex, item, (Equipment)i);
             Item.OnStream(item);
         }
     }
@@ -899,7 +899,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         var slot = packetReader.ReadInt32();
         if (slot >= 0 && slot < Core.Globals.Variables.MaxPlayerSkills && GameState.MyIndex >= 0)
         {
-            SetPlayerSkillCd(GameState.MyIndex, slot, General.GetTickCount());
+            SetSkillCd(GameState.MyIndex, slot, General.GetTickCount());
         }
     }
 
@@ -971,7 +971,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         {
             var item = packetReader.ReadInt32();
 
-            SetPlayerPaperdoll(player, item, (Equipment) i);
+            SetPaperdoll(player, item, (Equipment) i);
         }
     }
 
@@ -1543,13 +1543,13 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     {
         var buffer = new PacketReader(data);
 
-        SetPlayerVital(GameState.MyIndex, Core.Globals.Vital.Health, buffer.ReadInt32());
-        SetPlayerMaxVital(GameState.MyIndex, Core.Globals.Vital.Health, buffer.ReadInt32());
+        SetVital(GameState.MyIndex, Core.Globals.Vital.Health, buffer.ReadInt32());
+        SetMaxVital(GameState.MyIndex, Core.Globals.Vital.Health, buffer.ReadInt32());
 
         // set max width
-        if (GetPlayerVital(GameState.MyIndex, Core.Globals.Vital.Health) > 0)
+        if (GetVital(GameState.MyIndex, Core.Globals.Vital.Health) > 0)
         {
-            GameState.BarWidthGuiHPMax = (int)Math.Round(GetPlayerVital(GameState.MyIndex, Core.Globals.Vital.Health) / 209d / (GetPlayerMaxVital(GameState.MyIndex, Core.Globals.Vital.Health) / 209d) * 209d);
+            GameState.BarWidthGuiHPMax = (int)Math.Round(GetVital(GameState.MyIndex, Core.Globals.Vital.Health) / 209d / (GetMaxVital(GameState.MyIndex, Core.Globals.Vital.Health) / 209d) * 209d);
         }
         else
         {
@@ -1563,13 +1563,13 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     {
         var buffer = new PacketReader(data);
 
-        SetPlayerVital(GameState.MyIndex, Core.Globals.Vital.Mana, buffer.ReadInt32());
-        SetPlayerMaxVital(GameState.MyIndex, Core.Globals.Vital.Mana, buffer.ReadInt32());
+        SetVital(GameState.MyIndex, Core.Globals.Vital.Mana, buffer.ReadInt32());
+        SetMaxVital(GameState.MyIndex, Core.Globals.Vital.Mana, buffer.ReadInt32());
 
         // set max width
-        if (GetPlayerVital(GameState.MyIndex, Core.Globals.Vital.Mana) > 0)
+        if (GetVital(GameState.MyIndex, Core.Globals.Vital.Mana) > 0)
         {
-            GameState.BarWidthGuiMPMax = (int)Math.Round(GetPlayerVital(GameState.MyIndex, Core.Globals.Vital.Mana) / 209d / (GetPlayerMaxVital(GameState.MyIndex, Core.Globals.Vital.Mana) / 209d) * 209d);
+            GameState.BarWidthGuiMPMax = (int)Math.Round(GetVital(GameState.MyIndex, Core.Globals.Vital.Mana) / 209d / (GetMaxVital(GameState.MyIndex, Core.Globals.Vital.Mana) / 209d) * 209d);
         }
         else
         {
@@ -1583,13 +1583,13 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     {
         var buffer = new PacketReader(data);
 
-        SetPlayerVital(GameState.MyIndex, Core.Globals.Vital.Stamina, buffer.ReadInt32());
-        SetPlayerMaxVital(GameState.MyIndex, Core.Globals.Vital.Stamina, buffer.ReadInt32());
+        SetVital(GameState.MyIndex, Core.Globals.Vital.Stamina, buffer.ReadInt32());
+        SetMaxVital(GameState.MyIndex, Core.Globals.Vital.Stamina, buffer.ReadInt32());
 
         // set max width
-        if (GetPlayerVital(GameState.MyIndex, Core.Globals.Vital.Stamina) > 0)
+        if (GetVital(GameState.MyIndex, Core.Globals.Vital.Stamina) > 0)
         {
-            GameState.BarWidthGuiSPMax = (int)Math.Round(GetPlayerVital(GameState.MyIndex, Core.Globals.Vital.Stamina) / 209d / (GetPlayerMaxVital(GameState.MyIndex, Core.Globals.Vital.Stamina) / 209d) * 209d);
+            GameState.BarWidthGuiSPMax = (int)Math.Round(GetVital(GameState.MyIndex, Core.Globals.Vital.Stamina) / 209d / (GetMaxVital(GameState.MyIndex, Core.Globals.Vital.Stamina) / 209d) * 209d);
         }
         else
         {
@@ -1609,7 +1609,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         int statCount = Enum.GetValues(typeof(Stat)).Length;
         for (i = 0; i < statCount; i++)
-            SetPlayerStat(index, (Stat)i, buffer.ReadInt32());
+            SetStat(index, (Stat)i, buffer.ReadInt32());
     }
 
     public static async ValueTask PlayerData(ReadOnlyMemory<byte> data)
@@ -1626,26 +1626,26 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
                 Player.Instance.Add(new Player());
         }
        
-        SetPlayerName(i, buffer.ReadString());
-        SetPlayerJob(i, buffer.ReadByte());
-        SetPlayerLevel(i, buffer.ReadInt32());
-        SetPlayerPoints(i, buffer.ReadInt32());
-        SetPlayerSprite(i, buffer.ReadInt32());
-        SetPlayerMap(i, buffer.ReadInt32());
-        SetPlayerAccess(i, buffer.ReadByte());
-        SetPlayerPk(i, buffer.ReadBoolean());
+        SetName(i, buffer.ReadString());
+        SetJob(i, buffer.ReadByte());
+        SetLevel(i, buffer.ReadInt32());
+        SetPoints(i, buffer.ReadInt32());
+        SetSprite(i, buffer.ReadInt32());
+        SetMap(i, buffer.ReadInt32());
+        SetAccess(i, buffer.ReadByte());
+        SetPk(i, buffer.ReadBoolean());
         Player.Instance[i].Moving = 0;
 
         int statCount = Enum.GetValues(typeof(Stat)).Length;
         for (x = 0; x < statCount; x++)
-            SetPlayerStat(i, (Stat)x, buffer.ReadInt32());
+            SetStat(i, (Stat)x, buffer.ReadInt32());
 
         int resourceSkillCount = Enum.GetValues(typeof(ResourceSkill)).Length;
         for (x = 0; x < resourceSkillCount; x++)
         {
-            Player.Instance[i].GatherSkills[x].SkillLevel = buffer.ReadInt32();
-            Player.Instance[i].GatherSkills[x].SkillCurExperience = buffer.ReadInt32();
-            Player.Instance[i].GatherSkills[x].SkillNextLevelExperience = buffer.ReadInt32();
+            Player.Instance[i].GatherSkills[x].Level = buffer.ReadInt32();
+            Player.Instance[i].GatherSkills[x].Exp = buffer.ReadInt32();
+            Player.Instance[i].GatherSkills[x].MaxExp = buffer.ReadInt32();
         }
 
         // Check if the player is the client player
@@ -1664,21 +1664,21 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
                 instance.Controls[WindowManager.GetControl("winCharacter", "lblJob")].Text = "Job";
                 instance.Controls[WindowManager.GetControl("winCharacter", "lblLevel")].Text = "Level";
                 instance.Controls[WindowManager.GetControl("winCharacter", "lblGuild")].Text = "Guild";
-                instance.Controls[WindowManager.GetControl("winCharacter", "lblName2")].Text = GetPlayerName(GameState.MyIndex);
+                instance.Controls[WindowManager.GetControl("winCharacter", "lblName2")].Text = GetName(GameState.MyIndex);
                 instance.Controls[WindowManager.GetControl("winCharacter", "lblJob2")].Text = Job.Instance[GetJob(GameState.MyIndex)].Name;
-                instance.Controls[WindowManager.GetControl("winCharacter", "lblLevel2")].Text = GetPlayerLevel(GameState.MyIndex).ToString();
+                instance.Controls[WindowManager.GetControl("winCharacter", "lblLevel2")].Text = GetLevel(GameState.MyIndex).ToString();
                 instance.Controls[WindowManager.GetControl("winCharacter", "lblGuild2")].Text = "None";
                 WinCharacter.OnUpdate();
 
                 // stats
                 for (x = 0; x < statCount; x++)
-                    instance.Controls[WindowManager.GetControl("winCharacter", "lblStat_" + (x + 1))].Text = GetPlayerStat(GameState.MyIndex, (Stat)x).ToString();
+                    instance.Controls[WindowManager.GetControl("winCharacter", "lblStat_" + (x + 1))].Text = GetStat(GameState.MyIndex, (Stat)x).ToString();
 
                 // points
-                instance.Controls[WindowManager.GetControl("winCharacter", "lblPoints")].Text = GetPlayerPoints(GameState.MyIndex).ToString();
+                instance.Controls[WindowManager.GetControl("winCharacter", "lblPoints")].Text = GetPoints(GameState.MyIndex).ToString();
 
                 // grey out buttons
-                if (GetPlayerPoints(GameState.MyIndex) == 0)
+                if (GetPoints(GameState.MyIndex) == 0)
                 {
                     for (x = 0; x < statCount; x++)
                         instance.Controls[WindowManager.GetControl("winCharacter", "btnGreyStat_" + (x + 1))].Visible = true;
@@ -1718,7 +1718,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         i = buffer.ReadInt32();
         dir = buffer.ReadByte();
 
-        SetPlayerDir(i, dir);
+        SetDir(i, dir);
 
         // Do not reset local player's movement state on our own echoed dir packets; this causes micro-stutters
         if (i != GameState.MyIndex)
@@ -1735,17 +1735,17 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         var buffer = new PacketReader(data);
 
         index = buffer.ReadInt32();
-        SetPlayerExperience(index, buffer.ReadInt32());
+        SetExp(index, buffer.ReadInt32());
 
         tnl = buffer.ReadInt32();
         GameState.NextlevelExp = tnl;
 
         // set max width
-        if (GetPlayerLevel(GameState.MyIndex) < Core.Globals.Variables.MaxLevel)
+        if (GetLevel(GameState.MyIndex) < Core.Globals.Variables.MaxLevel)
         {
-            if (GetPlayerExperience(GameState.MyIndex) > 0)
+            if (GetExp(GameState.MyIndex) > 0)
             {
-                GameState.BarWidthGuiExpMax = (int)Math.Round(GetPlayerExperience(GameState.MyIndex) / 209d / (tnl / 209d) * 209d);
+                GameState.BarWidthGuiExpMax = (int)Math.Round(GetExp(GameState.MyIndex) / 209d / (tnl / 209d) * 209d);
             }
             else
             {
@@ -1782,9 +1782,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         // Ensure player array has the target index before applying
         if (index >= 0 && index < Player.Instance.Count)
         {
-            SetPlayerX(index, x);
-            SetPlayerY(index, y);
-            SetPlayerDir(index, dir);
+            SetX(index, x);
+            SetY(index, y);
+            SetDir(index, dir);
             Player.Instance[index].Moving = moving;
             Player.Instance[index].IsMoving = buffer.ReadBoolean();
 
@@ -1826,7 +1826,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         {
             if (i != GameState.MyIndex)
             {
-                SetPlayerMap(i, 0);
+                SetMap(i, 0);
             }
         }
 
@@ -1853,7 +1853,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         // and rendered from the correct map index (SPlayerXY does not include map).
         if (GameState.MyIndex >= 0 && GameState.MyIndex < Player.Instance.Count)
         {
-            SetPlayerMap(GameState.MyIndex, x);
+            SetMap(GameState.MyIndex, x);
         }
 
         needMap = 1;

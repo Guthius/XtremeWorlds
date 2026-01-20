@@ -90,7 +90,7 @@ public class Player : PlayerBase
         OnJoin(session.Id);
 
         General.Logger.LogInformation("{AccountName} | {PlayerName} has began playing {GameName}",
-            GetAccountLogin(session.Id), GetPlayerName(session.Id),
+            GetAccountLogin(session.Id), GetName(session.Id),
             SettingsManager.Instance.GameName);
     }
 
@@ -166,10 +166,10 @@ public class Player : PlayerBase
             NetworkSend.LeaveMap(playerId, oldMap);   
         }
 
-        SetPlayerMap(playerId, map);
-        SetPlayerX(playerId, x);
-        SetPlayerY(playerId, y);
-        SetPlayerDir(playerId, dir);
+        SetMap(playerId, map);
+        SetX(playerId, x);
+        SetY(playerId, y);
+        SetDir(playerId, dir);
 
         NetworkSend.PlayerXY(playerId);
 
@@ -262,7 +262,7 @@ public class Player : PlayerBase
             return;
         }
 
-        SetPlayerDir(playerId, dir);
+        SetDir(playerId, dir);
         var moved = false;
         var map = GetMap(playerId);
 
@@ -283,8 +283,8 @@ public class Player : PlayerBase
             return;
         }
 
-        var playerX = GetPlayerX(playerId);
-        var playerY = GetPlayerY(playerId);
+        var playerX = GetX(playerId);
+        var playerY = GetY(playerId);
         if (playerX < 0 || playerY < 0 || playerX >= mapData.MaxX || playerY >= mapData.MaxY)
         {
             General.Logger.LogWarning("OnMove rejected: out-of-bounds position x={X}, y={Y} on map {Map} (MaxX={MaxX}, MaxY={MaxY}) for player {PlayerId}", playerX, playerY, map, mapData.MaxX, mapData.MaxY, playerId);
@@ -295,18 +295,18 @@ public class Player : PlayerBase
         switch ((Direction) dir)
         {
             case Direction.Up:
-                if (GetPlayerY(playerId) > 0)
+                if (GetY(playerId) > 0)
                 {
-                    if (IsTileBlocked(playerId, map, GetPlayerX(playerId), GetPlayerY(playerId) - 1, Direction.Up))
+                    if (IsTileBlocked(playerId, map, GetX(playerId), GetY(playerId) - 1, Direction.Up))
                     {
                         NetworkSend.PlayerXY(playerId);
                         return;
                     }
 
-                    SetPlayerY(playerId, GetPlayerRawY(playerId) - 1);
+                    SetY(playerId, GetRawY(playerId) - 1);
                     moved = true;
                 }
-                else if (Server.Map.Instance[map].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type != TileType.NoCrossing && Server.Map.Instance[map].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type2 != TileType.NoCrossing)
+                else if (Server.Map.Instance[map].Tile[GetX(playerId), GetY(playerId)].Type != TileType.NoCrossing && Server.Map.Instance[map].Tile[GetX(playerId), GetY(playerId)].Type2 != TileType.NoCrossing)
                 {
                     var upMap = Server.Map.Instance[map].Up;
                     if (upMap > 0)
@@ -319,7 +319,7 @@ public class Player : PlayerBase
                         }
 
                         var newMapY = Server.Map.Instance[upMap].MaxY;
-                        OnWarp(playerId, upMap, GetPlayerX(playerId), newMapY, (int)Direction.Up);
+                        OnWarp(playerId, upMap, GetX(playerId), newMapY, (int)Direction.Up);
                         
                         didWarp = true;
                         moved = true;
@@ -329,23 +329,23 @@ public class Player : PlayerBase
                 break;
 
             case Direction.Down:
-                if (GetPlayerY(playerId) < Server.Map.Instance[map].MaxY - 1)
+                if (GetY(playerId) < Server.Map.Instance[map].MaxY - 1)
                 {
-                    if (IsTileBlocked(playerId, map, GetPlayerX(playerId), GetPlayerY(playerId) + 1, Direction.Down))
+                    if (IsTileBlocked(playerId, map, GetX(playerId), GetY(playerId) + 1, Direction.Down))
                     {
                         NetworkSend.PlayerXY(playerId);
                         return;
                     }
 
-                    SetPlayerY(playerId, GetPlayerRawY(playerId) + 1);
+                    SetY(playerId, GetRawY(playerId) + 1);
                     
                     moved = true;
                 }
-                else if (Server.Map.Instance[map].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type != TileType.NoCrossing && Server.Map.Instance[map].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type2 != TileType.NoCrossing)
+                else if (Server.Map.Instance[map].Tile[GetX(playerId), GetY(playerId)].Type != TileType.NoCrossing && Server.Map.Instance[map].Tile[GetX(playerId), GetY(playerId)].Type2 != TileType.NoCrossing)
                 {
                     if (Server.Map.Instance[map].Down > 0)
                     {
-                        OnWarp(playerId, Server.Map.Instance[map].Down, GetPlayerX(playerId), 0, (int)Direction.Down);
+                        OnWarp(playerId, Server.Map.Instance[map].Down, GetX(playerId), 0, (int)Direction.Down);
                         
                         didWarp = true;
                         moved = true;
@@ -355,19 +355,19 @@ public class Player : PlayerBase
                 break;
 
             case Direction.Left:
-                if (GetPlayerX(playerId) > 0)
+                if (GetX(playerId) > 0)
                 {
-                    if (IsTileBlocked(playerId, map, GetPlayerX(playerId) - 1, GetPlayerY(playerId), Direction.Left))
+                    if (IsTileBlocked(playerId, map, GetX(playerId) - 1, GetY(playerId), Direction.Left))
                     {
                         NetworkSend.PlayerXY(playerId);
                         return;
                     }
 
-                    SetPlayerX(playerId, GetPlayerRawX(playerId) - 1);
+                    SetX(playerId, GetRawX(playerId) - 1);
                     
                     moved = true;
                 }
-                else if (Server.Map.Instance[map].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type != TileType.NoCrossing && Server.Map.Instance[map].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type2 != TileType.NoCrossing)
+                else if (Server.Map.Instance[map].Tile[GetX(playerId), GetY(playerId)].Type != TileType.NoCrossing && Server.Map.Instance[map].Tile[GetX(playerId), GetY(playerId)].Type2 != TileType.NoCrossing)
                 {
                     var leftMap = Server.Map.Instance[map].Left;
                     if (leftMap > 0)
@@ -381,7 +381,7 @@ public class Player : PlayerBase
 
                         var newMapX = Server.Map.Instance[leftMap].MaxX;
 
-                        OnWarp(playerId, leftMap, newMapX, GetPlayerY(playerId), (int)Direction.Left);
+                        OnWarp(playerId, leftMap, newMapX, GetY(playerId), (int)Direction.Left);
 
                         didWarp = true;
                         moved = true;
@@ -391,23 +391,23 @@ public class Player : PlayerBase
                 break;
 
             case Direction.Right:
-                if (GetPlayerX(playerId) < Server.Map.Instance[map].MaxX - 1)
+                if (GetX(playerId) < Server.Map.Instance[map].MaxX - 1)
                 {
-                    if (IsTileBlocked(playerId, map, GetPlayerX(playerId) + 1, GetPlayerY(playerId), Direction.Right))
+                    if (IsTileBlocked(playerId, map, GetX(playerId) + 1, GetY(playerId), Direction.Right))
                     {
                         NetworkSend.PlayerXY(playerId);
                         return;
                     }
 
-                    SetPlayerX(playerId, GetPlayerRawX(playerId) + 1);
+                    SetX(playerId, GetRawX(playerId) + 1);
                     
                     moved = true;
                 }
-                else if (Server.Map.Instance[map].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type != TileType.NoCrossing && Server.Map.Instance[map].Tile[GetPlayerX(playerId), GetPlayerY(playerId)].Type2 != TileType.NoCrossing)
+                else if (Server.Map.Instance[map].Tile[GetX(playerId), GetY(playerId)].Type != TileType.NoCrossing && Server.Map.Instance[map].Tile[GetX(playerId), GetY(playerId)].Type2 != TileType.NoCrossing)
                 {
                     if (Server.Map.Instance[map].Right > 0)
                     {
-                        OnWarp(playerId, Server.Map.Instance[map].Right, 0, GetPlayerY(playerId), (int)Direction.Right);
+                        OnWarp(playerId, Server.Map.Instance[map].Right, 0, GetY(playerId), (int)Direction.Right);
                         
                         didWarp = true;
                         moved = true;
@@ -417,16 +417,16 @@ public class Player : PlayerBase
                 break;
 
             case Direction.UpRight:
-                if (GetPlayerY(playerId) > 0 && GetPlayerX(playerId) < Server.Map.Instance[map].MaxX - 1)
+                if (GetY(playerId) > 0 && GetX(playerId) < Server.Map.Instance[map].MaxX - 1)
                 {
-                    if (IsTileBlocked(playerId, map, GetPlayerX(playerId) + 1, GetPlayerY(playerId) - 1, Direction.UpRight))
+                    if (IsTileBlocked(playerId, map, GetX(playerId) + 1, GetY(playerId) - 1, Direction.UpRight))
                     {
                         NetworkSend.PlayerXY(playerId);
                         return;
                     }
 
-                    SetPlayerX(playerId, GetPlayerRawX(playerId) + 1);
-                    SetPlayerY(playerId, GetPlayerRawY(playerId) - 1);
+                    SetX(playerId, GetRawX(playerId) + 1);
+                    SetY(playerId, GetRawY(playerId) - 1);
                     
                     moved = true;
                 }
@@ -434,16 +434,16 @@ public class Player : PlayerBase
                 break;
 
             case Direction.UpLeft:
-                if (GetPlayerY(playerId) > 0 && GetPlayerX(playerId) > 0)
+                if (GetY(playerId) > 0 && GetX(playerId) > 0)
                 {
-                    if (IsTileBlocked(playerId, map, GetPlayerX(playerId) - 1, GetPlayerY(playerId) - 1, Direction.UpLeft))
+                    if (IsTileBlocked(playerId, map, GetX(playerId) - 1, GetY(playerId) - 1, Direction.UpLeft))
                     {
                         NetworkSend.PlayerXY(playerId);
                         return;
                     }
 
-                    SetPlayerX(playerId, GetPlayerRawX(playerId) - 1);
-                    SetPlayerY(playerId, GetPlayerRawY(playerId) - 1);
+                    SetX(playerId, GetRawX(playerId) - 1);
+                    SetY(playerId, GetRawY(playerId) - 1);
                     
                     moved = true;
                 }
@@ -451,16 +451,16 @@ public class Player : PlayerBase
                 break;
 
             case Direction.DownRight:
-                if (GetPlayerY(playerId) < Server.Map.Instance[map].MaxY - 1 && GetPlayerX(playerId) < Server.Map.Instance[map].MaxX - 1)
+                if (GetY(playerId) < Server.Map.Instance[map].MaxY - 1 && GetX(playerId) < Server.Map.Instance[map].MaxX - 1)
                 {
-                    if (IsTileBlocked(playerId, map, GetPlayerX(playerId) + 1, GetPlayerY(playerId) + 1, Direction.DownRight))
+                    if (IsTileBlocked(playerId, map, GetX(playerId) + 1, GetY(playerId) + 1, Direction.DownRight))
                     {
                         NetworkSend.PlayerXY(playerId);
                         return;
                     }
 
-                    SetPlayerX(playerId, GetPlayerRawX(playerId) + 1);
-                    SetPlayerY(playerId, GetPlayerRawY(playerId) + 1);
+                    SetX(playerId, GetRawX(playerId) + 1);
+                    SetY(playerId, GetRawY(playerId) + 1);
                     
                     moved = true;
                 }
@@ -468,16 +468,16 @@ public class Player : PlayerBase
                 break;
 
             case Direction.DownLeft:
-                if (GetPlayerY(playerId) < Server.Map.Instance[map].MaxY - 1 && GetPlayerX(playerId) > 0)
+                if (GetY(playerId) < Server.Map.Instance[map].MaxY - 1 && GetX(playerId) > 0)
                 {
-                    if (IsTileBlocked(playerId, map, GetPlayerX(playerId) - 1, GetPlayerY(playerId) + 1, Direction.DownLeft))
+                    if (IsTileBlocked(playerId, map, GetX(playerId) - 1, GetY(playerId) + 1, Direction.DownLeft))
                     {
                         NetworkSend.PlayerXY(playerId);
                         return;
                     }
 
-                    SetPlayerX(playerId, GetPlayerRawX(playerId) - 1);
-                    SetPlayerY(playerId, GetPlayerRawY(playerId) + 1);
+                    SetX(playerId, GetRawX(playerId) - 1);
+                    SetY(playerId, GetRawY(playerId) + 1);
 
                     moved = true;
                 }
@@ -489,10 +489,10 @@ public class Player : PlayerBase
         var currentMap = GetMap(playerId);
         if (currentMap >= 0 && currentMap < Server.Map.Instance.Count &&
             Server.Map.Instance[currentMap].Tile != null &&
-            GetPlayerX(playerId) >= 0 &&
-            GetPlayerY(playerId) >= 0 &&
-            GetPlayerX(playerId) < Server.Map.Instance[currentMap].MaxX &&
-            GetPlayerY(playerId) < Server.Map.Instance[currentMap].MaxY)
+            GetX(playerId) >= 0 &&
+            GetY(playerId) >= 0 &&
+            GetX(playerId) < Server.Map.Instance[currentMap].MaxX &&
+            GetY(playerId) < Server.Map.Instance[currentMap].MaxY)
         {
             // Player Touch events: EventPages is 1-based.
             for (var slot = 1; slot <= Data.TempPlayer[playerId].EventMap.CurrentEvents; slot++)
@@ -504,10 +504,10 @@ public class Player : PlayerBase
                 if (mapEventId < 0)
                     continue;
 
-                EventLogic.TriggerEvent(playerId, mapEventId, 1, GetPlayerX(playerId), GetPlayerY(playerId));
+                EventLogic.TriggerEvent(playerId, mapEventId, 1, GetX(playerId), GetY(playerId));
             }
 
-            ref var tile = ref Server.Map.Instance[currentMap].Tile[GetPlayerX(playerId), GetPlayerY(playerId)];
+            ref var tile = ref Server.Map.Instance[currentMap].Tile[GetX(playerId), GetY(playerId)];
 
             map = -1;
             x = 0;
@@ -584,7 +584,7 @@ public class Player : PlayerBase
             if (healVital >= 0 && healAmount > 0 && healVital < System.Enum.GetValues(typeof(Vital)).Length)
             {
                 var hv = (Vital)healVital;
-                if (GetPlayerVital(playerId, hv) < GetPlayerMaxVital(playerId, hv))
+                if (GetVital(playerId, hv) < GetMaxVital(playerId, hv))
                 {
                     int color = hv switch
                     {
@@ -592,8 +592,8 @@ public class Player : PlayerBase
                         Core.Globals.Vital.Mana => (int)ColorName.BrightBlue,
                         _ => (int)ColorName.Yellow
                     };
-                    NetworkSend.ActionMessage(GetMap(playerId), "+" + healAmount, color, (byte)ActionMessageType.Scroll, GetPlayerX(playerId) * 32, GetPlayerY(playerId) * 32, 1);
-                    SetPlayerVital(playerId, hv, Math.Min(GetPlayerVital(playerId, hv) + healAmount, GetPlayerMaxVital(playerId, hv)));
+                    NetworkSend.ActionMessage(GetMap(playerId), "+" + healAmount, color, (byte)ActionMessageType.Scroll, GetX(playerId) * 32, GetY(playerId) * 32, 1);
+                    SetVital(playerId, hv, Math.Min(GetVital(playerId, hv) + healAmount, GetMaxVital(playerId, hv)));
                     NetworkSend.PlayerMessage(playerId, "You feel rejuvenating forces coursing through your body.", (int)ColorName.BrightGreen);
                     NetworkSend.Vital(playerId, hv);
                 }
@@ -616,15 +616,15 @@ public class Player : PlayerBase
             if (trapAmount > 0)
             {
                 var tv = (Vital)trapVital;
-                NetworkSend.ActionMessage(GetMap(playerId), "-" + trapAmount, (int)ColorName.BrightRed, (byte)ActionMessageType.Scroll, GetPlayerX(playerId) * 32, GetPlayerY(playerId) * 32, 1);
-                if (tv == Core.Globals.Vital.Health && GetPlayerVital(playerId, Core.Globals.Vital.Health) - trapAmount <= 0)
+                NetworkSend.ActionMessage(GetMap(playerId), "-" + trapAmount, (int)ColorName.BrightRed, (byte)ActionMessageType.Scroll, GetX(playerId) * 32, GetY(playerId) * 32, 1);
+                if (tv == Core.Globals.Vital.Health && GetVital(playerId, Core.Globals.Vital.Health) - trapAmount <= 0)
                 {
                     OnKill(playerId);
                     Script.Instance?.KillPlayerNoAttacker(playerId, "You've been killed by a trap.");
                 }
                 else
                 {
-                    SetPlayerVital(playerId, tv, Math.Max(0, GetPlayerVital(playerId, tv) - trapAmount));
+                    SetVital(playerId, tv, Math.Max(0, GetVital(playerId, tv) - trapAmount));
                     NetworkSend.PlayerMessage(playerId, "You've been injured by a trap.", (int)ColorName.BrightRed);
                     NetworkSend.Vital(playerId, tv);
                 }
@@ -635,7 +635,7 @@ public class Player : PlayerBase
         // They tried to hack
         if (!moved || (expectingWarp && !didWarp))
         {
-            OnWarp(playerId, GetMap(playerId), GetPlayerX(playerId), GetPlayerY(playerId), (byte) Direction.Down);
+            OnWarp(playerId, GetMap(playerId), GetX(playerId), GetY(playerId), (byte) Direction.Down);
         }
 
         var wasMoving = Player.Instance[playerId].IsMoving;
@@ -645,7 +645,7 @@ public class Player : PlayerBase
         // Send immediately on movement start, on warp-triggered transitions, periodically, and on tile boundaries.
         var now = General.GetTime();
         var last = (playerId >= 0 && playerId < LastPlayerXYBroadcastMs.Length) ? LastPlayerXYBroadcastMs[playerId] : 0;
-        var onTileBoundary = (GetPlayerRawX(playerId) % Constants.TileSize == 0) && (GetPlayerRawY(playerId) % Constants.TileSize == 0);
+        var onTileBoundary = (GetRawX(playerId) % Constants.TileSize == 0) && (GetRawY(playerId) % Constants.TileSize == 0);
         var shouldSend = !wasMoving || expectingWarp || didWarp || onTileBoundary || now - last >= 100;
         if (shouldSend)
         {
@@ -701,8 +701,8 @@ public class Player : PlayerBase
 
                     // Players are tracked in pixels and can be mid-step/off-grid.
                     // Treat them as blocking if their tile-sized bounds intersect the destination tile.
-                    var otherLeft = GetPlayerRawX(otherPlayerId);
-                    var otherTop = GetPlayerRawY(otherPlayerId);
+                    var otherLeft = GetRawX(otherPlayerId);
+                    var otherTop = GetRawY(otherPlayerId);
                     var otherRight = otherLeft + Constants.TileSize;
                     var otherBottom = otherTop + Constants.TileSize;
                     if (otherLeft < tileRight && otherRight > tileLeft && otherTop < tileBottom && otherBottom > tileTop)
@@ -810,14 +810,14 @@ public class Player : PlayerBase
         var totalQuantity = 0;
         for (var i = 0; i < Core.Globals.Variables.MaxInventory; i++)
         {
-            if (GetPlayerInv(playerId, i) != item)
+            if (GetInv(playerId, i) != item)
             {
                 continue;
             }
 
             if (Item.Instance[item].Type == (byte) ItemCategory.Currency || Item.Instance[item].Stackable == 1)
             {
-                totalQuantity += GetPlayerInvValue(playerId, i);
+                totalQuantity += GetInvValue(playerId, i);
             }
             else
             {
@@ -837,7 +837,7 @@ public class Player : PlayerBase
 
         for (var i = 0; i < Core.Globals.Variables.MaxInventory; i++)
         {
-            if (GetPlayerInv(playerId, i) == item)
+            if (GetInv(playerId, i) == item)
             {
                 return i;
             }
@@ -863,7 +863,7 @@ public class Player : PlayerBase
         }
 
         if (string.IsNullOrEmpty(MapItem.Instance[map, mapItem].PlayerName) ||
-            MapItem.Instance[map, mapItem].PlayerName == GetPlayerName(playerId))
+            MapItem.Instance[map, mapItem].PlayerName == GetName(playerId))
         {
             return true;
         }
@@ -883,7 +883,7 @@ public class Player : PlayerBase
                     continue;
                 }
 
-                if (Math.Floor((double)MapItem.Instance[map, i].X / Constants.TileSize) != GetPlayerX(playerId) || Math.Floor((double)MapItem.Instance[map, i].Y / Constants.TileSize) != GetPlayerY(playerId))
+                if (Math.Floor((double)MapItem.Instance[map, i].X / Constants.TileSize) != GetX(playerId) || Math.Floor((double)MapItem.Instance[map, i].Y / Constants.TileSize) != GetY(playerId))
                 {
                     continue;
                 }
@@ -926,7 +926,7 @@ public class Player : PlayerBase
         {
             for (var invSlot = 0; invSlot < Core.Globals.Variables.MaxInventory; invSlot++)
             {
-                if (GetPlayerInv(playerId, invSlot) == item)
+                if (GetInv(playerId, invSlot) == item)
                 {
                     return invSlot;
                 }
@@ -935,7 +935,7 @@ public class Player : PlayerBase
 
         for (var invSlot = 0; invSlot < Core.Globals.Variables.MaxInventory; invSlot++)
         {
-            if (GetPlayerInv(playerId, invSlot) == -1)
+            if (GetInv(playerId, invSlot) == -1)
             {
                 return invSlot;
             }
@@ -956,7 +956,7 @@ public class Player : PlayerBase
         for (var invSlot = 0; invSlot < Core.Globals.Variables.MaxInventory; invSlot++)
         {
             // Check to see if the player has the item
-            if (GetPlayerInv(playerId, invSlot) != id)
+            if (GetInv(playerId, invSlot) != id)
             {
                 continue;
             }
@@ -965,13 +965,13 @@ public class Player : PlayerBase
                 Item.Instance[id].Stackable == 1)
             {
                 // Is what we are trying to take away more then what they have?  If so just set it to zero
-                if (val >= GetPlayerInvValue(playerId, invSlot))
+                if (val >= GetInvValue(playerId, invSlot))
                 {
                     clearInvSlot = true;
                 }
                 else
                 {
-                    SetInvValue(playerId, invSlot, GetPlayerInvValue(playerId, invSlot) - val);
+                    SetInvValue(playerId, invSlot, GetInvValue(playerId, invSlot) - val);
 
                     NetworkSend.InventoryUpdate(playerId, invSlot);
                 }
@@ -1014,7 +1014,7 @@ public class Player : PlayerBase
         val = Math.Max(val, 1);
 
         SetInv(playerId, slot, id);
-        SetInvValue(playerId, slot, GetPlayerInvValue(playerId, slot) + val);
+        SetInvValue(playerId, slot, GetInvValue(playerId, slot) + val);
         Player.Instance[playerId].Inventory[slot].Bound = bound;
 
         if (sendUpdate)
@@ -1052,7 +1052,7 @@ public class Player : PlayerBase
             return;
         }
 
-        var itemId = GetPlayerInv(playerId, invSlot);
+        var itemId = GetInv(playerId, invSlot);
         if (itemId < 0 || itemId >= Core.Globals.Variables.MaxItems)
         {
             return;
@@ -1066,9 +1066,9 @@ public class Player : PlayerBase
             ref var mapItem = ref MapItem.Instance[map, slot];
 
             mapItem.Num = itemId;
-            mapItem.X = GetPlayerX(playerId);
-            mapItem.Y = GetPlayerY(playerId);
-            mapItem.PlayerName = GetPlayerName(playerId);
+            mapItem.X = GetX(playerId);
+            mapItem.Y = GetY(playerId);
+            mapItem.PlayerName = GetName(playerId);
             mapItem.PlayerTimer = General.GetTime() + Script.Instance?.ItemSpawnTime();
             mapItem.DespawnTimer = General.GetTime() + Script.Instance?.ItemDespawnTime();
             mapItem.CanDespawn = true;
@@ -1097,19 +1097,19 @@ public class Player : PlayerBase
             return false;
         }
 
-        var item = GetPlayerInv(playerId, invSlot);
+        var item = GetInv(playerId, invSlot);
 
         if (Item.Instance[item].Type == (byte) ItemCategory.Currency ||
             Item.Instance[item].Stackable == 1)
         {
             // Is what we are trying to take away more then what they have?  If so just set it to zero
-            if (val >= GetPlayerInvValue(playerId, invSlot))
+            if (val >= GetInvValue(playerId, invSlot))
             {
                 takeInvSlot = true;
             }
             else
             {
-                SetInvValue(playerId, invSlot, GetPlayerInvValue(playerId, invSlot) - val);
+                SetInvValue(playerId, invSlot, GetInvValue(playerId, invSlot) - val);
             }
         }
         else
@@ -1142,7 +1142,7 @@ public class Player : PlayerBase
         var stats = Enum.GetValues<Stat>();
         foreach (var stat in stats)
         {
-            if (GetPlayerStat(playerId, stat) >= Item.Instance[itemNum].StatReq[(int) stat])
+            if (GetStat(playerId, stat) >= Item.Instance[itemNum].StatReq[(int) stat])
             {
                 continue;
             }
@@ -1151,7 +1151,7 @@ public class Player : PlayerBase
             return false;
         }
 
-        if (Item.Instance[itemNum].LevelReq > GetPlayerLevel(playerId))
+        if (Item.Instance[itemNum].LevelReq > GetLevel(playerId))
         {
             NetworkSend.PlayerMessage(playerId, "You do not meet the level requirements to use this item.", (int) ColorName.BrightRed);
             return false;
@@ -1185,7 +1185,7 @@ public class Player : PlayerBase
             return;
         }
 
-        var item = GetPlayerInv(playerId, invSlot);
+        var item = GetInv(playerId, invSlot);
         if (item < 0 || item >= Core.Globals.Variables.MaxItems)
         {
             return;
@@ -1213,10 +1213,10 @@ public class Player : PlayerBase
             return;
         }
 
-        var oldInv = GetPlayerInv(playerId, oldSlot);
-        var oldValue = GetPlayerInvValue(playerId, oldSlot);
-        var newInv = GetPlayerInv(playerId, newSlot);
-        var newValue = GetPlayerInvValue(playerId, newSlot);
+        var oldInv = GetInv(playerId, oldSlot);
+        var oldValue = GetInvValue(playerId, oldSlot);
+        var newInv = GetInv(playerId, newSlot);
+        var newValue = GetInvValue(playerId, newSlot);
         var oldBound = Player.Instance[playerId].Inventory[oldSlot].Bound;
         var newBound = Player.Instance[playerId].Inventory[newSlot].Bound;
 
@@ -1265,34 +1265,34 @@ public class Player : PlayerBase
             return;
         }
 
-        var oldSkill = GetPlayerSkill(playerId, oldSlot);
-        var oldValue = GetPlayerSkillCd(playerId, oldSlot);
-        var newSkill = GetPlayerSkill(playerId, newSlot);
-        var newValue = GetPlayerSkillCd(playerId, newSlot);
+        var oldSkill = GetSkill(playerId, oldSlot);
+        var oldValue = GetSkillCd(playerId, oldSlot);
+        var newSkill = GetSkill(playerId, newSlot);
+        var newValue = GetSkillCd(playerId, newSlot);
 
         if (newSkill >= 0)
         {
             if (oldSkill == newSkill & Item.Instance[newSkill].Stackable == 1) // Same item, if we can stack it, lets do that :P
             {
                 SetSkill(playerId, newSlot, newSkill);
-                SetPlayerSkillCd(playerId, newSlot, newValue);
+                SetSkillCd(playerId, newSlot, newValue);
                 SetSkill(playerId, oldSlot, 0);
-                SetPlayerSkillCd(playerId, oldSlot, 0);
+                SetSkillCd(playerId, oldSlot, 0);
             }
             else
             {
                 SetSkill(playerId, newSlot, oldSkill);
-                SetPlayerSkillCd(playerId, newSlot, oldValue);
+                SetSkillCd(playerId, newSlot, oldValue);
                 SetSkill(playerId, oldSlot, newSkill);
-                SetPlayerSkillCd(playerId, oldSlot, newValue);
+                SetSkillCd(playerId, oldSlot, newValue);
             }
         }
         else
         {
             SetSkill(playerId, newSlot, oldSkill);
-            SetPlayerSkillCd(playerId, newSlot, oldValue);
+            SetSkillCd(playerId, newSlot, oldValue);
             SetSkill(playerId, oldSlot, newSkill);
-            SetPlayerSkillCd(playerId, oldSlot, newValue);
+            SetSkillCd(playerId, oldSlot, newValue);
         }
 
         NetworkSend.PlayerSkills(playerId);
@@ -1304,16 +1304,16 @@ public class Player : PlayerBase
 
         foreach (var equipment in equipments)
         {
-            var item = GetPlayerPaperdoll(playerId, equipment);
+            var item = GetPaperdoll(playerId, equipment);
             if (item < 0)
             {
-                SetPlayerPaperdoll(playerId, -1, equipment);
+                SetPaperdoll(playerId, -1, equipment);
                 continue;
             }
 
             if (Item.Instance[item].SubType != (byte) equipment)
             {
-                SetPlayerPaperdoll(playerId, -1, equipment);
+                SetPaperdoll(playerId, -1, equipment);
             }
         }
     }
@@ -1326,13 +1326,13 @@ public class Player : PlayerBase
             return;
         }
 
-        var item = GetPlayerPaperdoll(playerId, (Equipment) eqSlot);
+        var item = GetPaperdoll(playerId, (Equipment) eqSlot);
         if (item < 0 || item >= Core.Globals.Variables.MaxItems)
         {
             return;
         }
 
-        if (GetPlayerPaperdoll(playerId, (Equipment)eqSlot) < 0 || GetPlayerPaperdoll(playerId, (Equipment)eqSlot) > Core.Globals.Variables.MaxItems)
+        if (GetPaperdoll(playerId, (Equipment)eqSlot) < 0 || GetPaperdoll(playerId, (Equipment)eqSlot) > Core.Globals.Variables.MaxItems)
             return;
 
         if (FindOpenInvSlot(playerId, item) >= 0)
@@ -1381,7 +1381,7 @@ public class Player : PlayerBase
         try
         {
             General.Logger.LogInformation("{AccountName} | {PlayerName} has stopped playing {GameName}",
-                GetAccountLogin(playerId), GetPlayerName(playerId),
+                GetAccountLogin(playerId), GetName(playerId),
                 SettingsManager.Instance.GameName);
 
             try
@@ -1492,51 +1492,51 @@ public class Player : PlayerBase
         }
 
         amount = Math.Max(amount, 0);
-        if (GetPlayerInvValue(playerId, invSlot) < amount && GetPlayerInv(playerId, invSlot) == 0)
+        if (GetInvValue(playerId, invSlot) < amount && GetInv(playerId, invSlot) == 0)
         {
             return;
         }
 
-        var bankSlot = FindOpenbankSlot(playerId, GetPlayerInv(playerId, invSlot));
+        var bankSlot = FindOpenbankSlot(playerId, GetInv(playerId, invSlot));
         if (bankSlot == -1)
         {
             return;
         }
 
-        var itemNum = GetPlayerInv(playerId, invSlot);
+        var itemNum = GetInv(playerId, invSlot);
         var bound = Player.Instance[playerId].Inventory[invSlot].Bound;
 
         Bank.Instance[playerId].Item[bankSlot].Bound = bound;
 
-        if (Item.Instance[GetPlayerInv(playerId, invSlot)].Type == (byte)ItemCategory.Currency ||
-            Item.Instance[GetPlayerInv(playerId, invSlot)].Stackable == 1)
+        if (Item.Instance[GetInv(playerId, invSlot)].Type == (byte)ItemCategory.Currency ||
+            Item.Instance[GetInv(playerId, invSlot)].Stackable == 1)
         {
-            if (GetBank(playerId, bankSlot) == GetPlayerInv(playerId, invSlot))
+            if (GetBank(playerId, bankSlot) == GetInv(playerId, invSlot))
             {
                 SetBankValue(playerId, bankSlot, GetBankValue(playerId, bankSlot) + amount);
 
-                TakeInv(playerId, GetPlayerInv(playerId, invSlot), amount);
+                TakeInv(playerId, GetInv(playerId, invSlot), amount);
             }
             else
             {
-                SetBank(playerId, bankSlot, GetPlayerInv(playerId, invSlot));
+                SetBank(playerId, bankSlot, GetInv(playerId, invSlot));
                 SetBankValue(playerId, bankSlot, amount);
 
-                TakeInv(playerId, GetPlayerInv(playerId, invSlot), amount);
+                TakeInv(playerId, GetInv(playerId, invSlot), amount);
             }
         }
-        else if (GetBank(playerId, bankSlot) == GetPlayerInv(playerId, invSlot))
+        else if (GetBank(playerId, bankSlot) == GetInv(playerId, invSlot))
         {
             SetBankValue(playerId, bankSlot, GetBankValue(playerId, bankSlot) + 1);
 
-            TakeInv(playerId, GetPlayerInv(playerId, invSlot), 0);
+            TakeInv(playerId, GetInv(playerId, invSlot), 0);
         }
         else
         {
             SetBank(playerId, bankSlot, itemNum);
             SetBankValue(playerId, bankSlot, 1);
 
-            TakeInv(playerId, GetPlayerInv(playerId, invSlot), 0);
+            TakeInv(playerId, GetInv(playerId, invSlot), 0);
         }
 
         NetworkSend.Bank(playerId);
@@ -1626,7 +1626,7 @@ public class Player : PlayerBase
                     Bank.Instance[playerId].Item[bankSlot].Bound = 0;
                 }
             }
-            else if (GetBank(playerId, bankSlot) == GetPlayerInv(playerId, invSlot))
+            else if (GetBank(playerId, bankSlot) == GetInv(playerId, invSlot))
             {
                 if (GetBankValue(playerId, bankSlot) > 1)
                 {

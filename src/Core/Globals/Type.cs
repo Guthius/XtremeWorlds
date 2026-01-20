@@ -4,9 +4,9 @@ public static class Type
 {
     public struct ResourceType
     {
-        public int SkillLevel;
-        public int SkillCurExperience;
-        public int SkillNextLevelExperience;
+        public int Level;
+        public int Exp;
+        public int MaxExp;
     }
     
     public struct Rect

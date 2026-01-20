@@ -89,7 +89,7 @@ public class Projectile : ProjectileBase, IAsyncData
         {
             if (!NetworkConfig.IsPlaying(p.Id)) continue;
             if (GetMap(p.Id) != map) continue;
-            if (GetPlayerX(p.Id) == tileX && GetPlayerY(p.Id) == tileY)
+            if (GetX(p.Id) == tileX && GetY(p.Id) == tileY)
             {
                 if (!(mp.OwnerType == (byte)TargetType.Player && mp.Owner == p.Id))
                 {
@@ -220,8 +220,8 @@ public class Projectile : ProjectileBase, IAsyncData
         else if (ang > -157.5 && ang <= -112.5) mp.Dir = (byte)Direction.UpLeft;
         else if (ang > -112.5 && ang <= -67.5) mp.Dir = (byte)Direction.Up;
         else mp.Dir = (byte)Direction.UpRight;
-        mp.X = GetPlayerRawX(playerId);
-        mp.Y = GetPlayerRawY(playerId);
+        mp.X = GetRawX(playerId);
+        mp.Y = GetRawY(playerId);
         mp.Vx = vx; mp.Vy = vy; mp.FreeAim = 1;
         mp.AccX = 0; mp.AccY = 0; mp.Range = 0;
         mp.TravelTime = General.GetTime() + Math.Max(1, Projectile.Instance[projectileNum].Speed);
@@ -259,8 +259,8 @@ public class Projectile : ProjectileBase, IAsyncData
         else if (ang > -157.5 && ang <= -112.5) mp.Dir = (byte)Direction.UpLeft;
         else if (ang > -112.5 && ang <= -67.5) mp.Dir = (byte)Direction.Up;
         else mp.Dir = (byte)Direction.UpRight;
-        mp.X = GetPlayerRawX(playerId);
-        mp.Y = GetPlayerRawY(playerId);
+        mp.X = GetRawX(playerId);
+        mp.Y = GetRawY(playerId);
         mp.Vx = vx; mp.Vy = vy; mp.FreeAim = 1; mp.SkillId = -1;
         mp.AccX = 0; mp.AccY = 0; mp.Range = 0;
         mp.DestX = destX; mp.DestY = destY;
@@ -310,9 +310,9 @@ public class Projectile : ProjectileBase, IAsyncData
         mapProjectile.Index = projectile;
         mapProjectile.Owner = playerId;
         mapProjectile.OwnerType = (byte)TargetType.Player;
-        mapProjectile.Dir = dir >= 0 ? (byte) dir : GetPlayerDir(playerId);
-        mapProjectile.X = GetPlayerRawX(playerId);
-        mapProjectile.Y = GetPlayerRawY(playerId);
+        mapProjectile.Dir = dir >= 0 ? (byte) dir : GetDir(playerId);
+        mapProjectile.X = GetRawX(playerId);
+        mapProjectile.Y = GetRawY(playerId);
         mapProjectile.SkillId = skillNum;
         mapProjectile.Range = 0;
         mapProjectile.TravelTime = General.GetTime() + Math.Max(1, Projectile.Instance[projectile].Speed);
@@ -565,7 +565,7 @@ public class Projectile : ProjectileBase, IAsyncData
 
                     if (!NetworkConfig.IsPlaying(p.Id)) continue;
                     if (GetMap(p.Id) != x) continue;
-                    if (GetPlayerX(p.Id) == tileX && GetPlayerY(p.Id) == tileY)
+                    if (GetX(p.Id) == tileX && GetY(p.Id) == tileY)
                     {
                         // Don't hit owner player
                         if (!(mp.OwnerType == (byte)TargetType.Player && mp.Owner == p.Id))

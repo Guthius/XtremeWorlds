@@ -118,8 +118,8 @@ namespace Client
                         if (lockindex >= 0 && lockindex < Core.Globals.Variables.MaxPlayers &&
                             IsPlaying(lockindex) && GetMap(lockindex) == GetMap(GameState.MyIndex))
                         {
-                            x = (int)Math.Round(GetPlayerX(lockindex) + 16 - width / 2d);
-                            y = (int)Math.Round(GetPlayerY(lockindex) + 16 - height / 2d);
+                            x = (int)Math.Round(GetX(lockindex) + 16 - width / 2d);
+                            y = (int)Math.Round(GetY(lockindex) + 16 - height / 2d);
                         }
                         break;
                     }

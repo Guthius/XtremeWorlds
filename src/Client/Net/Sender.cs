@@ -126,7 +126,7 @@ public static class Sender
         var packetWriter = new PacketWriter(14);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CPlayerMove);
-        packetWriter.WriteByte(GetPlayerDir(GameState.MyIndex));
+        packetWriter.WriteByte(GetDir(GameState.MyIndex));
         packetWriter.WriteByte(Player.Instance[GameState.MyIndex].Moving);
         packetWriter.WriteInt32(Player.Instance[GameState.MyIndex].X);
         packetWriter.WriteInt32(Player.Instance[GameState.MyIndex].Y);
@@ -139,7 +139,7 @@ public static class Sender
         var packetWriter = new PacketWriter(5);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CStopPlayerMove);
-        packetWriter.WriteByte(GetPlayerDir(GameState.MyIndex));
+        packetWriter.WriteByte(GetDir(GameState.MyIndex));
 
         Network.Send(packetWriter);
     }
@@ -287,7 +287,7 @@ public static class Sender
         var packetWriter = new PacketWriter(8);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CPlayerDir);
-        packetWriter.WriteByte(GetPlayerDir(GameState.MyIndex));
+        packetWriter.WriteByte(GetDir(GameState.MyIndex));
 
         Network.Send(packetWriter);
     }
@@ -440,8 +440,8 @@ public static class Sender
             return;
         }
 
-        if (Item.Instance[GetPlayerInv(GameState.MyIndex, invSlot)].Type == (byte) ItemCategory.Currency ||
-            Item.Instance[GetPlayerInv(GameState.MyIndex, invSlot)].Stackable == 1)
+        if (Item.Instance[GetInv(GameState.MyIndex, invSlot)].Type == (byte) ItemCategory.Currency ||
+            Item.Instance[GetInv(GameState.MyIndex, invSlot)].Stackable == 1)
         {
             if (amount < 0 || amount > Player.Instance[GameState.MyIndex].Inventory[invSlot].Value)
             {
@@ -1178,7 +1178,7 @@ public static class Sender
         var packetWriter = new PacketWriter(4);
 
         packetWriter.WriteEnum(Packets.ClientPackets.CRequestNewMap);
-        packetWriter.WriteInt32((int)GetPlayerDir(GameState.MyIndex));
+        packetWriter.WriteInt32((int)GetDir(GameState.MyIndex));
 
         Network.Send(packetWriter);
 

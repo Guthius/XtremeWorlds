@@ -615,7 +615,7 @@ public static class Database
             for (i = 0; i < vitalCount; i++)
             {
                 int value = Script.Instance?.GetPlayerMaxVital(index, (Vital)i) ?? 0;
-                SetPlayerVital(index, (Vital)i, value);
+                SetVital(index, (Vital)i, value);
             }
 
             // set starter items
@@ -648,13 +648,13 @@ public static class Database
             var resourceCount = Enum.GetValues(typeof(ResourceSkill)).Length;
             for (i = 0; i < resourceCount; i++)
             {
-                Account.Instance[index].Player[slot].GatherSkills[i].SkillLevel = 1;
-                Account.Instance[index].Player[slot].GatherSkills[i].SkillCurExperience = 0;
-                SetPlayerGatherSkillMaxExperience(index, i, (int)GetSkillNextLevel(index, i));
+                Account.Instance[index].Player[slot].GatherSkills[i].Level = 1;
+                Account.Instance[index].Player[slot].GatherSkills[i].Exp = 0;
+                SetSkillMaxExp(index, i, (int)GetSkillMaxExp(index, i));
             }
 
             if (Database.CharacterList?.Count == 1)
-                SetPlayerAccess(index, (int)Access.Owner);
+                SetAccess(index, (int)Access.Owner);
             
             await Account.OnSave(index);
         }
@@ -733,8 +733,8 @@ public static class Database
 
         ip = ip.Substring(0, i);
         Log.Add(ip, "banlist.txt");
-        NetworkSend.GlobalMessage(GetPlayerName(banPlayerIndex) + " has been banned from " + SettingsManager.Instance.GameName + " by " + GetPlayerName(bannedByIndex) + "!");
-        Log.Add(GetPlayerName(bannedByIndex) + " has banned " + GetPlayerName(banPlayerIndex) + ".", Constant.AdminLog);
+        NetworkSend.GlobalMessage(GetName(banPlayerIndex) + " has been banned from " + SettingsManager.Instance.GameName + " by " + GetName(bannedByIndex) + "!");
+        Log.Add(GetName(bannedByIndex) + " has banned " + GetName(banPlayerIndex) + ".", Constant.AdminLog);
         _ = Player.OnExit(banPlayerIndex).ContinueWith(
             t => General.Logger.LogError(t.Exception, "Unhandled error during forced logout"),
             TaskContinuationOptions.OnlyOnFaulted

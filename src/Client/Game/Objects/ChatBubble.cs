@@ -54,7 +54,7 @@ public class ChatBubble : IData
 
                 // Adjust upward so bubble sits above nameplate.
                 // Recreate nameplate top Y (TextRenderer logic simplified):
-                int spriteNumLocal = GetPlayerSprite((int)instance.Target);
+                int spriteNumLocal = GetSprite((int)instance.Target);
                 if (spriteNumLocal > 0 && spriteNumLocal <= GameState.NumCharacters)
                 {
                     var gi = GameClient.GetGfxInfo(System.IO.Path.Combine(Core.Globals.DataPath.Characters, spriteNumLocal.ToString()));

@@ -195,10 +195,10 @@ public class Script
     public void OnJoin(int index)
     {
         // Warp the Player to his saved location
-        OnWarp(index, GetMap(index), GetPlayerX(index), GetPlayerY(index), (byte)Direction.Down, true);
+        OnWarp(index, GetMap(index), GetX(index), GetY(index), (byte)Direction.Down, true);
 
         // Notify everyone that a Player has joined the game.
-        NetworkSend.GlobalMessage(string.Format("{0} has joined {1}!", GetPlayerName(index), SettingsManager.Instance.GameName));
+        NetworkSend.GlobalMessage(string.Format("{0} has joined {1}!", GetName(index), SettingsManager.Instance.GameName));
 
         // Send all the required game data to the user.
         OnCheckEquipment(index);
@@ -235,20 +235,20 @@ public class Script
         NetworkSend.Welcome(index);
     
         // Use a default bell sound that ships with content; adjust if you prefer another file
-        NetworkSend.PlaySound(index, "Bell.ogg", GetPlayerX(index), GetPlayerY(index));
+        NetworkSend.PlaySound(index, "Bell.ogg", GetX(index), GetY(index));
     }
 
     public void OnDrop(int index, int invSlot, int amount)
     {
-        var item = Item.Instance[GetPlayerInv(index, invSlot)];
+        var item = Item.Instance[GetInv(index, invSlot)];
         var map = GetMap(index);
-        var id = GetPlayerInv(index, invSlot);
+        var id = GetInv(index, invSlot);
 
         // Determine if the item is currency or stackable
         if (item.Type == (byte)ItemCategory.Currency || item.Stackable == 1)
         {
             // Check if dropping more than the Player has, drop all if so
-            var InventoryValue = GetPlayerInvValue(index, invSlot);
+            var InventoryValue = GetInvValue(index, invSlot);
             if (amount >= InventoryValue)
             {
                 amount = InventoryValue;
@@ -259,7 +259,7 @@ public class Script
             {
                 SetInvValue(index, invSlot, InventoryValue - amount);
             }
-            NetworkSend.MapMessage(map, string.Format("{0} has dropped {1} ({2}x).", GetPlayerName(index), GameLogic.CheckGrammar(item.Name), amount));
+            NetworkSend.MapMessage(map, string.Format("{0} has dropped {1} ({2}x).", GetName(index), GameLogic.CheckGrammar(item.Name), amount));
         }
         else
         {
@@ -267,14 +267,14 @@ public class Script
             SetInv(index, invSlot, -1);
             SetInvValue(index, invSlot, 0);
 
-            NetworkSend.MapMessage(map, string.Format("{0} has dropped {1}.", GetPlayerName(index), GameLogic.CheckGrammar(item.Name)));
+            NetworkSend.MapMessage(map, string.Format("{0} has dropped {1}.", GetName(index), GameLogic.CheckGrammar(item.Name)));
         }
 
         // Send inventory update
         NetworkSend.InventoryUpdate(index, invSlot);
 
         // Spawn the item on the map
-        Server.MapItem.OnSpawn(id, amount, map, GetPlayerX(index), GetPlayerY(index));
+        Server.MapItem.OnSpawn(id, amount, map, GetX(index), GetY(index));
     }
 
     public void OnPickup(int index, int map, int mapSlot, int invSlot)
@@ -301,7 +301,7 @@ public class Script
         if (item.Type == (byte)ItemCategory.Currency || item.Stackable == 1)
         {
             // For stackable/currency, add the value from the map item (should be 1 for most drops)
-            SetInvValue(index, invSlot, GetPlayerInvValue(index, invSlot) + mapValue);
+            SetInvValue(index, invSlot, GetInvValue(index, invSlot) + mapValue);
             msg = mapValue + " " + item.Name;
         }
         else
@@ -316,7 +316,7 @@ public class Script
         MapItem.Instance[map, mapSlot].Value = 0;
         NetworkSend.MapItemToAll(map, mapSlot);
         NetworkSend.InventoryUpdate(index, invSlot);
-        NetworkSend.ActionMessage(GetMap(index), msg, (int)ColorName.White, (byte)ActionMessageType.Static, GetPlayerX(index) * Variables.TileSize, GetPlayerY(index) * Variables.TileSize);
+        NetworkSend.ActionMessage(GetMap(index), msg, (int)ColorName.White, (byte)ActionMessageType.Static, GetX(index) * Variables.TileSize, GetY(index) * Variables.TileSize);
 
         // Unlock pickup for this Player
         _isPickingUp[index] = false;
@@ -335,10 +335,10 @@ public class Script
             Server.Player.Instance[index].Inventory[invSlot].Bound = Server.Player.Instance[index].Paperdoll[eqSlot].Bound;
             SetInvValue(index, invSlot, 1);
 
-            NetworkSend.PlayerMessage(index, "You unequip " + GameLogic.CheckGrammar(Item.Instance[GetPlayerPaperdoll(index, (Equipment)eqSlot)].Name) + ".", (int)ColorName.Yellow);
+            NetworkSend.PlayerMessage(index, "You unequip " + GameLogic.CheckGrammar(Item.Instance[GetPaperdoll(index, (Equipment)eqSlot)].Name) + ".", (int)ColorName.Yellow);
 
             // remove equipment
-            SetPlayerPaperdoll(index, -1, (Equipment)eqSlot);
+            SetPaperdoll(index, -1, (Equipment)eqSlot);
             NetworkSend.WornEquipment(index);
             NetworkSend.MapEquipment(index);
             NetworkSend.Stats(index);
@@ -380,9 +380,9 @@ public class Script
                         {
                             case (byte)ConsumableEffect.RestoresHealth:
                                 {
-                                    NetworkSend.ActionMessage(GetMap(index), "+" + Item.Instance[item].Data1, (int)ColorName.BrightGreen, (byte)ActionMessageType.Scroll, GetPlayerX(index) * Variables.TileSize, GetPlayerY(index) * Variables.TileSize);
+                                    NetworkSend.ActionMessage(GetMap(index), "+" + Item.Instance[item].Data1, (int)ColorName.BrightGreen, (byte)ActionMessageType.Scroll, GetX(index) * Variables.TileSize, GetY(index) * Variables.TileSize);
                                     NetworkSend.PlayAnimation(GetMap(index), Item.Instance[item].Animation, 0, 0, (byte)TargetType.Player, index);
-                                    SetPlayerVital(index, Core.Globals.Vital.Health, GetPlayerVital(index, Core.Globals.Vital.Health) + Item.Instance[item].Data1);
+                                    SetVital(index, Core.Globals.Vital.Health, GetVital(index, Core.Globals.Vital.Health) + Item.Instance[item].Data1);
                                     TakeInv(index, item, 1);
                                     NetworkSend.Vital(index, Core.Globals.Vital.Health);
                                     break;
@@ -390,9 +390,9 @@ public class Script
 
                             case (byte)ConsumableEffect.RestoresMana:
                                 {
-                                    NetworkSend.ActionMessage(GetMap(index), "+" + Item.Instance[item].Data1, (int)ColorName.BrightBlue, (byte)ActionMessageType.Scroll, GetPlayerX(index) * Variables.TileSize, GetPlayerY(index) * Variables.TileSize);
+                                    NetworkSend.ActionMessage(GetMap(index), "+" + Item.Instance[item].Data1, (int)ColorName.BrightBlue, (byte)ActionMessageType.Scroll, GetX(index) * Variables.TileSize, GetY(index) * Variables.TileSize);
                                     NetworkSend.PlayAnimation(GetMap(index), Item.Instance[item].Animation, 0, 0, (byte)TargetType.Player, index);
-                                    SetPlayerVital(index, Core.Globals.Vital.Stamina, GetPlayerVital(index, Core.Globals.Vital.Stamina) + Item.Instance[item].Data1);
+                                    SetVital(index, Core.Globals.Vital.Stamina, GetVital(index, Core.Globals.Vital.Stamina) + Item.Instance[item].Data1);
                                     TakeInv(index, item, 1);
                                     NetworkSend.Vital(index, Core.Globals.Vital.Stamina);
                                     break;
@@ -401,7 +401,7 @@ public class Script
                             case (byte)ConsumableEffect.RestoresStamina:
                                 {
                                     NetworkSend.PlayAnimation(GetMap(index), Item.Instance[item].Animation, 0, 0, (byte)TargetType.Player, index);
-                                    SetPlayerVital(index, Core.Globals.Vital.Stamina, GetPlayerVital(index, Core.Globals.Vital.Stamina) + Item.Instance[item].Data1);
+                                    SetVital(index, Core.Globals.Vital.Stamina, GetVital(index, Core.Globals.Vital.Stamina) + Item.Instance[item].Data1);
                                     TakeInv(index, item, 1);
                                     NetworkSend.Vital(index, Core.Globals.Vital.Stamina);
                                     break;
@@ -410,7 +410,7 @@ public class Script
                             case (byte)ConsumableEffect.GrantsExperience:
                                 {
                                     NetworkSend.PlayAnimation(GetMap(index), Item.Instance[item].Animation, 0, 0, (byte)TargetType.Player, index);
-                                    SetPlayerExperience(index, GetPlayerExperience(index) + Item.Instance[item].Data1);
+                                    SetExp(index, GetExp(index) + Item.Instance[item].Data1);
                                     TakeInv(index, item, 1);
                                     NetworkSend.Experience(index);
                                     break;
@@ -432,7 +432,7 @@ public class Script
                             }
                             else
                             {
-                                NetworkSend.PlayerMessage(index, "Out of " + Item.Instance[Item.Instance[GetPlayerPaperdoll(index, Equipment.Weapon)].Ammo].Name + "!", (int)ColorName.BrightRed);
+                                NetworkSend.PlayerMessage(index, "Out of " + Item.Instance[Item.Instance[GetPaperdoll(index, Equipment.Weapon)].Ammo].Name + "!", (int)ColorName.BrightRed);
                                 return;
                             }
                         }
@@ -530,9 +530,9 @@ public class Script
         var maxX = Server.Map.Instance[map].MaxX;
         var maxY = Server.Map.Instance[map].MaxY;
 
-        var (dx, dy) = GetDirectionDelta((Direction)GetPlayerDir(playerId));
-        var x = GetPlayerX(playerId) + dx;
-        var y = GetPlayerY(playerId) + dy;
+        var (dx, dy) = GetDirectionDelta((Direction)GetDir(playerId));
+        var x = GetX(playerId) + dx;
+        var y = GetY(playerId) + dy;
 
         if (x < 0 || y < 0 || x >= maxX || y >= maxY)
         {
@@ -735,11 +735,11 @@ public class Script
                 Server.Player.Instance[index].Inventory[invSlot].Bound = 2;
             }
 
-            if (GetPlayerPaperdoll(index, eqType) >= 0)
+            if (GetPaperdoll(index, eqType) >= 0)
             {
-                tempItem = GetPlayerPaperdoll(index, eqType);
+                tempItem = GetPaperdoll(index, eqType);
             }
-            SetPlayerPaperdoll(index, item, eqType);
+            SetPaperdoll(index, item, eqType);
             Server.Player.Instance[index].Paperdoll[(byte)eqType].Bound = Server.Player.Instance[index].Inventory[invSlot].Bound;
             NetworkSend.PlayerMessage(index, "You equip " + GameLogic.CheckGrammar(Item.Instance[item].Name) + ".", (int)ColorName.BrightGreen);
             TakeInv(index, item, 1);
@@ -784,7 +784,7 @@ public class Script
             // Make sure they are the right level
             i = Skill.Instance[n].LevelReq;
 
-            if (i <= GetPlayerLevel(index))
+            if (i <= GetLevel(index))
             {
                 i = FindOpenSkill(index);
 
@@ -889,25 +889,25 @@ public class Script
     public void OnDeath(int index)
     {
         // Set HP to nothing
-        SetPlayerVital(index, Core.Globals.Vital.Health, 0);
+        SetVital(index, Core.Globals.Vital.Health, 0);
 
         // Restore vitals
         var vitalCount = System.Enum.GetValues(typeof(Vital)).Length;
         for (int i = 0, count = vitalCount; i < count; i++)
-            SetPlayerVital(index, (Vital)i, GetPlayerMaxVital(index, (Vital)i));
+            SetVital(index, (Vital)i, GetPlayerMaxVital(index, (Vital)i));
 
         Vitals(index);
 
         // If the Player the attacker killed was a pk then take it away
-        if (GetPlayerPk(index))
+        if (GetPk(index))
         {
-            SetPlayerPk(index, false);
+            SetPk(index, false);
         }
 
         var instance = Server.Map.Instance[GetMap(index)];
 
         // Warp Player away
-        SetPlayerDir(index, (byte)Direction.Down);
+        SetDir(index, (byte)Direction.Down);
         Server.Player.Instance[index].Dead = false;
         Server.Player.Instance[index].DeathTimer = 0;
         PlayerDeath(index, Server.Player.Instance[index].DeathTimer);
@@ -981,13 +981,13 @@ public class Script
         }
 
         // Mana check (only deduct on finalize) - ensure sufficient now
-        if (GetPlayerVital(player, Core.Globals.Vital.Mana) < Skill.Instance[skill].MpCost)
+        if (GetVital(player, Core.Globals.Vital.Mana) < Skill.Instance[skill].MpCost)
         {
             NetworkSend.PlayerMessage(player, "Not enough mana.", (int)ColorName.BrightRed);
             return;
         }
 
-        if (GetPlayerVital(player, Core.Globals.Vital.Stamina) < Skill.Instance[skill].SpCost)
+        if (GetVital(player, Core.Globals.Vital.Stamina) < Skill.Instance[skill].SpCost)
         {
             NetworkSend.PlayerMessage(player, "Not enough stamina.", (int)ColorName.BrightRed);
             return;
@@ -1019,7 +1019,7 @@ public class Script
         if (!Moral.Instance[Server.Map.Instance[GetMap(index)].Moral].LoseExp)
             return 0;
 
-        int exp = GetPlayerExperience(index) / 3;
+        int exp = GetExp(index) / 3;
 
         if (exp == 0)
         {
@@ -1037,17 +1037,17 @@ public class Script
     public void OnTrain(int index, int tmpStat)
     {
         // make sure their stats are not maxed
-        if (GetPlayerRawStat(index, (Stat)tmpStat) >= Core.Globals.Variables.MaxStats)
+        if (GetRawStat(index, (Stat)tmpStat) >= Core.Globals.Variables.MaxStats)
         {
             NetworkSend.PlayerMessage(index, "You cannot spend any more points on that stat.", (int)ColorName.BrightRed);
             return;
         }
 
         // increment stat
-        SetPlayerStat(index, (Stat)tmpStat, GetPlayerRawStat(index, (Stat)tmpStat) + 1);
+        SetStat(index, (Stat)tmpStat, GetRawStat(index, (Stat)tmpStat) + 1);
 
         // decrement points
-        SetPlayerPoints(index, GetPlayerPoints(index) - 1);
+        SetPoints(index, GetPoints(index) - 1);
 
         // send Player new data
         NetworkSend.PlayerData(index);
@@ -1061,14 +1061,14 @@ public class Script
     public void OnLevel(int index)
     {
         int count = 0;
-        while (GetPlayerExperience(index) >= GetPlayerNextLevel(index))
+        while (GetExp(index) >= GetPlayerNextLevel(index))
         {
-            var expRollover = GetPlayerExperience(index) - GetPlayerNextLevel(index);
-            SetPlayerLevel(index, GetPlayerLevel(index) + 1);
+            var expRollover = GetExp(index) - GetPlayerNextLevel(index);
+            SetLevel(index, GetLevel(index) + 1);
             int points = GetPlayerPointsPerLevel(index);
-            points += ((int)Math.Floor((decimal)GetPlayerStat(index, Stat.Luck) / 10));
-            SetPlayerPoints(index, GetPlayerPoints(index) + points);
-            SetPlayerExperience(index, expRollover);
+            points += ((int)Math.Floor((decimal)GetStat(index, Stat.Luck) / 10));
+            SetPoints(index, GetPoints(index) + points);
+            SetExp(index, expRollover);
             count += 1;
         }
 
@@ -1077,14 +1077,14 @@ public class Script
             if (count == 1)
             {
                 // singular
-                NetworkSend.GlobalMessage(GetPlayerName(index) + " has gained " + count + " level!");
+                NetworkSend.GlobalMessage(GetName(index) + " has gained " + count + " level!");
             }
             else
             {
                 // plural
-                NetworkSend.GlobalMessage(GetPlayerName(index) + " has gained " + count + " levels!");
+                NetworkSend.GlobalMessage(GetName(index) + " has gained " + count + " levels!");
             }
-            NetworkSend.ActionMessage(GetMap(index), "Level Up", (int)ColorName.Yellow, 1, GetPlayerX(index) * Variables.TileSize, GetPlayerY(index) * Variables.TileSize);
+            NetworkSend.ActionMessage(GetMap(index), "Level Up", (int)ColorName.Yellow, 1, GetX(index) * Variables.TileSize, GetY(index) * Variables.TileSize);
             NetworkSend.Experience(index);
             NetworkSend.PlayerData(index);
         }
@@ -1149,31 +1149,31 @@ public class Script
                 int id = p.Id;
                 if (!NetworkConfig.IsPlaying(id)) continue;
                 int hpMax = GetPlayerMaxVital(id, Core.Globals.Vital.Health);
-                int hpCur = GetPlayerVital(id, Core.Globals.Vital.Health);
+                int hpCur = GetVital(id, Core.Globals.Vital.Health);
                 if (hpMax > 0 && hpCur <= 0 && !Server.Player.Instance[id].Dead)
                 {
                     KillPlayerNoAttacker(id);
                 }
                 else if (hpCur > 0 && hpCur < hpMax && !Server.Player.Instance[id].Dead)
                 {
-                    int amount = Math.Max(1, GetPlayerStat(id, Stat.Vitality) / 2);
-                    SetPlayerVital(id, Core.Globals.Vital.Health, Math.Min(hpMax, hpCur + amount));
+                    int amount = Math.Max(1, GetStat(id, Stat.Vitality) / 2);
+                    SetVital(id, Core.Globals.Vital.Health, Math.Min(hpMax, hpCur + amount));
                     NetworkSend.Vital(id, Core.Globals.Vital.Health);
                 }
                 int manaMax = GetPlayerMaxVital(id, Core.Globals.Vital.Mana);
-                int manaCur = GetPlayerVital(id, Core.Globals.Vital.Mana);
+                int manaCur = GetVital(id, Core.Globals.Vital.Mana);
                 if (manaCur < manaMax)
                 {
-                    int amount = Math.Max(1, GetPlayerStat(id, Stat.Intelligence) / 2);
-                    SetPlayerVital(id, Core.Globals.Vital.Mana, Math.Min(manaMax, manaCur + amount));
+                    int amount = Math.Max(1, GetStat(id, Stat.Intelligence) / 2);
+                    SetVital(id, Core.Globals.Vital.Mana, Math.Min(manaMax, manaCur + amount));
                     NetworkSend.Vital(id, Core.Globals.Vital.Mana);
                 }
                 int stamMax = GetPlayerMaxVital(id, Core.Globals.Vital.Stamina);
-                int stamCur = GetPlayerVital(id, Core.Globals.Vital.Stamina);
+                int stamCur = GetVital(id, Core.Globals.Vital.Stamina);
                 if (stamCur < stamMax)
                 {
-                    int amount = Math.Max(1, GetPlayerStat(id, Stat.Spirit) / 2);
-                    SetPlayerVital(id, Core.Globals.Vital.Stamina, Math.Min(stamMax, stamCur + amount));
+                    int amount = Math.Max(1, GetStat(id, Stat.Spirit) / 2);
+                    SetVital(id, Core.Globals.Vital.Stamina, Math.Min(stamMax, stamCur + amount));
                     NetworkSend.Vital(id, Core.Globals.Vital.Stamina);
                 }
             }
@@ -1186,7 +1186,7 @@ public class Script
         if (Server.Player.Instance[playerId].Dead) return;
 
         Server.Player.Instance[playerId].Dead = true;
-        SetPlayerVital(playerId, Core.Globals.Vital.Health, 0);
+        SetVital(playerId, Core.Globals.Vital.Health, 0);
         NetworkSend.Vital(playerId, Core.Globals.Vital.Health);
 
         ClearTargetsToDeadPlayer(playerId);
@@ -1281,7 +1281,7 @@ public class Script
             if (Server.Player.Instance[target.Id].Dead) return;
 
             Server.Player.Instance[target.Id].Dead = true;
-            SetPlayerVital(target.Id, Core.Globals.Vital.Health, 0);
+            SetVital(target.Id, Core.Globals.Vital.Health, 0);
             NetworkSend.Vital(target.Id, Core.Globals.Vital.Health);
 
             ClearTargetsToDeadPlayer(target.Id);
@@ -1293,11 +1293,11 @@ public class Script
                 // Drop equipment
                 for (int i = 0; i < equipCount; i++)
                 {
-                    if (GetPlayerPaperdoll(target.Id, (Equipment)i) >= 0)
+                    if (GetPaperdoll(target.Id, (Equipment)i) >= 0)
                     {
-                        Server.MapItem.OnSpawn(GetPlayerPaperdoll(target.Id, (Equipment)i), 1, GetMap(target.Id), GetPlayerX(target.Id), GetPlayerY(target.Id));
-                        NetworkSend.PlayerMessage(target.Id, "You have dropped your " + Item.Instance[GetPlayerPaperdoll(target.Id, (Equipment)i)].Name + " upon death.", (int)ColorName.BrightRed);
-                        SetPlayerPaperdoll(target.Id, -1, (Equipment)i);
+                        Server.MapItem.OnSpawn(GetPaperdoll(target.Id, (Equipment)i), 1, GetMap(target.Id), GetX(target.Id), GetY(target.Id));
+                        NetworkSend.PlayerMessage(target.Id, "You have dropped your " + Item.Instance[GetPaperdoll(target.Id, (Equipment)i)].Name + " upon death.", (int)ColorName.BrightRed);
+                        SetPaperdoll(target.Id, -1, (Equipment)i);
                     }
                 }
             }
@@ -1321,14 +1321,14 @@ public class Script
                     else
                     {
                         // Solo award
-                        SetPlayerExperience(attacker.Id, GetPlayerExperience(attacker.Id) + gain);
+                        SetExp(attacker.Id, GetExp(attacker.Id) + gain);
                         NetworkSend.Experience(attacker.Id);
                     }
-                    NetworkSend.PlayerMessage(attacker.Id, $"You gained {gain} experience for defeating {GetPlayerName(target.Id)}.", (int)ColorName.BrightGreen);
+                    NetworkSend.PlayerMessage(attacker.Id, $"You gained {gain} experience for defeating {GetName(target.Id)}.", (int)ColorName.BrightGreen);
                 }
             }
 
-            NetworkSend.GlobalMessage(GetPlayerName(target.Id) + " was slain by " + GetEntityName(attacker) + ".");
+            NetworkSend.GlobalMessage(GetName(target.Id) + " was slain by " + GetEntityName(attacker) + ".");
 
             // Record a per-character respawn deadline.
             var now = (int)General.GetTime();
@@ -1444,7 +1444,7 @@ public class Script
                         else
                         {
                             // Solo: award directly
-                            SetPlayerExperience(attacker.Id, GetPlayerExperience(attacker.Id) + baseExp);
+                            SetExp(attacker.Id, GetExp(attacker.Id) + baseExp);
                             NetworkSend.Experience(attacker.Id);
                         }
                         NetworkSend.PlayerMessage(attacker.Id, $"You gained {baseExp} experience.", (int)ColorName.BrightGreen);
@@ -1458,7 +1458,7 @@ public class Script
     {
         if (e.Type == Entity.EntityType.Player)
         {
-            return GetPlayerName(e.Id);
+            return GetName(e.Id);
         }
         if (e.Type == Entity.EntityType.Npc)
         {
@@ -1513,7 +1513,7 @@ public class Script
         {
             if (attacker.Type == Entity.EntityType.Player)
             {
-                NetworkSend.PlayerMessage(target.Id, $"You were hit by {GetPlayerName(attacker.Id)} for {dmg.Final} damage.", (int)ColorName.BrightRed);
+                NetworkSend.PlayerMessage(target.Id, $"You were hit by {GetName(attacker.Id)} for {dmg.Final} damage.", (int)ColorName.BrightRed);
             }
             else if (attacker.Type == Entity.EntityType.Npc)
             {
@@ -1611,7 +1611,7 @@ public class Script
         if (e.Type == Entity.EntityType.Player)
         {
             if (e.Id < 0 || e.Id >= Server.Player.Instance.Count) return false;
-            return !Server.Player.Instance[e.Id].Dead && GetPlayerVital(e.Id, Core.Globals.Vital.Health) > 0;
+            return !Server.Player.Instance[e.Id].Dead && GetVital(e.Id, Core.Globals.Vital.Health) > 0;
         }
         if (e.Vital == null) return false;
         return e.Vital[(int)Core.Globals.Vital.Health] > 0;
@@ -1877,11 +1877,11 @@ public class Script
     {
         int power = 0;
         if (skillId >= 0)
-            power = GetPlayerStat(PlayerId, Stat.Intelligence) / 2;
+            power = GetStat(PlayerId, Stat.Intelligence) / 2;
         else
-            power = GetPlayerStat(PlayerId, Stat.Strength) / 2;
+            power = GetStat(PlayerId, Stat.Strength) / 2;
 
-        int weaponId = GetPlayerPaperdoll(PlayerId, Equipment.Weapon);
+        int weaponId = GetPaperdoll(PlayerId, Equipment.Weapon);
         int weaponPower = (weaponId >= 0 && weaponId < Item.Instance.Count) ? Item.Instance[weaponId].Data2 : 0;
         // Keep formula aligned with prior CalculateDamage logic (without RNG)
         int baseDamage = power + weaponPower;
@@ -1890,18 +1890,18 @@ public class Script
 
     private int GetPlayerDefense(int PlayerId)
     {
-        int def = GetPlayerStat(PlayerId, Stat.Vitality) / 5;
+        int def = GetStat(PlayerId, Stat.Vitality) / 5;
         return def;
     }
 
     public int GetPlayerNextLevel(int index)
     {
-        int level = GetPlayerLevel(index);
-        int str = GetPlayerStat(index, Stat.Strength);
-        int vit = GetPlayerStat(index, Stat.Vitality);
-        int intellect = GetPlayerStat(index, Stat.Intelligence);
-        int luck = GetPlayerStat(index, Stat.Luck);
-        int points = GetPlayerPoints(index);
+        int level = GetLevel(index);
+        int str = GetStat(index, Stat.Strength);
+        int vit = GetStat(index, Stat.Vitality);
+        int intellect = GetStat(index, Stat.Intelligence);
+        int luck = GetStat(index, Stat.Luck);
+        int points = GetPoints(index);
 
         long next = (long)(level + 1) * (str + vit + intellect + luck + points) * 25L;
         return next > int.MaxValue ? int.MaxValue : (int)Math.Max(0, next);
@@ -1930,7 +1930,7 @@ public class Script
         {
             int pid = target.Id;
             if (!NetworkConfig.IsPlaying(pid)) return;
-            int cur = GetPlayerVital(pid, vital);
+            int cur = GetVital(pid, vital);
             int max = GetPlayerMaxVital(pid, vital);
             int newVal;
             if (isHeal)
@@ -1943,7 +1943,7 @@ public class Script
                 if (cur <= 0) return; // already dead/empty
                 newVal = Math.Max(0, cur - amount);
             }
-            SetPlayerVital(pid, vital, newVal);
+            SetVital(pid, vital, newVal);
             NetworkSend.Vital(pid, vital);
             if (!isHeal && newVal <= 0 && vital == Core.Globals.Vital.Health)
             {
@@ -1996,7 +1996,7 @@ public class Script
         {
             if (entity.Type == Core.Globals.Entity.EntityType.Player)
             {
-                if (GetPlayerVital(entity.Id, Core.Globals.Vital.Mana) < Skill.Instance[skill].MpCost) return;
+                if (GetVital(entity.Id, Core.Globals.Vital.Mana) < Skill.Instance[skill].MpCost) return;
             }
             else if (entity.Type == Core.Globals.Entity.EntityType.Npc)
             {
@@ -2008,7 +2008,7 @@ public class Script
         {
             if (entity.Type == Core.Globals.Entity.EntityType.Player)
             {
-                if (GetPlayerVital(entity.Id, Core.Globals.Vital.Stamina) < Skill.Instance[skill].SpCost) return;
+                if (GetVital(entity.Id, Core.Globals.Vital.Stamina) < Skill.Instance[skill].SpCost) return;
             }
             else if (entity.Type == Core.Globals.Entity.EntityType.Npc)
             {
@@ -2275,7 +2275,7 @@ public class Script
         {
             if (!NetworkConfig.IsPlaying(p.Id)) continue;
             if (GetMap(p.Id) != map) continue;
-            if (GetPlayerX(p.Id) == tx && GetPlayerY(p.Id) == ty)
+            if (GetX(p.Id) == tx && GetY(p.Id) == ty)
             {
                 var e = Core.Globals.Entity.FromPlayer(p.Id, Server.Player.Instance[p.Id]); e.Map = map; return e;
             }
@@ -2311,8 +2311,8 @@ public class Script
         {
             if (!NetworkConfig.IsPlaying(Player.Id)) continue;
             if (GetMap(Player.Id) != map) continue;
-            int px = GetPlayerX(Player.Id);
-            int py = GetPlayerY(Player.Id);
+            int px = GetX(Player.Id);
+            int py = GetY(Player.Id);
             if (Math.Abs(px - centerX) <= radius && Math.Abs(py - centerY) <= radius)
             {
                 var targetEntity = Core.Globals.Entity.FromPlayer(Player.Id, Server.Player.Instance[Player.Id]);
@@ -2391,8 +2391,8 @@ public class Script
             if (caster.Type == Core.Globals.Entity.EntityType.Player)
             {
                 int pid = caster.Id;
-                int cur = GetPlayerVital(pid, Core.Globals.Vital.Mana);
-                SetPlayerVital(pid, Core.Globals.Vital.Mana, Math.Max(0, cur - skill.MpCost));
+                int cur = GetVital(pid, Core.Globals.Vital.Mana);
+                SetVital(pid, Core.Globals.Vital.Mana, Math.Max(0, cur - skill.MpCost));
                 NetworkSend.Vital(pid, Core.Globals.Vital.Mana);
             }
             else if (caster.Type == Core.Globals.Entity.EntityType.Npc && caster.Vital != null && caster.Vital.Length > (int)Core.Globals.Vital.Mana)
@@ -2406,8 +2406,8 @@ public class Script
             if (caster.Type == Core.Globals.Entity.EntityType.Player)
             {
                 int pid = caster.Id;
-                int cur = GetPlayerVital(pid, Core.Globals.Vital.Stamina);
-                SetPlayerVital(pid, Core.Globals.Vital.Stamina, Math.Max(0, cur - skill.SpCost));
+                int cur = GetVital(pid, Core.Globals.Vital.Stamina);
+                SetVital(pid, Core.Globals.Vital.Stamina, Math.Max(0, cur - skill.SpCost));
                 NetworkSend.Vital(pid, Core.Globals.Vital.Stamina);
             }
             else if (caster.Type == Core.Globals.Entity.EntityType.Npc && caster.Vital != null && caster.Vital.Length > (int)Core.Globals.Vital.Stamina)
@@ -2523,9 +2523,9 @@ public class Script
         // Apply
         if (target.Type == Entity.EntityType.Player)
         {
-            var current = GetPlayerVital(target.Id, Core.Globals.Vital.Health);
+            var current = GetVital(target.Id, Core.Globals.Vital.Health);
             var newHp = Math.Max(0, current - final);
-            SetPlayerVital(target.Id, Core.Globals.Vital.Health, newHp);
+            SetVital(target.Id, Core.Globals.Vital.Health, newHp);
             NetworkSend.Vital(target.Id, Core.Globals.Vital.Health);
             NetworkSend.ActionMessage(map, "-" + final, (int)ColorName.BrightRed, 1, tx, ty);
         }
@@ -2580,7 +2580,7 @@ public class Script
         int before;
         if (target.Type == Entity.EntityType.Player)
         {
-            before = GetPlayerVital(target.Id, Core.Globals.Vital.Health);
+            before = GetVital(target.Id, Core.Globals.Vital.Health);
         }
         else if (target.Type == Entity.EntityType.Npc && target.Map >= 0 && target.Map < Core.Globals.Variables.MaxMaps && target.Id >= 0 && target.Id < Core.Globals.Variables.MaxMapNpcs)
         {
@@ -2592,7 +2592,7 @@ public class Script
         }
         ApplyDamage(attacker, target, dmg, skillId);
         int after = target.Type == Entity.EntityType.Player
-            ? GetPlayerVital(target.Id, Core.Globals.Vital.Health)
+            ? GetVital(target.Id, Core.Globals.Vital.Health)
             : (target.Vital != null ? target.Vital[(int)Core.Globals.Vital.Health] : 0);
         if (target.Type == Entity.EntityType.Npc && target.Map >= 0 && target.Map < Core.Globals.Variables.MaxMaps && target.Id >= 0 && target.Id < Core.Globals.Variables.MaxMapNpcs)
         {
@@ -2644,13 +2644,13 @@ public class Script
             {
                 foreach (var pid in PlayerService.Instance.PlayerIds)
                 {
-                    if (pid != target.Id && GetMap(pid) == map && GetPlayerX(pid) == nx && GetPlayerY(pid) == ny) { occ = true; break; }
+                    if (pid != target.Id && GetMap(pid) == map && GetX(pid) == nx && GetY(pid) == ny) { occ = true; break; }
                 }
                 if (!occ)
                 {
                     // Move Player by setting raw coordinates
-                    SetPlayerX(target.Id, nx * Variables.TileSize);
-                    SetPlayerY(target.Id, ny * Variables.TileSize);
+                    SetX(target.Id, nx * Variables.TileSize);
+                    SetY(target.Id, ny * Variables.TileSize);
                     NetworkSend.PlayerXYToMap(target.Id);
                 }
                 else break;
@@ -2704,7 +2704,7 @@ public class Script
 
     public int GetPlayerMaxHP(int index)
     {
-        int vit = GetPlayerStat(index, Stat.Vitality);
+        int vit = GetStat(index, Stat.Vitality);
         int job = GetJob(index);
         int stat = Job.Instance[job].Stat[(int)Stat.Vitality];
         long val = (long)(1 + (vit / 2) + stat) * 2L;
@@ -2714,7 +2714,7 @@ public class Script
 
     public int GetPlayerMaxMP(int index)
     {
-        int @int = GetPlayerStat(index, Stat.Intelligence);
+        int @int = GetStat(index, Stat.Intelligence);
         int job = GetJob(index);
         int stat = Job.Instance[job].Stat[(int)Stat.Intelligence];
         long val = (1 + (@int / 2) + stat) * 2L;
@@ -2724,7 +2724,7 @@ public class Script
 
     public int GetPlayerMaxSP(int index)
     {
-        int spirit = GetPlayerStat(index, Stat.Spirit);
+        int spirit = GetStat(index, Stat.Spirit);
         int job = GetJob(index);
         int stat = Job.Instance[job].Stat[(int)Stat.Spirit];
         long val = (1 + (spirit / 2) + stat) * 2L;

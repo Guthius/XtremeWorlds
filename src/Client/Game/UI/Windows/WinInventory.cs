@@ -59,7 +59,7 @@ public class WinInventory
 
         for (var slot = 0; slot < Core.Globals.Variables.MaxInventory; slot++)
         {
-            var item = GetPlayerInv(GameState.MyIndex, slot);
+            var item = GetInv(GameState.MyIndex, slot);
             if (item < 0 || item >= Core.Globals.Variables.MaxItems)
             {
                 continue;
@@ -101,10 +101,10 @@ public class WinInventory
                         continue;
                     }
 
-                    var tempItem = GetPlayerInv(GameState.MyIndex, Data.TradeYourOffer[tradeSlot].Num);
+                    var tempItem = GetInv(GameState.MyIndex, Data.TradeYourOffer[tradeSlot].Num);
 
                     if (Item.Instance[tempItem].Type != (byte) ItemCategory.Currency ||
-                        Data.TradeYourOffer[tradeSlot].Value == GetPlayerInvValue(GameState.MyIndex, slot))
+                        Data.TradeYourOffer[tradeSlot].Value == GetInvValue(GameState.MyIndex, slot))
                     {
                         skipItem = true;
                     }
@@ -126,12 +126,12 @@ public class WinInventory
 
                     GameClient.RenderTexture(ref iconPath, left, top, 0, 0, 32, 32, 32, 32);
 
-                    if (GetPlayerInvValue(GameState.MyIndex, slot) > 1)
+                    if (GetInvValue(GameState.MyIndex, slot) > 1)
                     {
                         y = top + 20;
 
                         var x = left + 1;
-                        var amount = GetPlayerInvValue(GameState.MyIndex, slot) - amountModifier;
+                        var amount = GetInvValue(GameState.MyIndex, slot) - amountModifier;
                         var amountColor = TextRenderer.GetColorForAmount(amount);
 
                         TextRenderer.Render(GameLogic.ConvertCurrency(amount), x, y, amountColor, amountColor, winInventory.Font);
@@ -156,7 +156,7 @@ public class WinInventory
             ref var dragBox = ref WindowManager.DragBox;
 
             dragBox.Type = DraggablePartType.Item;
-            dragBox.Value = GetPlayerInv(GameState.MyIndex, slot);
+            dragBox.Value = GetInv(GameState.MyIndex, slot);
             dragBox.Origin = PartOrigin.Inventory;
             dragBox.Slot = slot;
 
@@ -228,12 +228,12 @@ public class WinInventory
                     continue;
                 }
 
-                if (Item.Instance[GetPlayerInv(GameState.MyIndex, Data.TradeYourOffer[i].Num)].Type != (byte) ItemCategory.Currency)
+                if (Item.Instance[GetInv(GameState.MyIndex, Data.TradeYourOffer[i].Num)].Type != (byte) ItemCategory.Currency)
                 {
                     return;
                 }
 
-                if (Data.TradeYourOffer[i].Value == GetPlayerInvValue(GameState.MyIndex, Data.TradeYourOffer[i].Num))
+                if (Data.TradeYourOffer[i].Value == GetInvValue(GameState.MyIndex, Data.TradeYourOffer[i].Num))
                 {
                     return;
                 }

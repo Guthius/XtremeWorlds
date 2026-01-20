@@ -25,7 +25,7 @@ public static class GameLogic
     {
         foreach (var i in PlayerService.Instance.PlayerIds)
         {
-            if (GetPlayerName(i).ToUpperInvariant() == name.ToUpperInvariant())
+            if (GetName(i).ToUpperInvariant() == name.ToUpperInvariant())
             {
                 return i;
             }

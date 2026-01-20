@@ -1585,7 +1585,7 @@ public class WindowManager
         {
             if (Data.TradeYourOffer[i].Num >= 0)
             {
-                long item = GetPlayerInv(GameState.MyIndex, Data.TradeYourOffer[i].Num);
+                long item = GetInv(GameState.MyIndex, Data.TradeYourOffer[i].Num);
                 if (item >= 0 & item < Core.Globals.Variables.MaxItems)
                 {
                     Item.OnStream((int)item);

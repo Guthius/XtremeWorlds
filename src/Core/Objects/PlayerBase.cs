@@ -11,7 +11,7 @@ namespace Core.Objects
         public byte Job;
         public int Sprite;
         public byte Level;
-        public int Experience;
+        public int Exp;
         public byte Access;
         public bool Pk;
         public int[] Vital;
