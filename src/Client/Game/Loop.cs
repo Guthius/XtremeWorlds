@@ -1,5 +1,6 @@
 ﻿using Core;
 using System;
+using System.Threading;
 using Client.Game.UI;
 using Client.Game.UI.Controls;
 using Client.Game.UI.Windows;
@@ -14,6 +15,11 @@ namespace Client
 {
     public class Loop
     {
+        private static int _watchdogStarted;
+        private static int _lastHeartbeat;
+        private static int _stageStarted;
+        private static volatile string _stage = "init";
+
         // Declare private fields
         private static int _i;
         private static int _tmr1000;
@@ -54,9 +60,70 @@ namespace Client
             Audio.PlayMusic(Client.Map.Instance[mapId].Music);
         }
 
+        private static void StartWatchdog()
+        {
+            if (Interlocked.Exchange(ref _watchdogStarted, 1) == 1)
+            {
+                return;
+            }
+
+            var thread = new Thread(() =>
+            {
+                // If the client update blocks (deadlock, infinite loop, runaway content scan), this thread can still log.
+                while (true)
+                {
+                    Thread.Sleep(5000);
+
+                    var now = General.GetTickCount();
+                    var hb = Volatile.Read(ref _lastHeartbeat);
+                    if (hb == 0)
+                    {
+                        continue;
+                    }
+
+                    var stalledMs = now - hb;
+                    if (stalledMs < 0)
+                    {
+                        // TickCount can wrap; ignore negative deltas.
+                        continue;
+                    }
+
+                    if (stalledMs < 10000)
+                    {
+                        continue;
+                    }
+
+                    var stage = _stage;
+                    var stageForMs = now - Volatile.Read(ref _stageStarted);
+
+                    var msg = $"Client loop heartbeat stalled for {stalledMs}ms. Stage={stage} (for {stageForMs}ms).";
+                    Log.Add(msg, "errors.log");
+                    Console.WriteLine(msg);
+                }
+            })
+            {
+                IsBackground = true,
+                Name = "ClientLoopWatchdog"
+            };
+
+            thread.Start();
+        }
+
+        private static void SetStage(string stage, int nowMs)
+        {
+            if (!string.Equals(_stage, stage, StringComparison.Ordinal))
+            {
+                _stage = stage;
+                Volatile.Write(ref _stageStarted, nowMs);
+            }
+        }
+
         public static void OnUpdate()
         {
+            StartWatchdog();
             _tick = General.GetTickCount();
+            Volatile.Write(ref _lastHeartbeat, _tick);
+            SetStage("Update", _tick);
             GameState.ElapsedTime = _tick - _frameTime; // Set the time difference for time-based movement
 
             _frameTime = _tick;
@@ -67,12 +134,14 @@ namespace Client
                 {
                     if (_tmr1000 < _tick)
                     {
+                        SetStage("Ping", _tick);
                         Sender.GetPing();
                         _tmr1000 = _tick + 1000;
                     }
 
                     if (_tmr25 < _tick)
                     {
+                        SetStage("Editors", _tick);
                         TryPlayCurrentMapMusic();
                         UpdateEditors();
                         _tmr25 = _tick + 25;
@@ -88,6 +157,7 @@ namespace Client
                     {
                         if (_animationTmr[layer] < _tick)
                         {
+                            SetStage("TileAnimations", _tick);
                             if (Map.Instance.Count <= GetMap(GameState.MyIndex)) continue; // No maps loaded
                             byte mapMaxX = Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX;
                             for (byte x = 0; x < mapMaxX; x++)
@@ -195,6 +265,7 @@ namespace Client
                     // Process input before rendering, otherwise input will be behind by 1 frame
                     if (_walkTimer < _tick)
                     {
+                        SetStage("Movement", _tick);
                         if (GameState.CanMoveNow)
                         {
                             Player.OnMove(); // Check if player is trying to move
@@ -259,6 +330,7 @@ namespace Client
                     // chat timer
                     if (_chatTmr < _tick)
                     {
+                        SetStage("Chat", _tick);
                         // scrolling
                         if (GameState.ChatButtonUp)
                         {
@@ -276,6 +348,7 @@ namespace Client
                     // fog scrolling
                     if (_fogTmr < _tick)
                     {
+                        SetStage("Fog", _tick);
                         if (GameState.CurrentFogSpeed > 0)
                         {
                             // move
@@ -295,6 +368,7 @@ namespace Client
 
                     if (_tmr500 < _tick)
                     {
+                        SetStage("Anim500ms", _tick);
                         // animate waterfalls
                         switch (GameState.WaterfallFrame)
                         {
@@ -351,6 +425,7 @@ namespace Client
                     // elastic bars
                     if (_barTmr < _tick)
                     {
+                        SetStage("Bars", _tick);
                         GameLogic.SetBarWidth(ref GameState.BarWidthGuiHPMax, ref GameState.BarWidthGuiHP);
                         GameLogic.SetBarWidth(ref GameState.BarWidthGuiMPMax, ref GameState.BarWidthGuiMP);
                         GameLogic.SetBarWidth(ref GameState.BarWidthGuiExpMax, ref GameState.BarWidthGuiExp);
@@ -378,6 +453,7 @@ namespace Client
                     // Change map animation
                     if (_tmr250 < _tick)
                     {
+                        SetStage("Steps250ms", _tick);
                         for (int i = 0; i < Player.Instance.Count; i++)
                         {
                             if (!IsPlaying(i)) continue;
@@ -443,12 +519,14 @@ namespace Client
 
                 if (_tmrWeather < _tick)
                 {
+                    SetStage("Weather", _tick);
                     Weather.OnUpdate();
                     _tmrWeather = _tick + 50;
                 }
 
                 if (_fadeTmr < _tick)
                 {
+                    SetStage("Fade", _tick);
                     if (GameState.FadeType != 2)
                     {
                         if (GameState.FadeType == 1)
@@ -477,6 +555,7 @@ namespace Client
                     _fadeTmr = _tick + 30;
                 }
 
+                SetStage("ResizeGui", _tick);
                 WindowManager.ResizeGui();
             }
             catch (Exception ex)
