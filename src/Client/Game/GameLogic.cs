@@ -1553,7 +1553,7 @@ namespace Client
                 {
                     jobName = Job.Instance[Item.Instance[(int)item].JobReq].Name;
                     // do we match it?
-                    if (GetPlayerJob(GameState.MyIndex) == Item.Instance[(int)item].JobReq)
+                    if (GetJob(GameState.MyIndex) == Item.Instance[(int)item].JobReq)
                     {
                         color = Microsoft.Xna.Framework.Color.Green;
                     }

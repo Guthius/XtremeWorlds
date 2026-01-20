@@ -833,7 +833,7 @@ public static class NetworkSend
         packetWriter.WriteEnum(ServerPackets.SPlayerData);
         packetWriter.WriteInt32(playerId);
         packetWriter.WriteString(GetPlayerName(playerId));
-        packetWriter.WriteByte(GetPlayerJob(playerId));
+        packetWriter.WriteByte(GetJob(playerId));
         packetWriter.WriteInt32(GetPlayerLevel(playerId));
         packetWriter.WriteInt32(GetPlayerPoints(playerId));
         packetWriter.WriteInt32(GetPlayerSprite(playerId));

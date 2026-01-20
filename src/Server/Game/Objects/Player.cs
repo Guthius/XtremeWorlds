@@ -1157,7 +1157,7 @@ public class Player : PlayerBase
             return false;
         }
 
-        if (Item.Instance[itemNum].JobReq != -1 && Item.Instance[itemNum].JobReq != GetPlayerJob(playerId))
+        if (Item.Instance[itemNum].JobReq != -1 && Item.Instance[itemNum].JobReq != GetJob(playerId))
         {
             NetworkSend.PlayerMessage(playerId, "You do not meet the job requirements to use this item.", (int) ColorName.BrightRed);
             return false;

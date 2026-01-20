@@ -822,7 +822,7 @@ namespace Client
             }
 
             // Update per‑pixel offsets based on direction.
-            int job = GetPlayerJob(index);
+            int job = GetJob(index);
             double speed = 1.0;
             if (job >= 0 && job < Client.Job.Instance.Count)
                 speed = Client.Job.Instance[job].MoveSpeed;

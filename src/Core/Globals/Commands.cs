@@ -63,7 +63,7 @@ public static class Commands
         return PlayerBase.Instance[index].Sprite;
     }
 
-    public static byte GetPlayerJob(int index)
+    public static byte GetJob(int index)
     {
         if (!ValidPlayerIndex(index)) return 0;
         return PlayerBase.Instance[index].Job;

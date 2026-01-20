@@ -1665,7 +1665,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
                 instance.Controls[WindowManager.GetControl("winCharacter", "lblLevel")].Text = "Level";
                 instance.Controls[WindowManager.GetControl("winCharacter", "lblGuild")].Text = "Guild";
                 instance.Controls[WindowManager.GetControl("winCharacter", "lblName2")].Text = GetPlayerName(GameState.MyIndex);
-                instance.Controls[WindowManager.GetControl("winCharacter", "lblJob2")].Text = Job.Instance[GetPlayerJob(GameState.MyIndex)].Name;
+                instance.Controls[WindowManager.GetControl("winCharacter", "lblJob2")].Text = Job.Instance[GetJob(GameState.MyIndex)].Name;
                 instance.Controls[WindowManager.GetControl("winCharacter", "lblLevel2")].Text = GetPlayerLevel(GameState.MyIndex).ToString();
                 instance.Controls[WindowManager.GetControl("winCharacter", "lblGuild2")].Text = "None";
                 WinCharacter.OnUpdate();

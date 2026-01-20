@@ -779,7 +779,7 @@ public class Script
             return;
 
         // Make sure they are the right class
-        if (Skill.Instance[n].JobReq == GetPlayerJob(index) | Skill.Instance[n].JobReq == -1)
+        if (Skill.Instance[n].JobReq == GetJob(index) | Skill.Instance[n].JobReq == -1)
         {
             // Make sure they are the right level
             i = Skill.Instance[n].LevelReq;
@@ -947,7 +947,7 @@ public class Script
         }
         else
         {
-            OnWarp(index, Job.Instance[GetPlayerJob(index)].StartMap, Job.Instance[GetPlayerJob(index)].StartX, Job.Instance[GetPlayerJob(index)].StartY, (int)Direction.Down);
+            OnWarp(index, Job.Instance[GetJob(index)].StartMap, Job.Instance[GetJob(index)].StartX, Job.Instance[GetJob(index)].StartY, (int)Direction.Down);
         }
     }
 
@@ -2705,7 +2705,7 @@ public class Script
     public int GetPlayerMaxHP(int index)
     {
         int vit = GetPlayerStat(index, Stat.Vitality);
-        int job = GetPlayerJob(index);
+        int job = GetJob(index);
         int stat = Job.Instance[job].Stat[(int)Stat.Vitality];
         long val = (long)(1 + (vit / 2) + stat) * 2L;
 
@@ -2715,7 +2715,7 @@ public class Script
     public int GetPlayerMaxMP(int index)
     {
         int @int = GetPlayerStat(index, Stat.Intelligence);
-        int job = GetPlayerJob(index);
+        int job = GetJob(index);
         int stat = Job.Instance[job].Stat[(int)Stat.Intelligence];
         long val = (1 + (@int / 2) + stat) * 2L;
 
@@ -2725,7 +2725,7 @@ public class Script
     public int GetPlayerMaxSP(int index)
     {
         int spirit = GetPlayerStat(index, Stat.Spirit);
-        int job = GetPlayerJob(index);
+        int job = GetJob(index);
         int stat = Job.Instance[job].Stat[(int)Stat.Spirit];
         long val = (1 + (spirit / 2) + stat) * 2L;
 
