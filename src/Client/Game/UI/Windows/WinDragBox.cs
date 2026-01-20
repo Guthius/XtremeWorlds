@@ -486,8 +486,25 @@ public class WinDragBox
                 }
 
             case PartOrigin.SkillTree:
-                Sender.ForgetSkill(WindowManager.DragBox.Slot);
-                break;
+                {
+                    var slot = WindowManager.DragBox.Slot;
+                    var skill = GetPlayerSkill(GameState.MyIndex, slot);
+                    if (skill < 0 || skill >= Skill.Instance.Count)
+                    {
+                        break;
+                    }
+
+                    var name = Skill.Instance[skill].Name;
+
+                    GameLogic.Dialogue(
+                        "Forget Skill",
+                        $"Are you sure you want to forget {name}?",
+                        "This cannot be undone.",
+                        DialogueType.ForgetSkill,
+                        DialogueStyle.YesNo,
+                        slot);
+                    break;
+                }
 
             case PartOrigin.Hotbar:
                 Sender.DeleteHotbar(WindowManager.DragBox.Slot);
@@ -546,7 +563,7 @@ public class WinDragBox
         if (Item.Instance[GetPlayerInv(GameState.MyIndex, inv)].Type == (byte)ItemCategory.Currency)
         {
             GameLogic.Dialogue(
-                "Select Amount",
+                "Offer Item",
                 "Please choose how many to offer.",
                 "",
                 DialogueType.TradeAmount,

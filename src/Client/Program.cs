@@ -1651,6 +1651,32 @@ namespace Client
                                 }
                             }
 
+                            if (WindowManager.TryGetWindow("winSkills", out var winSkills))
+                            {
+                                var skillSlot = General.IsSkill(winSkills!.X, winSkills!.Y);
+                                if (skillSlot >= 0)
+                                {
+                                    var skill = GetPlayerSkill(GameState.MyIndex, skillSlot);
+                                    if (skill >= 0 && skill < Skill.Instance.Count)
+                                    {
+                                        var name = Skill.Instance[skill].Name;
+
+                                        GameState.CurMouseX = prevMouseX;
+                                        GameState.CurMouseY = prevMouseY;
+
+                                        GameLogic.Dialogue(
+                                            "Forget Skill",
+                                            $"Are you sure you want to forget {name}?",
+                                            "This cannot be undone.",
+                                            DialogueType.ForgetSkill,
+                                            DialogueStyle.YesNo,
+                                            skillSlot);
+
+                                        return;
+                                    }
+                                }
+                            }
+
                             GameState.CurMouseX = prevMouseX;
                             GameState.CurMouseY = prevMouseY;
                         }
