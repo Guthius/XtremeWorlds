@@ -952,7 +952,7 @@ public class Script
     }
 
     // Initiate a Player skill cast (buffer or instant). Called from Cast with (PlayerIndex, skillSlot)
-    public void BufferSkill(int player, int skillSlot)
+    public void OnCast(int player, int skillSlot)
     {
         // Basic validations
         if (player < 0 || player >= Server.Player.Instance.Count) return;

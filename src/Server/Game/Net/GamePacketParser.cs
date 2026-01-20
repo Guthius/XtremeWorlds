@@ -1943,7 +1943,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
         try
         {
-            Script.Instance?.BufferSkill(session.Id, n);
+            Script.Instance?.OnCast(session.Id, n);
         }
         catch (Exception ex)
         {
@@ -2736,7 +2736,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             {
                 try
                 {
-                    Script.Instance?.BufferSkill(session.Id, hotbar[slot].Slot);
+                    Script.Instance?.OnCast(session.Id, hotbar[slot].Slot);
                 }
                 catch (Exception ex)
                 {
