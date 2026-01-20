@@ -38,6 +38,18 @@ public class WindowManager
 
     private static bool _mouseOverAnyWindow;
 
+    // ResizeGui() is invoked from the main loop; cache the last inputs to avoid O(windowCount) name scans every frame.
+    private static int _lastResizeW = -1;
+    private static int _lastResizeH = -1;
+    private static int _lastResizeWindowCount = -1;
+
+    private static int _winHotbarId;
+    private static int _winChatId;
+    private static int _winChatSmallId;
+    private static int _winMenuId;
+    private static int _winRightClickBgId;
+    private static int _winComboMenuBgId;
+
     // Lock dragging if initial press was over a control or a different window
     private static bool _dragLockedByPress;
     public static bool IsWindowActive => _isSelected;
@@ -1513,10 +1525,35 @@ public class WindowManager
             return;
         }
 
-        // Helper to safely apply changes when a window exists
-        static void TryApply(string name, Action<Window> apply)
+        // Only recompute anchored positions when resolution changes or windows were added/removed.
+        // This avoids scanning Windows (GetWindow) every frame.
+        var wNow = GameState.ResolutionWidth;
+        var hNow = GameState.ResolutionHeight;
+        var windowCount = Windows.Count;
+        if (wNow == _lastResizeW && hNow == _lastResizeH && windowCount == _lastResizeWindowCount)
         {
-            var id = GetWindow(name);
+            return;
+        }
+
+        _lastResizeW = wNow;
+        _lastResizeH = hNow;
+        _lastResizeWindowCount = windowCount;
+
+        static int ResolveWindowId(ref int cachedId, string name)
+        {
+            if (cachedId != 0 && Windows.TryGetValue(cachedId, out var existing)
+                && string.Equals(existing.Name, name, StringComparison.CurrentCultureIgnoreCase))
+            {
+                return cachedId;
+            }
+
+            cachedId = GetWindow(name);
+            return cachedId;
+        }
+
+        // Helper to safely apply changes when a window exists
+        static void TryApply(int id, Action<Window> apply)
+        {
             if (id == 0)
             {
                 return;
@@ -1529,31 +1566,31 @@ public class WindowManager
         }
 
         // move Hotbar
-        TryApply("winHotbar", w => w.X = GameState.ResolutionWidth - 432);
+        TryApply(ResolveWindowId(ref _winHotbarId, "winHotbar"), w => w.X = wNow - 432);
 
         // move chat
-        TryApply("winChat", w => w.Y = GameState.ResolutionHeight - 178);
-        TryApply("winChatSmall", w => w.Y = GameState.ResolutionHeight - 162);
+        TryApply(ResolveWindowId(ref _winChatId, "winChat"), w => w.Y = hNow - 178);
+        TryApply(ResolveWindowId(ref _winChatSmallId, "winChatSmall"), w => w.Y = hNow - 162);
 
         // move menu
-        TryApply("winMenu", w =>
+        TryApply(ResolveWindowId(ref _winMenuId, "winMenu"), w =>
         {
-            w.X = GameState.ResolutionWidth - 238;
-            w.Y = GameState.ResolutionHeight - 42;
+            w.X = wNow - 238;
+            w.Y = hNow - 42;
         });
 
         // re-size right-click background
-        TryApply("winRightClickBG", w =>
+        TryApply(ResolveWindowId(ref _winRightClickBgId, "winRightClickBG"), w =>
         {
-            w.Width = GameState.ResolutionWidth;
-            w.Height = GameState.ResolutionHeight;
+            w.Width = wNow;
+            w.Height = hNow;
         });
 
         // re-size combo background
-        TryApply("winComboMenuBG", w =>
+        TryApply(ResolveWindowId(ref _winComboMenuBgId, "winComboMenuBG"), w =>
         {
-            w.Width = GameState.ResolutionWidth;
-            w.Height = GameState.ResolutionHeight;
+            w.Width = wNow;
+            w.Height = hNow;
         });
     }
 
