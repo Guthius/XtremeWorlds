@@ -556,7 +556,7 @@ namespace Client
                 }
 
                 SetStage("ResizeGui", _tick);
-                WindowManager.ResizeGui();
+                //WindowManager.ResizeGui();
             }
             catch (Exception ex)
             {
