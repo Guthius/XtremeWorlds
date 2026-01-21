@@ -1188,6 +1188,7 @@ public class WindowManager
                                             try
                                             {
                                                 WinOptions.ApplyResolutionSelection(id);
+                                                WindowManager.ResizeGui();
                                             }
                                             catch
                                             {
