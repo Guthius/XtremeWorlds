@@ -29,7 +29,7 @@ namespace Core.Objects
 
         public static void OnClear(int index)
         {
-            if (index < 0 || index >= IsChanged.Length || index >= IsStreaming.Length)
+            if (index < 0 || index >= Instance.Count)
                 return;
             if (Instance.Count > index)
                 Instance[index] = new ProjectileBase();
