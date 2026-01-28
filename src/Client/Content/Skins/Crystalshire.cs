@@ -2194,7 +2194,8 @@ public class Crystalshire
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
-                Item.Instance[WinItemEditor.SelectedIndex].Animation = (byte)v;
+                int sel = Math.Clamp(v, 0, Core.Globals.Variables.MaxAnimations);
+                Item.Instance[WinItemEditor.SelectedIndex].Animation = sel - 1;
                 Item.IsChanged[WinItemEditor.SelectedIndex] = true;
             }
         });

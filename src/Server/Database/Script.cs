@@ -393,7 +393,9 @@ public class Script
                             case (byte)ConsumableEffect.RestoresHealth:
                                 {
                                     Network.ActionMessage(GetMap(index), "+" + Item.Instance[item].Data1, (int)ColorName.BrightGreen, (byte)ActionMessageType.Scroll, GetX(index) * Variables.TileSize, GetY(index) * Variables.TileSize);
-                                    Network.PlayAnimation(GetMap(index), Item.Instance[item].Animation, 0, 0, (byte)TargetType.Player, index);
+                                    var anim = Item.Instance[item].Animation;
+                                    if (anim >= 0)
+                                        Network.PlayAnimation(GetMap(index), anim, 0, 0, (byte)TargetType.Player, index);
                                     SetVital(index, Core.Globals.Vital.Health, GetVital(index, Core.Globals.Vital.Health) + Item.Instance[item].Data1);
                                     TakeInv(index, item, 1);
                                     Network.Vital(index, Core.Globals.Vital.Health);
@@ -403,7 +405,9 @@ public class Script
                             case (byte)ConsumableEffect.RestoresMana:
                                 {
                                     Network.ActionMessage(GetMap(index), "+" + Item.Instance[item].Data1, (int)ColorName.BrightBlue, (byte)ActionMessageType.Scroll, GetX(index) * Variables.TileSize, GetY(index) * Variables.TileSize);
-                                    Network.PlayAnimation(GetMap(index), Item.Instance[item].Animation, 0, 0, (byte)TargetType.Player, index);
+                                    var anim = Item.Instance[item].Animation;
+                                    if (anim >= 0)
+                                        Network.PlayAnimation(GetMap(index), anim, 0, 0, (byte)TargetType.Player, index);
                                     SetVital(index, Core.Globals.Vital.Stamina, GetVital(index, Core.Globals.Vital.Stamina) + Item.Instance[item].Data1);
                                     TakeInv(index, item, 1);
                                     Network.Vital(index, Core.Globals.Vital.Stamina);
@@ -412,7 +416,9 @@ public class Script
 
                             case (byte)ConsumableEffect.RestoresStamina:
                                 {
-                                    Network.PlayAnimation(GetMap(index), Item.Instance[item].Animation, 0, 0, (byte)TargetType.Player, index);
+                                    var anim = Item.Instance[item].Animation;
+                                    if (anim >= 0)
+                                        Network.PlayAnimation(GetMap(index), anim, 0, 0, (byte)TargetType.Player, index);
                                     SetVital(index, Core.Globals.Vital.Stamina, GetVital(index, Core.Globals.Vital.Stamina) + Item.Instance[item].Data1);
                                     TakeInv(index, item, 1);
                                     Network.Vital(index, Core.Globals.Vital.Stamina);
@@ -421,7 +427,9 @@ public class Script
 
                             case (byte)ConsumableEffect.GrantsExperience:
                                 {
-                                    Network.PlayAnimation(GetMap(index), Item.Instance[item].Animation, 0, 0, (byte)TargetType.Player, index);
+                                    var anim = Item.Instance[item].Animation;
+                                    if (anim >= 0)
+                                        Network.PlayAnimation(GetMap(index), anim, 0, 0, (byte)TargetType.Player, index);
                                     SetExp(index, GetExp(index) + Item.Instance[item].Data1);
                                     TakeInv(index, item, 1);
                                     Network.Experience(index);
@@ -441,6 +449,9 @@ public class Script
                             {
                                 TakeInv(index, Item.Instance[item].Ammo, 1);
                                 Server.Projectile.OnShoot(index, -1, item);
+                                var anim = Item.Instance[item].Animation;
+                                if (anim >= 0)
+                                    Network.PlayAnimation(GetMap(index), anim, 0, 0, (byte)TargetType.Player, index);
                             }
                             else
                             {
@@ -450,6 +461,9 @@ public class Script
                         }
                         else
                         {
+                            var anim = Item.Instance[item].Animation;
+                            if (anim >= 0)
+                                Network.PlayAnimation(GetMap(index), anim, 0, 0, (byte)TargetType.Player, index);
                             Server.Projectile.OnShoot(index, -1, item);
                             return;
                         }
@@ -459,6 +473,9 @@ public class Script
 
                 case (byte)ItemCategory.Event:
                     {
+                        var anim = Item.Instance[item].Animation;
+                        if (anim >= 0)
+                            Network.PlayAnimation(GetMap(index), anim, 0, 0, (byte)TargetType.Player, index);
                         // Trigger item-driven common event using item's SubType/Data1/Data2
                         CommonEvent(index, item, invSlot);
                         break;
@@ -638,10 +655,8 @@ public class Script
         if (key >= 0 && key < Item.Instance.Count)
         {
             var anim = Item.Instance[key].Animation;
-            if (anim > 0)
-            {
+            if (anim >= 0)
                 Network.PlayAnimation(map, anim, 0, 0, (byte)TargetType.Player, playerId);
-            }
         }
 
         // Broadcast updated map so clients see the tile become unblocked/open.
@@ -807,13 +822,9 @@ public class Script
             Server.Player.Instance[index].Paperdoll[(byte)eqType].Bound = Server.Player.Instance[index].Inventory[invSlot].Bound;
             Network.PlayerMessage(index, "You equip " + GameLogic.CheckGrammar(Item.Instance[item].Name) + ".", (int)ColorName.BrightGreen);
 
-            // Play equip animation (if configured) on the player.
             var equipAnim = Item.Instance[item].Animation;
             if (equipAnim >= 0)
-            {
                 Network.PlayAnimation(GetMap(index), equipAnim, 0, 0, (byte)TargetType.Player, index);
-            }
-
             TakeInv(index, item, 1);
             if (tempItem >= 0)
             {
@@ -869,7 +880,9 @@ public class Script
                         SetSkill(index, i, n);
                         if (item >= 0)
                         {
-                            Network.PlayAnimation(GetMap(index), Item.Instance[item].Animation, 0, 0, (byte)TargetType.Player, index);
+                            var anim = Item.Instance[item].Animation;
+                            if (anim >= 0)
+                                Network.PlayAnimation(GetMap(index), anim, 0, 0, (byte)TargetType.Player, index);
                             TakeInv(index, item, 1);
                         }
                         Network.PlayerMessage(index, "You study the skill carefully.", (int)ColorName.Yellow);

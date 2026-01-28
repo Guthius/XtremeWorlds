@@ -1919,13 +1919,21 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             Client.Map.Instance[GetMap(GameState.MyIndex)].MinZoom = buffer.ReadSingle();
             Client.Map.Instance[GetMap(GameState.MyIndex)].MaxZoom = buffer.ReadSingle();
 
-            // Apply min zoom on map load (and keep zoom within bounds)
+            // Apply zoom bounds. Only force min zoom during actual map loads.
             var mapZoomMin = Client.Map.Instance[GetMap(GameState.MyIndex)].MinZoom;
             var mapZoomMax = Client.Map.Instance[GetMap(GameState.MyIndex)].MaxZoom;
             if (mapZoomMin <= 0) mapZoomMin = 0.5f;
             if (mapZoomMax <= 0) mapZoomMax = 2.0f;
             if (mapZoomMax < mapZoomMin) mapZoomMax = mapZoomMin;
-            GameState.CameraZoom = Math.Clamp(mapZoomMin, mapZoomMin, mapZoomMax);
+            if (GameState.GettingMap)
+            {
+                GameState.CameraZoom = Math.Clamp(mapZoomMin, mapZoomMin, mapZoomMax);
+            }
+            else
+            {
+                var currentZoom = GameState.CameraZoom <= 0 ? 1.0f : GameState.CameraZoom;
+                GameState.CameraZoom = Math.Clamp(currentZoom, mapZoomMin, mapZoomMax);
+            }
 
             Client.Map.Instance[GetMap(GameState.MyIndex)].Tile = new Core.Globals.Type.Tile[Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX, Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY];
             Data.TileHistory = new Core.Globals.Type.TileHistory[GameState.MaxTileHistory];

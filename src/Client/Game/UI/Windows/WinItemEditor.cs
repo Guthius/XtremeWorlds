@@ -186,6 +186,7 @@ public class WinItemEditor
         if (WindowManager.TryGetControl("winItemEditor", "cmbAnimation", out var animCtrl) && animCtrl is ComboBox cmbAnim)
         {
             cmbAnim.Items.Clear();
+            cmbAnim.Items.Add("None");
             for (int i = 0; i < Core.Globals.Variables.MaxAnimations; i++)
             {
                 string name = "None";
@@ -473,7 +474,11 @@ public class WinItemEditor
         // Ensure the correct group/field visibility for this item's type.
         ToggleTypeSections();
         if (WindowManager.TryGetControl("winItemEditor", "cmbAnimation", out var animCtrl) && animCtrl is ComboBox cmbAnim)
-            cmbAnim.Value = Math.Clamp(item.Animation, 0, cmbAnim.Items.Count - 1);
+        {
+            int val = item.Animation < 0 ? 0 : item.Animation + 1;
+            cmbAnim.Value = Math.Clamp(val, 0, cmbAnim.Items.Count - 1);
+        }
+        
         if (WindowManager.TryGetControl("winItemEditor", "cmbBind", out var bindCtrl) && bindCtrl is ComboBox cmbBind)
             cmbBind.Value = Math.Clamp(item.BindType, 0, cmbBind.Items.Count - 1);
 
