@@ -31,8 +31,7 @@ namespace Core.Objects
         {
             if (index < 0 || index >= Instance.Count)
                 return;
-            if (Instance.Count > index)
-                Instance[index] = new ProjectileBase();
+            Instance[index] = new ProjectileBase();
             IsChanged[index] = false;
             IsStreaming[index] = false;
         }

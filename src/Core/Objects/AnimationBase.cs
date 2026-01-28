@@ -50,8 +50,9 @@ namespace Core.Objects
 
         public static void OnClear(int index)
         {
-            if (Instance.Count > index)
-                Instance[index] = new AnimationBase();
+            if (index < 0 || index >= Instance.Count)
+                return;
+            Instance[index] = new AnimationBase();
             IsChanged[index] = false;
             IsStreaming[index] = false;
         }

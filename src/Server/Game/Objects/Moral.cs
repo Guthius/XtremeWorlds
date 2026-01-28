@@ -45,10 +45,7 @@ public class Moral : MoralBase, IAsyncData
         var data = await Database.SelectRowAsync(index, "moral", "data");
         if (data is null)
         {
-            lock (Moral.Instance)
-            {
-                Moral.Instance[index] = new Moral();
-            }
+            OnClear(index);
             return;
         }
 

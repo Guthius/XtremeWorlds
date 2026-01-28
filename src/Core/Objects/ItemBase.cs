@@ -57,8 +57,7 @@ namespace Core.Objects
         {
             if (index < 0 || index >= Instance.Count)
                 return;
-            if (Instance.Count > index)
-                Instance[index] = new ItemBase();
+            Instance[index] = new ItemBase();
             IsChanged[index] = false;
             IsStreaming[index] = false;
         }
@@ -71,8 +70,7 @@ namespace Core.Objects
 
         public static void OnClear()
         {
-            // Instance can temporarily exceed MaxItems (flags arrays), so clamp to avoid OOB.
-            for (int i = 0; i < IsChanged.Length; i++)
+            for (int i = 0; i < Instance.Count; i++)
                 OnClear(i);
         }
     }

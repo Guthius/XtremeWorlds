@@ -20,8 +20,9 @@ namespace Core.Objects
 
         public static void OnClear(int index)
         {
-            if (Instance.Count > index)
-                Instance[index] = new Bank();
+            if (index < 0 || index >= Instance.Count)
+                return;
+            Instance[index] = new Bank();
         }
 
         public static void OnDraw(int index)

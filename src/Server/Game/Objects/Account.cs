@@ -72,8 +72,9 @@ namespace Server
 
         public static void OnClear(int index)
         {
-            if (Instance.Count > index)
-                Instance[index] = new Account();
+            if (index < 0 || index >= Instance.Count)
+                return;
+            Instance[index] = new Account();
         }
 
         public static void OnDraw(int index)

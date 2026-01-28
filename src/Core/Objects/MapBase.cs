@@ -83,10 +83,9 @@ namespace Core.Objects
 
         public static void OnClear(int index)
         {
-            if (Instance.Count > index)
-            {
-                Instance[index] = new MapBase();
-            }
+            if (index < 0 || index >= Instance.Count)
+                return;
+            Instance[index] = new MapBase();
         }
 
         public static void OnClear()
