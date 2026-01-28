@@ -495,6 +495,13 @@ public class WinItemEditor
         {
             txtSpd.Text = item.AttackSpeed.ToString();
         }
+
+        // Attack speed scrollbar (this skin uses "txtAttackSpeed" as the ScrollBar control name)
+        if (WindowManager.TryGetControl("winItemEditor", "txtAttackSpeed", out var atkSpdCtrl) && atkSpdCtrl is TextBox txtAttackSpeed)
+        {
+            txtAttackSpeed.Text = txtAttackSpeed.Text;
+        }
+
         if (WindowManager.TryGetControl("winItemEditor", "txtMoveSpeed", out var msText) && msText is TextBox txtMs)
         {
             txtMs.Text = item.MovementSpeed.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);

@@ -12,9 +12,7 @@ namespace Client.Net;
 
 public static class Sender
 {
-    private static readonly int StatCount = Enum.GetValues<Stat>().Length;
-
-    private const int HotbarUseThrottle = 250;
+    private const int HotbarUseThrottle = 125;
     private static readonly int[] LastHotbarUseTick = new int[Core.Globals.Variables.MaxHotbar];
 
     public static void AddChar(string name, int sex, int job)
@@ -637,7 +635,8 @@ public static class Sender
         packetWriter.WriteInt32(npc.SpawnSecs);
         packetWriter.WriteInt32(npc.Sprite);
 
-        for (var i = 0; i < StatCount; i++)
+        var statCount = Enum.GetNames<Stat>().Length;
+        for (var i = 0; i < statCount; i++)
         {
             packetWriter.WriteByte(npc.Stat[i]);
         }
@@ -817,7 +816,9 @@ public static class Sender
         packetWriter.WriteString(Job.Instance[index].Desc);
         packetWriter.WriteInt32(Job.Instance[index].MaleSprite);
         packetWriter.WriteInt32(Job.Instance[index].FemaleSprite);
-        for (var i = 0; i < StatCount; i++)
+
+        var statCount = Enum.GetNames<Stat>().Length;
+        for (var i = 0; i < statCount; i++)
         {
             packetWriter.WriteInt32(Job.Instance[index].Stat[i]);
         }
@@ -850,7 +851,8 @@ public static class Sender
         packetWriter.WriteInt32(index);
         packetWriter.WriteInt32(Item.Instance[index].AccessReq);
 
-        for (var i = 0; i < StatCount; i++)
+        var statCount = Enum.GetNames<Stat>().Length;
+        for (var i = 0; i < statCount; i++)
         {
             packetWriter.WriteInt32(Item.Instance[index].AddStat[i]);
         }
@@ -873,7 +875,8 @@ public static class Sender
 
         packetWriter.WriteByte(Item.Instance[index].Stackable);
         packetWriter.WriteString(Item.Instance[index].Description);
-        for (var i = 0; i < StatCount; i++)
+
+        for (var i = 0; i < statCount; i++)
         {
             packetWriter.WriteInt32(Item.Instance[index].StatReq[i]);
         }

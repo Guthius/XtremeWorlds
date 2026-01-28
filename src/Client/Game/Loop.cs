@@ -491,7 +491,7 @@ namespace Client
                                         _lastMouseAttackY = GameClient.CurrentMouseState.Y;
                                     }
                                 }   
-                                // Attempt attack each tick; internal cooldown logic in OnCheckAttack prevents spam.
+                                // Attempt attack each tick; internal cooldown logic in attack prevents spam.
                                 Player.OnAttack(mouse: true);
                             }
                         }

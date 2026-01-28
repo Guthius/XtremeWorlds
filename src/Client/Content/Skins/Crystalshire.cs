@@ -1953,19 +1953,7 @@ public class Crystalshire
                 }
             };
         }
-
-        if (WindowManager.TryGetControl("winItemEditor", "sldAttackSpeed", out var spdCtrl) && spdCtrl is Client.Game.UI.Controls.ScrollBar sldAttackSpeed)
-        {
-            sldAttackSpeed.CallBack[(int)ControlState.MouseMove] = () =>
-            {
-                if (WinItemEditor.SelectedIndex >= 0 && WinItemEditor.SelectedIndex < Item.Instance.Count)
-                {
-                    Item.Instance[WinItemEditor.SelectedIndex].AttackSpeed = sldAttackSpeed.Value;
-                    Item.IsChanged[WinItemEditor.SelectedIndex] = true;
-                }
-            };
-        }
-
+        
         if (WindowManager.TryGetControl("winItemEditor", "chkKnockback", out var kbCtrl) && kbCtrl is CheckBox chkKb)
         {
             chkKb.CallBack[(int)ControlState.MouseDown] = () =>
@@ -2019,7 +2007,7 @@ public class Crystalshire
             }
         }, 0, 100000000);
 
-        BindIntText("txtSpeed", v =>
+        BindIntText("txtAttackSpeed", v =>
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {

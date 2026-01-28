@@ -923,7 +923,7 @@ namespace Client
                     return;
                 }
 
-                var remaining = (int) (Player.Instance[GameState.MyIndex].DeathTimer - General.GetTickCount()) / 1000;
+                var remaining = (Player.Instance[GameState.MyIndex].DeathTimer) / 1000;
                 if (remaining < 0) remaining = 0;
 
                 if (remaining > 0)
@@ -940,14 +940,15 @@ namespace Client
                 // speed from weapon
                 if (GetPaperdoll(GameState.MyIndex, Equipment.Weapon) >= 0)
                 {
-                    attackSpeed = Item.Instance[GetPaperdoll(GameState.MyIndex, Equipment.Weapon)].AttackSpeed * 1000;
+                    // AttackSpeed is stored/streamed in milliseconds.
+                    attackSpeed = Item.Instance[GetPaperdoll(GameState.MyIndex, Equipment.Weapon)].AttackSpeed;
                 }
                 else
                 {
                     attackSpeed = 1000;
                 }
 
-                if (Player.Instance[GameState.MyIndex].AttackTimer + attackSpeed < General.GetTickCount())
+                if (Player.Instance[GameState.MyIndex].AttackTimer == 0 || Player.Instance[GameState.MyIndex].AttackTimer + attackSpeed < General.GetTickCount())
                 {
                     if (Player.Instance[GameState.MyIndex].Attacking == 0)
                     {
@@ -1259,7 +1260,6 @@ namespace Client
             if (GetPaperdoll(index, Equipment.Weapon) >= 0)
             {
                 attackSpeed = Item.Instance[GetPaperdoll(index, Equipment.Weapon)].AttackSpeed;
-                if (attackSpeed < 50) attackSpeed *= 1000; // heuristic: treat tiny values as seconds, convert to ms
             }
             else
             {

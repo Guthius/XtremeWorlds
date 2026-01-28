@@ -3259,6 +3259,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Item.Instance[index].Rarity = packetReader.ReadByte();
         Item.Instance[index].AttackSpeed = packetReader.ReadInt32();
         Item.Instance[index].MovementSpeed = packetReader.ReadSingle();
+        
         Item.Instance[index].Stackable = packetReader.ReadByte();
         Item.Instance[index].Description = packetReader.ReadString();
 
