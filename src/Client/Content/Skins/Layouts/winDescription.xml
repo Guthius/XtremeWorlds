@@ -5,8 +5,8 @@
     <PictureBox Name="picSprite" Position="18, 32" Size="68, 68" Design="DescriptionPicture"/>
     <PictureBox Name="picSep" Position="80, 28" Size="0, 92" Image="44"/>
 
-    <Label Name="lblJob" Text="Job: None" Position="80, 112" Size="116, 10" Font="georgiaBold_16" Align="Center"/>
-    <Label Name="lblLevel" Text="Level 1" Position="80, 112" Size="116, 10" Font="georgiaBold_16" Align="Center"/>
+    <Label Name="lblJob" Text="Job: None" Position="80, 104" Size="116, 10" Font="georgiaBold_16" Align="Center"/>
+    <Label Name="lblLevel" Text="Level 1" Position="80, 118" Size="116, 10" Font="georgiaBold_16" Align="Center"/>
 
     <PictureBox Name="picBar" Position="19, 112" Size="66, 8" Image="45"/>
 </Window>
