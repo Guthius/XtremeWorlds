@@ -806,6 +806,14 @@ public class Script
             SetPaperdoll(index, item, eqType);
             Server.Player.Instance[index].Paperdoll[(byte)eqType].Bound = Server.Player.Instance[index].Inventory[invSlot].Bound;
             Network.PlayerMessage(index, "You equip " + GameLogic.CheckGrammar(Item.Instance[item].Name) + ".", (int)ColorName.BrightGreen);
+
+            // Play equip animation (if configured) on the player.
+            var equipAnim = Item.Instance[item].Animation;
+            if (equipAnim >= 0)
+            {
+                Network.PlayAnimation(GetMap(index), equipAnim, 0, 0, (byte)TargetType.Player, index);
+            }
+
             TakeInv(index, item, 1);
             if (tempItem >= 0)
             {
