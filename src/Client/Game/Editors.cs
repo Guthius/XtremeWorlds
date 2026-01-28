@@ -392,6 +392,44 @@ namespace Client
                             instance1.Data3_2 = 0;
                         }
                     }
+
+                    // Door
+                    if (GameState.OptDoor)
+                    {
+                        if (GameState.EditorAttribute == 1)
+                        {
+                            instance1.Type = TileType.Door;
+                            instance1.Data1 = GameState.EditorKeyItem;
+                            instance1.Data2 = GameState.EditorKeyTake;
+                            instance1.Data3 = 0;
+                        }
+                        else
+                        {
+                            instance1.Type2 = TileType.Door;
+                            instance1.Data1_2 = GameState.EditorKeyItem;
+                            instance1.Data2_2 = GameState.EditorKeyTake;
+                            instance1.Data3_2 = 0;
+                        }
+                    }
+
+                    // Key
+                    if (GameState.OptKey)
+                    {
+                        if (GameState.EditorAttribute == 1)
+                        {
+                            instance1.Type = TileType.Key;
+                            instance1.Data1 = GameState.EditorKeyItem;
+                            instance1.Data2 = GameState.EditorKeyTake;
+                            instance1.Data3 = 0;
+                        }
+                        else
+                        {
+                            instance1.Type2 = TileType.Key;
+                            instance1.Data1_2 = GameState.EditorKeyItem;
+                            instance1.Data2_2 = GameState.EditorKeyTake;
+                            instance1.Data3_2 = 0;
+                        }
+                    }
                 }
                else if (GameState.MapEditorTab == (int)MapEditorTab.Directions)
                 {

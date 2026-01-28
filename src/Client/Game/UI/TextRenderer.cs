@@ -510,6 +510,8 @@ public static class TextRenderer
                     case (int)TileType.Trap: Render("T", tX, tY, Color.Red, Color.Black); break;
                     case (int)TileType.Animation: Render("A", tX, tY, Color.Red, Color.Black); break;
                     case (int)TileType.NoCrossing: Render("X", tX, tY, Color.Red, Color.Black); break;
+                    case (int)TileType.Door: Render("D", tX, tY, Color.White, Color.Black); break;
+                    case (int)TileType.Key: Render("K", tX, tY, Color.Yellow, Color.Black); break;
                 }
             }
         }

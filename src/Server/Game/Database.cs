@@ -733,7 +733,7 @@ public static class Database
 
         ip = ip.Substring(0, i);
         Log.Add(ip, "banlist.txt");
-        NetworkSend.GlobalMessage(GetName(banPlayerIndex) + " has been banned from " + SettingsManager.Instance.GameName + " by " + GetName(bannedByIndex) + "!");
+        Network.GlobalMessage(GetName(banPlayerIndex) + " has been banned from " + SettingsManager.Instance.GameName + " by " + GetName(bannedByIndex) + "!");
         Log.Add(GetName(bannedByIndex) + " has banned " + GetName(banPlayerIndex) + ".", Constant.AdminLog);
         _ = Player.OnExit(banPlayerIndex).ContinueWith(
             t => General.Logger.LogError(t.Exception, "Unhandled error during forced logout"),

@@ -470,7 +470,7 @@ public class Crystalshire
         }
 
         // Attributes: mode combo (maps to GameState Opt* flags) and actions
-        string[] attrModes = new[] { "Blocked", "Warp", "Item", "Npc Avoid", "Resource", "Npc Spawn", "Shop", "Bank", "Heal", "Trap", "Animation", "No Crossing" };
+        string[] attrModes = new[] { "Blocked", "Warp", "Item", "Npc Avoid", "Resource", "Npc Spawn", "Shop", "Bank", "Heal", "Trap", "Animation", "No Crossing", "Door", "Key" };
 
         // Helpers to set/clear current attribute flags
         void ClearAttrFlags()
@@ -487,6 +487,8 @@ public class Crystalshire
             GameState.OptTrap = false;
             GameState.OptAnimation = false;
             GameState.OptNoCrossing = false;
+            GameState.OptDoor = false;
+            GameState.OptKey = false;
             GameState.OptInfo = false;
         }
 
@@ -505,6 +507,8 @@ public class Crystalshire
             GameState.OptTrap = index == 9;
             GameState.OptAnimation = index == 10;
             GameState.OptNoCrossing = index == 11;
+            GameState.OptDoor = index == 12;
+            GameState.OptKey = index == 13;
             GameState.OptInfo = false; // Info handled via dedicated button
         }
 
@@ -871,6 +875,57 @@ public class Crystalshire
                     };
                 }
             }
+
+            // Door / Key
+            bool showKeyDoor = id == 12 || id == 13;
+            string[] keyDoorCtrls = new[] { "lblKeyDoor", "lblKeyDoorItem", "cmbKeyDoorItem", "chkKeyDoorTake", "btnKeyDoorOk" };
+            foreach (var n in keyDoorCtrls)
+            {
+                if (WindowManager.TryGetControl("winMapEditor", n, out var c)) c.Visible = showKeyDoor;
+            }
+
+            if (showKeyDoor)
+            {
+                if (WindowManager.TryGetControl("winMapEditor", "cmbKeyDoorItem", out var cKeyItem) && cKeyItem is ComboBox cmb)
+                {
+                    // Populate once with item list: 1: Name
+                    if (cmb.Items.Count == 0)
+                    {
+                        for (int i = 0; i < Core.Globals.Variables.MaxItems; i++)
+                        {
+                            var name = (i < Item.Instance.Count) ? (Item.Instance[i].Name ?? string.Empty) : string.Empty;
+                            cmb.Items.Add(string.IsNullOrWhiteSpace(name) ? $"{i + 1}" : $"{i + 1}: {name.Trim()}");
+                        }
+                    }
+
+                    // Current selection reflects stored editor state.
+                    cmb.Value = Math.Clamp(GameState.EditorKeyItem, 0, Math.Max(0, cmb.Items.Count - 1));
+                }
+
+                if (WindowManager.TryGetControl("winMapEditor", "chkKeyDoorTake", out var cTake) && cTake is CheckBox chk)
+                {
+                    chk.Value = GameState.EditorKeyTake != 0 ? 1 : 0;
+
+                    // Persist immediately so the periodic UpdateAttrVisibility refresh doesn't undo user toggles.
+                    chk.CallBack[(int)ControlState.MouseDown] = () =>
+                    {
+                        chk.Value = chk.Value == 0 ? 1 : 0;
+                        GameState.EditorKeyTake = chk.Value != 0 ? 1 : 0;
+                    };
+                }
+
+                if (WindowManager.TryGetControl("winMapEditor", "btnKeyDoorOk", out var btn))
+                {
+                    btn.CallBack[(int)ControlState.MouseDown] = () =>
+                    {
+                        if (WindowManager.TryGetControl("winMapEditor", "cmbKeyDoorItem", out var c) && c is ComboBox cb)
+                            GameState.EditorKeyItem = Math.Clamp(cb.Value, 0, Item.Instance.Count - 1);
+
+                        if (WindowManager.TryGetControl("winMapEditor", "chkKeyDoorTake", out var takeCtrl) && takeCtrl is CheckBox chkTake)
+                            GameState.EditorKeyTake = chkTake.Value != 0 ? 1 : 0;
+                    };
+                }
+            }
         }
 
         if (WindowManager.TryGetControl("winMapEditor", "cmbAttrMode", out var cmbAttrCtrl) && cmbAttrCtrl is ComboBox cmbAttr)
@@ -990,7 +1045,7 @@ public class Crystalshire
                     // Ensure attribute group visibility matches current mode when tab opens
                     if (WindowManager.TryGetControl("winMapEditor", "cmbAttrMode", out var attrModeCtrl) && attrModeCtrl is ComboBox attrCmb)
                     {
-                        var id = Math.Clamp(attrCmb.Value, 0, 12);
+                        var id = Math.Clamp(attrCmb.Value, 0, attrModes.Length - 1);
                         UpdateAttrVisibility(id);
                     }
                     break;

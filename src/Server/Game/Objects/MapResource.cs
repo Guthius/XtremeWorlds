@@ -62,11 +62,11 @@ namespace Server
                 return;
             }
 
-            NetworkSend.PlayerMessage(playerId, count == 1
+            Network.PlayerMessage(playerId, count == 1
                 ? $"Your {GetResourceName((ResourceSkill)skillSlot)} has gained a level!"
                 : $"Your {GetResourceName((ResourceSkill)skillSlot)} has gained {count} levels!", (int)ColorName.BrightGreen);
 
-            NetworkSend.PlayerData(playerId);
+            Network.PlayerData(playerId);
         }
 
         public static void OnUpdate(int playerId, int x, int y)
@@ -104,13 +104,13 @@ namespace Server
 
             if (GetPaperdoll(playerId, Equipment.Weapon) < 0 && Resource.Instance[resourceIndex].ToolRequired != 0)
             {
-                NetworkSend.PlayerMessage(playerId, "You need a tool to gather this resource.", (int)ColorName.Yellow);
+                Network.PlayerMessage(playerId, "You need a tool to gather this resource.", (int)ColorName.Yellow);
                 return;
             }
 
             if (Item.Instance[GetPaperdoll(playerId, Equipment.Weapon)].Data3 != Resource.Instance[resourceIndex].ToolRequired)
             {
-                NetworkSend.PlayerMessage(playerId, "You have the wrong type of tool equiped.", (int)ColorName.Yellow);
+                Network.PlayerMessage(playerId, "You have the wrong type of tool equiped.", (int)ColorName.Yellow);
                 return;
             }
 
@@ -118,20 +118,20 @@ namespace Server
             {
                 if (Player.FindOpenInvSlot(playerId, Resource.Instance[resourceIndex].ItemReward) == 0)
                 {
-                    NetworkSend.PlayerMessage(playerId, "You have no inventory space.", (int)ColorName.Yellow);
+                    Network.PlayerMessage(playerId, "You have no inventory space.", (int)ColorName.Yellow);
                     return;
                 }
             }
 
             if (Resource.Instance[resourceIndex].LvlRequired > SetGatherLevel(playerId, resourceType))
             {
-                NetworkSend.PlayerMessage(playerId, "Your level is too low!", (int)ColorName.Yellow);
+                Network.PlayerMessage(playerId, "Your level is too low!", (int)ColorName.Yellow);
                 return;
             }
 
             if (MapResource.Instance[map].ResourceData[resourceNum].State != 0)
             {
-                NetworkSend.ActionMessage(map, Resource.Instance[resourceIndex].EmptyMessage, (int)ColorName.BrightRed, 1, GetX(playerId) * 32, GetY(playerId) * 32);
+                Network.ActionMessage(map, Resource.Instance[resourceIndex].EmptyMessage, (int)ColorName.BrightRed, 1, GetX(playerId) * 32, GetY(playerId) * 32);
                 return;
             }
 
@@ -150,15 +150,15 @@ namespace Server
 
             if (damage <= 0)
             {
-                NetworkSend.ActionMessage(map, "Miss!", (int)ColorName.BrightRed, 1, resourceX * 32, resourceY * 32);
+                Network.ActionMessage(map, "Miss!", (int)ColorName.BrightRed, 1, resourceX * 32, resourceY * 32);
                 return;
             }
 
             if (MapResource.Instance[map].ResourceData[resourceNum].Health - damage >= 0)
             {
                 MapResource.Instance[map].ResourceData[resourceNum].Health = (byte)(MapResource.Instance[map].ResourceData[resourceNum].Health - damage);
-                NetworkSend.ActionMessage(map, "-" + damage, (int)ColorName.BrightRed, 1, resourceX * 32, resourceY * 32);
-                NetworkSend.PlayAnimation(map, Resource.Instance[resourceIndex].Animation, resourceX, resourceY);
+                Network.ActionMessage(map, "-" + damage, (int)ColorName.BrightRed, 1, resourceX * 32, resourceY * 32);
+                Network.PlayAnimation(map, Resource.Instance[resourceIndex].Animation, resourceX, resourceY);
 
                 return;
             }
@@ -166,16 +166,16 @@ namespace Server
             MapResource.Instance[map].ResourceData[resourceNum].State = 0; // Cut
             MapResource.Instance[map].ResourceData[resourceNum].Timer = General.GetTime();
 
-            NetworkSend.MapResourceToMap(map);
+            Network.MapResourceToMap(map);
 
-            NetworkSend.ActionMessage(map, Resource.Instance[resourceIndex].SuccessMessage, (int)ColorName.BrightGreen, 1, GetX(playerId) * 32, GetY(playerId) * 32);
+            Network.ActionMessage(map, Resource.Instance[resourceIndex].SuccessMessage, (int)ColorName.BrightGreen, 1, GetX(playerId) * 32, GetY(playerId) * 32);
             Player.GiveInv(playerId, Resource.Instance[resourceIndex].ItemReward, 1);
-            NetworkSend.PlayAnimation(map, Resource.Instance[resourceIndex].Animation, resourceX, resourceY);
+            Network.PlayAnimation(map, Resource.Instance[resourceIndex].Animation, resourceX, resourceY);
 
             SetSkillExp(playerId, resourceType, GetGatherExp(playerId, resourceType) + Resource.Instance[resourceIndex].ExperienceReward);
 
-            NetworkSend.PlayerMessage(playerId, $"Your {GetResourceName((ResourceSkill)resourceType)} has earned {Resource.Instance[resourceIndex].ExperienceReward} experience. ({GetGatherExp(playerId, resourceType)}/{GetGatherSkillMaxExp(playerId, resourceType)})", (int)ColorName.BrightGreen);
-            NetworkSend.PlayerData(playerId);
+            Network.PlayerMessage(playerId, $"Your {GetResourceName((ResourceSkill)resourceType)} has earned {Resource.Instance[resourceIndex].ExperienceReward} experience. ({GetGatherExp(playerId, resourceType)}/{GetGatherSkillMaxExp(playerId, resourceType)})", (int)ColorName.BrightGreen);
+            Network.PlayerData(playerId);
 
             MapResource.OnLevel(playerId, resourceType);
         }

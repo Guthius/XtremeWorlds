@@ -12,13 +12,8 @@ using static Core.Net.Packets;
 
 namespace Server;
 
-public static class NetworkSend
+public static class Network
 {
-    private static readonly int EquipmentCount = Enum.GetValues<Equipment>().Length;
-    private static readonly int StatCount = Enum.GetValues<Stat>().Length;
-    private static readonly int VitalCount = Enum.GetValues<Vital>().Length;
-    private static readonly int MapLayerCount = Enum.GetValues<MapLayer>().Length;
-    private static readonly int ResourceSkillCount = Enum.GetValues<ResourceSkill>().Length;
 
     public static void AlertMessage(GameSession session, SystemMessage menuNo, Menu menuReset = 0, bool kick = true)
     {
@@ -125,7 +120,8 @@ public static class NetworkSend
             w.WriteInt32(job);
 
             // Equipment list may vary; clamp to EquipmentCount and guard item reads
-            for (int eq = 0; eq < EquipmentCount; eq++)
+            var equipmentCount = Enum.GetValues<Equipment>().Length;
+            for (int eq = 0; eq < equipmentCount; eq++)
             {
                 int itemId = (eq < Account.Instance[session.Id].Player[slot].Paperdoll.Length)
                     ? Account.Instance[session.Id].Player[slot].Paperdoll[eq].Num
@@ -309,7 +305,8 @@ public static class NetworkSend
         packetWriter.WriteEnum(ServerPackets.SMapWornEq);
         packetWriter.WriteInt32(playerId);
 
-        for (var i = 0; i < EquipmentCount; i++)
+        var equipmentCount = Enum.GetValues<Equipment>().Length;
+        for (var i = 0; i < equipmentCount; i++)
         {
             packetWriter.WriteInt32(GetPaperdoll(playerId, (Equipment)i));
         }
@@ -324,7 +321,8 @@ public static class NetworkSend
         packetWriter.WriteEnum(ServerPackets.SMapWornEq);
         packetWriter.WriteInt32(equipmentPlayerId);
 
-        for (var i = 0; i < EquipmentCount; i++)
+        var equipmentCount = Enum.GetValues<Equipment>().Length;
+        for (var i = 0; i < equipmentCount; i++)
         {
             packetWriter.WriteInt32(GetPaperdoll(equipmentPlayerId, (Equipment)i));
         }
@@ -469,7 +467,8 @@ public static class NetworkSend
         packetWriter.WriteEnum(ServerPackets.SPlayerStats);
         packetWriter.WriteInt32(playerId);
 
-        for (var i = 0; i < StatCount; i++)
+        var statCount = Enum.GetValues<Stat>().Length;
+        for (var i = 0; i < statCount; i++)
         {
             packetWriter.WriteInt32(GetStat(playerId, (Stat)i));
         }
@@ -479,7 +478,8 @@ public static class NetworkSend
 
     public static void Vitals(int playerId)
     {
-        for (var i = 0; i < VitalCount; i++)
+        var vitalCount = Enum.GetValues<Vital>().Length;
+        for (var i = 0; i < vitalCount; i++)
         {
             Vital(playerId, (Vital)i);
         }
@@ -511,7 +511,7 @@ public static class NetworkSend
 
         if (Data.TempPlayer[playerId].InParty >= 0)
         {
-            NetworkSend.PartyVitals(Data.TempPlayer[playerId].InParty, playerId);
+            Network.PartyVitals(Data.TempPlayer[playerId].InParty, playerId);
         }
     }
 
@@ -556,7 +556,8 @@ public static class NetworkSend
 
         packetWriter.WriteEnum(ServerPackets.SPlayerWornEq);
 
-        for (var i = 0; i < EquipmentCount; i++)
+        var equipmentCount = Enum.GetValues<Equipment>().Length;
+        for (var i = 0; i < equipmentCount; i++)
         {
             packetWriter.WriteInt32(GetPaperdoll(playerId, (Equipment)i));
         }
@@ -626,7 +627,8 @@ public static class NetworkSend
                     packetWriter.WriteInt32(Server.Map.Instance[map].Tile[x, y].Data3_2);
                     packetWriter.WriteByte(Server.Map.Instance[map].Tile[x, y].DirBlock);
 
-                    for (var i = 0; i < MapLayerCount; i++)
+                    var mapLayerCount = Enum.GetValues<MapLayer>().Length;
+                    for (var i = 0; i < mapLayerCount; i++)
                     {
                         packetWriter.WriteInt32(Server.Map.Instance[map].Tile[x, y].Layer[i].Tileset);
                         packetWriter.WriteInt32(Server.Map.Instance[map].Tile[x, y].Layer[i].X);
@@ -790,7 +792,8 @@ public static class NetworkSend
             packetWriter.WriteInt32(MapNpc.Instance[map, i].Y);
             packetWriter.WriteByte(MapNpc.Instance[map, i].Dir);
 
-            for (var x = 0; x < VitalCount; x++)
+            var vitalCount = Enum.GetValues<Vital>().Length;
+            for (var x = 0; x < vitalCount; x++)
             {
                 packetWriter.WriteInt32(MapNpc.Instance[map, i].Vital[x]);
             }
@@ -843,12 +846,14 @@ public static class NetworkSend
         packetWriter.WriteByte(GetAccess(playerId));
         packetWriter.WriteBoolean(GetPk(playerId));
 
-        for (var i = 0; i < StatCount; i++)
+        var statCount = Enum.GetValues<Stat>().Length;
+        for (var i = 0; i < statCount; i++)
         {
             packetWriter.WriteInt32(GetStat(playerId, (Stat)i));
         }
 
-        for (var i = 0; i < ResourceSkillCount; i++)
+        var resourceSkillCount = Enum.GetValues<ResourceSkill>().Length;
+        for (var i = 0; i < resourceSkillCount; i++)
         {
             packetWriter.WriteInt32(SetGatherLevel(playerId, i));
             packetWriter.WriteInt32(GetGatherExp(playerId, i));
@@ -1518,7 +1523,7 @@ public static class NetworkSend
     {
         for (var i = 0; i < Core.Globals.Variables.MaxResources; i++)
         { 
-            NetworkSend.UpdateResourceTo(playerId, i);
+            Network.UpdateResourceTo(playerId, i);
         }
     }
 
@@ -1612,7 +1617,8 @@ public static class NetworkSend
         packetWriter.WriteInt32(job.MaleSprite);
         packetWriter.WriteInt32(job.FemaleSprite);
 
-        for (var i = 0; i < StatCount; i++)
+        var statCount = Enum.GetValues<Stat>().Length;
+        for (var i = 0; i < statCount; i++)
         {
             packetWriter.WriteInt32(job.Stat[i]);
         }
@@ -1884,7 +1890,8 @@ public static class NetworkSend
         packetWriter.WriteEnum(ServerPackets.SPartyVitals);
         packetWriter.WriteInt32(playerId);
 
-        for (var i = 0; i < VitalCount; i++)
+        var vitalCount = Enum.GetNames<Vital>().Length;
+        for (var i = 0; i < vitalCount; i++)
         {
             packetWriter.WriteInt32(Player.Instance[playerId].Vital[i]);
         }
@@ -2009,7 +2016,8 @@ public static class NetworkSend
         packet.WriteInt32(npc.SpawnSecs);
         packet.WriteInt32(npc.Sprite);
 
-        for (var i = 0; i < StatCount; i++)
+        var statCount = Enum.GetValues<Stat>().Length;
+        for (var i = 0; i < statCount; i++)
         {
             packet.WriteByte(npc.Stat != null && npc.Stat.Length > i ? npc.Stat[i] : (byte)0);
         }

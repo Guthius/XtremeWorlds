@@ -226,7 +226,7 @@ public class Projectile : ProjectileBase, IAsyncData
         mp.AccX = 0; mp.AccY = 0; mp.Range = 0;
         mp.TravelTime = General.GetTime() + Math.Max(1, Projectile.Instance[projectileNum].Speed);
         mp.Timer = General.GetTime() + 60000;
-        NetworkSend.ProjectileToMap(map, mapProjectileNum);
+        Network.ProjectileToMap(map, mapProjectileNum);
     }
 
     public static void OnFreeAim(int playerId, short vx, short vy, int itemNum, int destX, int destY)
@@ -266,7 +266,7 @@ public class Projectile : ProjectileBase, IAsyncData
         mp.DestX = destX; mp.DestY = destY;
         mp.TravelTime = General.GetTime() + Math.Max(1, Projectile.Instance[index].Speed);
         mp.Timer = General.GetTime() + 60000;
-        NetworkSend.ProjectileToMap(map, mapProjectileNum);
+        Network.ProjectileToMap(map, mapProjectileNum);
     }
 
     public static void OnShoot(int playerId, int itemNum, int skillNum = -1, int dir = -1, bool suppressCooldown = false)
@@ -318,7 +318,7 @@ public class Projectile : ProjectileBase, IAsyncData
         mapProjectile.TravelTime = General.GetTime() + Math.Max(1, Projectile.Instance[projectile].Speed);
         mapProjectile.Timer = General.GetTime() + 60000;
 
-        NetworkSend.ProjectileToMap(map, mapProjectileNum);
+        Network.ProjectileToMap(map, mapProjectileNum);
     }
 
     public static void OnNpcProjectile(int map, int npc, int skill, int dir = -1)
@@ -364,7 +364,7 @@ public class Projectile : ProjectileBase, IAsyncData
         mapProjectile.TravelTime = General.GetTime() + Math.Max(1, Projectile.Instance[projectile].Speed);
         mapProjectile.Timer = General.GetTime() + 60000;
 
-        NetworkSend.ProjectileToMap(map, index);
+        Network.ProjectileToMap(map, index);
     }
 
     public static void OnUpdate()
@@ -495,7 +495,7 @@ public class Projectile : ProjectileBase, IAsyncData
                         {
                             int tx = Math.Clamp(mp.X / Constants.TileSize, 0, Server.Map.Instance[x].MaxX - 1);
                             int ty = Math.Clamp(mp.Y / Constants.TileSize, 0, Server.Map.Instance[x].MaxY - 1);
-                            NetworkSend.PlayAnimation(x, animation, tx, ty);
+                            Network.PlayAnimation(x, animation, tx, ty);
                             // Try to apply attack on expire at destination
                             OnAttack(x, ref mp, tx, ty, index);
                         }
@@ -512,7 +512,7 @@ public class Projectile : ProjectileBase, IAsyncData
                     {
                         int tx = Math.Clamp(prevTileX, 0, Server.Map.Instance[x].MaxX - 1);
                         int ty = Math.Clamp(prevTileY, 0, Server.Map.Instance[x].MaxY - 1);
-                        NetworkSend.PlayAnimation(x, animation, tx, ty);
+                        Network.PlayAnimation(x, animation, tx, ty);
                         OnAttack(x, ref mp, tx, ty, index);
                     }
                     MapProjectile.OnClear(x, i);
@@ -530,7 +530,7 @@ public class Projectile : ProjectileBase, IAsyncData
                         {
                             int tx = Math.Clamp(prevTileX, 0, Server.Map.Instance[x].MaxX - 1);
                             int ty = Math.Clamp(prevTileY, 0, Server.Map.Instance[x].MaxY - 1);
-                            NetworkSend.PlayAnimation(x, animation, tx, ty);
+                            Network.PlayAnimation(x, animation, tx, ty);
                             OnAttack(x, ref mp, tx, ty, index);
                         }
                     }
@@ -543,7 +543,7 @@ public class Projectile : ProjectileBase, IAsyncData
                 {
                     if (animation >= 0)
                     {
-                        NetworkSend.PlayAnimation(x, animation, tileX, tileY);
+                        Network.PlayAnimation(x, animation, tileX, tileY);
                         OnAttack(x, ref mp, tileX, tileY, index);
                     }
                     
@@ -582,7 +582,7 @@ public class Projectile : ProjectileBase, IAsyncData
                 {
                     if (animation >= 0)
                     {
-                        NetworkSend.PlayAnimation(x, animation, tileX, tileY);
+                        Network.PlayAnimation(x, animation, tileX, tileY);
                     }
 
                     try
@@ -631,7 +631,7 @@ public class Projectile : ProjectileBase, IAsyncData
                 {
                     if (animation >= 0)
                     {
-                        NetworkSend.PlayAnimation(x, animation, tileX, tileY);
+                        Network.PlayAnimation(x, animation, tileX, tileY);
                     }
 
                     try
@@ -655,7 +655,7 @@ public class Projectile : ProjectileBase, IAsyncData
 
                 if (!moved) continue;
 
-                NetworkSend.ProjectileToMap(x, i);
+                Network.ProjectileToMap(x, i);
             }
         }
     }

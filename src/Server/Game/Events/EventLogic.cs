@@ -1641,13 +1641,13 @@ namespace Server
                                             switch (command.Data2)
                                             {
                                                 case 0: // Player
-                                                    NetworkSend.PlayerMessage(i, command.Text1, command.Data1);
+                                                    Network.PlayerMessage(i, command.Text1, command.Data1);
                                                     break;
                                                 case 1: // Map
-                                                    NetworkSend.MapMessage(map, command.Text1);
+                                                    Network.MapMessage(map, command.Text1);
                                                     break;
                                                 case 2: // Global
-                                                    NetworkSend.GlobalMessage(command.Text1);
+                                                    Network.GlobalMessage(command.Text1);
                                                     break;
                                             }
 
@@ -1919,23 +1919,23 @@ namespace Server
                                                 }
                                             }
 
-                                            NetworkSend.Inventory(i);
+                                            Network.Inventory(i);
                                             break;
                                         }
 
                                         case (byte) EventCommand.RestoreHealth:
                                             SetVital(i, Core.Globals.Vital.Health, Script.Instance?.GetPlayerMaxVital(i, Core.Globals.Vital.Health));
-                                            NetworkSend.Vital(i, Core.Globals.Vital.Health);
+                                            Network.Vital(i, Core.Globals.Vital.Health);
                                             break;
 
                                         case (byte) EventCommand.RestoreMana:
                                             SetVital(i, Core.Globals.Vital.Mana, Script.Instance?.GetPlayerMaxVital(i, Core.Globals.Vital.Mana));
-                                            NetworkSend.Vital(i, Core.Globals.Vital.Mana);
+                                            Network.Vital(i, Core.Globals.Vital.Mana);
                                             break;
 
                                         case (byte) EventCommand.RestoreStamina:
                                             SetVital(i, Core.Globals.Vital.Stamina, Script.Instance?.GetPlayerMaxVital(i, Core.Globals.Vital.Stamina));
-                                            NetworkSend.Vital(i, Core.Globals.Vital.Stamina);
+                                            Network.Vital(i, Core.Globals.Vital.Stamina);
                                             break;
 
                                         case (byte) EventCommand.GiveExperience:
@@ -1950,14 +1950,14 @@ namespace Server
 
                                         case (byte) EventCommand.ChangePoints:
                                             SetPoints(i, GetPoints(i) + command.Data1);
-                                            NetworkSend.PlayerData(i);
+                                            Network.PlayerData(i);
                                             break;
 
                                         case (byte) EventCommand.ChangeLevel:
                                             SetLevel(i, GetLevel(i) + command.Data1);
                                             SetExp(i, 0);
-                                            NetworkSend.PlayerData(i);
-                                            NetworkSend.Experience(i);
+                                            Network.PlayerData(i);
+                                            Network.Experience(i);
                                             break;
 
                                         case (byte) EventCommand.ChangeSkills:
@@ -1980,28 +1980,28 @@ namespace Server
                                                 }
                                             }
 
-                                            NetworkSend.PlayerSkills(i);
+                                            Network.PlayerSkills(i);
                                             break;
                                         }
 
                                         case (byte) EventCommand.ChangeJob:
                                             Player.Instance[i].Job = (byte) command.Data1;
-                                            NetworkSend.PlayerData(i);
+                                            Network.PlayerData(i);
                                             break;
 
                                         case (byte) EventCommand.ChangeSprite:
                                             SetSprite(i, command.Data1);
-                                            NetworkSend.PlayerData(i);
+                                            Network.PlayerData(i);
                                             break;
 
                                         case (byte) EventCommand.ChangeSex:
                                             Player.Instance[i].Sex = (byte) (command.Data1 == 0 ? Sex.Male : Sex.Female);
-                                            NetworkSend.PlayerData(i);
+                                            Network.PlayerData(i);
                                             break;
 
                                         case (byte) EventCommand.SetPlayerKillable:
                                             Player.Instance[i].Pk = (command.Data1 == 0 ? false : true);
-                                            NetworkSend.PlayerData(i);
+                                            Network.PlayerData(i);
                                             break;
 
                                         case (byte) EventCommand.WarpPlayer:
@@ -2060,7 +2060,7 @@ namespace Server
                                             switch (command.Data2)
                                             {
                                                 case 0: // On Player
-                                                    NetworkSend.PlayAnimation(map, command.Data1, GetX(i), GetY(i), (byte) TargetType.Player, i);
+                                                    Network.PlayAnimation(map, command.Data1, GetX(i), GetY(i), (byte) TargetType.Player, i);
                                                     break;
                                                 case 1: // On Event
                                                 {
@@ -2071,7 +2071,7 @@ namespace Server
                                                     if (Server.Map.Instance[map].Event[command.Data3].Globals == 1)
                                                     {
                                                         // Play on global event.
-                                                        NetworkSend.PlayAnimation(map, command.Data1,
+                                                        Network.PlayAnimation(map, command.Data1,
                                                             Server.Map.Instance[map].Event[command.Data3].X,
                                                             Server.Map.Instance[map].Event[command.Data3].Y);
                                                     }
@@ -2082,7 +2082,7 @@ namespace Server
                                                             break;
 
                                                         // Play on local event.
-                                                        NetworkSend.PlayAnimation(map, command.Data1,
+                                                        Network.PlayAnimation(map, command.Data1,
                                                             Data.TempPlayer[i].EventMap.EventPages[command.Data3].X,
                                                             Data.TempPlayer[i].EventMap.EventPages[command.Data3].Y,
                                                             (byte) TargetType.Event, command.Data3);
@@ -2091,7 +2091,7 @@ namespace Server
                                                     break;
                                                 }
                                                 case 2: // On Coordinates
-                                                    NetworkSend.PlayAnimation(map, command.Data1, command.Data3, command.Data4, 0, 0);
+                                                    Network.PlayAnimation(map, command.Data1, command.Data3, command.Data4, 0, 0);
                                                     break;
                                             }
 
@@ -2140,7 +2140,7 @@ namespace Server
                                         }
                                         case (byte) EventCommand.SetAccessLevel:
                                             SetAccess(i, (byte) command.Data1);
-                                            NetworkSend.PlayerData(i);
+                                            Network.PlayerData(i);
                                             break;
 
                                         case (byte) EventCommand.OpenShop:
@@ -2148,7 +2148,7 @@ namespace Server
                                             // Check if the shop exists and has a valid name.
                                             if (command.Data1 > 0 && command.Data1 < Core.Globals.Variables.MaxShops && command.Data1 < Shop.Instance.Count && !string.IsNullOrEmpty(Shop.Instance[command.Data1].Name))
                                             {
-                                                NetworkSend.OpenShop(i, command.Data1);
+                                                Network.OpenShop(i, command.Data1);
                                                 Data.TempPlayer[i].InShop = command.Data1;
                                                 instance1.WaitingForResponse = 2; // Wait for shop to close.
                                             }
@@ -2156,7 +2156,7 @@ namespace Server
                                             break;
                                         }
                                         case (byte) EventCommand.OpenBank:
-                                            NetworkSend.Bank(i);
+                                            Network.Bank(i);
                                             Data.TempPlayer[i].InBank = true;
                                             instance1.WaitingForResponse = 3; // Wait for bank to close.
                                             break;
@@ -2167,13 +2167,13 @@ namespace Server
                                             switch (command.Data1)
                                             {
                                                 case (byte) TargetType.Player:
-                                                    NetworkSend.ChatBubble(map, i, command.Data1, command.Text1, (int) color);
+                                                    Network.ChatBubble(map, i, command.Data1, command.Text1, (int) color);
                                                     break;
                                                 case (byte) TargetType.Npc:
-                                                    NetworkSend.ChatBubble(map, command.Data2, command.Data1, command.Text1, (int) color);
+                                                    Network.ChatBubble(map, command.Data2, command.Data1, command.Text1, (int) color);
                                                     break;
                                                 case (byte) TargetType.Event:
-                                                    NetworkSend.ChatBubble(map, command.Data2, command.Data1, command.Text1, (int) color);
+                                                    Network.ChatBubble(map, command.Data2, command.Data1, command.Text1, (int) color);
                                                     break;
                                             }
 
@@ -2198,27 +2198,27 @@ namespace Server
                                             break;
 
                                         case (byte) EventCommand.FadeIn:
-                                            NetworkSend.SpecialEffect(i, Event.EffectTypeFadeIn);
+                                            Network.SpecialEffect(i, Event.EffectTypeFadeIn);
                                             break;
 
                                         case (byte) EventCommand.FadeOut:
-                                            NetworkSend.SpecialEffect(i, Event.EffectTypeFadeOut);
+                                            Network.SpecialEffect(i, Event.EffectTypeFadeOut);
                                             break;
 
                                         case (byte) EventCommand.FlashScreen:
-                                            NetworkSend.SpecialEffect(i, Event.EffectTypeFlash);
+                                            Network.SpecialEffect(i, Event.EffectTypeFlash);
                                             break;
 
                                         case (byte) EventCommand.SetFog:
-                                            NetworkSend.SpecialEffect(i, Event.EffectTypeFog, command.Data1, command.Data2, command.Data3);
+                                            Network.SpecialEffect(i, Event.EffectTypeFog, command.Data1, command.Data2, command.Data3);
                                             break;
 
                                         case (byte) EventCommand.SetWeather:
-                                            NetworkSend.SpecialEffect(i, Event.EffectTypeWeather, command.Data1, command.Data2);
+                                            Network.SpecialEffect(i, Event.EffectTypeWeather, command.Data1, command.Data2);
                                             break;
 
                                         case (byte) EventCommand.SetScreenTint:
-                                            NetworkSend.SpecialEffect(i, Event.EffectTypeTint, command.Data1, command.Data2, command.Data3, command.Data4);
+                                            Network.SpecialEffect(i, Event.EffectTypeTint, command.Data1, command.Data2, command.Data3, command.Data4);
                                             break;
 
                                         case (byte) EventCommand.Wait:

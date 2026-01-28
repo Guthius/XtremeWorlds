@@ -65,6 +65,12 @@
     <Label Name="lblAnimation" Text="Animation" Position="20,126" Size="80,16"/>
     <ComboBox Name="cmbAnimation" Position="104,124" Size="300,18"/>
     <Button Name="btnAnimation" Text="OK" Position="410,124" Size="60,18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
+
+    <Label Name="lblKeyDoor" Text="Key / Door" Position="20,126" Size="90,16"/>
+    <Label Name="lblKeyDoorItem" Text="Unlock" Position="20,148" Size="80,16"/>
+    <ComboBox Name="cmbKeyDoorItem" Position="104,146" Size="300,18"/>
+    <CheckBox Name="chkKeyDoorTake" Text="Consume" Position="410,146" Size="90,18" Design="None"/>
+    <Button Name="btnKeyDoorOk" Text="OK" Position="510,146" Size="60,18" Design="Green" DesignHover="GreenHover" DesignMouseDown="GreenClick"/>
   </GroupBox>
 
   <GroupBox Name="grpSettings" Caption="" Position="6,26" Size="788,624">

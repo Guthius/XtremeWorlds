@@ -250,7 +250,7 @@ public static class Loop
                     {
                         Data.TempPlayer[id].MoveSpeedMultiplier = 1.0f;
                         Data.TempPlayer[id].MoveSpeedMultiplierTimer = 0;
-                        NetworkSend.PlayerXYToMap(id);
+                        Network.PlayerXYToMap(id);
                     }
                 }
 
@@ -436,7 +436,7 @@ public static class Loop
             }
 
             MapItem.Spawn(map);
-            NetworkSend.MapItemsToAll(map);
+            Network.MapItemsToAll(map);
         }
     }
 
@@ -525,7 +525,7 @@ public static class Loop
                         // clear buffer
                         Data.TempPlayer[entity.Id].SkillBuffer = -1;
                         Data.TempPlayer[entity.Id].SkillBufferTimer = 0;
-                        NetworkSend.ClearSkillBuffer(entity.Id);
+                        Network.ClearSkillBuffer(entity.Id);
                     }
                 }
             }
@@ -585,7 +585,7 @@ public static class Loop
                                         {
                                             if (!string.IsNullOrEmpty(entity.AttackSay))
                                             {
-                                                NetworkSend.PlayerMessage(player.Id, GameLogic.CheckGrammar(entity.Name, 1) + " says, '" + entity.AttackSay + "' to you.", (int)ColorName.Yellow);
+                                                Network.PlayerMessage(player.Id, GameLogic.CheckGrammar(entity.Name, 1) + " says, '" + entity.AttackSay + "' to you.", (int)ColorName.Yellow);
                                             }
                                             entity.TargetType = (byte)TargetType.Player;
                                             entity.Target = player.Id;
@@ -1055,13 +1055,13 @@ public static class Loop
                     {
                         item.PlayerName = "";
                         item.PlayerTimer = 0;
-                        NetworkSend.MapItemToAll(map, i);
+                        Network.MapItemToAll(map, i);
                     }
 
                     if (item.CanDespawn && item.DespawnTimer < now)
                     {
                         MapItem.OnClear(i, map);
-                        NetworkSend.MapItemToAll(map, i);
+                        Network.MapItemToAll(map, i);
                     }
                 }
             }
@@ -1091,7 +1091,7 @@ public static class Loop
                                     resData.Timer = now;
                                     resData.State = 0;
                                     resData.Health = (byte)Resource.Instance[resourceindex].Health;
-                                    NetworkSend.MapResourceToMap(map);
+                                    Network.MapResourceToMap(map);
                                 }
                             }
                         }

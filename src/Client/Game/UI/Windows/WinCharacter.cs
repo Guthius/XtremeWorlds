@@ -139,6 +139,14 @@ public class WinCharacter
             return;
         }
 
+        // Right-click: unequip immediately (skip drag behavior)
+        if (GameClient.IsMouseButtonDown(MouseButton.Right))
+        {
+            Sender.UnEquip(slot);
+            OnMouseMove();
+            return;
+        }
+
         ref var dragBox = ref WindowManager.DragBox;
 
         dragBox.Type = DraggablePartType.Item;

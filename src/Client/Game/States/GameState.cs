@@ -155,6 +155,8 @@ namespace Client
         public static int EditorWarpMap;
         public static int EditorWarpX;
         public static int EditorWarpY;
+        public static int EditorKeyItem;
+        public static int EditorKeyTake;
         public static int EditorShop;
         public static int EditorAnimation;
         public static byte EditorAttribute;
@@ -472,6 +474,8 @@ namespace Client
         public static bool OptTrap;         // Trap attribute
         public static bool OptAnimation;    // Animation attribute
         public static bool OptNoCrossing;   // No Crossing attribute
+        public static bool OptDoor;         // Door attribute
+        public static bool OptKey;          // Key attribute
 
         // Editors
         public static bool InitMapEditor;
