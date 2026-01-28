@@ -940,92 +940,92 @@ public static class Loop
             if (map < 0 || map >= Core.Globals.Variables.MaxMaps) continue;
             if (npcIndex < 0 || npcIndex >= Core.Globals.Variables.MaxMapNpcs) continue;
 
-            ref var baseNpc = ref MapNpc.Instance[map, npcIndex];
+            ref var npc = ref MapNpc.Instance[map, npcIndex];
 
             // Corpse window: NPC stays visible but does not move/act.
-            if (baseNpc.DeathTimer > 0 && baseNpc.DeathTimer > nowMove)
+            if (npc.DeathTimer > 0 && npc.DeathTimer > nowMove)
             {
                 continue;
             }
 
             // Skip if stunned
-            if (baseNpc.StunDuration > 0) continue;
+            if (npc.StunDuration > 0) continue;
 
             // Sync any target assigned on snapshot back to base data if base has none.
-            if (baseNpc.TargetType == 0 && e.TargetType != 0)
+            if (npc.TargetType == 0 && e.TargetType != 0)
             {
-                baseNpc.TargetType = e.TargetType;
-                baseNpc.Target = e.Target;
+                npc.TargetType = e.TargetType;
+                npc.Target = e.Target;
             }
 
             bool moved = false;
 
             // If target exists but is out of range, clear it before deciding movement
-            if (baseNpc.TargetType == (byte)TargetType.Player && baseNpc.Target >= 0 && NetworkConfig.IsPlaying(baseNpc.Target) && GetMap(baseNpc.Target) == map)
+            if (npc.TargetType == (byte)TargetType.Player && npc.Target >= 0 && NetworkConfig.IsPlaying(npc.Target) && GetMap(npc.Target) == map)
             {
-                int sxR = baseNpc.X / Constants.TileSize;
-                int syR = baseNpc.Y / Constants.TileSize;
-                int txR = GetX(baseNpc.Target);
-                int tyR = GetY(baseNpc.Target);
-                int rR = Math.Max(0, (int)Npc.Instance[baseNpc.Num].Range);
+                int sxR = npc.X / Constants.TileSize;
+                int syR = npc.Y / Constants.TileSize;
+                int txR = GetX(npc.Target);
+                int tyR = GetY(npc.Target);
+                int rR = Math.Max(0, (int)Npc.Instance[npc.Num].Range);
                 if (Math.Abs(sxR - txR) > rR || Math.Abs(syR - tyR) > rR)
                 {
-                    baseNpc.TargetType = 0;
-                    baseNpc.Target = -1;
+                    npc.TargetType = 0;
+                    npc.Target = -1;
                 }
             }
-            else if (baseNpc.TargetType == (byte)TargetType.Npc && baseNpc.Target >= 0)
+            else if (npc.TargetType == (byte)TargetType.Npc && npc.Target >= 0)
             {
-                int targetSlot = baseNpc.Target;
+                int targetSlot = npc.Target;
                 if (targetSlot >= 0 && targetSlot < Core.Globals.Variables.MaxMapNpcs && MapNpc.Instance[map, targetSlot].Num >= 0)
                 {
-                    int sxR = baseNpc.X / Constants.TileSize;
-                    int syR = baseNpc.Y / Constants.TileSize;
+                    int sxR = npc.X / Constants.TileSize;
+                    int syR = npc.Y / Constants.TileSize;
                     int txR = MapNpc.Instance[map, targetSlot].X / Constants.TileSize;
                     int tyR = MapNpc.Instance[map, targetSlot].Y / Constants.TileSize;
-                    int rR = Math.Max(0, (int)Npc.Instance[baseNpc.Num].Range);
+                    int rR = Math.Max(0, (int)Npc.Instance[npc.Num].Range);
                     if (Math.Abs(sxR - txR) > rR || Math.Abs(syR - tyR) > rR)
                     {
-                        baseNpc.TargetType = 0;
-                        baseNpc.Target = -1;
+                        npc.TargetType = 0;
+                        npc.Target = -1;
                     }
                 }
                 else
                 {
-                    baseNpc.TargetType = 0;
-                    baseNpc.Target = -1;
+                    npc.TargetType = 0;
+                    npc.Target = -1;
                 }
             }
 
             // Read target info from persistent npc record
-            if (baseNpc.TargetType == (byte)TargetType.Player && baseNpc.Target >= 0 && NetworkConfig.IsPlaying(baseNpc.Target) && GetMap(baseNpc.Target) == map)
+            if (npc.TargetType == (byte)TargetType.Player && npc.Target >= 0 && NetworkConfig.IsPlaying(npc.Target) && GetMap(npc.Target) == map)
             {
-                int sx = baseNpc.X / Constants.TileSize;
-                int sy = baseNpc.Y / Constants.TileSize;
-                int tx = GetX(baseNpc.Target);
-                int ty = GetY(baseNpc.Target);
+                int sx = npc.X / Constants.TileSize;
+                int sy = npc.Y / Constants.TileSize;
+                int tx = GetX(npc.Target);
+                int ty = GetY(npc.Target);
                 moved = Script.Instance?.TryChase(map, npcIndex, sx, sy, tx, ty);
             }
-            else if (baseNpc.TargetType == (byte)TargetType.Npc && baseNpc.Target >= 0)
+            else if (npc.TargetType == (byte)TargetType.Npc && npc.Target >= 0)
             {
-                int targetSlot = baseNpc.Target;
+                int targetSlot = npc.Target;
                 if (targetSlot >= 0 && targetSlot < Core.Globals.Variables.MaxMapNpcs && MapNpc.Instance[map, targetSlot].Num >= 0)
                 {
-                    int sx = baseNpc.X / Constants.TileSize;
-                    int sy = baseNpc.Y / Constants.TileSize;
+                    int sx = npc.X / Constants.TileSize;
+                    int sy = npc.Y / Constants.TileSize;
                     int tx = MapNpc.Instance[map, targetSlot].X / Constants.TileSize;
                     int ty = MapNpc.Instance[map, targetSlot].Y / Constants.TileSize;
                     moved = Script.Instance?.TryChase(map, npcIndex, sx, sy, tx, ty);
                 }
                 else
                 {
-                    baseNpc.TargetType = 0;
-                    baseNpc.Target = -1;
+                    npc.TargetType = 0;
+                    npc.Target = -1;
                 }
             }
 
             // Wander if not moved and no target. AttackOnSight/Guard now also wander albeit less frequently.
-            if (!moved && baseNpc.TargetType == 0)
+            if (!moved && npc.TargetType == 0)
             {
                 bool aggressive = e.Behavior == (byte)NpcBehavior.AttackOnSight || e.Behavior == (byte)NpcBehavior.Guard;
                 double chance = aggressive ? 0.02 : 0.05; // aggressive wander less

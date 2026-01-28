@@ -540,7 +540,7 @@ namespace Client
 
                             if (remaining <= 0)
                             {
-                                TextRenderer.AddText("You are not in the respawn window.", (int)ColorName.BrightRed);
+                                TextRenderer.AddText("You cannot respawn.", (int)ColorName.BrightRed);
                                 goto Continue1;
                             }
 

@@ -13,6 +13,79 @@ namespace Client
         public static byte Index;
         public static Core.Globals.Type.MapAnimation[]? Instance;
 
+        private static string? _cachedGfxExt;
+        private static readonly Dictionary<int, string> _animationSpriteKeyCache = new();
+
+        private static string GetAnimationSpriteKey(int sprite)
+        {
+            // If the gfx extension changes (unlikely, but possible), invalidate our cache.
+            if (!string.Equals(_cachedGfxExt, GameState.GfxExt, StringComparison.OrdinalIgnoreCase))
+            {
+                _cachedGfxExt = GameState.GfxExt;
+                _animationSpriteKeyCache.Clear();
+            }
+
+            if (_animationSpriteKeyCache.TryGetValue(sprite, out var key))
+            {
+                return key;
+            }
+
+            key = System.IO.Path.Combine(DataPath.Animations, sprite.ToString());
+            key = DataPath.EnsureFileExtension(key);
+            _animationSpriteKeyCache[sprite] = key;
+            return key;
+        }
+
+        private static bool TryGetGfxInfoNoLoad(int sprite, out GameClient.GfxInfo? gfxInfo)
+        {
+            var key = GetAnimationSpriteKey(sprite);
+            return GameClient.GfxInfoCache.TryGetValue(key, out gfxInfo) && gfxInfo is not null;
+        }
+
+        public static int GetDuration(int animation, int layer)
+        {
+            if (animation < 0 || animation >= Animation.Instance.Count)
+                return 0;
+
+            if (layer < 0 || layer > 1)
+                return 0;
+
+            var anim = Animation.Instance[animation];
+            if (anim.Sprite == null || anim.Frames == null || anim.LoopTime == null || anim.LoopCount == null)
+                return 0;
+
+            if (anim.Sprite.Length <= layer || anim.Frames.Length <= layer || anim.LoopTime.Length <= layer || anim.LoopCount.Length <= layer)
+                return 0;
+
+            int sprite = anim.Sprite[layer];
+            if (sprite == 0)
+                return 0;
+
+            // Avoid triggering texture loads during Update/scan paths; only use cached info.
+            if (!TryGetGfxInfoNoLoad(sprite, out var gfxInfo) || gfxInfo is null)
+                return 0;
+
+            int columns = anim.Frames[layer];
+            if (columns <= 0)
+                return 0;
+
+            int totalWidth = gfxInfo.Width;
+            int totalHeight = gfxInfo.Height;
+            int frameWidth = (int)Math.Round(totalWidth / (double)columns);
+            if (frameWidth <= 0)
+                return 0;
+
+            int rows = Math.Max(1, (int)Math.Round(totalHeight / (double)frameWidth));
+            int frameCount = Math.Max(1, rows * columns);
+            int loopTime = anim.LoopTime[layer];
+            int loopCount = anim.LoopCount[layer];
+            if (loopTime <= 0 || loopCount <= 0)
+                return 0;
+
+            // Total duration for this layer.
+            return loopTime * frameCount * loopCount;
+        }
+
         public static void OnDraw(int index, int layer)
         {
             // Validate instance and animation
@@ -187,18 +260,28 @@ namespace Client
                     usedArr[layer] = false;
                     continue;
                 }
-
-                var gfxInfo = GameClient.GetGfxInfo(System.IO.Path.Combine(DataPath.Animations, sprite.ToString()));
                 int columns = framesArr[layer];
-                if (gfxInfo == null || columns <= 0)
+
+                if (columns <= 0)
                 {
                     usedArr[layer] = false;
+                    continue;
+                }
+
+                // Don't load textures during update; if not yet cached, just skip advancing this frame.
+                if (!TryGetGfxInfoNoLoad(sprite, out var gfxInfo) || gfxInfo is null)
+                {
                     continue;
                 }
 
                 int totalWidth = gfxInfo.Width;
                 int totalHeight = gfxInfo.Height;
                 int frameWidth = (int)Math.Round(totalWidth / (double)columns);
+                if (frameWidth <= 0)
+                {
+                    usedArr[layer] = false;
+                    continue;
+                }
                 int rows = Math.Max(1, (int)Math.Round(totalHeight / (double)frameWidth));
                 int frameHeight = rows > 0 ? (int)Math.Round(totalHeight / (double)rows) : 0;
                 int frameCount = Math.Max(1, rows * columns);
@@ -207,7 +290,8 @@ namespace Client
                 if (frameIndexArr[layer] == 0) frameIndexArr[layer] = 1;
                 if (loopIndexArr[layer] == 0) loopIndexArr[layer] = 1;
 
-                if (timerArr[layer] + loopTime <= General.GetTickCount())
+                var now = General.GetTickCount();
+                if (timerArr[layer] + loopTime <= now)
                 {
                     if (frameIndexArr[layer] >= frameCount)
                     {
@@ -228,7 +312,7 @@ namespace Client
                     {
                         frameIndexArr[layer]++;
                     }
-                    timerArr[layer] = General.GetTickCount();
+                    timerArr[layer] = now;
                 }
             }
 

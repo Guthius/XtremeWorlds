@@ -37,8 +37,6 @@ public class WindowManager
     public static bool IsMouseOverAnyWindow => _mouseOverAnyWindow;
 
     private static bool _mouseOverAnyWindow;
-
-    // ResizeGui() is invoked from the main loop; cache the last inputs to avoid O(windowCount) name scans every frame.
     private static int _lastResizeW = -1;
     private static int _lastResizeH = -1;
     private static int _lastResizeWindowCount = -1;

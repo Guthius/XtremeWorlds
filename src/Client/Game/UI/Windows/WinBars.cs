@@ -10,8 +10,8 @@ public class WinBars
         var winRespawn = WindowManager.GetWindowByName("winRespawn");
         if (winRespawn is not null && GameState.MyIndex >= 0 && GameState.MyIndex < Player.Instance.Count)
         {
-            var remainingMs = Player.Instance[GameState.MyIndex].DeathTimer - Client.General.GetTickCount();
-            var shouldShow = remainingMs > 0;
+            var remaining = Player.Instance[GameState.MyIndex].DeathTimer / 1000;
+            var shouldShow = remaining > 0;
             if (winRespawn.Visible != shouldShow)
             {
                 winRespawn.Visible = shouldShow;

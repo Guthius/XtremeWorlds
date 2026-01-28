@@ -31,6 +31,7 @@ using Shop = Server.Shop;
 using Projectile = Server.Projectile;
 using Core.Globals;
 using Server.Game;
+using Core.Objects;
 
 public class Script
 {
@@ -229,6 +230,10 @@ public class Script
             {
                 NetworkSend.PlayerDeath(index, remaining);
             }
+        }
+        else
+        {
+            NetworkSend.PlayerDeath(index, 0);
         }
 
         // Send welcome messages
@@ -1197,8 +1202,8 @@ public class Script
         }
 
         // Record a per-character respawn deadline.
-        var now = (int)General.GetTime();
-        Server.Player.Instance[playerId].DeathTimer = now + DeathSpawnTime;
+        var now = General.GetTime();
+        Server.Player.Instance[playerId].DeathTimer = DeathSpawnTime;
         NetworkSend.PlayerDeath(playerId, DeathSpawnTime);
 
         System.Threading.Tasks.Task.Run(async () =>
@@ -1332,7 +1337,7 @@ public class Script
 
             // Record a per-character respawn deadline.
             var now = (int)General.GetTime();
-            Server.Player.Instance[target.Id].DeathTimer = now + DeathSpawnTime;
+            Server.Player.Instance[target.Id].DeathTimer = DeathSpawnTime;
 
             // Hide the Player on their client immediately (do not broadcast to map)
             NetworkSend.PlayerDeath(target.Id, DeathSpawnTime);
@@ -1351,24 +1356,24 @@ public class Script
         else if (target.Type == Entity.EntityType.Npc)
         {
             var map = target.Map;
-            var npc = target.Id;
-            if (map >= 0 && map < Core.Globals.Variables.MaxMaps && npc >= 0 && npc < Core.Globals.Variables.MaxMapNpcs)
+            var id = target.Id;
+            if (map >= 0 && map < Core.Globals.Variables.MaxMaps && id >= 0 && id < Core.Globals.Variables.MaxMapNpcs)
             {
                 // Loot
-                DropNpcLoot(map, npc);
+            DropNpcLoot(map, id);
 
                 // Mark dead & schedule respawn with a 60-second countdown via action messages
-                ref var mapNpc = ref MapNpc.Instance[map, npc];
+                ref var mapNpc = ref MapNpc.Instance[map, id];
                 var deathTimer = DeathSpawnTime;
                 var currentTime = General.GetTime();
                 
                 // Store original NPC number for respawn and set to dead state
-                int originalNpcNum = mapNpc.Num;
+                int npc = mapNpc.Num;
 
                 // Death switch/variable (applied to killer if Player)
-                if (attacker.Type == Entity.EntityType.Player && originalNpcNum >= 0 && originalNpcNum < Npc.Instance.Count)
+                if (attacker.Type == Entity.EntityType.Player && npc >= 0 && npc < Npc.Instance.Count)
                 {
-                    var npcTemplate = Npc.Instance[originalNpcNum];
+                    var npcTemplate = Npc.Instance[npc];
 
                     if (npcTemplate.DeathSwitch > 0 && npcTemplate.DeathSwitch < Core.Globals.Variables.MaxSwitches)
                     {
@@ -1429,9 +1434,9 @@ public class Script
                 if (attacker.Type == Entity.EntityType.Player && mapNpc.Num == -1)
                 {
                     int baseExp = 0;
-                    if (originalNpcNum >= 0 && originalNpcNum < Npc.Instance.Count)
+                    if (npc >= 0 && npc < Npc.Instance.Count)
                     {
-                        baseExp = Npc.Instance[originalNpcNum].Experience; // NPC base EXP
+                        baseExp = Npc.Instance[npc].Experience; // NPC base EXP
                     }
                     if (baseExp > 0)
                     {

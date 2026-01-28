@@ -249,17 +249,12 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         // Reset per-character transient death/hold state on (re)entering the game session slot.
         // This prevents a death timer from one character leaking into another character on the same account.
-        try
+        if (GameState.MyIndex >= 0 && GameState.MyIndex < Player.Instance.Count)
         {
-            if (GameState.MyIndex >= 0 && GameState.MyIndex < Player.Instance.Count)
-            {
-                Player.Instance[GameState.MyIndex].DeathTimer = 0;
-                Player.Instance[GameState.MyIndex].Dead = false;
-            }
+            Player.Instance[GameState.MyIndex].DeathTimer = 0;
+            Player.Instance[GameState.MyIndex].Dead = false;
         }
-        catch { }
-
-        try { Event.HoldPlayer = false; } catch { }
+        Event.HoldPlayer = false;
     }
 
     public static async ValueTask PlayerCharacters(ReadOnlyMemory<byte> data)
@@ -459,8 +454,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         WindowManager.ShowWindow("winHotbar", resetPosition: false);
         WindowManager.ShowWindow("winMenu", resetPosition: false);
         WindowManager.ShowWindow("winBars", resetPosition: false);
-
-        try { WinChat.Hide(); } catch (Exception ex) { Console.WriteLine($"WinChat.Hide error: {ex.Message}"); }
+        WinChat.Hide();
 
         General.GameInit();
     }
@@ -623,8 +617,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
     private static async ValueTask SpawnNpc(ReadOnlyMemory<byte> data)
     {
         var packetReader = new PacketReader(data);
-        var npc = packetReader.ReadInt32();
-        ref var mapNpc = ref MapNpc.Instance[npc];
+        var i = packetReader.ReadInt32();
+        ref var mapNpc = ref MapNpc.Instance[i];
 
         mapNpc.Num = packetReader.ReadInt32();
         mapNpc.X = packetReader.ReadInt32();
@@ -636,9 +630,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         mapNpc.DeathTimer = deathTimer > 0 ? Client.General.GetTickCount() + deathTimer : 0;
 
         var vitalCount = Enum.GetValues<Vital>().Length;
-        for (npc = 0; npc < vitalCount; npc++)
+        for (i = 0; i < vitalCount; i++)
         {
-            mapNpc.Vital[npc] = packetReader.ReadInt32();
+            mapNpc.Vital[i] = packetReader.ReadInt32();
         }
 
         mapNpc.Moving = 0;
@@ -653,7 +647,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         // Keep the corpse visible until the timer expires.
         ref var mapNpc = ref MapNpc.Instance[npc];
-        mapNpc.DeathTimer = Client.General.GetTickCount() + timer;
+        mapNpc.DeathTimer = timer > 0 ? Client.General.GetTickCount() + timer : 0;
         mapNpc.Attacking = 0;
         mapNpc.AttackTimer = 0;
         mapNpc.Moving = 0;
@@ -665,6 +659,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         var timer = packetReader.ReadInt32(); // milliseconds until respawn
         var playerId = packetReader.ReadInt32();
 
+        // Timer from server is remaining ms until respawn (0 if alive). Only convert to an absolute expiry when > 0.
         Player.Instance[playerId].DeathTimer = timer > 0 ? Client.General.GetTickCount() + timer : 0;
 
         // If we just died, hard-stop movement immediately.
@@ -696,7 +691,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         var npc = new Npc
         {
             Animation = packetReader.ReadInt32(),
-            AttackSay = packetReader.ReadString() ?? string.Empty,
+            AttackSay = packetReader.ReadString(),
             Behavior = packetReader.ReadByte(),
         };
 
@@ -710,7 +705,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         npc.Experience = packetReader.ReadInt32();
         npc.Faction = packetReader.ReadByte();
         npc.Hp = packetReader.ReadInt32();
-        npc.Name = packetReader.ReadString() ?? string.Empty;
+        npc.Name = packetReader.ReadString();
         npc.Range = packetReader.ReadByte();
         npc.SpawnTime = packetReader.ReadByte();
         npc.SpawnSecs = packetReader.ReadInt32();

@@ -10,6 +10,8 @@ using Core.Globals;
 using static Core.Globals.Commands;
 using Type = Core.Globals.Type;
 using Core.Common;
+using System.Collections.Generic;
+using System.Text;
 
 namespace Client
 {
@@ -19,6 +21,134 @@ namespace Client
         private static int _lastHeartbeat;
         private static int _stageStarted;
         private static volatile string _stage = "init";
+
+        // Perf/debug logging (throttled to avoid log spam)
+        private const int WatchdogStallThresholdMs = 10000;
+        private const int SlowStageThresholdMs = 250;
+        private const int SlowLogThrottleMs = 5000;
+        private const string PerfLogFile = "perf.log";
+
+        private static readonly object _stageHistoryLock = new();
+        private const int StageHistorySize = 32;
+        private static readonly StageHistoryEntry[] _stageHistory = new StageHistoryEntry[StageHistorySize];
+        private static int _stageHistoryNext;
+        private static readonly Dictionary<string, int> _lastSlowStageLogAt = new(StringComparer.Ordinal);
+        private static int _lastSlowFrameLogAt;
+        private static int _stageHistoryCount;
+
+        // Progress markers help pinpoint where we got stuck even if stage transitions are empty.
+        private static int _progressMarker;
+        private static int _progressStarted;
+
+        private struct StageHistoryEntry
+        {
+            public string From;
+            public string To;
+            public int Started;
+            public int Ended;
+            public int Duration;
+        }
+
+        private static uint ElapsedTime(int now, int then)
+        {
+            return unchecked((uint)(now - then));
+        }
+
+        private static int ElapsedTimeInt(int now, int then)
+        {
+            var delta = ElapsedTime(now, then);
+            return delta > int.MaxValue ? int.MaxValue : (int)delta;
+        }
+
+        private static void RecordStageTransition(string from, string to, int started, int ended)
+        {
+            var duration = ElapsedTimeInt(ended, started);
+
+            lock (_stageHistoryLock)
+            {
+                _stageHistory[_stageHistoryNext] = new StageHistoryEntry
+                {
+                    From = from,
+                    To = to,
+                    Started = started,
+                    Ended = ended,
+                    Duration = duration,
+                };
+                _stageHistoryNext = (_stageHistoryNext + 1) % StageHistorySize;
+            }
+
+            Interlocked.Increment(ref _stageHistoryCount);
+
+            if (duration >= SlowStageThresholdMs)
+            {
+                if (!_lastSlowStageLogAt.TryGetValue(from, out var lastAt) || ElapsedTime(ended, lastAt) >= (uint)SlowLogThrottleMs)
+                {
+                    _lastSlowStageLogAt[from] = ended;
+                    Log.Add($"Slow stage: {from} took {duration}ms. NextStage={to} Tick={ended}.", PerfLogFile);
+                }
+            }
+        }
+
+        private static string GetRecentStageHistoryString()
+        {
+            var sb = new StringBuilder(256);
+            lock (_stageHistoryLock)
+            {
+                for (var i = 0; i < StageHistorySize; i++)
+                {
+                    var idx = _stageHistoryNext - 1 - i;
+                    if (idx < 0) idx += StageHistorySize;
+                    var e = _stageHistory[idx];
+                    if (string.IsNullOrEmpty(e.From) || string.IsNullOrEmpty(e.To))
+                    {
+                        continue;
+                    }
+
+                    if (sb.Length > 0) sb.Append(" | ");
+                    sb.Append(e.From).Append("->").Append(e.To).Append(' ').Append(e.Duration).Append("ms");
+                }
+            }
+            return sb.ToString();
+        }
+
+        private static void MaybeLogSlowFrame(int frameMs, int now)
+        {
+            if (frameMs < SlowStageThresholdMs * 4)
+            {
+                return;
+            }
+
+            if (ElapsedTime(now, _lastSlowFrameLogAt) < (uint)SlowLogThrottleMs)
+            {
+                return;
+            }
+
+            _lastSlowFrameLogAt = now;
+            Log.Add($"Slow frame: {frameMs}ms. Stage={_stage} RecentTransitions=[{GetRecentStageHistoryString()}]", PerfLogFile);
+        }
+
+        private static void SetProgress(int marker, int now)
+        {
+            if (Volatile.Read(ref _progressMarker) != marker)
+            {
+                Volatile.Write(ref _progressMarker, marker);
+                Volatile.Write(ref _progressStarted, now);
+            }
+        }
+
+        // Wrap-safe time check for TickCount-style integers.
+        // Returns true when now is equal or after the scheduled time, even if TickCount has overflowed.
+        private static bool TimePassed(int now, int scheduled)
+        {
+            // Many timers are initialized to 0 to mean "run immediately".
+            // Without this, TickCount wrapping negative would prevent the timer from ever firing until TickCount becomes positive again.
+            if (scheduled == 0)
+            {
+                return true;
+            }
+
+            return unchecked(now - scheduled) >= 0;
+        }
 
         // Declare private fields
         private static int _i;
@@ -81,22 +211,21 @@ namespace Client
                         continue;
                     }
 
-                    var stalledMs = now - hb;
-                    if (stalledMs < 0)
-                    {
-                        // TickCount can wrap; ignore negative deltas.
-                        continue;
-                    }
-
-                    if (stalledMs < 10000)
+                    var stalled = ElapsedTimeInt(now, hb);
+                    if (stalled < WatchdogStallThresholdMs)
                     {
                         continue;
                     }
 
                     var stage = _stage;
-                    var stageForMs = now - Volatile.Read(ref _stageStarted);
+                    var stageFor = ElapsedTimeInt(now, Volatile.Read(ref _stageStarted));
 
-                    var msg = $"Client loop heartbeat stalled for {stalledMs}ms. Stage={stage} (for {stageForMs}ms).";
+                    var recent = GetRecentStageHistoryString();
+                    var progress = Volatile.Read(ref _progressMarker);
+                    var progressFor = ElapsedTimeInt(now, Volatile.Read(ref _progressStarted));
+                    var historyCount = Volatile.Read(ref _stageHistoryCount);
+
+                    var msg = $"Client loop heartbeat stalled for {stalled}ms. Stage={stage} (for {stageFor}ms). Progress={progress} (for {progressFor}ms). StageHistoryCount={historyCount}. RecentTransitions=[{recent}]";
                     Log.Add(msg, "errors.log");
                     Console.WriteLine(msg);
                 }
@@ -109,12 +238,28 @@ namespace Client
             thread.Start();
         }
 
-        private static void SetStage(string stage, int nowMs)
+        public static void WatchdogPulse(string stage, int progressMarker)
         {
-            if (!string.Equals(_stage, stage, StringComparison.Ordinal))
+            var nowMs = General.GetTickCount();
+            StartWatchdog();
+            Volatile.Write(ref _lastHeartbeat, nowMs);
+            SetProgress(progressMarker, nowMs);
+            SetStage(stage, nowMs);
+        }
+
+        private static void SetStage(string stage, int now)
+        {
+            var prevStage = _stage;
+            var prevStarted = Volatile.Read(ref _stageStarted);
+
+            // Always refresh the stage timestamp so watchdog reports time spent in the *current frame* stage,
+            // not how long ago we first entered the stage name.
+            _stage = stage;
+            Volatile.Write(ref _stageStarted, now);
+
+            if (!string.Equals(prevStage, stage, StringComparison.Ordinal))
             {
-                _stage = stage;
-                Volatile.Write(ref _stageStarted, nowMs);
+                RecordStageTransition(prevStage, stage, prevStarted, now);
             }
         }
 
@@ -122,6 +267,8 @@ namespace Client
         {
             StartWatchdog();
             _tick = General.GetTickCount();
+            var frameStart = _tick;
+            SetProgress(1, _tick); // entered OnUpdate
             Volatile.Write(ref _lastHeartbeat, _tick);
             SetStage("Update", _tick);
             GameState.ElapsedTime = _tick - _frameTime; // Set the time difference for time-based movement
@@ -132,63 +279,100 @@ namespace Client
             {
                 if (GameLogic.GameStarted())
                 {
-                    if (_tmr1000 < _tick)
+                    SetProgress(2, _tick); // in-game branch
+                    var mapId = GetMap(GameState.MyIndex);
+
+                    if (TimePassed(_tick, _tmr1000))
                     {
+                        SetProgress(10, _tick);
                         SetStage("Ping", _tick);
                         Sender.GetPing();
                         _tmr1000 = _tick + 1000;
                     }
 
-                    if (_tmr25 < _tick)
+                    if (TimePassed(_tick, _tmr25))
                     {
+                        SetProgress(20, _tick);
                         SetStage("Editors", _tick);
                         TryPlayCurrentMapMusic();
                         UpdateEditors();
                         _tmr25 = _tick + 25;
                     }
 
-                    if (GameState.ShowAnimTimer < _tick)
+                    if (TimePassed(_tick, GameState.ShowAnimTimer))
                     {
                         GameState.ShowAnimLayers = !GameState.ShowAnimLayers;
                         GameState.ShowAnimTimer = _tick + 500;
                     }
 
-                    for (int layer = 0; layer <= 1; layer++)
+                    // Tile animations are expensive: scan the map at most when a layer timer expires.
+                    // Also avoid per-tile GetMap/IsValidMapPoint calls by caching the map and using bounds.
+                    if (TimePassed(_tick, _animationTmr[0]) || TimePassed(_tick, _animationTmr[1]))
                     {
-                        if (_animationTmr[layer] < _tick)
-                        {
-                            SetStage("TileAnimations", _tick);
-                            if (Map.Instance.Count <= GetMap(GameState.MyIndex)) continue; // No maps loaded
-                            byte mapMaxX = Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX;
-                            for (byte x = 0; x < mapMaxX; x++)
-                            {
-                                byte mapMaxY = Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY;
-                                for (byte y = 0; y < mapMaxY; y++)
-                                {
-                                    if (GameLogic.IsValidMapPoint(x, y))
-                                    {
-                                        if (Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Type == TileType.Animation)
-                                        {      
-                                            if (Animation.Instance.Count <= Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Data1) continue; // No animations loaded                           
-                                            _animationTmr[layer] = _tick + MapAnimation.OnPlay(Animation.Instance[Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Data1].Sprite[layer], layer, Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Data1, x, y);
-                                        }
+                        SetProgress(30, _tick);
+                        SetStage("TileAnimations", _tick);
 
-                                        if (Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Type2 == TileType.Animation)
+                        if (mapId >= 0 && mapId < Client.Map.Instance.Count)
+                        {
+                            var map = Client.Map.Instance[mapId];
+                            int mapMaxX = map.MaxX;
+                            int mapMaxY = map.MaxY;
+
+                            var min0 = int.MaxValue;
+                            var min1 = int.MaxValue;
+
+                            for (int x = 0; x < mapMaxX; x++)
+                            {
+                                for (int y = 0; y < mapMaxY; y++)
+                                {
+                                    var tile = map.Tile[x, y];
+
+                                    if (tile.Type == TileType.Animation)
+                                    {
+                                        var animId = tile.Data1;
+                                        if (animId >= 0 && animId < Animation.Instance.Count)
                                         {
-                                            if (Animation.Instance.Count <= Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Data1_2) continue; // No animations loaded                           
-                                            _animationTmr[layer] = _tick + MapAnimation.OnPlay(Animation.Instance[Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Data1_2].Sprite[layer], layer, Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Data1_2, x, y);
+                                            MapAnimation.OnCreate(animId, (byte)x, (byte)y);
+                                            var d0 = MapAnimation.GetDuration(animId, 0);
+                                            var d1 = MapAnimation.GetDuration(animId, 1);
+                                            if (d0 > 0 && d0 < min0) min0 = d0;
+                                            if (d1 > 0 && d1 < min1) min1 = d1;
+                                        }
+                                    }
+
+                                    if (tile.Type2 == TileType.Animation)
+                                    {
+                                        var animId = tile.Data1_2;
+                                        if (animId >= 0 && animId < Animation.Instance.Count)
+                                        {
+                                            MapAnimation.OnCreate(animId, (byte)x, (byte)y);
+                                            var d0 = MapAnimation.GetDuration(animId, 0);
+                                            var d1 = MapAnimation.GetDuration(animId, 1);
+                                            if (d0 > 0 && d0 < min0) min0 = d0;
+                                            if (d1 > 0 && d1 < min1) min1 = d1;
                                         }
                                     }
                                 }
                             }
-                            ;
+
+                            // If no animations were found, back off so we don't rescan every frame.
+                            _animationTmr[0] = _tick + (min0 == int.MaxValue ? 500 : min0);
+                            _animationTmr[1] = _tick + (min1 == int.MaxValue ? 500 : min1);
                         }
                     }
 
+                    SetProgress(40, _tick); // entering map animation updates
+
                     for (_i = 0; _i < byte.MaxValue; _i++)
                     {
+                        // If we stall inside a specific animation update, watchdog will report Progress=4000+index.
+                        SetProgress(4000 + _i, _tick);
                         MapAnimation.OnUpdate(_i);
                     }
+
+                    SetProgress(4099, _tick); // finished map animation updates
+
+                    SetProgress(4100, _tick); // post-map-animations: event chat timer check
 
                     if (_tick > Event.EventChatTimer)
                     {
@@ -201,10 +385,12 @@ namespace Client
                         }
                     }
 
+                    SetProgress(4110, _tick); // post-map-animations: screenshake
+
                     // screenshake
                     if (GameState.ShakeTimerEnabled)
                     {
-                        if (GameState.ShakeTimer < _tick)
+                        if (TimePassed(_tick, GameState.ShakeTimer))
                         {
                             if (GameState.ShakeCount < 10)
                             {
@@ -229,18 +415,21 @@ namespace Client
                         }
                     }
 
+                    SetProgress(4120, _tick); // post-map-animations: skill cooldown icon expiry
+
                     // check if we need to end the CD icon
                     if (GameState.NumSkills > 0)
                     {
                         for (_i = 0; _i < Core.Globals.Variables.MaxPlayerSkills; _i++)
                         {
+                            SetProgress(4200 + _i, _tick);
                             if (Player.Instance.Count <= GameState.MyIndex) break;
                             if (Skill.Instance.Count <= Player.Instance[GameState.MyIndex].Skill[_i].Num) break;
                             if (Player.Instance[GameState.MyIndex].Skill[_i].Num >= 0)
                             {
                                 if (Player.Instance[GameState.MyIndex].Skill[_i].Cd > 0)
                                 {
-                                    if (Player.Instance[GameState.MyIndex].Skill[_i].Cd + Skill.Instance[Player.Instance[GameState.MyIndex].Skill[_i].Num].CdTime * 1000 < _tick)
+                                    if (TimePassed(_tick, Player.Instance[GameState.MyIndex].Skill[_i].Cd + Skill.Instance[Player.Instance[GameState.MyIndex].Skill[_i].Num].CdTime * 1000))
                                     {
                                         Player.Instance[GameState.MyIndex].Skill[_i].Cd = 0;
                                     }
@@ -249,22 +438,27 @@ namespace Client
                         }
                     }
 
+                    SetProgress(4300, _tick); // post-map-animations: skill buffer unlock
+
                     // check if we need to unlock the player's skill casting restriction
                     if (GameState.SkillBuffer >= 0)
                     {
                         if (Skill.Instance.Count > Player.Instance[GameState.MyIndex].Skill[GameState.SkillBuffer].Num)
                         {
-                            if (GameState.SkillBufferTimer + Skill.Instance[Player.Instance[GameState.MyIndex].Skill[GameState.SkillBuffer].Num].CastTime * 1000 < _tick)
+                            if (TimePassed(_tick, GameState.SkillBufferTimer + Skill.Instance[Player.Instance[GameState.MyIndex].Skill[GameState.SkillBuffer].Num].CastTime * 1000))
                             {
                                 GameState.SkillBuffer = -1;
                                 GameState.SkillBufferTimer = 0;
                             }
                         }
                     }
+
+                    SetProgress(4400, _tick); // post-map-animations: before movement/input timer gate
                     
                     // Process input before rendering, otherwise input will be behind by 1 frame
-                    if (_walkTimer < _tick)
+                    if (TimePassed(_tick, _walkTimer))
                     {
+                        SetProgress(50, _tick);
                         SetStage("Movement", _tick);
                         if (GameState.CanMoveNow)
                         {
@@ -318,7 +512,7 @@ namespace Client
                             
                         }
 
-                        var count = GameState.CurrentEvents;
+                        var count = Data.MapEvents == null ? 0 : Math.Min(GameState.CurrentEvents, Data.MapEvents.Length);
                         for (_i = 0; _i < count; _i++)
                         {
                             Event.OnMove(_i);
@@ -328,8 +522,9 @@ namespace Client
                     }
 
                     // chat timer
-                    if (_chatTmr < _tick)
+                    if (TimePassed(_tick, _chatTmr))
                     {
+                        SetProgress(60, _tick);
                         SetStage("Chat", _tick);
                         // scrolling
                         if (GameState.ChatButtonUp)
@@ -346,8 +541,9 @@ namespace Client
                     }
 
                     // fog scrolling
-                    if (_fogTmr < _tick)
+                    if (TimePassed(_tick, _fogTmr))
                     {
+                        SetProgress(70, _tick);
                         SetStage("Fog", _tick);
                         if (GameState.CurrentFogSpeed > 0)
                         {
@@ -366,8 +562,9 @@ namespace Client
                         }
                     }
 
-                    if (_tmr500 < _tick)
+                    if (TimePassed(_tick, _tmr500))
                     {
+                        SetProgress(80, _tick);
                         SetStage("Anim500ms", _tick);
                         // animate waterfalls
                         switch (GameState.WaterfallFrame)
@@ -423,8 +620,9 @@ namespace Client
                     }
 
                     // elastic bars
-                    if (_barTmr < _tick)
+                    if (TimePassed(_tick, _barTmr))
                     {
+                        SetProgress(90, _tick);
                         SetStage("Bars", _tick);
                         GameLogic.SetBarWidth(ref GameState.BarWidthGuiHPMax, ref GameState.BarWidthGuiHP);
                         GameLogic.SetBarWidth(ref GameState.BarWidthGuiMPMax, ref GameState.BarWidthGuiMP);
@@ -451,8 +649,9 @@ namespace Client
                     }
 
                     // Change map animation
-                    if (_tmr250 < _tick)
+                    if (TimePassed(_tick, _tmr250))
                     {
+                        SetProgress(100, _tick);
                         SetStage("Steps250ms", _tick);
                         for (int i = 0; i < Player.Instance.Count; i++)
                         {
@@ -470,12 +669,13 @@ namespace Client
                             }
                         }
 
-                        var count = GameState.CurrentEvents;
-                        for (_i = 0; _i < count; _i++)
+                        var mapEvents = Core.Globals.Data.MapEvents;
+                        if (mapEvents != null)
                         {
-                            if (Core.Globals.Data.MapEvents != null && _i < Core.Globals.Data.MapEvents.Length)
+                            var count = Math.Min(GameState.CurrentEvents, mapEvents.Length);
+                            for (_i = 0; _i < count; _i++)
                             {
-                                unchecked { Core.Globals.Data.MapEvents[_i].Steps++; }
+                                unchecked { mapEvents[_i].Steps++; }
                             }
                         }
 
@@ -495,7 +695,8 @@ namespace Client
                 }
                 else
                 {
-                    if (_tmr500 < _tick)
+                    SetProgress(3, _tick); // menu branch
+                    if (TimePassed(_tick, _tmr500))
                     {
                         // animate textbox
                         if (GameState.ChatShowLine == "|")
@@ -510,22 +711,24 @@ namespace Client
                         _tmr500 = _tick + 500;
                     }
 
-                    if (_tmr25 < _tick)
+                    if (TimePassed(_tick, _tmr25))
                     {
                         Audio.PlayMusic(SettingsManager.Instance.MenuMusic);
                         _tmr25 = _tick + 25;
                     }
                 }
 
-                if (_tmrWeather < _tick)
+                if (TimePassed(_tick, _tmrWeather))
                 {
+                    SetProgress(110, _tick);
                     SetStage("Weather", _tick);
                     Weather.OnUpdate();
                     _tmrWeather = _tick + 50;
                 }
 
-                if (_fadeTmr < _tick)
+                if (TimePassed(_tick, _fadeTmr))
                 {
+                    SetProgress(120, _tick);
                     SetStage("Fade", _tick);
                     if (GameState.FadeType != 2)
                     {
@@ -554,14 +757,17 @@ namespace Client
                     }
                     _fadeTmr = _tick + 30;
                 }
-
-                SetStage("ResizeGui", _tick);
-                //WindowManager.ResizeGui();
             }
             catch (Exception ex)
             {
                 Log.Add(ex.Message, "errors.log");
                 Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                var end = General.GetTickCount();
+                var frameMs = ElapsedTimeInt(end, frameStart);
+                MaybeLogSlowFrame(frameMs, end);
             }
         }
 

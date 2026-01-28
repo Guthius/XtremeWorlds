@@ -451,9 +451,12 @@ namespace Client
 
         protected override void Draw(GameTime gameTime)
         {
+            Loop.WatchdogPulse("Draw", 900);
+
             // If graphics or sprite batch aren’t ready yet, skip this frame safely
             if (Graphics == null || Graphics.GraphicsDevice == null || SpriteBatch == null)
             {
+                Loop.WatchdogPulse("Base.Draw", 901);
                 base.Draw(gameTime);
                 return;
             }
@@ -499,12 +502,14 @@ namespace Client
             // Only recreate if needed
             if (RenderTarget == null || RenderTarget.Width != nativeWidth || RenderTarget.Height != nativeHeight)
             {
+                Loop.WatchdogPulse("Draw", 910);
                 if (RenderTarget != null)
                     RenderTarget.Dispose();
                 RenderTarget = new RenderTarget2D(GraphicsDevice, nativeWidth, nativeHeight, false, GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
             }
 
             // --- Render game/menu to RenderTarget (zoomed) ---
+            Loop.WatchdogPulse("Draw", 920);
             GraphicsDevice.SetRenderTarget(RenderTarget);
             GraphicsDevice.Clear(Color.Black);
 
@@ -515,6 +520,7 @@ namespace Client
             else
             {
                 // Draw the actual game onto the RenderTarget
+                Loop.WatchdogPulse("Draw", 930);
                 SpriteBatch?.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null);
                 Render_Game();
                 SpriteBatch?.End();
@@ -527,6 +533,7 @@ namespace Client
             // Only render UI when we're not loading/getting map; during map load we intentionally draw nothing.
             if (!GameState.GettingMap && !GameState.IsLoading)
             {
+                Loop.WatchdogPulse("Draw", 940);
                 if (_guiRenderTarget == null || _guiRenderTarget.Width != nativeWidth || _guiRenderTarget.Height != nativeHeight)
                 {
                     _guiRenderTarget?.Dispose();
@@ -546,6 +553,8 @@ namespace Client
                     SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null);
                     if (GameState.InMenu)
                         WindowManager.DrawMenuBackground();
+
+                    Loop.WatchdogPulse("Draw", 950);
                     WindowManager.Render();
                     TextRenderer.DrawMapName();
 
@@ -585,6 +594,7 @@ namespace Client
             float zoomNow = GameState.CameraZoom <= 0 ? 1.0f : GameState.CameraZoom;
             var zoomedRect = ComputeZoomedDestRect(viewportRect, nativeWidth, nativeHeight, zoomNow);
 
+            Loop.WatchdogPulse("Draw", 960);
             using (var targetBatch = new SpriteBatch(GraphicsDevice))
             {
                 targetBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
@@ -600,6 +610,7 @@ namespace Client
                 targetBatch.End();
             }
 
+            Loop.WatchdogPulse("Base.Draw", 980);
             base.Draw(gameTime);
         }
 
@@ -684,10 +695,13 @@ namespace Client
 
         protected override void Update(GameTime gameTime)
         {
+            Loop.WatchdogPulse("GameClient.Update", 800);
+
             // During background loading, keep updates minimal and skip input/UI logic
             if (GameState.IsLoading)
             {
                 ResetInputStates();
+                Loop.WatchdogPulse("Base.Update", 850);
                 base.Update(gameTime);
                 return;
             }
@@ -696,6 +710,7 @@ namespace Client
             if ((!IsActive || Window.ClientBounds.Width == 0) | Window.ClientBounds.Height == 0)
             {
                 ResetInputStates();
+                Loop.WatchdogPulse("Base.Update", 851);
                 base.Update(gameTime);
                 return;
             }
@@ -772,6 +787,8 @@ namespace Client
 
             Loop.OnUpdate();
 
+            // If we hang inside framework update, the watchdog should show it.
+            Loop.WatchdogPulse("Base.Update", 852);
             base.Update(gameTime);
         }
 

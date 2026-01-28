@@ -3,6 +3,7 @@ using Client.Game.UI;
 using Core.Configurations;
 using Core.Globals;
 using Core.Interfaces;
+using CSScripting;
 using Microsoft.Xna.Framework;
 using static Core.Globals.Commands;
 
@@ -29,7 +30,7 @@ public class ChatBubble : IData
         long x2;
         long y2;
         int color;
-        long tmpNum;
+        long tmp;
 
         ref var instance = ref Data.ChatBubble[(int) index];
 
@@ -54,10 +55,10 @@ public class ChatBubble : IData
 
                 // Adjust upward so bubble sits above nameplate.
                 // Recreate nameplate top Y (TextRenderer logic simplified):
-                int spriteNumLocal = GetSprite((int)instance.Target);
-                if (spriteNumLocal > 0 && spriteNumLocal <= GameState.NumCharacters)
+                int local = GetSprite((int)instance.Target);
+                if (local > 0 && local <= GameState.NumCharacters)
                 {
-                    var gi = GameClient.GetGfxInfo(System.IO.Path.Combine(Core.Globals.DataPath.Characters, spriteNumLocal.ToString()));
+                    var gi = GameClient.GetGfxInfo(System.IO.Path.Combine(Core.Globals.DataPath.Characters, local.ToString()));
                     if (gi != null && gi.Height > 0)
                     {
                         int configuredDirs = SettingsManager.Instance.SpriteDirections <= 0 ? 4 : SettingsManager.Instance.SpriteDirections;
@@ -118,9 +119,9 @@ public class ChatBubble : IData
         TextRenderer.WordWrap(instance.Msg, uiFont, GameState.ChatBubbleWidth, ref theArray);
 
         // find max width
-        tmpNum = Information.UBound(theArray);
+        tmp = Information.UBound(theArray);
 
-        var count = tmpNum;
+        var count = tmp;
         for (i = 0L; i <= count; i++)
         {
             if (TextRenderer.GetTextWidth(theArray[(int)i], uiFont) > maxWidth)
@@ -129,7 +130,7 @@ public class ChatBubble : IData
 
         // calculate the new position 
         x2 = x - maxWidth / 2L;
-        y2 = y - (Information.UBound(theArray) + 1) * 12;
+        y2 = y - (tmp + 1) * 12;
 
         // render bubble - top left
         string argPath = System.IO.Path.Combine(Core.Globals.DataPath.Gui, 33.ToString());
@@ -181,9 +182,9 @@ public class ChatBubble : IData
         GameClient.RenderTexture(ref argPath10, (int) (x - 5L), (int) y, 58, 19, 11, 11, 11, 11);
 
         // render each line centralized
-        tmpNum = Information.UBound(theArray);
+        tmp = Information.UBound(theArray);
 
-        var count2 = tmpNum;
+        var count2 = tmp;
         for (i = 0; i <= count2; i++)
         {
             if (theArray[(int) i] == null)
@@ -197,10 +198,10 @@ public class ChatBubble : IData
 
             // Calculate horizontal and vertical centers with padding
             double padding = (double) actualWidth / 6.0d;
+            x2 += (long)((actualWidth - textSize.X) / 2 + padding - 6);
 
             TextRenderer.Render(theArray[(int) i],
-                (int) Math.Round(x - theArray[(int) i].Length / 2d - TextRenderer.GetTextWidth(theArray[(int) i]) / 2d +
-                                    padding), (int) y2, GameClient.QbColorToXnaColor(instance.Color),
+                (int) x2, (int) y2, GameClient.QbColorToXnaColor(instance.Color),
                 Color.Black);
             y2 = y2 + 12L;
         }

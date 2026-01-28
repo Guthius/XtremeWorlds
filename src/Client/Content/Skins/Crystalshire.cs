@@ -2409,7 +2409,7 @@ public class Crystalshire
     public void UpdateWindow_Respawn()
     {
         var window = WindowLoader.FromLayout("winRespawn");
-        window.GetChild("btnRespawn").CallBack[(int)ControlState.MouseDown] = WinRespawn.OnRespawnClick;
+        window.GetChild("btnRespawn").CallBack[(int)ControlState.MouseDown] = WinRespawn.OnClick;
     }
 
     public void UpdateWindow_Options()

@@ -208,7 +208,7 @@ namespace Client
                 return canMove;
             }
 
-            var remaining = (Player.Instance[GameState.MyIndex].DeathTimer - General.GetTickCount()) / 1000;
+            var remaining = (Player.Instance[GameState.MyIndex].DeathTimer) / 1000;
             if (remaining < 0) remaining = 0;
 
             if (remaining > 0)
@@ -811,8 +811,6 @@ namespace Client
             return OnCheckDir;
         }
 
-        /// <summary>
-
         public static void OnMove(int index)
         {
             if (!IsPlaying(index)) return;
@@ -1176,7 +1174,7 @@ namespace Client
                 color = Color.Red;
             }
 
-            var remaining = (Player.Instance[index].DeathTimer - General.GetTickCount()) / 1000;
+            var remaining = Player.Instance[index].DeathTimer / 1000;
             if (remaining < 0) remaining = 0;
             var name = remaining > 0 ? $"{remaining}..." : Player.Instance[index].Name;
 

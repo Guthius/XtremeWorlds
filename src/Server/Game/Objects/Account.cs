@@ -93,7 +93,7 @@ namespace Server
 
         public static async Task OnSave(int index)
         {
-            var json = JsonConvert.SerializeObject(Account.Instance[index]).ToString();
+             var json = JsonConvert.SerializeObject(Account.Instance[index]).ToString();
             var login = GetAccountLogin(index);
             var id = GetStringHash(login);
 
