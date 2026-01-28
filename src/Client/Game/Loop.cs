@@ -460,9 +460,15 @@ namespace Client
                     {
                         SetProgress(50, _tick);
                         SetStage("Movement", _tick);
+
+                        // If we hang inside movement, advance progress markers so watchdog can pinpoint exactly where.
+                        // 50 = entered movement, 51+ = sub-steps, 1000+/2000+/3000+ = per-entity indices.
+                        SetProgress(51, _tick);
                         if (GameState.CanMoveNow)
                         {
+                            SetProgress(52, _tick);
                             Player.OnMove(); // Check if player is trying to move
+                            SetProgress(53, _tick);
                             Player.OnAttack(); // Keyboard attack
                             // Mouse attack support:
                             // 1. On fresh press, face cursor & attempt attack.
@@ -471,11 +477,13 @@ namespace Client
                             var leftPressedPrev = GameClient.PreviousMouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed;
                             if (leftPressedNow && !leftPressedPrev && !WindowManager.IsWindowActive)
                             {
+                                SetProgress(54, _tick);
                                 Player.UpdateFacingFromMouse(GameClient.CurrentMouseState.X, GameClient.CurrentMouseState.Y);
                                 Player.OnAttack(mouse: true);
                             }
                             else if (leftPressedNow && !WindowManager.IsWindowActive)
                             {
+                                SetProgress(55, _tick);
                                 // While holding: only update facing if cursor moved at least 2px to reduce network spam
                                 // (Simple heuristic: compare to last stored facing update position.)
                                 // We'll store last position in GameState (add if not present) or use static fields in Loop.
@@ -497,8 +505,11 @@ namespace Client
                         }
 
                         // Process player movements
-                        for (_i = 0; _i < Player.Instance.Count; _i++)
+                        SetProgress(56, _tick);
+                        var playerCount = Math.Min(Player.Instance.Count, Core.Globals.Variables.MaxPlayers);
+                        for (_i = 0; _i < playerCount; _i++)
                         {
+                            SetProgress(1000 + _i, _tick);
                             if (IsPlaying(_i))
                             {
                                 Player.OnMove(_i);                            
@@ -506,18 +517,27 @@ namespace Client
                         }
 
                         // Process npc movements
+                        SetProgress(57, _tick);
                         for (_i = 0; _i < Core.Globals.Variables.MaxMapNpcs; _i++)
                         {
+                            SetProgress(2000 + _i, _tick);
                             Npc.OnMove(_i);
                             
                         }
 
+                        SetProgress(58, _tick);
                         var count = Data.MapEvents == null ? 0 : Math.Min(GameState.CurrentEvents, Data.MapEvents.Length);
+                        if (mapId >= 0 && mapId < Client.Map.Instance.Count)
+                        {
+                            count = Math.Min(count, Client.Map.Instance[mapId].EventCount);
+                        }
                         for (_i = 0; _i < count; _i++)
                         {
+                            SetProgress(3000 + _i, _tick);
                             Event.OnMove(_i);
                         }
 
+                        SetProgress(59, _tick);
                         _walkTimer = _tick + 5;
                     }
 
