@@ -8,9 +8,9 @@ namespace Server
 {
     public class MapProjectile : IData
     {
-        public static void OnClear(int map, int mapProjectileNum)
+        public static void OnClear(int map, int mapProjectile)
         {
-            ref var mp = ref Data.MapProjectile[map, mapProjectileNum];
+            ref var mp = ref Data.MapProjectile[map, mapProjectile];
             mp.Index = -1;
             mp.Owner = -1;
             mp.OwnerType = 0;
@@ -49,9 +49,9 @@ namespace Server
         {
             for (int map = 0; map < Core.Globals.Variables.MaxMaps; map++)
             {
-                for (int mapProjectileNum = 0; mapProjectileNum < Data.MapProjectile.GetLength(1); mapProjectileNum++)
+                for (int mapProjectile = 0; mapProjectile < Data.MapProjectile.GetLength(1); mapProjectile++)
                 {
-                    OnClear(map, mapProjectileNum);
+                    OnClear(map, mapProjectile);
                 }
             }
         }

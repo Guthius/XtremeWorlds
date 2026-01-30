@@ -60,7 +60,7 @@
 		<ScrollBar Name="sldAoE" Position="140,300" Size="200,12" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 
 		<Label Name="lblProjectile" Text="Projectile" Position="12,324" Size="120,18"/>
-		<ComboBox Name="cmbProjectile" Position="150,322" Size="200,20"/>
+		<ComboBox Name="cmbProjectile" Position="140, 322" Size="200, 20"/>
 		<CheckBox Name="chkProjectile" Text="" Position="350,324" Size="160,18" Design="CheckboxNormal"/>
 
 		<Label Name="lblSound" Text="Sound" Position="370,108" Size="120,18"/>
