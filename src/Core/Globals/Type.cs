@@ -21,12 +21,14 @@ public static class Type
     {
         public int Num;
         public int Value;
+        public int Durability;
         public byte Bound;
     }
 
      public struct Paperdoll
     {
         public int Num;
+        public int Durability;
         public byte Bound;
     }
 
@@ -34,8 +36,8 @@ public static class Type
     {
         public int Num;
         public int Cd;
+        public int Uses;
     }
-
 
     public struct Layer
     {
@@ -177,6 +179,7 @@ public static class Type
     {
         public int Num;
         public int Value;
+        public int Durability;
         public int X;
         public int Y;
         public string PlayerName;

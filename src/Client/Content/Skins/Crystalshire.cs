@@ -2062,6 +2062,24 @@ public class Crystalshire
             }
         }, 0, 100000000);
 
+        BindIntText("txtMaxDamage", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Item.Instance[WinItemEditor.SelectedIndex].Data1 = v;
+                Item.IsChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        }, 0, 100000000);
+
+        BindIntText("txtMaxDurability", v =>
+        {
+            if (WinItemEditor.SelectedIndex >= 0)
+            {
+                Item.Instance[WinItemEditor.SelectedIndex].MaxDurability = v;
+                Item.IsChanged[WinItemEditor.SelectedIndex] = true;
+            }
+        }, 0, 100000000);
+
         BindIntText("txtAttackSpeed", v =>
         {
             if (WinItemEditor.SelectedIndex >= 0)
@@ -4031,6 +4049,28 @@ public class Crystalshire
             if (i >= 0 && i < Core.Globals.Variables.MaxSkills && Skill.Instance.Count > i)
             {
                 Skill.Instance[i].ChainOnHitSkillId = v <= 0 ? -1 : v - 1;
+                Skill.IsChanged[i] = true;
+            }
+        });
+
+        // Next rank (upgrade) -> Skill.NextRank (0=None => -1)
+        BindCombo("cmbNextRank", v =>
+        {
+            int i = WinSkillEditor.SelectedIndex;
+            if (i >= 0 && i < Core.Globals.Variables.MaxSkills && Skill.Instance.Count > i)
+            {
+                Skill.Instance[i].NextRank = v <= 0 ? -1 : v - 1;
+                Skill.IsChanged[i] = true;
+            }
+        });
+
+        // Learn casts -> Skill.NextUses
+        BindRangedIntText("txtNextUses", 0, 1000000, v =>
+        {
+            int i = WinSkillEditor.SelectedIndex;
+            if (i >= 0 && i < Core.Globals.Variables.MaxSkills && Skill.Instance.Count > i)
+            {
+                Skill.Instance[i].NextUses = v;
                 Skill.IsChanged[i] = true;
             }
         });

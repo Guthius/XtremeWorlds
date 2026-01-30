@@ -60,8 +60,8 @@
 		<ScrollBar Name="sldAoE" Position="140,300" Size="200,12" Min="0" Max="255" Value="0" Orientation="Horizontal" ThumbSize="16"/>
 
 		<Label Name="lblProjectile" Text="Projectile" Position="12,324" Size="120,18"/>
-		<ComboBox Name="cmbProjectile" Position="140,322" Size="220,20"/>
-		<CheckBox Name="chkProjectile" Text="Projectile" Position="370,324" Size="160,18" Design="CheckboxNormal"/>
+		<ComboBox Name="cmbProjectile" Position="150,322" Size="200,20"/>
+		<CheckBox Name="chkProjectile" Text="" Position="350,324" Size="160,18" Design="CheckboxNormal"/>
 
 		<Label Name="lblSound" Text="Sound" Position="370,108" Size="120,18"/>
 		<ComboBox Name="cmbSound" Position="480,108" Size="160,20"/>
@@ -77,6 +77,11 @@
 		<TextBox Name="txtMoveSpeed" Position="480,210" Size="160,22" Design="TextWhite"/>
 
 		<CheckBox Name="chkMoveCast" Text="Move Cast" Position="370,276" Size="220,18" Design="CheckboxNormal"/>
+
+		<Label Name="lblNextRank" Text="Next Skill" Position="370,300" Size="120,18"/>
+		<ComboBox Name="cmbNextRank" Position="480,298" Size="160,20"/>
+		<Label Name="lblNextUses" Text="Casts" Position="370,324" Size="120,18"/>
+		<TextBox Name="txtNextUses" Position="480,322" Size="160,22" Design="TextWhite"/>
 
 		<Label Name="lblIcon" Text="Icon" Position="370,242" Size="90,18"/>
 		<PictureBox Name="picIcon" Position="480,238" Size="32,32" Design="TextBlack"/>

@@ -94,6 +94,19 @@ public class WinSkillEditor
             }
         }
 
+        // Next rank (upgrade) skill (0=None, otherwise 1..MaxSkills)
+        if (WindowManager.TryGetControl("winSkillEditor", "cmbNextRank", out var nextCtrl) && nextCtrl is ComboBox cmbNext)
+        {
+            cmbNext.Items.Clear();
+            cmbNext.Items.Add("None");
+            for (int i = 0; i < Core.Globals.Variables.MaxSkills; i++)
+            {
+                var raw = Skill.Instance[i].Name ?? string.Empty;
+                var name = string.IsNullOrWhiteSpace(raw) ? "None" : raw.Trim();
+                cmbNext.Items.Add($"{i + 1}: {name}");
+            }
+        }
+
         // Projectile list (0=None)
         if (WindowManager.TryGetControl("winSkillEditor", "cmbProjectile", out var projCtrl) && projCtrl is ComboBox cmbProj)
         {
@@ -285,6 +298,18 @@ public class WinSkillEditor
 
         if (WindowManager.TryGetControl("winSkillEditor", "chkMoveCast", out var mwcCtrl) && mwcCtrl is CheckBox chkMoveCast)
             chkMoveCast.Value = s.MoveCast ? 1 : 0;
+
+        // Next rank (upgrade) + learn casts
+        if (WindowManager.TryGetControl("winSkillEditor", "cmbNextRank", out var nextCtrl) && nextCtrl is ComboBox cmbNext)
+        {
+            int val = s.NextRank < 0 ? 0 : s.NextRank + 1;
+            cmbNext.Value = Math.Clamp(val, 0, cmbNext.Items.Count - 1);
+        }
+
+        if (WindowManager.TryGetControl("winSkillEditor", "txtNextUses", out var usesCtrl) && usesCtrl is TextBox tbUses)
+        {
+            tbUses.Text = s.NextUses.ToString();
+        }
 
         // Preview draws
         if (WindowManager.TryGetControl("winSkillEditor", "picIcon", out var iconPicCtrl) && iconPicCtrl is PictureBox picIcon)

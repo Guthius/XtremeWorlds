@@ -1924,17 +1924,17 @@ namespace Server
                                         }
 
                                         case (byte) EventCommand.RestoreHealth:
-                                            SetVital(i, Core.Globals.Vital.Health, Script.Instance?.GetPlayerMaxVital(i, Core.Globals.Vital.Health));
+                                            SetVital(i, Core.Globals.Vital.Health, Script.Instance?.GetMaxHP(i, Core.Globals.Vital.Health));
                                             Network.Vital(i, Core.Globals.Vital.Health);
                                             break;
 
                                         case (byte) EventCommand.RestoreMana:
-                                            SetVital(i, Core.Globals.Vital.Mana, Script.Instance?.GetPlayerMaxVital(i, Core.Globals.Vital.Mana));
+                                            SetVital(i, Core.Globals.Vital.Mana, Script.Instance?.GetMaxMP(i, Core.Globals.Vital.Mana));
                                             Network.Vital(i, Core.Globals.Vital.Mana);
                                             break;
 
                                         case (byte) EventCommand.RestoreStamina:
-                                            SetVital(i, Core.Globals.Vital.Stamina, Script.Instance?.GetPlayerMaxVital(i, Core.Globals.Vital.Stamina));
+                                            SetVital(i, Core.Globals.Vital.Stamina, Script.Instance?.GetMaxSP(i, Core.Globals.Vital.Stamina));
                                             Network.Vital(i, Core.Globals.Vital.Stamina);
                                             break;
 

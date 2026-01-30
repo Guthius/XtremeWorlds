@@ -97,6 +97,11 @@ namespace Server
 
         public static void OnSpawn(int id, int val, int map, int x, int y)
         {
+            OnSpawn(id, val, map, x, y, Item.Instance[id].MaxDurability);
+        }
+
+        public static void OnSpawn(int id, int val, int map, int x, int y, int durability)
+        {
             if (id < 0 || id >= Core.Globals.Variables.MaxItems || map < 0 || map >= Core.Globals.Variables.MaxMaps)
             {
                 return;
@@ -125,12 +130,13 @@ namespace Server
                         return;
                     }
 
-                    SpawnSlot(slot, id, 1, map, x, y);
+                    // When spawning multiple singles, copy the same durability to each.
+                    SpawnSlot(slot, id, 1, map, x, y, durability);
                 }
             }
             else
             {
-                SpawnSlot(slot, id, val, map, x, y);
+                SpawnSlot(slot, id, val, map, x, y, durability);
             }
 
             try
@@ -150,22 +156,51 @@ namespace Server
                 return;
             }
 
+            SpawnSlot(mapItemSlot, id, val, map, x, y, durability: -1);
+        }
+
+        public static void SpawnSlot(int mapItem, int id, int val, int map, int x, int y, int durability)
+        {
+            if (mapItem < 0 || mapItem > Core.Globals.Variables.MaxMapItems || id < 0 || id > Core.Globals.Variables.MaxItems || map < 0 || map >= Core.Globals.Variables.MaxMaps)
+            {
+                return;
+            }
+
             x *= 32;
             y *= 32;
 
-            Instance[map, mapItemSlot].Num = id;
-            Instance[map, mapItemSlot].Value = val;
-            Instance[map, mapItemSlot].X = x;
-            Instance[map, mapItemSlot].Y = y;
+            Instance[map, mapItem].Num = id;
+            Instance[map, mapItem].Value = val;
+            Instance[map, mapItem].X = x;
+            Instance[map, mapItem].Y = y;
+
+            // Default to template max durability when not explicitly provided.
+            // Currency/stackable items never carry durability on the ground.
+            var item = id >= 0 && id < Item.Instance.Count ? Item.Instance[id] : null;
+            var maxDurability = item is null ? 0 : Math.Max(0, item.MaxDurability);
+
+            if (item is not null && item.Type != (byte)ItemCategory.Currency && item.Stackable != 1)
+            {
+                durability = durability < 0
+                    ? (maxDurability > 0 ? maxDurability : 0)
+                    : durability;
+
+                durability = maxDurability > 0
+                    ? Math.Clamp(durability, 0, maxDurability)
+                    : Math.Max(0, durability);
+            }
+
+            Instance[map, mapItem].Durability = durability;
 
             var packet = new PacketWriter();
 
             packet.WriteEnum(ServerPackets.SSpawnItem);
-            packet.WriteInt32(mapItemSlot);
+            packet.WriteInt32(mapItem);
             packet.WriteInt32(id);
             packet.WriteInt32(val);
             packet.WriteInt32(x);
             packet.WriteInt32(y);
+            packet.WriteInt32(durability);
 
             NetworkConfig.SendDataToMap(map, packet.GetBytes());
         }
@@ -177,11 +212,11 @@ namespace Server
                 return -1;
             }
 
-            for (var mapItem = 0; mapItem < Core.Globals.Variables.MaxMapItems; mapItem++)
+            for (var item = 0; item < Core.Globals.Variables.MaxMapItems; item++)
             {
-                if (Instance[map, mapItem].Num == -1)
+                if (Instance[map, item].Num == -1)
                 {
-                    return mapItem;
+                    return item;
                 }
             }
 
@@ -192,6 +227,13 @@ namespace Server
         {
             Instance[map, index].PlayerName = "";
             Instance[map, index].Num = -1;
+            Instance[map, index].Value = 0;
+            Instance[map, index].Durability = 0;
+            Instance[map, index].X = 0;
+            Instance[map, index].Y = 0;
+            Instance[map, index].PlayerTimer = 0;
+            Instance[map, index].CanDespawn = false;
+            Instance[map, index].DespawnTimer = 0;
         }
 
         public static void OnDraw(int index)

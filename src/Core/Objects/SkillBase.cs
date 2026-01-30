@@ -14,6 +14,9 @@ public class SkillBase
         Projectile = -1;
         ChainOnHitSkillId = -1;
 
+        NextRank = -1;
+        NextUses = 0;
+
         MoveSpeed = 1.0f;
 
         MoveCast = false;
@@ -51,6 +54,12 @@ public class SkillBase
     public byte CommonEventType { get; set; }
     public int CommonEventData1 { get; set; }
     public int CommonEventData2 { get; set; }
+
+    // Skill progression:
+    // NextRank is the skill id that this skill upgrades into after NextUses casts.
+    // NextUses is the number of casts required to upgrade.
+    public int NextRank { get; set; }
+    public int NextUses { get; set; }
 
     // Multiplies movement speed while this skill effect is active (typically via Duration).
     // 1.0 = no change, <1 slows, >1 speeds up.

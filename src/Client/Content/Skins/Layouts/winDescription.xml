@@ -8,5 +8,7 @@
     <Label Name="lblJob" Text="Job: None" Position="80, 104" Size="116, 10" Font="georgiaBold_16" Align="Center"/>
     <Label Name="lblLevel" Text="Level 1" Position="80, 118" Size="116, 10" Font="georgiaBold_16" Align="Center"/>
 
-    <PictureBox Name="picBar" Position="19, 112" Size="66, 8" Image="45"/>
+    <PictureBox Name="picDurability" Position="19, 112" Size="66, 12" Image="45"/>
+
+    <PictureBox Name="picBar" Position="19, 112" Size="66, 12" Image="45"/>
 </Window>

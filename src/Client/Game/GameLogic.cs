@@ -1145,7 +1145,15 @@ namespace Client
                     case DialogueType.DropItem:
                         {
                             value = (long)Math.Round(Conversion.Val(diaInput));
-                            Sender.DropItem((int)GameState.DiaData1, (int)value);
+
+                            var amount = (int)value;
+                            if (amount < 1)
+                            {
+                                TextRenderer.AddText("Drop amount must be at least 1.", (int)ColorName.BrightRed, channel: (byte)ChatChannel.Game);
+                                break;
+                            }
+
+                            Sender.DropItem((int)GameState.DiaData1, amount);
                             break;
                         }
 
@@ -1456,7 +1464,7 @@ namespace Client
             ShowItemDesc(x, y, itemId, invSlot);
         }
 
-        public static void ShowItemDesc(int x, int y, int item, int inv = -1, int eq = -1)
+        public static void ShowItemDesc(int x, int y, int item, int inv = -1, int eq = -1, int durability = -1)
         {
             var color = default(Microsoft.Xna.Framework.Color);
             string theName = string.Empty;
@@ -1491,8 +1499,36 @@ namespace Client
             }
             var invArr = player.Inventory;
             var eqArr = player.Paperdoll;
-            var invValid = inv >= 0 && invArr != null && inv < invArr.Length;
-            var eqValid = eq >= 0 && eqArr != null && eq < eqArr.Length;
+            var invValid = invArr is not null && inv >= 0 && inv < invArr.Length;
+            var eqValid = eqArr is not null && eq >= 0 && eq < eqArr.Length;
+
+            if (durability < 0)
+            {
+                if (invArr is not null && inv >= 0 && inv < invArr.Length)
+                {
+                    durability = invArr[inv].Durability;
+                }
+                else if (eqArr is not null && eq >= 0 && eq < eqArr.Length)
+                {
+                    durability = eqArr[eq].Durability;
+                }
+                else
+                {
+                    // Best-effort: if the caller didn't provide an instance slot (e.g. hotbar),
+                    // try to locate the first matching inventory instance.
+                    if (invArr != null)
+                    {
+                        for (var i = 0; i < invArr.Length; i++)
+                        {
+                            if (invArr[i].Num == item)
+                            {
+                                durability = invArr[i].Durability;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
 
             // set globals
             GameState.DescType = (byte)DraggablePartType.Item; // inventory
@@ -1523,67 +1559,92 @@ namespace Client
             if (WindowManager.TryGetControl("winDescription", "lblJob", out var lblJob) && lblJob != null) lblJob.Visible = true;
             if (WindowManager.TryGetControl("winDescription", "lblLevel", out var lblLevel) && lblLevel != null) lblLevel.Visible = true;
             if (WindowManager.TryGetControl("winDescription", "picBar", out var picBar) && picBar != null) picBar.Visible = false;
+            if (WindowManager.TryGetControl("winDescription", "picDurability", out var picDur) && picDur != null) picDur.Visible = false;
+
+            // Item tooltips should never show skill-only UI state.
+            // Reset any skill-only positioning/state so it doesn't bleed into items.
+            if (lblJob is Client.Game.UI.Controls.Label jobLbl)
+            {
+                jobLbl.X = 80;
+                jobLbl.Y = 104;
+                jobLbl.Width = 116;
+            }
+            if (lblLevel is Client.Game.UI.Controls.Label levelLbl)
+            {
+                levelLbl.X = 80;
+                levelLbl.Y = 118;
+                levelLbl.Width = 116;
+            }
+            if (picBar is Client.Game.UI.Controls.PictureBox skillBar)
+            {
+                skillBar.Visible = false;
+                skillBar.Value = 0;
+            }
+            if (picDur is Client.Game.UI.Controls.PictureBox durBarCtrl)
+            {
+                var maxDurability = itemEntry.MaxDurability;
+                if (maxDurability > 0)
+                {
+                    var curDur = Math.Clamp(durability, 0, maxDurability);
+                    durBarCtrl.Visible = true;
+                    durBarCtrl.Value = (int)Math.Clamp(Math.Round(66.0 * (curDur / (double)maxDurability)), 0, 66);
+                }
+                else
+                {
+                    durBarCtrl.Visible = false;
+                    durBarCtrl.Value = 0;
+                }
+            }
 
             // set variables
             {
                 var instance = WindowManager.GetWindowByName("winDescription");
+                if (instance is null)
+                    return;
+
                 if (invValid)
                 {
                     var invEntry = invArr![inv];
-                    if (invEntry.Bound > 0)
-                        theName = "(SB) " + itemEntry.Name;
-                    else
-                        theName = itemEntry.Name;
+                    theName = invEntry.Bound > 0 ? "(SB) " + itemEntry.Name : itemEntry.Name;
 
-
-                    if (WindowManager.TryGetControl("winDescription", "lblName", out var lblName)) lblName!.Text = theName;
+                    if (WindowManager.TryGetControl("winDescription", "lblName", out var lblName))
+                        lblName!.Text = theName;
                 }
 
                 if (eqValid)
                 {
                     var eqEntry = eqArr![eq];
-                    if (eqEntry.Bound > 0)
-                        theName = "(SB) " + itemEntry.Name;
-                    else
-                        theName = itemEntry.Name;
+                    theName = eqEntry.Bound > 0 ? "(SB) " + itemEntry.Name : itemEntry.Name;
 
-
-                    if (WindowManager.TryGetControl("winDescription", "lblName", out var lblName)) lblName!.Text = theName;
+                    if (WindowManager.TryGetControl("winDescription", "lblName", out var lblName))
+                        lblName!.Text = theName;
                 }
 
-                switch (itemEntry.Rarity)
+                switch ((Core.Globals.Rarity)itemEntry.Rarity)
                 {
-                    case 0: // white
-                        {
-                            color = Microsoft.Xna.Framework.Color.White;
-                            break;
-                        }
-                    case 1: // green
-                        {
-                            color = Microsoft.Xna.Framework.Color.Green;
-                            break;
-                        }
-                    case 2: // blue
-                        {
-                            color = Microsoft.Xna.Framework.Color.Blue;
-                            break;
-                        }
-                    case 3: // maroon
-                        {
-                            color = Microsoft.Xna.Framework.Color.Red;
-                            break;
-                        }
-                    case 4: // purple
-                        {
-                            color = Microsoft.Xna.Framework.Color.Magenta;
-                            break;
-                        }
-                    case 5: // cyan
-                        {
-                            color = Microsoft.Xna.Framework.Color.Cyan;
-                            break;
-                        }
+                    case Core.Globals.Rarity.Broken:
+                        color = Microsoft.Xna.Framework.Color.Gray;
+                        break;
+                    case Core.Globals.Rarity.Common:
+                        color = Microsoft.Xna.Framework.Color.White;
+                        break;
+                    case Core.Globals.Rarity.Uncommon:
+                        color = Microsoft.Xna.Framework.Color.Green;
+                        break;
+                    case Core.Globals.Rarity.Rare:
+                        color = Microsoft.Xna.Framework.Color.DodgerBlue;
+                        break;
+                    case Core.Globals.Rarity.Epic:
+                        color = Microsoft.Xna.Framework.Color.Magenta;
+                        break;
+                    case Core.Globals.Rarity.Legendary:
+                        color = Microsoft.Xna.Framework.Color.Cyan;
+                        break;
+                    default:
+                        color = Microsoft.Xna.Framework.Color.White;
+                        break;
                 }
+
                 if (WindowManager.TryGetControl("winDescription", "lblName", out var lblName0))
                     lblName0!.Color = color;
 
@@ -1712,7 +1773,11 @@ namespace Client
                         // Damage/defense
                         if (itemEntry.SubType == (byte)Equipment.Weapon)
                         {
-                            AddDescInfo("Damage: " + itemEntry.Data2, Microsoft.Xna.Framework.Color.White);
+                            var minDmg = itemEntry.Data2;
+                            var maxDmg = itemEntry.Data1;
+                            if (maxDmg <= 0 || maxDmg < minDmg)
+                                maxDmg = minDmg;
+                            AddDescInfo(maxDmg > minDmg ? $"Damage: {minDmg}-{maxDmg}" : $"Damage: {minDmg}", Microsoft.Xna.Framework.Color.White);
                             AddDescInfo("Speed: " + itemEntry.AttackSpeed / 1000d + "s", Microsoft.Xna.Framework.Color.White);
                         }
                         else if (itemEntry.Data2 > 0)
@@ -1830,6 +1895,7 @@ namespace Client
             // hide req. labels
             if (WindowManager.TryGetControl("winDescription", "lblLevel", out var lblLevel2)) lblLevel2!.Visible = false;
             if (WindowManager.TryGetControl("winDescription", "picBar", out var picBar2)) picBar2!.Visible = true;
+            if (WindowManager.TryGetControl("winDescription", "picDurability", out var picDur2)) picDur2!.Visible = false;
 
             // set variables
             {
@@ -1846,41 +1912,35 @@ namespace Client
                 // find ranks
                 if (skillSlot >= 0L)
                 {
-                    // draw the rank bar (fixed width for now)
-                    // If Type.Skill(skillNum).rank > 0 Then
-                    // tmpWidth = ((PlayerSkills(SkillSlot).Uses / barWidth) / (Type.Skill(skillNum).NextUses / barWidth)) * barWidth
-                    // Else
-                    tmpWidth = 66;
-                    // End If
+                    // draw casts progress bar
+                    var s = Skill.Instance[(int)skill];
+                    var nextUses = Math.Max(0, s.NextUses);
+                    var uses = GetSkillUses(GameState.MyIndex, (int)skillSlot);
+
+                    if (nextUses > 0)
+                    {
+                        tmpWidth = (int)Math.Clamp(Math.Round(66.0 * (Math.Clamp(uses, 0, nextUses) / (double)nextUses)), 0, 66);
+                    }
+                    else
+                    {
+                        tmpWidth = 66;
+                    }
+
                     instance.Controls[WindowManager.GetControl("winDescription", "picBar")].Value = tmpWidth;
-                    // does it rank up?
-                    // If Type.Skill(skillNum).NextRank > 0 Then
-                    // sUse = "Uses: " & PlayerSkills(SkillSlot).Uses & "/" & Type.Skill(skillNum).NextUses
-                    // If PlayerSkills(SkillSlot).Uses = Type.Skill(skillNum).NextUses Then
-                    // If Not GetPlayerLevel(GameState.MyIndex) >= Skill(Type.Skill(skillNum).NextRank).LevelReq Then
-                    // Color = BrightRed
-                    // sUse = "Lvl " & Skill(Type.Skill(skillNum).NextRank).LevelReq & " req."
-                    // End If
-                    // End If
-                    // Else
-                    sUse = "Max Rank";
-                    // End If
-                    // show controls
-                    instance.Controls[WindowManager.GetControl("winDescription", "lblJob")].Visible = true;
                     instance.Controls[WindowManager.GetControl("winDescription", "picBar")].Visible = true;
-                    // set vals
-                    instance.Controls[WindowManager.GetControl("winDescription", "lblJob")].Text = sUse;
-                    instance.Controls[WindowManager.GetControl("winDescription", "lblJob")].Color = Microsoft.Xna.Framework.Color.White;
+                    instance.Controls[WindowManager.GetControl("winDescription", "lblJob")].Visible = false;
+                    instance.Controls[WindowManager.GetControl("winDescription", "lblJob")].Text = string.Empty;
                 }
                 else
                 {
                     // hide some controls
                     instance.Controls[WindowManager.GetControl("winDescription", "lblJob")].Visible = false;
                     instance.Controls[WindowManager.GetControl("winDescription", "picBar")].Visible = false;
+                    instance.Controls[WindowManager.GetControl("winDescription", "lblJob")].Text = string.Empty;
                 }
             }
 
-            switch (Skill.Instance[(int)skill].Type)
+            switch (Skill.Instance[skill].Type)
             {
                 case (byte)SkillEffect.DamageHealth:
                     {

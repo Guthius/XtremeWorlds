@@ -623,8 +623,25 @@ public static class Database
             {
                 if (Job.Instance[job].StartItem[n] >= 0)
                 {
-                    Account.Instance[index].Player[slot].Inventory[n].Num = Job.Instance[job].StartItem[n];
+                    var startItemId = Job.Instance[job].StartItem[n];
+                    Account.Instance[index].Player[slot].Inventory[n].Num = startItemId;
                     Account.Instance[index].Player[slot].Inventory[n].Value = Job.Instance[job].StartValue[n];
+
+                    // Default starter items to full durability when applicable.
+                    if (startItemId >= 0 && startItemId < Server.Item.Instance.Count)
+                    {
+                        var itemTemplate = Server.Item.Instance[startItemId];
+                        var isStackable = itemTemplate.Type == (byte)ItemCategory.Currency || itemTemplate.Stackable == 1;
+                        if (isStackable)
+                        {
+                            Account.Instance[index].Player[slot].Inventory[n].Durability = 0;
+                        }
+                        else
+                        {
+                            var maxDurability = Math.Max(0, itemTemplate.MaxDurability);
+                            Account.Instance[index].Player[slot].Inventory[n].Durability = maxDurability > 0 ? maxDurability : 0;
+                        }
+                    }
                 }            
             }
 

@@ -284,6 +284,7 @@ public static class Network
         {
             packetWriter.WriteInt32(GetInv(playerId, i));
             packetWriter.WriteInt32(GetInvValue(playerId, i));
+            packetWriter.WriteInt32(Player.Instance[playerId].Inventory[i].Durability);
         }
 
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
@@ -308,7 +309,15 @@ public static class Network
         var equipmentCount = Enum.GetValues<Equipment>().Length;
         for (var i = 0; i < equipmentCount; i++)
         {
-            packetWriter.WriteInt32(GetPaperdoll(playerId, (Equipment)i));
+            var itemId = GetPaperdoll(playerId, (Equipment)i);
+            var durability = 0;
+            if (Player.Instance[playerId].Paperdoll is not null && i >= 0 && i < Player.Instance[playerId].Paperdoll.Length)
+            {
+                durability = Player.Instance[playerId].Paperdoll[i].Durability;
+            }
+
+            packetWriter.WriteInt32(itemId);
+            packetWriter.WriteInt32(durability);
         }
 
         NetworkConfig.SendDataToMap(GetMap(playerId), packetWriter.GetBytes());
@@ -324,7 +333,15 @@ public static class Network
         var equipmentCount = Enum.GetValues<Equipment>().Length;
         for (var i = 0; i < equipmentCount; i++)
         {
-            packetWriter.WriteInt32(GetPaperdoll(equipmentPlayerId, (Equipment)i));
+            var itemId = GetPaperdoll(equipmentPlayerId, (Equipment)i);
+            var durability = 0;
+            if (Player.Instance[equipmentPlayerId].Paperdoll is not null && i >= 0 && i < Player.Instance[equipmentPlayerId].Paperdoll.Length)
+            {
+                durability = Player.Instance[equipmentPlayerId].Paperdoll[i].Durability;
+            }
+
+            packetWriter.WriteInt32(itemId);
+            packetWriter.WriteInt32(durability);
         }
 
         PlayerService.Instance.SendDataTo(sendToPlayerId, packetWriter.GetBytes());
@@ -458,6 +475,10 @@ public static class Network
         packetWriter.WriteBoolean(skill.MoveCast);
 
         packetWriter.WriteInt32(skill.SpCost);
+
+        // Optional trailing fields (backward compatible)
+        packetWriter.WriteInt32(skill.NextRank);
+        packetWriter.WriteInt32(skill.NextUses);
     }
 
     public static void Stats(int playerId)
@@ -559,7 +580,15 @@ public static class Network
         var equipmentCount = Enum.GetValues<Equipment>().Length;
         for (var i = 0; i < equipmentCount; i++)
         {
-            packetWriter.WriteInt32(GetPaperdoll(playerId, (Equipment)i));
+            var itemId = GetPaperdoll(playerId, (Equipment)i);
+            var durability = 0;
+            if (Player.Instance[playerId].Paperdoll is not null && i >= 0 && i < Player.Instance[playerId].Paperdoll.Length)
+            {
+                durability = Player.Instance[playerId].Paperdoll[i].Durability;
+            }
+
+            packetWriter.WriteInt32(itemId);
+            packetWriter.WriteInt32(durability);
         }
 
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
@@ -783,6 +812,7 @@ public static class Network
             packetWriter.WriteInt32(MapItem.Instance[map, i].Value);
             packetWriter.WriteInt32(MapItem.Instance[map, i].X);
             packetWriter.WriteInt32(MapItem.Instance[map, i].Y);
+            packetWriter.WriteInt32(MapItem.Instance[map, i].Durability);
         }
 
         for (var i = 0; i < Core.Globals.Variables.MaxMapNpcs; i++)
@@ -1013,12 +1043,13 @@ public static class Network
 
     public static void InventoryUpdate(int playerId, int invSlot)
     {
-        var packetWriter = new PacketWriter(16);
+        var packetWriter = new PacketWriter(20);
 
         packetWriter.WriteEnum(ServerPackets.SInventoryUpdate);
         packetWriter.WriteInt32(invSlot);
         packetWriter.WriteInt32(GetInv(playerId, invSlot));
         packetWriter.WriteInt32(GetInvValue(playerId, invSlot));
+        packetWriter.WriteInt32(Player.Instance[playerId].Inventory[invSlot].Durability);
 
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
     }
@@ -1053,6 +1084,7 @@ public static class Network
             byte slot = (byte)Data.TempPlayer[playerId].Slot;
             packetWriter.WriteInt32(Account.Instance[playerId].Bank[slot].Item[i].Num);
             packetWriter.WriteInt32(Account.Instance[playerId].Bank[slot].Item[i].Value);
+            packetWriter.WriteInt32(Account.Instance[playerId].Bank[slot].Item[i].Durability);
         }
 
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
@@ -1102,8 +1134,10 @@ public static class Network
                     {
                         if (Data.TempPlayer[playerId].TradeOffer[i].Num >= 0)
                         {
-                            packetWriter.WriteInt32(Data.TempPlayer[playerId].TradeOffer[i].Num);
+                            var invSlot = Data.TempPlayer[playerId].TradeOffer[i].Num;
+                            packetWriter.WriteInt32(invSlot);
                             packetWriter.WriteInt32(Data.TempPlayer[playerId].TradeOffer[i].Value);
+                            packetWriter.WriteInt32(Player.Instance[playerId].Inventory[invSlot].Durability);
 
                             if (Item.Instance[Data.TempPlayer[playerId].TradeOffer[i].Num].Type == (int)ItemCategory.Currency || Item.Instance[Data.TempPlayer[playerId].TradeOffer[i].Num].Stackable == 1)
                             {
@@ -1118,6 +1152,7 @@ public static class Network
                         {
                             packetWriter.WriteInt32(-1);
                             packetWriter.WriteInt32(0);
+                            packetWriter.WriteInt32(0);
                         }
                     }
 
@@ -1131,8 +1166,10 @@ public static class Network
                     {
                         if (Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num >= 0)
                         {
-                            packetWriter.WriteInt32(GetInv((int)tradeTarget, Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num));
+                            var invSlot = Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num;
+                            packetWriter.WriteInt32(GetInv((int)tradeTarget, invSlot));
                             packetWriter.WriteInt32(Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Value);
+                            packetWriter.WriteInt32(Player.Instance[(int)tradeTarget].Inventory[invSlot].Durability);
 
                             if (GetInv((int)tradeTarget, Data.TempPlayer[(int)tradeTarget].TradeOffer[i].Num) < 0)
                             {
@@ -1151,6 +1188,7 @@ public static class Network
                         else
                         {
                             packetWriter.WriteInt32(-1);
+                            packetWriter.WriteInt32(0);
                             packetWriter.WriteInt32(0);
                         }
                     }
@@ -1184,6 +1222,7 @@ public static class Network
         for (var i = 0; i < Core.Globals.Variables.MaxPlayerSkills; i++)
         {
             packetWriter.WriteInt32(GetSkill(playerId, i));
+            packetWriter.WriteInt32(GetSkillUses(playerId, i));
         }
 
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
@@ -1318,6 +1357,7 @@ public static class Network
         packet.WriteInt32(MapItem.Instance[map, mapSlot].Value);
         packet.WriteInt32(MapItem.Instance[map, mapSlot].X);
         packet.WriteInt32(MapItem.Instance[map, mapSlot].Y);
+        packet.WriteInt32(MapItem.Instance[map, mapSlot].Durability);
 
         NetworkConfig.SendDataToMap(map, packet.GetBytes());
     }
@@ -1334,6 +1374,7 @@ public static class Network
             packet.WriteInt32(MapItem.Instance[map, i].Value);
             packet.WriteInt32(MapItem.Instance[map, i].X);
             packet.WriteInt32(MapItem.Instance[map, i].Y);
+            packet.WriteInt32(MapItem.Instance[map, i].Durability);
         }
 
         NetworkConfig.SendDataToMap(map, packet.GetBytes());
@@ -1606,6 +1647,8 @@ public static class Network
         packet.WriteByte(item.CommonEventType);
         packet.WriteInt32(item.CommonEventData1);
         packet.WriteInt32(item.CommonEventData2);
+
+        packet.WriteInt32(item.MaxDurability);
     }
 
      public static void WriteJobDataToPacket(int index, PacketWriter packetWriter)

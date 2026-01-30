@@ -380,6 +380,10 @@ public class WinItemEditor
             // Within equipment group, toggle individual equipment-only controls as extra safety
             SetVisible("lblDamage", eq);
             SetVisible("txtDamage", eq);
+            SetVisible("lblMaxDamage", eq);
+            SetVisible("txtMaxDamage", eq);
+            SetVisible("lblMaxDurability", eq);
+            SetVisible("txtMaxDurability", eq);
             SetVisible("lblSpeed", eq);
             SetVisible("txtSpeed", eq);
             SetVisible("chkKnockback", eq);
@@ -390,6 +394,28 @@ public class WinItemEditor
             SetVisible("lblPaperdollEquip", eq);
             SetVisible("sldPaperdoll", eq);
             SetVisible("picPaperdoll", eq);
+
+            // Weapon uses Min/Max damage; other equipment uses Defense (Data2) and hides Max.
+            bool isWeapon = false;
+            if (eq)
+            {
+                if (SelectedIndex >= 0 && SelectedIndex < Item.Instance.Count)
+                {
+                    isWeapon = Item.Instance[SelectedIndex].SubType == (byte)Equipment.Weapon;
+                }
+                else if (WindowManager.TryGetControl("winItemEditor", "cmbSubType", out var subCtrl) && subCtrl is ComboBox cmbSub)
+                {
+                    isWeapon = cmbSub.Value == (int)Equipment.Weapon;
+                }
+            }
+
+            if (WindowManager.TryGetControl("winItemEditor", "lblDamage", out var dmgLblCtrl) && dmgLblCtrl is Label lblDmg)
+            {
+                lblDmg.Text = isWeapon ? "Damage" : "Defense";
+            }
+
+            SetVisible("lblMaxDamage", eq && isWeapon);
+            SetVisible("txtMaxDamage", eq && isWeapon);
         }
 
         if (WindowManager.TryGetControl("winItemEditor", "grpItemUse", out var useCtrl) && useCtrl is GroupBox grpUse && WindowManager.TryGetWindow("winItemEditor", out var win2))
@@ -495,6 +521,16 @@ public class WinItemEditor
         if (WindowManager.TryGetControl("winItemEditor", "txtDamage", out var dmgText) && dmgText is TextBox txtDmg)
         {
             txtDmg.Text = item.Data2.ToString();
+        }
+
+        if (WindowManager.TryGetControl("winItemEditor", "txtMaxDamage", out var maxDmgText) && maxDmgText is TextBox txtMaxDmg)
+        {
+            txtMaxDmg.Text = item.Data1.ToString();
+        }
+
+        if (WindowManager.TryGetControl("winItemEditor", "txtMaxDurability", out var maxDurText) && maxDurText is TextBox txtMaxDur)
+        {
+            txtMaxDur.Text = item.MaxDurability.ToString();
         }
         if (WindowManager.TryGetControl("winItemEditor", "txtSpeed", out var spdText) && spdText is TextBox txtSpd)
         {

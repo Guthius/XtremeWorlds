@@ -983,6 +983,7 @@ public class Player : PlayerBase
 
             SetInv(playerId, invSlot, -1);
             SetInvValue(playerId, invSlot, 0);
+            SetInvDurability(playerId, invSlot, 0);
 
             Network.InventoryUpdate(playerId, invSlot);
 
@@ -993,6 +994,9 @@ public class Player : PlayerBase
     }
 
     public static bool GiveInv(int playerId, int id, int val, byte bound = 0, bool sendUpdate = true)
+        => GiveInv(playerId, id, val, bound, sendUpdate, durability: -1);
+
+    public static bool GiveInv(int playerId, int id, int val, byte bound, bool sendUpdate, int durability)
     {
         if (!NetworkConfig.IsPlaying(playerId) || id < 0 || id > Core.Globals.Variables.MaxItems)
         {
@@ -1008,9 +1012,32 @@ public class Player : PlayerBase
 
         val = Math.Max(val, 1);
 
+        var isStackable = Item.Instance[id].Type == (byte)ItemCategory.Currency || Item.Instance[id].Stackable == 1;
+
         SetInv(playerId, slot, id);
         SetInvValue(playerId, slot, GetInvValue(playerId, slot) + val);
         Player.Instance[playerId].Inventory[slot].Bound = bound;
+
+        // Only meaningful for non-stackable items (equipment, etc). Stackables always use 0.
+        // If durability isn't explicitly provided (durability < 0), default to template MaxDurability.
+        if (isStackable)
+        {
+            SetInvDurability(playerId, slot, 0);
+        }
+        else
+        {
+            var maxDurability = Math.Max(0, Item.Instance[id].MaxDurability);
+
+            var instanceDurability = durability < 0
+                ? (maxDurability > 0 ? maxDurability : 0)
+                : durability;
+
+            instanceDurability = maxDurability > 0
+                ? Math.Clamp(instanceDurability, 0, maxDurability)
+                : Math.Max(0, instanceDurability);
+
+            SetInvDurability(playerId, slot, instanceDurability);
+        }
 
         if (sendUpdate)
         {
@@ -1119,17 +1146,28 @@ public class Player : PlayerBase
 
         SetInv(playerId, invSlot, -1);
         SetInvValue(playerId, invSlot, 0);
+        SetInvDurability(playerId, invSlot, 0);
 
         return true;
     }
 
-    public static bool IsUsable(int playerId, int itemNum)
+    public static bool IsUsable(int playerId, int item, int invSlot = -1)
     {
+        // Durability gate: don't allow using broken items.
+        // Only enforce this for items that actually have durability configured.
+        if (invSlot >= 0 && invSlot < Core.Globals.Variables.MaxInventory
+            && Item.Instance[item].MaxDurability > 0
+            && GetInvDurability(playerId, invSlot) <= 0)
+        {
+            Network.PlayerMessage(playerId, "This item is broken! Please fix it at a broker!", (int)ColorName.BrightRed);
+            return false;
+        }
+
         if (Server.Map.Instance[GetMap(playerId)].Moral >= 0)
         {
             if (!Moral.Instance[Server.Map.Instance[GetMap(playerId)].Moral].CanUseItem)
             {
-                Network.PlayerMessage(playerId, "You can't use items with this moral!", (int) ColorName.BrightRed);
+                Network.PlayerMessage(playerId, "You can't use items in this zone!", (int) ColorName.BrightRed);
                 return false;
             }
         }
@@ -1137,7 +1175,7 @@ public class Player : PlayerBase
         var stats = Enum.GetValues<Stat>();
         foreach (var stat in stats)
         {
-            if (GetStat(playerId, stat) >= Item.Instance[itemNum].StatReq[(int) stat])
+            if (GetStat(playerId, stat) >= Item.Instance[item].StatReq[(int) stat])
             {
                 continue;
             }
@@ -1146,19 +1184,19 @@ public class Player : PlayerBase
             return false;
         }
 
-        if (Item.Instance[itemNum].LevelReq > GetLevel(playerId))
+        if (Item.Instance[item].LevelReq > GetLevel(playerId))
         {
             Network.PlayerMessage(playerId, "You do not meet the level requirements to use this item.", (int) ColorName.BrightRed);
             return false;
         }
 
-        if (Item.Instance[itemNum].JobReq != -1 && Item.Instance[itemNum].JobReq != GetJob(playerId))
+        if (Item.Instance[item].JobReq != -1 && Item.Instance[item].JobReq != GetJob(playerId))
         {
             Network.PlayerMessage(playerId, "You do not meet the job requirements to use this item.", (int) ColorName.BrightRed);
             return false;
         }
 
-        if (GetAccess(playerId) < Item.Instance[itemNum].AccessReq)
+        if (GetAccess(playerId) < Item.Instance[item].AccessReq)
         {
             Network.PlayerMessage(playerId, "You do not meet the access requirement to equip this item.", (int) ColorName.BrightRed);
             return false;
@@ -1186,7 +1224,7 @@ public class Player : PlayerBase
             return;
         }
 
-        if (!IsUsable(playerId, item))
+        if (!IsUsable(playerId, item, invSlot))
         {
             return;
         }
@@ -1210,8 +1248,10 @@ public class Player : PlayerBase
 
         var oldInv = GetInv(playerId, oldSlot);
         var oldValue = GetInvValue(playerId, oldSlot);
+        var oldDurability = GetInvDurability(playerId, oldSlot);
         var newInv = GetInv(playerId, newSlot);
         var newValue = GetInvValue(playerId, newSlot);
+        var newDurability = GetInvDurability(playerId, newSlot);
         var oldBound = Player.Instance[playerId].Inventory[oldSlot].Bound;
         var newBound = Player.Instance[playerId].Inventory[newSlot].Bound;
 
@@ -1221,8 +1261,10 @@ public class Player : PlayerBase
             {
                 SetInv(playerId, newSlot, newInv);
                 SetInvValue(playerId, newSlot, oldValue + newValue);
+                SetInvDurability(playerId, newSlot, 0);
                 SetInv(playerId, oldSlot, 0);
                 SetInvValue(playerId, oldSlot, 0);
+                SetInvDurability(playerId, oldSlot, 0);
                 Player.Instance[playerId].Inventory[oldSlot].Bound = 0;
 
                 if (oldBound > newBound)
@@ -1234,8 +1276,10 @@ public class Player : PlayerBase
             {
                 SetInv(playerId, newSlot, oldInv);
                 SetInvValue(playerId, newSlot, oldValue);
+                SetInvDurability(playerId, newSlot, oldDurability);
                 SetInv(playerId, oldSlot, newInv);
                 SetInvValue(playerId, oldSlot, newValue);
+                SetInvDurability(playerId, oldSlot, newDurability);
                 Player.Instance[playerId].Inventory[oldSlot].Bound = newBound;
                 Player.Instance[playerId].Inventory[newSlot].Bound = oldBound;
             }
@@ -1244,8 +1288,10 @@ public class Player : PlayerBase
         {
             SetInv(playerId, newSlot, oldInv);
             SetInvValue(playerId, newSlot, oldValue);
+            SetInvDurability(playerId, newSlot, oldDurability);
             SetInv(playerId, oldSlot, newInv);
             SetInvValue(playerId, oldSlot, newValue);
+            SetInvDurability(playerId, oldSlot, newDurability);
             Player.Instance[playerId].Inventory[oldSlot].Bound = newBound;
             Player.Instance[playerId].Inventory[newSlot].Bound = oldBound;
         }
@@ -1262,8 +1308,10 @@ public class Player : PlayerBase
 
         var oldSkill = GetSkill(playerId, oldSlot);
         var oldValue = GetSkillCd(playerId, oldSlot);
+        var oldUses = GetSkillUses(playerId, oldSlot);
         var newSkill = GetSkill(playerId, newSlot);
         var newValue = GetSkillCd(playerId, newSlot);
+        var newUses = GetSkillUses(playerId, newSlot);
 
         if (newSkill >= 0)
         {
@@ -1271,23 +1319,29 @@ public class Player : PlayerBase
             {
                 SetSkill(playerId, newSlot, newSkill);
                 SetSkillCd(playerId, newSlot, newValue);
+                SetSkillUses(playerId, newSlot, newUses);
                 SetSkill(playerId, oldSlot, 0);
                 SetSkillCd(playerId, oldSlot, 0);
+                SetSkillUses(playerId, oldSlot, 0);
             }
             else
             {
                 SetSkill(playerId, newSlot, oldSkill);
                 SetSkillCd(playerId, newSlot, oldValue);
+                SetSkillUses(playerId, newSlot, oldUses);
                 SetSkill(playerId, oldSlot, newSkill);
                 SetSkillCd(playerId, oldSlot, newValue);
+                SetSkillUses(playerId, oldSlot, newUses);
             }
         }
         else
         {
             SetSkill(playerId, newSlot, oldSkill);
             SetSkillCd(playerId, newSlot, oldValue);
+            SetSkillUses(playerId, newSlot, oldUses);
             SetSkill(playerId, oldSlot, newSkill);
             SetSkillCd(playerId, oldSlot, newValue);
+            SetSkillUses(playerId, oldSlot, newUses);
         }
 
         Network.PlayerSkills(playerId);
@@ -1500,8 +1554,10 @@ public class Player : PlayerBase
 
         var itemNum = GetInv(playerId, invSlot);
         var bound = Player.Instance[playerId].Inventory[invSlot].Bound;
+        var durability = Player.Instance[playerId].Inventory[invSlot].Durability;
 
         Bank.Instance[playerId].Item[bankSlot].Bound = bound;
+        Bank.Instance[playerId].Item[bankSlot].Durability = durability;
 
         if (Item.Instance[GetInv(playerId, invSlot)].Type == (byte)ItemCategory.Currency ||
             Item.Instance[GetInv(playerId, invSlot)].Stackable == 1)
@@ -1516,22 +1572,19 @@ public class Player : PlayerBase
             {
                 SetBank(playerId, bankSlot, GetInv(playerId, invSlot));
                 SetBankValue(playerId, bankSlot, amount);
+                Bank.Instance[playerId].Item[bankSlot].Durability = 0;
 
                 TakeInv(playerId, GetInv(playerId, invSlot), amount);
             }
-        }
-        else if (GetBank(playerId, bankSlot) == GetInv(playerId, invSlot))
-        {
-            SetBankValue(playerId, bankSlot, GetBankValue(playerId, bankSlot) + 1);
-
-            TakeInv(playerId, GetInv(playerId, invSlot), 0);
         }
         else
         {
             SetBank(playerId, bankSlot, itemNum);
             SetBankValue(playerId, bankSlot, 1);
+            Bank.Instance[playerId].Item[bankSlot].Durability = durability;
 
-            TakeInv(playerId, GetInv(playerId, invSlot), 0);
+            // Remove the specific instance being deposited.
+            TakeInvSlot(playerId, invSlot, 1);
         }
 
         Network.Bank(playerId);
@@ -1605,13 +1658,14 @@ public class Player : PlayerBase
 
         var invSlot = FindOpenInvSlot(playerId, GetBank(playerId, bankSlot));
         var bound =  Bank.Instance[playerId].Item[bankSlot].Bound;
+        var durability = Bank.Instance[playerId].Item[bankSlot].Durability;
 
         if (invSlot >= 0)
         {
             if (Item.Instance[GetBank(playerId, bankSlot)].Type == (byte)ItemCategory.Currency ||
                 Item.Instance[GetBank(playerId, bankSlot)].Stackable == 1)
             {
-                GiveInv(playerId, GetBank(playerId, bankSlot), amount, bound);
+                GiveInv(playerId, GetBank(playerId, bankSlot), amount, bound, true, durability: 0);
                 SetBankValue(playerId, bankSlot, GetBankValue(playerId, bankSlot) - amount);
 
                 if (GetBankValue(playerId, bankSlot) < 0)
@@ -1619,21 +1673,24 @@ public class Player : PlayerBase
                     SetBank(playerId, bankSlot, 0);
                     SetBankValue(playerId, bankSlot, 0);
                     Bank.Instance[playerId].Item[bankSlot].Bound = 0;
+                    Bank.Instance[playerId].Item[bankSlot].Durability = 0;
                 }
             }
             else if (GetBank(playerId, bankSlot) == GetInv(playerId, invSlot))
             {
                 if (GetBankValue(playerId, bankSlot) > 1)
                 {
-                    GiveInv(playerId, GetBank(playerId, bankSlot), bound);
+                    GiveInv(playerId, GetBank(playerId, bankSlot), 1, bound, true, durability);
                     SetBankValue(playerId, bankSlot, GetBankValue(playerId, bankSlot) - 1);
                 }
             }
             else
             {
-                GiveInv(playerId, GetBank(playerId, bankSlot), bound);
+                GiveInv(playerId, GetBank(playerId, bankSlot), 1, bound, true, durability);
                 SetBank(playerId, bankSlot, -1);
                 SetBankValue(playerId, bankSlot, 0);
+                Bank.Instance[playerId].Item[bankSlot].Bound = 0;
+                Bank.Instance[playerId].Item[bankSlot].Durability = 0;
             }
         }
 
@@ -1652,15 +1709,19 @@ public class Player : PlayerBase
         var newNum = GetBank(playerId, newSlot);
         var newValue = GetBankValue(playerId, newSlot);
         var oldBound = Bank.Instance[playerId].Item[oldSlot].Bound;
+        var oldDurability = Bank.Instance[playerId].Item[oldSlot].Durability;
         var newBound = Bank.Instance[playerId].Item[newSlot].Bound;
+        var newDurability = Bank.Instance[playerId].Item[newSlot].Durability;
 
         SetBank(playerId, newSlot, oldNum);
         SetBankValue(playerId, newSlot, oldValue);
         Bank.Instance[playerId].Item[newSlot].Bound = oldBound;
+        Bank.Instance[playerId].Item[newSlot].Durability = oldDurability;
 
         SetBank(playerId, oldSlot, newNum);
         SetBankValue(playerId, oldSlot, newValue);
         Bank.Instance[playerId].Item[oldSlot].Bound = newBound;
+        Bank.Instance[playerId].Item[oldSlot].Durability = newDurability;
 
         Network.Bank(playerId);
     }

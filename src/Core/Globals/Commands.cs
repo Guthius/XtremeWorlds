@@ -106,13 +106,55 @@ public static class Commands
         return p.Skill[skillSlot].Cd;
     }
 
+    public static int GetSkillUses(int index, int skillSlot)
+    {
+        if (!ValidIndex(index)) return 0;
+        var p = PlayerBase.Instance[index];
+        if (p.Skill == null || skillSlot < 0 || skillSlot >= p.Skill.Length) return 0;
+        return p.Skill[skillSlot].Uses;
+    }
+
+    public static void SetSkillUses(int index, int skillSlot, int value)
+    {
+        if (!ValidIndex(index)) return;
+        var p = PlayerBase.Instance[index];
+        if (p.Skill == null || skillSlot < 0 || skillSlot >= p.Skill.Length) return;
+        p.Skill[skillSlot].Uses = Math.Max(0, value);
+    }
+
     public static int GetStat(int index, Stat stat)
     {
         if (!ValidIndex(index)) return 0;
         var p = PlayerBase.Instance[index];
         var si = (int)stat;
         if (p.Stat == null || si < 0 || si >= p.Stat.Length) return 0;
-        return p.Stat[si];
+
+        var value = p.Stat[si];
+
+        // Add equipment bonuses.
+        // Broken items (MaxDurability > 0 and durability <= 0) contribute no stat bonuses.
+        // This intentionally computes dynamically from the paperdoll so we don't need to persist
+        // derived stats anywhere.
+        if (p.Paperdoll != null && ItemBase.Instance != null)
+        {
+            for (var eq = 0; eq < Math.Min(EquipmentCount, p.Paperdoll.Length); eq++)
+            {
+                var itemId = p.Paperdoll[eq].Num;
+                if (itemId < 0 || itemId >= ItemBase.Instance.Count) continue;
+
+                var item = ItemBase.Instance[itemId];
+                if (item == null) continue;
+
+                if (item.MaxDurability > 0 && p.Paperdoll[eq].Durability <= 0) continue;
+
+                if (item.AddStat != null && si >= 0 && si < item.AddStat.Length)
+                {
+                    value += item.AddStat[si];
+                }
+            }
+        }
+
+        return value;
     }
 
     public static byte GetAccess(int index)
@@ -346,6 +388,22 @@ public static class Commands
         p.Inventory[invSlot].Value = value;
     }
 
+    public static int GetInvDurability(int index, int invSlot)
+    {
+        if (!ValidIndex(index)) return 0;
+        var p = PlayerBase.Instance[index];
+        if (p.Inventory == null || invSlot < 0 || invSlot >= p.Inventory.Length) return 0;
+        return p.Inventory[invSlot].Durability;
+    }
+
+    public static void SetInvDurability(int index, int invSlot, int durability)
+    {
+        if (!ValidIndex(index)) return;
+        var p = PlayerBase.Instance[index];
+        if (p.Inventory == null || invSlot < 0 || invSlot >= p.Inventory.Length) return;
+        p.Inventory[invSlot].Durability = durability;
+    }
+
     public static void SetAccess(int index, byte access)
     {
         if (!ValidIndex(index)) return;
@@ -497,5 +555,21 @@ public static class Commands
         var b = Bank.Instance[index];
         if (b.Item == null || bankSlot < 0 || bankSlot >= b.Item.Length) return;
         b.Item[bankSlot].Value = itemValue;
+    }
+
+    public static int GetBankDurability(int index, int bankSlot)
+    {
+        if (Bank.Instance == null || index < 0 || index >= Bank.Instance.Count) return 0;
+        var b = Bank.Instance[index];
+        if (b.Item == null || bankSlot < 0 || bankSlot >= b.Item.Length) return 0;
+        return b.Item[bankSlot].Durability;
+    }
+
+    public static void SetBankDurability(int index, byte bankSlot, int durability)
+    {
+        if (Bank.Instance == null || index < 0 || index >= Bank.Instance.Count) return;
+        var b = Bank.Instance[index];
+        if (b.Item == null || bankSlot < 0 || bankSlot >= b.Item.Length) return;
+        b.Item[bankSlot].Durability = durability;
     }
 }

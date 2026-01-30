@@ -11,7 +11,6 @@ namespace Server
         public static void OnClear(int map, int mapProjectileNum)
         {
             ref var mp = ref Data.MapProjectile[map, mapProjectileNum];
-            // NOTE: Index==0 is a valid projectile definition; use -1 to represent an empty slot.
             mp.Index = -1;
             mp.Owner = -1;
             mp.OwnerType = 0;
@@ -29,8 +28,6 @@ namespace Server
             mp.Range = 0;
             mp.TravelTime = 0;
             mp.Timer = 0;
-
-            Network.ProjectileToMap(map, mapProjectileNum);
         }
 
         public static void OnClear(int index)

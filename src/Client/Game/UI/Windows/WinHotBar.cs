@@ -185,8 +185,22 @@ public class WinHotBar
                 break;
 
             case 2: // Skill
-                GameLogic.ShowSkillDesc(x, y, Player.Instance[GameState.MyIndex].Hotbar[slot].Slot, 0L);
-                break;
+                    {
+                        var skillId = Player.Instance[GameState.MyIndex].Hotbar[slot].Slot;
+                        long skillSlot = -1;
+
+                        for (var i = 0; i < Core.Globals.Variables.MaxPlayerSkills; i++)
+                        {
+                            if (GetSkill(GameState.MyIndex, i) == skillId)
+                            {
+                                skillSlot = i;
+                                break;
+                            }
+                        }
+
+                        GameLogic.ShowSkillDesc(x, y, skillId, skillSlot);
+                        break;
+                    }
         }
     }
 

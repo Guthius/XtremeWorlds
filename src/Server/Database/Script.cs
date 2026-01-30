@@ -157,7 +157,7 @@ public class Script
         Variables.Website = Website;
     }
 
-    public int GetPlayerMaxLevel()
+    public int GetMaxLevel()
     {
         return MaxLevel;
     }
@@ -249,16 +249,26 @@ public class Script
         var map = GetMap(index);
         var id = GetInv(index, invSlot);
 
+        // Safety: never allow zero/negative drops.
+        if (amount < 1)
+        {
+            return;
+        }
+
+        // Snapshot durability before we clear the inventory slot.
+        // Only meaningful for non-stackable, non-currency items.
+        var droppedDurability = GetInvDurability(index, invSlot);
+
         // Determine if the item is currency or stackable
         if (item.Type == (byte)ItemCategory.Currency || item.Stackable == 1)
         {
-            // Check if dropping more than the Player has, drop all if so
             var InventoryValue = GetInvValue(index, invSlot);
             if (amount >= InventoryValue)
             {
                 amount = InventoryValue;
                 SetInv(index, invSlot, -1);
                 SetInvValue(index, invSlot, 0);
+                SetInvDurability(index, invSlot, 0);
             }
             else
             {
@@ -271,6 +281,7 @@ public class Script
             // Not a currency or stackable item
             SetInv(index, invSlot, -1);
             SetInvValue(index, invSlot, 0);
+            SetInvDurability(index, invSlot, 0);
 
             Network.MapMessage(map, string.Format("{0} has dropped {1}.", GetName(index), GameLogic.CheckGrammar(item.Name)));
         }
@@ -279,7 +290,7 @@ public class Script
         Network.InventoryUpdate(index, invSlot);
 
         // Spawn the item on the map
-        Server.MapItem.OnSpawn(id, amount, map, GetX(index), GetY(index));
+        Server.MapItem.OnSpawn(id, amount, map, GetX(index), GetY(index), droppedDurability);
     }
 
     public void OnPickup(int index, int map, int mapSlot, int invSlot)
@@ -307,18 +318,28 @@ public class Script
         {
             // For stackable/currency, add the value from the map item (should be 1 for most drops)
             SetInvValue(index, invSlot, GetInvValue(index, invSlot) + mapValue);
+            SetInvDurability(index, invSlot, 0);
             msg = mapValue + " " + item.Name;
         }
         else
         {
             // For non-stackable, always set to 1 regardless of map item value
             SetInvValue(index, invSlot, 1);
+
+            var maxDurability = Math.Max(0, item.MaxDurability);
+            var mapDurability = MapItem.Instance[map, mapSlot].Durability;
+            var durability = maxDurability > 0
+                ? Math.Clamp(mapDurability, 0, maxDurability)
+                : 0;
+
+            SetInvDurability(index, invSlot, durability);
             msg = item.Name;
         }
 
         // Erase item from the map
         MapItem.Instance[map, mapSlot].Num = -1;
         MapItem.Instance[map, mapSlot].Value = 0;
+        MapItem.Instance[map, mapSlot].Durability = 0;
         Network.MapItemToAll(map, mapSlot);
         Network.InventoryUpdate(index, invSlot);
         Network.ActionMessage(GetMap(index), msg, (int)ColorName.White, (byte)ActionMessageType.Static, GetX(index) * Variables.TileSize, GetY(index) * Variables.TileSize);
@@ -338,12 +359,15 @@ public class Script
         {
             SetInv(index, invSlot, Server.Player.Instance[index].Paperdoll[eqSlot].Num);
             Server.Player.Instance[index].Inventory[invSlot].Bound = Server.Player.Instance[index].Paperdoll[eqSlot].Bound;
+            Server.Player.Instance[index].Inventory[invSlot].Durability = Server.Player.Instance[index].Paperdoll[eqSlot].Durability;
             SetInvValue(index, invSlot, 1);
 
             Network.PlayerMessage(index, "You unequip " + GameLogic.CheckGrammar(Item.Instance[GetPaperdoll(index, (Equipment)eqSlot)].Name) + ".", (int)ColorName.Yellow);
 
             // remove equipment
             SetPaperdoll(index, -1, (Equipment)eqSlot);
+            Server.Player.Instance[index].Paperdoll[eqSlot].Bound = 0;
+            Server.Player.Instance[index].Paperdoll[eqSlot].Durability = 0;
             Network.WornEquipment(index);
             Network.MapEquipment(index);
             Network.Stats(index);
@@ -807,6 +831,8 @@ public class Script
         try
         {
             int tempItem = -1;
+            var tempBound = (byte)0;
+            var tempDurability = 0;
             int m;
             Equipment eqType = (Equipment)Item.Instance[item].SubType;
             if (Item.Instance[item].BindType == 2)
@@ -817,20 +843,25 @@ public class Script
             if (GetPaperdoll(index, eqType) >= 0)
             {
                 tempItem = GetPaperdoll(index, eqType);
+                tempBound = Server.Player.Instance[index].Paperdoll[(byte)eqType].Bound;
+                tempDurability = Server.Player.Instance[index].Paperdoll[(byte)eqType].Durability;
             }
             SetPaperdoll(index, item, eqType);
             Server.Player.Instance[index].Paperdoll[(byte)eqType].Bound = Server.Player.Instance[index].Inventory[invSlot].Bound;
+            Server.Player.Instance[index].Paperdoll[(byte)eqType].Durability = Server.Player.Instance[index].Inventory[invSlot].Durability;
             Network.PlayerMessage(index, "You equip " + GameLogic.CheckGrammar(Item.Instance[item].Name) + ".", (int)ColorName.BrightGreen);
 
             var equipAnim = Item.Instance[item].Animation;
             if (equipAnim >= 0)
                 Network.PlayAnimation(GetMap(index), equipAnim, 0, 0, (byte)TargetType.Player, index);
-            TakeInv(index, item, 1);
+            Server.Player.TakeInvSlot(index, invSlot, 1);
             if (tempItem >= 0)
             {
                 m = FindOpenInvSlot(index, tempItem);
                 SetInv(index, m, tempItem);
                 SetInvValue(index, m, 1);
+                Server.Player.Instance[index].Inventory[m].Bound = tempBound;
+                Server.Player.Instance[index].Inventory[m].Durability = tempDurability;
             }
             Network.WornEquipment(index);
             Network.MapEquipment(index);
@@ -878,6 +909,7 @@ public class Script
                     if (!HasSkill(index, n))
                     {
                         SetSkill(index, i, n);
+                        SetSkillUses(index, i, 0);
                         if (item >= 0)
                         {
                             var anim = Item.Instance[item].Animation;
@@ -979,7 +1011,7 @@ public class Script
         // Restore vitals
         var vitalCount = System.Enum.GetValues(typeof(Vital)).Length;
         for (int i = 0, count = vitalCount; i < count; i++)
-            SetVital(index, (Vital)i, GetPlayerMaxVital(index, (Vital)i));
+            SetVital(index, (Vital)i, GetMaxVital(index, (Vital)i));
 
         Vitals(index);
 
@@ -1150,8 +1182,8 @@ public class Script
         {
             var expRollover = GetExp(index) - GetPlayerNextLevel(index);
             SetLevel(index, GetLevel(index) + 1);
-            int points = GetPlayerPointsPerLevel(index);
-            points += ((int)Math.Floor((decimal)GetStat(index, Stat.Luck) / 10));
+            int points = GetPointsPerLevel(index);
+            points += ((int)Math.Floor((decimal)GetRawStat(index, Stat.Luck) / 10));
             SetPoints(index, GetPoints(index) + points);
             SetExp(index, expRollover);
             count += 1;
@@ -1233,7 +1265,7 @@ public class Script
             {
                 int id = p.Id;
                 if (!NetworkConfig.IsPlaying(id)) continue;
-                int hpMax = GetPlayerMaxVital(id, Core.Globals.Vital.Health);
+                int hpMax = GetMaxVital(id, Core.Globals.Vital.Health);
                 int hpCur = GetVital(id, Core.Globals.Vital.Health);
                 if (hpMax > 0 && hpCur <= 0 && !Server.Player.Instance[id].Dead)
                 {
@@ -1245,7 +1277,7 @@ public class Script
                     SetVital(id, Core.Globals.Vital.Health, Math.Min(hpMax, hpCur + amount));
                     Network.Vital(id, Core.Globals.Vital.Health);
                 }
-                int manaMax = GetPlayerMaxVital(id, Core.Globals.Vital.Mana);
+                int manaMax = GetMaxVital(id, Core.Globals.Vital.Mana);
                 int manaCur = GetVital(id, Core.Globals.Vital.Mana);
                 if (manaCur < manaMax)
                 {
@@ -1253,7 +1285,7 @@ public class Script
                     SetVital(id, Core.Globals.Vital.Mana, Math.Min(manaMax, manaCur + amount));
                     Network.Vital(id, Core.Globals.Vital.Mana);
                 }
-                int stamMax = GetPlayerMaxVital(id, Core.Globals.Vital.Stamina);
+                int stamMax = GetMaxVital(id, Core.Globals.Vital.Stamina);
                 int stamCur = GetVital(id, Core.Globals.Vital.Stamina);
                 if (stamCur < stamMax)
                 {
@@ -1967,9 +1999,34 @@ public class Script
             power = GetStat(PlayerId, Stat.Strength) / 2;
 
         int weaponId = GetPaperdoll(PlayerId, Equipment.Weapon);
-        int weaponPower = (weaponId >= 0 && weaponId < Item.Instance.Count) ? Item.Instance[weaponId].Data2 : 0;
-        // Keep formula aligned with prior CalculateDamage logic (without RNG)
-        int baseDamage = power + weaponPower;
+        int weaponMin = 0;
+        int weaponMax = 0;
+        if (weaponId >= 0 && weaponId < Item.Instance.Count)
+        {
+            // If the weapon is broken, it contributes no damage.
+            var pd = PlayerBase.Instance[PlayerId].Paperdoll;
+            var weaponSlot = (int)Equipment.Weapon;
+            var weaponIsBroken = Item.Instance[weaponId].MaxDurability > 0
+                                 && pd != null
+                                 && weaponSlot >= 0
+                                 && weaponSlot < pd.Length
+                                 && pd[weaponSlot].Durability <= 0;
+
+            if (!weaponIsBroken)
+            {
+                weaponMin = Math.Max(0, Item.Instance[weaponId].Data2);
+                weaponMax = Math.Max(0, Item.Instance[weaponId].Data1);
+            }
+        }
+
+        if (weaponMax <= 0 || weaponMax < weaponMin)
+            weaponMax = weaponMin;
+
+        int weaponRoll = weaponMax > weaponMin
+            ? General.GetRandom.NextInt(weaponMin, weaponMax + 1)
+            : weaponMin;
+
+        int baseDamage = power + weaponRoll;
         return Math.Max(0, baseDamage);
     }
 
@@ -2016,7 +2073,7 @@ public class Script
             int pid = target.Id;
             if (!NetworkConfig.IsPlaying(pid)) return;
             int cur = GetVital(pid, vital);
-            int max = GetPlayerMaxVital(pid, vital);
+            int max = GetMaxVital(pid, vital);
             int newVal;
             if (isHeal)
             {
@@ -2509,6 +2566,45 @@ public class Script
                 Data.TempPlayer[pid].SkillCd[PlayerSkillSlot] = General.GetTime() + skill.CdTime * 1000;
                 Network.SkillCooldown(pid, PlayerSkillSlot);
             }
+
+            // Track casts/uses for skill progression.
+            if (PlayerBase.Instance[pid].Skill != null && PlayerSkillSlot < PlayerBase.Instance[pid].Skill.Length)
+            {
+                var currentUses = GetSkillUses(pid, PlayerSkillSlot);
+                var nextUses = Math.Max(0, skill.NextUses);
+
+                if (nextUses > 0)
+                {
+                    currentUses = Math.Min(nextUses, currentUses + 1);
+                    SetSkillUses(pid, PlayerSkillSlot, currentUses);
+
+                    if (skill.NextRank >= 0 && currentUses >= nextUses)
+                    {
+                        int nextSkillId = skill.NextRank;
+                        if (nextSkillId >= 0 && nextSkillId < Skill.Instance.Count)
+                        {
+                            // Only upgrade if the player meets the next skill's level requirement.
+                            if (GetLevel(pid) >= Skill.Instance[nextSkillId].LevelReq)
+                            {
+                                SetSkill(pid, PlayerSkillSlot, nextSkillId);
+                                SetSkillUses(pid, PlayerSkillSlot, 0);
+                                Network.PlayerMessage(pid, "Your skill has ranked up!", (int)ColorName.BrightGreen);
+                            }
+                        }
+                    }
+
+                    Network.PlayerSkills(pid);
+                }
+                else
+                {
+                    // No progression configured; keep uses at 0.
+                    if (currentUses != 0)
+                    {
+                        SetSkillUses(pid, PlayerSkillSlot, 0);
+                        Network.PlayerSkills(pid);
+                    }
+                }
+            }
         }
         else if (caster.Type == Core.Globals.Entity.EntityType.Npc)
         {
@@ -2550,6 +2646,10 @@ public class Script
             var item = entity.Paperdoll[i].Num;
             if (item >= 0 && item < Item.Instance.Count)
             {
+                // Broken equipment contributes no protection/defense.
+                if (Item.Instance[item].MaxDurability > 0 && entity.Paperdoll[i].Durability <= 0)
+                    continue;
+
                 total += Item.Instance[item].Data2;
             }
         }
@@ -2770,12 +2870,16 @@ public class Script
         ref var mapNpc = ref MapNpc.Instance[map, npc];
         var npcNum = mapNpc.Num;
         if (npcNum < 0 || npcNum >= Npc.Instance.Count) return;
+
         // Simple single-roll logic similar to legacy: choose one drop slot 0-4
         var slot = General.GetRandom.NextInt(0, Math.Min(5, Npc.Instance[npcNum].DropChance.Length));
+
         if (slot < 0) return;
         var chance = Npc.Instance[npcNum].DropChance[slot];
+
         if (chance <= 0) return;
         var roll = General.GetRandom.NextInt(1, chance + 1);
+        
         if (roll == 1)
         {
             var itemId = Npc.Instance[npcNum].DropItem[slot];
@@ -2787,7 +2891,7 @@ public class Script
         }
     }
 
-    public int GetPlayerMaxHP(int index)
+    public int GetMaxHP(int index)
     {
         int vit = GetStat(index, Stat.Vitality);
         int job = GetJob(index);
@@ -2797,7 +2901,7 @@ public class Script
         return (int)Math.Max(1, Math.Min(int.MaxValue, val));
     }
 
-    public int GetPlayerMaxMP(int index)
+    public int GetMaxMP(int index)
     {
         int @int = GetStat(index, Stat.Intelligence);
         int job = GetJob(index);
@@ -2807,7 +2911,7 @@ public class Script
         return (int)Math.Max(1, Math.Min(int.MaxValue, val));
     }
 
-    public int GetPlayerMaxSP(int index)
+    public int GetMaxSP(int index)
     {
         int spirit = GetStat(index, Stat.Spirit);
         int job = GetJob(index);
@@ -2817,23 +2921,23 @@ public class Script
         return (int)Math.Max(1, Math.Min(int.MaxValue, val));
     }
 
-    public int GetPlayerPointsPerLevel(int index)
+    public int GetPointsPerLevel(int index)
     {
         return StatPerLevel;
     }
 
-    public int GetPlayerMaxVital(int index, Vital vital)
+    public int GetMaxVital(int index, Vital vital)
     {
         switch (vital)
         {
             case Core.Globals.Vital.Health:
-                return GetPlayerMaxHP(index);
+                return GetMaxHP(index);
 
             case Core.Globals.Vital.Mana:
-                return GetPlayerMaxMP(index);
+                return GetMaxMP(index);
 
             case Core.Globals.Vital.Stamina:
-                return GetPlayerMaxSP(index);
+                return GetMaxSP(index);
                 
             default:
                 return 0;

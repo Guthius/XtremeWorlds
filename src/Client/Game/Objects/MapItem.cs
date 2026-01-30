@@ -60,6 +60,7 @@ namespace Client
             ref var instance = ref MapItem.Instance[index];
             instance.Num = -1;
             instance.Value = 0;
+            instance.Durability = 0;
             instance.X = 0;
             instance.Y = 0;
         }

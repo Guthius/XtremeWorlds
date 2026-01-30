@@ -26,18 +26,25 @@
     <GroupBox Name="grpEquip" Caption="" Position="260, 290" Size="842, 150">
         <Label Name="lblAttackSpeed" Text="Attack Speed" Position="8, 12" Size="100, 16"/>
         <TextBox Name="txtAttackSpeed" Position="100, 10" Size="120, 20" Design="TextWhite"/>
-        <Label Name="lblDamage" Text="Damage" Position="232, 12" Size="80, 16"/>
+        <Label Name="lblDamage" Text="Damage" Position="226, 12" Size="100, 16"/>
         <TextBox Name="txtDamage" Position="292, 10" Size="120, 20" Design="TextWhite"/>
-        <CheckBox Name="chkKnockback" Text="Knockback" Position="432, 10" Size="120, 20"/>
-        <Label Name="lblMoveSpeed" Text="Move Speed" Position="560, 12" Size="80, 16"/>
-        <TextBox Name="txtMoveSpeed" Position="640, 10" Size="120, 20" Design="TextWhite"/>
-        <Label Name="lblTool" Text="Tool" Position="8, 40" Size="60, 16"/>
-        <ComboBox Name="cmbTool" Position="100, 38" Size="160, 18"/>
-        <Label Name="lblKnockbackTiles" Text="Distance" Position="272, 40" Size="80, 16"/>
-        <ComboBox Name="cmbKnockBackTiles" Position="356, 38" Size="160, 18"/>
+        <Label Name="lblMaxDamage" Text="Max Damage" Position="416, 12" Size="100, 16"/>
+        <TextBox Name="txtMaxDamage" Position="496, 10" Size="124, 20" Design="TextWhite"/>
+        <CheckBox Name="chkKnockback" Text="Knockback" Position="628, 16" Size="120, 20"/>
+
+        <Label Name="lblMoveSpeed" Text="Move Speed" Position="8, 40" Size="80, 16"/>
+        <TextBox Name="txtMoveSpeed" Position="100, 38" Size="120, 20" Design="TextWhite"/>
+
+        <Label Name="lblTool" Text="Tool" Position="226, 40" Size="60, 16"/>
+        <ComboBox Name="cmbTool" Position="292, 38" Size="160, 18"/>
+        <Label Name="lblKnockbackTiles" Text="Distance" Position="452, 40" Size="80, 16"/>
+        <ComboBox Name="cmbKnockBackTiles" Position="516, 38" Size="200, 18"/>
         <Label Name="lblPaperdoll" Text="Paperdoll" Position="8, 64" Size="100, 16"/>
         <ScrollBar Name="sldPaperdoll" Position="100, 66" Size="200, 12" Min="0" Max="0" Orientation="Horizontal" ThumbSize="16"/>
         <PictureBox Name="picPaperdoll" Position="320, 68" Size="80, 80" Image="" Design="TextBlack"/>
+
+        <Label Name="lblMaxDurability" Text="Durability" Position="8, 88" Size="100, 16"/>
+        <TextBox Name="txtMaxDurability" Position="100, 86" Size="120, 20" Design="TextWhite"/>
     </GroupBox>
 
     <!-- Type/meta group -->
@@ -77,7 +84,6 @@
         <ComboBox Name="cmbSkill" Position="80, 10" Size="200, 18"/>
 
         <!-- Projectile -->
-        <Label Name="lblProjectileHeader" Text="Projectile" Position="8, 12" Size="80, 16"/>
         <ComboBox Name="cmbProjectile" Position="96, 10" Size="160, 18"/>
         <Label Name="lblAmmo" Text="Ammo" Position="272, 12" Size="50, 16"/>
         <ComboBox Name="cmbAmmo" Position="320, 10" Size="160, 18"/>

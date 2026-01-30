@@ -142,7 +142,7 @@ public class WinTrade
         var y = winTrade.Y - 6;
 
         GameState.DescOwnerWindow = "winTrade";
-        GameLogic.ShowItemDesc(x, y, GetInv(GameState.MyIndex, Data.TradeYourOffer[slot].Num));
+        GameLogic.ShowItemDesc(x, y, GetInv(GameState.MyIndex, Data.TradeYourOffer[slot].Num), Data.TradeYourOffer[slot].Num);
     }
 
     public static void OnTheirTradeMouseMove()
@@ -179,7 +179,7 @@ public class WinTrade
         var y = winTrade.Y - 6;
 
         GameState.DescOwnerWindow = "winTrade";
-        GameLogic.ShowItemDesc(x, y, Data.TradeTheirOffer[slot].Num);
+        GameLogic.ShowItemDesc(x, y, Data.TradeTheirOffer[slot].Num, durability: Data.TradeTheirOffer[slot].Durability);
     }
 
     private static bool YourOfferIsEmpty(int slot)

@@ -73,9 +73,7 @@ namespace Server
             if (Npc.Instance[npcNum].SpawnTime != (byte) Clock.Instance.TimeOfDay && Npc.Instance[npcNum].SpawnTime != 0)
             {
                 MapNpc.OnClear(npc, map);
-
                 Network.MapNpcsToMap(map);
-
                 return;
             }
 
@@ -123,7 +121,7 @@ namespace Server
                     if (x > Server.Map.Instance[map].MaxX) x = Server.Map.Instance[map].MaxX - 1;
                     if (y > Server.Map.Instance[map].MaxY) y = Server.Map.Instance[map].MaxY - 1;
 
-                    if (TileIsOpen(map, x, y))
+                    if (IsPassable(map, x, y))
                     {
                         Instance[map, npc].X = x * Variables.TileSize;
                         Instance[map, npc].Y = y * Variables.TileSize;
@@ -143,7 +141,7 @@ namespace Server
                 {
                     for (var y = 0; y < Server.Map.Instance[map].MaxY; y++)
                     {
-                        if (TileIsOpen(map, x, y))
+                        if (IsPassable(map, x, y))
                         {
                             continue;
                         }
@@ -174,7 +172,7 @@ namespace Server
             Network.MapNpcVitals(map, npc);
         }
 
-        public static bool TileIsOpen(int map, int x, int y)
+        public static bool IsPassable(int map, int x, int y)
         {
             foreach (var playerId in PlayerService.Instance.PlayerIds)
             {
@@ -217,7 +215,7 @@ namespace Server
                 return false;
             }
 
-            static bool IsEventBlockingTile(int mapId, int tileX, int tileY)
+            static bool IsBlocked(int mapId, int tileX, int tileY)
             {
                 // Global events (authoritative server-side position)
                 if (Event.TempEventMap != null && mapId >= 0 && mapId < Event.TempEventMap.Length)
@@ -287,7 +285,7 @@ namespace Server
                 return false;
 
             // Block by events with WalkThrough disabled
-            if (IsEventBlockingTile(map, nextTileX, nextTileY))
+            if (IsBlocked(map, nextTileX, nextTileY))
                 return false;
 
             // Check tile walkability

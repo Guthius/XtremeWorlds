@@ -441,10 +441,15 @@ public static class Sender
         if (Item.Instance[GetInv(GameState.MyIndex, invSlot)].Type == (byte) ItemCategory.Currency ||
             Item.Instance[GetInv(GameState.MyIndex, invSlot)].Stackable == 1)
         {
-            if (amount < 0 || amount > Player.Instance[GameState.MyIndex].Inventory[invSlot].Value)
+            if (amount < 1 || amount > Player.Instance[GameState.MyIndex].Inventory[invSlot].Value)
             {
                 return;
             }
+        }
+        else
+        {
+            // Non-stackable items are always dropped as a single instance.
+            amount = 1;
         }
 
         var packetWriter = new PacketWriter(12);
@@ -715,6 +720,10 @@ public static class Sender
         packetWriter.WriteBoolean(Skill.Instance[index].MoveCast);
         
         packetWriter.WriteInt32(Skill.Instance[index].SpCost);
+
+        // Optional trailing fields
+        packetWriter.WriteInt32(Skill.Instance[index].NextRank);
+        packetWriter.WriteInt32(Skill.Instance[index].NextUses);
         Network.Send(packetWriter);
     }
 
@@ -893,6 +902,8 @@ public static class Sender
         packetWriter.WriteByte(Item.Instance[index].CommonEventType);
         packetWriter.WriteInt32(Item.Instance[index].CommonEventData1);
         packetWriter.WriteInt32(Item.Instance[index].CommonEventData2);
+
+        packetWriter.WriteInt32(Item.Instance[index].MaxDurability);
 
         Network.Send(packetWriter);
     }

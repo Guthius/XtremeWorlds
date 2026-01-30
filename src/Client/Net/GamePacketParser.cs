@@ -467,12 +467,14 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         {
             var item = packetReader.ReadInt32();
             var amount = packetReader.ReadInt32();
+            var durability = packetReader.ReadInt32();
 
             // Guard against invalid indices
             if (i >= 0 && i < Core.Globals.Variables.MaxInventory && GameState.MyIndex >= 0)
             {
                 SetInv(GameState.MyIndex, i, item);
                 SetInvValue(GameState.MyIndex, i, amount);
+                SetInvDurability(GameState.MyIndex, i, durability);
             }
         }
 
@@ -485,11 +487,13 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         var inv = packetReader.ReadInt32();
         var item = packetReader.ReadInt32();
         var amount = packetReader.ReadInt32();
+        var durability = packetReader.ReadInt32();
 
         if (inv >= 0 && inv < Core.Globals.Variables.MaxInventory && GameState.MyIndex >= 0)
         {
             SetInv(GameState.MyIndex, inv, item);
             SetInvValue(GameState.MyIndex, inv, amount);
+            SetInvDurability(GameState.MyIndex, inv, durability);
         }
 
         GameLogic.SetGoldLabel();
@@ -503,8 +507,15 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         for (var i = 0; i < equipmentCount; i++)
         {
             var item = packetReader.ReadInt32();
+            var durability = packetReader.ReadInt32();
 
             SetPaperdoll(GameState.MyIndex, item, (Equipment)i);
+            if (GameState.MyIndex >= 0 && GameState.MyIndex < Player.Instance.Count
+                && Player.Instance[GameState.MyIndex].Paperdoll is not null
+                && i >= 0 && i < Player.Instance[GameState.MyIndex].Paperdoll.Length)
+            {
+                Player.Instance[GameState.MyIndex].Paperdoll[i].Durability = durability;
+            }
             Item.OnStream(item);
         }
     }
@@ -612,6 +623,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         mapItem.Value = packetReader.ReadInt32();
         mapItem.X = packetReader.ReadInt32();
         mapItem.Y = packetReader.ReadInt32();
+        mapItem.Durability = packetReader.ReadInt32();
     }
 
     private static async ValueTask SpawnNpc(ReadOnlyMemory<byte> data)
@@ -798,6 +810,9 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         skill.SpCost = packetReader.ReadInt32();
 
+        skill.NextRank = packetReader.ReadInt32();
+        skill.NextUses = packetReader.ReadInt32();
+
         // Update the skill
         Skill.Instance.Add(skill);
 
@@ -821,9 +836,11 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         for (var i = 0; i < Core.Globals.Variables.MaxPlayerSkills; i++)
         {
             var skill = packetReader.ReadInt32();
+            var uses = packetReader.ReadInt32();
             if (GameState.MyIndex >= 0 && i >= 0 && i < Core.Globals.Variables.MaxPlayerSkills)
             {
                 SetSkill(GameState.MyIndex, i, skill);
+                SetSkillUses(GameState.MyIndex, i, uses);
             }
         }
     }
@@ -968,8 +985,16 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         for (var i = 0; i < equipmentCount; i++)
         {
             var item = packetReader.ReadInt32();
+            var durability = packetReader.ReadInt32();
 
             SetPaperdoll(player, item, (Equipment) i);
+
+            if (player >= 0 && player < Player.Instance.Count
+                && Player.Instance[player].Paperdoll is not null
+                && i >= 0 && i < Player.Instance[player].Paperdoll.Length)
+            {
+                Player.Instance[player].Paperdoll[i].Durability = durability;
+            }
         }
     }
 
@@ -1233,6 +1258,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         item.CommonEventData1 = buffer.ReadInt32();
         item.CommonEventData2 = buffer.ReadInt32();
 
+        item.MaxDurability = buffer.ReadInt32();
+
         if (n == GameState.DescLastItem)
         {
             GameState.DescLastType = 0;
@@ -1482,6 +1509,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             {
                 Data.TradeYourOffer[i].Num = buffer.ReadInt32();
                 Data.TradeYourOffer[i].Value = buffer.ReadInt32();
+                Data.TradeYourOffer[i].Durability = buffer.ReadInt32();
             }
             Client.Trade.YourWorth = buffer.ReadInt32().ToString();
             if (WindowManager.TryGetControl("winTrade", "lblYourValue", out var lblYourValue))
@@ -1495,6 +1523,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             {
                 Data.TradeTheirOffer[i].Num = buffer.ReadInt32();
                 Data.TradeTheirOffer[i].Value = buffer.ReadInt32();
+                Data.TradeTheirOffer[i].Durability = buffer.ReadInt32();
             }
             Client.Trade.TheirWorth = buffer.ReadInt32().ToString();
             if (WindowManager.TryGetControl("winTrade", "lblTheirValue", out var lblTheirValue))
@@ -2173,6 +2202,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             MapItem.Instance[i].Value = buffer.ReadInt32();
             MapItem.Instance[i].X = buffer.ReadInt32();
             MapItem.Instance[i].Y = buffer.ReadInt32();
+            MapItem.Instance[i].Durability = buffer.ReadInt32();
         }
 
         int vitalCount = Enum.GetValues(typeof(Vital)).Length;
@@ -2240,6 +2270,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         instance.Value = buffer.ReadInt32();
         instance.X = buffer.ReadInt32();
         instance.Y = buffer.ReadInt32();
+        instance.Durability = buffer.ReadInt32();
 
     }
 
@@ -2254,6 +2285,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
             instance.Value = buffer.ReadInt32();
             instance.X = buffer.ReadInt32();
             instance.Y = buffer.ReadInt32();
+            instance.Durability = buffer.ReadInt32();
         }
 
     }
@@ -2906,6 +2938,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         {
             SetBank(GameState.MyIndex, (byte)i, buffer.ReadInt32());
             SetBankValue(GameState.MyIndex, (byte)i, buffer.ReadInt32());
+            SetBankDurability(GameState.MyIndex, (byte)i, buffer.ReadInt32());
         }
 
         GameState.InBank = true;

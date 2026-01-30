@@ -18,6 +18,7 @@ namespace Core.Objects
             Description = "";
             Ammo = -1;
             Stackable = 1;
+            MaxDurability = 0;
         }
 
         public string Name;
@@ -40,6 +41,7 @@ namespace Core.Objects
         public byte Rarity;
         public int AttackSpeed;
         public float MovementSpeed;
+        public int MaxDurability;
         public byte BindType;
         public int[] StatReq;
         public int Animation;

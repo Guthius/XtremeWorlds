@@ -756,6 +756,24 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
         Network.PlayerAttack(session.Id);
 
+        // Durability gate: don't allow attacking with a broken weapon.
+        var weapon = GetPaperdoll(session.Id, Equipment.Weapon);
+        if (weapon >= 0
+            && weapon < Item.Instance.Count
+            && Item.Instance[weapon].MaxDurability > 0)
+        {
+            var paperdoll = PlayerBase.Instance[session.Id].Paperdoll;
+            var weaponSlot = (int)Equipment.Weapon;
+            if (paperdoll is not null
+                && weaponSlot >= 0
+                && weaponSlot < paperdoll.Length
+                && paperdoll[weaponSlot].Durability <= 0)
+            {
+                Network.PlayerMessage(session.Id, "This item is broken! Please fix it at a broker!", (int)ColorName.BrightRed);
+                return;
+            }
+        }
+
         // Projectile check
         if (GetPaperdoll(session.Id, Equipment.Weapon) >= 0)
         {
@@ -1733,6 +1751,10 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
 
         Skill.Instance[skill].SpCost = buffer.ReadInt32();
 
+        Skill.Instance[skill].NextRank = buffer.ReadInt32();
+        Skill.Instance[skill].NextUses = buffer.ReadInt32();
+    
+
         // Save it
         Network.UpdateSkillToAll(skill);
         Skill.OnSave(skill);
@@ -2042,7 +2064,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         if (GetAccess(session.Id) < (byte)Access.Developer)
             return;
 
-        MapItem.OnSpawn(tmpItem, tmpAmount, GetMap(session.Id), GetX(session.Id), GetY(session.Id));
+        MapItem.OnSpawn(tmpItem, tmpAmount, GetMap(session.Id), GetX(session.Id), GetY(session.Id), Item.Instance[tmpItem].MaxDurability);
     }
 
     public static async ValueTask TrainStat(GameSession session, ReadOnlyMemory<byte> bytes)
@@ -2125,6 +2147,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         }
 
         PlayerBase.Instance[session.Id].Skill[skillSlot].Num = -1;
+        PlayerBase.Instance[session.Id].Skill[skillSlot].Uses = 0;
         Network.PlayerSkills(session.Id);
     }
 
@@ -2400,28 +2423,32 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             // player
             if (Data.TempPlayer[session.Id].TradeOffer[i].Num >= 0)
             {
-                item = (int)PlayerBase.Instance[session.Id].Inventory[(int)Data.TempPlayer[session.Id].TradeOffer[i].Num].Num;
+                var offeredSlot = (int)Data.TempPlayer[session.Id].TradeOffer[i].Num;
+                item = (int)PlayerBase.Instance[session.Id].Inventory[offeredSlot].Num;
                 if (item >= 0)
                 {
                     // store temp
                     tmpTradeItem[i].Num = item;
                     tmpTradeItem[i].Value = Data.TempPlayer[session.Id].TradeOffer[i].Value;
+                    tmpTradeItem[i].Durability = PlayerBase.Instance[session.Id].Inventory[offeredSlot].Durability;
                     // take item
-                    Server.Player.TakeInvSlot(session.Id, (int)Data.TempPlayer[session.Id].TradeOffer[i].Num, tmpTradeItem[i].Value);
+                    Server.Player.TakeInvSlot(session.Id, offeredSlot, tmpTradeItem[i].Value);
                 }
             }
 
             // target
             if (Data.TempPlayer[tradeTarget].TradeOffer[i].Num >= 0)
             {
-                item = GetInv(tradeTarget, (int)Data.TempPlayer[tradeTarget].TradeOffer[i].Num);
+                var offeredSlot = (int)Data.TempPlayer[tradeTarget].TradeOffer[i].Num;
+                item = GetInv(tradeTarget, offeredSlot);
                 if (item >= 0)
                 {
                     // store temp
                     tmpTradeItem2[i].Num = item;
                     tmpTradeItem2[i].Value = Data.TempPlayer[tradeTarget].TradeOffer[i].Value;
+                    tmpTradeItem2[i].Durability = PlayerBase.Instance[tradeTarget].Inventory[offeredSlot].Durability;
                     // take item
-                    Server.Player.TakeInvSlot(tradeTarget, (int)Data.TempPlayer[tradeTarget].TradeOffer[i].Num, tmpTradeItem2[i].Value);
+                    Server.Player.TakeInvSlot(tradeTarget, offeredSlot, tmpTradeItem2[i].Value);
                 }
             }
         }
@@ -2434,14 +2461,14 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             if (tmpTradeItem2[i].Num >= 0)
             {
                 // give away!
-                Server.Player.GiveInv(session.Id, (int)tmpTradeItem2[i].Num, tmpTradeItem2[i].Value, 0, false);
+                Server.Player.GiveInv(session.Id, (int)tmpTradeItem2[i].Num, tmpTradeItem2[i].Value, 0, false, tmpTradeItem2[i].Durability);
             }
 
             // target
             if (tmpTradeItem[i].Num >= 0)
             {
                 // give away!
-                Server.Player.GiveInv(tradeTarget, (int)tmpTradeItem[i].Num, tmpTradeItem[i].Value, 0, false);
+                Server.Player.GiveInv(tradeTarget, (int)tmpTradeItem[i].Num, tmpTradeItem[i].Value, 0, false, tmpTradeItem[i].Durability);
             }
         }
 
@@ -3279,6 +3306,8 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
         Item.Instance[index].CommonEventType = packetReader.ReadByte();
         Item.Instance[index].CommonEventData1 = packetReader.ReadInt32();
         Item.Instance[index].CommonEventData2 = packetReader.ReadInt32();
+
+        Item.Instance[index].MaxDurability = packetReader.ReadInt32();
     
         Item.OnSave(index);
 
@@ -3314,13 +3343,28 @@ public sealed class GamePacketParser : PacketParser<Packets.ClientPackets, GameS
             return;
         }
 
-        if (Item.Instance[GetInv(session.Id, inv)].Type == (byte)ItemCategory.Currency ||
-            Item.Instance[GetInv(session.Id, inv)].Stackable == 1)
+        // Never allow dropping zero/negative amounts.
+        if (amount < 1)
         {
-            if (amount < 0 | amount > GetInvValue(session.Id, inv))
+            Network.PlayerMessage(session.Id, "You must drop at least 1.", (int)ColorName.BrightRed);
+            return;
+        }
+
+        var itemId = GetInv(session.Id, inv);
+        var itemTemplate = Item.Instance[itemId];
+
+        if (itemTemplate.Type == (byte)ItemCategory.Currency ||
+            itemTemplate.Stackable == 1)
+        {
+            if (amount > GetInvValue(session.Id, inv))
             {
                 return;
             }
+        }
+        else
+        {
+            // Non-stackable items are dropped as a single instance regardless of client input.
+            amount = 1;
         }
 
         try

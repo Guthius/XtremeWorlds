@@ -23,7 +23,7 @@
 		<Label Name="lblGuild2" Text="" Position="10,70" Size="142,10" Font="georgiaBold_16" Align="Right"/>
 		<Label Name="lblHealth2" Text="" Position="10,90" Size="142,10" Font="georgiaBold_16" Align="Right"/>
 		<Label Name="lblSpirit2" Text="" Position="10,110" Size="142,10" Font="georgiaBold_16" Align="Right"/>
-		<Label Name="lblExperience2" Text="" Position="10,130" Size="142,10" Font="georgiaBold_16" Align="Right"/>
+		<Label Name="lblExperience2" Text="" Position="10,130" Size="158,10" Font="georgiaBold_16" Align="Right"/>
 
 		<PictureBox Name="picShadow" Position="14,154" Size="134,9" Design="BlackOval"/>
 		<Label Name="lblAttributes" Text="Attributes" Position="14,154" Size="134,10" Font="georgiaBold_16" Align="Center"/>
