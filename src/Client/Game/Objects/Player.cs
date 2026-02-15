@@ -1256,6 +1256,9 @@ namespace Client
             if (sprite <= 0 | sprite > GameState.NumCharacters)
                 return;
 
+            if (Item.Instance.Count <= GetPaperdoll(index, Equipment.Weapon))
+                return;
+                
             // Derive attack speed duration (ms). If stored as seconds, multiply here; if already ms, keep as-is.
             if (GetPaperdoll(index, Equipment.Weapon) >= 0)
             {
