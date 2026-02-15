@@ -614,7 +614,7 @@ public static class Database
             var vitalCount = Enum.GetValues(typeof(Vital)).Length;
             for (i = 0; i < vitalCount; i++)
             {
-                int value = Script.Instance?.GetPlayerMaxVital(index, (Vital)i) ?? 0;
+                int value = Script.Instance?.GetMaxVital(index, (Vital)i) ?? 0;
                 SetVital(index, (Vital)i, value);
             }
 

@@ -526,7 +526,7 @@ public static class Network
         }
 
         packetWriter.WriteInt32(GetVital(playerId, vital));
-        packetWriter.WriteInt32(Script.Instance?.GetPlayerMaxVital(playerId, vital));
+        packetWriter.WriteInt32(Script.Instance?.GetMaxVital(playerId, vital));
 
         PlayerService.Instance.SendDataTo(playerId, packetWriter.GetBytes());
 
