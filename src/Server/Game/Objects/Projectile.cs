@@ -380,6 +380,7 @@ public class Projectile : ProjectileBase, IAsyncData
                     if (Data.MapProjectile[x, i].Index >= 0)
                     {
                         MapProjectile.OnClear(x, i);
+                        Network.ProjectileToMap(x, i);
                     }
                 }
                 continue;
@@ -395,6 +396,7 @@ public class Projectile : ProjectileBase, IAsyncData
                 if (mp.Timer > 0 && now > mp.Timer)
                 {
                     MapProjectile.OnClear(x, i);
+                    Network.ProjectileToMap(x, i);
                     continue;
                 }
 
@@ -402,6 +404,7 @@ public class Projectile : ProjectileBase, IAsyncData
                 if (!TryGetProjectileSlot(index, out var speed, out var range, out var damage, out var animation))
                 {
                     MapProjectile.OnClear(x, i);
+                    Network.ProjectileToMap(x, i);
                     continue;
                 }
 
@@ -517,6 +520,7 @@ public class Projectile : ProjectileBase, IAsyncData
                         OnAttack(x, ref mp, tx, ty, index);
                     }
                     MapProjectile.OnClear(x, i);
+                    Network.ProjectileToMap(x, i);
                     continue;
                 }
 
@@ -536,6 +540,7 @@ public class Projectile : ProjectileBase, IAsyncData
                         }
                     }
                     MapProjectile.OnClear(x, i);
+                    Network.ProjectileToMap(x, i);
                     continue;
                 }
 
@@ -549,6 +554,7 @@ public class Projectile : ProjectileBase, IAsyncData
                     }
                     
                     MapProjectile.OnClear(x, i);
+                    Network.ProjectileToMap(x, i);
                     continue;
                 }
 
@@ -604,6 +610,7 @@ public class Projectile : ProjectileBase, IAsyncData
                         General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(OnUpdate));
                     }
                     MapProjectile.OnClear(x, i);
+                    Network.ProjectileToMap(x, i);
                     continue;
                 }
 
@@ -651,6 +658,7 @@ public class Projectile : ProjectileBase, IAsyncData
                         General.Logger.LogError(ex, "[Script] Error in {MethodName}", nameof(OnUpdate));
                     }
                     MapProjectile.OnClear(x, i);
+                    Network.ProjectileToMap(x, i);
                     continue;
                 }
 
