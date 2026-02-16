@@ -500,6 +500,7 @@ public class Projectile : ProjectileBase, IAsyncData
                             OnAttack(x, ref mp, tx, ty, index);
                         }
                         MapProjectile.OnClear(x, i);
+                        Network.ProjectileToMap(x, i);
                         continue;
                     }
                 }
@@ -520,8 +521,8 @@ public class Projectile : ProjectileBase, IAsyncData
                 }
 
                 // Bounds check
-                int tileX = Math.Clamp(mp.X / Constants.TileSize, 0, Math.Max(0, Server.Map.Instance[x].MaxX - 1));
-                int tileY = Math.Clamp(mp.Y / Constants.TileSize, 0, Math.Max(0, Server.Map.Instance[x].MaxY - 1));
+                int tileX = Math.Clamp(mp.X / Constants.TileSize, 0, Server.Map.Instance[x].MaxX);
+                int tileY = Math.Clamp(mp.Y / Constants.TileSize, 0, Server.Map.Instance[x].MaxY);
                 if (tileX < 0 || tileY < 0 || tileX >= Server.Map.Instance[x].MaxX || tileY >= Server.Map.Instance[x].MaxY)
                 {
                     if (animation >= 0)
