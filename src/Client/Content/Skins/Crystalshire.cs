@@ -2043,7 +2043,7 @@ public class Crystalshire
         BindStatSlider("sldSpr", () => Item.Instance[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Spirit], v => Item.Instance[WinItemEditor.SelectedIndex].AddStat[(int)Stat.Spirit] = v);
 
         // Vital mod (Data1 for consumables)    
-        BindIntText("txtVitalMod", v =>
+        BindIntText("txtVital", v =>
         {
             if (WinItemEditor.SelectedIndex >= 0)
             {
@@ -3090,12 +3090,12 @@ public class Crystalshire
             Job.Instance[id].Stat[(int)Stat.Strength] = v;
             Job.IsChanged[id] = true;
         }, 0, Core.Globals.Variables.MaxStats);
-        BindIntText("txtVit", v => {
+        BindIntText("txtVitality", v => {
             int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return;
             Job.Instance[id].Stat[(int)Stat.Vitality] = v;
             Job.IsChanged[id] = true;
         }, 0, Core.Globals.Variables.MaxStats);
-        BindIntText("txtInt", v => {
+        BindIntText("txtIntelligence", v => {
             int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return;
             Job.Instance[id].Stat[(int)Stat.Intelligence] = v;
             Job.IsChanged[id] = true;
@@ -3105,7 +3105,7 @@ public class Crystalshire
             Job.Instance[id].Stat[(int)Stat.Luck] = v;
             Job.IsChanged[id] = true;
         }, 0, Core.Globals.Variables.MaxStats);
-        BindIntText("txtSpi", v => {
+        BindIntText("txtSpirit", v => {
             int id = WinJobEditor.SelectedIndex; if (id < 0 || id >= Job.Instance.Count) return;
             Job.Instance[id].Stat[(int)Stat.Spirit] = v;
             Job.IsChanged[id] = true;

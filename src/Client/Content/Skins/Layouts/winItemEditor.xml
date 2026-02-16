@@ -67,8 +67,8 @@
     <!-- Use group (consumable/skill/projectile/event). This shares the same screen area as grpEquip; type toggles hide/show. -->
     <GroupBox Name="grpItemUse" Caption="" Position="260, 290" Size="842, 150">
         <!-- Consumable (Vital) -->
-        <Label Name="lblVitalMod" Text="Vital Mod" Position="8, 12" Size="100, 16"/>
-        <TextBox Name="txtVitalMod" Position="120, 10" Size="140, 20" Design="TextWhite"/>
+        <Label Name="lblVitalMod" Text="Vital" Position="8, 12" Size="100, 16"/>
+        <TextBox Name="txtVital" Position="120, 10" Size="140, 20" Design="TextWhite"/>
 
         <!-- Event -->
         <Label Name="lblEventHeader" Text="Event" Position="8, 12" Size="60, 16"/>

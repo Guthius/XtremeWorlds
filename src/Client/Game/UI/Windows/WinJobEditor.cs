@@ -108,7 +108,7 @@ namespace Client.Game.UI.Windows
                 }
                 cmbItem.Value = (prev >= 0 && prev < cmbItem.Items.Count) ? prev : 0;
             }
-            // Skills combo: 0=None, then 1..MaxSkills with names
+
             if (WindowManager.TryGetControl("winJobEditor", "cmbSkill", out var skCtrl) && skCtrl is ComboBox cmbSkill)
             {
                 int prev = cmbSkill.Value;
@@ -190,9 +190,9 @@ namespace Client.Game.UI.Windows
             GameState.EditorIndex = index;
 
             if (WindowManager.TryGetControl("winJobEditor", "txtName", out var nameCtrl) && nameCtrl is TextBox txtName)
-                txtName.Text = job.Name ?? string.Empty;
+                txtName.Text = job.Name;
             if (WindowManager.TryGetControl("winJobEditor", "txtDesc", out var descCtrl) && descCtrl is TextBox txtDesc)
-                txtDesc.Text = job.Desc ?? string.Empty;
+                txtDesc.Text = job.Desc;
 
             if (WindowManager.TryGetControl("winJobEditor", "txtStartMap", out var sm)) sm.Text = job.StartMap.ToString();
             if (WindowManager.TryGetControl("winJobEditor", "txtStartX", out var sx)) sx.Text = job.StartX.ToString();
@@ -205,13 +205,13 @@ namespace Client.Game.UI.Windows
             {
                 if (WindowManager.TryGetControl("winJobEditor", "txtStrength", out var st) && st is TextBox tbStr)
                     tbStr.Text = job.Stat[(int)Stat.Strength].ToString();
-                if (WindowManager.TryGetControl("winJobEditor", "txtVit", out var vt) && vt is TextBox tbVit)
+                if (WindowManager.TryGetControl("winJobEditor", "txtVitality", out var vt) && vt is TextBox tbVit)
                     tbVit.Text = job.Stat[(int)Stat.Vitality].ToString();
-                if (WindowManager.TryGetControl("winJobEditor", "txtInt", out var it) && it is TextBox tbInt)
+                if (WindowManager.TryGetControl("winJobEditor", "txtIntelligence", out var it) && it is TextBox tbInt)
                     tbInt.Text = job.Stat[(int)Stat.Intelligence].ToString();
                 if (WindowManager.TryGetControl("winJobEditor", "txtLuck", out var lk) && lk is TextBox tbLuck)
                     tbLuck.Text = job.Stat[(int)Stat.Luck].ToString();
-                if (WindowManager.TryGetControl("winJobEditor", "txtSpi", out var sp) && sp is TextBox tbSpi)
+                if (WindowManager.TryGetControl("winJobEditor", "txtSpirit", out var sp) && sp is TextBox tbSpi)
                     tbSpi.Text = job.Stat[(int)Stat.Spirit].ToString();
             }
 
