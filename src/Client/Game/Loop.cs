@@ -12,6 +12,7 @@ using Type = Core.Globals.Type;
 using Core.Common;
 using System.Collections.Generic;
 using System.Text;
+using System.Reflection.Metadata;
 
 namespace Client
 {
@@ -287,6 +288,25 @@ namespace Client
                         SetProgress(10, _tick);
                         SetStage("Ping", _tick);
                         Sender.GetPing();
+                        for (int i = 0; i < Player.Instance.Count; i++)
+                        {
+                            if (IsPlaying(i))
+                            {
+                                if (Player.Instance[i].DeathTimer > 0)
+                                {
+                                    Player.Instance[i].DeathTimer -= 1000;
+                                }
+                            }
+                        }
+
+                        for (int i = 0; i < MapNpc.Instance.Length; i++)
+                        {
+                            if (MapNpc.Instance[i].DeathTimer > 0)
+                            {
+                                MapNpc.Instance[i].DeathTimer -= 1000;
+                            }
+                        }
+                        
                         _tmr1000 = _tick + 1000;
                     }
 

@@ -535,7 +535,7 @@ namespace Client
                     case "/respawnnow":
                     case "/giveup":
                         {
-                            var remaining = (int)(Player.Instance[GameState.MyIndex].DeathTimer - General.GetTickCount()) / 1000;
+                            var remaining = (int)(Player.Instance[GameState.MyIndex].DeathTimer / 1000);
                             if (remaining < 0) remaining = 0;
 
                             if (remaining <= 0)

@@ -17,6 +17,7 @@ namespace Client
     public class MapNpc : IData
     {
         public static MapNpcData[] Instance { get; } = new MapNpcData[Core.Globals.Variables.MaxMapNpcs];
+        
         public static void OnClear(int index)
         {
             ref var instance = ref MapNpc.Instance[index];
@@ -59,7 +60,7 @@ namespace Client
                 case 2: color = Color.Yellow; backColor = Color.Black; break;
             }
 
-            var remaining = (MapNpc.Instance[mapNpc].DeathTimer - General.GetTickCount()) / 1000;
+            var remaining = MapNpc.Instance[mapNpc].DeathTimer / 1000;
             if (remaining < 0) remaining = 0;
 
             var name = remaining > 0 ? $"{remaining}..." : Npc.Instance[mapNpc].Name;

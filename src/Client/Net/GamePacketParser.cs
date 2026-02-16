@@ -638,7 +638,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         mapNpc.Dir = packetReader.ReadByte();
 
         // Server sends remaining ms until respawn (0 if alive)
-        var deathTimer = packetReader.ReadInt32();
+        var deathTimer = packetReader.ReadInt32();  
         mapNpc.DeathTimer = deathTimer;
 
         var vitalCount = Enum.GetValues<Vital>().Length;

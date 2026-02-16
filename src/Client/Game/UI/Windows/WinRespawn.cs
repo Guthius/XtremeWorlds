@@ -12,7 +12,7 @@ public class WinRespawn
             return;
         }
 
-        var remaining = Player.Instance[GameState.MyIndex].DeathTimer - Client.General.GetTickCount();
+        var remaining = Player.Instance[GameState.MyIndex].DeathTimer;
         if (remaining <= 0)
         {
             return;

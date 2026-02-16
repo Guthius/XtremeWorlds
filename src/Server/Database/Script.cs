@@ -1472,7 +1472,7 @@ public class Script
             if (map >= 0 && map < Core.Globals.Variables.MaxMaps && id >= 0 && id < Core.Globals.Variables.MaxMapNpcs)
             {
                 // Loot
-            DropNpcLoot(map, id);
+                DropNpcLoot(map, id);
 
                 // Mark dead & schedule respawn with a 60-second countdown via action messages
                 ref var mapNpc = ref MapNpc.Instance[map, id];

@@ -1956,18 +1956,8 @@ public static class Network
             packet.WriteByte(MapNpc.Instance[map, i].Dir);
 
             // Remaining ms until respawn (0 if alive)
-            var remaining = 0;
-            var expiry = MapNpc.Instance[map, i].DeathTimer;
-            if (expiry > 0)
-            {
-                var now = General.GetTime();
-                var ms = expiry - now;
-                if (ms > 0 && ms <= int.MaxValue)
-                {
-                    remaining = (int)ms;
-                }
-            }
-            packet.WriteInt32(remaining);
+            var deathTimer = MapNpc.Instance[map, i].DeathTimer;
+            packet.WriteInt32(deathTimer);
         }
 
         NetworkConfig.SendDataToMap(map, packet.GetBytes());
@@ -1987,18 +1977,8 @@ public static class Network
             packet.WriteByte(MapNpc.Instance[map, i].Dir);
 
             // Remaining ms until respawn (0 if alive)
-            var remaining = 0;
-            var expiry = MapNpc.Instance[map, i].DeathTimer;
-            if (expiry > 0)
-            {
-                var now = General.GetTime();
-                var ms = expiry - now;
-                if (ms > 0 && ms <= int.MaxValue)
-                {
-                    remaining = (int)ms;
-                }
-            }
-            packet.WriteInt32(remaining);
+            var deathTimer = MapNpc.Instance[map, i].DeathTimer;
+            packet.WriteInt32(deathTimer);
         }
 
         PlayerService.Instance.SendDataTo(playerId, packet.GetBytes());
