@@ -639,7 +639,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         // Server sends remaining ms until respawn (0 if alive)
         var deathTimer = packetReader.ReadInt32();
-        mapNpc.DeathTimer = deathTimer > 0 ? Client.General.GetTickCount() + deathTimer : 0;
+        mapNpc.DeathTimer = deathTimer;
 
         var vitalCount = Enum.GetValues<Vital>().Length;
         for (i = 0; i < vitalCount; i++)
@@ -659,7 +659,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
         // Keep the corpse visible until the timer expires.
         ref var mapNpc = ref MapNpc.Instance[npc];
-        mapNpc.DeathTimer = timer > 0 ? Client.General.GetTickCount() + timer : 0;
+        mapNpc.DeathTimer = timer;
         mapNpc.Attacking = 0;
         mapNpc.AttackTimer = 0;
         mapNpc.Moving = 0;
@@ -672,7 +672,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
         var playerId = packetReader.ReadInt32();
 
         // Timer from server is remaining ms until respawn (0 if alive). Only convert to an absolute expiry when > 0.
-        Player.Instance[playerId].DeathTimer = timer > 0 ? Client.General.GetTickCount() + timer : 0;
+        Player.Instance[playerId].DeathTimer = timer;
 
         // If we just died, hard-stop movement immediately.
         if (playerId == GameState.MyIndex && timer > 0)
@@ -2305,7 +2305,7 @@ public sealed class GamePacketParser : PacketParser<Packets.ServerPackets>
 
             // Server sends remaining ms until respawn (0 if alive)
             var deathTimer = buffer.ReadInt32();
-            instance.DeathTimer = deathTimer > 0 ? Client.General.GetTickCount() + deathTimer : 0;
+            instance.DeathTimer = deathTimer;
         }
     }
 
