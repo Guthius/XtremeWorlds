@@ -25,9 +25,9 @@ namespace Client
             if (Map.Instance.Count <= GetMap(GameState.MyIndex))
                 return isInBounds;
                 
-            if (GameState.CurX >= 0 & GameState.CurX <= Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX)
+            if (GameState.CurX >= 0 && GameState.CurX <= Client.Map.Instance[GetMap(GameState.MyIndex)].MaxX)
             {
-                if (GameState.CurY >= 0 & GameState.CurY <= Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY)
+                if (GameState.CurY >= 0 && GameState.CurY <= Client.Map.Instance[GetMap(GameState.MyIndex)].MaxY)
                 {
                     isInBounds = true;
                 }
@@ -842,7 +842,7 @@ namespace Client
 
             // Set the global index
             GameState.ChatBubbleindex = GameState.ChatBubbleindex + 1;
-            if (GameState.ChatBubbleindex < 1 | GameState.ChatBubbleindex > byte.MaxValue)
+            if (GameState.ChatBubbleindex < 1 || GameState.ChatBubbleindex > byte.MaxValue)
                 GameState.ChatBubbleindex = 1;
 
             // Default to new bubble
@@ -1439,8 +1439,8 @@ namespace Client
                     continue;
                 }
                 
-                if (GameState.CurMouseX >= rec.Left & GameState.CurMouseX <= rec.Right && 
-                    GameState.CurMouseY >= rec.Top & GameState.CurMouseY <= rec.Bottom)
+                if (GameState.CurMouseX >= rec.Left && GameState.CurMouseX <= rec.Right && 
+                    GameState.CurMouseY >= rec.Top && GameState.CurMouseY <= rec.Bottom)
                 {
                     return i;
                 }
@@ -1451,8 +1451,6 @@ namespace Client
 
         public static void ShowInvDesc(int x, int y, int invSlot)
         {
-            // reserved for future use
-
             if (invSlot < 0 || invSlot >= Core.Globals.Variables.MaxInventory)
                 return;
 
@@ -1467,9 +1465,8 @@ namespace Client
         public static void ShowItemDesc(int x, int y, int item, int inv = -1, int eq = -1, int durability = -1)
         {
             var color = default(Microsoft.Xna.Framework.Color);
-            string theName = string.Empty;
-            string jobName;
-            string levelTxt;
+            string name;
+            string level;
 
             // Defensive guards: UI hover can race with item list streaming/clears.
             if (item < 0 || item >= Item.Instance.Count)
@@ -1527,11 +1524,24 @@ namespace Client
                             }
                         }
                     }
+
+                    // If not found in inventory, try paperdoll/equipped items
+                    if (durability < 0 && eqArr != null)
+                    {
+                        for (var i = 0; i < eqArr.Length; i++)
+                        {
+                            if (eqArr[i].Num == item)
+                            {
+                                durability = eqArr[i].Durability;
+                                break;
+                            }
+                        }
+                    }
                 }
             }
 
             // set globals
-            GameState.DescType = (byte)DraggablePartType.Item; // inventory
+            GameState.DescType = (byte)DraggablePartType.Item;
             GameState.DescItem = item;
 
             // set position (guard if UI not ready)
@@ -1548,7 +1558,7 @@ namespace Client
             WindowManager.ShowWindow("winDescription", resetPosition: false);
 
             // exit out early if last is same
-            if (GameState.DescLastType == GameState.DescType & GameState.DescLastItem == GameState.DescItem)
+            if (GameState.DescLastType == GameState.DescType && GameState.DescLastItem == GameState.DescItem)
                 return;
 
             // set last to this
@@ -1582,7 +1592,7 @@ namespace Client
             }
             if (picDur is Client.Game.UI.Controls.PictureBox durBarCtrl)
             {
-                var maxDurability = itemEntry.MaxDurability;
+                var maxDurability = durability;
                 if (maxDurability > 0)
                 {
                     var curDur = Math.Clamp(durability, 0, maxDurability);
@@ -1605,19 +1615,19 @@ namespace Client
                 if (invValid)
                 {
                     var invEntry = invArr![inv];
-                    theName = invEntry.Bound > 0 ? "(SB) " + itemEntry.Name : itemEntry.Name;
+                    name = invEntry.Bound > 0 ? "(SB) " + itemEntry.Name : itemEntry.Name;
 
                     if (WindowManager.TryGetControl("winDescription", "lblName", out var lblName))
-                        lblName!.Text = theName;
+                        lblName!.Text = name;
                 }
 
                 if (eqValid)
                 {
                     var eqEntry = eqArr![eq];
-                    theName = eqEntry.Bound > 0 ? "(SB) " + itemEntry.Name : itemEntry.Name;
+                    name = eqEntry.Bound > 0 ? "(SB) " + itemEntry.Name : itemEntry.Name;
 
                     if (WindowManager.TryGetControl("winDescription", "lblName", out var lblName))
-                        lblName!.Text = theName;
+                        lblName!.Text = name;
                 }
 
                 switch ((Core.Globals.Rarity)itemEntry.Rarity)
@@ -1651,7 +1661,7 @@ namespace Client
                 // class req
                 if (itemEntry.JobReq > 0)
                 {
-                    jobName = Job.Instance[itemEntry.JobReq].Name;
+                    name = Job.Instance[itemEntry.JobReq].Name;
                     // do we match it?
                     if (GetJob(GameState.MyIndex) == itemEntry.JobReq)
                     {
@@ -1664,20 +1674,20 @@ namespace Client
                 }
                 else
                 {
-                    jobName = "No Job Req.";
+                    name = "No Job Req.";
                     color = Microsoft.Xna.Framework.Color.Green;
                 }
 
                 if (WindowManager.TryGetControl("winDescription", "lblJob", out var lblJob0))
                 {
-                    lblJob0!.Text = jobName;
+                    lblJob0!.Text = name;
                     lblJob0!.Color = color;
                 }
 
                 // level
                 if (itemEntry.LevelReq > 0)
                 {
-                    levelTxt = "Level " + itemEntry.LevelReq;
+                    level = "Level " + itemEntry.LevelReq;
                     // do we match it?
                     if (GetLevel(GameState.MyIndex) >= itemEntry.LevelReq)
                     {
@@ -1690,11 +1700,11 @@ namespace Client
                 }
                 else
                 {
-                    levelTxt = "No Level Req.";
+                    level = "No Level Req.";
                     color = Microsoft.Xna.Framework.Color.Green;
                 }
                 if (WindowManager.TryGetControl("winDescription", "lblLevel", out var lblLevel0))
-                    lblLevel0!.Text = levelTxt;
+                    lblLevel0!.Text = level;
                 if (WindowManager.TryGetControl("winDescription", "lblLevel", out var lblLevel1))
                     lblLevel1!.Color = color;
             }
@@ -1872,7 +1882,7 @@ namespace Client
                 return;
 
             // set globals
-            GameState.DescType = 2; // Skill
+            GameState.DescType = (byte)DraggablePartType.Skill;
             GameState.DescItem = skill;
 
             // set position (guard if UI not ready)
@@ -1886,10 +1896,12 @@ namespace Client
             WindowManager.ShowWindow("winDescription", resetPosition: false);
 
             // exit out early if last is same
-            if (GameState.DescLastType == GameState.DescType & GameState.DescLastItem == GameState.DescItem)
+            if (GameState.DescLastType == GameState.DescType && GameState.DescLastItem == GameState.DescItem)
                 return;
 
             // clear
+            GameState.DescLastType = GameState.DescType;
+            GameState.DescLastItem = GameState.DescItem;
             GameState.Description = new Type.Text[2];
 
             // hide req. labels
@@ -1901,12 +1913,13 @@ namespace Client
             {
                 var instance = WindowManager.GetWindowByName("winDescription");
                 if (instance is null) return;
+
                 // set name
-                if (WindowManager.TryGetControl("winDescription", "lblName", out var lblName2))
+                if (WindowManager.TryGetControl("winDescription", "lblName", out var name))
                 {
                     if (Skill.Instance.Count <= skill) return;
-                    lblName2!.Text = Skill.Instance[(int)skill].Name;
-                    lblName2!.Color = Microsoft.Xna.Framework.Color.White;
+                    name!.Text = Skill.Instance[(int)skill].Name;
+                    name!.Color = Microsoft.Xna.Framework.Color.White;
                 }
 
                 // find ranks
@@ -2002,7 +2015,7 @@ namespace Client
                         }
 
                         // dot
-                        if (Skill.Instance[(int)skill].Duration > 0 & Skill.Instance[(int)skill].Interval > 0)
+                        if (Skill.Instance[(int)skill].Duration > 0 && Skill.Instance[(int)skill].Interval > 0)
                         {
                             AddDescInfo("DoT: " + Skill.Instance[(int)skill].Duration / (double)Skill.Instance[(int)skill].Interval + " tick", Microsoft.Xna.Framework.Color.White);
                         }
@@ -2014,7 +2027,7 @@ namespace Client
 
         public static void ShowShopDesc(int x, int y, int item)
         {
-            if (item < 0L | item > Core.Globals.Variables.MaxItems)
+            if (item < 0L || item > Core.Globals.Variables.MaxItems)
                 return;
 
             // show
@@ -2033,7 +2046,6 @@ namespace Client
 
             // show
             ShowItemDesc(x, y, Player.Instance[GameState.MyIndex].Paperdoll[(int)eq].Num, -1, (byte)eq);
-            
         }
 
         public static void AddDescInfo(string text, Microsoft.Xna.Framework.Color color)
@@ -2159,7 +2171,7 @@ namespace Client
                             if (IsPlaying((int)pIndex))
                             {
                                 // get their health
-                                if (GetVital((int)pIndex, Core.Globals.Vital.Health) > 0 & GetMaxVital((int)pIndex, Core.Globals.Vital.Health) > 0)
+                                if (GetVital((int)pIndex, Core.Globals.Vital.Health) > 0 && GetMaxVital((int)pIndex, Core.Globals.Vital.Health) > 0)
                                 {
                                     width = (int)Math.Round(GetVital((int)pIndex, Core.Globals.Vital.Health) / (double)barWidth / (GetMaxVital((int)pIndex, Core.Globals.Vital.Health) / (double)barWidth) * barWidth);
                                     instance.Controls[WindowManager.GetControl("winParty", "picBar_HP" + i)].Width = width;
@@ -2169,7 +2181,7 @@ namespace Client
                                     instance.Controls[WindowManager.GetControl("winParty", "picBar_HP" + i)].Width = 0;
                                 }
                                 // get their spirit
-                                if (GetVital((int)pIndex, Core.Globals.Vital.Stamina) > 0 & GetMaxVital((int)pIndex, Core.Globals.Vital.Stamina) > 0)
+                                if (GetVital((int)pIndex, Core.Globals.Vital.Stamina) > 0 && GetMaxVital((int)pIndex, Core.Globals.Vital.Stamina) > 0)
                                 {
                                     width = (int)Math.Round(GetVital((int)pIndex, Core.Globals.Vital.Stamina) / (double)barWidth / (GetMaxVital((int)pIndex, Core.Globals.Vital.Stamina) / (double)barWidth) * barWidth);
                                     instance.Controls[WindowManager.GetControl("winParty", "picBar_SP" + i)].Width = width;
@@ -2205,7 +2217,7 @@ namespace Client
         public static void ShowPlayerMenu(long index, int x, int y)
         {
             GameState.PlayerMenuIndex = index;
-            if (GameState.PlayerMenuIndex == 0L | GameState.PlayerMenuIndex == GameState.MyIndex)
+            if (GameState.PlayerMenuIndex == 0L || GameState.PlayerMenuIndex == GameState.MyIndex)
                 return;
             WindowManager.Windows[WindowManager.GetWindow("winPlayerMenu")].X = x - 5;
             WindowManager.Windows[WindowManager.GetWindow("winPlayerMenu")].Y = y - 5;
@@ -2501,7 +2513,7 @@ namespace Client
 
         private static bool IsTransparent(int x, int y)
         {
-            if (Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Type == TileType.Blocked | Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Type2 == TileType.Blocked)
+            if (Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Type == TileType.Blocked || Client.Map.Instance[GetMap(GameState.MyIndex)].Tile[x, y].Type2 == TileType.Blocked)
             {
                 return false;
             }
